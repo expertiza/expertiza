@@ -1,0 +1,49 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+due_date1:
+    id: 1
+    due_at: <%= StudentAssignmentHelper::date_plus_days(-7) %>
+    deadline_type_id: 1
+    assignment_id: 1
+
+due_date2:
+    id: 2
+    due_at: <%= StudentAssignmentHelper::date_plus_days(-6) %>
+    deadline_type_id: 2
+    assignment_id: 1
+
+due_date3:
+    id: 3
+    due_at: <%= StudentAssignmentHelper::date_plus_days(-5) %>
+    deadline_type_id: 3
+    assignment_id: 1
+    
+due_date4:
+    id: 4
+    due_at: <%= StudentAssignmentHelper::date_plus_days(-4) %>
+    deadline_type_id: 4
+    assignment_id: 1    
+
+due_date5:
+    id: 5
+    due_at: <%= StudentAssignmentHelper::date_plus_days(-3) %>
+    deadline_type_id: 5
+    assignment_id: 1
+    
+
+due_date6:
+    id: 6
+    due_at: <%= StudentAssignmentHelper::date_plus_days(-2) %>
+    deadline_type_id: 1
+    assignment_id: 2
+
+due_date7:
+    id: 7
+    due_at: <%= StudentAssignmentHelper::date_plus_days(3) %>
+    deadline_type_id: 2
+    assignment_id: 2
+    
+due_date8:
+    id: 8
+    due_at: <%= StudentAssignmentHelper::date_plus_days(4) %>
+    deadline_type_id: 3
+    assignment_id: 2

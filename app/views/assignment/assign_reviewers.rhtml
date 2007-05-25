@@ -1,0 +1,13 @@
+<h1>Assign Reviewers for <%= @assignment.name %></h1>
+<%= start_form_tag ({:action => 'save_reviewer_mappings'}, {:method => 'post' }) %>
+<p>Number of reviews done per student: <%= text_field 'assignment', 'num_reviewers', "size" => 1 %>&nbsp;&nbsp;
+Number of reviews <em>of reviews</em> done per student: <%= text_field 'assignment', 'num_review_of_reviewers', "size" => 1 %></p>
+<p>Review strategy: <%= collection_select 'assignment', 'review_strategy_id', @review_strategies, :id, :name %> &nbsp;&nbsp; 
+Mapping strategy: <%= collection_select 'assignment', 'mapping_strategy_id', @mapping_strategies, :id, :name %> &nbsp;&nbsp;
+</p>
+<%= hidden_field_tag 'assignment_id', @assignment.id %>
+<input type='submit' value= 'Save' />
+<% end_form_tag %>
+<br/><br/>
+
+<%= link_to 'Back', :action => 'list' %>

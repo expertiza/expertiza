@@ -1,0 +1,24 @@
+<h1>Editing assignment</h1>
+
+<%= start_form_tag :action => 'update', :id => @assignment %>
+  <%= render :partial => 'form' %>
+  
+  <table>
+  <% 	i = 1;
+		for @due_date in @assignment.due_dates %>
+	<tr>
+		<td><%= text_field 'due_date[]', 'due_at', :size=>30%></td>
+		<td><%= select('due_date[]', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+		<td><%= select('due_date[]', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+		<td><%= select('due_date[]', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+		<td><%= select('due_date[]', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+		<td><%= select('due_date[]', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+	</tr>
+	<% 	i += 1;
+		end %>
+    </table>
+  &nbsp;&nbsp;<%= submit_tag "Save assignment" %>
+<%= end_form_tag %>
+<br/>
+<div style="padding: 15px">
+<%= link_to 'Back', :action => 'list' %></div>

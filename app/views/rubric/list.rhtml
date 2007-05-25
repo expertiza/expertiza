@@ -1,0 +1,34 @@
+<h1>Rubrics</h1>
+
+<%= start_form_tag :action => 'list' %>
+	<%= select(:display_option, :name, 
+			   @display_options, {}, 
+			   {:onchange => "document.forms[0].submit()"} ) %>
+<%= end_form_tag %>
+<br />
+
+<% if @rubrics.length == 0 %>	
+	No rubrics match the criteria.<br/>
+<% else %>
+<table class="listing" cellpadding=2>
+  <tr>
+	<th></th>
+    <th>Rubric name</th>
+  </tr>
+ 
+<% for rubric in @rubrics %>
+  <tr class="listingRow">
+	<td></td>
+	<td><%= rubric.name %></td>
+	<td><%= link_to 'Edit', :action => 'edit_rubric', :id => rubric %></td>
+	<td><%= link_to 'Copy', :action => 'copy_rubric', :id => rubric %></td>
+	<td><%= link_to 'Advice', :action => 'edit_advice', :id => rubric %></td>
+	<td><%= link_to 'Delete', :action => 'delete_rubric', :id => rubric %></td>
+  </tr>
+<% end %>
+</table>
+
+<% end %>
+<br />
+
+<%= link_to 'New rubric', :action => 'new_rubric' %>

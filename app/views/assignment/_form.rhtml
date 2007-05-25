@@ -1,0 +1,46 @@
+<%= error_messages_for 'assignment' %>
+
+<!--[form:assignment]-->
+<table>
+ <tr>
+   <td><label for="assignment_name">Assignment name: </label><%= text_field 'assignment', 'name'  %></td>
+   <td style="padding: 5px"><label for="assignment_directory" id="assgt_directory">Assignment directory: </label><%= text_field 'assignment', 'directory_path'%></td>
+   <td>
+    <table>
+     <tr>
+      <td><label for="team_assignment">Team assignment:</label></td><td><%= check_box 'assignment', 'team_assignment', {}, true, false %></td>
+     </tr>
+      <td><label for="wiki_assignment" id="wiki_assgt">Wiki assignment:</label></td><td><%= check_box 'assignment', 'wiki_assignment', {}, true, false %></td>
+     </tr>
+    </table>
+   </td>
+  </tr>
+</table>
+
+<table>
+ <tr>
+  <td><label for="review_rubric">Review rubric:</label>
+      <select name="review_rubric_id"></select>
+  </td>
+  <td style="padding: 15px"><label for="review_weight">Review weight:</label>
+      <%= text_field 'assignment', 'review_weight'%>
+  </td>
+  <td style="padding: 15px"><label for="review_of_review_rubric">Review-of-review rubric:</label>
+      <select name="review_of_review_rubric_id"></select>
+  </td>
+ </tr>
+</table>
+<p>
+<table>
+ <tr>
+  <td><label for="reviews_visible_to_all">Should the reviews be visible to other reviewers?:</label></td>
+  <td><%= check_box 'assignment', 'reviews_visible_to_all', {}, true, false %></td>
+ </tr>
+ <tr>
+  <td><label for="require_signup">Must users sign up before submitting?:</label></td>
+  <td><%= check_box 'assignment', 'require_signup', {}, true, false %></td>
+ <tr>
+</table>
+<p>
+</p>
+<!--[eoform:assignment]-->

@@ -1,0 +1,9 @@
+<h1>New course</h1>
+
+<%= start_form_tag :action => 'create_course' %>
+  <%= render :partial => 'course' %>
+  <%= submit_tag "Create" %>
+<%= end_form_tag %>
+<br />
+
+<%= link_to 'Back', :action => 'list_folders' %>

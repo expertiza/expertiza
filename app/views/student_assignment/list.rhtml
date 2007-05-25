@@ -1,0 +1,29 @@
+<h1>Assignments</h1>
+
+Note: The number denoted with '-'(minus) sign in Final Grade column, is the amount of Penalty applied.<br><br>
+<table class="listing" cellpadding=2>
+  <tr>
+	<th></th>
+    <th>Assignment</th>
+	<th>Course</th>
+	<th>Topic</th>
+	<th>Current Stage</th>
+	<th>Stage Deadline</th>
+	<th>Grade</th>
+  </tr>
+ 
+<% for participant in @participants %>
+  <tr class="listingRow">
+	<td></td>
+	<td><%= link_to participant.assignment.name, :action => 'view_actions', :id => participant %></td>
+	<td><%= participant.get_course_string %></td>
+	<td><%= participant.get_topic_string %></td>
+	<td><%= StudentAssignmentHelper::get_current_stage(participant.assignment.id) %></td>
+	<td><%= StudentAssignmentHelper::get_stage_deadline(participant.assignment.id) %></td>
+	<td><%= StudentAssignmentHelper::get_grade(participant.id) %></td>
+  </tr>
+<% end %>
+</table>
+<br>
+To begin, first click on an assignment from the list above.
+<br />

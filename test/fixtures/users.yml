@@ -1,0 +1,87 @@
+suadmin_user:
+    id: 1
+    name: admin
+    password: <%= Digest::SHA1.hexdigest("admin") %>
+    role_id: 4
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+
+admin1:
+    id: 2
+    name: mkpatel2
+    fullname: Patel, Mrunal Kamlesh
+    password: <%= Digest::SHA1.hexdigest("mkpatel2") %>
+    email: mkpatel2@ncsu.edu
+    role_id: 3
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+    
+admin2:
+    id: 3
+    name: riwesley
+    fullname: Wesley, Ravinand Isaac
+    password: <%= Digest::SHA1.hexdigest("riwesley") %>
+    email: riwesley@ncsu.edu
+    role_id: 3
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+    
+admin3:
+    id: 4
+    name: nebergma
+    fullname: Bergman, Neil Edward
+    password: <%= Digest::SHA1.hexdigest("nebergma") %>
+    email: nebergma@ncsu.edu
+    role_id: 3
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+    
+instructor1:
+    id: 5
+    name: ed_gehringer
+    fullname: Gehringer, Ed
+    password: <%= Digest::SHA1.hexdigest("ed_gehringer") %>
+    email: ed_gehringer@yahoo.com
+    role_id: 2
+    parent_id: 2
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+    
+instructor2:
+    id: 6
+    name: janedoe
+    fullname: Doe, Jane
+    password: <%= Digest::SHA1.hexdigest("janedoe") %>
+    email: jane5231@gmail.com
+    role_id: 2
+    parent_id: 2
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+
+student1:
+    id: 7
+    name: eberg
+    fullname: Berger, Eric
+    password: <%= Digest::SHA1.hexdigest("eberg") %>
+    email: eric3494@gmail.com
+    role_id: 1
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+
+student2:
+    id: 8
+    name: hcombs
+    fullname: Combs, Hannah
+    password: <%= Digest::SHA1.hexdigest("hcombs") %>
+    email: han123@yahoo.com
+    role_id: 1
+    email_on_review: 0
+    email_on_submission: 0
+    email_on_review: 0

@@ -1,0 +1,16 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+par1:
+  id: 1
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: 1
+  assignment_id: 1
+  topic: Research EPA
+  
+par2:
+  id: 2
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: 1
+  assignment_id: 2
+  topic: Research Communication

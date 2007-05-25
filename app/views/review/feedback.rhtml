@@ -1,0 +1,6 @@
+<h1>Reviews</h1>
+<ul>
+<% for review in @reviews %>
+<li><%= link_to User.find((ReviewMapping.find(review.id)).author_id).name,{:controller => 'review', :action => 'view_review', :id => review.id},:post => true %>
+<% end %>
+</ul>

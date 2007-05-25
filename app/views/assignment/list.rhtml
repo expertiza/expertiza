@@ -1,0 +1,30 @@
+<h1>Assignments</h1>
+
+<%= start_form_tag :action => 'list' %>
+	<%= select(:display_option, :name, 
+			   @display_options, {}, 
+			   {:onchange => "document.forms[0].submit()"} ) %>
+<%= end_form_tag %>
+
+<table class="listing" cellpadding=2>
+  <tr>
+	<th></th>
+    <th>Assignment name&nbsp;&nbsp;</th>
+    <th>Directory&nbsp;&nbsp;</th>
+  </tr>
+  
+<% for assignment in @assignments %>
+  <tr class="listingRow">
+	<td></td>
+	<td><%= assignment.name %></td>
+	<td><%= assignment.directory_path %></td>
+	<td><%= link_to 'Edit', :action => 'edit', :id => assignment %>&nbsp;&nbsp;</td>
+	<td><%= link_to 'Copy', :action => 'copy', :id => assignment %>&nbsp;&nbsp;</td>
+	<td><%= link_to 'Assign reviewers', :action => 'assign_reviewers', :id => assignment %>&nbsp;&nbsp;</td>
+  </tr>
+<% end %>
+</table>
+<br />
+
+<%= link_to 'New Assignment', :action => 'new' %>
+

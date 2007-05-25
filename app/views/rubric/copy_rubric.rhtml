@@ -1,0 +1,8 @@
+<h1>Copy an existing rubric</h1>
+
+<%= start_form_tag :action => 'copy_rubric' %>
+  <%= render :partial => 'rubric' %>
+  <%= submit_tag "Save Rubric", :name=>"save" %>
+<%= end_form_tag %>
+
+<%= link_to 'Back', :action => 'list' %>

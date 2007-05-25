@@ -1,0 +1,10 @@
+<h1>Editing student</h1>
+
+<%= start_form_tag :action => 'update_student', :id => @user %>
+  <p><label for="role_id">Role</label><br/>
+  <%= render :partial => 'users/user' %>
+  <%= submit_tag 'Edit' %>
+<%= end_form_tag %>
+
+<%= link_to 'Show', :action => 'show_student', :id => @user %> |
+<%= link_to 'Back', :action => 'list_students' %>

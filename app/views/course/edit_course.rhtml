@@ -1,0 +1,8 @@
+<h1>Edit an existing course</h1>
+
+<%= start_form_tag :action => 'update_course', :id => @course %>
+  <%= render :partial => 'course' %>
+  <%= submit_tag 'Save', :name=>"save" %>
+<%= end_form_tag %>
+
+<%= link_to 'Back', :action => 'list_folders' %>

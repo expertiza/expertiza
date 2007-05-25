@@ -1,0 +1,39 @@
+<h1>Assignment Participants</h1>
+<%= start_form_tag ({:action => 'add_assignment_participant'}, {:method => 'post'}) %>
+
+
+<br>
+
+<%= text_field_with_auto_complete :user, :name %>
+<%= hidden_field_tag ('assignment_id', @assignment.id) %>
+&nbsp;
+<input type='submit' value='Add Participant'/>
+<br />
+<%= end_form_tag %>
+<div class = "exp">
+
+
+
+<table>
+  <tr ><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th>
+  <tr><th class="head">Name</th><th class="head">Full Name</th class="head"><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Review of Review</th></tr>
+<% for user in @participants %>
+  <tr class= "exp">
+    <td ><%= link_to user.name, :action => 'show',
+	    :id => user.id %></td>
+    <td ><%= user.fullname %></td>
+    <td ><%= user.email %></td>
+    <td ><%= link_to user.role.name, :controller => 'roles',
+            :action => 'show', :id => user.role.id %></td>
+    <td  align="center"><%= (User.find_by_id(user.parent_id)).name %></td>
+    <td ><%= UsersController.yesorno(user.email_on_review) %></td>
+    <td ><%= UsersController.yesorno(user.email_on_submission) %></td>
+    <td ><%= UsersController.yesorno(user.email_on_review_of_review) %></td>
+    <td ><%= link_to 'Remove', {:action => 'remove_assignment_participant', :id => user.id, :assignment_id => @assignment},
+:confirm => 'Remove this participant?', :post => true %></td>
+  </tr>
+<% end -%>
+</table>
+</div>
+<hr/>
+

@@ -1,0 +1,11 @@
+<%if(@found)%>
+found <% else %>
+not found <% end %>
+<h1>Questions</h1>
+<ul>
+<% for question in @questions %>
+<li><%= question.txt %>
+<%= select( "review_score", "score", @valuemap) %><br />
+<%= text_area "review_score", :comments%><br />
+<% end %>
+</ul>

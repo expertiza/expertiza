@@ -1,0 +1,25 @@
+<%= error_messages_for 'assignment' %>
+
+<!--[form:assignment]-->
+<p><label for="assignment_name">Name</label><br/>
+<%= text_field 'assignment', 'name'  %></p>
+
+<p><label for="assignment_directory_path">Directory path</label><br/>
+<%= text_field 'assignment', 'directory_path'  %></p>
+
+<p><label for="assignment_review_weight">Review weight</label><br/>
+<%= text_field 'assignment', 'review_weight'  %></p>
+
+<p><label for="assignment_reviews_visible_to_all">Reviews visible to all</label><br/>
+<select id="assignment_reviews_visible_to_all" name="assignment[reviews_visible_to_all]"><option value="false">False</option><option value="true">True</option></select></p>
+
+<p><label for="assignment_team_assignment">Team assignment</label><br/>
+<select id="assignment_team_assignment" name="assignment[team_assignment]"><option value="false">False</option><option value="true">True</option></select></p>
+
+<p><label for="assignment_wiki_assignment">Wiki assignment</label><br/>
+<select id="assignment_wiki_assignment" name="assignment[wiki_assignment]"><option value="false">False</option><option value="true">True</option></select></p>
+
+<p><label for="assignment_require_signup">Require signup</label><br/>
+<select id="assignment_require_signup" name="assignment[require_signup]"><option value="false">False</option><option value="true">True</option></select></p>
+<!--[eoform:assignment]-->
+

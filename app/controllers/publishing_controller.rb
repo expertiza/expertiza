@@ -1,0 +1,2 @@
+class PublishingController < ApplicationController
+end

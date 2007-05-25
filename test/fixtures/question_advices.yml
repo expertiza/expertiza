@@ -1,0 +1,23 @@
+advice1:
+  id: 1
+  question_id: 1
+  score: 2
+  advice: This assignment was amazing
+  
+advice2:
+    id: 2
+    question_id: 1
+    score: 1
+    advice: This assignment was medicore
+    
+advice3:
+    id: 2
+    question_id: 2
+    score: 2
+    advice: Great
+    
+advice4:
+    id: 4
+    question_id: 2
+    score: 1
+    advice: OK

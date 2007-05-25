@@ -1,0 +1,39 @@
+<%= error_messages_for 'user' %>
+
+<!--[form:user]-->
+<p><label for="user_name">Name</label><br/>
+<%= text_field 'user', 'name'  %></p>
+
+<p><label for="user_fullname">Full name (last, first[ middle])</label><br/>
+<%= text_field 'user', 'fullname'  %></p>
+
+<p><label for="user_email">E-mail address</label><br/>
+<%= text_field 'user', 'email'  %></p>
+
+<p><label for="role_id">Role</label><br/>
+<%= collection_select 'user', 'role_id', @all_roles, :id, :name %></p>
+
+<p><label for="password">Password</label><br/>
+<%= password_field 'user', 'clear_password' %></p>
+
+<p><label for="confirm_password"> Confirm password</label><br/>
+<%= password_field 'user', 'confirm_password' %></p>
+
+<p><label for="user_email_on_review">E-mail on review</label><br/>
+<select id="email_on_review" name="user[email_on_review]"><option
+value="true">Yes</option><option
+value="false">No</option></select></p>
+
+<p><label for="user_email_on_submission">E-mail on submission</label><br/>
+<select id="email_on_submission" name="user[email_on_submission]"><option
+value="true">Yes</option><option
+value="false">No</option></select></p>
+
+<p><label for="user_email_on_review_of_review">E-mail on review_of_review</label><br/>
+<select id="email_on_review_of_review" name="user[email_on_review_of_review]"><option
+value="true">Yes</option><option
+value="false">No</option></select></p>
+
+
+<!--[eoform:user]-->
+

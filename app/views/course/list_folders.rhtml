@@ -1,0 +1,24 @@
+<h1>Courses</h1>
+
+<%= flash[:notice] %>
+<table>
+  <tr><th>Folder Name</th><th>Course</th></tr>
+<% for folder in @folders %>
+  <tr>
+    <td><%= link_to folder, :action => 'list_folders', :curr_dir=>folder %></td>
+    <td><% for course in @courses
+            print course.directory_path + " " + folder + "\n"
+            if CourseController.remove_last_slash(course.directory_path) === folder then %>
+                <%= link_to course.title, :action=>'edit_course', :id => course.id %>
+            <% end
+           end %></td> 
+  </tr>
+<% end -%>
+</table>
+
+<hr/>
+<%= start_form_tag :action => 'new_folder', :curr_dir=>@curr_dir %>
+<%= text_field 'folder', 'name'%>
+<%= submit_tag 'New folder' %>
+<%= end_form_tag %>
+<p><%= link_to 'New Course', :action => 'new_course', :curr_dir=>@curr_dir %></p>

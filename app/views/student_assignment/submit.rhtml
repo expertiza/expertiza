@@ -9,6 +9,7 @@
 <script type="text/javascript">
 
 function createNewFolder(){
+	checkIfFileExists('Create new folder');
 	var new_folder = prompt("Enter a name for a new folder","");
 	input1 = document.createElement("input");
 	input1.type = "hidden";
@@ -18,6 +19,10 @@ function createNewFolder(){
 	if ((new_folder!=null) && (new_folder!='')) {
 		document.submit_form.submit();
 	}
+	if (new_folder =='')
+    {   
+        alert("Please specify a filename");
+    }
 }
 
 function getSelectedName(){
@@ -35,7 +40,13 @@ function getSelectedName(){
 }
 
 function moveSelectedFile(){
+    checkIfFileExists('Move selected file');
 	var old_filename = getSelectedName();
+	if (old_filename=='undefined')
+	{
+	   alert('You need to click a radio button below before selecting "Move".');
+	   return false;
+	}
 	var new_filename = prompt("Enter a new location for " + old_filename + "\nExample: /folder1/file.doc","");
 	input1 = document.createElement("input");
 	input1.type = "hidden";
@@ -48,6 +59,7 @@ function moveSelectedFile(){
 }
 
 function copySelectedFile(){
+    checkIfFileExists('Copy selected file');
 	var old_filename = getSelectedName();
 	var new_filename = prompt("Enter a new location for the copy of " + old_filename + "\nExample: /folder1/file.doc","");
 	input1 = document.createElement("input");
@@ -61,6 +73,7 @@ function copySelectedFile(){
 }
 
 function renameFile(){
+    checkIfFileExists('Rename selected file');
 	var tbl = document.getElementById("file_table");
 	var numChecks = 0;
 	for(i=0; i<document.forms[0].elements.length; i++){
@@ -85,22 +98,32 @@ function renameFile(){
 	}
 }
 
+function checkIfFileExists(button)
+{
+    var filename=document.getElementById("uploaded_file");
+    if(filename.value==null ||filename.value=='')
+    {
+        alert('Please select a file before pressing "'+button+'".');
+    }
+}
+
+
 </script>
 
-Submit your work for the assignment titled: <%= @participant.assignment.name %>
+Submit your work for the assignment titled: <%= @student.assignment.name %>
 <%= form_tag({:action=>'submit'},:multipart => true, :name=>'submit_form')%>
 <br><br>
-<input type="file" name="uploaded_file" size=40 />
-<input type="submit" name="upload_file" value="Upload file"/>
+<input type="file" id="uploaded_file" name="uploaded_file" size=40 />
+<input type="submit" name="upload_file" value="Upload file" onclick="checkIfFileExists('Upload');"/>
 <br><br>
 
-<% if @participant.directory_num != nil and @participant.directory_num >= 0 %>
+<% if @student.directory_num != nil and @student.directory_num >= 0 %>
 	<div style="background-color:#EEEEEE; padding-bottom:0.6em"><strong>File and folder actions</strong><br>
-	<input style="margin-top:0.3em" type="button" onclick="createNewFolder()" name="create_new_folder" value="Create new folder"">
-	<input type="button" onclick="copySelectedFile()" name="copy_selected_file" value="Copy selected file"">
-	<input type="button" onclick="moveSelectedFile()" name="move_selected_file" value="Move selected file"">
-	<input type="button" onclick="renameFile()" name="rename_file" value="Rename selected file""/>
-	<input type="submit" name="delete_files" value="Delete selected file(s)""/></div><br>
+	<input style="margin-top:0.3em" type="button" onclick="createNewFolder()" name="create_new_folder" value="Create new folder" >
+	<input type="button" onclick="copySelectedFile()" name="copy_selected_file" value="Copy selected file" >
+	<input type="button" onclick="moveSelectedFile()" name="move_selected_file" value="Move selected file">
+	<input type="button" onclick="renameFile()" name="rename_file" value="Rename selected file" />
+	<input type="submit" name="delete_files" value="Delete selected file" onclick="checkIfFileExists('Delete selected file');" /></div><br>
 <table>
 	<tr>
 		<td></td>
@@ -120,10 +143,10 @@ Submit your work for the assignment titled: <%= @participant.assignment.name %>
 					for file in @files %>
 				<tr>
 					<td>
-						<input type=checkbox id="chk_files_<%= i %>" name="chk_files[<%= i %>]">
+						<input type=radio id="chk_files_<%= i %>" name="chk_files[<%= i %>]">
 						<input type=hidden id="filenames_<%=i%>" name="filenames[<%= i %>]" value="<%= File.basename(file) %>">
 						<% i = i + 1 %>
-						<%= link_to File.basename(file), :action => 'submit', :id => @participant.id, :download => File.basename(file), "current_folder[name]" => @current_folder.name %>
+						<%= link_to File.basename(file), :action => 'submit', :id => @student.id, :download => File.basename(file), "current_folder[name]" => @current_folder.name %>
 					</td>
 					<td><%= File.size(file) %></td>
 					<td>

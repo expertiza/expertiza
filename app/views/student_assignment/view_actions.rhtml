@@ -2,21 +2,21 @@
 
 <ul>
 	<li>
-		<% if @participant.able_to_submit %>
-			<%= link_to 'Your work', :action => 'submit', :id => @participant.id %>
+		<% if @student.able_to_submit %>
+			<%= link_to 'Your work', :action => 'submit', :id => @student.id %>
 		<% else %>
 			<font color="gray">Your work</font>
-		<% end%>: (Submit and view feedback)
+		<% end%> (Submit and view feedback)
 		
 	</li>
 	<li>
-		<% if @participant.able_to_review %>
-			<%= link_to "Others' work",{:controller => 'review', :action => 'feedback', :id => @participant.user_id}, :assignment_id => @participant.assignment_id %>
+		<% if @student.able_to_review %>
+			<%= link_to "Others' work",{:controller => 'review', :action => 'feedback', :id => @student.user_id}, :assignment_id => @student.assignment_id %>
 		<% else %>
 			<font color="gray">Others' work</font>
-		<% end %>: (Give feedback to others on their work)
+		<% end %> (Give feedback to others on their work)
 	</li>
 	<li>View grade report</li>
 </ul>
 <br>
-Next: Click the activity you wish to perform on the assignment titled: <%= @participant.assignment.name %>
+Next: Click the activity you wish to perform on the assignment titled: <%= @student.assignment.name %>

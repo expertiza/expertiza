@@ -3,6 +3,14 @@ class AssignmentController < ApplicationController
   @no_dl="1" # a value of "no" for whether an action is permitted prior to a deadline
   @late_dl="2" # a value of "late" for whether an action is permitted prior to a deadline (it is permitted, but marked late)
   @ok_dl="3" # a value of "OK" for whether an action is permitted prior to a deadline
+
+  # Deadline types used in the deadline_types DB table
+  @Submission_deadline=1;
+  @Review_deadline=2;
+  @Resubmission_deadline=3;
+  @Rereview_deadline=4;
+  @Review_of_review_deadline=5;
+  
   def new
     @assignment = Assignment.new
     @rubric = Rubric.find_all
@@ -15,12 +23,7 @@ class AssignmentController < ApplicationController
     @assignment.instructor_id = (session[:user]).id
     @duedate=DueDate.new
    
-    # Deadline types used in the deadline_types DB table
-    @Submission_deadline=1;
-    @Review_deadline=2;
-    @Resubmission_deadline=3;
-    @Rereview_deadline=4;
-    @Review_of_review_deadline=5;
+
     
     
     if @assignment.save

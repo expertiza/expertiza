@@ -5,7 +5,8 @@
   
   <table>
   <% 	i = 1;
-		for @due_date in @assignment.due_dates %>
+		for @due_date in @assignment.due_dates
+		 %>
 	<tr>
 		<td><%= text_field 'due_date[]', 'due_at', :size=>30%></td>
 		<td><%= select('due_date[]', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>

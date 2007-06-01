@@ -17,21 +17,21 @@ class StudentAssignmentController < ApplicationController
     @student = Participant.find(params[:id])
     @files = Array.new
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
-    #@due_dates = DueDate.find(@student.assignment_id)
+    @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",14])
     
     # Find the next due date (after the current date/time), and then find the type of deadline it is.
-    @very_last_due_date = DueDate.find_by_sql('select max(due_at) from due_dates')
-    #next_due_date = very_last_due_date
-#    for due_date in @due_dates
- #     if due_date.due_at > Time.now
-  #      if due_date.due_at < next_due_date.due_at
-   #       next_due_date = due_date
-    #    end
-     # end
-    #end
+    @very_last_due_date = DueDate.find(:all,:order => "due_at DESC", :limit =>1)
+    next_due_date = @very_last_due_date[0]
+    for due_date in @due_dates
+      if due_date.due_at > Time.now
+        if due_date.due_at < next_due_date.due_at
+          next_due_date = due_date
+        end
+      end
+    end
     
     
-    #review_phase = next_due_date.deadline_type_id;
+    @review_phase = next_due_date.deadline_type_id;
     
     @current_folder = DisplayOption.new
     @current_folder.name = "/"

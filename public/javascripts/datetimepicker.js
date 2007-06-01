@@ -471,12 +471,22 @@ Calendar.prototype.IsLeapYear=IsLeapYear;
 
 function FormatDate(pDate)
 {
+	if(this.Month+1<10)
+	{
+		var month='0'+ (this.Month+1);
+	}
+	if(pDate<10)
+	{
+		pDate='0'+pDate;
+	}
 	if (this.Format.toUpperCase()=="DDMMYYYY")
-		return (pDate+DateSeparator+(this.Month+1)+DateSeparator+this.Year);
+		return (pDate+DateSeparator+month+DateSeparator+this.Year);
 	else if (this.Format.toUpperCase()=="DDMMMYYYY")
 		return (pDate+DateSeparator+this.GetMonthName(false)+DateSeparator+this.Year);
 	else if (this.Format.toUpperCase()=="MMDDYYYY")
-		return ((this.Month+1)+DateSeparator+pDate+DateSeparator+this.Year);
+		return (month+DateSeparator+pDate+DateSeparator+this.Year);
+	else if (this.Format.toUpperCase()=="YYYYMMDD")
+		return (this.Year+DateSeparator+month+DateSeparator+pDate);
 	else if (this.Format.toUpperCase()=="MMMDDYYYY")
 		return (this.GetMonthName(false)+DateSeparator+pDate+DateSeparator+this.Year);			
 }

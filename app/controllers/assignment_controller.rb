@@ -3,14 +3,6 @@ class AssignmentController < ApplicationController
   @no_dl="1" # a value of "no" for whether an action is permitted prior to a deadline
   @late_dl="2" # a value of "late" for whether an action is permitted prior to a deadline (it is permitted, but marked late)
   @ok_dl="3" # a value of "OK" for whether an action is permitted prior to a deadline
-
-  # Deadline types used in the deadline_types DB table
-  @Submission_deadline=1;
-  @Review_deadline=2;
-  @Resubmission_deadline=3;
-  @Rereview_deadline=4;
-  @Review_of_review_deadline=5;
-  
   def new
     @assignment = Assignment.new
     @rubric = Rubric.find_all
@@ -22,23 +14,29 @@ class AssignmentController < ApplicationController
     @assignment = Assignment.new(params[:assignment])
     @assignment.instructor_id = (session[:user]).id
     @duedate=DueDate.new
-   
-
+    
+    # Deadline types used in the deadline_types DB table
+    @Submission_deadline=1;
+    @Review_deadline=2;
+    @Resubmission_deadline=3;
+    @Rereview_deadline=4;
+    @Review_of_review_deadline=5;
     
     
     if @assignment.save
-        submit_duedate=DueDate.new(params[:submit_deadline]);
-        submit_duedate.deadline_type_id=@Submission_deadline;
-        submit_duedate.assignment_id=@assignment.id;
-        submit_duedate.late_policy_id=1;
-        submit_duedate.save;
-        
-        review_duedate=DueDate.new(params[:review_deadline]);
-        review_duedate.deadline_type_id=@Review_deadline;
-        review_duedate.assignment_id=@assignment.id;
-        review_duedate.late_policy_id=1;
-        review_duedate.save;
-        
+      submit_duedate=DueDate.new(params[:submit_deadline]);
+      submit_duedate.deadline_type_id=@Submission_deadline;
+      submit_duedate.assignment_id=@assignment.id;
+      submit_duedate.late_policy_id=1;
+      submit_duedate.save;
+      
+      review_duedate=DueDate.new(params[:review_deadline]);
+      review_duedate.deadline_type_id=@Review_deadline;
+      review_duedate.assignment_id=@assignment.id;
+      review_duedate.late_policy_id=1;
+      review_duedate.save;
+      
+      if params[:assignment_helper][:no_of_reviews].to_i >= 2
         for resubmit_duedate_key in params[:additional_submit_deadline].keys
           resubmit_duedate=DueDate.new(params[:additional_submit_deadline][resubmit_duedate_key]);
           resubmit_duedate.deadline_type_id=@Submission_deadline;
@@ -54,12 +52,12 @@ class AssignmentController < ApplicationController
           rereview_duedate.late_policy_id=1;
           rereview_duedate.save;
         end
-      
-        reviewofreview_duedate=DueDate.new(params[:reviewofreview_deadline]);
-        reviewofreview_duedate.deadline_type_id=@Review_of_review_deadline;
-        reviewofreview_duedate.assignment_id=@assignment.id;
-        reviewofreview_duedate.late_policy_id=1;
-        reviewofreview_duedate.save;
+      end      
+      reviewofreview_duedate=DueDate.new(params[:reviewofreview_deadline]);
+      reviewofreview_duedate.deadline_type_id=@Review_of_review_deadline;
+      reviewofreview_duedate.assignment_id=@assignment.id;
+      reviewofreview_duedate.late_policy_id=1;
+      reviewofreview_duedate.save;
       
       flash[:notice] = 'Assignment was successfully created.'
       redirect_to :action => 'list'
@@ -112,6 +110,7 @@ class AssignmentController < ApplicationController
   def list
     set_up_display_options("ASSIGNMENT")
     @assignments=super(Assignment)
-#    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
-  end  
+    #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
+  end
+  
 end

@@ -35148,3 +35148,2327 @@ Rendered menu_items/_suckerfish (0.00000)
 Rendered menu_items/_breadcrumbs (0.00000)
 Rendered auth/_login (0.01000)
 Completed in 0.14000 (7 reqs/sec) | Rendering: 0.02000 (14%) | DB: 0.04000 (28%) | 200 OK [http://localhost/student_assignment/submit/2]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view_default (for 127.0.0.1 at 2007-05-31 15:04:27) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"view_default", "controller"=>"content_pages"}
+  [4;36;1mSystemSettings Load (0.032000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.015000)[0m   [0mSHOW FIELDS FROM roles[0m
+Action: authorised
+Authorised? true
+  [4;36;1mContentPage Load (0.281000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.id = 1) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view_default
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01500)
+Completed in 0.70300 (1 reqs/sec) | Rendering: 0.03100 (4%) | DB: 0.32800 (46%) | 200 OK [http://localhost/]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-05-31 15:04:32) [POST]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"commit"=>"Login", "action"=>"login", "controller"=>"auth", "login"=>{"name"=>"riwesley", "password"=>"password"}}
+  [4;36;1mSystemSettings Load (0.016000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.015000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;36;1mUser Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mUser Load (0.282000)[0m   [0mSELECT * FROM users WHERE (users.`name` = 'riwesley' ) LIMIT 1[0m
+User riwesley successfully logged in
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+Logging in user as role Credentials
+  [4;35;1mStudent Columns (0.015000)[0m   [0mSHOW FIELDS FROM users[0m
+Redirected to http://localhost:3000/student_assignment/list
+Completed in 0.35900 (2 reqs/sec) | DB: 0.34400 (95%) | 302 Found [http://localhost/auth/login]
+  [4;36;1mUser Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#list (for 127.0.0.1 at 2007-05-31 15:04:33) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"list", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.063000)[0m   [0mSELECT * FROM participants WHERE (user_id = 4) ORDER BY assignment_id DESC [0m
+Rendering  within layouts/application
+Rendering student_assignment/list
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.297000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mCourse Load (0.015000)[0m   [0mSELECT * FROM courses WHERE (courses.id = 0) LIMIT 1[0m
+  [4;36;1mDueDate Load (0.016000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 2) ORDER BY due_at DESC [0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mDueDate Load (0.297000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 2) ORDER BY due_at DESC [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.73500 (1 reqs/sec) | Rendering: 0.00000 (0%) | DB: 0.70300 (95%) | 200 OK [http://localhost/student_assignment/list]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#view_actions (for 127.0.0.1 at 2007-05-31 15:04:36) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"view_actions", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+Rendering  within layouts/application
+Rendering student_assignment/view_actions
+  [4;35;1mParticipant Columns (0.016000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14100 (7 reqs/sec) | Rendering: 0.01600 (11%) | DB: 0.03100 (21%) | 200 OK [http://localhost/student_assignment/view_actions/2]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:04:37) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.01600 (20%) | DB: 0.00000 (0%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:04:55) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+
+
+ActionView::TemplateError (undefined method `due_at' for #<Array:0x6a7ba60>) on line #2 of app/views/student_assignment/submit.rhtml:
+1: <h1>Submit Assignment</h1>
+2: Test: <%=@very_last_due_date.due_at%>
+3: <% if flash[:notice] != nil and flash[:notice].strip != "" %>
+4: <div class="flash_error">
+5: 	<%= flash[:notice] %>
+
+    #{RAILS_ROOT}/app/views/student_assignment/submit.rhtml:2:in `_run_rhtml_student_assignment_submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:316:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:316:in `compile_and_render_template'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:292:in `render_template'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:251:in `render_file'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:726:in `render_file'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:648:in `render_with_no_layout'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/layout.rb:245:in `render_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:53:in `render'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:53:in `render'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:942:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:05:08) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.015000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+
+
+ActionView::TemplateError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.due_at) on line #2 of app/views/student_assignment/submit.rhtml:
+1: <h1>Submit Assignment</h1>
+2: Test: <%=@very_last_due_date[1].due_at%>
+3: <% if flash[:notice] != nil and flash[:notice].strip != "" %>
+4: <div class="flash_error">
+5: 	<%= flash[:notice] %>
+
+    #{RAILS_ROOT}/app/views/student_assignment/submit.rhtml:2:in `_run_rhtml_student_assignment_submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:316:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:316:in `compile_and_render_template'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:292:in `render_template'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:251:in `render_file'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:726:in `render_file'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:648:in `render_with_no_layout'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/layout.rb:245:in `render_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:53:in `render'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:53:in `render'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:942:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:05:26) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.016000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01500)
+Completed in 0.09400 (10 reqs/sec) | Rendering: 0.03100 (32%) | DB: 0.03200 (34%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.016000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:32:14) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.015000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.015000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mDueDate Load (0.016000)[0m   [0;1mSELECT * FROM due_dates WHERE (due_dates.id = 2) LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+
+
+NoMethodError (undefined method `each' for #<DueDate:0x6bebea4>):
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activerecord-1.14.4/lib/active_record/base.rb:1792:in `method_missing'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:36:56) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mParticipant Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.016000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:39:24) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mParticipant Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:39:26) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.016000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:39:27) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.015000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mDueDate Load (0.015000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:40:30) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:40:31) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.016000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:40:33) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.016000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:40:55) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.016000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:40:56) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.016000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:04) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.016000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 8) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mParticipant Columns (0.016000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07900 (12 reqs/sec) | Rendering: 0.01600 (20%) | DB: 0.33200 (420%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:05) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 8) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mParticipant Columns (0.015000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14100 (7 reqs/sec) | Rendering: 0.00000 (0%) | DB: 0.01500 (10%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:12) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 8) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01600)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.01600 (20%) | DB: 0.01600 (20%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:13) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 8) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.06300)
+Completed in 0.14100 (7 reqs/sec) | Rendering: 0.06300 (44%) | DB: 0.01500 (10%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:15) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 8) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.01600 (20%) | DB: 0.01500 (19%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:29) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (8) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:31) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.016000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (8) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:32) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (8) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:41) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (8) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:46) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (8) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:47) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.015000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (8) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:41:48) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (8) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:42:05) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 8) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.00000 (0%) | DB: 0.07600 (97%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:42:07) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 8) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.00000 (0%) | DB: 0.01600 (20%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:42:39) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.016000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 8) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01600)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14100 (7 reqs/sec) | Rendering: 0.01600 (11%) | DB: 0.01600 (11%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:42:54) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:43:42) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 6) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10900 (9 reqs/sec) | Rendering: 0.01500 (13%) | DB: 0.03200 (29%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:46:04) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 6) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.015000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+
+
+ActionView::TemplateError (Called id for nil, which would mistakenly be 4 -- if you really wanted the id of nil, use object_id) on line #2 of app/views/student_assignment/submit.rhtml:
+1: <h1>Submit Assignment</h1>
+2: Test: <%=@due_dates[0].id%>
+3: <% if flash[:notice] != nil and flash[:notice].strip != "" %>
+4: <div class="flash_error">
+5: 	<%= flash[:notice] %>
+
+    #{RAILS_ROOT}/app/views/student_assignment/submit.rhtml:2:in `_run_rhtml_student_assignment_submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:316:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:316:in `compile_and_render_template'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:292:in `render_template'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:251:in `render_file'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:726:in `render_file'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:648:in `render_with_no_layout'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/layout.rb:245:in `render_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:53:in `render'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:53:in `render'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:942:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:46:44) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:47:03) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.01600 (20%) | DB: 0.01500 (19%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:47:49) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.015000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.01500 (19%) | DB: 0.03100 (39%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:47:51) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.016000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.01500 (19%) | DB: 0.03200 (41%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.016000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:47:52) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.015000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.06300 (15 reqs/sec) | Rendering: 0.00000 (0%) | DB: 0.04700 (74%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.015000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:48:10) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.016000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:48:11) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.>):
+    /app/controllers/student_assignment_controller.rb:26:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;35;1mUser Columns (0.015000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:48:57) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.<):
+    /app/controllers/student_assignment_controller.rb:27:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:48:59) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.000000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 2) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.<):
+    /app/controllers/student_assignment_controller.rb:27:in `submit'
+    /app/controllers/student_assignment_controller.rb:25:in `each'
+    /app/controllers/student_assignment_controller.rb:25:in `submit'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;35;1mUser Columns (0.016000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:49:55) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 14) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.01600 (20%) | DB: 0.12600 (161%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.015000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:49:57) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 14) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.00000 (0%) | DB: 0.03000 (38%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:50:11) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 14) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.015000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.06200 (16 reqs/sec) | Rendering: 0.00000 (0%) | DB: 0.01500 (24%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:50:48) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.016000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 14) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.01500 (10%) | DB: 0.03200 (22%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-05-31 15:50:50) [GET]
+  Session ID: b3dcf1971f55bfabb154c1c3c26cbc0b
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.016000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 14) [0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mParticipant Columns (0.016000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.01600)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01600)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.07800 (12 reqs/sec) | Rendering: 0.01600 (20%) | DB: 0.03200 (41%) | 200 OK [http://localhost/student_assignment/submit/2]
+Unknown database 'pg_development'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activerecord-1.14.4/lib/active_record/connection_adapters/mysql_adapter.rb:330:in `real_connect'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activerecord-1.14.4/lib/active_record/connection_adapters/mysql_adapter.rb:330:in `connect'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activerecord-1.14.4/lib/active_record/connection_adapters/mysql_adapter.rb:164:in `reconnect!'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activerecord-1.14.4/lib/active_record/connection_adapters/abstract_adapter.rb:85:in `verify!'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activerecord-1.14.4/lib/active_record/connection_adapters/abstract/connection_specification.rb:99:in `verify_active_connections!'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activerecord-1.14.4/lib/active_record/connection_adapters/abstract/connection_specification.rb:98:in `each_value'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activerecord-1.14.4/lib/active_record/connection_adapters/abstract/connection_specification.rb:98:in `verify_active_connections!'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:70:in `prepare_application'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:37:in `dispatch'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+script/server:3

@@ -20,13 +20,17 @@
 <table>
  <tr>
   <td><label for="review_rubric">Review rubric:</label>
-      <select name="review_rubric_id"></select>
+      <!--select name="review_rubric_id"></select-->
+      <%=@rubrics = Rubric.find(:all).map {|u| [u.name, u.id] }
+         select('assignment', 'review_rubric_id', @rubrics)%>
   </td>
   <td style="padding: 15px"><label for="review_weight">Review weight:</label>
-      <%= text_field 'assignment', 'review_weight'%>
+      <%= text_field 'assignment', 'review_weight', :size=>5%>
   </td>
   <td style="padding: 15px"><label for="review_of_review_rubric">Review-of-review rubric:</label>
-      <select name="review_of_review_rubric_id"></select>
+      <!--select name="review_of_review_rubric_id"></select-->
+      <%=@rubrics = Rubric.find(:all).map {|u| [u.name, u.id] }
+         select('assignment', 'review_of_review_rubric_id', @rubrics)%>
   </td>
  </tr>
 </table>

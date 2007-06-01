@@ -2,7 +2,7 @@
 // This file is automatically included by javascript_include_tag :defaults
 function addElement() {
   
-  var ni = document.getElementById('author');
+  var ni = document.getElementById('extra_deadlines');
   var numi = document.getElementById('numSubmitReviewPeriods');
   var authHTML = "";
    //alert (numi.value);
@@ -28,34 +28,58 @@ function addElement() {
 		rereview_var = 'Re-review-'+j+' deadline'
 	}
   	ni.innerHTML = ni.innerHTML + 
-  	                    '<TR><TD ALIGN=LEFT WIDTH=10%>'+submission_var+'</TD>'+
-  	                    '<TD ALIGN=CENTER WIDTH=30%><%= datetime_select(:submission, :due_on,:include_blank=>true)%></TD>'+
+  	                    '<TR><TD ALIGN=LEFT WIDTH=20%>'+submission_var+'</TD>'+
+  	                    '<TD ALIGN=CENTER WIDTH=5%><input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]"  onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"/></TD>'+
+  	                    
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_submission_allowed_id" name ="additional_submit_deadline['+j+'][submission_allowed_id]">'+
+						'<option value=2 SELECTED>Late</option<option value=1>No</option>'+
+                        '<option value=3>OK</option>'+
+						'</select></TD>'+
 						
-  	                    '<TD ALIGN=CENTER WIDTH=10%><%= select(:submit_deadline_s, +j+, [ ["No", 1],["Late", 2],["OK", 3]],:selected =>3 )%></TD>'+
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_review_allowed_id" name ="additional_submit_deadline['+j+'][review_allowed_id]">'+
+						'<option value=2 SELECTED>Late</option><option value=1>No</option><option value=3>OK</option>'+
+						'</select></TD>'+
 						
-						'<TD ALIGN=CENTER WIDTH=10%><%= select(:review_deadline_s, +j+, [ ["No", 1],["Late", 2],["OK", 3]],:selected =>2 )%></TD>'+
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_resubmission_allowed_id" name ="additional_submit_deadline['+j+'][resubmission_allowed_id]"><option value=2>Late</option>'+
+						'<option value=1>No</option><option value=3 SELECTED>OK</option>'+
+						'</select></TD>'+
 						
-						'<TD ALIGN=CENTER WIDTH=10%><%= select(:resubmit_deadline_s, +j+, [ ["No", 1],["Late", 2],["OK", 3]],:selected =>2 )%></TD>'+
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_rereview_allowed_id" name ="additional_submit_deadline['+j+'][rereview_allowed_id]">'+
+						'<option value=2>Late</option><option value=1 SELECTED >No</option>'+
+						'<option value=3>OK</option>'+
+						'</select></TD>'+
 						
-						'<TD ALIGN=CENTER WIDTH=10%><%= select(:rereview_deadline_s, +j+, [ ["No", 1],["Late", 2],["OK", 3]],:selected =>2 )%></TD>'+
-						
-						'<TD ALIGN=CENTER WIDTH=10%><%= select(:reviewofreview_deadline_s, +j+, [ ["No", 1],["Late", 2],["OK", 3]],:selected =>2 )%></TD>'+
-						
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_review_of_review_allowed_id" name ="additional_submit_deadline['+j+'][review_of_review_allowed_id]">'+
+						'<option value=2>Late</option><option value=1 SELECTED>No</option><option value=3>OK</option>'+
+						'</select></TD>'+
 						'</TR>'+
 						
 						'<TR><TD ALIGN=LEFT WIDTH=20%>'+rereview_var+'</TD>'+
-						'<TD ALIGN=CENTER WIDTH=10%><%= datetime_select(:submission, :due_on,:include_blank=>true)%></TD>'+
 						
-						'<TD ALIGN=CENTER WIDTH=30%><%= select(:submit_deadline_r, +j+, [ ["No", 1],["Late", 2],["OK", 3]],:selected =>2 )%></TD>'+
-												
-                        '<TD ALIGN=CENTER WIDTH=10%><%= select(:review_deadline_r, +j+, [ ["No", 1],["Late", 2],["OK", 3]],:selected =>2 )%></TD>'+
-					
-						'<TD ALIGN=CENTER WIDTH=10%><%= select(:resubmit_deadline_r, +j+, [ ["No", 1],["Late", 2],["OK", 3]],:selected =>2 )%></TD>'+
+						'<TD ALIGN=CENTER WIDTH=5%><input type="text" id="additional_review_deadline_'+j+'_due_at" name ="additional_review_deadline['+j+'][due_at]" onClick="NewCal(\'additional_review_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"/></TD>'+
 						
-						'<TD ALIGN=CENTER WIDTH=10%><%= select(:rereview_deadline_r, +j+, [ ["No", 1],["Late", 2],["OK", 3]],:selected =>3 )%></TD>'+
-                       
-						'<TD ALIGN=CENTER WIDTH=10%><%= select(:reviewofreview_deadline_r, +j+, [ ["No", 1],["Late", 2],["OK", 3]],:selected =>2 )%></TD>'+
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_submission_allowed_id" name ="additional_review_deadline['+j+'][submission_allowed_id]">'+
+						'<option value=2 SELECTED >Late</option<option value=1>No</option>'+
+                        '<option value=3>OK</option>'+
+						'</select></TD>'+
 						
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_review_allowed_id" name ="additional_review_deadline['+j+'][review_allowed_id]">'+
+						'<option value=2 SELECTED	>Late</option><option value=1>No</option><option value=3 	>OK</option>'+
+						'</select></TD>'+
+						
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_resubmission_allowed_id" name ="additional_review_deadline['+j+'][resubmission_allowed_id]"><option value=2 SELECTED>Late</option>'+
+						'<option value=1>No</option><option value=3>OK</option>'+
+						'</select></TD>'+
+						
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_rereview_allowed_id" name ="additional_review_deadline['+j+'][rereview_allowed_id]">'+
+						'<option value=2 >Late</option><option value=1 >No</option>'+
+						'<option value=3 SELECTED>OK</option>'+
+						'</select></TD>'+
+						
+						'<TD ALIGN=CENTER WIDTH=10%>'+
+						'<select id="additional_review_deadline_'+j+'_review_of_review_allowed_id" name ="additional_review_deadline['+j+'][review_of_review_allowed_id]">'+
+						'<option value=2>Late</option><option value=1 SELECTED>No</option><option value=3>OK</option>'+
+						'</select></TD>'+
 						'</TR>';
   }
 }

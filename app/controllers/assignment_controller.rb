@@ -39,7 +39,7 @@ class AssignmentController < ApplicationController
       if params[:assignment_helper][:no_of_reviews].to_i >= 2
         for resubmit_duedate_key in params[:additional_submit_deadline].keys
           resubmit_duedate=DueDate.new(params[:additional_submit_deadline][resubmit_duedate_key]);
-          resubmit_duedate.deadline_type_id=@Submission_deadline;
+          resubmit_duedate.deadline_type_id=@Resubmission_deadline;
           resubmit_duedate.assignment_id=@assignment.id;
           resubmit_duedate.late_policy_id=1;
           resubmit_duedate.save;
@@ -47,7 +47,7 @@ class AssignmentController < ApplicationController
         
         for rereview_duedate_key in params[:additional_review_deadline].keys
           rereview_duedate=DueDate.new(params[:additional_review_deadline][rereview_duedate_key]);
-          rereview_duedate.deadline_type_id=@Submission_deadline;
+          rereview_duedate.deadline_type_id=@Rereview_deadline;
           rereview_duedate.assignment_id=@assignment.id;
           rereview_duedate.late_policy_id=1;
           rereview_duedate.save;
@@ -92,6 +92,11 @@ class AssignmentController < ApplicationController
   def update
     @assignment = Assignment.find(params[:id])
     if @assignment.update_attributes(params[:assignment])
+      
+      for due_date_key in params[:due_date].keys
+        due_date_temp = DueDate.find(due_date_key)
+        due_date_temp.update_attributes(params[:due_date][due_date_key])
+      end
       flash[:notice] = 'Assignment was successfully updated.'
       redirect_to :action => 'show', :id => @assignment
     else
@@ -103,9 +108,21 @@ class AssignmentController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
   
-  def remove
-    
+  def delete
+    @assignment = get(Assignment, params[:id])
+    if @assignment == nil
+      redirect_to :action => 'list' 
+    else 
+      if @assignment.due_dates_exist? == false or params['delete'] or @assignment.review_feedback_exist? == false or @assignment.participants_exist? == false
+        @assignment.delete_due_dates
+        @assignment.delete_review_feedbacks
+        @assignment.delete_participants
+        @assignment.destroy
+        redirect_to :action => 'list'
+      end
+    end
   end
+
   
   def list
     set_up_display_options("ASSIGNMENT")

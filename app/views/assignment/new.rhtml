@@ -1,10 +1,13 @@
+
+<div style="margin-top:-30px" align="right"><%= render :partial => 'auth/login' %></div>
 <h1>New Assignment</h1>
 
-<%= start_form_tag :action => 'create'%>
+<%= start_form_tag( {:action => 'create'}, :onsubmit=> 'return checkForm();')%>
   <%= render :partial => 'form' %>
   <%= render :partial => 'due_dates' %>
   &nbsp;&nbsp;<%= submit_tag "Save assignment" %>
 <%= end_form_tag %>
 <br />
 <div style="padding: 15px">
-<%= link_to 'Back', :action => 'list' %></div>
+<%= link_to 'Back', :action => 'list' %>
+</div>

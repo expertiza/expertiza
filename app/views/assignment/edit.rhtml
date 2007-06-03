@@ -4,16 +4,43 @@
   <%= render :partial => 'form' %>
   
   <table>
-  <% 	i = 1;
+    <tr style="font-size:12px;padding:15px">
+        <th style="padding:10px">Deadline type</th>
+        <th style="padding:10px">Date & time</th>
+        <th style="padding:10px">Submission allowed</th>
+        <th style="padding:10px">Review allowed</th>
+        <th style="padding:10px">Resubmission allowed</th>
+        <th style="padding:10px">Re-review allowed</th>
+        <th style="padding:10px">Review of review allowed</th>
+    </tr>
+  <% 	i = 0;
 		for @due_date in @assignment.due_dates
+		  
+		      if  @due_date.deadline_type_id == 1
+		         heading = "Submission deadline"
+		      end
+		      if  @due_date.deadline_type_id == 2
+		         heading = "Review deadline"
+		      end
+		      if  @due_date.deadline_type_id == 3
+		         heading = "Resubmission deadline"
+		      end
+		      if  @due_date.deadline_type_id == 4
+		         heading = "Re-review deadline"
+		      end
+		      if  @due_date.deadline_type_id == 5
+		         heading = "Review of review deadline"
+		      end
+		      
 		 %>
 	<tr>
-		<td><%= text_field 'due_date[]', 'due_at', :size=>30%></td>
-		<td><%= select('due_date[]', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-		<td><%= select('due_date[]', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-		<td><%= select('due_date[]', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-		<td><%= select('due_date[]', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-		<td><%= select('due_date[]', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+		<td align ="center"><%= heading%></td>
+		<td align ="center"><%= text_field 'due_date[]', 'due_at', :size=>30%></td>
+		<td align ="center"><%= select('due_date[]', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+		<td align ="center"><%= select('due_date[]', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+		<td align ="center"><%= select('due_date[]', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+		<td align ="center"><%= select('due_date[]', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+		<td align ="center"><%= select('due_date[]', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 	</tr>
 	<% 	i += 1;
 		end %>

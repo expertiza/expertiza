@@ -20,6 +20,7 @@
 	<td><%= assignment.directory_path %></td>
 	<td><%= link_to 'Edit', :action => 'edit', :id => assignment %>&nbsp;&nbsp;</td>
 	<td><%= link_to 'Copy', :action => 'copy', :id => assignment %>&nbsp;&nbsp;</td>
+	<td><%= link_to 'Delete', :action => 'delete', :id => assignment %>&nbsp;&nbsp;</td>
 	<td><%= link_to 'Assign reviewers', :action => 'assign_reviewers', :id => assignment %>&nbsp;&nbsp;</td>
   </tr>
 <% end %>

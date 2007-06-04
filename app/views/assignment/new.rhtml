@@ -2,7 +2,7 @@
 <div style="margin-top:-30px" align="right"><%= render :partial => 'auth/login' %></div>
 <h1>New Assignment</h1>
 
-<%= start_form_tag( {:action => 'create'}, :onsubmit=> 'return checkForm();')%>
+<%= start_form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();', :onload => 'addElement();')%>
   <%= render :partial => 'form' %>
   <%= render :partial => 'due_dates' %>
   &nbsp;&nbsp;<%= submit_tag "Save assignment" %>

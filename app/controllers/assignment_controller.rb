@@ -64,6 +64,7 @@ class AssignmentController < ApplicationController
       redirect_to :action => 'list'
       
     else
+      @wiki_assignments = WikiAssignment.find_all
       render :action => 'new'
     end
     

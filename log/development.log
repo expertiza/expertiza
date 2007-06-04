@@ -37472,3 +37472,1905 @@ C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `ge
 C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
 C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
 script/server:3
+  [4;36;1mUser Columns (0.030000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 08:53:16) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.030000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.020000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.12000)
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.15100)
+Rendered assignment/_due_dates (0.11000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.02000)
+Rendered menu_items/_breadcrumbs (0.01000)
+Rendered auth/_login (0.00000)
+Completed in 1.37200 (0 reqs/sec) | Rendering: 0.55100 (40%) | DB: 0.13000 (9%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#create (for 127.0.0.1 at 2007-06-04 08:53:51) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"assignment_helper"=>{"no_of_reviews"=>"1"}, "commit"=>"Save assignment", "assignment"=>{"name"=>"", "require_signup"=>"false", "directory_path"=>"", "team_assignment"=>"false", "reviews_visible_to_all"=>"false", "review_of_review_rubric_id"=>"1", "wiki_assignment_id"=>"1", "review_weight"=>"", "review_rubric_id"=>"1"}, "action"=>"create", "controller"=>"assignment", "reviewofreview_deadline"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"3", "review_allowed_id"=>"2", "due_at"=>"2007-06-22 08:53:20", "rereview_allowed_id"=>"2"}, "review_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"3", "due_at"=>"2007-06-06 08:53:20", "rereview_allowed_id"=>"1"}, "submit_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"1", "due_at"=>"2007-06-04 08:53:20", "rereview_allowed_id"=>"1"}, "deadlineTitle0"=>"Submission deadline"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mDueDate Columns (0.230000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mSQL (0.010000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering actionnewlayoutfalse within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.04000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.43000 (2 reqs/sec) | Rendering: 0.05000 (11%) | DB: 0.29000 (67%) | 200 OK [http://localhost/assignment/create]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#create (for 127.0.0.1 at 2007-06-04 08:54:30) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"assignment_helper"=>{"no_of_reviews"=>"2"}, "additional_review_deadline"=>{"2"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"2", "due_at"=>"2007-06-18 08:53:20", "rereview_allowed_id"=>"3"}}, "commit"=>"Save assignment", "assignment"=>{"name"=>"Latest test", "require_signup"=>"false", "directory_path"=>"test/latest", "team_assignment"=>"false", "reviews_visible_to_all"=>"false", "review_of_review_rubric_id"=>"1", "wiki_assignment_id"=>"1", "review_weight"=>"80", "review_rubric_id"=>"1"}, "action"=>"create", "controller"=>"assignment", "additional_submit_deadline"=>{"2"=>{"resubmission_allowed_id"=>"3", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"2", "due_at"=>"2007-06-14 08:53:20", "rereview_allowed_id"=>"1"}}, "reviewofreview_deadline"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"3", "review_allowed_id"=>"2", "due_at"=>"2007-06-22 08:53:20", "rereview_allowed_id"=>"2"}, "review_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"3", "due_at"=>"2007-06-06 08:53:20", "rereview_allowed_id"=>"1"}, "submit_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"1", "due_at"=>"2007-06-04 08:53:20", "rereview_allowed_id"=>"1"}, "deadlineTitle0"=>"Submission deadline"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mDueDate Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (1.502000)[0m   [0;1mINSERT INTO assignments (`instructor_id`, `name`, `require_signup`, `directory_path`, `num_review_of_reviewers`, `private`, `submitter_count`, `mapping_strategy_id`, `review_strategy_id`, `team_assignment`, `review_of_review_rubric_id`, `reviews_visible_to_all`, `wiki_assignment_id`, `course_id`, `review_weight`, `num_reviewers`, `review_rubric_id`) VALUES(2, 'Latest test', 0, 'test/latest', 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 80.0, 0, 1)[0m
+  [4;35;1mSQL (0.371000)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (1.342000)[0m   [0mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(1, 3, 13, 1, 1, 1, '2007-06-04 08:53:20', 1, 1)[0m
+  [4;36;1mSQL (0.220000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(1, 2, 13, 1, 2, 3, '2007-06-06 08:53:20', 1, 1)[0m
+  [4;35;1mSQL (0.191000)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000000)[0m   [0mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(3, 2, 13, 1, 3, 2, '2007-06-14 08:53:20', 1, 1)[0m
+  [4;36;1mSQL (0.130000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.010000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(2, 2, 13, 1, 4, 2, '2007-06-18 08:53:20', 1, 3)[0m
+  [4;35;1mSQL (0.150000)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.010000)[0m   [0mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(2, 2, 13, 3, 5, 2, '2007-06-22 08:53:20', 1, 2)[0m
+  [4;36;1mSQL (0.140000)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/assignment/list
+Completed in 4.42600 (0 reqs/sec) | DB: 4.11600 (92%) | 302 Found [http://localhost/assignment/create]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 08:54:35) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.020000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.020000)[0m   [0mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.19000 (5 reqs/sec) | Rendering: 0.04000 (21%) | DB: 0.07000 (36%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#delete (for 127.0.0.1 at 2007-06-04 08:55:17) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"delete", "id"=>"13", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (id = '13') LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mDueDate Load (0.040000)[0m   [0mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 13) [0m
+  [4;36;1mReviewFeedback Load (0.050000)[0m   [0;1mSELECT * FROM review_feedbacks WHERE (review_feedbacks.assignment_id = 13) [0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mDueDate Destroy (0.070000)[0m   [0m DELETE FROM due_dates
+ WHERE id = 18
+[0m
+  [4;36;1mSQL (0.060000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.010000)[0m   [0mBEGIN[0m
+  [4;36;1mDueDate Destroy (0.000000)[0m   [0;1m DELETE FROM due_dates
+ WHERE id = 19
+[0m
+  [4;35;1mSQL (0.030000)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mBEGIN[0m
+  [4;35;1mDueDate Destroy (0.000000)[0m   [0m DELETE FROM due_dates
+ WHERE id = 20
+[0m
+  [4;36;1mSQL (0.040000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.010000)[0m   [0mBEGIN[0m
+  [4;36;1mDueDate Destroy (0.000000)[0m   [0;1m DELETE FROM due_dates
+ WHERE id = 21
+[0m
+  [4;35;1mSQL (0.080000)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mDueDate Destroy (0.000000)[0m   [0m DELETE FROM due_dates
+ WHERE id = 22
+[0m
+  [4;36;1mSQL (0.030000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mParticipant Load (0.050000)[0m   [0mSELECT * FROM participants WHERE (participants.assignment_id = 13) [0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Destroy (0.020000)[0m   [0m DELETE FROM assignments
+ WHERE id = 13
+[0m
+  [4;36;1mSQL (0.030000)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.78100 (1 reqs/sec) | DB: 0.56000 (71%) | 302 Found [http://localhost/assignment/delete/13]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 08:55:18) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.04000 (28%) | DB: 0.03000 (21%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 08:55:21) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mWikiAssignment Load (0.000000)[0m   [0;1mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.01100)
+  [4;35;1mWikiAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.000000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.17100 (5 reqs/sec) | Rendering: 0.03100 (18%) | DB: 0.04000 (23%) | 200 OK [http://localhost/assignment/new]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#create (for 127.0.0.1 at 2007-06-04 08:55:39) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"assignment_helper"=>{"no_of_reviews"=>"1"}, "commit"=>"Save assignment", "assignment"=>{"name"=>"Latest test", "require_signup"=>"false", "directory_path"=>"test/latest", "team_assignment"=>"false", "reviews_visible_to_all"=>"false", "review_of_review_rubric_id"=>"1", "wiki_assignment_id"=>"1", "review_weight"=>"80", "review_rubric_id"=>"1"}, "action"=>"create", "controller"=>"assignment", "reviewofreview_deadline"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"3", "review_allowed_id"=>"2", "due_at"=>"", "rereview_allowed_id"=>"2"}, "review_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"3", "due_at"=>"", "rereview_allowed_id"=>"1"}, "submit_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"1", "due_at"=>"", "rereview_allowed_id"=>"1"}, "deadlineTitle0"=>"Submission deadline"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000000)[0m   [0mINSERT INTO assignments (`instructor_id`, `name`, `require_signup`, `directory_path`, `num_review_of_reviewers`, `private`, `submitter_count`, `mapping_strategy_id`, `review_strategy_id`, `team_assignment`, `review_of_review_rubric_id`, `reviews_visible_to_all`, `wiki_assignment_id`, `course_id`, `review_weight`, `num_reviewers`, `review_rubric_id`) VALUES(2, 'Latest test', 0, 'test/latest', 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 80.0, 0, 1)[0m
+  [4;36;1mSQL (0.040000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(1, 3, 14, 1, 1, 1, NULL, 1, 1)[0m
+  [4;35;1mSQL (0.050000)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000000)[0m   [0mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(1, 2, 14, 1, 2, 3, NULL, 1, 1)[0m
+  [4;36;1mSQL (0.030000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(2, 2, 14, 3, 5, 2, NULL, 1, 2)[0m
+  [4;35;1mSQL (0.030000)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.32100 (3 reqs/sec) | DB: 0.18000 (56%) | 302 Found [http://localhost/assignment/create]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 08:55:39) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mSuperAdministrator Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.03000 (21%) | DB: 0.05000 (35%) | 200 OK [http://localhost/assignment/list]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 08:55:44) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"14", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.020000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = '14') LIMIT 1[0m
+  [4;36;1mWikiAssignment Load (0.010000)[0m   [0;1mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.05000)
+  [4;36;1mDueDate Load (0.010000)[0m   [0;1mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 14) [0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.21000 (4 reqs/sec) | Rendering: 0.09000 (42%) | DB: 0.05000 (23%) | 200 OK [http://localhost/assignment/edit/14]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 08:56:13) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mSuperAdministrator Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.31000 (3 reqs/sec) | Rendering: 0.04000 (12%) | DB: 0.04000 (12%) | 200 OK [http://localhost/assignment/list]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#delete (for 127.0.0.1 at 2007-06-04 08:56:16) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"delete", "id"=>"14", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;35;1mSuperAdministrator Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (id = '14') LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mDueDate Load (0.010000)[0m   [0;1mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 14) [0m
+  [4;35;1mReviewFeedback Load (0.000000)[0m   [0mSELECT * FROM review_feedbacks WHERE (review_feedbacks.assignment_id = 14) [0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mDueDate Destroy (0.000000)[0m   [0;1m DELETE FROM due_dates
+ WHERE id = 23
+[0m
+  [4;35;1mSQL (0.040000)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mDueDate Destroy (0.000000)[0m   [0m DELETE FROM due_dates
+ WHERE id = 24
+[0m
+  [4;36;1mSQL (0.040000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mDueDate Destroy (0.010000)[0m   [0;1m DELETE FROM due_dates
+ WHERE id = 25
+[0m
+  [4;35;1mSQL (0.030000)[0m   [0mCOMMIT[0m
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.assignment_id = 14) [0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mAssignment Destroy (0.010000)[0m   [0;1m DELETE FROM assignments
+ WHERE id = 14
+[0m
+  [4;35;1mSQL (0.060000)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.33000 (3 reqs/sec) | DB: 0.22000 (66%) | 302 Found [http://localhost/assignment/delete/14]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 08:56:16) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mSuperAdministrator Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.15000 (6 reqs/sec) | Rendering: 0.04000 (26%) | DB: 0.03000 (20%) | 200 OK [http://localhost/assignment/list]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 08:56:18) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.03000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.28100 (3 reqs/sec) | Rendering: 0.03000 (10%) | DB: 0.04000 (14%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:00:03) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.03000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.03000 (21%) | DB: 0.02000 (14%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.051000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:35:45) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.040000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.050000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.040000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.040000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.060000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+ERROR: compiling _run_rhtml_assignment_new RAISED compile error
+./script/../config/../app/views/assignment/new.rhtml:5: parse error, unexpected ':', expecting ')'
+_erbout.concat(( start_form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();' :onload => 'addElement();')).to_s); _erbout.concat "\n"
+                                                                                            ^
+./script/../config/../app/views/assignment/new.rhtml:5: parse error, unexpected ')', expecting kEND
+_erbout.concat(( start_form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();' :onload => 'addElement();')).to_s); _erbout.concat "\n"
+                                                                                                                             ^
+Function body: def _run_rhtml_assignment_new(local_assigns)
+_erbout = ''; _erbout.concat "\n"
+_erbout.concat "<div style=\"margin-top:-30px\" align=\"right\">"; _erbout.concat(( render :partial => 'auth/login' ).to_s); _erbout.concat "</div>\n"
+_erbout.concat "<h1>New Assignment</h1>\n"
+_erbout.concat "\n"
+_erbout.concat(( start_form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();' :onload => 'addElement();')).to_s); _erbout.concat "\n"
+_erbout.concat "  "; _erbout.concat(( render :partial => 'form' ).to_s); _erbout.concat "\n"
+_erbout.concat "  "; _erbout.concat(( render :partial => 'due_dates' ).to_s); _erbout.concat "\n"
+_erbout.concat "  &nbsp;&nbsp;"; _erbout.concat(( submit_tag "Save assignment" ).to_s); _erbout.concat "\n"
+_erbout.concat(( end_form_tag ).to_s); _erbout.concat "\n"
+_erbout.concat "<br />\n"
+_erbout.concat "<div style=\"padding: 15px\">\n"
+_erbout.concat(( link_to 'Back', :action => 'list' ).to_s); _erbout.concat "\n"
+_erbout.concat "</div>"; _erbout
+end
+Backtrace: ./script/../config/../app/views/assignment/new.rhtml:14:in `compile_template'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:307:in `compile_and_render_template'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:292:in `render_template'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:251:in `render_file'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:726:in `render_file'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:648:in `render_with_no_layout'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/layout.rb:245:in `render_without_benchmark'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:53:in `render'
+C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:53:in `render'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:942:in `perform_action_without_filters'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+script/server:3
+
+
+ActionView::TemplateError (compile error
+./script/../config/../app/views/assignment/new.rhtml:5: parse error, unexpected ':', expecting ')'
+_erbout.concat(( start_form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();' :onload => 'addElement();')).to_s); _erbout.concat "\n"
+                                                                                            ^
+./script/../config/../app/views/assignment/new.rhtml:5: parse error, unexpected ')', expecting kEND
+_erbout.concat(( start_form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();' :onload => 'addElement();')).to_s); _erbout.concat "\n"
+                                                                                                                             ^) on line #5 of app/views/assignment/new.rhtml:
+2: <div style="margin-top:-30px" align="right"><%= render :partial => 'auth/login' %></div>
+3: <h1>New Assignment</h1>
+4: 
+5: <%= start_form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();' :onload => 'addElement();')%>
+6:   <%= render :partial => 'form' %>
+7:   <%= render :partial => 'due_dates' %>
+8:   &nbsp;&nbsp;<%= submit_tag "Save assignment" %>
+
+    #{RAILS_ROOT}/app/views/assignment/new.rhtml:14:in `compile_template'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:307:in `compile_and_render_template'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:292:in `render_template'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_view/base.rb:251:in `render_file'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:726:in `render_file'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:648:in `render_with_no_layout'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/layout.rb:245:in `render_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:53:in `render'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:53:in `render'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:942:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 09:36:15) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mSuperAdministrator Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.28000 (3 reqs/sec) | Rendering: 0.02000 (7%) | DB: 0.04000 (14%) | 200 OK [http://localhost/assignment/list]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:36:19) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.011000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.17100 (5 reqs/sec) | Rendering: 0.04000 (23%) | DB: 0.08100 (47%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:37:38) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.01000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.02000 (14%) | DB: 0.05000 (35%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:47:23) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.01000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.15000 (6 reqs/sec) | Rendering: 0.03000 (20%) | DB: 0.04000 (26%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:52:21) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.03000)
+Rendered assignment/_due_dates (0.13000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.28000 (3 reqs/sec) | Rendering: 0.15000 (53%) | DB: 0.08000 (28%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:52:56) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.03000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.15000 (6 reqs/sec) | Rendering: 0.02000 (13%) | DB: 0.05000 (33%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:53:29) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.011000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.28100 (3 reqs/sec) | Rendering: 0.05000 (17%) | DB: 0.04100 (14%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:54:22) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.16000 (6 reqs/sec) | Rendering: 0.03000 (18%) | DB: 0.06000 (37%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:54:35) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.020000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.01000)
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.03000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.28100 (3 reqs/sec) | Rendering: 0.04000 (14%) | DB: 0.04000 (14%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 09:58:04) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.03000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.15000 (6 reqs/sec) | Rendering: 0.02000 (13%) | DB: 0.04000 (26%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 10:05:43) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14100 (7 reqs/sec) | Rendering: 0.02000 (14%) | DB: 0.04000 (28%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 10:06:53) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mSuperAdministrator Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.03000 (21%) | DB: 0.04000 (28%) | 200 OK [http://localhost/assignment/list]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 10:06:56) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.14000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.30000 (3 reqs/sec) | Rendering: 0.16000 (53%) | DB: 0.05000 (16%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 10:10:39) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.03000)
+Rendered assignment/_due_dates (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.16000 (6 reqs/sec) | Rendering: 0.03000 (18%) | DB: 0.07000 (43%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#create (for 127.0.0.1 at 2007-06-04 10:11:12) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"assignment_helper"=>{"no_of_reviews"=>"2"}, "additional_review_deadline"=>{"2"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"2", "due_at"=>"2007-06-12 10:10:39", "rereview_allowed_id"=>"3"}}, "commit"=>"Save assignment", "assignment"=>{"name"=>"", "require_signup"=>"false", "directory_path"=>"", "team_assignment"=>"false", "reviews_visible_to_all"=>"false", "review_of_review_rubric_id"=>"1", "wiki_assignment_id"=>"1", "review_weight"=>"", "review_rubric_id"=>"1"}, "action"=>"create", "controller"=>"assignment", "additional_submit_deadline"=>{"2"=>{"resubmission_allowed_id"=>"3", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"2", "due_at"=>"2007-06-12 10:10:39", "rereview_allowed_id"=>"1"}}, "reviewofreview_deadline"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"3", "review_allowed_id"=>"2", "due_at"=>"2007-06-22 10:10:39", "rereview_allowed_id"=>"2"}, "review_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"3", "due_at"=>"2007-06-07 10:06:56", "rereview_allowed_id"=>"1"}, "submit_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"1", "due_at"=>"2007-06-05 10:06:56", "rereview_allowed_id"=>"1"}, "deadlineTitle0"=>"Submission deadline"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mDueDate Columns (0.030000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering actionnewlayoutfalse within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.04100)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.29100 (3 reqs/sec) | Rendering: 0.04100 (14%) | DB: 0.08000 (27%) | 200 OK [http://localhost/assignment/create]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#create (for 127.0.0.1 at 2007-06-04 10:15:22) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"assignment_helper"=>{"no_of_reviews"=>"2"}, "additional_review_deadline"=>{"2"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"2", "due_at"=>"2007-06-12 10:10:39", "rereview_allowed_id"=>"3"}}, "commit"=>"Save assignment", "assignment"=>{"name"=>"", "require_signup"=>"false", "directory_path"=>"", "team_assignment"=>"false", "reviews_visible_to_all"=>"false", "review_of_review_rubric_id"=>"1", "wiki_assignment_id"=>"1", "review_weight"=>"", "review_rubric_id"=>"1"}, "action"=>"create", "controller"=>"assignment", "additional_submit_deadline"=>{"2"=>{"resubmission_allowed_id"=>"3", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"2", "due_at"=>"2007-06-12 10:10:39", "rereview_allowed_id"=>"1"}}, "reviewofreview_deadline"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"3", "review_allowed_id"=>"2", "due_at"=>"2007-06-22 10:10:39", "rereview_allowed_id"=>"2"}, "review_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"3", "due_at"=>"2007-06-07 10:06:56", "rereview_allowed_id"=>"1"}, "submit_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"1", "due_at"=>"2007-06-05 10:06:56", "rereview_allowed_id"=>"1"}, "deadlineTitle0"=>"Submission deadline"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mDueDate Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering actionnewlayoutfalse within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.05000)
+Rendered assignment/_due_dates (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.20100 (4 reqs/sec) | Rendering: 0.07000 (34%) | DB: 0.06000 (29%) | 200 OK [http://localhost/assignment/create]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 10:15:28) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mSuperAdministrator Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14100 (7 reqs/sec) | Rendering: 0.02100 (14%) | DB: 0.03000 (21%) | 200 OK [http://localhost/assignment/list]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 10:15:30) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.03000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.15000 (6 reqs/sec) | Rendering: 0.01000 (6%) | DB: 0.06000 (39%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#create (for 127.0.0.1 at 2007-06-04 10:15:49) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"assignment_helper"=>{"no_of_reviews"=>"1"}, "commit"=>"Save assignment", "assignment"=>{"name"=>"", "require_signup"=>"false", "directory_path"=>"", "team_assignment"=>"false", "reviews_visible_to_all"=>"false", "review_of_review_rubric_id"=>"1", "wiki_assignment_id"=>"1", "review_weight"=>"", "review_rubric_id"=>"1"}, "action"=>"create", "controller"=>"assignment", "reviewofreview_deadline"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"3", "review_allowed_id"=>"2", "due_at"=>"2007-06-06 10:15:31", "rereview_allowed_id"=>"2"}, "review_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"3", "due_at"=>"2007-06-05 10:15:31", "rereview_allowed_id"=>"1"}, "submit_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"1", "due_at"=>"2007-06-04 10:15:31", "rereview_allowed_id"=>"1"}, "deadlineTitle0"=>"Submission deadline"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mDueDate Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering actionnewlayoutfalse within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.03000)
+Rendered assignment/_due_dates (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.18100 (5 reqs/sec) | Rendering: 0.05000 (27%) | DB: 0.05000 (27%) | 200 OK [http://localhost/assignment/create]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 10:17:09) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mSuperAdministrator Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.02000 (14%) | DB: 0.04000 (28%) | 200 OK [http://localhost/assignment/list]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 10:17:12) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"8", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;35;1mAssignment Load (0.010000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = '8') LIMIT 1[0m
+  [4;36;1mWikiAssignment Load (0.010000)[0m   [0;1mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.04000)
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 8) [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.18000 (5 reqs/sec) | Rendering: 0.07000 (38%) | DB: 0.04000 (22%) | 200 OK [http://localhost/assignment/edit/8]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 10:17:24) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"7", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = '7') LIMIT 1[0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mWikiAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.000000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.05000)
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 7) [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.18000 (5 reqs/sec) | Rendering: 0.05000 (27%) | DB: 0.06000 (33%) | 200 OK [http://localhost/assignment/edit/7]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 10:18:19) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"7", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;35;1mAssignment Load (0.010000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = '7') LIMIT 1[0m
+  [4;36;1mWikiAssignment Load (0.000000)[0m   [0;1mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.04000)
+  [4;36;1mDueDate Load (0.010000)[0m   [0;1mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 7) [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.18000 (5 reqs/sec) | Rendering: 0.05000 (27%) | DB: 0.06000 (33%) | 200 OK [http://localhost/assignment/edit/7]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 10:24:00) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"7", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = '7') LIMIT 1[0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mWikiAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.010000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.04000)
+  [4;35;1mDueDate Load (0.010000)[0m   [0mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 7) [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.18100 (5 reqs/sec) | Rendering: 0.05000 (27%) | DB: 0.07000 (38%) | 200 OK [http://localhost/assignment/edit/7]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 10:24:30) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"7", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;35;1mAssignment Load (0.010000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = '7') LIMIT 1[0m
+  [4;36;1mWikiAssignment Load (0.010000)[0m   [0;1mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mWikiAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.05000)
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 7) [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.32000 (3 reqs/sec) | Rendering: 0.21000 (65%) | DB: 0.05000 (15%) | 200 OK [http://localhost/assignment/edit/7]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 10:27:58) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"1", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = '1') LIMIT 1[0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mWikiAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.020000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.010000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.06000)
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 1) [0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.21100 (4 reqs/sec) | Rendering: 0.09000 (42%) | DB: 0.05000 (23%) | 200 OK [http://localhost/assignment/edit/1]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 10:28:33) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.02000 (14%) | DB: 0.04000 (28%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 10:28:36) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"2", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = '2') LIMIT 1[0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mWikiAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.010000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.04000)
+  [4;35;1mDueDate Load (0.010000)[0m   [0mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 2) [0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.01000)
+Rendered auth/_login (0.00000)
+Completed in 0.19100 (5 reqs/sec) | Rendering: 0.05000 (26%) | DB: 0.06000 (31%) | 200 OK [http://localhost/assignment/edit/2]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 10:28:41) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.010000)[0m   [0mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.02000 (14%) | DB: 0.04000 (28%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 10:28:45) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"3", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = '3') LIMIT 1[0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mWikiAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.000000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.05000)
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 3) [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.18000 (5 reqs/sec) | Rendering: 0.07000 (38%) | DB: 0.04000 (22%) | 200 OK [http://localhost/assignment/edit/3]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 10:29:33) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mSuperAdministrator Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.02000 (14%) | DB: 0.04000 (28%) | 200 OK [http://localhost/assignment/list]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 10:29:37) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;36;1mWikiAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM wiki_assignments[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.15000 (6 reqs/sec) | Rendering: 0.03000 (20%) | DB: 0.05000 (33%) | 200 OK [http://localhost/assignment/new]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#create (for 127.0.0.1 at 2007-06-04 10:30:45) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"assignment_helper"=>{"no_of_reviews"=>"1"}, "commit"=>"Save assignment", "assignment"=>{"name"=>"TestDeadlineSave", "require_signup"=>"false", "directory_path"=>"admin/due_date_save", "team_assignment"=>"false", "reviews_visible_to_all"=>"false", "review_of_review_rubric_id"=>"1", "wiki_assignment_id"=>"1", "review_weight"=>"79", "review_rubric_id"=>"1"}, "action"=>"create", "controller"=>"assignment", "reviewofreview_deadline"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"3", "review_allowed_id"=>"2", "due_at"=>"2007-06-30 10:29:37", "rereview_allowed_id"=>"2"}, "review_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"3", "due_at"=>"2007-06-27 10:29:37", "rereview_allowed_id"=>"1"}, "submit_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"1", "due_at"=>"2007-06-25 10:29:37", "rereview_allowed_id"=>"1"}, "deadlineTitle0"=>"Submission deadline"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mINSERT INTO assignments (`instructor_id`, `name`, `require_signup`, `directory_path`, `num_review_of_reviewers`, `private`, `submitter_count`, `mapping_strategy_id`, `review_strategy_id`, `team_assignment`, `review_of_review_rubric_id`, `reviews_visible_to_all`, `wiki_assignment_id`, `course_id`, `review_weight`, `num_reviewers`, `review_rubric_id`) VALUES(2, 'TestDeadlineSave', 0, 'admin/due_date_save', 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 79.0, 0, 1)[0m
+  [4;35;1mSQL (0.031000)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000000)[0m   [0mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(1, 3, 15, 1, 1, 1, '2007-06-25 10:29:37', 1, 1)[0m
+  [4;36;1mSQL (0.050000)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.060000)[0m   [0;1mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(1, 2, 15, 1, 2, 3, '2007-06-27 10:29:37', 1, 1)[0m
+  [4;35;1mSQL (0.040000)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000000)[0m   [0mINSERT INTO due_dates (`resubmission_allowed_id`, `submission_allowed_id`, `assignment_id`, `review_of_review_allowed_id`, `deadline_type_id`, `review_allowed_id`, `due_at`, `late_policy_id`, `rereview_allowed_id`) VALUES(2, 2, 15, 3, 5, 2, '2007-06-30 10:29:37', 1, 2)[0m
+  [4;36;1mSQL (0.060000)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.52100 (1 reqs/sec) | DB: 0.29100 (55%) | 302 Found [http://localhost/assignment/create]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 10:30:46) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.17100 (5 reqs/sec) | Rendering: 0.04000 (23%) | DB: 0.03000 (17%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 10:30:49) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"15", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = '15') LIMIT 1[0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mWikiAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.010000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.04000)
+  [4;35;1mDueDate Load (0.010000)[0m   [0mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 15) [0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.19000 (5 reqs/sec) | Rendering: 0.05000 (26%) | DB: 0.09000 (47%) | 200 OK [http://localhost/assignment/edit/15]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 10:31:03) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.010000)[0m   [0mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.28100 (3 reqs/sec) | Rendering: 0.02000 (7%) | DB: 0.05000 (17%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-04 10:31:21) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"15", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = '15') LIMIT 1[0m
+  [4;35;1mWikiAssignment Load (0.000000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mWikiAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.000000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.04000)
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 15) [0m
+  [4;36;1mDueDate Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.19000 (5 reqs/sec) | Rendering: 0.06000 (31%) | DB: 0.06000 (31%) | 200 OK [http://localhost/assignment/edit/15]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-04 10:32:35) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.15000 (6 reqs/sec) | Rendering: 0.04000 (26%) | DB: 0.05000 (33%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-04 10:32:37) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mWikiAssignment Load (0.010000)[0m   [0;1mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;35;1mWikiAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.010000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.29000 (3 reqs/sec) | Rendering: 0.02000 (6%) | DB: 0.05000 (17%) | 200 OK [http://localhost/assignment/new]

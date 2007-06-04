@@ -11,50 +11,36 @@ function checkDeadlines()
 	var dates = new Array()
 	dates[0]= document.getElementById('submit_deadline_due_at').value
 	dates[1]= document.getElementById('review_deadline_due_at').value
-	var datesCounter=2;
+	var datesCount=2;
 	for (i=1;i<limit;i++)
 	{
 		var j = i+1;
 		var resubmitFieldName = "additional_submit_deadline_"+j+"_due_at"
 		var rereviewFieldName = "additional_review_deadline_"+j+"_due_at"
-		dates[datesCounter]= document.getElementById(resubmitFieldName).value
-		datesCounter++
-		dates[datesCounter]= document.getElementById(rereviewFieldName).value
-		datesCounter++
+		dates[datesCount]= document.getElementById(resubmitFieldName).value
+		datesCount++
+		dates[datesCount]= document.getElementById(rereviewFieldName).value
+		datesCount++
 	}
-	dates[datesCounter] = document.getElementById('reviewofreview_deadline_due_at').value
+	dates[datesCount] = document.getElementById('reviewofreview_deadline_due_at').value
 	 
-	for (i=0;i<datesCounter;i++)
+	for (i=0;i<datesCount;i++)
 	{
 		var check = 0
-		var iplsvn = i+1 
+		var iplus1 = i+1 
 		
-		if(getYear(dates[i])<= getYear(dates[iplsvn]))
+		if(getYear(dates[i])<= getYear(dates[iplus1])&& (getMonth(dates[i])<= getMonth(dates[iplus1]) && getDay(dates[i])<= getDay(dates[iplus1])))
 		{
-			if(getMonth(dates[i])<= getMonth(dates[iplsvn]))
+		  if(i == datesCount-1)
 			{
-				if(getDay(dates[i])<= getDay(dates[iplsvn]))
-				{
-					if(i == datesCounter-1)
-					{
-						return true
-					}
-				}
-				else
-				{
-					alert ("Deadlines incorrect- Make sure each date in a deadline is greater than or equal to the date its preceeding deadline.")
-					return false
-				}
+				return true
 			}
-			else
-			{
-				alert ("Month greater for "+i)
-				return false
-			}	
 		}
 		else
 		{
-			alert ("Year greater for "+i)
+			var iplus2=i+2
+			//alert ("Deadlines incorrect. Make sure each date in a deadline is greater than or equal to the date its preceding deadline.")
+			alert ("Deadline on line "+iplus2+" must be after deadline on line "+iplus1)
 			return false
 		}
 	}

@@ -9,7 +9,11 @@
 
     <table>
      <tr>
-      <td><label for="team_assignment">Team assignment:</label></td><td><%= check_box 'assignment', 'team_assignment', {}, true, false %></td>
+      <td><label for="team_assignment">Team assignment:</label></td><td><select name="assignment[team_assignment]">
+                <option value=false>No</option>
+                <option value=true>Yes</option>
+              </select>
+      </td>
      </tr>
      <tr>  
       <td><label for="wiki_assignment">Wiki assignment:</label></td>
@@ -54,11 +58,11 @@
 <p>
 <table>
  <tr>
-  <td><label for="reviews_visible_to_all">Should the reviews be visible to other reviewers?:</label></td>
+  <td><label for="reviews_visible_to_all">Reviews should be visible to all other reviewers</label></td>
   <td><%= check_box 'assignment', 'reviews_visible_to_all', {}, true, false %></td>
  </tr>
  <tr>
-  <td><label for="require_signup">Must users sign up before submitting?:</label></td>
+  <td><label for="require_signup">Users must sign up before submitting</label></td>
   <td><%= check_box 'assignment', 'require_signup', {}, true, false %></td>
  <tr>
 </table>

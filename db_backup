@@ -34,13 +34,14 @@ CREATE TABLE `assignments` (
   `review_weight` float default NULL,
   `reviews_visible_to_all` tinyint(1) default NULL,
   `team_assignment` tinyint(1) default NULL,
-  `wiki_assignment` tinyint(1) default NULL,
+  `wiki_assignment_id` int(11) NOT NULL default '0',
   `require_signup` tinyint(1) default NULL,
   PRIMARY KEY  (`id`),
   KEY `fk_assignments_review_rubrics` (`review_rubric_id`),
   KEY `fk_assignments_review_of_review_rubrics` (`review_of_review_rubric_id`),
   CONSTRAINT `fk_assignments_review_of_review_rubrics` FOREIGN KEY (`review_of_review_rubric_id`) REFERENCES `rubrics` (`id`),
-  CONSTRAINT `fk_assignments_review_rubrics` FOREIGN KEY (`review_rubric_id`) REFERENCES `rubrics` (`id`)
+  CONSTRAINT `fk_assignments_review_rubrics` FOREIGN KEY (`review_rubric_id`) REFERENCES `rubrics` (`id`),
+ CONSTRAINT `fk_assignments_wiki_assignments` FOREIGN KEY (`wiki_assignment_id`) REFERENCES `wiki_assignments` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -50,7 +51,30 @@ CREATE TABLE `assignments` (
 
 /*!40000 ALTER TABLE `assignments` DISABLE KEYS */;
 LOCK TABLES `assignments` WRITE;
-INSERT INTO `assignments` VALUES (1,'TestAssign1','admin/test1/',0,4,2,0,0,0,0,0,1,NULL,NULL,NULL,NULL,NULL,NULL),(2,'TestAssign2','admin/test2/',0,0,2,0,17,9,1,1,2,NULL,NULL,NULL,NULL,NULL,NULL),(3,'Another assignment','',0,0,2,0,0,0,0,0,NULL,NULL,NULL,0,0,0,0),(4,'','',0,0,2,0,0,0,0,0,NULL,NULL,NULL,0,0,0,0),(5,'','',0,0,2,0,0,0,0,0,NULL,NULL,NULL,0,0,0,0),(6,'New Assignment','admin/test3',0,0,2,0,0,0,0,0,NULL,NULL,NULL,1,1,1,1),(7,'New Assignment2','admin/test4',0,0,2,0,0,0,0,0,NULL,NULL,NULL,1,1,1,1),(8,'TestDueDateUpdate','admin/due_date_test',0,0,2,0,0,0,0,0,NULL,NULL,NULL,1,1,0,0);
+INSERT INTO `assignments` VALUES (1,'TestAssign1','admin/test1/',0,4,2,0,0,0,0,0,1,NULL,NULL,NULL,NULL,0,NULL),(2,'TestAssign2','admin/test2/',0,0,2,0,17,9,1,1,2,NULL,NULL,NULL,NULL,0,NULL),(3,'Another assignment','',0,0,2,0,0,0,0,0,NULL,NULL,NULL,0,0,0,0),(4,'','',0,0,2,0,0,0,0,0,NULL,NULL,NULL,0,0,0,0),(5,'','',0,0,2,0,0,0,0,0,NULL,NULL,NULL,0,0,0,0),(6,'New Assignment','admin/test3',0,0,2,0,0,0,0,0,NULL,NULL,NULL,1,1,0,1),(7,'New Assignment2','admin/test4',0,0,2,0,0,0,0,0,NULL,NULL,NULL,1,1,0,1),(8,'TestDueDateUpdate','admin/due_date_test',0,0,2,0,0,0,0,0,NULL,NULL,NULL,1,1,0,0);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `assignments` ENABLE KEYS */;
+
+
+--
+-- Table structure for table `wiki_assignments`
+--
+
+DROP TABLE IF EXISTS `wiki_assignments`;
+CREATE TABLE `wiki_assignments` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `assignments`
+--
+
+
+/*!40000 ALTER TABLE `assignments` DISABLE KEYS */;
+LOCK TABLES `wiki_assignments` WRITE;
+INSERT INTO `wiki_assignments` VALUES (1,'No'),(2,'MediaWiki'),(3,'DocuWiki');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `assignments` ENABLE KEYS */;
 

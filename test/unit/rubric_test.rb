@@ -4,6 +4,7 @@ class RubricTest < Test::Unit::TestCase
   fixtures :rubrics
 
   def setup
+    # Database was initialized with (at least) 3 rubrics.
     @rubric1 = Rubric.find(1)
     @rubric2 = Rubric.find(2)
     @rubric3 = Rubric.find(3)
@@ -30,10 +31,10 @@ class RubricTest < Test::Unit::TestCase
     assert_equal "rubric1 new name", @rubric1.name
   end
   
-  def test_destroy
-    @rubric1.destroy
-    assert_raise(ActiveRecord::RecordNotFound) { Rubric.find(@rubric1.id) }
-  end
+#  def test_destroy
+#    @rubric1.destroy
+#    assert_raise(ActiveRecord::RecordNotFound) { Rubric.find(@rubric1.id) }
+#  end
   
   def test_validate_no_numbers
     @rubric1.min_question_score = "akajfsd"

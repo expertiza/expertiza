@@ -1,0 +1,157 @@
+  [4;35;1mSQL (0.010000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mBEGIN[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 1) LIMIT 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (rubrics.id = 2) LIMIT 1[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 3) LIMIT 1[0m
+  [4;36;1mRubric Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM rubrics[0m
+  [4;35;1mSQL (0.010000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 1) LIMIT 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (rubrics.id = 2) LIMIT 1[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 3) LIMIT 1[0m
+  [4;36;1mRubric Destroy (0.000000)[0m   [0;1m DELETE FROM rubrics
+ WHERE id = 1
+[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 1) LIMIT 1[0m
+  [4;36;1mSQL (0.030000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics WHERE (rubrics.id = 1) LIMIT 1[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 2) LIMIT 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (rubrics.id = 3) LIMIT 1[0m
+  [4;35;1mQuestion Load (0.000000)[0m   [0mSELECT * FROM questions WHERE (questions.rubric_id = 1) [0m
+  [4;36;1mQuestion Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM questions[0m
+  [4;35;1mSQL (0.000000)[0m   [0mINSERT INTO questions (`true_false`, `rubric_id`, `weight`, `txt`) VALUES(0, 1, NULL, '1')[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mINSERT INTO questions (`true_false`, `rubric_id`, `weight`, `txt`) VALUES(1, 1, NULL, '2')[0m
+  [4;35;1mSQL (0.060000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mBEGIN[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 1) LIMIT 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (rubrics.id = 2) LIMIT 1[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 3) LIMIT 1[0m
+  [4;36;1mRubric Load (0.020000)[0m   [0;1mSELECT * FROM rubrics WHERE (id <> 1 and name = 'rubric1 new name' and instructor_id = 5) [0m
+  [4;35;1mRubric Update (0.010000)[0m   [0mUPDATE rubrics SET `max_question_score` = 8, `instructor_id` = 5, `min_question_score` = 2, `private` = 0, `name` = 'rubric1 new name' WHERE id = 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (rubrics.id = 1) LIMIT 1[0m
+  [4;35;1mSQL (0.020000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 1) LIMIT 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (rubrics.id = 2) LIMIT 1[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 3) LIMIT 1[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics WHERE (id <> 1 and name = 'rubric1' and instructor_id = 5) [0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 1) LIMIT 1[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics WHERE (rubrics.id = 2) LIMIT 1[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 3) LIMIT 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (id <> 1 and name = 'rubric1' and instructor_id = 5) [0m
+  [4;35;1mSQL (0.010000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 1) LIMIT 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (rubrics.id = 2) LIMIT 1[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 3) LIMIT 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (id <> 1 and name = 'rubric1' and instructor_id = 5) [0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mRubric Load (0.000000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 1) LIMIT 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (rubrics.id = 2) LIMIT 1[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics WHERE (rubrics.id = 3) LIMIT 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (id <> 1 and name = 'aaaa' and instructor_id = 1) [0m
+  [4;35;1mRubric Update (0.000000)[0m   [0mUPDATE rubrics SET `max_question_score` = 5, `instructor_id` = 1, `min_question_score` = 1, `private` = 0, `name` = 'aaaa' WHERE id = 1[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics WHERE (id <> 2 and name = 'aaaa' and instructor_id = 1) [0m
+  [4;35;1mSQL (0.030000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.010000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.010000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.010000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.010000)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.010000)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mROLLBACK[0m

@@ -9,7 +9,17 @@ class Assignment < ActiveRecord::Base
   
   validates_presence_of :name
   validates_presence_of :directory_path
+  #validates_presence_of :submitter_count
+  #validates_presence_of :instructor_id
+  #validates_presence_of :mapping_strategy_id
+  validates_presence_of :review_rubric_id
+  validates_presence_of :review_of_review_rubric_id
   validates_numericality_of :review_weight
+  validates_presence_of :reviews_visible_to_all
+  validates_presence_of :team_assignment
+  validates_presence_of :wiki_assignment_id
+  validates_presence_of :require_signup
+    
     
   def due_dates_exist?
     return false if due_dates == nil or due_dates.length == 0

@@ -39374,3 +39374,680 @@ Rendered menu_items/_suckerfish (0.00000)
 Rendered menu_items/_breadcrumbs (0.00000)
 Rendered auth/_login (0.00000)
 Completed in 0.29000 (3 reqs/sec) | Rendering: 0.02000 (6%) | DB: 0.05000 (17%) | 200 OK [http://localhost/assignment/new]
+  [4;35;1mUser Columns (0.040000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AuthController#logout (for 127.0.0.1 at 2007-06-05 09:25:23) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Logout", "action"=>"logout", "controller"=>"auth"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.270000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.181000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time expired
+  [4;36;1mContentPage Load (0.030000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.id = 2) LIMIT 1[0m
+  [4;35;1mContentPage Columns (0.020000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+Redirected to http://localhost:3000/expired
+Filter chain halted as [goldberg_security_filter] returned false
+Completed in 2.42300 (0 reqs/sec) | DB: 0.55100 (22%) | 302 Found [http://localhost/auth/logout]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-05 09:25:30) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["expired"], "controller"=>"content_pages"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mSystemSettings Columns (0.060000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+Page: authorised
+Authorised? true
+  [4;36;1mContentPage Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+  [4;35;1mContentPage Load (0.000000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('expired') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.02000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.02000)
+Completed in 0.87100 (1 reqs/sec) | Rendering: 0.21000 (24%) | DB: 0.09000 (10%) | 200 OK [http://localhost/expired]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-05 09:25:50) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Login", "action"=>"login", "controller"=>"auth", "login"=>{"name"=>"riwesley", "password"=>"password"}}
+  [4;36;1mSystemSettings Load (0.030000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.020000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mUser Load (0.010000)[0m   [0mSELECT * FROM users WHERE (users.`name` = 'riwesley' ) LIMIT 1[0m
+User riwesley successfully logged in
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+Logging in user as role Credentials
+  [4;35;1mStudent Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+Redirected to http://localhost:3000/student_assignment/list
+Completed in 1.62200 (0 reqs/sec) | DB: 0.09000 (5%) | 302 Found [http://localhost/auth/login]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#list (for 127.0.0.1 at 2007-06-05 09:25:53) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.020000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.060000)[0m   [0mSELECT * FROM participants WHERE (user_id = 4) ORDER BY assignment_id DESC [0m
+Rendering  within layouts/application
+Rendering student_assignment/list
+  [4;36;1mParticipant Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM participants[0m
+  [4;35;1mAssignment Load (0.020000)[0m   [0mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;36;1mAssignment Columns (0.020000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mCourse Load (0.030000)[0m   [0mSELECT * FROM courses WHERE (courses.id = 0) LIMIT 1[0m
+  [4;36;1mDueDate Load (0.030000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 2) ORDER BY due_at DESC [0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mDueDate Load (0.010000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 2) ORDER BY due_at DESC [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.59100 (1 reqs/sec) | Rendering: 0.16100 (27%) | DB: 0.23000 (38%) | 200 OK [http://localhost/student_assignment/list]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#view_actions (for 127.0.0.1 at 2007-06-05 09:26:04) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view_actions", "id"=>"2", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+Rendering  within layouts/application
+Rendering student_assignment/view_actions
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.35000 (2 reqs/sec) | Rendering: 0.13000 (37%) | DB: 0.06000 (17%) | 200 OK [http://localhost/student_assignment/view_actions/2]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing ReviewController#feedback (for 127.0.0.1 at 2007-06-05 09:26:08) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"feedback", "id"=>"4", "controller"=>"review"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.020000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mReviewMapping Load (0.020000)[0m   [0mSELECT * FROM review_mappings WHERE (reviewer_id = '4' and assignment_id = NULL) [0m
+Rendering  within layouts/application
+Rendering review/feedback
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.27000 (3 reqs/sec) | Rendering: 0.03000 (11%) | DB: 0.06000 (22%) | 200 OK [http://localhost/review/feedback/4]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#submit (for 127.0.0.1 at 2007-06-05 09:26:19) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"submit", "id"=>"2", "controller"=>"student_assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: authorised
+Authorised? true
+  [4;35;1mParticipant Load (0.010000)[0m   [0mSELECT * FROM participants WHERE (participants.id = '2') LIMIT 1[0m
+  [4;36;1mDueDate Load (0.000000)[0m   [0;1mSELECT * FROM due_dates WHERE (assignment_id = 14) [0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates ORDER BY due_at DESC LIMIT 1[0m
+  [4;36;1mDueDate Columns (0.020000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mParticipant Columns (0.010000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendering  within layouts/application
+Rendering student_assignment/submit
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.53100 (1 reqs/sec) | Rendering: 0.13100 (24%) | DB: 0.10000 (18%) | 200 OK [http://localhost/student_assignment/submit/2]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AuthController#logout (for 127.0.0.1 at 2007-06-05 09:28:23) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Logout", "action"=>"logout", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/
+Completed in 0.13000 (7 reqs/sec) | DB: 0.04000 (30%) | 302 Found [http://localhost/auth/logout]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view_default (for 127.0.0.1 at 2007-06-05 09:28:23) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view_default", "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.020000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+Action: authorised
+Authorised? true
+  [4;35;1mContentPage Load (0.010000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 1) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view_default
+  [4;36;1mContentPage Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.01000)
+Rendered auth/_login (0.00000)
+Completed in 0.30000 (3 reqs/sec) | Rendering: 0.03000 (9%) | DB: 0.07000 (23%) | 200 OK [http://localhost/]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-05 09:28:39) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Login", "action"=>"login", "controller"=>"auth", "login"=>{"name"=>"admin", "password"=>"admin"}}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.020000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mUser Load (0.010000)[0m   [0;1mSELECT * FROM users WHERE (users.`name` = 'admin' ) LIMIT 1[0m
+User admin successfully logged in
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+Logging in user as role Credentials
+  [4;36;1mSuperAdministrator Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.66100 (1 reqs/sec) | DB: 0.09000 (13%) | 302 Found [http://localhost/auth/login]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-05 09:28:40) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.020000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.020000)[0m   [0mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.08000)
+Rendered menu_items/_suckerfish (0.08000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.08000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.49000 (2 reqs/sec) | Rendering: 0.17000 (34%) | DB: 0.06000 (12%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#edit (for 127.0.0.1 at 2007-06-05 09:28:55) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"edit", "id"=>"3", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.030000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Controller: authorised
+Authorised? true
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = '3') LIMIT 1[0m
+  [4;35;1mWikiAssignment Load (0.010000)[0m   [0mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/edit
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mWikiAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.010000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.15000)
+  [4;35;1mDueDate Load (0.010000)[0m   [0mSELECT * FROM due_dates WHERE (due_dates.assignment_id = 3) [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.48000 (2 reqs/sec) | Rendering: 0.16000 (33%) | DB: 0.14000 (29%) | 200 OK [http://localhost/assignment/edit/3]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AuthController#logout (for 127.0.0.1 at 2007-06-05 09:40:07) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Logout", "action"=>"logout", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.030000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/
+Completed in 0.15000 (6 reqs/sec) | DB: 0.05000 (33%) | 302 Found [http://localhost/auth/logout]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view_default (for 127.0.0.1 at 2007-06-05 09:40:07) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view_default", "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+  [4;35;1mRole Load (0.011000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+Action: authorised
+Authorised? true
+  [4;35;1mContentPage Load (0.000000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 1) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view_default
+  [4;36;1mContentPage Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.13100 (7 reqs/sec) | Rendering: 0.02000 (15%) | DB: 0.02100 (16%) | 200 OK [http://localhost/]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-05 09:40:21) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Login", "action"=>"login", "controller"=>"auth", "login"=>{"name"=>"riwesley", "password"=>"password"}}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mUser Load (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`name` = 'riwesley' ) LIMIT 1[0m
+User riwesley successfully logged in
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+Logging in user as role Credentials
+  [4;36;1mStudent Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+Redirected to http://localhost:3000/student_assignment/list
+Completed in 0.11000 (9 reqs/sec) | DB: 0.01000 (9%) | 302 Found [http://localhost/auth/login]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#list (for 127.0.0.1 at 2007-06-05 09:40:22) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.000000)[0m   [0;1mSELECT * FROM participants WHERE (user_id = 4) ORDER BY assignment_id DESC [0m
+Rendering  within layouts/application
+Rendering student_assignment/list
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mCourse Load (0.000000)[0m   [0;1mSELECT * FROM courses WHERE (courses.id = 0) LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) ORDER BY due_at DESC [0m
+  [4;36;1mDueDate Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) ORDER BY due_at DESC [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.19000 (5 reqs/sec) | Rendering: 0.09000 (47%) | DB: 0.04000 (21%) | 200 OK [http://localhost/student_assignment/list]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AuthController#logout (for 127.0.0.1 at 2007-06-05 09:45:24) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Logout", "action"=>"logout", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/
+Completed in 0.06000 (16 reqs/sec) | DB: 0.00000 (0%) | 302 Found [http://localhost/auth/logout]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view_default (for 127.0.0.1 at 2007-06-05 09:45:24) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view_default", "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+  [4;35;1mRole Load (0.011000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+Action: authorised
+Authorised? true
+  [4;35;1mContentPage Load (0.000000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 1) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view_default
+  [4;36;1mContentPage Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10100 (9 reqs/sec) | Rendering: 0.01000 (9%) | DB: 0.03100 (30%) | 200 OK [http://localhost/]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-05 09:45:31) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Login", "action"=>"login", "controller"=>"auth", "login"=>{"name"=>"riwesley", "password"=>"password"}}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mUser Load (0.010000)[0m   [0;1mSELECT * FROM users WHERE (users.`name` = 'riwesley' ) LIMIT 1[0m
+User riwesley successfully logged in
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+Logging in user as role Credentials
+  [4;36;1mStudent Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+Redirected to http://localhost:3000/student_assignment/list
+Completed in 0.10000 (10 reqs/sec) | DB: 0.03000 (30%) | 302 Found [http://localhost/auth/login]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing StudentAssignmentController#list (for 127.0.0.1 at 2007-06-05 09:45:31) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"student_assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;36;1mParticipant Load (0.010000)[0m   [0;1mSELECT * FROM participants WHERE (user_id = 4) ORDER BY assignment_id DESC [0m
+Rendering  within layouts/application
+Rendering student_assignment/list
+  [4;35;1mParticipant Columns (0.000000)[0m   [0mSHOW FIELDS FROM participants[0m
+  [4;36;1mAssignment Load (0.000000)[0m   [0;1mSELECT * FROM assignments WHERE (assignments.id = 2) LIMIT 1[0m
+  [4;35;1mAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM assignments[0m
+  [4;36;1mCourse Load (0.010000)[0m   [0;1mSELECT * FROM courses WHERE (courses.id = 0) LIMIT 1[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) ORDER BY due_at DESC [0m
+  [4;36;1mDueDate Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM due_dates[0m
+  [4;35;1mDueDate Load (0.000000)[0m   [0mSELECT * FROM due_dates WHERE (assignment_id = 2) ORDER BY due_at DESC [0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.15000 (6 reqs/sec) | Rendering: 0.04000 (26%) | DB: 0.05000 (33%) | 200 OK [http://localhost/student_assignment/list]
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AuthController#logout (for 127.0.0.1 at 2007-06-05 09:45:33) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Logout", "action"=>"logout", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/
+Completed in 0.05000 (20 reqs/sec) | DB: 0.04000 (80%) | 302 Found [http://localhost/auth/logout]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view_default (for 127.0.0.1 at 2007-06-05 09:45:34) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view_default", "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+  [4;35;1mRole Load (0.000000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+Action: authorised
+Authorised? true
+  [4;35;1mContentPage Load (0.010000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 1) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view_default
+  [4;36;1mContentPage Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.11000 (9 reqs/sec) | Rendering: 0.02000 (18%) | DB: 0.03000 (27%) | 200 OK [http://localhost/]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-05 09:45:43) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Login", "action"=>"login", "controller"=>"auth", "login"=>{"name"=>"admin", "password"=>"admin"}}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mUser Load (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`name` = 'admin' ) LIMIT 1[0m
+User admin successfully logged in
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+Logging in user as role Credentials
+  [4;36;1mSuperAdministrator Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.12000 (8 reqs/sec) | DB: 0.03000 (24%) | 302 Found [http://localhost/auth/login]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-05 09:45:43) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.000000)[0m   [0mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.14000 (7 reqs/sec) | Rendering: 0.02000 (14%) | DB: 0.02000 (14%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-05 09:45:56) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.011000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mRubric Load (0.010000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mWikiAssignment Load (0.000000)[0m   [0;1mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;35;1mWikiAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.000000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.03000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.31100 (3 reqs/sec) | Rendering: 0.01000 (3%) | DB: 0.08100 (26%) | 200 OK [http://localhost/assignment/new]
+  [4;35;1mUser Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#create (for 127.0.0.1 at 2007-06-05 10:55:55) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"assignment_helper"=>{"no_of_reviews"=>"1"}, "commit"=>"Save assignment", "assignment"=>{"name"=>"", "require_signup"=>"false", "directory_path"=>"", "team_assignment"=>"false", "reviews_visible_to_all"=>"false", "review_of_review_rubric_id"=>"1", "wiki_assignment_id"=>"1", "review_weight"=>"", "review_rubric_id"=>"1"}, "action"=>"create", "controller"=>"assignment", "reviewofreview_deadline"=>{"resubmission_allowed_id"=>"2", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"3", "review_allowed_id"=>"2", "due_at"=>"", "rereview_allowed_id"=>"2"}, "review_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"2", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"3", "due_at"=>"", "rereview_allowed_id"=>"1"}, "submit_deadline"=>{"resubmission_allowed_id"=>"1", "submission_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "review_allowed_id"=>"1", "due_at"=>"", "rereview_allowed_id"=>"1"}, "deadlineTitle0"=>"Submission deadline"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.020000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mAssignment Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mDueDate Columns (0.000000)[0m   [0mSHOW FIELDS FROM due_dates[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000000)[0m   [0mCOMMIT[0m
+  [4;36;1mWikiAssignment Load (0.010000)[0m   [0;1mSELECT * FROM wiki_assignments [0m
+Rendering actionnewlayoutfalse within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.00000)
+  [4;35;1mWikiAssignment Columns (0.010000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.000000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.010000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.06000)
+Rendered assignment/_due_dates (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.33000 (3 reqs/sec) | Rendering: 0.07000 (21%) | DB: 0.08000 (24%) | 200 OK [http://localhost/assignment/create]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AuthController#logout (for 127.0.0.1 at 2007-06-05 11:21:26) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Logout", "action"=>"logout", "controller"=>"auth"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.020000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/
+Completed in 0.06000 (16 reqs/sec) | DB: 0.02000 (33%) | 302 Found [http://localhost/auth/logout]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view_default (for 127.0.0.1 at 2007-06-05 11:21:27) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view_default", "controller"=>"content_pages"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+Action: authorised
+Authorised? true
+  [4;36;1mContentPage Load (0.030000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.id = 1) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view_default
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.12000 (8 reqs/sec) | Rendering: 0.01000 (8%) | DB: 0.05000 (41%) | 200 OK [http://localhost/]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-05 11:22:08) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Login", "action"=>"login", "controller"=>"auth", "login"=>{"name"=>"efg", "password"=>"10amwed"}}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mUser Load (0.010000)[0m   [0mSELECT * FROM users WHERE (users.`name` = 'efg' ) LIMIT 1[0m
+User efg successfully logged in
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 2) LIMIT 1[0m
+Logging in user as role Credentials
+  [4;35;1mInstructor Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.13000 (7 reqs/sec) | DB: 0.04000 (30%) | 302 Found [http://localhost/auth/login]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-05 11:22:09) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 2) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mInstructor Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.010000)[0m   [0;1mSELECT * FROM assignments WHERE (instructor_id = 6) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.12000 (8 reqs/sec) | Rendering: 0.01000 (8%) | DB: 0.05000 (41%) | 200 OK [http://localhost/assignment/list]

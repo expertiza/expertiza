@@ -14,6 +14,7 @@ class AssignmentController < ApplicationController
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.
     @assignment = Assignment.new(params[:assignment])
     @assignment.instructor_id = (session[:user]).id
+    @assignment.submitter_count = 0
     @duedate=DueDate.new
     
     # Deadline types used in the deadline_types DB table

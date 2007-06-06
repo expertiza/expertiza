@@ -40051,3 +40051,1563 @@ Rendered menu_items/_suckerfish (0.00000)
 Rendered menu_items/_breadcrumbs (0.00000)
 Rendered auth/_login (0.00000)
 Completed in 0.12000 (8 reqs/sec) | Rendering: 0.01000 (8%) | DB: 0.05000 (41%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.400000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 16:43:14) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.401000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.170000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 2) LIMIT 1[0m
+  [4;36;1mRole Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.020000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time expired
+  [4;36;1mContentPage Load (0.361000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.id = 2) LIMIT 1[0m
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+Redirected to http://localhost:3000/expired
+Filter chain halted as [goldberg_security_filter] returned false
+Completed in 1.79300 (0 reqs/sec) | DB: 1.36200 (75%) | 302 Found [http://localhost/assignment/list]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 16:43:20) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["expired"], "controller"=>"content_pages"}
+  [4;36;1mSystemSettings Load (0.021000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+Page: authorised
+Authorised? true
+  [4;36;1mContentPage Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+  [4;35;1mContentPage Load (0.030000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('expired') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (1.60300)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.03000)
+Completed in 2.31400 (0 reqs/sec) | Rendering: 1.84300 (79%) | DB: 0.07100 (3%) | 200 OK [http://localhost/expired]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-06 16:43:39) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Login", "action"=>"login", "controller"=>"auth", "login"=>{"name"=>"admin", "password"=>"admin"}}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;36;1mUser Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mUser Load (0.010000)[0m   [0mSELECT * FROM users WHERE (users.`name` = 'admin' ) LIMIT 1[0m
+User admin successfully logged in
+  [4;36;1mRole Load (0.130000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+Logging in user as role Credentials
+  [4;35;1mSuperAdministrator Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.35000 (2 reqs/sec) | DB: 0.16000 (45%) | 302 Found [http://localhost/auth/login]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 16:43:39) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;35;1mSuperAdministrator Columns (0.010000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mAssignment Load (0.140000)[0m   [0;1mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;35;1mAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.02000)
+Rendered menu_items/_suckerfish (0.03000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.04000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01100)
+Completed in 0.45100 (2 reqs/sec) | Rendering: 0.11100 (24%) | DB: 0.19000 (42%) | 200 OK [http://localhost/assignment/list]
+  [4;36;1mUser Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+
+
+Processing AuthController#logout (for 127.0.0.1 at 2007-06-06 16:44:23) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Logout", "action"=>"logout", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/
+Completed in 0.06100 (16 reqs/sec) | DB: 0.01000 (16%) | 302 Found [http://localhost/auth/logout]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view_default (for 127.0.0.1 at 2007-06-06 16:44:24) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view_default", "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+Action: authorised
+Authorised? true
+  [4;35;1mContentPage Load (0.020000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 1) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view_default
+  [4;36;1mContentPage Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.12000 (8 reqs/sec) | Rendering: 0.00000 (0%) | DB: 0.05000 (41%) | 200 OK [http://localhost/]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 16:44:30) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.role_id):
+    /app/helpers/application_helper.rb:8:in `get_user_role'
+    /app/controllers/application.rb:30:in `set_up_display_options'
+    /app/controllers/assignment_controller.rb:134:in `list'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 16:49:52) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.07000 (14 reqs/sec) | DB: 0.01000 (14%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing Base#index (for 127.0.0.1 at 2007-06-06 16:49:53) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {}
+
+
+SyntaxError (./script/../config/../app/controllers/assignment_controller.rb:141: parse error, unexpected $, expecting kEND):
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:140:in `load'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:140:in `load'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:56:in `require_or_load'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:30:in `depend_on'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:85:in `require_dependency'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/routing.rb:285:in `attempt_load'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/routing.rb:281:in `each'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/routing.rb:281:in `attempt_load'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/routing.rb:237:in `traverse_to_controller'
+    generated/routing/recognition.rb:3:in `recognize_path'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/routing.rb:511:in `recognize!'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 16:50:13) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 16:50:13) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.role_id):
+    /app/helpers/application_helper.rb:8:in `get_user_role'
+    /app/controllers/application.rb:30:in `set_up_display_options'
+    /app/controllers/assignment_controller.rb:137:in `list'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view_default (for 127.0.0.1 at 2007-06-06 16:56:35) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view_default", "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;35;1mContentPage Load (0.010000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 1) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view_default
+  [4;36;1mContentPage Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10000 (10 reqs/sec) | Rendering: 0.01000 (10%) | DB: 0.04000 (40%) | 200 OK [http://localhost/]
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 16:56:39) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.060000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.12100 (8 reqs/sec) | DB: 0.07000 (57%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 16:56:40) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.role_id):
+    /app/helpers/application_helper.rb:8:in `get_user_role'
+    /app/controllers/assignment_controller.rb:134:in `list'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view_default (for 127.0.0.1 at 2007-06-06 16:58:30) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view_default", "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;35;1mContentPage Load (0.010000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 1) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view_default
+  [4;36;1mContentPage Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10000 (10 reqs/sec) | Rendering: 0.01000 (10%) | DB: 0.02000 (20%) | 200 OK [http://localhost/]
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 16:58:34) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 16:58:34) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.role_id):
+    /app/helpers/application_helper.rb:8:in `get_user_role'
+    /app/controllers/assignment_controller.rb:134:in `list'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 16:58:39) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["home"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/home
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/menu/home]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 16:58:39) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["home"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.000000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('home') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.23000 (4 reqs/sec) | Rendering: 0.01000 (4%) | DB: 0.01000 (4%) | 200 OK [http://localhost/home]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 16:59:57) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["home"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.010000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.000000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('home') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10100 (9 reqs/sec) | Rendering: 0.01000 (9%) | DB: 0.02000 (19%) | 200 OK [http://localhost/home]
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 16:59:59) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.07000 (14 reqs/sec) | DB: 0.03000 (42%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 16:59:59) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.role_id):
+    /app/controllers/assignment_controller.rb:134:in `list'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 17:00:16) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.role_id):
+    /app/controllers/assignment_controller.rb:134:in `list'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 17:00:41) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.role_id):
+    /app/helpers/application_helper.rb:8:in `get_user_role'
+    /app/controllers/application.rb:30:in `set_up_display_options'
+    /app/controllers/assignment_controller.rb:137:in `list'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:00:45) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["home"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.010000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.000000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('home') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.33000 (3 reqs/sec) | Rendering: 0.01000 (3%) | DB: 0.04000 (12%) | 200 OK [http://localhost/home]
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 17:00:48) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.08000 (12 reqs/sec) | DB: 0.02000 (24%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 17:00:48) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/
+
+
+NoMethodError (You have a nil object when you didn't expect it!
+The error occured while evaluating nil.role_id):
+    /app/helpers/application_helper.rb:8:in `get_user_role'
+    /app/controllers/application.rb:30:in `set_up_display_options'
+    /app/controllers/assignment_controller.rb:137:in `list'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:941:in `perform_action_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:368:in `perform_action_without_benchmark'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/benchmarking.rb:69:in `perform_action_without_rescue'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/rescue.rb:82:in `perform_action'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `send'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/base.rb:408:in `process_without_filters'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/filters.rb:377:in `process_without_session_management_support'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/session_management.rb:117:in `process'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/dispatcher.rb:38:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:115:in `handle_dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:81:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:95:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `each'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:92:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:23:in `start'
+    C:/InstantRails/ruby/lib/ruby/1.8/webrick/server.rb:82:in `start'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/webrick_server.rb:67:in `dispatch'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/servers/webrick.rb:59
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/rails-1.1.6/lib/commands/server.rb:30
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    C:/InstantRails/ruby/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/activesupport-1.3.1/lib/active_support/dependencies.rb:147:in `require'
+    script/server:3
+
+
+Rendering C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:07:46) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["home"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.060000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('home') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.15000 (6 reqs/sec) | Rendering: 0.01000 (6%) | DB: 0.08000 (53%) | 200 OK [http://localhost/home]
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 17:07:49) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.07000 (14 reqs/sec) | DB: 0.03000 (42%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 17:07:49) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/login
+Completed in 0.08000 (12 reqs/sec) | DB: 0.03000 (37%) | 302 Found [http://localhost/assignment/list]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-06 17:07:49) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"login", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/list
+Filter chain halted as [#<Proc:0x02d01428@C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/verification.rb:64>] returned false
+Completed in 0.05000 (20 reqs/sec) | DB: 0.02000 (40%) | 302 Found [http://localhost/auth/login]
+
+
+Processing AuthController#list (for 127.0.0.1 at 2007-06-06 17:07:50) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: NOT authorised
+Authorised? false
+  [4;35;1mContentPage Load (0.000000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 4) LIMIT 1[0m
+  [4;36;1mContentPage Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Redirected to http://localhost:3000/denied
+Filter chain halted as [goldberg_security_filter] returned false
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/auth/list]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:07:50) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.010000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.000000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10000 (10 reqs/sec) | Rendering: 0.01000 (10%) | DB: 0.04000 (40%) | 200 OK [http://localhost/denied]
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 17:07:53) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 17:07:54) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/login
+Completed in 0.06000 (16 reqs/sec) | DB: 0.01000 (16%) | 302 Found [http://localhost/assignment/list]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-06 17:07:54) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"login", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/list
+Filter chain halted as [#<Proc:0x02d01428@C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/verification.rb:64>] returned false
+Completed in 0.05000 (20 reqs/sec) | DB: 0.02000 (40%) | 302 Found [http://localhost/auth/login]
+
+
+Processing AuthController#list (for 127.0.0.1 at 2007-06-06 17:07:54) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: NOT authorised
+Authorised? false
+  [4;35;1mContentPage Load (0.010000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 4) LIMIT 1[0m
+  [4;36;1mContentPage Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Redirected to http://localhost:3000/denied
+Filter chain halted as [goldberg_security_filter] returned false
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/auth/list]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:07:55) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.010000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10000 (10 reqs/sec) | Rendering: 0.01000 (10%) | DB: 0.02000 (20%) | 200 OK [http://localhost/denied]
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 17:07:59) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 17:07:59) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/login
+Completed in 0.08000 (12 reqs/sec) | DB: 0.03000 (37%) | 302 Found [http://localhost/assignment/list]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-06 17:07:59) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"login", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.021000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/list
+Filter chain halted as [#<Proc:0x02d01428@C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/verification.rb:64>] returned false
+Completed in 0.07100 (14 reqs/sec) | DB: 0.03100 (43%) | 302 Found [http://localhost/auth/login]
+
+
+Processing AuthController#list (for 127.0.0.1 at 2007-06-06 17:08:00) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: NOT authorised
+Authorised? false
+  [4;35;1mContentPage Load (0.000000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 4) LIMIT 1[0m
+  [4;36;1mContentPage Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Redirected to http://localhost:3000/denied
+Filter chain halted as [goldberg_security_filter] returned false
+Completed in 0.07000 (14 reqs/sec) | DB: 0.03000 (42%) | 302 Found [http://localhost/auth/list]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:08:00) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.011000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.11100 (9 reqs/sec) | Rendering: 0.01000 (9%) | DB: 0.04100 (36%) | 200 OK [http://localhost/denied]
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 17:08:02) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 17:08:03) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/login
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/assignment/list]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-06 17:08:03) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"login", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.011000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/list
+Filter chain halted as [#<Proc:0x02d01428@C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/verification.rb:64>] returned false
+Completed in 0.06100 (16 reqs/sec) | DB: 0.03100 (50%) | 302 Found [http://localhost/auth/login]
+
+
+Processing AuthController#list (for 127.0.0.1 at 2007-06-06 17:08:03) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: NOT authorised
+Authorised? false
+  [4;35;1mContentPage Load (0.010000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 4) LIMIT 1[0m
+  [4;36;1mContentPage Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Redirected to http://localhost:3000/denied
+Filter chain halted as [goldberg_security_filter] returned false
+Completed in 0.07000 (14 reqs/sec) | DB: 0.03000 (42%) | 302 Found [http://localhost/auth/list]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:08:03) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.010000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.01000)
+Rendered auth/_login (0.00000)
+Completed in 0.11000 (9 reqs/sec) | Rendering: 0.01000 (9%) | DB: 0.02000 (18%) | 200 OK [http://localhost/denied]
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 17:08:07) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.07000 (14 reqs/sec) | DB: 0.03000 (42%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 17:08:08) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/login
+Completed in 0.07000 (14 reqs/sec) | DB: 0.03000 (42%) | 302 Found [http://localhost/assignment/list]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-06 17:08:08) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"login", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/list
+Filter chain halted as [#<Proc:0x02d01428@C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/verification.rb:64>] returned false
+Completed in 0.05000 (20 reqs/sec) | DB: 0.03000 (60%) | 302 Found [http://localhost/auth/login]
+
+
+Processing AuthController#list (for 127.0.0.1 at 2007-06-06 17:08:08) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: NOT authorised
+Authorised? false
+  [4;35;1mContentPage Load (0.010000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 4) LIMIT 1[0m
+  [4;36;1mContentPage Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Redirected to http://localhost:3000/denied
+Filter chain halted as [goldberg_security_filter] returned false
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/auth/list]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:08:08) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.000000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10100 (9 reqs/sec) | Rendering: 0.01000 (9%) | DB: 0.03000 (29%) | 200 OK [http://localhost/denied]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:12:47) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.010000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10000 (9 reqs/sec) | Rendering: 0.01000 (9%) | DB: 0.03000 (30%) | 200 OK [http://localhost/denied]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:12:50) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.000000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.01000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.09000 (11 reqs/sec) | Rendering: 0.01000 (11%) | DB: 0.01000 (11%) | 200 OK [http://localhost/denied]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:13:21) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.010000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.24000 (4 reqs/sec) | Rendering: 0.01000 (4%) | DB: 0.02000 (8%) | 200 OK [http://localhost/denied]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:13:25) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.000000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10000 (10 reqs/sec) | Rendering: 0.00000 (0%) | DB: 0.03000 (30%) | 200 OK [http://localhost/denied]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:13:26) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.010000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.000000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.10000 (9 reqs/sec) | Rendering: 0.01000 (9%) | DB: 0.02000 (19%) | 200 OK [http://localhost/denied]
+MenuItemsController: missing default helper path menu_items_helper
+
+
+Processing MenuItemsController#link (for 127.0.0.1 at 2007-06-06 17:14:21) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"name"=>["assignments"], "action"=>"link", "controller"=>"menu_items"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.000000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/assignment/list
+Completed in 0.07000 (14 reqs/sec) | DB: 0.02000 (28%) | 302 Found [http://localhost/menu/assignments]
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 17:14:22) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/login
+Completed in 0.07000 (14 reqs/sec) | DB: 0.01000 (14%) | 302 Found [http://localhost/assignment/list]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-06 17:14:22) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"login", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.020000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+Redirected to http://localhost:3000/auth/list
+Filter chain halted as [#<Proc:0x02d01428@C:/InstantRails/ruby/lib/ruby/gems/1.8/gems/actionpack-1.12.5/lib/action_controller/verification.rb:64>] returned false
+Completed in 0.08000 (12 reqs/sec) | DB: 0.02000 (25%) | 302 Found [http://localhost/auth/login]
+
+
+Processing AuthController#list (for 127.0.0.1 at 2007-06-06 17:14:23) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"auth"}
+  [4;35;1mSystemSettings Load (0.010000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Controller: NOT authorised
+Authorised? false
+  [4;35;1mContentPage Load (0.000000)[0m   [0mSELECT * FROM content_pages WHERE (content_pages.id = 4) LIMIT 1[0m
+  [4;36;1mContentPage Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM content_pages[0m
+Redirected to http://localhost:3000/denied
+Filter chain halted as [goldberg_security_filter] returned false
+Completed in 0.07000 (14 reqs/sec) | DB: 0.04000 (57%) | 302 Found [http://localhost/auth/list]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:14:23) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.000000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.000000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.000000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.09000 (11 reqs/sec) | Rendering: 0.00000 (0%) | DB: 0.01000 (11%) | 200 OK [http://localhost/denied]
+ContentPagesController: missing default helper path content_pages_helper
+
+
+Processing ContentPagesController#view (for 127.0.0.1 at 2007-06-06 17:18:14) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"view", "page_name"=>["denied"], "controller"=>"content_pages"}
+  [4;35;1mSystemSettings Load (0.030000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.010000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.000000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Page: authorised
+Authorised? true
+  [4;35;1mContentPage Columns (0.010000)[0m   [0mSHOW FIELDS FROM content_pages[0m
+  [4;36;1mContentPage Load (0.000000)[0m   [0;1mSELECT * FROM content_pages WHERE (content_pages.`name` IN ('denied') ) LIMIT 1[0m
+Rendering  within layouts/application
+Rendering content_pages/view
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.12000 (8 reqs/sec) | Rendering: 0.01000 (8%) | DB: 0.05000 (41%) | 200 OK [http://localhost/denied]
+
+
+Processing AuthController#login (for 127.0.0.1 at 2007-06-06 18:26:24) [POST]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"commit"=>"Login", "action"=>"login", "controller"=>"auth", "login"=>{"name"=>"admin", "password"=>"admin"}}
+  [4;35;1mSystemSettings Load (0.020000)[0m   [0mSELECT * FROM system_settings LIMIT 1[0m
+  [4;36;1mRole Load (0.020000)[0m   [0;1mSELECT * FROM roles WHERE (roles.id = 1) LIMIT 1[0m
+  [4;35;1mRole Columns (0.010000)[0m   [0mSHOW FIELDS FROM roles[0m
+(Role still current)
+  [4;36;1mSystemSettings Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM system_settings[0m
+Action: authorised
+Authorised? true
+  [4;35;1mUser Columns (0.020000)[0m   [0mSHOW FIELDS FROM users[0m
+  [4;36;1mUser Load (0.010000)[0m   [0;1mSELECT * FROM users WHERE (users.`name` = 'admin' ) LIMIT 1[0m
+User admin successfully logged in
+  [4;35;1mRole Load (0.080000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+Logging in user as role Credentials
+  [4;36;1mSuperAdministrator Columns (0.020000)[0m   [0;1mSHOW FIELDS FROM users[0m
+Redirected to http://localhost:3000/assignment/list
+Completed in 1.41200 (0 reqs/sec) | DB: 0.19000 (13%) | 302 Found [http://localhost/auth/login]
+  [4;35;1mUser Columns (0.011000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#list (for 127.0.0.1 at 2007-06-06 18:26:26) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"list", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.000000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.000000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mSuperAdministrator Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM users[0m
+  [4;35;1mAssignment Load (0.040000)[0m   [0mSELECT * FROM assignments WHERE (instructor_id = 2) [0m
+Rendering  within layouts/application
+Rendering assignment/list
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.00000)
+Completed in 0.23000 (4 reqs/sec) | Rendering: 0.05000 (21%) | DB: 0.07100 (30%) | 200 OK [http://localhost/assignment/list]
+  [4;35;1mUser Columns (0.000000)[0m   [0mSHOW FIELDS FROM users[0m
+
+
+Processing AssignmentController#new (for 127.0.0.1 at 2007-06-06 18:26:30) [GET]
+  Session ID: 996157852519d3a20a7081a1192af47d
+  Parameters: {"action"=>"new", "controller"=>"assignment"}
+  [4;36;1mSystemSettings Load (0.010000)[0m   [0;1mSELECT * FROM system_settings LIMIT 1[0m
+  [4;35;1mRole Load (0.010000)[0m   [0mSELECT * FROM roles WHERE (roles.id = 4) LIMIT 1[0m
+  [4;36;1mRole Columns (0.000000)[0m   [0;1mSHOW FIELDS FROM roles[0m
+  [4;35;1mSystemSettings Columns (0.010000)[0m   [0mSHOW FIELDS FROM system_settings[0m
+(Logged-in user)
+Session: time NOT expired
+Action: authorised
+Authorised? true
+  [4;36;1mAssignment Columns (0.010000)[0m   [0;1mSHOW FIELDS FROM assignments[0m
+  [4;35;1mRubric Load (0.050000)[0m   [0mSELECT * FROM rubrics [0m
+  [4;36;1mWikiAssignment Load (0.060000)[0m   [0;1mSELECT * FROM wiki_assignments [0m
+Rendering  within layouts/application
+Rendering assignment/new
+Rendered auth/_login (0.01000)
+  [4;35;1mWikiAssignment Columns (0.000000)[0m   [0mSHOW FIELDS FROM wiki_assignments[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+  [4;35;1mRubric Columns (0.000000)[0m   [0mSHOW FIELDS FROM rubrics[0m
+  [4;36;1mRubric Load (0.000000)[0m   [0;1mSELECT * FROM rubrics [0m
+Rendered assignment/_form (0.02000)
+Rendered assignment/_due_dates (0.01000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_suckerfish (0.00000)
+Rendered menu_items/_breadcrumbs (0.00000)
+Rendered auth/_login (0.01000)
+Completed in 0.30000 (3 reqs/sec) | Rendering: 0.05000 (16%) | DB: 0.15000 (50%) | 200 OK [http://localhost/assignment/new]

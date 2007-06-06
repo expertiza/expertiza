@@ -7,7 +7,7 @@ class RubricControllerTest < ActionController::IntegrationTest
     @response   = ActionController::TestResponse.new
   end
 
-  def login_instructor
+  def log_instructor_in
     post "/auth/login", :login => {:name => 'ed_gehringer', :password => 'ed_gehringer'}
     assert_response :redirect
     follow_redirect!
@@ -21,20 +21,20 @@ class RubricControllerTest < ActionController::IntegrationTest
   end
   
   def test_list
-    login_instructor
+    log_instructor_in
     get "/rubric/list"
     assert_response :success
   end
   
   def test_create_empty_rubric
-    login_instructor
+    log_instructor_in
     size = Rubric.find(:all).length
     post "/rubric/create_rubric", "save"
     assert_response :error
   end
   
   def test_create_rubric
-    login_instructor
+    log_instructor_in
     size = Rubric.find(:all).length + 1
     post "/rubric/create_rubric",
          :save => "save",
@@ -57,7 +57,7 @@ class RubricControllerTest < ActionController::IntegrationTest
   
   def test_delete
     # Delete a rubric with no assignments associated with it.
-    login_instructor
+    log_instructor_in
     size = Rubric.find(:all).length
     get "/rubric/delete_rubric/1"
     assert_response :redirect # Rubric 1 has no assignments
@@ -68,7 +68,7 @@ class RubricControllerTest < ActionController::IntegrationTest
   
   def test_delete_unknown_rubric
     # User is redirected to the list if the rubric id is bogus
-    login_instructor
+    log_instructor_in
     size = Rubric.find(:all).length
     get "/rubric/delete_rubric/9834343"
     assert_response :redirect 

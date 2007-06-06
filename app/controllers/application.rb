@@ -2,6 +2,12 @@
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
   
+  def authorize 
+    unless session[:user]
+      flash[:notice] = "Please log in."
+      redirect_to(:controller => 'auth', :action => 'login')
+    end
+  end
   protected
   def list(object_type)
     # Calls the correct listing method based on the role of the

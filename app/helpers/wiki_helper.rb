@@ -1,21 +1,27 @@
 require 'open-uri'
+#require 'date'
+require 'time'
+#NOTE: Use time instead of date for speed reasons. See:
+#http://www.recentrambles.com/pragmatic/view/33
+
 
 module WikiHelper
 
   #TODO:
   #1) Add new args for User & Date
-  def review_dokuwiki(assignment_dir)
+  def review_dokuwiki(_assignment_url, _start_date = nil)
 
     response = '' #the response from the URL
 
     #Check to make sure we were passed a valid URL
-    matches = /http:/.match( assignment_dir )
+    matches = /http:/.match( _assignment_url )
     if not matches
       return response
     end
 
     #Args
-    url = assignment_dir
+    url = _assignment_url
+    wiki_url = _assignment_url.scan(/(.*?)dokuwiki/)
     #unity_id = 
 
     #Doku Wiki Specific
@@ -37,6 +43,10 @@ module WikiHelper
     }
 
     ## DOKUWIKI PARSING
+
+    #Clean URLs
+    response = response.gsub(/\/dokuwiki/,wiki_url[0].to_s + 'dokuwiki')
+
     # Luckily, dokuwiki uses a structure like:
     # <!-- wikipage start -->  
     # Content
@@ -46,14 +56,36 @@ module WikiHelper
     changes = changes[1].sub(/start -->/,"") #Trim the "start -->" from "<!-- wikipage start -->"
     response = changes.sub(/<!--/,"") #Trim the "<!--" from "<!-- wikipage stop -->"
 
-    #Clean Up HTMAL
-    response['<h1><a name="recent_changes" id="recent_changes">Recent Changes</a></h1>'] = '<h3>Recent Wiki Changes</h3>'
-    #TODO
-    # Update links with absolute path not relative
-    # Show only this users changes
-    # Show only changes from date arg
+    #Extract each date line item
+    date_lines = response.scan(/<li>(.*?)<\/li>/)
 
-    return response
+    #if start date provided we only want date line items since start date
+    if _start_date
+      
+      #Extract the dates only
+      dates = response.scan(/\d\d\d\d\/\d\d\/\d\d \d\d\:\d\d/) 
+
+      #NOTE: The date_lines index = dates index
+    
+      #Convert _start_date
+      start_date = Time.parse(_start_date)
+
+      #Remove dates before deadline
+      dates.each_with_index do |date, index| 
+
+          #The date is before start of review
+          if Time.parse(date) < start_date
+            date_lines.delete_at(index)
+          end
+
+      end
+
+    end
+    
+    #TODO
+    # Show only this users changes
+
+    return date_lines
   end
 
 

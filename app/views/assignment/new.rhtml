@@ -5,7 +5,7 @@
 <%= start_form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();', :onload => 'addElement();')%>
   <%= render :partial => 'form' %>
   <%= render :partial => 'due_dates' %>
-  &nbsp;&nbsp;<%= submit_tag "Save assignment" %>
+  &nbsp;&nbsp;<%= submit_tag "Save assignment", :name=>"save" %>
 <%= end_form_tag %>
 <br />
 <div style="padding: 15px">

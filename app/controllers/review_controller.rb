@@ -45,9 +45,9 @@ class ReviewController < ApplicationController
   end
   
   def feedback
-    reviewer_id = params[:id]
-    assignment_id = params[:assignment_id]
-    @reviews = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", reviewer_id, assignment_id])
+    @reviewer_id = session[:user].id
+    @assignment_id = params[:id]
+    @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
   end
   
 end

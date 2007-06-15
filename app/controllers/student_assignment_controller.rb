@@ -12,6 +12,11 @@ class StudentAssignmentController < ApplicationController
     @student = Participant.find(params[:id])
   end
   
+  def view_scores
+    @author_id = session[:user].id
+    @assignment_id = params[:id]
+    @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])   
+  end
   
   def submit
     @student = Participant.find(params[:id])
@@ -226,4 +231,7 @@ private
       return base.split(".")[base.split(".").size-1]
 	  end
 	end
+  
+
+  
 end

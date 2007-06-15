@@ -7,9 +7,8 @@ require 'time'
 
 module WikiHelper
 
-  #TODO:
-  #1) Add new args for User & Date
-  def review_dokuwiki(_assignment_url, _start_date = nil)
+
+  def review_dokuwiki(_assignment_url, _start_date = nil, _wiki_user = nil)
 
     response = '' #the response from the URL
 
@@ -25,18 +24,15 @@ module WikiHelper
     #unity_id = 
 
     #Doku Wiki Specific
-    review = "?do=recent"
+    review = "?do=revisions" #"?do=recent"
 
     url += review
 
     open(url, 
          "User-Agent" => "Ruby/#{RUBY_VERSION}",
-         "From" => "email@addr.com",
-         "Referer" => "http://") { |f|
+         "From" => "email@addr.com", #Put pg admin email address here
+         "Referer" => "http://") { |f| #Put pg URL here
       
-      #puts "Source URL: #{f.base_uri}"
-      #puts "\t Last Modified: #{f.last_modified}\n\n"
-
       # Save the response body
       response = f.read
       
@@ -52,18 +48,44 @@ module WikiHelper
     # Content
     # <!-- wikipage stop -->
     # 
-    changes = response.split(/wikipage/) #Get everything between the words "wikipage"
-    changes = changes[1].sub(/start -->/,"") #Trim the "start -->" from "<!-- wikipage start -->"
-    response = changes.sub(/<!--/,"") #Trim the "<!--" from "<!-- wikipage stop -->"
+    #Get everything between the words "wikipage"
+    changes = response.split(/wikipage/) 
+    #Trim the "start -->" from "<!-- wikipage start -->"
+    changes = changes[1].sub(/start -->/,"") 
+    #Trim the "<!--" from "<!-- wikipage stop -->"
+    response = changes.sub(/<!--/,"") 
 
-    #Extract each date line item
-    date_lines = response.scan(/<li>(.*?)<\/li>/)
+
+    #Extract each line item
+    line_items = response.scan(/<li>(.*?)<\/li>/)
+
+    #Extract the dates only
+    dates = response.scan(/\d\d\d\d\/\d\d\/\d\d \d\d\:\d\d/) 
+
+
+    #if wiki username provided we only want their line items
+    if _wiki_user
+   
+      #Remove line items that do not contain this user
+      line_items.each_with_index do |item, index| 
+
+        scan_result = item[0].scan(_wiki_user) #scan current item
+
+        if not _wiki_user === scan_result[0] #no match for wiki user --> eliminate
+          line_items[index] = nil  
+          dates[index] = nil
+        end
+
+      end
+
+      line_items.compact!
+      dates.compact!
+    end
+
 
     #if start date provided we only want date line items since start date
     if _start_date
       
-      #Extract the dates only
-      dates = response.scan(/\d\d\d\d\/\d\d\/\d\d \d\d\:\d\d/) 
 
       #NOTE: The date_lines index = dates index
     
@@ -75,17 +97,16 @@ module WikiHelper
 
           #The date is before start of review
           if Time.parse(date) < start_date
-            date_lines.delete_at(index)
+            line_items.delete_at(index)
           end
 
       end
 
     end
     
-    #TODO
-    # Show only this users changes
 
-    return date_lines
+    return line_items
+
   end
 
 

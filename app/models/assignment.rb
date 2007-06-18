@@ -6,6 +6,7 @@ class Assignment < ActiveRecord::Base
   has_many :users, :through => :participants
   has_many :due_dates
   has_many :review_feedbacks
+  has_many :review_mappings
   
   validates_presence_of :name
   validates_presence_of :directory_path
@@ -15,10 +16,12 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :review_rubric_id
   validates_presence_of :review_of_review_rubric_id
   validates_numericality_of :review_weight
-  validates_presence_of :reviews_visible_to_all
-  validates_presence_of :team_assignment
-  validates_presence_of :wiki_assignment_id
-  validates_presence_of :require_signup
+  # The following fields don't need to be set; an unchecked checkbox is interpreted as "false".
+  # validates_presence_of :reviews_visible_to_all
+  # validates_presence_of :team_assignment
+  # validates_presence_of :require_signup
+  # If user doesn't specify an id for wiki assignment, id is 0 by default, which means "not a wiki assgt."
+  # validates_presence_of :wiki_assignment_id
     
     
   def due_dates_exist?

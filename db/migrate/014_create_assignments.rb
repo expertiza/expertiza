@@ -16,7 +16,7 @@ class CreateAssignments < ActiveRecord::Migration
 	t.column :review_weight, :float # the percentage that reviews count for; the balance of grade depends on reviews of reviews
 	t.column :reviews_visible_to_all, :boolean # if false, other reviewers can't see this reviewer's review
 	t.column :team_assignment, :boolean
-	t.column :wiki_assignment_id, :integer # id of wiki assignment type
+	t.column :wiki_type_id, :integer # id of wiki assignment type
 	t.column :require_signup, :boolean # if true, users need to sign up thru Shimmer before submitting; if false, everyone in course may submit; if assgt. not in course, default is that no one may submit
     end
     execute "alter table assignments 

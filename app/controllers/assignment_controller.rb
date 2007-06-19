@@ -1,14 +1,14 @@
 class AssignmentController < ApplicationController
   
   before_filter :authorize
-  
+
   @no_dl="1" # a value of "no" for whether an action is permitted prior to a deadline
   @late_dl="2" # a value of "late" for whether an action is permitted prior to a deadline (it is permitted, but marked late)
   @ok_dl="3" # a value of "OK" for whether an action is permitted prior to a deadline
   def new
     @assignment = Assignment.new
     @rubric = Rubric.find_all
-    @wiki_assignments = WikiAssignment.find_all
+    @wiki_types = WikiType.find_all
   end
   
   def create
@@ -67,7 +67,7 @@ class AssignmentController < ApplicationController
       redirect_to :action => 'list'
       
     else
-      @wiki_assignments = WikiAssignment.find_all
+      @wiki_types = WikiType.find_all
       render :action => 'new'
     end
     
@@ -86,14 +86,14 @@ class AssignmentController < ApplicationController
       flash[:notice] = 'Reviewers assigned successfully.'
       redirect_to :action => 'list'
     else
-      @wiki_assignments = WikiAssignment.find_all
+      @wiki_types = WikiType.find_all
       render :action => 'edit'
     end    
   end
   
   def edit
     @assignment = Assignment.find(params[:id])
-    @wiki_assignments = WikiAssignment.find_all
+    @wiki_types = WikiType.find_all
   end
   
   def update
@@ -107,7 +107,7 @@ class AssignmentController < ApplicationController
       flash[:notice] = 'Assignment was successfully updated.'
       redirect_to :action => 'show', :id => @assignment
     else
-      @wiki_assignments = WikiAssignment.find_all
+      @wiki_types = WikiType.find_all
       render :action => 'edit'
     end
   end

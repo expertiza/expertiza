@@ -1,6 +1,6 @@
 class Assignment < ActiveRecord::Base
   belongs_to :course 
-  belongs_to :wiki_assignment 
+  belongs_to :wiki_type
   belongs_to :user, :foreign_key => "instructor_id"
   has_many :participants
   has_many :users, :through => :participants
@@ -20,8 +20,8 @@ class Assignment < ActiveRecord::Base
   # validates_presence_of :reviews_visible_to_all
   # validates_presence_of :team_assignment
   # validates_presence_of :require_signup
-  # If user doesn't specify an id for wiki assignment, id is 0 by default, which means "not a wiki assgt."
-  # validates_presence_of :wiki_assignment_id
+  # If user doesn't specify an id for wiki type, id is 0 by default, which means "not a wiki assgt."
+  # validates_presence_of :wiki_type_id
     
     
   def due_dates_exist?

@@ -34,14 +34,14 @@ CREATE TABLE `assignments` (
   `review_weight` float default NULL,
   `reviews_visible_to_all` tinyint(1) default NULL,
   `team_assignment` tinyint(1) default NULL,
-  `wiki_assignment_id` int(11) NOT NULL default '0',
+  `wiki_type_id` int(11) NOT NULL default '0',
   `require_signup` tinyint(1) default NULL,
   PRIMARY KEY  (`id`),
   KEY `fk_assignments_review_rubrics` (`review_rubric_id`),
   KEY `fk_assignments_review_of_review_rubrics` (`review_of_review_rubric_id`),
   CONSTRAINT `fk_assignments_review_of_review_rubrics` FOREIGN KEY (`review_of_review_rubric_id`) REFERENCES `rubrics` (`id`),
   CONSTRAINT `fk_assignments_review_rubrics` FOREIGN KEY (`review_rubric_id`) REFERENCES `rubrics` (`id`),
- CONSTRAINT `fk_assignments_wiki_assignments` FOREIGN KEY (`wiki_assignment_id`) REFERENCES `wiki_assignments` (`id`)
+ CONSTRAINT `fk_assignments_wiki_types` FOREIGN KEY (`wiki_type_id`) REFERENCES `wiki_types` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -57,11 +57,11 @@ UNLOCK TABLES;
 
 
 --
--- Table structure for table `wiki_assignments`
+-- Table structure for table `wiki_types`
 --
-
 DROP TABLE IF EXISTS `wiki_assignments`;
-CREATE TABLE `wiki_assignments` (
+DROP TABLE IF EXISTS `wiki_types`;
+CREATE TABLE `wiki_types` (
   `id` int(11) NOT NULL auto_increment,
   `name` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`id`)
@@ -72,11 +72,11 @@ CREATE TABLE `wiki_assignments` (
 --
 
 
-/*!40000 ALTER TABLE `assignments` DISABLE KEYS */;
-LOCK TABLES `wiki_assignments` WRITE;
-INSERT INTO `wiki_assignments` VALUES (1,'No'),(2,'MediaWiki'),(3,'DocuWiki');
+/*!40000 ALTER TABLE `wiki_types` DISABLE KEYS */;
+LOCK TABLES `wiki_types` WRITE;
+INSERT INTO `wiki_types` VALUES (1,'No'),(2,'MediaWiki'),(3,'DokuWiki');
 UNLOCK TABLES;
-/*!40000 ALTER TABLE `assignments` ENABLE KEYS */;
+/*!40000 ALTER TABLE `wiki_types` ENABLE KEYS */;
 
 --
 -- Table structure for table `content_pages`

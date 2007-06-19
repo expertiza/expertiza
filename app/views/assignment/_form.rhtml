@@ -16,18 +16,18 @@
       </td>
      </tr>
      <tr>  
-      <td><label for="wiki_assignment">Wiki assignment:</label></td>
+      <td><label for="wiki_type">Wiki Type:</label></td>
     <td>
-    <% if @wiki_assignments.length == 0 %>
+    <% if @wiki_types.length == 0 %>
      <em>There are currently no wiki assignment types defined</em>
      <br/>
      <br/>
      <% else %>
-     <select name="assignment[wiki_assignment_id]">
-     <% @wiki_assignments.each do |wiki_assignment| %>
-       <option value="<%= wiki_assignment.id %>"
-    <%= ' selected' if wiki_assignment.id == @assignment.wiki_assignment_id %> >
-    <%= wiki_assignment.name %>
+     <select name="assignment[wiki_type_id]">
+     <% @wiki_types.each do |wiki_type| %>
+       <option value="<%= wiki_type.id %>"
+    <%= ' selected' if wiki_type.id == @assignment.wiki_type_id %> >
+    <%= wiki_type.name %>
     </option>
    <% end %>
  </select>

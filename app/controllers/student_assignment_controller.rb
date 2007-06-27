@@ -18,6 +18,12 @@ class StudentAssignmentController < ApplicationController
     @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])   
   end
   
+  def view_grade
+    @author_id = session[:user].id
+    @assignment_id = params[:id]
+    @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])   
+  end
+    
   def submit
     @student = Participant.find(params[:id])
     @files = Array.new
@@ -232,6 +238,7 @@ private
 	  end
 	end
   
+
 
   
 end

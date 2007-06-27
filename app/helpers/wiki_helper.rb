@@ -4,10 +4,25 @@ require 'time'
 #NOTE: Use time instead of date for speed reasons. See:
 #http://www.recentrambles.com/pragmatic/view/33
 
-
+##
+# WikiHelper
+#
+# author: Jeffrey T. Haug
+#
+## 
 module WikiHelper
 
 
+  ##
+  # review_dokuwiki
+  #
+  # author: Jeffrey T. Haug
+  #
+  # usage: To be used in a view such as:
+  #
+  # <%= review_dokuwiki 'http://pg-server.ece.ncsu.edu/dokuwiki/doku.php/ece633:hw1', '2007/06/11', 'jthaug'  %>
+  #
+  ##
   def review_dokuwiki(_assignment_url, _start_date = nil, _wiki_user = nil)
 
     response = '' #the response from the URL
@@ -19,9 +34,8 @@ module WikiHelper
     end
 
     #Args
-    #TODO: Add check to remove trailing slash if provided
-    url = _assignment_url
-    wiki_url = _assignment_url.scan(/(.*?)dokuwiki/)
+    url = _assignment_url.chomp("/")
+    wiki_url = _assignment_url.scan(/(.*?)doku.php/)
     namespace = _assignment_url.split(/\//)
     namespace_url = namespace.last
 
@@ -43,7 +57,7 @@ module WikiHelper
     }
 
     #Clean URLs
-    response = response.gsub(/\/dokuwiki/,wiki_url[0].to_s + 'dokuwiki')
+    response = response.gsub(/href=\"(.*?)doku.php/, 'href="' + wiki_url[0].to_s + 'doku.php')
 
     #Get all URLs 
     index_urls = response.scan(/href=\"(.*?)\"/)
@@ -85,7 +99,7 @@ module WikiHelper
       ## DOKUWIKI PARSING
       
       #Clean URLs
-      response = response.gsub(/\/dokuwiki/,wiki_url[0].to_s + 'dokuwiki')
+      response = response.gsub(/href=\"(.*?)doku.php/,'href="' + wiki_url[0].to_s + 'doku.php')
       
       # Luckily, dokuwiki uses a structure like:
       # <!-- wikipage start -->  
@@ -157,5 +171,94 @@ module WikiHelper
 
   end
 
+
+  ##
+  # review_mediawiki
+  #
+  # author: Jeffrey T. Haug
+  #
+  # usage: To be used in a view such as:
+  #
+  # <%= review_mediawiki 'http://pg-server.ece.ncsu.edu/mediawiki/index.php/ECE633:hw1', '2007/06/11', 'jthaug'  %>
+  #
+  ##
+  def review_mediawiki(_assignment_url, _start_date = nil, _wiki_user = nil)
+
+    response = '' #the response from the URL
+
+    #Check to make sure we were passed a valid URL
+    matches = /http:/.match( _assignment_url )
+    if not matches
+      return response
+    end
+
+    #Args
+    url = _assignment_url.chomp("/")
+    wiki_url = _assignment_url.scan(/(.*?)index.php/)
+    namespace = _assignment_url.split(/\//)
+    namespace_url = namespace.last
+
+    #Media Wiki Specific
+    review = "index.php?title=Special:Contributions&target=" + _wiki_user
+
+
+    #Grab this user's contributions
+    url = wiki_url[0].to_s + review
+    open(url, 
+         "User-Agent" => "Ruby/#{RUBY_VERSION}",
+         "From" => "email@addr.com", #Put pg admin email address here
+         "Referer" => "http://") { |f| #Put pg URL here
+      
+      # Save the response body
+      response = f.read
+      
+    }
+
+    #Clean URLs
+    response = response.gsub(/href=\"(.*?)index.php/,'href="' + wiki_url[0].to_s + 'index.php')
+
+    #Mediawiki uses a structure like:
+    # <!-- start content -->  
+    # Content
+    # <!-- end content -->
+    # 
+    #Get everything between the words "wikipage"
+    changes = response.split(/<!-- start content -->/) 
+    changes2 = changes[1].split(/<!-- end content -->/)
+    response = changes2[0]
+
+    #Extract each line item
+    line_items = response.scan(/<li>.*<\/li>/)
+
+    #Extract the dates only
+    dates = response.scan(/\d\d:\d\d, \d+ \w+ \d\d\d\d/)
+
+    #if start date provided we only want date line items since start date
+    if _start_date
+        
+        
+      #NOTE: The date_lines index = dates index
+      
+      #Convert _start_date
+      start_date = Time.parse(_start_date)
+      
+      #Remove dates before deadline
+      dates.each_with_index do |date, index| 
+        
+        #The date is before start of review
+        if Time.parse(date) < start_date
+          line_items.delete_at(index)
+        end
+        
+      end
+      
+    end
+
+    
+
+    
+    return line_items
+
+  end
 
 end

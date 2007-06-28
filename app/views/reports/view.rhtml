@@ -1,0 +1,22 @@
+<%
+    @participants = Participant.find(:all, :conditions => ["assignment_id = ?",14]).map {|u| [u.user_id]}
+    for participant in @participants
+        review_no = 1
+        grade = 0
+        @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", participant, 14])
+        for review_map in @review_mapping 
+            for review in review_map.reviews%>
+                Review <%=review_no%>
+                 <%
+                total = 0
+                 for review_score in review.review_scores
+                    if (!Question.find(review_score.question_id).true_false)
+                        total += review_score.score 
+                    end
+                 end
+                 grade += total
+                 review_no +=1
+            end
+        end
+     end
+%>

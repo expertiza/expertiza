@@ -22,6 +22,9 @@ module WikiHelper
   #
   # <%= review_dokuwiki 'http://pg-server.ece.ncsu.edu/dokuwiki/doku.php/ece633:hw1', '2007/06/11', 'jthaug'  %>
   #
+  # @args: _assignment_url (URL of the wiki assignment.)
+  # @args: _start_date (all review items older will be filtered out)
+  # @args: _wiki_user (wiki user id to crawl)
   ##
   def review_dokuwiki(_assignment_url, _start_date = nil, _wiki_user = nil)
 
@@ -181,6 +184,9 @@ module WikiHelper
   #
   # <%= review_mediawiki 'http://pg-server.ece.ncsu.edu/mediawiki/index.php/ECE633:hw1', '2007/06/11', 'jthaug'  %>
   #
+  # @args: _assignment_url (URL of the wiki assignment.)
+  # @args: _start_date (all review items older will be filtered out)
+  # @args: _wiki_user (wiki user id to crawl)
   ##
   def review_mediawiki(_assignment_url, _start_date = nil, _wiki_user = nil)
 

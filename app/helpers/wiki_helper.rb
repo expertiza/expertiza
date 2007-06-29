@@ -254,7 +254,19 @@ module WikiHelper
       
     end
 
-    
+
+    #Remove line items that not in this namespace
+    line_items.each_with_index do |item, index| 
+
+      scan_result = item.scan(namespace_url)
+
+      if not namespace_url === scan_result[0]
+        line_items[index] = nil
+      end
+
+    end
+
+    line_items.compact!
 
     
     return line_items

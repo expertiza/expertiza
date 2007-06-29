@@ -5,7 +5,11 @@
     <th>Review-id</th>
 	<th>Feedback</th>
   </tr>
-
+  
+  Mappings for the user
+  <%for review_map in @review_mapping %>
+  <%=review_map.author_id%>
+  <% end %>
 <%for review_map in @review_mapping 
     for review in review_map.reviews
         for review_feedback in review.review_feedbacks%>
@@ -13,5 +17,9 @@
    <%   end
    end
   end%>
+  
+  <% for question in @questions %>
+  <%=question.txt%><br />
+  <% end %>
   </table>
 

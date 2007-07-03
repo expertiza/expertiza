@@ -1,11 +1,13 @@
-<%if(@found)%>
-found <% else %>
-not found <% end %>
-<h1>Questions</h1>
-<ul>
-<% for question in @questions %>
-<li><%= question.txt %>
-<%= select( "review_score", "score", @valuemap) %><br />
-<%= text_area "review_score", :comments%><br />
-<% end %>
-</ul>
+
+<h1>Review</h1>
+
+<%= start_form_tag :action => 'create_review' %>
+  	<%= render :partial => 'review' %>
+         <%= hidden_field_tag('mapping_id', @mapping.id) %>
+         <%= hidden_field_tag('assgt_id', @assgt.id) %>
+  	<%= submit_tag "Create Review", :name=>"save" %>       
+<%= end_form_tag %>
+<br />
+
+<%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
+

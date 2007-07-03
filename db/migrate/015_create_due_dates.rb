@@ -10,6 +10,7 @@ class CreateDueDates < ActiveRecord::Migration
 	t.column :resubmission_allowed_id, :integer
 	t.column :rereview_allowed_id, :integer # controls whether a version submitted since last review deadline may be reviewed now
 	t.column :review_of_review_allowed_id, :integer
+  t.column :penalty_accumulated, :integer #total penalty accumulated since the first submission deadline in minutes
     end
     execute "alter table due_dates
              add constraint fk_deadline_type_due_date

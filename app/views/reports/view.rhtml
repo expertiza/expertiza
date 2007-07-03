@@ -1,9 +1,11 @@
 <%
-    @participants = Participant.find(:all, :conditions => ["assignment_id = ?",14]).map {|u| [u.user_id]}
+    @participants = Participant.find(:all, :conditions => ["assignment_id = ?",@assignment_id]).map {|u| [u.user_id]}
     for participant in @participants
         review_no = 1
         grade = 0
-        @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", participant, 14])
+        if participant.submitted_at > @very_last_due_date
+        penalty_in_minutes = participant.submitted_at
+        @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", participant, @assignment_id])
         for review_map in @review_mapping 
             for review in review_map.reviews%>
                 Review <%=review_no%>

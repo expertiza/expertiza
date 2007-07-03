@@ -11,7 +11,7 @@
 	</li>
 	<li>
 		<% if @student.able_to_review %>
-			<%= link_to "Others' work",{:controller => 'review', :action => 'feedback', :id => @student.assignment_id} %>
+			<%= link_to "Others' work",{:controller => 'review', :action => 'list_reviews', :id => @student.assignment_id} %>
 		<% else %>
 			<font color="gray">Others' work</font>
 		<% end %> (Give feedback to others on their work)

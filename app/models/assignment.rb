@@ -2,6 +2,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :course 
   belongs_to :wiki_type
   belongs_to :user, :foreign_key => "instructor_id"
+  has_one :late_policy
   has_many :participants
   has_many :users, :through => :participants
   has_many :due_dates

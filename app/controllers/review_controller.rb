@@ -21,13 +21,10 @@ class ReviewController < ApplicationController
   end
   
   def view_review
-    @review = Review.new
-    @mapping = ReviewMapping.find(params[:id])
-    @assgt = Assignment.find(@mapping.assignment_id)
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Rubric.find(@assgt.review_rubric_id)
-    @max = @rubric.max_question_score
-    @min = @rubric.min_question_score
+    @review = Review.find(params[:id])
+    @review_scores = @review.review_scores
+    @mapping = ReviewMapping.find(@review.review_mapping_id)
+    @assgt = Assignment.find(@mapping.assignment_id)    
   end
   
   def edit_review
@@ -35,8 +32,13 @@ class ReviewController < ApplicationController
   end
   
   def new_review
-    
-    
+    @review = Review.new
+    @mapping = ReviewMapping.find(params[:id])
+    @assgt = Assignment.find(@mapping.assignment_id)
+    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
+    @rubric = Rubric.find(@assgt.review_rubric_id)
+    @max = @rubric.max_question_score
+    @min = @rubric.min_question_score    
   end
   
   def create_review

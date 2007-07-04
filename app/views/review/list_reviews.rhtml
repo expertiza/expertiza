@@ -1,19 +1,16 @@
 <h1>Reviews</h1>
 
 <table class="listing" cellpadding=2>
-  <tr>
-    <th>Review-id</th>
-	<th>Feedback</th>
-  </tr>
-  
-  Mappings for the user
+ <tr>
   <%for review_map in @review_mapping %>
-  <%=review_map.id%>
-  <%= link_to "View review",{:controller => 'review', :action => 'view_review', :id => review_map.id} %>
+  <% @review = Review.find_by_review_mapping_id(review_map.id) %>
+  <% if (@review)%>
+  <%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %>
+  <%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %>
+  <% else %>
+  <%= link_to "Create",{:controller => 'review', :action => 'new_review', :id => review_map.id} %>
   <% end %>
-
-  
-  
- 
+  <% end %>
+  </tr>
   </table>
 

@@ -1,13 +1,21 @@
 
-<h1>Review</h1>
-
-<%= start_form_tag :action => 'create_review' %>
-  	<%= render :partial => 'review' %>
-         <%= hidden_field_tag('mapping_id', @mapping.id) %>
-         <%= hidden_field_tag('assgt_id', @assgt.id) %>
-  	<%= submit_tag "Create Review", :name=>"save" %>       
-<%= end_form_tag %>
-<br />
+<h1>View Review</h1>
+<table>
+    <tr>
+        <th>Questions</th><th>Comments</th><th>Score</th>
+    </tr>
+    <% for @rs in @review_scores %>
+        <tr>
+            <td>
+                <%=Question.find(@rs.question_id).txt%>                
+            </td>
+            <td>
+                <%=@rs.comments%>
+            </td>
+            <td><%=@rs.score%></td>
+        </tr>
+    <% end %>
+</table>
 
 <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
 

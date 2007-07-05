@@ -1,6 +1,7 @@
 <h1>Scores</h1>
 <%
     review_no = 1
+	grade = 0
     for review_map in @review_mapping 
         for review in review_map.reviews%>
         
@@ -11,20 +12,26 @@
              <tr>
                 <th>Question</th>
                 <th>Score</th>
+				<th>Comment</th>
              </tr>
          
              <%
              total = 0
              for review_score in review.review_scores
-                if (!Question.find(review_score.question_id).true_false)
+                #if (!Question.find(review_score.question_id).true_false)
                     total += review_score.score 
-                end%>
+                #end%>
                 <tr class="listingRow">
-                    <td><%=Question.find(review_score.question_id).txt%></td><td><%=review_score.score%></td>
+                    <td><%=Question.find(review_score.question_id).txt%></td><td><%=review_score.score%></td><td><%=review_score.comments%></td>
                 </tr>
-            <%end%>
+            <%end
+			  grade += total%>
             <tr><td><i>Total</i></td><td><%=total%></td></tr>
            </table><br/>
            <%review_no +=1
         end
     end%>
+	<h3>Grade</h3> 
+	<li>Average = <%=grade/(review_no-1)%></li>
+	<li>Penalty units= <%=@penalty_units%>&nbsp;Penalty per unit=<%=@late_policy.penalty_per_unit%></li>
+	<li>Final Grade= <%=(grade/(review_no-1))*100/@sum_of_max%>-<%=@final_penalty%>=<%=(grade/(review_no-1))*100/@sum_of_max-@final_penalty%></li>

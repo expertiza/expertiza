@@ -37,4 +37,5 @@ class User < ActiveRecord::Base
     self.password == Digest::SHA1.hexdigest(self.password_salt.to_s +
                                                  clear_password)
   end
+    
 end

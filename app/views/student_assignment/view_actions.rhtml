@@ -10,13 +10,13 @@
 		
 	</li>
 	<li>
-		<% if @student.able_to_review %>
+		<% if @review_phase == 2 or @review_phase == 4 %>
 			<%= link_to "Others' work",{:controller => 'review', :action => 'list_reviews', :id => @student.assignment_id} %>
 		<% else %>
 			<font color="gray">Others' work</font>
 		<% end %> (Give feedback to others on their work)
 	</li>
-	<li>View grade report</li>
+	<li><%= link_to "View scores",{:action => 'view_scores', :id => @student.id} %></li>
 </ul>
 <br>
 Next: Click the activity you wish to perform on the assignment titled: <%= @student.assignment.name %>

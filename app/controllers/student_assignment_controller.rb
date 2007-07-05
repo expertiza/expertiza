@@ -10,39 +10,71 @@ class StudentAssignmentController < ApplicationController
   
   def view_actions
     @student = Participant.find(params[:id])
+    @assignment_id = @student.assignment_id
+    # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
+    @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
+    @review_phase = find_review_phase(@due_dates)
   end
   
   def view_scores
     @author_id = session[:user].id
-    @assignment_id = params[:id]
-    @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])   
+    @assignment_id = Participant.find(params[:id]).assignment_id
+    @student = Participant.find(params[:id])
+    @late_policy = LatePolicy.find(Assignment.find(@assignment_id).due_dates[0].late_policy_id)
+    @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
+    @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes
+    
+    #the code below finds the sum of the maximum scores of all questions in the rubric
+    @sum_of_max = 0
+    for question in Rubric.find(Assignment.find(@assignment_id).review_rubric_id).questions
+      @sum_of_max += Rubric.find(Assignment.find(@assignment_id).review_rubric_id).max_question_score
+    end
+    
+    if @student.penalty_accumulated/@late_policy.penalty_period_in_minutes*@late_policy.penalty_per_unit < @late_policy.max_penalty
+      @final_penalty = @penalty_units*@late_policy.penalty_per_unit
+    end
+    else
+      @final_penalty = @late_policy.max_penalty
+    
   end
   
   def view_grade
     @author_id = session[:user].id
-    @assignment_id = params[:id]
+    @assignment_id = Participant.find(params[:id]).assignment_id
     @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])   
   end
-    
-  def submit
-    @student = Participant.find(params[:id])
-    @files = Array.new
-    # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
-    @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",14])
-    
+  
+  def find_review_phase(due_dates)
     # Find the next due date (after the current date/time), and then find the type of deadline it is.
     @very_last_due_date = DueDate.find(:all,:order => "due_at DESC", :limit =>1)
     next_due_date = @very_last_due_date[0]
-    for due_date in @due_dates
+    for due_date in due_dates
       if due_date.due_at > Time.now
         if due_date.due_at < next_due_date.due_at
           next_due_date = due_date
         end
       end
     end
-    
-    
     @review_phase = next_due_date.deadline_type_id;
+    return @review_phase
+  end
+   
+  def submit
+    @student = Participant.find(params[:id])
+    @files = Array.new
+    @assignment_id = @student.assignment_id
+    # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
+    @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
+    @submit_due_date = DueDate.find(:all, :conditions => ["assignment_id = ? and deadline_type_id = ?",@assignment_id,1])
+    @resubmission_times = ResubmissionTime.find(:all,:order => "resubmitted_at ASC",:conditions => ["participant_id= ?",@student.id])
+
+    @review_phase = find_review_phase(@due_dates)
+    
+    #If the student is submitting his work for the first time and is late, the time difference is recorded in the field penalty accumulated in the Participants table
+    if Time.now > @submit_due_date[0].due_at and !@resubmission_times[0]
+      diff_minutes = (Time.now - @submit_due_date[0].due_at).round/60
+      @student.penalty_accumulated += diff_minutes
+    end
     
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
@@ -84,8 +116,8 @@ class StudentAssignmentController < ApplicationController
       end      
       
       safe_filename = StudentAssignmentHelper::sanitize_filename(file.full_original_filename)
-      curr_directory = get_student_directory(@student)+ @current_folder.name + "/"
-      full_filename = curr_directory + safe_filename
+      curr_directory = get_student_directory(@student)+ @current_folder.name
+      full_filename =  curr_directory + safe_filename #curr_directory +
       File.open(full_filename, "wb") { |f| f.write(file.read) }
       StudentAssignmentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
       

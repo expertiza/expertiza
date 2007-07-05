@@ -38,7 +38,16 @@ class ReviewController < ApplicationController
     @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
     @rubric = Rubric.find(@assgt.review_rubric_id)
     @max = @rubric.max_question_score
-    @min = @rubric.min_question_score    
+    @min = @rubric.min_question_score  
+    @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
+    @direc = RAILS_ROOT + "/pg_data/" + @author.assignment.directory_path + "/" + @author.directory_num.to_s
+    temp_files = Dir[@direc + "/*"]
+    @files = Array.new
+    for file in temp_files
+      if not File.directory?(Dir.pwd + "/" + file) then
+        @files << file
+      end
+    end
   end
   
   def create_review

@@ -9,7 +9,7 @@ Note: The number denoted with '-'(minus) sign in Final Grade column, is the amou
 	<th>Topic</th>
 	<th>Current Stage</th>
 	<th>Stage Deadline</th>
-	<th>Grade</th>
+	<!--<th>Grade</th>-->
   </tr>
  
 <% for participant in @participants %>
@@ -20,7 +20,6 @@ Note: The number denoted with '-'(minus) sign in Final Grade column, is the amou
 	<td><%= participant.get_topic_string %></td>
 	<td><%= StudentAssignmentHelper::get_current_stage(participant.assignment.id) %></td>
 	<td><%= StudentAssignmentHelper::get_stage_deadline(participant.assignment.id) %></td>
-	<td><%= StudentAssignmentHelper::get_grade(participant.id) %></td>
   </tr>
 <% end %>
 </table>

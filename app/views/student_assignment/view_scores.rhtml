@@ -33,5 +33,5 @@
     end%>
 	<h3>Grade</h3> 
 	<li>Average = <%=grade/(review_no-1)%></li>
-	<li>Penalty units= <%=@penalty_units%>&nbsp;Penalty per unit=<%=@late_policy.penalty_per_unit%></li>
+	<li>Penalty units= <%=@penalty_units%>&nbsp;Penalty per unit=<%=@late_policy.penalty_per_unit%>&nbsp;Maximum penalty=<%=@late_policy.max_penalty%></li>
 	<li>Final Grade= <%=(grade/(review_no-1))*100/@sum_of_max%>-<%=@final_penalty%>=<%=(grade/(review_no-1))*100/@sum_of_max-@final_penalty%></li>

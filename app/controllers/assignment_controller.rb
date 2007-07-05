@@ -31,7 +31,7 @@ class AssignmentController < ApplicationController
       submit_duedate=DueDate.new(params[:submit_deadline]);
       submit_duedate.deadline_type_id=@Submission_deadline;
       submit_duedate.assignment_id=@assignment.id;
-      submit_duedate.late_policy_id=params[:duedate][late_policy_id];
+      submit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
       submit_duedate.save;
       
       review_duedate=DueDate.new(params[:review_deadline]);
@@ -45,7 +45,7 @@ class AssignmentController < ApplicationController
           resubmit_duedate=DueDate.new(params[:additional_submit_deadline][resubmit_duedate_key]);
           resubmit_duedate.deadline_type_id=@Resubmission_deadline;
           resubmit_duedate.assignment_id=@assignment.id;
-          resubmit_duedate.late_policy_id=params[:duedate][late_policy_id];
+          resubmit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
           resubmit_duedate.save;
         end
         
@@ -53,14 +53,14 @@ class AssignmentController < ApplicationController
           rereview_duedate=DueDate.new(params[:additional_review_deadline][rereview_duedate_key]);
           rereview_duedate.deadline_type_id=@Rereview_deadline;
           rereview_duedate.assignment_id=@assignment.id;
-          rereview_duedate.late_policy_id=params[:duedate][late_policy_id];
+          rereview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
           rereview_duedate.save;
         end
       end      
       reviewofreview_duedate=DueDate.new(params[:reviewofreview_deadline]);
       reviewofreview_duedate.deadline_type_id=@Review_of_review_deadline;
       reviewofreview_duedate.assignment_id=@assignment.id;
-      reviewofreview_duedate.late_policy_id=params[:duedate][late_policy_id];
+      reviewofreview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
       reviewofreview_duedate.save;
       
       flash[:notice] = 'Assignment was successfully created.'

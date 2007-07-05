@@ -46,12 +46,11 @@ class AdminController < ApplicationController
       @user.update_attributes(params[:user])
       redirect_to :action => 'list_instructors'
     else
-      
-    
     
     @user = User.new(params[:user])
     @user.parent_id = (session[:user]).id
-    @user.role_id = Role::INSTRUCTOR  
+    @user.role_id = Role::INSTRUCTOR
+    #@user.mru_directory_path = "/"
     
     if params[:user][:clear_password].length == 0 or
         params[:user][:confirm_password] != params[:user][:clear_password]

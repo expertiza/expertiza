@@ -56,7 +56,7 @@
  
  <td><label for="late_policy">Late Policy: </label>
  <%=@late_policies = LatePolicy.find(:all).map {|u| [u.id] }
-         select('due_date', 'late_policy_id', @late_policies)%>
+         select('for_due_date', 'late_policy_id', @late_policies,:selected =>1)%>
  </tr>
 </table>
 <p>

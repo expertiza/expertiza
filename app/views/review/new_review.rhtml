@@ -4,6 +4,7 @@ Submitted Files<br />
 <ul>
 <% for file in @files %>
 <li><%=File.basename(file)%></li>
+<%= link_to File.basename(file), :action => 'download', :id => @author.id, :fname => File.basename(file) %>
 <% end %>
 </ul>
 

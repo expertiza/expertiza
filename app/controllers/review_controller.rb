@@ -91,4 +91,11 @@ class ReviewController < ApplicationController
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])     
   end
   
+  def download
+    if params['fname']
+      file_name = StudentAssignmentHelper::sanitize_filename(params['fname'])
+      @author = Participant.find(params[:id])
+      send_file(RAILS_ROOT + "/pg_data/" + @author.assignment.directory_path + "/" + @author.directory_num.to_s + "/" + file_name) 
+    end
+  end  
 end

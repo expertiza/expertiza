@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
       redirect_to(:controller => 'auth', :action => 'login')
     end
   end
+  
   protected
   def list(object_type)
     # Calls the correct listing method based on the role of the

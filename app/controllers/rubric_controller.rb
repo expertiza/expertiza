@@ -1,5 +1,7 @@
 class RubricController < ApplicationController
   
+  before_filter :authorize
+  
   def list
     set_up_display_options("RUBRIC")
     @rubrics = super(Rubric)

@@ -21,7 +21,9 @@ class Assignment < ActiveRecord::Base
   # validates_presence_of :reviews_visible_to_all
   # validates_presence_of :team_assignment
   # validates_presence_of :require_signup
-  # If user doesn't specify an id for wiki type, id is 0 by default, which means "not a wiki assgt."
+  # If user doesn't specify an id for wiki type, id is 1 by default, which means "not a wiki assgt."
+  #   The reason the default is 1, not 0, is because we use a dropdown box to select a wiki type,
+  #   and rails _form helpers generates HTML that looks like table1_1_table2.
   # validates_presence_of :wiki_type_id
     
     

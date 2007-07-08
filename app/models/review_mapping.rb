@@ -4,6 +4,7 @@ class ReviewMapping < ActiveRecord::Base
 
   def self.assign_reviewers(assignment_id, num_reviewers, num_review_of_reviewers)
     @reviewers = Participant.find(:all, :conditions => ['assignment_id = ? and review_allowed=1', assignment_id])
+    puts 'reviewers.size = ', @reviewers.size
     
     stride = 1 # get_rel_prime(num_reviewers, @reviewers.size)
     for i in 1 .. @reviewers.size

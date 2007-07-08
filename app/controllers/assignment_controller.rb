@@ -82,7 +82,7 @@ class AssignmentController < ApplicationController
   def save_reviewer_mappings
     @assignment = Assignment.find(params[:assignment_id])
     if @assignment.update_attributes(params[:assignment])
-      ReviewMappings.assign_reviewers(@assignment.id, @assignment.num_reviewers, @assignment.num_review_of_reviewers)
+      ReviewMapping.assign_reviewers(@assignment.id, @assignment.num_reviewers, @assignment.num_review_of_reviewers)
       flash[:notice] = 'Reviewers assigned successfully.'
       redirect_to :action => 'list'
     else

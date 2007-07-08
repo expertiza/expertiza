@@ -28,6 +28,44 @@ class ReviewController < ApplicationController
   end
   
   def edit_review
+    @review = Review.find(params[:id])
+    @review_scores = @review.review_scores
+    @mapping = ReviewMapping.find(@review.review_mapping_id)
+    @assgt = Assignment.find(@mapping.assignment_id)    
+    @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
+    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
+    @rubric = Rubric.find(@assgt.review_rubric_id)    
+    @max = @rubric.max_question_score
+    @min = @rubric.min_question_score 
+    @direc = RAILS_ROOT + "/pg_data/" + @author.assignment.directory_path + "/" + @author.directory_num.to_s
+    temp_files = Dir[@direc + "/*"]
+    @files = Array.new
+    for file in temp_files
+      if not File.directory?(Dir.pwd + "/" + file) then
+        @files << file
+      end
+    end
+  end
+  
+  def update_review
+    @review = Review.find(params[:review_id])
+    if params[:new_review_score]
+      # The new_question array contains all the new questions
+      # that should be saved to the database
+      for review_key in params[:new_review_score].keys
+        question_id = params[:new_question][review_key]
+        rs = ReviewScore.find(:first,:conditions => ["review_id = ? AND question_id = ?", @review.id, question_id])
+        rs.comments = params[:new_review_score][review_key][:comments]
+        rs.score = params[:new_score][review_key]
+        rs.update
+      end      
+    end
+    if @review.update
+      flash[:notice] = 'Rubric was successfully saved.'
+      redirect_to :action => 'list_reviews', :id => params[:assgt_id]
+    else # If something goes wrong, stay at same page
+      render :action => 'view_review'
+    end
     
   end
   

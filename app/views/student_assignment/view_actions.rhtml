@@ -6,8 +6,12 @@
 			<%= link_to 'Your work', :action => 'submit', :id => @student.id %>
 		<% else %>
 			<font color="gray">Your work</font>
-		<% end%> (Submit and view feedback)
-		
+		<% end%> 
+		<% if @student.assignment.wiki_type_id == 1%> # i.e., if assignment is not a wiki assignment
+				(Submit and view feedback)
+		<% else %>
+		        (View feedback)
+		<% end %>
 	</li>
 	<li>
 		<% if @review_phase == 2 or @review_phase == 4 %>

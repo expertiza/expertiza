@@ -20,12 +20,13 @@ ActiveRecord::Schema.define(:version => 28) do
     t.column "review_weight", :float
     t.column "reviews_visible_to_all", :boolean
     t.column "team_assignment", :boolean
-    t.column "wiki_assignment", :boolean
+    t.column "wiki_assignment_id", :integer, :default => 0, :null => false
     t.column "require_signup", :boolean
   end
 
   add_index "assignments", ["review_rubric_id"], :name => "fk_assignments_review_rubrics"
   add_index "assignments", ["review_of_review_rubric_id"], :name => "fk_assignments_review_of_review_rubrics"
+  add_index "assignments", ["wiki_assignment_id"], :name => "fk_assignments_wiki_assignments"
 
   create_table "content_pages", :force => true do |t|
     t.column "title", :string
@@ -460,5 +461,9 @@ ActiveRecord::Schema.define(:version => 28) do
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"
   add_index "users", ["institution_id"], :name => "FK_institutions_users"
+
+  create_table "wiki_assignments", :force => true do |t|
+    t.column "name", :string, :default => "", :null => false
+  end
 
 end

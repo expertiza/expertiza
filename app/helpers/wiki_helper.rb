@@ -52,7 +52,7 @@ module WikiHelper
     open(url, 
          "User-Agent" => "Ruby/#{RUBY_VERSION}",
          "From" => "email@addr.com", #Put pg admin email address here
-         "Referer" => "http://") { |f| #Put pg URL here
+         "Referrer" => "http://") { |f| #Put pg URL here
       
       # Save the response body
       response = f.read

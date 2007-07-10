@@ -88,12 +88,33 @@ class ReviewController < ApplicationController
     end
   end
   
+  def find_review_phase(due_dates)
+    # Find the next due date (after the current date/time), and then find the type of deadline it is.
+    @very_last_due_date = DueDate.find(:all,:order => "due_at DESC", :limit =>1)
+    next_due_date = @very_last_due_date[0]
+    for due_date in due_dates
+      if due_date.due_at > Time.now
+        if due_date.due_at < next_due_date.due_at
+          next_due_date = due_date
+        end
+      end
+    end
+    @review_phase = next_due_date.deadline_type_id;
+    return @review_phase
+  end
+  
   def create_review
      params.each do |elem|
        puts "#{elem[0]}, #{elem[1]}" 
      end
      @review = Review.new
      @review.review_mapping_id = params[:mapping_id]
+     @mapping = ReviewMapping.find(params[:mapping_id])
+     @assignment = Assignment.find(@mapping.assignment_id)
+     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
+     @review_phase = find_review_phase(@due_dates)
+     #if(@review_phase != 2)
+     
      
      if params[:new_review_score]
       # The new_question array contains all the new questions

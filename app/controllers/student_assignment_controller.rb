@@ -32,10 +32,11 @@ class StudentAssignmentController < ApplicationController
     
     if @student.penalty_accumulated/@late_policy.penalty_period_in_minutes*@late_policy.penalty_per_unit < @late_policy.max_penalty
       @final_penalty = @penalty_units*@late_policy.penalty_per_unit
-    end
+    elsif @penalty_units ==0
+      @final_penalty = 0
     else
       @final_penalty = @late_policy.max_penalty
-    
+    end
   end
   
   def view_grade

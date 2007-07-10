@@ -3,15 +3,18 @@ class ReviewMapping < ActiveRecord::Base
   has_many :reviews
 
   def self.assign_reviewers(assignment_id, num_reviewers, num_review_of_reviewers)
+    @authors = Participant.find(:all, :conditions => ['assignment_id = ? and submit_allowed=1', assignment_id])
     @reviewers = Participant.find(:all, :conditions => ['assignment_id = ? and review_allowed=1', assignment_id])
+    puts 'authors.size = ', @authors.size
     puts 'reviewers.size = ', @reviewers.size
     
     stride = 1 # get_rel_prime(num_reviewers, @reviewers.size)
-    for i in 1 .. @reviewers.size
+    for i in 0 .. @reviewers.size - 1
       current_reviewer_candidate = i
-      for j in 1 .. num_reviewers
-        current_author_candidate = (current_author_candidate + stride) % @reviewers.size
-        ReviewMapping.create(:author_id => current_author_candidate, :reviewer_id => i, :assignment_id => assignment_id)
+      current_author_candidate = current_reviewer_candidate
+      for j in 0 .. num_reviewers - 1
+        current_author_candidate = (current_author_candidate + stride) % @reviewers.size # this will work when authors are all reviewers & vice versa; otherwise should be mod @authors.size
+        ReviewMapping.create(:author_id => @authors[current_author_candidate].user_id, :reviewer_id => @reviewers[i].user_id, :assignment_id => assignment_id)
       end
     end
   end

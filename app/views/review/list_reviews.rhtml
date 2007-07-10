@@ -1,16 +1,18 @@
 <h1>Reviews</h1>
 
 <table class="listing" cellpadding=2>
- <tr>
+ <tr><ul>
+  <%review_no = 1%>
   <%for review_map in @review_mapping %>
-  <% @review = Review.find_by_review_mapping_id(review_map.id) %>
+  <% 
+  @review = Review.find_by_review_mapping_id(review_map.id) %>
   <% if (@review)%>
-  <%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %>
-  <%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %>
+  <li>Review <%=review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
+  <%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %></li>
   <% else %>
-  <%= link_to "Create",{:controller => 'review', :action => 'new_review', :id => review_map.id} %>
+  <li>Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id} %></li>
   <% end %>
-  <% end %>
-  </tr>
-  </table>
-
+  <%review_no += 1
+  end %></ul>
+ </tr>
+</table>

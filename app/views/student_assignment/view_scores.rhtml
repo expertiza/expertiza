@@ -26,12 +26,16 @@
                 </tr>
             <%end
 			  grade += total%>
-            <tr><td><i>Total</i></td><td><%=total%></td></tr>
+            <tr><td><i>Total</i></td><td><%=total%> (<%=total*100/@sum_of_max%>%)</td></tr>
            </table><br/>
            <%review_no +=1
         end
     end%>
+    <% if review_no-1 > 0 %>
 	<h3>Grade</h3> 
-	<li>Average = <%=grade/(review_no-1)%></li>
+	<li>Average = <%=grade/(review_no-1)%> (<%=grade/(review_no-1)*100/@sum_of_max%>%)</li>
+	<%if @final_penalty !=0%>
 	<li>Penalty units= <%=@penalty_units%>&nbsp;Penalty per unit=<%=@late_policy.penalty_per_unit%>&nbsp;Maximum penalty=<%=@late_policy.max_penalty%></li>
-	<li>Final Grade= <%=(grade/(review_no-1))*100/@sum_of_max%>-<%=@final_penalty%>=<%=(grade/(review_no-1))*100/@sum_of_max-@final_penalty%></li>
+	<%end%>
+	<li>Final Grade=<%=(grade/(review_no-1))*100/@sum_of_max-@final_penalty%></li>
+    <%end%>

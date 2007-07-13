@@ -7,8 +7,8 @@ class CreateAssignments < ActiveRecord::Migration
     t.column :course_id, :integer # id of course (if any) that this assignment is associated with
 	t.column :instructor_id, :integer # id of instructor who created the assignment
 	t.column :private, :boolean  # whether assignment is visible to other instructors
-    t.column :num_reviewers, :integer # number of people who review each submission for this assgt.
-    t.column :num_review_of_reviewers, :integer # number of people who review each review for this assgt.
+    t.column :num_reviews, :integer # number of reviews done by a student for this assignment
+    t.column :num_review_of_reviews, :integer # number of reviews of reviews done by a student for this assgt.
     t.column :review_strategy_id, :integer # the review strategy, e.g., "rubric", "ranking"
     t.column :mapping_strategy_id, :integer # the review-mapping strategy, e.g., "static", "dynamic"
 	t.column :review_rubric_id, :integer

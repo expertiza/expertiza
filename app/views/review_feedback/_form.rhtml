@@ -1,0 +1,10 @@
+<%= error_messages_for 'review_feedback' %>
+
+<!--[form:review_feedback]-->
+<p><label for="review_feedback_feedback_at">Feedback at</label><br/>
+<%= datetime_select 'review_feedback', 'feedback_at'  %></p>
+
+<p><label for="review_feedback_txt">Txt</label><br/>
+<%= text_area 'review_feedback', 'txt'  %></p>
+<!--[eoform:review_feedback]-->
+

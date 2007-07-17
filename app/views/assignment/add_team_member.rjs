@@ -1,0 +1,13 @@
+page.insert_html :bottom, 'team_entries',
+                "Enter team members<br/>"
+#count = params[:team][:count]
+
+for i in 0 .. 3
+text = "member"+@count.to_s
+  page.insert_html :bottom, 'team_entries',
+                  text
+  page.insert_html :bottom, 'team_entries',
+                  text_field_with_auto_complete(:user, :name)
+  page.insert_html :bottom, 'team_entries',
+                  "<br/>"
+end

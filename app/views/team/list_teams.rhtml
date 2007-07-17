@@ -1,0 +1,27 @@
+<h1>Listing Teams</h1>
+
+<table>
+  <tr>
+  <% for column in Team.content_columns %>
+    <th><%= column.human_name %></th>
+  <% end %>
+  </tr>
+  
+<% for team in @teams %>
+  <tr>
+  <% for column in Team.content_columns %>
+    <td><%=h team.send(column.name) %></td>
+  <% end %>
+    <td><%= link_to 'Show', :action => 'show', :id => team %></td>
+    <td><%= link_to 'Edit members', :action => 'view_team_members', :id => team.id %></td>
+    <td><%= link_to 'Destroy', { :action => 'destroy', :id => team }, :confirm => 'Are you sure?', :post => true %></td>
+  </tr>
+<% end %>
+</table>
+
+<%= link_to 'Previous page', { :page => @team_pages.current.previous } if @team_pages.current.previous %>
+<%= link_to 'Next page', { :page => @team_pages.current.next } if @team_pages.current.next %> 
+
+<br />
+
+<%= link_to 'New team', :action => 'new_team' %>

@@ -1,0 +1,9 @@
+<h1>Editing review_feedback</h1>
+
+<%= start_form_tag :action => 'update', :id => @review_feedback %>
+  <%= render :partial => 'form' %>
+  <%= submit_tag 'Edit' %>
+<%= end_form_tag %>
+
+<%= link_to 'Show', :action => 'show', :id => @review_feedback %> |
+<%= link_to 'Back', :action => 'list' %>

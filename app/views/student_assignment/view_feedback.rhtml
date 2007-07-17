@@ -1,0 +1,35 @@
+<h1>Feedback</h1>
+<%
+    _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
+ 	review_no = 1
+	grade = 0
+    for review_map in @review_mapping 
+        for review in review_map.reviews%>
+        
+            Review <%=review_no%>: <br/>
+            <table class="listing" cellpadding=2>
+             <tr>
+                <th>Question</th>
+				<th>Comment</th>
+             </tr>
+         
+             <%
+             for review_score in review.review_scores%>
+                <tr class="listingRow">
+                    <td><%=Question.find(review_score.question_id).txt%></td><td><%=review_score.comments%></td>
+                </tr>
+            <%end%>
+           </table><br/>
+           <%review_no +=1
+        end
+    end%>
+	
+	<% if review_no-1 <= 0 %>
+		<%if @assignment.wiki_type_id == 2 %>
+			<%if review_mediawiki @assignment.directory_path, _time, @user_name ==''%>	
+				<label>There is no feedback on your work because it seems that you have not submitted anything for this assignment.</label>
+			<%else%>
+				<label>There is no feedback on your work yet.</label>
+			<%end%>
+		<%end%>	
+	<%end%>

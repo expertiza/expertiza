@@ -1,0 +1,19 @@
+<h1>Delete an existing rubric</h1>
+
+<%= form_tag({:action=>'delete'})%>
+  	Are you sure you want to delete <%= @assignment.name.capitalize %>?<br/><br/>
+	<table>
+	   <tr>
+	     <th>Name&nbsp;&nbsp;</th><th>Directory path</th>
+	   </tr>
+	   <tr>
+		   <td><%= @assignment.name %></td>
+		   <td><%= @assignment.directory_path %></td>
+		 </tr>
+	</table>
+	<br />
+	<%= submit_tag "Delete assignment", :name=>"delete" %>
+
+</form>
+<br />
+<%= link_to 'Back', :action => 'list' %>

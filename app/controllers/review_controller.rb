@@ -1,4 +1,5 @@
 class ReviewController < ApplicationController
+  helper :wiki
   def list
     # lists the reviews that the current user is assigned to do
     user_id = session[:user].id
@@ -34,7 +35,17 @@ class ReviewController < ApplicationController
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
     @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Rubric.find(@assgt.review_rubric_id)    
+    @rubric = Rubric.find(@assgt.review_rubric_id)
+    
+    if @assgt.team_assignment 
+      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
+      @author_name = User.find(@author_first_user_id).name;
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
+    else
+      @author_name = User.find(@mapping.author_id).name
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
+    end
+    
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score 
     @direc = RAILS_ROOT + "/pg_data/" + @author.assignment.directory_path + "/" + @author.directory_num.to_s
@@ -70,6 +81,7 @@ class ReviewController < ApplicationController
   end
   
   def new_review
+
     @review = Review.new
     @mapping = ReviewMapping.find(params[:id])
     @assgt = Assignment.find(@mapping.assignment_id)
@@ -77,7 +89,15 @@ class ReviewController < ApplicationController
     @rubric = Rubric.find(@assgt.review_rubric_id)
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score  
-    @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
+    
+    if @assgt.team_assignment 
+      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
+      @author_name = User.find(@author_first_user_id).name;
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
+    else
+      @author_name = User.find(@mapping.author_id).name
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
+    end
     @direc = RAILS_ROOT + "/pg_data/" + @author.assignment.directory_path + "/" + @author.directory_num.to_s
     temp_files = Dir[@direc + "/*"]
     @files = Array.new
@@ -150,11 +170,4 @@ class ReviewController < ApplicationController
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])     
   end
   
-  def download
-    if params['fname']
-      file_name = StudentAssignmentHelper::sanitize_filename(params['fname'])
-      @author = Participant.find(params[:id])
-      send_file(RAILS_ROOT + "/pg_data/" + @author.assignment.directory_path + "/" + @author.directory_num.to_s + "/" + file_name) 
-    end
-  end  
 end

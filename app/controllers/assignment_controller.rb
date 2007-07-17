@@ -1,5 +1,5 @@
 class AssignmentController < ApplicationController
-  
+  auto_complete_for :user, :name
   before_filter :authorize
 
   @no_dl="1" # a value of "no" for whether an action is permitted prior to a deadline
@@ -10,7 +10,9 @@ class AssignmentController < ApplicationController
     @rubric = Rubric.find_all
     @wiki_types = WikiType.find_all
   end
-  
+  def add_team_member
+    @count=4#params[:newitem]
+  end
   def create
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.
@@ -137,5 +139,16 @@ class AssignmentController < ApplicationController
     @assignments=super(Assignment)
     #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
-  
+    
+  def list_team
+    @team_pages, @teams = paginate :teams, :per_page => 10
+  end
+
+  def show_team
+    @team = Team.find(params[:id])
+  end
+
+  def new_team
+    @team = Team.new
+  end
 end

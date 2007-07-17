@@ -2,6 +2,7 @@
 <%
     review_no = 1
 	grade = 0
+    _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
     for review_map in @review_mapping 
         for review in review_map.reviews%>
         
@@ -32,10 +33,22 @@
         end
     end%>
     <% if review_no-1 > 0 %>
-	<h3>Grade</h3> 
-	<li>Average = <%=grade/(review_no-1)%> (<%=grade/(review_no-1)*100/@sum_of_max%>%)</li>
-	<%if @final_penalty !=0%>
-	<li>Penalty units= <%=@penalty_units%>&nbsp;Penalty per unit=<%=@late_policy.penalty_per_unit%>&nbsp;Maximum penalty=<%=@late_policy.max_penalty%></li>
+		<h3>Grade</h3> 
+		<li>Average = <%=grade/(review_no-1)%> (<%=grade/(review_no-1)*100/@sum_of_max%>%)</li>
+		<%if @final_penalty !=0%>
+			<li>Penalty units= <%=@penalty_units%>&nbsp;Penalty per unit=<%=@late_policy.penalty_per_unit%>&nbsp;Maximum penalty=<%=@late_policy.max_penalty%></li>
+		<%end%>
+		<li>Final Grade=<%=(grade/(review_no-1))*100/@sum_of_max-@final_penalty%></li>
+   	<%else%>
+		<%if @assignment.wiki_type_id == 2 %>
+			<%if @assignment.team_assignment %>
+				<label>There are no reviews of your work yet.</label>
+			<%else%>
+				<%if review_mediawiki @assignment.directory_path, _time, @user_name == ''%>	
+					<label>There are no reviews of your work because it seems that you have not submitted anything for this assignment.</label>
+				<%else%>
+					<label>There are no reviews of your work yet.</label>
+				<%end%>
+			<%end%>
+		<%end%>
 	<%end%>
-	<li>Final Grade=<%=(grade/(review_no-1))*100/@sum_of_max-@final_penalty%></li>
-    <%end%>

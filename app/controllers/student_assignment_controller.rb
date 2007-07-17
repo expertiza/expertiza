@@ -1,6 +1,7 @@
 require 'zip/zip'
 
 class StudentAssignmentController < ApplicationController
+  helper :wiki
   def list
     user_id = session[:user].id
     @participants = Participant.find(:all, 
@@ -19,10 +20,24 @@ class StudentAssignmentController < ApplicationController
   def view_scores
     @author_id = session[:user].id
     @assignment_id = Participant.find(params[:id]).assignment_id
-    @student = Participant.find(params[:id])
+    @assignment = Assignment.find(@assignment_id)
+    if @assignment.team_assignment 
+      @team_id = TeamsUser.find(:first,:conditions => ["user_id=?", @author_id]).team_id
+      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
+      @student = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @assignment_id])
+      @user_name= session[:user].name
+      #@user_name = User.find(@author_first_user_id).name
+      @review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", @team_id, @assignment_id])
+    elsif !@assignment.team_assignment
+      @student = Participant.find(params[:id])
+      @user_name= session[:user].name
+      @user_name = User.find(@student.user_id).name
+      @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
+    end
+    
     @late_policy = LatePolicy.find(Assignment.find(@assignment_id).due_dates[0].late_policy_id)
-    @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
     @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes
+    
     
     #the code below finds the sum of the maximum scores of all questions in the rubric
     @sum_of_max = 0
@@ -38,7 +53,14 @@ class StudentAssignmentController < ApplicationController
       @final_penalty = @late_policy.max_penalty
     end
   end
-  
+  def view_feedback
+    @author_id = session[:user].id
+    @assignment_id = Participant.find(params[:id]).assignment_id
+    @assignment = Assignment.find(@assignment_id)
+    @student = Participant.find(params[:id])
+    @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
+    @user_name = User.find(@student.user_id).name
+  end
   def view_grade
     @author_id = session[:user].id
     @assignment_id = Participant.find(params[:id]).assignment_id

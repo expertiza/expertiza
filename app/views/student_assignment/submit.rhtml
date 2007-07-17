@@ -1,5 +1,4 @@
 <h1>Submit Assignment</h1>
-Test: <%=@review_phase%>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
 	<%= flash[:notice] %>
@@ -110,6 +109,9 @@ function checkIfFileExists(button)
 
 </script>
 
+<li><%= link_to "View feedback on submissions",{:action => 'view_feedback', :id => @student.id} %></li>
+
+<% if @student.assignment.wiki_type_id == 1%>
 Submit your work for the assignment titled: <%= @student.assignment.name %>
 <%= form_tag({:action=>'submit'},:multipart => true, :name=>'submit_form')%>
 <br><br>
@@ -165,3 +167,4 @@ Submit your work for the assignment titled: <%= @student.assignment.name %>
 <% end %>		
 </form>
 <br><br><br><br>
+<%end%>

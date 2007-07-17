@@ -51,3 +51,4 @@ end
 # end
 
 # Include your application configuration below
+#ActionController::AbstractRequest.relative_url_root = "/blog"

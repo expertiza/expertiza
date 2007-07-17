@@ -5,6 +5,27 @@ Submitted Files<br />
 <li><%= link_to File.basename(file), :action => 'download', :id => @author.id, :fname => File.basename(file) %></li>
 <% end %>
 </ul>
+<%
+ _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
+ if @assgt.wiki_type.name == "DocuWiki" %>
+<br>
+<b>DokuWiki Review Test:</b>
+<br>
+<br>
+<%= review_dokuwiki @assgt.directory_path, _time, @author_name  %>
+<br>
+<% elsif @assgt.wiki_type.name == "MediaWiki" %>
+<br>
+<b>MediaWiki Review Test:</b>
+<br>
+<br>
+<%= review_mediawiki @assgt.directory_path, _time, @author_name  %>
+<br>
+<% end %>
+<% for file in @files %>
+<li><%= link_to File.basename(file), :action => 'download', :id => @author.id, :fname => File.basename(file) %></li>
+<% end %>
+</ul>
 
 <%= start_form_tag :action => 'update_review' %>
     <% i = 0;

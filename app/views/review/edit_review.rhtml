@@ -19,7 +19,15 @@ Submitted Files<br />
 <b>MediaWiki Review Test:</b>
 <br>
 <br>
-<%= review_mediawiki @assgt.directory_path, _time, @author_name  %>
+<%if @assgt.team_assignment
+  	for team_member in @team_members
+		member_name = User.find(team_member.user_id).name 
+%>
+	<%= review_mediawiki_group @assgt.directory_path, _time, member_name  %>
+	<%end%>
+<%else%>
+	<%= review_mediawiki @assgt.directory_path, _time, @author_name  %>
+<%end%>
 <br>
 <% end %>
 <% for file in @files %>

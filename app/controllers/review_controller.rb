@@ -39,6 +39,7 @@ class ReviewController < ApplicationController
     
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
+      @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
       @author_name = User.find(@author_first_user_id).name;
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
     else
@@ -92,6 +93,7 @@ class ReviewController < ApplicationController
     
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
+      @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
       @author_name = User.find(@author_first_user_id).name;
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
     else

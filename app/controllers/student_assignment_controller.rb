@@ -14,7 +14,7 @@ class StudentAssignmentController < ApplicationController
     @assignment_id = @student.assignment_id
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
-    @review_phase = find_review_phase(@due_dates)
+    @can_view_your_work, @can_view_others_work = find_viewing_permissions(@due_dates)
   end
   
   def view_scores
@@ -34,10 +34,8 @@ class StudentAssignmentController < ApplicationController
       @user_name = User.find(@student.user_id).name
       @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
     end
-    
     @late_policy = LatePolicy.find(Assignment.find(@assignment_id).due_dates[0].late_policy_id)
     @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes
-    
     
     #the code below finds the sum of the maximum scores of all questions in the rubric
     @sum_of_max = 0
@@ -53,6 +51,7 @@ class StudentAssignmentController < ApplicationController
       @final_penalty = @late_policy.max_penalty
     end
   end
+  
   def view_feedback
     @author_id = session[:user].id
     @assignment_id = Participant.find(params[:id]).assignment_id
@@ -61,6 +60,7 @@ class StudentAssignmentController < ApplicationController
     @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
     @user_name = User.find(@student.user_id).name
   end
+  
   def view_grade
     @author_id = session[:user].id
     @assignment_id = Participant.find(params[:id]).assignment_id
@@ -81,7 +81,7 @@ class StudentAssignmentController < ApplicationController
     @review_phase = next_due_date.deadline_type_id;
     return @review_phase
   end
-   
+
   def submit
     @student = Participant.find(params[:id])
     @files = Array.new
@@ -284,6 +284,42 @@ private
         find_student_folders file
       end
     end
+  end
+  
+    def find_viewing_permissions(due_dates)
+    # Find the next due date (after the current date/time), and then find the type of deadline it is.
+    @very_last_due_date = DueDate.find(:all,:order => "due_at DESC", :limit =>1)
+    next_due_date = @very_last_due_date[0]
+    for due_date in due_dates
+      if due_date.due_at > Time.now
+        if due_date.due_at < next_due_date.due_at
+          next_due_date = due_date
+        end
+      end
+    end
+    
+    @review_phase = next_due_date.deadline_type_id;
+
+      if next_due_date.submission_allowed_id == 2 or next_due_date.submission_allowed_id == 3
+        @can_view_your_work =1
+      end
+      if next_due_date.review_allowed_id == 2 or next_due_date.review_allowed_id == 3
+        @can_view_others_work =1
+      end
+
+      if next_due_date.resubmission_allowed_id == 2 or next_due_date.resubmission_allowed_id == 3
+        @can_view_your_work =1
+      end
+
+      if next_due_date.rereview_allowed_id == 2 or next_due_date.rereview_allowed_id == 3
+        @can_view_others_work =1
+      end
+
+      if next_due_date.review_of_review_allowed_id == 2 or next_due_date.review_of_review_allowed_id == 3
+        @can_view_others_work =1
+      end
+
+    return [@can_view_your_work, @can_view_others_work]
   end
   
   def get_file_type file_name

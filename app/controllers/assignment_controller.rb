@@ -65,6 +65,8 @@ class AssignmentController < ApplicationController
       reviewofreview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
       reviewofreview_duedate.save;
       
+      # Create submission directory for this assignment
+      Dir.mkdir(RAILS_ROOT + "/pg_data/" + params[:assignment][:directory_path])
       flash[:notice] = 'Assignment was successfully created.'
       redirect_to :action => 'list'
       
@@ -100,15 +102,16 @@ class AssignmentController < ApplicationController
   
   def update
     @assignment = Assignment.find(params[:id])
+    # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])
-      
+      # Iterate over due_dates, from due_date[0] to the maximum due_date
       for due_date_key in params[:due_date].keys
         due_date_temp = DueDate.find(due_date_key)
         due_date_temp.update_attributes(params[:due_date][due_date_key])
       end
       flash[:notice] = 'Assignment was successfully updated.'
       redirect_to :action => 'show', :id => @assignment
-    else
+    else # Simply refresh the page
       @wiki_types = WikiType.find_all
       render :action => 'edit'
     end
@@ -120,14 +123,25 @@ class AssignmentController < ApplicationController
   
   def delete
     @assignment = get(Assignment, params[:id])
+    # If the assignment is already deleted, go back to the list of assignments
     if @assignment == nil
       redirect_to :action => 'list' 
     else 
       if @assignment.due_dates_exist? == false or params['delete'] or @assignment.review_feedback_exist? == false or @assignment.participants_exist? == false
+        puts(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
+        puts(Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size)
+        # The size of an empty directory is 2
+        # Delete the directory if it is empty
+        if Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size == 2
+            Dir.delete(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
+        else
+          flash[:notice] = "Directory not empty.  Assignment has been deleted, but submitted files remain."
+        end
         @assignment.delete_due_dates
         @assignment.delete_review_feedbacks
         @assignment.delete_participants
         @assignment.destroy
+        
         redirect_to :action => 'list'
       end
     end

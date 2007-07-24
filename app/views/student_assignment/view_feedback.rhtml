@@ -26,12 +26,16 @@
 	
 	<% if review_no-1 <= 0 %>
 		<%if @assignment.wiki_type_id == 2 %>
-			<%if review_mediawiki @assignment.directory_path, _time, @user_name ==''%>	
-				<label>There is no feedback on your work because it seems that you have not submitted anything for this assignment.</label>
-			<%else%>
+			<%if @assignment.team_assignment %>
 				<label>There is no feedback on your work yet.</label>
+			<%else%>
+				<%if review_mediawiki @assignment.directory_path, _time, @user_name == ''%>	
+					<label>There is no feedback on your work because it seems that you have not submitted anything for this assignment.</label>
+				<%else%>
+					<label>There is no feedback on your work yet.</label>
+				<%end%>
 			<%end%>
 		<%else%>
 			<label>There is no feedback on your work yet.</label>
-		<%end%>	
+		<%end%>
 	<%end%>

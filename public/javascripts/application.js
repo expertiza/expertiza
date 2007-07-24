@@ -28,12 +28,29 @@ function checkDeadlines()
 	{
 		var check = 0
 		var iplus1 = i+1 
-		
-		if(getYear(dates[i])<= getYear(dates[iplus1])&& (getMonth(dates[i])<= getMonth(dates[iplus1]) && getDay(dates[i])<= getDay(dates[iplus1])))
+		getTime(dates[i])
+		if(getDate(dates[i])< getDate(dates[iplus1]))
 		{
 		  if(i == datesCount-1)
 			{
 				return true
+			}
+		}
+		else if(getDate(dates[i])== getDate(dates[iplus1]))
+		{
+			if(getTime(dates[i])< getTime(dates[iplus1]))
+			{
+				if(i == datesCount-1)
+				{
+					return true
+				}
+			}
+			else
+			{
+				var iplus2=i+2
+				//alert ("Deadlines incorrect. Make sure each date in a deadline is greater than or equal to the date its preceding deadline.")
+				alert ("Deadline on line "+iplus2+" must be after deadline on line "+iplus1)
+				return false
 			}
 		}
 		else
@@ -47,6 +64,11 @@ function checkDeadlines()
 	
 }
 
+function getDate(date)
+{
+	var dateVar = getYear(date)+''+getMonth(date)+''+getDay(date)
+	return dateVar
+}
 function getDay(date)
 {
 	var day = date.substring(8,10)
@@ -63,6 +85,11 @@ function getYear(date)
 {
 	var year = date.substring(0,4)
 	return year
+}
+function getTime(date)
+{
+	var timeVar = date.substring(11,13)+''+date.substring(14,16)+''+date.substring(17,19)
+	return timeVar
 }
 
 function addElement() {

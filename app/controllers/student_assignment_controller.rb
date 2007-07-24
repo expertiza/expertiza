@@ -56,9 +56,19 @@ class StudentAssignmentController < ApplicationController
     @author_id = session[:user].id
     @assignment_id = Participant.find(params[:id]).assignment_id
     @assignment = Assignment.find(@assignment_id)
-    @student = Participant.find(params[:id])
-    @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
-    @user_name = User.find(@student.user_id).name
+     if @assignment.team_assignment 
+      @team_id = TeamsUser.find(:first,:conditions => ["user_id=?", @author_id]).team_id
+      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
+      @student = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @assignment_id])
+      @user_name= session[:user].name
+      #@user_name = User.find(@author_first_user_id).name
+      @review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", @team_id, @assignment_id])
+    elsif !@assignment.team_assignment
+      @student = Participant.find(params[:id])
+      @user_name= session[:user].name
+      @user_name = User.find(@student.user_id).name
+      @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
+    end
   end
   
   def view_grade

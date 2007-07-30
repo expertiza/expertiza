@@ -29,7 +29,7 @@ Submitted Files<br />
 <br>
 <% end %>
 <% for file in @files %>
-<li><%= link_to File.basename(file), :action => 'download', :id => @author.id, :fname => File.basename(file) %></li>
+<li><%= link_to File.basename(file), :action => 'new_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
 <% end %>
 </ul>
 

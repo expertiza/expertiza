@@ -30,6 +30,7 @@ class ReviewController < ApplicationController
   
   def edit_review
     @review = Review.find(params[:id])
+    @mapping_id = params[:id]
     @review_scores = @review.review_scores
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
@@ -49,6 +50,12 @@ class ReviewController < ApplicationController
     
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score 
+     
+    @current_folder = DisplayOption.new
+    @current_folder.name = "/"
+    if params[:current_folder]
+      @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
+    end
     @direc = RAILS_ROOT + "/pg_data/" + @author.assignment.directory_path + "/" + @author.directory_num.to_s
     temp_files = Dir[@direc + "/*"]
     @files = Array.new
@@ -56,6 +63,9 @@ class ReviewController < ApplicationController
       if not File.directory?(Dir.pwd + "/" + file) then
         @files << file
       end
+    end
+    if params['fname']
+      view_submitted_file(@current_folder,@author)
     end
   end
   
@@ -84,6 +94,7 @@ class ReviewController < ApplicationController
   def new_review
 
     @review = Review.new
+    @mapping_id = params[:id]
     @mapping = ReviewMapping.find(params[:id])
     @assgt = Assignment.find(@mapping.assignment_id)
     @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
@@ -100,6 +111,12 @@ class ReviewController < ApplicationController
       @author_name = User.find(@mapping.author_id).name
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
+
+    @current_folder = DisplayOption.new
+    @current_folder.name = "/"
+    if params[:current_folder]
+      @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
+    end
     @direc = RAILS_ROOT + "/pg_data/" + @author.assignment.directory_path + "/" + @author.directory_num.to_s
     temp_files = Dir[@direc + "/*"]
     @files = Array.new
@@ -108,6 +125,22 @@ class ReviewController < ApplicationController
         @files << file
       end
     end
+    if params['fname']
+      view_submitted_file(@current_folder,@author)
+    end
+  end
+  
+  #follows a link
+  def view_submitted_file(current_folder,author)
+    folder_name = StudentAssignmentHelper::sanitize_folder(current_folder.name)
+    file_name = StudentAssignmentHelper::sanitize_filename(params['fname'])
+    send_file(RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + @author.directory_num.to_s + folder_name + "/" + file_name) 
+  end
+  
+  
+  def get_student_directory(directory_path, directory_num)
+    # This assumed that the directory num has already been set
+    return RAILS_ROOT + "/pg_data/" + directory_path + "/" + directory_num
   end
   
   def find_review_phase(due_dates)
@@ -155,8 +188,6 @@ class ReviewController < ApplicationController
       render :action => 'view_review'
     end
   end
-  
- 
   
   def feedback
     @reviewer_id = session[:user].id

@@ -118,7 +118,13 @@ class StudentAssignmentController < ApplicationController
     if params['download']
       folder_name = StudentAssignmentHelper::sanitize_folder(@current_folder.name)
       file_name = StudentAssignmentHelper::sanitize_filename(params['download'])
-      send_file(get_student_directory(@student) + folder_name + "/" + file_name) 
+      
+      file_split = file_name.split('.')
+      if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
+        send_file(get_student_directory(@student) + folder_name + "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline') 
+      else
+        send_file(get_student_directory(@student) + folder_name + "/" + file_name, :disposition => 'inline') 
+      end
     end
     
     if params['new_folder']

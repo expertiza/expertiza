@@ -1,21 +1,32 @@
 <h1>Edit Review</h1>
+<%if @files.size == 0%>
+<strong>This submission is missing.</strong>
+<%else%>
 Submitted Files<br />
+<%end%>
 
 <%
  _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
- if @assgt.wiki_type.name == "DocuWiki" %>
+ if @assgt.wiki_type.name == "DokuWiki" %>
 <br>
-<b>DokuWiki Review Test:</b>
+<b>DokuWiki Review Links:</b>
 <br>
 <br>
 <%= review_dokuwiki @assgt.directory_path, _time, @author_name  %>
 <br>
 <% elsif @assgt.wiki_type.name == "MediaWiki" %>
 <br>
-<b>MediaWiki Review Test:</b>
+<b>MediaWiki Review Links:</b>
 <br>
 <br>
-<%if @assgt.team_assignment
+<!--The following checks a wiki type.  If we add a new wiki type, we need to modify this code, which is in
+    a very unexpected place.  This should be done by polymorphism, based on a Wiki class that is subclassed
+    for various kinds of wikis. 
+    
+    Make a generic review_wiki function, with a parameter specifying wiki type.  The review_wiki function
+    then makes callbacks to the various wiki classes, depending on what kind of a wiki it is working on.
+    This allows wiki-specific behavior to be kept in the wiki classes. -->
+<%if @assgt.team_assignment  # The lookup of all team members should be put in a wiki helper
   	for team_member in @team_members
 		member_name = User.find(team_member.user_id).name 
 %>
@@ -26,17 +37,19 @@ Submitted Files<br />
 <%end%>
 <br>
 <% end %>
+<ul>
 <% for file in @files %>
 <li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
 <% end %>
 </ul>
+
 
 <%= start_form_tag :action => 'update_review' %>
     <% i = 0;
         for @question in @questions %>
           <%=@question.txt%><br />  
           <% @rs = ReviewScore.find(:first,:conditions => ["review_id = ? AND question_id = ?", @review.id, @question.id])%>
-          <input id=new_review_score_<%=i%>_comments name=new_review_score[<%=i%>][comments] value = "<%=@rs.comments%>"  size=70 type=text />
+          <input id=new_review_score_<%=i%>_comments name=new_review_score[<%=i%>][comments] value = "<%=@rs.comments.gsub(/\"/,'&quot;')%>"  size=70 type=text />
           <% if @question.true_false? %>
               <select id=new_score_<%=i%> name=new_score[<%=i%>]>
                  <option value="<%=@min%>" <%if @min==@rs.score%>selected="selected"<%end%> >false</option>

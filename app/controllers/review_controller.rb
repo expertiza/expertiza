@@ -56,17 +56,28 @@ class ReviewController < ApplicationController
     if params[:current_folder]
       @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
     end
-    @direc = RAILS_ROOT + "/pg_data/" + @author.assignment.directory_path + "/" + @author.directory_num.to_s
-    temp_files = Dir[@direc + "/*"]
+    
     @files = Array.new
-    for file in temp_files
-      if not File.directory?(Dir.pwd + "/" + file) then
-        @files << file
-      end
-    end
+    @files = get_submitted_file_list(@direc, @author, @files)
+    
     if params['fname']
       view_submitted_file(@current_folder,@author)
     end
+  end
+  
+  def get_submitted_file_list(direc,author,files)
+   if(author.directory_num)
+    direc = RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + author.directory_num.to_s
+    temp_files = Dir[direc + "/*"]
+    for file in temp_files
+      if not File.directory?(Dir.pwd + "/" + file) then
+        files << file
+      end
+    end
+   else
+     files[0]="the submission"
+    end
+   return files
   end
   
   def update_review
@@ -117,14 +128,8 @@ class ReviewController < ApplicationController
     if params[:current_folder]
       @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
     end
-    @direc = RAILS_ROOT + "/pg_data/" + @author.assignment.directory_path + "/" + @author.directory_num.to_s
-    temp_files = Dir[@direc + "/*"]
     @files = Array.new
-    for file in temp_files
-      if not File.directory?(Dir.pwd + "/" + file) then
-        @files << file
-      end
-    end
+    @files = get_submitted_file_list(@direc, @author, @files)
     if params['fname']
       view_submitted_file(@current_folder,@author)
     end

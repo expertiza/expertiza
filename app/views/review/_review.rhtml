@@ -17,3 +17,6 @@ for @question in @questions %>
   <input id=new_question_<%=i%> name=new_question[<%=i%>] value=<%=@question.id%> type=hidden />
 <% i += 1;
 end %>
+
+Additional feedback<br/>
+<textarea id=review_additional_feedback name=review_additional_feedback />

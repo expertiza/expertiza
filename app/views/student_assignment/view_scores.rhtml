@@ -23,22 +23,22 @@
                     total += review_score.score 
                 #end%>
                 <tr class="listingRow">
-                    <td><%=Question.find(review_score.question_id).txt%></td><td><%=review_score.score%></td><td><%=review_score.comments%></td>
+                    <td><%=Question.find(review_score.question_id).txt%></td><td align = 'right'><%=review_score.score%>&nbsp;&nbsp;</td><td><%=review_score.comments%></td>
                 </tr>
             <%end
 			  grade += total%>
-            <tr><td><i>Total</i></td><td><%=total%> (<%=total*100/@sum_of_max%>%)</td></tr>
+            <tr><td><em>Total</em></td><td align = 'right'><%=total%>&nbsp;&nbsp;</td><td><em>Score:</em> <%=total*100/@sum_of_max%>%</td></tr>
            </table><br/>
            <%review_no +=1
         end
     end%>
     <% if review_no-1 > 0 %>
 		<h3>Grade</h3> 
-		<li>Average = <%=grade/(review_no-1)%> (<%=grade/(review_no-1)*100/@sum_of_max%>%)</li>
+		<strong>Average (of all reviews)</strong> = <%=grade/(review_no-1)%>
 		<%if @final_penalty !=0%>
 			<li>Penalty units= <%=@penalty_units%>&nbsp;Penalty per unit=<%=@late_policy.penalty_per_unit%>&nbsp;Maximum penalty=<%=@late_policy.max_penalty%></li>
 		<%end%>
-		<li>Final Grade=<%=(grade/(review_no-1))*100/@sum_of_max-@final_penalty%></li>
+		&nbsp;&nbsp;<strong>Final grade</strong> = <%=(grade/(review_no-1))*100/@sum_of_max-@final_penalty%>%</li>
    	<%else%>
 		<%if @assignment.wiki_type_id == 2 %>
 			<%if @assignment.team_assignment %>

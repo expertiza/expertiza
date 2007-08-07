@@ -136,6 +136,7 @@ class ReviewController < ApplicationController
   end
   
   #follows a link
+  #needs to be moved to a separate helper function
   def view_submitted_file(current_folder,author)
     folder_name = StudentAssignmentHelper::sanitize_folder(current_folder.name)
     file_name = StudentAssignmentHelper::sanitize_filename(params['fname'])

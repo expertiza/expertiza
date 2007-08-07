@@ -1,0 +1,33 @@
+<h1>Reports</h1>
+<%for participant in @participants
+	student =User.find(participant.user_id)
+	if !@assignment.team_assignment
+		review_mapping = ReviewMapping.find_by_sql("select * from review_mappings where author_id = "+student.id.to_s+" and assignment_id = "+@assignment.id.to_s)
+	elsif @assignment.team_assignment
+		team_id = 10 #TeamsUser.find_by_sql("select * from teams_users where user_id = "+student.id.to_s)[0].team_id
+		review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", team_id, @assignment.id])
+	end
+	review_no = 1
+	grade = 0
+    _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s%>
+	<strong><%=student.name%></strong><br/>
+	<%for review_map in review_mapping
+	  	for review in review_map.reviews
+			total = 0
+	        for review_score in review.review_scores
+		        total += review_score.score 
+			end
+			grade += total
+            review_no +=1
+			%>
+			<i>Reviewer:</i> <%=User.find(review_map.reviewer_id).name%>
+            - <i>Score = </i><%=total*100/@sum_of_max%>%</td></tr><br/>
+           <%
+        end
+	end%>
+	<%if review_no-1 > 0 %>
+		Final Grade = <%=grade/(review_no-1)*100/@sum_of_max%>%<br/><br/>
+	<%end
+end%>
+
+Test :<%=TeamsUser.find_by_sql("select * from teams_users where user_id = "+student.id.to_s)%>

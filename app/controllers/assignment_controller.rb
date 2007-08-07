@@ -165,4 +165,18 @@ class AssignmentController < ApplicationController
   def new_team
     @team = Team.new
   end
+  
+  def view_report
+    @assignment = Assignment.find(params[:id])
+    @participants = Participant.find(:all,:conditions => ["assignment_id = ?", @assignment.id])
+    if @assignment.team_assignment
+    elsif !@assignment.team_assignment
+    end
+    @sum_of_max = 0
+    for question in Rubric.find(Assignment.find(@assignment.id).review_rubric_id).questions
+      @sum_of_max += Rubric.find(Assignment.find(@assignment.id).review_rubric_id).max_question_score
+    end
+  end
+  
+  
 end

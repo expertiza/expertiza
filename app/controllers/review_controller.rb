@@ -5,7 +5,7 @@ class ReviewController < ApplicationController
     user_id = session[:user].id
     assignment_id = params[:assignment_id]
     @review_mappings = ReviewMappings.find_by_sql("select * from review_mappings, reviews where reviewer_id = " +
-                                user_id + "and assignment_id =" + assignment_id + "and reviews.review_mapping_id = review_mappings.id")
+    user_id + "and assignment_id =" + assignment_id + "and reviews.review_mapping_id = review_mappings.id")
     @review_pages, @reviews = paginate :users, :order => 'review_num_for_reviewer', :conditions => ["parent_id = ? AND role_id = ?", user_id, Role::ADMINISTRATOR], :per_page => 50
   end
   
@@ -50,7 +50,7 @@ class ReviewController < ApplicationController
     
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score 
-     
+    
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -66,18 +66,16 @@ class ReviewController < ApplicationController
   end
   
   def get_submitted_file_list(direc,author,files)
-   if(author.directory_num)
-    direc = RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + author.directory_num.to_s
-    temp_files = Dir[direc + "/*"]
-    for file in temp_files
-      if not File.directory?(Dir.pwd + "/" + file) then
-        files << file
+    if(author.directory_num)
+      direc = RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + author.directory_num.to_s
+      temp_files = Dir[direc + "/*"]
+      for file in temp_files
+        if not File.directory?(Dir.pwd + "/" + file) then
+          files << file
+        end
       end
     end
-   else
-     files[0]="the submission"
-    end
-   return files
+    return files
   end
   
   def update_review
@@ -103,7 +101,7 @@ class ReviewController < ApplicationController
   end
   
   def new_review
-
+    
     @review = Review.new
     @mapping_id = params[:id]
     @mapping = ReviewMapping.find(params[:id])
@@ -122,7 +120,7 @@ class ReviewController < ApplicationController
       @author_name = User.find(@mapping.author_id).name
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
-
+    
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -170,19 +168,19 @@ class ReviewController < ApplicationController
   end
   
   def create_review
-     params.each do |elem|
-       puts "#{elem[0]}, #{elem[1]}" 
-     end
-     @review = Review.new
-     @review.review_mapping_id = params[:mapping_id]
-     @mapping = ReviewMapping.find(params[:mapping_id])
-     @assignment = Assignment.find(@mapping.assignment_id)
-     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
-     @review_phase = find_review_phase(@due_dates)
-     #if(@review_phase != 2)
-     
-     
-     if params[:new_review_score]
+    params.each do |elem|
+      puts "#{elem[0]}, #{elem[1]}" 
+    end
+    @review = Review.new
+    @review.review_mapping_id = params[:mapping_id]
+    @mapping = ReviewMapping.find(params[:mapping_id])
+    @assignment = Assignment.find(@mapping.assignment_id)
+    @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
+    @review_phase = find_review_phase(@due_dates)
+    #if(@review_phase != 2)
+    
+    
+    if params[:new_review_score]
       # The new_question array contains all the new questions
       # that should be saved to the database
       for review_key in params[:new_review_score].keys

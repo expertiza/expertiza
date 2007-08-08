@@ -209,7 +209,8 @@ class ReviewController < ApplicationController
     @reviewer_id = session[:user].id
     @assignment_id = params[:id]
     @questions = Question.find(:all,:conditions => ["rubric_id = ?", Assignment.find(@assignment_id).review_rubric_id])
-    @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])     
+    @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
+    @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
   end
   
 end

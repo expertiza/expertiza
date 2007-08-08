@@ -15,4 +15,24 @@
   <%review_no += 1
   end %></ul>
  </tr>
+ <hr />
+ <tr><ul>
+  <%ror_no = 1%>
+  <%for ror_map in @review_of_review_mappings %>
+  <% 
+  @ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id) %>
+  <% if (@ror)%>
+  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view_review_of_review', :id => @ror.id} %> &nbsp;
+  <%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @ror.id} %></li>
+  <% else %>
+  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new_review_of_review', :id => ror_map.id} %></li>
+  <% end %>
+  <%ror_no += 1
+  end %></ul>
+ </tr>
+ 
+ 
+ 
+ 
+ 
 </table>

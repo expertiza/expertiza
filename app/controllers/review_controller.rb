@@ -80,6 +80,7 @@ class ReviewController < ApplicationController
   
   def update_review
     @review = Review.find(params[:review_id])
+    @review.additional_comment = params[:new_review][:comments]
     if params[:new_review_score]
       # The new_question array contains all the new questions
       # that should be saved to the database
@@ -173,10 +174,12 @@ class ReviewController < ApplicationController
     end
     @review = Review.new
     @review.review_mapping_id = params[:mapping_id]
+    @review.additional_comment = params[:new_review][:comments]
     @mapping = ReviewMapping.find(params[:mapping_id])
     @assignment = Assignment.find(@mapping.assignment_id)
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
     @review_phase = find_review_phase(@due_dates)
+    
     #if(@review_phase != 2)
     
     

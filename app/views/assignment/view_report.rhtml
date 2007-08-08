@@ -1,5 +1,5 @@
 <h1>Report</h1>
-<table>
+<table border =1>
 	<th>Author</th>
 	<%for i in 0...@assignment.num_reviewers%>
 	<th>Review<%=i+1%></th>
@@ -17,7 +17,7 @@
 	grade = 0
     _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s%>
 	<tr>
-		<td><strong><%=student.name%></strong><br/></td>
+		<td><strong><%=student.fullname%></strong><br/></td>
 	<%for review_map in review_mapping
 	  	for review in review_map.reviews
 			total = 0

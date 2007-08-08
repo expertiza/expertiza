@@ -65,6 +65,7 @@ Submitted Files<br />
           <input id=new_question_<%=i%> name=new_question[<%=i%>] value=<%=@question.id%> type=hidden />
     <% i += 1;
     end %>
+	<textarea id=new_review_comments name=new_review[comments]><%=@review.additional_comment%></textarea>
     <%= hidden_field_tag('review_id', @review.id) %>
     <%= hidden_field_tag('mapping_id', @mapping.id) %>
     <%= hidden_field_tag('assgt_id', @assgt.id) %>

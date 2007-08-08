@@ -29,7 +29,8 @@
 			  grade += total%>
             <tr><td><em>Total</em></td><td align = 'right'><%=total%>&nbsp;&nbsp;</td><td><em>Score:</em> <%=total*100/@sum_of_max%>%</td></tr>
            </table><br/>
-           <%review_no +=1
+           Additional comment : <%=review.additional_comment%><br/>
+		   <%review_no +=1
         end
     end%>
     <% if review_no-1 > 0 %>

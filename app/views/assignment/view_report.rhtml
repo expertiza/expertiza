@@ -1,7 +1,7 @@
 <h1>Report</h1>
 <table border =1>
 	<th>Author</th>
-	<%for i in 0...@assignment.num_reviewers%>
+	<%for i in 0...@assignment.num_reviews%>
 	<th>Review<%=i+1%></th>
 	<%end%>
 	<th>Final Score</th>
@@ -24,21 +24,21 @@
 	        for review_score in review.review_scores
 		        total += review_score.score 
 			end
-			grade += total
+			grade += total.to_f
             review_no +=1
 			%>
-			<td>&nbsp;&nbsp;<%=User.find(review_map.reviewer_id).fullname%><br/>&nbsp;&nbsp;<%=total*100/@sum_of_max%>%</td>
+			<td>&nbsp;&nbsp;<%=User.find(review_map.reviewer_id).fullname%><br/>&nbsp;&nbsp;<%=sprintf("%.2f",total.to_f*100/@sum_of_max.to_f)%>%</td>
            <%
         end
 	end
-	if review_no < (@assignment.num_reviewers+1)
-		for i in 0...@assignment.num_reviewers+1-review_no%>
+	if review_no < (@assignment.num_reviews+1)
+		for i in 0...@assignment.num_reviews+1-review_no%>
 		<td></td>
 		<%
 		end
 	end%>
 	<%if review_no-1 > 0 %>
-		<td><%=grade/(review_no-1)*100/@sum_of_max%>%</td></tr>
+		<td><%=sprintf("%.2f",(grade.to_f/(review_no-1).to_f*100/@sum_of_max.to_f).to_f)%>%</td></tr>
 	<%end
 end%>
 </table>

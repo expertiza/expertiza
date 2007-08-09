@@ -1,5 +1,5 @@
 <h1>Edit Review</h1>
-<%if @files.size == 0%>
+<%if @files.size == 0 and @assgt.wiki_type.name == "No"%>%>
 <strong>This submission is missing.</strong>
 <%else%>
 Submitted Files<br />

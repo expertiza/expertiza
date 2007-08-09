@@ -273,9 +273,12 @@ module WikiHelper
     end
 
     line_items.compact!
-
     
-    return line_items
+    formatted_line_items =Array.new
+    formatted_line_items << "<ul>"
+    formatted_line_items << line_items
+    formatted_line_items << "</ul>"
+    return formatted_line_items
 
   end
   def review_mediawiki_group(_assignment_url, _start_date = nil, _wiki_user = nil)

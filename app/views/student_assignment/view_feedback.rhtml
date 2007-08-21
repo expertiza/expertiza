@@ -10,13 +10,14 @@
             <table class="listing" cellpadding=2>
              <tr>
                 <th>Question</th>
+				<th>Score</th>
 				<th>Comment</th>
              </tr>
          
              <%
              for review_score in review.review_scores%>
                 <tr class="listingRow">
-                    <td><%=Question.find(review_score.question_id).txt%></td><td><%=review_score.comments%></td>
+                    <td><%=Question.find(review_score.question_id).txt%></td><td align = 'right'><%=review_score.score%>&nbsp;&nbsp;</td><td><%=review_score.comments%></td>
                 </tr>
             <%end%>
            </table><br/>

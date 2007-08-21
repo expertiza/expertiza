@@ -1,4 +1,9 @@
 <h1>Scores</h1>
+<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+<div class="flash_error">
+	<%= flash[:notice] %>
+</div>
+<% end %>
 <%
     review_no = 1
 	grade = 0
@@ -30,9 +35,12 @@
             <tr><td><em>Total</em></td><td align = 'right'><%=total%>&nbsp;&nbsp;</td><td><em>Score:</em> <%=total*100/@sum_of_max%>%</td></tr>
            </table><br/>
            Additional comment : <%=review.additional_comment%><br/>
+		   <p><label>Give feedback to reviewer:</label><br/>
+		   	<%=text_area('author','feedback',:rows=>5)%><br/>
+			<%= link_to "Submit/Edit",{:action => 'view_scores', :feedbacked_review=>review.id} %></p></p>
 		   <%review_no +=1
         end
-    end%>
+	end%>
     <% if review_no-1 > 0 %>
 		<h3>Grade</h3> 
 		<strong>Average (of all reviews)</strong> = <%=grade/(review_no-1)%>

@@ -50,6 +50,9 @@ class StudentAssignmentController < ApplicationController
     else
       @final_penalty = @late_policy.max_penalty
     end
+    if params['feedbacked_review']
+      flash[:notice] = 'feedback has been updated'+ params['feedbacked_review']
+    end
   end
   
   def view_feedback
@@ -68,6 +71,11 @@ class StudentAssignmentController < ApplicationController
       @user_name= session[:user].name
       @user_name = User.find(@student.user_id).name
       @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
+    end
+    #the code below finds the sum of the maximum scores of all questions in the rubric
+    @sum_of_max = 0
+    for question in Rubric.find(Assignment.find(@assignment_id).review_rubric_id).questions
+      @sum_of_max += Rubric.find(Assignment.find(@assignment_id).review_rubric_id).max_question_score
     end
   end
   

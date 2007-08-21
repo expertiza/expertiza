@@ -51,7 +51,25 @@ class StudentAssignmentController < ApplicationController
       @final_penalty = @late_policy.max_penalty
     end
     if params['feedbacked_review']
-      flash[:notice] = 'feedback has been updated'+ params['feedbacked_review']
+      text = "author_"+params['feedbacked_review']
+      puts params[text]
+      update_author_feedback(params['feedbacked_review'],@assignment_id,text)
+    end
+  end
+  
+  def update_author_feedback(review_id,assignment_id,text)
+    if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review_id, assignment_id]))
+      @review_feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review_id, assignment_id])
+      @review_feedback.txt = text
+      @review_feedback.update
+    else
+      @review_feedback = ReviewFeedback.new
+      @review_feedback.review_id = review_id
+      @review_feedback.assignment_id = assignment_id
+      @review_feedback.txt = text
+      if @review_feedback.save
+        flash[:notice] = 'feedback has been updated'
+      end
     end
   end
   

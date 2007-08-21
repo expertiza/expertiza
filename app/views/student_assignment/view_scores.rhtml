@@ -36,7 +36,7 @@
            </table><br/>
            Additional comment : <%=review.additional_comment%><br/>
 		   <p><label>Give feedback to reviewer:</label><br/>
-		   	<%=text_area('author','feedback',:rows=>5)%><br/>
+		   	<%=text_area('author', review.id,:rows=>5)%><br/>
 			<%= link_to "Submit/Edit",{:action => 'view_scores', :feedbacked_review=>review.id} %></p></p>
 		   <%review_no +=1
         end

@@ -7,6 +7,9 @@ class ReviewController < ApplicationController
     @review_mappings = ReviewMappings.find_by_sql("select * from review_mappings, reviews where reviewer_id = " +
     user_id + "and assignment_id =" + assignment_id + "and reviews.review_mapping_id = review_mappings.id")
     @review_pages, @reviews = paginate :users, :order => 'review_num_for_reviewer', :conditions => ["parent_id = ? AND role_id = ?", user_id, Role::ADMINISTRATOR], :per_page => 50
+    
+    
+    
   end
   
   def display
@@ -244,6 +247,23 @@ class ReviewController < ApplicationController
     @questions = Question.find(:all,:conditions => ["rubric_id = ?", Assignment.find(@assignment_id).review_rubric_id])
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
     @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
+    # Finding the current phase that we are in
+    due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
+    @very_last_due_date = DueDate.find(:all,:order => "due_at DESC", :limit =>1)
+    next_due_date = @very_last_due_date[0]
+    for due_date in due_dates
+      if due_date.due_at > Time.now
+        if due_date.due_at < next_due_date.due_at
+          next_due_date = due_date
+        end
+      end
+    end
+    @review_phase = next_due_date.deadline_type_id;
+    if next_due_date.review_of_review_allowed_id == 2 or next_due_date.review_of_review_allowed_id == 3
+      if @review_phase == 5
+        @can_view_review_of_review =1
+      end
+    end
   end
   
 end

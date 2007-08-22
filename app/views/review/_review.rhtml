@@ -17,5 +17,4 @@ for @question in @questions %>
   <input id=new_question_<%=i%> name=new_question[<%=i%>] value=<%=@question.id%> type=hidden />
 <% i += 1;
 end %>
-<textarea cols="40" rows="5" id="new_review_comments" name="new_review[comments]">
-</textarea>
+<p><textarea cols="70" rows="5" id="new_review_comments" name="new_review[comments]"></textarea></p>

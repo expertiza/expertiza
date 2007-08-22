@@ -198,8 +198,6 @@ class StudentAssignmentController < ApplicationController
     @review_of_review_mappings = Array.new
     
     @review_mappings_for_author = ReviewMapping.find(:all, :conditions => ["author_id = ?",(session[:user].id)])
-    puts "(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((("
-    puts @review_mappings_for_author
     for review_mapping_for_author in @review_mappings_for_author
       if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
         puts ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])

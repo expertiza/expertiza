@@ -52,7 +52,8 @@ class StudentAssignmentController < ApplicationController
     end
     if params['feedbacked_review']
       text = "author_"+params['feedbacked_review']
-      puts params[text]
+      puts "#####################################################################################################"
+      puts params['author_2']
       update_author_feedback(params['feedbacked_review'],@assignment_id,text)
     end
   end
@@ -192,6 +193,18 @@ class StudentAssignmentController < ApplicationController
     if @student.directory_num != nil and @student.directory_num >= 0
       get_student_folders
       get_student_files 
+    end
+    
+    @review_of_review_mappings = Array.new
+    
+    @review_mappings_for_author = ReviewMapping.find(:all, :conditions => ["author_id = ?",(session[:user].id)])
+    puts "(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((("
+    puts @review_mappings_for_author
+    for review_mapping_for_author in @review_mappings_for_author
+      if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
+        puts ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
+        @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
+      end
     end
   end
 

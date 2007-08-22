@@ -43,6 +43,7 @@ Submitted Files<br />
 <li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
 <% end %>
 </ul>
+<strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at %></strong>
 <table>
     <tr>
         <th>Questions</th><th>Comments</th><th>Score</th>
@@ -60,6 +61,7 @@ Submitted Files<br />
     <% end %>
 </table>
 Additional Comment : <%=@review.additional_comment%><br/>
+<br/>
 
 <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
 

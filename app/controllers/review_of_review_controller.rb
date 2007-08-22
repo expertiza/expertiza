@@ -34,15 +34,33 @@ class ReviewOfReviewController < ApplicationController
     
     @user = params['user']
     @assignment_id = params['assignment']
-    @eligible_review_mapping = ReviewMapping.find(:first,:conditions => ["reviewer_id <> ? and author_id <> ? and assignment_id = ?", @user, @user, @assignment_id] )
+    @eligible_review_mappings = ReviewMapping.find(:all,:conditions => ["reviewer_id <> ? and author_id <> ? and assignment_id = ?", @user, @user, @assignment_id] )
     # This is the review that is eligible for a review of review based on the criteria defined above
-    @eligible_review = Review.find_by_review_mapping_id(@eligible_review_mapping.id)
+    puts "(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((("
+    puts @eligible_review_mappings
+    for eligible_review_map in @eligible_review_mappings
+      puts "####################################################"
+      puts eligible_review_map
+      if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",eligible_review_map.id])== nil)
+        if (Review.find_by_review_mapping_id(eligible_review_map.id))
+          puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          @eligible_review_mapping_id = eligible_review_map.id
+          @eligible_review_mapping = eligible_review_map
+          @eligible_review = Review.find_by_review_mapping_id(@eligible_review_mapping_id)
+          puts @eligible_review_mapping_id
+        end
+      end
+    end
+    begin   
     @eligible_review_scores = @eligible_review.review_scores
     @assgt = Assignment.find(@assignment_id)    
     @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @assgt.id])
     @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
     @rubric = Rubric.find(@assgt.review_rubric_id)
     
+    
+    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+    puts @assgt.id
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @eligible_review_mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @eligible_review_mapping.team_id])
@@ -74,6 +92,11 @@ class ReviewOfReviewController < ApplicationController
     @rubric = Rubric.find(@assgt.review_of_review_rubric_id)
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score
+    
+   rescue
+       flash[:notice] = "Review of review cannot be created now"
+       redirect_to :controller =>'review', :action => 'list_reviews', :id => params['assignment']
+    end
   end
   
   #follows a link

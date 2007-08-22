@@ -1,3 +1,8 @@
+<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+<div class="flash_error">
+	<%= flash[:notice] %>
+</div>
+<% end %>
 <h1>Reviews</h1>
 
 <table class="listing" cellpadding=2>
@@ -17,7 +22,14 @@
  </tr>
  <hr />
  <h1>Reviews of reviews</h1>
- <%= link_to "New review of review",{:controller => 'review_of_review', :action => 'new_review_of_review', :user => @reviewer_id, :assignment => @assignment_id} %>
+ <ul>
+ <li>
+		<% if @can_view_review_of_review == 1 %>
+			<%= link_to "New review of review",{:controller => 'review_of_review', :action => 'new_review_of_review', :user => @reviewer_id, :assignment => @assignment_id} %>
+		<% else %>
+			<font color="gray">New review of review</font>
+		<% end %>
+	</li></ul>
 	<h3>Existing reviews of reviews</h3>
  <tr><ul>
   <%ror_no = 1%>

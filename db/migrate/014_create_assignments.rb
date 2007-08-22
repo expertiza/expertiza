@@ -1,6 +1,8 @@
 class CreateAssignments < ActiveRecord::Migration
   def self.up
     create_table :assignments do |t|
+	t.column :created_at, :datetime  # time that the assignment was created
+    t.column :updated_at, :datetime  # time that the assignment was updated
 	t.column :name, :string
 	t.column :directory_path, :string
 	t.column :submitter_count, :integer, :default => 0 # number of people who have submitted to this assgt. so far; initialized to 0

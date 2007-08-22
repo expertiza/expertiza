@@ -1,7 +1,7 @@
 class AssignmentController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
-
+  
   @no_dl="1" # a value of "no" for whether an action is permitted prior to a deadline
   @late_dl="2" # a value of "late" for whether an action is permitted prior to a deadline (it is permitted, but marked late)
   @ok_dl="3" # a value of "OK" for whether an action is permitted prior to a deadline
@@ -122,46 +122,50 @@ class AssignmentController < ApplicationController
   end
   
   def delete
-    @assignment = get(Assignment, params[:id])
-    # If the assignment is already deleted, go back to the list of assignments
-    if @assignment == nil
-      redirect_to :action => 'list' 
-    else 
-      if @assignment.due_dates_exist? == false or params['delete'] or @assignment.review_feedback_exist? == false or @assignment.participants_exist? == false
-        puts(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
-        puts(Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size)
-        # The size of an empty directory is 2
-        # Delete the directory if it is empty
-        if Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size == 2
+    begin
+      @assignment = get(Assignment, params[:id])
+      # If the assignment is already deleted, go back to the list of assignments
+      if @assignment == nil
+        redirect_to :action => 'list' 
+      else 
+        if @assignment.due_dates_exist? == false or params['delete'] or @assignment.review_feedback_exist? == false or @assignment.participants_exist? == false
+          puts(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
+          puts(Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size)
+          # The size of an empty directory is 2
+          # Delete the directory if it is empty
+          if Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size == 2
             Dir.delete(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
-        else
-          flash[:notice] = "Directory not empty.  Assignment has been deleted, but submitted files remain."
+          else
+            flash[:notice] = "Directory not empty.  Assignment has been deleted, but submitted files remain."
+          end
+          @assignment.delete_due_dates
+          @assignment.delete_review_feedbacks
+          @assignment.delete_participants
+          @assignment.destroy
+          
+          redirect_to :action => 'list'
         end
-        @assignment.delete_due_dates
-        @assignment.delete_review_feedbacks
-        @assignment.delete_participants
-        @assignment.destroy
-        
-        redirect_to :action => 'list'
       end
+    rescue
+      flash[:notice] = "Assignment cannot be deleted at this time"
     end
   end
-
+  
   
   def list
     set_up_display_options("ASSIGNMENT")
     @assignments=super(Assignment)
     #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
-    
+  
   def list_team
     @team_pages, @teams = paginate :teams, :per_page => 10
   end
-
+  
   def show_team
     @team = Team.find(params[:id])
   end
-
+  
   def new_team
     @team = Team.new
   end

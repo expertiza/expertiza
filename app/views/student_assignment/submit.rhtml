@@ -109,7 +109,9 @@ function checkIfFileExists(button)
 
 </script>
 
+<ul>
 <li><%= link_to "View feedback on submissions",{:action => 'view_feedback', :id => @student.id} %></li>
+</ul>
 
 <% if @student.assignment.wiki_type_id == 1%>
 Submit your work for the assignment titled: <%= @student.assignment.name %>

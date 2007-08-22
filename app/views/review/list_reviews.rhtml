@@ -16,6 +16,9 @@
   end %></ul>
  </tr>
  <hr />
+ <h1>Reviews of reviews</h1>
+ <%= link_to "New review of review",{:controller => 'review_of_review', :action => 'new_review_of_review', :user => @reviewer_id, :assignment => @assignment_id} %>
+	<h3>Existing reviews of reviews</h3>
  <tr><ul>
   <%ror_no = 1%>
   <%for ror_map in @review_of_review_mappings %>
@@ -23,7 +26,7 @@
   @ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id) %>
   <% if (@ror)%>
   <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view_review_of_review', :id => @ror.id} %> &nbsp;
-  <%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @ror.id} %></li>
+  </li>
   <% else %>
   <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new_review_of_review', :id => ror_map.id} %></li>
   <% end %>

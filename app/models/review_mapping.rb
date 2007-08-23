@@ -1,6 +1,7 @@
 class ReviewMapping < ActiveRecord::Base
   belongs_to :assignment
   has_many :reviews
+  has_many :review_of_review_mappings
   
   def self.assign_reviewers(assignment_id, num_reviews, num_review_of_reviews)
     @authors = Participant.find(:all, :conditions => ['assignment_id = ? and submit_allowed=1', assignment_id])

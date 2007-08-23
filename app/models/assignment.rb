@@ -8,6 +8,7 @@ class Assignment < ActiveRecord::Base
   has_many :due_dates
   has_many :review_feedbacks
   has_many :review_mappings
+  has_many :review_of_review_mappings
   
   validates_presence_of :name
   validates_presence_of :directory_path
@@ -56,9 +57,48 @@ class Assignment < ActiveRecord::Base
   
   def delete_participants
     for participant in participants
+      for resubmission_time in participant.resubmission_times
+        resubmission_time.destroy
+      end
       participant.destroy
     end
   end
   
+  def delete_review_mapping
+    for review_mapping in review_mappings
+      for review in review_mapping.reviews
+        for review_score in review.review_scores
+          review_score.destroy
+        end
+        for review_feedback in review.review_feedbacks
+          review_feedback.destroy
+        end
+        review.destroy
+      end
+      for review_of_review_mapping in review_mapping.review_of_review_mappings
+        review_of_review_mapping.destroy
+      end
+      review_mapping.destroy
+    end
+  end
 
+  def delete_review_of_review_mapping
+    for review_of_review_mapping in review_of_review_mappings
+      for review_of_review in review_of_review_mapping.review_of_reviews
+        for review_of_review_score in review_of_review.review_of_review_scores
+          review_of_review_score.destroy
+        end
+        review.destroy
+      end
+      for review_of_review_mapping in review_mapping.review_of_review_mappings
+        review_of_review_mapping.destroy
+      end
+      review_mapping.destroy
+    end
+  end
+  def delete_review_feedback
+    for review_feedback in review_feedbacks
+      review_feedback.destroy
+    end
+  end
 end

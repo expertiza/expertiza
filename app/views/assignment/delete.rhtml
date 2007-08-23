@@ -1,5 +1,9 @@
 <h1>Delete an existing rubric</h1>
-
+<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+<div class="flash_error">
+	<%= flash[:notice] %>
+</div>
+<% end %>
 <%= form_tag({:action=>'delete'})%>
   	Are you sure you want to delete <%= @assignment.name.capitalize %>?<br/><br/>
 	<table>

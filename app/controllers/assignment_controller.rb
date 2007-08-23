@@ -122,17 +122,15 @@ class AssignmentController < ApplicationController
   end
   
   def delete
-    begin
-      @assignment = get(Assignment, params[:id])
-      # If the assignment is already deleted, go back to the list of assignments
-      if @assignment == nil
-        redirect_to :action => 'list' 
-      else 
-        if @assignment.due_dates_exist? == false or params['delete'] or @assignment.review_feedback_exist? == false or @assignment.participants_exist? == false
-          puts(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
-          puts(Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size)
-          # The size of an empty directory is 2
-          # Delete the directory if it is empty
+    @assignment = get(Assignment, params[:id])
+    # If the assignment is already deleted, go back to the list of assignments
+    if @assignment == nil
+      redirect_to :action => 'list' 
+    else 
+      if @assignment.due_dates_exist? == false or params['delete'] or @assignment.review_feedback_exist? == false or @assignment.participants_exist? == false
+        # The size of an empty directory is 2
+        # Delete the directory if it is empty
+        begin
           if Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size == 2
             Dir.delete(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
           else
@@ -141,14 +139,26 @@ class AssignmentController < ApplicationController
           @assignment.delete_due_dates
           @assignment.delete_review_feedbacks
           @assignment.delete_participants
+          @assignment.delete_review_mapping
+          @assignment.delete_review_of_review_mapping
+          @assignment.delete_review_feedback
+          @assignment.destroy
+          
+          redirect_to :action => 'list'
+        rescue
+          @assignment.delete_due_dates
+          @assignment.delete_review_feedbacks
+          @assignment.delete_participants
+          @assignment.delete_review_mapping
+          @assignment.delete_review_of_review_mapping
+          @assignment.delete_review_feedback
           @assignment.destroy
           
           redirect_to :action => 'list'
         end
       end
-    rescue
-      flash[:notice] = "Assignment cannot be deleted at this time"
     end
+    
   end
   
   

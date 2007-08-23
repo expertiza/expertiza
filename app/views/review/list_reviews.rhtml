@@ -21,6 +21,7 @@
   end %></ul>
  </tr>
  <hr />
+ <% if @can_view_review_of_review == 1 %>
  <h1>Reviews of reviews</h1>
  <ul>
  <li>
@@ -45,7 +46,7 @@
   <%ror_no += 1
   end %></ul>
  </tr>
- 
+ <% end %>
  
  
  

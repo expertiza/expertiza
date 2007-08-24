@@ -170,7 +170,7 @@ Submit your work for the assignment titled: <%= @student.assignment.name %>
 </form>
 <br><br><br><br>
 <%end%>
-<%if(@review_of_review_mappings)%>
+<%if(@review_of_review_mappings.size > 0)%>
 <h3>Reviews of reviews</h3>
  <tr><ul>
   <%ror_no = 1%>

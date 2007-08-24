@@ -126,7 +126,7 @@ class ReviewController < ApplicationController
       end      
     end
     if @review.update
-      flash[:notice] = 'Rubric was successfully saved.'
+      flash[:notice] = 'Review was successfully saved.'
       redirect_to :action => 'list_reviews', :id => params[:assgt_id]
     else # If something goes wrong, stay at same page
       render :action => 'view_review'

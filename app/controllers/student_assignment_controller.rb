@@ -56,6 +56,18 @@ class StudentAssignmentController < ApplicationController
       puts params['author_2']
       update_author_feedback(params['feedbacked_review'],@assignment_id,text)
     end
+    
+     
+    @review_of_review_mappings = Array.new
+    
+    @review_mappings_for_author = ReviewMapping.find(:all, :conditions => ["author_id = ?",(session[:user].id)])
+    for review_mapping_for_author in @review_mappings_for_author
+      if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
+        puts ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
+        @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
+      end
+    end
+    
   end
   
   def update_author_feedback(review_id,assignment_id,text)

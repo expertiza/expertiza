@@ -15,6 +15,7 @@ class ModifyUsers < ActiveRecord::Migration
     add_column :users, :email_on_review, :boolean
     add_column :users, :email_on_submission, :boolean
     add_column :users, :email_on_review_of_review, :boolean
+    add_column :users, :is_new_user, :boolean
 
     execute "alter table users 
              add constraint fk_institutions_users

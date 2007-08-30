@@ -1,3 +1,6 @@
+<%if @user.is_new_user == 1%>
+	<%= render :partial => 'eula' %>
+<%else%>
 <h1>Assignments</h1>
 
 <table class="listing" cellpadding=2>
@@ -25,3 +28,4 @@
 <br>
 To begin, first click on an assignment from the list above.
 <br />
+<%end%>

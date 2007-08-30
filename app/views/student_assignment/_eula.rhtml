@@ -1,0 +1,10 @@
+<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+<div class="flash_error">
+	<%= flash[:notice] %>
+</div>
+<% end %>
+EULA text<br/>
+--<br/>
+--<br/>
+--<br/>
+<%= link_to 'Yes', :action => 'eula_yes'%>&nbsp;&nbsp;<%= link_to 'No', :action => 'eula_no'%>

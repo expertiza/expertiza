@@ -27,7 +27,7 @@
 			grade += total.to_f
             review_no +=1
 			%>
-			<td>&nbsp;&nbsp;<%=User.find(review_map.reviewer_id).fullname%><br/>&nbsp;&nbsp;<%=sprintf("%.2f",total.to_f*100/@sum_of_max.to_f)%>%</td>
+			<td>&nbsp;&nbsp;<%= link_to User.find(review_map.reviewer_id).fullname, :controller=>'review', :action => 'view_review', :id=> review.id%><br/>&nbsp;&nbsp;<%=sprintf("%.2f",total.to_f*100/@sum_of_max.to_f)%>%</td>
            <%
         end
 	end
@@ -42,3 +42,5 @@
 	<%end
 end%>
 </table>
+<br/>
+<%= link_to 'Back', :action=>'list'%>

@@ -4,6 +4,7 @@ class StudentAssignmentController < ApplicationController
   helper :wiki
   def list
     user_id = session[:user].id
+    @user =session[:user]
     @participants = Participant.find(:all, 
                                     :conditions => ['user_id = ?', user_id],
                                     :order => "assignment_id DESC")
@@ -15,6 +16,23 @@ class StudentAssignmentController < ApplicationController
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
     @can_view_your_work, @can_view_others_work = find_viewing_permissions(@due_dates)
+  end
+  
+  def eula_yes
+    @user = session[:user]
+    @user.is_new_user = 0
+    
+    if @user.save
+      flash[:notice] = 'You have accepted the license agreement'
+      redirect_to :action => 'list'
+    else # If something goes wrong, stay at same page
+      render :action => 'list'
+    end
+  end
+  
+    def eula_no
+      flash[:notice] = 'You have to accept the license agreement in order to use the system'
+      redirect_to :action => 'list'
   end
   
   def view_scores

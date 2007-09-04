@@ -34,6 +34,11 @@ class ParticipantsController < ApplicationController
     end    
   end
   
+  def imitate_student
+    @new_id = params[:id]
+    session[:user] = User.find(@new_id)
+  end
+  
   def show_student
     @user = User.find(params[:id])
     if @user.role_id

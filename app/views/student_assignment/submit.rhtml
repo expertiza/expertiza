@@ -108,7 +108,10 @@ function checkIfFileExists(button)
 
 
 </script>
-
+<%if !@student.permission_granted%>
+<div class="flash_note">Your work cannot be published because you haven't granted us permissionto publish your work. 
+<br/>Click <%= link_to 'yes', :action =>'set_publish_permission_yes', :id => @student.id%> to grant permission. </div>
+<%end%>
 <ul>
 <li><%= link_to "View feedback on submissions",{:action => 'view_feedback', :id => @student.id} %></li>
 </ul>

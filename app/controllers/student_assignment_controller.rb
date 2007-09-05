@@ -35,6 +35,18 @@ class StudentAssignmentController < ApplicationController
       redirect_to :action => 'list'
   end
   
+  def set_publish_permission_yes
+    @participant = Participant.find(:first, :conditions => ["user_id = ?",(session[:user].id)])
+    @participant.permission_granted = 1;
+    @participant_id = params[:id]
+    if @participant.save
+      flash[:notice] = 'Your work will now be published'
+      redirect_to :action => 'submit', :id => @participant_id
+    else # If something goes wrong, stay at same page
+      render :action => 'submit', :id => @participant_id
+    end
+  end
+  
   def view_scores
     @author_id = session[:user].id
     @assignment_id = Participant.find(params[:id]).assignment_id
@@ -411,8 +423,4 @@ private
       return base.split(".")[base.split(".").size-1]
 	  end
 	end
-  
-
-
-  
 end

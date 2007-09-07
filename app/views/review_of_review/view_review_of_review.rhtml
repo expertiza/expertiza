@@ -42,39 +42,9 @@ Submitted Files<br />
 <% end %>
 </ul>
 <h3>Review</h3>
-<table>
-    <tr>
-        <th>Questions</th><th>Comments</th><th>Score</th>
-    </tr>
-    <% for @rs in @review_scores %>
-        <tr>
-            <td>
-                <%=Question.find(@rs.question_id).txt%>                
-            </td>
-            <td>
-                <%=@rs.comments%>
-            </td>
-            <td><%=@rs.score%></td>
-        </tr>
-    <% end %>
-</table>
+<%= render :partial => '../review/scores' %>
 Additional Comment : <%=@review.additional_comment%><br/>
 <h3>Review of review</h3>
-<table>
-    <tr>
-        <th>Questions</th><th>Comments</th><th>Score</th>
-    </tr>
-    <% for @rs in @ror_review_scores %>
-        <tr>
-            <td>
-                <%=Question.find(@rs.question_id).txt%>                
-            </td>
-            <td>
-                <%=@rs.comments%>
-            </td>
-            <td><%=@rs.score%></td>
-        </tr>
-    <% end %>
-</table>
+<%= render :partial => 'scores' %>
 <br/>
 <%= link_to 'Back', :controller => 'review', :action => 'list_reviews', :id => @assgt.id %>

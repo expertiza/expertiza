@@ -19,4 +19,19 @@ class ReviewMapping < ActiveRecord::Base
       end
     end
   end
+  
+  #return an array of authors for this mapping
+  #ajbudlon, sept 07, 2007  
+  def get_author_ids
+    author_ids = Array.new
+    if (self.team_id)
+      team_users = TeamUser.find_by_sql("select * from team_users where team_id = " + self.team_id.to_s)
+      for member in team_users
+        author_id << member.user_id
+      end
+    else
+      author_ids << self.author_id
+    end
+    return author_ids
+  end
 end

@@ -1,0 +1,31 @@
+Dear <%= @user %>,
+
+A new <%= @type %> has been made for <%= @assignment.name %> in Review <%= @location %>.
+
+<% if @review_scores != nil %>
+Review Content:
+<% for @rs in @review_scores %>
+-----------------------------------------------------------
+Question: <%=Question.find(@rs.question_id).txt %>
+
+Comment: <%=@rs.comments%>
+
+Score: <%=@rs.score%>
+<% end %>
+<% end %>
+
+<% if @ror_review_scores != nil %>
+Review Content:
+<% for @rs in @ror_review_scores %>
+-----------------------------------------------------------
+Question: <%=Question.find(@rs.question_id).txt %>
+
+Comment: <%=@rs.comments%>
+
+Score: <%=@rs.score%>
+<% end %>
+<% end %>
+
+Expertiza Peer Review System
+
+This is an automatically generated e-mail message.

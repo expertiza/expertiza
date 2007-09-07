@@ -58,4 +58,43 @@ class Review < ActiveRecord::Base
       send_file(RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + @author.directory_num.to_s + folder_name + "/" + file_name) 
     end
   end
+
+  # Generate emails for authors when a new review of their work
+  # is made
+  #ajbudlon, sept 07, 2007   
+  def email
+   mapping = ReviewMapping.find_by_id(self.review_mapping_id)   
+   for author_id in mapping.get_author_ids
+    if User.find_by_id(author_id).email_on_review
+      review_num = getReviewNumber(mapping)
+      Pgmailer.deliver_message(        
+        User.find_by_id(author_id),
+        Assignment.find_by_id(mapping.assignment_id),
+        review_num.to_s,       
+        "review",
+        self.review_scores)
+    end  
+   end
+  end
+  
+  # Get all review mappings for this assignment & author
+  # required to give reviewer location of new submission content
+  # link can not be provided as it might give user ability to access data not
+  # available to them.  
+  #ajbudlon, sept 07, 2007       
+  def getReviewNumber(mapping)
+    reviewer_mappings = ReviewMapping.find_by_sql(
+      "select * from review_mappings where assignment_id = " +self.id.to_s +
+      " and author_id = " + mapping.author_id.to_s
+    )
+    review_num = 1
+    for rm in reviewer_mappings
+      if rm.reviewer_id != mapping.reviewer_id
+        review_num += 1
+      else
+        break
+      end
+    end  
+    return review_num
+  end
 end

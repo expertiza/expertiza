@@ -44,22 +44,7 @@ Submitted Files<br />
 <% end %>
 </ul>
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at %></strong>
-<table>
-    <tr>
-        <th>Questions</th><th>Comments</th><th>Score</th>
-    </tr>
-    <% for @rs in @review_scores %>
-        <tr>
-            <td>
-                <%=Question.find(@rs.question_id).txt%>                
-            </td>
-            <td>
-                <%=@rs.comments%>
-            </td>
-            <td><%=@rs.score%></td>
-        </tr>
-    <% end %>
-</table>
+<%= render :partial => 'review/scores' %> 
 Additional Comment : <%=@review.additional_comment%><br/>
 <br/>
 

@@ -21,7 +21,7 @@ Rails::Initializer.run do |config|
 
   # Force all environments to use the same logger level 
   # (by default production uses :info, the others :debug)
-  # config.log_level = :debug
+  #config.log_level = :debug
 
   # Use the database for sessions instead of the file system
   # (create the session table with 'rake db:sessions:create')
@@ -39,6 +39,27 @@ Rails::Initializer.run do |config|
   # config.active_record.default_timezone = :utc
   
   # See Rails::Configuration for more options
+  
+  
+  
+  #TODO: locate correct SMTP & authentication information
+  # authenticated smtp server for NCSU is
+  #    smtp.ncsu.edu
+  # a valid login/password is required for this server.
+  # if part of resnet, we can use 
+  #   smtp-resnet.ncsu.edu 
+  # without authentication
+  # Comment out the test line once 
+  
+  config.action_mailer.delivery_method = :test
+  #config.action_mailer.delivery_method = :smtp
+  #config.action_mailer.server_settings = {
+  #  :address => "smtp.ncsu.edu",
+  #  :port => 25,
+  #  :authentication => :login,
+  #  :user_name => "ajbudlon",
+  #  :password => "#######"
+  #}
 end
 
 # Add new inflection rules using the following format 

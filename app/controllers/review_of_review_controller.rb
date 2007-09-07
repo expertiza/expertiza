@@ -216,6 +216,9 @@ class ReviewOfReviewController < ApplicationController
       end      
     end
     if @review_of_review.save
+      #send message to reviewers(s) when review of review has been updated
+      #ajbudlon, sept 07, 2007    
+      @review_of_review.email
       flash[:notice] = 'Review of review was successfully saved.'
       redirect_to :controller => 'review', :action => 'list_reviews', :id => params[:assgt_id]
     else # If something goes wrong, stay at same page

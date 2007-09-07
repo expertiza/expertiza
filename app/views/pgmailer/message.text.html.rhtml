@@ -1,0 +1,15 @@
+Dear <%= @user %>,
+
+A new <%= @type %> has been made for <%= @assignment.name %> in Review <%= @location %>.
+
+<% if @review_scores != nil %>
+<%= render :partial => '../review/scores' %> 
+<% end %>
+
+<% if @ror_review_scores != nil %>
+<%= render :partial => '../review_of_review/scores' %> 
+<% end %>
+
+Expertiza Peer Review System
+
+This is an automatically generated e-mail message.

@@ -101,4 +101,53 @@ class Assignment < ActiveRecord::Base
       review_feedback.destroy
     end
   end
+  
+  # Generate emails for reviewers when new content is available for review
+  #ajbudlon, sept 07, 2007   
+  def email(author_id) 
+  
+    # Get all review mappings for this assignment & author
+    review_mappings = ReviewMapping.find_by_sql(
+        "select * from review_mappings where assignment_id = " + self.id.to_s + 
+        " and author_id =" + author_id.to_s
+        )   
+  
+    for mapping in review_mappings
+
+       # If the reviewer has requested an e-mail deliver a notification
+       # that includes the assignment, and which item has been updated.
+       if User.find_by_id(mapping.reviewer_id).email_on_submission
+       
+          review_num = getReviewNumber(mapping)
+          Pgmailer.deliver_message(     
+              User.find_by_id(mapping.reviewer_id),
+              self,
+              review_num.to_s,     
+              "submission",
+              nil,
+              nil)
+       end
+    end
+  end
+
+  # Get all review mappings for this assignment & reviewer
+  # required to give reviewer location of new submission content
+  # link can not be provided as it might give user ability to access data not
+  # available to them.  
+  #ajbudlon, sept 07, 2007      
+  def getReviewNumber(mapping)
+    reviewer_mappings = ReviewMapping.find_by_sql(
+      "select * from review_mappings where assignment_id = " +self.id.to_s +
+      " and reviewer_id = " + mapping.reviewer_id.to_s
+    )
+    review_num = 1
+    for rm in reviewer_mappings
+      if rm.author_id != mapping.author_id
+        review_num += 1
+      else
+        break
+      end
+    end  
+    return review_num
+  end
 end

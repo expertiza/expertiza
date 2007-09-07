@@ -92,7 +92,8 @@ class ReviewController < ApplicationController
     
     @files = Array.new
     @files = get_submitted_file_list(@direc, @author, @files)
-    
+    #send message to author(s) when review has been updated
+    @review.email    
     if params['fname']
       view_submitted_file(@current_folder,@author)
     end
@@ -126,6 +127,9 @@ class ReviewController < ApplicationController
       end      
     end
     if @review.update
+      #send message to author(s) when review has been updated
+      #ajbudlon, sept 07, 2007
+      @review.email
       flash[:notice] = 'Review was successfully saved.'
       redirect_to :action => 'list_reviews', :id => params[:assgt_id]
     else # If something goes wrong, stay at same page
@@ -154,7 +158,7 @@ class ReviewController < ApplicationController
       @author_name = User.find(@mapping.author_id).name
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
-    
+       
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -162,9 +166,12 @@ class ReviewController < ApplicationController
     end
     @files = Array.new
     @files = get_submitted_file_list(@direc, @author, @files)
+    
     if params['fname']
       view_submitted_file(@current_folder,@author)
     end
+    
+    
   end
   
   #follows a link
@@ -227,6 +234,8 @@ class ReviewController < ApplicationController
       end      
     end
     if @review.save
+      #send message to author(s) when review has been updated
+      @review.email
       flash[:notice] = 'Review was successfully saved.'
       redirect_to :action => 'list_reviews', :id => params[:assgt_id]
     else # If something goes wrong, stay at same page

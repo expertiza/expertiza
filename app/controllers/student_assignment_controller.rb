@@ -19,6 +19,7 @@ class StudentAssignmentController < ApplicationController
   end
   
   def eula_yes
+  
     @user = session[:user]
     @user.is_new_user = 0
     
@@ -194,6 +195,7 @@ class StudentAssignmentController < ApplicationController
       else
         send_file(get_student_directory(@student) + folder_name + "/" + file_name, :disposition => 'inline') 
       end
+      
     end
     
     if params['new_folder']
@@ -221,6 +223,9 @@ class StudentAssignmentController < ApplicationController
 
       if @student.directory_num == nil or @student.directory_num < 0
         set_student_directory_num
+        #send message to reviewers(s) when submission has been updated
+        #ajbudlon, sept 07, 2007
+        Assignment.find_by_id(@assignment_id).email(@student.user_id)
       end      
       
       safe_filename = StudentAssignmentHelper::sanitize_filename(file.full_original_filename)

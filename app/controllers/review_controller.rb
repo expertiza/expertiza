@@ -24,9 +24,11 @@ class ReviewController < ApplicationController
     # default score (probably the lowest possible score) should appear in the dropbox.
   end
   
-  def view_review
-    @review = Review.find(params[:id])
-    @mapping_id = params[:id]
+
+  
+  def process_review(id,current_folder)
+    @review = Review.find(id)
+    @mapping_id = id
     @review_scores = @review.review_scores
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
@@ -47,14 +49,20 @@ class ReviewController < ApplicationController
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score 
     
+    @files = Array.new
+    @files = get_submitted_file_list(@direc, @author, @files)
+    
+    return @review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc
+  end
+  
+  def view_review
+    @review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
+    
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
       @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
     end
-    
-    @files = Array.new
-    @files = get_submitted_file_list(@direc, @author, @files)
     
     if params['fname']
       view_submitted_file(@current_folder,@author)
@@ -62,38 +70,15 @@ class ReviewController < ApplicationController
   end
   
   def edit_review
-    @review = Review.find(params[:id])
-    @mapping_id = params[:id]
-    @review_scores = @review.review_scores
-    @mapping = ReviewMapping.find(@review.review_mapping_id)
-    @assgt = Assignment.find(@mapping.assignment_id)    
-    @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Rubric.find(@assgt.review_rubric_id)
-    
-    if @assgt.team_assignment 
-      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
-      @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
-      @author_name = User.find(@author_first_user_id).name;
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
-    else
-      @author_name = User.find(@mapping.author_id).name
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
-    end
-    
-    @max = @rubric.max_question_score
-    @min = @rubric.min_question_score 
-    
+    @review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
       @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
     end
     
-    @files = Array.new
-    @files = get_submitted_file_list(@direc, @author, @files)
     #send message to author(s) when review has been updated
-    @review.email    
+    #@review.email    
     if params['fname']
       view_submitted_file(@current_folder,@author)
     end

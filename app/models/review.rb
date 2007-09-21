@@ -66,13 +66,20 @@ class Review < ActiveRecord::Base
    mapping = ReviewMapping.find_by_id(self.review_mapping_id)   
    for author_id in mapping.get_author_ids
     if User.find_by_id(author_id).email_on_review
-      review_num = getReviewNumber(mapping)
-      Pgmailer.deliver_message(        
-        User.find_by_id(author_id),
-        Assignment.find_by_id(mapping.assignment_id),
-        review_num.to_s,       
-        "review",
-        self.review_scores)
+        user = User.find_by_id(author_id)
+        Pgmailer.deliver_message(
+            {:recipient => user.email,
+             :subject => "An new submission is available for #{self.name}",
+             :body => {
+              :obj_name => self.name,
+              :type => "review",
+              :location => getReviewNumber(mapping).to_s,
+              :review_scores => self.review_scores,
+              :user => Assignment.get_user_first_name(user),
+              :partial_name => "update"
+              }
+            }
+        )
     end  
    end
   end

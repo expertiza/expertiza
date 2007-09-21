@@ -13,14 +13,22 @@ class ReviewOfReview < ActiveRecord::Base
      review_id = review_of_review_mapping.review_id
      review = Review.find(review_id)
      
-     
-     Pgmailer.deliver_message(        
-         User.find_by_id(review_mapping.reviewer_id),
-         Assignment.find_by_id(review_mapping.assignment_id),
-         "Review "+review_num.to_s,       
-         "review of review",
-         review.review_scores,
-         self.review_of_review_scores)
+     user = User.find(review_mapping.reviewer_id)
+     recipient = User.find_by_id(review_mapping.reviewer_id).email
+     Pgmailer.deliver_message(
+         {:recipients => recipient,
+          :subject => "An new review of review is available for #{self.name}",
+          :body => {
+           :obj_name => Assignment.find_by_id(review_mapping.assignment_id).name,
+           :type => "review of review",
+           :location => "Review "+getReviewNumber(review_of_review_mapping).to_s,
+           :review_scores => review.review_scores,
+           :ror_review_scores => self.review_of_review_scores,
+           :user_name => Assignment.get_user_first_name(user),
+           :partial_name => "update"
+          }
+         }
+        )         
    end  
   end
   

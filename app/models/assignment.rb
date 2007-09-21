@@ -117,17 +117,31 @@ class Assignment < ActiveRecord::Base
        # If the reviewer has requested an e-mail deliver a notification
        # that includes the assignment, and which item has been updated.
        if User.find_by_id(mapping.reviewer_id).email_on_submission
-       
-          review_num = getReviewNumber(mapping)
-          Pgmailer.deliver_message(     
-              User.find_by_id(mapping.reviewer_id),
-              self,
-              review_num.to_s,     
-              "submission",
-              nil,
-              nil)
+          user = User.find(mapping.reviewer_id)
+          Pgmailer.deliver_message(
+            {:recipients => user.email,
+             :subject => "An new submission is available for #{self.name}",
+             :body => {
+              :obj_name => self.name,
+              :type => "submission",
+              :location => getReviewNumber(mapping).to_s,
+              :user_name => get_user_first_name(user),
+              :partial_name => "update"
+             }
+            }
+          )
        end
     end
+  end
+  
+  def get_user_first_name(recipient)
+      if recipient.fullname.index(",")
+        start_ss = recipient.fullname.index(",")+2
+     else
+        start_ss = 0
+     end   
+     name = recipient.fullname[start_ss, recipient.fullname.length]
+     return name
   end
 
   # Get all review mappings for this assignment & reviewer

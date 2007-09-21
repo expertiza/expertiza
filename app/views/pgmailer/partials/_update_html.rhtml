@@ -1,0 +1,11 @@
+Dear <%= @user_name %>,
+
+A new <%= @type %> has been made for <%= @obj_name %> in Review <%= @location %>.
+
+<% if @review_scores != nil %>
+<%= render :partial => '../review/scores' %> 
+<% end %>
+
+<% if @ror_review_scores != nil %>
+<%= render :partial => '../review_of_review/scores' %> 
+<% end %>

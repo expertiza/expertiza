@@ -1,21 +1,25 @@
 class Pgmailer < ActionMailer::Base
- 
-#Creates message content
-  def message(recip,object,location,type,review_scores,ror_review_scores)
-     @subject = "An new "+type+" is available for "+object.name
-     @recipients = recip.email
-     @from = "pg-server@ncsu.edu"
-     @body["assignment"] = assignment;
-     @body["type"] = type
-     @body["location"] = location 
-     @body["review_scores"] = review_scores
-     @body["ror_review_scores"] = ror_review_scores
-     if recip.fullname.index(",")
-        start_ss = recip.fullname.index(",")+2
-     else
-        start_ss = 0
+
+  #Creates message content
+  #defn - A hash object containing the following items:
+  #    subject - message's subject line
+  #    recipients - a string or array containing the recipient e-mail 
+  #                 address(es)
+  #    bcc <optional> - a string or array containing the bcc e-mail
+  #                 address(es)
+  #    body - a hash containing the following:
+  #           partial_name - the name of the partial located in 
+  #               /app/views/pgmailer/partials to use when rendering
+  #               this message. Do not include the message type (_html or _plain)
+  #           <optional> Other content can be included as needed by the partial
+  def message(defn)
+     @subject = defn[:subject]
+     @recipients = defn[:recipients]
+     if defn[:bcc] != nil
+       @bcc = defn[:bcc]
      end
-     @body["user"] = recip.fullname[start_ss, recip.fullname.length]
+     @from = "pg-server@ncsu.edu"
+     @body = defn[:body]
      @sent_on = Time.now 
   end
 end

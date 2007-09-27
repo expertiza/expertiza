@@ -1,8 +1,5 @@
 class ReviewOfReviewController < ApplicationController
-  
-  
-  
-  
+  # This method returns the 
   def get_student_directory(directory_path, directory_num)
     # This assumed that the directory num has already been set
     return RAILS_ROOT + "/pg_data/" + directory_path + "/" + directory_num
@@ -34,6 +31,7 @@ class ReviewOfReviewController < ApplicationController
     
     @user = params['user']
     @assignment_id = params['assignment']
+    @instructor_review = params['instructor_review']
     @eligible_review_mappings = ReviewMapping.find(:all,:conditions => ["reviewer_id <> ? and author_id <> ? and assignment_id = ?", @user, @user, @assignment_id] )
     # This is the review that is eligible for a review of review based on the criteria defined above
     puts "(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((("
@@ -52,50 +50,50 @@ class ReviewOfReviewController < ApplicationController
       end
     end
     begin   
-    @eligible_review_scores = @eligible_review.review_scores
-    @assgt = Assignment.find(@assignment_id)    
-    @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @assgt.id])
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Rubric.find(@assgt.review_rubric_id)
-    
-    
-    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-    puts @assgt.id
-    if @assgt.team_assignment 
-      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @eligible_review_mapping.team_id]).user_id
-      @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @eligible_review_mapping.team_id])
-      @author_name = User.find(@author_first_user_id).name;
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @eligible_review_mapping.assignment_id])
-    else
-      @author_name = User.find(@eligible_review_mapping.author_id).name
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @eligible_review_mapping.assignment_id])
-    end
-    @max = @rubric.max_question_score
-    @min = @rubric.min_question_score 
-    @current_folder = DisplayOption.new
-    @current_folder.name = "/"
-    if params[:current_folder]
-      @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
-    end
-    @files = Array.new
-    @files = get_submitted_file_list(@direc, @author, @files)
-    
-    if params['fname']
-      view_submitted_file(@current_folder,@author)
-    end
-    
-    @review_scores = @eligible_review.review_scores
-    @assgt = Assignment.find(@assignment_id)
-    
-    @review_of_review = ReviewOfReview.new
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_of_review_rubric_id]) 
-    @rubric = Rubric.find(@assgt.review_of_review_rubric_id)
-    @max = @rubric.max_question_score
-    @min = @rubric.min_question_score
-    
-   rescue
-       flash[:notice] = "Review of review cannot be created now"
-       redirect_to :controller =>'review', :action => 'list_reviews', :id => params['assignment']
+      @eligible_review_scores = @eligible_review.review_scores
+      @assgt = Assignment.find(@assignment_id)    
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @assgt.id])
+      @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
+      @rubric = Rubric.find(@assgt.review_rubric_id)
+      
+      
+      puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+      puts @assgt.id
+      if @assgt.team_assignment 
+        @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @eligible_review_mapping.team_id]).user_id
+        @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @eligible_review_mapping.team_id])
+        @author_name = User.find(@author_first_user_id).name;
+        @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @eligible_review_mapping.assignment_id])
+      else
+        @author_name = User.find(@eligible_review_mapping.author_id).name
+        @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @eligible_review_mapping.assignment_id])
+      end
+      @max = @rubric.max_question_score
+      @min = @rubric.min_question_score 
+      @current_folder = DisplayOption.new
+      @current_folder.name = "/"
+      if params[:current_folder]
+        @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
+      end
+      @files = Array.new
+      @files = get_submitted_file_list(@direc, @author, @files)
+      
+      if params['fname']
+        view_submitted_file(@current_folder,@author)
+      end
+      
+      @review_scores = @eligible_review.review_scores
+      @assgt = Assignment.find(@assignment_id)
+      
+      @review_of_review = ReviewOfReview.new
+      @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_of_review_rubric_id]) 
+      @rubric = Rubric.find(@assgt.review_of_review_rubric_id)
+      @max = @rubric.max_question_score
+      @min = @rubric.min_question_score
+      
+      rescue
+      flash[:notice] = "Review of review cannot be created now"
+      redirect_to :controller =>'review', :action => 'list_reviews', :id => params['assignment']
     end
   end
   
@@ -218,11 +216,20 @@ class ReviewOfReviewController < ApplicationController
     if @review_of_review.save
       #send message to reviewers(s) when review of review has been updated
       #ajbudlon, sept 07, 2007    
-      @review_of_review.email
-      flash[:notice] = 'Review of review was successfully saved.'
-      redirect_to :controller => 'review', :action => 'list_reviews', :id => params[:assgt_id]
+      #@review_of_review.email
+      if params['instructor_review']
+        flash[:notice] = 'Review of review was successfully saved.'
+        redirect_to :controller => 'assignment', :action => 'ror_for_instructors', :id => params[:assgt_id]
+      else
+        flash[:notice] = 'Review of review was successfully saved.' + params['instructor_review']
+        redirect_to :controller => 'review', :action => 'list_reviews', :id => params[:assgt_id]
+      end
     else # If something goes wrong, stay at same page
-      render :action => 'view_review'
+      if params['instructor_review']
+        render :controller => 'assignment', :action => 'ror_for_instructors', :id => params[:assgt_id]
+      else
+        render :action => 'view_review'
+      end
     end
   end
 end

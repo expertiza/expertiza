@@ -35,9 +35,18 @@
             <tr><td><em>Total</em></td><td align = 'right'><%=total%>&nbsp;&nbsp;</td><td><em>Score:</em> <%=total*100/@sum_of_max%>%</td></tr>
            </table><br/>
            Additional comment : <%=review.additional_comment%><br/>
+		   <%= start_form_tag ({:action => 'set_feedback'}, {:method => 'post'}) %>
 		   <p><label>Give feedback to reviewer:</label><br/>
-		   	<%=text_area('author', review.id,:rows=>5)%><br/>
-			<%= link_to "Submit/Edit",{:action => 'view_scores', :feedbacked_review=>review.id} %></p></p>
+		    <%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review.id, @assignment_id]))
+      		  	review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review.id, @assignment_id]).txt
+		      end
+			%>
+		   	<%=text_area('author','text',:rows=>5,:value=>review_feedback_text)%><br/>
+			<%= hidden_field_tag ('participant_id', @student.id) %>
+			<%= hidden_field_tag ('review_id', review.id) %>
+			<%= hidden_field_tag ('assignment_id', @assignment_id) %>
+			<input type='submit' value='Submit/Edit'/>
+			<%= end_form_tag %><br/><br/>
 		   <%review_no +=1
         end
 	end%>

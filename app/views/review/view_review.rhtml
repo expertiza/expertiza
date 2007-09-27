@@ -1,9 +1,11 @@
 
 <h1>View Review</h1>
-<%if @files.size == 0 and @assgt.wiki_type.name == "No"%>
+<%if @assgt.wiki_type.name == "No"%>
+<%if @files.size == 0%>
 <strong>This submission is missing.</strong>
 <%else%>
 Submitted Files<br />
+<%end%>
 <%end%>
 
 <%
@@ -47,6 +49,12 @@ Submitted Files<br />
 <%= render :partial => 'review/scores' %> 
 Additional Comment : <%=@review.additional_comment%><br/>
 <br/>
-
+<%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]))
+      		  	review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]).txt
+%>		     
+Author feedback:<br/>
+<%=review_feedback_text%><br/>
+<% end
+			%>
 <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
 

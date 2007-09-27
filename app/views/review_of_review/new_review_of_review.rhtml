@@ -1,4 +1,4 @@
-
+Inst<%=@instructor_review%>
 <h1>New Review of Review</h1>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
@@ -92,6 +92,7 @@ end %>
 		<%= hidden_field_tag('review_mapping_id', @eligible_review_mapping.id) %>
 		<%= hidden_field_tag('user', @user) %>
 		<%= hidden_field_tag('review_id', @eligible_review.id) %>
+		<%= hidden_field_tag('instructor_review', @instructor_review) %>
   	<%= submit_tag "Create Review of Review", :name=>"save" %>   	
 
 <%= end_form_tag %>

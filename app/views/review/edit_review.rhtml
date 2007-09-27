@@ -73,5 +73,10 @@ Submitted Files<br />
     <%= submit_tag "Edit Review", :name=>"save" %>       
 <%= end_form_tag %>
 <br />
-
+<%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]))
+      		  	review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]).txt
+%>		     
+Author feedback:<br/>
+<%=review_feedback_text%><br/>
+<% end%>
 <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>

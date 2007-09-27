@@ -2,6 +2,7 @@ require 'zip/zip'
 
 class StudentAssignmentController < ApplicationController
   helper :wiki
+  helper :student_assignment
   def list
     user_id = session[:user].id
     @user =session[:user]
@@ -81,14 +82,7 @@ class StudentAssignmentController < ApplicationController
     else
       @final_penalty = @late_policy.max_penalty
     end
-    if params['feedbacked_review']
-      text = "author_"+params['feedbacked_review']
-      puts "#####################################################################################################"
-      puts params['author_2']
-      update_author_feedback(params['feedbacked_review'],@assignment_id,text)
-    end
-    
-     
+        
     @review_of_review_mappings = Array.new
     
     @review_mappings_for_author = ReviewMapping.find(:all, :conditions => ["author_id = ?",(session[:user].id)])
@@ -99,6 +93,16 @@ class StudentAssignmentController < ApplicationController
       end
     end
     
+  end
+  
+  def set_feedback
+    @participant_id = params[:participant_id]
+    @review_id = params[:review_id]
+    @assignment_id = params[:assignment_id]
+    puts "#####################################################################################################"
+    puts params['author']
+    update_author_feedback(@review_id,@assignment_id,params['author']['text'])
+    redirect_to :action => 'view_scores', :id => @participant_id
   end
   
   def update_author_feedback(review_id,assignment_id,text)

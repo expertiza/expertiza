@@ -192,5 +192,17 @@ class AssignmentController < ApplicationController
     end
   end
   
+  def ror_for_instructors
+    @reviewer_id = session[:user].id
+    @assignment_id = params[:id]
+    @reviews = Array.new
+    review_mappings = ReviewMapping.find(:all,:conditions => ["assignment_id = ?", params[:id]])
+    for review_mapping in review_mappings
+      if Review.find_by_review_mapping_id(review_mapping.id)
+        @reviews << Review.find_by_review_mapping_id(review_mapping.id)
+      end
+    end
+    
+  end
   
 end

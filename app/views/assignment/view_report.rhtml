@@ -4,23 +4,44 @@
 	<%for i in 0...@assignment.num_reviews%>
 	<th>Review<%=i+1%></th>
 	<%end%>
+	<th>Review of Review</th>
 	<th>Final Score</th>
 <%for participant in @participants
 	student =User.find(participant.user_id)
 	if !@assignment.team_assignment
 		review_mapping = ReviewMapping.find_by_sql("select * from review_mappings where author_id = "+student.id.to_s+" and assignment_id = "+@assignment.id.to_s)
 	elsif @assignment.team_assignment
-		team_id = 10 #TeamsUser.find_by_sql("select * from teams_users where user_id = "+student.id.to_s)[0].team_id
-		review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", team_id, @assignment.id])
+		teams = TeamsUser.find_by_sql("select * from teams_users where user_id = "+student.id.to_s)
+		for team in teams
+			if ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", team.team_id, @assignment.id])
+				review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", team.team_id, @assignment.id])
+			end
+		end
 	end
 	review_no = 1
 	grade = 0
     _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s%>
 	<tr>
 		<td><strong><%=student.fullname%></strong><br/></td>
-	<%for review_map in review_mapping
-	  	for review in review_map.reviews
-			total = 0
+	<%if review_mapping
+	
+	for review_map in review_mapping
+	  	ror_count =0
+		ror_final = 0
+		for review in review_map.reviews
+			
+			review_of_review_mapping = ReviewOfReviewMapping.find(:first,:conditions => ["review_id = ?", review.id])
+			if review_of_review_mapping
+				for review_of_review in review_of_review_mapping.review_of_reviews
+					ror_total = 0
+					ror_count += 1
+					for review_of_review_score in review_of_review.review_of_review_scores
+				        ror_total += review_of_review_score.score 
+					end
+				end
+			end
+			ror_final +=ror_total.to_f
+            total = 0
 	        for review_score in review.review_scores
 		        total += review_score.score 
 			end
@@ -31,14 +52,27 @@
            <%
         end
 	end
+	end
 	if review_no < (@assignment.num_reviews+1)
 		for i in 0...@assignment.num_reviews+1-review_no%>
 		<td></td>
 		<%
 		end
 	end%>
-	<%if review_no-1 > 0 %>
-		<td><%=sprintf("%.2f",(grade.to_f/(review_no-1).to_f*100/@sum_of_max.to_f).to_f)%>%</td></tr>
+	<%if review_no-1 > 0 
+		ror_cnt = 1
+		if ror_count > 0
+			ror_cnt = ror_count
+		end		
+		review = (grade.to_f/(review_no-1).to_f*100/@sum_of_max.to_f).to_f
+		if ror_count < 1
+			review_of_review = (100*(100-@assignment.review_weight)/100).to_f
+		else
+			review_of_review = (ror_final.to_f/(ror_cnt).to_f*100/@sum_of_max.to_f*(100-@assignment.review_weight)/100).to_f
+		end
+		 %>
+		<td><%=sprintf("%.2f",(ror_final.to_f/(ror_cnt).to_f*100/@sum_of_max.to_f).to_f)%>%</td>
+		<td><%=sprintf("%.2f",review)%>%</td>
 	<%end
 end%>
 </table>

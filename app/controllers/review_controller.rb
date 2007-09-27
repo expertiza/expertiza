@@ -24,7 +24,7 @@ class ReviewController < ApplicationController
     # default score (probably the lowest possible score) should appear in the dropbox.
   end
   
-
+  
   
   def process_review(id,current_folder)
     @review = Review.find(id)
@@ -143,7 +143,7 @@ class ReviewController < ApplicationController
       @author_name = User.find(@mapping.author_id).name
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
-       
+    
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]

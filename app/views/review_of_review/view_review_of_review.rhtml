@@ -1,7 +1,9 @@
-<%if @files.size == 0 and @assgt.wiki_type.name == "No"%>
+<%if @assgt.wiki_type.name == "No"%>
+<%if @files.size == 0%>
 <strong>This submission is missing.</strong>
 <%else%>
 Submitted Files<br />
+<%end%>
 <%end%>
 
 <%
@@ -42,7 +44,7 @@ Submitted Files<br />
 <% end %>
 </ul>
 <h3>Review</h3>
-<%= render :partial => '../review/scores' %>
+<%= render :partial => '/review/scores' %>
 Additional Comment : <%=@review.additional_comment%><br/>
 <h3>Review of review</h3>
 <%= render :partial => 'scores' %>

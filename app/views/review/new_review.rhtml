@@ -1,10 +1,13 @@
+
 <h1>New Review</h1>
+<%if @assgt.wiki_type.name == "No"%>
 <%if @files.size == 0%>
 <strong>This submission is missing.</strong>
 <%else%>
 Submitted Files<br />
 <%end%>
-<ul>
+<%end%>
+
 	
 <%
  _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
@@ -41,6 +44,7 @@ Submitted Files<br />
   	<%= render :partial => 'review' %>
          <%= hidden_field_tag('mapping_id', @mapping.id) %>
          <%= hidden_field_tag('assgt_id', @assgt.id) %>
+		 
   	<%= submit_tag "Create Review", :name=>"save" %>       
 <%= end_form_tag %>
 <br />

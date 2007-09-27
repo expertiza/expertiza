@@ -79,4 +79,9 @@ module StudentAssignmentHelper
     #rescue
     #end
   end
+  
+  def get_feedback_text(review_id)
+    return params['author_6']
+  end
+  
 end

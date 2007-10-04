@@ -1,0 +1,5 @@
+<%= form_tag({:action=>'import_roster'},:multipart => true, :name=>'submit_form')%>
+<%= hidden_field_tag (obj_type, obj_id) %>
+Specify roster location: <input type="file" id="uploaded_file" name="uploaded_file" size=40/>
+<input type="submit" name="load_users" value="Add" onclick="checkIfFileExists('=import roster');"/>
+<% end_form_tag %>

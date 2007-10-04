@@ -1,7 +1,7 @@
 class Participant < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :user
-  has_many :resubmission_times
+  has_many :resubmission_times 
 
   def get_topic_string
     if topic == nil or topic.strip == ""
@@ -31,4 +31,22 @@ class Participant < ActiveRecord::Base
     end
     return false
   end
+  
+  def email(pw, home_page)
+    user = User.find_by_id(self.user_id)
+    assignment = Assignment.find_by_id(self.assignment_id)
+    Pgmailer.deliver_message(
+            {:recipients => user.email,
+             :subject => "You have been registered as a participant in Assignment #{assignment.name}",
+             :body => {  
+              :home_page => home_page,  
+              :user_name => ApplicationHelper::get_user_first_name(user),
+              :name =>user.name,
+              :password =>pw,
+              :partial_name => "register"
+             }
+            }
+    )   
+  end
+  
 end

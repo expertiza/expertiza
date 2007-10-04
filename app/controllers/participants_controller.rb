@@ -148,9 +148,29 @@ class ParticipantsController < ApplicationController
     @course_action = 'view_participants'
     @my_controller = 'participants'
     user_id = session[:user].id
-   @courses_pages, @courses = paginate :courses, :order => 'title',:conditions => ["instructor_id = ?", session[:user].id], :per_page => 10
+    @courses_pages, @courses = paginate :courses, :order => 'title',:conditions => ["instructor_id = ?", session[:user].id], :per_page => 10
   end
   
   def edit_team_members
   end
+  
+  def import_roster      
+    if params['load_users']      
+      file = params['uploaded_file']
+      temp_directory = RAILS_ROOT + "/pg_data/tmp/#{session[:user].id}_"
+      safe_filename = StudentAssignmentHelper::sanitize_filename(file.full_original_filename)
+      File.open(temp_directory+safe_filename, "w") { |f| f.write(file.read) }            
+      users = ParticipantsHelper::upload_users(temp_directory+safe_filename, session, params, url_for(:controller => '/')) 
+      File.delete(temp_directory+safe_filename)      
+    end  
+    if (params[:course_id] != nil)
+      redirect_to :action => 'view_participants', :id => params[:course_id]      
+    elsif (params[:assignment_id] != nil)
+      redirect_to :action => 'view_assignment_participants', :id => params[:assignment_id]
+    end
+  end
+    
 end
+
+#TODO: label fields in views
+

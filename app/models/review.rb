@@ -75,7 +75,7 @@ class Review < ActiveRecord::Base
               :type => "review",
               :location => getReviewNumber(mapping).to_s,
               :review_scores => self.review_scores,
-              :user => Assignment.get_user_first_name(user),
+              :user => ApplicationHelper::get_user_first_name(user),
               :partial_name => "update"
               }
             }

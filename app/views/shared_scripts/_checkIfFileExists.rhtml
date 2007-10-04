@@ -1,0 +1,8 @@
+function checkIfFileExists(button)
+{
+    var filename=document.getElementById("uploaded_file");
+    if(filename.value==null ||filename.value=='')
+    {
+        alert('Please select a file before pressing "'+button+'".');
+    }
+}

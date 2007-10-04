@@ -24,7 +24,7 @@ class ReviewOfReview < ActiveRecord::Base
            :location => "Review "+getReviewNumber(review_of_review_mapping).to_s,
            :review_scores => review.review_scores,
            :ror_review_scores => self.review_of_review_scores,
-           :user_name => Assignment.get_user_first_name(user),
+           :user_name => ApplicationHelper::get_user_first_name(user),
            :partial_name => "update"
           }
          }

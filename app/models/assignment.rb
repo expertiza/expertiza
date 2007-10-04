@@ -125,7 +125,7 @@ class Assignment < ActiveRecord::Base
               :obj_name => self.name,
               :type => "submission",
               :location => getReviewNumber(mapping).to_s,
-              :user_name => get_user_first_name(user),
+              :user_name => ApplicationHelper::get_user_first_name(user),
               :partial_name => "update"
              }
             }
@@ -134,15 +134,7 @@ class Assignment < ActiveRecord::Base
     end
   end
   
-  def get_user_first_name(recipient)
-      if recipient.fullname.index(",")
-        start_ss = recipient.fullname.index(",")+2
-     else
-        start_ss = 0
-     end   
-     name = recipient.fullname[start_ss, recipient.fullname.length]
-     return name
-  end
+
 
   # Get all review mappings for this assignment & reviewer
   # required to give reviewer location of new submission content

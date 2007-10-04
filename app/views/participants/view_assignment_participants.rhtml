@@ -1,15 +1,21 @@
 <h1>Assignment Participants</h1>
-<%= start_form_tag ({:action => 'add_assignment_participant'}, {:method => 'post'}) %>
 
+<%= 
+	render :partial => 'add_individual', 
+		:locals => {:form_action => "add_assignment_participant",
+		            :obj_type => "assignment_id", 
+					:obj_id => @assignment.id} 
+%>
+<br/>
+<%= 
+	render :partial => 'import_roster', 
+		:locals => {:obj_type => "assignment_id", 
+		            :obj_id => @assignment.id} 
+%>
+				
+<br/>
+<br/>
 
-<br>
-
-<%= text_field_with_auto_complete :user, :name %>
-<%= hidden_field_tag ('assignment_id', @assignment.id) %>
-&nbsp;
-<input type='submit' value='Add Participant'/>
-<br />
-<%= end_form_tag %>
 <div class = "exp">
 
 

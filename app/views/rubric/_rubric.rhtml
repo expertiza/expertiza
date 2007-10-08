@@ -76,6 +76,9 @@ function addQuestion(){
 			<%= text_field 'rubric', 'name'  %>
 			<%= hidden_field 'rubric', 'id' %>
 		</td>
+		<td><label for="type">&nbsp;&nbsp;Type:</label></td>
+		<td><%= select(:rubric, :type_id, [ ['Rubric', 1], 
+									 		['Survey',  2]])%></td>
 	</tr>
 </table>
 <table>
@@ -84,7 +87,7 @@ function addQuestion(){
 		<td><%= text_field 'rubric', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
 		<td>Max question score:</td>
 		<td><%= text_field 'rubric', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
-		<td>Is this rubric private:</td> 
+		<td>Is this questionnaire private:</td> 
 		<td><%= select(:rubric, :private, [ ['no', false], 
 									 		['yes',  true]])%>
 		</td>
@@ -118,7 +121,7 @@ function addQuestion(){
 	<% 	i += 1;
 		end %>
 </table>
-<div id="save_warning" class="warning" style="display:none;"><center>This rubric must be saved for any new or altered questions to be saved.</center></div>
+<div id="save_warning" class="warning" style="display:none;"><center>This questionnaire must be saved for any new or altered questions to be saved.</center></div>
 <br />
 <!--[eoform:course]-->
 

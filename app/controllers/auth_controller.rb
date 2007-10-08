@@ -134,4 +134,19 @@ class AuthController < ApplicationController
     session[:clear] = true
   end
 
+#new selective session delete
+  def self.clear_user_info(session)
+    session[:user_id] = nil
+    session[:user] = ""
+    role = Role.find(1)
+      if role
+        if not role.cache or not role.cache.has_key?(:credentials)
+          Role.rebuild_cache
+        end
+          session[:credentials] = role.cache[:credentials]
+          session[:menu] = role.cache[:menu]
+      end
+    session[:clear] = true
+  end
+
 end

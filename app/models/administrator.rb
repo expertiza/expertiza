@@ -1,9 +1,9 @@
 
 class Administrator < User
   
-  RUBRIC = [["My instructors' rubrics",'list_instructors'],
-            ['My rubrics','list_mine'],
-            ['All public rubrics','list_all']]
+  RUBRIC = [["My instructors' questionnaires",'list_instructors'],
+            ['My questionnaires','list_mine'],
+            ['All public questionnaires','list_all']]
   ASSIGNMENT = [["My instructors' assignments",'list_instructors'],
                 ['My assignments','list_mine'],
                 ['All public assignments','list_all']]

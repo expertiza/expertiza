@@ -205,4 +205,37 @@ class AssignmentController < ApplicationController
     
   end
   
+  def assign_survey
+    @assignment = Assignment.find(params[:id])
+    @assigned_surveys = SurveyHelper::get_assigned_surveys(@assignment.id)
+    @surveys = Rubric.find(:all, :conditions => ["type_id = 2"])
+    
+    if params['update']
+      if params[:surveys]
+        @checked = params[:surveys]
+        for survey in @surveys
+          unless @checked.include? survey.id
+            AssignmentsQuestionnaires.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
+            @assigned_surveys.delete(survey)
+          end
+        end 
+        
+        for checked_survey in @checked
+          @current = Rubric.find(checked_survey)
+          unless @assigned_surveys.include? @current
+            @new = AssignmentsQuestionnaires.new(:questionnaire_id => checked_survey, :assignment_id => @assignment.id)
+            @new.save
+            @assigned_surveys << @current
+          end
+        end
+      else
+        for assigned_survey in @assigned_surveys
+          AssignmentsQuestionnaires.delete_all(["questionnaire_id = ? and assignment_id = ?", assigned_survey.id, @assignment.id])
+          @assigned_surveys.delete(assigned_survey)
+        end 
+      end
+    end
+
+  end
+  
 end

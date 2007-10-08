@@ -1,10 +1,17 @@
 <% if session[:user] -%>
+<% unless session[:user] == "" %>
 <p> User:&nbsp;<%= h(session[:user].name) %>
 <%= start_form_tag :controller => 'auth', :action => 'logout' %>
   <%= submit_tag "Logout" %>
 <%= end_form_tag %>
 </p>
-
+<% else %>
+<p>&nbsp;
+<%= start_form_tag :controller => 'auth', :action => 'logout' %>
+  <%= submit_tag "Log back in" %>
+<%= end_form_tag %>
+</p>
+<% end %>
 <% else -%>
 <h1>Login</h1>
 

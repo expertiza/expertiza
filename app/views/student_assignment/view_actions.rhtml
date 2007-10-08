@@ -20,6 +20,15 @@
 		<% end %> (Give feedback to others on their work)
 	</li>
 	<li><%= link_to "View scores",{:action => 'view_scores', :id => @student.id} %></li>
+	<% if StudentAssignmentHelper::get_current_stage(@assignment_id) == "Complete" %>
+	<li>Take Survey: (clicking on a survey will log you out)
+		<ul>
+			<% for survey in @assigned_surveys %>
+			<li><%= link_to survey.name,{:controller => 'survey_response', :action => 'create', :survey_id=> survey.id, :assignment_id => @assignment_id} %></li>
+			<% end %>
+		</ul>
+	</li>
+	<% end %>
 </ul>
 <br>
 <div class="flash_note">

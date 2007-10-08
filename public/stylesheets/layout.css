@@ -182,3 +182,7 @@ h1 {
   height: 0 ;
   clear: both ;
 }
+
+#email_request{
+	width: 45em;
+}

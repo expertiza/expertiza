@@ -1,0 +1,9 @@
+<h1>Thank you for your input.</h1>
+<p>Other surveys for this assignment: </p>
+<ul>
+	<% for survey in @surveys %>
+		<% unless survey.id == @survey.id %>
+				<li><%= link_to survey.name,{:controller => 'survey_response', :action => 'create', :survey_id=> survey.id, :assignment_id => @assignment_id} %></li>
+		<% end %>
+	<% end %>
+</ul>

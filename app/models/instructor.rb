@@ -1,8 +1,8 @@
 
 class Instructor < User
   
-  RUBRIC = [['My rubrics','list_mine'],
-            ['All public rubrics','list_all']]
+  RUBRIC = [['My questionnaires','list_mine'],
+            ['All public questionnaires','list_all']]
   
   ASSIGNMENT = [['My assignments','list_mine'],
                 ['All public assignments','list_all']]

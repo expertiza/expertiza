@@ -3,6 +3,8 @@ class Rubric < ActiveRecord::Base
     # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
     has_many :assignments, :foreign_key => "review_rubric_id"
     has_many :questions
+    belongs_to :questionnaire_type, :foreign_key => "type_id"
+    has_many :assignment_questionnairess
     
     validates_presence_of :name
     validates_numericality_of :max_question_score

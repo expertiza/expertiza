@@ -1,0 +1,18 @@
+<h1>Surveys for Assignment: <%= @assignment.name %></h1>
+<%= form_tag(:action=>'assign_survey')%>
+	<table id="surveys_table">
+	<% for survey in @surveys %>
+		<tr>
+			<td align=center><input type=checkbox name="surveys[]" value="<%= survey.id %>"
+			<% if @assigned_surveys.include?(survey) -%>
+				checked="checked"
+			<% end -%>
+			></td>
+		 	<td><%= survey.name %></td>
+		</tr>
+	<% end %>
+	</table>
+	<%= submit_tag "Update", :name=>"update" %>
+<%= end_form_tag %>
+<br />
+<%= link_to 'Back', :action => 'list' %>

@@ -66,7 +66,7 @@ Submitted Files<br />
     <% i += 1;
     end %>
 	<br/>Additional Comment:<br/>
-	<textarea id=new_review_comments name=new_review[comments]><%=@review.additional_comment%></textarea>
+	<textarea cols="70" rows="5" id=new_review_comments name=new_review[comments]><%=@review.additional_comment%></textarea>
     <%= hidden_field_tag('review_id', @review.id) %>
     <%= hidden_field_tag('mapping_id', @mapping.id) %>
     <%= hidden_field_tag('assgt_id', @assgt.id) %>

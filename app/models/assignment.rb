@@ -1,6 +1,10 @@
 class Assignment < ActiveRecord::Base
   belongs_to :course 
   belongs_to :wiki_type
+  # wiki_type needs to be removed. When an assignment is created, it needs to
+  # be created as an instance of a subclass of the Assignment (model) class;
+  # then Rails will "automatically" set the type field to the value that
+  # designates an assignment of the appropriate type.
   belongs_to :user, :foreign_key => "instructor_id"
   has_one :late_policy
   has_many :participants

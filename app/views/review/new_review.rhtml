@@ -1,5 +1,10 @@
 
 <h1>New Review</h1>
+<% # The code below should be replaced with a call to a function that returns a list of the submitted files
+   # (or listing of wiki pages the reviewer should be able to see).  Then, you check the cardinality of that
+   # list.  If it is nonzero, you print out the list and then the review form.  If it is 0, you print a message
+   # saying nothing has been submitted, and exit.
+%>
 <%if @assgt.wiki_type.name == "No"%>
 <%if @files.size == 0%>
 <strong>This submission is missing.</strong>
@@ -16,6 +21,9 @@ Submitted Files<br />
 <b>DokuWiki Review Links:</b>
 <br>
 <br>
+<% # The code below becomes @assgt.review, which invokes the proper review function
+   # for this type of assignment
+%>
 <%= review_dokuwiki @assgt.directory_path, _time, @author_name  %>
 <br>
 <% elsif @assgt.wiki_type.name == "MediaWiki" %>
@@ -23,6 +31,17 @@ Submitted Files<br />
 <b>MediaWiki Review Links:</b>
 <br>
 <br>
+<% # What we need here is a method that finds all of the contributions of the 
+   # user(s) being reviewed, e.g., files submitted or wiki pages created.  It
+   # should return an array of links.  It is passed (or has as its receiver)
+   # some kind of data structure that contains the IDs of the user(s) being reviewed. 
+%>
+<% # We shouldn't check for team assignments.  Rather, an assignment should have an
+   # attribute that corresponds to whether or not it's a team assignment.  This
+   # attribute will be sent a message G to go get a set of the users being reviewed.
+   # Then the method that finds all the contributions (described in the immediately
+   # preceding comment) will be sent the array that message G returns).
+%>
 <%if @assgt.team_assignment
   	for team_member in @team_members
 		member_name = User.find(team_member.user_id).name 

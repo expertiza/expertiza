@@ -124,7 +124,7 @@ class ReviewController < ApplicationController
   end
   
   def new_review
-    
+
     @review = Review.new
     @mapping_id = params[:id]
     @mapping = ReviewMapping.find(params[:id])

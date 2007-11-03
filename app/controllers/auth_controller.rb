@@ -132,12 +132,13 @@ class AuthController < ApplicationController
     session[:credentials] = nil
     session[:menu] = nil
     session[:clear] = true
+    session[:assignment_id] = nil
   end
 
-#new selective session delete
-  def self.clear_user_info(session)
+#clears any identifying info from session
+  def self.clear_user_info(session, assignment_id)
     session[:user_id] = nil
-    session[:user] = ""
+    session[:user] = ""  #sets user to an empty string instead of nil, to show that the user was logged in
     role = Role.find(1)
       if role
         if not role.cache or not role.cache.has_key?(:credentials)
@@ -147,6 +148,7 @@ class AuthController < ApplicationController
           session[:menu] = role.cache[:menu]
       end
     session[:clear] = true
+    session[:assignment_id] = assignment_id
   end
 
 end

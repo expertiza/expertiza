@@ -6,9 +6,9 @@
 <%= end_form_tag %>
 </p>
 <% else %>
-<p>&nbsp;
+<p>(not logged in)
 <%= start_form_tag :controller => 'auth', :action => 'logout' %>
-  <%= submit_tag "Log back in" %>
+  <%= submit_tag "Log in" %>
 <%= end_form_tag %>
 </p>
 <% end %>

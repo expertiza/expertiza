@@ -208,7 +208,15 @@ class AssignmentController < ApplicationController
   def assign_survey
     @assignment = Assignment.find(params[:id])
     @assigned_surveys = SurveyHelper::get_assigned_surveys(@assignment.id)
-    @surveys = Rubric.find(:all, :conditions => ["type_id = 2"])
+    @surveys = Array.new
+    
+    if params['subset'] == "mine"
+      @surveys = Rubric.find(:all, :conditions => ["type_id = 2 and instructor_id = ?", session[:user].id])
+    elsif params['subset'] == "public"
+      @surveys = Rubric.find(:all, :conditions => ["type_id = 2 and private = 0"])
+    else
+      @surveys = @assigned_surveys
+    end
     
     if params['update']
       if params[:surveys]
@@ -229,9 +237,9 @@ class AssignmentController < ApplicationController
           end
         end
       else
-        for assigned_survey in @assigned_surveys
-          AssignmentsQuestionnaires.delete_all(["questionnaire_id = ? and assignment_id = ?", assigned_survey.id, @assignment.id])
-          @assigned_surveys.delete(assigned_survey)
+        for survey in @surveys
+          AssignmentsQuestionnaires.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
+          @surveys.delete(survey)
         end 
       end
     end

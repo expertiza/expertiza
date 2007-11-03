@@ -1,9 +1,15 @@
 <h1>Thank you for your input.</h1>
-<p>Other surveys for this assignment: </p>
-<ul>
-	<% for survey in @surveys %>
-		<% unless survey.id == @survey.id %>
-				<li><%= link_to survey.name,{:controller => 'survey_response', :action => 'create', :survey_id=> survey.id, :assignment_id => @assignment_id} %></li>
-		<% end %>
-	<% end %>
-</ul>
+<% if @surveys.length != 1 -%>
+	<p>Other surveys for this assignment: </p>
+	<%= form_tag(:action => 'create') %>
+			<select name="survey_id">
+				<% for survey in @surveys %>
+					<% if @survey.id != survey.id %>
+						<option value="<%= survey.id %>"><%= survey.name %></option>
+					<% end %>
+				<% end %>
+			</select>
+			<input type="hidden" name="assignment_id" value="<%= @assignment_id %>" />
+			<%= submit_tag "Go", :name=>"go" %>
+	<%= end_form_tag %>
+<% end -%>

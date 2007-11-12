@@ -1,0 +1,41 @@
+<h1>
+	Survey Responses for Assignment: <%= @assignment.name %>
+</h1>
+<% if @empty %>
+	<p>No survey responses exist for this assignment.</p>
+<% else %>
+<% for survey in @responses -%>
+<h3><%= survey[:name] %></h3>
+	<% for question in survey[:questions] -%>
+	<p class="noBottom"><b><%= question[:name] %></b></p>
+	<% count = 0 %>
+	<table class="graph">
+		<% for score in question[:scores] -%>
+			<tr class="graphRow">
+				<th class="graphScore"><%=score[:value]%>&nbsp;</th>
+			<% for i in 1..score[:length]%>
+				<td class="graphFill">&nbsp;</td>
+			<% end %>
+			<% count += score[:length] %>
+				<td class="countPrint" colspan="3">&nbsp;<%=score[:length]%></td>
+			</tr>			
+		<% end %>
+	</table>
+	<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
+	<p class="noBottom">Total Responses: <%= count %></p>
+	<table class="graph">
+		<tr>
+			<% for score in question[:scores] -%>
+				<td>
+					<b><%=score[:value] %></b>:
+					<%=score[:length]*100/count %>%
+					&nbsp;
+				</td>
+			<% end %>
+		</tr>
+	</table>
+	<% end %>
+<% end %>		
+<% end %>
+<br />
+<%= link_to 'Back', :controller => 'assignment',:action => 'list' %>

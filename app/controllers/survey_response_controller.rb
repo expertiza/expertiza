@@ -56,5 +56,44 @@ class SurveyResponseController < ApplicationController
     
     @surveys = SurveyHelper::get_assigned_surveys(@assignment_id)
   end
-
+  
+  def view_responses
+    @assignment = Assignment.find(params[:id])
+    @surveys = SurveyHelper::get_assigned_surveys(params[:id])
+    @responses = Array.new
+    @empty = true
+    for survey in @surveys
+      min = survey.min_question_score
+      max = survey.max_question_score
+      this_response = Hash.new
+      this_response[:name] = survey.name
+      this_response[:id] = survey.id
+      this_response[:questions] = Array.new
+      for question in survey.questions
+        nums = Hash.new
+        nums[:name] = question.txt
+        nums[:id] = question.id
+        nums[:scores] = Array.new
+        for i in min..max
+          list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i]);
+          this_score = Hash.new
+          this_score[:value] = i
+          this_score[:length] = list.length
+          if list.length > 0 
+            @empty = false
+          end
+          nums[:scores] << this_score
+        end
+        this_response[:questions] << nums
+      end
+      @responses << this_response
+    end
+  end
+  
+  def comments
+    @responses = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]], :order => "score");
+    @question = Question.find(params[:question_id])
+    @survey = Rubric.find(params[:survey_id])
+    @assignment = Assignment.find(params[:assignment_id])
+  end
 end

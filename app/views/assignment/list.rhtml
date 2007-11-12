@@ -27,7 +27,11 @@
 	<td><%= link_to 'Delete', :action => 'delete', :id => assignment %>&nbsp;&nbsp;</td>
 	<td><%= link_to 'Assign reviewers', :action => 'assign_reviewers', :id => assignment %>&nbsp;&nbsp;</td>
 	<td><%= link_to 'View report', :action => 'view_report', :id => assignment %>&nbsp;&nbsp;</td>
-	<td><%= link_to 'Assign Surveys', :action => 'assign_survey', :id => assignment %>&nbsp;&nbsp;</td>
+	<td><%= link_to 'Assign surveys', :action => 'assign_survey', :id => assignment %>&nbsp;&nbsp;</td>
+	<% assigned_surveys = SurveyHelper::get_assigned_surveys(assignment.id) %>
+    <% if StudentAssignmentHelper::get_current_stage(assignment.id) == "Complete" && assigned_surveys.length != 0 -%>
+		<td><%= link_to 'View survey responses', :action => 'view_responses', :controller => 'survey_response', :id => assignment %>&nbsp;&nbsp;</td>
+	<% end %>
   </tr>
 <% end %>
 </table>

@@ -186,3 +186,37 @@ h1 {
 #email_request{
 	width: 45em;
 }
+
+tr.graphRow td {
+	padding: 0;
+	margin: 0;
+}
+
+td.graphFill {
+	background: green;
+}
+
+p.noBottom{
+	margin-bottom: 0;
+	margin-left: 1em;
+}
+
+td.graphEmpty {
+	background: white;
+}
+
+table.graph {
+	margin-left: 2em;
+}
+
+th.graphScore {
+	text-align: center;
+}
+
+td.countPrint {
+	width: .5em;
+}
+
+table.boldTable td{
+	font-weight: bold;
+}

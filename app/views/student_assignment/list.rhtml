@@ -6,7 +6,8 @@
 <table class="listing" cellpadding=2>
   <tr>
 	<th></th>
-    <th>Assignment</th>
+  <th>Assignment</th>
+  <th>Specification</th>
 	<th>Course</th>
 	<th>Topic</th>
 	<th>Current Stage</th>
@@ -18,6 +19,7 @@
   <tr class="listingRow">
 	<td></td>
 	<td><%= link_to participant.assignment.name, :action => 'view_actions', :id => participant %></td>
+  <td><%= participant.get_scenario_string %></td>
 	<td><%= participant.get_course_string %></td>
 	<td><%= participant.get_topic_string %></td>
 	<td><%= StudentAssignmentHelper::get_current_stage(participant.assignment.id) %></td>

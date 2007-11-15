@@ -1,0 +1,16 @@
+<H1>Team Members</H1>
+
+
+<H3><%= @team.name %></H3>
+<TABLE>
+<TR><TH>Member Login</TH></TR>
+<% for teamuser in @teams_users %>
+<% user = User.find_by_id(teamuser.user_id) %>
+<TR>
+<TD><%= user.name %></TD><TD>&nbsp;</TD>
+<TD><%= link_to 'Delete', :action => 'destroy', :id => user %></TD>
+</TR>
+<% end %>
+</TABLE>
+<BR/>
+<%= link_to 'New Team Member', :action => 'new', :id => @team %>

@@ -3,27 +3,10 @@
 </script>
 
 <h1>Participants</h1>
-
-<%= 
-	render :partial => 'add_individual', 
-		:locals => {:form_action => "add_participant",
-					:obj_type => "course_id", 
-					:obj_id => @course.id} 
-%>
-
-<br/>
-
-<%= 
-	render :partial => 'import_roster', 
-		:locals => {:obj_type => "course_id", 
-					:obj_id => @course.id} 
-%>
-		
-
-<br/>
 <br/>
 
 <div class = "exp">
+<%if @participants.length > 0%>
 
 <table>
   <tr ><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th>
@@ -45,6 +28,20 @@
   </tr>
 <% end -%>
 </table>
+<% end -%>
+
 </div>
+<br/>
+<%= 
+	render :partial => 'add_individual', 
+		:locals => {:form_action => "add_participant",
+					:obj_type => "course_id", 
+					:obj_id => @course.id} 
+%>
+<%= 
+	render :partial => 'import_roster', 
+		:locals => {:obj_type => "course_id", 
+					:obj_id => @course.id} 
+%>
 <hr/>
 

@@ -1,58 +1,80 @@
+require 'dl'
+
 class TeamController < ApplicationController
    auto_complete_for :user, :name
    
-   def list_teams
-    @team_pages, @teams = paginate :teams, :per_page => 10
-  end
-
-  def show_team
-    @team = Team.find(params[:id])
-  end
-
-  def new_team
-    @team = Team.new
+  def list    
+     unknown = params[:unknown]
+     if unknown != nil && unknown.length > 0        
+        str = 'The following logins were not added to a team: '
+        for login in unknown
+          str = str + login +' '
+        end       
+        flash[:note] = str
+     end
+     if(session[:assignment_id] == nil)
+         session[:assignment_id] = params[:id] 
+     end         
+     @team_pages, @teams = paginate :teams, :conditions => ["assignment_id = ?",session[:assignment_id]], :per_page => 10
   end
   
+  def edit
+    @team = Team.find(params[:id])
+  end
+  
+  def destroy
+    @team = Team.find(params[:id])
+    for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", @team.id])
+       teamsuser.destroy
+    end    
+    @team.destroy
+    redirect_to :action => 'list'
+  end
+
+  def new
+    @assignment = Assignment.find(session[:assignment_id])
+    @team = Team.new 
+  end
+
   def create
+    check = Team.find(:all, :conditions => ["name =? and assignment_id =?", params[:team][:name], session[:assignment_id]])        
     @team = Team.new(params[:team])
-    if @team.save
-      flash[:notice] = 'Team was successfully created.'
-      redirect_to :action => 'list_teams'
+    if (check.length == 0)      
+      @team.save
+      redirect_to :action => 'list'
     else
-      render :action => 'new_team'
-    end
+      flash[:error] = 'Team name is already in use.'        
+      render :action => 'new'
+    end 
   end
   
-    def edit
-    @team = Team.find(params[:id])
-  end
-
   def update
     @team = Team.find(params[:id])
-    if @team.update_attributes(params[:team])
-      flash[:notice] = 'Team was successfully updated.'
-      redirect_to :action => 'show', :id => @team
+    check = Team.find(:all, :conditions => ["name =? and assignment_id =?", params[:team][:name], @team.assignment_id])    
+    if (check.length == 0)
+       if @team.update_attributes(params[:team])
+          redirect_to :action => 'list'
+       end
     else
+      flash[:error] = 'Team name is already in use.'        
       render :action => 'edit'
-    end
+    end 
   end
-
-  def destroy
-    Team.find(params[:id]).destroy
-    redirect_to :action => 'list_teams'
-  end
+   
+  def import_teams
+    if params['load_teams']      
+      file = params['uploaded_file']
+      temp_directory = RAILS_ROOT + "/pg_data/tmp/#{session[:user].id}_"
+      safe_filename = StudentAssignmentHelper::sanitize_filename(file.full_original_filename)
+      File.open(temp_directory+safe_filename, "w") { |f| f.write(file.read) }   
+      unknown = TeamHelper::upload_teams(temp_directory+safe_filename,session[:assignment_id],params[:options])       
+      File.delete(temp_directory+safe_filename)      
+    end  
+    redirect_to :action => 'list', :unknown => unknown
+  end  
   
-  def view_team_members
-    @team = Team.find(params[:id])
-    @members = @team.teams_users
-  end
-  
-    def add_team_member
-    @team = Team.find(params[:team_id])
-    @user = User.find_by_name(params[:user][:name])
-    
-      @team_user = TeamsUser.create(:team_id => @team.id, :user_id => @user.id)
-      redirect_to :action => 'view_team_members', :id => @team
-    
+  def list_assignments
+    user_id = session[:user].id    
+    @assignment_pages, @assignments = paginate :assignments, :order => 'name',:conditions => ["instructor_id = ?", session[:user].id], :per_page => 10
   end
 end

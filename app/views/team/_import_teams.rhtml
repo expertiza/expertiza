@@ -1,0 +1,27 @@
+<%= form_tag({:action=>'import_teams'},:multipart => true, :name=>'submit_form')%>
+<table>
+<tr>
+<td colspan=2>
+<label for="column_one_has_name">Team name is found in first column:</label>
+<%= check_box 'options','has_column_names', {:checked => 'checked'},  "true", "false"  %><br/>
+</td>
+</tr>
+<tr>
+<td><label for="options[handle_dups]">Select option for duplicate teams:</label></td>
+<td>
+<select id="options_handle_dups" name="options[handle_dups]">
+  <option value="replace">Replace team
+  <option value="insert">Insert new members
+  <option value="rename">Automatically rename the team
+  <option value="ignore">Ignore the duplicate team
+</select>
+</td>
+</tr>
+<tr>
+<td>Specify file location:</td>
+<td><input type="file" id="uploaded_file" name="uploaded_file" size=40/>
+<input type="submit" name="load_teams" value="Add" onclick="checkIfFileExists('=import teams');"/>
+</td>
+</tr>
+</table>
+<% end_form_tag %>

@@ -18,6 +18,13 @@ class Participant < ActiveRecord::Base
     return assignment.course.title
   end
   
+  def get_scenario_string
+    if assignment.spec_location == nil
+      return "<center>&#8212;</center>"      
+    end
+    return "<a href=\"" + assignment.spec_location + "\" target=\"new\"/>View</A>"
+  end
+  
   def able_to_submit
     if submit_allowed
       return true

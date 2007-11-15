@@ -20,7 +20,9 @@ class CreateAssignments < ActiveRecord::Migration
 	t.column :team_assignment, :boolean
 	t.column :wiki_type_id, :integer # id of wiki assignment type
 	t.column :require_signup, :boolean # if true, users need to sign up thru Shimmer before submitting; if false, everyone in course may submit; if assgt. not in course, default is that no one may submit
+	t.column :spec_location, :string # location of the assignment description, should be content able to be rendered in a web browser
     end
+    
     execute "alter table assignments 
              add constraint fk_assignments_review_rubrics
              foreign key (review_rubric_id) references rubrics(id)"

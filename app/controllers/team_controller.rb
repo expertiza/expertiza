@@ -14,7 +14,8 @@ class TeamController < ApplicationController
      end
      if(session[:assignment_id] == nil)
          session[:assignment_id] = params[:id] 
-     end         
+     end     
+     @assignment = Assignment.find(session[:assignment_id])    
      @team_pages, @teams = paginate :teams, :conditions => ["assignment_id = ?",session[:assignment_id]], :per_page => 10
   end
   
@@ -75,6 +76,6 @@ class TeamController < ApplicationController
   
   def list_assignments
     user_id = session[:user].id    
-    @assignment_pages, @assignments = paginate :assignments, :order => 'name',:conditions => ["instructor_id = ?", session[:user].id], :per_page => 10
+    @assignment_pages, @assignments = paginate :assignments, :order => 'name',:conditions => ["instructor_id = ? and team_assignment =?", session[:user].id, 1], :per_page => 10
   end
 end

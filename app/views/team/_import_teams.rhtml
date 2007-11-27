@@ -2,25 +2,25 @@
 <table>
 <tr>
 <td colspan=2>
-<label for="column_one_has_name">Team name is found in first column:</label>
+<label for="column_one_has_name">Interpret first column as team name:</label>
 <%= check_box 'options','has_column_names', {:checked => 'checked'},  "true", "false"  %><br/>
 </td>
 </tr>
 <tr>
-<td><label for="options[handle_dups]">Select option for duplicate teams:</label></td>
+<td><label for="options[handle_dups]">If a duplicate team name is found in the roster,</label></td>
 <td>
 <select id="options_handle_dups" name="options[handle_dups]">
-  <option value="replace">Replace team
-  <option value="insert">Insert new members
-  <option value="rename">Automatically rename the team
-  <option value="ignore">Ignore the duplicate team
+  <option value="ignore">ignore the new team
+  <option value="replace">replace the existing team with the new team
+  <option value="insert">insert any new members into the existing team
+  <option value="rename">rename the new team and import
 </select>
 </td>
 </tr>
 <tr>
 <td>Specify file location:</td>
 <td><input type="file" id="uploaded_file" name="uploaded_file" size=40/>
-<input type="submit" name="load_teams" value="Add" onclick="checkIfFileExists('=import teams');"/>
+<input type="submit" name="load_teams" value="Import Teams" onclick="checkIfFileExists('=import teams');"/>
 </td>
 </tr>
 </table>

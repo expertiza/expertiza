@@ -3,5 +3,5 @@
 <%= hidden_field_tag (obj_type, obj_id) %>
 Import a class roster: <input type="file" id="uploaded_file" name="uploaded_file" size=40/>
 <input type="submit" name="load_users" value="Import Participants" onclick="checkIfFileExists('=import roster');"/>
-<% end_form_tag %>
+<%= end_form_tag %>
 </p>

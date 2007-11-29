@@ -3,7 +3,7 @@
 <%= render :partial => 'wiki' %>
 
 <%= start_form_tag :action => 'create_review' %>
-  	<%= render :partial => 'reviewContent' %>
+  	<%= render :partial => 'review' %>
          <%= hidden_field_tag('mapping_id', @mapping.id) %>
          <%= hidden_field_tag('assgt_id', @assgt.id) %>
 		 

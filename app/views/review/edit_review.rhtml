@@ -1,17 +1,19 @@
 <h1>Edit Review</h1>
+<%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]))
+                        review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]).txt
+%>
+<div class="flash_error"><strong>Author's feedback:</strong><br/>
+<%=review_feedback_text%></div>
+<% end%>
 <%= render :partial => 'wiki' %>
 <%= start_form_tag :action => 'update_review' %>
-<%= render :partial => 'reviewContent' %>    
+<%= render :partial => 'reviewContentforEdit' %>    
 <%= hidden_field_tag('review_id', @review.id) %>
     <%= hidden_field_tag('mapping_id', @mapping.id) %>
     <%= hidden_field_tag('assgt_id', @assgt.id) %>
     <%= submit_tag "Edit Review", :name=>"save" %>       
 <%= end_form_tag %>
 <br />
-<%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]))
-      		  	review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]).txt
-%>		     
-Author feedback:<br/>
-<%=review_feedback_text%><br/>
-<% end%>
+
 <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
+

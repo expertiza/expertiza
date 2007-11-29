@@ -16,15 +16,15 @@ class ModifyUsers < ActiveRecord::Migration
     add_column :users, :email_on_submission, :boolean
     add_column :users, :email_on_review_of_review, :boolean
     add_column :users, :is_new_user, :boolean
-
+    
     execute "alter table users 
              add constraint fk_institutions_users
              foreign key (institution_id) references institutions(id)"
-
+    
     user = User.create(:username => "suadmin", :password=> User.hash_password("2wolfpack"),:role_id => "3",:parent_id => 1)#This should be the first user created in the system
     user.save
   end
-
+  
   def self.down
     remove_column :users, :parent_id
     remove_column :users, :home_directory_path

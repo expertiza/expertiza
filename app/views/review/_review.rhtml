@@ -1,3 +1,7 @@
+Weblinks if added already:<br/>
+<%for link in @links%>
+<a href="../../../<%=link.link%>" target="new"><%=link.link%></a><br/>
+<%end%>
 <% i = 0;
 for @question in @questions %>
   <%=@question.txt%><br />        

@@ -34,11 +34,6 @@ class ParticipantsController < ApplicationController
     end    
   end
   
-  def imitate_student
-    @new_id = params[:id]
-    session[:user] = User.find(@new_id)
-  end
-  
   def show_student
     @user = User.find(params[:id])
     if @user.role_id
@@ -90,7 +85,7 @@ class ParticipantsController < ApplicationController
   
   def list_assignments
     user_id = session[:user].id
-    @assignment_pages, @assignments = paginate :assignments, :order => 'name',:conditions => ["instructor_id = ?", session[:user].id], :per_page => 10
+    @assignment_pages, @assignments = paginate :assignments, :order => 'name',:conditions => ["instructor_id = ?", session[:user].id], :per_page => 25
   end
 
   def view_participants

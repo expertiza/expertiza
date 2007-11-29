@@ -4,7 +4,7 @@ class CreateInstitutions < ActiveRecord::Migration
       t.column :name, :string # printname of institution (college, university, high school, etc.)
     end
   end
-
+  
   def self.down
     drop_table :institutions
   end

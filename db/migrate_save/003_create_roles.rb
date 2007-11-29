@@ -3,7 +3,7 @@ class CreateRoles < ActiveRecord::Migration
   def self.up
     create_table :roles do |t|
       # t.column :name, :string
-	t.column :name, :string, :limit=>32
+      t.column :name, :string, :limit=>32
     end
     role = Role.create(:name=>"suadmin")
     role.save
@@ -14,7 +14,7 @@ class CreateRoles < ActiveRecord::Migration
     role = Role.create(:name=>"student")
     role.save
   end
-
+  
   def self.down
     drop_table :roles
   end

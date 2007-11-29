@@ -45,18 +45,18 @@ class ReviewController < ApplicationController
       @author_name = User.find(@mapping.author_id).name
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
-    
+    @links = SubmissionWeblink. find(:all, :conditions => ["participant_id = ?",@author.id])
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score 
     
     @files = Array.new
     @files = get_submitted_file_list(@direc, @author, @files)
     
-    return @review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc
+    return @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc
   end
   
   def view_review
-    @review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
     
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
@@ -70,7 +70,7 @@ class ReviewController < ApplicationController
   end
   
   def edit_review
-    @review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -133,7 +133,7 @@ class ReviewController < ApplicationController
     @rubric = Rubric.find(@assgt.review_rubric_id)
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score  
-    
+    @links = SubmissionWeblink. find(:all, :conditions => ["participant_id = ?",@author.id])
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])

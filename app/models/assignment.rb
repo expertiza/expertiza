@@ -93,12 +93,12 @@ class Assignment < ActiveRecord::Base
         for review_of_review_score in review_of_review.review_of_review_scores
           review_of_review_score.destroy
         end
-        review.destroy
+        review_of_review.destroy
       end
       for review_of_review_mapping in review_mapping.review_of_review_mappings
         review_of_review_mapping.destroy
       end
-      review_mapping.destroy
+      review_of_review_mapping.destroy
     end
   end
   def delete_review_feedback

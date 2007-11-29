@@ -108,10 +108,14 @@ function renameFile(){
 <li><%= link_to "View feedback on submissions",{:action => 'view_feedback', :id => @student.id} %></li>
 </ul>
 
+
 <% if @student.assignment.wiki_type_id == 1%>
-Submit your work for the assignment titled: <%= @student.assignment.name %>
+Submit your work for the assignment titled: <%= @student.assignment.name %><br/><br/>
 <%= form_tag({:action=>'submit'},:multipart => true, :name=>'submit_form')%>
-<br><br>
+<input type="text" name="submission" size=40 value = " "/><input type="submit" name="upload_link" value="Upload link"/>
+<%= end_form_tag%>
+<%= form_tag({:action=>'submit'},:multipart => true, :name=>'submit_form')%>
+<br>
 <input type="file" id="uploaded_file" name="uploaded_file" size=40 />
 <input type="submit" name="upload_file" value="Upload file" onclick="checkIfFileExists('Upload');"/>
 <br><br>
@@ -165,6 +169,11 @@ Submit your work for the assignment titled: <%= @student.assignment.name %>
 </form>
 <br><br><br><br>
 <%end%>
+Weblinks if added already:<br/>
+<%for link in @links%>
+<a href="../../../<%=link.link%>" target="new"><%=link.link%></a><br/>
+<%end%>
+
 <%if(@review_of_review_mappings.size > 0)%>
 <h3>Reviews of reviews</h3>
  <tr><ul>

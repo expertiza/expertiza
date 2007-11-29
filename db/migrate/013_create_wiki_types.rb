@@ -1,7 +1,7 @@
 class CreateWikiTypes < ActiveRecord::Migration
   def self.up
     create_table :wiki_types do |t|
-	t.column :name, :string #Wiki Assignment Type
+      t.column :name, :string #Wiki Assignment Type
     end
     wiki_type = WikiType.create(:name=>"No")
     wiki_type.save
@@ -10,7 +10,7 @@ class CreateWikiTypes < ActiveRecord::Migration
     wiki_type = WikiType.create(:name=>"DokuWiki")
     wiki_type.save
   end
-
+  
   def self.down
     drop_table :wiki_types
   end

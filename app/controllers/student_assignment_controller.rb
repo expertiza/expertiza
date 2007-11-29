@@ -169,6 +169,10 @@ class StudentAssignmentController < ApplicationController
 
   def submit
     @student = Participant.find(params[:id])
+    @links = SubmissionWeblink. find(:all, :conditions => ["participant_id = ?",@student.id])
+    @submission = params[:submission]
+    puts "*********************************************"
+    puts @submission
     @files = Array.new
     @assignment_id = @student.assignment_id
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
@@ -207,6 +211,12 @@ class StudentAssignmentController < ApplicationController
       create_new_folder
     end
     
+     if params['upload_link']
+       puts "***********@@@@te@@@@dfgd@@*"
+       puts params['submission']
+      save_weblink
+    end
+    
     if params['moved_file']
       move_file
     end
@@ -225,6 +235,7 @@ class StudentAssignmentController < ApplicationController
     
     if params['upload_file']
       file = params['uploaded_file']
+      puts file
 
       if @student.directory_num == nil or @student.directory_num < 0
         set_student_directory_num
@@ -280,6 +291,18 @@ private
       file_op "move", old_filename, new_filename
       break
     end
+  end
+  
+  def save_weblink
+    participant_id = Participant.find(params[:id]).id
+     
+    weblink = params['submission']
+   
+    submission = SubmissionWeblink.new
+    submission.participant_id = participant_id
+    submission.link = weblink
+    submission.save
+    redirect_to :action => 'submit'
   end
   
   def copy_file

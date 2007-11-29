@@ -187,8 +187,12 @@ class AssignmentController < ApplicationController
     elsif !@assignment.team_assignment
     end
     @sum_of_max = 0
+    @sum_of_max_ror = 0
     for question in Rubric.find(Assignment.find(@assignment.id).review_rubric_id).questions
       @sum_of_max += Rubric.find(Assignment.find(@assignment.id).review_rubric_id).max_question_score
+    end
+    for question in Rubric.find(Assignment.find(@assignment.id).review_of_review_rubric_id).questions
+      @sum_of_max_ror += Rubric.find(Assignment.find(@assignment.id).review_of_review_rubric_id).max_question_score
     end
   end
   

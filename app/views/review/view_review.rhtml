@@ -45,6 +45,8 @@ Submitted Files<br />
 <li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
 <% end %>
 </ul>
+
+<br/><label>URL to file submission (if available):</label><%=Participant.find(:first, :conditions =>["user_id = ? and assignment_id = ?",team_member.user_id,@assgt.id]).url%><br/>
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at %></strong>
 <%= render :partial => 'review/scores' %> 
 Additional Comment : <%=@review.additional_comment%><br/>
@@ -54,7 +56,6 @@ Additional Comment : <%=@review.additional_comment%><br/>
 %>		     
 Author feedback:<br/>
 <%=review_feedback_text%><br/>
-<% end
-			%>
+<% end%>
 <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
 

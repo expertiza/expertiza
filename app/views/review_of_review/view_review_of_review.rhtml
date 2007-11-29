@@ -40,7 +40,7 @@ Submitted Files<br />
 <% end %>
 <ul>
 <% for file in @files %>
-<li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
+<li><%= link_to File.basename(file), :controller=>'review', :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
 <% end %>
 </ul>
 <h3>Review</h3>

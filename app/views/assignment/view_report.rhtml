@@ -18,6 +18,30 @@
 			end
 		end
 	end
+	review_mappings_for_student = ReviewMapping.find(:all,:conditions => ["reviewer_id = ?", participant.user_id])
+	ror_count =0
+	ror_final = 0
+	for review_mapping_for_student in review_mappings_for_student	
+		ror = 0
+		for review in review_mapping_for_student.reviews
+			review_of_review_mapping = ReviewOfReviewMapping.find(:first,:conditions => ["review_id = ?", review.id])
+			if review_of_review_mapping
+				ror_count += 1
+				for review_of_review in review_of_review_mapping.review_of_reviews
+					ror_total = 0
+					question_count = 0
+					for review_of_review_score in review_of_review.review_of_review_scores
+					       ror_total += review_of_review_score.score 
+						   question_count += 1
+					end
+						ror_total = ror_total*100/@sum_of_max.to_f
+					end
+				end
+			end
+			ror +=ror_total.to_f
+		end
+		ror_final +=ror
+	end
 	review_no = 1
 	grade = 0
     _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s%>
@@ -26,21 +50,7 @@
 	<%if review_mapping
 	
 	for review_map in review_mapping
-	  	ror_count =0
-		ror_final = 0
 		for review in review_map.reviews
-			
-			review_of_review_mapping = ReviewOfReviewMapping.find(:first,:conditions => ["review_id = ?", review.id])
-			if review_of_review_mapping
-				for review_of_review in review_of_review_mapping.review_of_reviews
-					ror_total = 0
-					ror_count += 1
-					for review_of_review_score in review_of_review.review_of_review_scores
-				        ror_total += review_of_review_score.score 
-					end
-				end
-			end
-			ror_final +=ror_total.to_f
             total = 0
 	        for review_score in review.review_scores
 		        total += review_score.score 

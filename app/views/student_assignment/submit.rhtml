@@ -167,9 +167,11 @@ Submit your work for the assignment titled: <%= @student.assignment.name %><br/>
 </table>
 <% end %>		
 </form>
-<br><br><br><br>
+<br><br>
 <%end%>
-Weblinks if added already:<br/>
+<%if @links.size>0%>
+<h3>Weblinks:</h3>
+<%end%>
 <%for link in @links%>
 <a href="../../../<%=link.link%>" target="new"><%=link.link%></a><br/>
 <%end%>

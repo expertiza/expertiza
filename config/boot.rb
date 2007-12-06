@@ -25,7 +25,7 @@ unless defined?(Rails::Initializer)
       rails_gem = Gem.cache.search('rails', "=#{version}").first
 
       if rails_gem
-        require_gem "rails", "=#{version}"
+        gem "rails", "=#{version}"
         require rails_gem.full_gem_path + '/lib/initializer'
       else
         STDERR.puts %(Cannot find gem for Rails =#{version}:
@@ -35,7 +35,7 @@ unless defined?(Rails::Initializer)
         exit 1
       end
     else
-      require_gem "rails"
+      gem "rails"
       require 'initializer'
     end
   end

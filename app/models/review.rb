@@ -10,7 +10,7 @@ class Review < ActiveRecord::Base
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
     @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Rubric.find(@assgt.review_rubric_id)
+    @rubric = Questionnaire.find(@assgt.review_rubric_id)
     @control_folder = control_folder
     
     if @assgt.team_assignment 

@@ -1,18 +1,18 @@
-class RubricController < ApplicationController
+class QuestionnaireController < ApplicationController
   
   before_filter :authorize
   
   def list
-    set_up_display_options("RUBRIC")
-    @rubrics = super(Rubric)
+    set_up_display_options("QUESTIONNAIRE")
+    @rubrics = super(Questionnaire)
   end
   ## There needs to be an option for administrators to list all rubrics (public & private)
   
   def copy_rubric
-    @rubric = get(Rubric, params[:id])
+    @rubric = get(Questionnaire, params[:id])
     
     if params['save']
-      @rubric = Rubric.new
+      @rubric = Questionnaire.new
       # Take attributes from form filled in by user
       @rubric.update_attributes(params[:rubric])
       @rubric.instructor_id = session[:user].id
@@ -26,7 +26,7 @@ class RubricController < ApplicationController
   end
   
   def delete_rubric
-    @rubric = get(Rubric, params[:id])
+    @rubric = get(Questionnaire, params[:id])
     
     if @rubric == nil
       redirect_to :action => 'list' 
@@ -41,7 +41,7 @@ class RubricController < ApplicationController
   end
   
   def edit_rubric
-    @rubric = get(Rubric, params[:id])
+    @rubric = get(Questionnaire, params[:id])
     redirect_to :action => 'list' if @rubric == nil
    
     if params['save']
@@ -70,17 +70,17 @@ class RubricController < ApplicationController
   end
 
   def new_rubric
-    @rubric = Rubric.new
-    @rubric.min_question_score = Rubric::DEFAULT_MIN_QUESTION_SCORE
-    @rubric.max_question_score = Rubric::DEFAULT_MAX_QUESTION_SCORE
+    @rubric = Questionnaire.new
+    @rubric.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
+    @rubric.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE
   end
 
   def create_rubric
     if params[:rubric][:id] != nil and params[:rubric][:id].to_i > 0
       # Rubric already exists in the database
-      @rubric = get(Rubric, params[:id])
+      @rubric = get(Questionnaire, params[:id])
     end
-    @rubric = Rubric.new if @rubric == nil
+    @rubric = Questionnaire.new if @rubric == nil
     @rubric.update_attributes(params[:rubric])
    
     # Don't save until Save button is pressed
@@ -90,7 +90,7 @@ class RubricController < ApplicationController
   end
   
   def edit_advice
-    @rubric = get(Rubric, params[:id])
+    @rubric = get(Questionnaire, params[:id])
     
     for question in @rubric.questions
       if question.true_false
@@ -107,7 +107,7 @@ class RubricController < ApplicationController
         rubric_changed = RubricHelper::adjust_advice_size(@rubric, question)
       end
     end
-    @rubric = get(Rubric, params[:id])
+    @rubric = get(Questionnaire, params[:id])
   end
   
   def save_advice
@@ -140,7 +140,7 @@ class RubricController < ApplicationController
   def copy_questions(old_id, new_id)
     # Creates a new copy of each question belonging to the copied rubric.
     # Each new question will belong to the newly created rubri
-    questions = Question.find(:all, :conditions => ["rubric_id = ?", old_id])
+    questions = Question.find(:all, :conditions => ["questionnaire_id = ?", old_id])
     
     for question in questions
       q = Question.new(question.attributes)

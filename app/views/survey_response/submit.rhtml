@@ -2,6 +2,7 @@
 <% if @surveys.length != 1 -%>
 	<p>Other surveys for this assignment: </p>
 	<%= form_tag(:action => 'create') %>
+			<p class="inline">&nbsp;&nbsp;&nbsp;</p>
 			<select name="survey_id">
 				<% for survey in @surveys %>
 					<% if @survey.id != survey.id %>

@@ -1,11 +1,11 @@
 
 class SuperAdministrator < User
   
-  RUBRIC = [["My instructors' rubrics",'list_instructors'],
-            ["My admins' rubrics",'list_admins'],
-            ['My rubrics','list_mine'],
-            ['All public rubrics','list_all'],
-            ['All private rubrics','list_all_private']]
+  QUESTIONNAIRE = [["My instructors' questionnaires",'list_instructors'],
+            ["My admins' questionnaires",'list_admins'],
+            ['My questionnaires','list_mine'],
+            ['All public questionnaires','list_all'],
+            ['All private questionnaires','list_all_private']]
  
   ASSIGNMENT = [["My instructors' assignments",'list_instructors'],
                 ["My admins' assignments",'list_admins'],

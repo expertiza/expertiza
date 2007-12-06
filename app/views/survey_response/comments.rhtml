@@ -1,19 +1,35 @@
-<h1>Comments</h1>
-<table class="boldTable">
-	<tr><td>Question:</td> <td><%= @question.txt %></td></tr>
-<tr><td>Survey:</td> <td><%= @survey.name %></td></tr>
-<tr><td>Assignment:</td> <td><%= @assignment.name %></td></tr>
+<h1 class="noBottom">Comments for:</h1>
+<table class="boldCenterTable">
+	<tr>
+		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+		<td>Question:</td>
+		<td><%= @question.txt %></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>Survey:</td>
+		<td><%= @survey.name %></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>Assignment:&nbsp;</td>
+		<td><%= @assignment.name %></td>
+	</tr>
 </table>
 <br />
+<% if @responses.length > 0 %>
 <table>
 <% for response in @responses %>
-	<% if response.comments != "" %>
+	<% if response.comments != "" -%>
 		<tr><td>Score:</td> <td><%= response.score %></td></tr>
 		<tr><td>Email:</td> <td><%= response.email %></td></tr>
-		<tr><td>Comment:</td> <td><%= response.comments %></td></tr>
+		<tr><td>Comment:&nbsp;</td> <td><%= response.comments %></td></tr>
 		<tr><td>&nbsp;</td></tr>
-	<% end %>
+	<% end -%>
 <% end %>
 </table>
+<% else %>
+	<p>No comments exist for this survey.</p>
+<% end %>
 <br />
 <%= link_to 'Back', :action => 'view_responses', :id => params[:assignment_id] %>

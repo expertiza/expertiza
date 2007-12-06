@@ -7,7 +7,7 @@ class AssignmentController < ApplicationController
   @ok_dl="3" # a value of "OK" for whether an action is permitted prior to a deadline
   def new
     @assignment = Assignment.new
-    @rubric = Rubric.find_all
+    @rubric = Questionnaire.find_all
     @wiki_types = WikiType.find_all
   end
   def add_team_member
@@ -188,11 +188,11 @@ class AssignmentController < ApplicationController
     end
     @sum_of_max = 0
     @sum_of_max_ror = 0
-    for question in Rubric.find(Assignment.find(@assignment.id).review_rubric_id).questions
-      @sum_of_max += Rubric.find(Assignment.find(@assignment.id).review_rubric_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_rubric_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_rubric_id).max_question_score
     end
-    for question in Rubric.find(Assignment.find(@assignment.id).review_of_review_rubric_id).questions
-      @sum_of_max_ror += Rubric.find(Assignment.find(@assignment.id).review_of_review_rubric_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_rubric_id).questions
+      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_rubric_id).max_question_score
     end
   end
   
@@ -215,9 +215,9 @@ class AssignmentController < ApplicationController
     @surveys = Array.new
     
     if params['subset'] == "mine"
-      @surveys = Rubric.find(:all, :conditions => ["type_id = 2 and instructor_id = ?", session[:user].id])
+      @surveys = Questionnaire.find(:all, :conditions => ["type_id = 2 and instructor_id = ?", session[:user].id])
     elsif params['subset'] == "public"
-      @surveys = Rubric.find(:all, :conditions => ["type_id = 2 and private = 0"])
+      @surveys = Questionnaire.find(:all, :conditions => ["type_id = 2 and private = 0"])
     else
       @surveys = @assigned_surveys
     end
@@ -225,7 +225,16 @@ class AssignmentController < ApplicationController
     if params['update']
       if params[:surveys]
         @checked = params[:surveys]
-        for survey in @surveys
+        
+        if params['submit_subset'] == "mine"
+          @submit_surveys = Questionnaire.find(:all, :conditions => ["type_id = 2 and instructor_id = ?", session[:user].id])
+        elsif params['submit_subset'] == "public"
+          @submit_surveys = Questionnaire.find(:all, :conditions => ["type_id = 2 and private = 0"])
+        else
+          @submit_surveys = @assigned_surveys
+        end
+        
+        for survey in @submit_surveys
           unless @checked.include? survey.id
             AssignmentsQuestionnaires.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
             @assigned_surveys.delete(survey)
@@ -233,7 +242,7 @@ class AssignmentController < ApplicationController
         end 
         
         for checked_survey in @checked
-          @current = Rubric.find(checked_survey)
+          @current = Questionnaire.find(checked_survey)
           unless @assigned_surveys.include? @current
             @new = AssignmentsQuestionnaires.new(:questionnaire_id => checked_survey, :assignment_id => @assignment.id)
             @new.save
@@ -241,12 +250,15 @@ class AssignmentController < ApplicationController
           end
         end
       else
-        for survey in @surveys
+        for survey in @submit_surveys
           AssignmentsQuestionnaires.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
+          @assigned_surveys.delete(survey)
           @surveys.delete(survey)
         end 
       end
     end
+    
+    @surveys.sort!{|a,b| a.name <=> b.name}
 
   end
   

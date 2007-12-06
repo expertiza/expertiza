@@ -300,10 +300,10 @@ ActiveRecord::Schema.define(:version => 28) do
     t.column "txt", :text
     t.column "true_false", :boolean
     t.column "weight", :integer
-    t.column "rubric_id", :integer
+    t.column "questionnaire_id", :integer
   end
 
-  add_index "questions", ["rubric_id"], :name => "fk_question_rubrics"
+  add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
   create_table "questionnaire_types", :force => true do |t|
     t.column "name", :string
@@ -311,6 +311,7 @@ ActiveRecord::Schema.define(:version => 28) do
   
   QuestionnaireType.create(:id => 1, :name => "Rubric")
   QuestionnaireType.create(:id => 2, :name => "Survey")
+  QuestionnaireType.create(:id => 3, :name => "Global Survey")
 
   create_table "resubmission_times", :force => true do |t|
     t.column "participant_id", :integer

@@ -8,12 +8,12 @@
 <% for question in @questions %>
   <%= question.txt %><br />        
   <textarea name="comments[<%= question.id %>]" cols="50" rows="3"></textarea>
+  <% @box_values = [] -%>
+  <% @box_values << nil %>
   <% if question.true_false? -%>
-  	<% @box_values = [] -%>
     <% @box_values << @min -%>
 	<% @box_values << @max -%>
   <% else -%>
-  	<% @box_values = [] -%>
   	<% for j in @min..@max -%>
     	<% @box_values << j -%>
     <% end -%> 

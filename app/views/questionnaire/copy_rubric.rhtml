@@ -1,0 +1,10 @@
+<% @q_type=QuestionnaireType.find(Questionnaire.find(params[:id]).type_id).name %>
+
+<h1>Copy an Existing <%= @q_type %></h1>
+
+<%= start_form_tag :action => 'copy_rubric' %>
+  <%= render :partial => 'questionnaire' %>
+  <%= submit_tag "Save "+@q_type, :name=>"save" %>
+<%= end_form_tag %>
+
+<%= link_to 'Back', :action => 'list' %>

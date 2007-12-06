@@ -18,7 +18,7 @@ class SurveyResponseController < ApplicationController
       end
     
       @assignment = Assignment.find(params[:assignment_id])
-      @assigned_surveys = SurveyHelper::get_all_available_surveys(@assignment.id)
+      @assigned_surveys = SurveyHelper::get_all_available_surveys(@assignment.id, session[:user].role_id)
       @survey = Questionnaire.find(params[:survey_id])
     
       unless @assigned_surveys.include? @survey
@@ -54,16 +54,12 @@ class SurveyResponseController < ApplicationController
       @new.save
     end
     
-    @surveys = SurveyHelper::get_all_available_surveys(@assignment_id)
+    @surveys = SurveyHelper::get_all_available_surveys(@assignment_id, session[:user].role_id)
   end
   
   def view_responses
     @assignment = Assignment.find(params[:id])
-    if session[:user].role_id == 3 || session[:user].role_id == 4 
-      @surveys = SurveyHelper::get_all_available_surveys(params[:id])
-    else
-      @surveys = SurveyHelper::get_assigned_surveys(params[:id])
-    end
+    @surveys = SurveyHelper::get_all_available_surveys(params[:id], session[:user].role_id)
     @responses = Array.new
     @empty = true
     for survey in @surveys

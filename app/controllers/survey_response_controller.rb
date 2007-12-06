@@ -19,7 +19,7 @@ class SurveyResponseController < ApplicationController
     
       @assignment = Assignment.find(params[:assignment_id])
       @assigned_surveys = SurveyHelper::get_assigned_surveys(@assignment.id)
-      @survey = Rubric.find(params[:survey_id])
+      @survey = Questionnaire.find(params[:survey_id])
     
       unless @assigned_surveys.include? @survey
         AuthController.logout(session)
@@ -38,7 +38,7 @@ class SurveyResponseController < ApplicationController
   def submit
     @submitted = true;
     @survey_id = params[:survey_id]
-    @survey = Rubric.find(@survey_id)
+    @survey = Questionnaire.find(@survey_id)
     @questions = @survey.questions
     @scores = params[:score]
     @comments = params[:comments]
@@ -65,35 +65,45 @@ class SurveyResponseController < ApplicationController
     for survey in @surveys
       min = survey.min_question_score
       max = survey.max_question_score
-      this_response = Hash.new
-      this_response[:name] = survey.name
-      this_response[:id] = survey.id
-      this_response[:questions] = Array.new
+      this_response_survey = Hash.new
+      this_response_survey[:name] = survey.name
+      this_response_survey[:id] = survey.id
+      this_response_survey[:questions] = Array.new
+      this_response_survey[:empty] = true
+      surveylist = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ?", params[:id], survey.id]) 
+      if surveylist.length > 0
+        @empty = false
+        this_response_survey[:empty] = false 
+      end
       for question in survey.questions
-        nums = Hash.new
-        nums[:name] = question.txt
-        nums[:id] = question.id
-        nums[:scores] = Array.new
+        this_response_question = Hash.new
+        this_response_question[:name] = question.txt
+        this_response_question[:id] = question.id
+        this_response_question[:scores] = Array.new
+        this_response_question[:empty] = true
         for i in min..max
-          list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i]);
+          list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
           this_score = Hash.new
           this_score[:value] = i
           this_score[:length] = list.length
+          this_score[:empty] = true
           if list.length > 0 
             @empty = false
+            this_response_survey[:empty] = false
+            this_response_question[:empty] = false
           end
-          nums[:scores] << this_score
+          this_response_question[:scores] << this_score
         end
-        this_response[:questions] << nums
+        this_response_survey[:questions] << this_response_question
       end
-      @responses << this_response
+      @responses << this_response_survey
     end
   end
   
   def comments
-    @responses = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]], :order => "score");
+    @responses = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and comments != ?", params[:assignment_id], params[:survey_id], params[:question_id], ""], :order => "score");
     @question = Question.find(params[:question_id])
-    @survey = Rubric.find(params[:survey_id])
+    @survey = Questionnaire.find(params[:survey_id])
     @assignment = Assignment.find(params[:assignment_id])
   end
 end

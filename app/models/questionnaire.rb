@@ -1,10 +1,11 @@
-class Rubric < ActiveRecord::Base
+class Questionnaire < ActiveRecord::Base
     # for doc on why we do it this way, 
     # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
     has_many :assignments, :foreign_key => "review_rubric_id"
     has_many :questions
     belongs_to :questionnaire_type, :foreign_key => "type_id"
-    has_many :assignment_questionnairess
+     has_many :assignments_questionnairess
+
     
     validates_presence_of :name
     validates_numericality_of :max_question_score
@@ -51,9 +52,9 @@ class Rubric < ActiveRecord::Base
         errors.add(:min_question_score, "The minimum question score must be less than the maximum")
       end
       
-      results = Rubric.find(:all, 
+      results = Questionnaire.find(:all, 
                             :conditions => ["id <> ? and name = ? and instructor_id = ?", 
                             id, name, instructor_id])
-      errors.add(:name, "Rubric names must be unique.") if results != nil and results.length > 0
+      errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
     end
 end

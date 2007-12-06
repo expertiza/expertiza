@@ -1,5 +1,5 @@
 class Question < ActiveRecord::Base
-    belongs_to :rubric
+    belongs_to :questionnaire
     belongs_to :review_score  # each review_score pertains to a particular question
     belongs_to :review_of_review_score  # ditto
     has_many :question_advices # for each question, there is separate advice about each possible score

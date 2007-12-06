@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class RubricControllerTest < ActionController::IntegrationTest
   def setup
-    @controller = RubricController.new
+    @controller = QuestionnaireController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
   end
@@ -22,21 +22,21 @@ class RubricControllerTest < ActionController::IntegrationTest
   
   def test_list
     log_instructor_in
-    get "/rubric/list"
+    get "/questionnaire/list"
     assert_response :success
   end
   
   def test_create_empty_rubric
     log_instructor_in
-    size = Rubric.find(:all).length
-    post "/rubric/create_rubric", "save"
+    size = Questionnaire.find(:all).length
+    post "/questionnaire/create_rubric", "save"
     assert_response :error
   end
   
   def test_create_rubric
     log_instructor_in
-    size = Rubric.find(:all).length + 1
-    post "/rubric/create_rubric",
+    size = Questionnaire.find(:all).length + 1
+    post "/questionnaire/create_rubric",
          :save => "save",
          :rubric => {:id => "4",
                      :name => "rubric test", 
@@ -46,9 +46,9 @@ class RubricControllerTest < ActionController::IntegrationTest
     assert_response :redirect
     follow_redirect!
     assert_response :success
-    assert size, Rubric.find(:all).length
+    assert size, Questionnaire.find(:all).length
     
-    new_rubric = Rubric.find_by_name("rubric test")
+    new_rubric = Questionnaire.find_by_name("rubric test")
     assert_equal new_rubric.name, "rubric test"
     assert_equal new_rubric.min_question_score, 1
     assert_equal new_rubric.max_question_score, 5
@@ -58,22 +58,22 @@ class RubricControllerTest < ActionController::IntegrationTest
   def test_delete
     # Delete a rubric with no assignments associated with it.
     log_instructor_in
-    size = Rubric.find(:all).length
-    get "/rubric/delete_rubric/1"
+    size = Questionnaire.find(:all).length
+    get "/questionnaire/delete_rubric/1"
     assert_response :redirect # Rubric 1 has no assignments
     follow_redirect!
     assert_response :success
-    assert size, Rubric.find(:all).length - 1
+    assert size, Questionnaire.find(:all).length - 1
   end
   
   def test_delete_unknown_rubric
     # User is redirected to the list if the rubric id is bogus
     log_instructor_in
-    size = Rubric.find(:all).length
+    size = Questionnaire.find(:all).length
     get "/rubric/delete_rubric/9834343"
     assert_response :redirect 
     follow_redirect!
     assert_response :success
-    assert size, Rubric.find(:all).length
+    assert size, Questionnaire.find(:all).length
   end
 end

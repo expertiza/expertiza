@@ -196,8 +196,11 @@ td.graphFill {
 	background: green;
 }
 
-p.noBottom{
+.noBottom{
 	margin-bottom: 0;
+}
+
+p.noBottom{
 	margin-left: 1em;
 }
 
@@ -219,4 +222,12 @@ td.countPrint {
 
 table.boldTable td{
 	font-weight: bold;
+}
+
+p.inline {
+	display:inline;
+}
+
+.noTop {
+	margin-top: 0;
 }

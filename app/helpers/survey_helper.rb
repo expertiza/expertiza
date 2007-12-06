@@ -5,8 +5,8 @@ module SurveyHelper
       joiners = AssignmentsQuestionnaires.find(:all, :conditions => ["assignment_id = ?", assignment_id])
       assigned_surveys = []
       for joiner in joiners
-        assigned_surveys << Rubric.find(joiner.questionnaire_id)
+        assigned_surveys << Questionnaire.find(joiner.questionnaire_id)
       end
-      assigned_surveys
+      assigned_surveys.sort!{|a,b| a.name <=> b.name} 
   end
 end

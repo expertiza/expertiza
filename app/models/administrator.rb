@@ -1,7 +1,7 @@
 
 class Administrator < User
   
-  RUBRIC = [["My instructors' questionnaires",'list_instructors'],
+  QUESTIONNAIRE = [["My instructors' questionnaires",'list_instructors'],
             ['My questionnaires','list_mine'],
             ['All public questionnaires','list_all']]
   ASSIGNMENT = [["My instructors' assignments",'list_instructors'],

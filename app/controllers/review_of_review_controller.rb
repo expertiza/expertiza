@@ -54,7 +54,7 @@ class ReviewOfReviewController < ApplicationController
       @assgt = Assignment.find(@assignment_id)    
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @assgt.id])
       @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-      @rubric = Rubric.find(@assgt.review_rubric_id)
+      @rubric = Questionnaire.find(@assgt.review_rubric_id)
       
       
       puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@"
@@ -87,7 +87,7 @@ class ReviewOfReviewController < ApplicationController
       
       @review_of_review = ReviewOfReview.new
       @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_of_review_rubric_id]) 
-      @rubric = Rubric.find(@assgt.review_of_review_rubric_id)
+      @rubric = Questionnaire.find(@assgt.review_of_review_rubric_id)
       @max = @rubric.max_question_score
       @min = @rubric.min_question_score
       
@@ -138,7 +138,7 @@ class ReviewOfReviewController < ApplicationController
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
     @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Rubric.find(@assgt.review_rubric_id)
+    @rubric = Questionnaire.find(@assgt.review_rubric_id)
     
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
@@ -174,7 +174,7 @@ class ReviewOfReviewController < ApplicationController
     @ror_assgt = Assignment.find(@ror_mapping.assignment_id)    
     @ror_author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @ror_mapping.author_id, @ror_assgt.id])
     @ror_questions = Question.find(:all,:conditions => ["rubric_id = ?", @ror_assgt.review_of_review_rubric_id]) 
-    @ror_rubric = Rubric.find(@ror_assgt.review_of_review_rubric_id)
+    @ror_rubric = Questionnaire.find(@ror_assgt.review_of_review_rubric_id)
     @ror_max = @ror_rubric.max_question_score
     @ror_min = @ror_rubric.min_question_score 
     

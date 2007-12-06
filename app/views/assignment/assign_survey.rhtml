@@ -39,6 +39,8 @@
 		</table>
 		<br />
 		<%= submit_tag "Update", :name=>"update" %>
+		<input type="hidden" name="submit_subset" value="<%= params[:subset] %>" />
+		<input type="hidden" name="subset" value="assigned" />
 	<%= end_form_tag %>
 <br />
 <% else -%>

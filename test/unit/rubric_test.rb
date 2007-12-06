@@ -5,13 +5,13 @@ class RubricTest < Test::Unit::TestCase
 
   def setup
     # Database was initialized with (at least) 3 rubrics.
-    @rubric1 = Rubric.find(1)
-    @rubric2 = Rubric.find(2)
-    @rubric3 = Rubric.find(3)
+    @rubric1 = Questionnaire.find(1)
+    @rubric2 = Questionnaire.find(2)
+    @rubric3 = Questionnaire.find(3)
   end
   
   def test_create
-    assert_kind_of Rubric, @rubric1
+    assert_kind_of Questionnaire, @rubric1
     assert_equal "rubric1", @rubric1.name
     
     assert_equal 1, @rubric1.min_question_score

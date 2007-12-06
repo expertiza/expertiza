@@ -5,10 +5,18 @@
 	<p>No survey responses exist for this assignment.</p>
 <% else %>
 <% for survey in @responses -%>
-<h3><%= survey[:name] %></h3>
+<h3>Survey: <%= survey[:name] %></h3>
+<% if survey[:empty] -%>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;No scores exist for this survey.</p>
+<br />
+<% else %>
 	<% for question in survey[:questions] -%>
 	<p class="noBottom"><b><%= question[:name] %></b></p>
-	<% count = 0 %>
+	<% count = 0 -%>
+	<% if question[:empty] -%>
+		<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		No scores exist for this question.</p>
+	<% else %>	
 	<table class="graph">
 		<% for score in question[:scores] -%>
 			<tr class="graphRow">
@@ -21,20 +29,27 @@
 			</tr>			
 		<% end %>
 	</table>
-	<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
 	<p class="noBottom">Total Responses: <%= count %></p>
 	<table class="graph">
 		<tr>
+			<% count=1 if count == 0 %>
 			<% for score in question[:scores] -%>
 				<td>
 					<b><%=score[:value] %></b>:
-					<%=score[:length]*100/count %>%
+					<%= score[:length]*100/count %>%
 					&nbsp;
 				</td>
 			<% end %>
 		</tr>
 	</table>
 	<% end %>
+	<p class="noTop">
+		&nbsp;&nbsp;
+	<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
+	</p>
+	<p>&nbsp;</p>
+	<% end %>
+<% end %>	
 <% end %>		
 <% end %>
 <br />

@@ -72,8 +72,8 @@ class StudentAssignmentController < ApplicationController
     
     #the code below finds the sum of the maximum scores of all questions in the rubric
     @sum_of_max = 0
-    for question in Rubric.find(Assignment.find(@assignment_id).review_rubric_id).questions
-      @sum_of_max += Rubric.find(Assignment.find(@assignment_id).review_rubric_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment_id).review_rubric_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment_id).review_rubric_id).max_question_score
     end
     
     if @student.penalty_accumulated/@late_policy.penalty_period_in_minutes*@late_policy.penalty_per_unit < @late_policy.max_penalty
@@ -141,8 +141,8 @@ class StudentAssignmentController < ApplicationController
     end
     #the code below finds the sum of the maximum scores of all questions in the rubric
     @sum_of_max = 0
-    for question in Rubric.find(Assignment.find(@assignment_id).review_rubric_id).questions
-      @sum_of_max += Rubric.find(Assignment.find(@assignment_id).review_rubric_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment_id).review_rubric_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment_id).review_rubric_id).max_question_score
     end
   end
   

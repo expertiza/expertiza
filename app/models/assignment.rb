@@ -130,7 +130,7 @@ class Assignment < ActiveRecord::Base
               :obj_name => self.name,
               :type => "submission",
               :location => getReviewNumber(mapping).to_s,
-              :user_name => ApplicationHelper::get_user_first_name(user),
+              :first_name => ApplicationHelper::get_user_first_name(user),
               :partial_name => "update"
              }
             }

@@ -167,5 +167,3 @@ class ParticipantsController < ApplicationController
     
 end
 
-#TODO: label fields in views
-

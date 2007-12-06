@@ -47,7 +47,7 @@ class Participant < ActiveRecord::Base
              :subject => "You have been registered as a participant in Assignment #{assignment.name}",
              :body => {  
               :home_page => home_page,  
-              :user_name => ApplicationHelper::get_user_first_name(user),
+              :first_name => ApplicationHelper::get_user_first_name(user),
               :name =>user.name,
               :password =>pw,
               :partial_name => "register"

@@ -37,6 +37,10 @@ def self.yesorno(elt)
   end
 
   def create
+    check = User.find_by_name(params[:user][:name])
+    if check != nil
+      params[:user][:name] = params[:user][:email]
+    end
     @user = User.new(params[:user])
     @user.parent_id = (session[:user]).id
 

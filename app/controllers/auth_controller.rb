@@ -10,7 +10,18 @@ class AuthController < ApplicationController
     if request.get?
       AuthController.clear_session(session)
     else
-      user = User.find_by_name(params[:login][:name])
+      entry = params[:login][:name]
+      user = User.find_by_email(params[:login][:name])
+      if user == nil
+         items = entry.split("@")
+         shortName = items[0]
+         userList = User.find(:all, {:conditions=> ["name =?",shortName]})
+         logger.info "#{userList}"
+         logger.info "#{userList.length}"
+         if userList != nil && userList.length == 1
+            user = userList.first            
+         end
+      end
       
       if user and user.check_password(params[:login][:password])
         logger.info "User #{params[:login][:name]} successfully logged in"

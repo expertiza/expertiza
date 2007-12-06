@@ -15,8 +15,11 @@ module SurveyHelper
       global_surveys.sort!{|a,b| a.name <=> b.name} 
    end
 
-  def self.get_all_available_surveys(assignment_id)
-    surveys = SurveyHelper::get_assigned_surveys(assignment_id) + SurveyHelper::get_global_surveys
+  def self.get_all_available_surveys(assignment_id, role)
+    surveys = SurveyHelper::get_assigned_surveys(assignment_id) 
+    unless role == 2
+      surveys += SurveyHelper::get_global_surveys
+    end
     surveys.sort!{|a,b| a.name <=> b.name}
   end
 end

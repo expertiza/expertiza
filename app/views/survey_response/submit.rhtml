@@ -13,4 +13,6 @@
 			<input type="hidden" name="assignment_id" value="<%= @assignment_id %>" />
 			<%= submit_tag "Go", :name=>"go" %>
 	<%= end_form_tag %>
+<% else %>
+<p>Please log back in to continue.</p>	
 <% end -%>

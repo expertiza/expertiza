@@ -27,7 +27,7 @@
 			<p class="inline">&nbsp;&nbsp;</p>
 			<select name="survey_id">
 				<% for survey in @assigned_surveys %>
-					<option value="<%= survey.id %>"><%= survey.name %></option>
+					<option value="<%= survey.id %>"><%= survey.name %>&nbsp;</option>
 				<% end %>
 			</select>
 			<input type="hidden" name="assignment_id" value="<%= @assignment_id %>" />

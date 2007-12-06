@@ -17,7 +17,7 @@ class StudentAssignmentController < ApplicationController
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
     @can_view_your_work, @can_view_others_work = find_viewing_permissions(@due_dates)
-    @assigned_surveys = SurveyHelper::get_assigned_surveys(@assignment_id)
+    @assigned_surveys = SurveyHelper::get_all_available_surveys(@assignment_id)
   end
   
   def eula_yes

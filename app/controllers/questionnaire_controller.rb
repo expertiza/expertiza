@@ -70,9 +70,16 @@ class QuestionnaireController < ApplicationController
   end
 
   def new_rubric
+    
+    if params[:type_id] && params[:type_id] == "3" && session[:user].role_id != 3 && session[:user].role_id != 4
+      redirect_to '/'
+      return
+    end
+    
     @rubric = Questionnaire.new
     @rubric.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
     @rubric.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE
+    
   end
 
   def create_rubric
@@ -149,13 +156,13 @@ class QuestionnaireController < ApplicationController
     end
   end
   
-  def save_new_questions(rubric_id)
+  def save_new_questions(questionnaire_id)
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
       for question_key in params[:new_question].keys
         q = Question.new(params[:new_question][question_key])
-        q.rubric_id = rubric_id
+        q.questionnaire_id = questionnaire_id
         q.save if !q.txt.strip.empty?
       end
     end
@@ -163,7 +170,7 @@ class QuestionnaireController < ApplicationController
   
   def delete_questions(rubric_id)
     # Deletes any questions that, as a result of the edit, are no longer in the rubric
-    questions = Question.find(:all, :conditions => "rubric_id = " + rubric_id.to_s)
+    questions = Question.find(:all, :conditions => "questionnaire_id = " + rubric_id.to_s)
     for question in questions
       should_delete = true
       for question_key in params[:question].keys
@@ -181,10 +188,10 @@ class QuestionnaireController < ApplicationController
     end
   end
   
-  def save_questions(rubric_id)
+  def save_questions(questionnaire_id)
     # Handles questions whose wording changed as a result of the edit
-    delete_questions rubric_id
-    save_new_questions rubric_id
+    delete_questions questionnaire_id
+    save_new_questions questionnaire_id
     
     if params[:question]
       for question_key in params[:question].keys

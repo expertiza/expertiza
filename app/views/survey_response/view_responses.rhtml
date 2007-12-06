@@ -1,3 +1,19 @@
+<script type="text/javascript">
+	function toggleVis(id) { 
+		var elem = document.getElementById(id);
+		if(elem.style.display == 'none'){
+			elem.style.display = '';
+			document.getElementById(id+"_show").style.display = 'none';
+			document.getElementById(id+"_hide").style.display = '';
+		} else {
+			elem.style.display = 'none';
+			document.getElementById(id+"_show").style.display = '';
+			document.getElementById(id+"_hide").style.display = 'none';
+		}
+	}
+</script>
+
+
 <h1>
 	Survey Responses for Assignment: <%= @assignment.name %>
 </h1>
@@ -5,7 +21,13 @@
 	<p>No survey responses exist for this assignment.</p>
 <% else %>
 <% for survey in @responses -%>
-<h3>Survey: <%= survey[:name] %></h3>
+<h3 class="inline">Survey: <%= survey[:name] %></h3>
+<a href="#<%= survey[:id] %>" onClick="toggleVis('<%= survey[:id] %>');">
+		<p class="inline" id="<%= survey[:id] %>_show">Show</p>
+		<p class="inline" id="<%= survey[:id] %>_hide" style="display: none">Hide</p>
+</a>
+<br />
+<div style="display: none" id="<%= survey[:id] %>">
 <% if survey[:empty] -%>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;No scores exist for this survey.</p>
 <br />
@@ -42,14 +64,15 @@
 			<% end %>
 		</tr>
 	</table>
-	<% end %>
+	<% end #end if question empty %>
 	<p class="noTop">
 		&nbsp;&nbsp;
 	<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
 	</p>
-	<p>&nbsp;</p>
-	<% end %>
-<% end %>	
+	<% end #end for question in survey%>
+<% end #end survey empty%>	
+</div>
+<br />
 <% end %>		
 <% end %>
 <br />

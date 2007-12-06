@@ -224,7 +224,7 @@ table.boldTable td{
 	font-weight: bold;
 }
 
-p.inline {
+.inline {
 	display:inline;
 }
 

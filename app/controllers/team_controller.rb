@@ -40,6 +40,7 @@ class TeamController < ApplicationController
   def create
     check = Team.find(:all, :conditions => ["name =? and assignment_id =?", params[:team][:name], session[:assignment_id]])        
     @team = Team.new(params[:team])
+    @team.assignment_id = session[:assignment_id]
     if (check.length == 0)      
       @team.save
       redirect_to :action => 'list'

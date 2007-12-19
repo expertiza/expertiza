@@ -196,6 +196,10 @@ td.graphFill {
 	background: green;
 }
 
+td.darkGraphFill {
+	background: #00FF00;
+}
+
 .noBottom{
 	margin-bottom: 0;
 }
@@ -209,7 +213,7 @@ td.graphEmpty {
 }
 
 table.graph {
-	margin-left: 2em;
+	margin: 0 auto;
 }
 
 th.graphScore {
@@ -230,4 +234,72 @@ table.boldTable td{
 
 .noTop {
 	margin-top: 0;
+}
+
+ul.floatleft {
+	float:left;
+}
+
+img.floatleft {
+	float:left;
+	clear:left;
+}
+
+p.responseDisplay {
+	clear: both;
+}
+
+span.separator {
+	margin: 0 2.5em;
+}
+
+div.survey_wrapper {
+	clear:both;
+}
+
+div.empty_question_wrapper, div.question_wrapper {
+	float: left;
+	padding: 0 .5em;
+}
+
+div.question_wrapper {
+	border: .1em solid #DADADA;
+	width: 450px;
+	height: 200px;
+	padding: auto;
+}
+
+p.clearBoth{
+	clear:both;
+}
+
+table.centered {
+	margin: 0 auto;
+}
+
+h1.restrictLength{
+	max-width: 92%;
+	margin-bottom: 0;
+}
+
+tr.center {
+	text-align: center;
+}	
+
+p.left_inline {
+	clear:both;
+	display:inline;
+}
+
+select.float_right {
+	float: right;
+}
+
+#student_survey_wrapper {
+	width: 32.5em;
+}
+
+textarea.clear_both{
+	clear:both;
+	margin-top: .5em;
 }

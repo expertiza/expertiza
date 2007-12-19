@@ -1,32 +1,59 @@
 class SurveyResponseController < ApplicationController
 
-  def create
-    unless session[:user]   #redirect to homepage if user not logged in
+  def begin_survey
+    unless session[:user] #redirect to homepage if user not logged in
       redirect_to '/'
       return
     end
     
-    begin
-      unless session[:assignment_id]   #if the anonymous session has not been tied to an assignment
-        @participants = Participant.find(:all, :conditions => ["user_id = ? and assignment_id = ?", session[:user].id, params[:assignment_id]])
-        if @participants.length == 0   #make sure the user is a participant of the assignment
-          AuthController.logout(session)  #otherwise kick them out for their tomfoolery!
-          redirect_to '/'
-          return
+    @participants = Participant.find(:all, :conditions => ["user_id = ? and assignment_id = ?", session[:user].id, params[:id]])
+    if @participants.length == 0   #make sure the user is a participant of the assignment
+      AuthController.logout(session)  #otherwise kick them out for their tomfoolery!
+      redirect_to '/'
+      return
+    end
+    AuthController.clear_user_info(session, params[:id]) #ties the session to an assignment
+  end
+
+  def create
+    unless session[:user] && session[:assignment_id]  #redirect to homepage if user not logged in or session not tied to assignment 
+      redirect_to '/'
+      return
+    end
+    
+    begin          
+      @assignment = Assignment.find(params[:id])
+      @assigned_surveys = SurveyHelper::get_all_available_surveys(@assignment.id, 1)
+      
+      if params[:submit]
+        @submit_survey = Questionnaire.find(params[:survey_id])
+        @submit_questions = @submit_survey.questions
+        @scores = params[:score]
+        @comments = params[:comments]
+        for question in @submit_questions
+          list = []
+          list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and email = ?", params[:id], params[:survey_id], question.id, params[:email]]) if params[:email]
+          if list.length > 0
+            @new = list[0] 
+          else 
+            @new = SurveyResponse.new
+          end
+          @new.survey_id = params[:survey_id]
+          @new.question_id = question.id
+          @new.assignment_id = params[:id]
+          @new.email = params[:email]
+          @new.score = @scores[question.id.to_s]
+          @new.comments = @comments[question.id.to_s]
+          @new.save
         end
-        AuthController.clear_user_info(session, params[:assignment_id])        
       end
-    
-      @assignment = Assignment.find(params[:assignment_id])
-      @assigned_surveys = SurveyHelper::get_all_available_surveys(@assignment.id, session[:user].role_id)
-      @survey = Questionnaire.find(params[:survey_id])
-    
-      unless @assigned_surveys.include? @survey
-        AuthController.logout(session)
-        redirect_to '/'
+      
+      if params[:count].to_i == @assigned_surveys.length
+        redirect_to(:action =>'submit')
         return
       end
-    
+      
+      @survey = @assigned_surveys[params[:count].to_i]
       @questions = @survey.questions
     rescue
       AuthController.logout(session)
@@ -36,25 +63,28 @@ class SurveyResponseController < ApplicationController
   end
 
   def submit
-    @submitted = true;
-    @survey_id = params[:survey_id]
-    @survey = Questionnaire.find(@survey_id)
-    @questions = @survey.questions
-    @scores = params[:score]
-    @comments = params[:comments]
-    @assignment_id = params[:assignment_id]
-    for question in @questions
-      @new = SurveyResponse.new
-      @new.survey_id = @survey_id
-      @new.question_id = question.id
-      @new.assignment_id = @assignment_id
-      @new.email = params[:email]
-      @new.score = @scores[question.id.to_s]
-      @new.comments = @comments[question.id.to_s]
-      @new.save
-    end
+ #   @submitted = true;
+ #   @survey_id = params[:survey_id]
+ #   @survey = Questionnaire.find(@survey_id)
+ #   @questions = @survey.questions
+ #   @scores = params[:score]
+ #   @comments = params[:comments]
+ #   @assignment_id = params[:id]
+ #   for question in @questions
+ #     if params[:email]
+ #       @new = SurveyResponse.find(:conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and email = ?", @assignment_id, @survey_id, question.id, params[:email]])
+ #     end 
+ #     @new ||= SurveyResponse.new
+ #     @new.survey_id = @survey_id
+ #     @new.question_id = question.id
+ #     @new.assignment_id = @assignment_id
+ #     @new.email = params[:email]
+ #     @new.score = @scores[question.id.to_s]
+ #     @new.comments = @comments[question.id.to_s]
+ #     @new.save
+ #   end
     
-    @surveys = SurveyHelper::get_all_available_surveys(@assignment_id, session[:user].role_id)
+ #   @surveys = SurveyHelper::get_all_available_surveys(@assignment_id, 1)
   end
   
   def view_responses
@@ -79,20 +109,28 @@ class SurveyResponseController < ApplicationController
         this_response_question = Hash.new
         this_response_question[:name] = question.txt
         this_response_question[:id] = question.id
-        this_response_question[:scores] = Array.new
-        this_response_question[:empty] = true
+        this_response_question[:labels] = Array.new
+        this_response_question[:values] = Array.new
+        this_response_question[:count] = 0
         for i in min..max
-          list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
-          this_score = Hash.new
-          this_score[:value] = i
-          this_score[:length] = list.length
-          this_score[:empty] = true
-          if list.length > 0 
-            @empty = false
-            this_response_survey[:empty] = false
-            this_response_question[:empty] = false
+          if !question.true_false? || i == min || i == max
+            list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
+            if question.true_false?
+              if i == min
+                this_response_question[:labels] << "False"
+              else
+                this_response_question[:labels] << "True"
+              end
+            else
+              this_response_question[:labels] << i
+            end
+            this_response_question[:values] << list.length
+            this_response_question[:count] += list.length
+            if list.length > 0 
+              @empty = false
+              this_response_survey[:empty] = false
+            end
           end
-          this_response_question[:scores] << this_score
         end
         this_response_survey[:questions] << this_response_question
       end

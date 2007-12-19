@@ -21,59 +21,45 @@
 	<p>No survey responses exist for this assignment.</p>
 <% else %>
 <% for survey in @responses -%>
+<div class="survey_wrapper" id="<%= survey[:id] %>">
 <h3 class="inline">Survey: <%= survey[:name] %></h3>
-<a href="#<%= survey[:id] %>" onClick="toggleVis('<%= survey[:id] %>');">
+<a href="#<%= survey[:id] %>" onClick="toggleVis('<%= survey[:id] %>_inner');">
 		<p class="inline" id="<%= survey[:id] %>_show">Show</p>
 		<p class="inline" id="<%= survey[:id] %>_hide" style="display: none">Hide</p>
 </a>
 <br />
-<div style="display: none" id="<%= survey[:id] %>">
+<div style="display: none" id="<%= survey[:id] %>_inner" >
 <% if survey[:empty] -%>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;No scores exist for this survey.</p>
-<br />
 <% else %>
 	<% for question in survey[:questions] -%>
-	<p class="noBottom"><b><%= question[:name] %></b></p>
-	<% count = 0 -%>
-	<% if question[:empty] -%>
+	<% if question[:count] == 0 -%>
+		<div class="empty_question_wrapper">	
+		<p class="noBottom"><b><%= question[:name] %></b></p>
 		<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		No scores exist for this question.</p>
-	<% else %>	
-	<table class="graph">
-		<% for score in question[:scores] -%>
-			<tr class="graphRow">
-				<th class="graphScore"><%=score[:value]%>&nbsp;</th>
-			<% for i in 1..score[:length]%>
-				<td class="graphFill">&nbsp;</td>
-			<% end %>
-			<% count += score[:length] %>
-				<td class="countPrint" colspan="3">&nbsp;<%=score[:length]%></td>
-			</tr>			
-		<% end %>
-	</table>
-	<p class="noBottom">Total Responses: <%= count %></p>
-	<table class="graph">
-		<tr>
-			<% count=1 if count == 0 %>
-			<% for score in question[:scores] -%>
-				<td>
-					<b><%=score[:value] %></b>:
-					<%= score[:length]*100/count %>%
-					&nbsp;
-				</td>
-			<% end %>
-		</tr>
-	</table>
+		<p> <!-- open p tag link to comments -->
+	<% else %>
+	<div class="question_wrapper">
+	<p class="noBottom"><b><%= question[:name] %></b></p>
+	<img class="floatleft" src="<%= ChartsHelper::get_pie_chart_url(question[:labels],question[:values]) %>" />
+	<ul class="floatleft">
+		<% i = 0 %>
+		<% for label in question[:labels] -%>
+			<li><b><%= label %></b>: <%= question[:values][i]*100/question[:count] %>% &nbsp;</li>
+			<% i += 1 -%>
+		<% end -%>
+	</ul>
+	<p class="responseDisplay">&nbsp;&nbsp;Total Responses: <%= question[:count] %> <span class="separator">&nbsp;</span>
 	<% end #end if question empty %>
-	<p class="noTop">
-		&nbsp;&nbsp;
-	<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
+	&nbsp;&nbsp;<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
 	</p>
+	</div>
 	<% end #end for question in survey%>
 <% end #end survey empty%>	
+</div>
 </div>
 <br />
 <% end %>		
 <% end %>
-<br />
-<%= link_to 'Back', :controller => 'assignment',:action => 'list' %>
+<p class="clearBoth"><%= link_to 'Back', :controller => 'assignment',:action => 'list' %></p>

@@ -22,18 +22,7 @@
 	</li>
 	<li><%= link_to "View scores",{:action => 'view_scores', :id => @student.id} %></li>
 	<% if StudentAssignmentHelper::get_current_stage(@assignment_id) == "Complete" && @assigned_surveys.length != 0 -%>
-		<li>Take Survey: (This will log you out)
-			<%= form_tag(:controller => 'survey_response', :action => 'create') %>
-			<p class="inline">&nbsp;&nbsp;</p>
-			<select name="survey_id">
-				<% for survey in @assigned_surveys %>
-					<option value="<%= survey.id %>"><%= survey.name %>&nbsp;</option>
-				<% end %>
-			</select>
-			<input type="hidden" name="assignment_id" value="<%= @assignment_id %>" />
-			<%= submit_tag "Go", :name=>"go" %>
-			<%= end_form_tag %>
-		</li>
+		<li><%= link_to "Take Survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment_id} %> (This will log you out)</li>
 	<% end %>
 </ul>
 <br>

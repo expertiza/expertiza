@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	function toggleVis(id) { 
-		var elem = document.getElementById(id);
+		var elem = document.getElementById(id+"_inner");
 		if(elem.style.display == 'none'){
 			elem.style.display = '';
 			document.getElementById(id+"_show").style.display = 'none';
@@ -23,7 +23,7 @@
 <% for survey in @responses -%>
 <div class="survey_wrapper" id="<%= survey[:id] %>">
 <h3 class="inline">Survey: <%= survey[:name] %></h3>
-<a href="#<%= survey[:id] %>" onClick="toggleVis('<%= survey[:id] %>_inner');">
+<a href="#<%= survey[:id] %>" onClick="toggleVis('<%= survey[:id] %>');">
 		<p class="inline" id="<%= survey[:id] %>_show">Show</p>
 		<p class="inline" id="<%= survey[:id] %>_hide" style="display: none">Hide</p>
 </a>

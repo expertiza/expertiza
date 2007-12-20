@@ -63,28 +63,7 @@ class SurveyResponseController < ApplicationController
   end
 
   def submit
- #   @submitted = true;
- #   @survey_id = params[:survey_id]
- #   @survey = Questionnaire.find(@survey_id)
- #   @questions = @survey.questions
- #   @scores = params[:score]
- #   @comments = params[:comments]
- #   @assignment_id = params[:id]
- #   for question in @questions
- #     if params[:email]
- #       @new = SurveyResponse.find(:conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and email = ?", @assignment_id, @survey_id, question.id, params[:email]])
- #     end 
- #     @new ||= SurveyResponse.new
- #     @new.survey_id = @survey_id
- #     @new.question_id = question.id
- #     @new.assignment_id = @assignment_id
- #     @new.email = params[:email]
- #     @new.score = @scores[question.id.to_s]
- #     @new.comments = @comments[question.id.to_s]
- #     @new.save
- #   end
-    
- #   @surveys = SurveyHelper::get_all_available_surveys(@assignment_id, 1)
+ 
   end
   
   def view_responses

@@ -1,8 +1,8 @@
 <h1 class="restrictLength">Comments on:  "<%= @question.txt %>"</h1>
-<table class="centered">
+<table>
 	<tr>
-		<th colspan="3"><h2>Survey: <%= @survey.name %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-				Assignment: <%= @assignment.name %></h2></th>
+		<th colspan="3"><h3>Survey: <%= @survey.name %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+				Assignment: <%= @assignment.name %></h3></th>
 	</tr>
 	<tr></tr>
 <% if @responses.length > 0 %>
@@ -21,9 +21,9 @@
 		<tr>
 	<% end -%>
 <% end %>
-</table>
 <% else %>
-	<p>No comments exist for this survey.</p>
+	<tr class="center"><td colspan="3">No comments exist for this question.</td></tr>
 <% end %>
+</table>
 <br />
 <%= link_to 'Back', :action => 'view_responses', :id => params[:assignment_id] %>

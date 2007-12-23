@@ -79,6 +79,9 @@ class SurveyResponseController < ApplicationController
       this_response_survey[:id] = survey.id
       this_response_survey[:questions] = Array.new
       this_response_survey[:empty] = true
+      this_response_survey[:avg_labels] = Array.new
+      this_response_survey[:avg_values] = Array.new
+      this_response_survey[:max] = max
       surveylist = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ?", params[:id], survey.id]) 
       if surveylist.length > 0
         @empty = false
@@ -91,6 +94,7 @@ class SurveyResponseController < ApplicationController
         this_response_question[:labels] = Array.new
         this_response_question[:values] = Array.new
         this_response_question[:count] = 0
+        this_response_question[:average] = 0
         for i in min..max
           if !question.true_false? || i == min || i == max
             list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
@@ -105,11 +109,15 @@ class SurveyResponseController < ApplicationController
             end
             this_response_question[:values] << list.length
             this_response_question[:count] += list.length
-            if list.length > 0 
-              @empty = false
-              this_response_survey[:empty] = false
-            end
+            this_response_question[:average] += i*list.length
           end
+        end
+        if this_response_question[:count] > 0 
+          @empty = false
+          this_response_survey[:empty] = false
+          this_response_question[:average] /= this_response_question[:count].to_f      
+          this_response_survey[:avg_labels] << this_response_question[:name][0..50] 
+          this_response_survey[:avg_values] << this_response_question[:average]
         end
         this_response_survey[:questions] << this_response_question
       end

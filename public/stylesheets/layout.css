@@ -303,3 +303,8 @@ textarea.clear_both{
 	clear:both;
 	margin-top: .5em;
 }
+
+img.barchart {
+	padding: 1em;
+	background: #dddddd;
+}

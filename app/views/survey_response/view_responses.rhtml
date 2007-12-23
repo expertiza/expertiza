@@ -24,9 +24,13 @@
 <div class="survey_wrapper" id="<%= survey[:id] %>">
 <h3 class="inline">Survey: <%= survey[:name] %></h3>
 <a href="#<%= survey[:id] %>" onClick="toggleVis('<%= survey[:id] %>');">
-		<p class="inline" id="<%= survey[:id] %>_show">Show</p>
-		<p class="inline" id="<%= survey[:id] %>_hide" style="display: none">Hide</p>
+		<p class="inline" id="<%= survey[:id] %>_show">Show Details</p>
+		<p class="inline" id="<%= survey[:id] %>_hide" style="display: none">Hide Details</p>
 </a>
+<br />
+<% if survey[:avg_labels].length != 0 -%>
+		<img class="barchart" src="<%= ChartsHelper::get_bar_chart_url(survey[:avg_labels],survey[:avg_values],survey[:max]) %>" />
+<% end -%>
 <br />
 <div style="display: none" id="<%= survey[:id] %>_inner" >
 <% if survey[:empty] -%>
@@ -50,9 +54,9 @@
 			<% i += 1 -%>
 		<% end -%>
 	</ul>
-	<p class="responseDisplay">&nbsp;&nbsp;Total Responses: <%= question[:count] %> <span class="separator">&nbsp;</span>
+	<p class="responseDisplay">&nbsp;&nbsp;Total Responses: <%= question[:count] %> &nbsp;&nbsp;&nbsp; Average Score: <%= sprintf("%.2f",question[:average]) %> &nbsp;
 	<% end #end if question empty %>
-	&nbsp;&nbsp;<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
+	&nbsp;&nbsp;<%= link_to 'View Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
 	</p>
 	</div>
 	<% end #end for question in survey%>

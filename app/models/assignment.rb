@@ -123,7 +123,7 @@ class Assignment < ActiveRecord::Base
        # that includes the assignment, and which item has been updated.
        if User.find_by_id(mapping.reviewer_id).email_on_submission
           user = User.find(mapping.reviewer_id)
-          Pgmailer.deliver_message(
+          Mailer.deliver_message(
             {:recipients => user.email,
              :subject => "An new submission is available for #{self.name}",
              :body => {

@@ -67,7 +67,7 @@ class Review < ActiveRecord::Base
    for author_id in mapping.get_author_ids
     if User.find_by_id(author_id).email_on_review
         user = User.find_by_id(author_id)
-        Pgmailer.deliver_message(
+        Mailer.deliver_message(
             {:recipient => user.email,
              :subject => "An new submission is available for #{self.name}",
              :body => {

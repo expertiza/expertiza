@@ -15,7 +15,7 @@ class ReviewOfReview < ActiveRecord::Base
      
      user = User.find(review_mapping.reviewer_id)
      recipient = User.find_by_id(review_mapping.reviewer_id).email
-     Pgmailer.deliver_message(
+     Mailer.deliver_message(
          {:recipients => recipient,
           :subject => "An new review of review is available for #{self.name}",
           :body => {

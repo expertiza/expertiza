@@ -7,7 +7,7 @@
 <% end%>
 <%= render :partial => 'wiki' %>
 <%= start_form_tag :action => 'update_review' %>
-<%= render :partial => 'reviewContentforEdit' %>    
+<%= render :partial => 'reviewContent' %>    
 <%= hidden_field_tag('review_id', @review.id) %>
     <%= hidden_field_tag('mapping_id', @mapping.id) %>
     <%= hidden_field_tag('assgt_id', @assgt.id) %>

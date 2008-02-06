@@ -33,7 +33,7 @@ class ReviewController < ApplicationController
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_rubric_id]) 
     @rubric = Questionnaire.find(@assgt.review_rubric_id)
     
     if @assgt.team_assignment 
@@ -129,11 +129,11 @@ class ReviewController < ApplicationController
     @mapping_id = params[:id]
     @mapping = ReviewMapping.find(params[:id])
     @assgt = Assignment.find(@mapping.assignment_id)
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_rubric_id]) 
     @rubric = Questionnaire.find(@assgt.review_rubric_id)
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score  
-    @links = SubmissionWeblink. find(:all, :conditions => ["participant_id = ?",@author.id])
+    @links = SubmissionWeblink. find(:all, :conditions => ["participant_id = ?",4])
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
@@ -231,14 +231,14 @@ class ReviewController < ApplicationController
   def feedback
     @reviewer_id = session[:user].id
     @assignment_id = params[:id]
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", Assignment.find(@assignment_id).review_rubric_id])
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_rubric_id])
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
   end
   
   def list_reviews
     @reviewer_id = session[:user].id
     @assignment_id = params[:id]
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", Assignment.find(@assignment_id).review_rubric_id])
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_rubric_id])
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
     @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
     # Finding the current phase that we are in

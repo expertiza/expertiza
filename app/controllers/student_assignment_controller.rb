@@ -39,7 +39,7 @@ class StudentAssignmentController < ApplicationController
   end
   
   def set_publish_permission_yes
-    @participant = Participant.find(:first, :conditions => ["user_id = ?",(session[:user].id)])
+    @participant = Participant.find(:first, :conditions => ["id = ?",params[:id]])
     @participant.permission_granted = 1;
     @participant_id = params[:id]
     if @participant.save
@@ -169,7 +169,7 @@ class StudentAssignmentController < ApplicationController
 
   def submit
     @student = Participant.find(params[:id])
-    @links = SubmissionWeblink. find(:all, :conditions => ["participant_id = ?",@student.id])
+    @links = SubmissionWeblink.find(:all, :conditions => ["participant_id = ?",@student.id])
     @submission = params[:submission]
     puts "*********************************************"
     puts @submission

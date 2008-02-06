@@ -69,9 +69,9 @@ class Review < ActiveRecord::Base
         user = User.find_by_id(author_id)
         Mailer.deliver_message(
             {:recipient => user.email,
-             :subject => "An new submission is available for #{self.name}",
+             :subject => "An new submission is available for #{user.name}",
              :body => {
-              :obj_name => self.name,
+              :obj_name => user.name,
               :type => "review",
               :location => getReviewNumber(mapping).to_s,
               :review_scores => self.review_scores,

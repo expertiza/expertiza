@@ -214,6 +214,7 @@ class StudentAssignmentController < ApplicationController
      if params['upload_link']
        puts "***********@@@@te@@@@dfgd@@*"
        puts params['submission']
+      Assignment.find_by_id(@assignment_id).email(@student.user_id)
       save_weblink
     end
     
@@ -236,12 +237,14 @@ class StudentAssignmentController < ApplicationController
     if params['upload_file']
       file = params['uploaded_file']
       puts file
-
+      #send message to reviewers(s) when submission has been updated
+      #rschmidt, feb 06, 2008
+      Assignment.find_by_id(@assignment_id).email(@student.user_id)
       if @student.directory_num == nil or @student.directory_num < 0
         set_student_directory_num
         #send message to reviewers(s) when submission has been updated
         #ajbudlon, sept 07, 2007
-        Assignment.find_by_id(@assignment_id).email(@student.user_id)
+        #Assignment.find_by_id(@assignment_id).email(@student.user_id)
       end      
       
       safe_filename = StudentAssignmentHelper::sanitize_filename(file.full_original_filename)

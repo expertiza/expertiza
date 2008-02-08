@@ -7,7 +7,7 @@ class AssignmentController < ApplicationController
   @ok_dl="3" # a value of "OK" for whether an action is permitted prior to a deadline
   def new
     @assignment = Assignment.new
-    @rubric = Questionnaire.find_all
+    @questionnaire = Questionnaire.find_all
     @wiki_types = WikiType.find_all
   end
   def add_team_member
@@ -66,8 +66,14 @@ class AssignmentController < ApplicationController
       reviewofreview_duedate.save;
       
       # Create submission directory for this assignment
-      Dir.mkdir(RAILS_ROOT + "/pg_data/" + params[:assignment][:directory_path])
-      flash[:notice] = 'Assignment was successfully created.'
+      @assignment.save
+      newdir = RAILS_ROOT + "/pg_data/" + @assignment.directory_path
+      begin
+        FileUtils.mkdir_p(newdir)
+        flash[:notice] = 'Assignment was successfully created.'
+      rescue
+        flash[:error] = 'Submission directory was not created. \nAssignment was saved. \nError: ' + $!
+      end      
       redirect_to :action => 'list'
       
     else
@@ -94,6 +100,20 @@ class AssignmentController < ApplicationController
       render :action => 'edit'
     end    
   end
+  #Still to be completed. AJB 2/6/2008
+  #def import_mappings
+  #  @assignment = Assignment.find(params[:assignment_id]);
+  #  if params['load_mapping']      
+  #    file = params['uploaded_file']
+  #    temp_directory = RAILS_ROOT + "/pg_data/tmp/#{session[:user].id}_"
+  #   safe_filename = StudentAssignmentHelper::sanitize_filename(file.full_original_filename)
+  #    File.open(temp_directory+safe_filename, "w") { |f| f.write(file.read) }            
+  #    users = ReviewMapping.import_reviewers(temp_directory+safe_filename, @assignment) 
+  #    File.delete(temp_directory+safe_filename)
+  #  end  
+  #  flash[:notice] = 'Reviewers assigned successfully.'
+  #  redirect_to :action => 'list'      
+  #end
   
   def edit
     @assignment = Assignment.find(params[:id])
@@ -102,6 +122,20 @@ class AssignmentController < ApplicationController
   
   def update
     @assignment = Assignment.find(params[:id])
+    begin
+     oldpath = RAILS_ROOT + "/pg_data/" + @assignment.directory_path         
+     newpath = RAILS_ROOT + "/pg_data/" + params[:assignment][:directory_path]
+     logger.info "#{oldpath}"
+     logger.info "#{newpath}"
+     logger.info "#{Dir[oldpath].length}"
+     if (Dir[oldpath].length > 0)
+         File.rename(oldpath, newpath)
+     else         
+         FileUtils.mkdir_p(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
+     end
+   rescue SystemCallError
+     flash[:error] = 'Directory was not created. \nError: ' + $!
+   end
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])
       # Iterate over due_dates, from due_date[0] to the maximum due_date
@@ -122,7 +156,7 @@ class AssignmentController < ApplicationController
   end
   
   def delete
-    @assignment = get(Assignment, params[:id])
+    @assignment = get(Assignment, params[:id])    
     # If the assignment is already deleted, go back to the list of assignments
     if @assignment == nil
       redirect_to :action => 'list' 
@@ -130,7 +164,7 @@ class AssignmentController < ApplicationController
       if @assignment.due_dates_exist? == false or params['delete'] or @assignment.review_feedback_exist? == false or @assignment.participants_exist? == false
         # The size of an empty directory is 2
         # Delete the directory if it is empty
-        begin
+        begin         
           if Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size == 2
             Dir.delete(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
           else
@@ -188,11 +222,11 @@ class AssignmentController < ApplicationController
     end
     @sum_of_max = 0
     @sum_of_max_ror = 0
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_rubric_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_rubric_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
     end
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_rubric_id).questions
-      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_rubric_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).questions
+      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).max_question_score
     end
   end
   

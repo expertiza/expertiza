@@ -4,11 +4,11 @@ class CreateQuestions < ActiveRecord::Migration
       t.column :txt, :text
       t.column :true_false, :boolean  # either it's a true/false question, or it's a question that is to be given a numeric score
       t.column :weight, :integer
-      t.column :rubric_id, :integer
+      t.column :questionnaire_id, :integer
     end
     execute "alter table questions
-             add constraint fk_question_rubrics
-             foreign key (rubric_id) references rubrics(id)"
+             add constraint fk_question_questionnaires
+             foreign key (questionnaire_id) references questionnaires(id)"
   end
 
   def self.down

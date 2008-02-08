@@ -1,7 +1,7 @@
-<h1>Edit an existing rubric's advice</h1>
+<h1>Edit an existing questionnaire's advice</h1>
 
 <script>
-<% for question in @rubric.questions %>
+<% for question in @questionnaire.questions %>
 	<%= "var display_vertical_" + question.id.to_s + " = false;" %>
 <% end %>
 
@@ -39,10 +39,10 @@ function show_horizontal_questions(question_id){
 <table>
 	<tr>
 		<th></th>
-		<% 	for i in (0..@rubric.max_question_score-@rubric.min_question_score) %>
+		<% 	for i in (0..@questionnaire.max_question_score-@questionnaire.min_question_score) %>
 		<th>
-			<%= @rubric.max_question_score-i %>
-			<% if @rubric.true_false_questions? %>
+			<%= @questionnaire.max_question_score-i %>
+			<% if @questionnaire.true_false_questions? %>
 				<% if i == 0 %>
 					/ True
 					<% end %>
@@ -53,7 +53,7 @@ function show_horizontal_questions(question_id){
 		</th>
 		<% 	end %>
 	</tr>
-	<% for question in @rubric.questions %>
+	<% for question in @questionnaire.questions %>
 		<tr id="horizontal_questions_<%= question.id %>">
 			<td>
 				<a onclick="
@@ -83,7 +83,7 @@ function show_horizontal_questions(question_id){
 			<% 	end %>
 		</tr>
 		<tr>
-			<td colspan=<%=@rubric.max_question_score-@rubric.min_question_score+2%>>
+			<td colspan=<%=@questionnaire.max_question_score-@questionnaire.min_question_score+2%>>
 			<table id="vertical_questions_<%= question.id %>" style="display:none">
 					<% for @advice in question.question_advices.sort {|x,y| y.score <=> x.score } %>
 					<tr>

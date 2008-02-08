@@ -1,23 +1,23 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-rubric1:
+questionnaire1:
   id: 1
-  name: rubric1
+  name: questionnaire1
   min_question_score: 1
   max_question_score: 5
   private: false
   instructor_id: 5
   
-rubric2:
+questionnaire2:
   id: 2
-  name: rubric2
+  name: questionnaire2
   min_question_score: 3
   max_question_score: 5
   private: true
   instructor_id: 5
 
-rubric3:
+questionnaire3:
   id: 3
-  name: rubric3
+  name: questionnaire3
   min_question_score: 5
   max_question_score: 8
   private: false

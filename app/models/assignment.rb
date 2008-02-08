@@ -20,8 +20,8 @@ class Assignment < ActiveRecord::Base
   #validates_presence_of :submitter_count
   #validates_presence_of :instructor_id
   #validates_presence_of :mapping_strategy_id
-  validates_presence_of :review_rubric_id
-  validates_presence_of :review_of_review_rubric_id
+  validates_presence_of :review_questionnaire_id
+  validates_presence_of :review_of_review_questionnaire_id
   validates_numericality_of :review_weight
   # The following fields don't need to be set; an unchecked checkbox is interpreted as "false".
   # validates_presence_of :reviews_visible_to_all

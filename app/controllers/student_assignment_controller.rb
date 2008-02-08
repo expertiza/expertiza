@@ -70,10 +70,10 @@ class StudentAssignmentController < ApplicationController
     @late_policy = LatePolicy.find(Assignment.find(@assignment_id).due_dates[0].late_policy_id)
     @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes
     
-    #the code below finds the sum of the maximum scores of all questions in the rubric
+    #the code below finds the sum of the maximum scores of all questions in the questionnaire
     @sum_of_max = 0
-    for question in Questionnaire.find(Assignment.find(@assignment_id).review_rubric_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment_id).review_rubric_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).max_question_score
     end
     
     if @student.penalty_accumulated/@late_policy.penalty_period_in_minutes*@late_policy.penalty_per_unit < @late_policy.max_penalty
@@ -139,10 +139,10 @@ class StudentAssignmentController < ApplicationController
       @user_name = User.find(@student.user_id).name
       @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
     end
-    #the code below finds the sum of the maximum scores of all questions in the rubric
+    #the code below finds the sum of the maximum scores of all questions in the questionnaire
     @sum_of_max = 0
-    for question in Questionnaire.find(Assignment.find(@assignment_id).review_rubric_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment_id).review_rubric_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).max_question_score
     end
   end
   
@@ -214,7 +214,6 @@ class StudentAssignmentController < ApplicationController
      if params['upload_link']
        puts "***********@@@@te@@@@dfgd@@*"
        puts params['submission']
-      Assignment.find_by_id(@assignment_id).email(@student.user_id)
       save_weblink
     end
     
@@ -237,14 +236,12 @@ class StudentAssignmentController < ApplicationController
     if params['upload_file']
       file = params['uploaded_file']
       puts file
-      #send message to reviewers(s) when submission has been updated
-      #rschmidt, feb 06, 2008
-      Assignment.find_by_id(@assignment_id).email(@student.user_id)
+
       if @student.directory_num == nil or @student.directory_num < 0
         set_student_directory_num
         #send message to reviewers(s) when submission has been updated
         #ajbudlon, sept 07, 2007
-        #Assignment.find_by_id(@assignment_id).email(@student.user_id)
+        Assignment.find_by_id(@assignment_id).email(@student.user_id)
       end      
       
       safe_filename = StudentAssignmentHelper::sanitize_filename(file.full_original_filename)

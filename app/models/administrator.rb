@@ -18,7 +18,7 @@ class Administrator < User
                      :conditions => ["instructor_id = ? OR private = 0", user_id])
   end
   
-  # This method gets a rubric or an assignment, making sure that current user is allowed to see it.
+  # This method gets a questionnaire or an assignment, making sure that current user is allowed to see it.
   def get(object_type, id, user_id)
     object_type.find(:first, 
                      :conditions => ["id = ? AND (instructor_id = ? OR private = 0)", 

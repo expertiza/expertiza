@@ -1,18 +1,18 @@
-module RubricHelper
+module QuestionnaireHelper
   
-  RUBRICS_FOLDER = "public/temp-rubrics/" # CSV files are stored in a temporary public directory
+  questionnaireS_FOLDER = "public/temp-questionnaires/" # CSV files are stored in a temporary public directory
   CSV_ALLOWED_AGE = 60 * 5 # CSV files may be deleted if they are 5 minutes old
 
   CSV_QUESTION = 0
   CSV_TYPE = 1
   CSV_WEIGHT = 2
 
-  def self.create_rubric_csv(rubric, user_name)
-    RubricHelper::delete_expired_csv_files
-    filename = RUBRICS_FOLDER + user_name + "-" + rubric.name + ".csv"
+  def self.create_questionnaire_csv(questionnaire, user_name)
+    questionnaireHelper::delete_expired_csv_files
+    filename = questionnaireS_FOLDER + user_name + "-" + questionnaire.name + ".csv"
     buf = File.new(filename, 'w')
     
-    for question in rubric.questions
+    for question in questionnaire.questions
       # Each row is formatted as follows
       # Question, question advice (from high score to low), type, weight
       row = Array.new
@@ -22,7 +22,7 @@ module RubricHelper
       row << question.weight
       
       # loop through all the question advice from highest score to lowest score
-      adjust_advice_size(rubric, question)
+      adjust_advice_size(questionnaire, question)
       for advice in question.question_advices.sort {|x,y| y.score <=> x.score }
         row << advice.advice
       end
@@ -34,13 +34,13 @@ module RubricHelper
     return filename
   end
   
-  def self.get_questions_from_csv(rubric, file)
+  def self.get_questions_from_csv(questionnaire, file)
     questions = Array.new
     
     CSV::Reader.parse(file) do |row|
       if row.length > 0
         i = 0
-        score = rubric.max_question_score
+        score = questionnaire.max_question_score
         q = Question.new
         q.true_false = false
         
@@ -57,7 +57,7 @@ module RubricHelper
             when CSV_WEIGHT
               q.weight = cell.strip.to_i if cell != nil
             else
-              if score >= rubric.min_question_score and cell != nil
+              if score >= questionnaire.min_question_score and cell != nil
                 a = QuestionAdvice.new(:score => score, :advice => cell.strip) if !q.true_false
                 a = QuestionAdvice.new(:score => 1, :advice => cell.strip) if q.true_false and i == 3
                 a = QuestionAdvice.new(:score => 0, :advice => cell.strip) if q.true_false and i == 4
@@ -77,7 +77,7 @@ module RubricHelper
 
   def self.delete_expired_csv_files
     # Deletes any old CSV files that reside in the temp directory
-    files = Dir[RUBRICS_FOLDER + "*"]
+    files = Dir[questionnaireS_FOLDER + "*"]
     for file in files
       if Time.now > File.ctime(file) + CSV_ALLOWED_AGE and file.include? ".csv"
         File.delete(file)
@@ -85,7 +85,7 @@ module RubricHelper
     end
   end  
   
-  def self.adjust_advice_size(rubric, question)
+  def self.adjust_advice_size(questionnaire, question)
     if question.true_false and question.question_advices.length != 2
         question.question_advices << QuestionAdvice.new(:score=>0)
         question.question_advices << QuestionAdvice.new(:score=>1)
@@ -93,7 +93,7 @@ module RubricHelper
         QuestionAdvice.delete_all(["question_id = ? AND (score > 1 OR score < 0)", question.id])
         return true
     elsif question.true_false == false
-      for i in (rubric.min_question_score..rubric.max_question_score)
+      for i in (questionnaire.min_question_score..questionnaire.max_question_score)
         print "\n#{i}: #{question.id}"
         qa = QuestionAdvice.find(:first, 
                                  :conditions=>"question_id = #{question.id} AND score = #{i}")
@@ -105,7 +105,7 @@ module RubricHelper
       end
         
       QuestionAdvice.delete_all(["question_id = ? AND (score > ? OR score < ?)", 
-                                    question.id, rubric.max_question_score, rubric.min_question_score])
+                                    question.id, questionnaire.max_question_score, questionnaire.min_question_score])
       return true
     end
     

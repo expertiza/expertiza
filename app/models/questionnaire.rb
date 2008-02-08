@@ -1,7 +1,7 @@
 class Questionnaire < ActiveRecord::Base
     # for doc on why we do it this way, 
     # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
-    has_many :assignments, :foreign_key => "review_rubric_id"
+    has_many :assignments, :foreign_key => "review_questionnaire_id"
     has_many :questions
     belongs_to :questionnaire_type, :foreign_key => "type_id"
      has_many :assignments_questionnairess
@@ -11,8 +11,8 @@ class Questionnaire < ActiveRecord::Base
     validates_numericality_of :max_question_score
     validates_numericality_of :min_question_score
     
-    DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any rubric question
-    DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any rubric question
+    DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
+    DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
     
     def true_false_questions?
       for question in questions

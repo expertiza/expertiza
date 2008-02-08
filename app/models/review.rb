@@ -9,8 +9,8 @@ class Review < ActiveRecord::Base
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Questionnaire.find(@assgt.review_rubric_id)
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
+    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
     @control_folder = control_folder
     
     if @assgt.team_assignment 
@@ -23,8 +23,8 @@ class Review < ActiveRecord::Base
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
     
-    @max = @rubric.max_question_score
-    @min = @rubric.min_question_score 
+    @max = @questionnaire.max_question_score
+    @min = @questionnaire.min_question_score 
     
     @files = Array.new
     @files = get_submitted_file_list(@direc, @author, @files)
@@ -32,7 +32,7 @@ class Review < ActiveRecord::Base
     if fname
       view_submitted_file(@current_folder,@author)
     end 
-    return @files,@assgt,@author_name,@team_member,@rs,@mapping_id,@review_scores,@rubric,@max,@min
+    return @files,@assgt,@author_name,@team_member,@rs,@mapping_id,@review_scores,@questionnaire,@max,@min
   end
    def self.get_submitted_file_list(direc,author,files)
     if(author.directory_num)
@@ -67,10 +67,9 @@ class Review < ActiveRecord::Base
    for author_id in mapping.get_author_ids
     if User.find_by_id(author_id).email_on_review
         user = User.find_by_id(author_id)
-        assignment = Assignment.find_by_id(mapping.assignment_id)
         Mailer.deliver_message(
-            {:recipients => user.email,
-             :subject => "An new review is available for #{assignment.name}",
+            {:recipient => user.email,
+             :subject => "An new submission is available for #{user.name}",
              :body => {
               :obj_name => user.name,
               :type => "review",

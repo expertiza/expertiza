@@ -32,8 +32,8 @@ class ApplicationController < ActionController::Base
   end
   
   def set_up_display_options(object_type)
-    # Create a set that will be used to populate the dropbox when a user lists a set of objects (assgts., rubrics, etc.)
-    # Get the Instructor::RUBRIC constant
+    # Create a set that will be used to populate the dropbox when a user lists a set of objects (assgts., questionnaires, etc.)
+    # Get the Instructor::questionnaire constant
     @display_options = eval ApplicationHelper::get_user_role(session[:user]).class.to_s+"::"+object_type 
     @display_option = DisplayOption.new
     @display_option.name = 'list_mine'

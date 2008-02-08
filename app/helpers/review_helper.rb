@@ -6,8 +6,8 @@ module ReviewHelper
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Questionnaire.find(@assgt.review_rubric_id)
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
+    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
     
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
@@ -19,8 +19,8 @@ module ReviewHelper
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
     
-    @max = @rubric.max_question_score
-    @min = @rubric.min_question_score 
+    @max = @questionnaire.max_question_score
+    @min = @questionnaire.min_question_score 
     
     @current_folder = DisplayOption.new
     @current_folder.name = "/"

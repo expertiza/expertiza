@@ -23,7 +23,7 @@ class ReviewOfReviewController < ApplicationController
   def list_reviews
     @reviewer_id = session[:user].id
     @assignment_id = params[:id]
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", Assignment.find(@assignment_id).review_rubric_id])
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_questionnaire_id])
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])     
   end
   
@@ -53,8 +53,8 @@ class ReviewOfReviewController < ApplicationController
       @eligible_review_scores = @eligible_review.review_scores
       @assgt = Assignment.find(@assignment_id)    
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @assgt.id])
-      @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-      @rubric = Questionnaire.find(@assgt.review_rubric_id)
+      @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
+      @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
       
       
       puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@"
@@ -68,8 +68,8 @@ class ReviewOfReviewController < ApplicationController
         @author_name = User.find(@eligible_review_mapping.author_id).name
         @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @eligible_review_mapping.assignment_id])
       end
-      @max = @rubric.max_question_score
-      @min = @rubric.min_question_score 
+      @max = @questionnaire.max_question_score
+      @min = @questionnaire.min_question_score 
       @current_folder = DisplayOption.new
       @current_folder.name = "/"
       if params[:current_folder]
@@ -86,10 +86,10 @@ class ReviewOfReviewController < ApplicationController
       @assgt = Assignment.find(@assignment_id)
       
       @review_of_review = ReviewOfReview.new
-      @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_of_review_rubric_id]) 
-      @rubric = Questionnaire.find(@assgt.review_of_review_rubric_id)
-      @max = @rubric.max_question_score
-      @min = @rubric.min_question_score
+      @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_of_review_questionnaire_id]) 
+      @questionnaire = Questionnaire.find(@assgt.review_of_review_questionnaire_id)
+      @max = @questionnaire.max_question_score
+      @min = @questionnaire.min_question_score
       
       rescue
       flash[:notice] = "Review of review cannot be created now"
@@ -137,8 +137,8 @@ class ReviewOfReviewController < ApplicationController
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
-    @questions = Question.find(:all,:conditions => ["rubric_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Questionnaire.find(@assgt.review_rubric_id)
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
+    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
     
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
@@ -150,8 +150,8 @@ class ReviewOfReviewController < ApplicationController
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
     
-    @max = @rubric.max_question_score
-    @min = @rubric.min_question_score 
+    @max = @questionnaire.max_question_score
+    @min = @questionnaire.min_question_score 
     
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
@@ -173,10 +173,10 @@ class ReviewOfReviewController < ApplicationController
     @ror_mapping = ReviewMapping.find(@review_of_review.review_of_review_mapping_id)
     @ror_assgt = Assignment.find(@ror_mapping.assignment_id)    
     @ror_author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @ror_mapping.author_id, @ror_assgt.id])
-    @ror_questions = Question.find(:all,:conditions => ["rubric_id = ?", @ror_assgt.review_of_review_rubric_id]) 
-    @ror_rubric = Questionnaire.find(@ror_assgt.review_of_review_rubric_id)
-    @ror_max = @ror_rubric.max_question_score
-    @ror_min = @ror_rubric.min_question_score 
+    @ror_questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @ror_assgt.review_of_review_questionnaire_id]) 
+    @ror_questionnaire = Questionnaire.find(@ror_assgt.review_of_review_questionnaire_id)
+    @ror_max = @ror_questionnaire.max_question_score
+    @ror_min = @ror_questionnaire.min_question_score 
     
   end
   def list_review_of_review

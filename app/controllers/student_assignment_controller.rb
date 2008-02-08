@@ -191,12 +191,12 @@ class StudentAssignmentController < ApplicationController
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
-      @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
     
     if params['download']
-      folder_name = StudentAssignmentHelper::sanitize_folder(@current_folder.name)
-      file_name = StudentAssignmentHelper::sanitize_filename(params['download'])
+      folder_name = FileHelper::sanitize_folder(@current_folder.name)
+      file_name = FileHelper::sanitize_filename(params['download'])
       
       file_split = file_name.split('.')
       if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
@@ -244,7 +244,7 @@ class StudentAssignmentController < ApplicationController
         Assignment.find_by_id(@assignment_id).email(@student.user_id)
       end      
       
-      safe_filename = StudentAssignmentHelper::sanitize_filename(file.full_original_filename)
+      safe_filename = FileHelper::sanitize_filename(file.full_original_filename)
       curr_directory = get_student_directory(@student)+ @current_folder.name
       full_filename =  curr_directory + safe_filename #curr_directory +
       File.open(full_filename, "wb") { |f| f.write(file.read) }
@@ -276,7 +276,7 @@ private
   end
 
   def create_new_folder
-    new_folder = StudentAssignmentHelper::sanitize_filename(params[:new_folder])
+    new_folder = FileHelper::sanitize_filename(params[:new_folder])
     if !File.exist?(get_student_directory(@student) + @current_folder.name + "/" + new_folder)
       Dir.mkdir(get_student_directory(@student) + @current_folder.name + "/" + new_folder)
     else 
@@ -287,7 +287,7 @@ private
   def move_file
     for file_checked in params[:chk_files]
       old_filename = get_student_directory(@student) + @current_folder.name + "/" + params[:filenames][file_checked[0]].to_s
-      new_filename = get_student_directory(@student) + StudentAssignmentHelper::sanitize_folder(params[:moved_file])
+      new_filename = get_student_directory(@student) + FileHelper::sanitize_folder(params[:moved_file])
       file_op "move", old_filename, new_filename
       break
     end
@@ -308,7 +308,7 @@ private
   def copy_file
     for file_checked in params[:chk_files]
       old_filename = get_student_directory(@student) + @current_folder.name + "/" + params[:filenames][file_checked[0]].to_s
-      new_filename = get_student_directory(@student) + StudentAssignmentHelper::sanitize_folder(params[:copy_file])
+      new_filename = get_student_directory(@student) + FileHelper::sanitize_folder(params[:copy_file])
       if File.exist?(old_filename)
         file_op "copy", old_filename, new_filename
       else
@@ -321,7 +321,7 @@ private
   def rename_selected_file
     for file_checked in params[:chk_files]
       old_filename = get_student_directory(@student) + @current_folder.name + "/" + params[:filenames][file_checked[0]].to_s
-      new_filename = get_student_directory(@student) + @current_folder.name + "/" + StudentAssignmentHelper::sanitize_filename(params[:new_filename])
+      new_filename = get_student_directory(@student) + @current_folder.name + "/" + FileHelper::sanitize_filename(params[:new_filename])
       file_op "rename", old_filename, new_filename
       break
     end

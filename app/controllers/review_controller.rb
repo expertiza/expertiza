@@ -61,7 +61,7 @@ class ReviewController < ApplicationController
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
-      @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
     
     if params['fname']
@@ -74,7 +74,7 @@ class ReviewController < ApplicationController
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
-      @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
     
     #send message to author(s) when review has been updated
@@ -147,7 +147,7 @@ class ReviewController < ApplicationController
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
-      @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
     @files = Array.new
     @files = get_submitted_file_list(@direc, @author, @files)
@@ -162,8 +162,8 @@ class ReviewController < ApplicationController
   #follows a link
   #needs to be moved to a separate helper function
   def view_submitted_file(current_folder,author)
-    folder_name = StudentAssignmentHelper::sanitize_folder(current_folder.name)
-    file_name = StudentAssignmentHelper::sanitize_filename(params['fname'])
+    folder_name = FileHelper::sanitize_folder(current_folder.name)
+    file_name = FileHelper::sanitize_filename(params['fname'])
     file_split = file_name.split('.')
     if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
       send_file(RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + @author.directory_num.to_s + folder_name + "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline') 

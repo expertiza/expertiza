@@ -15,8 +15,8 @@ ActiveRecord::Schema.define(:version => 28) do
     t.column "num_review_of_reviews", :integer, :default => 0, :null => false
     t.column "review_strategy_id", :integer, :default => 0, :null => false
     t.column "mapping_strategy_id", :integer, :default => 0, :null => false
-    t.column "review_rubric_id", :integer
-    t.column "review_of_review_rubric_id", :integer
+    t.column "review_questionnaire_id", :integer
+    t.column "review_of_review_questionnaire_id", :integer
     t.column "review_weight", :float
     t.column "reviews_visible_to_all", :boolean
     t.column "team_assignment", :boolean
@@ -24,8 +24,8 @@ ActiveRecord::Schema.define(:version => 28) do
     t.column "require_signup", :boolean
   end
 
-  add_index "assignments", ["review_rubric_id"], :name => "fk_assignments_review_rubrics"
-  add_index "assignments", ["review_of_review_rubric_id"], :name => "fk_assignments_review_of_review_rubrics"
+  add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
+  add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["wiki_assignment_id"], :name => "fk_assignments_wiki_assignments"
 
   create_table "assignments_questionnaires", :force => true do |t|
@@ -309,7 +309,7 @@ ActiveRecord::Schema.define(:version => 28) do
     t.column "name", :string
   end
   
-  QuestionnaireType.create(:id => 1, :name => "Rubric")
+  QuestionnaireType.create(:id => 1, :name => "questionnaire")
   QuestionnaireType.create(:id => 2, :name => "Survey")
   QuestionnaireType.create(:id => 3, :name => "Global Survey")
 
@@ -412,7 +412,7 @@ ActiveRecord::Schema.define(:version => 28) do
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
 
-  create_table "rubrics", :force => true do |t|
+  create_table "questionnaires", :force => true do |t|
     t.column "name", :string, :limit => 64
     t.column "instructor_id", :integer, :default => 0, :null => false
     t.column "private", :boolean, :default => false, :null => false
@@ -424,7 +424,7 @@ ActiveRecord::Schema.define(:version => 28) do
     t.column "type_id", :integer, :default => 1
   end
   
-  add_index "rubrics", ["type_id"], :name => "fk_rubrics_questionnaire_types"
+  add_index "questionnaires", ["type_id"], :name => "fk_questionnaires_questionnaire_types"
 
   create_table "site_controllers", :force => true do |t|
     t.column "name", :string, :default => "", :null => false

@@ -1,36 +1,27 @@
 <h1>Questionnaires</h1>
 
-<%= start_form_tag :action => 'list' %>
+<%= start_form_tag :action => 'list_questionnaires' %>
 	<%= select(:display_option, :name, 
 			   @display_options, {}, 
 			   {:onchange => "document.forms[0].submit()"} ) %>
 <%= end_form_tag %>
-<br />
 
-<% if @questionnaires.length == 0 %>	
-	No questionnaires match the criteria.<br/>
-<% else %>
 <table class="listing" cellpadding=2>
   <tr>
 	<th></th>
-    <th>Name</th>
-	<th>Type</th>
+    <th>questionnaire Name</th>
   </tr>
+  
 <% for questionnaire in @questionnaires %>
   <tr class="listingRow">
 	<td></td>
 	<td><%= questionnaire.name %></td>
-	<td><% @type = QuestionnaireType.find(questionnaire.type_id) -%>
-		<%= @type.name %></td>
 	<td><%= link_to 'Edit', :action => 'edit_questionnaire', :id => questionnaire %></td>
 	<td><%= link_to 'Copy', :action => 'copy_questionnaire', :id => questionnaire %></td>
 	<td><%= link_to 'Advice', :action => 'edit_advice', :id => questionnaire %></td>
-	<td><%= link_to 'Delete', :action => 'delete_questionnaire', :id => questionnaire %></td>
   </tr>
 <% end %>
 </table>
-
-<% end %>
 <br />
 
 <%= link_to 'New questionnaire', :action => 'new_questionnaire' %>

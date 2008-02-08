@@ -3,12 +3,12 @@ question1:
   id: 1
   txt: This is test question 1?
   yesno: true
-  rubric_id: 1
+  questionnaire_id: 1
   weight: 5
   
 question2:
     id: 2
     txt: This is test question 2?
     yesno: false
-    rubric_id: 1
+    questionnaire_id: 1
     weight: 2

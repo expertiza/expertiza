@@ -3,10 +3,10 @@ assignment1:
   id: 1
   name: TestAssign1
   directory_path: admin/test1
-  review_rubric_id: 1
+  review_questionnaire_id: 1
   
 assignment2:
     id: 2
     name: TestAssign2
     directory_path: admin/test2
-    review_rubric_id: 2
+    review_questionnaire_id: 2

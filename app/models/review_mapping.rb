@@ -20,6 +20,23 @@ class ReviewMapping < ActiveRecord::Base
     end
   end
   
+  def self.import_reviewers(file,assignment)
+    File.open(file, "r") do |infile|
+        while (rline = infile.gets)
+          line_split = rline.split(",")
+          author = User.find_by_name(line_split[0].strip)
+          if (Participant.find(:all,{:conditions => ['user_id=? AND assignment_id=?', author.id, assignment.id]}).size > 0)
+            for i in 1 .. line_split.size - 1              
+              reviewer = User.find_by_name(line_split[i].strip)
+              if (Participant.find(:all,{:conditions => ['user_id=? AND assignment_id=?', reviewer.id, assignment.id]}).size > 0)
+                ReviewMapping.create(:author_id => author.id, :reviewer_id => reviewer.id, :assignment_id => assignment.id)
+              end
+            end
+          end
+        end
+    end
+  end
+  
   #return an array of authors for this mapping
   #ajbudlon, sept 07, 2007  
   def get_author_ids

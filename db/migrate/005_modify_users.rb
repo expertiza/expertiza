@@ -7,7 +7,7 @@ class ModifyUsers < ActiveRecord::Migration
     # t.column :last_name, :string, :limit=>30   -- subsumed by "fullname" in Goldberg data model   "  "
     # t.column :role_id, :integer -- already included in Goldberg table
     add_column :users, :parent_id, :integer # for an instructor, the id in this table of the administrator who created the acct for the instructor; otherwise, empty
-    add_column :users, :private_by_default, :boolean # whether assgts. & rubrics created by this instructor should be private (i.e., not viewable by others).  Can be overridden when creating a new one.
+    add_column :users, :private_by_default, :boolean # whether assgts. & questionnaires created by this instructor should be private (i.e., not viewable by others).  Can be overridden when creating a new one.
     # We used to have a home_directory_path column, but now we are just using the user name in place of the home_directory_path
     # add_column :users, :home_directory_path, :string # for an instructor, the home directory above which (s)he is not allowed access; otherwise empty
     add_column :users, :mru_directory_path, :string, :limit => 128 # for an instructor, the directory that (s)he was working in the previous time he used the system; this is the pathname relative to the home_directory_path; empty for a non-instructor

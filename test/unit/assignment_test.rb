@@ -22,8 +22,8 @@ class AssignmentTest < Test::Unit::TestCase
     # assert_equal assignment.instructor_id, (session[:user]).id
 
     # The following fields have not been set yet.
-    assert assignment.errors.invalid?(:review_rubric_id)
-    assert assignment.errors.invalid?(:review_of_review_rubric_id)
+    assert assignment.errors.invalid?(:review_questionnaire_id)
+    assert assignment.errors.invalid?(:review_of_review_questionnaire_id)
     assert assignment.errors.invalid?(:review_weight)
     assert assignment.errors.invalid?(:reviews_visible_to_all)
     assert assignment.errors.invalid?(:team_assignment)

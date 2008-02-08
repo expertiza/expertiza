@@ -20,7 +20,7 @@ class ReviewController < ApplicationController
     # populate the text boxes that the reviewer is about to revise.
     # In any case, if this reviewer has reviewed this author on (any version of) this assignment, the 
     # previously assigned scores should populate the dropboxes used to assign scores.
-    # If a rubric question has been added since the last time this reviewer reviewed this author, a
+    # If a questionnaire question has been added since the last time this reviewer reviewed this author, a
     # default score (probably the lowest possible score) should appear in the dropbox.
   end
   
@@ -33,8 +33,8 @@ class ReviewController < ApplicationController
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Questionnaire.find(@assgt.review_rubric_id)
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
+    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
     
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
@@ -46,17 +46,17 @@ class ReviewController < ApplicationController
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
     @links = SubmissionWeblink. find(:all, :conditions => ["participant_id = ?",@author.id])
-    @max = @rubric.max_question_score
-    @min = @rubric.min_question_score 
+    @max = @questionnaire.max_question_score
+    @min = @questionnaire.min_question_score 
     
     @files = Array.new
     @files = get_submitted_file_list(@direc, @author, @files)
     
-    return @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc
+    return @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc
   end
   
   def view_review
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
     
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
@@ -70,7 +70,7 @@ class ReviewController < ApplicationController
   end
   
   def edit_review
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -129,10 +129,10 @@ class ReviewController < ApplicationController
     @mapping_id = params[:id]
     @mapping = ReviewMapping.find(params[:id])
     @assgt = Assignment.find(@mapping.assignment_id)
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_rubric_id]) 
-    @rubric = Questionnaire.find(@assgt.review_rubric_id)
-    @max = @rubric.max_question_score
-    @min = @rubric.min_question_score  
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
+    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
+    @max = @questionnaire.max_question_score
+    @min = @questionnaire.min_question_score  
     @links = SubmissionWeblink. find(:all, :conditions => ["participant_id = ?",4])
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
@@ -231,14 +231,14 @@ class ReviewController < ApplicationController
   def feedback
     @reviewer_id = session[:user].id
     @assignment_id = params[:id]
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_rubric_id])
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_questionnaire_id])
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
   end
   
   def list_reviews
     @reviewer_id = session[:user].id
     @assignment_id = params[:id]
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_rubric_id])
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_questionnaire_id])
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
     @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
     # Finding the current phase that we are in

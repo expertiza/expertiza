@@ -100,20 +100,20 @@ class AssignmentController < ApplicationController
       render :action => 'edit'
     end    
   end
-  #Still to be completed. AJB 2/6/2008
-  #def import_mappings
-  #  @assignment = Assignment.find(params[:assignment_id]);
-  #  if params['load_mapping']      
-  #    file = params['uploaded_file']
-  #    temp_directory = RAILS_ROOT + "/pg_data/tmp/#{session[:user].id}_"
-  #   safe_filename = StudentAssignmentHelper::sanitize_filename(file.full_original_filename)
-  #    File.open(temp_directory+safe_filename, "w") { |f| f.write(file.read) }            
-  #    users = ReviewMapping.import_reviewers(temp_directory+safe_filename, @assignment) 
-  #    File.delete(temp_directory+safe_filename)
-  #  end  
-  #  flash[:notice] = 'Reviewers assigned successfully.'
-  #  redirect_to :action => 'list'      
-  #end
+  
+  def import_mappings
+    @assignment = Assignment.find(params[:assignment_id]);
+    if params['load_mapping']      
+      file = params['uploaded_file']
+      temp_directory = RAILS_ROOT + "/pg_data/tmp/#{session[:user].id}_"
+      safe_filename = FileHelper::sanitize_filename(file.full_original_filename)
+      File.open(temp_directory+safe_filename, "w") { |f| f.write(file.read) }            
+      users = ReviewMapping.import_reviewers(temp_directory+safe_filename, @assignment) 
+      File.delete(temp_directory+safe_filename)
+    end  
+    flash[:notice] = 'Reviewers assigned successfully.'
+    redirect_to :action => 'list'      
+  end
   
   def edit
     @assignment = Assignment.find(params[:id])

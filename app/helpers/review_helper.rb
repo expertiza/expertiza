@@ -25,7 +25,7 @@ module ReviewHelper
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if current_folder_name
-      @current_folder.name = StudentAssignmentHelper::sanitize_folder(current_folder_name)
+      @current_folder.name = FileHelper::sanitize_folder(current_folder_name)
     end
     
     @files = Array.new

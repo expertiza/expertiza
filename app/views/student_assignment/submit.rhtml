@@ -169,12 +169,10 @@ Submit your work for the assignment titled: <%= @student.assignment.name %><br/>
 </form>
 <br><br>
 <%end%>
-<%if @links.size>0%>
-<h3>Weblinks:</h3>
-<%end%>
-<%for link in @links%>
-<a href="../../../<%=link.link%>" target="new"><%=link.link%></a><br/>
-<%end%>
+<% if @link != nil %>
+<h3>Hyperlink:</h3><a href="<%= @link %>" target="new"><%= @link %></a><br>
+<% end %>
+
 
 <%if(@review_of_review_mappings.size > 0)%>
 <h3>Reviews of reviews</h3>

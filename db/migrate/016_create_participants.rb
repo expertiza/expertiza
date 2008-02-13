@@ -10,6 +10,7 @@ class CreateParticipants < ActiveRecord::Migration
       # note that lateness of REsubmissions is tracked in the resubmission_times table.  The lateness of resubmissions is cumulative; e.g., if you're late by 2 days on the first resubmission and late by 1 day on the second, you're late by 3 days on resubmissions overall
       t.column :topic, :string # the topic, if any, that the user selected in Shimmer
       t.column :permission_granted, :boolean # whether user has granted permission to "publish" this work
+      t.column :submitted_hyperlink, :text #a hyperlink included with the student's submission
     end
     execute "alter table participants
              add constraint fk_participant_users

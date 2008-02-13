@@ -169,7 +169,7 @@ class StudentAssignmentController < ApplicationController
 
   def submit
     @student = Participant.find(params[:id])
-    @links = SubmissionWeblink.find(:all, :conditions => ["participant_id = ?",@student.id])
+    @link = @student.submitted_hyperlink
     @submission = params[:submission]
     puts "*********************************************"
     puts @submission
@@ -211,9 +211,7 @@ class StudentAssignmentController < ApplicationController
       create_new_folder
     end
     
-     if params['upload_link']
-       puts "***********@@@@te@@@@dfgd@@*"
-       puts params['submission']
+    if params['upload_link']
       save_weblink
     end
     
@@ -294,15 +292,32 @@ private
   end
   
   def save_weblink
-    participant_id = Participant.find(params[:id]).id
-     
+    
     weblink = params['submission']
-   
-    submission = SubmissionWeblink.new
-    submission.participant_id = participant_id
-    submission.link = weblink
-    submission.save
+    
+    if validate(weblink)
+      participant = Participant.find(params[:id])   
+      participant.submitted_hyperlink = weblink
+      participant.save
+    end
     redirect_to :action => 'submit'
+  end
+  
+  def validate(url)   
+    begin
+      logger.info "**#{url}**"
+      uri = URI.parse(url)
+    
+      logger.info "**#{uri.class}**"
+      if uri.class != URI::HTTP and uri.class != URI::FTP
+        flash[:error] = "Only HTTP or FTP addresses can be supplied. \n" + url
+        return false
+      end
+    rescue      
+      flash[:error] = "The format of the url is not valid. " + $!
+      return false
+    end
+    return true
   end
   
   def copy_file

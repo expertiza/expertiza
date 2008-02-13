@@ -42,7 +42,8 @@ class Participant < ActiveRecord::Base
   def email(pw, home_page)
     user = User.find_by_id(self.user_id)
     assignment = Assignment.find_by_id(self.assignment_id)
-    Pgmailer.deliver_message(
+
+    Mailer.deliver_message(
             {:recipients => user.email,
              :subject => "You have been registered as a participant in Assignment #{assignment.name}",
              :body => {  

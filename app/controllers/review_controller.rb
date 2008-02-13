@@ -45,7 +45,7 @@ class ReviewController < ApplicationController
       @author_name = User.find(@mapping.author_id).name
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
-    @links = SubmissionWeblink. find(:all, :conditions => ["participant_id = ?",@author.id])
+    @link = @author.submitted_hyperlink
     @max = @questionnaire.max_question_score
     @min = @questionnaire.min_question_score 
     
@@ -133,7 +133,6 @@ class ReviewController < ApplicationController
     @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
     @max = @questionnaire.max_question_score
     @min = @questionnaire.min_question_score  
-    @links = SubmissionWeblink. find(:all, :conditions => ["participant_id = ?",4])
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
@@ -143,6 +142,7 @@ class ReviewController < ApplicationController
       @author_name = User.find(@mapping.author_id).name
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
+    @link = @author.submitted_hyperlink
     
     @current_folder = DisplayOption.new
     @current_folder.name = "/"

@@ -115,7 +115,11 @@ class ParticipantsController < ApplicationController
     if(@user==nil)
       redirect_to :action => 'new_student', :name => params[:user][:name]
     else
-      @participant = Participant.create(:assignment_id => @assignment.id, :user_id => @user.id)
+      if @user.master_permission_granted
+        @participant = Participant.create(:assignment_id => @assignment.id, :user_id => @user.id, :permission_granted => true)
+      else
+        @participant = Participant.create(:assignment_id => @assignment.id, :user_id => @user.id, :permission_granted => false)
+      end
       redirect_to :action => 'view_assignment_participants', :id => @assignment
     end
   end

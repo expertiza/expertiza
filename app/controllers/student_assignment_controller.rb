@@ -11,6 +11,14 @@ class StudentAssignmentController < ApplicationController
                                     :order => "assignment_id DESC")
   end
   
+  def view_publishing
+    user_id = session[:user].id
+    @user =session[:user]
+    @participants = Participant.find(:all, 
+                                    :conditions => ['user_id = ?', user_id],
+                                    :order => "assignment_id DESC")
+  end
+  
   def view_actions
     @student = Participant.find(params[:id])
     @assignment_id = @student.assignment_id
@@ -38,15 +46,81 @@ class StudentAssignmentController < ApplicationController
       redirect_to :action => 'list'
   end
   
+#  def set_publish_permission_yes
+#    @participant = Participant.find(:first, :conditions => ["id = ?",params[:id]])
+#    @participant.permission_granted = 1;
+#    @participant_id = params[:id]
+#    if @participant.save
+#      flash[:notice] = 'Your work will now be published'
+#      redirect_to :action => 'submit', :id => @participant_id
+#    else # If something goes wrong, stay at same page
+#      render :action => 'submit', :id => @participant_id
+#    end
+#  end
+  
   def set_publish_permission_yes
-    @participant = Participant.find(:first, :conditions => ["id = ?",params[:id]])
+    @participant = Participant.find(:first, :conditions => ["id = ?",params[:participant]])
     @participant.permission_granted = 1;
     @participant_id = params[:id]
     if @participant.save
       flash[:notice] = 'Your work will now be published'
-      redirect_to :action => 'submit', :id => @participant_id
+      redirect_to :action => 'view_publishing'
     else # If something goes wrong, stay at same page
-      render :action => 'submit', :id => @participant_id
+      render :action => 'view_publishing'
+    end
+  end
+  
+  def set_publish_permission_no
+    @participant = Participant.find(:first, :conditions => ["id = ?",params[:participant]])
+    @participant.permission_granted = 0;
+    @participant_id = params[:id]
+    if @participant.save
+      flash[:notice] = 'Your work will now be published'
+      redirect_to :action => 'view_publishing'
+    else # If something goes wrong, stay at same page
+      render :action => 'view_publishing'
+    end
+  end
+  
+  def set_all_publish_permission_yes
+    @participants = Participant.find(:all, :conditions => ["user_id = ?",params[:user]])
+    for participant in @participants
+      participant.permission_granted = 1;
+      if !participant.save
+        render :action => 'view_publishing'
+      end
+    end
+    redirect_to :action => 'view_publishing'
+  end
+  
+  def set_all_publish_permission_no
+    @participants = Participant.find(:all, :conditions => ["user_id = ?",params[:user]])
+    for participant in @participants
+      participant.permission_granted = 0;
+      if !participant.save
+        render :action => 'view_publishing'
+      end
+    end
+    redirect_to :action => 'view_publishing'
+  end
+  
+  def set_future_publish_permission_yes
+    @user = session[:user]
+    @user.master_permission_granted = 1;
+    if @user.save
+      redirect_to :action => 'view_publishing'
+    else # If something goes wrong, stay at same page
+      render :action => 'view_publishing'
+    end
+  end
+  
+  def set_future_publish_permission_no
+    @user = session[:user]
+    @user.master_permission_granted = 0;
+    if @user.save
+      redirect_to :action => 'view_publishing'
+    else # If something goes wrong, stay at same page
+      render :action => 'view_publishing'
     end
   end
   
@@ -304,19 +378,19 @@ private
   end
   
   def validate(url)   
-    begin
-      logger.info "**#{url}**"
-      uri = URI.parse(url)
-    
-      logger.info "**#{uri.class}**"
-      if uri.class != URI::HTTP and uri.class != URI::FTP
-        flash[:error] = "Only HTTP or FTP addresses can be supplied. \n" + url
-        return false
-      end
-    rescue      
-      flash[:error] = "The format of the url is not valid. " + $!
-      return false
-    end
+#    begin
+#      logger.info "**#{url}**"
+#      uri = URI.parse(url)
+#    
+#      logger.info "**#{uri.class}**"
+#      if uri.class != URI::HTTP and uri.class != URI::FTP
+#        flash[:error] = "Only HTTP or FTP addresses can be supplied. \n" + url
+#        return false
+#      end
+#    rescue      
+#      flash[:error] = "The format of the url is not valid. " + $!
+#      return false
+#    end
     return true
   end
   

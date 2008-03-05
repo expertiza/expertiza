@@ -17,7 +17,7 @@ module ParticipantsHelper
     attributes = {}
     attributes["role_id"] = Role.find_by_name "Student"
     attributes["name"] = line_split[config["name"].to_i]
-    attributes["fullname"] = generate_user_name(line_split[config["fullname"].to_i].split(" "))
+    attributes["fullname"] = config["fullname"]
     attributes["email"] = line_split[config["email"].to_i]
     attributes["clear_password"] = assign_password(8)
     attributes["email_on_submission"] = 1
@@ -58,7 +58,6 @@ module ParticipantsHelper
   end
   
   def self.add_user_to_course(params, user)
-    course = Course.find params[:course_id]
     if (CoursesUsers.find(:all, {:conditions => ['user_id=? AND course_id=?', user.id, params[:course_id]]}).size == 0)
       CoursesUsers.create :user_id => user.id, :course_id => params[:course_id]
     end
@@ -80,7 +79,6 @@ module ParticipantsHelper
   
   def self.store_item(line, ident, config)
       line_split = line.split("=")
-      key = ident+"="      
       if line_split[0] == ident
          newstr = line_split[1].sub!("\n","")
          if newstr != nil
@@ -95,15 +93,6 @@ module ParticipantsHelper
     newpass = ""
     1.upto(len) { |i| newpass << chars[rand(chars.size-1)] }
     return newpass
-  end
-  
-  def self.generate_user_name(username) 
-        if username.length == 3 and username[2] != nil
-           middlename = username[2].capitalize
-        else
-           middlename = ""
-        end    
-        return username[0].capitalize+", "+username[1].capitalize+" "+middlename
   end
     
 end

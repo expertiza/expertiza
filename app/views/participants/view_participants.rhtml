@@ -3,6 +3,7 @@
 </script>
 
 <h1>Participants</h1>
+<h2>Course: <%= @course.title %></h2>
 <br/>
 
 <div class = "exp">
@@ -38,10 +39,12 @@
 					:obj_type => "course_id", 
 					:obj_id => @course.id} 
 %>
-<%= 
-	render :partial => 'import_roster', 
-		:locals => {:obj_type => "course_id", 
-					:obj_id => @course.id} 
+<% 
+  session[:return_to] = request.request_uri  
+  session[:expected_fields] = 'Name, Full name (first[ middle] last), E-mail address, Password'
+  session[:course_id] = @course.id 
 %>
+<%= link_to 'Import Participants', :controller=>'import_file', :action=>'start', :import_type => 'Course Participants' %>
+
 <hr/>
 

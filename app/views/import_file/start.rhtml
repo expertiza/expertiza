@@ -1,0 +1,39 @@
+<script type="text/javascript">
+function checkIfFileExists()
+{
+    var filename=document.getElementById("file");
+    if(filename.value==null || filename.value=='')
+    {
+        return false;
+    }
+    else 
+    {
+    	return true;
+   	}
+}
+</script>
+
+<h2>Import <%= @import_type%></h2>
+<%= start_form_tag 'import', :multipart => true, :name => 'import_form' %>
+<table>
+ <tr>
+  <td valign='Top'>Delimiter:</td>
+  <td>
+     <%= radio_button_tag 'delim_type','comma',true %> Comma<br/>
+     <%= radio_button_tag 'delim_type','space' %> Space<br/>
+     <%= radio_button_tag 'delim_type','tab' %> Tab<br/>
+     <%= radio_button_tag 'delim_type','other' %> Other <%= text_field_tag 'other_char' %><br/>
+  </td>
+ </tr>
+ </table>
+ <br/>
+ <label for="file">File to Import: </label><%= file_field_tag 'file', :size => 40 %><br/><br/>
+<%= end_form_tag %>
+
+ * The import process expects the following columns:<br/>
+ &nbsp;&nbsp;&nbsp;<%= session[:expected_fields] %>
+ <br/><br/>
+
+ <a href="<%= session[:return_to]%>">Back</a>
+ <a href="#" onclick='if (checkIfFileExists()) {import_form.submit();} else {alert("Please select a file before clicking Next.");}'>Next</a>
+ 

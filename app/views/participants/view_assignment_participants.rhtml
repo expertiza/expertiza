@@ -10,7 +10,8 @@ function showFields()
 }
 </script>
 
-<h1>Assignment Participants</h1>
+<h1>Participants</h1>
+<h2>Assignment: <%= @assignment.name %></h2>
 <br/>
 
 <div class = "exp">
@@ -46,9 +47,12 @@ function showFields()
 					:obj_type => "assignment_id", 
 					:obj_id => @assignment.id} 
 %>
-<%= 
-	render :partial => 'import_roster', 
-		:locals => {:obj_type => "assignment_id", 
-					:obj_id => @assignment.id} 
+<br/>
+<% 
+  session[:return_to] = request.request_uri  
+  session[:expected_fields] = 'Name, Full name (first[ middle] last), E-mail address, Password'
+  session[:assignment_id] = @assignment.id 
 %>
+<%= link_to 'Import Participants', :controller=>'import_file', :action=>'start', :import_type => 'Assignment Participants' %>
+
 <hr/>

@@ -1,4 +1,4 @@
-<h1>Scores</h1>
+<h1>Scores for <%= Assignment.find(@assignment_id).name %></h1>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
 	<%= flash[:notice] %>

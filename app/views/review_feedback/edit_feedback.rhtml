@@ -1,0 +1,10 @@
+<h1>Edit Feedback</h1>
+
+<%= start_form_tag :action => 'update_feedback' %>
+<%= render :partial => 'feedbackcontentforedit' %>    
+<%= hidden_field_tag('assgt_id', @assgt_id) %>
+<%= hidden_field_tag('author_id', @author_id) %>
+<%= hidden_field_tag('review_id', @review_id) %>
+    <%= submit_tag "Edit Feedback", :name=>"save" %>       
+<%= end_form_tag %>
+<br />

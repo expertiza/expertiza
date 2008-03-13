@@ -26,4 +26,8 @@
 <% end %>
 </table>
 <br />
+<% unless @course_eval %>
 <%= link_to 'Back', :action => 'view_responses', :id => params[:assignment_id] %>
+<% else %>
+<%= link_to 'Back', :action => 'view_responses', :id => params[:assignment_id] , :course_eval=>@course_eval %>
+<% end %>

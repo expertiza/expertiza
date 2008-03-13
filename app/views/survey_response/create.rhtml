@@ -1,13 +1,13 @@
-<h1>Taking Survey</h1>
+<h1>Survey for all students</h1>
 
-<%= form_tag(:action=>'create')%>
+<%= form_tag(:action=>'create', :survey_id=> @survey.id)%>
 
 <% @min= @survey.min_question_score %>
 <% @max= @survey.max_question_score %>
-
+<p>
 <div id="student_survey_wrapper">
 <% for question in @questions %>
-  <p class="left_inline"><%= question.txt %></p>     
+  <p class="left_inline"><%= question.txt %> &nbsp;     
   <% @box_values = []
 	 @box_labels = []
      if question.true_false?
@@ -32,13 +32,21 @@
 			end
 		%>
 	 </select>
+	 </p>
 	 <br />
-	 <textarea class="clear_both" name="comments[<%= question.id %>]" cols="50" rows="3"></textarea>
+	 <textarea class="clear_both" name="comments[<%= question.id %>]" cols="80" rows="3"></textarea>
   <br />
   <br />
 <% end %>
+
+<% if @course_eval %>
+<input name="survey_deployment_id" value=<%= params[:id] %> type=hidden />
+<input name="assignment_id" value=0 type=hidden />
+<% end %>
+
 <br />
 </div>
+</p>
 <input name="id" value=<%= params[:id] %> type=hidden />
 <input name="survey_id" value=<%= @survey.id %> type=hidden />
 <input name="count" value=<%= params[:count].to_i+1 %> type=hidden />

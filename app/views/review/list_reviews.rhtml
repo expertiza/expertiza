@@ -3,7 +3,7 @@
 	<%= flash[:notice] %>
 </div>
 <% end %>
-<h1>Reviews</h1>
+<h1>Reviews for <%= @assignment.name %></h1>
 
 <table class="listing" cellpadding=2>
  <tr><ul>
@@ -21,7 +21,7 @@
   end %></ul>
  </tr>
  <% if @can_view_review_of_review == 1 %>
- <h1>Reviews of reviews</h1>
+ <h1>Reviews of reviews for <%= @assignment.name %></h1>
  <tr><ul>
   <%ror_no = 1%>
   <%for ror_map in @review_of_review_mappings %>
@@ -40,7 +40,7 @@
  <li>
 		<% if @can_view_review_of_review == 1 
 			current_ror = ReviewOfReviewMapping.count_by_sql("select count(*) from review_of_review_mappings, reviews where reviewer_id ="+@reviewer_id.to_s)
-			max_ror = Assignment.find(@assignment_id).num_review_of_reviews
+			max_ror = @assignment.num_review_of_reviews
 			if current_ror < max_ror%>
 			<%= link_to "New review of review",{:controller => 'review_of_review', :action => 'new_review_of_review', :user => @reviewer_id, :assignment => @assignment_id} %>
 		    <% 	end

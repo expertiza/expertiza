@@ -237,12 +237,12 @@ class ReviewController < ApplicationController
   
   def list_reviews
     @reviewer_id = session[:user].id
-    @assignment_id = params[:id]
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_questionnaire_id])
-    @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
-    @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
+    @assignment = Assignment.find(params[:id])
+    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assignment.review_questionnaire_id])
+    @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment.id])   
+    @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment.id])   
     # Finding the current phase that we are in
-    due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
+    due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
     @very_last_due_date = DueDate.find(:all,:order => "due_at DESC", :limit =>1)
     next_due_date = @very_last_due_date[0]
     for due_date in due_dates

@@ -1,5 +1,7 @@
 class ReviewMapping < ActiveRecord::Base
   belongs_to :assignment
+  belongs_to :author, :class_name => "User", :foreign_key => "author_id"
+  belongs_to :reviewer, :class_name => "User", :foreign_key => "reviewer_id"
   has_many :reviews
   has_many :review_of_review_mappings
   

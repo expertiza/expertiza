@@ -1,6 +1,7 @@
 class Review < ActiveRecord::Base
   has_many :review_feedbacks
   has_many :review_scores
+  belongs_to :review_mapping
   
     def self.review_view_helper(review_id,fname,control_folder)
     @review = Review.find(review_id)

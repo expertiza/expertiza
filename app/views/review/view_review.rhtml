@@ -1,61 +1,7 @@
-
-<h1>View Review</h1>
-<%if @assgt.wiki_type.name == "No"%>
-<%if @files.size == 0%>
-<strong>This submission is missing.</strong>
-<%else%>
-Submitted Files<br />
-<%end%>
-<%end%>
-
-<%
- _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
- if @assgt.wiki_type.name == "DokuWiki" %>
-<br>
-<b>DokuWiki Review Links:</b>
-<br>
-<br>
-<%= review_dokuwiki @assgt.directory_path, _time, @author_name  %>
-<br>
-<% elsif @assgt.wiki_type.name == "MediaWiki" %>
-<br>
-<b>MediaWiki Review Links:</b>
-<br>
-<br>
-<!--The following checks a wiki type.  If we add a new wiki type, we need to modify this code, which is in
-    a very unexpected place.  This should be done by polymorphism, based on a Wiki class that is subclassed
-    for various kinds of wikis. 
-    
-    Make a generic review_wiki function, with a parameter specifying wiki type.  The review_wiki function
-    then makes callbacks to the various wiki classes, depending on what kind of a wiki it is working on.
-    This allows wiki-specific behavior to be kept in the wiki classes. -->
-<%if @assgt.team_assignment  # The lookup of all team members should be put in a wiki helper
-  	for team_member in @team_members
-		member_name = User.find(team_member.user_id).name 
-%>
-	<%= review_mediawiki_group @assgt.directory_path, _time, member_name  %>
-	<%end%>
-<%else%>
-	<%= review_mediawiki @assgt.directory_path, _time, @author_name  %>
-<%end%>
-<br>
-<% end %>
-<ul>
-<% for file in @files %>
-<li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
-<% end %>
-</ul>
-
-<br/><label>URL to file submission (if available):</label><%=Participant.find(:first, :conditions =>["user_id = ? and assignment_id = ?",team_member.user_id,@assgt.id]).url%><br/>
-<strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at %></strong>
-<%= render :partial => 'review/scores' %> 
-Additional Comment : <%=@review.additional_comment%><br/>
-<br/>
-<%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]))
-      		  	review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]).txt
-%>		     
-Author feedback:<br/>
-<%=review_feedback_text%><br/>
-<% end%>
+<%= render :partial => 'view' %>
+<% if params[:where] == nil%>
 <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
+<%else%>
+<%= link_to 'Back',:controller=>'assignment', :action => 'view_report', :id => @assgt.id %>
+<%end%>
 

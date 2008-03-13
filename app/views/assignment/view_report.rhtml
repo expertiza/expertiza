@@ -45,7 +45,7 @@
 			ror +=ror_total.to_f
 		end
 		ror_final +=ror
-	end
+	
 	review_no = 1
 	grade = 0
 	_time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
@@ -91,6 +91,7 @@
 			<td><%=sprintf("%.2f",review)%>%</td>
 <%
 		end
+  end
 %>
 </table>
 <br/>

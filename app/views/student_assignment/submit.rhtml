@@ -1,4 +1,4 @@
-<h1>Submit Assignment</h1>
+<h1>Submit work for <%= @student.assignment.name %></h1>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
 	<%= flash[:notice] %>

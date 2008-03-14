@@ -10,7 +10,7 @@ module ChartsHelper
       address = "http://chart.apis.google.com/chart?cht=p3&chs=300x125"
       max = 100.0
       for value in values
-        max = value if value > max
+        max = value if value.to_f > max
       end
       
       max = max/100.0
@@ -22,7 +22,8 @@ module ChartsHelper
       i = 0
       for value in values
         unless value == 0
-          value_string += (value/max).to_i.to_s + ","
+        
+          value_string += (value.to_f/max).to_i.to_s + ","
           label_string += labels[i].to_s + "|" 
           color_string += self.get_rg_color(i+0.5,values.length) + ","          
         end  
@@ -59,12 +60,8 @@ module ChartsHelper
     i = 0
     for value in values
       label_string += labels[labels.length - 1 - i].to_s + "|" 
-      color_string += self.get_rg_color(value,max) + ","
-      
-      i.times do value_string += 0.to_s + "," end
-    
-      value_string += (value*100/max).to_i.to_s + "|"
-      
+      color_string += self.get_rg_color(value,max)+","
+      value_string += (value*100/max).to_i.to_s + ","
       i += 1
     end 
     
@@ -73,7 +70,6 @@ module ChartsHelper
     color_string = color_string[0..-2]   # remove last comma
      
     address += value_string + label_string + color_string
-    
   end
 
 

@@ -1,98 +1,99 @@
-<h1>Grade report: <%=@assignment.name%></h1>
-<table border=1>
-	<th>Author</th>
-<%
-	for i in 0...@assignment.num_reviews%>
-		<th>Review<%=i+1%></th>
-<%
-	end
-%>
-	<th>Review of Review</th>
-	<th>Final Score</th>
-<%
-	for participant in @participants
-		student =User.find(participant.user_id)
-		if !@assignment.team_assignment
-			review_mapping = ReviewMapping.find_by_sql("select * from review_mappings where author_id = "+student.id.to_s+" and assignment_id = "+@assignment.id.to_s)
-		elsif @assignment.team_assignment
-			teams = TeamsUser.find_by_sql("select * from teams_users where user_id = "+student.id.to_s)
-			for team in teams
-				if ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", team.team_id, @assignment.id])
+<h1>Grade report for Assignment: <%=@assignment.name%></h1>
+<% if @participants.size >0 %>
+	<table class="listing" cellpadding=2>
+		<th>Author</th>
+		<%for i in 0...@assignment.num_reviews%>
+			<th>Review <%=i+1%></th>
+		<%end%>
+		<th>Review of Review</th>
+		<th>Final Score</th>
+		
+		<%for participant in @participants
+			flag = 0
+			student =User.find(participant.user_id)
+			if !@assignment.team_assignment
+				review_mapping = ReviewMapping.find_by_sql("select * from review_mappings where author_id = "+student.id.to_s+" and assignment_id = "+@assignment.id.to_s)
+			elsif @assignment.team_assignment
+				teams = TeamsUser.find_by_sql("select * from teams_users where user_id = "+student.id.to_s+" and team_id in (select id from teams where assignment_id = "+@assignment.id.to_s+")")
+				for team in teams
 					review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", team.team_id, @assignment.id])
 				end
 			end
-		end
-		review_mappings_for_student = ReviewMapping.find(:all,:conditions => ["reviewer_id = ?", participant.user_id])
-		ror_count =0
-		ror_final = 0
-		for review_mapping_for_student in review_mappings_for_student	
-			ror = 0
-			for review in review_mapping_for_student.reviews
-				review_of_review_mapping = ReviewOfReviewMapping.find(:first,:conditions => ["review_id = ?", review.id])
-				if review_of_review_mapping
-					ror_count += 1
-					for review_of_review in review_of_review_mapping.review_of_reviews
-						ror_total = 0
-						question_count = 0
-						for review_of_review_score in review_of_review.review_of_review_scores
-							ror_total += review_of_review_score.score 
-							question_count += 1
+			
+			#review_mappings_for_student = ReviewMapping.find(:all,:conditions => ["reviewer_id = ?", participant.user_id])
+			ror_count =0
+			ror_final = 0
+			for review_mapping_for_student in review_mapping		
+				ror = 0
+				for review in review_mapping_for_student.reviews
+					flag = 1
+					review_of_review_mapping = ReviewOfReviewMapping.find(:first,:conditions => ["review_id = ?", review.id])
+					if review_of_review_mapping
+						ror_count += 1
+						for review_of_review in review_of_review_mapping.review_of_reviews
+							ror_total = 0
+							question_count = 0
+							for review_of_review_score in review_of_review.review_of_review_scores
+							    ror_total += review_of_review_score.score 
+								question_count += 1
+							end
+							ror_total = ror_total*100/@sum_of_max.to_f
 						end
-						ror_total = ror_total*100/@sum_of_max.to_f
 					end
+					ror +=ror_total.to_f
 				end
+				ror_final +=ror
 			end
-			ror +=ror_total.to_f
-		end
-		ror_final +=ror
-	
-	review_no = 1
-	grade = 0
-	_time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
-%>
-	<tr>
-		<td><strong><%=student.fullname%></strong><br/></td>
-<%
-		if review_mapping
-			for review_map in review_mapping
-				for review in review_map.reviews
-					total = 0
-					for review_score in review.review_scores
-						total += review_score.score 
+			review_no = 1
+			grade = 0
+		    _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s%>    
+			<tr>
+				<td><% if ( flag ==1 ) %> <%=link_to student.fullname, :controller => 'review', :action => 'review_for_author', :id1 => review.id, :id2 => @assignment.id, :where=>"reports_page"%><%else%><b><%= student.fullname%>
+				</b><%end%>
+				</td>
+				<%if review_mapping
+				
+				for review_map in review_mapping
+					for review in review_map.reviews
+			            total = 0
+				        for review_score in review.review_scores
+					        total += review_score.score 
+						end
+						grade += total.to_f
+			            review_no +=1
+						%>
+						<td>&nbsp;&nbsp;<%= link_to User.find(review_map.reviewer_id).fullname, :controller=>'review', :action => 'view_review', :id=> review.id, :where=>"reports_page"%><br/>&nbsp;&nbsp;<%=sprintf("%.2f",total.to_f*100/@sum_of_max.to_f)%>%</td>
+			           <%
+			        end
+				end
+				end
+				if review_no < (@assignment.num_reviews+1)
+					for i in 0...@assignment.num_reviews+1-review_no%>
+					<td></td>
+					<%
 					end
-					grade += total.to_f
-					review_no +=1
-%>
-					<td>&nbsp;&nbsp;<%= link_to User.find(review_map.reviewer_id).fullname, :controller=>'review', :action => 'view_review', :id=> review.id%><br/>&nbsp;&nbsp;<%=sprintf("%.2f",total.to_f*100/@sum_of_max.to_f)%>%</td>
-<%
-				end
-			end
-		end
-		if review_no < (@assignment.num_reviews+1)
-			for i in 0...@assignment.num_reviews+1-review_no
-%>
-				<td></td>
-<%
-			end
-		end
-		if review_no-1 > 0 
-			ror_cnt = 1
-			if ror_count > 0
-				ror_cnt = ror_count
-			end		
-			review = (grade.to_f/(review_no-1).to_f*100/@sum_of_max.to_f).to_f
-			if ror_count < 1
-				review_of_review = (100*(100-@assignment.review_weight)/100).to_f
-			else
-				review_of_review = (ror_final.to_f/(ror_cnt).to_f*100/@sum_of_max.to_f*(100-@assignment.review_weight)/100).to_f
-			end
-%>
-			<td><%=sprintf("%.2f",(ror_final.to_f/(ror_cnt).to_f*100/@sum_of_max.to_f).to_f)%>%</td>
-			<td><%=sprintf("%.2f",review)%>%</td>
-<%
-		end
-  end
-%>
-</table>
+				end%>
+				<%if review_no-1 > 0 
+					ror_cnt = 1
+					if ror_count > 0
+						ror_cnt = ror_count
+					end		
+					review = (grade.to_f/(review_no-1).to_f*100/@sum_of_max.to_f).to_f
+					if ror_count < 1
+						review_of_review = (100*(100-@assignment.review_weight)/100).to_f
+					else
+						review_of_review = (ror_final.to_f/(ror_cnt).to_f*100/@sum_of_max.to_f*(100-@assignment.review_weight)/100).to_f
+					end%>
+					<td><%=sprintf("%.2f",(ror_final.to_f/(ror_cnt).to_f*100/@sum_of_max.to_f).to_f)%>%</td>
+					<td><%=sprintf("%.2f",review)%>%</td>
+				<%end %>
+			
+			</tr>
+		<% end%>
+	</table>
+<% else %>
+	<br/>
+	<p>To view reports for <%=@assignment.name%>, first assign reviewers, by <%= link_to 'clicking here', :action => 'assign_reviewers', :id => @assignment.id %>.</p> 
+<% end %>
 <br/>
 <%= link_to 'Back', :action=>'list'%>

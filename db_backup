@@ -43,6 +43,7 @@ CREATE TABLE `assignments` (
   `require_signup` tinyint(1) default NULL,
   `num_reviewers` int(10) unsigned NOT NULL default '0',
   `spec_location` text,
+  `author_feedback_questionnaire_id` int(11) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `fk_assignments_review_questionnaires` (`review_questionnaire_id`),
   KEY `fk_assignments_review_of_review_questionnaires` (`review_of_review_questionnaire_id`),
@@ -809,7 +810,7 @@ CREATE TABLE `questionnaire_types` (
 
 LOCK TABLES `questionnaire_types` WRITE;
 /*!40000 ALTER TABLE `questionnaire_types` DISABLE KEYS */;
-INSERT INTO `questionnaire_types` VALUES (1,'Rubric'),(2,'Survey'),(3,'Global Survey');
+INSERT INTO `questionnaire_types` VALUES (1,'Rubric'),(2,'Survey'),(3,'Global Survey'),(4,'Course Evaluation'),(5,'Author Feedback');
 /*!40000 ALTER TABLE `questionnaire_types` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -902,6 +903,8 @@ CREATE TABLE `review_feedbacks` (
   `user_id` int(11) default NULL,
   `feedback_at` datetime default NULL,
   `txt` text,
+  `additional_comment` text,
+  `author_id` int(11) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `fk_review_feedback_assignments` (`assignment_id`),
   KEY `fk_review_feedback_reviews` (`review_id`),
@@ -929,6 +932,7 @@ CREATE TABLE `review_mappings` (
   `team_id` int(11) default NULL,
   `reviewer_id` int(11) default NULL,
   `assignment_id` int(11) default NULL,
+  `round` int(11) default NULL,
   PRIMARY KEY  (`id`),
   KEY `fk_review_mapping_assignments` (`assignment_id`),
   CONSTRAINT `fk_review_mapping_assignments` FOREIGN KEY (`assignment_id`) REFERENCES `assignments` (`id`)
@@ -1033,6 +1037,7 @@ CREATE TABLE `review_scores` (
   `question_id` int(11) default NULL,
   `score` int(11) default NULL,
   `comments` text,
+  `questionnaire_type_id` int(11) default NULL,
   PRIMARY KEY  (`id`),
   KEY `fk_review_score_reviews` (`review_id`),
   KEY `fk_review_score_questions` (`question_id`),

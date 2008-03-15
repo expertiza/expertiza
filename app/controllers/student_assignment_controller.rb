@@ -174,8 +174,6 @@ class StudentAssignmentController < ApplicationController
     @participant_id = params[:participant_id]
     @review_id = params[:review_id]
     @assignment_id = params[:assignment_id]
-    puts "#####################################################################################################"
-    puts params['author']
     update_author_feedback(@review_id,@assignment_id,params['author']['text'])
     redirect_to :action => 'view_scores', :id => @participant_id
   end
@@ -245,8 +243,6 @@ class StudentAssignmentController < ApplicationController
     @student = Participant.find(params[:id])
     @link = @student.submitted_hyperlink
     @submission = params[:submission]
-    puts "*********************************************"
-    puts @submission
     @files = Array.new
     @assignment_id = @student.assignment_id
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)

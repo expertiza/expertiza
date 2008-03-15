@@ -55,10 +55,6 @@ class ReviewOfReviewController < ApplicationController
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @assgt.id])
       @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
       @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
-      
-      
-      puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-      puts @assgt.id
       if @assgt.team_assignment 
         @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @eligible_review_mapping.team_id]).user_id
         @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @eligible_review_mapping.team_id])
@@ -89,8 +85,7 @@ class ReviewOfReviewController < ApplicationController
       @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_of_review_questionnaire_id]) 
       @questionnaire = Questionnaire.find(@assgt.review_of_review_questionnaire_id)
       @max = @questionnaire.max_question_score
-      @min = @questionnaire.min_question_score
-      
+      @min = @questionnaire.min_question_scoreF
       rescue
       flash[:notice] = "Review of review cannot be created now"
       redirect_to :controller =>'review', :action => 'list_reviews', :id => params['assignment']
@@ -177,7 +172,6 @@ class ReviewOfReviewController < ApplicationController
     @ror_questionnaire = Questionnaire.find(@ror_assgt.review_of_review_questionnaire_id)
     @ror_max = @ror_questionnaire.max_question_score
     @ror_min = @ror_questionnaire.min_question_score 
-    
   end
   def list_review_of_review
     

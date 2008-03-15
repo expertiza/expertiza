@@ -77,8 +77,8 @@
   <!-- Provided drop down menu for selecting the feedback rubric -->
   <td style ="padding: 15px"><label for="feedback rubric">Feedback rubric</label>
    	  <!--select name="author_feedback_questionnaire_id"></select-->
-      <%=@rubrics = Questionnaire.find(:all, :conditions => ["type_id = 5"]).map {|u| [u.name, u.id] }
-      select('assignment', 'author_feedback_questionnaire_id', @rubrics)%>
+      <%=@questionnaires = Questionnaire.find(:all, :conditions => ["type_id = 5"]).map {|u| [u.name, u.id] }
+      select('assignment', 'author_feedback_questionnaire_id', @questionnaires)%>
   </td>
   <td style="padding: 15px"><label for="review_of_review_questionnaire">Review-of-review questionnaire:</label>
       <!--select name="review_of_review_questionnaire_id"></select-->

@@ -28,9 +28,15 @@
 <table>
 <tr>
   <td><label for="team_assignment">Team assignment:</label></td>
-  <td><select name="assignment[team_assignment]">
+  <td>
+  		<select name="assignment[team_assignment]">
+  		<% if @assignment.team_assignment == true %>
                 <option value=false>No</option>
+                <option value=true SELECTED>Yes</option>
+        <% else %>         
+        		<option value=false>No</option>
                 <option value=true>Yes</option>
+        <% end %>
        </select></td>
 </tr>
 <tr>
@@ -67,6 +73,12 @@
   </td>
   <td style="padding: 15px"><label for="review_weight">Review weight:</label>
       <%= text_field 'assignment', 'review_weight', :size=>5%>
+  </td>
+  <!-- Provided drop down menu for selecting the feedback rubric -->
+  <td style ="padding: 15px"><label for="feedback rubric">Feedback rubric</label>
+   	  <!--select name="author_feedback_questionnaire_id"></select-->
+      <%=@rubrics = Questionnaire.find(:all, :conditions => ["type_id = 5"]).map {|u| [u.name, u.id] }
+      select('assignment', 'author_feedback_questionnaire_id', @rubrics)%>
   </td>
   <td style="padding: 15px"><label for="review_of_review_questionnaire">Review-of-review questionnaire:</label>
       <!--select name="review_of_review_questionnaire_id"></select-->

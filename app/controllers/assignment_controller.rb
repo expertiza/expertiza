@@ -1,4 +1,5 @@
 class AssignmentController < ApplicationController
+  require 'ftools'
   auto_complete_for :user, :name
   before_filter :authorize
   
@@ -19,6 +20,9 @@ class AssignmentController < ApplicationController
     @assignment = Assignment.new(params[:assignment])
     @assignment.instructor_id = (session[:user]).id
     @assignment.submitter_count = 0
+    ## feedback added
+    puts "round = ",params[:assignment_helper][:no_of_reviews].to_i
+    ##
     @duedate=DueDate.new
     
     # Deadline types used in the deadline_types DB table
@@ -34,13 +38,24 @@ class AssignmentController < ApplicationController
       submit_duedate.deadline_type_id=@Submission_deadline;
       submit_duedate.assignment_id=@assignment.id;
       submit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
+      ## feedback added
+      submit_duedate.round = 1;
+      puts "submit round",submit_duedate.round
+      ##
       submit_duedate.save;
       
       review_duedate=DueDate.new(params[:review_deadline]);
       review_duedate.deadline_type_id=@Review_deadline;
       review_duedate.assignment_id=@assignment.id;
       review_duedate.late_policy_id=1;
+      ## feedback added
+      review_duedate.round = 1;
+      puts "review round",review_duedate.round
+      ##
       review_duedate.save;
+      ## feedback added
+      max_round = 2;
+      ##
       
       if params[:assignment_helper][:no_of_reviews].to_i >= 2
         for resubmit_duedate_key in params[:additional_submit_deadline].keys
@@ -48,32 +63,46 @@ class AssignmentController < ApplicationController
           resubmit_duedate.deadline_type_id=@Resubmission_deadline;
           resubmit_duedate.assignment_id=@assignment.id;
           resubmit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
+          ## feedback added
+          resubmit_duedate.round = max_round
+          puts "resubmit round",resubmit_duedate.round
+          max_round = max_round + 1
+          ##
           resubmit_duedate.save;
         end
-        
+        ## feedback added
+        max_round = 2
+        ##
         for rereview_duedate_key in params[:additional_review_deadline].keys
           rereview_duedate=DueDate.new(params[:additional_review_deadline][rereview_duedate_key]);
           rereview_duedate.deadline_type_id=@Rereview_deadline;
           rereview_duedate.assignment_id=@assignment.id;
           rereview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
+          ## feedback added
+          rereview_duedate.round = max_round
+          puts "rereview round",rereview_duedate.round
+          max_round = max_round + 1
+          ##
           rereview_duedate.save;
         end
+        ## feedback added
+        puts "max_round ", max_round
+        ##
+        
       end      
       reviewofreview_duedate=DueDate.new(params[:reviewofreview_deadline]);
       reviewofreview_duedate.deadline_type_id=@Review_of_review_deadline;
       reviewofreview_duedate.assignment_id=@assignment.id;
       reviewofreview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
+      ## feedback added
+      reviewofreview_duedate.round = max_round
+      puts "review of review round",reviewofreview_duedate.round
+      ##
       reviewofreview_duedate.save;
       
       # Create submission directory for this assignment
-      @assignment.save
-      newdir = RAILS_ROOT + "/pg_data/" + @assignment.directory_path
-      begin
-        FileUtils.mkdir_p(newdir)
-        flash[:notice] = 'Assignment was successfully created.'
-      rescue
-        flash[:error] = 'Submission directory was not created. \nAssignment was saved. \nError: ' + $!
-      end      
+      File.makedirs(RAILS_ROOT + "/pg_data/" + params[:assignment][:directory_path])
+      flash[:notice] = 'Assignment was successfully created.'
       redirect_to :action => 'list'
       
     else
@@ -91,28 +120,32 @@ class AssignmentController < ApplicationController
   
   def save_reviewer_mappings
     @assignment = Assignment.find(params[:assignment_id])
+    @assignment.review_strategy_id = 1
+    @assignment.mapping_strategy_id = 1
+    
+    ## feedback added    
+    params[:selection].each {|key, value| puts "#{key} is #{value}" }
+    
+    mapping_strategy = {}
+    params[:selection].each{|a|
+      if a[0] =~ /^m_/
+        puts "hey"
+        mapping_strategy[a[0]] = a[1]
+      end
+    }
+    
+    mapping_strategy.each {|key, value| puts "#{key} maps #{value}" }
+    ##
     if @assignment.update_attributes(params[:assignment])
-      ReviewMapping.assign_reviewers(@assignment.id, @assignment.num_reviews, @assignment.num_review_of_reviews)
+      ## feedback added
+      ReviewMapping.assign_reviewers(@assignment.id, @assignment.num_reviews, @assignment.num_review_of_reviews, mapping_strategy)
+      ##
       flash[:notice] = 'Reviewers assigned successfully.'
       redirect_to :action => 'list'
     else
       @wiki_types = WikiType.find_all
       render :action => 'edit'
     end    
-  end
-  
-  def import_mappings
-    @assignment = Assignment.find(params[:assignment_id]);
-    if params['load_mapping']      
-      file = params['uploaded_file']
-      temp_directory = RAILS_ROOT + "/pg_data/tmp/#{session[:user].id}_"
-      safe_filename = FileHelper::sanitize_filename(file.full_original_filename)
-      File.open(temp_directory+safe_filename, "w") { |f| f.write(file.read) }            
-      users = ReviewMapping.import_reviewers(temp_directory+safe_filename, @assignment) 
-      File.delete(temp_directory+safe_filename)
-    end  
-    flash[:notice] = 'Reviewers assigned successfully.'
-    redirect_to :action => 'list'      
   end
   
   def edit
@@ -122,20 +155,6 @@ class AssignmentController < ApplicationController
   
   def update
     @assignment = Assignment.find(params[:id])
-    begin
-     oldpath = RAILS_ROOT + "/pg_data/" + @assignment.directory_path         
-     newpath = RAILS_ROOT + "/pg_data/" + params[:assignment][:directory_path]
-     logger.info "#{oldpath}"
-     logger.info "#{newpath}"
-     logger.info "#{Dir[oldpath].length}"
-     if (Dir[oldpath].length > 0)
-         File.rename(oldpath, newpath)
-     else         
-         FileUtils.mkdir_p(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
-     end
-   rescue SystemCallError
-     flash[:error] = 'Directory was not created. \nError: ' + $!
-   end
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])
       # Iterate over due_dates, from due_date[0] to the maximum due_date
@@ -156,7 +175,7 @@ class AssignmentController < ApplicationController
   end
   
   def delete
-    @assignment = get(Assignment, params[:id])    
+    @assignment = get(Assignment, params[:id])
     # If the assignment is already deleted, go back to the list of assignments
     if @assignment == nil
       redirect_to :action => 'list' 
@@ -164,7 +183,7 @@ class AssignmentController < ApplicationController
       if @assignment.due_dates_exist? == false or params['delete'] or @assignment.review_feedback_exist? == false or @assignment.participants_exist? == false
         # The size of an empty directory is 2
         # Delete the directory if it is empty
-        begin         
+        begin
           if Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size == 2
             Dir.delete(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
           else
@@ -222,11 +241,11 @@ class AssignmentController < ApplicationController
     end
     @sum_of_max = 0
     @sum_of_max_ror = 0
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_rubric_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_rubric_id).max_question_score
     end
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).questions
-      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_rubric_id).questions
+      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_rubric_id).max_question_score
     end
   end
   

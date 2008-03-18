@@ -9,13 +9,12 @@
  <tr><ul>
   <%review_no = 1%>
   <%for review_map in @review_mapping %>
-  <% 
-  @review = Review.find_by_review_mapping_id(review_map.id) %>
+  <% @review = Review.find_by_review_mapping_id(review_map.id) %>
   <% if (@review)%>
-  <li>Review <%=review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
+  <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%= review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
   <%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %></li>
   <% else %>
-  <li>Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id} %></li>
+  <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id} %></li>
   <% end %>
   <%review_no += 1
   end %></ul>

@@ -241,11 +241,11 @@ class AssignmentController < ApplicationController
     end
     @sum_of_max = 0
     @sum_of_max_ror = 0
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_rubric_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_rubric_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
     end
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_rubric_id).questions
-      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_rubric_id).max_question_score
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).questions
+      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).max_question_score
     end
   end
   

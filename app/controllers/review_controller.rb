@@ -265,6 +265,7 @@ class ReviewController < ApplicationController
   def list_reviews
     @reviewer_id = session[:user].id
     @assignment_id = params[:id]
+    @assignment = Assignment.find(@assignment_id)
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_questionnaire_id])
     # Finding the current phase that we are in
     due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])

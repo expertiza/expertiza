@@ -3,9 +3,9 @@
 	<%= flash[:notice] %>
 </div>
 <% end %>
-<h1>Reviews for <%= @assignment.name %></h1>
+<h3>Reviews for <%= @assignment.name %></h3>
 
-<table class="listing" cellpadding=2>
+<table class="listing" cellpadding=2 width =100%>
  <tr><ul>
   <%review_no = 1%>
   <%for review_map in @review_mapping %>
@@ -20,7 +20,7 @@
   end %></ul>
  </tr>
  <% if @can_view_review_of_review == 1 %>
- <h1>Reviews of reviews for <%= @assignment.name %></h1>
+ <h3>Reviews of reviews for <%= @assignment.name %></h3>
  <tr><ul>
   <%ror_no = 1%>
   <%for ror_map in @review_of_review_mappings %>

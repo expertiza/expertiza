@@ -1,4 +1,7 @@
 <h1>Submit or Review work for <%= @student.assignment.name %></h1>
+<div class="flash_note">
+Next: Click the activity you wish to perform on the assignment titled: <%= @student.assignment.name %>
+</div>
 <a href="<%= @student.assignment.spec_location %>" target="new">Writeup URL</a>
 <ul>
 	<li>
@@ -26,6 +29,3 @@
 	<% end %>
 </ul>
 <br>
-<div class="flash_note">
-Next: Click the activity you wish to perform on the assignment titled: <%= @student.assignment.name %>
-</div>

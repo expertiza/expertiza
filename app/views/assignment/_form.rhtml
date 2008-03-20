@@ -75,7 +75,7 @@
       <%= text_field 'assignment', 'review_weight', :size=>5%>
   </td>
   <!-- Provided drop down menu for selecting the feedback rubric -->
-  <td style ="padding: 15px"><label for="feedback rubric">Feedback rubric</label>
+  <td style ="padding: 15px"><label for="feedback rubric">Author-feedback rubric</label>
    	  <!--select name="author_feedback_questionnaire_id"></select-->
       <%=@questionnaires = Questionnaire.find(:all, :conditions => ["type_id = 5"]).map {|u| [u.name, u.id] }
       select('assignment', 'author_feedback_questionnaire_id', @questionnaires)%>

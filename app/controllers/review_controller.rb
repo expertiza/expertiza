@@ -338,12 +338,10 @@ class ReviewController < ApplicationController
     @instructor_id = session[:user].id
     @review_id = params[:id1]
     @a = params[:id2]
-    puts "assignment value passed ", @a
     
     @review = Review.find(:all, :conditions => ["id = ?", @review_id])
     @review_mapping_id = @review[0].review_mapping_id
     @review_mapping = ReviewMapping.find(:all, :conditions => ["id = ?", @review_mapping_id])
-    puts "review, review_mapping", @review.length, @review[0].id, @review_mapping[0].id
     
     @assignment = Assignment.find(:all, :conditions => ["id = ?", @review_mapping[0].assignment_id])
     @assgt =@assignment[0]
@@ -400,7 +398,7 @@ class ReviewController < ApplicationController
       puts "Mapping saved"
       @instructor_author_mapping[0] = @mapping
     end
-    puts "instructor mapping id", @instructor_author_mapping[0].id
+    
   end
   
   #save review for author

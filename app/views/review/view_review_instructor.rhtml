@@ -7,7 +7,7 @@ Edit his review , other wise he has a link to Begin his review -->
 <h1>View Review</h1>
 <%if @assgt.wiki_type.name == "No"%>
 <%if @files.size == 0%>
-<strong>This submission is missing.</strong>
+
 <%else%>
 Submitted Files<br />
 <%end%>
@@ -50,6 +50,7 @@ Submitted Files<br />
 <li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
 <% end %>
 </ul>
+
 <!-- Display the review by reviwer -->
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at %></strong>
 <%= render :partial => 'review/score1' %> 

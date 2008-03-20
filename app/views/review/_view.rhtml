@@ -1,7 +1,16 @@
+<SCRIPT LANGUAGE="JavaScript">
+function toggle(divid){
+	if(document.getElementById(divid).style.display == 'none'){
+		document.getElementById(divid).style.display = 'block';
+	}else{
+		document.getElementById(divid).style.display = 'none';
+	}
+} 
+</SCRIPT>
 <h1>View Review</h1>
 <%if @assgt.wiki_type.name == "No"%>
 <%if @files.size == 0%>
-<strong>This submission is missing.</strong>
+
 <%else%>
 Submitted Files<br />
 <%end%>
@@ -44,8 +53,6 @@ Submitted Files<br />
 <li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
 <% end %>
 </ul>
-
-<br/>
 <%if @assgt.team_assignment %>
 	<% for team_member in @team_members %>
 	<label>
@@ -56,15 +63,30 @@ Submitted Files<br />
 	<br/>
 	<% end%>
 	<% end %>
+<%else %>
+	<% if @link != nil %>
+		Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
+	<% end %>	
 <%end%>	
-
-<strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at %></strong>
+<a href="javascript:toggle('myDivReview');">View review</a><br/>
+<div id="myDivReview" style="display:none">
+<strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
 <%= render :partial => 'review/scores' %> 
 Additional Comment : <%=@review.additional_comment%><br/>
 <br/>
-<%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]))
-  review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]).additional_comment
+</div>
+<%
+review_feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id])
+if(review_feedback) %>
+<a href="javascript:toggle('myDiv');">View author feedback</a>
+<br/>
+<% @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", review_feedback.id, '4'])
 %>		     
-Author feedback:<br/>
-<%=review_feedback_text%><br/>
+<div id="myDiv" style="display:none">
+<strong>Author feedback: </strong><br/>
+<%= render :partial => 'review/score1' %>
+Additional Comment: 
+<%=review_feedback.additional_comment%>
+</div>
+<br/>
 <% end%>

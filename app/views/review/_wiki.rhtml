@@ -1,5 +1,5 @@
 <%if @files.size == 0 and @assgt.wiki_type.name == "No"%>
-<strong>This submission is missing.</strong>
+
 <%else%>
 Submitted Files<br />
 <%end%>
@@ -41,3 +41,18 @@ Submitted Files<br />
 <li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
 <% end %>
 </ul>
+<%if @assgt.team_assignment %>
+	<% for team_member in @team_members %>
+	<label>
+	<% submitted = Participant.find(:first, :conditions =>["user_id = ? and assignment_id = ?",team_member.user_id,@assgt.id]).submitted_hyperlink
+	if submitted !=nil
+	%>
+	URL to file submission (if available):</label><%= submitted %>
+	<br/>
+	<% end%>
+	<% end %>
+<%else %>
+	<% if @link != nil %>
+		Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
+	<% end %>	
+<%end%>

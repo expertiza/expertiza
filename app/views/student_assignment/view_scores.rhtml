@@ -44,8 +44,8 @@
 				
 		     <%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review.id, @assignment_id]))%>
 		           
-		           <p> View your previous feedback : <%= link_to "View", {:controller =>'review_feedback', :action=>'view_feedback', :id1 =>@assgt_id, :id2 =>@author_id, :id3=>review.id} %><p>
-		           <p> Edit your previous feedback : <%= link_to "Edit", {:controller =>'review_feedback', :action =>'edit_feedback', :id1 =>@assgt_id, :id2 =>@author_id, :id3=>review.id} %></p>
+		           <p> View feedback : <%= link_to "View", {:controller =>'review_feedback', :action=>'view_feedback', :id1 =>@assgt_id, :id2 =>@author_id, :id3=>review.id} %><p>
+		           <p> Edit feedback : <%= link_to "Edit", {:controller =>'review_feedback', :action =>'edit_feedback', :id1 =>@assgt_id, :id2 =>@author_id, :id3=>review.id} %></p>
 		     <% else %>
 		      	<p><label>Give feedback to reviewer:<%= link_to "Begin", {:controller => 'review_feedback', :action => 'new_feedback',:id1 =>@assgt_id, :id2 =>@author_id, :id3=>review.id} %></label></p>
 		

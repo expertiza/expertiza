@@ -62,7 +62,7 @@ class ReviewFeedbackController < ApplicationController
     @review_id = params[:id3]
     @assignment = Assignment.find(@assgt_id)
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assignment.author_feedback_questionnaire_id]) 
-    @rubric = Rubric.find(@assignment.author_feedback_questionnaire_id)
+    @rubric = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score  
     
@@ -71,14 +71,13 @@ class ReviewFeedbackController < ApplicationController
   #Action for entering a new feedback
   #Find the questions for particular feedback from Questions table and display those questions
   def new_feedback
-
     @review_feedback = ReviewFeedback.new
     @assgt_id = params[:id1]
     @author_id = params[:id2]
     @review_id = params[:id3]
     @assignment = Assignment.find(@assgt_id)
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assignment.author_feedback_questionnaire_id]) 
-    @rubric = Rubric.find(@assignment.author_feedback_questionnaire_id)
+    @rubric = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
     @max = @rubric.max_question_score
     @min = @rubric.min_question_score  
       

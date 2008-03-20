@@ -46,15 +46,17 @@ Submitted Files<br />
 </ul>
 
 <br/>
-<% for team_member in @team_members %>
-<label>
-<% submitted = Participant.find(:first, :conditions =>["user_id = ? and assignment_id = ?",team_member.user_id,@assgt.id]).submitted_hyperlink
-if submitted !=nil
-%>
-URL to file submission (if available):</label><%= submitted %>
-<br/>
-<% end%>
-<% end %>
+<%if @assgt.team_assignment %>
+	<% for team_member in @team_members %>
+	<label>
+	<% submitted = Participant.find(:first, :conditions =>["user_id = ? and assignment_id = ?",team_member.user_id,@assgt.id]).submitted_hyperlink
+	if submitted !=nil
+	%>
+	URL to file submission (if available):</label><%= submitted %>
+	<br/>
+	<% end%>
+	<% end %>
+<%end%>	
 
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at %></strong>
 <%= render :partial => 'review/scores' %> 

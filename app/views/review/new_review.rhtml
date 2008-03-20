@@ -5,7 +5,6 @@ if (specs != nil && specs != "")
 <p><strong><a href = "<%= specs %>">Assignment Specification</a></strong></p>
 <%end%>
 <%= render :partial => 'wiki' %>
-
 <%= start_form_tag :action => 'create_review' %>
   	<%= render :partial => 'review' %>
          <%= hidden_field_tag('mapping_id', @mapping.id) %>

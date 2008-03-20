@@ -6,7 +6,6 @@ if (specs != nil && specs != "")
 <p><strong><a href = "<%= specs %>">Assignment Specification</a></strong></p>
 <%end%>
 <%= render :partial => 'wiki' %>
-
 <%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]))
                         review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]).additional_comment
 %>
@@ -21,6 +20,5 @@ if (specs != nil && specs != "")
     <br/>
     <%= submit_tag "Edit Review", :name=>"save" %>       
 <%= end_form_tag %>
-<br />
 <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
 

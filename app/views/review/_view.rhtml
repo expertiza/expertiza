@@ -1,9 +1,19 @@
 <SCRIPT LANGUAGE="JavaScript">
+var dispReview = 0;
+var dispFeedback = 0;
 function toggle(divid){
 	if(document.getElementById(divid).style.display == 'none'){
 		document.getElementById(divid).style.display = 'block';
+		if (divid == 'myDivReview')
+			dispReview = 1;
+		else
+			dispFeedback = 1;
 	}else{
 		document.getElementById(divid).style.display = 'none';
+		if (divid == 'myDivReview')
+			dispReview = 0;
+		else
+			dispFeedback = 0;
 	}
 } 
 </SCRIPT>
@@ -68,7 +78,8 @@ Submitted Files<br />
 		Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
 	<% end %>	
 <%end%>	
-<a href="javascript:toggle('myDivReview');">View review</a><br/>
+<a href="javascript:toggle('myDivReview');">View review
+</a><br/>
 <div id="myDivReview" style="display:none">
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
 <%= render :partial => 'review/scores' %> 

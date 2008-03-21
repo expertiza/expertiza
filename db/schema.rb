@@ -2,9 +2,11 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 28) do
+ActiveRecord::Schema.define(:version => 33) do
 
   create_table "assignments", :force => true do |t|
+    t.column "created_at", :datetime
+    t.column "updated_at", :datetime
     t.column "name", :string
     t.column "directory_path", :string
     t.column "submitter_count", :integer, :limit => 10, :default => 0, :null => false
@@ -20,22 +22,25 @@ ActiveRecord::Schema.define(:version => 28) do
     t.column "review_weight", :float
     t.column "reviews_visible_to_all", :boolean
     t.column "team_assignment", :boolean
-    t.column "wiki_assignment_id", :integer, :default => 0, :null => false
+    t.column "wiki_type_id", :integer
     t.column "require_signup", :boolean
+    t.column "num_reviewers", :integer, :limit => 10, :default => 0, :null => false
+    t.column "spec_location", :text
+    t.column "author_feedback_questionnaire_id", :integer
   end
 
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
-  add_index "assignments", ["wiki_assignment_id"], :name => "fk_assignments_wiki_assignments"
+  add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
+  add_index "assignments", ["author_feedback_questionnaire_id"], :name => "fk_assignments_author_feedback"
 
   create_table "assignments_questionnaires", :force => true do |t|
-    t.column "questionnaire_id", :int
-    t.column "assignment_id", :int
+    t.column "questionnaire_id", :integer, :default => 0, :null => false
+    t.column "assignment_id", :integer, :default => 0, :null => false
   end
 
   add_index "assignments_questionnaires", ["questionnaire_id"], :name => "fk_assignments_questionnaires_questionnaires"
   add_index "assignments_questionnaires", ["assignment_id"], :name => "fk_assignments_questionnaires_assignments"
-
 
   create_table "content_pages", :force => true do |t|
     t.column "title", :string
@@ -97,16 +102,17 @@ ActiveRecord::Schema.define(:version => 28) do
     t.column "resubmission_allowed_id", :integer
     t.column "rereview_allowed_id", :integer
     t.column "review_of_review_allowed_id", :integer
+    t.column "round", :integer
   end
 
   add_index "due_dates", ["deadline_type_id"], :name => "fk_deadline_type_due_date"
   add_index "due_dates", ["assignment_id"], :name => "fk_due_dates_assignments"
   add_index "due_dates", ["late_policy_id"], :name => "fk_due_date_late_policies"
-  add_index "due_dates", ["submission_allowed_id"], :name => "fk_due_date_submission_allowed"
-  add_index "due_dates", ["review_allowed_id"], :name => "fk_due_date_review_allowed"
-  add_index "due_dates", ["resubmission_allowed_id"], :name => "fk_due_date_resubmission_allowed"
-  add_index "due_dates", ["rereview_allowed_id"], :name => "fk_due_date_rereview_allowed"
-  add_index "due_dates", ["review_of_review_allowed_id"], :name => "fk_due_date_review_of_review_allowed"
+  add_index "due_dates", ["submission_allowed_id"], :name => "idx_submission_allowed"
+  add_index "due_dates", ["review_allowed_id"], :name => "idx_review_allowed"
+  add_index "due_dates", ["resubmission_allowed_id"], :name => "idx_resubmission_allowed"
+  add_index "due_dates", ["rereview_allowed_id"], :name => "idx_rereview_allowed"
+  add_index "due_dates", ["review_of_review_allowed_id"], :name => "idx_review_of_review_allowed"
 
   create_table "goldberg_content_pages", :force => true do |t|
     t.column "title", :string
@@ -266,14 +272,16 @@ ActiveRecord::Schema.define(:version => 28) do
   add_index "menu_items", ["parent_id"], :name => "fk_menu_item_parent_id"
 
   create_table "participants", :force => true do |t|
-    t.column "submit_allowed", :boolean
-    t.column "review_allowed", :boolean
+    t.column "submit_allowed", :boolean, :default => true
+    t.column "review_allowed", :boolean, :default => true
     t.column "user_id", :integer
     t.column "assignment_id", :integer
     t.column "directory_num", :integer
     t.column "submitted_at", :datetime
     t.column "topic", :string
     t.column "permission_granted", :boolean
+    t.column "penalty_accumulated", :integer, :limit => 10, :default => 0, :null => false
+    t.column "submitted_hyperlink", :string, :limit => 500
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
@@ -296,6 +304,24 @@ ActiveRecord::Schema.define(:version => 28) do
 
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
+  create_table "questionnaire_types", :force => true do |t|
+    t.column "name", :string, :default => "", :null => false
+  end
+
+  create_table "questionnaires", :force => true do |t|
+    t.column "name", :string, :limit => 64
+    t.column "instructor_id", :integer, :default => 0, :null => false
+    t.column "private", :boolean, :default => false, :null => false
+    t.column "min_question_score", :integer, :default => 0, :null => false
+    t.column "max_question_score", :integer
+    t.column "created_at", :datetime
+    t.column "updated_at", :datetime, :null => false
+    t.column "default_num_choices", :integer
+    t.column "type_id", :integer, :default => 1, :null => false
+  end
+
+  add_index "questionnaires", ["type_id"], :name => "fk_questionnaire_type"
+
   create_table "questions", :force => true do |t|
     t.column "txt", :text
     t.column "true_false", :boolean
@@ -304,14 +330,6 @@ ActiveRecord::Schema.define(:version => 28) do
   end
 
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
-
-  create_table "questionnaire_types", :force => true do |t|
-    t.column "name", :string
-  end
-  
-  QuestionnaireType.create(:id => 1, :name => "questionnaire")
-  QuestionnaireType.create(:id => 2, :name => "Survey")
-  QuestionnaireType.create(:id => 3, :name => "Global Survey")
 
   create_table "resubmission_times", :force => true do |t|
     t.column "participant_id", :integer
@@ -339,15 +357,21 @@ ActiveRecord::Schema.define(:version => 28) do
   end
 
   add_index "review_mappings", ["assignment_id"], :name => "fk_review_mapping_assignments"
+  add_index "review_mappings", ["reviewer_id"], :name => "fk_review_users_reviewer"
+  add_index "review_mappings", ["author_id"], :name => "fk_review_users_author"
+  add_index "review_mappings", ["team_id"], :name => "fk_review_teams"
 
   create_table "review_of_review_mappings", :force => true do |t|
     t.column "review_mapping_id", :integer
     t.column "reviewer_id", :integer
     t.column "review_id", :integer
+    t.column "assignment_id", :integer, :limit => 10
   end
 
   add_index "review_of_review_mappings", ["review_id"], :name => "fk_review_of_review_mapping_reviews"
   add_index "review_of_review_mappings", ["review_mapping_id"], :name => "fk_review_of_review_mapping_review_mappings"
+  add_index "review_of_review_mappings", ["reviewer_id"], :name => "fk_review_of_review_users"
+  add_index "review_of_review_mappings", ["assignment_id"], :name => "fk_review_of_review_assignments"
 
   create_table "review_of_review_scores", :force => true do |t|
     t.column "review_of_review_id", :integer
@@ -383,10 +407,13 @@ ActiveRecord::Schema.define(:version => 28) do
   end
 
   create_table "reviews", :force => true do |t|
-    t.column "reviewed_at", :datetime
     t.column "review_mapping_id", :integer
     t.column "review_num_for_author", :integer
     t.column "review_num_for_reviewer", :integer
+    t.column "ignore", :integer, :limit => 4, :default => 0, :null => false
+    t.column "additional_comment", :text
+    t.column "updated_at", :datetime
+    t.column "created_at", :datetime
   end
 
   add_index "reviews", ["review_mapping_id"], :name => "fk_review_mappings"
@@ -412,20 +439,6 @@ ActiveRecord::Schema.define(:version => 28) do
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
 
-  create_table "questionnaires", :force => true do |t|
-    t.column "name", :string, :limit => 64
-    t.column "instructor_id", :integer, :default => 0, :null => false
-    t.column "private", :boolean, :default => false, :null => false
-    t.column "min_question_score", :integer, :default => 0, :null => false
-    t.column "max_question_score", :integer
-    t.column "created_at", :datetime, :null => true
-    t.column "updated_at", :datetime
-    t.column "default_num_choices", :integer, :null => true
-    t.column "type_id", :integer, :default => 1
-  end
-  
-  add_index "questionnaires", ["type_id"], :name => "fk_questionnaires_questionnaire_types"
-
   create_table "site_controllers", :force => true do |t|
     t.column "name", :string, :default => "", :null => false
     t.column "permission_id", :integer, :default => 0, :null => false
@@ -433,19 +446,19 @@ ActiveRecord::Schema.define(:version => 28) do
   end
 
   add_index "site_controllers", ["permission_id"], :name => "fk_site_controller_permission_id"
-  
+
   create_table "survey_responses", :force => true do |t|
-    t.column "score", :int, :null => true
-    t.column "comments", :text, :null => true
-    t.column "assignment_id", :int
-    t.column "question_id", :int
-    t.column "survey_id", :int
-    t.column "email", :string, :null => true
+    t.column "score", :integer, :limit => 10
+    t.column "comments", :text
+    t.column "assignment_id", :integer, :limit => 10, :default => 0, :null => false
+    t.column "question_id", :integer, :limit => 10, :default => 0, :null => false
+    t.column "survey_id", :integer, :limit => 10, :default => 0, :null => false
+    t.column "email", :string
   end
-  
-  add_index "survey_responses", ["assignment_id"], :name => "fk_survey_responses_assignments"
-  add_index "survey_responses", ["question_id"], :name => "fk_survey_responses_questions"
-  add_index "survey_responses", ["survey_id"], :name => "fk_survey_responses_questionnaires"
+
+  add_index "survey_responses", ["assignment_id"], :name => "fk_survey_assignments"
+  add_index "survey_responses", ["question_id"], :name => "fk_survey_questions"
+  add_index "survey_responses", ["survey_id"], :name => "fk_survey_questionnaires"
 
   create_table "system_settings", :force => true do |t|
     t.column "site_name", :string, :default => "", :null => false
@@ -469,7 +482,10 @@ ActiveRecord::Schema.define(:version => 28) do
 
   create_table "teams", :force => true do |t|
     t.column "name", :string
+    t.column "assignment_id", :integer, :default => 0, :null => false
   end
+
+  add_index "teams", ["assignment_id"], :name => "fk_teams_assignments"
 
   create_table "teams_users", :force => true do |t|
     t.column "team_id", :integer
@@ -482,23 +498,23 @@ ActiveRecord::Schema.define(:version => 28) do
   create_table "users", :force => true do |t|
     t.column "name", :string, :default => "", :null => false
     t.column "password", :string, :limit => 40, :default => "", :null => false
-    t.column "institution_id", :integer
     t.column "role_id", :integer, :default => 0, :null => false
     t.column "password_salt", :string
     t.column "fullname", :string
     t.column "email", :string
     t.column "parent_id", :integer
-    t.column "private_by_default", :boolean, :default => false, :null => false
+    t.column "private_by_default", :boolean, :default => false
     t.column "mru_directory_path", :string, :limit => 128
     t.column "email_on_review", :boolean
     t.column "email_on_submission", :boolean
     t.column "email_on_review_of_review", :boolean
+    t.column "is_new_user", :integer, :limit => 4, :default => 1, :null => false
+    t.column "master_permission_granted", :integer, :limit => 4, :default => 0, :null => false
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"
-  add_index "users", ["institution_id"], :name => "FK_institutions_users"
 
-  create_table "wiki_assignments", :force => true do |t|
+  create_table "wiki_types", :force => true do |t|
     t.column "name", :string, :default => "", :null => false
   end
 

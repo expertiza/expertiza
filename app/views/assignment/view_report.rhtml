@@ -5,6 +5,11 @@
 		<%for i in 0...@assignment.num_reviews%>
 			<th>Review <%=i+1%></th>
 		<%end%>
+		<%instructor_review = ReviewMapping.find(:first,:conditions=>["reviewer_id=? and assignment_id=?",session[:user].id,@assignment.id])
+		if (instructor_review)
+		%>
+			<th>Instructor Review</th>
+		<%end%>
 		<th>Review of Review</th>
 		<th>Final Score</th>
 		
@@ -48,7 +53,23 @@
 			grade = 0
 		    _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s%>    
 			<tr>
-				<td><% if ( flag ==1 ) %> <%=link_to student.fullname, :controller => 'review', :action => 'review_for_author', :id1 => review.id, :id2 => @assignment.id, :where=>"reports_page"%><%else%><b><%= student.fullname%>
+				<td><% if ( flag ==1 ) 
+					if (!@assignment.team_assignment)
+						check = Review.find(:first, :conditions=>["review_mapping_id in (select id from review_mappings where author_id =? and reviewer_id=? and assignment_id=?)",student.id, session[:user].id,@assignment.id])
+					else
+						check = Review.find(:first, :conditions=>["review_mapping_id in (select id from review_mappings where team_id =? and reviewer_id=? and assignment_id=?)",team.team_id, session[:user].id,@assignment.id])
+					end							
+					if (check)%>
+						<%=link_to student.fullname, :controller => 'review', :action => 'edit_review', :user_id=>student.id, :id => check.id, :id2 => @assignment.id, :where=>"reports_page"%>		
+					<% else %>
+						<% if @assignment.team_assignment %>
+							<%=link_to student.fullname, :controller => 'review', :action => 'review_for_author', :user_id=>student.id, :team_id=>team.team_id , :id => review.id, :id2 => @assignment.id, :where=>"reports_page"%>
+						<% else %>
+							<%=link_to student.fullname, :controller => 'review', :action => 'review_for_author', :user_id=>student.id, :id => review.id, :id2 => @assignment.id, :where=>"reports_page"%>
+						<% end %>	
+					<% end %>	
+				<%else%>
+				<b><%= student.fullname%>
 				</b><%end%>
 				</td>
 				<%if review_mapping

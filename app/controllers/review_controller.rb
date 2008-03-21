@@ -55,7 +55,6 @@ class ReviewController < ApplicationController
     @review_id=params[:id]
     @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, '1'])
     if( ReviewFeedback.find_by_review_id(@review_id))
-      
       if (ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id = ?", @review_id,  @a]))
       @reviewfeedback_id_1 = ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id = ?", @review_id,  @a])
       @review_scores2 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_1.id, '5'])
@@ -226,12 +225,11 @@ class ReviewController < ApplicationController
     @review.additional_comment = params[:new_review][:comments]
     @mapping = ReviewMapping.find(params[:mapping_id])
     @assignment = Assignment.find(@mapping.assignment_id)
+    if @assignment.team_assignment 
+      @mapping.team_id = params[:team_id]
+    end 
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
     @review_phase = find_review_phase(@due_dates)
-    
-    #if(@review_phase != 2)
-    
-    
     if params[:new_review_score]
       # The new_question array contains all the new questions
       # that should be saved to the database
@@ -239,7 +237,7 @@ class ReviewController < ApplicationController
         rs = ReviewScore.new(params[:new_review_score][review_key])
         rs.question_id = params[:new_question][review_key]
         rs.score = params[:new_score][review_key]
-        ##anitha
+        ## feed back added
         rs.questionnaire_type_id = 1
         ##
         @review.review_scores << rs
@@ -336,24 +334,26 @@ class ReviewController < ApplicationController
   #creating review for author by the instructor
   def review_for_author
     @instructor_id = session[:user].id
-    @review_id = params[:id1]
-    @a = params[:id2]
-    
-    @review = Review.find(:all, :conditions => ["id = ?", @review_id])
-    @review_mapping_id = @review[0].review_mapping_id
-    @review_mapping = ReviewMapping.find(:all, :conditions => ["id = ?", @review_mapping_id])
-    
-    @assignment = Assignment.find(:all, :conditions => ["id = ?", @review_mapping[0].assignment_id])
-    @assgt =@assignment[0]
-    @author_id = @review_mapping[0].reviewer_id
+    @review_id = params[:id]
+    @a = params[:id2]    
+    @assgt = Assignment.find(:first, :conditions => ["id = ?", @a])
+    if @assgt.team_assignment == true # we need to find the team id
+      team = TeamsUser.find_by_sql("select * from teams_users where team_id in(select id from teams where assignment_id="+@a.to_s+") and user_id="+params[:user_id].to_s)
+      logger.info ""+team[0].id.to_s
+      @review_mapping = ReviewMapping.find(:all, :conditions => ["author_id= ? and assignment_id = ? and team_id=?", params[:user_id], @a, team[0].team_id])
+      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", team[0].team_id]).user_id
+      @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @review_mapping[0].team_id])
+      @author_name = User.find(params[:user_id]).name;
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @review_mapping[0].assignment_id])
+    else
+      @review_mapping = ReviewMapping.find(:all, :conditions => ["author_id= ? and assignment_id = ?", params[:user_id], @a])
+    end
+    @author_id = @review_mapping[0].author_id
     @author = User.find(:first, :conditions => ["id =?",@author_id])
-    
     @participant = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_id, @review_mapping[0].assignment_id])
-          
-    
+    @link = @participant.submitted_hyperlink
     @files = Array.new
     @files = get_submitted_file_list(@assgt.directory_path, @participant, @files)
-    
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -386,7 +386,7 @@ class ReviewController < ApplicationController
       @cur_round = next_due_date.round
     end
     
-    @instructor_author_mapping = ReviewMapping.find(:all, :conditions => ["author_id = ? and reviewer_id = ? and assignment_id = ?", @author_id, @instructor_id, @assignment[0].id])
+    @instructor_author_mapping = ReviewMapping.find(:all, :conditions => ["author_id = ? and reviewer_id = ? and assignment_id = ?", @author_id, @instructor_id, @assgt.id])
     
     if @instructor_author_mapping.length == 0
       @mapping = ReviewMapping.new
@@ -394,6 +394,7 @@ class ReviewController < ApplicationController
       @mapping.reviewer_id = @instructor_id
       @mapping.assignment_id = @a
       @mapping.round = @cur_round
+      @mapping.team_id = params[:team_id] if @assgt.team_assignment?
       @mapping.save
       puts "Mapping saved"
       @instructor_author_mapping[0] = @mapping
@@ -430,7 +431,7 @@ class ReviewController < ApplicationController
       #send message to author(s) when review has been updated
       #@review.email
       flash[:notice] = 'Review was successfully saved.'
-      redirect_to :action => 'list_reviews', :id => params[:assgt_id]
+      redirect_to :action => 'view_report', :id => params[:assgt_id]
     else # If something goes wrong, stay at same page
       render :action => 'view_review'
     end

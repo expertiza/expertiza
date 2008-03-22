@@ -84,7 +84,7 @@ class ParticipantsController < ApplicationController
   end
   
   def list_assignments
-    @assignment_pages, @assignments = paginate :assignments, :order => 'name',:conditions => ["instructor_id = ?", session[:user].id], :per_page => 25
+    @assignment_pages, @assignments = paginate :assignments, :order => 'name',:conditions => ["instructor_id = ? and team_assignment = ?", session[:user].id, 0], :per_page => 25
   end
 
   def view_participants

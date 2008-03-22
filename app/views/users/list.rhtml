@@ -1,4 +1,15 @@
 <h1>Users</h1>
+
+<br/>
+<%= form_tag :action => 'show_selection' %>
+Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+<input type='submit' value='Edit'/>
+<%= end_form_tag %>
+  
+
+<% for letter in @letters %>
+  <%= link_to letter, :controller => 'users', :action => 'list', :letter => letter %>&nbsp;
+<% end %>
 <div class = "exp">
 <table>
   <tr ><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th>
@@ -20,4 +31,9 @@
 </table>
 </div>
 <hr/>
+<%= pagination_links(@user_pages) %><br/><br/>
+<% for letter in @letters %>
+  <%= link_to letter, :controller => 'users', :action => 'list', :letter => letter %>&nbsp;
+<% end %>
 <p><%= link_to 'New User', :action => 'new' %></p>
+

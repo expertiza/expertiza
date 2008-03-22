@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-
+  auto_complete_for :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :list }
@@ -10,14 +10,40 @@ class UsersController < ApplicationController
   end
 
   def list
-    @user_pages, @users = paginate :users, :order => 'name', :per_page => 50
+    all_users = User.find(:all, :order => 'name', :conditions => ['role_id < ? or id = ?',(session[:user]).role_id, (session[:user]).id])
+    
+    letter = params[:letter]
+    if letter == nil
+      letter = all_users.first.name[0,1].downcase
+    end 
+    logger.info "#{letter}"
+    @letters = Array.new
+    @user_pages, @users = paginate :users, :order => 'name', :per_page => 20,  :conditions => ["(role_id < ? or id = ?) and substring(name,1,1) = ?", (session[:user]).role_id, (session[:user]).id, letter]
+    all_users = User.find(:all, :order => 'name', :conditions => ['role_id < ? or id = ?',(session[:user]).role_id, (session[:user]).id])
+    all_users.each {
+       | user |
+       first = user.name[0,1].downcase
+       if not @letters.include?(first)
+          @letters << first  
+       end
+    }
   end
-
+  
+  def show_selection
+    @user = User.find_by_name(params[:user][:name])
+    getRole
+    render :action => 'show'
+  end
+  
   def show
     @user = User.find(params[:id])
-    if @user.role_id
+    getRole
+  end
+  
+  def getRole
+     if @user && @user.role_id
       @role = Role.find(@user.role_id)
-    else
+    elsif @user
       @role = Role.new(:id => nil, :name => '(none)')
     end
   end
@@ -30,7 +56,8 @@ def self.yesorno(elt)
     else
       ""
   end
- end
+end
+
   def new
     @user = User.new
     foreign
@@ -95,15 +122,23 @@ def self.yesorno(elt)
   end
 
   def destroy
-    User.find(params[:id]).destroy
+    user = User.find(params[:id])
+    participant = Participant.find_by_user_id(user.id)
+    team_user = TeamsUser.find_by_user_id(user.id)
+    if participant 
+      participant.destroy()  
+    end
+    if team_user
+      team_user.destroy()
+    end
+    user.destroy()
     redirect_to :action => 'list'
   end
 
   protected
 
-  def foreign
-    @all_roles = Role.find(:all, :order => 'name')
-    
+  def foreign    
+    @all_roles = Role.find(:all, :order => 'name', :conditions => ['id <= ?',(session[:user]).role_id])    
   end
   
 end

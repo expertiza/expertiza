@@ -180,6 +180,14 @@ class AssignmentController < ApplicationController
     if @assignment == nil
       redirect_to :action => 'list' 
     else 
+      if @assignment.team_assignment
+        logger.info "Assignment destroy"
+        teams = Team.find(:all,:conditions => ["assignment_id = ?",@assignment.id])
+        teams.each {|team|
+          logger.info "#{team.name}"
+          team.delete
+        }
+      end
       if @assignment.due_dates_exist? == false or params['delete'] or @assignment.review_feedback_exist? == false or @assignment.participants_exist? == false
         # The size of an empty directory is 2
         # Delete the directory if it is empty

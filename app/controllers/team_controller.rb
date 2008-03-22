@@ -12,24 +12,18 @@ class TeamController < ApplicationController
         end       
         flash[:note] = str
      end
-     if(session[:assignment_id] == nil)
-         session[:assignment_id] = params[:id] 
-     end     
-     @assignment = Assignment.find(session[:assignment_id])    
-     @team_pages, @teams = paginate :teams, :conditions => ["assignment_id = ?",session[:assignment_id]], :per_page => 10
+     if (params[:assignment_id] == nil)
+       assignment_id = session[:assignment_id]
+     else
+       session[:assignment_id] = params[:assignment_id]
+       assignment_id = params[:assignment_id]
+     end
+     @assignment = Assignment.find(assignment_id)    
+     @team_pages, @teams = paginate :teams, :conditions => ["assignment_id = ?",assignment_id], :per_page => 10
   end
   
   def edit
     @team = Team.find(params[:id])
-  end
-  
-  def destroy
-    @team = Team.find(params[:id])
-    for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", @team.id])
-       teamsuser.destroy
-    end    
-    @team.destroy
-    redirect_to :action => 'list'
   end
 
   def new
@@ -66,11 +60,7 @@ class TeamController < ApplicationController
   def import_teams
     if params['load_teams']      
       file = params['uploaded_file']
-      temp_directory = RAILS_ROOT + "/pg_data/tmp/#{session[:user].id}_"
-      safe_filename = FileHelper::sanitize_filename(file.full_original_filename)
-      File.open(temp_directory+safe_filename, "w") { |f| f.write(file.read) }   
-      unknown = TeamHelper::upload_teams(temp_directory+safe_filename,session[:assignment_id],params[:options])       
-      File.delete(temp_directory+safe_filename)      
+      unknown = TeamHelper::upload_teams(file,params[:assignment_id],params[:options],logger)           
     end  
     redirect_to :action => 'list', :unknown => unknown
   end  
@@ -78,5 +68,11 @@ class TeamController < ApplicationController
   def list_assignments
     user_id = session[:user].id    
     @assignment_pages, @assignments = paginate :assignments, :order => 'name',:conditions => ["instructor_id = ? and team_assignment =?", session[:user].id, 1], :per_page => 10
+  end
+  
+  def delete_team
+    @team = Team.find(params[:id])
+    @team.delete
+    redirect_to :action => 'list'
   end
 end

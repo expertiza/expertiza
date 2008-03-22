@@ -1,4 +1,4 @@
-<% if @user.is_new_user != 0 %>
+<% if @user.is_new_user == 1 %>
     <%= render :partial => 'eula' %>
 <% else %>
 <h1>Assignments</h1>
@@ -10,8 +10,8 @@ To begin, click on an assignment from the list above or <%= link_to 'click here'
 <table class="listing" cellpadding=2>
   <tr>
 		<th></th>
-	  <th>Assignment</th>
-	  <th>Course</th>
+	    <th>Assignment</th>
+	    <th>Course</th>
 		<th>Topic</th>
 		<th>Current Stage</th>
 		<th>Stage Deadline</th>

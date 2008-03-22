@@ -11,7 +11,7 @@ class Participant < ActiveRecord::Base
   end
   
   def get_course_string
-    # if no course is associated with this assingment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
+    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
     if assignment.course == nil or assignment.course.title == nil or assignment.course.title.strip == ""
       return "<center>&#8212;</center>"
     end
@@ -56,5 +56,24 @@ class Participant < ActiveRecord::Base
             }
     )   
   end
+    
   
+
+  def self.import(row,session)
+      if row.length == 4
+        user = User.find_by_name(row[0])        
+        if (user == nil)
+          attributes = ImportFileHelper::define_attributes(row)
+          user = ImportFileHelper::create_new_user(attributes,session,logger)
+        end      
+        if (session[:assignment_id] != nil)
+          ImportFileHelper::add_user_to_assignment(session[:assignment_id], user)
+        end
+        if (session[:course_id] != nil)
+          ImportFileHelper::add_user_to_course(session[:course_id], user)
+        end
+      else
+        raise ArgumentError, "Not enough items" 
+      end    
+  end
 end

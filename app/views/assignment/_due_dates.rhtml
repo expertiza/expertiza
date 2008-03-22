@@ -19,8 +19,9 @@
                <TD ALIGN=LEFT WIDTH=20%>
                    Submission deadline
                </TD>
-               <TD ALIGN=CENTER WIDTH=5%>
-                    <input type="text" id="submit_deadline_due_at" name ="submit_deadline[due_at]"/> <img src="/images/cal.gif"  onClick="NewCal('submit_deadline_due_at','YYYYMMDD',true,24); return false;">
+               <TD ALIGN="CENTER">
+                    <input type="text" id="submit_deadline_due_at" name ="submit_deadline[due_at]"/>
+                    <img src="/images/cal.gif"  onClick="NewCal('submit_deadline_due_at','YYYYMMDD',true,24); return false;"/>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
                    <%= select('submit_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>3 )%>
@@ -42,8 +43,9 @@
                <TD ALIGN=LEFT WIDTH=20%>
                    <input name="deadlineTitle0" size=10	maxlength=10 value="Submission deadline" type="hidden"/>Review deadline
                </TD>
-               <TD ALIGN=CENTER WIDTH=5%>
-                   <input type="text" id="review_deadline_due_at" name ="review_deadline[due_at]"/> <img src="/images/cal.gif" onClick="NewCal('review_deadline_due_at','YYYYMMDD',true,24); return false;">
+               <TD ALIGN="CENTER">
+                   <input type="text" id="review_deadline_due_at" name ="review_deadline[due_at]"/>
+                   <img src="/images/cal.gif" onClick="NewCal('review_deadline_due_at','YYYYMMDD',true,24); return false;"/>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
                    <%= select('review_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>2 )%>
@@ -71,8 +73,9 @@
                <TD ALIGN=LEFT WIDTH=20%>
                    Review-of-review deadline
                </TD>
-               <TD ALIGN=CENTER WIDTH=5%>
-                  <input type="text" id="reviewofreview_deadline_due_at" name ="reviewofreview_deadline[due_at]"/> <img src="/images/cal.gif" onClick="NewCal('reviewofreview_deadline_due_at','YYYYMMDD',true,24); return false;">
+               <TD ALIGN="CENTER">
+                  <input type="text" id="reviewofreview_deadline_due_at" name ="reviewofreview_deadline[due_at]"/>
+                  <img src="/images/cal.gif" onClick="NewCal('reviewofreview_deadline_due_at','YYYYMMDD',true,24); return false;"/>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
                    <%= select('reviewofreview_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>2 )%>

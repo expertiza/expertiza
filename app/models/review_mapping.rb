@@ -59,6 +59,30 @@ class ReviewMapping < ActiveRecord::Base
     end
   end
   
+  def self.import(row,session)
+    if row.length < 2
+       raise ArgumentError, "Not enough items" 
+    end
+    
+    author = User.find_by_name(row[0].to_s.strip)
+    logger.info("*** Author: #{author} ***")
+    
+    index = 1
+    while index < row.length
+      reviewer = User.find_by_name(row[index].to_s.strip)
+      logger.info("*** Reviewer: #{reviewer} *** Index: #{index} ***")
+      if(reviewer != nil)
+        mapping = ReviewMapping.new
+        mapping.author_id = author.id
+        mapping.reviewer_id = reviewer.id
+        mapping.assignment_id = session[:assignment_id]
+        mapping.save
+      end
+      
+      index += 1
+    end 
+  end  
+  
   #return an array of authors for this mapping
   #ajbudlon, sept 07, 2007  
   def get_author_ids

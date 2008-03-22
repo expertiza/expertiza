@@ -1,7 +1,7 @@
 class ImportFileController < ApplicationController
   
   def start
-    @import_type = params[:import_type]            
+    @model = params[:model]            
   end
   
   def import
@@ -12,10 +12,25 @@ class ImportFileController < ApplicationController
       when "tab": "\t"
       when "other": params[:other_char]
     end 
-    file = params['file']    
-    if delim_type == "comma"
-      ImportFileHelper::import_csv(file,session)
+    file = params['file']
+    begin      
+       importFile(file,session,delimiter,params[:model])       
+    rescue ArgumentError             
+       flash[:error] = 'An unexpected number of columns were received.' + $!
+    end 
+   redirect_to session[:return_to] 
+ end
+ 
+   def importFile(file,session,delimiter,model)
+    while (line = file.gets)      
+      items = line.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/)
+      row = Array.new
+      items.each { | value | row << value.sub("\"","").sub("\"","").strip }
+      
+      row.each {| value | logger.info "#{value}"}
+      Object.const_get(model).import(row,session)
     end    
-    redirect_to session[:return_to] 
   end
+
+    
 end

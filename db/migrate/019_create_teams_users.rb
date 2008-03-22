@@ -8,7 +8,7 @@ class CreateTeamsUsers < ActiveRecord::Migration
   add_index "teams_users", ["team_id"], :name => "fk_users_teams"
 
   execute "alter table teams_users
-             add constraint ffk_users_teams
+             add constraint fk_users_teams
              foreign key (team_id) references teams(id)"   
 
   add_index "teams_users", ["user_id"], :name => "fk_teams_users"

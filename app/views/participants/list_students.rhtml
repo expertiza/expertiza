@@ -1,4 +1,11 @@
-<h1>Students</h1>
+<% 
+   parent = User.find_by_id((session[:user]).id).fullname  
+   if parent.length == 0
+   	  parent = User.find_by_id((session[:user]).id).name   
+   end
+%>
+
+<h1>Students for <%= parent %></h1>
 
 <table>
   <tr><th>Name</th><th>Full Name</th><th>Email Address</th><th>Parent</th></tr>
@@ -8,7 +15,7 @@
 	    :id => user.id %></td>
     <td><%= user.fullname %></td>
     <td><%= user.email %></td>
-    <td><%= (User.find_by_id(user.parent_id)).name  %></td>
+    <td><%= parent %></td>
     </tr>
 <% end -%>
 </table>

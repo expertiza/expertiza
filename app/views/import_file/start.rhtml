@@ -28,6 +28,7 @@ function checkIfFileExists()
  </table>
  <br/>
  <label for="file">File to Import: </label><%= file_field_tag 'file', :size => 40 %><br/><br/>
+ <%= hidden_field_tag ('model', @model) %>
 <%= end_form_tag %>
 
  * The import process expects the following columns:<br/>

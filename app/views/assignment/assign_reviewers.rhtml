@@ -19,4 +19,13 @@ Import a reviewer mapping: <input type="file" id="uploaded_file" name="uploaded_
 </p>
 <br/><br/>
 -->
+
+<% 
+  session[:return_to] = request.request_uri  
+  session[:expected_fields] = 'Author, Reviewer1, Reviewer2, ... , ReviewerN'
+  session[:assignment_id] = @assignment.id 
+%>
+<%= link_to 'Import Reviewer Mappings', :controller=>'import_file', :action=>'start', :import_type => 'Review Mappings' %>
+<br/><br/>
+
 <%= link_to 'Back', :action => 'list' %>

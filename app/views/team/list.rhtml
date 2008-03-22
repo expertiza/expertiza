@@ -4,16 +4,30 @@
 
 <H1>Teams for <%= @assignment.name %></H1>
 
+<% if @teams.length > 0 %>
+<div class = "exp">
 <TABLE>
-<TR><TH>Team Name</TH></TR>
+<TR><TH class="head">Team Name</TH><TH class="head">Edit Name</TH><TH class="head">Modify Members</TH><TH class="head">Delete Team</TH></TR>
 <% for team in @teams %>
-<TR>
-<TD><%= link_to team.name, :controller => 'teams_users', :action => 'list', :id => team.id %></TD><TD>&nbsp;</TD>
-<TD><%= link_to 'Edit', :action => 'edit',:id => team.id %></TD>
-<TD><%= link_to 'Delete', {:action => 'destroy',:id => team.id}, {:onclick => 'return confirm("Delete this team?");'} %></TD>
+<TR class="exp">
+<TD><%= team.name %></TD>
+<%= start_form_tag ({:action => 'edit' }, {:method => 'post'}) %>
+<TD align="center"><input type="radio" name="edit" onClick="submit();"></TD>
+<%= hidden_field_tag ('id', team.id) %>
+<%= end_form_tag %>
+<%= start_form_tag ({:controller => 'teams_users', :action => 'list' }, {:method => 'post'}) %>
+<TD align="center"><input type="radio" name="edit" onClick="submit();"></TD>
+<%= hidden_field_tag ('id', team.id) %>
+<%= end_form_tag %>
+<%= start_form_tag ({:action => 'delete_team' }, {:method => 'post'}) %>
+<TD align="center"><input type="radio" name="edit" onClick="submit();"></TD>
+<%= hidden_field_tag ('id', team.id) %>
+<%= end_form_tag %>
 </TR>
 <% end %>
 </TABLE>
+</div>
+<% end %>
 <BR/>
 <%= render :partial => 'import_teams' %>
 <BR/>

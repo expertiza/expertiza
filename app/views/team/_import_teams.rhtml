@@ -20,8 +20,9 @@
 <tr>
 <td>Specify file location:</td>
 <td><input type="file" id="uploaded_file" name="uploaded_file" size=40/>
+<%= hidden_field_tag 'assignment_id', @assignment.id %>
 <input type="submit" name="load_teams" value="Import Teams" onclick="checkIfFileExists('=import teams');"/>
 </td>
 </tr>
 </table>
-<% end_form_tag %>
+<%= end_form_tag %>

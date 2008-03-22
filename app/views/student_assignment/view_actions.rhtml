@@ -2,7 +2,9 @@
 <div class="flash_note">
 Next: Click the activity you wish to perform on the assignment titled: <%= @student.assignment.name %>
 </div>
-<a href="<%= @student.assignment.spec_location %>" target="new">Writeup URL</a>
+<% if @student.assignment.spec_location.length > 0 %>
+  <a href="<%= @student.assignment.spec_location %>" target="new">Writeup URL</a>
+<% end %>
 <ul>
 	<li>
 		<% if @can_view_your_work == 1 %>

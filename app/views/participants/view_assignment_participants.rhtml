@@ -14,9 +14,8 @@ function showFields()
 <h2>Assignment: <%= @assignment.name %></h2>
 <br/>
 
-<div class = "exp">
-
 <%if @participants.length > 0%>
+<div class = "exp">
 <table>
   <tr ><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th>
   <tr><th class="head">Name</th><th class="head">Full Name</th class="head"><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Review of Review</th></tr>
@@ -37,8 +36,9 @@ function showFields()
   </tr>
 <% end -%>
 </table>
-<% end -%>
 </div>
+<% end -%>
+
 <br/>
 
 <%= 
@@ -50,9 +50,9 @@ function showFields()
 <br/>
 <% 
   session[:return_to] = request.request_uri  
-  session[:expected_fields] = 'Name, Full name (first[ middle] last), E-mail address, Password'
+  session[:expected_fields] = 'Name, "Full name (last, first[ middle])", E-mail address, Password'
   session[:assignment_id] = @assignment.id 
 %>
-<%= link_to 'Import Participants', :controller=>'import_file', :action=>'start', :import_type => 'Assignment Participants' %>
+<%= link_to 'Import Participants', :controller=>'import_file', :action=>'start', :model => 'Participant' %>
 
 <hr/>

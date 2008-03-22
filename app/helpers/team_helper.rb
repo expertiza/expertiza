@@ -1,12 +1,10 @@
 module TeamHelper
 
   #separates the file into the necessary elements to create a new user
-  def self.upload_teams(filename, assignment_id, options) 
+  def self.upload_teams(file, assignment_id, options,logger) 
     unknown = Array.new
-    File.open(filename, "r") do |infile|
-      while (rline = infile.gets)
-        
-        split_line = rline.strip.split(%r{[\,\t]})        
+    while (rline = file.gets)        
+        split_line = rline.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/)       
         if options[:has_column_names] == "true"
           name = split_line[0]
           pos = 1
@@ -26,7 +24,7 @@ module TeamHelper
             end    
             currTeam.destroy
             currTeam = nil
-        end                                              
+        end        
         if teams.length == 0 || currTeam == nil
           currTeam = Team.new
           currTeam.name = name
@@ -34,10 +32,12 @@ module TeamHelper
           currTeam.save
         end
               
-       while(pos < split_line.length)          
-          user = User.find_by_name(split_line[pos])
-          if user && !(options[:handle_dups] == "ignore" && teams.length > 0)
-            teamusers = TeamsUser.find(:all, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])                                  
+       logger.info "#{split_line.length}"
+       logger.info "#{split_line}"
+       while(pos < split_line.length) 
+          user = User.find_by_name(split_line[pos].strip)
+          if user && !(options[:handle_dups] == "ignore" && teams.length > 0)            
+            teamusers = TeamsUser.find(:all, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])
             currUser = teamusers.first
             if teamusers.length == 0 || currUser == nil
               currUser = TeamsUser.new
@@ -51,7 +51,7 @@ module TeamHelper
           pos = pos+1
         end
       end         
-    end    
+       
     return unknown
   end  
   

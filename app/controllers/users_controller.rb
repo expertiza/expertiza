@@ -8,7 +8,12 @@ class UsersController < ApplicationController
     list
     render :action => 'list'
   end
-
+  
+  def auto_complete_for_user_name
+    @users = User.find(:all, :conditions => ['name LIKE ? and (role_id < ? or id = ?)', "#{params[:user][:name]}%",(session[:user]).role_id, (session[:user]).id])
+    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
+  end
+    
   def list
     all_users = User.find(:all, :order => 'name', :conditions => ['role_id < ? or id = ?',(session[:user]).role_id, (session[:user]).id])
     
@@ -32,7 +37,12 @@ class UsersController < ApplicationController
   def show_selection
     @user = User.find_by_name(params[:user][:name])
     getRole
-    render :action => 'show'
+    if @role.id < (session[:user]).role_id || @user.id == (session[:user]).id
+      render :action => 'show'
+    else
+      flash[:note] = 'The specified user is not available for editing.'      
+      redirect_to :action => 'list'
+    end
   end
   
   def show

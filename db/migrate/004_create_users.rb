@@ -14,13 +14,13 @@ class CreateUsers < ActiveRecord::Migration
       t.column "email_on_submission", :boolean
       t.column "email_on_review_of_review", :boolean
       t.column "is_new_user", :integer, :limit => 4, :default => 1, :null => false
-      t.column "master_permission_granted", :integer, :limit => 4, :default => 0, :null => false
+      t.column "master_permission_granted", :boolean
 
     end
 
     add_index "users", ["role_id"], :name => "fk_user_role_id"
    
-    execute "INSERT INTO `users` VALUES (2,'admin','d033e22ae348aeb5660fc2140aec35850c4da997',4,NULL,'','',2,0,NULL,1,1,1,0,0);"
+    execute "INSERT INTO `users` VALUES (2,'admin','d033e22ae348aeb5660fc2140aec35850c4da997',5,NULL,'','',2,0,NULL,1,1,1,0,0);"
   end
   
   def self.down

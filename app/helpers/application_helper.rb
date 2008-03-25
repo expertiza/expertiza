@@ -8,6 +8,8 @@ module ApplicationHelper
     case l_user.role_id
       when Role::STUDENT  
         user = Student.new
+      when Role::TA
+        user = Ta.new 
       when Role::INSTRUCTOR 
         user = Instructor.new 
       when Role::ADMINISTRATOR

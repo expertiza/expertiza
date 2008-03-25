@@ -5,12 +5,13 @@ class Role < ActiveRecord::Base
   serialize :cache
   validates_presence_of :name
   validates_uniqueness_of :name
-  attr_reader :student,:instructor,:administrator,:superadministrator
+  attr_reader :student,:ta,:instructor,:administrator,:superadministrator
 
   STUDENT = 1
-  INSTRUCTOR = 2
-  ADMINISTRATOR = 3
-  SUPERADMINISTRATOR = 4
+  TA = 2
+  INSTRUCTOR = 3
+  ADMINISTRATOR = 4
+  SUPERADMINISTRATOR = 5
   
   def Role.rebuild_cache
     roles = Role.find(:all)

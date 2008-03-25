@@ -10,8 +10,8 @@
   <tr>
     <td><%= link_to role.name, :action => 'show', :id => role %></td>
     <td><%= role.description %></td>
-    <td><%= role.created_at %></td>
-    <td><%= role.updated_at %></td>
+    <td><%= role.created_at.to_s(:short) %></td>
+    <td><%= role.updated_at.to_s(:short) %></td>
     <!--td><%= link_to 'Destroy', { :action => 'destroy', :id => role }, :confirm => 'Are you sure?' %></td-->
   </tr>
 <% end %>

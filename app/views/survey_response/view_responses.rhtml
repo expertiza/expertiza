@@ -43,6 +43,7 @@
 					<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					No scores exist for this question.</p>
 					<p> <!-- open p tag link to comments -->
+					</div>
 				<% else %>
 					<div class="question_wrapper">
 					<p class="noBottom"><b><%= question[:name] %></b></p>
@@ -57,7 +58,12 @@
 					</ul>
 					<p class="responseDisplay">&nbsp;&nbsp;Total Responses: <%= question[:count] %> &nbsp;&nbsp;&nbsp; Average Score: <%= sprintf("%.2f",question[:average]) %> &nbsp;
 				<% end #end if question empty %>
-				&nbsp;&nbsp;<%= link_to 'View Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
+				&nbsp;
+				<% unless params[:course_eval] # Check if survey is a course evaluation %>	
+					<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
+				<% else %>
+					<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :id => params[:id], :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id], :course_eval=>'1' %>
+				<% end %>					
 				</p>
 				</div>
 			<% end #end for question in survey%>

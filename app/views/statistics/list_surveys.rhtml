@@ -1,0 +1,17 @@
+<h1>Course Evaluation: Select survey to view deployments</h1>
+
+<table class="listing" cellpadding=2>
+  <tr>
+	<th></th>
+    <th align=left>Survey</th>
+  </tr>
+  
+<% for rubric in @surveys %>
+  <tr class="listingRow">
+	<td></td>
+	<td><%= link_to rubric.name, :action => 'list', :id => rubric %></td>
+  </tr>
+<% end %>
+</table>
+</br>
+

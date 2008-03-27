@@ -1,21 +1,16 @@
 <SCRIPT LANGUAGE="JavaScript">
-var dispReview = 0;
-var dispFeedback = 0;
-function toggle(divid){
-	if(document.getElementById(divid).style.display == 'none'){
-		document.getElementById(divid).style.display = 'block';
-		if (divid == 'myDivReview')
-			dispReview = 1;
-		else
-			dispFeedback = 1;
-	}else{
-		document.getElementById(divid).style.display = 'none';
-		if (divid == 'myDivReview')
-			dispReview = 0;
-		else
-			dispFeedback = 0;
-	}
-} 
+function toggleVis(id) { 
+		var elem = document.getElementById(id+"_myDiv");
+		if(elem.style.display == 'none'){
+			elem.style.display = '';
+			document.getElementById(id+"_show").style.display = 'none';
+			document.getElementById(id+"_hide").style.display = '';
+		} else {
+			elem.style.display = 'none';
+			document.getElementById(id+"_show").style.display = '';
+			document.getElementById(id+"_hide").style.display = 'none';
+		}
+	} 
 </SCRIPT>
 <h1>View Review</h1>
 <%if @assgt.wiki_type.name == "No"%>
@@ -78,9 +73,13 @@ Submitted Files<br />
 		Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
 	<% end %>	
 <%end%>	
-<a href="javascript:toggle('myDivReview');">View review
-</a><br/>
-<div id="myDivReview" style="display:none">
+<a href="#1" onClick="toggleVis('1');">
+	<p class="inline" id="1_show">View review</p>
+	<p class="inline" id="1_hide" style="display: none">Hide review</p>
+</a>
+
+<br/>
+<div id="1_myDiv" style="display:none">
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
 <%= render :partial => 'review/scores' %> 
 Additional Comment : <%=@review.additional_comment%><br/>
@@ -89,11 +88,16 @@ Additional Comment : <%=@review.additional_comment%><br/>
 <%
 review_feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id])
 if(review_feedback) %>
-<a href="javascript:toggle('myDiv');">View author feedback</a>
+
+<a href="#2" onClick="toggleVis('2');">
+	<p class="inline" id="2_show">View author feedback</p>
+	<p class="inline" id="2_hide" style="display: none">Hide author feedback</p>
+</a>
+
 <br/>
 <% @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", review_feedback.id, '4'])
 %>		     
-<div id="myDiv" style="display:none">
+<div id="2_myDiv" style="display:none">
 <strong>Author feedback: </strong><br/>
 <%= render :partial => 'review/score1' %>
 Additional Comment: 

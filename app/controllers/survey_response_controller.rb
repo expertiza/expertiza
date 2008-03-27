@@ -16,6 +16,17 @@ class SurveyResponseController < ApplicationController
   end
 
   def create
+    
+    if params[:course_eval] #Check if its a course evaluation
+       @assigned_surveys = Questionnaire.find_all(params[:id])
+       @survey = Questionnaire.find(params[:questionnaire_id])
+       @questions = @survey.questions
+       @course_eval=params[:course_eval]   
+       AuthController.clear_user_info(session, nil)
+       #@assigned_surveys = SurveyHelper::get_course_surveys(params[:course_id], 1)
+       return
+    end
+    
     unless session[:user] && session[:assignment_id]  #redirect to homepage if user not logged in or session not tied to assignment 
       redirect_to '/'
       return
@@ -82,12 +93,7 @@ class SurveyResponseController < ApplicationController
       @new.save
       end
     
-    if params[:survey_deployment_id] # Remove participant for course evaluations once he is done with the survey
-       @surveys=nil
-       SurveyParticipant.find_all_by_user_id_and_survey_deployment_id(session[:user].id,params[:survey_deployment_id]).each do |sp|
-         sp.destroy
-       end
-    else
+    if !params[:survey_deployment_id]
       @surveys = SurveyHelper::get_assigned_surveys(@assignment_id)
     end
   end
@@ -96,7 +102,7 @@ class SurveyResponseController < ApplicationController
    
     if params[:course_eval] # Check if this is a course evaluation
        survey_id=SurveyDeployment.find(params[:id]).course_evaluation_id
-       @surveys = [Questionnaire.find(survey_id)]
+       @surveys = Questionnaire.find(:all, :conditions=>["id=?", survey_id])
        #Temprorary Assignment object
        @assignment=Assignment.new
        @assignment.name="Course Evaluation"
@@ -119,7 +125,11 @@ class SurveyResponseController < ApplicationController
       this_response_survey[:avg_labels] = Array.new
       this_response_survey[:avg_values] = Array.new
       this_response_survey[:max] = max
-      surveylist = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ?", params[:id], survey.id]) 
+      if !params[:course_eval]
+        surveylist = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ?", params[:id], survey.id])
+      else
+        surveylist = SurveyResponse.find(:all, :conditions => ["survey_deployment_id = ? and survey_id = ?", params[:id], survey.id])
+      end
       if surveylist.length > 0
         @empty = false
         this_response_survey[:empty] = false 
@@ -134,8 +144,11 @@ class SurveyResponseController < ApplicationController
         this_response_question[:average] = 0
         for i in min..max
           if !question.true_false? || i == min || i == max
-            list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
-            
+            if !params[:course_eval]
+              list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
+            elsif params[:course_eval]
+              list = SurveyResponse.find(:all, :conditions => ["survey_deployment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i]);
+            end
             if question.true_false?
               if i == min
                 this_response_question[:labels] << "False"
@@ -147,12 +160,15 @@ class SurveyResponseController < ApplicationController
             end
             this_response_question[:values] << list.length.to_s  
             this_response_question[:average] += i*list.length
-           elsif params[:course_eval]
-            list = SurveyResponse.find(:all, :conditions => ["survey_deployment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i]);
-          end  
+          end    
         end
-        no_of_question = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
+        if !params[:course_eval]
+          no_of_question = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
+        else
+          no_of_question = SurveyResponse.find(:all, :conditions => ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
+        end  
         this_response_question[:count] = no_of_question.length
+        
         if this_response_question[:count] > 0 
           @empty = false
           this_response_survey[:empty] = false

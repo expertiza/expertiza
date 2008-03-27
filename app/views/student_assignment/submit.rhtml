@@ -114,7 +114,8 @@ if(@user.master_permission_granted == nil && !@student.permission_granted)%>
 
 
 <% if @student.assignment.wiki_type_id == 1%>
-Submit your work for the assignment titled: <%= @student.assignment.name %><br/><br/>
+Submit your work for the assignment titled: <%= @student.assignment.name %>
+<p><img src="/images/submit.png" size="60%"/></p>
 <%= form_tag({:action=>'submit'},:multipart => true, :name=>'submit_form')%>
 <input type="text" name="submission" size=40 value = " "/><input type="submit" name="upload_link" value="Upload link"/>
 <%= end_form_tag%>

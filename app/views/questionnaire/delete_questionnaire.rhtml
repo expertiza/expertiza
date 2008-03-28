@@ -1,6 +1,6 @@
 <h1>Delete an existing questionnaire</h1>
 
-<%= form_tag({:action=>'delete_questionnaire'})%>
+<%= form_tag({:action=>'delete_questionnaire', :id=>@questionnaire.id})%>
   	<%= @questionnaire.name.capitalize %> is used by the following assignments.  Are you sure you want to delete it?<br/><br/>
 	<table>
 	   <tr>

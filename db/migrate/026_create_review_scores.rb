@@ -22,5 +22,6 @@ class CreateReviewScores < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "review_scores"
   end
 end

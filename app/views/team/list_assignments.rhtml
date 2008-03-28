@@ -1,5 +1,9 @@
 <h1>Assignments</h1>
 
+
+<% if @assignments.length == 0 %>
+   <h4>No team assignments are defined</h4>
+<% else %>
 <table>
   <tr><th>Title</th><th>Directory Path</th></tr>
 <% for assignment in @assignments %>
@@ -10,3 +14,4 @@
   </tr>
 <% end -%>
 </table>
+<% end %>

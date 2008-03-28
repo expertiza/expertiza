@@ -9,5 +9,6 @@ class CreateDeadlineRights < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "deadline_rights"
   end
 end

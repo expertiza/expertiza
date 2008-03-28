@@ -46,5 +46,6 @@ class CreateAssignments < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "assignments"
   end
 end

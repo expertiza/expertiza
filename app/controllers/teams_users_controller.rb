@@ -29,9 +29,9 @@ class TeamsUsersController < ApplicationController
   end
   
   def delete_team_user
-    @teamuser = TeamsUser.find(params[:id])
+    @teamuser = TeamsUser.find(params[:id])   
     team_id = @teamuser.team_id
-    @team_user.destroy    
+    @teamuser.destroy    
     redirect_to :action => 'list', :id => team_id    
-  end
+  end   
 end

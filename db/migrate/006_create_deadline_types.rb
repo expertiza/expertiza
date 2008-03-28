@@ -9,5 +9,6 @@ class CreateDeadlineTypes < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "deadline_types"
   end
 end

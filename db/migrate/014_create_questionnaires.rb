@@ -18,9 +18,9 @@ class CreateQuestionnaires < ActiveRecord::Migration
              add constraint fk_questionnaire_type
              foreign key (type_id) references questionnaire_types(id)"
   
-  execute "INSERT INTO `questionnaires` VALUES (1,'Test Rubric',2,0,0,5,'2008-03-19 21:15:58','2008-03-19 21:15:58',NULL,1);" 
   end
 
   def self.down
+    drop_table "questionnaires"
   end
 end

@@ -36,6 +36,21 @@ class Role < ActiveRecord::Base
     self.cache[:menu] = menu
   end
 
+  def get_available_roles  
+    ids = Array.new
+    
+    current = self.parent_id
+    while current
+      role = Role.find(current)
+      if role
+        if not ids.index(role.id)
+          ids << role.id
+          current = role.parent_id
+        end   
+      end     
+    end
+    return ids
+  end
 
   def get_parents
     parents = Array.new

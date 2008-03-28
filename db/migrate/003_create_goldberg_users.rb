@@ -22,5 +22,6 @@ class CreateGoldbergUsers < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "goldberg_users"
   end
 end

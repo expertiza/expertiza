@@ -9,5 +9,6 @@ class CreateWikiTypes < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "wiki_types"
   end
 end

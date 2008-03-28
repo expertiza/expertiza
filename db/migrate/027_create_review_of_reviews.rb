@@ -16,5 +16,6 @@ class CreateReviewOfReviews < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "review_of_reviews"
   end
 end

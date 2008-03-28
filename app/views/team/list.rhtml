@@ -4,30 +4,20 @@
 
 <H1>Teams for <%= @assignment.name %></H1>
 
-<% if @teams.length > 0 %>
-<div class = "exp">
-<TABLE>
-<TR><TH class="head">Team Name</TH><TH class="head">Edit Name</TH><TH class="head">Modify Members</TH><TH class="head">Delete Team</TH></TR>
-<% for team in @teams %>
-<TR class="exp">
-<TD><%= team.name %></TD>
-<%= start_form_tag ({:action => 'edit' }, {:method => 'post'}) %>
-<TD align="center"><input type="radio" name="edit" onClick="submit();"></TD>
-<%= hidden_field_tag ('id', team.id) %>
-<%= end_form_tag %>
-<%= start_form_tag ({:controller => 'teams_users', :action => 'list' }, {:method => 'post'}) %>
-<TD align="center"><input type="radio" name="edit" onClick="submit();"></TD>
-<%= hidden_field_tag ('id', team.id) %>
-<%= end_form_tag %>
-<%= start_form_tag ({:action => 'delete_team' }, {:method => 'post'}) %>
-<TD align="center"><input type="radio" name="edit" onClick="submit();"></TD>
-<%= hidden_field_tag ('id', team.id) %>
-<%= end_form_tag %>
-</TR>
+<% 
+   column_definitions = Array.new
+   column_definitions << {:name => 'Team Name',      :type => 'display',        :field => 'name'}
+   column_definitions << {:name => 'Edit Name',      :action => 'edit',         :controller => 'team'}
+   column_definitions << {:name => 'Modify Members', :action => 'list',         :controller => 'teams_users'}
+   column_definitions << {:name => 'Delete Team',    :action => 'delete_team',  :controller => 'team'}   
+%>
+<%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :elements => @teams} %>
+
+<%= pagination_links(@team_pages) %><br/><br/>
+<% for letter in @letters %>
+  <%= link_to letter, :controller => 'teams', :action => 'list', :letter => letter %>&nbsp;
 <% end %>
-</TABLE>
-</div>
-<% end %>
+
 <BR/>
 <%= render :partial => 'import_teams' %>
 <BR/>

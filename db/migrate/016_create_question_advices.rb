@@ -15,5 +15,6 @@ class CreateQuestionAdvices < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "question_advices"
   end
 end

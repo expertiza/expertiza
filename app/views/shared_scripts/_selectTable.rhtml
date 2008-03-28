@@ -1,0 +1,32 @@
+<% if elements.length > 0 %>
+<div class = "exp">
+<TABLE>
+<TR>
+<% for definition in column_definitions %>
+	<TH CLASS="head"><%= definition[:name] %></TH>
+<% end %>
+</TR>
+
+<% for element in elements %>
+<TR class="exp">
+  <% for definition in column_definitions %>  
+     <% if definition[:type] == "display" %>
+       <TD align="center"><%= element[definition[:field].to_sym] %></TD>
+     <% else %>      
+       <%= start_form_tag ({:controller => definition[:controller], :action => definition[:action]}, {:method => 'post'} ) %>
+         <% 
+            disabled = false
+            if definition[:disabled] != nil
+              disabled = element[definition[:disabled].to_sym]             
+            end                                  
+         %>
+       	 <TD align="center"><%= radio_button_tag definition[:action], definition[:name], false, :onClick => 'this.checked = false;submit();' %>
+       	 <%= hidden_field_tag ('id', element.id) %>
+       <%= end_form_tag %>
+     <% end %>
+  <% end %>
+</TR>
+<% end %>
+</TABLE>
+</div>
+<% end %>

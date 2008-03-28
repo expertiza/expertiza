@@ -23,7 +23,11 @@ class ImportFileController < ApplicationController
  
    def importFile(file,session,delimiter,model)
     while (line = file.gets)      
-      items = line.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/)
+      if delimiter == ","
+         items = line.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/)
+      else
+         items = line.split(delimiter)
+      end
       row = Array.new
       items.each { | value | row << value.sub("\"","").sub("\"","").strip }
       

@@ -80,11 +80,11 @@ class ParticipantsController < ApplicationController
   end
   
   def list_courses
-    @courses_pages, @courses = paginate :courses, :order => 'title',:conditions => ["instructor_id = ?", session[:user].id], :per_page => 10
+    @courses = Course.find(:all, :order => 'title',:conditions => ["instructor_id = ?", session[:user].id])
   end
   
   def list_assignments
-    @assignment_pages, @assignments = paginate :assignments, :order => 'name',:conditions => ["instructor_id = ? and team_assignment = ?", session[:user].id, 0], :per_page => 25
+    @assignments = Assignment.find(:all, :conditions => ["instructor_id = ? and team_assignment = 0", session[:user].id])
   end
 
   def view_participants

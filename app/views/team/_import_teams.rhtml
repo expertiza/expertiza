@@ -1,5 +1,5 @@
-<%= form_tag({:action=>'import_teams'},:multipart => true, :name=>'submit_form')%>
-<table>
+<%= form_tag({:action=>'import_teams', :assignment_id => params[:assignment_id]},:multipart => true, :name=>'submit_form')%>
+<table width =100%>
 <tr>
 <td colspan=2>
 <label for="column_one_has_name">Interpret first column as team name:</label>

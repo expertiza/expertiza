@@ -1,6 +1,4 @@
 class TeamsUsersController < ApplicationController
-  auto_complete_for :user, :name
-  
 
   def list
     @team = Team.find_by_id(params[:id])
@@ -14,7 +12,7 @@ class TeamsUsersController < ApplicationController
   end
   
   def create
-    user = User.find_by_name(params[:user][:name])
+    user = User.find_by_name(params[:user][:name].strip)
     team = Team.find_by_id(params[:id])
     check = TeamsUser.find(:all, :conditions => ["team_id =? and user_id =?",team.id,user.id])
     if (check.size > 0)
@@ -34,4 +32,11 @@ class TeamsUsersController < ApplicationController
     @teamuser.destroy    
     redirect_to :action => 'list', :id => team_id    
   end   
+  
+ def auto_complete_for_user_name
+  search = params[:user][:name].to_s
+  @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%' and id in (select user_id from participants where user_id not in (select user_id from teams_users where team_id in (select id from teams where assignment_id ="+session[:assignment_id]+")) and assignment_id ="+session[:assignment_id]+")") unless search.blank?
+  render :partial => "members" 
+ end
+  
 end

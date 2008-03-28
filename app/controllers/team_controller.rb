@@ -73,13 +73,7 @@ class TeamController < ApplicationController
   end  
   
   def list_assignments
-    user_id = session[:user].id
-    if (User.find_by_id(session[:user].id).role_id!=1)
-      @assignments = Assignment.find(:all, :order => 'name',:conditions => ["instructor_id = ? and team_assignment =?", session[:user].id, 1])
-    else
-      @assignments = Assignment.find(:all, :order => 'name',:conditions => ["team_assignment =?", 1])
-    end 
-    
+    @assignments = Assignment.find(:all, :order => 'name',:conditions => ["instructor_id = ? and team_assignment =?", session[:user].id, 1])
   end
   
   def delete_team

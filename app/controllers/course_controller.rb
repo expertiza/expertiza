@@ -1,5 +1,5 @@
 class CourseController < ApplicationController
-
+  require 'ftools'
   def get_courses_in_folder(curr_dir)
     Course.find(:all,
                 :conditions => ["instructor_id = ? AND directory_path LIKE ?", 
@@ -9,14 +9,13 @@ class CourseController < ApplicationController
   def list_folders
     # the default directory to display is your username
     @curr_dir = session[:user].name + "/"
+    temp = ""
     if params[:curr_dir] then
       @curr_dir = params[:curr_dir] + "/"
     end
-
     files = Dir[@curr_dir + "*"]
     @folders = Array.new
     for file in files
-      print Dir.pwd + file + "\n";
       if File.directory?(Dir.pwd + "/" + file) then
         @folders << file
       end
@@ -42,7 +41,9 @@ class CourseController < ApplicationController
       end
       
       begin
-        Dir.mkdir curr_dir + params[:folder][:name]
+        # Create submission directory for this assignment
+        File.makedirs(curr_dir + params[:folder][:name])
+        
         flash[:notice] = "New Folder has been created"
       rescue
         flash[:notice] = "<font color=red> Folder already exists</font>"

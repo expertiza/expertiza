@@ -4,7 +4,7 @@ class Questionnaire < ActiveRecord::Base
     has_many :assignments, :foreign_key => "review_questionnaire_id"
     has_many :questions
     belongs_to :questionnaire_type, :foreign_key => "type_id"
-     has_many :assignments_questionnairess
+    has_many :assignments_questionnairess
 
     
     validates_presence_of :name
@@ -56,5 +56,8 @@ class Questionnaire < ActiveRecord::Base
                             :conditions => ["id <> ? and name = ? and instructor_id = ?", 
                             id, name, instructor_id])
       errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
+    end
+    def get_field(type_id)
+      type = QuestionnaireType.find(type_id.to_s).name
     end
 end

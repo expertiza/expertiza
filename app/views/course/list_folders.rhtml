@@ -6,12 +6,13 @@
 <% for folder in @folders %>
   <tr>
     <td><%= link_to folder, :action => 'list_folders', :curr_dir=>folder %></td>
-    <td><% for course in @courses
+    <% for course in @courses
             print course.directory_path + " " + folder + "\n"
             if CourseController.remove_last_slash(course.directory_path) === folder then %>
-                <%= link_to course.title, :action=>'edit_course', :id => course.id %>
+                <td><%= link_to course.title, :action=>'edit_course', :id => course.id %></td> 
+								<td><%= link_to "add TA", :action=>'view_teaching_assistants', :id => course.id %></td>
             <% end
-           end %></td> 
+           end %>
   </tr>
 <% end -%>
 </table>

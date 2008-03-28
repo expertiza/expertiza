@@ -8,10 +8,10 @@ class Role < ActiveRecord::Base
   attr_reader :student,:ta,:instructor,:administrator,:superadministrator
 
   STUDENT = 1
-  TA = 2
-  INSTRUCTOR = 3
-  ADMINISTRATOR = 4
-  SUPERADMINISTRATOR = 5
+  TA = 5
+  INSTRUCTOR = 2
+  ADMINISTRATOR = 3
+  SUPERADMINISTRATOR = 4
   
   def Role.rebuild_cache
     roles = Role.find(:all)

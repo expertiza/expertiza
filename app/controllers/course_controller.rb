@@ -1,4 +1,6 @@
 class CourseController < ApplicationController
+  auto_complete_for :user, :name
+  
   require 'ftools'
   def get_courses_in_folder(curr_dir)
     Course.find(:all,
@@ -22,6 +24,11 @@ class CourseController < ApplicationController
     end
     
     @courses = get_courses_in_folder @curr_dir
+  end
+  
+  def list_courses
+    @courses = Course.find(:all,
+                :conditions => ["instructor_id = ?", session[:user].id])
   end
 
   def self.remove_last_slash(dir)
@@ -91,4 +98,33 @@ class CourseController < ApplicationController
     Course.find(params[:id]).destroy
     redirect_to :action => 'list_folders'
   end
-end 
+  
+  def view_teaching_assistants
+    @course = Course.find(params[:id])
+    ta_mappings = @course.ta_mappings
+    @ta_users = []
+    for mappings in ta_mappings
+      @ta_users << mappings.ta
+    end
+  end
+  
+  def add_ta
+    @course = Course.find(params[:course_id])
+    @user = User.find_by_name(params[:user][:name])
+    if(@user==nil)
+      redirect_to :action => 'view_teaching_assistants', :id => @course.id 
+    else
+      @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
+      redirect_to :action => 'view_teaching_assistants', :id => @course.id
+    end
+  end 
+  
+  def remove_ta
+    @course = Course.find(params[:course_id])
+    @ta_mapping = TaMapping.find(:first, 
+                                   :conditions =>["course_id = ? AND ta_id = ?", 
+                                    params[:course_id], params[:id]])
+    @ta_mapping.destroy
+    redirect_to :action => 'view_teaching_assistants', :id => @course
+  end
+end

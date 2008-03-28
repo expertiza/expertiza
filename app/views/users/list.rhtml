@@ -31,7 +31,14 @@ Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} 
 </table>
 </div>
 <hr/>
-<%= pagination_links(@user_pages) %><br/><br/>
+<% for page in @user_pages %>
+  <%if @user_pages.current_page == page %>
+     <%= page.to_i %>
+  <% else %>
+     <%= link_to page.to_i, :controller => 'users', :action => 'list', :letter => params[:letter], :page => page %>
+  <%end %>
+<% end %>
+<br/><br/>
 <% for letter in @letters %>
   <%= link_to letter, :controller => 'users', :action => 'list', :letter => letter %>&nbsp;
 <% end %>

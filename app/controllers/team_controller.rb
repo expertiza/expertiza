@@ -13,21 +13,9 @@ class TeamController < ApplicationController
      end
      session[:assignment_id] = params[:assignment_id]
      
-     @assignment = Assignment.find(session[:assignment_id])   
-     all_teams = Team.find(:all, :order => 'name', :conditions => ["assignment_id = ?",@assignment.id])
-     letter = params[:letter]
-     if letter == nil
-       letter = all_teams.first.name[0,1].downcase
-     end      
-     @letters = Array.new
-     @team_pages, @teams = paginate :teams, :order => 'name', :conditions => ["assignment_id = ?",@assignment.id], :per_page => 20
-     all_teams.each {
-       | team |
-       first = team.name[0,1].downcase
-       if not @letters.include?(first)
-          @letters << first  
-       end
-      }
+     @assignment = Assignment.find(session[:assignment_id])        
+     @teams = Team.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
+     
   end
   
   def edit
@@ -92,6 +80,6 @@ class TeamController < ApplicationController
   def delete_team
     @team = Team.find(params[:id])
     @team.delete
-    redirect_to :action => 'list'
+    redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end
 end

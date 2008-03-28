@@ -1,6 +1,7 @@
 class TeamsUser < ActiveRecord::Base
   
-  def name
-    User.find(self.user_id).name
+  def get_field(field)
+    user = User.find(self.user_id)
+    return user[field.to_sym]
   end
 end

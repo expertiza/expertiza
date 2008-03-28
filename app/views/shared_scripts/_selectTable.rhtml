@@ -10,8 +10,11 @@
 <% for element in elements %>
 <TR class="exp">
   <% for definition in column_definitions %>  
+     <TD align="center">
      <% if definition[:type] == "display" %>
-       <TD align="center"><%= element[definition[:field].to_sym] %></TD>
+       <%= element[definition[:field].to_sym] %>
+     <% elsif definition[:type] == "fetch" %>
+       <%= element.get_field(definition[:field]) %>
      <% else %>      
        <%= start_form_tag ({:controller => definition[:controller], :action => definition[:action]}, {:method => 'post'} ) %>
          <% 
@@ -20,10 +23,14 @@
               disabled = element[definition[:disabled].to_sym]             
             end                                  
          %>
-       	 <TD align="center"><%= radio_button_tag definition[:action], definition[:name], false, :onClick => 'this.checked = false;submit();' %>
+       	 <%= radio_button_tag definition[:action], definition[:name], false, :onClick => 'this.checked = false;submit();' %>
+       	 <% if definition[:hidden] %>
+       	    <%= hidden_field_tag(definition[:hidden][:name], definition[:hidden][:id]) %>
+       	 <% end %>
        	 <%= hidden_field_tag ('id', element.id) %>
        <%= end_form_tag %>
      <% end %>
+     </TD>
   <% end %>
 </TR>
 <% end %>

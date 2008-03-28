@@ -84,7 +84,7 @@ class ParticipantsController < ApplicationController
   end
   
   def list_assignments
-    @assignments = Assignment.find(:all, :conditions => ["instructor_id = ? and team_assignment = 0", session[:user].id])
+    @assignments = Assignment.find(:all, :conditions => ["instructor_id = ?", session[:user].id])
   end
 
   def view_participants

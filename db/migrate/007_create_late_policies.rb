@@ -14,5 +14,6 @@ class CreateLatePolicies < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "late_policies"
   end
 end

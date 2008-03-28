@@ -23,5 +23,6 @@ class CreateReviewFeedbacks < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "review_feedbacks"
   end
 end

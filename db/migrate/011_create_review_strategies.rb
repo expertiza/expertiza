@@ -8,5 +8,6 @@ class CreateReviewStrategies < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "review_strategies"
   end
 end

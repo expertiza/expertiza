@@ -37,5 +37,18 @@ class User < ActiveRecord::Base
     self.password == Digest::SHA1.hexdigest(self.password_salt.to_s +
                                                  clear_password)
   end
+  
+  def self.import(row,session)
+      row.each { |item| logger.info "#{item}" }
+      if row.length == 4
+        user = User.find_by_name(row[0])        
+        if (user == nil)
+          attributes = ImportFileHelper::define_attributes(row)
+          user = ImportFileHelper::create_new_user(attributes,session,logger)
+        end   
+      else
+        raise ArgumentError, "Not enough items" 
+      end    
+  end  
     
 end

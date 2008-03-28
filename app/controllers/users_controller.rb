@@ -9,13 +9,18 @@ class UsersController < ApplicationController
     render :action => 'list'
   end
   
+
   def auto_complete_for_user_name
-    @users = User.find(:all, :conditions => ['name LIKE ? and (role_id < ? or id = ?)', "#{params[:user][:name]}%",(session[:user]).role_id, (session[:user]).id])
+    user = session[:user]
+    role = Role.find(user.role_id)   
+    @users = User.find(:all, :conditions => ['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%",role.get_available_roles, user.id])
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
     
   def list
-    all_users = User.find(:all, :order => 'name', :conditions => ['role_id < ? or id = ?',(session[:user]).role_id, (session[:user]).id])
+    user = session[:user]
+    role = Role.find(user.role_id)
+    all_users = User.find(:all, :order => 'name', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
     
     letter = params[:letter]
     if letter == nil
@@ -23,8 +28,7 @@ class UsersController < ApplicationController
     end 
     logger.info "#{letter}"
     @letters = Array.new
-    @user_pages, @users = paginate :users, :order => 'name', :per_page => 20,  :conditions => ["(role_id < ? or id = ?) and substring(name,1,1) = ?", (session[:user]).role_id, (session[:user]).id, letter]
-    all_users = User.find(:all, :order => 'name', :conditions => ['role_id < ? or id = ?',(session[:user]).role_id, (session[:user]).id])
+    @user_pages, @users = paginate :users, :order => 'name', :per_page => 20,  :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter]
     all_users.each {
        | user |
        first = user.name[0,1].downcase
@@ -37,7 +41,7 @@ class UsersController < ApplicationController
   def show_selection
     @user = User.find_by_name(params[:user][:name])
     getRole
-    if @role.id < (session[:user]).role_id || @user.id == (session[:user]).id
+    if @role.parent_id < (session[:user]).role_id || @role.parent_id == nil || @user.id == (session[:user]).id
       render :action => 'show'
     else
       flash[:note] = 'The specified user is not available for editing.'      
@@ -147,8 +151,9 @@ end
 
   protected
 
-  def foreign    
-    @all_roles = Role.find(:all, :order => 'name', :conditions => ['id <= ?',(session[:user]).role_id])    
+  def foreign
+    role = Role.find((session[:user]).role_id)  
+    @all_roles = Role.find(:all, :conditions => ['id in (?) or id = ?',role.get_available_roles,role.id])
   end
   
 end

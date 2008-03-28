@@ -4,5 +4,6 @@ class DueDateRounds < ActiveRecord::Migration
   end
 
   def self.down
+     remove_column "due_dates","round"
   end
 end

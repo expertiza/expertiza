@@ -21,5 +21,6 @@ class CreateAssignmentsQuestionnaires < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "assignments_questionnaires"
   end
 end

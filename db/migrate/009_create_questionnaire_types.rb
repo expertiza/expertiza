@@ -11,5 +11,6 @@ class CreateQuestionnaireTypes < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "questionnaire_types"
   end
 end

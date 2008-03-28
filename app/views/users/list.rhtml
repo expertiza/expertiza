@@ -35,5 +35,13 @@ Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} 
 <% for letter in @letters %>
   <%= link_to letter, :controller => 'users', :action => 'list', :letter => letter %>&nbsp;
 <% end %>
-<p><%= link_to 'New User', :action => 'new' %></p>
+<p>
+<% 
+  session[:return_to] = request.request_uri  
+  session[:expected_fields] = 'Name, "Full name (last, first[ middle])", E-mail address, Password'  
+%>
+
+<%= link_to 'New User', :action => 'new' %> |
+<%= link_to 'Import Users', :controller=>'import_file', :action=>'start', :model => 'User' %>
+</p>
 

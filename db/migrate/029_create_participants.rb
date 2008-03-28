@@ -29,5 +29,6 @@ class CreateParticipants < ActiveRecord::Migration
   end
 
   def self.down
+     drop_table "participants"
   end
 end

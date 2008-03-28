@@ -12,10 +12,9 @@ class CreateQuestions < ActiveRecord::Migration
   execute "alter table questions 
              add constraint fk_question_questionnaires
              foreign key (questionnaire_id) references questionnaires(id)"
-   
-  execute "INSERT INTO `questions` VALUES (1,'This is a question',1,1,1);"
   end
 
   def self.down
+    drop_table "questions"
   end
 end

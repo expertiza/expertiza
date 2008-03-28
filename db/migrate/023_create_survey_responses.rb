@@ -30,5 +30,6 @@ class CreateSurveyResponses < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "survey_responses"
   end
 end

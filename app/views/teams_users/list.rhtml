@@ -2,15 +2,13 @@
 
 
 <H3>Team Name: <%= @team.name %></H3>
-<TABLE>
-<TR><TH>Member Login</TH></TR>
-<% for teamuser in @teams_users %>
-<% user = User.find_by_id(teamuser.user_id) %>
-<TR>
-<TD><%= user.name %></TD><TD>&nbsp;</TD>
-<TD><%= link_to 'Delete', :action => 'destroy', :id => teamuser.id %></TD>
-</TR>
-<% end %>
-</TABLE>
+
+<% 
+   column_definitions = Array.new
+   column_definitions << {:name => 'Team Member', :type => 'display', :field => 'name'}
+   column_definitions << {:name => 'Remove from Team',      :action => 'delete_team_user', :controller => 'teams_users'}
+%>
+<%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :elements => @teams_users} %>
+
 <BR/>
 <%= link_to 'New Team Member', :action => 'new', :id => @team %>

@@ -9,5 +9,6 @@ class CreateMappingStrategies < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "mapping_strategies"
   end
 end

@@ -35,6 +35,6 @@ function checkIfFileExists()
  &nbsp;&nbsp;&nbsp;<%= session[:expected_fields] %>
  <br/><br/>
 
- <a href="<%= session[:return_to]%>">Back</a>
+ <a href="<%= session[:return_to]%>">Back</a> |
  <a href="#" onclick='if (checkIfFileExists()) {import_form.submit();} else {alert("Please select a file before clicking Next.");}'>Next</a>
  

@@ -148,6 +148,14 @@ class ParticipantsController < ApplicationController
     @courses_pages, @courses = paginate :courses, :order => 'title',:conditions => ["instructor_id = ?", session[:user].id], :per_page => 10
   end
   
+  def delete_participant
+    user = User.find(params[:id])
+    participant = Participant.find_by_user_id(user.id)
+    assignment = participant.assignment_id
+    participant.destroy
+    redirect_to :action => 'view_assignment_participants', :id => assignment
+  end
+  
   def edit_team_members
   end     
 end

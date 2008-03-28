@@ -39,5 +39,6 @@ class CreateDueDates < ActiveRecord::Migration
   end
 
   def self.down
+      drop_table "due_dates"
   end
 end

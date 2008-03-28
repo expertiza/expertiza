@@ -4,7 +4,7 @@ class CreateReviews < ActiveRecord::Migration
     t.column "review_mapping_id", :integer
     t.column "review_num_for_author", :integer
     t.column "review_num_for_reviewer", :integer
-    t.column "ignore", :integer, :limit => 4, :default => 0, :null => false
+    t.column "ignore", :boolean, :default => 0
     t.column "additional_comment", :text
     t.column "updated_at", :datetime
     t.column "created_at", :datetime
@@ -19,5 +19,6 @@ class CreateReviews < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "reviews"
   end
 end

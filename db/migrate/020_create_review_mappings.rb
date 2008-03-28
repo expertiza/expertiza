@@ -33,5 +33,6 @@ class CreateReviewMappings < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table "review_mappings"
   end
 end

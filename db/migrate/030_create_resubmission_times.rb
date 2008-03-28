@@ -15,5 +15,6 @@ class CreateResubmissionTimes < ActiveRecord::Migration
   end
 
   def self.down
+      drop_table "resubmission_times"
   end
 end

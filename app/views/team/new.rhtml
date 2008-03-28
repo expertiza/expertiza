@@ -1,4 +1,4 @@
 <H1>New Team for <%= @assignment.name %></H1>
 
-<%= form_tag :action => 'create' %>
+<%= form_tag :action => 'create', :assignment_id => params[:assignment_id] %>
 <%= render :partial => 'form' %>

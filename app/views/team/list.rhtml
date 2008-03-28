@@ -7,16 +7,11 @@
 <% 
    column_definitions = Array.new
    column_definitions << {:name => 'Team Name',      :type => 'display',        :field => 'name'}
-   column_definitions << {:name => 'Edit Name',      :action => 'edit',         :controller => 'team'}
+   column_definitions << {:name => 'Edit Name',      :action => 'edit',         :controller => 'team', :hidden => {:id => @assignment.id, :name => 'assignment_id'} }
    column_definitions << {:name => 'Modify Members', :action => 'list',         :controller => 'teams_users'}
-   column_definitions << {:name => 'Delete Team',    :action => 'delete_team',  :controller => 'team'}   
+   column_definitions << {:name => 'Delete Team',    :action => 'delete_team',  :controller => 'team', :hidden => {:id => @assignment.id, :name => 'assignment_id'} }  
 %>
 <%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :elements => @teams} %>
-
-<%= pagination_links(@team_pages) %><br/><br/>
-<% for letter in @letters %>
-  <%= link_to letter, :controller => 'teams', :action => 'list', :letter => letter %>&nbsp;
-<% end %>
 
 <BR/>
 <%= render :partial => 'import_teams' %>

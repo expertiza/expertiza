@@ -9,13 +9,13 @@ class CourseController < ApplicationController
   def list_folders
     # the default directory to display is your username
     @curr_dir = session[:user].name + "/"
-    temp = ""
     if params[:curr_dir] then
       @curr_dir = params[:curr_dir] + "/"
     end
     files = Dir[@curr_dir + "*"]
     @folders = Array.new
     for file in files
+      print Dir.pwd + file + "\n";
       if File.directory?(Dir.pwd + "/" + file) then
         @folders << file
       end

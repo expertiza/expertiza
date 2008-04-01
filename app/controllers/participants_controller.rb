@@ -84,7 +84,11 @@ class ParticipantsController < ApplicationController
   end
   
   def list_assignments
-    @assignments = Assignment.find(:all, :conditions => ["instructor_id = ?", session[:user].id])
+    if (session[:user].role_id != 4)
+      @assignments = Assignment.find(:all, :conditions => ["instructor_id = ?", session[:user].id])
+    else
+      @assignments = Assignment.find(:all)
+    end  
   end
 
   def view_participants

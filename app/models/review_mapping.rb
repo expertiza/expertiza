@@ -5,12 +5,13 @@ class ReviewMapping < ActiveRecord::Base
   has_many :reviews
   has_many :review_of_review_mappings
   
-  ##feedback added
   def self.assign_reviewers(assignment_id, num_reviews, num_review_of_reviews, mapping_strategy)
     @authors = Participant.find(:all, :conditions => ['assignment_id = ? and submit_allowed=1', assignment_id])
+    @reviewers = Participant.find(:all, :conditions => ['assignment_id = ? and review_allowed=1', assignment_id])
     @assignments = Assignment.find_by_id(assignment_id)
-    @reviewers = Participant.find(:all, :conditions => ['assignment_id = ? and review_allowed=1', assignment_id])  
-    
+    puts 'authors.size = ', @authors.size
+    puts 'reviewers.size = ', @reviewers.size
+
     due_date = DueDate.find(:all,:conditions => ["assignment_id = ?",assignment_id], :order => "round DESC", :limit =>1)
     @round = 1
     if (due_date[0] && !due_date[0].round.nil?)
@@ -25,40 +26,24 @@ class ReviewMapping < ActiveRecord::Base
         current_author_candidate = current_reviewer_candidate
         for j in 0 .. (@reviewers.size * num_reviews / @authors.size) - 1  # This method potentially assigns authors different #s of reviews, if limit is non-integer
           current_author_candidate = (current_author_candidate + stride) % @authors.size
-          if (@assignments.team_assignment != true)
-            ReviewMapping.create(:author_id => @authors[current_author_candidate].user_id, :reviewer_id => @reviewers[i].user_id, :assignment_id => assignment_id, :round => round_num)
-          else
-            team = TeamsUser.find(:first,:conditions=>["user_id =? and team_id in (select id from teams where assignment_id=?)", @authors[current_author_candidate].user_id, assignment_id])
-            if team != nil
-              team_id = team.team_id
-              count = check_for_team(@reviewers[i].user_id, team_id)
-              if count != nil
+            if (@assignments.team_assignment != true)
+              ReviewMapping.create(:author_id => @authors[current_author_candidate].user_id, :reviewer_id => @reviewers[i].user_id, :assignment_id => assignment_id, :round => round_num)
+            else
+                team = TeamsUser.find(:first,:conditions=>["user_id =? and team_id in (select id from teams where assignment_id=?)", @authors[current_author_candidate].user_id, assignment_id])
+              if team != nil
+                team_id = team.team_id
                 ReviewMapping.create(:author_id => @authors[current_author_candidate].user_id, :reviewer_id => @reviewers[i].user_id, :assignment_id => assignment_id, :round => round_num, :team_id=>team_id)
-              else
-               val = get_next_reviewer(i, @reviewers, team_id) 
-               ReviewMapping.create(:author_id => @authors[current_author_candidate].user_id, :reviewer_id => @reviewers[val].user_id, :assignment_id => assignment_id, :round => round_num, :team_id=>team_id)
               end
-            end  
-          end  
-          ##
-          puts 'Review Mapping created'
-          ##
+            end
+            ##
+            puts 'Review Mapping created'
+            ##
         end
       end
     end
   end
   ##
-  
-  def self.check_for_team(user_id, team_id)
-    count = TeamsUser.find(:first, :conditions=>["user_id=? and team_id=?", user_id, team_id])
-  end
-  
-  def self.get_next_reviewer(id, object, team_id)
-    for count in id .. object.size - 1
-      team = TeamsUser.find(:first, :conditions=>["team_id!=?",team_id])
-      return count
-    end  
-  end
+
     
   def self.import_reviewers(file,assignment)
     File.open(file, "r") do |infile|

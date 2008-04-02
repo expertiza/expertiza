@@ -103,10 +103,9 @@ function renameFile(){
 <%
 @user = session[:user]
 if(@user.master_permission_granted == nil && !@student.permission_granted)%>
-<div class="flash_note">Your work cannot be published because you haven't granted us permission to publish your work. 
-<br/>Click <%= link_to 'yes', :action =>'set_publish_permission_yes', :id => @student.id%> to grant permission for this work. 
-<br/>Click <%= link_to 'always', :action =>'set_publish_master_permission_yes', :id => @student.id%> to grant permission for <b>all</b> your work. 
-<br/>Click <%= link_to 'never', :action =>'set_publish_master_permission_no', :id => @student.id%> to deny permission for <b>all</b> your work. </div>
+<div class="flash_note">Your work cannot be published because you haven't granted us publishing permissions. 
+<br/>Click <%= link_to 'here', :action =>'view_publishing' %> to set your publishing preferences. 
+</div>
 <%end%>
 <ul>
 <li><%= link_to "View feedback on submissions",{:action => 'view_feedback', :id => @student.id} %></li>

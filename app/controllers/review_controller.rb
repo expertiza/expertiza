@@ -283,20 +283,18 @@ class ReviewController < ApplicationController
       end
     end
     ## feedback added
-    @cur_round = nil
-    if !next_due_date.round.nil?
-      @cur_round = next_due_date.round
-    end
-    
-    if !(@cur_round == nil)
-       puts "not nil"
-       @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ? and round = ?", 
-         @reviewer_id, @assignment_id, @cur_round])
-    else
-      puts "nil"
+#    @cur_round = nil
+#    if !next_due_date.round.nil?
+#      @cur_round = next_due_date.round
+#    end
+#    
+#    if (@cur_round != nil)
+#       @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ? and round = ?", 
+#         @reviewer_id, @assignment_id, @cur_round])
+#    else   
       @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", 
-         @reviewer_id, @assignment_id])
-    end   
+      @reviewer_id, @assignment_id])
+#    end
     ##
     @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", 
     @reviewer_id, @assignment_id])

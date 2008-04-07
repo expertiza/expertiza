@@ -1200,6 +1200,48 @@ INSERT INTO `site_controllers` VALUES (1,'content_pages',1,1),(2,'controller_act
 /*!40000 ALTER TABLE `site_controllers` ENABLE KEYS */;
 UNLOCK TABLES;
 
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `survey_deployments`
+-- 
+
+CREATE TABLE `survey_deployments` (
+  `id` int(11) NOT NULL auto_increment,
+  `course_evaluation_id` int(11) default NULL,
+  `start_date` datetime default NULL,
+  `end_date` datetime default NULL,
+  `num_of_students` int(11) default NULL,
+  `last_reminder` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- 
+-- Dumping data for table `survey_deployments`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `survey_participants`
+-- 
+
+CREATE TABLE `survey_participants` (
+  `id` int(11) NOT NULL auto_increment,
+  `user_id` int(11) default NULL,
+  `survey_deployment_id` int(11) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- 
+-- Dumping data for table `survey_participants`
+-- 
+
+
+-- --------------------------------------------------------
+
+
 --
 -- Table structure for table `survey_responses`
 --

@@ -1,7 +1,5 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-first:
+one:
   id: 1
-  title: Object-Oriented Programming
-another:
+two:
   id: 2
-  title: E-Commerce

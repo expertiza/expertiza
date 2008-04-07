@@ -1,5 +1,13 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 first:
   id: 1
-another:
+  review_id: 3
+  question_id: 0
+  score: 0
+  comments: "test first"
+second:
   id: 2
+  review_id : 3
+  question_id: 1
+  score: 1
+  comments: "test second"

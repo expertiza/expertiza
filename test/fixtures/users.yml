@@ -85,3 +85,14 @@ student2:
     email_on_review: 0
     email_on_submission: 0
     email_on_review: 0
+ 
+test1:
+    id: 9
+    name: test
+    fullname: test, test
+    password: <%= Digest::SHA1.hexdigest("test") %>
+    email: 
+    role_id: 1
+    email_on_review: 0
+    email_on_submission: 0
+    email_on_review: 0   

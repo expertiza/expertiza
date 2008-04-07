@@ -1,0 +1,7 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+institution1:
+  id: 1
+  name: Computer Science
+institution2:
+  id: 2
+  name: Electrical Engineering

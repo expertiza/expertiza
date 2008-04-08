@@ -4,6 +4,7 @@ class CreateSurveyParticipants < ActiveRecord::Migration
       # Note: Table name pluralized by convention.
       t.column :user_id, :integer  # the user participating in the course evaluation.
       t.column :survey_deployment_id, :integer  # the survey deployment
+    end
   end
 
   def self.down

@@ -1,0 +1,9 @@
+Hi <%= @recipients_name %>,
+
+You submitted a score of <%= @recipients_grade %> for assignment <%= @assignment_name%> that 
+varied greatly from another reviewer's score for the same submission.  
+The Expertiza system has brought this to my attention.
+
+<% if @comments.to_s != "...enter additional text here..." %>
+<%= @comments %>
+<% end %>

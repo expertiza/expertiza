@@ -1,0 +1,84 @@
+<h1>Grade summary for <%=@assignment.name%></h1>
+
+<table>
+	<th>Author</th>
+	<% for i in 0...@num_of_reviews%>
+		<th>Review <%=i+1%></th>
+	<% end %>
+	<th>Greatest Diff</th>
+	<th>Final Score</th>
+	<th colspan=2>Actions</th>
+	
+	<% for author in @scores_by_author
+		colNum = 0
+		prevScore = 0
+		maxDiff = 0
+		sumScores = 0
+	%>
+		<tr>
+			<td><%= author[0].fullname %></td>
+			<% 
+      grades = author[1]
+      for grade in grades
+				if grade.review.review_mapping.assignment_id == @assignment.id
+					colNum += 1
+					sumScores += grade.total_score.to_f*100/@sum_of_max
+					if colNum > 1
+						if maxDiff < (grade.total_score.to_f*100/@sum_of_max - prevScore)
+							maxDiff = (grade.total_score.to_f*100/@sum_of_max - prevScore)
+						end
+					end
+					prevScore = grade.total_score.to_f*100/@sum_of_max
+					%>
+					<td>
+						&nbsp;&nbsp;<%= sprintf("%.2f",grade.total_score.to_f*100/@sum_of_max) %>%
+						(<%= link_to grade.review.review_mapping.reviewer.fullname, 
+										:controller=>'review', 
+										:action => 'view_review', 
+										:id=> grade.review.id%>)
+					</td>
+				<% 
+				end 
+			end 
+			while colNum < @num_of_reviews
+				colNum += 1;
+				%> <td></td> <%
+			end %>		 
+			<% if maxDiff >= 15 %>
+			<td style="color: red;"> 
+			<% else %>
+			<td>
+			<% end %>
+				&nbsp;&nbsp;<%= sprintf("%.2f",maxDiff) %>% 
+			</td>
+			<td>
+				<%if @num_of_reviews != 0 %>
+					&nbsp;&nbsp;<%= sprintf("%.2f",sumScores/@num_of_reviews) %>%</td>
+				<% else %>
+					0%
+				<% end %>
+			<td><%= link_to "email reviewers", 
+								:controller=>'assignment', 
+								:action => 'grading_conflict_email_form',
+								:author => grade.review.review_mapping.author,
+								:assignment => @assignment
+								%>
+			</td>
+			<td>
+				<%= link_to "final grade report", 
+								:controller=>'assignment', 
+								:action => 'final_grade_report',
+								:author => grade.review.review_mapping.author,
+								:assignment => @assignment
+								%>
+			</td>
+		</tr>	
+		<% 
+		colNum = 0
+		prevScore = 0
+		maxDiff = 0
+	end %>
+	
+</table>
+<br/>
+<%= link_to 'Back', :action=>'list'%>

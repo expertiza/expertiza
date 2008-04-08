@@ -244,9 +244,6 @@ class AssignmentController < ApplicationController
   def view_report
     @assignment = Assignment.find(params[:id])
     @participants = Participant.find(:all,:conditions => ["assignment_id = ?", @assignment.id])
-    if @assignment.team_assignment
-    elsif !@assignment.team_assignment
-    end
     @sum_of_max = 0
     @sum_of_max_ror = 0
     for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
@@ -323,4 +320,88 @@ class AssignmentController < ApplicationController
 
   end
   
+  def view_grading_report
+    @sum_of_max = 0
+    @sum_of_max_ror = 0
+    @num_of_reviews = 0;
+    @assignment = Assignment.find(params[:id])
+    scores = ReviewScore.find_by_sql("select review_id, sum(score) as total_score from review_scores group by review_id order by total_score")
+    @scores_by_author = scores.group_by {|score| score.review.review_mapping.author}.sort_by { |participant| participant[0].fullname}
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
+    end
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).questions
+      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).max_question_score
+    end
+    for author in @scores_by_author
+      temp = 0;
+      for grade in author[1]
+        if grade.review.review_mapping.assignment_id == @assignment.id
+          temp += 1;
+        end
+      end
+      if temp > @num_of_reviews
+        @num_of_reviews = temp
+      end
+    end
+  end
+    
+	def grading_conflict_email_form
+		@instructor = session[:user];
+    @sum_of_max = 0
+    @assignment = Assignment.find(params[:assignment])
+    @author = User.find(params[:author])
+    @reviewers_email_hash = {}
+    @users_grades = Array.new
+    all_grades = ReviewScore.find_by_sql("select review_id, sum(score) as total_score from review_scores group by review_id order by total_score") 
+    for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
+    end
+    for grade in all_grades
+      if grade.review.review_mapping.author_id.to_s == @author.id.to_s
+        @users_grades << grade
+        reviewer = grade.review.review_mapping.reviewer
+        @reviewers_email_hash[reviewer.fullname.to_s+" <"+reviewer.email.to_s+">"] = reviewer.email.to_s
+      end
+    end
+  end
+  
+  def send_grading_conflict_email
+    email_form = params[:mailer]
+    assignment = Assignment.find(email_form[:assignment])
+    recipient = User.find(:first, :conditions => ["email = ?", email_form[:recipients]])
+    recipients_grade = 0
+    all_grades = ReviewScore.find_by_sql("select review_id, sum(score) as total_score from review_scores group by review_id order by total_score") 
+    for grade in all_grades
+      if grade.review.review_mapping.reviewer_id.to_s == recipient.id.to_s
+        recipients_grade = grade.total_score.to_f*100/25
+      end
+    end
+    
+    Mailer.deliver_message(
+      { :recipients => email_form[:recipients],
+        :subject => email_form[:subject],
+        :from => email_form[:from],
+        :body => {  
+          :recipients_name => recipient.fullname,
+          :comments => email_form[:comments],
+          :assignment_name => assignment.name,
+          :recipients_grade => recipients_grade,
+          :partial_name => "grading_conflict"
+        }
+      }
+    )   
+    
+    flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
+    redirect_to :action => 'grading_conflict_email_form', 
+                :assignment => email_form[:assignment], 
+                :author => email_form[:author]
+  end
+  
+  def final_grade_report
+    @assignment = Assignment.find(params[:assignment])
+    @participant = Participant.find(:first, :conditions => ["user_id = ?", params[:author]])
+    
+  end
+
 end

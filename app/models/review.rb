@@ -69,7 +69,7 @@ class Review < ActiveRecord::Base
     if User.find_by_id(author_id).email_on_review
         user = User.find_by_id(author_id)
         Mailer.deliver_message(
-            {:recipient => user.email,
+            {:recipients => user.email,
              :subject => "An new submission is available for #{user.name}",
              :body => {
               :obj_name => user.name,

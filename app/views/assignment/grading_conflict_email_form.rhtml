@@ -1,0 +1,65 @@
+<h1>Email Reviewers</h1>
+
+<% if flash[:notice] %>
+	<div class="flash_note"><%= flash[:notice] %></div>
+<% end %>
+
+<h2>Grades</h2>
+<table class="exp">
+	<tr class="head">
+		<% for i in 0...@users_grades.size%>
+			<th>Review <%=i+1%></th>
+		<% end %>
+	</tr>
+	<tr>
+		<% @users_grades.sort_by{ |grade| grade.review.review_mapping.reviewer.fullname}.each do |grade|
+			if grade.review.review_mapping.assignment_id.to_s == @assignment.id.to_s
+				%>
+				<td align="center">
+					<%= sprintf("%.2f",grade.total_score.to_f*100/@sum_of_max) %>% &nbsp;
+					(<%= link_to grade.review.review_mapping.reviewer.fullname, 
+									:controller=>'review', 
+									:action => 'view_review', 
+									:id=> grade.review.id%>)
+				</td>
+			<% 
+			end 
+		end %>
+	</tr>
+</table>
+
+<br/>
+
+<% form_for :mailer, :url => { :action => 'send_grading_conflict_email' } do |form| %>
+	<table>
+		<tr>	
+			<th>To:</th>
+
+			<td><%= form.select(:recipients, @reviewers_email_hash.sort, @reviewers_email_hash) %></td>
+		</tr>
+		<tr>	
+			<th>From:</th>
+			<td><%= @instructor.email %><%= form.hidden_field :from, :size => 90, :value => (@instructor.email) %></td>
+		</tr>
+		<tr>	
+			<th>Subject:</th>
+			<td><%= form.text_field :subject, :size => 90, :value => ('There is a conflict with a review you submitted.') %></td>
+		</tr>
+		<tr width=100%>	
+			<td colspan=2>
+				Hi,<br/><br/>
+				You submitted a score for assignment <%= @assignment.name%> that varied greatly from another reviewer's score for the same submission.  
+				<br/>The Expertiza system has brought this to my attention.
+				<%= form.text_area :comments, 'cols' => 100, 'rows' => 20,
+					'onclick' => "value=''", :value => ("...enter additional text here...")
+				%>
+			</td>
+		</tr>
+	</table>
+	<br/>
+	<%= form.hidden_field :assignment, :value => @assignment.id %>
+	<%= form.hidden_field :author, :value => @author.id %>
+  <%= submit_tag "Send Email" %> | 
+	<%= link_to 'Back', :action=>'view_grading_report', :id => params[:assignment] %>
+<% end %>
+

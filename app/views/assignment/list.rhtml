@@ -19,7 +19,7 @@
    column_definitions << {:name => 'Copy', :action => 'copy', :controller => 'assignment' }
    column_definitions << {:name => 'Delete', :action => 'delete', :controller => 'assignment' }
    column_definitions << {:name => 'Assign Reviewers', :action => 'assign_reviewers', :controller => 'assignment' }
-   column_definitions << {:name => 'View Report', :action => 'view_report', :controller => 'assignment' }
+   column_definitions << {:name => 'View Report', :action => 'view_grading_report', :controller => 'assignment' }
    column_definitions << {:name => 'Assign Surveys', :action => 'assign_survey', :controller => 'assignment' }   
    column_definitions << {:name => 'View Survey Responses', :action => 'view_responses', :controller => 'survey_response'}  
 %>
@@ -43,6 +43,7 @@
 	<td><%= link_to 'Delete', :action => 'delete', :id => assignment %>&nbsp;&nbsp;</td>
 	<td><%= link_to 'Assign reviewers', :action => 'assign_reviewers', :id => assignment %>&nbsp;&nbsp;</td>
 	<td><%= link_to 'View report', :action => 'view_report', :id => assignment %>&nbsp;&nbsp;</td>
+	<td><%= link_to 'View grading report', :action => 'view_grading_report', :id => assignment %>&nbsp;&nbsp;</td>
 	<td><%= link_to 'Assign surveys', :action => 'assign_survey', :id => assignment %>&nbsp;&nbsp;</td>
 	<% assigned_surveys = SurveyHelper::get_all_available_surveys(assignment.id, session[:user].role_id) %>
     <% if StudentAssignmentHelper::get_current_stage(assignment.id) == "Complete" && assigned_surveys.length != 0 -%>

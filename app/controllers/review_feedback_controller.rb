@@ -54,7 +54,7 @@ class ReviewFeedbackController < ApplicationController
   @a = (params[:id3])
     @b = (params[:id2])
     # Find entry in ReviewFeedback table with passed review id and author id
-    @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND author_id = ?", @a, @b])
+    @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND user_id = ?", @a, @b])
   
   #@reviewfeedback = ReviewFeedback.find_by_review_id(params[:id3])
     @assgt_id = params[:id1]
@@ -95,9 +95,9 @@ class ReviewFeedbackController < ApplicationController
     @author_id = params[:author_id]
     @review_id = params[:review_id]
     
-    @review_feedback.additional_comment = params[:new_feedback][:comments]
+    @review_feedback.txt = params[:new_feedback][:comments]
     @review_feedback.assignment_id = @assgt_id
-    @review_feedback.author_id = @author_id
+    @review_feedback.user_id = @author_id
     @review_feedback.review_id = @review_id
 
     if params[:new_review_score]
@@ -125,8 +125,8 @@ class ReviewFeedbackController < ApplicationController
   def update_feedback
     @a = (params[:review_id])
     @b = (params[:author_id])
-    @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND author_id = ?", @a, @b])
-    @reviewfeedback.additional_comment = params[:new_reviewfeedback][:comments]
+    @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND user_id = ?", @a, @b])
+    @reviewfeedback.txt = params[:new_reviewfeedback][:comments]
     @rev_id = @reviewfeedback.id
     @author_id = params[:author_id]
     @assgt_id = params[:assgt_id]
@@ -152,7 +152,7 @@ class ReviewFeedbackController < ApplicationController
   def view_feedback
     @a = (params[:id3])
     @b = (params[:id2])
-    @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND author_id = ?", @a, @b])
+    @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND user_id = ?", @a, @b])
     #@reviewfeedback = ReviewFeedback.find_by_review_id(params[:id3]) 
     @review_id = @reviewfeedback.id
     puts @review_id
@@ -166,7 +166,7 @@ class ReviewFeedbackController < ApplicationController
   
   # Action for Instructor to view a review given by the reviwer to an author. The author Feedback will also be available through this action
   def view_feedback_instructor 
-    @reviewfeedback = ReviewFeedback.find(:all, :conditions =>["review_id =? AND author_id = ?", (params[:id3]), (params[:id2])]) 
+    @reviewfeedback = ReviewFeedback.find(:all, :conditions =>["review_id =? AND user_id = ?", (params[:id3]), (params[:id2])]) 
     @review_id = @reviewfeedback.id
     @review_scores = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, '4'])
     @assgt_id = params[:id1]

@@ -21,6 +21,14 @@ class CreateTaMappings < ActiveRecord::Migration
   end
 
   def self.down
+    
+    execute "ALTER TABLE ta_mappings 
+             DROP FOREIGN KEY fk_ta_mappings_course_id"
+    
+    execute "ALTER TABLE ta_mappings 
+             DROP FOREIGN KEY fk_ta_mappings_ta_id"
+             
+    
     drop_table :ta_mappings
   end
 end

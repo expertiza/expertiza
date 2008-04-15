@@ -1,7 +1,7 @@
 
 <h1> View Feedback </h1>
 <%= render :partial => 'review/scores' %> 
-<th>Additional Comment: </th><% review_feedback_text = ReviewFeedback.find(:first,:conditions =>["id = ?", @reviewfeedback.id]).additional_comment %>
+<th>Additional Comment: </th><% review_feedback_text = ReviewFeedback.find(:first,:conditions =>["id = ?", @reviewfeedback.id]).txt %>
 <%= review_feedback_text%><br/>
 
 

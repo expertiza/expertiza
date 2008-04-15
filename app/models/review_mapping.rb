@@ -83,7 +83,7 @@ class ReviewMapping < ActiveRecord::Base
     end
   end
   
-  def self.assign_reviewers_for_team (assignment_id, num_reviews)
+  def self.assign_reviewers_for_team (assignment_id, num_reviews, round_num)
     @r = num_reviews # indicates the num of reviews to be done
     @teams = Team.find(:all, :conditions=>['assignment_id = ?', assignment_id])
     @t = @teams.size if @teams != nil # indicates the num of teams
@@ -156,17 +156,17 @@ class ReviewMapping < ActiveRecord::Base
         end
       end
     end
-    save_mapping(assignment_id)
+    save_mapping(assignment_id, round_num)
     print_matrix()
   end
   
-  def self.save_mapping (assignment_id)
+  def self.save_mapping (assignment_id, round_num)
     i = 0
     j = 0
     for student in @students do
       for team in @teams do
         if (@team_review[i][j] == 1)
-          ReviewMapping.create(:reviewer_id => student.user_id, :assignment_id => assignment_id, :team_id=>team.id)     
+          ReviewMapping.create(:reviewer_id => student.user_id, :assignment_id => assignment_id, :team_id=>team.id, :round => round_num)     
         end
         j += 1  
       end

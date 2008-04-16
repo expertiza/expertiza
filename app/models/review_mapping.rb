@@ -36,21 +36,23 @@ class ReviewMapping < ActiveRecord::Base
   
   def self.import(row,session)
     if row.length < 2
-      raise ArgumentError, "Not enough items" 
+       raise ArgumentError, "Not enough items" 
     end
     
-    author = User.find_by_name(row[0].to_s.strip)
-    logger.info("*** Author: #{author} ***")
-    
+    assignment = Assignment.find(session[:assignment_id])
     index = 1
     while index < row.length
       reviewer = User.find_by_name(row[index].to_s.strip)
-      logger.info("*** Reviewer: #{reviewer} *** Index: #{index} ***")
       if(reviewer != nil)
         mapping = ReviewMapping.new
-        mapping.author_id = author.id
+        if assignment.team_assignment
+           team = Team.find(:all, :conditions => ['name = ? and assignment_id = ?',row[0].to_s.strip, assignment.id])
+           mapping.team_id = team.first.id
+        else
+          mapping.author_id = User.find_by_name(row[0].to_s.strip).id
+        end
         mapping.reviewer_id = reviewer.id
-        mapping.assignment_id = session[:assignment_id]
+        mapping.assignment_id = assignment.id
         mapping.save
       end
       

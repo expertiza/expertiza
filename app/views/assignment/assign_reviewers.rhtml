@@ -42,3 +42,20 @@ puts "rounddue date ",@round%>
 <input type='submit' value= 'Save' />
 <%= end_form_tag %>
 <br/><br/>
+
+<% 
+  if @assignment.team_assignment
+  	type = 'Team'
+  else
+    type = 'Author'
+  end
+  
+  session[:return_to] = request.request_uri  
+  session[:expected_fields] = type+', Reviewer1, Reviewer2, ... , ReviewerN'
+  session[:assignment_id] = @assignment.id 
+%>
+<%= link_to 'Import Reviewer Mappings', :controller=>'import_file', :action=>'start', :model => 'ReviewMapping' %>
+<br/>
+<br/>
+<%= link_to 'Back', :action => 'list' %>
+

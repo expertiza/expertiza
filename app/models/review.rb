@@ -3,6 +3,12 @@ class Review < ActiveRecord::Base
   has_many :review_scores
   belongs_to :review_mapping
   
+    def delete
+      mappings = ReviewOfReviewMapping.find(:all, :conditions => ['review_id = ?',self.id])
+      mappings.each {|mapping| mapping.delete}
+      self.destroy
+    end
+  
     def self.review_view_helper(review_id,fname,control_folder)
     @review = Review.find(review_id)
     @mapping_id = review_id
@@ -65,6 +71,8 @@ class Review < ActiveRecord::Base
   #ajbudlon, sept 07, 2007   
   def email
    mapping = ReviewMapping.find_by_id(self.review_mapping_id)   
+   assignment = Assignment.find(mapping.assignment_id)
+   if !assignment.team_assignment
    for author_id in mapping.get_author_ids
     if User.find_by_id(author_id).email_on_review
         user = User.find_by_id(author_id)
@@ -82,7 +90,8 @@ class Review < ActiveRecord::Base
             }
         )
     end  
-   end
+  end
+  end
   end
   
   # Get all review mappings for this assignment & author

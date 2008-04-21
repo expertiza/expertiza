@@ -1,46 +1,127 @@
+<SCRIPT LANGUAGE="JavaScript">
+function toggleVis(id) {
+                var elem = document.getElementById(id+"_myDiv");
+                if(elem.style.display == 'none'){
+                        elem.style.display = '';
+                        document.getElementById(id+"_show").style.display = 'none';
+                        document.getElementById(id+"_hide").style.display = '';
+                } else {
+                        elem.style.display = 'none';
+                        document.getElementById(id+"_show").style.display = '';
+                        document.getElementById(id+"_hide").style.display = 'none';
+                }
+        }
+</SCRIPT>
+
 <h1>Feedback for <%= @student.assignment.name %></h1>
+
+<%if @assignment.wiki_type.name == "No"%>
+<%if @files.size == 0%>
+
+<%else%>
+Submitted Files<br />
+<%end%>
+<%end%>
+
 <%
-    _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
- 	review_no = 1
-	grade = 0
-    for review_map in @review_mapping 
-        for review in review_map.reviews%>
-        
-            Review <%=review_no%>: <br/>
-            <table class="listing" cellpadding=2>
-             <tr>
-                <th>Question</th>
-				<th>Score</th>
-				<th>Comment</th>
-             </tr>
-         
-             <%
-             for review_score in review.review_scores%>
-                <tr class="listingRow">
-                    <td><%=Question.find(review_score.question_id).txt%></td><td align = 'right'><%=review_score.score%>&nbsp;&nbsp;</td><td><%=review_score.comments%></td>
-                </tr>
-            <%end%>
-           </table><br/>
-           <%review_no +=1%>
-Additional comment : <%=review.additional_comment%><br/>
-		<%end
-    end%>
-	
-	<% if review_no-1 <= 0 %>
-		<%if @assignment.wiki_type_id == 2 %>
-			<%if @assignment.team_assignment %>
-				<label>There is no feedback on your work yet.</label>
-			<%else%>
-				<%if review_mediawiki @assignment.directory_path, _time, @user_name == ''%>	
-					<label>There is no feedback on your work because it seems that you have not submitted anything for this assignment.</label>
-				<%else%>
-					<label>There is no feedback on your work yet.</label>
-				<%end%>
-			<%end%>
-		<%else%>
-			<label>There is no feedback on your work yet.</label>
-		<%end%>
+ _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
+ if @assignment.wiki_type.name == "DokuWiki" %>
+<br>
+<b>DokuWiki Review Links:</b>
+<br>
+<br>
+<%= review_dokuwiki @assignment.directory_path, _time, session[:user].name  %>
+<br>
+<% elsif @assignment.wiki_type.name == "MediaWiki" %>
+<br>
+<b>MediaWiki Review Links:</b>
+<br>
+<br>
+<!--The following checks a wiki type.  If we add a new wiki type, we need to modify this code, which is in
+    a very unexpected place.  This should be done by polymorphism, based on a Wiki class that is subclassed
+    for various kinds of wikis. 
+    
+    Make a generic review_wiki function, with a parameter specifying wiki type.  The review_wiki function
+    then makes callbacks to the various wiki classes, depending on what kind of a wiki it is working on.
+    This allows wiki-specific behavior to be kept in the wiki classes. -->
+<%if @assignment.team_assignment  # The lookup of all team members should be put in a wiki helper
+	@team_members = TeamsUser.find("select * from teams_users where team_id in (select id from team where assignment_id = "+@assignment.id.to_s+") and user_id="+session[:user].id.to_s)
+  	for team_member in @team_members
+		member_name = User.find(team_member.user_id).name 
+	%>
+		<%= review_mediawiki_group @assignment.directory_path, _time, member_name  %>
 	<%end%>
+<%else%>
+	<%= review_mediawiki @assignment.directory_path, _time, session[:user].name  %>
+<%end%>
+<br>
+<% end %>
+<ul>
+<% for file in @files %>
+<li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
+<% end %>
+</ul>
+<%if @assignment.team_assignment %>
+	<% for team_member in @team_members %>
+	<label>
+	<% submitted = Participant.find(:first, :conditions =>["user_id = ? and assignment_id = ?",team_member.user_id,@assignment.id]).submitted_hyperlink
+	if submitted !=nil
+	%>
+	URL to file submission (if available):</label><%= submitted %>
+	<br/>
+	<% end%>
+	<% end %>
+<%else %>
+	<% if @link != nil %>
+		Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
+	<% end %>	
+<%end
+    review_no = 1
+    grade = 0
+    for review_map in @review_mapping
+        for review in review_map.reviews%>
+                Review <%=review_no%> <a href="#1" onClick="toggleVis('<%=review_no %>');">
+                                <span class="inline" id="<%=review_no %>_show">View</span>
+                                <span class="inline" id="<%=review_no %>_hide" style="display: none">Hide</span>
+                        </a>
+                        <br/>
+                                <div id="<%=review_no%>_myDiv" style="display:none">
+                    <table class="listing" cellpadding=2>
+                     <tr>
+                        <th>Question</th>
+                        <th>Score</th>
+                        <th>Comment</th>
+                     </tr>
+
+                     <%
+                     for review_score in review.review_scores%>
+                        <tr class="listingRow">
+                            <td><%=Question.find(review_score.question_id).txt%></td><td align = 'right'><%=review_score.score%>&nbsp;&nbsp;</td><td><%=review_score.comments%></td>
+                        </tr>
+                    <%end%>
+                    </table>
+                    <br/>
+                    Additional comment : <%=review.additional_comment%><br/>
+           		</div>
+				<%review_no +=1%>
+        <%end
+    end%>
+    
+    <% if review_no-1 <= 0 %>
+        <%if @assignment.wiki_type_id == 2 %>
+            <%if @assignment.team_assignment %>
+                <label>There is no feedback on your work yet.</label>
+            <%else%>
+                <%if review_mediawiki @assignment.directory_path, _time, @user_name == ''%>	
+                    <label>There is no feedback on your work because it seems that you have not submitted anything for this assignment.</label>
+                <%else%>
+                    <label>There is no feedback on your work yet.</label>
+                <%end%>
+            <%end%>
+        <%else%>
+            <label>There is no feedback on your work yet.</label>
+        <%end%>
+    <%end%>
 <br/>
 <a href="javascript:window.history.back()">Back</a>	
 	

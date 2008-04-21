@@ -9,7 +9,7 @@
 <% for assignment in @assignments %>
   <tr>
     <td><%= link_to assignment.name, :action => 'list',
-	    :id=> assignment.id, :assignment_id => assignment.id %>&nbsp;&nbsp;</td>
+	    :id=> assignment.id %>&nbsp;&nbsp;</td>
     <td><%= assignment.directory_path %></td>
   </tr>
 <% end -%>

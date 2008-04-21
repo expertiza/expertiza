@@ -7,9 +7,9 @@
 <% 
    column_definitions = Array.new
    column_definitions << {:name => 'Team Name',      :type => 'display',        :field => 'name'}
-   column_definitions << {:name => 'Edit Name',      :action => 'edit',         :controller => 'team', :hidden => {:id => @assignment.id, :name => 'assignment_id'} }
+   column_definitions << {:name => 'Edit Name',      :action => 'edit',         :controller => 'team'}
    column_definitions << {:name => 'Modify Members', :action => 'list',         :controller => 'teams_users'}
-   column_definitions << {:name => 'Delete Team',    :action => 'delete_team',  :controller => 'team', :hidden => {:id => @assignment.id, :name => 'assignment_id'} }  
+   column_definitions << {:name => 'Delete Team',    :action => 'delete_team',  :controller => 'team'}  
 %>
 <%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :elements => @teams} %>
 
@@ -17,4 +17,5 @@
 <%= render :partial => 'import_teams' %>
 <BR/>
 <BR/>
-<%= link_to 'New Team', :action => 'new', :assignment_id=>params[:assignment_id] %>
+<%= link_to 'New Team', :action => 'new', :id=> @assignment.id %> |
+<%= link_to 'Back', :action => 'list_assignments' %>

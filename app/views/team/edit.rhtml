@@ -1,8 +1,7 @@
 <H1>Edit Team</H1>
 
-<%= form_tag :action => 'update', :assignment_id=>params[:assignment_id] %>
+<%= form_tag :action => 'update' %>
 <%= hidden_field_tag 'id', @team.id %>
-<%= hidden_field_tag ('id', @team.id) %>
 <%= render :partial => 'form'%>
 <br/>
 <%= link_to 'Back', :action => 'list' %>

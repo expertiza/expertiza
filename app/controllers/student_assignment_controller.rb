@@ -213,7 +213,7 @@ class StudentAssignmentController < ApplicationController
     end
     @link = @student.submitted_hyperlink
     @files = Array.new
-    @files = ReviewController.get_submitted_file_list(@direc, @student, @files)
+    @files = get_submitted_file_list(@direc, @student, @files)
     
     #the code below finds the sum of the maximum scores of all questions in the questionnaire
     @sum_of_max = 0

@@ -338,16 +338,19 @@ class ReviewController < ApplicationController
     if @assgt.team_assignment == true # we need to find the team id
       team = TeamsUser.find_by_sql("select * from teams_users where team_id in(select id from teams where assignment_id="+@a.to_s+") and user_id="+params[:user_id].to_s)
       logger.info ""+team[0].id.to_s
-      @review_mapping = ReviewMapping.find(:all, :conditions => ["author_id= ? and assignment_id = ? and team_id=?", params[:user_id], @a, team[0].team_id])
+      @review_mapping = ReviewMapping.find(:all, :conditions => ["assignment_id = ? and team_id=?", @a, team[0].team_id])
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", team[0].team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @review_mapping[0].team_id])
       @author_name = User.find(params[:user_id]).name;
+      @author_id = @author_first_user_id
       @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @review_mapping[0].assignment_id])
     else
       @review_mapping = ReviewMapping.find(:all, :conditions => ["author_id= ? and assignment_id = ?", params[:user_id], @a])
+      @author_id = @review_mapping[0].author_id
+      @author = User.find(:first, :conditions => ["id =?",@author_id])
     end
-    @author_id = @review_mapping[0].author_id
-    @author = User.find(:first, :conditions => ["id =?",@author_id])
+    @participant = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_id, @review_mapping[0].assignment_id])
+    @link = @participant.submitted_hyperlink
     @participant = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_id, @review_mapping[0].assignment_id])
     @link = @participant.submitted_hyperlink
     @files = Array.new

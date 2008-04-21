@@ -30,8 +30,8 @@ class UsersController < ApplicationController
     @letters = Array.new
     @user_pages, @users = paginate :users, :order => 'name', :per_page => 20,  :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter]
     all_users.each {
-       | user |
-       first = user.name[0,1].downcase
+       | userObj |
+       first = userObj.name[0,1].downcase
        if not @letters.include?(first)
           @letters << first  
        end

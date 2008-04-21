@@ -43,7 +43,9 @@ module TeamHelper
               currUser = TeamsUser.new
               currUser.team_id = currTeam.id
               currUser.user_id = user.id
-              currUser.save                        
+              currUser.save   
+              
+              Participant.create(:assignment_id => assignment_id, :user_id => user.id, :permission_granted => true)
             end                      
           else
             unknown << split_line[pos]

@@ -1,4 +1,4 @@
-<%= form_tag({:action=>'import_teams', :assignment_id => params[:assignment_id]},:multipart => true, :name=>'submit_form')%>
+<%= form_tag({:action=>'import_teams', :assignment_id => @assignment.id},:multipart => true, :name=>'submit_form')%>
 <table width =100%>
 <tr>
 <td colspan=2>
@@ -19,8 +19,8 @@
 </tr>
 <tr>
 <td>Specify file location:</td>
-<td><input type="file" id="uploaded_file" name="uploaded_file" size=40/>
-<%= hidden_field_tag 'assignment_id', @assignment.id %>
+<td>
+<input type="file" id="uploaded_file" name="uploaded_file" size=40/>
 <input type="submit" name="load_teams" value="Import Teams" onclick="checkIfFileExists('=import teams');"/>
 </td>
 </tr>

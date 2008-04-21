@@ -80,12 +80,12 @@ Submitted Files<br />
     grade = 0
     for review_map in @review_mapping
         for review in review_map.reviews%>
-                Review <%=review_no%> <a href="#1" onClick="toggleVis('<%=review_no %>');">
+                <b>Review <%=review_no%></b> done on <b><%= review.created_at.strftime('%A %B %d %Y, %I:%M%p') %></b>  <a href="#1" onClick="toggleVis('<%=review_no %>');">
                                 <span class="inline" id="<%=review_no %>_show">View</span>
                                 <span class="inline" id="<%=review_no %>_hide" style="display: none">Hide</span>
                         </a>
                         <br/>
-                                <div id="<%=review_no%>_myDiv" style="display:none">
+                    <div id="<%=review_no%>_myDiv" style="display:none">
                     <table class="listing" cellpadding=2>
                      <tr>
                         <th>Question</th>

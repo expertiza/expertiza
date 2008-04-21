@@ -25,7 +25,7 @@ function toggleVis(id) {
     _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
     for review_map in @review_mapping 
         for review in review_map.reviews%>
-			Review <%=review_no%> <a href="#1" onClick="toggleVis('<%=review_no %>');">
+			<b>Review <%=review_no%></b> done on <b><%= review.created_at.strftime('%A %B %d %Y, %I:%M%p') %></b><a href="#1" onClick="toggleVis('<%=review_no %>');">
             	<span class="inline" id="<%=review_no %>_show">View</span>
               	<span class="inline" id="<%=review_no %>_hide" style="display: none">Hide</span>
             </a>

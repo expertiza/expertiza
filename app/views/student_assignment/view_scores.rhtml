@@ -1,3 +1,18 @@
+<SCRIPT LANGUAGE="JavaScript">
+function toggleVis(id) {
+                var elem = document.getElementById(id+"_myDiv");
+                if(elem.style.display == 'none'){
+                        elem.style.display = '';
+                        document.getElementById(id+"_show").style.display = 'none';
+                        document.getElementById(id+"_hide").style.display = '';
+                } else {
+                        elem.style.display = 'none';
+                        document.getElementById(id+"_show").style.display = '';
+                        document.getElementById(id+"_hide").style.display = 'none';
+                }
+        }
+</SCRIPT>
+
 <h1>Scores for <%= Assignment.find(@assignment_id).name %></h1>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
@@ -10,10 +25,12 @@
     _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
     for review_map in @review_mapping 
         for review in review_map.reviews%>
-        
-            Review <%=review_no
-                #review.id
-                %>: <br/>
+			Review <%=review_no%> <a href="#1" onClick="toggleVis('<%=review_no %>');">
+            	<span class="inline" id="<%=review_no %>_show">View</span>
+              	<span class="inline" id="<%=review_no %>_hide" style="display: none">Hide</span>
+            </a>
+            <br/>
+			<div id="<%=review_no%>_myDiv" style="display:none">
             <table class="listing" cellpadding=2>
              <tr>
                 <th>Question</th>
@@ -32,9 +49,11 @@
                 </tr>
             <%end
 			  grade += total%>
+			  
             <tr><td><em>Total</em></td><td align = 'right'><%=total%>&nbsp;&nbsp;</td><td><em>Score:</em> <%=total*100/@sum_of_max%>%</td></tr>
            </table><br/>
            Additional comment : <%=review.additional_comment%><br/>
+		   </div>
            <% @mapping = ReviewMapping.find(review_map.id) %>
            <% @assgt_id = @mapping.assignment_id %>
            <% @author_id = @mapping.author_id %>

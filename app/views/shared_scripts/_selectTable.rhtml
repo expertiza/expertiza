@@ -1,39 +1,87 @@
-<% if elements.length > 0 %>
-<div class = "exp">
-<TABLE>
-<TR>
-<% for definition in column_definitions %>
-	<TH CLASS="head"><%= definition[:name] %></TH>
-<% end %>
-</TR>
+<script type="text/javascript">
+function markAllRows( container_id ) {
+    var rows = document.getElementById(container_id).getElementsByTagName('tr');
+    var checkbox;
 
-<% for element in elements %>
-<TR class="exp">
-  <% for definition in column_definitions %>  
-     <TD align="center">
-     <% if definition[:type] == "display" %>
+    for ( var i = 0; i < rows.length; i++ ) {
+        checkbox = rows[i].getElementsByTagName( 'input' )[0];
+        if ( checkbox && checkbox.type == 'checkbox') {            
+                checkbox.checked = true;        
+        }
+    }
+
+    return false;
+}
+  
+function unMarkAllRows( container_id ) {
+    var rows = document.getElementById(container_id).getElementsByTagName('tr');
+    var checkbox;
+    for ( var i = 0; i < rows.length; i++ ) {
+        checkbox = rows[i].getElementsByTagName( 'input' )[0];
+        if ( checkbox && checkbox.type == 'checkbox' ) {
+            checkbox.checked = false;            
+        }
+    }
+
+    return false;
+}
+
+function submitAction(container_id, action_url){
+  var myform = document.getElementById(container_id);
+  myform.action = action_url;
+  myform.submit();  
+}
+</script>
+
+<% if elements.length > 0 %>
+<form id="tableForm" name="tableForm" method="post">
+<DIV CLASS="exp">
+<TABLE>
+  <TR><!-- Header Row -->
+    <TH CLASS="head">&nbsp;</TH>
+    <% for definition in column_definitions %>
+	   <TH CLASS="head"><%= definition[:name] %></TH>
+    <% end %>
+  </TR>
+  
+  <% for element in elements %>
+  <TR>
+     <!-- Selection Box -->
+     <TD> 
+        <input id="item" name="item[<%= element.id %>]" type="checkbox" value="<%= element.id %>" />        
+     </TD> 
+     <!-- End Selection Box -->
+     <!-- Names and Actions -->
+	 <% for definition in column_definitions %>          
+     <TD align="center"> 
+     <% if definition[:type] == "display" %>       
        <%= element[definition[:field].to_sym] %>
      <% elsif definition[:type] == "fetch" %>
        <%= element.get_field(definition[:field]) %>
-     <% else %>      
-       <%= start_form_tag ({:controller => definition[:controller], :action => definition[:action]}, {:method => 'post'} ) %>
+     <% else %>            
          <% 
             disabled = false
             if definition[:disabled] != nil
               disabled = element[definition[:disabled].to_sym]             
             end                                  
          %>
-       	 <%= radio_button_tag definition[:action], definition[:name], false, :onClick => 'this.checked = false;submit();' %>
+         <input id="<%= definition[:action] %>" 
+                name="<%= definition[:action] %>" 
+                value="<%= definition[:name] %>" type="radio" 
+                onClick="submitAction('tableForm', '<%= url_for(:controller => definition[:controller], :action => definition[:action], :id => element.id,:edit => nil, :list => nil) %>');"/>                
        	 <% if definition[:hidden] %>
-       	    <%= hidden_field_tag(definition[:hidden][:name], definition[:hidden][:id]) %>
-       	 <% end %>
-       	 <%= hidden_field_tag ('id', element.id) %>
-       <%= end_form_tag %>
-     <% end %>
-     </TD>
+       	 <%= hidden_field_tag(definition[:hidden][:name], definition[:hidden][:id]) %>
+       	 <% end %>         
+     <% end %>     
+     </TD>     
+     <% end %>         
+     <!-- End Names and Actions --> 
+  </TR>
   <% end %>
-</TR>
-<% end %>
 </TABLE>
-</div>
-<% end %>
+</DIV>
+<a href="" onClick="return markAllRows('tableForm');">Check All</a> | <a href="" onClick="return unMarkAllRows('tableForm');">Uncheck All</a>
+<br/>With selected: <a href="" onClick="submitAction('tableForm','<%= url_for(:controller => definition[:controller], :action => 'delete_selected', :edit => nil, :list => nil) %>')">Delete</a>
+<%= end_form_tag %>
+<% end %> 
+<br/>

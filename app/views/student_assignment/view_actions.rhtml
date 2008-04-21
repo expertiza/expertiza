@@ -2,7 +2,7 @@
 <div class="flash_note">
 Next: Click the activity you wish to perform on the assignment titled: <%= @student.assignment.name %>
 </div>
-<% if @student.assignment.spec_location.length > 0 %>
+<% if @student.assignment.spec_location && @student.assignment.spec_location.length > 0 %>
   <a href="<%= @student.assignment.spec_location %>" target="new">Assignment Description</a>
 <% end %>
 <ul>

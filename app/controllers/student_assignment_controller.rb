@@ -545,4 +545,18 @@ private
       return base.split(".")[base.split(".").size-1]
 	  end
 	end
+  
+  def get_submitted_file_list(direc,author,files)
+    if(author!=nil && author.directory_num)
+      direc = RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + author.directory_num.to_s
+      temp_files = Dir[direc + "/*"]
+      for file in temp_files
+        if not File.directory?(Dir.pwd + "/" + file) then
+          files << file
+        end
+      end
+    end
+    return files
+  end
+  
 end

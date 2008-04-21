@@ -91,7 +91,7 @@ class ReviewController < ApplicationController
     end
   end
   
-  def self.get_submitted_file_list(direc,author,files)
+  def get_submitted_file_list(direc,author,files)
     if(author!=nil && author.directory_num)
       direc = RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + author.directory_num.to_s
       temp_files = Dir[direc + "/*"]

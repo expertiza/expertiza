@@ -181,13 +181,13 @@ class StudentAssignmentController < ApplicationController
   def update_author_feedback(review_id,assignment_id,text)
     if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review_id, assignment_id]))
       @review_feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review_id, assignment_id])
-      @review_feedback.txt = text
+      @review_feedback.additional_comments = text
       @review_feedback.update
     else
       @review_feedback = ReviewFeedback.new
       @review_feedback.review_id = review_id
       @review_feedback.assignment_id = assignment_id
-      @review_feedback.txt = text
+      @review_feedback.additional_comments = text
       if @review_feedback.save
         flash[:notice] = 'feedback has been updated'
       end
@@ -338,6 +338,52 @@ class StudentAssignmentController < ApplicationController
         puts ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
         @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
       end
+    end
+  end
+  
+  #the final grade report is a page that summarizes all the information an instructor
+  #might need to assign a grade for an assignment. Currently it provides all review scores left
+  #for an assignment (as well as the comments) and the author feedback (with comments).
+  #Support for review of reviews, submission versions and teams still needs to be added.
+  def final_grade_report
+    @student = Participant.find(params[:id])
+    @link = @student.submitted_hyperlink
+    @submission = params[:submission]
+    @files = Array.new
+    @assignment = @student.assignment
+    @reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (
+          select id from review_mappings where author_id = " + @student.user_id.to_s + 
+          " and assignment_id = " + @assignment.id.to_s + ")")       
+    @review_feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where 
+            author_id = " + @student.user_id.to_s + 
+          " and assignment_id = " + @assignment.id.to_s)  
+    @current_folder = DisplayOption.new
+    @current_folder.name = "/"
+    @final_grade = 0
+    
+    if @student.directory_num != nil and @student.directory_num >= 0
+      get_student_folders
+      get_student_files 
+    end
+    
+    @files.sort_by { |file| File.mtime(file) }
+  end
+  
+  #this saves the the final grade for a participant of an assignment, as well as saving
+  #comments for the student and the instructor. It is called from the final_grade_reports page
+  def save_final_grade
+    form = params[:participant]
+    student = Participant.find(form[:student])
+    student.grade = form[:grade]
+    student.comments_to_student = form[:student_comments]
+    student.private_instructor_comments = form[:non_student_comments]
+     
+    if student.save
+      flash[:note] = 'Final grade was successfully submitted.'
+      redirect_to :action => 'final_grade_report', :id => form[:student]
+    else
+      flash[:notice] = 'An error occured trying to submit the final grade. Please ensure you provided a grade greater than or equal to zero.'
+      redirect_to :action => 'final_grade_report', :id => form[:student]
     end
   end
 

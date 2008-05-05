@@ -2,12 +2,11 @@
 
 <table>
 	<th>Author</th>
-	<% for i in 0...@num_of_reviews%>
+	<% for i in 0...@max_num_of_reviews%>
 		<th>Review <%=i+1%></th>
 	<% end %>
-	<th>Greatest Diff</th>
 	<th>Final Score</th>
-	<th colspan=2>Actions</th>
+	<th>Greatest Diff</th>
 	
 	<% for author in @scores_by_author
 		colNum = 0
@@ -18,12 +17,26 @@
 		<tr>
 			<td><%= author[0].fullname %></td>
 			<% 
-      grades = author[1]
-      for grade in grades
+			participant = Participant.find(:first, :conditions => ["user_id = ? and assignment_id = ?", author[0].id, @assignment.id])
+      		grades = author[1]
+			
+			#if multiple reviews by the same reviewer are going to be displayed (for
+			# instance, if multiple reviews are left for different versions of a submission)
+			# then it may be beneficial to sort the reviews in chronological order, rather
+			# than by review_score (which is how they are sorted now). If this is done
+			# the maxDiff needs to be calculated in a different method because it relies on
+			# sorting the reviews from lowest to highest score to get an accurate calculation.
+			
+			for grade in grades
 				if grade.review.review_mapping.assignment_id == @assignment.id
 					colNum += 1
+					
+					#sum up the review scores to get an average of all the reviews
 					sumScores += grade.total_score.to_f*100/@sum_of_max
 					if colNum > 1
+						#caluclate the maximum difference between all the review scores
+						#to help the instructor see if there are any outlying/unfair
+						#review scores
 						if maxDiff < (grade.total_score.to_f*100/@sum_of_max - prevScore)
 							maxDiff = (grade.total_score.to_f*100/@sum_of_max - prevScore)
 						end
@@ -32,45 +45,50 @@
 					%>
 					<td>
 						&nbsp;&nbsp;<%= sprintf("%.2f",grade.total_score.to_f*100/@sum_of_max) %>%
-						(<%= link_to grade.review.review_mapping.reviewer.fullname, 
+						<div style="font-size:x-small;">
+							&nbsp;&nbsp;<%= link_to grade.review.review_mapping.reviewer.fullname, 
 										:controller=>'review', 
 										:action => 'view_review', 
-										:id=> grade.review.id%>)
+										:id=> grade.review.id%>
+						</div>
 					</td>
 				<% 
 				end 
 			end 
-			while colNum < @num_of_reviews
-				colNum += 1;
-				%> <td></td> <%
-			end %>		 
-			<% if maxDiff >= 15 %>
-			<td style="color: red;"> 
-			<% else %>
+
+			colNum.upto(@max_num_of_reviews-1) { %> <td></td> <% } %>
 			<td>
+				<%if @num_of_reviews != 0 && colNum != 0%>
+					&nbsp;&nbsp;<%= sprintf("%.2f",sumScores/colNum) %>%
+				<% else %>
+					&nbsp;&nbsp;0.00%
+				<% end %>
+				<div style="font-size:x-small;">
+					&nbsp;&nbsp;<%= link_to "final grade report", 
+								:controller=>'student_assignment', 
+								:action => 'final_grade_report',
+								:id => participant
+					%>
+				</div>
+			</td> 
+			
+			<%
+			# the maxDiff threshold should be customizable by the instructor. A column should
+			# be added to the users table in the database which would store this variable and
+			# then referenced here to decide whether the difference should be displayed in red. 
+			if maxDiff >= 15 %>
+				<td style="color: red;"> 
+			<% else %>
+				<td>
 			<% end %>
 				&nbsp;&nbsp;<%= sprintf("%.2f",maxDiff) %>% 
-			</td>
-			<td>
-				<%if @num_of_reviews != 0 %>
-					&nbsp;&nbsp;<%= sprintf("%.2f",sumScores/@num_of_reviews) %>%</td>
-				<% else %>
-					0%
-				<% end %>
-			<td><%= link_to "email reviewers", 
+				<div style="font-size:x-small;">
+					&nbsp;&nbsp;<%= link_to "email reviewers", 
 								:controller=>'assignment', 
 								:action => 'grading_conflict_email_form',
-								:author => grade.review.review_mapping.author,
-								:assignment => @assignment
-								%>
-			</td>
-			<td>
-				<%= link_to "final grade report", 
-								:controller=>'assignment', 
-								:action => 'final_grade_report',
-								:author => grade.review.review_mapping.author,
-								:assignment => @assignment
-								%>
+								:id => participant
+					%>
+				</div>
 			</td>
 		</tr>	
 		<% 

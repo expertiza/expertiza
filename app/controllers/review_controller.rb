@@ -52,6 +52,16 @@ class ReviewController < ApplicationController
   def view_review
     @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
     
+    @review_display = "display: block;"
+    @author_feedback_display = "display: none;"
+    
+    if(params[:display] == "review")
+      @review_display = "display: block;"
+    elsif(params[:display] == "all")
+      @review_display = "display: block;"
+      @author_feedback_display = "display: block;"
+    end
+    
     @review_id=params[:id]
     @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, '1'])
     if( ReviewFeedback.find_by_review_id(@review_id))

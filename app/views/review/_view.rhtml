@@ -74,12 +74,12 @@ Submitted Files<br />
 	<% end %>	
 <%end%>	
 <a href="#1" onClick="toggleVis('1');">
-	<p class="inline" id="1_show">View review</p>
-	<p class="inline" id="1_hide" style="display: none">Hide review</p>
+	<p class="inline" id="1_show" style="display: none">View review</p>
+	<p class="inline" id="1_hide" >Hide review</p>
 </a>
 
 <br/>
-<div id="1_myDiv" style="display:none">
+<div id="1_myDiv" style="<%= @review_display %>">
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
 <%= render :partial => 'review/scores' %> 
 Additional Comment : <%=@review.additional_comment%><br/>
@@ -90,18 +90,18 @@ review_feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and a
 if(review_feedback) %>
 
 <a href="#2" onClick="toggleVis('2');">
-	<p class="inline" id="2_show">View author feedback</p>
-	<p class="inline" id="2_hide" style="display: none">Hide author feedback</p>
+	<p class="inline" id="2_show" <% if(params[:display] == "all") %> style="display: none" <% end %> >View author feedback</p>
+	<p class="inline" id="2_hide" <% if(params[:display] != "all") %> style="display: none" <% end %> >Hide author feedback</p>
 </a>
 
 <br/>
 <% @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", review_feedback.id, '4'])
 %>		     
-<div id="2_myDiv" style="display:none">
+<div id="2_myDiv" style="<%= @author_feedback_display %>">
 <strong>Author feedback: </strong><br/>
 <%= render :partial => 'review/score1' %>
 Additional Comment: 
-<%=review_feedback.additional_comment%>
+<%=review_feedback.additional_comments%>
 </div>
 <br/>
 <% end%>

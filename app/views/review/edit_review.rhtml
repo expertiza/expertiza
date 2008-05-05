@@ -7,7 +7,7 @@ if (specs != nil && specs != "")
 <%end%>
 <%= render :partial => 'wiki' %>
 <%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]))
-                        review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]).additional_comment
+                        review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]).additional_comments
 %>
 <div class="flash_note"><strong>Author's feedback:</strong><br/>
 <%=review_feedback_text%></div>

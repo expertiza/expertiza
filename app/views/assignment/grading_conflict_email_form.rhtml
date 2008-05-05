@@ -5,6 +5,7 @@
 <% end %>
 
 <h2>Grades</h2>
+<% form_for :mailer, :url => { :action => 'send_grading_conflict_email' } do |form| %>
 <table class="exp">
 	<tr class="head">
 		<% for i in 0...@users_grades.size%>
@@ -15,7 +16,7 @@
 		<% @users_grades.sort_by{ |grade| grade.review.review_mapping.reviewer.fullname}.each do |grade|
 			if grade.review.review_mapping.assignment_id.to_s == @assignment.id.to_s
 				%>
-				<td align="center">
+				<td align="center"><%= form.hidden_field grade.review.review_mapping.reviewer.fullname+"_grade", :value => grade.total_score.to_f*100/@sum_of_max %>
 					<%= sprintf("%.2f",grade.total_score.to_f*100/@sum_of_max) %>% &nbsp;
 					(<%= link_to grade.review.review_mapping.reviewer.fullname, 
 									:controller=>'review', 
@@ -30,12 +31,13 @@
 
 <br/>
 
-<% form_for :mailer, :url => { :action => 'send_grading_conflict_email' } do |form| %>
+
 	<table>
 		<tr>	
 			<th>To:</th>
-
-			<td><%= form.select(:recipients, @reviewers_email_hash.sort, @reviewers_email_hash) %></td>
+			<td>
+				<%= form.select(:recipients, @reviewers_email_hash.sort, @reviewers_email_hash) %>
+			</td>
 		</tr>
 		<tr>	
 			<th>From:</th>
@@ -43,22 +45,18 @@
 		</tr>
 		<tr>	
 			<th>Subject:</th>
-			<td><%= form.text_field :subject, :size => 90, :value => ('There is a conflict with a review you submitted.') %></td>
+			<td><%= form.text_field :subject, :size => 90, :value => @subject %></td>
+		</tr>
+		<tr>
+			<td colspan=2 style='font-size: x-small; color: red;'>Note: please do not remove the text between the ##[ ] delimiters. They are used to fill in variables when the email is sent.</td>
 		</tr>
 		<tr width=100%>	
-			<td colspan=2>
-				Hi,<br/><br/>
-				You submitted a score for assignment <%= @assignment.name%> that varied greatly from another reviewer's score for the same submission.  
-				<br/>The Expertiza system has brought this to my attention.
-				<%= form.text_area :comments, 'cols' => 100, 'rows' => 20,
-					'onclick' => "value=''", :value => ("...enter additional text here...")
-				%>
-			</td>
+			<td colspan=2><%= form.text_area :body_text, 'cols' => 100, 'rows' => 20, :value => (@body) %></td>
 		</tr>
 	</table>
 	<br/>
 	<%= form.hidden_field :assignment, :value => @assignment.id %>
-	<%= form.hidden_field :author, :value => @author.id %>
+	<%= form.hidden_field :author, :value => @student.user.id %>
   <%= submit_tag "Send Email" %> | 
 	<%= link_to 'Back', :action=>'view_grading_report', :id => params[:assignment] %>
 <% end %>

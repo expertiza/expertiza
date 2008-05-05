@@ -2,6 +2,8 @@ class Participant < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :user
   has_many :resubmission_times 
+  
+  validates_numericality_of :grade, :allow_nil => true
 
   def get_topic_string
     if topic == nil or topic.strip == ""
@@ -75,5 +77,10 @@ class Participant < ActiveRecord::Base
       else
         raise ArgumentError, "Not enough items" 
       end    
+  end
+  
+  protected
+  def validate
+    errors.add(:grade, "should be greater or equal to zero") if grade < 0
   end
 end

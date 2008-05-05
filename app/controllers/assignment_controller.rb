@@ -320,12 +320,16 @@ class AssignmentController < ApplicationController
 
   end
   
+  #the view grading report provides the instructor with an overall view of all the grades for
+  #an assignment. It lists all participants of an assignment and all the reviews they recieved.
+  #It also gives a final score which is an average of all the reviews and greatest difference
+  #in the scores of all the reviews.
   def view_grading_report
     @sum_of_max = 0
     @sum_of_max_ror = 0
-    @num_of_reviews = 0;
+    @max_num_of_reviews = 0;
     @assignment = Assignment.find(params[:id])
-    scores = ReviewScore.find_by_sql("select review_id, sum(score) as total_score from review_scores group by review_id order by total_score")
+    scores = ReviewScore.find_by_sql("select review_id, sum(score) as total_score from review_scores where questionnaire_type_id=1 group by review_id order by total_score")
     @scores_by_author = scores.group_by {|score| score.review.review_mapping.author}.sort_by { |participant| participant[0].fullname}
     for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
       @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
@@ -340,53 +344,57 @@ class AssignmentController < ApplicationController
           temp += 1;
         end
       end
-      if temp > @num_of_reviews
-        @num_of_reviews = temp
+      if temp > @max_num_of_reviews
+        @max_num_of_reviews = temp
       end
     end
   end
     
-	def grading_conflict_email_form
-		@instructor = session[:user];
+  # ther grading conflict email form provides the instructor a way of emailing
+  # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.
+  def grading_conflict_email_form
+    @instructor = session[:user];
     @sum_of_max = 0
-    @assignment = Assignment.find(params[:assignment])
-    @author = User.find(params[:author])
+    @student = Participant.find(params[:id])
+    @assignment = @student.assignment
     @reviewers_email_hash = {}
+    @reviewers = Array.new
+    @subject = " Your review score for " + @assignment.name + " conflicts with another reviewers."
+    
+    @body = get_body_text
+      
     @users_grades = Array.new
     all_grades = ReviewScore.find_by_sql("select review_id, sum(score) as total_score from review_scores group by review_id order by total_score") 
     for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
       @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
     end
     for grade in all_grades
-      if grade.review.review_mapping.author_id.to_s == @author.id.to_s
+      if grade.review.review_mapping.author_id.to_s == @student.user.id.to_s
         @users_grades << grade
         reviewer = grade.review.review_mapping.reviewer
+        @reviewers << grade.review.review_mapping.reviewer
         @reviewers_email_hash[reviewer.fullname.to_s+" <"+reviewer.email.to_s+">"] = reviewer.email.to_s
       end
     end
+    @reviewers = @reviewers.sort {|a,b| a.fullname <=> b.fullname}
   end
   
   def send_grading_conflict_email
     email_form = params[:mailer]
     assignment = Assignment.find(email_form[:assignment])
     recipient = User.find(:first, :conditions => ["email = ?", email_form[:recipients]])
-    recipients_grade = 0
-    all_grades = ReviewScore.find_by_sql("select review_id, sum(score) as total_score from review_scores group by review_id order by total_score") 
-    for grade in all_grades
-      if grade.review.review_mapping.reviewer_id.to_s == recipient.id.to_s
-        recipients_grade = grade.total_score.to_f*100/25
-      end
-    end
+    
+    body_text = email_form[:body_text]
+    body_text["##[recipient_name]"] = recipient.fullname
+    body_text["##[recipients_grade]"] = email_form[recipient.fullname+"_grade"]+"%"
+    body_text["##[assignment_name]"] = assignment.name
     
     Mailer.deliver_message(
       { :recipients => email_form[:recipients],
         :subject => email_form[:subject],
         :from => email_form[:from],
         :body => {  
-          :recipients_name => recipient.fullname,
-          :comments => email_form[:comments],
-          :assignment_name => assignment.name,
-          :recipients_grade => recipients_grade,
+          :body_text => body_text,
           :partial_name => "grading_conflict"
         }
       }
@@ -398,10 +406,14 @@ class AssignmentController < ApplicationController
                 :author => email_form[:author]
   end
   
-  def final_grade_report
-    @assignment = Assignment.find(params[:assignment])
-    @participant = Participant.find(:first, :conditions => ["user_id = ?", params[:author]])
+private
+  def get_body_text
+    "Hi ##[recipient_name], 
     
-  end
+You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that 
+varied greatly from another reviewer's score for the same submission.  
+The Expertiza system has brought this to my attention.
 
+"
+  end
 end

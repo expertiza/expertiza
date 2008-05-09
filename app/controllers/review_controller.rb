@@ -86,6 +86,23 @@ class ReviewController < ApplicationController
     end   
   end
   
+  def view_file
+    @current_folder = DisplayOption.new
+    @current_folder.name = "/"
+    if params[:current_folder]
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
+    end
+    @mapping = ReviewMapping.find(params[:id])
+    @assgt = Assignment.find(@mapping.assignment_id)    
+    if @assgt.team_assignment
+      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
+    else
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
+    end
+    view_submitted_file(@current_folder,@author)
+  end
+  
   def edit_review
     @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
     @current_folder = DisplayOption.new

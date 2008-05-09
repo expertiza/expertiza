@@ -38,7 +38,11 @@ Submitted Files<br />
 <% end %>
 <ul>
 <% for file in @files %>
-<li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
+	<% if params[:action] == "new_review" %>
+		<li><%= link_to File.basename(file), :action => 'view_file', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
+	<%else%>
+		<li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
+	<%end%>	
 <% end %>
 </ul>
 <%if @assgt.team_assignment %>

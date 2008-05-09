@@ -41,7 +41,10 @@ class UsersController < ApplicationController
   def show_selection
     @user = User.find_by_name(params[:user][:name])
     getRole
-    if @role.parent_id < (session[:user]).role_id || @role.parent_id == nil || @user.id == (session[:user]).id
+    logger.info "Role ID: #{@role.id}"
+    logger.info "Parent Role ID: #{@role.parent_id}"
+    logger.info "Session User Role: #{(session[:user]).role_id}"
+    if @role.parent_id == nil || @role.parent_id < (session[:user]).role_id || @user.id == (session[:user]).id
       render :action => 'show'
     else
       flash[:note] = 'The specified user is not available for editing.'      

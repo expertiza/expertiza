@@ -15,7 +15,7 @@ module ImportFileHelper
     attributes
   end
 
-  def self.create_new_user(attributes, session,logger)
+  def self.create_new_user(attributes, session)
     user = User.new(attributes)
     user.parent_id = (session[:user]).id
     user.save

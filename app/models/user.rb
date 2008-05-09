@@ -39,12 +39,11 @@ class User < ActiveRecord::Base
   end
   
   def self.import(row,session)
-      row.each { |item| logger.info "#{item}" }
       if row.length == 4
         user = User.find_by_name(row[0])        
         if (user == nil)
           attributes = ImportFileHelper::define_attributes(row)
-          user = ImportFileHelper::create_new_user(attributes,session,logger)
+          user = ImportFileHelper::create_new_user(attributes,session)
         end   
       else
         raise ArgumentError, "Not enough items" 

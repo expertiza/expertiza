@@ -3,11 +3,10 @@
 
 <% 
    column_definitions = Array.new
-   column_definitions << {:name => 'Teaching Assistant Name',   :type => 'display',              :field => 'name'}
-   column_definitions << {:name => 'Edit Participant',   :action => 'show',               :controller => 'users'}
-   column_definitions << {:name => 'Remove Participant', :action => 'remove_ta', :controller => 'courses'} 
+   column_definitions << {:name => 'Teaching Assistant Name',   :type => 'display', :field => 'name'}
+   column_definitions << {:name => 'Remove TA', :action => 'remove_ta', :controller => 'course'} 
  %>
-<%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :elements => @ta_users} %>
+<%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :elements => @ta_mappings} %>
 
 
 <br/>

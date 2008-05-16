@@ -101,10 +101,9 @@ class CourseController < ApplicationController
   
   def view_teaching_assistants
     @course = Course.find(params[:id])
-    ta_mappings = @course.ta_mappings
-    @ta_users = []
-    for mappings in ta_mappings
-      @ta_users << mappings.ta
+    @ta_mappings = @course.ta_mappings
+    for mapping in @ta_mappings
+      mapping[:name] = mapping.ta.name
     end
   end
   
@@ -120,11 +119,8 @@ class CourseController < ApplicationController
   end 
   
   def remove_ta
-    @course = Course.find(params[:course_id])
-    @ta_mapping = TaMapping.find(:first, 
-                                   :conditions =>["course_id = ? AND ta_id = ?", 
-                                    params[:course_id], params[:id]])
+    @ta_mapping = TaMapping.find(params[:id])
     @ta_mapping.destroy
-    redirect_to :action => 'view_teaching_assistants', :id => @course
+    redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end
 end

@@ -8,7 +8,7 @@ class Role < ActiveRecord::Base
   attr_reader :student,:ta,:instructor,:administrator,:superadministrator
 
   STUDENT = 1
-  TA = 5
+  TA = 6
   INSTRUCTOR = 2
   ADMINISTRATOR = 3
   SUPERADMINISTRATOR = 4

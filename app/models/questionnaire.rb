@@ -57,7 +57,10 @@ class Questionnaire < ActiveRecord::Base
                             id, name, instructor_id])
       errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
     end
-    def get_field(type_id)
-      type = QuestionnaireType.find(type_id.to_s).name
+    
+    def get_field(field)     
+     if field == 'type_id'
+         return QuestionnaireType.find(self.type_id).name         
+     end
     end
 end

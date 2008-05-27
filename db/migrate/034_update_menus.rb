@@ -1,6 +1,6 @@
 class UpdateMenus < ActiveRecord::Migration
   def self.up
-    instructor_perm = Permission.find_by_name('Administer assignments')
+    instructor_perm = Permission.find_by_name('Administer Assignments')
     execute "UPDATE `menu_items` set name='List teams', label='Add teams to assignment' where id=28;"
     execute "UPDATE `controller_actions` set permission_id=#{instructor_perm.id}, url_to_use='' where id=15;"
     execute "UPDATE `content_pages` set permission_id=#{instructor_perm.id} where id=8;"
@@ -16,7 +16,7 @@ class UpdateMenus < ActiveRecord::Migration
 
   def self.down
     
-    admin_perm = Permission.find_by_name('Administer Expertiza')
+    admin_perm = Permission.find_by_name('Administer PG')
     
     execute "UPDATE `menu_items` set name='Create Team', label='Create Team' where id=28;"
     execute "UPDATE `controller_actions` set permission_id=NULL, url_to_use=NULL where id=15;"

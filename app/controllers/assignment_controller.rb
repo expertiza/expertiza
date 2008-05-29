@@ -37,7 +37,8 @@ class AssignmentController < ApplicationController
       submit_duedate=DueDate.new(params[:submit_deadline]);
       submit_duedate.deadline_type_id=@Submission_deadline;
       submit_duedate.assignment_id=@assignment.id;
-      submit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
+      # ajbudlon 5/28/2008 commented out late policy
+      #submit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];      
       ## feedback added
       submit_duedate.round = 1;
       puts "submit round",submit_duedate.round
@@ -62,7 +63,8 @@ class AssignmentController < ApplicationController
           resubmit_duedate=DueDate.new(params[:additional_submit_deadline][resubmit_duedate_key]);
           resubmit_duedate.deadline_type_id=@Resubmission_deadline;
           resubmit_duedate.assignment_id=@assignment.id;
-          resubmit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
+          # ajbudlon 5/28/2008 commented out late policy
+          #resubmit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
           ## feedback added
           resubmit_duedate.round = max_round
           puts "resubmit round",resubmit_duedate.round
@@ -77,7 +79,8 @@ class AssignmentController < ApplicationController
           rereview_duedate=DueDate.new(params[:additional_review_deadline][rereview_duedate_key]);
           rereview_duedate.deadline_type_id=@Rereview_deadline;
           rereview_duedate.assignment_id=@assignment.id;
-          rereview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
+          # ajbudlon 5/28/2008 commented out late policy
+          #rereview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
           ## feedback added
           rereview_duedate.round = max_round
           puts "rereview round",rereview_duedate.round
@@ -93,7 +96,8 @@ class AssignmentController < ApplicationController
       reviewofreview_duedate=DueDate.new(params[:reviewofreview_deadline]);
       reviewofreview_duedate.deadline_type_id=@Review_of_review_deadline;
       reviewofreview_duedate.assignment_id=@assignment.id;
-      reviewofreview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
+      # ajbudlon 5/28/2008 commented out late policy
+      #reviewofreview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
       ## feedback added
       reviewofreview_duedate.round = max_round
       puts "review of review round",reviewofreview_duedate.round

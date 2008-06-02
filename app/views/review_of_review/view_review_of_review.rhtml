@@ -45,7 +45,7 @@ Submitted Files<br />
 </ul>
 <h3>Review</h3>
 <%= render :partial => '/review/scores' %>
-Additional Comment : <%=@review.additional_comment%><br/>
+Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
 <h3>Review of review</h3>
 <%= render :partial => 'scores' %>
 <br/>

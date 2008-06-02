@@ -82,7 +82,7 @@ Submitted Files<br />
 <div id="1_myDiv" style="<%= @review_display %>">
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
 <%= render :partial => 'review/scores' %> 
-Additional Comment : <%=@review.additional_comment%><br/>
+Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
 <br/>
 </div>
 <%

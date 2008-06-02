@@ -29,12 +29,13 @@ function checkIfFileExists()
  <br/>
  <label for="file">File to Import: </label><%= file_field_tag 'file', :size => 40 %><br/><br/>
  <%= hidden_field_tag ('model', @model) %>
-<%= end_form_tag %>
+
 
  * The import process expects the following columns:<br/>
  &nbsp;&nbsp;&nbsp;<%= session[:expected_fields] %>
  <br/><br/>
+<input type='submit' value='Import' onclick='if (checkIfFileExists()) {import_form.submit();} else {alert("Please select a file before clicking Next.");}'/>
+<%= end_form_tag %>
+ <br/><br/>
 
- <a href="<%= session[:return_to]%>">Back</a> |
- <a href="#" onclick='if (checkIfFileExists()) {import_form.submit();} else {alert("Please select a file before clicking Next.");}'>Next</a>
- 
+ <a href="<%= session[:return_to]%>">Back</a>

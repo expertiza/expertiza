@@ -26,7 +26,6 @@ class TeamsUsersController < ApplicationController
         @teams_user = TeamsUser.new
         @teams_user.team_id = team.id
         @teams_user.user_id = user.id
-        @teams_user.assignment_id = team.assignment_id
         @teams_user.save        
       end
       participants = Participant.find(:all, :conditions => ['assignment_id = ? and user_id = ?',team.assignment_id, user.id])

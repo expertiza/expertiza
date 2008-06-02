@@ -1,7 +1,8 @@
 class ImpersonateController < ApplicationController
   def auto_complete_for_user_name
     curr_user = session[:user]
-    role = Role.find(curr_user.role_id)    
+    role = Role.find(curr_user.role_id) 
+    permissions = Permission.find_all_for_role(role.id)
     if role.name == "instructor" || role.name == "teaching assistant"
       user_ids = Array.new
       assignments = Assignment.find(:all, :conditions => ['instructor_id = ?',(session[:user]).id])

@@ -30,8 +30,6 @@ class ImportFileController < ApplicationController
       end
       row = Array.new
       items.each { | value | row << value.sub("\"","").sub("\"","").strip }
-      
-      row.each {| value | logger.info "#{value}"}
       Object.const_get(model).import(row,session)
     end    
   end

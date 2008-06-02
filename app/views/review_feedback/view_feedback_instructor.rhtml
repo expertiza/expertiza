@@ -1,4 +1,4 @@
 <p> Feedback Received from Author </p>
 <%= render :partial => 'review/scores' %> 
 Additional Comment: <% review_feedback_text = ReviewFeedback.find(:first,:conditions =>["id = ?", @reviewfeedback.id]).additional_comment %>
-<%= review_feedback_text%><br/>
+<br><%= review_feedback_text.gsub(/\n/, '<br>')%><br/>

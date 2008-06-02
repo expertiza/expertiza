@@ -1,4 +1,5 @@
 <script type="text/javascript">
+<% if delete_options[:enabled] %>
 function markAllRows( container_id ) {
     var rows = document.getElementById(container_id).getElementsByTagName('tr');
     var checkbox;
@@ -25,7 +26,7 @@ function unMarkAllRows( container_id ) {
 
     return false;
 }
-
+<% end %>
 function submitAction(container_id, action_url){
   var myform = document.getElementById(container_id);
   myform.action = action_url;
@@ -33,12 +34,15 @@ function submitAction(container_id, action_url){
 }
 </script>
 
+
 <% if elements.length > 0 %>
 <form id="tableForm" name="tableForm" method="post">
 <DIV CLASS="exp">
 <TABLE>
   <TR><!-- Header Row -->
-    <TH CLASS="head">&nbsp;</TH>
+    <% if delete_options[:enabled] %>
+       <TH CLASS="head">&nbsp;</TH>
+    <% end %>
     <% for definition in column_definitions %>
 	   <TH CLASS="head"><%= definition[:name] %></TH>
     <% end %>
@@ -46,18 +50,20 @@ function submitAction(container_id, action_url){
   
   <% for element in elements %>
   <TR>
+     <% if delete_options[:enabled] %>
      <!-- Selection Box -->
      <TD> 
         <input id="item" name="item[<%= element.id %>]" type="checkbox" value="<%= element.id %>" />        
      </TD> 
      <!-- End Selection Box -->
+     <% end %>
      <!-- Names and Actions -->
 	 <% for definition in column_definitions %>          
      <TD align="center"> 
      <% if definition[:type] == "display" %>       
        <%= element[definition[:field].to_sym] %>
      <% elsif definition[:type] == "fetch" %>
-       <%= element.get_field(definition[:field]) %>
+       <%= ApplicationHelper.get_field(element,definition[:field],definition[:model],definition[:column]) %>       
      <% else %>            
          <% 
             disabled = false
@@ -80,8 +86,10 @@ function submitAction(container_id, action_url){
   <% end %>
 </TABLE>
 </DIV>
+<% if delete_options[:enabled] %>
 <a href="" onClick="return markAllRows('tableForm');">Check All</a> | <a href="" onClick="return unMarkAllRows('tableForm');">Uncheck All</a>
-<br/>With selected: <a href="" onClick="submitAction('tableForm','<%= url_for(:controller => definition[:controller], :action => 'delete_selected', :edit => nil, :list => nil) %>')">Delete</a>
+<br/>With selected: <a href="" onClick="submitAction('tableForm','<%= url_for(:controller => delete_options[:controller], :action => 'delete_selected', :edit => nil, :list => nil) %>')">Delete</a>
+<% end %>
 <%= end_form_tag %>
 <% end %> 
 <br/>

@@ -10,8 +10,11 @@
    column_definitions << {:name => 'Edit Name',      :action => 'edit',         :controller => 'team'}
    column_definitions << {:name => 'Modify Members', :action => 'list',         :controller => 'teams_users'}
    column_definitions << {:name => 'Delete Team',    :action => 'delete_team',  :controller => 'team'}  
+     
+     
+   delete_options = {:enabled => true, :controller => 'team'}        
 %>
-<%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :elements => @teams} %>
+<%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :delete_options => delete_options, :elements => @teams} %>
 
 <BR/>
 <%= render :partial => 'import_teams' %>

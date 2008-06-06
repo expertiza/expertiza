@@ -34,7 +34,7 @@ function showFields()
 <br/>
 <% 
   session[:return_to] = request.request_uri  
-  session[:expected_fields] = 'Name, "Full name (last, first[ middle])", E-mail address, Password'
+  session[:expected_fields] = 'Username, "Full name (last, first[ middle])", E-mail address, Password'
   session[:assignment_id] = @assignment.id 
 %>
 <%= link_to 'Import Participants', :controller=>'import_file', :action=>'start', :model => 'Participant' %>

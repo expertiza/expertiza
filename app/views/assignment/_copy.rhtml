@@ -1,0 +1,17 @@
+<!-- Partial for copying assignments -->
+<table>
+<tr><td>Assignment name:</td><td><%= text_field 'object', 'name', :size=>30%></td></tr>
+<tr><td>Submission directory:</td><td><%= text_field 'object', 'directory_path', :size=>30 %></td></tr>
+<tr>
+    <td colspan=2>Submit Deadline*:
+    <%
+       @submit_deadline = DueDate.find(:first, :conditions=>['assignment_id = ? and deadline_type_id = 1',@object.id])
+       
+    %>
+    <%= text_field 'submit_deadline', 'due_at', :size=>30%>
+       <img src="/images/cal.gif"  onClick="NewCal('submit_deadline_due_at','YYYYMMDD',true,24); return false;"/>    
+    </td>
+</tr>
+</table>
+* All additional deadlines will be updated to maintain the same schedule as the original assignment.
+<br/>

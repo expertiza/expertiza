@@ -1,0 +1,2 @@
+module CopyHelper
+end

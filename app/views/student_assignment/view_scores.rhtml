@@ -57,7 +57,7 @@ function toggleVis(id) {
 		   </div>
            <% @mapping = ReviewMapping.find(review_map.id) %>
            <% @assgt_id = @mapping.assignment_id %>
-		   <% @assignment = Assignment.find_by_id (@assigt_id)
+		   <% @assignment = Assignment.find_by_id (@assgt_id)
 			if @assignment.team_assignment 
 				@team_id = @mapping.team_id
 			else

@@ -102,11 +102,11 @@ class ReviewFeedbackController < ApplicationController
     @review_id = params[:review_id]
     @team_id = params[:team_id]
     
-    @review_feedback.additional_comments = params[:new_feedback][:comments]
+    @review_feedback.additional_comment = params[:new_feedback][:comments]
     @review_feedback.assignment_id = @assgt_id
     @review_feedback.author_id = @author_id
     @review_feedback.review_id = @review_id
-
+    @review_feedback.team_id = @team_id
     if params[:new_review_score]
         for review_key in params[:new_review_score].keys
         rs = ReviewScore.new(params[:new_review_score][review_key])
@@ -139,7 +139,7 @@ class ReviewFeedbackController < ApplicationController
     else  
       @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND user_id = ?", @a, @b])
     end
-    @reviewfeedback.additional_comments = params[:new_reviewfeedback][:comments]
+    @reviewfeedback.additional_comment = params[:new_reviewfeedback][:comments]
     @rev_id = @reviewfeedback.id
         
     if params[:new_review_score]

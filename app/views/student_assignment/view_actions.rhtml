@@ -6,8 +6,13 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @stud
   <a href="<%= @student.assignment.spec_location %>" target="new">Assignment Description</a>
 <% end %>
 <ul>
+	<%if Assignment.find(:all, :conditions => ['id= ?', @student.assignment_id])[0].team_assignment == true%>
+		<li> <%= link_to 'Your team', :action => 'view_team', :id => @student.id %> 
+		(View and manage your team)
+		</li>
+	<%end%>	
 	<li>
-		<% if @can_view_your_work == 1 %>
+	    <% if @can_view_your_work == 1 %>
 			<%= link_to 'Your work', :action => 'submit', :id => @student.id %>
 		<% else %>
 			<font color="gray">Your work</font>

@@ -3,6 +3,22 @@ require 'zip/zip'
 class StudentAssignmentController < ApplicationController
   helper :wiki
   helper :student_assignment
+  
+  def view_team
+    @student = Participant.find(params[:id])
+    @teams = Team.find(:all, :conditions => ['assignment_id = ?', @student.assignment_id])
+    for team in @teams
+      @teamuser = TeamsUser.find(:first, :conditions => ['team_id = ? and user_id = ?', team.id, @student.user_id])
+      if @teamuser != nil
+        @team_id = @teamuser.team_id
+      end
+    end
+    
+    @team_members = TeamsUser.find(:all, :conditions => ['team_id = ?', @team_id])
+    @send_invs = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', @student.user_id, @student.assignment_id])
+    @received_invs = Invitation.find(:all, :conditions => ['to_id = ? and assignment_id = ? and reply_status = "W"', @student.user_id, @student.assignment_id])
+  end
+  
   def list
     user_id = session[:user].id
     @user =session[:user]

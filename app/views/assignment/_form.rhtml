@@ -38,6 +38,14 @@
                 <option value=true>Yes</option>
         <% end %>
        </select></td>
+       <% if @assignment.team_assignment == true %>
+   	   		<td><label for="max_team_count">Max team count:</label></td>       
+   			<td><select name="assignment[max_team_count]">
+                <option value=false>No</option>
+                <option value=true SELECTED>Yes</option>
+                </select></td>
+        <% end %>
+       
 </tr>
 <tr>
   <td><label for="wiki_type">Wiki Type:</label></td>

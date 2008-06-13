@@ -2,7 +2,7 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 33) do
+ActiveRecord::Schema.define(:version => 43) do
 
   create_table "assignments", :force => true do |t|
     t.column "created_at", :datetime
@@ -15,6 +15,7 @@ ActiveRecord::Schema.define(:version => 33) do
     t.column "private", :boolean, :default => false, :null => false
     t.column "num_reviews", :integer, :default => 0, :null => false
     t.column "num_review_of_reviews", :integer, :default => 0, :null => false
+    t.column "num_review_of_reviewers", :integer, :default => 0, :null => false
     t.column "review_strategy_id", :integer, :default => 0, :null => false
     t.column "mapping_strategy_id", :integer, :default => 0, :null => false
     t.column "review_questionnaire_id", :integer
@@ -282,6 +283,9 @@ ActiveRecord::Schema.define(:version => 33) do
     t.column "permission_granted", :boolean
     t.column "penalty_accumulated", :integer, :limit => 10, :default => 0, :null => false
     t.column "submitted_hyperlink", :string, :limit => 500
+    t.column "grade", :float
+    t.column "comments_to_student", :text
+    t.column "private_instructor_comments", :text
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
@@ -341,9 +345,9 @@ ActiveRecord::Schema.define(:version => 33) do
   create_table "review_feedbacks", :force => true do |t|
     t.column "assignment_id", :integer
     t.column "review_id", :integer
-    t.column "user_id", :integer
+    t.column "author_id", :integer
     t.column "feedback_at", :datetime
-    t.column "txt", :text
+    t.column "additional_comments", :text
   end
 
   add_index "review_feedbacks", ["assignment_id"], :name => "fk_review_feedback_assignments"
@@ -354,6 +358,7 @@ ActiveRecord::Schema.define(:version => 33) do
     t.column "team_id", :integer
     t.column "reviewer_id", :integer
     t.column "assignment_id", :integer
+    t.column "round", :integer
   end
 
   add_index "review_mappings", ["assignment_id"], :name => "fk_review_mapping_assignments"
@@ -397,10 +402,12 @@ ActiveRecord::Schema.define(:version => 33) do
     t.column "question_id", :integer
     t.column "score", :integer
     t.column "comments", :text
+    t.column "questionnaire_type_id", :integer
   end
 
   add_index "review_scores", ["review_id"], :name => "fk_review_score_reviews"
   add_index "review_scores", ["question_id"], :name => "fk_review_score_questions"
+  add_index "review_scores", ["questionnaire_type_id"], :name => "fk_review_scores_questionnaire_type_id"
 
   create_table "review_strategies", :force => true do |t|
     t.column "name", :string
@@ -410,7 +417,7 @@ ActiveRecord::Schema.define(:version => 33) do
     t.column "review_mapping_id", :integer
     t.column "review_num_for_author", :integer
     t.column "review_num_for_reviewer", :integer
-    t.column "ignore", :integer, :limit => 4, :default => 0, :null => false
+    t.column "ignore", :boolean, :default => false
     t.column "additional_comment", :text
     t.column "updated_at", :datetime
     t.column "created_at", :datetime
@@ -447,6 +454,19 @@ ActiveRecord::Schema.define(:version => 33) do
 
   add_index "site_controllers", ["permission_id"], :name => "fk_site_controller_permission_id"
 
+  create_table "survey_deployments", :force => true do |t|
+    t.column "course_evaluation_id", :integer
+    t.column "start_date", :datetime
+    t.column "end_date", :datetime
+    t.column "num_of_students", :integer
+    t.column "last_reminder", :datetime
+  end
+
+  create_table "survey_participants", :force => true do |t|
+    t.column "user_id", :integer
+    t.column "survey_deployment_id", :integer
+  end
+
   create_table "survey_responses", :force => true do |t|
     t.column "score", :integer, :limit => 10
     t.column "comments", :text
@@ -454,6 +474,7 @@ ActiveRecord::Schema.define(:version => 33) do
     t.column "question_id", :integer, :limit => 10, :default => 0, :null => false
     t.column "survey_id", :integer, :limit => 10, :default => 0, :null => false
     t.column "email", :string
+    t.column "survey_deployment_id", :integer
   end
 
   add_index "survey_responses", ["assignment_id"], :name => "fk_survey_assignments"
@@ -479,6 +500,14 @@ ActiveRecord::Schema.define(:version => 33) do
   add_index "system_settings", ["not_found_page_id"], :name => "fk_system_settings_not_found_page_id"
   add_index "system_settings", ["permission_denied_page_id"], :name => "fk_system_settings_permission_denied_page_id"
   add_index "system_settings", ["session_expired_page_id"], :name => "fk_system_settings_session_expired_page_id"
+
+  create_table "ta_mappings", :force => true do |t|
+    t.column "ta_id", :integer
+    t.column "course_id", :integer
+  end
+
+  add_index "ta_mappings", ["ta_id"], :name => "fk_ta_mappings_ta_id"
+  add_index "ta_mappings", ["course_id"], :name => "fk_ta_mappings_course_id"
 
   create_table "teams", :force => true do |t|
     t.column "name", :string
@@ -508,8 +537,8 @@ ActiveRecord::Schema.define(:version => 33) do
     t.column "email_on_review", :boolean
     t.column "email_on_submission", :boolean
     t.column "email_on_review_of_review", :boolean
-    t.column "is_new_user", :integer, :limit => 4, :default => 1, :null => false
-    t.column "master_permission_granted", :integer, :limit => 4, :default => 0, :null => false
+    t.column "is_new_user", :boolean, :default => true
+    t.column "master_permission_granted", :boolean
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

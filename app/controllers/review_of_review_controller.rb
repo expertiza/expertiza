@@ -28,67 +28,34 @@ class ReviewOfReviewController < ApplicationController
   end
   
   def new_review_of_review
-    
-    @user = params['user']
-    @assignment_id = params['assignment']
-    @instructor_review = params['instructor_review']
-    @eligible_review_mappings = ReviewMapping.find(:all,:conditions => ["reviewer_id <> ? and author_id <> ? and assignment_id = ?", @user, @user, @assignment_id] )
-    # This is the review that is eligible for a review of review based on the criteria defined above
-    puts "(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((("
-    puts @eligible_review_mappings
-    for eligible_review_map in @eligible_review_mappings
-      puts "####################################################"
-      puts eligible_review_map
-      if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",eligible_review_map.id])== nil)
-        if (Review.find_by_review_mapping_id(eligible_review_map.id))
-          puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-          @eligible_review_mapping_id = eligible_review_map.id
-          @eligible_review_mapping = eligible_review_map
-          @eligible_review = Review.find_by_review_mapping_id(@eligible_review_mapping_id)
-          puts @eligible_review_mapping_id
-        end
-      end
-    end
-    begin   
-      @eligible_review_scores = @eligible_review.review_scores
-      @assgt = Assignment.find(@assignment_id)    
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @assgt.id])
-      @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
-      @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
-      if @assgt.team_assignment 
-        @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @eligible_review_mapping.team_id]).user_id
-        @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @eligible_review_mapping.team_id])
-        @author_name = User.find(@author_first_user_id).name;
-        @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @eligible_review_mapping.assignment_id])
-      else
-        @author_name = User.find(@eligible_review_mapping.author_id).name
-        @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @eligible_review_mapping.author_id, @eligible_review_mapping.assignment_id])
-      end
-      @max = @questionnaire.max_question_score
-      @min = @questionnaire.min_question_score 
+    @ror_mapping = ReviewOfReviewMapping.find(params[:id])
+    @user = session[:user].id
+    @eligible_review = Review.find(@ror_mapping.review_id)
+    begin
+      review_mapping = ReviewMapping.find(@ror_mapping.review_mapping_id)
+      @eligible_review_mapping = review_mapping
+      @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(@eligible_review.id,params[:current_folder])
       @current_folder = DisplayOption.new
       @current_folder.name = "/"
       if params[:current_folder]
         @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
       end
-      @files = Array.new
-      @files = get_submitted_file_list(@direc, @author, @files)
-      
+
       if params['fname']
         view_submitted_file(@current_folder,@author)
       end
-      
+
       @review_scores = @eligible_review.review_scores
-      @assgt = Assignment.find(@assignment_id)
-      
+      #@assgt = Assignment.find(@assignment_id)
+
       @review_of_review = ReviewOfReview.new
-      @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_of_review_questionnaire_id]) 
+      @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_of_review_questionnaire_id])
       @questionnaire = Questionnaire.find(@assgt.review_of_review_questionnaire_id)
       @max = @questionnaire.max_question_score
-      @min = @questionnaire.min_question_scoreF
+      @min = @questionnaire.min_question_score
       rescue
-      flash[:notice] = "Review of review cannot be created now"
-      redirect_to :controller =>'review', :action => 'list_reviews', :id => params['assignment']
+      flash[:notice] = "Review of review cannot be created now. Cause: "+ $!
+      redirect_to :controller =>'review', :action => 'list_reviews', :id => @ror_mapping.assignment_id
     end
   end
   
@@ -124,8 +91,10 @@ class ReviewOfReviewController < ApplicationController
   end
   
   def view_review_of_review
+    
     @ror_map_id = ReviewOfReview.find(params[:id]).review_of_review_mapping_id
     @review_id = ReviewOfReviewMapping.find(@ror_map_id).review_id
+    
     @review = Review.find(@review_id)
     @mapping_id = @review_id
     @review_scores = @review.review_scores
@@ -178,25 +147,9 @@ class ReviewOfReviewController < ApplicationController
   end
   
   def create_review_of_review
-    
-    @review_of_review_mapping = ReviewOfReviewMapping.new
-    @review_of_review_mapping.review_mapping_id = params[:review_mapping_id]
-    @review_of_review_mapping.reviewer_id = params[:user]
-    @review_of_review_mapping.review_id = params[:review_id]
-    @review_of_review_mapping.assignment_id = params[:assgt_id]
-    @review_of_review_mapping.save
-    
-    @ror_mapping = ReviewOfReviewMapping.find(:first, :conditions => ["review_id = ? and reviewer_id = ? ", params[:review_id], params[:user]])
-    
-    
-    
-    
+    @ror_mapping = ReviewOfReviewMapping.find(:first, :conditions => ["review_id = ? and review_reviewer_id = ? ", params[:review_id], params[:user]])
     @review_of_review = ReviewOfReview.new
     @review_of_review.review_of_review_mapping_id = @ror_mapping.id
-    @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",params['assignment']])
-    @review_phase = find_review_phase(@due_dates)
-    #if(@review_phase != 2)
-    
     if params[:new_review_score]
       # The new_question array contains all the new questions
       # that should be saved to the database
@@ -205,25 +158,13 @@ class ReviewOfReviewController < ApplicationController
         rs.question_id = params[:new_question][review_key]
         rs.score = params[:new_score][review_key]
         @review_of_review.review_of_review_scores << rs
-      end      
+      end
     end
     if @review_of_review.save
-      #send message to reviewers(s) when review of review has been updated
-      #ajbudlon, sept 07, 2007    
-      #@review_of_review.email
-      if params['instructor_review']
-        flash[:notice] = 'Review of review was successfully saved.'
-        redirect_to :controller => 'assignment', :action => 'ror_for_instructors', :id => params[:assgt_id]
-      else
-        flash[:notice] = 'Review of review was successfully saved.' + params['instructor_review']
-        redirect_to :controller => 'review', :action => 'list_reviews', :id => params[:assgt_id]
-      end
+      flash[:notice] = 'Review of review was successfully saved.' + params['instructor_review']
+      redirect_to :controller => 'review', :action => 'list_reviews', :id => params[:assgt_id]
     else # If something goes wrong, stay at same page
-      if params['instructor_review']
-        render :controller => 'assignment', :action => 'ror_for_instructors', :id => params[:assgt_id]
-      else
-        render :action => 'view_review'
-      end
+      render :action => 'view_review'
     end
   end
 end

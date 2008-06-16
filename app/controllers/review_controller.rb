@@ -21,7 +21,7 @@ class ReviewController < ApplicationController
     # default score (probably the lowest possible score) should appear in the dropbox.
   end
   
-  def process_review(id,current_folder)
+  def self.process_review(id,current_folder)
     @review = Review.find(id)
     @mapping_id = id
     @review_scores = @review.review_scores
@@ -44,13 +44,13 @@ class ReviewController < ApplicationController
     @min = @questionnaire.min_question_score 
     
     @files = Array.new
-    @files = get_submitted_file_list(@direc, @author, @files)
+    @files = ReviewController.get_submitted_file_list(@direc, @author, @files)
     
     return @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc
   end
   
   def view_review
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(params[:id],params[:current_folder])
     
     @review_display = "display: block;"
     @author_feedback_display = "display: none;"
@@ -104,7 +104,7 @@ class ReviewController < ApplicationController
   end
   
   def edit_review
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(params[:id],params[:current_folder])
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -118,7 +118,7 @@ class ReviewController < ApplicationController
     end
   end
   
-  def get_submitted_file_list(direc,author,files)
+  def self.get_submitted_file_list(direc,author,files)
     if(author!=nil && author.directory_num)
       direc = RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + author.directory_num.to_s
       temp_files = Dir[direc + "/*"]
@@ -323,7 +323,7 @@ class ReviewController < ApplicationController
       @reviewer_id, @assignment_id])
 #    end
     ##
-    @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", 
+    @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["review_reviewer_id = ? and assignment_id = ?", 
     @reviewer_id, @assignment_id])
     ##
   end
@@ -332,7 +332,7 @@ class ReviewController < ApplicationController
   #viewing review and giving feedback by the instructor to the reviewer 
   # This page should show the review by the reviewer and the feedback obtained by the author if any. The instructor has the option to either give a new feedback or edit and view his previous feedback
   def view_review_instructor  
-    @review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = process_review(params[:id],params[:current_folder])
+    @review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@rubric,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(params[:id],params[:current_folder])
     @a = @author.user_id
     
     @user_id = session[:user].id

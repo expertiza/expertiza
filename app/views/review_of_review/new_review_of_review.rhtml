@@ -1,14 +1,29 @@
-Inst<%=@instructor_review%>
+<SCRIPT LANGUAGE="JavaScript">
+function toggleVis(id) { 
+		var elem = document.getElementById(id+"_myDiv");
+		if(elem.style.display == 'none'){
+			elem.style.display = '';
+			document.getElementById(id+"_show").style.display = 'none';
+			document.getElementById(id+"_hide").style.display = '';
+		} else {
+			elem.style.display = 'none';
+			document.getElementById(id+"_show").style.display = '';
+			document.getElementById(id+"_hide").style.display = 'none';
+		}
+	} 
+</SCRIPT>
+
 <h1>New Review of Review</h1>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
 	<%= flash[:notice] %>
 </div>
 <% end %>
-<%if @files.size == 0 and @assgt.wiki_type.name == "No"%>
-<strong>This submission is missing.</strong>
+<%if @assgt.wiki_type.name == "No"%>
+<%if @files.size == 0%>
 <%else%>
 Submitted Files<br />
+<%end%>
 <%end%>
 
 <%
@@ -35,8 +50,8 @@ Submitted Files<br />
 <%if @assgt.team_assignment  # The lookup of all team members should be put in a wiki helper
   	for team_member in @team_members
 		member_name = User.find(team_member.user_id).name 
-%>
-	<%= review_mediawiki_group @assgt.directory_path, _time, member_name  %>
+	%>
+		<%= review_mediawiki_group @assgt.directory_path, _time, member_name  %>
 	<%end%>
 <%else%>
 	<%= review_mediawiki @assgt.directory_path, _time, @author_name  %>
@@ -44,28 +59,38 @@ Submitted Files<br />
 <br>
 <% end %>
 <ul>
+
 <% for file in @files %>
-<li><%= link_to File.basename(file), :controller=>'review', :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
+<li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
 <% end %>
 </ul>
-<table>
-    <tr>
-        <th>Questions</th><th>Comments</th><th>Score</th>
-    </tr>
-    <% for @rs in @review_scores %>
-        <tr>
-            <td>
-                <%=Question.find(@rs.question_id).txt%>                
-            </td>
-            <td>
-                <%=@rs.comments%>
-            </td>
-            <td><%=@rs.score%></td>
-        </tr>
-    <% end %>
-</table>
+<%if @assgt.team_assignment %>
+	<% for team_member in @team_members %>
+	<label>
+	<% submitted = Participant.find(:first, :conditions =>["user_id = ? and assignment_id = ?",team_member.user_id,@assgt.id]).submitted_hyperlink
+	if submitted !=nil
+	%>
+	URL to file submission (if available):</label><%= submitted %>
+	<br/>
+	<% end%>
+	<% end %>
+<%else %>
+	<% if @link != nil %>
+		Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
+	<% end %>	
+<%end%>
 
-<br />
+
+<a href="#1" onClick="toggleVis('1');">
+        <p class="inline" id="1_show" >View review</p>
+        <p class="inline" id="1_hide" style="display: none;">Hide review</p>
+</a>
+<div id="1_myDiv" style="display: none;">
+<strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
+<%= render :partial => 'review/scores' %>
+Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
+<br/>
+</div>
 
 
 <%= start_form_tag :action => 'create_review_of_review' %>
@@ -94,7 +119,6 @@ end %>
 		<%= hidden_field_tag('review_id', @eligible_review.id) %>
 		<%= hidden_field_tag('instructor_review', @instructor_review) %>
   	<%= submit_tag "Create Review of Review", :name=>"save" %>   	
-
 <%= end_form_tag %>
 <br />
 

@@ -3,20 +3,40 @@ class ReviewMapping < ActiveRecord::Base
   belongs_to :author, :class_name => "User", :foreign_key => "author_id"
   belongs_to :reviewer, :class_name => "User", :foreign_key => "reviewer_id"
   has_many :reviews
-  has_many :review_of_review_mappings
+  has_many :review_of_review_mappings 
     
-  def self.assign_reviewers(assignment_id, num_reviews, num_review_of_reviews, mapping_strategy)
-    @assignments = Assignment.find_by_id(assignment_id)
-    @round = max_review_round_allowed(assignment_id) 
-    for round_num in 1..@round
-      if (!@assignments.team_assignment)
-        assign_individual_reviewer(assignment_id, num_reviews, round_num) 
-      else
-        assign_reviewers_for_team(assignment_id, num_reviews, round_num)
-      end
+  def delete
+    review = Review.find(:all, :conditions => ['review_mapping_id = ?',self.id])    
+    if review.length > 0
+      raise "At least one review has already been performed."
+    end  
+    mappings = ReviewOfReviewMapping.find(:all, :conditions => ['review_mapping_id = ?',self.id])
+    mappings.each { |mapping| mapping.delete  }
+    self.destroy
+  end
+    
+  def self.get_mappings(assignment_id,contributor_id)
+    assignment = Assignment.find(assignment_id)
+    if assignment.team_assignment
+      query = 'team_id = ? and assignment_id = ?'      
+    else
+      query = 'author_id = ? and assignment_id = ?'
     end
+    return ReviewMapping.find(:all, :conditions => [query,contributor_id,assignment_id])
   end
   
+  def self.assign_reviewers(assignment_id, num_reviews, num_review_of_reviews, mapping_strategy)  
+      assignment = Assignment.find_by_id(assignment_id)
+      round = max_review_round_allowed(assignment_id) 
+      for round_num in 1..round
+        if (!assignment.team_assignment)        
+          assign_individual_reviewer(assignment_id, num_reviews, round_num) 
+        else
+          assign_reviewers_for_team(assignment_id, num_reviews, round_num)
+        end
+      end   
+  end
+    
   def self.import_reviewers(file,assignment)
     File.open(file, "r") do |infile|
       while (rline = infile.gets)
@@ -34,6 +54,15 @@ class ReviewMapping < ActiveRecord::Base
     end
   end
   
+  def get_creator_id
+    assignment = Assignment.find(self.assignment_id)
+    if assignment.team_assignment
+      return team_id
+    else
+      return author_id
+    end
+  end
+  
   def self.import(row,session)
     if row.length < 2
        raise ArgumentError, "Not enough items" 
@@ -42,8 +71,9 @@ class ReviewMapping < ActiveRecord::Base
     assignment = Assignment.find(session[:assignment_id])
     index = 1
     while index < row.length
-      reviewer = User.find_by_name(row[index].to_s.strip)
+      reviewer = User.find_by_name(row[index].to_s.strip)      
       if(reviewer != nil)
+        ImportFileHelper::add_user_to_assignment(assignment.id, reviewer)
         mapping = ReviewMapping.new
         if assignment.team_assignment
            team = Team.find(:all, :conditions => ['name = ? and assignment_id = ?',row[0].to_s.strip, assignment.id])
@@ -250,14 +280,17 @@ class ReviewMapping < ActiveRecord::Base
   
   def self.assign_individual_reviewer (assignment_id,num_reviews, round_num)
     stride = 1
-    @authors = Participant.find(:all, :conditions => ['assignment_id = ? and submit_allowed=1', assignment_id])
-    @reviewers = Participant.find(:all, :conditions => ['assignment_id = ? and review_allowed=1', assignment_id])
-    for i in 0 .. @reviewers.size - 1
+    authors = Participant.find(:all, :conditions => ['assignment_id = ? and submit_allowed=1', assignment_id])
+    reviewers = Participant.find(:all, :conditions => ['assignment_id = ? and review_allowed=1', assignment_id])
+    if authors.size == 0 or reviewers.size == 0 
+      raise "No participants available for assignment"
+    end
+    for i in 0 .. reviewers.size - 1
       current_reviewer_candidate = i
       current_author_candidate = current_reviewer_candidate
-      for j in 0 .. (@reviewers.size * num_reviews / @authors.size) - 1  # This method potentially assigns authors different #s of reviews, if limit is non-integer
-        current_author_candidate = (current_author_candidate + stride) % @authors.size   
-        ReviewMapping.create(:author_id => @authors[current_author_candidate].user_id, :reviewer_id => @reviewers[i].user_id, :assignment_id => assignment_id, :round => round_num)
+      for j in 0 .. (reviewers.size * num_reviews / authors.size) - 1  # This method potentially assigns authors different #s of reviews, if limit is non-integer
+        current_author_candidate = (current_author_candidate + stride) % authors.size   
+        ReviewMapping.create(:author_id => authors[current_author_candidate].user_id, :reviewer_id => reviewers[i].user_id, :assignment_id => assignment_id, :round => round_num)
       end
     end
   end
@@ -265,8 +298,8 @@ class ReviewMapping < ActiveRecord::Base
   def self.max_review_round_allowed(assignment_id)
     due_date = DueDate.find(:all,:conditions => ["assignment_id = ?",assignment_id], :order => "round DESC", :limit =>1)
     round = 1
-    if (due_date[0] && !due_date[0].round.nil?)
-      round = due_date[0].round - 1
+    if (due_date[0] && !due_date[0].round.nil?)      
+      round = due_date[0].round - 1      
     end
     return round
   end

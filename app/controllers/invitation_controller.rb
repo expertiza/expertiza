@@ -41,6 +41,8 @@ class InvitationController < ApplicationController
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
     @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%' and id in (select user_id from participants where user_id not in (select user_id from teams_users where team_id in (select id from teams where assignment_id ="+session[:assignment_id]+")) and assignment_id ="+session[:assignment_id]+")") unless search.blank?
+    puts @user
+    
     #render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
  

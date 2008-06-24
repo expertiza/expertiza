@@ -1,33 +1,14 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/balloontip.css" />
 
 <script type="text/javascript" src="/javascripts/balloontip.js">
-
 /***********************************************
 * Rich HTML Balloon Tooltip- © Dynamic Drive DHTML code library (www.dynamicdrive.com)
 * This notice MUST stay intact for legal use
 * Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
 ***********************************************/
-
 </script>
 
- <script type="text/javascript">
-  <!--
-    function toggleView(elementId, linkText) {
-			Element.toggle(elementId);
-      var obj = document.getElementById(elementId)
-			var objLinks = document.getElementsByName(elementId+'Link')
-			for (var i = 0; i < objLinks.length; i++) {
-				if (Element.visible(obj)) {
-		  		objLinks[i].innerHTML = 'hide ' + linkText
-		  	}
-		  	else {
-		  		objLinks[i].innerHTML = 'show ' + linkText
-		  	}
-	  	}
-    }
-  // -->
-  </script>
-
+<%= render :partial => 'shared_scripts/toggleElement' %>
 
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
@@ -47,7 +28,7 @@
 
 
 <% if @files.size > 1 || (@files.size == 1 && @student.submitted_hyperlink != nil && @student.submitted_hyperlink.length > 0)%>
-	<span style="font-size: small;">&nbsp;&nbsp;<b><a id=submissionsLink name=submissionsLink href="#" onclick="toggleView('submissions','additional submissions'); Element.toggle('singleSubmission'); return false;">show additional submissions</a></b></span>
+	<span style="font-size: small;">&nbsp;&nbsp;<b><a id=submissionsLink name=submissionsLink href="#" onclick="toggleElement('submissions','additional submissions'); Element.toggle('singleSubmission'); return false;">show additional submissions</a></b></span>
 <% end %>
 </div>
 
@@ -61,7 +42,7 @@
 		<th>Size</th>
 		<th>Type</th>
 		<th>Date modified</th>
-		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=submissionsLink name=submissionsLink href="#" onclick="toggleView('submissions','additional submissions'); Element.toggle('singleSubmission'); return false;">hide additional submissions</a></span></th>
+		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=submissionsLink name=submissionsLink href="#" onclick="toggleElement('submissions','additional submissions'); Element.toggle('singleSubmission'); return false;">hide additional submissions</a></span></th>
 	</tr>
 	<% i = 0
 		for file in @files %>
@@ -103,8 +84,8 @@
 			<% sum_of_max += question.questionnaire.max_question_score
 		end %>
 		<th>Total score</th>
-		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=reviewsLink name=reviewsLink href="#" onclick="toggleView('reviews','reviews'); Element.toggle('reviewsHeader'); return false;">show reviews</a></span></th>
-		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=reviewCommentsLink name=reviewCommentsLink href="#" onclick="toggleView('reviewComments','all comments'); return false;">show all comments</a></span></th>
+		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=reviewsLink name=reviewsLink href="#" onclick="toggleElement('reviews','reviews'); Element.toggle('reviewsHeader'); return false;">show reviews</a></span></th>
+		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=reviewCommentsLink name=reviewCommentsLink href="#" onclick="toggleElement('reviewComments','all comments'); return false;">show all comments</a></span></th>
 	</tr>
 </table>
 </div>
@@ -123,8 +104,8 @@
 			<% sum_of_max += question.questionnaire.max_question_score
 		end %>
 		<th>Total score</th>
-		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=reviewsLink name=reviewsLink href="#" onclick="toggleView('reviews','reviews'); Element.toggle('reviewsHeader'); return false;">hide reviews</a></span></th>
-		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=reviewCommentsLink name=reviewCommentsLink href="#" onclick="toggleView('reviewComments','all comments'); return false;">show all comments</a></span></th>
+		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=reviewsLink name=reviewsLink href="#" onclick="toggleElement('reviews','reviews'); Element.toggle('reviewsHeader'); return false;">hide reviews</a></span></th>
+		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=reviewCommentsLink name=reviewCommentsLink href="#" onclick="toggleElement('reviewComments','all comments'); return false;">show all comments</a></span></th>
 	</tr>
 	<tr>
 
@@ -172,7 +153,7 @@
 			<% sum_of_max += question.questionnaire.max_question_score
 		end %>
 		<th>Total score</th>
-		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=authorFeedbackLink name=authorFeedbackLink href="#" onclick="toggleView('authorFeedback','feedback'); Element.toggle('authorFeedbackHeader'); return false;">show feedback</a></span></th>
+		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=authorFeedbackLink name=authorFeedbackLink href="#" onclick="toggleElement('authorFeedback','feedback'); Element.toggle('authorFeedbackHeader'); return false;">show feedback</a></span></th>
 	</tr>
 </table>
 </div>
@@ -192,7 +173,7 @@
 			<% sum_of_max += question.questionnaire.max_question_score
 		end %>
 		<th>Total score</th>
-		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=authorFeedbackLink name=authorFeedbackLink href="#" onclick="toggleView('authorFeedback','feedback'); Element.toggle('authorFeedbackHeader'); return false;">hide feedback</a></span></th>
+		<th><span style="font-size: small;">&nbsp;&nbsp;<a id=authorFeedbackLink name=authorFeedbackLink href="#" onclick="toggleElement('authorFeedback','feedback'); Element.toggle('authorFeedbackHeader'); return false;">hide feedback</a></span></th>
 	</tr>
 	<tr>
 

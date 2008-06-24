@@ -1,4 +1,6 @@
 class Assignment < ActiveRecord::Base
+  require 'ftools'
+  
   belongs_to :course 
   belongs_to :wiki_type
   belongs_to :questionnaire, :foreign_key => "review_questionnaire_id"
@@ -36,6 +38,33 @@ class Assignment < ActiveRecord::Base
   #   and rails _form helpers generates HTML that looks like table1_1_table2.
   # validates_presence_of :wiki_type_id
     
+  def delete_assignment
+      if self.team_assignment
+        teams = Team.find(:all,:conditions => ["assignment_id = ?",self.id])
+        teams.each {|team|
+          team.delete
+        }
+      end
+      
+      participants = Participant.find(:all, :conditions => ["assignment_id = ?",self.id])
+      participants.each {|participant| participant.destroy }
+      
+      due_dates = DueDate.find(:all, :conditions => ['assignment_id = ?',self.id])
+      due_dates.each{ |date| date.destroy }
+      
+      # The size of an empty directory is 2
+      # Delete the directory if it is empty
+      begin
+        if Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size == 2
+           Dir.delete(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)          
+        end  
+      rescue 
+        raise "Directory not empty.  Assignment has been deleted, but submitted files remain."
+      ensure
+        self.delete_review_mappings
+        self.destroy
+      end       
+  end
     
   def due_dates_exist?
     return false if due_dates == nil or due_dates.length == 0
@@ -73,22 +102,11 @@ class Assignment < ActiveRecord::Base
     end
   end
   
-  def delete_review_mapping
-    for review_mapping in review_mappings
-      for review in review_mapping.reviews
-        for review_score in review.review_scores
-          review_score.destroy
-        end
-        for review_feedback in review.review_feedbacks
-          review_feedback.destroy
-        end
-        review.destroy
-      end
-      for review_of_review_mapping in review_mapping.review_of_review_mappings
-        review_of_review_mapping.destroy
-      end
-      review_mapping.destroy
-    end
+  def delete_review_mappings
+    review_mappings = ReviewMapping.find(:all, :conditions => ['assignment_id =?',self.id])
+    review_mappings.each{
+      |mapping| mapping.delete
+    }
   end
 
   def delete_review_of_review_mapping
@@ -103,11 +121,6 @@ class Assignment < ActiveRecord::Base
         review_of_review_mapping.destroy
       end
       review_of_review_mapping.destroy
-    end
-  end
-  def delete_review_feedback
-    for review_feedback in review_feedbacks
-      review_feedback.destroy
     end
   end
   
@@ -141,9 +154,7 @@ class Assignment < ActiveRecord::Base
           )
        end
     end
-  end
-  
-
+  end 
 
   # Get all review mappings for this assignment & reviewer
   # required to give reviewer location of new submission content
@@ -165,4 +176,65 @@ class Assignment < ActiveRecord::Base
     end  
     return review_num
   end
+  
+  # Provides copy functionality for assignments. 
+  #   - params: parameter object passed from Copy Controller
+  #             should have new assignment name, directory path, and submission deadline
+  # All deadlines are computed by adding the time difference between the old submission and the new submission.
+  # Author: Adam Budlong
+  # Date: 6/3/2008
+  def copy(params)    
+    begin
+    newAssign = self.clone    
+    newAssign.name = params[:object][:name]
+    if Assignment.find_by_directory_path(params[:object][:directory_path])
+      raise ArgumentError,"The directory path must be unique."
+    end
+    newAssign.directory_path = params[:object][:directory_path]       
+    if newAssign.wiki_type_id == 1
+       File.makedirs(RAILS_ROOT + "/pg_data/" + newAssign.directory_path)
+    end
+    if newAssign.save   
+      oldsubmission = DueDate.find(:all, :conditions => ['assignment_id = ? and deadline_type_id = 1',self.id]).first            
+      datetime = params[:submit_deadline][:due_at].split
+      
+      date = datetime[0].split('-')
+      time = datetime[1].split(':')
+      
+      year = date[0]
+      month = date[1]
+      day = date[2]
+      hour = time[0]
+      min = time[1]
+      sec = time[2]
+           
+      newsubmission = Time.mktime(year,month,day,hour,min,sec,0)
+      timediff = newsubmission - oldsubmission.due_at
+      
+      alldates = DueDate.find(:all, :conditions => ['assignment_id = ?',self.id])
+      
+      alldates.each{
+         | olddate |
+         date = olddate.clone
+         date.due_at = olddate.due_at + timediff
+         date.assignment_id = newAssign.id
+         date.save         
+      }       
+    else      
+      return "Copy failed: Assignment could not be saved." 
+    end    
+    rescue
+       crashmsg = $!
+       return "Copy failed: "+crashmsg.to_s
+   end
+   return ""
+ end
+ 
+ def isWikiAssignment
+   if self.wiki_type_id > 1 
+     return true
+   else
+     return false
+   end
+ end
 end

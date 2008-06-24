@@ -1,0 +1,8 @@
+<% for page in @pages %>
+  <%if @pages.current_page == page %>
+     <%= page.to_i %>
+  <% else %>
+     <%= link_to page.to_i, :action => 'list', :letter => params[:letter], :page => page %>
+  <%end %>
+<% end %>
+<br/><br/>

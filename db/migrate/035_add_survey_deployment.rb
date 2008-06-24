@@ -5,6 +5,6 @@ class AddSurveyDeployment < ActiveRecord::Migration
   end
 
   def self.down
-    
+    remove_column "survey_responses","survey_deployment_id"
   end
 end

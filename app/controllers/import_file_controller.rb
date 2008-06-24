@@ -1,6 +1,7 @@
 class ImportFileController < ApplicationController
   
   def start
+    @expected_fields = params[:expected_fields]
     @model = params[:model]            
   end
   

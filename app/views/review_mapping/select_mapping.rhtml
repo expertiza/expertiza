@@ -1,9 +1,8 @@
-<h1>Assign Reviewers for <%= @assignment.name %></h1>
+<h1>Mapping Strategies for <%= @assignment.name %></h1>
+
 <%= start_form_tag ({:action => 'save_reviewer_mappings'}, {:method => 'post' }) %>
 <p>Number of reviews done by a student: <%= text_field 'assignment', 'num_reviews', "size" => 1 %>&nbsp;&nbsp;
 Number of reviews <em>of reviews</em> done by a student: <%= text_field 'assignment', 'num_review_of_reviews', "size" => 1 %></p>
-
-<!--feedback added-->
 
 <%due_date = DueDate.find(:all,:conditions => ["assignment_id = ?",@assignment.id], :order => "round DESC", :limit =>1)
 @round = 1
@@ -34,28 +33,10 @@ puts "rounddue date ",@round%>
 
 </div>
 
-<!--12/1/2007-->
-
-
 </p>
-<%= hidden_field_tag 'assignment_id', @assignment.id %>
+<%= hidden_field_tag 'id', @assignment.id %>
 <input type='submit' value= 'Save' />
 <%= end_form_tag %>
 <br/><br/>
 
-<% 
-  if @assignment.team_assignment
-  	type = 'Team'
-  else
-    type = 'Author'
-  end
-  
-  session[:return_to] = request.request_uri  
-  session[:expected_fields] = type+', Reviewer1, Reviewer2, ... , ReviewerN'
-  session[:assignment_id] = @assignment.id 
-%>
-<%= link_to 'Import Reviewer Mappings', :controller=>'import_file', :action=>'start', :model => 'ReviewMapping' %>
-<br/>
-<br/>
-<%= link_to 'Back', :action => 'list' %>
-
+<%= link_to 'Back', :action => 'assign_reviewers', :id => @assignment.id %>

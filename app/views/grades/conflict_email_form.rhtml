@@ -58,6 +58,6 @@
 	<%= form.hidden_field :assignment, :value => @assignment.id %>
 	<%= form.hidden_field :author, :value => @student.user.id %>
   <%= submit_tag "Send Email" %> | 
-	<%= link_to 'Back', :action=>'view_grading_report', :id => params[:assignment] %>
+	<%= link_to 'Back', :action=>'view', :id => params[:assignment] %>
 <% end %>
 

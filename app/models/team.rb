@@ -7,4 +7,8 @@ class Team < ActiveRecord::Base
     end    
     self.destroy
   end
+  
+  def get_author_name
+    return self.name
+  end
 end

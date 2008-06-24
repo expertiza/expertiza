@@ -41,10 +41,9 @@
 %>
 <% 
   session[:return_to] = request.request_uri  
-  session[:expected_fields] = 'Name, Full name (first[ middle] last), E-mail address, Password'
   session[:course_id] = @course.id 
 %>
-<%= link_to 'Import Participants', :controller=>'import_file', :action=>'start', :import_type => 'Course Participants' %>
+<%= link_to 'Import Participants', :controller=>'import_file', :action=>'start', :import_type => 'Course Participants', :expected_fields => 'Name, Full name (first[ middle] last), E-mail address, Password' %>
 
 <hr/>
 

@@ -1,6 +1,12 @@
 class ReviewOfReview < ActiveRecord::Base
     has_many :review_of_review_scores
 
+  def delete
+    rOfRScores = ReviewOfReviewScore.find(:all, :conditions => ['review_of_review_id =?',self.id])
+    rOfRScores.each {|review| rOfRScores.delete }
+    self.destroy
+  end
+
   # Generate emails for reviewers when a new review of their work
   # is made
   #ajbudlon, sept 07, 2007        

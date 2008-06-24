@@ -13,6 +13,20 @@ class User < ActiveRecord::Base
   def list_mine(object_type, user_id)
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end
+  
+  def getAvailableUsers(name)    
+    parents = Role.find(self.role_id).get_parents
+    
+    allUsers = User.find(:all, :conditions => ['name LIKE ?',"#{name}%"],:limit => 10)
+    users = Array.new
+    allUsers.each { | user | 
+      role = Role.find(user.role_id)
+      if parents.index(role) 
+        users << user
+      end
+    }    
+    return users 
+  end
 
   def role
     if self.role_id
@@ -49,5 +63,9 @@ class User < ActiveRecord::Base
         raise ArgumentError, "Not enough items" 
       end    
   end  
+  
+  def get_author_name
+    return self.fullname
+  end
     
 end

@@ -1,0 +1,61 @@
+<%= render :partial => 'shared_scripts/toggleElement' %>
+<% numItems = 0 %>
+<h1>Grade summary for <%=@assignment.name%></h1>
+
+<TABLE>
+<TR><TH colspan=2 align="left">Contributor</TH><TH align="left">Average Score</TH><TH align="left">Greatest Difference</TH></TR>
+<% 
+  for entry in @scores_by_author 
+  name = "item" + numItems.to_s
+  numItems += 1
+  participant = Participant.find(:first, :conditions => ["user_id = ? and assignment_id = ?", entry[:author].id, @assignment.id])  
+%>
+
+<TR>
+   <TD colspan=2><%= entry[:author].get_author_name %></TD>
+   <TD>&nbsp;&nbsp;<%= sprintf("%.2f",entry[:average_author_score].to_f / @sum_of_max.to_f * 100 ) %>%
+	   <div style="font-size:x-small;">
+		   &nbsp;&nbsp;<%= link_to "final grade report", 						
+						:action => 'report',
+						:id => participant%>
+	   </div>
+   </TD>   
+   <% 			
+      diffPct = entry[:diff].to_f / @sum_of_max.to_f * 100
+	  if diffPct >= 15 %>
+		 <TD style="color: red;"> 
+   <% else %>
+	  	 <TD>
+   <% end %>
+     &nbsp;&nbsp;<%= sprintf("%.2f",diffPct) %>% 
+	 <div style="font-size:x-small;">
+	 &nbsp;&nbsp;<%= link_to "email reviewers", :action => 'conflict_email_form', :id => participant %>
+	 </div>			
+   </TD>
+   <TD><a id=<%= name+"Link" %> name=<%= name+"Link" %> href="#" onclick="toggleElement('<%= name %>','reviews'); return false;">show reviews</a></TD>   
+   </TR>      
+   <TR id="<%= name %>" style="display: none;">
+     <TD>&nbsp;</TD>
+     <TD colspan=4>     
+       <TABLE>
+       <TR><TH>Reviewer</TH><TH>Score Awarded</TH></TR>
+       <% for grade in entry[:review_scores] %>
+       		<TR>
+       		   <TD><%= grade[:review].review_mapping.reviewer.fullname %></TD>
+       		   <TD>
+       		      &nbsp;&nbsp;<%= sprintf("%.2f",grade[:total_review_score].to_f*100/@sum_of_max) %>%
+       		      <div style="font-size:x-small;">
+       		      &nbsp;&nbsp;<%= link_to "view review",  :controller=>'review', :action => 'view_review', :id=> grade[:review].id%>
+       		      </div>
+       		   </TD>
+       		</TR>
+       <% end %>    
+       <TR><TD colspan=5><HR></TD></TR>   
+       </TABLE>          
+     </TD>
+   </TR>    
+<% end %>
+</table>
+
+<br/>
+<%= link_to 'Back', :action=>'list'%>

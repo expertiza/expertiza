@@ -48,7 +48,8 @@ class AssignmentController < ApplicationController
       review_duedate=DueDate.new(params[:review_deadline]);
       review_duedate.deadline_type_id=@Review_deadline;
       review_duedate.assignment_id=@assignment.id;
-      review_duedate.late_policy_id=1;
+      # ajbudlon 5/28/2008 commented out late policy
+      #review_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
       ## feedback added
       review_duedate.round = 1;
       puts "review round",review_duedate.round
@@ -105,7 +106,9 @@ class AssignmentController < ApplicationController
       reviewofreview_duedate.save;
       
       # Create submission directory for this assignment
-      File.makedirs(RAILS_ROOT + "/pg_data/" + params[:assignment][:directory_path])
+      if params[:assignment][:wiki_type_id] == 1
+        File.makedirs(RAILS_ROOT + "/pg_data/" + params[:assignment][:directory_path])
+      end
       flash[:notice] = 'Assignment was successfully created.'
       redirect_to :action => 'list'
       
@@ -115,43 +118,7 @@ class AssignmentController < ApplicationController
     end
     
   end
-  
-  def assign_reviewers
-    @assignment = Assignment.find(params[:id])
-    @review_strategies = ReviewStrategy.find(:all, :order => 'name')
-    @mapping_strategies = MappingStrategy.find(:all, :order => 'name')
-  end
-  
-  def save_reviewer_mappings
-    @assignment = Assignment.find(params[:assignment_id])
-    @assignment.review_strategy_id = 1
-    @assignment.mapping_strategy_id = 1
     
-    ## feedback added    
-    params[:selection].each {|key, value| puts "#{key} is #{value}" }
-    
-    mapping_strategy = {}
-    params[:selection].each{|a|
-      if a[0] =~ /^m_/
-        puts "hey"
-        mapping_strategy[a[0]] = a[1]
-      end
-    }
-    
-    mapping_strategy.each {|key, value| puts "#{key} maps #{value}" }
-    ##
-    if @assignment.update_attributes(params[:assignment])
-      ## feedback added
-      ReviewMapping.assign_reviewers(@assignment.id, @assignment.num_reviews, @assignment.num_review_of_reviews, mapping_strategy)
-      ##
-      flash[:notice] = 'Reviewers assigned successfully.'
-      redirect_to :action => 'list'
-    else
-      @wiki_types = WikiType.find_all
-      render :action => 'edit'
-    end    
-  end
-  
   def edit
     @assignment = Assignment.find(params[:id])
     @wiki_types = WikiType.find_all
@@ -179,51 +146,16 @@ class AssignmentController < ApplicationController
   end
   
   def delete
-    @assignment = get(Assignment, params[:id])
+    assignment = Assignment.find(params[:id])
     # If the assignment is already deleted, go back to the list of assignments
-    if @assignment == nil
-      redirect_to :action => 'list' 
-    else 
-      if @assignment.team_assignment
-        logger.info "Assignment destroy"
-        teams = Team.find(:all,:conditions => ["assignment_id = ?",@assignment.id])
-        teams.each {|team|
-          logger.info "#{team.name}"
-          team.delete
-        }
-      end
-      if @assignment.due_dates_exist? == false or params['delete'] or @assignment.review_feedback_exist? == false or @assignment.participants_exist? == false
-        # The size of an empty directory is 2
-        # Delete the directory if it is empty
-        begin
-          if Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size == 2
-            Dir.delete(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
-          else
-            flash[:notice] = "Directory not empty.  Assignment has been deleted, but submitted files remain."
-          end
-          @assignment.delete_due_dates
-          @assignment.delete_review_feedbacks
-          @assignment.delete_participants
-          @assignment.delete_review_mapping
-          @assignment.delete_review_of_review_mapping
-          @assignment.delete_review_feedback
-          @assignment.destroy
-          
-          redirect_to :action => 'list'
-        rescue
-          @assignment.delete_due_dates
-          @assignment.delete_review_feedbacks
-          @assignment.delete_participants
-          @assignment.delete_review_mapping
-          @assignment.delete_review_of_review_mapping
-          @assignment.delete_review_feedback
-          @assignment.destroy
-          
-          redirect_to :action => 'list'
-        end
+    if assignment 
+      begin
+        assignment.delete_assignment
+      rescue
+        flash[:error] = "The assignment could not be deleted. Cause: "+$!
       end
     end
-    
+    redirect_to :action => 'list'    
   end
   
   
@@ -243,19 +175,6 @@ class AssignmentController < ApplicationController
   
   def new_team
     @team = Team.new
-  end
-  
-  def view_report
-    @assignment = Assignment.find(params[:id])
-    @participants = Participant.find(:all,:conditions => ["assignment_id = ?", @assignment.id])
-    @sum_of_max = 0
-    @sum_of_max_ror = 0
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
-    end
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).questions
-      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).max_question_score
-    end
   end
   
   def ror_for_instructors
@@ -323,101 +242,14 @@ class AssignmentController < ApplicationController
     @surveys.sort!{|a,b| a.name <=> b.name}
 
   end
-  
-  #the view grading report provides the instructor with an overall view of all the grades for
-  #an assignment. It lists all participants of an assignment and all the reviews they recieved.
-  #It also gives a final score which is an average of all the reviews and greatest difference
-  #in the scores of all the reviews.
-  def view_grading_report
-    @sum_of_max = 0
-    @sum_of_max_ror = 0
-    @max_num_of_reviews = 0;
-    @assignment = Assignment.find(params[:id])
-    scores = ReviewScore.find_by_sql("select review_id, sum(score) as total_score from review_scores where questionnaire_type_id=1 group by review_id order by total_score")
-    @scores_by_author = scores.group_by {|score| score.review.review_mapping.author}.sort_by { |participant| participant[0].fullname}
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
-    end
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).questions
-      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).max_question_score
-    end
-    for author in @scores_by_author
-      temp = 0;
-      for grade in author[1]
-        if grade.review.review_mapping.assignment_id == @assignment.id
-          temp += 1;
-        end
-      end
-      if temp > @max_num_of_reviews
-        @max_num_of_reviews = temp
-      end
-    end
-  end
-    
-  # ther grading conflict email form provides the instructor a way of emailing
-  # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.
-  def grading_conflict_email_form
-    @instructor = session[:user];
-    @sum_of_max = 0
-    @student = Participant.find(params[:id])
-    @assignment = @student.assignment
-    @reviewers_email_hash = {}
-    @reviewers = Array.new
-    @subject = " Your review score for " + @assignment.name + " conflicts with another reviewers."
-    
-    @body = get_body_text
-      
-    @users_grades = Array.new
-    all_grades = ReviewScore.find_by_sql("select review_id, sum(score) as total_score from review_scores group by review_id order by total_score") 
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
-    end
-    for grade in all_grades
-      if grade.review.review_mapping.author_id.to_s == @student.user.id.to_s
-        @users_grades << grade
-        reviewer = grade.review.review_mapping.reviewer
-        @reviewers << grade.review.review_mapping.reviewer
-        @reviewers_email_hash[reviewer.fullname.to_s+" <"+reviewer.email.to_s+">"] = reviewer.email.to_s
-      end
-    end
-    @reviewers = @reviewers.sort {|a,b| a.fullname <=> b.fullname}
-  end
-  
-  def send_grading_conflict_email
-    email_form = params[:mailer]
-    assignment = Assignment.find(email_form[:assignment])
-    recipient = User.find(:first, :conditions => ["email = ?", email_form[:recipients]])
-    
-    body_text = email_form[:body_text]
-    body_text["##[recipient_name]"] = recipient.fullname
-    body_text["##[recipients_grade]"] = email_form[recipient.fullname+"_grade"]+"%"
-    body_text["##[assignment_name]"] = assignment.name
-    
-    Mailer.deliver_message(
-      { :recipients => email_form[:recipients],
-        :subject => email_form[:subject],
-        :from => email_form[:from],
-        :body => {  
-          :body_text => body_text,
-          :partial_name => "grading_conflict"
-        }
-      }
-    )   
-    
-    flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
-    redirect_to :action => 'grading_conflict_email_form', 
-                :assignment => email_form[:assignment], 
-                :author => email_form[:author]
-  end
-  
-private
-  def get_body_text
-    "Hi ##[recipient_name], 
-    
-You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that 
-varied greatly from another reviewer's score for the same submission.  
-The Expertiza system has brought this to my attention.
 
-"
-  end
+  def delete_selected
+    params[:item].each {
+      |item_id|      
+      assignment = Assignment.find(item_id).first
+      assignment.delete_assignment(logger,params)
+    }
+    
+    redirect_to :action => 'list', :id => params[:id]
+  end  
 end

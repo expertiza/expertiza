@@ -9,6 +9,14 @@ class UsersController < ApplicationController
     render :action => 'list'
   end
   
+  def self.participants_in(assignment_id)
+    users = Array.new
+    participants = Participants.find_by_assignment_id(assignment_id)    
+    participants.each{
+      |participant| 
+      users << User.find(participant.user_id)
+    }
+  end
 
   def auto_complete_for_user_name
     user = session[:user]
@@ -28,7 +36,7 @@ class UsersController < ApplicationController
     end 
     logger.info "#{letter}"
     @letters = Array.new
-    @user_pages, @users = paginate :users, :order => 'name', :per_page => 20,  :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter]
+    @pages, @users = paginate :users, :order => 'name', :per_page => 20,  :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter]
     all_users.each {
        | userObj |
        first = userObj.name[0,1].downcase
@@ -40,15 +48,17 @@ class UsersController < ApplicationController
   
   def show_selection
     @user = User.find_by_name(params[:user][:name])
-    getRole
-    logger.info "Role ID: #{@role.id}"
-    logger.info "Parent Role ID: #{@role.parent_id}"
-    logger.info "Session User Role: #{(session[:user]).role_id}"
-    if @role.parent_id == nil || @role.parent_id < (session[:user]).role_id || @user.id == (session[:user]).id
-      render :action => 'show'
+    if @user != nil
+       getRole
+       if @role.parent_id == nil || @role.parent_id < (session[:user]).role_id || @user.id == (session[:user]).id
+          render :action => 'show'
+      else
+          flash[:note] = 'The specified user is not available for editing.'      
+          redirect_to :action => 'list'
+      end
     else
-      flash[:note] = 'The specified user is not available for editing.'      
-      redirect_to :action => 'list'
+        flash[:note] = params[:user][:name]+' does not exist.'
+        redirect_to :action => 'list'
     end
   end
   

@@ -18,7 +18,7 @@ if (specs != nil && specs != "")
     <%= hidden_field_tag('mapping_id', @mapping.id) %>
     <%= hidden_field_tag('assgt_id', @assgt.id) %>
     <br/>
-    <%= submit_tag "Edit Review", :name=>"save" %>       
+    <%= submit_tag "Save", :name=>"save" %>       
 <%= end_form_tag %>
 <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
 

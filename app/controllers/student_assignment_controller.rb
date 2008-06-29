@@ -173,17 +173,12 @@ class StudentAssignmentController < ApplicationController
     else
       @final_penalty = @late_policy.max_penalty
     end
-        
     @review_of_review_mappings = Array.new
-    
-    @review_mappings_for_author = ReviewMapping.find(:all, :conditions => ["author_id = ?",(session[:user].id)])
-    for review_mapping_for_author in @review_mappings_for_author
+    for review_mapping_for_author in @review_mappings
       if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
-        puts ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
         @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
       end
     end
-    
   end
   
   def set_feedback

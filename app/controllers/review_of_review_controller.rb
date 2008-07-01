@@ -59,6 +59,42 @@ class ReviewOfReviewController < ApplicationController
     end
   end
   
+  def initialize_ror
+    @ror_map_id = ReviewOfReview.find(params[:id]).review_of_review_mapping_id
+    @review_id = ReviewOfReviewMapping.find(@ror_map_id).review_id
+    @review = Review.find(@review_id)
+    @eligible_review = @review
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(@eligible_review.id,params[:current_folder])
+    if @assgt.team_assignment 
+      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
+      @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
+      @author_name = User.find(@author_first_user_id).name;
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
+    else
+      @author_name = User.find(@mapping.author_id).name
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
+    end
+    
+    @max = @questionnaire.max_question_score
+    @min = @questionnaire.min_question_score 
+    @current_folder = DisplayOption.new
+    @current_folder.name = "/"
+    if params[:current_folder]
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
+    end
+    if params['fname']
+      view_submitted_file(@current_folder,@author)
+    end   
+    @review_of_review = ReviewOfReview.find(params[:id])
+    @ror_review_scores = ReviewOfReviewScore.find(:all,:conditions => ["review_of_review_id = ?", params[:id]])
+    @ror_mapping = ReviewofReviewMapping.find(@review_of_review.review_of_review_mapping_id)
+    @ror_assgt = Assignment.find(@ror_mapping.assignment_id)    
+    @ror_questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @ror_assgt.review_of_review_questionnaire_id]) 
+    @ror_questionnaire = Questionnaire.find(@ror_assgt.review_of_review_questionnaire_id)
+    @ror_max = @ror_questionnaire.max_question_score
+    @ror_min = @ror_questionnaire.min_question_score
+  end
+  
   #follows a link
   #needs to be moved to a separate helper function
   def view_submitted_file(current_folder,author)
@@ -91,59 +127,32 @@ class ReviewOfReviewController < ApplicationController
   end
   
   def view_review_of_review
-    
-    @ror_map_id = ReviewOfReview.find(params[:id]).review_of_review_mapping_id
-    @review_id = ReviewOfReviewMapping.find(@ror_map_id).review_id
-    
-    @review = Review.find(@review_id)
-    @mapping_id = @review_id
-    @review_scores = @review.review_scores
-    @mapping = ReviewMapping.find(@review.review_mapping_id)
-    @assgt = Assignment.find(@mapping.assignment_id)    
-    @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
-    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
-    
-    if @assgt.team_assignment 
-      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
-      @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
-      @author_name = User.find(@author_first_user_id).name;
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
-    else
-      @author_name = User.find(@mapping.author_id).name
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
-    end
-    
-    @max = @questionnaire.max_question_score
-    @min = @questionnaire.min_question_score 
-    
-    @current_folder = DisplayOption.new
-    @current_folder.name = "/"
-    if params[:current_folder]
-      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
-    end
-    
-    @files = Array.new
-    @files = get_submitted_file_list(@direc, @author, @files)
-    
-    if params['fname']
-      view_submitted_file(@current_folder,@author)
-    end   
-    
-    
-    @review_of_review = ReviewOfReview.find(params[:id])
-    @ror_mapping_id = params[:id]
-    @ror_review_scores = @review_of_review.review_of_review_scores
-    @ror_mapping = ReviewMapping.find(@review_of_review.review_of_review_mapping_id)
-    @ror_assgt = Assignment.find(@ror_mapping.assignment_id)    
-    @ror_author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @ror_mapping.author_id, @ror_assgt.id])
-    @ror_questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @ror_assgt.review_of_review_questionnaire_id]) 
-    @ror_questionnaire = Questionnaire.find(@ror_assgt.review_of_review_questionnaire_id)
-    @ror_max = @ror_questionnaire.max_question_score
-    @ror_min = @ror_questionnaire.min_question_score 
+     initialize_ror
   end
-  def list_review_of_review
-    
+  
+  def edit_review_of_review
+    initialize_ror
+  end
+  
+  def update_review_of_review
+    @review_of_review = ReviewOfReview.find(params[:review_of_review_id])
+    if params[:new_review_of_review_score]
+      # The new_question array contains all the new questions
+      # that should be saved to the database
+      for review_of_review_key in params[:new_review_of_review_score].keys
+        question_id = params[:new_question][review_of_review_key]
+        rs = ReviewOfReviewScore.find(:first,:conditions => ["review_of_review_id = ? AND question_id = ?", @review_of_review.id, question_id])
+        rs.comments = params[:new_review_of_review_score][review_of_review_key][:comments]
+        rs.score = params[:new_score][review_of_review_key]
+        rs.update
+      end      
+    end
+    if @review_of_review.update
+      flash[:notice] = 'Review of review was successfully saved.'
+      redirect_to :controller=>'review', :action => 'list_reviews', :id => params[:assgt_id]
+    else # If something goes wrong, stay at same page
+      render :action => 'edit_review_of_review', :id=> params[:review_of_review_id]
+    end
   end
   
   def create_review_of_review
@@ -153,10 +162,10 @@ class ReviewOfReviewController < ApplicationController
     if params[:new_review_score]
       # The new_question array contains all the new questions
       # that should be saved to the database
-      for review_key in params[:new_review_score].keys
-        rs = ReviewOfReviewScore.new(params[:new_review_score][review_key])
-        rs.question_id = params[:new_question][review_key]
-        rs.score = params[:new_score][review_key]
+      for review_of_review_key in params[:new_review_score].keys
+        rs = ReviewOfReviewScore.new(params[:new_review_score][review_of_review_key])
+        rs.question_id = params[:new_question][review_of_review_key]
+        rs.score = params[:new_score][review_of_review_key]
         @review_of_review.review_of_review_scores << rs
       end
     end

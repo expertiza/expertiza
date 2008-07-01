@@ -13,7 +13,7 @@ function toggleVis(id) {
 	} 
 </SCRIPT>
 
-<h1>New review of review</h1>
+<h1>Edit review of review</h1>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
 	<%= flash[:notice] %>
@@ -33,17 +33,13 @@ Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
 <br/>
 </div>
 
-
-<%= start_form_tag :action => 'create_review_of_review' %>
+<%= start_form_tag :action => 'update_review_of_review' %>
 	<%= render :partial => 'review_of_review' %>
     <%= hidden_field_tag('assgt_id', @assgt.id) %>
-    <%= hidden_field_tag('review_mapping_id', @eligible_review_mapping.id) %>
     <%= hidden_field_tag('user', @user) %>
-    <%= hidden_field_tag('review_id', @eligible_review.id) %>
+    <%= hidden_field_tag('review_of_review_id', @review_of_review.id) %>
     <%= hidden_field_tag('instructor_review', @instructor_review) %>
-  	<%= submit_tag "Create review of review", :name=>"save" %>   	
+  	<%= submit_tag "Update review of review", :name=>"save" %>   	
 <%= end_form_tag %>
 <br />
-
 <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
-

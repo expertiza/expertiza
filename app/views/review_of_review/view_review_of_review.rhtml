@@ -1,52 +1,37 @@
-<%if @assgt.wiki_type.name == "No"%>
-<%if @files.size == 0%>
-
-<%else%>
-Submitted Files<br />
-<%end%>
-<%end%>
-
-<%
- _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
- if @assgt.wiki_type.name == "DokuWiki" %>
-<br>
-<b>DokuWiki Review Links:</b>
-<br>
-<br>
-<%= review_dokuwiki @assgt.directory_path, _time, @author_name  %>
-<br>
-<% elsif @assgt.wiki_type.name == "MediaWiki" %>
-<br>
-<b>MediaWiki Review Links:</b>
-<br>
-<br>
-<!--The following checks a wiki type.  If we add a new wiki type, we need to modify this code, which is in
-    a very unexpected place.  This should be done by polymorphism, based on a Wiki class that is subclassed
-    for various kinds of wikis. 
-    
-    Make a generic review_wiki function, with a parameter specifying wiki type.  The review_wiki function
-    then makes callbacks to the various wiki classes, depending on what kind of a wiki it is working on.
-    This allows wiki-specific behavior to be kept in the wiki classes. -->
-<%if @assgt.team_assignment  # The lookup of all team members should be put in a wiki helper
-  	for team_member in @team_members
-		member_name = User.find(team_member.user_id).name 
-%>
-	<%= review_mediawiki_group @assgt.directory_path, _time, member_name  %>
-	<%end%>
-<%else%>
-	<%= review_mediawiki @assgt.directory_path, _time, @author_name  %>
-<%end%>
-<br>
-<% end %>
-<ul>
-<% for file in @files %>
-<li><%= link_to File.basename(file), :controller=>'review', :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
-<% end %>
-</ul>
-<h3>Review</h3>
-<%= render :partial => '/review/scores' %>
+<SCRIPT LANGUAGE="JavaScript">
+function toggleVis(id) { 
+		var elem = document.getElementById(id+"_myDiv");
+		if(elem.style.display == 'none'){
+			elem.style.display = '';
+			document.getElementById(id+"_show").style.display = 'none';
+			document.getElementById(id+"_hide").style.display = '';
+		} else {
+			elem.style.display = 'none';
+			document.getElementById(id+"_show").style.display = '';
+			document.getElementById(id+"_hide").style.display = 'none';
+		}
+	} 
+</SCRIPT>
+<h1>View review of review</h1>
+<%= render :partial => '/review/wiki' %>
+	
+<a href="#1" onClick="toggleVis('1');">
+	<p class="inline" id="1_show" style="display: none">View review</p>
+	<p class="inline" id="1_hide" >Hide review</p>
+</a>
+<div id="1_myDiv" style="display:none">
+<strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
+<%= render :partial => 'review/scores' %> 
 Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
+</div>
+
+<a href="#2" onClick="toggleVis('2');">
+	<p class="inline" id="2_show" style="display: none">View review of review</p>
+	<p class="inline" id="2_hide" >Hide review of review</p>
+</a>
+<div id="2_myDiv" style="display:none">
 <h3>Review of review</h3>
 <%= render :partial => 'scores' %>
 <br/>
+</div>
 <%= link_to 'Back', :controller => 'review', :action => 'list_reviews', :id => @assgt.id %>

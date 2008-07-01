@@ -145,7 +145,7 @@ class StudentAssignmentController < ApplicationController
     @assignment_id = Participant.find(params[:id]).assignment_id
     @assignment = Assignment.find(@assignment_id)
     if @assignment.team_assignment 
-      @team_id = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where assignment_id=?)", @author_id, @assignment_id]).team_id
+      @team_id = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where assignment_id=?) and assignment_id = ?", @author_id, @assignment_id, @assignment_id]).team_id
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
       @student = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @assignment_id])
       @user_name= session[:user].name
@@ -210,8 +210,8 @@ class StudentAssignmentController < ApplicationController
     @assignment_id = Participant.find(params[:id]).assignment_id
     @assignment = Assignment.find(@assignment_id)
      if @assignment.team_assignment 
-      @team_id = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where assignment_id=?)", @author_id, @assignment_id]).team_id
-      @team_members = TeamsUser.find(:all,:conditions => ["user_id=? and team_id in (select id from teams where assignment_id=?)", @author_id, @assignment_id])
+      @team_id = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where assignment_id=?) and assignment_id = ?", @author_id, @assignment_id, @assignment_id]).team_id
+      @team_members = TeamsUser.find(:all,:conditions => ["user_id=? and team_id in (select id from teams where assignment_id=?) and assignment_id= ?", @author_id, @assignment_id, @assignment_id])
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
       @student = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @assignment_id])
       @user_name= session[:user].name

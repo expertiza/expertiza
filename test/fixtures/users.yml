@@ -1,98 +1,129 @@
-suadmin_user:
+superadmin:
     id: 1
+    name: suadmin
+    password: <%= Digest::SHA1.hexdigest("suadmin") %>
+    role_id: <%= Role.find_by_name("Super-Administrator").id %>
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+
+admin:
+    id: 2
     name: admin
     password: <%= Digest::SHA1.hexdigest("admin") %>
-    role_id: 4
+    role_id: <%= Role.find_by_name("Administrator").id %>
     email_on_review: 1
     email_on_submission: 1
     email_on_review: 1
-
-admin1:
-    id: 2
-    name: mkpatel2
-    fullname: Patel, Mrunal Kamlesh
-    password: <%= Digest::SHA1.hexdigest("mkpatel2") %>
-    email: mkpatel2@ncsu.edu
-    role_id: 3
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
-    
-admin2:
-    id: 3
-    name: riwesley
-    fullname: Wesley, Ravinand Isaac
-    password: <%= Digest::SHA1.hexdigest("riwesley") %>
-    email: riwesley@ncsu.edu
-    role_id: 3
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
-    
-admin3:
-    id: 4
-    name: nebergma
-    fullname: Bergman, Neil Edward
-    password: <%= Digest::SHA1.hexdigest("nebergma") %>
-    email: nebergma@ncsu.edu
-    role_id: 3
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
-    
-instructor1:
-    id: 5
-    name: ed_gehringer
-    fullname: Gehringer, Ed
-    password: <%= Digest::SHA1.hexdigest("ed_gehringer") %>
-    email: ed_gehringer@yahoo.com
-    role_id: 2
-    parent_id: 2
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
-    
-instructor2:
-    id: 6
-    name: janedoe
-    fullname: Doe, Jane
-    password: <%= Digest::SHA1.hexdigest("janedoe") %>
-    email: jane5231@gmail.com
-    role_id: 2
-    parent_id: 2
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
-
-student1:
-    id: 7
-    name: eberg
-    fullname: Berger, Eric
-    password: <%= Digest::SHA1.hexdigest("eberg") %>
-    email: eric3494@gmail.com
-    role_id: 1
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
-
-student2:
-    id: 8
-    name: hcombs
-    fullname: Combs, Hannah
-    password: <%= Digest::SHA1.hexdigest("hcombs") %>
-    email: han123@yahoo.com
-    role_id: 1
-    email_on_review: 0
-    email_on_submission: 0
-    email_on_review: 0
  
-test1:
-    id: 9
-    name: test
-    fullname: test, test
-    password: <%= Digest::SHA1.hexdigest("test") %>
-    email: 
-    role_id: 1
+instructor:
+    id: 3
+    name: instr1
+    fullname: Instructor, Joe
+    password: <%= Digest::SHA1.hexdigest("instr1") %>
+    email: instr1@foo.edu
+    role_id: <%= Role.find_by_name("Instructor").id %>
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+
+student:
+    id: 4
+    name: student1
+    fullname: Student, Joe
+    password: <%= Digest::SHA1.hexdigest("student1") %>
+    email: student1@foo.edu
+    role_id: <%= Role.find_by_name("Student").id %>
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+
+noreview_note_student:
+    id: 5
+    name: student2
+    fullname: Student, Bill
+    password: <%= Digest::SHA1.hexdigest("student2") %>
+    email: student2@foo.edu
+    role_id: <%= Role.find_by_name("Student").id %>
     email_on_review: 0
+    email_on_submission: 1
+    email_on_review: 1
+
+nosubmission_note_student:
+    id: 6
+    name: student3
+    fullname: Student, Mary
+    password: <%= Digest::SHA1.hexdigest("student3") %>
+    email: student3@foo.edu
+    role_id: <%= Role.find_by_name("Student").id %>
+    email_on_review: 1
     email_on_submission: 0
-    email_on_review: 0   
+    email_on_review: 1
+
+norofreview_note_student:
+    id: 7
+    name: student4
+    fullname: Student, Peter
+    password: <%= Digest::SHA1.hexdigest("student4") %>
+    email: student4@foo.edu
+    role_id: <%= Role.find_by_name("Student").id %>
+    email_on_review: 1
+    email_on_submission: 0
+    email_on_review_of_review: 1
+
+norofreview_note_student:
+    id: 7
+    name: student4
+    fullname: Student, Peter
+    password: <%= Digest::SHA1.hexdigest("student4") %>
+    email: student4@foo.edu
+    role_id: <%= Role.find_by_name("Student").id %>
+    email_on_review: 1
+    email_on_submission: 0
+    email_on_review_of_review: 1
+
+noemailstudent:
+    id: 8
+    name: student5
+    fullname: Student, Susan
+    password: <%= Digest::SHA1.hexdigest("student5") %>
+    role_id: <%= Role.find_by_name("Student").id %>
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review: 1
+
+new_student:
+    id: 9
+    name: student6
+    fullname: Student, Edmund
+    password: <%= Digest::SHA1.hexdigest("student6") %>
+    email: student6@foo.edu
+    role_id: <%= Role.find_by_name("Student").id %>
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review_of_review: 1   
+    is_new_user: 1
+
+master_permission_denied_student:
+    id: 10
+    name: student7
+    fullname: Student, Lucy
+    password: <%= Digest::SHA1.hexdigest("student7") %>
+    email: student7@foo.edu
+    role_id: <%= Role.find_by_name("Student").id %>
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review_of_review: 1   
+    master_permission_granted: 0
+
+master_permission_granted_student:
+    id: 11
+    name: student8
+    fullname: Student, Wendy
+    password: <%= Digest::SHA1.hexdigest("student8") %>
+    email: student8@foo.edu
+    role_id: <%= Role.find_by_name("Student").id %>
+    email_on_review: 1
+    email_on_submission: 1
+    email_on_review_of_review: 1   
+    master_permission_granted: 1

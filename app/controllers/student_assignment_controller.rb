@@ -458,7 +458,7 @@ private
     # this is done by determining the last directory number 
     # created and incrementing it.
 
-    particpants = Participants.find(:all, :conditions => ['assignment_id = ?',@assignment.id], :order => 'directory_num DESC')
+    participants = Participant.find(:all, :conditions => ['assignment_id = ?',@assignment.id], :order => 'directory_num DESC')
 
     if participants != nil and participants[0].directory_num != nil
       if @assignment.team_assignment

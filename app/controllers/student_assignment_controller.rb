@@ -453,22 +453,39 @@ private
   end
 
   def set_student_directory_num
-    # Student has not submitted a file yet, so the directory_num
-    # needs to be set before saving the file
-    participants = Participant.find(:all,
-                                   :conditions => "assignment_id = #{@student.assignment_id}",
-                                   :order => "directory_num DESC")
-    if participants == nil or participants.size == 0
-      @student.directory_num = 0
-    elsif participants != nil
-      if participants[0].directory_num != nil
-        @student.directory_num = participants[0].directory_num + 1
+    # If a student or team member has not submitted anything
+    # a directory number needs to be assigned to the participants
+    # this is done by determining the last directory number 
+    # created and incrementing it.
+
+    particpants = Participants.find(:all, :conditions => ['assignment_id = ?',@assignment.id], :order => 'directory_num DESC')
+
+    if participants != nil and participants[0].directory_num != nil
+      if @assignment.team_assignment
+         assign_team_directories(participants[0].directory_num + 1)
       else
-        @student.directory_num = 0
+         @student.directory_num = participants[0].directory_num + 1
       end
-    end     
-    @student.save 
-    create_student_directory
+    else
+      if @assignnment.team_assignment
+         assign_team_directories(0)
+      else
+         @student.directory_num(0)
+      end
+    end
+  end
+
+  def assign_team_directories(dir_num)
+    # handles a team assignment so that each member
+    # of the team has the same submission directory
+   
+    Team.find_by_assignment_id(@assignment.id).each{
+      | team | 
+      TeamsUser.find_by_team_id(team.id).each{
+        |member| 
+        Participant.find(:first, :conditions => ['user_id = ? and assignment_id = ?', member.user_id, @assignment.id]).directory_num = dir_num
+     }
+    }    
   end
 
   def get_student_directory(participant)

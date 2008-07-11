@@ -1,6 +1,7 @@
 superadmin:
     id: 1
     name: suadmin
+    parent_id:
     password: <%= Digest::SHA1.hexdigest("suadmin") %>
     role_id: <%= Role.find_by_name("Super-Administrator").id %>
     email_on_review: 1
@@ -10,6 +11,7 @@ superadmin:
 admin:
     id: 2
     name: admin
+    parent_id: 1
     password: <%= Digest::SHA1.hexdigest("admin") %>
     role_id: <%= Role.find_by_name("Administrator").id %>
     email_on_review: 1
@@ -19,6 +21,7 @@ admin:
 instructor:
     id: 3
     name: instr1
+    parent_id: 1
     fullname: Instructor, Joe
     password: <%= Digest::SHA1.hexdigest("instr1") %>
     email: instr1@foo.edu
@@ -30,6 +33,7 @@ instructor:
 student:
     id: 4
     name: student1
+    parent_id: 1
     fullname: Student, Joe
     password: <%= Digest::SHA1.hexdigest("student1") %>
     email: student1@foo.edu
@@ -40,6 +44,7 @@ student:
 
 noreview_note_student:
     id: 5
+    parent_id: 3
     name: student2
     fullname: Student, Bill
     password: <%= Digest::SHA1.hexdigest("student2") %>
@@ -52,6 +57,7 @@ noreview_note_student:
 nosubmission_note_student:
     id: 6
     name: student3
+    parent_id: 3
     fullname: Student, Mary
     password: <%= Digest::SHA1.hexdigest("student3") %>
     email: student3@foo.edu
@@ -63,6 +69,7 @@ nosubmission_note_student:
 norofreview_note_student:
     id: 7
     name: student4
+    parent_id: 3
     fullname: Student, Peter
     password: <%= Digest::SHA1.hexdigest("student4") %>
     email: student4@foo.edu
@@ -74,6 +81,7 @@ norofreview_note_student:
 norofreview_note_student:
     id: 7
     name: student4
+    parent_id: 3
     fullname: Student, Peter
     password: <%= Digest::SHA1.hexdigest("student4") %>
     email: student4@foo.edu
@@ -85,6 +93,7 @@ norofreview_note_student:
 noemailstudent:
     id: 8
     name: student5
+    parent_id: 3
     fullname: Student, Susan
     password: <%= Digest::SHA1.hexdigest("student5") %>
     role_id: <%= Role.find_by_name("Student").id %>
@@ -95,6 +104,7 @@ noemailstudent:
 new_student:
     id: 9
     name: student6
+    parent_id: 3
     fullname: Student, Edmund
     password: <%= Digest::SHA1.hexdigest("student6") %>
     email: student6@foo.edu
@@ -107,6 +117,7 @@ new_student:
 master_permission_denied_student:
     id: 10
     name: student7
+    parent_id: 3
     fullname: Student, Lucy
     password: <%= Digest::SHA1.hexdigest("student7") %>
     email: student7@foo.edu
@@ -119,6 +130,7 @@ master_permission_denied_student:
 master_permission_granted_student:
     id: 11
     name: student8
+    parent_id: 3
     fullname: Student, Wendy
     password: <%= Digest::SHA1.hexdigest("student8") %>
     email: student8@foo.edu

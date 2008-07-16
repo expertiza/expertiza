@@ -51,15 +51,12 @@ Rails::Initializer.run do |config|
   # without authentication
   # Comment out the test line once 
   
-  config.action_mailer.delivery_method = :test
-  #config.action_mailer.delivery_method = :smtp
-  #config.action_mailer.server_settings = {
-  #  :address => "smtp.ncsu.edu",
-  #  :port => 25,
-  #  :authentication => :login,
-  #  :user_name => "ajbudlon",
-  #  :password => "#######"
-  #}
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.server_settings = {
+    :address => "smtp.ncsu.edu",
+    :port => 25,
+    :domain => "localhost"
+  }
 end
 
 # Add new inflection rules using the following format 

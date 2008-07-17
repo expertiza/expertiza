@@ -78,15 +78,20 @@ function NewCal(pCtrl,pFormat,pShowTime,pTimeMode)
 		Sp1=exDateTime.indexOf(DateSeparator,0)
 		Sp2=exDateTime.indexOf(DateSeparator,(parseInt(Sp1)+1));
 		
-		if ((Cal.Format.toUpperCase()=="DDMMYYYY") || (Cal.Format.toUpperCase()=="DDMMMYYYY"))
+		if ((Cal.Format.toUpperCase() == "DDMMYYYY") || (Cal.Format.toUpperCase()=="DDMMMYYYY"))
 		{
 			strMonth=exDateTime.substring(Sp1+1,Sp2);
 			strDate=exDateTime.substring(0,Sp1);
 		}
-		else if ((Cal.Format.toUpperCase()=="MMDDYYYY") || (Cal.Format.toUpperCase()=="MMMDDYYYY"))
+		else if ((Cal.Format.toUpperCase() == "MMDDYYYY") || (Cal.Format.toUpperCase()=="MMMDDYYYY"))
 		{
 			strMonth=exDateTime.substring(0,Sp1);
 			strDate=exDateTime.substring(Sp1+1,Sp2);
+		} 
+		else if (Cal.Format.toUpperCase() == "YYYYMMDD")
+		{   
+		    strMonth = exDateTime.substring(Sp1+1,Sp2);
+		    strDate = exDateTime.substring(Sp2+1);
 		}
 		if (isNaN(strMonth))
 			intMonth=Cal.GetMonthIndex(strMonth);

@@ -1,0 +1,72 @@
+<h1>Administration</h1>
+<br/>
+<%= start_form_tag({:action => 'list'}) %>
+<TABLE width="80%">
+<TR>
+<TD width="40%" align="left">
+<input type='checkbox' name='show' value='<%= session[:user].id %>' onclick='submit();' <% if @show %>checked<% end %>>Show my items only
+</TD>
+<TD width="35%" align="right">
+Sort by: 
+<select name='sortvar' style="width: 10em">
+  <option value='name' <% if @sortvar == 'name'%>selected<% end %>>name</option>
+  <option value='created_at' <% if @sortvar == 'created_at'%>selected<% end %>>date created</option>
+  <option value='directory_path' <% if @sortvar == 'directory_path'%>selected<% end %>>directory path</option>
+</select>
+<select name='sortorder' style="width: 10em">
+  <option value='asc' <% if @sortorder == 'asc'%>selected<% end %>>ascending</option>
+  <option value='desc' <% if @sortorder == 'desc'%>selected<% end %>>descending</option>
+</select>
+</TD>
+<TD width="5%" align="left"><%= submit_tag "Sort" %></TD>
+</TR>
+</TABLE>
+<% if @root %>
+	<%= hidden_field_tag('root', @root) %>	
+<% end %>	
+<%= end_form_tag %>
+
+<BR/> 
+<% if @root %>        
+     <%= link_to "Top", :controller => 'tree_display', :action => 'list', :sortorder => @sortorder, :sortvar => @sortvar, :show => @show %>
+     <%  
+     curr_node = Node.find(@root)
+     puts "** in list **" 
+     puts "** "+curr_node.to_s+" **"
+     puts @sort
+     nodes = curr_node.get_children(@sortvar,@sortorder,@show)              
+     while curr_node.parent_id %>
+       &nbsp;&rarr;&nbsp;
+       <%= link_to curr_node.get_name, :controller => 'tree_display', :action => 'list', :root => curr_node.parent_id %>
+     <%   
+       curr_node = Node.find(curr_node.parent_id)
+     end %>
+     &nbsp;&rarr;&nbsp;<%= curr_node.get_name %>
+<% else
+     nodes = FolderNode.get()
+   end
+%>
+
+<% if nodes.length > 0 %>
+<br/><br/>     
+<TABLE WIDTH="80%" CELLPADDING="5" ID="theTable" BORDER="1">
+  <TR ID="header"><TH COLSPAN="5" WIDTH="70%">Details</TH><TH WIDTH="10%">Actions</TH></TR>
+  <%   
+     index = 1 
+     for node in nodes
+       if index % 2 == 0 
+          rowtype = "odd"
+       else
+          rowtype = "even"
+       end 
+  %>
+  <!-- Start Listing -->
+  <%= render :partial=> 'listing', :locals => {:node => node, :prefix => node.node_object_id.to_s+"_"+index.to_s, :depth => 0, :rowtype => rowtype} %>   
+  <!-- End Listing -->
+  <% 
+     index+=1   
+     end 
+  %>
+</TABLE>
+<% end %>
+

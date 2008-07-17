@@ -120,6 +120,62 @@ a:hover {
   left: auto ;
 }
 
+#actionmenu * { 
+  margin: 0 ;
+  padding: 0 ;
+}
+
+#actionmenu, #actionmenu ul {
+  padding: 0 ;
+  margin: 0 ;
+  width: 80% ;
+  list-style: none ;
+  z-index: 999 ;
+}
+
+#actionmenu a {
+  color: white ;
+  display: block ;
+}
+
+#actionmenu a:hover {    
+  color: #f4ec7d ;
+  text-decoration: none ;
+}
+
+#actionmenu li {
+  float: left ;
+}
+
+#actionmenu li ul li a {  
+  text-align: left ;
+  line-height: 2em ;
+  width: 15em ;
+  border-bottom: .075em solid white ;
+  border-right: .075em solid white ;   
+}
+#actionmenu li.daddy {  
+  width: 9em;
+  background-image: url("/images/action_img.png") ;
+  background-position: center center;
+  background-repeat: no-repeat ;
+}
+
+#actionmenu li ul {  
+  background: #6d7a73 ;  
+  position: absolute ;
+  width: 15em ;
+  left: -999em ;
+  margin: -1.5em 0 0 9em ;
+}
+
+#actionmenu li:hover ul ul, #actionmenu li.acthover ul ul {
+  left: -999em ;
+}
+
+#actionmenu li:hover ul, #actionmenu li li:hover ul, #actionmenu li.acthover ul, #actionmenu li li.acthover ul {
+  left: auto ;
+}
 
 .container {
   width: 100%;
@@ -131,6 +187,7 @@ a:hover {
 .main {
   background: white ;
   //margin-right: 200px ;
+  width: 85%
 }
 
 .breadcrumbs {
@@ -142,7 +199,7 @@ a:hover {
 }
 
 .sidebar {
-  //width: 200px ;
+  width: 15% ;
   float: right ;
 }
 
@@ -307,4 +364,12 @@ textarea.clear_both{
 img.barchart {
 	padding: 1em;
 	background: #dddddd;
+}
+
+.odd {
+  background-color: white;
+}
+
+.even {
+  background-color: #FAFAEA;
 }

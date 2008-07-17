@@ -1,0 +1,11 @@
+<TD WIDTH="15%">      
+<ul id="actionmenu"><li class="daddy">&nbsp;
+<ul>
+  <li><%= link_to 'Edit course',:controller=>'course', :action=>'edit', :id => id %></li>
+  <li><%= link_to 'Copy course',:controller=>'course', :action=>'copy', :id => id %></li>
+  <li><%= link_to 'Delete course',:controller=>'course', :action=>'delete', :id => id %></li>
+  <li><%= link_to 'Create assignment',:controller=>'assignment', :action=>'new', :parent_id => id %></li>
+  <li><%= link_to 'Add participants',:controller=>'courses_users', :action=>'list', :id => id %></li>
+</ul>
+</li></ul>
+</TD> 

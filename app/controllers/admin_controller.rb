@@ -1,11 +1,5 @@
 class AdminController < ApplicationController
 
-#
-#  This code has been copied from pgnew.  It may or may not
-#  have any of the functionality we need.  Someone who under-
-#  stands it should have a look at it before it is used!
-#
-
   def search_users (role)
     username = request.raw_post || request.query_string
     # show only instructors created by logged in admin
@@ -72,21 +66,10 @@ class AdminController < ApplicationController
     #render :action => 'new_instructor'
   end
   
-  #def create_instructor # saves newly created instructor to database
-  # PgUsersController.create(Role::INSTRUCTOR,:admin_controller,:list_instructors,:new_instructor)
-  #end
-  
   def list_instructors
    user_id = session[:user].id
    @user_pages, @users = paginate :users, :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role::INSTRUCTOR], :per_page => 50
   end
-
- # def list_instructors
-  #  user_id = session[:user].id
-   # @users = User.find(:all,
-  #                           :conditions => ["parent_id = ? AND role_id = ?",
- #                            user_id, Role::INSTRUCTOR])
- # end
 
   def search_administrator
     @results = search_users(Role::ADMINISTRATOR)
@@ -100,17 +83,11 @@ class AdminController < ApplicationController
     PgUsersController.create(Role::ADMINISTRATOR,:admin_controller,:list_administrators,:add_administrator)
   end
 
-  def list_administrators
-    
-    user_id = session[:user].id
-     # @users = User.find(:all,
-     #                        :conditions => ["parent_id = ? AND role_id = ?",
-     #                        user_id, Role::ADMINISTRATOR])
+  def list_administrators    
+    user_id = session[:user].id    
     @user_pages, @users = paginate :users, :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role::ADMINISTRATOR], :per_page => 50
   end
-  
-  
-  
+   
   def list_users(conditions)
     @user_pages, @users = paginate :users, :order => 'name',:conditions => conditions, :per_page => 50
   end

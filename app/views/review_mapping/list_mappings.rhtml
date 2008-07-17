@@ -17,11 +17,22 @@
 <%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :delete_options => delete_options, :elements => @items, :delete_controller => 'review_mapping'} %>
 
 <% 
-  session[:return_to] = request.request_uri  
-  session[:assignment_id] = @assignment.id 
+  session[:return_to] = request.request_uri    
 %>
 <%= link_to 'Select Mapping Strategy', :action => 'select_mapping', :id => @assignment.id %>
-| <%= link_to 'Import Reviewer Mappings', :controller=>'import_file', :action=>'start', :model => 'ReviewMapping', :expected_fields => "Contributor, Reviewer1, Reviewer2, ... , ReviewerN" %>
-| <%= link_to 'Import Review of Reviewer Mappings', :controller=>'import_file', :action=>'start', :model => 'ReviewOfReviewMapping', :expected_fields => "Contributor, Reviewer, ReviewOfReviewer1, ReviewOfReviewer2, ... ReviewOfReviewerN" %> 
-| <%= link_to 'Back', :action => 'list' %>
+| <%= link_to 'Import Reviewer Mappings', 
+            :controller=>'import_file', 
+            :action=>'start', 
+            :model => 'ReviewMapping', 
+            :title => 'Reviewer Mappings',
+            :expected_fields =>  "Contributor, Reviewer1, Reviewer2, ... , ReviewerN",
+            :id => @assignment.id %> 
+| <%= link_to 'Import Review of Reviewer Mappings', 
+            :controller=>'import_file', 
+            :action=>'start', 
+            :model => 'ReviewOfReviewMapping', 
+            :title => 'Review of Reviewer Mappings',
+            :expected_fields => 'Contributor, Reviewer, ReviewOfReviewer1, ReviewOfReviewer2, ... ReviewOfReviewerN',
+            :id => @assignment.id %>
+| <%= link_to 'Back', :controller => 'tree_display', :action => 'list' %>
 

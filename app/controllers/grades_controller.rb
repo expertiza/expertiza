@@ -112,7 +112,7 @@ class GradesController < ApplicationController
   
   # ther grading conflict email form provides the instructor a way of emailing
   # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.  
-  def conflict_email_form
+  def conflict_notification
     @instructor = session[:user];
     @sum_of_max = 0
     @student = Participant.find(params[:id])
@@ -143,28 +143,8 @@ class GradesController < ApplicationController
   #might need to assign a grade for an assignment. Currently it provides all review scores left
   #for an assignment (as well as the comments) and the author feedback (with comments).
   #Support for review of reviews, submission versions and teams still needs to be added.
-  def report
-    @student = Participant.find(params[:id])
-    @link = @student.submitted_hyperlink
-    @submission = params[:submission]
-    @files = Array.new
-    @assignment = @student.assignment
-    @reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (
-          select id from review_mappings where author_id = " + @student.user_id.to_s + 
-          " and assignment_id = " + @assignment.id.to_s + ")")       
-    @review_feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where 
-            author_id = " + @student.user_id.to_s + 
-          " and assignment_id = " + @assignment.id.to_s)  
-    @current_folder = DisplayOption.new
-    @current_folder.name = "/"
-    @final_grade = 0
+  def edit
     
-    if @student.directory_num != nil and @student.directory_num >= 0
-      get_student_folders
-      get_student_files 
-    end
-    
-    @files.sort_by { |file| File.mtime(file) }
   end
   
   #this saves the the final grade for a participant of an assignment, as well as saving

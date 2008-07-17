@@ -51,21 +51,45 @@ class User < ActiveRecord::Base
     self.password == Digest::SHA1.hexdigest(self.password_salt.to_s +
                                                  clear_password)
   end
-  
-  def self.import(row,session)
-      if row.length == 4
-        user = User.find_by_name(row[0])        
-        if (user == nil)
-          attributes = ImportFileHelper::define_attributes(row)
-          user = ImportFileHelper::create_new_user(attributes,session)
-        end   
-      else
-        raise ArgumentError, "Not enough items" 
+ 
+  def self.import(row,session,id = nil)
+      if row.length != 4
+       raise ArgumentError, "Not enough items" 
       end    
+      user = User.find_by_name(row[0])        
+      if (user == nil)
+        attributes = ImportFileHelper::define_attributes(row)
+        user = ImportFileHelper::create_new_user(attributes,session)
+      end          
   end  
   
   def get_author_name
     return self.fullname
   end
     
+  def self.yesorno(elt)
+    if elt==true
+      "yes"
+    elsif elt ==false
+      "no"
+    else
+      ""
+    end
+  end    
+    
+  # locate User based on provided login.
+  # If user supplies e-mail or name, the
+  # helper will try to find that User account.
+  def self.find_by_login(login)
+      user = User.find_by_email(login)
+      if user == nil
+         items = login.split("@")
+         shortName = items[0]
+         userList = User.find(:all, {:conditions=> ["name =?",shortName]})
+         if userList != nil && userList.length == 1
+            user = userList.first            
+         end
+      end
+      return user     
+  end    
 end

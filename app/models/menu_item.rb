@@ -5,6 +5,12 @@ class MenuItem < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
 
+  def delete
+    children = MenuItem.find(:all, :conditions => ['parent_id = ?',self.id])
+    children.each {|child| child.delete }
+    self.destroy
+  end
+
   def above
     if self.parent_id
       conditions = 

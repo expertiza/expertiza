@@ -5,6 +5,11 @@ class Participant < ActiveRecord::Base
   
   validates_numericality_of :grade, :allow_nil => true
 
+  def delete
+    times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])
+    times.each {|time| time.destroy }
+  end
+
   def get_topic_string
     if topic == nil or topic.strip == ""
       return "<center>&#8212;</center>"
@@ -57,27 +62,26 @@ class Participant < ActiveRecord::Base
              }
             }
     )   
-  end
-    
-  
+  end    
 
-  def self.import(row,session)
-      logger.info "Row Length: #{row.length}"      
-      if row.length == 4
-        user = User.find_by_name(row[0])        
-        if (user == nil)
-          attributes = ImportFileHelper::define_attributes(row)
-          user = ImportFileHelper::create_new_user(attributes,session)
-        end      
-        if (session[:assignment_id] != nil)
-          ImportFileHelper::add_user_to_assignment(session[:assignment_id], user)
-        end
-        if (session[:course_id] != nil)
-          ImportFileHelper::add_user_to_course(session[:course_id], user)
-        end
-      else
-        raise ArgumentError, "Not enough items" 
-      end    
+  # provide import functionality for Assignment Participants
+  # if user does not exist, it will be created and added to this assignment
+  def self.import(row,session,id)
+    if row.length != 4
+       raise ArgumentError, "Not enough items" 
+    end
+    user = User.find_by_name(row[0])        
+    if (user == nil)
+      attributes = ImportFileHelper::define_attributes(row)
+      user = ImportFileHelper::create_new_user(attributes,session)
+    end              
+    assignment = Assignment.find(id)
+    if assignment == nil
+       raise ImportError, "The assignment with id \""+id.to_s+"\" was not found."
+    end
+    if (Participant.find(:all, {:conditions => ['user_id=? AND assignment_id=?', user.id, assignment.id]}).size == 0)
+       Participant.create(:user_id => user.id, :assignment_id => assignment.id)
+    end   
   end
   
   protected

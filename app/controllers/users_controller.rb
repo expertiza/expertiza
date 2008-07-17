@@ -75,16 +75,6 @@ class UsersController < ApplicationController
     end
   end
 
-def self.yesorno(elt)
-    if elt==true
-      "yes"
-    elsif elt ==false
-      "no"
-    else
-      ""
-  end
-end
-
   def new
     @user = User.new
     foreign

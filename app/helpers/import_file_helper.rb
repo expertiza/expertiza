@@ -22,20 +22,6 @@ module ImportFileHelper
    
     user 
   end
-  
-  def self.add_user_to_assignment(assignment_id, user)
-    assignment = Assignment.find assignment_id
-    if (Participant.find(:all,{:conditions => ['user_id=? AND assignment_id=?', user.id, assignment.id]}).size == 0)
-      return Participant.create(:assignment_id => assignment.id, :user_id => user.id)
-    end
-  end
-  
-  def self.add_user_to_course(course_id, user)
-    course = Course.find course_id
-    if (CoursesUsers.find(:all, {:conditions => ['user_id=? AND course_id=?', user.id, course.id]}).size == 0)
-      CoursesUsers.create :user_id => user.id, :course_id => course.id
-    end
-  end
 end
 
 

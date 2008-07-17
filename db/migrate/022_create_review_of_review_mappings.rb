@@ -3,11 +3,11 @@ class CreateReviewOfReviewMappings < ActiveRecord::Migration
   create_table "review_of_review_mappings", :force => true do |t|
     t.column "review_mapping_id", :integer
     t.column "review_reviewer_id", :integer
-    #t.column "review_id", :integer
-    #t.column "assignment_id", :integer, :limit => 10
+    t.column "review_id", :integer
+    t.column "assignment_id", :integer, :limit => 10
   end
 
-  #add_index "review_of_review_mappings", ["review_id"], :name => "fk_review_of_review_mapping_reviews"
+  add_index "review_of_review_mappings", ["review_id"], :name => "fk_review_of_review_mapping_reviews"
 
   #execute "alter table review_of_review_mappings
   #           add constraint fk_review_of_review_mapping_reviews

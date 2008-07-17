@@ -457,33 +457,38 @@ private
     # a directory number needs to be assigned to the participants
     # this is done by determining the last directory number 
     # created and incrementing it.
+    assignment = Assignment.find(@assignment_id)
+    participants = Participant.find(:all, :conditions => ['assignment_id = ?',assignment.id], :order => 'directory_num DESC')
 
-    participants = Participant.find(:all, :conditions => ['assignment_id = ?',@assignment.id], :order => 'directory_num DESC')
-
-    if participants != nil and participants[0].directory_num != nil
-      if @assignment.team_assignment
-         assign_team_directories(participants[0].directory_num + 1)
+    if assignment.team_assignment
+      if participants != nil and participants[0].directory_num != nil
+        assign_team_directories(assignment, participants[0].directory_num + 1)
       else
-         @student.directory_num = participants[0].directory_num + 1
-      end
+        assign_team_directories(assignment,0)
+      end     
     else
-      if @assignnment.team_assignment
-         assign_team_directories(0)
+      if participants != nil and participants[0].directory_num != nil
+        @student.directory_num = participants[0].directory_num + 1
       else
-         @student.directory_num(0)
+        @student.directory_num = 0
       end
-    end
+      Dir.mkdir(get_student_directory(@student))
+      @student.save   
+    end    
   end
 
-  def assign_team_directories(dir_num)
+  def assign_team_directories(assignment, dir_num)
     # handles a team assignment so that each member
     # of the team has the same submission directory
    
-    Team.find_by_assignment_id(@assignment.id).each{
+    Team.find_by_assignment_id(assignment.id).each{
       | team | 
       TeamsUser.find_by_team_id(team.id).each{
         |member| 
-        Participant.find(:first, :conditions => ['user_id = ? and assignment_id = ?', member.user_id, @assignment.id]).directory_num = dir_num
+        participant = Participant.find(:first, :conditions => ['user_id = ? and assignment_id = ?', member.user_id, assignment.id])
+        participant.directory_num = dir_num
+        participant.save        
+        Dir.mkdir(get_student_directory(participant))
      }
     }    
   end
@@ -491,11 +496,6 @@ private
   def get_student_directory(participant)
     # This assumed that the directory num has already been set
     return RAILS_ROOT + "/pg_data/" + participant.assignment.directory_path + "/" + participant.directory_num.to_s
-  end
-
-  def create_student_directory
-    print "\n\n" + get_student_directory(@student)
-    Dir.mkdir(get_student_directory(@student))
   end
 
   def get_student_files

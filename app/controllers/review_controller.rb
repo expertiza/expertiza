@@ -212,6 +212,19 @@ class ReviewController < ApplicationController
     end
   end
   
+  def get_submitted_file_list(direc, author, files)
+    if(author != nil && author.directory_num)
+       direct = RAILS_ROOT + "/pg_data/"+author.assignment.directory_path + "/" + author.directory_num.to_s
+       temp_files = Dir[direct + "/*"]
+       for file in temp_files
+          if not File.directory?(Dir.pwd + "/" + file) then
+              files << file              
+          end
+      end
+    end
+    return files
+  end
+  
   #follows a link
   #needs to be moved to a separate helper function
   def view_submitted_file(current_folder,author)
@@ -323,8 +336,8 @@ class ReviewController < ApplicationController
       @reviewer_id, @assignment_id])
 #    end
     ##
-    @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["review_reviewer_id = ? and assignment_id = ?", 
-    @reviewer_id, @assignment_id])
+    @review_of_review_mappings = ReviewOfReviewMapping.find(:all,:conditions => ["review_reviewer_id = ? and review_mapping_id = ?", 
+    @reviewer_id, @review_mapping.id])
     ##
   end
   
@@ -424,7 +437,6 @@ class ReviewController < ApplicationController
       @mapping.round = @cur_round
       @mapping.team_id = params[:team_id] if @assgt.team_assignment?
       @mapping.save
-      puts "Mapping saved"
       @instructor_author_mapping[0] = @mapping
     end
     

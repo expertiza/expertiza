@@ -19,7 +19,8 @@ class ImpersonateController < ApplicationController
         end
         session[:user] = user 
         ImpersonateHelper::display_user_view(session,logger)     
-        redirect_to :controller =>'student_assignment', :action => 'list'
+        redirect_to :action => AuthHelper::get_home_action(session[:user]), 
+                    :controller => AuthHelper::get_home_controller(session[:user])
      else 
         flash[:error] = "No user exists with the name '#{params[:user][:name]}'"
         redirect_to :back
@@ -32,8 +33,9 @@ class ImpersonateController < ApplicationController
         session[:user] = session[:super_user]
         session[:super_user] = nil
         ImpersonateHelper::display_user_view(session,logger)
-        redirect_to :controller =>'assignment', :action => 'list'
-      else
+        redirect_to :action => AuthHelper::get_home_action(session[:user]), 
+                    :controller => AuthHelper::get_home_controller(session[:user])
+     else
         redirect_to :back
       end 
   end

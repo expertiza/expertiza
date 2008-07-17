@@ -36,23 +36,6 @@ class ReviewMapping < ActiveRecord::Base
         end
       end   
   end
-    
-  def self.import_reviewers(file,assignment)
-    File.open(file, "r") do |infile|
-      while (rline = infile.gets)
-        line_split = rline.split(",")
-        author = User.find_by_name(line_split[0].strip)
-        if (Participant.find(:all,{:conditions => ['user_id=? AND assignment_id=?', author.id, assignment.id]}).size > 0)
-          for i in 1 .. line_split.size - 1              
-            reviewer = User.find_by_name(line_split[i].strip)
-            if (Participant.find(:all,{:conditions => ['user_id=? AND assignment_id=?', reviewer.id, assignment.id]}).size > 0)
-              ReviewMapping.create(:author_id => author.id, :reviewer_id => reviewer.id, :assignment_id => assignment.id)
-            end
-          end
-        end
-      end
-    end
-  end
   
   def get_creator_id
     assignment = Assignment.find(self.assignment_id)
@@ -63,29 +46,43 @@ class ReviewMapping < ActiveRecord::Base
     end
   end
   
-  def self.import(row,session)
+  def self.import(row,session,id)    
     if row.length < 2
        raise ArgumentError, "Not enough items" 
     end
     
-    assignment = Assignment.find(session[:assignment_id])
+    assignment = Assignment.find(id)
+    if assignment == nil
+      raise ImportError, "The assignment with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+    end
     index = 1
     while index < row.length
-      reviewer = User.find_by_name(row[index].to_s.strip)      
-      if(reviewer != nil)
-        ImportFileHelper::add_user_to_assignment(assignment.id, reviewer)
-        mapping = ReviewMapping.new
-        if assignment.team_assignment
-           team = Team.find(:all, :conditions => ['name = ? and assignment_id = ?',row[0].to_s.strip, assignment.id])
-           mapping.team_id = team.first.id
-        else
-          mapping.author_id = User.find_by_name(row[0].to_s.strip).id
-        end
-        mapping.reviewer_id = reviewer.id
-        mapping.assignment_id = assignment.id
+      reviewer = User.find_by_name(row[index].to_s.strip)  
+      if reviewer == nil
+        raise ImportError, "The reviewer \""+row[index].to_s+"\" was not found. <a href='/users/new'>Create</a> this user?"
+      end
+          
+      mapping = ReviewMapping.new
+      if assignment.team_assignment
+         author = Team.find(:first, :conditions => ['name = ? and assignment_id = ?',row[0].to_s.strip, assignment.id])
+         if author == nil
+           raise ImportError, "The author \""+row[0].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"                   
+         end
+         existing = ReviewMapping.find(:all, :conditions => ['assignment_id = ? and team_id = ? and reviewer_id = ?',assignment.id, author.id, reviewer.id])
+         mapping.team_id = author.id
+      else
+         author = User.find_by_name(row[0].to_s.strip)
+         if author == nil
+           raise ImportError, "The author \""+row[0].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"                   
+         end  
+         existing = ReviewMapping.find(:all, :conditions => ['assignment_id = ? and author_id = ? and reviewer_id = ?',assignment.id, author.id, reviewer.id])         
+         mapping.author_id = author.id
+      end
+      mapping.reviewer_id = reviewer.id
+      mapping.assignment_id = assignment.id
+      if existing.size == 0
         mapping.save
       end
-      
       index += 1
     end 
   end  

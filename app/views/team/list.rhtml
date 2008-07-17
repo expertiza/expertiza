@@ -15,10 +15,16 @@
    delete_options = {:enabled => true, :controller => 'team'}        
 %>
 <%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :delete_options => delete_options, :elements => @teams} %>
-
+<% 
+  session[:return_to] = request.request_uri    
+%>
 <BR/>
-<%= render :partial => 'import_teams' %>
-<BR/>
-<BR/>
-<%= link_to 'New Team', :action => 'new', :id=> @assignment.id %> |
-<%= link_to 'Back', :action => 'list_assignments' %>
+<%= link_to 'New Team', :action => 'new', :id=> @assignment.id %> 
+| <%= link_to 'Import Teams', 
+            :controller=>'import_file', 
+            :action=>'start', 
+            :model => 'Team', 
+            :title => 'Teams',
+            :expected_fields =>  "&lt;Team Name - optional, &gt; Team Member1, Team Member2, ... , Team Member3",
+            :id => @assignment.id %> 
+| <%= link_to 'Back', :controller => 'tree_display', :action => 'list' %>

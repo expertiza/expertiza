@@ -21,9 +21,9 @@ Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} 
     <td ><%= link_to user.role.name, :controller => 'roles',
             :action => 'show', :id => user.role.id %></td>
     <td  align="center"><%= (User.find_by_id(user.parent_id)).name %></td>
-    <td ><%= UsersController.yesorno(user.email_on_review) %></td>
-    <td ><%= UsersController.yesorno(user.email_on_submission) %></td>
-    <td ><%= UsersController.yesorno(user.email_on_review_of_review) %></td>
+    <td ><%= User.yesorno(user.email_on_review) %></td>
+    <td ><%= User.yesorno(user.email_on_submission) %></td>
+    <td ><%= User.yesorno(user.email_on_review_of_review) %></td>
   </tr>
 <% end -%>
 </table>

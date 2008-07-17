@@ -2,18 +2,8 @@ require 'dl'
 class TeamController < ApplicationController
    auto_complete_for :user, :name
    
-  def list    
-     unknown = params[:unknown]
-     if unknown != nil && unknown.length > 0        
-        str = 'The following logins were not added to a team: '
-        for login in unknown
-          str = str + login +' '
-        end       
-        flash[:note] = str
-     end
-     session[:assignment_id] = params[:id]
-     
-     @assignment = Assignment.find(session[:assignment_id])        
+  def list        
+     @assignment = Assignment.find(params[:id])        
      @teams = Team.find(:all, :conditions => ["assignment_id = ?",@assignment.id])     
   end
   

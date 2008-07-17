@@ -60,6 +60,12 @@ class ReviewMappingController < ApplicationController
          flash[:error] = "A delete action failed." + $!
        end
     }
+    if Assignment.find(params[:assignment_id]).team_assignment
+      contributor = Team.find(params[:id])
+    else
+      contributor = User.find(params[:id])
+    end
+    flash[:note] = "All review mappings for "+contributor.get_author_name+" have been deleted."
     redirect_to :action => 'list_mappings', :id => params[:assignment_id]
   end
   
@@ -76,6 +82,8 @@ class ReviewMappingController < ApplicationController
     rescue
       flash[:error] = "A delete action failed." + $! 
     end
+    
+    flash[:note] = "All review mappings for "+contributor.get_author_name+" have been deleted."    
     redirect_to :action => 'list_reviewers', :assignment_id => assignment.id, :id => contributor.id
   end
   
@@ -84,6 +92,7 @@ class ReviewMappingController < ApplicationController
     revmapid = mapping.review_mapping_id
     mapping.delete
     
+    flash[:note] = "The review of reviewer has been deleted."
     redirect_to :action => 'list_rofreviewers', :id => revmapid  
   end     
     

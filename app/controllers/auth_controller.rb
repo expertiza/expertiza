@@ -1,5 +1,5 @@
 class AuthController < ApplicationController
-
+  helper :auth
   before_filter :authorize, :except => :login
   
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -10,41 +10,17 @@ class AuthController < ApplicationController
     if request.get?
       AuthController.clear_session(session)
     else
-      entry = params[:login][:name]
-      user = User.find_by_email(params[:login][:name])
-      if user == nil
-         items = entry.split("@")
-         shortName = items[0]
-         userList = User.find(:all, {:conditions=> ["name =?",shortName]})
-         logger.info "#{userList}"
-         logger.info "#{userList.length}"
-         if userList != nil && userList.length == 1
-            user = userList.first            
-         end
-      end
+      user = User.find_by_login(params[:login][:name])
       
       if user and user.check_password(params[:login][:password])
         logger.info "User #{params[:login][:name]} successfully logged in"
         session[:user] = user
-        if user.role_id
-          role = Role.find(user.role_id)
-          if role
-            if not role.cache or not role.cache.has_key?(:credentials)
-              Role.rebuild_cache
-            end
-            session[:credentials] = role.cache[:credentials]
-            session[:menu] = role.cache[:menu]
-            logger.info "Logging in user as role #{session[:credentials].class}"
-          else
-            logger.error "Something went seriously wrong with the role"
-          end
-        end
+        AuthController.set_current_role(user.role_id,session)
         
-        respond_to do |wants|
+        respond_to do |wants|          
           wants.html do
             ## This line must be modified to read as shown at left when a new version of Goldberg is installed!
-            redirect_to :action => AuthHelper::get_home_action(session[:user]), 
-                        :controller => AuthHelper::get_home_controller(session[:user]) 
+            redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user]) 
           end
           wants.xml do
             render :nothing => true, :status => 200
@@ -135,6 +111,22 @@ class AuthController < ApplicationController
   def self.logout(session)
     session.delete
     self.clear_session(session)
+  end
+  
+  def self.set_current_role(role_id, session)
+    if role_id
+       role = Role.find(role_id)
+       if role
+          if not role.cache or not role.cache.has_key?(:credentials)
+             Role.rebuild_cache
+          end
+          session[:credentials] = role.cache[:credentials]
+          session[:menu] = role.cache[:menu]
+          logger.info "Logging in user as role #{session[:credentials].class}"
+       else
+          logger.error "Something went seriously wrong with the role"
+       end
+    end
   end
 
   def self.clear_session(session)

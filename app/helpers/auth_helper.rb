@@ -17,7 +17,7 @@ module AuthHelper
     rescue
       # If no get_home_controller method exists for the user then
       # default to the assignment controller
-      controller_name = "assignment"
+      controller_name = "tree_display"
     end
     return controller_name
   end

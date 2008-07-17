@@ -6,20 +6,64 @@ class AssignmentController < ApplicationController
   @no_dl="1" # a value of "no" for whether an action is permitted prior to a deadline
   @late_dl="2" # a value of "late" for whether an action is permitted prior to a deadline (it is permitted, but marked late)
   @ok_dl="3" # a value of "OK" for whether an action is permitted prior to a deadline
+  
+  
+  def copy    
+    orig_assign = Assignment.find(params[:id])
+    new_assign = orig_assign.clone
+    new_assign.instructor_id = session[:user].id
+    new_assign.name = 'Copy of '+new_assign.name 
+   
+    if new_assign.save
+    
+      duedates = DueDate.find(:all, :conditions => ['assignment_id = ?',orig_assign.id])
+      duedates.each{
+        |orig_due_date|
+        new_due_date = orig_due_date.clone
+        new_due_date.assignment_id = new_assign.id
+        new_due_date.save       
+      }
+           
+      parent = CourseNode.find_by_node_object_id(new_assign.course_id)      
+      node = AssignmentNode.create(:node_object_id => new_assign.id)
+      if parent != nil
+        node.parent_id = parent.id            
+      end
+      node.save            
+      flash[:note] = 'The assignment is currently associated with an existing location. This could cause errors for furture submissions.'
+      redirect_to :action => 'edit', :id => new_assign.id
+    else
+      flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
+      redirect_to :action => 'list', :controller => 'tree_display'
+    end
+
+  end
+  
+  
   def new
+    if params[:parent_id]
+      @course = Course.find(params[:parent_id])           
+    end    
     @assignment = Assignment.new
     @questionnaire = Questionnaire.find_all
     @wiki_types = WikiType.find_all
+    @private = params[:private] == true        
   end
-  def add_team_member
-    @count=4#params[:newitem]
+  
+  def toggle_access
+    assignment = Assignment.find(params[:id])
+    assignment.private = !assignment.private
+    assignment.save
+    
+    redirect_to :controller => 'tree_display', :action => 'list'
   end
+  
   def create
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
-    # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.
+    # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.    
     @assignment = Assignment.new(params[:assignment])
     @assignment.instructor_id = (session[:user]).id
-    @assignment.submitter_count = 0
+    @assignment.submitter_count = 0    
     ## feedback added
     puts "round = ",params[:assignment_helper][:no_of_reviews].to_i
     ##
@@ -30,10 +74,9 @@ class AssignmentController < ApplicationController
     @Review_deadline=2;
     @Resubmission_deadline=3;
     @Rereview_deadline=4;
-    @Review_of_review_deadline=5;
+    @Review_of_review_deadline=5;   
     
-    
-    if @assignment.save
+    if @assignment.save          
       submit_duedate=DueDate.new(params[:submit_deadline]);
       submit_duedate.deadline_type_id=@Submission_deadline;
       submit_duedate.assignment_id=@assignment.id;
@@ -106,11 +149,21 @@ class AssignmentController < ApplicationController
       reviewofreview_duedate.save;
       
       # Create submission directory for this assignment
-      if params[:assignment][:wiki_type_id] == 1
-        File.makedirs(RAILS_ROOT + "/pg_data/" + params[:assignment][:directory_path])
+      puts "** Getting ready to create directory **"
+      if @assignment.wiki_type_id == 1
+        puts "** Creating directory **"
+        File.makedirs(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
       end
+      puts "** Created directory **"
+      parent = CourseNode.find_by_node_object_id(@assignment.course_id)      
+      node = AssignmentNode.create(:node_object_id => @assignment.id)
+      if parent != nil
+        node.parent_id = parent.id       
+      end
+      node.save
+       
       flash[:notice] = 'Assignment was successfully created.'
-      redirect_to :action => 'list'
+      redirect_to :action => 'list', :controller => 'tree_display'
       
     else
       @wiki_types = WikiType.find_all
@@ -151,11 +204,13 @@ class AssignmentController < ApplicationController
     if assignment 
       begin
         assignment.delete_assignment
+        AssignmentNode.find_by_node_object_id(params[:id]).destroy
       rescue
         flash[:error] = "The assignment could not be deleted. Cause: "+$!
       end
     end
-    redirect_to :action => 'list'    
+    
+    redirect_to :controller => 'tree_display', :action => 'list'
   end
   
   
@@ -164,19 +219,7 @@ class AssignmentController < ApplicationController
     @assignments=super(Assignment)
     #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
-  
-  def list_team
-    @team_pages, @teams = paginate :teams, :per_page => 10
-  end
-  
-  def show_team
-    @team = Team.find(params[:id])
-  end
-  
-  def new_team
-    @team = Team.new
-  end
-  
+    
   def ror_for_instructors
     @reviewer_id = session[:user].id
     @assignment_id = params[:id]

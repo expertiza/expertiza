@@ -119,9 +119,6 @@ class AdminController < ApplicationController
   end
 
   def list_super_administrators
-    user_id = session[:user].id
-    @users = User.find(:all,
-                             :conditions => ["role_id = ?",
-                             Role::SUPERADMINISTRATOR])
+    @users = User.find(:all, :conditions => ["role_id = ?", Role::SUPERADMINISTRATOR])
   end
 end

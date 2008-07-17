@@ -23,47 +23,55 @@ class Assignment < ActiveRecord::Base
   
   validates_presence_of :name
   validates_presence_of :directory_path
-  #validates_presence_of :submitter_count
-  #validates_presence_of :instructor_id
-  #validates_presence_of :mapping_strategy_id
   validates_presence_of :review_questionnaire_id
   validates_presence_of :review_of_review_questionnaire_id
   validates_numericality_of :review_weight
-  # The following fields don't need to be set; an unchecked checkbox is interpreted as "false".
-  # validates_presence_of :reviews_visible_to_all
-  # validates_presence_of :team_assignment
-  # validates_presence_of :require_signup
-  # If user doesn't specify an id for wiki type, id is 1 by default, which means "not a wiki assgt."
-  #   The reason the default is 1, not 0, is because we use a dropdown box to select a wiki type,
-  #   and rails _form helpers generates HTML that looks like table1_1_table2.
-  # validates_presence_of :wiki_type_id
     
   def delete_assignment
+    begin
       if self.team_assignment
         teams = Team.find(:all,:conditions => ["assignment_id = ?",self.id])
         teams.each {|team|
           team.delete
         }
-      end
-      
+      end  
+    rescue
+      raise $!
+    end
       participants = Participant.find(:all, :conditions => ["assignment_id = ?",self.id])
-      participants.each {|participant| participant.destroy }
-      
+    begin
+      participants.each {|participant| participant.delete }
+    rescue
+      raise $!
+    end
       due_dates = DueDate.find(:all, :conditions => ['assignment_id = ?',self.id])
-      due_dates.each{ |date| date.destroy }
       
-      # The size of an empty directory is 2
-      # Delete the directory if it is empty
-      begin
-        if Dir.entries(RAILS_ROOT + "/pg_data/" + @assignment.directory_path).size == 2
-           Dir.delete(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)          
-        end  
-      rescue 
-        raise "Directory not empty.  Assignment has been deleted, but submitted files remain."
-      ensure
-        self.delete_review_mappings
-        self.destroy
-      end       
+    begin
+      due_dates.each{ |date| date.destroy }
+    rescue
+      raise $!
+    end
+      
+    # The size of an empty directory is 2
+    # Delete the directory if it is empty
+    begin 
+      directory = Dir.entries(RAILS_ROOT + "/pg_data/" + self.directory_path)
+    rescue
+      # directory does not exist
+    end
+    
+    if !(self.wiki_type_id == 2 or self.wiki_type_id == 3) and directory != nil and directory.size == 2 
+        Dir.delete(RAILS_ROOT + "/pg_data/" + self.directory_path)          
+    elsif !(self.wiki_type_id == 2 or self.wiki_type_id == 3) and directory != nil and directory.size != 2
+        raise "Assignment directory is not empty."
+    end
+    begin
+      self.delete_review_mappings
+    rescue
+      raise $!
+    end
+    
+    self.destroy
   end
     
   def due_dates_exist?
@@ -176,59 +184,6 @@ class Assignment < ActiveRecord::Base
     end  
     return review_num
   end
-  
-  # Provides copy functionality for assignments. 
-  #   - params: parameter object passed from Copy Controller
-  #             should have new assignment name, directory path, and submission deadline
-  # All deadlines are computed by adding the time difference between the old submission and the new submission.
-  # Author: Adam Budlong
-  # Date: 6/3/2008
-  def copy(params)    
-    begin
-    newAssign = self.clone    
-    newAssign.name = params[:object][:name]
-    if Assignment.find_by_directory_path(params[:object][:directory_path])
-      raise ArgumentError,"The directory path must be unique."
-    end
-    newAssign.directory_path = params[:object][:directory_path]       
-    if newAssign.wiki_type_id == 1
-       File.makedirs(RAILS_ROOT + "/pg_data/" + newAssign.directory_path)
-    end
-    if newAssign.save   
-      oldsubmission = DueDate.find(:all, :conditions => ['assignment_id = ? and deadline_type_id = 1',self.id]).first            
-      datetime = params[:submit_deadline][:due_at].split
-      
-      date = datetime[0].split('-')
-      time = datetime[1].split(':')
-      
-      year = date[0]
-      month = date[1]
-      day = date[2]
-      hour = time[0]
-      min = time[1]
-      sec = time[2]
-           
-      newsubmission = Time.mktime(year,month,day,hour,min,sec,0)
-      timediff = newsubmission - oldsubmission.due_at
-      
-      alldates = DueDate.find(:all, :conditions => ['assignment_id = ?',self.id])
-      
-      alldates.each{
-         | olddate |
-         date = olddate.clone
-         date.due_at = olddate.due_at + timediff
-         date.assignment_id = newAssign.id
-         date.save         
-      }       
-    else      
-      return "Copy failed: Assignment could not be saved." 
-    end    
-    rescue
-       crashmsg = $!
-       return "Copy failed: "+crashmsg.to_s
-   end
-   return ""
- end
  
  def isWikiAssignment
    if self.wiki_type_id > 1 

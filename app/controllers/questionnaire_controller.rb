@@ -27,7 +27,10 @@ class QuestionnaireController < ApplicationController
   
   def delete_questionnaire
     @questionnaire = get(Questionnaire, params[:id])
-    
+    node = QuestionnaireNode.find_by_node_object_id(@questionnaire.id)             
+    if node
+      node.destroy
+    end
     if @questionnaire == nil
       redirect_to :action => 'list' 
     else 
@@ -142,8 +145,10 @@ class QuestionnaireController < ApplicationController
     save_questions @questionnaire.id if @questionnaire.id != nil and @questionnaire.id > 0
     
     if @questionnaire.save
+      parent = QuestionnaireTypeNode.find_by_node_object_id(@questionnaire.type_id)
+      QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id, :table => 'questionnaires')             
       flash[:notice] = 'questionnaire was successfully saved.'
-      redirect_to :action => 'list'
+      redirect_to :controller => 'tree_display', :action => 'list'
     else # If something goes wrong, stay at same page
       render :action => failure_action
     end

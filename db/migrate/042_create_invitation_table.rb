@@ -8,6 +8,8 @@ class CreateInvitationTable < ActiveRecord::Migration
       t.column :reply_status, :char
     end
     
+    add_column :assignments, :max_team_count, :boolean
+    
     add_index "invitations", ["from_id"], :name => "fk_invitationfrom_users"
 
     execute "alter table invitations 

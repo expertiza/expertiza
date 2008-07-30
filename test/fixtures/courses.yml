@@ -1,7 +1,16 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 first:
   id: 1
-  title: Object-Oriented Programming
-another:
+  name: My Course
+  instructor_id: 1
+  directory_path: abc123
+  info: This is info
+  private: 1
+  
+public:
   id: 2
-  title: E-Commerce
+  name: My Public Course
+  instructor_id: 1
+  directory_path: abc123
+  info: This is info
+  private: 0 

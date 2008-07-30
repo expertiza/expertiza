@@ -1,12 +1,9 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-assignment1:
+first:
   id: 1
-  name: TestAssign1
-  directory_path: admin/test1
-  review_rubric_id: 1
-  
-assignment2:
-    id: 2
-    name: TestAssign2
-    directory_path: admin/test2
-    review_rubric_id: 2
+  name: Assignment 1
+  directory_path: abc\123
+  instructor_id: 1
+  private: 0
+  team_assignment: 0
+  wiki_type_id: 1

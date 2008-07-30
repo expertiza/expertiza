@@ -1,8 +1,19 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class UserTest < Test::Unit::TestCase
-  fixtures :users
   
+  # Test user retrieval by email
+  def test_get_by_login_email
+    user = User.get_by_login('ajbudlon@ncsu.edu')    
+    assert_equal 'ajbudlon', user.name
+  end
+  
+  # Test user retrieval by name
+  def test_get_by_login_name
+    user = User.get_by_login('ajbudlon@ncsu.edu')    
+    assert_equal 'ajbudlon', user.name
+  end
+
   # 101 add a new user 
   def test_add_user
     user = User.new(:name => "testStudent1",
@@ -40,6 +51,5 @@ class UserTest < Test::Unit::TestCase
     user = users(:test1)
     user.name = users(:admin1).name;
     assert !user.valid?
-  end
-  
+  end  
 end

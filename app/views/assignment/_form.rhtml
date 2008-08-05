@@ -29,7 +29,7 @@
 <tr>
   <td><label for="team_assignment">Team assignment:</label></td>
   <td>
-  		<select name="assignment[team_assignment]">
+  		<select id="teamselect" name="assignment[team_assignment]" onchange='OnChange()'>
   		<% if @assignment.team_assignment == true %>
                 <option value=false>No</option>
                 <option value=true SELECTED>Yes</option>
@@ -37,15 +37,24 @@
         		<option value=false>No</option>
                 <option value=true>Yes</option>
         <% end %>
-       </select></td>
-       <% if @assignment.team_assignment == true %>
-   	   		<td><label for="max_team_count">Max team count:</label></td>       
-   			<td><select name="assignment[max_team_count]">
-                <option value=false>No</option>
-                <option value=true SELECTED>Yes</option>
-                </select></td>
-        <% end %>
-       
+       </select>
+  </td>
+  
+  <td>
+  <% if @assignment.team_assignment == true %>
+  	<div id="team_count" style="display: inline">
+  <% else %>
+  	<div id="team_count" style="display: none">
+  <% end %>
+  <label for="max_team_count">Max team count:</label>      
+  <select name="assignment[team_count]">
+    <option value=2 SELECTED>2</option>
+    <option value=3>3</option>
+    <option value=4>4</option>
+  </select>
+  </div> 
+  </td>
+        
 </tr>
 <tr>
   <td><label for="wiki_type">Wiki Type:</label></td>
@@ -83,6 +92,7 @@
       <%= text_field 'assignment', 'review_weight', :size=>5%>
   </td>
   <!-- Provided drop down menu for selecting the feedback rubric -->
+
   <td style ="padding: 15px"><label for="feedback rubric">Author-feedback rubric</label>
    	  <!--select name="author_feedback_questionnaire_id"></select-->
       <%=@questionnaires = Questionnaire.find(:all, :conditions => ["type_id = 5"]).map {|u| [u.name, u.id] }
@@ -94,11 +104,27 @@
          select('assignment', 'review_of_review_questionnaire_id', @questionnaires)%>
   </td>
  
- <td><label for="late_policy">Late Policy: </label>
- <%=@late_policies = LatePolicy.find(:all).map {|u| [u.id] }
-         select('for_due_date', 'late_policy_id', @late_policies,:selected =>1)%>
- </tr>
-</table>
+  <td><label for="late_policy">Late Policy: </label>
+      <%=@late_policies = LatePolicy.find(:all).map {|u| [u.id] }
+	         select('for_due_date', 'late_policy_id', @late_policies,:selected =>1)%>
+  </td>
+  </table>
+  
+  <table>
+  <tr>
+  <% if @assignment.team_assignment == true %>
+ 	<div id="peer_review" style="display: inline">
+  <% else %>
+ 	<div id="peer_review" style="display: none">
+  <% end %>
+  <label for="peer_review_questionnaire">Peer-review questionnaire:</label>
+      <!--select name="peer_review_questionnaire_id"></select-->
+      <%=@questionnaires = Questionnaire.find(:all, :conditions => ["type_id = 6"]).map {|u| [u.name, u.id] }
+         select('assignment', 'peer_review_questionnaire_id', @questionnaires)%>
+  </div>
+  </tr>
+  </table>
+
 <p>
 <table>
  <tr>
@@ -113,3 +139,20 @@
 <p>
 </p>
 <!--[eoform:assignment]-->
+
+<script type="text/javascript">
+function OnChange(){
+	document.poppedLayer1 = eval('document.getElementById("team_count")');
+	document.poppedLayer2 = eval('document.getElementById("peer_review")');
+	var dropdownIndex = document.getElementById('teamselect').selectedIndex;
+	var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
+	if(dropdownValue == "true"){
+		document.poppedLayer1.style.display = "inline";
+		document.poppedLayer2.style.display = "inline";
+	}else{
+		document.poppedLayer1.style.display = "none";
+		document.poppedLayer2.style.display = "none";
+	}
+}
+</script>
+

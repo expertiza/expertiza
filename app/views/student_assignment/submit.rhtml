@@ -111,6 +111,9 @@ if(@user.master_permission_granted == nil && !@student.permission_granted)%>
 <li><%= link_to "View feedback on submissions",{:action => 'view_feedback', :id => @student.id} %></li>
 </ul>
 
+<ul>
+<li><%= link_to "Evaluate your team members",{:action => 'peer_review', :id => @student.id} %></li>
+</ul>
 
 <% if @student.assignment.wiki_type_id == 1%>
 Submit your work for the assignment titled: <%= @student.assignment.name %>

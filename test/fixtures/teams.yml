@@ -1,5 +1,13 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-first:
+team1:
   id: 1
-another:
+  name: team1
+  assignment_id: 1
+team2:
   id: 2
+  name: team2
+  assignment_id: 1
+team3:
+  id: 3
+  name: team3
+  assignment_id: 1

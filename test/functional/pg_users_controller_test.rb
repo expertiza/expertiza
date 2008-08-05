@@ -5,14 +5,15 @@ require 'pg_users_controller'
 class PgUsersController; def rescue_action(e) raise e end; end
 
 class PgUsersControllerTest < Test::Unit::TestCase
+  fixtures :users
+  
   def setup
     @controller = PgUsersController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
+    @request.session[:user] = User.find(users(:superadmin).id)
+    AuthController.set_current_role(User.find(users(:superadmin).id).role_id,@request.session)
   end
 
-  # Replace this with your real tests.
-  def test_truth
-    assert true
-  end
+  
 end

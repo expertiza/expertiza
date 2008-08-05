@@ -11,6 +11,8 @@ class InstitutionsControllerTest < Test::Unit::TestCase
     @controller = InstitutionController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
+    @request.session[:user] = User.find(users(:superadmin).id)
+    AuthController.set_current_role(User.find(users(:superadmin).id).role_id,@request.session)
   end
 
   # 401 Add a new institution

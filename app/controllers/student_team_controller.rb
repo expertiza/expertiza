@@ -18,7 +18,7 @@ class StudentTeamController < ApplicationController
       @team_user.save
       redirect_to :controller => 'student_assignment', :action => 'view_team' , :id=> @student.id
     else
-      flash[:error] = 'Team name is already in use.'
+      flash[:notice] = 'Team name is already in use.'
       redirect_to :controller => 'student_assignment', :action => 'view_team' , :id=> @student.id
     end 
   end
@@ -35,10 +35,10 @@ class StudentTeamController < ApplicationController
        if @team.update_attributes(params[:team])
           redirect_to :controller => 'student_assignment', :action => 'view_team', :id => params[:student_id]
        end
-    elsif (check.length == 1 && check[0].name == params[:team][:name])
+    elsif (check.length == 1 && (check[0].name <=> @team.name) == 0)
       redirect_to :controller => 'student_assignment', :action => 'view_team', :id => params[:student_id]
     else
-      flash[:error] = 'Team name is already in use.'
+      flash[:notice] = 'Team name is already in use.'
       redirect_to :controller =>'student_team', :action => 'edit', :team_id =>params[:team_id], :student_id => params[:student_id]
     end 
   end
@@ -64,5 +64,10 @@ class StudentTeamController < ApplicationController
     end
     
     redirect_to :controller => 'student_assignment', :action => 'view_team' , :id => @student.id
+  end
+  
+  def review
+    @assignment = Assignment.find_by_id(params[:assignment_id])
+    redirect_to :controller =>'questionnaire', :action => 'view_questionnaire', :id => @assignment.peer_review_questionnaire_id
   end
 end

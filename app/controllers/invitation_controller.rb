@@ -9,16 +9,16 @@ class InvitationController < ApplicationController
     student = Participant.find(params[:student_id])
     #check if the invited user is valid
     if !user
-      flash[:error] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct." 
+      flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct." 
     else
       participant = Participant.find(:first, :conditions => ['user_id =? and assignment_id =?', user.id, student.assignment_id])
       if !participant
-        flash[:error] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment." 
+        flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment." 
       else
         check = TeamsUser.find(:all, :conditions => ['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
         if (check.size > 0)
-          flash[:error] = "\"#{user.name}\" is already a member of team \"#{team.name}\""
+          flash[:notice] = "\"#{user.name}\" is already a member of team."
         else
           current_invs = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.assignment_id])
           #check if the invited user is already invited (i.e. awaiting reply)
@@ -30,7 +30,7 @@ class InvitationController < ApplicationController
             @invitation.reply_status = 'W' 
             @invitation.save
           else
-            flash[:error] = "You have already send an invitation to \"#{user.name}\"."  
+            flash[:notice] = "You have already send an invitation to \"#{user.name}\"."  
           end   
         end
       end
@@ -40,8 +40,10 @@ class InvitationController < ApplicationController
   
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%' and id in (select user_id from participants where user_id not in (select user_id from teams_users where team_id in (select id from teams where assignment_id ="+session[:assignment_id]+")) and assignment_id ="+session[:assignment_id]+")") unless search.blank?
-    puts @user
+    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?
+    #@users = getAvailableUsers(search)
+    #@users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%' and id in (select user_id from participants where user_id not in (select user_id from teams_users where team_id in (select id from teams where assignment_id ="+session[:assignment_id]+")) and assignment_id ="+session[:assignment_id]+")") unless search.blank?
+    #puts @user
     
     #render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end

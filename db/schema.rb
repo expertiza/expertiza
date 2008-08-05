@@ -2,7 +2,7 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 43) do
+ActiveRecord::Schema.define(:version => 63) do
 
   create_table "assignments", :force => true do |t|
     t.column "created_at", :datetime
@@ -28,6 +28,8 @@ ActiveRecord::Schema.define(:version => 43) do
     t.column "num_reviewers", :integer, :limit => 10, :default => 0, :null => false
     t.column "spec_location", :text
     t.column "author_feedback_questionnaire_id", :integer
+    t.column "peer_review_questionnaire_id", :integer
+    t.column "team_count", :integer, :default => 0, :null => false
   end
 
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
@@ -68,10 +70,11 @@ ActiveRecord::Schema.define(:version => 43) do
   add_index "controller_actions", ["site_controller_id"], :name => "fk_controller_action_site_controller_id"
 
   create_table "courses", :force => true do |t|
-    t.column "title", :string
+    t.column "name", :string
     t.column "instructor_id", :integer
     t.column "directory_path", :string
     t.column "info", :text
+    t.column "created_at", :datetime
   end
 
   add_index "courses", ["instructor_id"], :name => "fk_course_users"
@@ -238,6 +241,17 @@ ActiveRecord::Schema.define(:version => 43) do
     t.column "name", :string, :default => "", :null => false
   end
 
+  create_table "invitations", :force => true do |t|
+    t.column "assignment_id", :integer
+    t.column "from_id", :integer
+    t.column "to_id", :integer
+    t.column "reply_status", :string, :limit => 1
+  end
+
+  add_index "invitations", ["from_id"], :name => "fk_invitationfrom_users"
+  add_index "invitations", ["to_id"], :name => "fk_invitationto_users"
+  add_index "invitations", ["assignment_id"], :name => "fk_invitation_assignments"
+
   create_table "languages", :force => true do |t|
     t.column "name", :string, :limit => 32
   end
@@ -271,6 +285,13 @@ ActiveRecord::Schema.define(:version => 43) do
   add_index "menu_items", ["controller_action_id"], :name => "fk_menu_item_controller_action_id"
   add_index "menu_items", ["content_page_id"], :name => "fk_menu_item_content_page_id"
   add_index "menu_items", ["parent_id"], :name => "fk_menu_item_parent_id"
+
+  create_table "nodes", :force => true do |t|
+    t.column "parent_id", :integer
+    t.column "node_object_id", :integer
+    t.column "table", :string
+    t.column "type", :string
+  end
 
   create_table "participants", :force => true do |t|
     t.column "submit_allowed", :boolean, :default => true
@@ -523,6 +544,11 @@ ActiveRecord::Schema.define(:version => 43) do
 
   add_index "teams_users", ["team_id"], :name => "fk_users_teams"
   add_index "teams_users", ["user_id"], :name => "fk_teams_users"
+
+  create_table "tree_folders", :force => true do |t|
+    t.column "name", :string
+    t.column "child_type", :string
+  end
 
   create_table "users", :force => true do |t|
     t.column "name", :string, :default => "", :null => false

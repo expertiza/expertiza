@@ -13,12 +13,17 @@
 	<td><b>Username &nbsp</b></td>
 	<td><b>Full Name &nbsp</b></td>
 	<td><b>Email &nbsp</b></td>
+	<td></td>
 	</tr>
 	<%for member in @team_members%>
 		<tr>
 		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).name%></td>
 		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).fullname%></td>
 		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).email%></td>
+		<td><%= link_to "Review", 
+			{:controller => 'student_team', :action => 'review', :team_id => @team_id, 
+			:reviewer_id => @student.id, :reviewee_id => member.user_id, 
+			:assignment_id => @student.assignment_id}%></td>
 		</tr>
 	<%end%>
 	</table>

@@ -2,9 +2,13 @@ class PgUsersController < UsersController
   # This method creates an entry in the users table.  It is caled from the Add Super-Admin, Add Administrator, Add Instructor, and Add Student functions
   # The parent field identifies the entity in the users table (e.g., an instructor) that created this entry (e.g., a student).
   def self.create(role, controller, success_action, failure_action)
+    puts "here"
+    
     user = User.new(params[:user])
     user.parent_id = (session[:user]).id
     user.role_id = role
+    
+    
 
     if params[:user][:clear_password].length == 0 or
         params[:user][:confirm_password] != params[:user][:clear_password]

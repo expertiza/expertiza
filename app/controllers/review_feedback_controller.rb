@@ -93,7 +93,6 @@ class ReviewFeedbackController < ApplicationController
   #Save the comments of Feedback in review scores table and the additional cooment in ReviewFeedback table
   def create_feedback
     params.each do |elem|
-    puts "#{elem[0]}, #{elem[1]}" 
     end
     
     @review_feedback = ReviewFeedback.new
@@ -173,7 +172,6 @@ class ReviewFeedbackController < ApplicationController
     end
     #@reviewfeedback = ReviewFeedback.find_by_review_id(params[:id3]) 
     @review_id = @reviewfeedback.id
-    puts @review_id
     @review_scores = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, '4'])
     @assgt_id = params[:id1]
     @author_id = params[:id2]

@@ -1,6 +1,7 @@
-<H1>New Team for <%= @assignment.name %></H1>
+<H1>New Team for <%= @parent.name %></H1>
 
 <%= form_tag :action => 'create'%>
-<%= hidden_field_tag 'id', @assignment.id %>
-
+<%= hidden_field_tag 'id', @parent.id %>
 <%= render :partial => 'form' %>
+<BR/>
+<%= link_to 'Back', :controller => 'team', :action => 'list', :id => @parent.id %>

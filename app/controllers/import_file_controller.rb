@@ -68,7 +68,5 @@ class ImportFileController < ApplicationController
       row = Array.new
       items.each { | value | row << value.sub("\"","").sub("\"","").strip }
       return row
-  end
-
-    
+  end   
 end

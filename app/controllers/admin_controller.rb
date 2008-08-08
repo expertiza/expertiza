@@ -1,3 +1,5 @@
+# This controller is used for the Admin functionality
+# Author: unknown
 class AdminController < ApplicationController
 
   def search_users (role)

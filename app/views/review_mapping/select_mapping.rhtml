@@ -7,12 +7,11 @@ Number of reviews <em>of reviews</em> done by a student: <%= text_field 'assignm
 <%due_date = DueDate.find(:all,:conditions => ["assignment_id = ?",@assignment.id], :order => "round DESC", :limit =>1)
 @round = 1
 if (due_date[0] && !due_date[0].round.nil?)
-    puts "am in"
+   
     @round = due_date[0].round - 1
 else
     @round = 1
-end
-puts "rounddue date ",@round%>
+end%>
 
 <p>Reviewer assignments vary for different rounds
 <%= check_box('assign_reviewers','different_mapping',{:onclick =>

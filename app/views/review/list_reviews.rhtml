@@ -1,3 +1,4 @@
+<% session[:return_to] = request.request_uri %>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
 	<%= flash[:notice] %>
@@ -39,3 +40,5 @@
  </tr>
  <%end%>
 </table>
+<BR/>
+<%= link_to "Back", :controller=>'student_assignment', :action => 'view_actions', :id => @student.id %>

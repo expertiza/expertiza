@@ -1,0 +1,9 @@
+<!-- REVIEWS --> 
+<% if participant.get_reviews.length > 0 %>
+  <% for review in participant.get_reviews %>
+    <%= review.display_as_html() %><BR/><BR/> 
+  <% end %>
+<% else %>
+  <i>No reviews have been completed for this user's submissions.</i>
+<% end %>
+<!-- END REVIEWS --> 

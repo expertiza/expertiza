@@ -1,6 +1,7 @@
 class ReviewMapping < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :author, :class_name => "User", :foreign_key => "author_id"
+  belongs_to :team, :class_name => "Team", :foreign_key => "team_id"
   belongs_to :reviewer, :class_name => "User", :foreign_key => "reviewer_id"
   has_many :reviews
   has_many :review_of_review_mappings 
@@ -277,8 +278,8 @@ class ReviewMapping < ActiveRecord::Base
   
   def self.assign_individual_reviewer (assignment_id,num_reviews, round_num)
     stride = 1
-    authors = Participant.find(:all, :conditions => ['assignment_id = ? and submit_allowed=1', assignment_id])
-    reviewers = Participant.find(:all, :conditions => ['assignment_id = ? and review_allowed=1', assignment_id])
+    authors = AssignmentParticipant.find(:all, :conditions => ['parent_id = ? and submit_allowed=1', assignment_id])
+    reviewers = AssignmentParticipant.find(:all, :conditions => ['parent_id = ? and review_allowed=1', assignment_id])
     if authors.size == 0 or reviewers.size == 0 
       raise "No participants available for assignment"
     end

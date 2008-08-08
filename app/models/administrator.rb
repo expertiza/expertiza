@@ -1,4 +1,6 @@
-
+# Administrator Class
+# Subtype of User class
+# Author: unknown
 class Administrator < User
   
   QUESTIONNAIRE = [["My instructors' questionnaires",'list_instructors'],
@@ -7,7 +9,7 @@ class Administrator < User
   ASSIGNMENT = [["My instructors' assignments",'list_instructors'],
                 ['My assignments','list_mine'],
                 ['All public assignments','list_all']]
-  
+    
   def list_instructors(object_type, user_id)
     object_type.find(:all,
                      :joins => "inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)

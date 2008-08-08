@@ -11,7 +11,7 @@ class UsersController < ApplicationController
   
   def self.participants_in(assignment_id)
     users = Array.new
-    participants = Participants.find_by_assignment_id(assignment_id)    
+    participants = AssignmentParticipant.find_by_parent_id(assignment_id)    
     participants.each{
       |participant| 
       users << User.find(participant.user_id)
@@ -140,7 +140,7 @@ class UsersController < ApplicationController
 
   def destroy
     user = User.find(params[:id])
-    participant = Participant.find_by_user_id(user.id)
+    participant = AssignmentParticipant.find_by_user_id(user.id)
     team_user = TeamsUser.find_by_user_id(user.id)
     if participant 
       participant.destroy()  

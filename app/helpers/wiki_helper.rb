@@ -188,10 +188,9 @@ module WikiHelper
   # @args: _start_date (all review items older will be filtered out)
   # @args: _wiki_user (wiki user id to crawl)
   ##
-  def review_mediawiki(_assignment_url, _start_date = nil, _wiki_user = nil)
-
+  def review_mediawiki(_assignment_url, _start_date = nil, _wiki_user = nil)  
     response = '' #the response from the URL
-
+   
     #Check to make sure we were passed a valid URL
     matches = /http:/.match( _assignment_url )
     if not matches
@@ -210,6 +209,7 @@ module WikiHelper
 
     #Grab this user's contributions
     url = wiki_url[0].to_s + review
+    puts url
     open(url, 
          "User-Agent" => "Ruby/#{RUBY_VERSION}",
          "From" => "email@addr.com", #Put pg admin email address here
@@ -282,6 +282,7 @@ module WikiHelper
 
   end
   def review_mediawiki_group(_assignment_url, _start_date = nil, _wiki_user = nil)
+    puts "*** getting group review ***"
     line_items = review_mediawiki(_assignment_url, _start_date , _wiki_user)
     return line_items.first(3)
   end

@@ -45,7 +45,7 @@ Submitted Files<br />
     then makes callbacks to the various wiki classes, depending on what kind of a wiki it is working on.
     This allows wiki-specific behavior to be kept in the wiki classes. -->
 <%if @assignment.team_assignment  # The lookup of all team members should be put in a wiki helper
-	@team_members = TeamsUser.find("select * from teams_users where team_id in (select id from team where assignment_id = "+@assignment.id.to_s+") and user_id="+session[:user].id.to_s)
+	@team_members = TeamsUser.find_by_sql("select * from teams_users where team_id in (select id from teams where type = 'AssignmentTeam' and parent_id = "+@assignment.id.to_s+") and user_id="+session[:user].id.to_s)
   	for team_member in @team_members
 		member_name = User.find(team_member.user_id).name 
 	%>
@@ -64,7 +64,7 @@ Submitted Files<br />
 <%if @assignment.team_assignment %>
 	<% for team_member in @team_members %>
 	<label>
-	<% submitted = Participant.find(:first, :conditions =>["user_id = ? and assignment_id = ?",team_member.user_id,@assignment.id]).submitted_hyperlink
+	<% submitted = AssignmentParticipant.find(:first, :conditions =>["user_id = ? and parent_id = ?",team_member.user_id,@assignment.id]).submitted_hyperlink
 	if submitted !=nil
 	%>
 	URL to file submission (if available):</label><%= submitted %>

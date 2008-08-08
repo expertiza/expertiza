@@ -1,9 +1,18 @@
 class Participant < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :user
+  has_many :comments
   has_many :resubmission_times 
   
   validates_numericality_of :grade, :allow_nil => true
+
+  def name
+    User.find(self.user_id).name
+  end
+  
+  def fullname
+    User.find(self.user_id).fullname
+  end 
 
   def delete
     times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])
@@ -19,17 +28,10 @@ class Participant < ActiveRecord::Base
   
   def get_course_string
     # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
-    if assignment.course == nil or assignment.course.title == nil or assignment.course.title.strip == ""
+    if assignment.course == nil or assignment.course.name == nil or assignment.course.name.strip == ""
       return "<center>&#8212;</center>"
     end
-    return assignment.course.title
-  end
-  
-  def get_scenario_string
-    if assignment.spec_location == nil
-      return "<center>&#8212;</center>"      
-    end
-    return "<a href=\"" + assignment.spec_location + "\" target=\"new\"/>View</A>"
+    return assignment.course.name
   end
   
   def able_to_submit
@@ -62,27 +64,9 @@ class Participant < ActiveRecord::Base
              }
             }
     )   
-  end    
+  end  
+  
 
-  # provide import functionality for Assignment Participants
-  # if user does not exist, it will be created and added to this assignment
-  def self.import(row,session,id)
-    if row.length != 4
-       raise ArgumentError, "Not enough items" 
-    end
-    user = User.find_by_name(row[0])        
-    if (user == nil)
-      attributes = ImportFileHelper::define_attributes(row)
-      user = ImportFileHelper::create_new_user(attributes,session)
-    end              
-    assignment = Assignment.find(id)
-    if assignment == nil
-       raise ImportError, "The assignment with id \""+id.to_s+"\" was not found."
-    end
-    if (Participant.find(:all, {:conditions => ['user_id=? AND assignment_id=?', user.id, assignment.id]}).size == 0)
-       Participant.create(:user_id => user.id, :assignment_id => assignment.id)
-    end   
-  end
   
   protected
   def validate

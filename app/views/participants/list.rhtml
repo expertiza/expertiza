@@ -2,8 +2,8 @@
 <%= render :partial => 'shared_scripts/checkIfFileExists' %>
 </script>
 
-<h1>Assignment Participants</h1>
-<h2>Assignment: <%= @assignment.name %></h2>
+<h1><%= @model %> Participants</h1>
+<h2><%= @parent.name %></h2>
 <br/>
 <%= render :partial => '/shared_scripts/user_list',
            :locals => {:controller => 'participants', 
@@ -12,21 +12,20 @@
 <%= 
 	render :partial => '/shared_scripts/add_individual', 
 		   :locals => {:form_action => "add",
-					   :obj_type => "assignment_id", 
-					   :obj_id => @assignment.id} 
+					   :obj_type => "id", 
+					   :obj_id => @parent.id,
+					   :model => @model} 
 %>
 <br/>
 
-<% 
-  session[:return_to] = request.request_uri
-%>
-<%= link_to 'Import Assignment Participants', 
+<% session[:return_to] = request.request_uri %>
+<%= link_to 'Import '+@model+' Participants', 
             :controller=>'import_file', 
             :action=>'start', 
-            :model => 'Participant', 
-            :title => 'Assignment Participants',
+            :model => @model+'Participant', 
+            :title => @model+' Participants',
             :expected_fields => 'Username, "Full name (last, first[ middle])", E-mail address, Password',
-            :id => @assignment.id %>
-| <%= link_to 'Back', :controller => 'tree_display', :action => 'list' %>           
+            :id => @parent.id %>
+| <%= render :partial => '/shared_scripts/back' %>
 <hr/>
 

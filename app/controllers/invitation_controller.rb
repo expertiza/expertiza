@@ -5,13 +5,13 @@ class InvitationController < ApplicationController
   
   def create    
     user = User.find_by_name(params[:user][:name].strip)
-    team = Team.find_by_id(params[:team_id])
-    student = Participant.find(params[:student_id])
+    team = AssignmentTeam.find_by_id(params[:team_id])
+    student = AssignmentParticipant.find(params[:student_id])
     #check if the invited user is valid
     if !user
       flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct." 
     else
-      participant = Participant.find(:first, :conditions => ['user_id =? and assignment_id =?', user.id, student.assignment_id])
+      participant = AssignmentParticipant.find(:first, :conditions => ['user_id =? and parent_id =?', user.id, student.assignment_id])
       if !participant
         flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment." 
       else
@@ -40,12 +40,7 @@ class InvitationController < ApplicationController
   
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?
-    #@users = getAvailableUsers(search)
-    #@users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%' and id in (select user_id from participants where user_id not in (select user_id from teams_users where team_id in (select id from teams where assignment_id ="+session[:assignment_id]+")) and assignment_id ="+session[:assignment_id]+")") unless search.blank?
-    #puts @user
-    
-    #render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
+    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?    
   end
  
   def accept
@@ -64,7 +59,7 @@ class InvitationController < ApplicationController
     #if you are on a team and you accept another invitation and if your old team does not have any members, delete the entry for the team
     other_members = TeamsUser.find(:all, :conditions => ['team_id = ?', params[:team_id]])
     if other_members.length == 0
-      old_team = Team.find(:first, :conditions => ['id = ?', params[:team_id]])
+      old_team = AssignmentTeam.find(:first, :conditions => ['id = ?', params[:team_id]])
       if old_team != nil
         old_team.destroy
       end
@@ -80,7 +75,7 @@ class InvitationController < ApplicationController
     @team_user = TeamsUser.new
     users_teams = TeamsUser.find(:all, :conditions => ['user_id = ?', @inv.from_id])
     for team in users_teams
-      current_team = Team.find(:first, :conditions => ['id = ? and assignment_id = ?', team.team_id, student.assignment_id])
+      current_team = AssignmentTeam.find(:first, :conditions => ['id = ? and parent_id = ?', team.team_id, student.assignment_id])
       if current_team != nil
         @team_user.team_id = current_team.id
       end

@@ -1,0 +1,10 @@
+<li><%= link_to 'Copy '+model.downcase , :controller => controller, :action=>'copy', :id => node.node_object_id %></li>
+<% if session[:user].id == owner_id %>
+  <li><%= link_to 'Edit '+model.downcase, :controller => controller, :action=>'edit', :id => node.node_object_id %></li>
+  <li><%= link_to 'Delete '+model.downcase,  :controller => controller, :action=>'delete', :id => node.node_object_id %></li>   
+  <% if Object.const_get(model).find(node.node_object_id).private %>  
+    <li><%= link_to 'Make Public',  :controller => controller, :action=>'toggle_access', :id => node.node_object_id %></li>
+  <% else %>
+    <li><%= link_to 'Make Private', :controller => controller, :action=>'toggle_access', :id => node.node_object_id %></li>
+  <% end %>
+<% end %>

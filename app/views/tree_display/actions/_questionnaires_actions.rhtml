@@ -1,14 +1,12 @@
+<% owner_id = Object.const_get('Questionnaire').find(node.node_object_id).instructor_id %>
+
 <TD WIDTH="15%">
 <ul id="actionmenu"><li class="daddy">&nbsp;
 <ul>
-  <% if session[:user].id == Questionnaire.find(id).instructor_id %>
-     <li><%= link_to 'Edit questionnaire',:controller=>'questionnaire', :action=>'edit', :id => id %></li>
-  <% end %>
-     <li><%= link_to 'Copy questionnaire',:controller=>'questionnaire', :action=>'copy', :id => id %></li>
-  <% if session[:user].id == Questionnaire.find(id).instructor_id %>     
-     <li><%= link_to 'Delete questionnaire',:controller=>'questionnaire', :action=>'delete', :id => id %></li>      
-     <li><%= link_to 'Add advice',:controller=>'questionnaire', :action=>'add_advice', :id => id %></li>
-  <% end %>                                                                                                                
+<%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Questionnaire', :controller => 'questionnaire', :node => node, :owner_id => owner_id} %>
+<% if session[:user].id == owner_id %>  
+   <li><%= link_to 'Add advice',:controller=>'questionnaire', :action=>'add_advice', :id => node.node_object_id %></li>
+<% end %>                                                                                                                
 </ul>
 </li></ul>       
 </TD>

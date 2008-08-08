@@ -1,59 +1,100 @@
-<% numItems = 0 %>
-<h1>Grade summary for <%=@assignment.name%></h1>
+<SCRIPT>
+  function toggleAll(numteams){    
+    var maintag = document.getElementById('teamAll');
+    hidden = maintag.innerHTML == 'Show all teams';    
+    if (hidden) {maintag.innerHTML = 'Hide all teams';}
+    else {maintag.innerHTML = 'Show all teams';}    
+   	toggleTeams(numteams,hidden);       
+  }
+  
+  function collapseObj(obj, atag){
+	obj.style.display = 'none';
+  	atag.innerHTML = '<img src="/images/expand.png">';  	    	
+  	   	
+  	files = document.getElementById(obj.id+'_files');
+  	if (files) {
+  		files.style.display = 'none';
+  	    files_tag = document.getElementById(obj.id+'_filesLink');
+  	    if (files_tag){files_tag.innerHTML = 'show submission';}
+  	}  
+  	reviews = document.getElementById(obj.id+'_reviews');
+  	if (reviews) {
+  		reviews.style.display = 'none';
+  	   	reviews_tag = document.getElementById(obj.id+'_reviewsLink');
+  	   	if (reviews_tag){reviews_tag.innerHTML = 'show reviews';}
+	} 
+  	mreviews = document.getElementById(obj.id+'_mreviews');
+  	if (mreviews) {
+  		mreviews.style.display = 'none';
+  	   	mreviews_tag = document.getElementById(obj.id+'_mreviewsLink');
+  	   	if(mreviews_tag){mreviews_tag.innerHTML = 'show metareviews';}
+	}	 	
+  }
+  
+  function toggleTeams(numteams,hidden){
+  	for (var i = 1; i <= numteams; i++){
+  	  elementId = 'team'+i;
+  	  var atag = document.getElementById(elementId+'Link');
+  	  var sublistsize = 1;
+  	  while (document.getElementById(elementId+"_"+sublistsize) != null){
+  	    var obj = document.getElementById(elementId+"_"+sublistsize);
+  	    if (hidden) {
+  	    	obj.style.display = '';
+  	    	atag.innerHTML = '<img src="/images/collapse.png">';}
+  	    else {
+  	    	collapseObj(obj, atag);  	    	  	       
+  	    }  	    
+  	    sublistsize += 1;  	    
+  	  }
+  	}
+  } 
+  
+  function toggleTeam(elementId){
+	var sublistsize = 1;
+	var obj = document.getElementById(elementId+"_"+sublistsize);	
+	var atag = document.getElementById(elementId+'Link');	
+	
+  	while (obj != null){ 
+  	  var bExpand = obj.style.display.length == 0;	  	   	  
+  	  if (bExpand) {
+        collapseObj(obj, atag);   	         	  	       
+  	  }
+  	  else {
+  	    obj.style.display = '';
+  	  	atag.innerHTML = '<img src="/images/collapse.png">';  	    	    
+  	  }  	    
+  	  sublistsize += 1;  
+  	  var obj = document.getElementById(elementId+"_"+sublistsize);	    
+  	}  	  
+  }  
+</SCRIPT>
+<h1>Summary report for <%= @assignment.name %></h1>
 
-<TABLE>
-<TR><TH colspan=2 align="left">Contributor |</TH><TH align="left">Average Score |</TH><TH align="left">Greatest Difference</TH></TR>
-<% 
-  for entry in @scores_by_author 
-  name = "item" + numItems.to_s
-  numItems += 1 
-%>
-
-<TR>
-   <TD colspan=2><%= entry[:author].get_author_name %></TD>
-   <TD>&nbsp;&nbsp;<%= sprintf("%.2f",entry[:average_author_score].to_f / @sum_of_max.to_f * 100 ) %>%
-	   <div style="font-size:x-small;">
-		   &nbsp;&nbsp;<%= link_to "edit final score", 						
-						:action => 'edit',
-						:id => entry[:author].id%>
-	   </div>
-   </TD>   
-   <% 			
-      diffPct = entry[:diff].to_f / @sum_of_max.to_f * 100
-	  if diffPct >= 15 %>
-		 <TD style="color: red;"> 
-   <% else %>
-	  	 <TD>
-   <% end %>
-     &nbsp;&nbsp;<%= sprintf("%.2f",diffPct) %>% 
-	 <div style="font-size:x-small;">
-	 &nbsp;&nbsp;<%= link_to "email reviewers", :action => 'conflict_notification', :id => entry[:author] %>
-	 </div>			
-   </TD>
-   <TD><a id=<%= name+"Link" %> name=<%= name+"Link" %> href="#" onclick="toggleElement('<%= name %>','reviews'); return false;">show reviews</a></TD>   
-   </TR>      
-   <TR id="<%= name %>" style="display: none;">
-     <TD>&nbsp;</TD>
-     <TD colspan=4>     
-       <TABLE>
-       <TR><TH>Reviewer</TH><TH>Score Awarded</TH></TR>
-       <% for grade in entry[:review_scores] %>
-       		<TR>
-       		   <TD><%= grade[:review].review_mapping.reviewer.fullname %></TD>
-       		   <TD>
-       		      &nbsp;&nbsp;<%= sprintf("%.2f",grade[:total_review_score].to_f*100/@sum_of_max) %>%
-       		      <div style="font-size:x-small;">
-       		      &nbsp;&nbsp;<%= link_to "view review",  :controller=>'review', :action => 'view_review', :id=> grade[:review].id%>
-       		      </div>
-       		   </TD>
-       		</TR>
-       <% end %>    
-       <TR><TD colspan=5><HR></TD></TR>   
-       </TABLE>          
-     </TD>
-   </TR>    
+<BR/>  
+<%if @teams and @teams.length > 0 %>
+<a href="#" onClick="toggleAll(<%= @teams.length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
 <% end %>
-</table>
-
-<br/>
-<%= render :partial => '/shared_scripts/back' %>
+<BR/><BR/>
+<% if @participants.length > 0 %>
+<TABLE class="grades" width="100%">
+<% if @teams and @teams.length > 0 %>   
+  <%= render :partial => 'teams' %>  
+<% else %>
+  <TR><TH>&nbsp;</TH><TH COLSPAN="2">Submission score</TH><TH COLSPAN="2">Review score</TH><TH>&nbsp;</TH></TR>           
+  <TR><TH ALIGN="LEFT">Contributor</TH><TH>Average</TH><TH>Range</TH><TH>Average</TH><TH>Range </TH><TH>Final score</TH></TR>    
+  <% for participant in @participants
+    s_avg, s_max, s_min = participant.compute_review_scores
+    r_avg, r_max, r_min = participant.compute_metareview_scores
+  %>
+    <%= render :partial => 'participant',
+               :locals => {:participant => participant,
+                           :s_avg => s_avg, :s_min => s_min, :s_max => s_max,
+                           :r_avg => r_avg, :r_min => r_min, :r_max => r_max }%>
+  <% end %>
+<% end %>
+</TABLE>
+<BR/>
+<FONT SIZE="-1">** A <FONT COLOR="#0033FF">blue</FONT> score indicates that the instructor has provided additional comments or modified the score for the participant.</FONT><BR/> 
+<% end %>
+<BR/>
+<%= render :partial => 'shared_scripts/back' %> 

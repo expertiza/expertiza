@@ -1,5 +1,30 @@
 class ReviewOfReview < ActiveRecord::Base
     has_many :review_of_review_scores
+    belongs_to :review_of_review_mapping
+
+  def display_as_html          
+    code = "<B>Metareviewer:</B> "+self.review_of_review_mapping.review_reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview'+self.id.to_s+'Link" onClick="toggleElement('+"'metareview"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
+    code = code + '<div id="metareview'+self.id.to_s+'" style="">'
+    code = code +"<BR/><BR/>"    
+    ReviewOfReviewScore.find_all_by_review_of_review_id(self.id).each{
+      | reviewScore |      
+      code = code + "<I>"+reviewScore.question.txt+"</I><BR/><BR/>"
+      code = code + '(<FONT COLOR="#229933">'+reviewScore.score.to_s+"</FONT> out of "+reviewScore.question.questionnaire.max_question_score.to_s+"): "+reviewScore.comments+"<BR/><BR/>"
+    }  
+    code = code + "</div>"
+    return code
+  end
+
+  # Computes the total score awarded for a metareview
+  def get_total_score
+    scores = ReviewOfReviewScore.find_all_by_review_of_review_id(self.id)
+    total_score = 0
+    scores.each{
+      |item|
+      total_score += item.score
+    }   
+    return total_score
+  end
 
   def delete
     rOfRScores = ReviewOfReviewScore.find(:all, :conditions => ['review_of_review_id =?',self.id])
@@ -7,8 +32,7 @@ class ReviewOfReview < ActiveRecord::Base
     self.destroy
   end
 
-  # Generate emails for reviewers when a new review of their work
-  # is made
+  # Generate emails for reviewers when a new review of their work is made
   #ajbudlon, sept 07, 2007        
   def email
    review_of_review_mapping = ReviewOfReviewMapping.find_by_id(self.review_of_review_mapping_id)

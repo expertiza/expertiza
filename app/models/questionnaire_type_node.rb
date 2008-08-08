@@ -16,7 +16,6 @@ class QuestionnaireTypeNode < Node
   end  
   
   def get_children(sortvar = nil,sortorder = nil,user_id = nil,parent_id = nil)
-    puts "** Getting type children. Type: "+self.node_object_id.to_s
     QuestionnaireNode.get(sortvar,sortorder,user_id,self.node_object_id)
   end
 end

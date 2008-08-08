@@ -1,11 +1,2 @@
-<TD WIDTH="15%">
-  <ul id="actionmenu">
-    <li class="daddy">&nbsp;
-      <ul>
-        <% for type in QuestionnaireType.find(:all, :order => 'name') %>
-          <li><%= link_to 'Create '+type.name,:controller=>'questionnaire', :action=>'new_questionnaire', :type_id => type.id %></li>  
-        <% end %>
-      </ul>
-    </li>
-  </ul>        
-</TD>
+<TD WIDTH="15%">&nbsp;</TD>
+

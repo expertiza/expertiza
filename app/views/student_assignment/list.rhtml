@@ -1,4 +1,4 @@
-<% if @user.is_new_user %>
+<% if @user.is_new_user == 1 %>
     <%= render :partial => 'eula' %>
 <% else %>
 <h1>Assignments</h1>
@@ -19,13 +19,14 @@ To begin, click on an assignment from the list above or <%= link_to 'click here'
   </tr>
 	
 <% for participant in @participants %>
+  <% assignment = Assignment.find(participant.parent_id) %>
   <tr class="listingRow">
 		<td></td>
-		<td><%= link_to participant.assignment.name, :action => 'view_actions', :id => participant %></td>
-	  <td><%= participant.get_course_string %></td>
+		<td><%= link_to assignment.name, :action => 'view_actions', :id => participant %></td>
+	    <td><%= participant.get_course_string %></td>
 		<td><%= participant.get_topic_string %></td>
-		<td><%= StudentAssignmentHelper::get_current_stage(participant.assignment.id) %></td>
-		<td><%= StudentAssignmentHelper::get_stage_deadline(participant.assignment.id) %></td>
+		<td><%= assignment.get_current_stage() %></td>
+		<td><%= assignment.get_stage_deadline() %></td>
 	  <td align=center>
 	  	<%if participant.permission_granted %>granted
 			<% else %>denied

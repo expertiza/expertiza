@@ -9,36 +9,22 @@ class AssignmentController < ApplicationController
   
   
   def copy    
-    orig_assign = Assignment.find(params[:id])
-    new_assign = orig_assign.clone
+    old_assign = Assignment.find(params[:id])
+    new_assign = old_assign.clone
     new_assign.instructor_id = session[:user].id
     new_assign.name = 'Copy of '+new_assign.name 
    
-    if new_assign.save
-    
-      duedates = DueDate.find(:all, :conditions => ['assignment_id = ?',orig_assign.id])
-      duedates.each{
-        |orig_due_date|
-        new_due_date = orig_due_date.clone
-        new_due_date.assignment_id = new_assign.id
-        new_due_date.save       
-      }
-           
-      parent = CourseNode.find_by_node_object_id(new_assign.course_id)      
-      node = AssignmentNode.create(:node_object_id => new_assign.id)
-      if parent != nil
-        node.parent_id = parent.id            
-      end
-      node.save            
+    if new_assign.save    
+      DueDate.copy(old_assign.id, new_assign.id)           
+      new_assign.create_node()
+      
       flash[:note] = 'The assignment is currently associated with an existing location. This could cause errors for furture submissions.'
       redirect_to :action => 'edit', :id => new_assign.id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
       redirect_to :action => 'list', :controller => 'tree_display'
     end
-
-  end
-  
+  end  
   
   def new
     if params[:parent_id]
@@ -65,7 +51,6 @@ class AssignmentController < ApplicationController
     @assignment.instructor_id = (session[:user]).id
     @assignment.submitter_count = 0    
     ## feedback added
-    puts "round = ",params[:assignment_helper][:no_of_reviews].to_i
     ##
     @duedate=DueDate.new
     
@@ -76,7 +61,7 @@ class AssignmentController < ApplicationController
     @Rereview_deadline=4;
     @Review_of_review_deadline=5;   
     
-    if @assignment.save          
+    if @assignment.save                      
       submit_duedate=DueDate.new(params[:submit_deadline]);
       submit_duedate.deadline_type_id=@Submission_deadline;
       submit_duedate.assignment_id=@assignment.id;
@@ -84,7 +69,6 @@ class AssignmentController < ApplicationController
       #submit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];      
       ## feedback added
       submit_duedate.round = 1;
-      puts "submit round",submit_duedate.round
       ##
       submit_duedate.save;
       
@@ -95,7 +79,6 @@ class AssignmentController < ApplicationController
       #review_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
       ## feedback added
       review_duedate.round = 1;
-      puts "review round",review_duedate.round
       ##
       review_duedate.save;
       ## feedback added
@@ -111,7 +94,6 @@ class AssignmentController < ApplicationController
           #resubmit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
           ## feedback added
           resubmit_duedate.round = max_round
-          puts "resubmit round",resubmit_duedate.round
           max_round = max_round + 1
           ##
           resubmit_duedate.save;
@@ -127,14 +109,12 @@ class AssignmentController < ApplicationController
           #rereview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
           ## feedback added
           rereview_duedate.round = max_round
-          puts "rereview round",rereview_duedate.round
           max_round = max_round + 1
           ##
           rereview_duedate.save;
         end
         ## feedback added
-        puts "max_round ", max_round
-        ##
+       
         
       end      
       reviewofreview_duedate=DueDate.new(params[:reviewofreview_deadline]);
@@ -144,23 +124,16 @@ class AssignmentController < ApplicationController
       #reviewofreview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
       ## feedback added
       reviewofreview_duedate.round = max_round
-      puts "review of review round",reviewofreview_duedate.round
       ##
-      reviewofreview_duedate.save;
-      
+      reviewofreview_duedate.save;        
+            
       # Create submission directory for this assignment
-      puts "** Getting ready to create directory **"
-      if @assignment.wiki_type_id == 1
-        puts "** Creating directory **"
-        File.makedirs(RAILS_ROOT + "/pg_data/" + @assignment.directory_path)
-      end
-      puts "** Created directory **"
-      parent = CourseNode.find_by_node_object_id(@assignment.course_id)      
-      node = AssignmentNode.create(:node_object_id => @assignment.id)
-      if parent != nil
-        node.parent_id = parent.id       
-      end
-      node.save
+      # If assignment is a Wiki Assignment (or has no directory)
+      # the helper will not create a path
+      FileHelper.create_directory(@assignment)      
+      
+      # Creating node information for assignment display
+      @assignment.create_node()
        
       flash[:notice] = 'Assignment was successfully created.'
       redirect_to :action => 'list', :controller => 'tree_display'
@@ -178,20 +151,29 @@ class AssignmentController < ApplicationController
   end
   
   def update
+    if params[:assignment][:course_id]
+     begin
+       Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
+     rescue
+       flash[:error] = $!
+     end
+    end
     @assignment = Assignment.find(params[:id])
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])
       # Iterate over due_dates, from due_date[0] to the maximum due_date
-      for due_date_key in params[:due_date].keys
-        due_date_temp = DueDate.find(due_date_key)
-        due_date_temp.update_attributes(params[:due_date][due_date_key])
+      if params[:due_date]
+        for due_date_key in params[:due_date].keys
+          due_date_temp = DueDate.find(due_date_key)
+          due_date_temp.update_attributes(params[:due_date][due_date_key])
+        end
       end
       flash[:notice] = 'Assignment was successfully updated.'
-      redirect_to :action => 'show', :id => @assignment
+      redirect_to :action => 'show', :id => @assignment                  
     else # Simply refresh the page
       @wiki_types = WikiType.find_all
       render :action => 'edit'
-    end
+    end    
   end
   
   def show
@@ -229,70 +211,18 @@ class AssignmentController < ApplicationController
       if Review.find_by_review_mapping_id(review_mapping.id)
         @reviews << Review.find_by_review_mapping_id(review_mapping.id)
       end
-    end
-    
+    end    
   end
   
-  def assign_survey
+  def assign
     @assignment = Assignment.find(params[:id])
-    @assigned_surveys = SurveyHelper::get_assigned_surveys(@assignment.id)
-    @surveys = Array.new
-    
-    if params['subset'] == "mine"
-      @surveys = Questionnaire.find(:all, :conditions => ["type_id = 2 and instructor_id = ?", session[:user].id])
-    elsif params['subset'] == "public"
-      @surveys = Questionnaire.find(:all, :conditions => ["type_id = 2 and private = 0"])
-    else
-      @surveys = @assigned_surveys
-    end
-    
-    if params['update']
-      if params[:surveys]
-        @checked = params[:surveys]
-        
-        if params['submit_subset'] == "mine"
-          @submit_surveys = Questionnaire.find(:all, :conditions => ["type_id = 2 and instructor_id = ?", session[:user].id])
-        elsif params['submit_subset'] == "public"
-          @submit_surveys = Questionnaire.find(:all, :conditions => ["type_id = 2 and private = 0"])
-        else
-          @submit_surveys = @assigned_surveys
-        end
-        
-        for survey in @submit_surveys
-          unless @checked.include? survey.id
-            AssignmentsQuestionnaires.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
-            @assigned_surveys.delete(survey)
-          end
-        end 
-        
-        for checked_survey in @checked
-          @current = Questionnaire.find(checked_survey)
-          unless @assigned_surveys.include? @current
-            @new = AssignmentsQuestionnaires.new(:questionnaire_id => checked_survey, :assignment_id => @assignment.id)
-            @new.save
-            @assigned_surveys << @current
-          end
-        end
-      else
-        for survey in @submit_surveys
-          AssignmentsQuestionnaires.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
-          @assigned_surveys.delete(survey)
-          @surveys.delete(survey)
-        end 
-      end
-    end
-    
-    @surveys.sort!{|a,b| a.name <=> b.name}
-
+    @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
   end
-
-  def delete_selected
-    params[:item].each {
-      |item_id|      
-      assignment = Assignment.find(item_id).first
-      assignment.delete_assignment(logger,params)
-    }
-    
-    redirect_to :action => 'list', :id => params[:id]
+  
+  def remove
+    assignment = Assignment.find(params[:id])
+    assignment.course_id = nil    
+    assignment.save
+    redirect_to :controller => 'tree_display', :action => 'list'
   end  
 end

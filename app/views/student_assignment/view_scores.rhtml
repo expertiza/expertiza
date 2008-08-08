@@ -13,7 +13,7 @@ function toggleVis(id) {
         }
 </SCRIPT>
 
-<h1>Scores for <%= Assignment.find(@assignment_id).name %></h1>
+<h1>Scores for <%= @assignment.name %></h1>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
 	<%= flash[:notice] %>
@@ -24,6 +24,7 @@ function toggleVis(id) {
     review_no = 1
 	grade = 0
     _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
+    
     for review_map in @review_mapping 
         for review in review_map.reviews%>
 			<b>Review <%=review_no%></b> done on <b><%= review.created_at.strftime('%A %B %d %Y, %I:%M%p') %></b><a href="#1" onClick="toggleVis('<%=review_no %>');">
@@ -51,7 +52,7 @@ function toggleVis(id) {
             <%end
 			  grade += total%>
 			  
-            <tr><td><em>Total</em></td><td align = 'right'><%=total%>&nbsp;&nbsp;</td><td><em>Score:</em> <%=total*100/@sum_of_max%>%</td></tr>
+            <tr><td><em>Total</em></td><td align = 'right'><%=total%>&nbsp;&nbsp;</td><td><em>Score:</em> <%=total*100/@assignment.get_max_review_score%>%</td></tr>
            </table><br/>
            Additional comment : <%=review.additional_comment%><br/>
 		   </div>
@@ -86,7 +87,7 @@ function toggleVis(id) {
 		<%if @final_penalty !=0%>
 			<li>Penalty units= <%=@penalty_units%>&nbsp;Penalty per unit=<%=@late_policy.penalty_per_unit%>&nbsp;Maximum penalty=<%=@late_policy.max_penalty%></li>
 		<%end%>
-		&nbsp;&nbsp;<strong>Final grade</strong> = <%=(grade/(review_no-1))*100/@sum_of_max-@final_penalty%>%</li>
+		&nbsp;&nbsp;<strong>Final grade</strong> = <%=(grade/(review_no-1))*100/@assignment.get_max_review_score-@final_penalty%>%</li>
    	<%else%>
 		<%if @assignment.wiki_type_id == 2 %>
 			<%if @assignment.team_assignment %>

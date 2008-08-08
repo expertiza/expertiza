@@ -47,12 +47,14 @@ class ContentPagesController < ApplicationController
 
   def create
     @content_page = ContentPage.new(params[:content_page])
-    if @content_page.save
+    begin
+      @content_page.save!
       flash[:notice] = 'ContentPage was successfully created.'
       Role.rebuild_cache
       redirect_to :action => 'list'
-    else
+    rescue
       foreign
+      
       render :action => 'new'
     end
   end

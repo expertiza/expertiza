@@ -1,4 +1,10 @@
-class TeamsUsersController < ApplicationController
+class TeamsUsersController < ApplicationController  
+
+  def auto_complete_for_user_name      
+    team = Team.find(session[:team_id])    
+    @users = team.get_possible_team_members(params[:user][:name])
+    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
+  end
 
   def list
     @team = Team.find_by_id(params[:id])
@@ -12,42 +18,25 @@ class TeamsUsersController < ApplicationController
   
   def create    
     user = User.find_by_name(params[:user][:name].strip)
-    team = Team.find_by_id(params[:id])
     if !user
-      logger.info "No User found"
-      urlCreate = url_for :controller => 'users', :action => 'new'
-      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
-      
-    else
-      check = TeamsUser.find(:all, :conditions => ["team_id =? and user_id =?",team.id,user.id])
-      if (check.size > 0)
-        flash[:error] = "\"#{user.name}\" is already a member of team \"#{team.name}\""
-      else
-        @teams_user = TeamsUser.new
-        @teams_user.team_id = team.id
-        @teams_user.user_id = user.id
-        @teams_user.save        
-      end
-      participants = Participant.find(:all, :conditions => ['assignment_id = ? and user_id = ?',team.assignment_id, user.id])
-      if participants.length == 0
-        Participant.create(:assignment_id => team.assignment_id, :user_id => user.id, :permission_granted => true)      
-      end
+      urlCreate = url_for :controller => 'users', :action => 'new'      
+      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."            
     end
-    redirect_to :action => 'list', :id => team.id
+    team = Team.find_by_id(params[:id])    
+    
+      team.add_member(user)
+    
+    #  flash[:error] = $!
+    #end
+    redirect_to :controller => 'team', :action => 'list', :id => team.parent_id
   end
-  
-  def delete_team_user
-    @teamuser = TeamsUser.find(params[:id])   
-    team_id = @teamuser.team_id
-    @teamuser.destroy    
-    redirect_to :action => 'list', :id => team_id    
-  end   
-  
- def auto_complete_for_user_name
-  search = params[:user][:name].to_s
-  @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%' and id in (select user_id from participants where user_id not in (select user_id from teams_users where team_id in (select id from teams where assignment_id ="+session[:assignment_id]+")) and assignment_id ="+session[:assignment_id]+")") unless search.blank?
-  render :partial => "members" 
- end
+        
+  def delete
+    teamuser = TeamsUser.find(params[:id])   
+    parent_id = Team.find(teamuser.team_id).parent_id
+    teamuser.destroy    
+    redirect_to :controller => 'team', :action => 'list', :id => parent_id   
+  end    
 
   def delete_selected
     params[:item].each {

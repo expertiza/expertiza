@@ -1,5 +1,8 @@
 class ReviewOfReviewMapping < ActiveRecord::Base
 has_many :review_of_reviews
+belongs_to :reviewer, :class_name => "User", :foreign_key => "reviewer_id"
+belongs_to :review_reviewer, :class_name => "User", :foreign_key => "review_reviewer_id"
+belongs_to :review_mapping
 
   def delete
     reviewofreviews = ReviewOfReview.find(:all, :conditions => ['review_of_review_mapping_id =?',self.id])

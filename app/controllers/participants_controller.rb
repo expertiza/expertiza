@@ -1,44 +1,31 @@
 class ParticipantsController < ApplicationController
   auto_complete_for :user, :name
   
-  def select
-    if (session[:user].role_id != 4)
-      @assignments = Assignment.find(:all, :conditions => ["instructor_id = ?", session[:user].id])
-    else
-      @assignments = Assignment.find(:all)
-    end  
-  end
-
-
-  
   def list
-    @assignment = Assignment.find(params[:id])
-    @participants = @assignment.users
+    @parent = Object.const_get(params[:model]).find(params[:id])
+    @participants = @parent.get_participants  
+    @model = params[:model]    
   end
   
-
-  
-  def add
-    assignment = Assignment.find(params[:assignment_id])
-    user = User.find_by_name(params[:user][:name])
-    if user != nil
-      if user.master_permission_granted
-        participant = Participant.create(:assignment_id => assignment.id, :user_id => user.id, :permission_granted => true)
-      else
-        participant = Participant.create(:assignment_id => assignment.id, :user_id => user.id, :permission_granted => false)
-      end
-    else
-      flash[:error] = "No user account exists with the name "+params[:user][:name]+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."
+  def add    
+    curr_object = Object.const_get(params[:model]).find(params[:id])    
+    begin
+      curr_object.add_participant(params[:user][:name])
+    rescue
+      flash[:error] = $!
     end
-    redirect_to :action => 'list', :id => assignment.id
+    redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
   end
-  
-   
+    
   def delete
     participant = Participant.find_by_user_id(params[:id])
-    assignment_id = participant.assignment_id
+    parent_id = participant.parent_id
+    if participant.type.to_s == 'AssignmentParticipant'
+      model = 'Assignment'
+    else
+      model = 'Course'
+    end
     participant.destroy
-    redirect_to :action => 'list', :id => assignment_id
-  end 
+    redirect_to :action => 'list', :id => parent_id, :model => model
+  end   
 end
-

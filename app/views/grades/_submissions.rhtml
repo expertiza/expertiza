@@ -1,0 +1,24 @@
+<!-- SUBMISSIONS --> 
+<% if participant.get_submitted_files.length > 0 %>
+	<B>File Submissions:</B></BR>
+		<ul>
+		<% for file in participant.get_submitted_files() %>			
+	   	<li><%= link_to file.gsub(participant.get_path+"/"," "), :action => 'open', :fname => file %></li>	   
+		<% end %>    
+		</ul>
+	<% end %>
+	<% if participant.get_wiki_submissions.length > 0 %>
+		<B>Wiki Submissions:</B><BR/>
+		<ul>
+		<% for wiki_subs in participant.get_wiki_submissions() %>
+	   	<li><%= wiki_subs %></li>
+		<% end %>
+		</ul>
+	<% end %>
+	<% if participant.submitted_hyperlink and  participant.submitted_hyperlink.strip.length > 0 %>
+		<B>Hyperlink Submissions:</B><BR/>
+		<ul>
+		<li><A HREF="<%= participant.submitted_hyperlink %>" target="new"><%= participant.submitted_hyperlink %></A></li>
+		</ul>			
+<% end %>
+<!-- END SUBMISSIONS --> 

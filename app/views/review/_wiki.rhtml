@@ -48,7 +48,7 @@ Submitted Files<br />
 <%if @assgt.team_assignment %>
 	<% for team_member in @team_members %>
 	<label>
-	<% submitted = Participant.find(:first, :conditions =>["user_id = ? and assignment_id = ?",team_member.user_id,@assgt.id]).submitted_hyperlink
+	<% submitted = AssignmentParticipant.find(:first, :conditions =>["user_id = ? and parent_id = ?",team_member.user_id,@assgt.id]).submitted_hyperlink
 	if submitted !=nil
 	%>
 	URL to file submission (if available):</label><%= submitted %>

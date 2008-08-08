@@ -1,10 +1,16 @@
 class ReviewMappingController < ApplicationController
   auto_complete_for :user, :name
   
-  def auto_complete_for_user_name       
-    mapping = ReviewMapping.find(session[:mapping_id])
-    @users = User.find_by_sql('SELECT * FROM `users` WHERE `name` like \''+params[:user][:name]+'%\' and `id` IN (SELECT user_id FROM `participants` WHERE `assignment_id` = '+mapping.assignment_id.to_s+')')
-    
+  def auto_complete_for_user_name           
+    query = "select users.* from users, participants"
+    query = query + " where participants.type = 'AssignmentParticipant'"
+    query = query + " and users.name like '"+params[:user][:name]+"%'"
+    query = query + " and users.id = participants.user_id"
+    query = query + " and participants.parent_id = "+session[:mapping][:assignment].id.to_s
+    query = query + " and participants.parent_id <> "+session[:mapping][:contributor].id.to_s
+    query = query + " order by users.name"
+    puts query
+    @users = User.find_by_sql(query)
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
   
@@ -26,8 +32,10 @@ class ReviewMappingController < ApplicationController
   def add_rofreviewer    
     reviewmapping = ReviewMapping.find(params[:id])
     rofreviewer = User.find_by_name(params[:user][:name])
-    rofr = ReviewOfReviewMapping.create(:review_mapping_id => reviewmapping.id,
-                                        :review_reviewer_id => rofreviewer.id)
+    ReviewOfReviewMapping.create(:review_mapping_id => reviewmapping.id,
+                                 :review_reviewer_id => rofreviewer.id,                          
+                                 :reviewer_id => reviewmapping.reviewer_id
+                                 )
    
     redirect_to :action => 'list_rofreviewers', :id => reviewmapping.id                                            
   end  
@@ -120,9 +128,9 @@ class ReviewMappingController < ApplicationController
     @assignment = Assignment.find(params[:id])
         
     if @assignment.team_assignment
-      @items = Team.find_by_sql('select * from `teams` where `assignment_id` = '+@assignment.id.to_s)
+      @items = AssignmentTeam.find_by_sql('select * from `teams` where `parent_id` = '+@assignment.id.to_s)
     else
-      @items = User.find_by_sql('select * from `users` where id in (select `user_id` from `participants` where `assignment_id` = '+@assignment.id.to_s+')')
+      @items = User.find_by_sql('select * from `users` where id in (select `user_id` from `participants` where `parent_id` = '+@assignment.id.to_s+')')
     end
   end
   

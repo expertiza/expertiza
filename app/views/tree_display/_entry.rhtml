@@ -1,5 +1,5 @@
 <% child_nodes = node.get_children(@sortvar,@sortorder,@show) %>
-<%= render :partial => 'row_header', 
+<%= render :partial => '/tree_display/row_header', 
            :locals => {
                :depth => depth, 
                :prefix => prefix, 
@@ -9,11 +9,11 @@
             } %>
 <% if node.get_partial_name %>           
 <%= render :partial => '/tree_display/actions/'+node.get_partial_name, 
-           :locals => {:id => node.node_object_id} %>
+           :locals => {:node => node} %>
 <% else %>
     <%= render :partial=> '/tree_display/actions/no_actions' %>
 <% end %>                        
-<%= render :partial => 'row_footer', 
+<%= render :partial => '/tree_display/row_footer', 
            :locals => {
                :depth => depth, 
                :prefix => prefix, 

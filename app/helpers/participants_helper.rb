@@ -52,14 +52,14 @@ module ParticipantsHelper
   
   def self.add_user_to_assignment(params, user)
     assignment = Assignment.find params[:assignment_id]
-    if (Participant.find(:all,{:conditions => ['user_id=? AND assignment_id=?', user.id, assignment.id]}).size == 0)
-      return Participant.create(:assignment_id => assignment.id, :user_id => user.id)
+    if (AssignmentParticipant.find(:all,{:conditions => ['user_id=? AND parent_id=?', user.id, assignment.id]}).size == 0)
+      return AssignmentParticipant.create(:parent_id => assignment.id, :user_id => user.id)
     end
   end
   
   def self.add_user_to_course(params, user)
-    if (CoursesUsers.find(:all, {:conditions => ['user_id=? AND course_id=?', user.id, params[:course_id]]}).size == 0)
-      CoursesUsers.create :user_id => user.id, :course_id => params[:course_id]
+    if (CourseParticipant.find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, params[:course_id]]}).size == 0)
+      CourseParticipant.create(:user_id => user.id, :parent_id => params[:course_id])
     end
   end
  

@@ -1,0 +1,9 @@
+<!-- METAREVIEWS --> 
+<% if participant.get_metareviews.length > 0 %>
+  <% for metareview in participant.get_metareviews %>
+    <%= metareview.display_as_html() %><BR/><BR/> 
+  <% end %>
+<% else %>
+  <i>No metareviews have been completed for this user's reviews.</i>
+<% end %>
+<!-- END METAREVIEWS -->

@@ -1,23 +1,9 @@
-<SCRIPT LANGUAGE="JavaScript">
-function toggleVis(id) { 
-		var elem = document.getElementById(id+"_myDiv");
-		if(elem.style.display == 'none'){
-			elem.style.display = '';
-			document.getElementById(id+"_show").style.display = 'none';
-			document.getElementById(id+"_hide").style.display = '';
-		} else {
-			elem.style.display = 'none';
-			document.getElementById(id+"_show").style.display = '';
-			document.getElementById(id+"_hide").style.display = 'none';
-		}
-	} 
-</SCRIPT>
 <h1>View Review</h1>
 <%if @assgt.wiki_type.name == "No"%>
-<%if @files.size == 0%>
-<%else%>
-Submitted Files<br />
-<%end%>
+	<%if @files.size == 0%>
+	<%else%>
+		Submitted Files<br />
+	<%end%>
 <%end%>
 
 <%
@@ -60,7 +46,7 @@ Submitted Files<br />
 <%if @assgt.team_assignment %>
 	<% for team_member in @team_members %>
 	<label>
-	<% submitted = Participant.find(:first, :conditions =>["user_id = ? and assignment_id = ?",team_member.user_id,@assgt.id]).submitted_hyperlink
+	<% submitted = AssignmentParticipant.find(:first, :conditions =>["user_id = ? and parent_id = ?",team_member.user_id,@assgt.id]).submitted_hyperlink
 	if submitted !=nil
 	%>
 	URL to file submission (if available):</label><%= submitted %>
@@ -72,13 +58,10 @@ Submitted Files<br />
 		Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
 	<% end %>	
 <%end%>	
-<a href="#1" onClick="toggleVis('1');">
-	<p class="inline" id="1_show" style="display: none">View review</p>
-	<p class="inline" id="1_hide" >Hide review</p>
-</a>
 
+<a href="#1" onClick="toggleElement('review','review');" id="reviewLink" name="reviewLink">Hide review</a>
 <br/>
-<div id="1_myDiv" style="<%= @review_display %>">
+<div id="review">
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
 <%= render :partial => 'review/scores' %> 
 Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
@@ -86,21 +69,15 @@ Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
 </div>
 <%
 review_feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id])
-if(review_feedback) %>
-
-<a href="#2" onClick="toggleVis('2');">
-	<p class="inline" id="2_show" <% if(params[:display] == "all") %> style="display: none" <% end %> >View author feedback</p>
-	<p class="inline" id="2_hide" <% if(params[:display] != "all") %> style="display: none" <% end %> >Hide author feedback</p>
-</a>
-
+  if(review_feedback) %>
+<a href="#1" onClick="toggleElement('feedback','feedback');" id="feedbackLink" name="feedbackLink">Show author feedback</a>
 <br/>
-<% @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", review_feedback.id, '4'])
-%>		     
-<div id="2_myDiv" style="<%= @author_feedback_display %>">
+<% @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", review_feedback.id, '4']) %>		     
+<div id="feedback" style="display:none">
 <strong>Author feedback: </strong><br/>
 <%= render :partial => 'review/score1' %>
 Additional Comment: 
-<%=review_feedback.additional_comments%>
+<%=review_feedback.additional_comment%>
 </div>
 <br/>
 <% end%>

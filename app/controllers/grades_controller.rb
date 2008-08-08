@@ -1,88 +1,23 @@
 class GradesController < ApplicationController
+  helper :file
   
   #the view grading report provides the instructor with an overall view of all the grades for
   #an assignment. It lists all participants of an assignment and all the reviews they recieved.
   #It also gives a final score which is an average of all the reviews and greatest difference
   #in the scores of all the reviews.  
   def view    
-    @max_num_of_reviews = 0;
     @assignment = Assignment.find(params[:id])
-        
-    if @assignment.team_assignment      
-      author_type = 'team_id'
-    else
-      author_type = 'author_id'
+    @participants = @assignment.get_participants
+    if @assignment.team_assignment
+      @teams = @assignment.get_teams
     end
-    mappings = ReviewMapping.find_by_sql("select distinct #{author_type} from review_mappings where assignment_id = #{@assignment.id} order by #{author_type}")
-        
-    @scores_by_author = Array.new 
- 
-    mappings.each {
-      | mappings |
-      
-      entry = Hash.new
-      
-      if @assignment.team_assignment
-        entry[:author] = Team.find(mappings.team_id)
-      else
-        entry[:author] = User.find(mappings.author_id)
-      end
-      
-      entry[:review_scores] = Array.new
-      
-      entry[:total_author_score] = 0
-      entry[:num_reviews] = 0
-      
-      reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (select id from review_mappings where assignment_id  = #{@assignment.id} and #{author_type} = #{entry[:author].id})")
-      max_score = 0
-      min_score = 100
-      
-      reviews.each{
-        |review|
-        total_review_score = 0      
-        if !review.nil?  
-          entry[:num_reviews] += 1
-          score_entry = Hash.new
-          scores = ReviewScore.find(:all, :conditions => ['review_id = ?',review.id]) 
-          scores.each { | item | total_review_score += item.score}
-          score_entry[:review] = review
-          score_entry[:total_review_score] = total_review_score
-          if total_review_score > max_score
-            max_score = total_review_score
-          end
-          if total_review_score < min_score
-            min_score = total_review_score
-          end
-          entry[:review_scores] << score_entry
-        end    
-        entry[:total_author_score] += total_review_score        
-      } 
-      
-      if entry[:num_reviews] > @max_num_of_reviews
-        @max_num_of_reviews = entry[:num_reviews]
-      end      
-      if entry[:num_reviews] > 0
-        entry[:average_author_score] = entry[:total_author_score].to_f / entry[:num_reviews].to_f
-        entry[:max_score] = max_score
-        entry[:min_score] = min_score        
-        entry[:diff] = max_score - min_score
-      else
-        entry[:average_author_score] = 0
-        entry[:diff] = 0
-      end
-      @scores_by_author << entry
-      
-    @sum_of_max = 0
-    @sum_of_max_ror = 0
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
-    end
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).questions
-      @sum_of_max_ror += Questionnaire.find(Assignment.find(@assignment.id).review_of_review_questionnaire_id).max_question_score
-    end  
-    }          
   end  
   
+  def open
+    send_file(params['fname'],:disposition => 'inline')
+  end
+  
+    
   def send_grading_conflict_email
     email_form = params[:mailer]
     assignment = Assignment.find(email_form[:assignment])
@@ -113,66 +48,93 @@ class GradesController < ApplicationController
   # ther grading conflict email form provides the instructor a way of emailing
   # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.  
   def conflict_notification
-    @instructor = session[:user];
-    @sum_of_max = 0
-    @student = Participant.find(params[:id])
-    @assignment = @student.assignment
-    @reviewers_email_hash = {}
-    @reviewers = Array.new
-    @subject = " Your review score for " + @assignment.name + " conflicts with another reviewers."
+    @instructor = session[:user]
+    @participant = AssignmentParticipant.find(params[:id])
+    @assignment = Assignment.find(@participant.parent_id)  
     
-    @body = get_body_text
-      
-    @users_grades = Array.new
-    all_grades = ReviewScore.find_by_sql("select review_id, sum(score) as total_score from review_scores group by review_id order by total_score") 
-    for question in Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment.id).review_questionnaire_id).max_question_score
-    end
-    for grade in all_grades
-      if grade.review.review_mapping.author_id.to_s == @student.user.id.to_s
-        @users_grades << grade
-        reviewer = grade.review.review_mapping.reviewer
-        @reviewers << grade.review.review_mapping.reviewer
-        @reviewers_email_hash[reviewer.fullname.to_s+" <"+reviewer.email.to_s+">"] = reviewer.email.to_s
-      end
-    end
-    @reviewers = @reviewers.sort {|a,b| a.fullname <=> b.fullname}
-  end
-  
-  #the final grade report is a page that summarizes all the information an instructor
-  #might need to assign a grade for an assignment. Currently it provides all review scores left
-  #for an assignment (as well as the comments) and the author feedback (with comments).
-  #Support for review of reviews, submission versions and teams still needs to be added.
-  def edit
+    @reviews = Array.new    
+    @reviewers_email_hash = Hash.new 
     
-  end
-  
-  #this saves the the final grade for a participant of an assignment, as well as saving
-  #comments for the student and the instructor. It is called from the final_grade_reports page
-  def save_final_grade
-    form = params[:participant]
-    student = Participant.find(form[:student])
-    student.grade = form[:grade]
-    student.comments_to_student = form[:student_comments]
-    student.private_instructor_comments = form[:non_student_comments]
-     
-    if student.save
-      flash[:note] = 'Final grade was successfully submitted.'
-      redirect_to :action => 'final_grade_report', :id => form[:student]
+    if params[:submission]       
+      processReview()   
     else
-      flash[:notice] = 'An error occured trying to submit the final grade. Please ensure you provided a grade greater than or equal to zero.'
-      redirect_to :action => 'final_grade_report', :id => form[:student]
+      processMetareview()
+    end       
+  
+    @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."
+    @body = get_body_text(params[:submission])
+    @submission = params[:submission]
+  end
+  
+  def edit    
+    @participant = AssignmentParticipant.find(params[:id])        
+  end
+  
+  def update
+    @participant = AssignmentParticipant.find(params[:id])
+    if sprintf("%.2f",@participant.compute_total_score*100) != params[:participant][:grade]
+      @participant.grade = params[:participant][:grade]
+      @participant.save
     end
+    
+    redirect_to :action => 'edit', :id => params[:id]
   end
   
 private
-  def get_body_text
+
+  
+  def processReview
+      @collabel = "Review"
+      @rowlabel = "Reviewer"
+      if @assignment.team_assignment       
+         @author = AssignmentTeam.find_by_sql("select distinct teams.* from teams, teams_users where teams.id = teams_users.team_id and teams.type = 'AssignmentTeam' and teams.parent_id = "+@assignment.id.to_s+" and teams_users.user_id = "+@participant.user_id.to_s).first      
+         query = "assignment_id = ? and team_id = ?"
+      else
+         @author = User.find(participant.user_id)
+         query = "assignment_id = ? and author_id = ?"
+      end   
+      mappings = ReviewMapping.find(:all, :conditions => [query,@assignment.id,@author.id])    
+   
+      mappings.each{
+        | mapping |
+        review = Review.find_by_review_mapping_id(mapping.id)
+        if review
+          @reviews << review
+          @reviewers_email_hash[mapping.reviewer.fullname.to_s+" <"+mapping.reviewer.email.to_s+">"] = mapping.reviewer.email.to_s        
+        end
+      }    
+      @reviews = @reviews.sort {|a,b| a.review_mapping.reviewer.fullname <=> b.review_mapping.reviewer.fullname}    
+  end
+  
+  def processMetareview
+      @collabel = "Metareview"
+      @rowlabel = "Metareviewer"
+      @author = User.find(@participant.user_id)
+     
+      mappings = ReviewOfReviewMapping.find_by_sql("select * from review_of_review_mappings where review_mapping_id in (select id from review_mappings where assignment_id = "+@assignment.id.to_s+" and reviewer_id = "+@author.id.to_s+")") 
+      mappings.each {
+        | mapping |
+        review = ReviewOfReview.find_by_review_of_review_mapping_id(mapping.id)
+        if review
+           @reviews << review
+           @reviewers_email_hash[mapping.review_reviewer.fullname.to_s+" <"+mapping.review_reviewer.email.to_s+">"] = mapping.review_reviewer.email.to_s
+        end    
+      }
+      @reviews = @reviews.sort {|a,b| a.review_of_review_mapping.review_reviewer.fullname <=> b.review_of_review_mapping.review_reviewer.fullname}    
+  end
+
+  def get_body_text(submission)
+    if submission
+      role = "reviewer"
+      item = "submission"
+    else
+      role = "metareviewer"
+      item = "review"
+    end
     "Hi ##[recipient_name], 
     
-You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that 
-varied greatly from another reviewer's score for the same submission.  
-The Expertiza system has brought this to my attention.
-
-"
+You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+". 
+    
+The Expertiza system has brought this to my attention."
   end  
 end

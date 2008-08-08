@@ -5,8 +5,8 @@ class StudentAssignmentController < ApplicationController
   helper :student_assignment
   
   def view_team
-    @student = Participant.find(params[:id])
-    @teams = Team.find(:all, :conditions => ['assignment_id = ?', @student.assignment_id])
+    @student = AssignmentParticipant.find(params[:id])
+    @teams = AssignmentTeam.find_all_by_parent_id(@student.parent_id)
     for team in @teams
       @teamuser = TeamsUser.find(:first, :conditions => ['team_id = ? and user_id = ?', team.id, @student.user_id])
       if @teamuser != nil
@@ -15,37 +15,34 @@ class StudentAssignmentController < ApplicationController
     end
     
     @team_members = TeamsUser.find(:all, :conditions => ['team_id = ?', @team_id])
-    @send_invs = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', @student.user_id, @student.assignment_id])
-    @received_invs = Invitation.find(:all, :conditions => ['to_id = ? and assignment_id = ? and reply_status = "W"', @student.user_id, @student.assignment_id])
+    @send_invs = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', @student.user_id, @student.parent_id])
+    @received_invs = Invitation.find(:all, :conditions => ['to_id = ? and assignment_id = ? and reply_status = "W"', @student.user_id, @student.parent_id])
   end
   
   def list
     user_id = session[:user].id
     @user =session[:user]
-    @participants = Participant.find(:all, 
-                                    :conditions => ['user_id = ?', user_id],
-                                    :order => "assignment_id DESC")
+    @participants = AssignmentParticipant.find_all_by_user_id(user_id, :order => "parent_id DESC")
   end
   
   def view_publishing
     user_id = session[:user].id
     @user =session[:user]
-    @participants = Participant.find(:all, 
+    @participants = AssignmentParticipant.find(:all, 
                                     :conditions => ['user_id = ?', user_id],
-                                    :order => "assignment_id DESC")
+                                    :order => "parent_id DESC")
   end
   
   def view_actions
-    @student = Participant.find(params[:id])
-    @assignment_id = @student.assignment_id
+    @student = AssignmentParticipant.find(params[:id])
+    @assignment_id = @student.parent_id
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
     @can_view_your_work, @can_view_others_work = find_viewing_permissions(@due_dates)
     @assigned_surveys = SurveyHelper::get_all_available_surveys(@assignment_id, session[:user].role_id)
   end
   
-  def eula_yes
-  
+  def eula_yes  
     @user = session[:user]
     @user.is_new_user = 0
     
@@ -57,7 +54,7 @@ class StudentAssignmentController < ApplicationController
     end
   end
   
-    def eula_no
+  def eula_no
       flash[:notice] = 'You have to accept the license agreement in order to use the system'
       redirect_to :action => 'list'
   end
@@ -75,7 +72,7 @@ class StudentAssignmentController < ApplicationController
 #  end
   
   def set_publish_permission_yes
-    @participant = Participant.find(:first, :conditions => ["id = ?",params[:participant]])
+    @participant = AssignmentParticipant.find(:first, :conditions => ["id = ?",params[:participant]])
     @participant.permission_granted = 1;
     @participant_id = params[:id]
     if @participant.save
@@ -87,7 +84,7 @@ class StudentAssignmentController < ApplicationController
   end
   
   def set_publish_permission_no
-    @participant = Participant.find(:first, :conditions => ["id = ?",params[:participant]])
+    @participant = AssignmentParticipant.find(:first, :conditions => ["id = ?",params[:participant]])
     @participant.permission_granted = 0;
     @participant_id = params[:id]
     if @participant.save
@@ -99,7 +96,7 @@ class StudentAssignmentController < ApplicationController
   end
   
   def set_all_publish_permission_yes
-    @participants = Participant.find(:all, :conditions => ["user_id = ?",params[:user]])
+    @participants = AssignmentParticipant.find(:all, :conditions => ["user_id = ?",params[:user]])
     for participant in @participants
       participant.permission_granted = 1;
       if !participant.save
@@ -110,7 +107,7 @@ class StudentAssignmentController < ApplicationController
   end
   
   def set_all_publish_permission_no
-    @participants = Participant.find(:all, :conditions => ["user_id = ?",params[:user]])
+    @participants = AssignmentParticipant.find(:all, :conditions => ["user_id = ?",params[:user]])
     for participant in @participants
       participant.permission_granted = 0;
       if !participant.save
@@ -141,30 +138,23 @@ class StudentAssignmentController < ApplicationController
   end
   
   def view_scores
-    @author_id = session[:user].id
-    @assignment_id = Participant.find(params[:id]).assignment_id
-    @assignment = Assignment.find(@assignment_id)
+    @student = AssignmentParticipant.find(params[:id])    
+    @assignment = Assignment.find(@student.parent_id)
     if @assignment.team_assignment 
-      @team_id = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where assignment_id=?) and assignment_id = ?", @author_id, @assignment_id, @assignment_id]).team_id
-      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
-      @student = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @assignment_id])
-      @user_name= session[:user].name
-      #@user_name = User.find(@author_first_user_id).name
-      @review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", @team_id, @assignment_id])
-    elsif !@assignment.team_assignment
-      @student = Participant.find(params[:id])
-      @user_name= session[:user].name
-      @user_name = User.find(@student.user_id).name
-      @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
-    end
-    @late_policy = LatePolicy.find(Assignment.find(@assignment_id).due_dates[0].late_policy_id)
-    @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes
-    
-    #the code below finds the sum of the maximum scores of all questions in the questionnaire
-    @sum_of_max = 0
-    for question in Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).max_question_score
-    end
+      t_query = "select teams.* from teams, teams_users"
+      t_query = t_query + " where teams.parent_id = "+@assignment.id.to_s
+      t_query = t_query + " and teams.type = 'AssignmentTeam'"
+      t_query = t_query + " and teams.id = teams_users.team_id"
+      t_query = t_query + " and teams_users.user_id = "+@student.user_id.to_s
+      author = Team.find_by_sql(t_query).first            
+      query = "team_id = ? and assignment_id = ?"      
+    else
+      author = @student
+      query = "author_id = ? and assignment_id = ?"
+    end   
+    @review_mapping = ReviewMapping.find(:all, :conditions => [query, author.id, @assignment.id])
+    @late_policy = LatePolicy.find(Assignment.find(@assignment.id).due_dates[0].late_policy_id)
+    @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes      
     
     if @student.penalty_accumulated/@late_policy.penalty_period_in_minutes*@late_policy.penalty_per_unit < @late_policy.max_penalty
       @final_penalty = @penalty_units*@late_policy.penalty_per_unit
@@ -173,12 +163,17 @@ class StudentAssignmentController < ApplicationController
     else
       @final_penalty = @late_policy.max_penalty
     end
-    @review_of_review_mappings = Array.new
-    for review_mapping_for_author in @review_mappings
-      if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
-        @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
-      end
+    
+    query = "select review_of_review_mappings.* from review_of_review_mappings, review_mappings"
+    query = query + "  where review_of_review_mappings.review_mapping_id = review_mappings.id"
+    if @assignment.team_assignment
+      query = query + "        and review_mappings.team_id = "+author.id.to_s
+    else
+      query = query + "        and review_mappings.author_id = "+author.id.to_s
     end
+    
+    
+    @review_of_review_mappings = ReviewOfReviewMapping.find_by_sql(query)    
   end
   
   def set_feedback
@@ -206,36 +201,36 @@ class StudentAssignmentController < ApplicationController
   end
   
   def view_feedback
-    @author_id = session[:user].id
-    @assignment_id = Participant.find(params[:id]).assignment_id
+    participant = AssignmentParticipant.find(params[:id])
+    @author_id = participant.user.id
+    @assignment_id = participant.parent_id
     @assignment = Assignment.find(@assignment_id)
      if @assignment.team_assignment 
-      @team_id = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where assignment_id=?) and assignment_id = ?", @author_id, @assignment_id, @assignment_id]).team_id
-      @team_members = TeamsUser.find(:all,:conditions => ["user_id=? and team_id in (select id from teams where assignment_id=?) and assignment_id= ?", @author_id, @assignment_id, @assignment_id])
+      @team_id = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where type = 'AssignmentTeam' and parent_id=?)", @author_id, @assignment_id]).team_id
+      @team_members = TeamsUser.find(:all,:conditions => ["user_id=? and team_id in (select id from teams where type = 'AssignmentTeam' and parent_id=?)", @author_id, @assignment_id])
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
-      @student = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @assignment_id])
+      @student = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @assignment_id])
       @user_name= session[:user].name
       @review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", @team_id, @assignment_id])
     elsif !@assignment.team_assignment
-      @student = Participant.find(params[:id])
+      @student = AssignmentParticipant.find(params[:id])
       @user_name= session[:user].name
       @user_name = User.find(@student.user_id).name
       @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
     end
     @link = @student.submitted_hyperlink
     @files = Array.new
-    @files = get_submitted_file_list(@direc, @student, @files)
-    
-    #the code below finds the sum of the maximum scores of all questions in the questionnaire
-    @sum_of_max = 0
-    for question in Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).max_question_score
-    end
+    @files = @student.get_submitted_files()
+    @current_folder = DisplayOption.new
+    @current_folder.name = "/"
+    if params[:current_folder]
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
+    end    
   end
   
   def view_grade
     @author_id = session[:user].id
-    @assignment_id = Participant.find(params[:id]).assignment_id
+    @assignment_id = AssignmentParticipant.find(params[:id]).parent_id
     @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])   
   end
   
@@ -254,12 +249,12 @@ class StudentAssignmentController < ApplicationController
     return @review_phase
   end
 
-  def submit
-    @student = Participant.find(params[:id])
+  def submit    
+    @student = AssignmentParticipant.find(params[:id])
     @link = @student.submitted_hyperlink
     @submission = params[:submission]
     @files = Array.new
-    @assignment_id = @student.assignment_id
+    @assignment_id = @student.parent_id
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
     @submit_due_date = DueDate.find(:all, :conditions => ["assignment_id = ? and deadline_type_id = ?",@assignment_id,1])
@@ -285,9 +280,9 @@ class StudentAssignmentController < ApplicationController
       
       file_split = file_name.split('.')
       if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
-        send_file(get_student_directory(@student) + folder_name + "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline') 
+        send_file(@student.get_path + folder_name + "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline') 
       else
-        send_file(get_student_directory(@student) + folder_name + "/" + file_name, :disposition => 'inline') 
+        send_file(@student.get_path + folder_name + "/" + file_name, :disposition => 'inline') 
       end
       
     end
@@ -318,23 +313,30 @@ class StudentAssignmentController < ApplicationController
     
     if params['upload_file']
       file = params['uploaded_file']
-      puts file
-
+      
       if @student.directory_num == nil or @student.directory_num < 0
-        set_student_directory_num
-        #send message to reviewers(s) when submission has been updated
-        #ajbudlon, sept 07, 2007
-        Assignment.find_by_id(@assignment_id).email(@student.user_id)
-      end      
+        @student.set_student_directory_num        
+      end     
+      
+      FileHelper.create_directory(@student)
+      
       
       safe_filename = FileHelper::sanitize_filename(file.full_original_filename)
-      curr_directory = get_student_directory(@student)+ @current_folder.name
-      full_filename =  curr_directory + safe_filename #curr_directory +
+            
+      full_filename = @student.get_path + safe_filename      
+      puts full_filename
       File.open(full_filename, "wb") { |f| f.write(file.read) }
+      #send message to reviewers(s) when submission has been updated
+      #ajbudlon, sept 07, 2007
+      Assignment.find_by_id(@assignment_id).email(@student.user_id)      
       StudentAssignmentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
       
       update_resubmit_times
+      puts "*** done ***"
     end
+    
+    puts "** directory num **"
+    puts @student.directory_num
     
     if @student.directory_num != nil and @student.directory_num >= 0
       get_student_folders
@@ -346,7 +348,6 @@ class StudentAssignmentController < ApplicationController
     @review_mappings_for_author = ReviewMapping.find(:all, :conditions => ["author_id = ?",(session[:user].id)])
     for review_mapping_for_author in @review_mappings_for_author
       if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
-        puts ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
         @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
       end
     end
@@ -360,8 +361,8 @@ private
 
   def create_new_folder
     new_folder = FileHelper::sanitize_filename(params[:new_folder])
-    if !File.exist?(get_student_directory(@student) + @current_folder.name + "/" + new_folder)
-      Dir.mkdir(get_student_directory(@student) + @current_folder.name + "/" + new_folder)
+    if !File.exist?(@student.get_path + @current_folder.name + "/" + new_folder)
+      Dir.mkdir(@student.get_path + @current_folder.name + "/" + new_folder)
     else 
       flash[:notice] = "Directory name is already taken"
     end
@@ -369,8 +370,8 @@ private
   
   def move_file
     for file_checked in params[:chk_files]
-      old_filename = get_student_directory(@student) + @current_folder.name + "/" + params[:filenames][file_checked[0]].to_s
-      new_filename = get_student_directory(@student) + FileHelper::sanitize_folder(params[:moved_file])
+      old_filename = @student.get_path + @current_folder.name + "/" + params[:filenames][file_checked[0]].to_s
+      new_filename = @student.get_path + FileHelper::sanitize_folder(params[:moved_file])
       file_op "move", old_filename, new_filename
       break
     end
@@ -381,7 +382,7 @@ private
     weblink = params['submission']
     
     if validate(weblink)
-      participant = Participant.find(params[:id])   
+      participant = AssignmentParticipant.find(params[:id])   
       participant.submitted_hyperlink = weblink
       participant.save
     end
@@ -407,8 +408,8 @@ private
   
   def copy_file
     for file_checked in params[:chk_files]
-      old_filename = get_student_directory(@student) + @current_folder.name + "/" + params[:filenames][file_checked[0]].to_s
-      new_filename = get_student_directory(@student) + FileHelper::sanitize_folder(params[:copy_file])
+      old_filename = @student.get_path + @current_folder.name + "/" + params[:filenames][file_checked[0]].to_s
+      new_filename = @student.get_path + FileHelper::sanitize_folder(params[:copy_file])
       if File.exist?(old_filename)
         file_op "copy", old_filename, new_filename
       else
@@ -420,8 +421,8 @@ private
 
   def rename_selected_file
     for file_checked in params[:chk_files]
-      old_filename = get_student_directory(@student) + @current_folder.name + "/" + params[:filenames][file_checked[0]].to_s
-      new_filename = get_student_directory(@student) + @current_folder.name + "/" + FileHelper::sanitize_filename(params[:new_filename])
+      old_filename = @student.get_path + @current_folder.name + "/" + params[:filenames][file_checked[0]].to_s
+      new_filename = @student.get_path + @current_folder.name + "/" + FileHelper::sanitize_filename(params[:new_filename])
       file_op "rename", old_filename, new_filename
       break
     end
@@ -447,59 +448,16 @@ private
       for file_checked in params[:chk_files]
         # Loop through all the selected files and delete them
         filename = params[:filenames][file_checked[0]].to_s
-        File.delete(get_student_directory(@student) + @current_folder.name + "/" + filename)
+        File.delete(@student.get_path + @current_folder.name + "/" + filename)
       end
     end
   end
 
-  def set_student_directory_num
-    # If a student or team member has not submitted anything
-    # a directory number needs to be assigned to the participants
-    # this is done by determining the last directory number 
-    # created and incrementing it.
-    assignment = Assignment.find(@assignment_id)
-    participants = Participant.find(:all, :conditions => ['assignment_id = ?',assignment.id], :order => 'directory_num DESC')
-
-    if assignment.team_assignment
-      if participants != nil and participants[0].directory_num != nil
-        assign_team_directories(assignment, participants[0].directory_num + 1)
-      else
-        assign_team_directories(assignment,0)
-      end     
-    else
-      if participants != nil and participants[0].directory_num != nil
-        @student.directory_num = participants[0].directory_num + 1
-      else
-        @student.directory_num = 0
-      end
-      Dir.mkdir(get_student_directory(@student))
-      @student.save   
-    end    
-  end
-
-  def assign_team_directories(assignment, dir_num)
-    # handles a team assignment so that each member
-    # of the team has the same submission directory
-   
-    Team.find_by_assignment_id(assignment.id).each{
-      | team | 
-      TeamsUser.find_by_team_id(team.id).each{
-        |member| 
-        participant = Participant.find(:first, :conditions => ['user_id = ? and assignment_id = ?', member.user_id, assignment.id])
-        participant.directory_num = dir_num
-        participant.save        
-        Dir.mkdir(get_student_directory(participant))
-     }
-    }    
-  end
-
-  def get_student_directory(participant)
-    # This assumed that the directory num has already been set
-    return RAILS_ROOT + "/pg_data/" + participant.assignment.directory_path + "/" + participant.directory_num.to_s
-  end
-
-  def get_student_files
-    temp_files = Dir[get_student_directory(@student) + @current_folder.name + "/*"]
+  def get_student_files   
+    puts "** Getting files **"
+    path = @student.get_path + @current_folder.name
+    puts path
+    temp_files = Dir[@student.get_path + @current_folder.name + "/*"]   
     for file in temp_files
       if not File.directory?(Dir.pwd + "/" + file) then
         @files << file
@@ -509,12 +467,13 @@ private
   end
   
   def get_student_folders
-    temp_files = Dir[get_student_directory(@student) + "/*"]
+    puts "** Getting folders **"
+    temp_files = Dir[@student.get_path + "*"]
     @folders = Array.new
     @folders << "/"
     for file in temp_files
       if File.directory?(Dir.pwd + "/" + file) then
-        @folders << file.gsub(get_student_directory(@student), "")
+        @folders << file.gsub(@student.get_path, "")
         find_student_folders file
       end
     end
@@ -525,7 +484,7 @@ private
     temp_files = Dir[dir + "/*"]
     for file in temp_files
       if File.directory?(file) then
-        @folders << file.gsub(get_student_directory(@student), "")
+        @folders << file.gsub(@student.get_path, "")
         find_student_folders file
       end
     end
@@ -576,7 +535,7 @@ private
   
   def get_submitted_file_list(direc,author,files)
     if(author!=nil && author.directory_num)
-      direc = RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + author.directory_num.to_s
+      direc = author.get_path
       temp_files = Dir[direc + "/*"]
       for file in temp_files
         if not File.directory?(Dir.pwd + "/" + file) then

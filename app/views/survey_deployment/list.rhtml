@@ -25,7 +25,7 @@ Survey Deployment
 <% @survey_deployments.each do |survey_deployment| %>
 <tr>
 <td align=center><%= @surveys[survey_deployment.id] %></td>
-<td align=center><%= Course.find_by_id(survey_deployment.course_id).title %></td>
+<td align=center><%= Course.find_by_id(survey_deployment.course_id).name %></td>
 <td align=center><%= survey_deployment.start_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
 <td align=center><%= survey_deployment.end_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
 <td align=center><%= survey_deployment.num_of_students %></td>

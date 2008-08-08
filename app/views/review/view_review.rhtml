@@ -1,7 +1,8 @@
 <%= render :partial => 'view' %>
-<% if params[:where] == nil%>
-<%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
-<%else%>
-<%= link_to 'Back',:controller=>'assignment', :action => 'view_report', :id => @assgt.id %>
+<BR/>
+<% if session[:return_to] %>
+  <%= link_to 'Back', session[:return_to] %>
+<% elsif params[:where] == nil%>
+  <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %> 
 <%end%>
 

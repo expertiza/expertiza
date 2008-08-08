@@ -5,7 +5,7 @@ module ReviewHelper
     @review_scores = @review.review_scores
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
-    @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
+    @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @assgt.id])
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
     @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
     
@@ -13,10 +13,10 @@ module ReviewHelper
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
       @author_name = User.find(@author_first_user_id).name;
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
+      @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @mapping.assignment_id])
     else
       @author_name = User.find(@mapping.author_id).name
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
+      @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
     
     @max = @questionnaire.max_question_score
@@ -29,7 +29,7 @@ module ReviewHelper
     end
     
     @files = Array.new
-    @files = get_submitted_file_list(@direc, @author, @files)
+    @files = @author.get_submitted_files()
     
     if fname
       view_submitted_file(@current_folder,@author)

@@ -2,6 +2,21 @@ class QuestionnaireController < ApplicationController
   
   before_filter :authorize
   
+  def copy
+    orig_questionnaire = Questionnaire.find(params[:id])
+    new_questionnaire = orig_questionnaire.clone
+    new_questionnaire.instructor_id = session[:user].id
+    new_questionnaire.name = 'Copy of '+orig_questionnaire.name
+    if new_questionnaire.save
+      parent = QuestionnaireTypeNode.find_by_node_object_id(new_questionnaire.type_id)
+      QuestionnaireNode.create(:node_object_id => new_questionnaire.id, :parent_id => parent.id)
+      redirect_to :controller => 'questionnaire', :action => 'edit', :id => new_questionnaire.id
+    else
+      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'
+      redirect_to :action => 'list', :controller => 'tree_display'
+    end      
+  end
+  
   def list
     set_up_display_options("QUESTIONNAIRE")
     @questionnaires = super(Questionnaire)
@@ -25,20 +40,20 @@ class QuestionnaireController < ApplicationController
     end
   end
   
-  def delete_questionnaire
-    @questionnaire = get(Questionnaire, params[:id])
-    node = QuestionnaireNode.find_by_node_object_id(@questionnaire.id)             
+  def delete
+    questionnaire = get(Questionnaire, params[:id])
+    node = QuestionnaireNode.find_by_node_object_id(questionnaire.id)             
     if node
       node.destroy
     end
-    if @questionnaire == nil
-      redirect_to :action => 'list' 
+    if questionnaire == nil
+      redirect_to :action => 'list', :controller => 'tree_display'
     else 
-      if @questionnaire.assignments_exist? == false or params['delete']
-        @questionnaire.delete_assignments
-        @questionnaire.delete_questions
-        @questionnaire.destroy
-        redirect_to :action => 'list'
+      if questionnaire.assignments_exist? == false or params['delete']
+        questionnaire.delete_assignments
+        questionnaire.delete_questions
+        questionnaire.destroy
+        redirect_to :action => 'list', :controller => 'tree_display'
       end
     end
   end
@@ -48,7 +63,7 @@ class QuestionnaireController < ApplicationController
     redirect_to :action => 'list' if @questionnaire == nil
   end
   
-  def edit_questionnaire
+  def edit
     @questionnaire = get(Questionnaire, params[:id])
     redirect_to :action => 'list' if @questionnaire == nil
    
@@ -146,7 +161,7 @@ class QuestionnaireController < ApplicationController
     
     if @questionnaire.save
       parent = QuestionnaireTypeNode.find_by_node_object_id(@questionnaire.type_id)
-      QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id, :table => 'questionnaires')             
+      QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)             
       flash[:notice] = 'questionnaire was successfully saved.'
       redirect_to :controller => 'tree_display', :action => 'list'
     else # If something goes wrong, stay at same page

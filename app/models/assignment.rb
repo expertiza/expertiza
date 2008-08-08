@@ -25,7 +25,42 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :directory_path
   validates_presence_of :review_questionnaire_id
   validates_presence_of :review_of_review_questionnaire_id
-  validates_numericality_of :review_weight
+  validates_numericality_of :review_weight    
+    
+  def get_max_review_score
+    max = 0
+    Questionnaire.find(self.review_questionnaire_id).questions.each{
+      max += Questionnaire.find(self.review_questionnaire_id).max_question_score
+    }    
+    return max.to_f
+  end
+  
+  def get_max_metareview_score
+    max = 0
+    Questionnaire.find(self.review_of_review_questionnaire_id).questions.each{
+      max += Questionnaire.find(self.review_of_review_questionnaire_id).max_question_score
+    }    
+    return max.to_f
+  end
+    
+  def get_path
+    if self.course_id == nil and self.instructor_id == nil
+      raise "Path can not be created. The assignment must be associated with either a course or an instructor."
+    end
+    if self.wiki_type_id != 1
+      raise PathError, "No path needed"
+    end
+    if self.course_id > 0
+       path = Course.find(self.course_id).get_path
+    else
+       path = RAILS_ROOT + "/pg_data/" +  FileHelper.clean_path(User.find(self.instructor_id).name) + "/"
+    end         
+    return path + FileHelper.clean_path(self.directory_path)      
+  end
+    
+  def get_participants
+    AssignmentParticipant.find_by_sql("select participants.* from participants, users where participants.user_id = users.id and participants.type = 'AssignmentParticipant' and participants.parent_id = "+self.id.to_s+" order by users.fullname")
+  end
     
   def delete_assignment
     begin
@@ -38,7 +73,7 @@ class Assignment < ActiveRecord::Base
     rescue
       raise $!
     end
-      participants = Participant.find(:all, :conditions => ["assignment_id = ?",self.id])
+      participants = AssignmentParticipant.find(:all, :conditions => ["parent_id = ?",self.id])
     begin
       participants.each {|participant| participant.delete }
     rescue
@@ -192,4 +227,71 @@ class Assignment < ActiveRecord::Base
      return false
    end
  end
+ 
+ def get_teams
+   AssignmentTeam.find_all_by_parent_id(self.id)
+ end
+ 
+ def add_participant(user_name)
+  user = User.find_by_name(user_name)
+  if (user == nil) 
+    raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."      
+  end
+  participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)    
+  if !participant
+    AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
+  else
+    raise "The user \""+user.name+"\" is already a participant."
+  end
+ end 
+ 
+ def create_node()
+      parent = CourseNode.find_by_node_object_id(self.course_id)      
+      node = AssignmentNode.create(:node_object_id => self.id)
+      if parent != nil
+        node.parent_id = parent.id       
+      end
+      node.save   
+ end
+ 
+ COMPLETE = "Complete"
+ 
+ def get_current_stage()
+    due_date = find_current_stage()
+    if due_date == nil or due_date == COMPLETE
+      return COMPLETE
+    else
+      return DeadlineType.find(due_date.deadline_type_id).name
+    end
+  end 
+  
+  def get_stage_deadline()
+    due_date = find_current_stage()
+    if due_date == nil or due_date == COMPLETE
+      return due_date
+    else
+      return due_date.due_at.to_s
+    end
+  end
+  
+def find_current_stage()
+    due_dates = DueDate.find(:all, 
+                 :conditions => ["assignment_id = ?", self.id],
+                 :order => "due_at DESC")
+                 
+    if due_dates != nil and due_dates.size > 0
+      if Time.now > due_dates[0].due_at
+        return COMPLETE
+      else
+        i = 0
+        for due_date in due_dates
+          if Time.now < due_date.due_at and
+             (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
+            return due_date
+          end
+          i = i + 1
+        end
+      end
+    end
+  end  
 end

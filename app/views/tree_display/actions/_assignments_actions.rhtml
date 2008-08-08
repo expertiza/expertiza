@@ -1,24 +1,23 @@
+<% owner_id = Object.const_get('Assignment').find(node.node_object_id).instructor_id %>
+
 <TD WIDTH="15%">      
 <ul id="actionmenu"><li class="daddy">&nbsp;
 <ul>
-<% if session[:user].id == Assignment.find(id).instructor_id %>
-<li><%= link_to 'Edit assignment',:controller=>'assignment', :action=>'edit', :id => id %></li>
-<% end %>
-<li><%= link_to 'Copy assignment',:controller=>'assignment', :action=>'copy', :id => id %></li>
-<% if session[:user].id == Assignment.find(id).instructor_id %>
-<li><%= link_to 'Delete assignment',:controller=>'assignment', :action=>'delete', :id => id %></li>   
-<% if Assignment.find(id).private %>  
-	<li><%= link_to 'Make Public',:controller=>'assignment', :action=>'toggle_access', :id => id %></li>
+<%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Assignment', :controller => 'assignment', :node => node, :owner_id => owner_id} %>
+<% if session[:user].id == owner_id %>  
+<li><%= link_to 'Add Participants',:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment'%></li>            
+<% if Assignment.find(node.node_object_id).team_assignment %><li><%= link_to 'Create teams',:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Assignment' %></li><% end %>
+<% if Assignment.find(node.node_object_id).course_id > 0%>
+<li><%= link_to 'Remove from Course', :controller => 'assignment', :action => 'remove', :id => node.node_object_id %>
 <% else %>
-    <li><%= link_to 'Make Private',:controller=>'assignment', :action=>'toggle_access', :id => id %></li>
-<% end %>   
-<% if Assignment.find(id).team_assignment %><li><%= link_to 'Create teams',:controller=>'team', :action=>'list', :id => id %></li>
-<% else %><li><%= link_to 'Add Participants',:controller=>'participants', :action=>'list', :id => id %></li>            
+<li><%= link_to 'Assign to Course', :controller => 'assignment', :action => 'assign', :id => node.node_object_id %> 
 <% end %> 
-<li><%= link_to 'Assign Reviewers',:controller=>'review_mapping', :action=>'list_mappings', :id => id %></li>
-<li><%= link_to 'View Scores',:controller=>'grades', :action=>'view', :id => id %></li>   
-<li><%= link_to 'View Survey Responses',:controller=>'survey_response', :action=>'view_responses', :id => id %></li>
-<% end %>                                                         
+<li><%= link_to 'Assign Reviewers',:controller=>'review_mapping', :action=>'list_mappings', :id => node.node_object_id %></li>
+<li><%= link_to 'View Scores',:controller=>'grades', :action=>'view', :id => node.node_object_id %></li>   
+<li><%= link_to 'Assign Surveys',:controller=>'survey', :action=>'list', :id => node.node_object_id %></li>
+
+<li><%= link_to 'View Survey Responses',:controller=>'survey_response', :action=>'view_responses', :id => node.node_object_id %></li>
+<% end %>
 </ul>
 </li></ul>
-</TD>          
+</TD> 

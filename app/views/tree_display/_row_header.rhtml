@@ -29,12 +29,12 @@
          onclick="return false;"><img src="/images/noaction.png">
        <% end %></a></div></TD>
        <TD WIDTH="2%" ALIGN="RIGHT">
-         <%= link_to '<img src="/images/drill.png">', :controller => 'tree_display', :action => 'list', :root => parent_node.id, :show => @show, :sortvar => @sortvar, :sortorder => @sortorder %>
+         <%= link_to '<img src="/images/drill.png">', :controller => 'tree_display', :action => 'drill', :root => parent_node.id %>
        </TD>
     <% end %>     
 <% end %>    
-
-<TD COLSPAN="<%= 3 - depth %>" WIDTH="<%= 66 - depth * 2 %>%">     
+<% width = 66 - depth * 2 %>
+<TD COLSPAN="<%= 3 - depth %>" WIDTH="<%= width %>%">     
   <%= parent_node.get_name %>
   <% if parent_node.get_directory != nil%>
     <BR/><I>Directory:</I> <%= parent_node.get_directory %>

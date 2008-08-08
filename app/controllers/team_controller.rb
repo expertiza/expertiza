@@ -1,84 +1,101 @@
-require 'dl'
 class TeamController < ApplicationController
-   auto_complete_for :user, :name
+ auto_complete_for :user, :name  
    
-  def list        
-     @assignment = Assignment.find(params[:id])        
-     @teams = Team.find(:all, :conditions => ["assignment_id = ?",@assignment.id])     
-  end
-  
-  def edit
-    @team = Team.find(params[:id])
-  end
-  
-  def destroy
-    @team = Team.find(params[:id])
-    for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", @team.id])
-       teamsuser.destroy
-    end    
-    @team.destroy
-    redirect_to :action => 'list', :assignment_id=> params[:assignment_id]
-  end
-
-  def new
-    @assignment = Assignment.find(params[:id])    
-    @team = Team.new 
-  end
-
-  def create
-    check = Team.find(:all, :conditions => ["name =? and assignment_id =?", params[:team][:name], params[:id]])        
-    @team = Team.new(params[:team])
-    @team.assignment_id = params[:id]
-    if (check.length == 0)      
-      @team.save
-      redirect_to :action => 'list', :id=> params[:id]
+ def list
+   if params[:type]
+    session[:team_type] = params[:type]
+   end
+   @root_node = Object.const_get(session[:team_type]+"Node").find_by_node_object_id(params[:id])   
+   @child_nodes = @root_node.get_teams()
+ end
+ 
+ def new
+   @parent = Object.const_get(session[:team_type]).find(params[:id])   
+ end
+ 
+ def create
+   parent = Object.const_get(session[:team_type]).find(params[:id])
+   begin
+    check_for_existing_team_name(parent,params[:team][:name])
+    team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => parent.id)
+    TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
+    redirect_to :action => 'list', :id => parent.id
+   rescue TeamExistsError
+    flash[:error] = $! 
+    redirect_to :action => 'new', :id => parent.id
+   end
+ end
+ 
+ def update  
+   team = Team.find(params[:id])
+   parent = Object.const_get(session[:team_type]).find(team.parent_id)
+   begin
+    check_for_existing_team_name(parent,params[:team][:name])
+    team.name = params[:team][:name]
+    team.save
+    redirect_to :action => 'list', :id => parent.id
+   rescue TeamExistsError
+    flash[:error] = $! 
+    redirect_to :action => 'edit', :id => team.id
+   end   
+ end
+ 
+ def edit
+   @team = Team.find(params[:id])
+ end
+ 
+ def delete   
+   team = Team.find(params[:id])
+   course = Object.const_get(session[:team_type]).find(team.parent_id)
+   team.delete
+   redirect_to :action => 'list', :id => course.id
+ end
+ 
+ # Copies existing teams from a course down to an assignment
+ # The team and team members are all copied.  
+ def inherit
+   assignment = Assignment.find(params[:id])
+   if assignment.course_id > 0
+    course = Course.find(assignment.course_id)
+    teams = course.get_teams
+    if teams.length > 0 
+      teams.each{
+        |team|
+        team.copy(assignment.id)
+      }
     else
-      flash[:error] = 'Team name is already in use.'        
-      render :action => 'new'
-    end 
-  end
-  
-  def update
-    @team = Team.find(params[:id])
-    check = Team.find(:all, :conditions => ["name =? and assignment_id =?", params[:team][:name], @team.assignment_id])    
-    if (check.length == 0)
-       if @team.update_attributes(params[:team])
-          redirect_to :action => 'list', :id => @team.assignment_id
-       end
-    elsif (check.length == 1 && check[0].name = params[:team][:name])
-      redirect_to :action => 'list', :id => @team.assignment_id
-    else
-      flash[:error] = 'Team name is already in use.'        
-      render :action => 'edit'
-    end 
-  end
-   
-  def import_teams
-    if params['load_teams']      
-      file = params['uploaded_file']
-      unknown = TeamHelper::upload_teams(file,params[:assignment_id],params[:options],logger)           
-    end  
-    redirect_to :action => 'list', :unknown => unknown, :id=> params[:assignment_id]
-  end  
-  
-  def list_assignments
-    @assignments = Assignment.find(:all, :order => 'name',:conditions => ["instructor_id = ? and team_assignment =?", session[:user].id, 1])
-  end
-  
-  def delete_team       
-    @team = Team.find(params[:id])
-    id = @team.assignment_id
-    @team.delete
-    redirect_to :action => 'list', :id => id 
-  end
-  
-  def delete_selected
-    params[:item].each {
-      |team_id|      
-      team = Team.find(team_id).first
-      team.delete
-    }
-    
-    redirect_to :action => 'list', :id => params[:id]
-  end
+      flash[:note] = "No teams were found to inherit."
+    end
+   else
+     flash[:error] = "No course was found for this assignment."
+   end
+   redirect_to :controller => 'team', :action => 'list', :id => assignment.id   
+ end
+ 
+ # Copies existing teams from an assignment up to a course
+ # The team and team members are all copied. 
+ def bequeath
+   team = AssignmentTeam.find(params[:id])
+   assignment = Assignment.find(team.parent_id)
+   if assignment.course_id
+      course = Course.find(assignment.course_id)
+      team.copy(course.id)
+      flash[:note] = "\""+team.name+"\" was successfully copied to \""+course.name+"\""
+   else
+      flash[:error] = "This assignment is not #{url_for(:controller => 'assignment', :action => 'assign', :id => assignment.id)} with a course."
+   end      
+   redirect_to :controller => 'team', :action => 'list', :id => assignment.id
+ end
+ 
+ protected
+ 
+ def check_for_existing_team_name(parent,name)
+    model = Object.const_get(session[:team_type]+'Team')    
+    list = model.find(:all, :conditions => ['parent_id = ? and name = ?',parent.id,name])
+    if list.length > 0     
+      raise TeamExistsError, 'Team name, "'+name+'", is already in use.'
+    end
+ end
+
+ 
 end

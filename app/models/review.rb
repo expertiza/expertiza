@@ -3,6 +3,32 @@ class Review < ActiveRecord::Base
   has_many :review_scores
   belongs_to :review_mapping
   
+  def display_as_html  
+    code = "<B>Reviewer:</B> "+self.review_mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review'+self.id.to_s+'Link" onClick="toggleElement('+"'review"+self.id.to_s+"','review'"+');return false;">hide review</a>'
+    code = code + '<div id="review'+self.id.to_s+'" style="">'   
+    code = code + '<BR/><BR/>'
+    ReviewScore.find_all_by_review_id(self.id).each{
+      | reviewScore |      
+      code = code + "<I>"+reviewScore.question.txt+"</I><BR/><BR/>"
+      code = code + '(<FONT COLOR="#229933">'+reviewScore.score.to_s+"</FONT> out of "+reviewScore.question.questionnaire.max_question_score.to_s+"): "+reviewScore.comments+"<BR/><BR/>"
+    }          
+    comment = self.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')    
+    code = code + "<B>Additional Comment:</B><BR/>"+comment+""
+    code = code + "</div>"
+    return code
+  end
+    
+  # Computes the total score awarded for a review
+  def get_total_score
+    scores = ReviewScore.find_all_by_review_id(self.id)
+    total_score = 0
+    scores.each{
+      |item|
+      total_score += item.score
+    }   
+    return total_score
+  end
+  
     def delete
       mappings = ReviewOfReviewMapping.find(:all, :conditions => ['review_id = ?',self.id])
       mappings.each {|mapping| mapping.delete}
@@ -15,7 +41,7 @@ class Review < ActiveRecord::Base
     @review_scores = @review.review_scores
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
-    @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @assgt.id])
+    @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @assgt.id])
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
     @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
     @control_folder = control_folder
@@ -24,17 +50,17 @@ class Review < ActiveRecord::Base
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
       @author_name = User.find(@author_first_user_id).name;
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
+      @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @mapping.assignment_id])
     else
       @author_name = User.find(@mapping.author_id).name
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
+      @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
     
     @max = @questionnaire.max_question_score
     @min = @questionnaire.min_question_score 
     
     @files = Array.new
-    @files = get_submitted_file_list(@direc, @author, @files)
+    @files = @author.get_submitted_files()
     
     if fname
       view_submitted_file(@current_folder,@author)
@@ -52,19 +78,7 @@ class Review < ActiveRecord::Base
       end
     end
     return files
-  end
-    #follows a link
-  #needs to be moved to a separate helper function
-  def self.view_submitted_file(current_folder,author)
-    folder_name = FileHelper::sanitize_folder(current_folder.name)
-    file_name = FileHelper::sanitize_filename(params['fname'])
-    file_split = file_name.split('.')
-    if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
-      send_file(RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + @author.directory_num.to_s + folder_name + "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline') 
-    else
-      send_file(RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + @author.directory_num.to_s + folder_name + "/" + file_name) 
-    end
-  end
+  end   
 
   # Generate emails for authors when a new review of their work
   # is made
@@ -114,4 +128,5 @@ class Review < ActiveRecord::Base
     end  
     return review_num
   end
+
 end

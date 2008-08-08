@@ -6,7 +6,7 @@ par1:
   user_id: 1
   assignment_id: 1
   topic: Research EPA
-  
+
 par2:
   id: 2
   submit_allowed: 1
@@ -14,39 +14,39 @@ par2:
   user_id: 1
   assignment_id: 2
   topic: Research Communication
-  
+
 par3:
   id: 3
   user_id: 4
   assignment_id: 1
-  
+
 par4:
   id: 4
   user_id: 5
   assignment_id: 1
-  
+
 par5:
   id: 5
   user_id: 6
   assignment_id: 1
- 
+
 par6:
   id: 6
   user_id: 7
   assignment_id: 1
-  
+
 par7:
   id: 7
   user_id: 8
   assignment_id: 2
-  
+
 par8:
   id: 8
   user_id: 9
   assignment_id: 1
-  
+
 par9:
   id: 9
   user_id: 10
   assignment_id: 1
-  
+

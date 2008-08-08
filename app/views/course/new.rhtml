@@ -3,6 +3,8 @@
 <%= start_form_tag :action => 'create' %>
    <%= render :partial => 'course' %>
    <%= submit_tag "Create" %>
+   <%= hidden_field_tag 'course[private]', @private %>
+   
 <%= end_form_tag %>
        
 <br/>

@@ -6,7 +6,7 @@ class SurveyResponseController < ApplicationController
       return
     end
     
-    @participants = Participant.find(:all, :conditions => ["user_id = ? and assignment_id = ?", session[:user].id, params[:id]])
+    @participants = AssignmentParticipant.find(:all, :conditions => ["user_id = ? and parent_id = ?", session[:user].id, params[:id]])
     if @participants.length == 0   #make sure the user is a participant of the assignment
       AuthController.logout(session)  #otherwise kick them out for their tomfoolery!
       redirect_to '/'

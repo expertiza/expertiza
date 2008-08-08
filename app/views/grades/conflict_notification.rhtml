@@ -1,0 +1,68 @@
+<h1>Email <%= @rowlabel %>s</h1>
+<% session[:return_to] = request.request_uri %>
+
+<% if flash[:notice] %>
+	<div class="flash_note"><%= flash[:notice] %></div>
+<% end %>
+
+<h2>Grades</h2>
+<% form_for :mailer, :url => { :action => 'send_grading_conflict_email' } do |form| %>
+
+<table class="grades">    
+	<tr><th>&nbsp;</th>
+		<% for i in 0...@reviews.size%>
+			<th><%= @collabel %><%=i+1%></th>
+		<% end %>
+	</tr>
+	<tr class="head"><td align="right"><b><%= @rowlabel %></b></td>	    	
+		<% for review in @reviews %>
+		<% if @submission %>
+			<td align="center"><%= link_to review.review_mapping.reviewer.fullname, :controller=>'review', :action => 'view_review', :id=> review.id%></td>
+	    <% else %>
+	    	<td align="center"><%= link_to review.review_of_review_mapping.review_reviewer.fullname, :controller=>'review_of_review', :action => 'view_review_of_review', :id=> review.id%></td>
+	    <% end %>
+	    <% end %>
+	</tr>
+	<tr class="head"><td align="right"><b>Average score</b></td>
+		<% for review in @reviews %>
+		<% if @submission %>
+		<td align="center"><%= form.hidden_field review.review_mapping.reviewer.fullname+"_grade", :value => review.get_total_score.to_f*100/@assignment.get_max_review_score %>
+				<%= sprintf("%.2f",review.get_total_score.to_f*100/@assignment.get_max_review_score) %>% &nbsp;</td>
+		<% else %>
+		<td align="center"><%= form.hidden_field review.review_of_review_mapping.review_reviewer.fullname+"_grade", :value => review.get_total_score.to_f*100/@assignment.get_max_metareview_score %>
+				<%= sprintf("%.2f",review.get_total_score.to_f*100/@assignment.get_max_metareview_score) %>% &nbsp;</td>
+		<% end %>
+	    <% end %>
+	</tr>
+</table>
+
+<br/>
+	<table>
+		<tr>	
+			<th>To:</th>
+			<td>
+				<%= form.select(:recipients, @reviewers_email_hash.sort, @reviewers_email_hash) %>
+			</td>
+		</tr>
+		<tr>	
+			<th>From:</th>
+			<td><%= @instructor.email %><%= form.hidden_field :from, :size => 90, :value => (@instructor.email) %></td>
+		</tr>
+		<tr>	
+			<th>Subject:</th>
+			<td><%= form.text_field :subject, :size => 90, :value => @subject %></td>
+		</tr>
+		<tr>
+			<td colspan=2 style='font-size: x-small; color: red;'>Note: please do not remove the text between the ##[ ] delimiters. They are used to fill in variables when the email is sent.</td>
+		</tr>
+		<tr width=100%>	
+			<td colspan=2><%= form.text_area :body_text, 'cols' => 100, 'rows' => 20, :value => (@body) %></td>
+		</tr>
+	</table>
+	<br/>
+	<%= form.hidden_field :assignment, :value => @assignment.id %>
+	<%= form.hidden_field :author, :value => @author.id %>	
+    <%= submit_tag "Send Email" %> | 
+	<%= link_to 'Back', :action=>'view', :id => @assignment.id %>
+<% end %>
+

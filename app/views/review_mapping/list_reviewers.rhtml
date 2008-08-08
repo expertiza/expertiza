@@ -1,14 +1,15 @@
 <% 
-  
+   session[:mapping] = Hash.new
    mapping = @items.first 
    if !mapping.nil?   	   
    	if @assignment.team_assignment       
       type = 'team_id'
    	else
    	  type = 'author_id'
-   	end
-   	session[:mapping_id] = mapping.id
+   	end   	
    end
+   session[:mapping][:contributor] = @contributor
+   session[:mapping][:assignment] = @assignment
 %>
 
 <h1>Reviewers</h1>

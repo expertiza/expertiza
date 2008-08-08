@@ -9,17 +9,21 @@ class QuestionnaireNode < Node
     query = query+" and nodes.type = '"+self.to_s+"'"
     if user_id
       query = query+" and "+self.table+".instructor_id = "+user_id.to_s
+    else
+      query = query+" and "+self.table+".private = 0"
     end     
     if parent_id
       query = query+ " and "+self.table+".type_id = "+parent_id.to_s
     end  
-    if sortvar            
-      query = query+" order by "+self.table+"."+sortvar
+    if sortvar        
+      if sortvar == 'directory_path'
+        sortvar = 'name'
+      end
+      query = query+" order by "+self.table+"."+sortvar      
       if sortorder
         query = query+" "+sortorder
       end
     end  
-    puts query
     find_by_sql(query)
   end 
   
@@ -29,7 +33,12 @@ class QuestionnaireNode < Node
     
   def get_creation_date
     Questionnaire.find(self.node_object_id).created_at
-  end  
+  end 
+  
+  # Gets the updated_at from the associated Questionnaire   
+  def get_modified_date
+    Questionnaire.find(self.node_object_id).updated_at
+  end   
   
   def is_leaf
     true

@@ -1,5 +1,5 @@
 <%
-    @participants = Participant.find(:all, :conditions => ["assignment_id = ?",@assignment_id]).map {|u| [u.user_id]}
+    @participants = AssignmentParticipant.find(:all, :conditions => ["parent_id = ?",@assignment_id]).map {|u| [u.user_id]}
     for participant in @participants
         review_no = 1
         grade = 0

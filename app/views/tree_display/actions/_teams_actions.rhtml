@@ -1,0 +1,12 @@
+<TD WIDTH="15%">
+<ul id="actionmenu"><li class="daddy">&nbsp;
+  <ul>
+    <li><%= link_to 'Edit Team Name', :controller=>'team', :action=>'edit', :id => node.node_object_id %></li>
+    <li><%= link_to 'Delete Team', :controller=>'team', :action=>'delete', :id => node.node_object_id %></li>
+    <li><%= link_to 'Add Team Member', :controller=>'teams_users', :action=>'new', :id => node.node_object_id %></li>
+    <% if session[:team_type] == 'Assignment' %>
+    	<li><%= link_to 'Copy Team to Course', :controller => 'team', :action=>'bequeath', :id => node.node_object_id %></li>
+    <% end %>    
+  </ul>
+</ul>
+</TD>

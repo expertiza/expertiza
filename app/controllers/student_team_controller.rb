@@ -1,11 +1,11 @@
 class StudentTeamController < ApplicationController
   def new
-    @student = Participant.find(params[:id])
+    @student = AssignmentParticipant.find(params[:id])
     @team = Team.new 
   end
   
   def create
-    @student = Participant.find(params[:id])
+    @student = AssignmentParticipant.find(params[:id])
     check = Team.find(:all, :conditions => ["name =? and assignment_id =?", params[:team][:name], @student.assignment_id])        
     @team = Team.new(params[:team])
     @team.assignment_id = @student.assignment_id
@@ -25,7 +25,7 @@ class StudentTeamController < ApplicationController
   
   def edit 
     @team = Team.find_by_id(params[:team_id])
-    @student = Participant.find(params[:student_id])
+    @student = AssignmentParticipant.find(params[:student_id])
   end
   
   def update
@@ -44,7 +44,7 @@ class StudentTeamController < ApplicationController
   end
   
   def leave
-    @student = Participant.find(params[:student_id])
+    @student = AssignmentParticipant.find(params[:student_id])
     #remove the entry from teams_users
     TeamsUser.find(:first, :conditions =>["team_id =? and user_id =?", params[:team_id], @student.user_id]).destroy
     

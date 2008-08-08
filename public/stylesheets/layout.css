@@ -150,7 +150,7 @@ a:hover {
 #actionmenu li ul li a {  
   text-align: left ;
   line-height: 2em ;
-  width: 15em ;
+  width: 17em ;
   border-bottom: .075em solid white ;
   border-right: .075em solid white ;   
 }
@@ -164,7 +164,7 @@ a:hover {
 #actionmenu li ul {  
   background: #6d7a73 ;  
   position: absolute ;
-  width: 15em ;
+  width: 17em ;
   left: -999em ;
   margin: -1.5em 0 0 9em ;
 }
@@ -185,8 +185,7 @@ a:hover {
 }
 
 .main {
-  background: white ;
-  //margin-right: 200px ;
+  background: white ;  
   width: 85%
 }
 
@@ -213,7 +212,6 @@ a:hover {
 
 .footer {
   color: white ;
-  //background: #6d7a73 url('/images/footer_bg.png') repeat-x top ;
   padding: 8px ;
 }
 
@@ -323,7 +321,6 @@ div.question_wrapper {
 	border: .1em solid #DADADA;
 	width: 450px;
 	height: 200px;
-	padding: auto;
 }
 
 p.clearBoth{
@@ -372,4 +369,25 @@ img.barchart {
 
 .even {
   background-color: #FAFAEA;
+}
+
+table{}
+.grades{ 
+color: Black;
+background-color: #EAEAEA;
+text-decoration: none;
+}
+
+.row {
+  padding:5px;
+  margin:0px;
+  color: black;
+  background-color: white;
+}
+
+.team {
+  padding:5px;
+  margin:0px;
+  color: black;
+  background-color: #EAEADA;
 }

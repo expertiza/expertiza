@@ -6,7 +6,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @stud
   <a href="<%= @student.assignment.spec_location %>" target="new">Assignment Description</a>
 <% end %>
 <ul>
-	<%if Assignment.find(:all, :conditions => ['id= ?', @student.assignment_id])[0].team_assignment == true%>
+	<%if Assignment.find(:all, :conditions => ['id= ?', @student.parent_id])[0].team_assignment == true%>
 		<li> <%= link_to 'Your team', :action => 'view_team', :id => @student.id %> 
 		(View and manage your team)
 		</li>
@@ -25,13 +25,13 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @stud
 	</li>
 	<li>
 		<% if @can_view_others_work == 1 %>
-			<%= link_to "Others' work",{:controller => 'review', :action => 'list_reviews', :id => @student.assignment_id} %>
+			<%= link_to "Others' work",{:controller => 'review', :action => 'list_reviews', :id => @student.parent_id} %>
 		<% else %>
 			<font color="gray">Others' work</font>
 		<% end %> (Give feedback to others on their work)
 	</li>
 	<li><%= link_to "View scores",{:action => 'view_scores', :id => @student.id} %></li>
-	<% if StudentAssignmentHelper::get_current_stage(@assignment_id) == "Complete" && @assigned_surveys.length != 0 -%>
+	<% if Assignment.find(@assignment_id).get_current_stage() == "Complete" && @assigned_surveys.length != 0 -%>
 		<li><%= link_to "Take Survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment_id} %> (This will log you out)</li>
 	<% end %>
 </ul>

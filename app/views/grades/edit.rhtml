@@ -1,12 +1,8 @@
 <H1>Score for <%= @participant.fullname %></H1>
 
-<% colwidth = 12 %>
-<% namecol = 20 %>
-
 <%= start_form_tag :action => 'update', :id => @participant.id %>
 <TABLE class="grades" >
-    <TR><TH WIDTH="<%= namecol %>%">&nbsp;</TH><TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submission score</TH><TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Review score</TH><TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
-    <TR><TH WIDTH="<%= namecol %>%" ALIGN="LEFT">Contributor</TH><TH WIDTH="<%= colwidth %>%">Average</TH><TH WIDTH="<%= colwidth %>%">Range</TH><TH WIDTH="<%= colwidth %>%">Average</TH><TH WIDTH="<%= colwidth %>%">Range </TH><TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
+<%= render :partial => 'participant_title' %>
 <%  s_avg, s_max, s_min = @participant.compute_review_scores
     r_avg, r_max, r_min = @participant.compute_metareview_scores %>
 <%= render :partial => 'participant', 

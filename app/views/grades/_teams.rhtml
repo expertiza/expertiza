@@ -1,9 +1,6 @@
-<% colwidth = 12 %>
-<% namecol = 20 %>
 <!-- TEAMS --> 
 <% index = 0 %>
-<TR class="team"><TH WIDTH="<%= namecol %>%">&nbsp;</TH><TH COLSPAN="2" WIDTH="<%= colwidth %>%">Submission score</TH><TH COLSPAN="3" WIDTH="<%= colwidth*3 %>%">&nbsp;</TH></TR>
-<TR class="team"><TH WIDTH="<%= namecol %>%" ALIGN="LEFT">Team</TH><TH WIDTH="<%= colwidth %>%" >Average</TH><TH WIDTH="<%= colwidth %>%" >Range</TH><TH COLSPAN="3" WIDTH="<%= colwidth*3 %>%">&nbsp;</TH></TR>
+<%= render :partial => 'team_title', :locals => {:prefix => nil}  %>
 <% for team in @teams %>    
     <% index += 1 %>    
     <% if team.get_participants.length > 0 %>    
@@ -19,9 +16,8 @@
             <TD ALIGN="CENTER">---</TD>
             <TD ALIGN="CENTER">---</TD>
         <% end %>
-        <TD COLSPAN="3">&nbsp;</TD></TR>          
-    <TR id='<%= prefix %>_1' style="display:none"><TH WIDTH="<%= namecol %>%">&nbsp;</TH><TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submission score</TH><TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Review score</TH><TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
-    <TR id='<%= prefix %>_2' style="display:none"><TH WIDTH="<%= namecol %>%" ALIGN="LEFT">Contributor</TH><TH WIDTH="<%= colwidth %>%">Average</TH><TH WIDTH="<%= colwidth %>%">Range</TH><TH WIDTH="<%= colwidth %>%">Average</TH><TH WIDTH="<%= colwidth %>%">Range </TH><TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
+        <TD COLSPAN="3">&nbsp;</TD></TR>  
+    <%= render :partial => 'participant_title', :locals => {:prefix => prefix } %>        
     <% pindex = 2 %>
     <% for participant in team.get_participants 
          pindex += 1  	              
@@ -35,8 +31,7 @@
     <% end %>        
     <TR id='<%= prefix %>_<%= team.get_participants.length+3 %>' style="display:none"><TD COLSPAN="6"><HR/></TD></TR>  
     <% if index < @teams.length %>
-    	<TR class="team" id='<%= prefix %>_<%= team.get_participants.length+4 %>' style="display:none"><TH>&nbsp;</TH><TH COLSPAN="2">Submission score</TH><TH COLSPAN="3">&nbsp;</TH></TR>
-    	<TR class="team" id='<%= prefix %>_<%= team.get_participants.length+5 %>' style="display:none"><TH>Team</TH><TH>Average</TH><TH>Range</TH><TH COLSPAN="3">&nbsp;</TH></TR>
+        <%= render :partial => 'team_title', :locals => {:prefix => prefix, :num => team.get_participants.length}  %>
     <% end %>    
     <% end %>    
   <% end %> 

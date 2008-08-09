@@ -80,8 +80,7 @@
 <% if @teams and @teams.length > 0 %>   
   <%= render :partial => 'teams' %>  
 <% else %>
-  <TR><TH>&nbsp;</TH><TH COLSPAN="2">Submission score</TH><TH COLSPAN="2">Review score</TH><TH>&nbsp;</TH></TR>           
-  <TR><TH ALIGN="LEFT">Contributor</TH><TH>Average</TH><TH>Range</TH><TH>Average</TH><TH>Range </TH><TH>Final score</TH></TR>    
+  <%= render :partial => 'participant_title' %>
   <% for participant in @participants
     s_avg, s_max, s_min = participant.compute_review_scores
     r_avg, r_max, r_min = participant.compute_metareview_scores

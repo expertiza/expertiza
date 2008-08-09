@@ -9,7 +9,7 @@ class ReviewOfReview < ActiveRecord::Base
     ReviewOfReviewScore.find_all_by_review_of_review_id(self.id).each{
       | reviewScore |      
       code = code + "<I>"+reviewScore.question.txt+"</I><BR/><BR/>"
-      code = code + '(<FONT COLOR="#229933">'+reviewScore.score.to_s+"</FONT> out of "+reviewScore.question.questionnaire.max_question_score.to_s+"): "+reviewScore.comments+"<BR/><BR/>"
+      code = code + '(<FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+reviewScore.question.questionnaire.max_question_score.to_s+"</B>): "+reviewScore.comments+"<BR/><BR/>"
     }  
     code = code + "</div>"
     return code

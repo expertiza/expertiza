@@ -29,6 +29,7 @@ class MenuUpdateTreeDisplay < ActiveRecord::Migration
      
      site_controller = SiteController.find_or_create_by_name('statistics')
      site_controller.permission_id = permission1.id
+     site_controller.save
      action = ControllerAction.find(:first, :conditions => ['site_controller_id = ? and name = ?',site_controller.id,'list_surveys'])
      if action == nil
        action = ControllerAction.create(:name => 'list_surveys', :site_controller_id => site_controller.id)

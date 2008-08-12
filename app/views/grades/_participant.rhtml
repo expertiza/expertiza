@@ -1,5 +1,5 @@
 <!-- PARTICIPANT -->
-<TR class="row" <% if prefix %> id="<%= prefix %>" style="display:none" <% end %>>
+<TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
     <TD><%= participant.fullname %>
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a></FONT>  	
     </TD>
@@ -16,7 +16,7 @@
     <% end %>
     <% if r_avg %>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",r_avg*100) %>%
-    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','mreviews');return false;">show metareviews</a></FONT>
+    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a></FONT>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min*100) %>% - <%= sprintf("%.0f",r_max*100) %>%
     <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => false %></FONT>  	    
@@ -51,9 +51,9 @@
 	<TD COLSPAN="6"><%= render :partial=>'submissions', :locals => {:participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_reviews" style="display:none">
-	<TD COLSPAN="6"><%= render :partial=>'reviews', :locals => {:participant => participant} %></TD>
+	<TD COLSPAN="6"><%= render :partial=>'reviews', :locals => {:prefix => 'user', :participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
-	<TD COLSPAN="6"><%= render :partial=>'metareviews', :locals => {:participant => participant} %></TD>
+	<TD COLSPAN="6"><%= render :partial=>'metareviews', :locals => {:prefix => prefix, :participant => participant} %></TD>
 </TR>
 <!-- END PARTICIPANT -->

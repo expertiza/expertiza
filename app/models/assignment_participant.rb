@@ -143,12 +143,12 @@ class AssignmentParticipant < Participant
     end
   end
   
-  def compute_total_score   
+  def compute_total_score    
     if Assignment.find(self.parent_id).team_assignment
       review_score,max,min = self.get_review_score_for_team
     else
       review_score,max,min = self.compute_review_scores
-    end
+    end       
     if review_score
       r_score = review_score * (Assignment.find(self.parent_id).review_weight / 100).to_f
     end    
@@ -160,6 +160,8 @@ class AssignmentParticipant < Participant
       return r_score + m_score
     elsif r_score
       return review_score
+    else
+      return 0
     end
   end  
   

@@ -1,7 +1,19 @@
 <!-- REVIEWS --> 
 <% if participant.get_reviews.length > 0 %>
+  <BR/>
+  <%= render :partial => 'review_table',
+           :locals => {
+           :submission => true,
+           :prefix => prefix,
+           :assignment => Assignment.find(participant.parent_id),
+           :reviews => participant.get_reviews,
+           :collabel => "Review",
+           :rowlabel => "Reviewer"
+           }%>
+  <BR/>         
+  <HR/> 
   <% for review in participant.get_reviews %>
-    <%= review.display_as_html() %><BR/><BR/> 
+    <a name="<%=prefix+"_"+review.review_mapping.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/> 
   <% end %>
 <% else %>
   <i>No reviews have been completed for this user's submissions.</i>

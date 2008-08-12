@@ -3,9 +3,9 @@ class Review < ActiveRecord::Base
   has_many :review_scores
   belongs_to :review_mapping
   
-  def display_as_html  
-    code = "<B>Reviewer:</B> "+self.review_mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review'+self.id.to_s+'Link" onClick="toggleElement('+"'review"+self.id.to_s+"','review'"+');return false;">hide review</a>'
-    code = code + '<div id="review'+self.id.to_s+'" style="">'   
+  def display_as_html(prefix) 
+    code = "<B>Reviewer:</B> "+self.review_mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+prefix+"_"+self.id.to_s+"','review'"+');return false;">hide review</a>'
+    code = code + '<div id="review_'+prefix+"_"+self.id.to_s+'" style="">'   
     code = code + '<BR/><BR/>'
     ReviewScore.find_all_by_review_id(self.id).each{
       | reviewScore |      
@@ -16,7 +16,7 @@ class Review < ActiveRecord::Base
     code = code + "<B>Additional Comment:</B><BR/>"+comment+""
     code = code + "</div>"
     return code
-  end
+  end 
     
   # Computes the total score awarded for a review
   def get_total_score

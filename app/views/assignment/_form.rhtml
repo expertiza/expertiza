@@ -7,8 +7,9 @@
 
 <!--[form:assignment]-->
 <table>
-<tr><td>
-<table>
+
+<tr>
+<td><table>
 <tr>
   <td><label for="assignment_name">Assignment name: </label></td>
   <td><%= text_field 'assignment', 'name'  %></td>
@@ -18,68 +19,56 @@
   <td><%= text_field 'assignment', 'directory_path'%></td>
 </tr>
 <tr>
-  <td><label for="assignment_spec">Assignment Description:</label></td>
-  <td><%= text_field 'assignment', 'spec_location'  %></td>
+  <td height="50" valign="top"><label for="assignment_spec">Assignment Description:</label></td>
+  <td height="50" valign="top"><%= text_field 'assignment', 'spec_location'  %></td>
 </tr>
-</table>
-</td>
-<td>&nbsp;&nbsp;</td>
-<td>
-<table>
+<tr>  
+</table></td>
+
+<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
+<td><table>
 <tr>
-  <td><label for="team_assignment">Team assignment:</label></td>
-  <td>
-  		<select id="teamselect" name="assignment[team_assignment]" onchange='OnChange()'>
-  		<% if @assignment.team_assignment == true %>
-                <option value=false>No</option>
-                <option value=true SELECTED>Yes</option>
-        <% else %>         
-        		<option value=false>No</option>
-                <option value=true>Yes</option>
-        <% end %>
-       </select>
-  </td>
-  
-  <td>
-  <% if @assignment.team_assignment == true %>
-  	<div id="team_count" style="display: inline">
-  <% else %>
-  	<div id="team_count" style="display: none">
-  <% end %>
-  <label for="max_team_count">Max team count:</label>      
-  <select name="assignment[team_count]">
-    <option value=2 SELECTED>2</option>
-    <option value=3>3</option>
-    <option value=4>4</option>
-  </select>
-  </div> 
-  </td>
-        
-</tr>
-<tr>
-  <td><label for="wiki_type">Wiki Type:</label></td>
+  <td width="250"><label for="wiki_type">Wiki Type:</label></td>
   <td>
     <% if @wiki_types.length == 0 %>
       <em>There are currently no wiki assignment types defined</em>
       <br/>
       <br/>
     <% else %>
-      <select name="assignment[wiki_type_id]">
+      <select name="assignment[wiki_type_id]" width="15%">
       <% @wiki_types.each do |wiki_type| %>
-        <option value="<%= wiki_type.id %>"
+        <option style="width:75px" value="<%= wiki_type.id %>"
         <%= ' selected' if wiki_type.id == @assignment.wiki_type_id %> >
         <%= wiki_type.name %>
         </option>
       <% end %>
       </select>
     <% end %>
-  </td>       
+  </td>
 </tr>
-<tr><td>&nbsp;</td></tr>
-</table>
-</td></tr>
-</table>
+<tr>
+  <td><label for="team_assignment">Team assignment:</label></td>
+  <td>
+  		<select id="teamselect" name="assignment[team_assignment]" onchange="onChange();">
+  		 <option value=false style="width:75px">No</option>
+         <option value=true style="width:75px" <% if @assignment.team_assignment %>SELECTED<%end%>>Yes</option>      
+        </select>
+  </td>  
+</tr>
 
+<tr id="team_count1" style="display:none">  
+  <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>   
+  <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5%></td>  
+  </td> 
+</tr>
+
+<tr id="team_count2">
+  <td colspan="2" height="50">&nbsp;</td>
+</tr> 
+</table></td>
+</tr>
+</table>
 
 <table>
  <tr>
@@ -141,17 +130,20 @@
 <!--[eoform:assignment]-->
 
 <script type="text/javascript">
-function OnChange(){
-	document.poppedLayer1 = eval('document.getElementById("team_count")');
-	document.poppedLayer2 = eval('document.getElementById("peer_review")');
+function onChange(){
+	count = document.getElementById("team_count1");
+	hidden = document.getElementById("team_count2");
+	document.poppedLayer3 = eval('document.getElementById("peer_review")');
 	var dropdownIndex = document.getElementById('teamselect').selectedIndex;
 	var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
 	if(dropdownValue == "true"){
-		document.poppedLayer1.style.display = "inline";
-		document.poppedLayer2.style.display = "inline";
+		count.style.display = "";
+		hidden.style.display = "none";
+		document.poppedLayer3.style.display = "";
 	}else{
-		document.poppedLayer1.style.display = "none";
-		document.poppedLayer2.style.display = "none";
+		count.style.display = "none";
+		hidden.style.display  = "";
+		document.poppedLayer3.style.display = "none";
 	}
 }
 </script>

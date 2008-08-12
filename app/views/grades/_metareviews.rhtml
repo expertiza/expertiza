@@ -1,7 +1,19 @@
 <!-- METAREVIEWS --> 
 <% if participant.get_metareviews.length > 0 %>
+  <BR/>
+  <%= render :partial => 'review_table',
+           :locals => {
+           :submission => false,
+           :prefix => prefix,
+           :assignment => Assignment.find(participant.parent_id),
+           :reviews => participant.get_metareviews,
+           :collabel => "Metareview1",
+           :rowlabel => "Metareviewer"
+           }%>
+  <BR/>         
+  <HR/> 
   <% for metareview in participant.get_metareviews %>
-    <%= metareview.display_as_html() %><BR/><BR/> 
+    <a name="<%=prefix+"_"+metareview.review_of_review_mapping.review_reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/>  
   <% end %>
 <% else %>
   <i>No metareviews have been completed for this user's reviews.</i>

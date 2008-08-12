@@ -2,9 +2,9 @@ class ReviewOfReview < ActiveRecord::Base
     has_many :review_of_review_scores
     belongs_to :review_of_review_mapping
 
-  def display_as_html          
-    code = "<B>Metareviewer:</B> "+self.review_of_review_mapping.review_reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview'+self.id.to_s+'Link" onClick="toggleElement('+"'metareview"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
-    code = code + '<div id="metareview'+self.id.to_s+'" style="">'
+  def display_as_html(prefix)         
+    code = "<B>Metareviewer:</B> "+self.review_of_review_mapping.review_reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+prefix+"_"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
+    code = code + '<div id="metareview_'+prefix+"_"+self.id.to_s+'" style="">'
     code = code +"<BR/><BR/>"    
     ReviewOfReviewScore.find_all_by_review_of_review_id(self.id).each{
       | reviewScore |      

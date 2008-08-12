@@ -8,8 +8,10 @@ class CreatePeerReviews < ActiveRecord::Migration
       #t.column "team_id", :integer
       t.column "additional_comment", :text
     end
-    
-    add_column :assignments, :peer_review_questionnaire_id, :integer
+    begin
+      add_column :assignments, :peer_review_questionnaire_id, :integer
+    rescue
+    end
     
     add_index "peer_reviews", ["reviewer_id"], :name => "fk_reviewer_id_users"
 

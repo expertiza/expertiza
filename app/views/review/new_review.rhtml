@@ -13,6 +13,9 @@ if (specs != nil && specs != "")
   	<%= submit_tag "Save", :name=>"save" %>       
 <%= end_form_tag %>
 <br />
-
-<%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
+<% if session[:return_to] %>
+  <%= link_to 'Back', session[:return_to] %>
+<% else %>
+  <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
+<% end %>
 

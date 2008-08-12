@@ -25,6 +25,7 @@
     %>
      	 <%= render :partial => 'participant', 
      	 			:locals => {:prefix => prefix+"_"+pindex.to_s,
+     	 			            :team => true,
      	 			            :participant => participant,
      	 			            :s_avg => t_score, :s_max => t_max, :s_min => t_min,
      	 			            :r_avg => r_avg, :r_max => r_max, :r_min => r_min} %>  

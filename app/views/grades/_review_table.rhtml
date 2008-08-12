@@ -1,0 +1,56 @@
+<% if submission %>
+   <%       
+      controller = 'review'
+      action = 'view_review'
+      max_score = assignment.get_max_review_score
+   %>
+<% else %>
+   <%     
+      controller = 'review_of_review' 
+      action = 'view_review_of_review'
+      max_score = assignment.get_max_metareview_score
+    %>
+<% end %>
+
+<table class="grades">    
+	<tr><th>&nbsp;</th>
+		<% for i in 0...reviews.size%>
+			<th><%= collabel %><%=i+1%></th>
+		<% end %>
+	</tr>
+	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
+		<% for review in reviews %>
+		  <% if submission 
+		       mapping = ReviewMapping.find(review.review_mapping_id) 
+               rev_user = User.find(mapping.reviewer_id)
+             else
+               mapping = ReviewOfReviewMapping.find(review.review_of_review_mapping_id) 
+               rev_user = User.find(mapping.review_reviewer_id)
+             end
+           %>  
+           <td align="center">                       
+           <% if prefix %>         
+             <a href="#<%= prefix+"_"+rev_user.name %>"><%= rev_user.fullname %></a>      		   		     
+		   <% else %>
+		     <%= link_to rev_user.fullname, :controller=>controller, :action => action, :id=> review.id%>
+		   <% end %>
+		   </td>	    
+	    <% end %>
+	</tr>
+	<tr class="head"><td align="right"><b>Average score</b></td>
+		<% for review in reviews %>
+		  <% if submission 
+		       mapping = ReviewMapping.find(review.review_mapping_id) 
+               rev_user = User.find(mapping.reviewer_id)
+             else
+               mapping = ReviewOfReviewMapping.find(review.review_of_review_mapping_id) 
+               rev_user = User.find(mapping.review_reviewer_id)
+             end
+           %>  		
+		   <td align="center">
+		       <input type="hidden" id="mailer_<%= rev_user.fullname %>_grade" name="mailer[<%= rev_user.fullname %>_grade]" value="<%= review.get_total_score.to_f*100/max_score %>" %>   
+	  	       <%= sprintf("%.2f",review.get_total_score.to_f*100/max_score) %>% &nbsp;
+	  	   </td>
+	    <% end %>
+	</tr>
+</table>

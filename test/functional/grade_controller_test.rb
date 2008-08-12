@@ -5,7 +5,7 @@ require 'grades_controller'
 class GradesController; def rescue_action(e) raise e end; end
 
 class GradesControllerTest < Test::Unit::TestCase
-  fixtures :participants
+  fixtures :participants, :assignments
   
   def setup
     @controller = GradesController.new
@@ -19,6 +19,11 @@ class GradesControllerTest < Test::Unit::TestCase
   def test_update 
     post :update, :id => participants(:part1).id, :participant => {:grade => '100'}
     assert_equal 100,participants(:part1).grade
+  end
+  
+  def test_view
+    post :view, :id => assignments(:first).id
+    assert_response :success
   end
   
 end

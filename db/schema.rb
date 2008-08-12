@@ -2,7 +2,7 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 69) do
+ActiveRecord::Schema.define(:version => 74) do
 
   create_table "assignments", :force => true do |t|
     t.column "created_at", :datetime
@@ -29,6 +29,8 @@ ActiveRecord::Schema.define(:version => 69) do
     t.column "spec_location", :text
     t.column "author_feedback_questionnaire_id", :integer
     t.column "max_team_count", :boolean
+    t.column "peer_review_questionnaire_id", :integer
+    t.column "team_count", :integer, :default => 0, :null => false
   end
 
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
@@ -306,6 +308,27 @@ ActiveRecord::Schema.define(:version => 69) do
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
+
+  create_table "peer_review_scores", :force => true do |t|
+    t.column "peer_review_id", :integer
+    t.column "question_id", :integer
+    t.column "score", :integer
+    t.column "comments", :text
+  end
+
+  add_index "peer_review_scores", ["peer_review_id"], :name => "fk_peer_review_score_peer_reviews"
+  add_index "peer_review_scores", ["question_id"], :name => "fk_peer_review_score_questions"
+
+  create_table "peer_reviews", :force => true do |t|
+    t.column "reviewer_id", :integer
+    t.column "reviewee_id", :integer
+    t.column "assignment_id", :integer
+    t.column "additional_comment", :text
+  end
+
+  add_index "peer_reviews", ["reviewer_id"], :name => "fk_reviewer_id_users"
+  add_index "peer_reviews", ["reviewee_id"], :name => "fk_reviewee_id_users"
+  add_index "peer_reviews", ["assignment_id"], :name => "fk_peer_reviews_assignments"
 
   create_table "permissions", :force => true do |t|
     t.column "name", :string, :default => "", :null => false

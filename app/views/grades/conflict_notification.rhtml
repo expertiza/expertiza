@@ -8,33 +8,14 @@
 <h2>Grades</h2>
 <% form_for :mailer, :url => { :action => 'send_grading_conflict_email' } do |form| %>
 
-<table class="grades">    
-	<tr><th>&nbsp;</th>
-		<% for i in 0...@reviews.size%>
-			<th><%= @collabel %><%=i+1%></th>
-		<% end %>
-	</tr>
-	<tr class="head"><td align="right"><b><%= @rowlabel %></b></td>	    	
-		<% for review in @reviews %>
-		<% if @submission %>
-			<td align="center"><%= link_to review.review_mapping.reviewer.fullname, :controller=>'review', :action => 'view_review', :id=> review.id%></td>
-	    <% else %>
-	    	<td align="center"><%= link_to review.review_of_review_mapping.review_reviewer.fullname, :controller=>'review_of_review', :action => 'view_review_of_review', :id=> review.id%></td>
-	    <% end %>
-	    <% end %>
-	</tr>
-	<tr class="head"><td align="right"><b>Average score</b></td>
-		<% for review in @reviews %>
-		<% if @submission %>
-		<td align="center"><%= form.hidden_field review.review_mapping.reviewer.fullname+"_grade", :value => review.get_total_score.to_f*100/@assignment.get_max_review_score %>
-				<%= sprintf("%.2f",review.get_total_score.to_f*100/@assignment.get_max_review_score) %>% &nbsp;</td>
-		<% else %>
-		<td align="center"><%= form.hidden_field review.review_of_review_mapping.review_reviewer.fullname+"_grade", :value => review.get_total_score.to_f*100/@assignment.get_max_metareview_score %>
-				<%= sprintf("%.2f",review.get_total_score.to_f*100/@assignment.get_max_metareview_score) %>% &nbsp;</td>
-		<% end %>
-	    <% end %>
-	</tr>
-</table>
+<%= render :partial => 'review_table',
+           :locals => {
+           :submission => @submission,
+           :assignment => @assignment,
+           :reviews => @reviews,
+           :collabel => @collabel,
+           :rowlabel => @rowlabel
+           }%>
 
 <br/>
 	<table>

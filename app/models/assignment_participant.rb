@@ -35,6 +35,18 @@ class AssignmentParticipant < Participant
       end
     }
     return mreviews.sort {|a,b| a.review_of_review_mapping.reviewer.fullname <=> b.review_of_review_mapping.reviewer.fullname }      
+  end
+  
+  def get_peer_reviews    
+    previews = Array.new  
+    pr_query = "select * from peer_reviews where assignment_id = "+self.parent_id.to_s+" and reviewee_id = "+self.user_id.to_s
+    PeerReview.find_by_sql(pr_query).each{    
+      | pr |
+      if pr        
+        previews << pr
+      end
+    }
+    return previews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname }      
   end  
   
   def has_submissions    
@@ -99,17 +111,16 @@ class AssignmentParticipant < Participant
        Team.find_by_sql(query).first    
   end
     
-  #computes this participants current review scores:
+  #computes this participants current peer review scores:
   # avg_review_score
   # difference
-  def compute_review_scores   
+  def compute_peer_review_scores #(participant_id)
+    #participant = Participants.find_by_id(participant_id)
     if Assignment.find(self.parent_id).team_assignment
-      return self.get_review_score_for_team
-    else
-      reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (select id from review_mappings where author_id = #{self.user_id} and assignment_id = #{self.parent_id})")
-      if reviews.length > 0
-        avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews)     
-        max_assignment_score = Assignment.find(self.parent_id).get_max_review_score
+      peer_reviews = PeerReview.find_by_sql("select * from peer_reviews where reviewee_id = #{self.user_id} and assignment_id = #{self.parent_id}")
+      if peer_reviews.length > 0
+        avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(peer_reviews)     
+        max_assignment_score = Assignment.find(self.parent_id).get_max_peer_review_score
         return avg_review_score/max_assignment_score,max_score/max_assignment_score,min_score/max_assignment_score
       else
         return nil,nil
@@ -143,9 +154,10 @@ class AssignmentParticipant < Participant
     end
   end
   
-  def compute_total_score    
+  def compute_total_score   
     if Assignment.find(self.parent_id).team_assignment
       review_score,max,min = self.get_review_score_for_team
+      peer_review_score,max,min = self.compute_peer_review_scores
     else
       review_score,max,min = self.compute_review_scores
     end       
@@ -156,10 +168,19 @@ class AssignmentParticipant < Participant
     if metareview_score
       m_score = metareview_score * ((100 - Assignment.find(self.parent_id).review_weight) / 100).to_f
     end
+    
     if r_score and m_score
-      return r_score + m_score
+      if Assignment.find(self.parent_id).team_assignment and peer_review_score
+       return (r_score + m_score)*peer_review_score
+      else
+       return r_score + m_score
+      end
     elsif r_score
-      return review_score
+      if Assignment.find(self.parent_id).team_assignment and peer_review_score
+        return (review_score)*peer_review_score
+      else
+        return review_score
+      end        
     else
       return 0
     end

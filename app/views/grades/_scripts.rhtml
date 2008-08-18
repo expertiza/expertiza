@@ -28,7 +28,13 @@
   		mreviews.style.display = 'none';
   	   	mreviews_tag = document.getElementById(obj.id+'_mreviewsLink');
   	   	if(mreviews_tag){mreviews_tag.innerHTML = 'show metareviews';}
-	}	 	
+	}
+	previews = document.getElementById(obj.id+'_previews');
+  	if (previews) {
+  		previews.style.display = 'none';
+  	   	previews_tag = document.getElementById(obj.id+'_previewsLink');
+  	   	if(previews_tag){previews_tag.innerHTML = 'show peer reviews';}
+	}		 	
   }
   
   function toggleTeams(numteams,hidden){

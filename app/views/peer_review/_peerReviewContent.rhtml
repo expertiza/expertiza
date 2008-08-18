@@ -1,0 +1,24 @@
+<% i = 0;
+        for @question in @questions %>
+          <%=@question.txt%><br />  
+          <% @prs = PeerReviewScore.find(:first,:conditions => ["peer_review_id = ? AND question_id = ?", @peer_review.id, @question.id])%>
+          <input id=new_peer_review_score_<%=i%>_comments name=new_peer_review_score[<%=i%>][comments] value = "<%=@prs.comments.gsub(/\"/,'&quot;')%>"  size=70 type=text />
+          <% if @question.true_false? %>
+              <select id=new_score_<%=i%> name=new_score[<%=i%>]>
+                 <option value="<%=@min%>" <%if @min==@prs.score%>selected="selected"<%end%> >false</option>
+                 <option value="<%=@max%>" <%if @max==@prs.score%>selected="selected"<%end%> >true</option>     
+              </select><br />  
+          <% else %>
+              <select id=new_score_<%=i%> name=new_score[<%=i%>]>
+                  <% for j in @min..@max %>
+                    <option value="<%=j%>" <%if j==@prs.score%>selected="selected"<%end%> ><%=j%></option>
+                  <% end %>
+              </select><br />  
+          <% end %>
+          <input id=new_question_<%=i%> name=new_question[<%=i%>] value=<%=@question.id%> type=hidden />
+    <% i += 1;
+    end %>
+    <p>
+	<label for="new_peer_review_comments">Additional Comments</label>
+	<textarea cols="70" rows="5" id=new_peer_review_comments name=new_peer_review[comments]><%=@peer_review.additional_comment%></textarea>
+	</p>

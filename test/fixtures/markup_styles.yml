@@ -1,0 +1,8 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+markup_style1:
+  id: 1
+  name: markup1
+
+markup_style2:
+  id: 2 
+  name: markup2

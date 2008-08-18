@@ -1,0 +1,18 @@
+<% if @peer_review_scores.size > 0 %>
+<table class=listing cellpadding =2>
+    <tr>
+        <th>Questions</th><th>Comments</th><th>Score</th>
+    </tr>
+    <% for @prs in @peer_review_scores %>
+        <tr>
+            <td>
+                <%=Question.find(@prs.question_id).txt%>                
+            </td>
+            <td>
+                <%=@prs.comments%>
+            </td>
+            <td><%=@prs.score%></td>
+        </tr>
+    <% end %>
+</table>
+<% end%>

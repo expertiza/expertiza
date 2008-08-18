@@ -1,14 +1,28 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 question1:
-  id: 1
-  txt: This is test question 1?
-  true_false: true
-  rubric_id: 1
-  weight: 5
+	id: 1
+	txt: This is test question 1?
+	true_false: true
+	questionnaire_id: 1
+	weight: 5
   
 question2:
-    id: 2
+	id: 2
     txt: This is test question 2?
     true_false: false
-    rubric_id: 1
+    questionnaire_id: 1
+    weight: 2
+    
+question3:
+  	id: 3
+  	txt: This is test question 3?
+  	true_false: true
+  	questionnaire_id: 4
+  	weight: 5
+  
+question4:
+    id: 4
+    txt: This is test question 4?
+    true_false: false
+    questionnaire_id: 4
     weight: 2

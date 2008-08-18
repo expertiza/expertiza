@@ -20,10 +20,28 @@
 		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).name%></td>
 		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).fullname%></td>
 		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).email%></td>
-		<td><%= link_to "Review", 
-			{:controller => 'student_team', :action => 'review', :team_id => @team_id, 
-			:reviewer_id => @student.id, :reviewee_id => member.user_id, 
-			:assignment_id => @student.assignment_id}%></td>
+		<% if  @student.user_id != member.user_id%>
+			<% @peer_review = PeerReview.find(:first, :conditions => ['reviewer_id = ? and reviewee_id = ? 
+					and assignment_id = ?', @student.user_id, member.user_id, @student.parent_id]) %>
+		  	<% @due_date = DueDate.find(:first, :conditions => ['assignment_id = ? and deadline_type_id = 5', 
+		  			@student.parent_id])%>
+			<%if @peer_review%>
+				<% if @due_date.due_at > Time.now%>
+					<td><%= link_to "Edit Peer Review", 
+					{:controller => 'peer_review', :action => 'edit', :id => @peer_review.id}%></td>
+					<td>|<td>
+				<% end %>
+				<td><%= link_to "View Peer Review", 
+				{:controller => 'peer_review', :action => 'view', :id => @peer_review.id}%></td>
+			<%else%>
+				<% if @due_date.due_at > Time.now%>
+					<td><%= link_to "New Peer Review", 
+					{:controller => 'peer_review', :action => 'new', 
+					:reviewer_id => @student.user_id, :reviewee_id => member.user_id, 
+					:assignment_id => @student.parent_id}%></td>
+				<% end %>
+			<%end%>
+		<%end%>	
 		</tr>
 	<%end%>
 	</table>
@@ -81,7 +99,7 @@
 			<td><%= User.find(:first, :conditions => ['id =?', inv.from_id]).name%></td>
 			<td><%users_teams = TeamsUser.find(:all, :conditions => ['user_id = ?', inv.from_id])%>
 			    <%for team in users_teams%>
-			      <%current_team = Team.find(:first, :conditions => ['id = ? and assignment_id = ?', team.team_id, @student.assignment_id])%>
+			      <%current_team = Team.find(:first, :conditions => ['id = ? and parent_id = ?', team.team_id, @student.parent_id])%>
 			      <%if current_team != nil%>
 			        <%=Team.find(:first, :conditions => ['id = ?', current_team.id]).name%>
 			      <%end%>
@@ -112,7 +130,7 @@
 	<%= form_tag :controller => 'invitation', :action => 'create' %>
 	<%= hidden_field_tag 'team_id', @team_id %>
 	<%= hidden_field_tag 'student_id', @student.id %>
-	Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+	Enter user login: <%= text_field :user, :name, {:size => 41} %>
 	<input type='submit' value='Invite'/>
 	<%= end_form_tag %>
 <%end%>

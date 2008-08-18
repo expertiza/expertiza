@@ -22,3 +22,13 @@ questionnaire3:
   max_question_score: 8
   private: false
   instructor_id: 5
+  
+ peer_review_questionnaire:
+  id: 4
+  name: questionnaire4
+  min_question_score: 5
+  max_question_score: 8
+  private: false
+  instructor_id: 5
+  type_id: 6
+  

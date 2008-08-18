@@ -42,6 +42,14 @@ class Assignment < ActiveRecord::Base
     }    
     return max.to_f
   end
+  
+  def get_max_peer_review_score
+    max = 0
+    Questionnaire.find(self.peer_review_questionnaire_id).questions.each{
+      max += Questionnaire.find(self.peer_review_questionnaire_id).max_question_score
+    }    
+    return max.to_f
+  end
     
   def get_path
     if self.course_id == nil and self.instructor_id == nil

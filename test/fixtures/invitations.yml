@@ -1,0 +1,42 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+create_invitation_with_waiting_reply:
+  id: 1
+  from_id: 4
+  to_id: 6
+  assignment_id: 1
+  reply_status: 'W'
+
+accept_invitation_with_team_and_members:
+  id: 2
+  from_id: 4
+  to_id: 7
+  assignment_id: 1
+  reply_status: 'W'
+  
+accept_invitation_without_team:
+  id: 3
+  from_id: 4
+  to_id: 9
+  assignment_id: 1
+  reply_status: 'W'
+  
+decline_invitation:
+  id: 4
+  from_id: 5
+  to_id: 8
+  assignment_id: 1
+  reply_status: 'W'
+  
+cancel_invitation:
+  id: 5
+  from_id: 4
+  to_id: 8
+  assignment_id: 1
+  reply_status: 'W'
+  
+accept_invitation_with_team_and_no_members:
+  id: 6
+  from_id: 4
+  to_id: 9
+  assignment_id: 1
+  reply_status: 'W'

@@ -55,10 +55,12 @@ class GradesController < ApplicationController
     @reviews = Array.new    
     @reviewers_email_hash = Hash.new 
     
-    if params[:submission]       
+    if params[:submission] == '1'      
       processReview()   
-    else
+    elsif params[:submission] == '2'
       processMetareview()
+    elsif params[:submission] == '3'
+      processPeerReview()
     end       
   
     @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."
@@ -121,6 +123,23 @@ private
         end    
       }
       @reviews = @reviews.sort {|a,b| a.review_of_review_mapping.review_reviewer.fullname <=> b.review_of_review_mapping.review_reviewer.fullname}    
+  end
+  
+  def processPeerReview
+      @collabel = "Peer Review"
+      @rowlabel = "Reviewer"
+      @author = User.find(@participant.user_id)
+      
+      reviews = PeerReview.find(:all, :conditions => ['reviewee_id =? and assignment_id =?',@author.id, @assignment.id])    
+   
+      reviews.each{
+        | review |
+        if review
+          @reviews << review
+          @reviewers_email_hash[review.reviewer.fullname.to_s+" <"+review.reviewer.email.to_s+">"] = review.reviewer.email.to_s        
+        end
+      }    
+      @reviews = @reviews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}    
   end
 
   def get_body_text(submission)

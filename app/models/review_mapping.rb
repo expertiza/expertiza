@@ -115,9 +115,9 @@ class ReviewMapping < ActiveRecord::Base
   
   def self.assign_reviewers_for_team (assignment_id, num_reviews, round_num)
     @r = num_reviews # indicates the num of reviews to be done
-    @teams = Team.find(:all, :conditions=>['assignment_id = ?', assignment_id])
+    @teams = Team.find(:all, :conditions=>['parent_id = ?', assignment_id])
     @t = @teams.size if @teams != nil # indicates the num of teams
-    @students = TeamsUser.find(:all, :conditions => ['team_id in (select id from teams where assignment_id= ?)', assignment_id])
+    @students = TeamsUser.find(:all, :conditions => ['team_id in (select id from teams where parent_id= ?)', assignment_id])
     @n = @students.size if @students != nil # indicates the num of students participating in the assignment
     @team_review = Array.new(@n).map!{ Array.new(@t)} 
     populate_review_matrix() # the matrix that maps reviewers and teams

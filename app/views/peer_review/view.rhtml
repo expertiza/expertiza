@@ -1,0 +1,7 @@
+<%= render :partial => 'view' %>
+<BR/>
+<% if session[:return_to] %>
+  <%= link_to 'Back', session[:return_to] %>
+<% elsif params[:where] == nil%>
+  <%= link_to 'Back', :controller => 'student_assignment', :action => 'view_team',  :id => @student.id %>
+<%end%>

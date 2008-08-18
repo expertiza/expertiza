@@ -11,7 +11,7 @@ class InvitationController < ApplicationController
     if !user
       flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct." 
     else
-      participant = AssignmentParticipant.find(:first, :conditions => ['user_id =? and parent_id =?', user.id, student.assignment_id])
+      participant = AssignmentParticipant.find(:first, :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
       if !participant
         flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment." 
       else
@@ -20,13 +20,13 @@ class InvitationController < ApplicationController
         if (check.size > 0)
           flash[:notice] = "\"#{user.name}\" is already a member of team."
         else
-          current_invs = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.assignment_id])
+          current_invs = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.parent_id])
           #check if the invited user is already invited (i.e. awaiting reply)
           if current_invs.length == 0
             @invitation = Invitation.new
             @invitation.to_id = user.id
             @invitation.from_id = student.user_id
-            @invitation.assignment_id = student.assignment_id
+            @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W' 
             @invitation.save
           else
@@ -66,7 +66,7 @@ class InvitationController < ApplicationController
     end
     
     #if you change your team, remove all your invitations that you send to other people
-    old_invs = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', @inv.to_id, student.assignment_id])
+    old_invs = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', @inv.to_id, student.parent_id])
     for old_inv in old_invs
       old_inv.destroy
     end
@@ -75,7 +75,7 @@ class InvitationController < ApplicationController
     @team_user = TeamsUser.new
     users_teams = TeamsUser.find(:all, :conditions => ['user_id = ?', @inv.from_id])
     for team in users_teams
-      current_team = AssignmentTeam.find(:first, :conditions => ['id = ? and parent_id = ?', team.team_id, student.assignment_id])
+      current_team = AssignmentTeam.find(:first, :conditions => ['id = ? and parent_id = ?', team.team_id, student.parent_id])
       if current_team != nil
         @team_user.team_id = current_team.id
       end

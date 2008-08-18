@@ -1,14 +1,20 @@
-<% if submission %>
+<% if submission == '1' %>
    <%       
       controller = 'review'
       action = 'view_review'
       max_score = assignment.get_max_review_score
    %>
-<% else %>
+<% elsif submission == '2' %>
    <%     
       controller = 'review_of_review' 
       action = 'view_review_of_review'
       max_score = assignment.get_max_metareview_score
+    %>
+<% elsif submission == '3' %>
+   <%     
+      controller = 'peer_review' 
+      action = 'view'
+      max_score = assignment.get_max_peer_review_score
     %>
 <% end %>
 
@@ -20,12 +26,14 @@
 	</tr>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
-		  <% if submission 
+		  <% if submission == '1'
 		       mapping = ReviewMapping.find(review.review_mapping_id) 
                rev_user = User.find(mapping.reviewer_id)
-             else
+             elsif submission == '2'
                mapping = ReviewOfReviewMapping.find(review.review_of_review_mapping_id) 
                rev_user = User.find(mapping.review_reviewer_id)
+             elsif submission == '3'
+               rev_user = User.find(review.reviewer_id)
              end
            %>  
            <td align="center">                       
@@ -39,12 +47,14 @@
 	</tr>
 	<tr class="head"><td align="right"><b>Average score</b></td>
 		<% for review in reviews %>
-		  <% if submission 
+		  <% if submission == '1'
 		       mapping = ReviewMapping.find(review.review_mapping_id) 
                rev_user = User.find(mapping.reviewer_id)
-             else
+             elsif submission == '2'
                mapping = ReviewOfReviewMapping.find(review.review_of_review_mapping_id) 
                rev_user = User.find(mapping.review_reviewer_id)
+             elsif submission == '3'
+               rev_user = User.find(review.reviewer_id)
              end
            %>  		
 		   <td align="center">

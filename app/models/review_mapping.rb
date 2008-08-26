@@ -22,6 +22,7 @@ class ReviewMapping < ActiveRecord::Base
       query = 'team_id = ? and assignment_id = ?'      
     else
       query = 'author_id = ? and assignment_id = ?'
+#      assign_reviewers_of_review(assignment_id, num_review_of_reviews)
     end
     return ReviewMapping.find(:all, :conditions => [query,contributor_id,assignment_id])
   end
@@ -190,6 +191,10 @@ class ReviewMapping < ActiveRecord::Base
     print_matrix()
   end
   
+  def assign_reviewers_of_review (assignment_id, num_review_of_reviews)
+    
+  end
+  
   def self.save_mapping (assignment_id, round_num)
     i = 0
     j = 0
@@ -303,15 +308,10 @@ class ReviewMapping < ActiveRecord::Base
   end
   
   def self.init()
-    # @backup_team_review = Array.new(@n).map!{ Array.new(@t)}
     @rows_zeros = Array.new(@n, 0) # keeps the track of zeros in each row
-    # @backup_rows_zeros = Array.new(@n, 0)
     @rows_ones = Array.new(@n, 0) # keeps the track of ones in each row
-    # @backup_rows_ones = Array.new(@n, 0)
     @columns_zeros = Array.new(@t, 0)# keeps the track of zeros in each column
-    # @backup_columns_zeros = Array.new(@t, 0)
     @columns_ones = Array.new(@t, 0) # keeps the track of ones in each column
-    # @backup_columns_ones = Array.new(@t, 0)
     @changed_cells = Array.new 
     @num_max = @r*@n % @t # the number of teams which can have the max. no. of reviewers
     @min = @r*@n/@t # the min # of reviewers a team can have

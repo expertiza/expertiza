@@ -3,6 +3,9 @@ class Instructor < User
   
   QUESTIONNAIRE = [['My questionnaires','list_mine'],
             ['All public questionnaires','list_all']]
+            
+   SIGNUPSHEET = [['My signups','list_mine'],
+            ['All public signups','list_all']]       
   
   ASSIGNMENT = [['My assignments','list_mine'],
                 ['All public assignments','list_all']]

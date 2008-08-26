@@ -1,9 +1,12 @@
-<h1>Editing review_feedback</h1>
+<h1>Edit Feedback</h1>
 
-<%= start_form_tag :action => 'update', :id => @review_feedback %>
-  <%= render :partial => 'form' %>
-  <%= submit_tag 'Edit' %>
+<%= start_form_tag :action => 'update_feedback' %>
+<%= render :partial => 'feedbackcontentforedit' %>    
+<%= hidden_field_tag('assgt_id', @assgt_id) %>
+<%= hidden_field_tag('author_id', @author_id) %>
+<%= hidden_field_tag('review_id', @review_id) %>
+<%= hidden_field_tag('team_id', @team_id) %>
+<br/>
+    <%= submit_tag "Edit Feedback", :name=>"save" %>       
 <%= end_form_tag %>
-
-<%= link_to 'Show', :action => 'show', :id => @review_feedback %> |
-<%= link_to 'Back', :action => 'list' %>
+<a href="javascript:window.history.back()">Back</a>

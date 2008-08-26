@@ -1,6 +1,6 @@
 	<% i = 0;
         for @question in @questions %>
-          <%=@question.additional_comments%><br />
+          <%=@question.txt%><br />
           <% @rev = @reviewfeedback.id %>  
           <% @rs = ReviewScore.find(:first,:conditions => ["review_id = ? AND question_id = ? AND questionnaire_type_id =4", @rev, @question.id])%>
           <input id=new_review_score_<%=i%>_comments name=new_review_score[<%=i%>][comments] value = "<%=@rs.comments.gsub(/\"/,'&quot;')%>"  size=70 type=text />
@@ -20,6 +20,6 @@
     <% i += 1;
     end %>
 	<br/>Additional Comment:<br/>
-<textarea cols="70" rows="5" id=new_review_comments name=new_reviewfeedback[comments]><%=@reviewfeedback.additional_comments%></textarea>
+<textarea cols="70" rows="5" id=new_review_comments name=new_reviewfeedback[comments]><%=@reviewfeedback.additional_comment%></textarea>
 
 	

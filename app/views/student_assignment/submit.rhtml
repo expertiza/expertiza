@@ -4,19 +4,40 @@
 	<%= flash[:notice] %>
 </div>
 <% end %>
-
+<% ret =  display_directory_tree (@files, @student) %>
 <script type="text/javascript">
-
+function collapseSubDirectory(row) {
+  var image = $('expand.'+row);
+  var index = 0;
+  var visible = true;
+  while (true) {
+    var partner = $('subdir.'+row+'.'+index++);
+    if (partner==null) {
+      break;
+    }
+    if (partner.visible()) {
+      visible = false;
+      Element.hide(partner);
+    } else {
+      Element.show(partner);
+    }
+  }
+  if (visible) {
+    image.src="/images/up.png"
+  } else {
+    image.src="/images/down.png"
+  }
+}
 function createNewFolder(){
-	checkIfFileExists('Create new folder');
 	var new_folder = prompt("Enter a name for a new folder","");
 	input1 = document.createElement("input");
+	var form = document.getElementsByTagName('form')[2];
 	input1.type = "hidden";
 	input1.name = "new_folder";
 	input1.value = new_folder;
-	document.submit_form.appendChild(input1);
+	form.appendChild(input1);
 	if ((new_folder!=null) && (new_folder!='')) {
-		document.submit_form.submit();
+		form.submit();
 	}
 	if (new_folder =='')
     {   
@@ -27,10 +48,10 @@ function createNewFolder(){
 function getSelectedName(){
 	var tbl = document.getElementById("file_table");
 	var numChecks = 0;
-	for(i=0; i<document.forms[0].elements.length; i++){
-		if(document.forms[0].elements[i].type=="checkbox" &&
-		   document.forms[0].elements[i].id.substring(0,9)=="chk_files"){
-			if(document.forms[0].elements[i].checked==true){
+	for(i=0; i<document.forms[2].elements.length; i++){
+		if(document.forms[2].elements[i].type=="radio" &&
+		   document.forms[2].elements[i].id.substring(0,9)=="chk_files"){
+			if(document.forms[2].elements[i].checked==true){
 				return document.getElementById("filenames_" + numChecks).value;
 			}
 			numChecks++;
@@ -39,61 +60,73 @@ function getSelectedName(){
 }
 
 function moveSelectedFile(){
-    checkIfFileExists('Move selected file');
+	if (!checkIfFileSelected('Move')) return;
 	var old_filename = getSelectedName();
-	if (old_filename=='undefined')
-	{
-	   alert('You need to click a radio button below before selecting "Move".');
-	   return false;
-	}
 	var new_filename = prompt("Enter a new location for " + old_filename + "\nExample: /folder1/file.doc","");
+	var form = document.getElementsByTagName('form')[2];
 	input1 = document.createElement("input");
 	input1.type = "hidden";
 	input1.name = "moved_file";
 	input1.value = new_filename;
-	document.submit_form.appendChild(input1);
+	form.appendChild(input1);
 	if ((new_filename!=null) && (new_filename!='')) {
-		document.submit_form.submit();
+		form.submit();
 	}
 }
 
 function copySelectedFile(){
-    checkIfFileExists('Copy selected file');
+	if (!checkIfFileSelected('Copy')) return;
 	var old_filename = getSelectedName();
 	var new_filename = prompt("Enter a new location for the copy of " + old_filename + "\nExample: /folder1/file.doc","");
+	var form = document.getElementsByTagName('form')[2];
 	input1 = document.createElement("input");
 	input1.type = "hidden";
 	input1.name = "copy_file";
 	input1.value = new_filename;
-	document.submit_form.appendChild(input1);
+	form.appendChild(input1);
 	if ((new_filename!=null) && (new_filename!='')) {
-		document.submit_form.submit();
+		form.submit();
 	}
 }
 
 function renameFile(){
-    checkIfFileExists('Rename selected file');
-	var tbl = document.getElementById("file_table");
-	var numChecks = 0;
-	for(i=0; i<document.forms[0].elements.length; i++){
-		if(document.forms[0].elements[i].type=="checkbox" &&
-		   document.forms[0].elements[i].id.substring(0,9)=="chk_files"){
-			if(document.forms[0].elements[i].checked==true){
-				var old_filename = document.getElementById("filenames_" + numChecks).value;
-				break;
-			}
-			numChecks++;
-		}
-	}
-	
+        if (!checkIfFileSelected('Rename')) return;
+	var old_filename = getSelectedName();
 	var new_filename = prompt("Enter a new name for " + old_filename,"");
-	input1 = document.createElement("input");
-	input1.type = "hidden";
-	input1.name = "new_filename";
-	input1.value = new_filename;
-	document.submit_form.appendChild(input1);
+	var form = document.getElementsByTagName('form')[2];	
+	if (navigator.appName == "Microsoft Internet Explorer") {
+		input1 = document.createElement('<input type=hidden name="new_filename" value = "'+new_filename+'">');
+		form.appendChild(input1);
+	}
+	else {
+		input1 = document.createElement("input");
+		input1.type = "hidden";
+                input1.name = "new_filename";
+                input1.value = new_filename;
+		form.appendChild(input1);
+	}
 	if ((new_filename!=null) && (new_filename!='')) {
-		document.submit_form.submit();
+		form.submit();
+	}
+}
+
+function deleteSelectedFile(){
+        if (!checkIfFileSelected('Delete')) 
+		return;
+        else
+	{	
+		if (confirm("Are you sure. If directory all its children will be deleted.  Do you want to delete?"))
+		{
+	        	var form = document.getElementsByTagName('form')[2];
+			input1 = document.createElement("input");
+			input1.type = "hidden";
+	        	input1.name = "delete_files";
+        		input1.value = "delete_files";
+        		form.appendChild(input1);
+        		form.submit();
+		}
+		else
+			return false;
 	}
 }
 
@@ -103,44 +136,48 @@ function renameFile(){
 <%
 @user = session[:user]
 if(@user.master_permission_granted == nil && !@student.permission_granted)%>
-<div class="flash_note">Your work cannot be published because you haven't granted us publishing permissions. 
-<br/>Click <%= link_to 'here', :action =>'view_publishing' %> to set your publishing preferences. 
-</div>
+<div class="flash_note">Your work cannot be published because you haven't granted us permission to publish your work. 
+<br/>Click <%= link_to 'yes', :action =>'set_publish_permission_yes', :id => @student.id%> to grant permission for this work. 
+<br/>Click <%= link_to 'always', :action =>'set_publish_master_permission_yes', :id => @student.id%> to grant permission for <b>all</b> your work. 
+<br/>Click <%= link_to 'never', :action =>'set_publish_master_permission_no', :id => @student.id%> to deny permission for <b>all</b> your work. </div>
 <%end%>
 <ul>
 <li><%= link_to "View feedback on submissions",{:action => 'view_feedback', :id => @student.id} %></li>
-</ul>
-
-<ul>
 <li><%= link_to "Evaluate your team members",{:action => 'peer_review', :id => @student.id} %></li>
 </ul>
 
+
 <% if @student.assignment.wiki_type_id == 1%>
-Submit your work for the assignment titled: <%= @student.assignment.name %>
+Submit your work for the assignment titled: <%= @student.assignment.name %><br/><br/>
+<form action="/student_assignment/submit/<%=params[:id] %>" enctype="multipart/form-data" method="post" onsubmit = "return checkIfFileExists(submission.value,0);">
 <p><img src="/images/submit.png" size="60%"/></p>
-<%= form_tag({:action=>'submit'},:multipart => true, :name=>'submit_form')%>
-<input type="text" name="submission" size=40 value = " "/><input type="submit" name="upload_link" value="Upload link"/>
-<%= end_form_tag%>
-<%= form_tag({:action=>'submit'},:multipart => true, :name=>'submit_form')%>
+<% stage = StudentAssignmentHelper::get_current_stage(@student.assignment.id) %>
+<% if stage != "Complete" %>
+<input type="text" name="submission" size=40/><input type="submit" name="upload_link" value="Upload link"/>
+</form>
+<form action="/student_assignment/submit/<%=params[:id] %>" enctype="multipart/form-data" method="post" onsubmit = "return checkIfFileExists(uploaded_file.value,1);">
+<br>
+<input type="checkbox" name="unzip" value=""/> Unzip submission
 <br>
 <input type="file" id="uploaded_file" name="uploaded_file" size=40 />
-<input type="submit" name="upload_file" value="Upload file" onclick="checkIfFileExists('Upload');"/>
+<input type="submit" name="upload_file" value="Upload file"/>
 <br><br>
-
+</form>
+<%end%>
+<%= form_tag({:action=>'submit'},:multipart => true, :name=>'submit_form')%>
 <% if @student.directory_num != nil and @student.directory_num >= 0 %>
-	<div style="background-color:#EEEEEE; padding-bottom:0.6em"><strong>File and folder actions</strong><br>
-	<input style="margin-top:0.3em" type="button" onclick="createNewFolder()" name="create_new_folder" value="Create new folder" >
-	<input type="button" onclick="copySelectedFile()" name="copy_selected_file" value="Copy selected file" >
-	<input type="button" onclick="moveSelectedFile()" name="move_selected_file" value="Move selected file">
-	<input type="button" onclick="renameFile()" name="rename_file" value="Rename selected file" />
-	<input type="submit" name="delete_files" value="Delete selected file" onclick="checkIfFileExists('Delete selected file');" /></div><br>
+	<% if stage != "Complete" %>
+		<div style="background-color:#EEEEEE; padding-bottom:0.6em"><strong>File and folder actions</strong><br>
+		<input style="margin-top:0.3em" type="button" onclick="createNewFolder()" name="create_new_folder" value="Create new folder" >
+		<input type="button" onclick="copySelectedFile()" value="Copy selected file" name="copy_file" >
+		<input type="button" onclick="moveSelectedFile()" value="Move selected file" name="moved_file">
+		<input type="button" onclick="renameFile()" value="Rename selected file" name="rename_file" />
+		<input type="button" value="Delete selected file" name="delete_files" onclick="deleteSelectedFile();" /><input type="reset" value="Reset"></div><br>
+	<%end%>
 <table>
 	<tr>
 		<td></td>
 		<td>
-			Directory <%= select(:current_folder, :name, 
-					   @folders, {}, 
-					   {:onchange => "document.forms[0].submit()"} ) %>
 			<table id="file_table">
 				<tr>
 					<th>Name</th>
@@ -148,26 +185,7 @@ Submit your work for the assignment titled: <%= @student.assignment.name %>
 					<th>Type</th>
 					<th>Date Modified</th>
 				</tr>
-				
-				<%  i = 0
-					for file in @files %>
-				<tr>
-					<td>
-						<input type=radio id="chk_files_<%= i %>" name="chk_files[<%= i %>]">
-						<input type=hidden id="filenames_<%=i%>" name="filenames[<%= i %>]" value="<%= File.basename(file) %>">
-						<% i = i + 1 %>
-						<%= link_to File.basename(file), :action => 'submit', :id => @student.id, :download => File.basename(file), "current_folder[name]" => @current_folder.name %>
-					</td>
-					<td><%= File.size(file) %></td>
-					<td>
-						<% base = File.basename(file)
-						   if base.split(".").size > 1 %>
-							<%= base.split(".")[base.split(".").size-1] %>
-						<% end %>
-					</td>
-					<td><%= File.mtime(file) %></td>
-				</tr>
-					<% end %>
+				<%= @ret %>	
 			</table>
 		</td>
 	</tr>
@@ -180,14 +198,13 @@ Submit your work for the assignment titled: <%= @student.assignment.name %>
 <h3>Hyperlink:</h3><a href="<%= @link %>" target="new"><%= @link %></a><br>
 <% end %>
 
-
 <%if(@review_of_review_mappings.size > 0)%>
 <h3>Reviews of reviews</h3>
  <tr><ul>
   <%ror_no = 1%>
    <% for ror_map in @review_of_review_mappings %>
   <% 
-  @ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id) %>
+  @ror = ReviewOfReview.find(:all,  :conditions => ["review_of_review_mapping_id = ? and review_of_review_mapping_id in( select id from review_of_review_mappings where assignment_id=?)",ror_map.id, @assignment_id]) %>
   <% if (@ror)%>
   <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view_review_of_review', :id => @ror.id} %> &nbsp;
   <% end %>

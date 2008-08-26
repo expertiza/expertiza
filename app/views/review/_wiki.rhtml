@@ -23,6 +23,7 @@ function collapseSubDirectory(row) {
 }
 </script>
 <%if @files.size == 0 and @assgt.wiki_type.name == "No"%>
+
 <%else%>
 Submitted Files<br />
 <%end%>
@@ -96,3 +97,4 @@ Submitted Files<br />
 		Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
 	<% end %>	
 <%end%>
+

@@ -137,25 +137,30 @@ class StudentAssignmentController < ApplicationController
     end
   end
   
-  def view_scores
-    @student = AssignmentParticipant.find(params[:id])    
-    @assignment = Assignment.find(@student.parent_id)
-    if @assignment.team_assignment 
-      t_query = "select teams.* from teams, teams_users"
-      t_query = t_query + " where teams.parent_id = "+@assignment.id.to_s
-      t_query = t_query + " and teams.type = 'AssignmentTeam'"
-      t_query = t_query + " and teams.id = teams_users.team_id"
-      t_query = t_query + " and teams_users.user_id = "+@student.user_id.to_s
-      author = Team.find_by_sql(t_query).first            
-      query = "team_id = ? and assignment_id = ?"      
-    else
-      author = @student
-      query = "author_id = ? and assignment_id = ?"
-    end   
-    @review_mapping = ReviewMapping.find(:all, :conditions => [query, author.id, @assignment.id])
-    @late_policy = LatePolicy.find(Assignment.find(@assignment.id).due_dates[0].late_policy_id)
-    @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes      
-    
+   def view_scores
+    @author_id = session[:user].id
+    @assignment_id = AssignmentParticipant.find(params[:id]).parent_id
+    @assignment = Assignment.find(@assignment_id)
+    if @assignment.team_assignment
+      @team_id = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where parent_id=?)", @author_id, @assignment_id]).team_id
+      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
+      @student = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @assignment_id])
+      @user_name= session[:user].name
+      @review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", @team_id, @assignment_id])
+    elsif !@assignment.team_assignment
+      @student = AssignmentParticipant.find(params[:id])
+      @user_name= session[:user].name
+      @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
+    end
+    @late_policy = LatePolicy.find(Assignment.find(@assignment_id).due_dates[0].late_policy_id)
+    @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes
+
+    #the code below finds the sum of the maximum scores of all questions in the questionnaire
+    @sum_of_max = 0
+    for question in Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).questions
+      @sum_of_max += Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).max_question_score
+    end
+
     if @student.penalty_accumulated/@late_policy.penalty_period_in_minutes*@late_policy.penalty_per_unit < @late_policy.max_penalty
       @final_penalty = @penalty_units*@late_policy.penalty_per_unit
     elsif @penalty_units ==0
@@ -163,17 +168,15 @@ class StudentAssignmentController < ApplicationController
     else
       @final_penalty = @late_policy.max_penalty
     end
-    
-    query = "select review_of_review_mappings.* from review_of_review_mappings, review_mappings"
-    query = query + "  where review_of_review_mappings.review_mapping_id = review_mappings.id"
-    if @assignment.team_assignment
-      query = query + "        and review_mappings.team_id = "+author.id.to_s
-    else
-      query = query + "        and review_mappings.author_id = "+author.id.to_s
+
+    @review_of_review_mappings = Array.new
+
+    for review_mapping_for_author in @review_mapping
+      if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
+        @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
+      end
     end
-    
-    
-    @review_of_review_mappings = ReviewOfReviewMapping.find_by_sql(query)    
+   
   end
   
   def set_feedback

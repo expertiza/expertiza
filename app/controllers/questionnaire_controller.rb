@@ -73,13 +73,13 @@ class QuestionnaireController < ApplicationController
     end
     
     if params['export']
-      filename = questionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
+      filename = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
       send_file(filename) 
     end
     
     if params['import']
       file = params['csv']
-      questions = questionnaireHelper::get_questions_from_csv(@questionnaire, file)
+      questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
       
       if questions != nil and questions.length > 0
         @questionnaire.delete_questions
@@ -91,7 +91,7 @@ class QuestionnaireController < ApplicationController
         redirect_to :action => 'edit_advice', :id => params[:questionnaire][:id]
     end
   end
-
+    
   def new_questionnaire
     
     if params[:type_id] && params[:type_id] == "3" && session[:user].role_id != 3 && session[:user].role_id != 4
@@ -134,7 +134,7 @@ class QuestionnaireController < ApplicationController
          sorted_advice[0].score != @questionnaire.min_question_score or
          sorted_advice[sorted_advice.length-1] != @questionnaire.max_question_score
         #  The number of advices for this question has changed.
-        questionnaire_changed = questionnaireHelper::adjust_advice_size(@questionnaire, question)
+        questionnaire_changed = QuestionnaireHelper::adjust_advice_size(@questionnaire, question)
       end
     end
     @questionnaire = get(Questionnaire, params[:id])

@@ -58,7 +58,7 @@ class ReviewFeedbackController < ApplicationController
     # Find entry in ReviewFeedback table with passed review id and author id
       @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND team_id = ?", @a, params[:id4]])
     else  
-      @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND user_id = ?", @a, @b])
+      @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND author_id = ?", @a, @b])
     end
     @assgt_id = params[:id1]
     @author_id = params[:id2]
@@ -93,6 +93,7 @@ class ReviewFeedbackController < ApplicationController
   #Save the comments of Feedback in review scores table and the additional cooment in ReviewFeedback table
   def create_feedback
     params.each do |elem|
+    puts "#{elem[0]}, #{elem[1]}" 
     end
     
     @review_feedback = ReviewFeedback.new
@@ -106,6 +107,7 @@ class ReviewFeedbackController < ApplicationController
     @review_feedback.author_id = @author_id
     @review_feedback.review_id = @review_id
     @review_feedback.team_id = @team_id
+
     if params[:new_review_score]
         for review_key in params[:new_review_score].keys
         rs = ReviewScore.new(params[:new_review_score][review_key])
@@ -131,12 +133,12 @@ class ReviewFeedbackController < ApplicationController
   def update_feedback
     @a = (params[:review_id])
     @b = (params[:author_id])
-    @assignment = Assignment.find_by_id(params[:id1])
+    @assignment = Assignment.find_by_id(params[:assgt_id])
     if @assignment.team_assignment
     # Find entry in ReviewFeedback table with passed review id and author id
-      @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND team_id = ?", @a, params[:id4]])
+      @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND team_id = ?", @a, params[:team_id]])
     else  
-      @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND user_id = ?", @a, @b])
+      @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND author_id = ?", @a, @b])
     end
     @reviewfeedback.additional_comment = params[:new_reviewfeedback][:comments]
     @rev_id = @reviewfeedback.id
@@ -155,7 +157,11 @@ class ReviewFeedbackController < ApplicationController
     end
     if @reviewfeedback.update
       flash[:notice] = 'Review was successfully updated.'
-      redirect_to :action=> 'view_feedback', :id1 =>params[:assgt_id], :id2 =>params[:author_id], :id3=>params[:review_id], :id4=>params[:author_id]
+      if @assignment.team_assignment
+        redirect_to :action=> 'view_feedback', :id1 =>params[:assgt_id], :id2 =>params[:author_id], :id3=>params[:review_id], :id4=>params[:team_id]
+      else
+     redirect_to :action=> 'view_feedback', :id1 =>params[:assgt_id], :id2 =>params[:author_id], :id3=>params[:review_id], :id4=>params[:author_id]
+      end   
     end    
   end
   
@@ -168,18 +174,18 @@ class ReviewFeedbackController < ApplicationController
     # Find entry in ReviewFeedback table with passed review id and author id
       @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND team_id = ?", @a, params[:id4]])
     else  
-      @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND user_id = ?", @a, @b])
+      @reviewfeedback = ReviewFeedback.find(:first, :conditions =>["review_id =? AND author_id = ?", @a, @b])
     end
     #@reviewfeedback = ReviewFeedback.find_by_review_id(params[:id3]) 
     @review_id = @reviewfeedback.id
+    puts @review_id
     @review_scores = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, '4'])
     @assgt_id = params[:id1]
     @author_id = params[:id2]
     @team_id = params[:id4]
     @assgt = Assignment.find(@assgt_id)
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.author_feedback_questionnaire_id])
-  end
-  
+  end 
   
   # Action for Instructor to view a review given by the reviwer to an author. The author Feedback will also be available through this action
   def view_feedback_instructor 

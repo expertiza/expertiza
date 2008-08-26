@@ -1,7 +1,7 @@
 <h1> Pending Course Evaluations </h1>
 
 <table class=listing cellpadding=2 width=50%>
-<% if @surveys.size > 0 %>
+<% if (@surveys.size > 0) %>
 <tr><th align = left> Course </th>
 <th align=left> Due Date </th></tr>
 <% i=0 %>
@@ -13,7 +13,7 @@
 <tr>
 <td>
 <div class="flash_note">
-There exists no pending course evaluations.
+There exist no pending course evaluations.
 </div>
 </td> </tr>
 <%end%>

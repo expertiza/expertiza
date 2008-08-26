@@ -1,20 +1,39 @@
+<SCRIPT LANGUAGE="JavaScript">
+function toggleVis(id) { 
+		var elem = document.getElementById(id+"_myDiv");
+		if(elem.style.display == 'none'){
+			elem.style.display = '';
+			document.getElementById(id+"_show").style.display = 'none';
+			document.getElementById(id+"_hide").style.display = '';
+		} else {
+			elem.style.display = 'none';
+			document.getElementById(id+"_show").style.display = '';
+			document.getElementById(id+"_hide").style.display = 'none';
+		}
+	} 
+</SCRIPT>
 <h1>View review of review</h1>
 <%= render :partial => '/review/wiki' %>
-<a href="#1" onClick="toggleElement('review','review');" id="reviewLink" name="reviewLink">Show review</a>	
-<div id="review" style="display:none">
+	
+<a href="#1" onClick="toggleVis('1');">
+	<p class="inline" id="1_show">View review</p>
+	<p class="inline" id="1_hide" style="display: none">Hide review</p>
+</a>
+<div id="1_myDiv" style="display:none">
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
 <%= render :partial => 'review/scores' %> 
-Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%>
+Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
 </div>
-<br/><br/>
-<a href="#1" onClick="toggleElement('metareview','review of review');" id="metareviewLink" name="metareviewLink">Show review of review</a>	
-<div id="metareview" style="display:none">
+<br/>
+<a href="#2" onClick="toggleVis('2');">
+	<p class="inline" id="2_show">View review of review</p>
+	<p class="inline" id="2_hide" style="display: none">Hide review of review</p>
+</a>
+<div id="2_myDiv" style="display:none">
 <h3>Review of review</h3>
 <%= render :partial => 'scores' %>
+<br/>
 </div>
-<br/><br/>
-<% if session[:return_to] %>
-  <%= link_to 'Back', session[:return_to] %>
-<% elsif params[:where] == nil%>
-  <%= link_to 'Back', :controller => 'review', :action => 'list_reviews', :id => @assgt.id %> 
-<% end %>
+<br/>
+<%= link_to 'Back', :controller => 'review', :action => 'list_reviews', :id => @assgt.id %>
+

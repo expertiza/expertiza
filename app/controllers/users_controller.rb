@@ -31,6 +31,7 @@ class UsersController < ApplicationController
     all_users = User.find(:all, :order => 'name', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
     
     letter = params[:letter]
+    session[:letter] = letter
     if letter == nil
       letter = all_users.first.name[0,1].downcase
     end 

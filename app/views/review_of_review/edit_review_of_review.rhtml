@@ -42,4 +42,5 @@ Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
   	<%= submit_tag "Update review of review", :name=>"save" %>   	
 <%= end_form_tag %>
 <br />
-<%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
+<%= link_to 'Back', :controller=>'review', :action => 'list_reviews', :id => @assgt.id %>
+

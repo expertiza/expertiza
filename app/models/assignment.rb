@@ -18,6 +18,7 @@ class Assignment < ActiveRecord::Base
   has_many :due_dates
   has_many :review_feedbacks
   has_many :review_mappings
+  has_many :signup_sheets
   has_many :review_of_review_mappings
   has_many :assignments_questionnairess
   

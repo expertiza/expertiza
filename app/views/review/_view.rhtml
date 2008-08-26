@@ -1,79 +1,44 @@
+<SCRIPT LANGUAGE="JavaScript">
+function toggleVis(id) { 
+		var elem = document.getElementById(id+"_myDiv");
+		if(elem.style.display == 'none'){
+			elem.style.display = '';
+			document.getElementById(id+"_show").style.display = 'none';
+			document.getElementById(id+"_hide").style.display = '';
+		} else {
+			elem.style.display = 'none';
+			document.getElementById(id+"_show").style.display = '';
+			document.getElementById(id+"_hide").style.display = 'none';
+		}
+	} 
+</SCRIPT>
 <h1>View Review</h1>
-<%if @assgt.wiki_type.name == "No"%>
-	<%if @files.size == 0%>
-	<%else%>
-		Submitted Files<br />
-	<%end%>
-<%end%>
+<%= render :partial => 'wiki' %>
+<a href="#1" onClick="toggleVis('1');">
+	<span class="inline" id="1_show">View review</span>
+	<span class="inline" id="1_hide" style="display: none">Hide review</span>
+</a>
 
-<%
- _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
- if @assgt.wiki_type.name == "DokuWiki" %>
-<br>
-<b>DokuWiki Review Links:</b>
-<br>
-<br>
-<%= review_dokuwiki @assgt.directory_path, _time, @author_name  %>
-<br>
-<% elsif @assgt.wiki_type.name == "MediaWiki" %>
-<br>
-<b>MediaWiki Review Links:</b>
-<br>
-<br>
-<!--The following checks a wiki type.  If we add a new wiki type, we need to modify this code, which is in
-    a very unexpected place.  This should be done by polymorphism, based on a Wiki class that is subclassed
-    for various kinds of wikis. 
-    
-    Make a generic review_wiki function, with a parameter specifying wiki type.  The review_wiki function
-    then makes callbacks to the various wiki classes, depending on what kind of a wiki it is working on.
-    This allows wiki-specific behavior to be kept in the wiki classes. -->
-<%if @assgt.team_assignment  # The lookup of all team members should be put in a wiki helper
-  	for team_member in @team_members
-		member_name = User.find(team_member.user_id).name 
-	%>
-		<%= review_mediawiki_group @assgt.directory_path, _time, member_name  %>
-	<%end%>
-<%else%>
-	<%= review_mediawiki @assgt.directory_path, _time, @author_name  %>
-<%end%>
-<br>
-<% end %>
-<ul>
-<% for file in @files %>
-<li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
-<% end %>
-</ul>
-<%if @assgt.team_assignment %>
-	<% for team_member in @team_members %>
-	<label>
-	<% submitted = AssignmentParticipant.find(:first, :conditions =>["user_id = ? and parent_id = ?",team_member.user_id,@assgt.id]).submitted_hyperlink
-	if submitted !=nil
-	%>
-	URL to file submission (if available):</label><%= submitted %>
-	<br/>
-	<% end%>
-	<% end %>
-<%else %>
-	<% if @link != nil %>
-		Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
-	<% end %>	
-<%end%>	
-
-<a href="#1" onClick="toggleElement('review','review');" id="reviewLink" name="reviewLink">Hide review</a>
 <br/>
-<div id="review">
+<div id="1_myDiv" style="display:none">
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
 <%= render :partial => 'review/scores' %> 
-Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
+Additional Comment : <%=@review.additional_comment%><br/>
 <br/>
 </div>
 <%
 review_feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id])
-  if(review_feedback) %>
-<a href="#1" onClick="toggleElement('feedback','feedback');" id="feedbackLink" name="feedbackLink">Show author feedback</a>
+if(review_feedback) %>
+
+<a href="#2" onClick="toggleVis('2');">
+	<p class="inline" id="2_show">View author feedback</p>
+	<p class="inline" id="2_hide" style="display: none">Hide author feedback</p>
+</a>
+
 <br/>
-<% @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", review_feedback.id, '4']) %>		     
-<div id="feedback" style="display:none">
+<% @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", review_feedback.id, '4'])
+%>		     
+<div id="2_myDiv" style="display:none">
 <strong>Author feedback: </strong><br/>
 <%= render :partial => 'review/score1' %>
 Additional Comment: 

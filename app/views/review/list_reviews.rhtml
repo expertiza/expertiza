@@ -13,32 +13,44 @@
   <% @review = Review.find_by_review_mapping_id(review_map.id) %>
   <% if (@review)%>
   <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%= review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
-  <%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %></li>
+  <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
+  	<%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %></li>
+  <% end %>	
   <% else %>
-  <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id} %></li>
+  	<% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
+		 <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id} %></li>
+  	<% else %>
+		<li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%=review_no%> &nbsp;Begin</li>
+  	<% end %>
   <% end %>
   <%review_no += 1
   end %></ul>
  </tr>
- 
  <% if @can_view_review_of_review == 1 && @review_of_review_mappings.size > 0 %>
  <h3>Reviews of reviews for <%= @assignment.name %></h3>
  <tr><ul>
   <%ror_no = 1%>
   <%for ror_map in @review_of_review_mappings %>
   <% 
-  @ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id) %>
+  @ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id) 
+  %>
   <% if (@ror)%>
   <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view_review_of_review', :id => @ror.id} %> &nbsp;
-  <%= link_to "Edit",{:controller => 'review_of_review', :action => 'edit_review_of_review', :id => @ror.id} %></li>
+  <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
+	  <%= link_to "Edit",{:controller => 'review_of_review', :action => 'edit_review_of_review', :id => @ror.id} %></li>
+  <% end %>
   </li>
   <% else %>
-  <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review of Review <%=ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new_review_of_review', :id => ror_map.id} %></li>
+	<% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
+		<li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review of Review <%=ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new_review_of_review', :id => ror_map.id} %></li>
+	<%else%>
+		<li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review of Review <%=ror_no%> &nbsp;Begin</li>
+	<%end%>	
   <% end %>
   <%ror_no += 1
   end %></ul>
  </tr>
- <%end%>
+<%end%> 
 </table>
 <BR/>
 <%= link_to "Back", :controller=>'student_assignment', :action => 'view_actions', :id => @student.id %>

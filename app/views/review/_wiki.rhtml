@@ -1,5 +1,28 @@
+<script type="text/javascript">
+function collapseSubDirectory(row) {
+  var image = $('expand.'+row);
+  var index = 0;
+  var visible = true;
+  while (true) {
+    var partner = $('subdir.'+row+'.'+index++);
+    if (partner==null) {
+      break;
+    }
+    if (partner.visible()) {
+      visible = false;
+      Element.hide(partner);
+    } else {
+      Element.show(partner);
+    }
+  }
+  if (visible) {
+    image.src="/images/up.png"
+  } else {
+    image.src="/images/down.png"
+  }
+}
+</script>
 <%if @files.size == 0 and @assgt.wiki_type.name == "No"%>
-
 <%else%>
 Submitted Files<br />
 <%end%>
@@ -36,23 +59,36 @@ Submitted Files<br />
 <%end%>
 <br>
 <% end %>
-<ul>
-<% for file in @files %>
-	<% if params[:action] == "new_review" %>
-		<li><%= link_to File.basename(file), :action => 'view_file', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
-	<%else%>
-		<li><%= link_to File.basename(file), :action => 'edit_review', :id => @mapping_id, :fname => File.basename(file),"current_folder[name]" => @current_folder.name %></li>
-	<%end%>	
-<% end %>
-</ul>
+<% if @files!= nil &&  @files.size>0%>
+<% ret =  display_directory_tree(@files, @author, true) %>
+<table>
+        <tr>
+                <td></td>
+                <td>
+                        <table id="file_table">
+                                <tr>
+                                        <th>Name</th>
+                                        <th>Size</th>
+                                        <th>Type</th>
+                                        <th>Date Modified</th>
+                                </tr>
+                                <%= @ret %>
+                        </table>
+                </td>
+        </tr>
+</table>
+<br>
+<br>
+<%end%>
 <%if @assgt.team_assignment %>
 	<% for team_member in @team_members %>
 	<label>
-	<% submitted = AssignmentParticipant.find(:first, :conditions =>["user_id = ? and parent_id = ?",team_member.user_id,@assgt.id]).submitted_hyperlink
+	<% submitted = @link
 	if submitted !=nil
 	%>
-	URL to file submission (if available):</label><%= submitted %>
+	URL to file submission (if available):</label><a href="<%= submitted %>" target="new"><%= submitted %></a>
 	<br/>
+        <%break%>
 	<% end%>
 	<% end %>
 <%else %>

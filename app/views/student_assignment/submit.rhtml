@@ -4,7 +4,7 @@
 	<%= flash[:notice] %>
 </div>
 <% end %>
-<% ret =  display_directory_tree (@files, @student) %>
+<% ret =  display_directory_tree (@files, @student, false) %>
 <script type="text/javascript">
 function collapseSubDirectory(row) {
   var image = $('expand.'+row);
@@ -185,7 +185,9 @@ Submit your work for the assignment titled: <%= @student.assignment.name %><br/>
 					<th>Type</th>
 					<th>Date Modified</th>
 				</tr>
-				<%= @ret %>	
+				<div id="1_myDiv">	
+					<%= @ret %>	
+				</div>
 			</table>
 		</td>
 	</tr>
@@ -204,11 +206,12 @@ Submit your work for the assignment titled: <%= @student.assignment.name %><br/>
   <%ror_no = 1%>
    <% for ror_map in @review_of_review_mappings %>
   <% 
-  @ror = ReviewOfReview.find(:all,  :conditions => ["review_of_review_mapping_id = ? and review_of_review_mapping_id in( select id from review_of_review_mappings where assignment_id=?)",ror_map.id, @assignment_id]) %>
+  @ror = ReviewOfReview.find(:all,  :conditions => ["review_of_review_mapping_id = ?",ror_map.id]) %>
   <% if (@ror)%>
-  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view_review_of_review', :id => @ror.id} %> &nbsp;
+  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view_review_of_review', :id => @ror[0].id} %> &nbsp;
   <% end %>
   <%ror_no += 1
   	end 
   end%></ul>
  </tr>
+

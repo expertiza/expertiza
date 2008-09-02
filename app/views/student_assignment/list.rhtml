@@ -19,7 +19,12 @@ To begin, click on an assignment from the list above or <%= link_to 'click here'
   </tr>
 	
 <% for participant in @participants %>
-  <% assignment = Assignment.find(participant.parent_id) %>
+  <% begin 
+       assignment = Assignment.find(participant.parent_id)
+     rescue
+       assignment = nil
+     end %>
+  <% if assignment %>
   <tr class="listingRow">
 		<td></td>
 		<td><%= link_to assignment.name, :action => 'view_actions', :id => participant %></td>
@@ -33,6 +38,7 @@ To begin, click on an assignment from the list above or <%= link_to 'click here'
 			<% end %>
 		</td>
 	</tr>
+	<% end %>
 <% end %>
 </table>
 <% end %>

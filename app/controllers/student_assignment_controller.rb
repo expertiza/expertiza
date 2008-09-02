@@ -350,7 +350,7 @@ class StudentAssignmentController < ApplicationController
     
     @review_of_review_mappings = Array.new
     
-    @review_mappings_for_author = ReviewMapping.find(:all, :conditions => ["author_id = ?",(session[:user].id)])
+    @review_mappings_for_author = ReviewMapping.find(:all, :conditions => ["author_id = ? and assignment_id = ?",session[:user].id,@assignment_id])
     for review_mapping_for_author in @review_mappings_for_author
       if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
         @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])

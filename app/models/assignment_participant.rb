@@ -243,7 +243,12 @@ class AssignmentParticipant < Participant
   
   def set_student_directory_num
     if self.directory_num.nil? or self.directory_num < 0           
-      self.directory_num = AssignmentParticipant.find(:first, :conditions=>['parent_id = ?',self.parent_id], :order => 'directory_num desc').directory_num+1
+      maxnum = AssignmentParticipant.find(:first, :conditions=>['parent_id = ?',self.parent_id], :order => 'directory_num desc').directory_num
+      if maxnum
+        self.directory_num = maxnum + 1
+      else
+        self.directory_num = 0
+      end
       self.save
       
       if Assignment.find(self.parent_id).team_assignment

@@ -1,4 +1,5 @@
 class TreeDisplayController < ApplicationController
+  helper :application
   
   # called when the display is requested
   # ajbudlon, July 3rd 2008

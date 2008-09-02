@@ -1,5 +1,4 @@
 class Participant < ActiveRecord::Base
-  belongs_to :assignment
   belongs_to :user
   has_many :comments
   has_many :resubmission_times 
@@ -25,14 +24,7 @@ class Participant < ActiveRecord::Base
     end
     return topic
   end
-  
-  def get_course_string
-    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
-    if assignment.course == nil or assignment.course.name == nil or assignment.course.name.strip == ""
-      return "<center>&#8212;</center>"
-    end
-    return assignment.course.name
-  end
+ 
   
   def able_to_submit
     if submit_allowed

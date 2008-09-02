@@ -1,6 +1,7 @@
 class Course < ActiveRecord::Base
   has_many :ta_mappings
-   validates_presence_of :name
+  validates_presence_of :name
+  has_many :assignments
  
   # Return any predefined teams associated with this course
   # Author: ajbudlon

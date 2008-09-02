@@ -1,4 +1,5 @@
 class CourseParticipant < Participant
+  belongs_to :course, :class_name => 'Course', :foreign_key => 'parent_id'
   
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
@@ -18,7 +19,15 @@ class CourseParticipant < Participant
     if (find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, course.id]}).size == 0)
        create(:user_id => user.id, :parent_id => course.id)
     end   
-  end    
+  end 
+  
+  def get_course_string
+    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
+    if self.course == nil or self.course.name == nil or self.course.name.strip == ""
+      return "<center>&#8212;</center>"
+    end
+    return self.course.name
+  end  
   
   def get_parent_name
     Course.find(self.parent_id).name

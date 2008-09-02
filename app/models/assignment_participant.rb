@@ -1,9 +1,21 @@
 class AssignmentParticipant < Participant  
   require 'wiki_helper'
+  belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
+  
+  def get_course_string
+    puts "*** *** ***"
+    puts self.id
+    puts self.assignment.id
+    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
+    if self.assignment.course == nil or self.assignment.course.name == nil or self.assignment.course.name.strip == ""
+      return "<center>&#8212;</center>"
+    end
+    return self.assignment.course.name
+  end
   
   def get_reviews
     if Assignment.find(self.parent_id).team_assignment
-      author_id = get_team().id
+      author_id = self.team.id
       query = "team_id = ? and assignment_id = ?"
     else
       author_id = self.user_id
@@ -88,7 +100,7 @@ class AssignmentParticipant < Participant
     if Assignment.find(self.parent_id).team_assignment and Assignment.find(self.parent_id).wiki_type.name == "MediaWiki"
 
        submissions = Array.new
-       self.get_team().get_team_users().each {
+       self.team.get_team_users().each {
          | user |
          submissions << WikiType.review_mediawiki(Assignment.find(self.parent_id).directory_path, currenttime, user.name)
        }
@@ -102,7 +114,7 @@ class AssignmentParticipant < Participant
     end
   end    
     
-  def get_team
+  def team
        query = "select distinct teams.* from teams, teams_users"
        query = query + " where teams.type = 'AssignmentTeam'"
        query = query + " and teams.parent_id = "+self.parent_id.to_s
@@ -134,8 +146,7 @@ class AssignmentParticipant < Participant
       query = query + " and teams.parent_id = "+self.parent_id.to_s
       query = query + " and teams.id = teams_users.team_id"
       query = query + " and teams_users.user_id = "+self.user_id.to_s
-      team = Team.find_by_sql(query).first
-      return team.compute_review_scores    
+      return Team.find_by_sql(query).first
   end
   
   #computes this participants current metareview score
@@ -229,10 +240,6 @@ class AssignmentParticipant < Participant
   def get_path
      Assignment.find(self.parent_id).get_path + "/"+ self.directory_num.to_s
   end
-  
-  def assignment
-    Assignment.find(self.parent_id)
-  end  
   
   def set_student_directory_num
     if self.directory_num.nil? or self.directory_num < 0           

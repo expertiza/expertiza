@@ -74,7 +74,7 @@ class Assignment < ActiveRecord::Base
   def delete_assignment
     begin
       if self.team_assignment
-        teams = Team.find(:all,:conditions => ["assignment_id = ?",self.id])
+        teams = Team.find(:all,:conditions => ["parent_id = ?",self.id])
         teams.each {|team|
           team.delete
         }

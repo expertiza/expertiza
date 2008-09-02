@@ -3,7 +3,7 @@
 <h1>Edit an existing <%= @q_type.downcase %></h1>
 
 
-<%= form_tag({:action=>'edit_questionnaire', :id=>@questionnaire.id}, :multipart => true)%>
+<%= form_tag({:action=>'edit', :id=>@questionnaire.id}, :multipart => true)%>
 	<%= render :partial => 'questionnaire' %>
 	
 	<%= submit_tag "Save "+@q_type, :name=>"save" %>

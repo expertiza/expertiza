@@ -205,13 +205,12 @@ Submit your work for the assignment titled: <%= @student.assignment.name %><br/>
  <tr><ul>
   <%ror_no = 1%>
    <% for ror_map in @review_of_review_mappings %>
-  <% 
-  @ror = ReviewOfReview.find(:all,  :conditions => ["review_of_review_mapping_id = ?",ror_map.id]) %>
-  <% if (@ror)%>
-  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view_review_of_review', :id => @ror[0].id} %> &nbsp;
-  <% end %>
-  <%ror_no += 1
-  	end 
+     <% @ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id) %>
+     <% if (@ror)%>
+         <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view_review_of_review', :id => @ror.id} %> &nbsp;
+     <% end %>
+     <%ror_no += 1
+     end 
   end%></ul>
  </tr>
 

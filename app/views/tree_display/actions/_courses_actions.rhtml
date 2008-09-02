@@ -5,7 +5,7 @@
 <ul id="actionmenu"><li class="daddy">&nbsp;
 <ul>
 <%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Course', :controller => 'course', :node => node, :owner_id => owner_id} %>
-<% if session[:user].id == owner_id %>  
+<% if is_available(session[:user],owner_id)%>  
   <li><%= link_to 'Create assignment',:controller=>'assignment', :action=>'new', :parent_id => node.node_object_id %></li>
   <li><%= link_to 'Add participants',:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Course'%></li>
   <li><%= link_to 'Create teams',:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Course' %></li>  

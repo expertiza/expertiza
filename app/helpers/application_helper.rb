@@ -1,6 +1,17 @@
 # Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
   
+  def is_available(user,owner_id)
+    if session[:user].id == owner_id
+      return true
+    elsif user.role.name == 'Administrator' or
+       user.role.name == 'Super-Administrator'
+       return true
+    else
+       return false
+    end
+  end
+  
   def self.get_user_role(l_user)
     user = nil
     

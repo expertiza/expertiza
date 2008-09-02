@@ -152,7 +152,9 @@ class StudentAssignmentController < ApplicationController
       @user_name= session[:user].name
       @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
     end
-    @late_policy = LatePolicy.find(Assignment.find(@assignment_id).due_dates[0].late_policy_id)
+    
+    # use the default late policy until policies are implemented
+    @late_policy = LatePolicy.find(1) #LatePolicy.find(Assignment.find(@assignment_id).due_dates[0].late_policy_id)
     @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes
 
     #the code below finds the sum of the maximum scores of all questions in the questionnaire

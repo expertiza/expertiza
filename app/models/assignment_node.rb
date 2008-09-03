@@ -20,15 +20,18 @@ class AssignmentNode < Node
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,parent_id = nil)    
     query = "select nodes.* from nodes, "+self.table
     query = query+" where nodes.node_object_id = "+self.table+".id"
-    query = query+" and nodes.type = '"+self.to_s+"'"    
-    if user_id
+    query = query+" and nodes.type = '"+self.to_s+"'"
+    if user_id && User.find(user_id).role_id != 6 # if not teaching assistant
       query = query+" and "+self.table+".instructor_id = "+user_id.to_s
+    elsif user_id #for teaching assistant
+      query = query+ " and "+self.table+".id in (select assignments.id from assignments, "+
+      "ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id="+user_id.to_s+")"    
     else
       query = query+" and "+self.table+".private = 0"
-    end
+    end  
     if parent_id
       query = query+ " and course_id = "+parent_id.to_s
-    end    
+    end
     if sortvar            
       query = query+" order by "+self.table+"."+sortvar
       if sortorder

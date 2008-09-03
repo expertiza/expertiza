@@ -29,9 +29,7 @@ class Ta < User
       #### this find method compares the directories of an assignment and a course to find out if the 
       #### the assignment is in a subdirectory of a course that the user is a TA for.
       Assignment.find_by_sql(["select assignments.id, assignments.name, assignments.directory_path " +
-        "from assignments inner join courses ON(assignments.directory_path like CONCAT(courses.directory_path,'%')) " +
-        "inner join ta_mappings ON(courses.id=ta_mappings.course_id and ta_id=?) " +
-        "UNION select assignments.id, assignments.name, assignments.directory_path from assignments where instructor_id=?",user_id,user_id])
+      "from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?",user_id])    
     else
       object_type.find(:all, :conditions => ["instructor_id = ?", user_id])      
     end
@@ -42,4 +40,10 @@ class Ta < User
                      :conditions => ["id = ? AND (instructor_id = ? OR private = 0)", 
                                      id, user_id])
   end
+  
+  def self.get_my_instructor (user_id)
+    course_id = TaMapping.get_course_id(user_id)
+    Course.find(course_id).instructor_id
+  end
+  
 end

@@ -3,9 +3,6 @@ class AssignmentParticipant < Participant
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   
   def get_course_string
-    puts "*** *** ***"
-    puts self.id
-    puts self.assignment.id
     # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
     if self.assignment.course == nil or self.assignment.course.name == nil or self.assignment.course.name.strip == ""
       return "<center>&#8212;</center>"
@@ -14,7 +11,7 @@ class AssignmentParticipant < Participant
   end
   
   def get_reviews
-    if Assignment.find(self.parent_id).team_assignment
+    if self.assignment.team_assignment
       author_id = self.team.id
       query = "team_id = ? and assignment_id = ?"
     else
@@ -140,15 +137,6 @@ class AssignmentParticipant < Participant
    end
   end
   
-  def get_review_score_for_team
-      query = "select teams.* from teams, teams_users"
-      query = query + " where teams.type = 'AssignmentTeam'"
-      query = query + " and teams.parent_id = "+self.parent_id.to_s
-      query = query + " and teams.id = teams_users.team_id"
-      query = query + " and teams_users.user_id = "+self.user_id.to_s
-      return Team.find_by_sql(query).first
-  end
-  
   #computes this participants current metareview score
   #metareview = review_of_review
   def compute_metareview_scores    
@@ -165,33 +153,45 @@ class AssignmentParticipant < Participant
     end
   end
   
-  def compute_total_score   
+  def compute_review_scores
     if Assignment.find(self.parent_id).team_assignment
-      review_score,max,min = self.get_review_score_for_team
-      peer_review_score,max,min = self.compute_peer_review_scores
+      return self.team.compute_review_scores
     else
-      review_score,max,min = self.compute_review_scores
-    end       
+      reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (select id from review_mappings where author_id = #{self.user_id} and assignment_id = #{self.parent_id})")
+      if reviews.length > 0
+        avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews)     
+        max_assignment_score = Assignment.find(self.parent_id).get_max_review_score
+        return avg_review_score/max_assignment_score,max_score/max_assignment_score,min_score/max_assignment_score
+      else
+        return nil,nil
+    end
+   end    
+  end
+  
+  def compute_total_score   
+    review_score,max,min = self.compute_review_scores
+     
     if review_score
-      r_score = review_score * (Assignment.find(self.parent_id).review_weight / 100).to_f
+      puts review_score
+      r_score = review_score * (self.assignment.review_weight / 100).to_f
     end    
     metareview_score,max,min = self.compute_metareview_scores
     if metareview_score
-      m_score = metareview_score * ((100 - Assignment.find(self.parent_id).review_weight) / 100).to_f
+      m_score = metareview_score * ((100 - self.assignment.review_weight) / 100).to_f
     end
     
     if r_score and m_score
-      if Assignment.find(self.parent_id).team_assignment and peer_review_score
-       return (r_score + m_score)*peer_review_score
-      else
+      #if self.assignment.team_assignment and peer_review_score
+      # return (r_score + m_score)*peer_review_score
+      #else
        return r_score + m_score
-      end
+      #end
     elsif r_score
-      if Assignment.find(self.parent_id).team_assignment and peer_review_score
-        return (review_score)*peer_review_score
-      else
+      #if self.assignment.team_assignment and peer_review_score
+      #  return (review_score)*peer_review_score
+      #else
         return review_score
-      end        
+      #end        
     else
       return 0
     end

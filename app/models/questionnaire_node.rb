@@ -7,8 +7,12 @@ class QuestionnaireNode < Node
     query = "select nodes.* from nodes, "+self.table
     query = query+" where nodes.node_object_id = "+self.table+".id"
     query = query+" and nodes.type = '"+self.to_s+"'"
-    if user_id
+    if user_id && User.find(user_id).role_id != 6 # if not teaching assistant
+      # in an TA we have to get all the questionnaires of my instructor who is registered
+      # for a course
       query = query+" and "+self.table+".instructor_id = "+user_id.to_s
+    elsif user_id
+      query = query+" and "+self.table+".instructor_id = "+Ta.get_my_instructor(user_id).to_s
     else
       query = query+" and "+self.table+".private = 0"
     end     

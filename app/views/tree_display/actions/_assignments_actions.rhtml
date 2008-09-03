@@ -4,7 +4,7 @@
 <ul id="actionmenu"><li class="daddy">&nbsp;
 <ul>
 <%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Assignment', :controller => 'assignment', :node => node, :owner_id => owner_id} %>
-<% if is_available(session[:user],owner_id)%>  
+<% if is_available(session[:user],owner_id) || session[:user].role_id == 6%>  
 <li><%= link_to 'Add Participants',:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment'%></li>            
 <% if Assignment.find(node.node_object_id).team_assignment %><li><%= link_to 'Create teams',:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Assignment' %></li><% end %>
 <% if Assignment.find(node.node_object_id).course_id > 0%>

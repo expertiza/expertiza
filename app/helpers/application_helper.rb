@@ -2,7 +2,7 @@
 module ApplicationHelper
   
   def is_available(user,owner_id)
-    if session[:user].id == owner_id
+    if user.id == owner_id
       return true
     elsif user.role.name == 'Administrator' or
        user.role.name == 'Super-Administrator'

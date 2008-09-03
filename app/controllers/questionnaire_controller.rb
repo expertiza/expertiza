@@ -5,7 +5,11 @@ class QuestionnaireController < ApplicationController
   def copy
     orig_questionnaire = Questionnaire.find(params[:id])
     new_questionnaire = orig_questionnaire.clone
-    new_questionnaire.instructor_id = session[:user].id
+    if (session[:user]).role_id != 6
+      new_questionnaire.instructor_id = session[:user].id
+    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+      new_questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+    end
     new_questionnaire.name = 'Copy of '+orig_questionnaire.name
     if new_questionnaire.save
       parent = QuestionnaireTypeNode.find_by_node_object_id(new_questionnaire.type_id)
@@ -66,10 +70,16 @@ class QuestionnaireController < ApplicationController
   def edit
     @questionnaire = get(Questionnaire, params[:id])
     redirect_to :action => 'list' if @questionnaire == nil
-   
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
+      if (session[:user]).role_id == 6
+        @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+      end  
       save_questionnaire 'edit_questionnaire', false
+    end
+    
+    if (session[:user]).role_id == 6
+      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
     end
     
     if params['export']
@@ -112,7 +122,9 @@ class QuestionnaireController < ApplicationController
     end
     @questionnaire = Questionnaire.new if @questionnaire == nil
     @questionnaire.update_attributes(params[:questionnaire])
-   
+    if (session[:user]).role_id == 6
+      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+    end   
     # Don't save until Save button is pressed
     if params[:save]
       save_questionnaire 'new_questionnaire', true

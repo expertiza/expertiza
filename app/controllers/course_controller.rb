@@ -6,7 +6,12 @@
 class CourseController < ApplicationController
   auto_complete_for :user, :name
   require 'fileutils'
- 
+  
+  def auto_complete_for_user_name
+    search = params[:user][:name].to_s
+    @users = User.find_by_sql("select * from users where role_id=6") unless search.blank?
+    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false 
+  end 
   # Creates a new course
   # if private is set to 1, then the course will
   # only be available to the instructor who created it.
@@ -90,4 +95,30 @@ class CourseController < ApplicationController
     end
     redirect_to :controller => 'tree_display', :action => 'list'
   end
+  
+  def view_teaching_assistants
+    @course = Course.find(params[:id])
+    @ta_mappings = @course.ta_mappings
+    for mapping in @ta_mappings
+      mapping[:name] = mapping.ta.name
+    end
+  end
+  
+  def add_ta
+    @course = Course.find(params[:course_id])
+    @user = User.find_by_name(params[:user][:name])
+    if(@user==nil)
+      redirect_to :action => 'view_teaching_assistants', :id => @course.id 
+    else
+      @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
+      redirect_to :action => 'view_teaching_assistants', :id => @course.id
+    end
+  end 
+  
+  def remove_ta
+    @ta_mapping = TaMapping.find(params[:id])
+    @ta_mapping.destroy
+    redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
+  end
+  
 end

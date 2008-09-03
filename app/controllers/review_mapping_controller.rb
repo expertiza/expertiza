@@ -17,13 +17,25 @@ class ReviewMappingController < ApplicationController
   def add_reviewer
     assignment = Assignment.find(params[:assignment_id])        
     reviewer = User.find_by_name(params[:user][:name])
-    if reviewer != nil && assignment != nil 
+    if reviewer != nil && assignment != nil        
        if assignment.team_assignment
-        mapping = ReviewMapping.create(:team_id => params[:contributor_id], :reviewer_id => reviewer.id, :assignment_id => assignment.id, :round => 0)
-       else
-        mapping = ReviewMapping.create(:author_id => params[:contributor_id], :reviewer_id => reviewer.id, :assignment_id => assignment.id, :round => 0)
+        exists = ReviewMapping.find(:first, :conditions => ['team_id = ? and reviewer_id = ? and assignment_id = ?',params[:contributor_id],reviewer.id,assignment.id])
+        if exists == nil
+           mapping = ReviewMapping.create(:team_id => params[:contributor_id], :reviewer_id => reviewer.id, :assignment_id => assignment.id, :round => 0)
+        else
+          flash[:note] = "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+        end
+      else
+        exists = ReviewMapping.find(:first, :conditions => ['author_id = ? and reviewer_id = ? and assignment_id = ?',params[:contributor_id],reviewer.id,assignment.id])
+        if exists == nil
+           mapping = ReviewMapping.create(:author_id => params[:contributor_id], :reviewer_id => reviewer.id, :assignment_id => assignment.id, :round => 0)
+        else
+           flash[:note] = "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+        end
       end
-      mapping.save
+      if mapping
+        mapping.save
+      end
     end   
           
     redirect_to :action => 'list_reviewers', :assignment_id => assignment.id, :id => params[:contributor_id]    
@@ -91,7 +103,7 @@ class ReviewMappingController < ApplicationController
       flash[:error] = "A delete action failed." + $! 
     end
     
-    flash[:note] = "All review mappings for "+contributor.get_author_name+" have been deleted."    
+    flash[:note] = "All review mappings for "+contributor.get_author_name+" and "+mapping.reviewer.name+" have been deleted."    
     redirect_to :action => 'list_reviewers', :assignment_id => assignment.id, :id => contributor.id
   end
   

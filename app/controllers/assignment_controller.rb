@@ -11,7 +11,14 @@ class AssignmentController < ApplicationController
   def copy    
     old_assign = Assignment.find(params[:id])
     new_assign = old_assign.clone
-    new_assign.instructor_id = session[:user].id
+    if (session[:user]).role_id != 6
+      new_assign.instructor_id = session[:user].id
+    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+      new_assign.instructor_id = Ta.get_my_instructor((session[:user]).id)
+      new_assign.course_id = TaMapping.get_course_id((session[:user]).id)
+    end 
+    
+    
     new_assign.name = 'Copy of '+new_assign.name 
    
     if new_assign.save    
@@ -48,7 +55,12 @@ class AssignmentController < ApplicationController
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.    
     @assignment = Assignment.new(params[:assignment])
-    @assignment.instructor_id = (session[:user]).id
+    if (session[:user]).role_id != 6
+      @assignment.instructor_id = (session[:user]).id
+    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+      @assignment.instructor_id = Ta.get_my_instructor((session[:user]).id)
+      @assignment.course_id = TaMapping.get_course_id((session[:user]).id)
+    end  
     @assignment.submitter_count = 0    
     ## feedback added
     ##
@@ -216,7 +228,11 @@ class AssignmentController < ApplicationController
   
   def assign
     @assignment = Assignment.find(params[:id])
-    @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
+    if session[:user].role_id != 6 # for other that TA
+      @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
+    else
+       @courses = TaMapping.get_courses(session[:user].id)
+    end   
   end
   
   def remove

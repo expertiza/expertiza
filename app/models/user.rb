@@ -51,6 +51,26 @@ class User < ActiveRecord::Base
     self.password == Digest::SHA1.hexdigest(self.password_salt.to_s +
                                                  clear_password)
   end
+  
+  # Generate email to user with new password
+  #ajbudlon, sept 07, 2007   
+  def send_password(clear_password) 
+    self.password = Digest::SHA1.hexdigest(self.password_salt.to_s + clear_password)
+    self.save
+    
+    Mailer.deliver_message(
+        {:recipients => self.email,
+         :subject => "Your Expertiza password has been reset",
+         :body => {
+           :user => self,
+           :password => clear_password,
+           :first_name => ApplicationHelper::get_user_first_name(self),
+           :partial_name => "send_password"           
+         }
+        }
+    )
+    
+  end   
  
   def self.import(row,session,id = nil)
       if row.length != 4

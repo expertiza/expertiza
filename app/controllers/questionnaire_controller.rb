@@ -72,14 +72,7 @@ class QuestionnaireController < ApplicationController
     redirect_to :action => 'list' if @questionnaire == nil
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
-      if (session[:user]).role_id == 6
-        @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-      end  
       save_questionnaire 'edit_questionnaire', false
-    end
-    
-    if (session[:user]).role_id == 6
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
     end
     
     if params['export']
@@ -121,10 +114,8 @@ class QuestionnaireController < ApplicationController
       @questionnaire = get(Questionnaire, params[:id])
     end
     @questionnaire = Questionnaire.new if @questionnaire == nil
-    @questionnaire.update_attributes(params[:questionnaire])
-    if (session[:user]).role_id == 6
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    end   
+    
+    @questionnaire.update_attributes(params[:questionnaire])   
     # Don't save until Save button is pressed
     if params[:save]
       save_questionnaire 'new_questionnaire', true
@@ -168,7 +159,11 @@ class QuestionnaireController < ApplicationController
   
   private
   def save_questionnaire(failure_action, save_instructor_id)
-    @questionnaire.instructor_id = session[:user].id if save_instructor_id
+    if (session[:user]).role_id == 6
+      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+    else
+      @questionnaire.instructor_id = session[:user].id if save_instructor_id
+    end
     save_questions @questionnaire.id if @questionnaire.id != nil and @questionnaire.id > 0
     
     if @questionnaire.save

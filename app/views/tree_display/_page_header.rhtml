@@ -2,9 +2,11 @@
 <%= start_form_tag({:action => 'list'}) %>
 <TABLE width="80%">
 <TR>
+<% if session[:user].role_id!=6 %>
 <TD width="30%" align="left">
 <input type='checkbox' name = 'display[check]' value = '1' onclick='submit();' <% if @show == nil %>checked<% end %>>Show all items
 </TD>
+<%end%>
 <TD width="50%" align="right">
 Sort by: 
 <select name='display[sortvar]' style="width: 10em">

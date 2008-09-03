@@ -28,13 +28,13 @@ class CourseController < ApplicationController
     course = Course.find(params[:id])
     if course.directory_path != params[:course][:directory_path]
       begin
-        FileHelper.delete_directory(course.directory_path)
+        FileHelper.delete_directory(course)
       rescue
         flash[:error] = $!
       end
       
       begin
-        FileHelper.create_directory(params[:course][:directory_path])
+        FileHelper.create_directory_from_path(params[:course][:directory_path])
       rescue
         flash[:error] = $!
       end
@@ -59,24 +59,27 @@ class CourseController < ApplicationController
     end      
   end
 
+  # create a course
   def create
     course = Course.new(params[:course])
+    puts course.directory_path
     course.instructor_id = session[:user].id
-    begin
+    #begin
       course.save!
       course.create_node
-      FileHelper.create_directory(course.directory_path) 
+      FileHelper.create_directory(course) 
       redirect_to :controller => 'tree_display', :action => 'list'
-    rescue
-      flash[:error] = "An error occurred while saving the course: "+$!
-      redirect_to :action => 'new'
-    end        
+    #rescue
+    #  flash[:error] = "An error occurred while saving the course: "+$!
+    #  redirect_to :action => 'new'
+    #end        
   end
   
+  # delete the course
   def delete
     course = Course.find(params[:id])
     begin
-      FileHelper.delete_directory(course.directory_path)
+      FileHelper.delete_directory(course)
     rescue
       flash[:error] = $!
     end

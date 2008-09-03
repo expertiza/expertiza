@@ -44,4 +44,17 @@ module FileHelper
       raise "An error was encountered while creating this directory: "+$!
     end   
   end  
+  
+  def self.create_directory_from_path(path)     
+    begin
+      if !File.exists? path
+        FileUtils.mkdir_p(path)
+      end
+    rescue PathError
+      puts $!
+    rescue
+      puts $!
+      raise "An error was encountered while creating this directory: "+$!
+    end   
+  end   
 end

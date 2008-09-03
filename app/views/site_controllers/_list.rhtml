@@ -5,8 +5,6 @@
   </tr>
   
 <% for site_controller in site_controllers %>
-<% puts "*******"
-puts site_controller.id %>
   <tr class="depth0">
     <td><%= link_to site_controller.name, :action => 'show',
           :id => site_controller %></td>

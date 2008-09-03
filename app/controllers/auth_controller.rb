@@ -40,10 +40,7 @@ class AuthController < ApplicationController
       end
     end
   end  # def login
-  
-  def forgotten
-  end
-
+ 
   def login_failed
     flash.now[:error] = "Incorrect Name/Password"
     render :action => 'forgotten'

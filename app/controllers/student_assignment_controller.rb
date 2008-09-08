@@ -1,6 +1,5 @@
 require 'zip/zip'
 require 'uri'
-require 'net/sftp'
 
 class StudentAssignmentController < ApplicationController
   helper :wiki

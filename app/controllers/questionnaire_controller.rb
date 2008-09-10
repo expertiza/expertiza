@@ -62,9 +62,8 @@ class QuestionnaireController < ApplicationController
     end
   end
   
-  def view_questionnaire
+  def view
     @questionnaire = get(Questionnaire, params[:id])
-    redirect_to :action => 'list' if @questionnaire == nil
   end
   
   def edit

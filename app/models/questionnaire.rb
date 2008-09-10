@@ -5,6 +5,7 @@ class Questionnaire < ActiveRecord::Base
     has_many :questions
     belongs_to :questionnaire_type, :foreign_key => "type_id"
     has_many :assignments_questionnairess
+    belongs_to :instructor, :class_name => "User", :foreign_key => "instructor_id"
 
     
     validates_presence_of :name

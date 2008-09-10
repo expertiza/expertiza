@@ -4,6 +4,8 @@
 <ul id="actionmenu"><li class="daddy">&nbsp;
 <ul>
 <%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Questionnaire', :controller => 'questionnaire', :node => node, :owner_id => owner_id} %>
+<li><%= link_to 'View questionnaire',:controller=>'questionnaire', :action=>'view', :id => node.node_object_id %></li>
+
 <% if is_available(session[:user],owner_id)%>  
    <li><%= link_to 'Add advice',:controller=>'questionnaire', :action=>'add_advice', :id => node.node_object_id %></li>
 <% end %>                                                                                                                

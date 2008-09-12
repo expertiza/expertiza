@@ -26,6 +26,7 @@
 	</tr>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
+		  <% puts submission %>
 		  <% if submission == '1'
 		       mapping = ReviewMapping.find(review.review_mapping_id) 
                rev_user = User.find(mapping.reviewer_id)

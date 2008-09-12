@@ -3,7 +3,7 @@
   <BR/>
   <%= render :partial => 'review_table',
            :locals => {
-           :submission => false,
+           :submission => '2',
            :prefix => prefix,
            :assignment => Assignment.find(participant.parent_id),
            :reviews => participant.get_metareviews,

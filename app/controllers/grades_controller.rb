@@ -92,7 +92,7 @@ private
          @author = AssignmentTeam.find_by_sql("select distinct teams.* from teams, teams_users where teams.id = teams_users.team_id and teams.type = 'AssignmentTeam' and teams.parent_id = "+@assignment.id.to_s+" and teams_users.user_id = "+@participant.user_id.to_s).first      
          query = "assignment_id = ? and team_id = ?"
       else
-         @author = User.find(participant.user_id)
+         @author = User.find(@participant.user_id)
          query = "assignment_id = ? and author_id = ?"
       end   
       mappings = ReviewMapping.find(:all, :conditions => [query,@assignment.id,@author.id])    

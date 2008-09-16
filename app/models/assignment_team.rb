@@ -34,8 +34,12 @@ class AssignmentTeam < Team
   # difference
   def compute_review_scores   
     reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (select id from review_mappings where team_id = #{self.id} and assignment_id = #{self.parent_id})")
-    avg_review_score, max_score, min_score = AssignmentParticipant.compute_scores(reviews)     
-    max_assignment_score = Assignment.find(self.parent_id).get_max_review_score
-    return avg_review_score/max_assignment_score,max_score/max_assignment_score,min_score/max_assignment_score
+    if reviews.length > 0 
+      avg_review_score, max_score, min_score = AssignmentParticipant.compute_scores(reviews)     
+      max_assignment_score = Assignment.find(self.parent_id).get_max_review_score
+      return avg_review_score/max_assignment_score,max_score/max_assignment_score,min_score/max_assignment_score
+    else
+      return nil,nil,nil
+    end
    end
 end

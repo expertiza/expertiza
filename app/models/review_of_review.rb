@@ -39,7 +39,7 @@ class ReviewOfReview < ActiveRecord::Base
    review_mapping = ReviewMapping.find_by_id(review_of_review_mapping.review_mapping_id)
       
    if User.find_by_id(review_mapping.reviewer_id).email_on_review_of_review
-     review_num = getReviewNumber(review_of_review_mapping)     
+     review_num = get_review_number(review_of_review_mapping)     
      review_id = review_of_review_mapping.review_id
      review = Review.find(review_id)
      
@@ -51,7 +51,7 @@ class ReviewOfReview < ActiveRecord::Base
           :body => {
            :obj_name => Assignment.find_by_id(review_mapping.assignment_id).name,
            :type => "review of review",
-           :location => "Review "+getReviewNumber(review_of_review_mapping).to_s,
+           :location => "Review "+get_review_number(review_of_review_mapping).to_s,
            :review_scores => review.review_scores,
            :ror_review_scores => self.review_of_review_scores,
            :user_name => ApplicationHelper::get_user_first_name(user),
@@ -67,7 +67,7 @@ class ReviewOfReview < ActiveRecord::Base
   # link can not be provided as it might give user ability to access data not
   # available to them.  
   #ajbudlon, sept 07, 2007       
-  def getReviewNumber(mapping)
+  def get_review_number(mapping)
     reviewer_mappings = ReviewMapping.find_by_sql(
       "select * from review_of_review_mappings where assignment_id = " +self.id.to_s +
       " and review_id = " + mapping.review_id.to_s

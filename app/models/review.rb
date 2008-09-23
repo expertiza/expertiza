@@ -96,7 +96,7 @@ class Review < ActiveRecord::Base
              :body => {
               :obj_name => user.name,
               :type => "review",
-              :location => getReviewNumber(mapping).to_s,
+              :location => get_review_number(mapping).to_s,
               :review_scores => self.review_scores,
               :user => ApplicationHelper::get_user_first_name(user),
               :partial_name => "update"
@@ -113,7 +113,7 @@ class Review < ActiveRecord::Base
   # link can not be provided as it might give user ability to access data not
   # available to them.  
   #ajbudlon, sept 07, 2007       
-  def getReviewNumber(mapping)
+  def get_review_number(mapping)
     reviewer_mappings = ReviewMapping.find_by_sql(
       "select * from review_mappings where assignment_id = " +self.id.to_s +
       " and author_id = " + mapping.author_id.to_s

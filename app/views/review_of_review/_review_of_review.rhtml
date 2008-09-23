@@ -1,10 +1,10 @@
 <% i = 0;
 for @ror_question in @ror_questions %>
   <%=@ror_question.txt%><br />       
-  <%if params[:action] != 'new_review_of_review' %>
-	  <input id=new_review_of_review_score_<%=i%>_comments name=new_review_of_review_score[<%=i%>][comments] size=70 value = "<%=@ror_review_scores[i].comments.gsub(/\"/,'&quot;')%>" type=text />
+  <%if params[:action] != 'new' %>
+	  <input id=new_metareview_score_<%=i%>_comments name=new_metareview_score[<%=i%>][comments] size=70 value = "<%=@ror_review_scores[i].comments.gsub(/\"/,'&quot;')%>" type=text />
   <%else%>
-	 <input id=new_review_of_review_score_<%=i%>_comments name=new_review_of_review_score[<%=i%>][comments] size=70 type=text />
+	 <input id=new_metareview_score_<%=i%>_comments name=new_metareview_score[<%=i%>][comments] size=70 type=text />
   <%end%>
   <% if @ror_question.true_false? %>
       <select id=new_score_<%=i%> name=new_score[<%=i%>]>
@@ -14,7 +14,7 @@ for @ror_question in @ror_questions %>
   <% else %>
       <select id=new_score_<%=i%> name=new_score[<%=i%>]>
           <% for j in @ror_min..@ror_max %>
-	     <%if params[:action] != 'new_review_of_review' %>
+	     <%if params[:action] != 'new' %>
             	<option value="<%=j%>"<%if j==@ror_review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
              <%else%>
 		<option value="<%=j%>" ><%=j%></option>

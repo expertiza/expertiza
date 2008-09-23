@@ -28,7 +28,7 @@ class ReviewOfReviewController < ApplicationController
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])     
   end
   
-  def new_review_of_review
+  def new
     @ror_mapping = ReviewOfReviewMapping.find(params[:id])    
     @user = session[:user].id
     @eligible_review = Review.find(@ror_mapping.review_id)
@@ -124,23 +124,23 @@ class ReviewOfReviewController < ApplicationController
     @ror_min = @ror_questionnaire.min_question_score
   end
 
-  def view_review_of_review
+  def view
      initialize_ror
   end
   
-  def edit_review_of_review
+  def edit
     initialize_ror
   end
   
   def update_review_of_review
     @review_of_review = ReviewOfReview.find(params[:review_of_review_id])
-    if params[:new_review_of_review_score]
+    if params[:new_metareview_score]
       # The new_question array contains all the new questions
       # that should be saved to the database
-      for review_of_review_key in params[:new_review_of_review_score].keys
+      for review_of_review_key in params[:new_metareview_score].keys
         question_id = params[:new_question][review_of_review_key]
         rs = ReviewOfReviewScore.find(:first,:conditions => ["review_of_review_id = ? AND question_id = ?", @review_of_review.id, question_id])
-        rs.comments = params[:new_review_of_review_score][review_of_review_key][:comments]
+        rs.comments = params[:new_metareview_score][review_of_review_key][:comments]
         rs.score = params[:new_score][review_of_review_key]
         rs.update
       end      
@@ -149,7 +149,7 @@ class ReviewOfReviewController < ApplicationController
       flash[:notice] = 'Review of review was successfully saved.'
       redirect_to :controller=>'review', :action => 'list_reviews', :id => params[:assgt_id]
     else # If something goes wrong, stay at same page
-      render :action => 'edit_review_of_review', :id=> params[:review_of_review_id]
+      render :action => 'edit', :id=> params[:review_of_review_id]
     end
   end  
 
@@ -157,11 +157,11 @@ class ReviewOfReviewController < ApplicationController
     @ror_mapping = ReviewOfReviewMapping.find(:first, :conditions => ["review_id = ? and review_reviewer_id = ? ", params[:review_id], params[:user]])
     @review_of_review = ReviewOfReview.new
     @review_of_review.review_of_review_mapping_id = @ror_mapping.id
-    if params[:new_review_of_review_score]
+    if params[:new_metareview_score]
       # The new_question array contains all the new questions
       # that should be saved to the database
-      for review_key in params[:new_review_of_review_score].keys
-        rs = ReviewOfReviewScore.new(params[:new_review_of_review_score][review_key])
+      for review_key in params[:new_metareview_score].keys
+        rs = ReviewOfReviewScore.new(params[:new_metareview_score][review_key])
         rs.question_id = params[:new_question][review_key]
         rs.score = params[:new_score][review_key]
         @review_of_review.review_of_review_scores << rs

@@ -20,7 +20,7 @@
   <%review_no += 1
   end %></ul>
  </tr>
- <% if @can_view_review_of_review == 1 %>
+ <% if @can_view_metareview == 1 %>
  <h1>Reviews of reviews</h1>
  <tr><ul>
   <%ror_no = 1%>
@@ -28,21 +28,21 @@
   <% 
   @ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id) %>
   <% if (@ror)%>
-  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view_review_of_review', :id => @ror.id} %> &nbsp;
+  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view', :id => @ror.id} %> &nbsp;
   </li>
   <% else %>
-  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new_review_of_review', :id => ror_map.id} %></li>
+  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new', :id => ror_map.id} %></li>
   <% end %>
   <%ror_no += 1
   end %></ul>
  </tr>
  <ul>
  <li>
-		<% if @can_view_review_of_review == 1 
+		<% if @can_view_metareview == 1 
 			current_ror = ReviewOfReviewMapping.count_by_sql("select count(*) from review_of_review_mappings, reviews where reviewer_id ="+@reviewer_id.to_s)
 			max_ror = Assignment.find(@assignment_id).num_review_of_reviews
 			if current_ror < max_ror%>
-			<%= link_to "New review of review",{:controller => 'review_of_review', :action => 'new_review_of_review', :user => @reviewer_id, :assignment => @assignment_id} %>
+			<%= link_to "New review of review",{:controller => 'review_of_review', :action => 'new', :user => @reviewer_id, :assignment => @assignment_id} %>
 		    <% 	end
 			else %>
 			<font color="gray">New review of review</font>
@@ -55,10 +55,10 @@
   <% 
   @ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id) %>
   <% if (@ror)%>
-  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view_review_of_review', :id => @ror.id} %> &nbsp;
+  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view', :id => @ror.id} %> &nbsp;
   </li>
   <% else %>
-  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new_review_of_review', :id => ror_map.id} %></li>
+  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new', :id => ror_map.id} %></li>
   <% end %>
   <%ror_no += 1
   end %></ul>

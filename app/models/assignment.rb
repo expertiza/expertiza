@@ -198,7 +198,7 @@ class Assignment < ActiveRecord::Base
              :body => {
               :obj_name => self.name,
               :type => "submission",
-              :location => getReviewNumber(mapping).to_s,
+              :location => get_review_number(mapping).to_s,
               :first_name => ApplicationHelper::get_user_first_name(user),
               :partial_name => "update"
              }
@@ -213,7 +213,7 @@ class Assignment < ActiveRecord::Base
   # link can not be provided as it might give user ability to access data not
   # available to them.  
   #ajbudlon, sept 07, 2007      
-  def getReviewNumber(mapping)
+  def get_review_number(mapping)
     reviewer_mappings = ReviewMapping.find_by_sql(
       "select * from review_mappings where assignment_id = " +self.id.to_s +
       " and reviewer_id = " + mapping.reviewer_id.to_s
@@ -229,7 +229,8 @@ class Assignment < ActiveRecord::Base
     return review_num
   end
  
- def isWikiAssignment
+ # It appears that this method is not used at present!
+ def is_wiki_assignment
    if self.wiki_type_id > 1 
      return true
    else

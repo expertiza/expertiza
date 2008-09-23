@@ -268,7 +268,7 @@ class ReviewController < ApplicationController
     @review_phase = next_due_date.deadline_type_id;
     if next_due_date.review_of_review_allowed_id == 2 or next_due_date.review_of_review_allowed_id == 3
       if @review_phase == 5
-        @can_view_review_of_review =1
+        @can_view_metareview =1
       end
     end    
     if @assignment.team_assignment

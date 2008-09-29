@@ -1,6 +1,62 @@
 class TreeDisplayController < ApplicationController
   helper :application
   
+  # direct access to questionnaires
+  def goto_questionnaires
+    node_object = TreeFolder.find_by_name('Questionnaires')
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end
+  
+  # direct access to review rubrics
+  def goto_review_rubrics
+    node_object = QuestionnaireType.find_by_name('Review Rubric')
+    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end  
+  
+  # direct access to author feedbacks
+  def goto_author_feedbacks
+    node_object = QuestionnaireType.find_by_name('Author Feedback')
+    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end  
+  
+  # direct access to global survey
+  def goto_global_survey
+    node_object = QuestionnaireType.find_by_name('Global Survey')
+    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end  
+  
+  # direct access to surveys
+  def goto_surveys
+    node_object = QuestionnaireType.find_by_name('Survey')
+    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end  
+  
+  # direct access to course evaluations
+  def goto_course_evaluations
+    node_object = QuestionnaireType.find_by_name('Course Evaluation')
+    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end    
+  
+  # direct access to courses
+  def goto_courses
+    node_object = TreeFolder.find_by_name('Courses')
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end
+  
+  # direct access to assignments
+  def goto_courses
+    node_object = TreeFolder.find_by_name('Assignments')
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end  
+  
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list  

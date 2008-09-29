@@ -25,7 +25,7 @@ class ReviewController < ApplicationController
   def self.process_review(id,current_folder)   
     @review = Review.find(id)
     @mapping_id = id
-    @review_scores = @review.review_scores
+    @review_scores = ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review Rubric")])
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @assgt.id])

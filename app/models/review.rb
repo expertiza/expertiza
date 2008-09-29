@@ -20,7 +20,7 @@ class Review < ActiveRecord::Base
     
   # Computes the total score awarded for a review
   def get_total_score
-    scores = ReviewScore.find_all_by_review_id(self.id)
+    scores = ReviewScore.find(:all,:conditions=>["review_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review Rubric")])
     total_score = 0
     scores.each{
       |item|

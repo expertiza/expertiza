@@ -97,7 +97,7 @@ class Review < ActiveRecord::Base
               :obj_name => user.name,
               :type => "review",
               :location => get_review_number(mapping).to_s,
-              :review_scores => self.review_scores,
+              :review_scores => ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review Rubric")]),
               :user => ApplicationHelper::get_user_first_name(user),
               :partial_name => "update"
               }

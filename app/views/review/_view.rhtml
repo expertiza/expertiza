@@ -22,7 +22,7 @@ function toggleVis(id) {
 <br/>
 <div id="1_myDiv" style="display:none">
 <strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
-<%= render :partial => 'review/scores' %> 
+<%= render :partial => 'review/score1' %> 
 Additional Comment : <%=@review.additional_comment%><br/>
 <br/>
 </div>

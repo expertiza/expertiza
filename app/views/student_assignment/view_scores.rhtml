@@ -40,7 +40,7 @@ function toggleVis(id) {
          
              <%
              total = 0
-             for review_score in review.review_scores
+             for review_score in ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",review.id, QuestionnaireType.find_by_name("Review Rubric").id])
                 #if (!Question.find(review_score.question_id).true_false)
                     total += review_score.score 
                 #end%>

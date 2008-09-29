@@ -53,15 +53,17 @@ class ReviewController < ApplicationController
     @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(params[:id],params[:current_folder])
     
     @review_id=params[:id]
-    @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, '1'])
+    
+    # determine whether the rubric is a review rubric  
+    @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, QuestionnaireType.find_by_name("Review Rubric").id])
     if( ReviewFeedback.find_by_review_id(@review_id))
       if (ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id = ?", @review_id,  @a]))
-      @reviewfeedback_id_1 = ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id = ?", @review_id,  @a])
-      @review_scores2 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_1.id, '5'])
+        @reviewfeedback_id_1 = ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id = ?", @review_id,  @a])
+        @review_scores2 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_1.id, QuestionnaireType.find_by_name("Author Feedback").id])
       end
       if (ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id != ?", @review_id,  @a]))
-      @reviewfeedback_id_2 = ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id != ?", @review_id,  @a])
-      @review_scores3 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_2.id, '5'])
+        @reviewfeedback_id_2 = ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id != ?", @review_id,  @a])
+        @review_scores3 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_2.id, QuestionnaireType.find_by_name("Author Feedback").id])
       end     
     end
     
@@ -108,7 +110,7 @@ class ReviewController < ApplicationController
     end
   end
   
-
+  
   
   def update_review
     @review = Review.find(params[:review_id])
@@ -122,7 +124,8 @@ class ReviewController < ApplicationController
         rs.comments = params[:new_review_score][review_key][:comments]
         rs.score = params[:new_score][review_key]
         ## feedback added
-        rs.questionnaire_type_id = "1"
+        # determine whether the rubric is a review rubric
+        rs.questionnaire_type_id = QuestionnaireType.find_by_name("Review Rubric").id
         ##
         rs.update
       end      
@@ -140,10 +143,35 @@ class ReviewController < ApplicationController
   end
   
   def new_review
-
+    
     @review = Review.new
     @mapping_id = params[:id]
-    @mapping = ReviewMapping.find(params[:id])
+    #    @mapping = ReviewMapping.find(params[:id])
+    @mapping = 
+    begin 
+      ReviewMapping.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      nil    
+    end    
+    # if we did'nt find the mapping, we must be doing dynamic reviewer assignment
+    if (@mapping == nil)    
+      
+      @assignment = Assignment.find(params[:assignment])
+      if (@assignment.team_assignment)
+        rm = TeamReviewMappingManager.new
+      else
+        rm = IndividualReviewMappingManager.new
+      end
+      @mapping = rm.generateReviewMapping(@assignment, session[:user].id)
+      if (@mapping == nil)
+        flash[:notice] = 'There are no submissions available for review available at this time. Please check back later.'
+        redirect_to :action => 'list_reviews', :id => @assignment.id 
+        return
+      end   
+      # record the timeout value in the session so we can verify that we still own this mapping when we submit it
+      session[:review_timeout] = @mapping.timeout.to_s()
+    end 
+    
     @assgt = Assignment.find(@mapping.assignment_id)
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
     @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
@@ -179,19 +207,19 @@ class ReviewController < ApplicationController
     @old_review_mapping = @old_mapping[0]
     i = 1
     for mapping in @old_mapping
-      
       if @mapping.id == mapping.id        
         return
       end
       @old_review = Review.find_by_review_mapping_id(mapping.id)
       if (@old_review)
         @old_review_mapping = mapping
-        @old_scores = ReviewScore.find(:all, :conditions => ["review_id = ? and questionnaire_type_id = 1", @old_review.id])
+        # determine whether the rubric is a review rubric
+        @old_scores = ReviewScore.find(:all, :conditions => ["review_id = ? and questionnaire_type_id = ?", @old_review.id, QuestionnaireType.find_by_name("Review Rubric").id])
       end
       i+=1
     end
   end  
-    
+  
   def find_review_phase(due_dates)
     # Find the next due date (after the current date/time), and then find the type of deadline it is.
     @very_last_due_date = DueDate.find(:all,:order => "due_at DESC", :limit =>1)
@@ -213,7 +241,18 @@ class ReviewController < ApplicationController
     @review.additional_comment = params[:new_review][:comments]
     @mapping = ReviewMapping.find(params[:mapping_id])
     @assignment = Assignment.find(@mapping.assignment_id)
-    if @assignment.team_assignment 
+    if @assignment.mapping_strategy_id == 2
+      # compare the timeout value in the session to the mapping so we can verify that we still own it
+      if session[:review_timeout] != @mapping.timeout.to_s() || session[:user].id != @mapping.reviewer_id
+        flash[:notice] = 'The time for submitting the review has been exceeded. Please select another review.'
+        session[:review_timeout] = nil
+        redirect_to :action => 'list_reviews', :id => @assignment.id 
+        return
+      end
+      session[:review_timeout] = nil
+    end
+    
+    if @assignment.team_assignment && params[:team_id] != nil
       @mapping.team_id = params[:team_id]
     end 
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
@@ -226,12 +265,18 @@ class ReviewController < ApplicationController
         rs.question_id = params[:new_question][review_key]
         rs.score = params[:new_score][review_key]
         ## feed back added
-        rs.questionnaire_type_id = 1
+        # determine whether the rubric is a review rubric
+        rs.questionnaire_type_id = QuestionnaireType.find_by_name("Review Rubric").id
         ##
         @review.review_scores << rs
       end      
     end
     if @review.save
+
+      #null out the mapping's timeout value to indicate that its been submitted
+      @mapping.timeout = nil
+      @mapping.save
+      
       #send message to author(s) when review has been updated
       @review.email
       flash[:notice] = 'Review was successfully saved.'
@@ -280,14 +325,21 @@ class ReviewController < ApplicationController
     else
       @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])
     end
-    
+    reviews_left = @assignment.num_reviews - @review_mapping.size()
+    if (reviews_left > 0 && @assignment.mapping_strategy_id == 2)
+      for i in 1..reviews_left do
+        @placeholder = ReviewMapping.new
+        @placeholder.id = 999
+        @placeholder.assignment_id = @assignment_id
+        @review_mapping << @placeholder
+      end
+    end
     mapping_ids = Array.new
     @review_mapping.each{
       |mapping|
       mapping_ids << mapping.id
     }
     
-
     query = "select distinct review_of_review_mappings.* from review_of_review_mappings, review_mappings"
     query = query + " where review_mappings.id = review_of_review_mappings.review_mapping_id"
     query = query + " and review_mappings.assignment_id = "+@assignment_id.to_s
@@ -305,13 +357,15 @@ class ReviewController < ApplicationController
     
     @user_id = session[:user].id
     @review_id=params[:id]
-    @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, '1'])
+    # determine whether the rubric is a review rubric
+    @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, QuestionnaireType.find_by_name("Review Rubric").id])
     @reviewfeedback = ReviewFeedback.find_by_review_id(@review_id)
     if (@reviewfeedback)
       @reviewfeedback_id = @reviewfeedback.id
       @author_id = @reviewfeedback.author_id
     end
-    @review_scores2 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @reviewfeedback_id, '4'])
+    # determine whether the rubric is an author feedback rubric
+    @review_scores2 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @reviewfeedback_id, QuestionnaireType.find_by_name("Author Feedback").id])
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]

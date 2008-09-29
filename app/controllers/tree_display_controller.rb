@@ -51,7 +51,7 @@ class TreeDisplayController < ApplicationController
   end
   
   # direct access to assignments
-  def goto_courses
+  def goto_assignments
     node_object = TreeFolder.find_by_name('Assignments')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to :controller => 'tree_display', :action => 'list'

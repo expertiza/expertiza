@@ -6,7 +6,7 @@ module AuthHelper
       action_name = ApplicationHelper::get_user_role(user).send(:get_home_action) 
     rescue
       # Default to the list method within the assignment controller
-      action_name = "list"
+      action_name = "drill"
     end
     return action_name
   end

@@ -52,7 +52,7 @@ class ReviewOfReview < ActiveRecord::Base
            :obj_name => Assignment.find_by_id(review_mapping.assignment_id).name,
            :type => "review of review",
            :location => "Review "+get_review_number(review_of_review_mapping).to_s,
-           :review_scores => ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",review.id, QuestionnaireType.find_by_name("Review Rubric")]),
+           :review_scores => ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",review.id, QuestionnaireType.find_by_name("Review Rubric").id]),
            :ror_review_scores => self.review_of_review_scores,
            :user_name => ApplicationHelper::get_user_first_name(user),
            :partial_name => "update"

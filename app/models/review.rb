@@ -20,7 +20,7 @@ class Review < ActiveRecord::Base
     
   # Computes the total score awarded for a review
   def get_total_score
-    scores = ReviewScore.find(:all,:conditions=>["review_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review Rubric")])
+    scores = ReviewScore.find(:all,:conditions=>["review_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review Rubric").id])
     total_score = 0
     scores.each{
       |item|
@@ -38,7 +38,7 @@ class Review < ActiveRecord::Base
     def self.review_view_helper(review_id,fname,control_folder)
     @review = Review.find(review_id)
     @mapping_id = review_id
-    @review_scores = ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review Rubric")])
+    @review_scores = ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review Rubric").id])
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @assgt.id])
@@ -97,7 +97,7 @@ class Review < ActiveRecord::Base
               :obj_name => user.name,
               :type => "review",
               :location => get_review_number(mapping).to_s,
-              :review_scores => ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review Rubric")]),
+              :review_scores => ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review Rubric").id]),
               :user => ApplicationHelper::get_user_first_name(user),
               :partial_name => "update"
               }

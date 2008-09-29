@@ -3,7 +3,8 @@
 <TABLE width="80%">
 <TR>
 <TD width="30%" align="left">
-<input type='checkbox' name = 'display[check]' value = '1' onclick='submit();' <% if @show == nil %>checked<% end %>>Show public items
+<input type='radio' name='display[check]' value='1' onclick='submit();' <% if @show == nil %>checked<% end %>>Show public and private items<br/>
+<input type='radio' name='display[check]' value='0' onclick='submit();' <% if @show != nil %>checked<% end %>>Show private items only<br/>
 </TD>
 <TD width="50%" align="right">
 Sort by: 

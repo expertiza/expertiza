@@ -36,7 +36,7 @@ function toggleVis(id) {
                      </tr>
 
                      <%
-                     for review_score in review.review_scores%>
+                     for review_score in ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",review.id, QuestionnaireType.find_by_name("Author Feedback")])%>
                         <tr class="listingRow">
                             <td><%=Question.find(review_score.question_id).txt%></td><td align = 'right'><%=review_score.score%>&nbsp;&nbsp;</td><td><%=review_score.comments%></td>
                         </tr>
@@ -54,7 +54,8 @@ function toggleVis(id) {
             <%if @assignment.team_assignment %>
                 <label>There is no feedback on your work yet.</label>
             <%else%>
-                <%if review_mediawiki @assignment.directory_path, _time, @user_name == ''%>	
+				<%_time1 = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s%>
+                <%if review_mediawiki @assignment.directory_path, _time1, @user_name == ''%>	
                     <label>There is no feedback on your work because it seems that you have not submitted anything for this assignment.</label>
                 <%else%>
                     <label>There is no feedback on your work yet.</label>

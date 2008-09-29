@@ -38,7 +38,7 @@ class Review < ActiveRecord::Base
     def self.review_view_helper(review_id,fname,control_folder)
     @review = Review.find(review_id)
     @mapping_id = review_id
-    @review_scores = @review.review_scores
+    @review_scores = ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review Rubric")])
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @assgt.id])

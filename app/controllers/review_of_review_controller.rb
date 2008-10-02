@@ -35,7 +35,7 @@ class ReviewOfReviewController < ApplicationController
     begin   
       review_mapping = ReviewMapping.find(@ror_mapping.review_mapping_id)
       @eligible_review_mapping = review_mapping
-      @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(@eligible_review.id,params[:current_folder])
+      @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(@eligible_review.id)
       @current_folder = DisplayOption.new
       @current_folder.name = "/"
       if params[:current_folder]
@@ -93,7 +93,7 @@ class ReviewOfReviewController < ApplicationController
     @review_id = ReviewOfReviewMapping.find(@ror_map_id).review_id
     @review = Review.find(@review_id)
     @eligible_review = @review
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(@eligible_review.id,params[:current_folder])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(@eligible_review.id)
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])

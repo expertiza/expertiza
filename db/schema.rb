@@ -2,7 +2,7 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 74) do
+ActiveRecord::Schema.define(:version => 75) do
 
   create_table "assignments", :force => true do |t|
     t.column "created_at", :datetime
@@ -28,7 +28,6 @@ ActiveRecord::Schema.define(:version => 74) do
     t.column "num_reviewers", :integer, :limit => 10, :default => 0, :null => false
     t.column "spec_location", :text
     t.column "author_feedback_questionnaire_id", :integer
-    t.column "max_team_count", :boolean
     t.column "peer_review_questionnaire_id", :integer
     t.column "team_count", :integer, :default => 0, :null => false
   end

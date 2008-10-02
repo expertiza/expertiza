@@ -45,7 +45,7 @@ class PeerReviewController < ApplicationController
   end
 
   def view
-    #@links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(params[:id],params[:current_folder])
+    #@links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
     @peer_review_id=params[:id]
     @peer_review = PeerReview.find_by_id(@peer_review_id)
     @student = Participant.find(:first, :conditions => ['user_id =? and parent_id =?', @peer_review.reviewer_id, @peer_review.assignment_id])
@@ -53,7 +53,7 @@ class PeerReviewController < ApplicationController
   end
   
   def edit
-    #@links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(params[:id],params[:current_folder])
+    #@links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
     @peer_review_id=params[:id]
     @peer_review = PeerReview.find_by_id(@peer_review_id)
     @student = Participant.find(:first, :conditions => ['user_id =? and parent_id =?', @peer_review.reviewer_id, @peer_review.assignment_id])

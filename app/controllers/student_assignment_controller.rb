@@ -365,6 +365,7 @@ class StudentAssignmentController < ApplicationController
          FileUtils.mkdir_p(curr_directory)
       end
       safe_filename = file.full_original_filename.gsub(/\\/,"/")
+      safe_filename = FileHelper::sanitize_filename(safe_filename) # new code to sanitize file path before upload*
       full_filename =  curr_directory + File.split(safe_filename).last.gsub(" ",'_') #safe_filename #curr_directory +
       File.open(full_filename, "wb") { |f| f.write(file.read) }
       if params['unzip']

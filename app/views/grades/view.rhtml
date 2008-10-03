@@ -17,15 +17,15 @@
     index += 1
     s_avg, s_max, s_min = participant.compute_review_scores
     r_avg, r_max, r_min = participant.compute_metareview_scores
-    p_avg, p_max, p_min = participant.compute_peer_review_scores
+#   t_avg, t_max, t_min = participant.compute_teammate_review_scores
   %>
     <%= render :partial => 'participant',
                :locals => {:prefix => 'user_'+index.to_s,
                			   :team => false,
                            :participant => participant,
                            :s_avg => s_avg, :s_min => s_min, :s_max => s_max,
-                           :r_avg => r_avg, :r_min => r_min, :r_max => r_max,
-                           :p_avg => p_avg, :p_min => p_min, :p_max => p_max}%>
+                           :r_avg => r_avg, :r_min => r_min, :r_max => r_max}%>
+
   <% end %>
 <% end %>
 </TABLE>
@@ -34,3 +34,5 @@
 <% end %>
 <BR/>
 <%= render :partial => 'shared_scripts/back' %> 
+<!-- # When teammate reviews are inserted, this line needs to go after the one starting with ":r_avg" -->
+<!--  :t_avg => t_avg, :t_min => t_min, :t_max => t_max} -->

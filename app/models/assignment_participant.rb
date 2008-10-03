@@ -46,10 +46,10 @@ class AssignmentParticipant < Participant
     return mreviews.sort {|a,b| a.review_of_review_mapping.reviewer.fullname <=> b.review_of_review_mapping.reviewer.fullname }      
   end
   
-  def get_peer_reviews    
+  def get_teammate_reviews    
     previews = Array.new  
-    pr_query = "select * from peer_reviews where assignment_id = "+self.parent_id.to_s+" and reviewee_id = "+self.user_id.to_s
-    PeerReview.find_by_sql(pr_query).each{    
+    pr_query = "select * from teammate_reviews where assignment_id = "+self.parent_id.to_s+" and reviewee_id = "+self.user_id.to_s
+    TeammateReview.find_by_sql(pr_query).each{    
       | pr |
       if pr        
         previews << pr
@@ -120,16 +120,16 @@ class AssignmentParticipant < Participant
        Team.find_by_sql(query).first    
   end
     
-  #computes this participants current peer review scores:
+  #computes this participant's current teammate review scores:
   # avg_review_score
   # difference
-  def compute_peer_review_scores #(participant_id)
+  def compute_teammate_review_scores #(participant_id)
     #participant = Participants.find_by_id(participant_id)
     if Assignment.find(self.parent_id).team_assignment
-      peer_reviews = PeerReview.find_by_sql("select * from peer_reviews where reviewee_id = #{self.user_id} and assignment_id = #{self.parent_id}")
-      if peer_reviews.length > 0
-        avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(peer_reviews)     
-        max_assignment_score = Assignment.find(self.parent_id).get_max_peer_review_score
+      teammate_reviews = TeammateReview.find_by_sql("select * from teammate_reviews where reviewee_id = #{self.user_id} and assignment_id = #{self.parent_id}")
+      if teammate_reviews.length > 0
+        avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(teammate_reviews)     
+        max_assignment_score = Assignment.find(self.parent_id).get_max_teammate_review_score
         return avg_review_score/max_assignment_score,max_score/max_assignment_score,min_score/max_assignment_score
       else
         return nil,nil
@@ -181,14 +181,14 @@ class AssignmentParticipant < Participant
     end
     
     if r_score and m_score
-      #if self.assignment.team_assignment and peer_review_score
-      # return (r_score + m_score)*peer_review_score
+      #if self.assignment.team_assignment and teammate_review_score
+      # return (r_score + m_score)*teammate_review_score
       #else
        return r_score + m_score
       #end
     elsif r_score
-      #if self.assignment.team_assignment and peer_review_score
-      #  return (review_score)*peer_review_score
+      #if self.assignment.team_assignment and teammate_review_score
+      #  return (review_score)*teammate_review_score
       #else
         return review_score
       #end        

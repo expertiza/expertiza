@@ -23,15 +23,16 @@
     <% for participant in team.get_participants 
          pindex += 1  	              
          r_avg, r_max, r_min = participant.compute_metareview_scores 
-         p_avg, p_max, p_min = participant.compute_peer_review_scores
+#        t_avg, t_max, t_min = participant.compute_teammate_review_scores
     %>
-     	 <%= render :partial => 'participant', 
+      	 <%= render :partial => 'participant', 
      	 			:locals => {:prefix => prefix+"_"+pindex.to_s,
      	 			            :team => true,
      	 			            :participant => participant,
      	 			            :s_avg => t_score, :s_max => t_max, :s_min => t_min,
-     	 			            :r_avg => r_avg, :r_max => r_max, :r_min => r_min,
-     	 			            :p_avg => p_avg, :p_max => p_max, :p_min => p_min} %>  
+     	 			            :r_avg => r_avg, :r_max => r_max, :r_min => r_min}
+#     	 			            :t_avg => t_avg, :t_max => t_max, :t_min => t_min}
+								%>   
     <% end %>        
     <TR id='<%= prefix %>_<%= team.get_participants.length+3 %>' style="display:none"><TD COLSPAN="9"><HR/></TD></TR>  
     <% if index < @teams.length %>

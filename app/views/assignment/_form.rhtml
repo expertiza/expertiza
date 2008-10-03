@@ -102,14 +102,14 @@
   <table>
   <tr>
   <% if @assignment.team_assignment == true %>
- 	<div id="peer_review" style="display: inline">
+ 	<div id="teammate_review" style="display: inline">
   <% else %>
- 	<div id="peer_review" style="display: none">
+ 	<div id="teammate_review" style="display: none">
   <% end %>
-  <label for="peer_review_questionnaire">Peer-review questionnaire:</label>
-      <!--select name="peer_review_questionnaire_id"></select-->
+  <label for="teammate_review_questionnaire">Teammate-review questionnaire:</label>
+      <!--select name="teammate_review_questionnaire_id"></select-->
       <%=@questionnaires = Questionnaire.find(:all, :conditions => ["type_id = 6"]).map {|u| [u.name, u.id] }
-         select('assignment', 'peer_review_questionnaire_id', @questionnaires)%>
+         select('assignment', 'teammate_review_questionnaire_id', @questionnaires)%>
   </div>
   </tr>
   </table>
@@ -133,7 +133,7 @@
 function onChange(){
 	count = document.getElementById("team_count1");
 	hidden = document.getElementById("team_count2");
-	document.poppedLayer3 = eval('document.getElementById("peer_review")');
+	document.poppedLayer3 = eval('document.getElementById("teammate_review")');
 	var dropdownIndex = document.getElementById('teamselect').selectedIndex;
 	var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
 	if(dropdownValue == "true"){

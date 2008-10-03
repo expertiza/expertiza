@@ -12,9 +12,9 @@
     %>
 <% elsif submission == '3' %>
    <%     
-      controller = 'peer_review' 
+      controller = 'teammate_review' 
       action = 'view'
-      max_score = assignment.get_max_peer_review_score
+      max_score = assignment.get_max_teammate_review_score
     %>
 <% end %>
 

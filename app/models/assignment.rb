@@ -44,10 +44,10 @@ class Assignment < ActiveRecord::Base
     return max.to_f
   end
   
-  def get_max_peer_review_score
+  def get_max_teammate_review_score
     max = 0
-    Questionnaire.find(self.peer_review_questionnaire_id).questions.each{
-      max += Questionnaire.find(self.peer_review_questionnaire_id).max_question_score
+    Questionnaire.find(self.teammate_review_questionnaire_id).questions.each{
+      max += Questionnaire.find(self.teammate_review_questionnaire_id).max_question_score
     }    
     return max.to_f
   end

@@ -60,7 +60,7 @@ class GradesController < ApplicationController
     elsif params[:submission] == '2'
       processMetareview()
     elsif params[:submission] == '3'
-      processPeerReview()
+      processTeammateReview()
     end       
   
     @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."
@@ -125,12 +125,12 @@ private
       @reviews = @reviews.sort {|a,b| a.review_of_review_mapping.review_reviewer.fullname <=> b.review_of_review_mapping.review_reviewer.fullname}    
   end
   
-  def processPeerReview
-      @collabel = "Peer Review"
+  def processTeammateReview
+      @collabel = "Teammate Review"
       @rowlabel = "Reviewer"
       @author = User.find(@participant.user_id)
       
-      reviews = PeerReview.find(:all, :conditions => ['reviewee_id =? and assignment_id =?',@author.id, @assignment.id])    
+      reviews = TeammateReview.find(:all, :conditions => ['reviewee_id =? and assignment_id =?',@author.id, @assignment.id])    
    
       reviews.each{
         | review |

@@ -69,4 +69,5 @@ belongs_to :review_mapping
       index += 1
     end 
   end
+  
 end

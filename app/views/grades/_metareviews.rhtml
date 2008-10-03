@@ -12,6 +12,7 @@
            }%>
   <BR/>         
   <HR/> 
+  UUUUUUUU <%= participant.user_id %>
   <% for metareview in participant.get_metareviews %>
     <a name="<%=prefix+"_"+metareview.review_of_review_mapping.review_reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/>  
   <% end %>

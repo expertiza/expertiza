@@ -68,6 +68,6 @@ class StudentTeamController < ApplicationController
   
   def review
     @assignment = Assignment.find_by_id(params[:assignment_id])
-    redirect_to :controller =>'questionnaire', :action => 'view_questionnaire', :id => @assignment.peer_review_questionnaire_id
+    redirect_to :controller =>'questionnaire', :action => 'view_questionnaire', :id => @assignment.teammate_review_questionnaire_id
   end
 end

@@ -27,17 +27,6 @@
     <TD ALIGN="CENTER">---</TD>
     <% end %>
     
-    <% if p_avg %>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",p_avg*100) %>%
-    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_previewsLink" name="<%=prefix%>_previewsLink" onClick="toggleElement('<%=prefix%>_previews','peer reviews');return false;">show peer reviews</a></FONT>
-    </TD>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",p_min*100) %>% - <%= sprintf("%.0f",p_max*100) %>%
-    <BR/><FONT SIZE="-1"><%= link_to 'email peer reviewers', :action => 'conflict_notification', :id => participant.id, :submission => '3' %></FONT>  	    
-    </TD>
-    <% else %>
-    <TD ALIGN="CENTER">---</TD>
-    <TD ALIGN="CENTER">---</TD>
-    <% end %>
     
     <% stage = Assignment.find(participant.parent_id).get_current_stage() %>
     <% if controller.action_name == 'view' %>
@@ -71,6 +60,6 @@
 	<TD COLSPAN="9"><%= render :partial=>'metareviews', :locals => {:prefix => prefix, :participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_previews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'peer_reviews', :locals => {:prefix => prefix, :participant => participant} %></TD>
+	<TD COLSPAN="9"><%= render :partial=>'teammate_reviews', :locals => {:prefix => prefix, :participant => participant} %></TD>
 </TR>
 <!-- END PARTICIPANT -->

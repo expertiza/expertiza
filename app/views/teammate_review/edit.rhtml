@@ -1,7 +1,7 @@
 <h1>Edit Review</h1>
 <%= start_form_tag :action => 'update' %>
-<%= render :partial => 'peerReviewContent' %>    
-<%= hidden_field_tag('peer_review_id', @peer_review.id) %>
+<%= render :partial => 'TeammateReviewContent' %>    
+<%= hidden_field_tag('teammate_review_id', @teammate_review.id) %>
     <br/>
     <%= submit_tag "Save", :name=>"save" %>       
 <%= end_form_tag %>

@@ -26,6 +26,10 @@ class ReviewOfReview < ActiveRecord::Base
     return total_score
   end
 
+  def self.get_metareivew_mapping
+    ReviewOfReviewMapping.find_by_id (self.review_of_review_mapping_id)
+  end
+
   def delete
     rOfRScores = ReviewOfReviewScore.find(:all, :conditions => ['review_of_review_id =?',self.id])
     rOfRScores.each {|review| rOfRScores.delete }
@@ -81,5 +85,6 @@ class ReviewOfReview < ActiveRecord::Base
       end
     end  
     return review_num
-  end    
+  end  
+  
 end

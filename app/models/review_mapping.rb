@@ -6,6 +6,14 @@ class ReviewMapping < ActiveRecord::Base
   has_many :reviews
   has_many :review_of_review_mappings 
     
+  def reviewee
+    if self.assignment.team_assignment
+      return team
+    else
+      return author
+    end
+  end
+    
   def delete
     review = Review.find(:all, :conditions => ['review_mapping_id = ?',self.id])    
     if review.length > 0

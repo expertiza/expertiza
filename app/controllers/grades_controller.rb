@@ -56,11 +56,13 @@ class GradesController < ApplicationController
     @reviewers_email_hash = Hash.new 
     
     if params[:submission] == '1'      
-      processReview()   
+      process_review()   
     elsif params[:submission] == '2'
-      processMetareview()
+      process_metareview()
     elsif params[:submission] == '3'
-      processTeammateReview()
+      process_author_feedback()           
+    elsif params[:submission] == '4'
+      process_teammate_review()
     end       
   
     @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."
@@ -82,17 +84,15 @@ class GradesController < ApplicationController
     redirect_to :action => 'edit', :id => params[:id]
   end
   
-private
-
-  
-  def processReview
+private  
+  def process_review
       @collabel = "Review"
       @rowlabel = "Reviewer"
       if @assignment.team_assignment       
          @author = AssignmentTeam.find_by_sql("select distinct teams.* from teams, teams_users where teams.id = teams_users.team_id and teams.type = 'AssignmentTeam' and teams.parent_id = "+@assignment.id.to_s+" and teams_users.user_id = "+@participant.user_id.to_s).first      
          query = "assignment_id = ? and team_id = ?"
       else
-         @author = User.find(@participant.user_id)
+         @author = @participant.user
          query = "assignment_id = ? and author_id = ?"
       end   
       mappings = ReviewMapping.find(:all, :conditions => [query,@assignment.id,@author.id])    
@@ -107,11 +107,24 @@ private
       }    
       @reviews = @reviews.sort {|a,b| a.review_mapping.reviewer.fullname <=> b.review_mapping.reviewer.fullname}    
   end
-  
-  def processMetareview
+
+  def process_author_feedback
+      @collabel = "Feedback"
+      @rowlabel = "Author"
+      @author = @participant.user
+      @reviews = @participant.get_feedbacks
+      @reviews.each{
+        |review|
+        @reviewers_email_hash[review.reviewer.fullname.to_s+" <"+review.reviewer.email.to_s+">"] = review.reviewer.email.to_s
+      }
+        
+      @reviews = @reviews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}
+  end
+
+  def process_metareview
       @collabel = "Metareview"
       @rowlabel = "Metareviewer"
-      @author = User.find(@participant.user_id)
+      @author = @participant.user
      
       mappings = ReviewOfReviewMapping.find_by_sql("select * from review_of_review_mappings where review_mapping_id in (select id from review_mappings where assignment_id = "+@assignment.id.to_s+" and reviewer_id = "+@author.id.to_s+")") 
       mappings.each {
@@ -125,7 +138,7 @@ private
       @reviews = @reviews.sort {|a,b| a.review_of_review_mapping.review_reviewer.fullname <=> b.review_of_review_mapping.review_reviewer.fullname}    
   end
   
-  def processTeammateReview
+  def process_teammate_review
       @collabel = "Teammate Review"
       @rowlabel = "Reviewer"
       @author = User.find(@participant.user_id)

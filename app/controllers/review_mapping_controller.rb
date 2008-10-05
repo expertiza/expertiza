@@ -9,8 +9,7 @@ class ReviewMappingController < ApplicationController
     query = query + " and participants.parent_id = "+session[:mapping][:assignment].id.to_s
     query = query + " and participants.parent_id <> "+session[:mapping][:contributor].id.to_s
     query = query + " order by users.name"
-    puts query
-    @users = User.find_by_sql(query)
+   @users = User.find_by_sql(query)
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
   

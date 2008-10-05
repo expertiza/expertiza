@@ -62,7 +62,6 @@ class CourseController < ApplicationController
   # create a course
   def create
     course = Course.new(params[:course])
-    puts course.directory_path
     course.instructor_id = session[:user].id
     #begin
       course.save!

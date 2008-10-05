@@ -3,6 +3,7 @@
     <TD><%= participant.fullname %>
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a></FONT>  	
     </TD>
+    
     <% if s_avg %>
   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg*100) %>%
   	<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a></FONT>
@@ -27,7 +28,18 @@
     <TD ALIGN="CENTER">---</TD>
     <% end %>
     
-    
+    <% if f_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",f_avg*100) %>%
+    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedbacks</a></FONT>
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min*100) %>% - <%= sprintf("%.0f",f_max*100) %>%
+    <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => '3' %></FONT>  	    
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+        
     <% stage = Assignment.find(participant.parent_id).get_current_stage() %>
     <% if controller.action_name == 'view' %>
     	<TD ALIGN="CENTER">
@@ -58,6 +70,9 @@
 </TR>
 <TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
 	<TD COLSPAN="9"><%= render :partial=>'metareviews', :locals => {:prefix => prefix, :participant => participant} %></TD>
+</TR>
+<TR  class="row" id="<%= prefix %>_feedback" style="display:none">
+	<TD COLSPAN="9"><%= render :partial=>'author_feedbacks', :locals => {:prefix => 'user', :participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_previews" style="display:none">
 	<TD COLSPAN="9"><%= render :partial=>'teammate_reviews', :locals => {:prefix => prefix, :participant => participant} %></TD>

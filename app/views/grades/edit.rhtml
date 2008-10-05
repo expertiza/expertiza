@@ -4,11 +4,17 @@
 <TABLE class="grades" >
 <%= render :partial => 'participant_title' %>
 <%  s_avg, s_max, s_min = @participant.compute_review_scores
-    r_avg, r_max, r_min = @participant.compute_metareview_scores %>
-<%= render :partial => 'participant', 
-           :locals => {:participant => @participant,
-                       :s_avg => s_avg, :s_min => s_min, :s_max => s_max,
-                       :r_avg => r_avg, :r_min => r_min, :r_max => r_max } %>
+    r_avg, r_max, r_min = @participant.compute_metareview_scores 
+    f_avg, f_max, f_min = @participant.compute_author_feedback_scores
+    %>
+                           
+    <%= render :partial => 'participant',
+               :locals => {:prefix => 'user_',
+               			   :team => false,
+                           :participant => @participant,
+                           :s_avg => s_avg, :s_min => s_min, :s_max => s_max,
+                           :r_avg => r_avg, :r_min => r_min, :r_max => r_max,
+                           :f_avg => f_avg, :f_min => f_min, :f_max => f_max}%>                       
 </TABLE>
 <BR/>
 <%= submit_tag "Update" %>

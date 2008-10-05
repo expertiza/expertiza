@@ -1,0 +1,21 @@
+<!-- FEEDBACKS --> 
+<% if participant.get_feedbacks.length > 0 %>
+  <BR/>
+  <%= render :partial => 'review_table',
+           :locals => {
+           :submission => '3',
+           :prefix => prefix,
+           :assignment => participant.assignment,
+           :reviews => participant.get_feedbacks,
+           :collabel => "Feedback",
+           :rowlabel => "Author"
+           }%>
+  <BR/>         
+  <HR/> 
+  <% for feedback in participant.get_feedbacks %>
+    <a name="<%=prefix+"_"+feedback.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>  
+  <% end %>
+<% else %>
+  <i>No author feedback has been provided for this user's reviews.</i>
+<% end %>
+<!-- END FEEDBACKS -->

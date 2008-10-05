@@ -12,9 +12,9 @@
            }%>
   <BR/>         
   <HR/> 
-  UUUUUUUU <%= participant.user_id %>
   <% for metareview in participant.get_metareviews %>
-    <a name="<%=prefix+"_"+metareview.review_of_review_mapping.review_reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/>  
+    <% puts prefix %>
+    <a name="<%=prefix+"_"+metareview.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/>  
   <% end %>
 <% else %>
   <i>No metareviews have been completed for this user's reviews.</i>

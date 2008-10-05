@@ -1,11 +1,12 @@
-<% namecolwidth=20 %>
-<% colwidth= 12 %>
+<% namecolwidth = 19 %>
+<% colwidth = 9  %>
 
 <TR <% if prefix %>id='<%= prefix %>_1' style="display:none"<% end %>>
 <TH WIDTH="<%= namecolwidth %>%">&nbsp;</TH>
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</TH>
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
-<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Evaluations by Teammates</TH>
+<!-- <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Evaluations by Teammates</TH> -->
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
 <TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
 
 <TR <% if prefix %>id='<%= prefix %>_2' style="display:none"<% end %>>
@@ -14,6 +15,9 @@
 <TH WIDTH="<%= colwidth %>%">Range</TH>
 <TH WIDTH="<%= colwidth %>%">Average</TH>
 <TH WIDTH="<%= colwidth %>%">Range </TH>
+<!-- 
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH> --> 
 <TH WIDTH="<%= colwidth %>%">Average</TH>
 <TH WIDTH="<%= colwidth %>%">Range </TH>
 <TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    

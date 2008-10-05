@@ -14,6 +14,14 @@ class ReviewOfReview < ActiveRecord::Base
     code = code + "</div>"
     return code
   end
+  
+  def reviewer
+    if self.review_of_review_mapping.review_reviewer_id != nil
+      User.find(self.review_of_review_mapping.review_reviewer_id)
+    else
+      User.find(self.review_of_review_mapping.reviewer_id)
+    end
+  end
 
   # Computes the total score awarded for a metareview
   def get_total_score
@@ -27,7 +35,7 @@ class ReviewOfReview < ActiveRecord::Base
   end
 
   def self.get_metareivew_mapping
-    ReviewOfReviewMapping.find_by_id (self.review_of_review_mapping_id)
+    ReviewOfReviewMapping.find_by_id(self.review_of_review_mapping_id)
   end
 
   def delete

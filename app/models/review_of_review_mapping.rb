@@ -48,9 +48,7 @@ belongs_to :review_mapping
       
       rvm_query = "select id from review_mappings where assignment_id = "+assignment.id.to_s
       query = "select * from review_of_review_mappings where review_mapping_id in ("+rvm_query+") and reviewer_id = "+reviewer.id.to_s+" and review_reviewer_id = "+rofreviewer.id.to_s
-      
-      puts query
-      
+            
       existing_mappings = ReviewOfReviewMapping.find_by_sql(query)
       if existing_mappings.size == 0
           mapping = ReviewOfReviewMapping.new

@@ -12,6 +12,12 @@
     %>
 <% elsif submission == '3' %>
    <%     
+      controller = 'review_feedback' 
+      action = 'view'
+      max_score = assignment.get_max_feedback_score
+    %>    
+<% elsif submission == '4' %>
+   <%     
       controller = 'teammate_review' 
       action = 'view'
       max_score = assignment.get_max_teammate_review_score
@@ -26,7 +32,6 @@
 	</tr>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
-		  <% puts submission %>
 		  <% if submission == '1'
 		       mapping = ReviewMapping.find(review.review_mapping_id) 
                rev_user = User.find(mapping.reviewer_id)
@@ -34,6 +39,8 @@
                mapping = ReviewOfReviewMapping.find(review.review_of_review_mapping_id) 
                rev_user = User.find(mapping.review_reviewer_id)
              elsif submission == '3'
+               rev_user = review.reviewer
+             elsif submission == '4'
                rev_user = User.find(review.reviewer_id)
              end
            %>  
@@ -55,6 +62,8 @@
                mapping = ReviewOfReviewMapping.find(review.review_of_review_mapping_id) 
                rev_user = User.find(mapping.review_reviewer_id)
              elsif submission == '3'
+               rev_user = review.reviewer
+             elsif submission == '4'
                rev_user = User.find(review.reviewer_id)
              end
            %>  		

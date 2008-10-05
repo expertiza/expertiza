@@ -10,6 +10,14 @@ class AssignmentParticipant < Participant
     return self.assignment.course.name
   end
   
+  def get_feedbacks
+    review_mapping_query = "select id from review_mappings where assignment_id = "+self.assignment.id.to_s+" and reviewer_id = "+self.user.id.to_s    
+    review_query = "select id from reviews where review_mapping_id in ("+review_mapping_query+")"
+    
+    feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where review_id in ("+review_query+")")
+    return feedbacks.sort {|a,b| a.reviewer.name <=> b.reviewer.name}    
+  end
+  
   def get_reviews
     if self.assignment.team_assignment
       author_id = self.team.id
@@ -152,6 +160,21 @@ class AssignmentParticipant < Participant
       return nil,nil
     end
   end
+ 
+  #computes this participants current author feedback score
+  def compute_author_feedback_scores   
+    review_mapping_query = "select id from review_mappings where assignment_id = "+self.assignment.id.to_s+" and reviewer_id = "+self.user.id.to_s    
+    review_query = "select id from reviews where review_mapping_id in ("+review_mapping_query+")"
+    
+    feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where review_id in ("+review_query+")")
+    if feedbacks.length > 0
+      avg_feedback_score, max_score,min_score = AssignmentParticipant.compute_scores(feedbacks)
+      max_assignment_score = self.assignment.get_max_feedback_score
+      return avg_feedback_score/max_assignment_score, max_score/max_assignment_score, min_score/max_assignment_score
+    else
+      return nil,nil
+    end
+  end  
   
   def compute_review_scores
     if Assignment.find(self.parent_id).team_assignment
@@ -172,7 +195,6 @@ class AssignmentParticipant < Participant
     review_score,max,min = self.compute_review_scores
      
     if review_score
-      puts review_score
       r_score = review_score * (self.assignment.review_weight / 100).to_f
     end    
     metareview_score,max,min = self.compute_metareview_scores

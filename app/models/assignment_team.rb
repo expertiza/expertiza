@@ -1,5 +1,9 @@
 class AssignmentTeam < Team
 
+  def email
+    self.get_team_users.first.email    
+  end
+
   def get_participant_type
     "AssignmentParticipant"
   end  
@@ -8,12 +12,19 @@ class AssignmentTeam < Team
     "Assignment"
   end
   
+  def fullname
+    self.name
+  end
+  
   def get_participants
     users = self.get_team_users
     participants = Array.new
     users.each{
       | user | 
-      participants << AssignmentParticipant.find_by_user_id_and_parent_id(user.id,self.parent_id)
+      participant = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,self.parent_id)
+      if participant != nil
+        participants << participant
+      end
     }
     return participants    
   end

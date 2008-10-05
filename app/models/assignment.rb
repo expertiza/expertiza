@@ -36,6 +36,14 @@ class Assignment < ActiveRecord::Base
     return max.to_f
   end
   
+  def get_max_feedback_score
+    max = 0
+    Questionnaire.find(self.author_feedback_questionnaire_id).questions.each{
+      max += Questionnaire.find(self.author_feedback_questionnaire_id).max_question_score
+    }    
+    return max.to_f
+  end
+  
   def get_max_metareview_score
     max = 0
     Questionnaire.find(self.review_of_review_questionnaire_id).questions.each{

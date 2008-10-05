@@ -10,28 +10,31 @@
          <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><img src="/images/expand.png"/></a>
          <%= team.name %></TD>
          <% if t_score %>
-        	<TD ALIGN="CENTER"><%= sprintf("%.2f",t_score*100) %>%</TD>
-        	<TD ALIGN="CENTER"><%= sprintf("%.0f",t_min*100) %>% - <%= sprintf("%.0f",t_max*100) %>%</TD>
+        	<TD COLSPAN="3" ALIGN="CENTER"><%= sprintf("%.2f",t_score*100) %>%</TD>
+        	<TD COLSPAN="3" ALIGN="CENTER"><%= sprintf("%.0f",t_min*100) %>% - <%= sprintf("%.0f",t_max*100) %>%</TD>
         <% else %>
-            <TD ALIGN="CENTER">---</TD>
-            <TD ALIGN="CENTER">---</TD>
+            <TD COLSPAN="3" ALIGN="CENTER">---</TD>
+            <TD COLSPAN="3" ALIGN="CENTER">---</TD>
         <% end %>
-        <TD COLSPAN="2">&nbsp;</TD>
-        <TD COLSPAN="3">&nbsp;</TD></TR>  
+        <TD WIDTH="9">&nbsp;</TD></TR>  
     <%= render :partial => 'participant_title', :locals => {:prefix => prefix } %>        
     <% pindex = 2 %>
     <% for participant in team.get_participants 
          pindex += 1  	              
-         r_avg, r_max, r_min = participant.compute_metareview_scores 
-#        t_avg, t_max, t_min = participant.compute_teammate_review_scores
+         r_avg, r_max, r_min = participant.compute_metareview_scores
+         f_avg, f_max, f_min = participant.compute_author_feedback_scores 
+#        tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores
+         
     %>
       	 <%= render :partial => 'participant', 
      	 			:locals => {:prefix => prefix+"_"+pindex.to_s,
      	 			            :team => true,
      	 			            :participant => participant,
      	 			            :s_avg => t_score, :s_max => t_max, :s_min => t_min,
-     	 			            :r_avg => r_avg, :r_max => r_max, :r_min => r_min}
-#     	 			            :t_avg => t_avg, :t_max => t_max, :t_min => t_min}
+     	 			            :r_avg => r_avg, :r_max => r_max, :r_min => r_min,
+#                               :tr_avg => tr_avg, :tr_max => tr_max, :tr_min => tr_min,     	 			            
+     	 			            :f_avg => f_avg, :f_min => f_min, :f_max => f_max
+     	 			            }
 								%>   
     <% end %>        
     <TR id='<%= prefix %>_<%= team.get_participants.length+3 %>' style="display:none"><TD COLSPAN="9"><HR/></TD></TR>  

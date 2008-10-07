@@ -120,7 +120,7 @@ class ReviewOfReviewController < ApplicationController
     @ror_map_id = ReviewOfReview.find(params[:id]).review_of_review_mapping_id
     @review_mapping_id = ReviewOfReviewMapping.find(@ror_map_id).review_mapping_id
     @review = Review.find_by_review_mapping_id(@review_mapping_id)
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(@review.id,params[:current_folder])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.show_review(@review.id,params[:current_folder])
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])

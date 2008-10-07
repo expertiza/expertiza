@@ -162,7 +162,7 @@ class AssignmentController < ApplicationController
     @wiki_types = WikiType.find_all
   end
   
-  def update
+  def update  
     if params[:assignment][:course_id]
      begin
        Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
@@ -171,8 +171,11 @@ class AssignmentController < ApplicationController
      end
     end
     @assignment = Assignment.find(params[:id])
+    oldpath = @assignment.get_path
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])
+      newpath = @assignment.get_path
+      FileHelper.update_file_location(oldpath,newpath)
       # Iterate over due_dates, from due_date[0] to the maximum due_date
       if params[:due_date]
         for due_date_key in params[:due_date].keys
@@ -229,16 +232,19 @@ class AssignmentController < ApplicationController
   def assign
     @assignment = Assignment.find(params[:id])
     if session[:user].role_id != 6 # for other that TA
-      @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
+       @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
     else
        @courses = TaMapping.get_courses(session[:user].id)
     end   
   end
   
-  def remove
+  def remove    
     assignment = Assignment.find(params[:id])
+    oldpath = assignment.get_path
     assignment.course_id = nil    
     assignment.save
+    newpath = assignment.get_path
+    FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
   end  
 end

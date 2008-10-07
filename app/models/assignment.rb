@@ -26,7 +26,7 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :directory_path
   validates_presence_of :review_questionnaire_id
   validates_presence_of :review_of_review_questionnaire_id
-  validates_numericality_of :review_weight    
+  validates_numericality_of :review_weight      
     
   def get_max_review_score
     max = 0
@@ -67,7 +67,7 @@ class Assignment < ActiveRecord::Base
     if self.wiki_type_id != 1
       raise PathError, "No path needed"
     end
-    if self.course_id > 0
+    if self.course_id != nil && self.course_id > 0
        path = Course.find(self.course_id).get_path
     else
        path = RAILS_ROOT + "/pg_data/" +  FileHelper.clean_path(User.find(self.instructor_id).name) + "/"

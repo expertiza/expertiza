@@ -13,7 +13,6 @@
   <BR/>         
   <HR/> 
   <% for metareview in participant.get_metareviews %>
-    <% puts prefix %>
     <a name="<%=prefix+"_"+metareview.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/>  
   <% end %>
 <% else %>

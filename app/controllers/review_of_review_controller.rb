@@ -29,7 +29,35 @@ class ReviewOfReviewController < ApplicationController
   end
   
   def new
-    @ror_mapping = ReviewOfReviewMapping.find(params[:id])    
+    #    @ror_mapping = ReviewOfReviewMapping.find(params[:id])
+    @ror_mapping = 
+    begin 
+      ReviewOfReviewMapping.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      nil    
+    end
+    
+    # if we did'nt find the ror mapping, we must be doing dynamic reviewer assignment
+    if (@ror_mapping == nil)    
+      
+      @assignment = Assignment.find(params[:assignment])
+      if (@assignment.team_assignment)
+        rm = TeamReviewOfReviewMappingManager.new
+      else
+        rm = IndividualReviewOfReviewMappingManager.new
+      end
+      @ror_mapping = rm.generateReviewOfReviewMapping(@assignment, session[:user].id)
+      
+      if (@ror_mapping == nil)
+        flash[:notice] = 'There are no reviews available for review available at this time. Please check back later.'
+        redirect_to :controller => 'review', :action => 'list_reviews', :id => @assignment.id 
+        return
+      end 
+      
+      # record the timeout value in the session so we can verify that we still own this mapping when we submit it
+      session[:review_of_review_timeout] = @ror_mapping.timeout.to_s()
+    end
+    
     @user = session[:user].id
     @eligible_review = Review.find(@ror_mapping.review_id)
     begin   
@@ -41,17 +69,17 @@ class ReviewOfReviewController < ApplicationController
       if params[:current_folder]
         @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
       end
-
+      
       if params['fname']
         view_submitted_file(@current_folder,@author)
       end
- 
+      
       
       @ror_questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_of_review_questionnaire_id]) 
       @ror_questionnaire = Questionnaire.find(@assgt.review_of_review_questionnaire_id)
       @ror_max = @ror_questionnaire.max_question_score
       @ror_min = @ror_questionnaire.min_question_score
-      rescue
+    rescue
       flash[:notice] = "Review of review cannot be created now. Cause: "+ $!
       redirect_to :controller =>'review', :action => 'list_reviews', :id => @ror_mapping.assignment_id
     end
@@ -87,21 +115,20 @@ class ReviewOfReviewController < ApplicationController
     end
     return files
   end
-   
+  
   def initialize_ror
     @ror_map_id = ReviewOfReview.find(params[:id]).review_of_review_mapping_id
-    @review_id = ReviewOfReviewMapping.find(@ror_map_id).review_id
-    @review = Review.find(@review_id)
-    @eligible_review = @review
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(@eligible_review.id)
+    @review_mapping_id = ReviewOfReviewMapping.find(@ror_map_id).review_mapping_id
+    @review = Review.find_by_review_mapping_id(@review_mapping_id)
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.process_review(@review.id,params[:current_folder])
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
       @author_name = User.find(@author_first_user_id).name;
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @author_first_user_id, @mapping.assignment_id])
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @mapping.assignment_id])
     else
       @author_name = User.find(@mapping.author_id).name
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND assignment_id = ?", @mapping.author_id, @mapping.assignment_id])
+      @author = Participant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @mapping.assignment_id])
     end
     
     @max = @questionnaire.max_question_score
@@ -117,15 +144,15 @@ class ReviewOfReviewController < ApplicationController
     @review_of_review = ReviewOfReview.find(params[:id])
     @ror_review_scores = @review_of_review.review_of_review_scores
     @ror_mapping = ReviewOfReviewMapping.find(@review_of_review.review_of_review_mapping_id)
-    @ror_assgt = Assignment.find(@ror_mapping.assignment_id)    
+    @ror_assgt = Assignment.find(@assgt.id)    
     @ror_questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @ror_assgt.review_of_review_questionnaire_id]) 
     @ror_questionnaire = Questionnaire.find(@ror_assgt.review_of_review_questionnaire_id)
     @ror_max = @ror_questionnaire.max_question_score
     @ror_min = @ror_questionnaire.min_question_score
   end
-
+  
   def view
-     initialize_ror
+    initialize_ror
   end
   
   def edit
@@ -152,9 +179,26 @@ class ReviewOfReviewController < ApplicationController
       render :action => 'edit', :id=> params[:review_of_review_id]
     end
   end  
-
+  
   def create_review_of_review
-    @ror_mapping = ReviewOfReviewMapping.find(:first, :conditions => ["review_id = ? and review_reviewer_id = ? ", params[:review_id], params[:user]])
+#    @ror_mapping = ReviewOfReviewMapping.find(:first, :conditions => ["review_id = ? and review_reviewer_id = ? ", params[:review_id], params[:user]])
+    review = Review.find(params[:review_id])
+    review_mapping = ReviewMapping.find(review.review_mapping_id)
+    @ror_mapping = ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id
+      = ? and review_reviewer_id = ? ", review_mapping.id, params[:user]])
+    @assignment = Assignment.find(review_mapping.assignment_id)  
+  
+    if @assignment.mapping_strategy_id == 2
+      # compare the timeout value in the session to the mapping so we can verify that we still own it
+      if session[:review_of_review_timeout] != @ror_mapping.timeout.to_s() || session[:user].id != @ror_mapping.review_reviewer_id
+        flash[:notice] = 'The time for submitting the review of the reivew, has been exceeded. Please select another review to review.'
+        session[:review_of_review_timeout] = nil
+        redirect_to :controller=>'review', :action => 'list_reviews', :id => @assignment.id 
+        return
+      end
+      session[:review_of_review_timeout] = nil
+    end
+    
     @review_of_review = ReviewOfReview.new
     @review_of_review.review_of_review_mapping_id = @ror_mapping.id
     if params[:new_metareview_score]

@@ -5,6 +5,17 @@ module FileHelper
       FileHelper.clean_path(just_filename) 
   end
   
+  def self.update_file_location(oldpath,newpath)
+    begin
+      create_directory_from_path(newpath)    
+      oldcontents = Dir.glob(oldpath + "/*")        
+      FileUtils.mv(oldcontents,newpath)
+      FileUtils.remove_dir(oldpath)
+    rescue
+      puts $!
+    end
+  end
+  
   # replace invalid characters with underscore
   #    valid: period
   #           underscore

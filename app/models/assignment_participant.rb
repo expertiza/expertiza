@@ -260,7 +260,11 @@ class AssignmentParticipant < Participant
   end   
   
   def get_path
-     Assignment.find(self.parent_id).get_path + "/"+ self.directory_num.to_s
+     path = self.assignment.get_path + "/"+ self.directory_num.to_s
+     if self.id == 1117
+        puts path
+     end
+     return path
   end
   
   def set_student_directory_num

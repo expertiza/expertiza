@@ -105,30 +105,30 @@ class ReviewFeedbackController < ApplicationController
     @review_feedback.review_id = @review_id
     @review_feedback.team_id = @team_id
     
-    # create review scores for a particular author feedback
-    if params[:new_review_score]
-        for review_key in params[:new_review_score].keys
-        rs = ReviewScore.new(params[:new_review_score][review_key])
-        rs.review_id = @review_id
-        rs.question_id = params[:new_question][review_key]
-        rs.score = params[:new_score][review_key]
-        
-        # determine whether the rubric is an author feedback rubric
-        rs.questionnaire_type_id = QuestionnaireType.find_by_name("Author Feedback").id        
-        @review_feedback.review_scores<< rs
-      end      
-    end
     if @review_feedback.save
-      flash[:notice] = 'ReviewFeedback was successfully created.'
-      redirect_to :action=> 'view_feedback', :id1 =>params[:assgt_id], :id2 =>params[:author_id], :id3=>params[:review_id], :id4=>params[:team_id]
+        # create review scores for a particular author feedback
+        if params[:new_review_score]
+          for review_key in params[:new_review_score].keys
+            rs = ReviewScore.new(params[:new_review_score][review_key])
+            rs.review_id = ReviewFeedback.find_by_sql ("select max(id) as id from review_feedbacks")[0].id
+            rs.question_id = params[:new_question][review_key]
+            rs.score = params[:new_score][review_key]
+            
+            # determine whether the rubric is an author feedback rubric
+            rs.questionnaire_type_id = QuestionnaireType.find_by_name("Author Feedback").id        
+            rs.save        
+          end
+          flash[:notice] = 'ReviewFeedback was successfully created.'
+          redirect_to :action=> 'view_feedback', :id1 =>params[:assgt_id], :id2 =>params[:author_id], :id3=>params[:review_id], :id4=>params[:team_id]
+        end
     end
     
-    # determine whether the rubric is an author feedback rubric
-    @review_scores = ReviewScore.find(:all,:conditions =>["review_id = ? and questionnaire_type_id = ?", @review_id, QuestionnaireType.find_by_name("Author Feedback").id])
-    for review_score in @review_scores
-    review_score.review_id = @review_feedback.id
-    review_score.update
-    end
+#    # determine whether the rubric is an author feedback rubric
+#    @review_scores = ReviewScore.find(:all,:conditions =>["review_id = ? and questionnaire_type_id = ?", @review_id, QuestionnaireType.find_by_name("Author Feedback").id])
+#    for review_score in @review_scores
+#    review_score.review_id = @review_feedback.id
+#    review_score.update
+#    end
   end
  
   #Action for updating a previous feedback and inserting new values in the ReviewFeedback and ReviewScores table

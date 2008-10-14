@@ -25,7 +25,7 @@ class ReviewController < ApplicationController
   def self.show_review(id)   
     @review = Review.find(id)
     @mapping_id = id
-    @review_scores = ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review Rubric").id])
+    @review_scores = Score.find(:all, :conditions=>["instance_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review").id])
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @assgt.id])
@@ -55,15 +55,15 @@ class ReviewController < ApplicationController
     @review_id=params[:id]
     
     # determine whether the rubric is a review rubric  
-    @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, QuestionnaireType.find_by_name("Review Rubric").id])
+    @review_scores1 = Score.find(:all,:conditions =>["instance_id =? AND questionnaire_type_id = ?", @review_id, QuestionnaireType.find_by_name("Review").id])
     if( ReviewFeedback.find_by_review_id(@review_id))
       if (ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id = ?", @review_id,  @a]))
         @reviewfeedback_id_1 = ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id = ?", @review_id,  @a])
-        @review_scores2 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_1.id, QuestionnaireType.find_by_name("Author Feedback").id])
+        @review_scores2 = Score.find(:all,:conditions =>["instance_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_1.id, QuestionnaireType.find_by_name("Author Feedback").id])
       end
       if (ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id != ?", @review_id,  @a]))
         @reviewfeedback_id_2 = ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id != ?", @review_id,  @a])
-        @review_scores3 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_2.id, QuestionnaireType.find_by_name("Author Feedback").id])
+        @review_scores3 = Score.find(:all,:conditions =>["instance_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_2.id, QuestionnaireType.find_by_name("Author Feedback").id])
       end     
     end
     
@@ -120,12 +120,12 @@ class ReviewController < ApplicationController
       # that should be saved to the database
       for review_key in params[:new_review_score].keys
         question_id = params[:new_question][review_key]
-        rs = ReviewScore.find(:first,:conditions => ["review_id = ? AND question_id = ?", @review.id, question_id])
+        rs = Score.find(:first,:conditions => ["instance_id = ? AND question_id = ?", @review.id, question_id])
         rs.comments = params[:new_review_score][review_key][:comments]
         rs.score = params[:new_score][review_key]
         ## feedback added
         # determine whether the rubric is a review rubric
-        rs.questionnaire_type_id = QuestionnaireType.find_by_name("Review Rubric").id
+        rs.questionnaire_type_id = QuestionnaireType.find_by_name("Review").id
         ##
         rs.update
       end      
@@ -214,7 +214,7 @@ class ReviewController < ApplicationController
       if (@old_review)
         @old_review_mapping = mapping
         # determine whether the rubric is a review rubric
-        @old_scores = ReviewScore.find(:all, :conditions => ["review_id = ? and questionnaire_type_id = ?", @old_review.id, QuestionnaireType.find_by_name("Review Rubric").id])
+        @old_scores = Score.find(:all, :conditions => ["instance_id = ? and questionnaire_type_id = ?", @old_review.id, QuestionnaireType.find_by_name("Review").id])
       end
       i+=1
     end
@@ -257,22 +257,23 @@ class ReviewController < ApplicationController
     end 
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
     @review_phase = find_review_phase(@due_dates)
-    if params[:new_review_score]
-      # The new_question array contains all the new questions
-      # that should be saved to the database
-      for review_key in params[:new_review_score].keys
-        rs = ReviewScore.new(params[:new_review_score][review_key])
-        rs.question_id = params[:new_question][review_key]
-        rs.score = params[:new_score][review_key]
-        ## feed back added
-        # determine whether the rubric is a review rubric
-        rs.questionnaire_type_id = QuestionnaireType.find_by_name("Review Rubric").id
-        ##
-        @review.review_scores << rs
-      end      
-    end
     if @review.save
-
+      if params[:new_review_score]
+        latest_review_id = Review.find_by_sql ("select max(id) as id from reviews")[0].id
+        # The new_question array contains all the new questions
+        # that should be saved to the database
+        for review_key in params[:new_review_score].keys
+          rs = Score.new(params[:new_review_score][review_key])
+          rs.instance_id = latest_review_id
+          rs.question_id = params[:new_question][review_key]
+          rs.score = params[:new_score][review_key]
+          ## feed back added
+          # determine whether the rubric is a review rubric
+          rs.questionnaire_type_id = QuestionnaireType.find_by_name("Review").id
+          ##
+          rs.save
+        end      
+      end
       #null out the mapping's timeout value to indicate that its been submitted
       @mapping.timeout = nil
       @mapping.save
@@ -358,14 +359,14 @@ class ReviewController < ApplicationController
     @user_id = session[:user].id
     @review_id=params[:id]
     # determine whether the rubric is a review rubric
-    @review_scores1 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @review_id, QuestionnaireType.find_by_name("Review Rubric").id])
+    @review_scores1 = Score.find(:all,:conditions =>["instance_id =? AND questionnaire_type_id = ?", @review_id, QuestionnaireType.find_by_name("Review").id])
     @reviewfeedback = ReviewFeedback.find_by_review_id(@review_id)
     if (@reviewfeedback)
       @reviewfeedback_id = @reviewfeedback.id
       @author_id = @reviewfeedback.author_id
     end
     # determine whether the rubric is an author feedback rubric
-    @review_scores2 = ReviewScore.find(:all,:conditions =>["review_id =? AND questionnaire_type_id = ?", @reviewfeedback_id, QuestionnaireType.find_by_name("Author Feedback").id])
+    @review_scores2 = Score.find(:all,:conditions =>["instance_id =? AND questionnaire_type_id = ?", @reviewfeedback_id, QuestionnaireType.find_by_name("Author Feedback").id])
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -462,21 +463,22 @@ class ReviewController < ApplicationController
     @assignment = Assignment.find(params[:assgt_id])
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
     @review_phase = find_review_phase(@due_dates)
-    
-    #if(@review_phase != 2)
-    
-    
-    if params[:new_review_score]
-      # The new_question array contains all the new questions
-      # that should be saved to the database
-      for review_key in params[:new_review_score].keys
-        rs = ReviewScore.new(params[:new_review_score][review_key])
-        rs.question_id = params[:new_question][review_key]
-        rs.score = params[:new_score][review_key]
-        @review.review_scores << rs
-      end      
-    end
     if @review.save
+      if params[:new_review_score]
+        latest_review_id = Review.find_by_sql ("select max(id) as id from reviews")[0].id
+        # The new_question array contains all the new questions
+        # that should be saved to the database
+        for review_key in params[:new_review_score].keys
+          rs = Score.new(params[:new_review_score][review_key])
+          rs.instance_id = latest_review_id
+          rs.question_id = params[:new_question][review_key]
+          rs.score = params[:new_score][review_key]
+          # determine whether the rubric is a review rubric
+          rs.questionnaire_type_id = QuestionnaireType.find_by_name("Review").id
+          ##
+          rs.save
+        end      
+      end
       #send message to author(s) when review has been updated
       #@review.email
       flash[:notice] = 'Review was successfully saved.'

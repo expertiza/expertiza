@@ -48,7 +48,9 @@ class GradesController < ApplicationController
   # ther grading conflict email form provides the instructor a way of emailing
   # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.  
   def conflict_notification
-    @instructor = session[:user]
+    
+    @instructor = session[:user] if session[:user].role_id !=6
+    else @instructor = Ta.get_my_instructor(session[:user].id)
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = Assignment.find(@participant.parent_id)  
     

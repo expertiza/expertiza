@@ -21,17 +21,20 @@ class TeammateReviewController < ApplicationController
     @teammate_review.assignment_id = params[:assgt_id]
     #@teammate_review.team_id = params[:team_id]
     @teammate_review.additional_comment = params[:new_teammate_review][:comments]
-    if params[:new_teammate_review_score]
-      # The new_question array contains all the new questions
-      # that should be saved to the database
-      for teammate_review_key in params[:new_teammate_review_score].keys
-        prs = TeammateReviewScore.new(params[:new_teammate_review_score][teammate_review_key])
-        prs.question_id = params[:new_question][teammate_review_key]
-        prs.score = params[:new_score][teammate_review_key]
-        @teammate_review.teammate_review_scores << prs
-      end      
-    end
     if @teammate_review.save
+      if params[:new_teammate_review_score]
+        # The new_question array contains all the new questions
+        # that should be saved to the database
+        latest_teammate_review_id = TeammateReview.find_by_sql ("select max(id) as id from teammate_reviews")[0].id
+        for teammate_review_key in params[:new_teammate_review_score].keys
+          prs = Score.new(params[:new_teammate_review_score][teammate_review_key])
+          prs.question_id = params[:new_question][teammate_review_key]
+          prs.instance_id = latest_teammate_review_id
+          prs.questionnaire_type_id = QuestionnaireType.find_by_name("Teammate Review").id
+          prs.score = params[:new_score][teammate_review_key]
+          prs.save
+        end      
+      end
       flash[:notice] = 'Teammate review was successfully saved.'
       @student = Participant.find(:first, :conditions => ['user_id =? and parent_id =?', @teammate_review.reviewer_id, @teammate_review.assignment_id])
       redirect_to :controller => 'student_assignment', :action => 'view_team', :id => @student.id
@@ -49,7 +52,7 @@ class TeammateReviewController < ApplicationController
     @teammate_review_id=params[:id]
     @teammate_review = TeammateReview.find_by_id(@teammate_review_id)
     @student = Participant.find(:first, :conditions => ['user_id =? and parent_id =?', @teammate_review.reviewer_id, @teammate_review.assignment_id])
-    @teammate_review_scores = TeammateReviewScore.find(:all,:conditions =>["teammate_review_id =?", @teammate_review_id])
+    @teammate_review_scores = Score.find(:all,:conditions =>["instance_id =? and questionnaire_type_id=?", @teammate_review_id, QuestionnaireType.find_by_name("Teammate Review").id])
   end
   
   def edit
@@ -62,7 +65,7 @@ class TeammateReviewController < ApplicationController
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @questionnaire.id]) 
     @max = @questionnaire.max_question_score
     @min = @questionnaire.min_question_score 
-    #@teammate_review_scores = TeammateReviewScore.find(:all,:conditions =>["teammate_review_id =?", @teammate_review_id])
+    #@teammate_review_scores = Score.find(:all,:conditions =>["instance_id =? and questionnaire_type_id=?", @teammate_review_id, QuestionnaireType.find_by_name("Teammate Review").id])
   end
  
   def update  
@@ -73,7 +76,7 @@ class TeammateReviewController < ApplicationController
       # that should be saved to the database
       for teammate_review_key in params[:new_teammate_review_score].keys
         question_id = params[:new_question][teammate_review_key]
-        prs = TeammateReviewScore.find(:first,:conditions => ["teammate_review_id = ? AND question_id = ?", @teammate_review.id, question_id])
+        prs = Score.find(:first,:conditions => ["teammate_review_id = ? AND question_id = ? and questionnaire_type_id=?", @teammate_review.id, question_id, @teammate_review_scores = Score.find(:all,:conditions =>["instance_id =? and questionnaire_type_id=?", @teammate_review_id, QuestionnaireType.find_by_name("Teammate Review").id])])
         prs.comments = params[:new_teammate_review_score][teammate_review_key][:comments]
         prs.score = params[:new_score][teammate_review_key]
         prs.update

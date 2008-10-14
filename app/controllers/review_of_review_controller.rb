@@ -120,7 +120,7 @@ class ReviewOfReviewController < ApplicationController
     @ror_map_id = ReviewOfReview.find(params[:id]).review_of_review_mapping_id
     @review_mapping_id = ReviewOfReviewMapping.find(@ror_map_id).review_mapping_id
     @review = Review.find_by_review_mapping_id(@review_mapping_id)
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.show_review(@review.id,params[:current_folder])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.show_review(@review.id)
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
@@ -142,7 +142,7 @@ class ReviewOfReviewController < ApplicationController
       view_submitted_file(@current_folder,@author)
     end   
     @review_of_review = ReviewOfReview.find(params[:id])
-    @ror_review_scores = @review_of_review.review_of_review_scores
+    @ror_review_scores = Score.find(:first,:conditions => ["instance_id = ? AND questionnaire_type_id = ?", @review_of_review.id, QuestionnaireType.find_by_name("Metareview").id])
     @ror_mapping = ReviewOfReviewMapping.find(@review_of_review.review_of_review_mapping_id)
     @ror_assgt = Assignment.find(@assgt.id)    
     @ror_questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @ror_assgt.review_of_review_questionnaire_id]) 
@@ -166,7 +166,7 @@ class ReviewOfReviewController < ApplicationController
       # that should be saved to the database
       for review_of_review_key in params[:new_metareview_score].keys
         question_id = params[:new_question][review_of_review_key]
-        rs = ReviewOfReviewScore.find(:first,:conditions => ["review_of_review_id = ? AND question_id = ?", @review_of_review.id, question_id])
+        rs = Score.find(:first,:conditions => ["instance_id = ? AND question_id = ?", @review_of_review.id, question_id])
         rs.comments = params[:new_metareview_score][review_of_review_key][:comments]
         rs.score = params[:new_score][review_of_review_key]
         rs.update
@@ -201,17 +201,22 @@ class ReviewOfReviewController < ApplicationController
     
     @review_of_review = ReviewOfReview.new
     @review_of_review.review_of_review_mapping_id = @ror_mapping.id
-    if params[:new_metareview_score]
-      # The new_question array contains all the new questions
-      # that should be saved to the database
-      for review_key in params[:new_metareview_score].keys
-        rs = ReviewOfReviewScore.new(params[:new_metareview_score][review_key])
-        rs.question_id = params[:new_question][review_key]
-        rs.score = params[:new_score][review_key]
-        @review_of_review.review_of_review_scores << rs
-      end      
-    end
     if @review_of_review.save
+      if params[:new_metareview_score]
+        # The new_question array contains all the new questions
+        # that should be saved to the database
+        latest_metareview_id = ReviewOfReview.find_by_sql ("select max(id) as id from review_of_reviews")[0].id
+        for review_key in params[:new_metareview_score].keys
+          rs = Score.new(params[:new_metareview_score][review_key])
+          rs.question_id = params[:new_question][review_key]
+          rs.instance_id = latest_metareview_id
+          # determine whether the rubric is a metareview rubric
+          rs.questionnaire_type_id = QuestionnaireType.find_by_name("Metareview").id
+          ##
+          rs.score = params[:new_score][review_key]
+          rs.save
+        end      
+      end
       flash[:notice] = 'Review of review was successfully saved.' + params['instructor_review']
       redirect_to :controller => 'review', :action => 'list_reviews', :id => params[:assgt_id]
     else # If something goes wrong, stay at same page

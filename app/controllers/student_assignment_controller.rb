@@ -365,6 +365,7 @@ class StudentAssignmentController < ApplicationController
       
       if @student.directory_num == nil or @student.directory_num < 0
         set_student_directory_num
+      end  
         #send message to reviewers(s) when submission has been updated
         #ajbudlon, sept 07, 2007
       logger.info "Sending submission e-mail"    
@@ -624,23 +625,23 @@ private
     
     @review_phase = next_due_date.deadline_type_id;
 
-      if next_due_date.submission_allowed_id == 2 or next_due_date.submission_allowed_id == 3
-        @can_view_your_work =1
+      if next_due_date.submission_allowed_id == LATE or next_due_date.submission_allowed_id == OK
+        @can_view_your_work = true
       end
-      if next_due_date.review_allowed_id == 2 or next_due_date.review_allowed_id == 3
-        @can_view_others_work =1
-      end
-
-      if next_due_date.resubmission_allowed_id == 2 or next_due_date.resubmission_allowed_id == 3
-        @can_view_your_work =1
+      if next_due_date.review_allowed_id == LATE or next_due_date.review_allowed_id == OK 
+        @can_view_others_work = true
       end
 
-      if next_due_date.rereview_allowed_id == 2 or next_due_date.rereview_allowed_id == 3
-        @can_view_others_work =1
+      if next_due_date.resubmission_allowed_id == LATE or next_due_date.resubmission_allowed_id == OK
+        @can_view_your_work = true
       end
 
-      if next_due_date.review_of_review_allowed_id == 2 or next_due_date.review_of_review_allowed_id == 3
-        @can_view_others_work =1
+      if next_due_date.rereview_allowed_id == LATE or next_due_date.rereview_allowed_id == OK
+        @can_view_others_work = true
+      end
+
+      if next_due_date.review_of_review_allowed_id == LATE or next_due_date.review_of_review_allowed_id == OK
+        @can_view_others_work = true
       end
 
     return [@can_view_your_work, @can_view_others_work]
@@ -665,4 +666,3 @@ private
   end
   
 end
-

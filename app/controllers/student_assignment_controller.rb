@@ -3,7 +3,15 @@ require 'uri'
 
 class StudentAssignmentController < ApplicationController
   helper :wiki
-  helper :student_assignment
+  helper :student_assignment	
+  helper :google
+  auto_complete_for :user, :name
+  
+#  def auto_complete_for_user_name
+#    search = params[:user][:name].to_s
+#    @users = User.find_by_sql("select * from users where id !="+session[:user].id.to_s+" and LOWER(name) LIKE '%"+search+"%' and id in (select user_id from participants where parent_id = "+session[:dummy][:assignment_id]+")")
+#    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
+#  end
   
   def view_team
     @student = AssignmentParticipant.find(params[:id])
@@ -29,7 +37,7 @@ class StudentAssignmentController < ApplicationController
   def view_publishing
     user_id = session[:user].id
     @user =session[:user]
-    AssignmentParticipant.find(:all, 
+    @participants = AssignmentParticipant.find(:all, 
                                     :conditions => ['user_id = ?', user_id],
                                     :order => "parent_id DESC")
   end
@@ -109,7 +117,7 @@ class StudentAssignmentController < ApplicationController
   end
   
   def set_all_publish_permission_no
-    @participants = Participant.find(:all, :conditions => ["user_id = ?",params[:user]])
+    @participants = AssignmentParticipant.find(:all, :conditions => ["user_id = ?",params[:user]])
     for participant in @participants
       participant.permission_granted = 0;
       if !participant.save
@@ -273,7 +281,15 @@ class StudentAssignmentController < ApplicationController
     @submission = params[:submission]
     @files = Array.new
     @assignment_id = @student.parent_id
-    @assignment = Assignment.find_by_id(@assignment_id)
+    
+    # Return URI depending on link type.
+    @assignment = Assignment.find(@assignment_id)
+    if @assignment.is_google_doc
+      @link = google_id_to_url(@student.submitted_hyperlink)
+    else
+      @link = @student.submitted_hyperlink
+    end
+    
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
     @submit_due_date = DueDate.find(:all, :conditions => ["assignment_id = ? and deadline_type_id = ?",@assignment_id,1])
@@ -301,12 +317,12 @@ class StudentAssignmentController < ApplicationController
       file_split = file_name.split('.')
       if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
         #send_file(get_student_directory(@student) + folder_name + file_name, :type => Mime::HTML.to_s, :disposition => 'inline') 
-  send_file(folder_name+ "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline')
+        send_file(folder_name+ "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline')
       else
         #send_file(get_student_directory(@student) + folder_name + file_name, :disposition => 'inline') 
         if !File.directory?(folder_name + "/" + file_name)
-    send_file( folder_name + "/" + file_name, :disposition => 'inline')
-  else
+          send_file( folder_name + "/" + file_name, :disposition => 'inline')
+    else
     #StudentAssignmentHelper::zip_file(folder_name + "/" + file_name, folder_name, file_name)
     #send_file( folder_name + "/" + file_name+ ".zip", :disposition => 'inline')
     #FileUtils.rm_r (folder_name + "/" + file_name+ ".zip")
@@ -345,10 +361,10 @@ class StudentAssignmentController < ApplicationController
     
     if params['upload_file']
       file = params['uploaded_file']
-      @student.set_student_directory_num
+      #@student.set_student_directory_num
       
-      #if @student.directory_num == nil or @student.directory_num < 0
-      #  set_student_directory_num
+      if @student.directory_num == nil or @student.directory_num < 0
+        set_student_directory_num
         #send message to reviewers(s) when submission has been updated
         #ajbudlon, sept 07, 2007
       logger.info "Sending submission e-mail"    
@@ -390,6 +406,15 @@ class StudentAssignmentController < ApplicationController
   end
 
 private
+
+    
+  # Converts a document ID to a fully qualified HTTP URL. This is
+  # done for maintainability, since the URL format of Google Docs
+  # may change in the future.
+  def google_id_to_url(doc_id)
+    return "http://docs.google.com/View?docid=#{doc_id}"
+  end
+  
   def update_resubmit_times
     new_submit = ResubmissionTime.new(:resubmitted_at => Time.now.to_s)
     @student.resubmission_times << new_submit
@@ -496,20 +521,20 @@ private
     # created and incrementing it.
 
     participants = Participant.find(:all, :conditions => ['parent_id = ?',@assignment_id], :order => 'directory_num DESC')
-
+    instructor = User.find(@assignment.instructor_id).name
     if participants != nil and participants[0].directory_num != nil
       if @assignment.team_assignment
          @student.directory_num = participants[0].directory_num + 1
          assign_team_directories (participants[0].directory_num + 1)
-         if Dir[RAILS_ROOT + "/pg_data/" + @assignment.directory_path+ "/" +@student.directory_num.to_s] != nil  
-          Dir.mkdir (RAILS_ROOT + "/pg_data/" + @assignment.directory_path+ "/" +@student.directory_num.to_s) 
+         if Dir[RAILS_ROOT + "/pg_data/" + instructor + "/" +@assignment.directory_path+ "/" +@student.directory_num.to_s] != nil  
+          Dir.mkdir (RAILS_ROOT + "/pg_data/" + instructor + "/" + @assignment.directory_path+ "/" +@student.directory_num.to_s) 
   end
       else
          @student.directory_num = participants[0].directory_num + 1
       end
     else
       if @assignment.team_assignment
-         Dir.mkdir (RAILS_ROOT + "/pg_data/" + @assignment.directory_path+ "/0")
+         Dir.mkdir (RAILS_ROOT + "/pg_data/" + instructor + "/" + @assignment.directory_path+ "/0")
          @student.directory_num = 0
          assign_team_directories(0)
       else
@@ -637,6 +662,7 @@ private
     else
       send_file(fullfilename)
     end
-  end  
+  end
+  
 end
 

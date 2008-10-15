@@ -1,5 +1,9 @@
 class CorrectQuestionnaireTypeInReviewScores < ActiveRecord::Migration
   def self.up
+    type = QuestionnaireType.find_by_name('Review Rubric')
+    type.name = 'Review'
+    type.save
+    
     ReviewScore.find(:all).each{
        |entry|
        if entry.questionnaire_type_id.nil?

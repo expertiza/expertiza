@@ -2,7 +2,7 @@
         for @question in @questions %>
           <%=@question.txt%><br />
           <% @rev = @reviewfeedback.id %>  
-          <% @rs = ReviewScore.find(:first,:conditions => ["review_id = ? AND question_id = ? AND questionnaire_type_id = ?", @rev, @question.id, QuestionnaireType.find_by_name("Author Feedback").id])%>
+          <% @rs = Score.find(:first,:conditions => ["instance_id = ? AND question_id = ? AND questionnaire_type_id = ?", @rev, @question.id, QuestionnaireType.find_by_name("Author Feedback").id])%>
           <input id=new_review_score_<%=i%>_comments name=new_review_score[<%=i%>][comments] value = "<%=@rs.comments.gsub(/\"/,'&quot;')%>"  size=70 type=text />
           <% if @question.true_false? %>
               <select id=new_score_<%=i%> name=new_score[<%=i%>]>

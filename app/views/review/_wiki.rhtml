@@ -22,7 +22,7 @@ function collapseSubDirectory(row) {
   }
 }
 </script>
-<%if @files.size == 0 and @assgt.wiki_type.name == "No"%>
+<%if @assgt.wiki_type.name == "No" and @files.size == 0 %>
 
 <%else%>
 Submitted Files<br />

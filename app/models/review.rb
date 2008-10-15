@@ -7,7 +7,8 @@ class Review < ActiveRecord::Base
     code = "<B>Reviewer:</B> "+self.review_mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+prefix+"_"+self.id.to_s+"','review'"+');return false;">hide review</a>'
     code = code + '<div id="review_'+prefix+"_"+self.id.to_s+'" style="">'   
     code = code + '<BR/><BR/>'
-    ReviewScore.find_all_by_review_id(self.id).each{
+    scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Review").id)
+    scores.each{
       | reviewScore |      
       code = code + "<I>"+reviewScore.question.txt+"</I><BR/><BR/>"
       code = code + '(<FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+reviewScore.question.questionnaire.max_question_score.to_s+"</B>): "+reviewScore.comments+"<BR/><BR/>"
@@ -20,7 +21,7 @@ class Review < ActiveRecord::Base
     
   # Computes the total score awarded for a review
   def get_total_score
-    scores = ReviewScore.find(:all,:conditions=>["review_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review Rubric").id])
+    scores = Score.find(:all,:conditions=>["instance_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review").id])
     total_score = 0
     scores.each{
       |item|
@@ -38,7 +39,7 @@ class Review < ActiveRecord::Base
     def self.review_view_helper(review_id,fname,control_folder)
     @review = Review.find(review_id)
     @mapping_id = review_id
-    @review_scores = ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review Rubric").id])
+    @review_scores = Score.find(:all, :conditions=>["instance_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review").id])
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @assgt.id])
@@ -97,7 +98,7 @@ class Review < ActiveRecord::Base
               :obj_name => user.name,
               :type => "review",
               :location => get_review_number(mapping).to_s,
-              :review_scores => ReviewScore.find(:all, :conditions=>["review_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review Rubric").id]),
+              :review_scores => Score.find(:all, :conditions=>["instance_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review").id]),
               :user => ApplicationHelper::get_user_first_name(user),
               :partial_name => "update"
               }

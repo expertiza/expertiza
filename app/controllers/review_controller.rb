@@ -146,31 +146,32 @@ class ReviewController < ApplicationController
     
     @review = Review.new
     @mapping_id = params[:id]
-    #    @mapping = ReviewMapping.find(params[:id])
-    @mapping = 
-    begin 
-      ReviewMapping.find(params[:id])
-    rescue ActiveRecord::RecordNotFound
-      nil    
-    end    
-    # if we did'nt find the mapping, we must be doing dynamic reviewer assignment
-    if (@mapping == nil)    
-      
-      @assignment = Assignment.find(params[:assignment])
-      if (@assignment.team_assignment)
-        rm = TeamReviewMappingManager.new
-      else
-        rm = IndividualReviewMappingManager.new
-      end
-      @mapping = rm.generateReviewMapping(@assignment, session[:user].id)
-      if (@mapping == nil)
-        flash[:notice] = 'There are no submissions available for review available at this time. Please check back later.'
-        redirect_to :action => 'list_reviews', :id => @assignment.id 
-        return
-      end   
-      # record the timeout value in the session so we can verify that we still own this mapping when we submit it
-      session[:review_timeout] = @mapping.timeout.to_s()
-    end 
+    # code  for dynamic reviewer mapping has been commented out because code for it has not been implemented
+    @mapping = ReviewMapping.find(params[:id])
+#    @mapping = 
+#    begin 
+#      ReviewMapping.find(params[:id])
+#    rescue ActiveRecord::RecordNotFound
+#      nil    
+#    end    
+#    # if we did'nt find the mapping, we must be doing dynamic reviewer assignment
+#    if (@mapping == nil)    
+#      
+#      @assignment = Assignment.find(params[:assignment])
+#      if (@assignment.team_assignment)
+#        rm = TeamReviewMappingManager.new
+#      else
+#        rm = IndividualReviewMappingManager.new
+#      end
+#      @mapping = rm.generateReviewMapping(@assignment, session[:user].id)
+#      if (@mapping == nil)
+#        flash[:notice] = 'There are no submissions available for review available at this time. Please check back later.'
+#        redirect_to :action => 'list_reviews', :id => @assignment.id 
+#        return
+#      end   
+#      # record the timeout value in the session so we can verify that we still own this mapping when we submit it
+#      session[:review_timeout] = @mapping.timeout.to_s()
+#    end 
     
     @assgt = Assignment.find(@mapping.assignment_id)
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
@@ -241,16 +242,17 @@ class ReviewController < ApplicationController
     @review.additional_comment = params[:new_review][:comments]
     @mapping = ReviewMapping.find(params[:mapping_id])
     @assignment = Assignment.find(@mapping.assignment_id)
-    if @assignment.mapping_strategy_id == 2
-      # compare the timeout value in the session to the mapping so we can verify that we still own it
-      if session[:review_timeout] != @mapping.timeout.to_s() || session[:user].id != @mapping.reviewer_id
-        flash[:notice] = 'The time for submitting the review has been exceeded. Please select another review.'
-        session[:review_timeout] = nil
-        redirect_to :action => 'list_reviews', :id => @assignment.id 
-        return
-      end
-      session[:review_timeout] = nil
-    end
+    # code  for dynamic reviewer mapping has been commented out because code for it has not been implemented
+#    if @assignment.mapping_strategy_id == MappingStrategy.find_by_name ("Dynamic, fewest extant reviews").id
+#      # compare the timeout value in the session to the mapping so we can verify that we still own it
+#      if session[:review_timeout] != @mapping.timeout.to_s() || session[:user].id != @mapping.reviewer_id
+#        flash[:notice] = 'The time for submitting the review has been exceeded. Please select another review.'
+#        session[:review_timeout] = nil
+#        redirect_to :action => 'list_reviews', :id => @assignment.id 
+#        return
+#      end
+#      session[:review_timeout] = nil
+#    end
     
     if @assignment.team_assignment && params[:team_id] != nil
       @mapping.team_id = params[:team_id]
@@ -275,7 +277,7 @@ class ReviewController < ApplicationController
         end      
       end
       #null out the mapping's timeout value to indicate that its been submitted
-      @mapping.timeout = nil
+#      @mapping.timeout = nil
       @mapping.save
       
       #send message to author(s) when review has been updated
@@ -312,9 +314,9 @@ class ReviewController < ApplicationController
       end
     end
     @review_phase = next_due_date.deadline_type_id;
-    if next_due_date.review_of_review_allowed_id == 2 or next_due_date.review_of_review_allowed_id == 3
-      if @review_phase == 5
-        @can_view_metareview =1
+    if next_due_date.review_of_review_allowed_id == LATE or next_due_date.review_of_review_allowed_id == OK
+      if @review_phase == DeadlineType.find_by_name("metareview").id
+        @can_view_metareview = true
       end
     end    
     if @assignment.team_assignment
@@ -327,7 +329,7 @@ class ReviewController < ApplicationController
       @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])
     end
     reviews_left = @assignment.num_reviews - @review_mapping.size()
-    if (reviews_left > 0 && @assignment.mapping_strategy_id == 2)
+    if (reviews_left > 0 && @assignment.mapping_strategy_id == MappingStrategy.find_by_name ("Dynamic, fewest extant reviews").id)
       for i in 1..reviews_left do
         @placeholder = ReviewMapping.new
         @placeholder.id = 999

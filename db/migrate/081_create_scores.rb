@@ -1,18 +1,26 @@
 class CreateScores < ActiveRecord::Migration
   def self.up
-    execute "CREATE TABLE `scores` (
-        `id` int(11) NOT NULL auto_increment,
-        `instance_id` int(11) NOT NULL,
-        `question_id` int(11) NOT NULL,
-        `score` int(11) default NULL,
-        `comments` text,
-        `questionnaire_type_id` int(11) NOT NULL,
-        PRIMARY KEY  (`id`),
-        KEY `fk_score_questions` (`question_id`),
-        KEY `fk_score_questionnaire_types` (`questionnaire_type_id`),
-        CONSTRAINT `fk_score_questions` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`),
-        CONSTRAINT `fk_score_questionnaire_types` FOREIGN KEY (`questionnaire_type_id`) REFERENCES `questionnaire_types` (`id`)
-      ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+    create_table :scores do |t|
+      t.column :instance_id, :integer, :null => false
+      t.column :question_id, :integer, :null => false
+      t.column :questionnaire_type_id, :integer, :null => false
+      t.column :score, :integer, :null => true
+      t.column :comments, :text      
+    end
+    
+    add_index "scores", ["question_id"], :name => "fk_score_questions"
+
+    execute "alter table scores 
+               add constraint fk_score_questions
+               foreign key (question_id) references questions(id)"
+               
+    add_index "scores", ["questionnaire_type_id"], :name => "fk_score_questionnaire_types"
+    
+    execute " ALTER TABLE `questionnaire_types`  ENGINE = innodb"
+    
+    execute "alter table scores 
+               add constraint fk_score_questionnaire_types
+               foreign key (questionnaire_type_id) references questionnaire_types(id)"               
   end
   def self.down
     execute 'ALTER TABLE scores DROP FOREIGN KEY fk_score_questions'

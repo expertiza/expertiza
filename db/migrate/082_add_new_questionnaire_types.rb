@@ -1,5 +1,9 @@
 class AddNewQuestionnaireTypes < ActiveRecord::Migration
   def self.up
+    type = QuestionnaireType.find_by_name('Review Rubric')
+    type.name = 'Review'
+    type.save
+    
     execute "INSERT INTO `questionnaire_types` (`id`, `name`) VALUES 
             (6, 'Metareview'),
             (7, 'Teammate Review');"

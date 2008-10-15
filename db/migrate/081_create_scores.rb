@@ -11,7 +11,7 @@ class CreateScores < ActiveRecord::Migration
         KEY `fk_score_questions` (`question_id`),
         KEY `fk_score_questionnaire_types` (`questionnaire_type_id`),
         CONSTRAINT `fk_score_questions` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`),
-        CONSTRAINT `fk_score_questionnaire_types` FOREIGN KEY (`questionnaire_type_id`) REFERENCES `questionnaire_types` (`id`),
+        CONSTRAINT `fk_score_questionnaire_types` FOREIGN KEY (`questionnaire_type_id`) REFERENCES `questionnaire_types` (`id`)
       ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
   end
   def self.down

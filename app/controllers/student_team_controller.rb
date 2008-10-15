@@ -6,10 +6,10 @@ class StudentTeamController < ApplicationController
   
   def create
     @student = AssignmentParticipant.find(params[:id])
-    check = Team.find(:all, :conditions => ["name =? and assignment_id =?", params[:team][:name], @student.assignment_id])        
+    check = Team.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @student.parent_id])        
     @team = Team.new(params[:team])
-    @team.assignment_id = @student.assignment_id
-    #check if the team name is in use.
+    @team.parent_id = @student.parent_id
+    #check if the team name is in use
     if (check.length == 0)      
       @team.save
       @team_user = TeamsUser.new
@@ -30,7 +30,7 @@ class StudentTeamController < ApplicationController
   
   def update
     @team = Team.find_by_id(params[:team_id])
-    check = Team.find(:all, :conditions => ["name =? and assignment_id =?", params[:team][:name], @team.assignment_id])    
+    check = Team.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @team.parent_id])    
     if (check.length == 0)
        if @team.update_attributes(params[:team])
           redirect_to :controller => 'student_assignment', :action => 'view_team', :id => params[:student_id]
@@ -62,7 +62,6 @@ class StudentTeamController < ApplicationController
     for old_inv in old_invs
       old_inv.destroy
     end
-    
     redirect_to :controller => 'student_assignment', :action => 'view_team' , :id => @student.id
   end
   

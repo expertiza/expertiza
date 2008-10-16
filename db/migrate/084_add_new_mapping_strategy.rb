@@ -4,7 +4,7 @@ class AddNewMappingStrategy < ActiveRecord::Migration
     execute "INSERT INTO mapping_strategies (`id`, `name`) VALUES 
             (2, 'Dynamic, fewest extant reviews');"
             
-    deadline_type = DeadlineType.find_by_name('review of reviews')
+    deadline_type = DeadlineType.find_by_name('review of review')
     deadline_type.name = 'metareview'
     deadline_type.save        
   end

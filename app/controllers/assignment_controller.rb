@@ -171,11 +171,21 @@ class AssignmentController < ApplicationController
      end
     end
     @assignment = Assignment.find(params[:id])
-    oldpath = @assignment.get_path
+    begin 
+      oldpath = @assignment.get_path
+    rescue
+      oldpath = nil
+    end
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])
-      newpath = @assignment.get_path
-      FileHelper.update_file_location(oldpath,newpath)
+      begin
+        newpath = @assignment.get_path
+      rescue
+        newpath = nil
+      end
+      if oldpath != nil and newpath != nil
+        FileHelper.update_file_location(oldpath,newpath)
+      end
       # Iterate over due_dates, from due_date[0] to the maximum due_date
       if params[:due_date]
         for due_date_key in params[:due_date].keys

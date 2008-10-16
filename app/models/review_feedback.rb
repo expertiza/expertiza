@@ -8,12 +8,11 @@ class ReviewFeedback < ActiveRecord::Base
     code = code + '<div id="feedback_'+prefix+"_"+self.id.to_s+'" style="">'   
     code = code + '<BR/><BR/>'
     questions_query = "select id from questions where questionnaire_id = "+self.assignment.author_feedback_questionnaire_id.to_s    
-    scores = ReviewScore.find_by_sql("select * from review_scores where review_id = "+self.id.to_s+" and question_id in ("+questions_query+")")
-    
+    scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and question_id in ("+questions_query+") and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Author Feedback").id.to_s)
     scores.each{
       | reviewScore |      
-      code = code + "<I>"+reviewScore.question.txt+"</I><BR/><BR/>"
-      code = code + '(<FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+reviewScore.question.questionnaire.max_question_score.to_s+"</B>): "+reviewScore.comments+"<BR/><BR/>"
+      code = code + "<I>"+Question.find_by_id(reviewScore.question_id).txt+"</I><BR/><BR/>"
+      code = code + '(<FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find_by_id(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B>): "+reviewScore.comments+"<BR/><BR/>"
     }          
     if self.additional_comment != nil
       comment = self.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')
@@ -39,7 +38,7 @@ class ReviewFeedback < ActiveRecord::Base
   def get_total_score
     questions_query = "select id from questions where questionnaire_id = "+self.assignment.author_feedback_questionnaire_id.to_s
     
-    scores = ReviewScore.find_by_sql("select * from review_scores where review_id = "+self.id.to_s+" and question_id in ("+questions_query+")")
+    scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and question_id in ("+questions_query+") and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Author Feedback").id.to_s)
     total_score = 0
     scores.each{
       |item|

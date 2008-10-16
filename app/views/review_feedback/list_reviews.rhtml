@@ -20,7 +20,11 @@
   <%review_no += 1
   end %></ul>
  </tr>
+<<<<<<< .mine
+ <% if @can_view_review_of_review == true %>
+=======
  <% if @can_view_metareview == 1 %>
+>>>>>>> .r447
  <h1>Reviews of reviews</h1>
  <tr><ul>
   <%ror_no = 1%>
@@ -38,7 +42,11 @@
  </tr>
  <ul>
  <li>
+<<<<<<< .mine
+		<% if @can_view_review_of_review == true 
+=======
 		<% if @can_view_metareview == 1 
+>>>>>>> .r447
 			current_ror = ReviewOfReviewMapping.count_by_sql("select count(*) from review_of_review_mappings, reviews where reviewer_id ="+@reviewer_id.to_s)
 			max_ror = Assignment.find(@assignment_id).num_review_of_reviews
 			if current_ror < max_ror%>

@@ -49,8 +49,10 @@ class GradesController < ApplicationController
   # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.  
   def conflict_notification
     
-    @instructor = session[:user] if session[:user].role_id !=6
-    else @instructor = Ta.get_my_instructor(session[:user].id)
+    if session[:user].role_id !=6
+      @instructor = session[:user]
+    else @instructor = Ta.get_my_instructor(session[:user].id)  
+    end
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = Assignment.find(@participant.parent_id)  
     

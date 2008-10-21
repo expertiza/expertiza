@@ -13,7 +13,8 @@ class Assignment < ActiveRecord::Base
   # designates an assignment of the appropriate type.
   belongs_to :user, :foreign_key => "instructor_id"
   has_one :late_policy
-  has_many :participants
+  has_one :survey_distribution
+  has_many :participants  
   has_many :users, :through => :participants
   has_many :due_dates
   has_many :review_feedbacks
@@ -23,7 +24,6 @@ class Assignment < ActiveRecord::Base
   has_many :assignments_questionnairess
   
   validates_presence_of :name
-  validates_presence_of :directory_path
   validates_presence_of :review_questionnaire_id
   validates_presence_of :review_of_review_questionnaire_id
   validates_numericality_of :review_weight      
@@ -245,6 +245,33 @@ class Assignment < ActiveRecord::Base
      return false
    end
  end
+ 
+ #
+ def self.is_submission_possible (assignment)
+    # Is it possible to upload a file?
+    # Check whether the directory text box is nil
+    if assignment.directory_path != nil && assignment.wiki_type == 1      
+      return true   
+      # Is it possible to submit a URL (or a wiki page)
+    elsif assignment.directory_path != nil && /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix.match(assignment.directory_path)
+        # In this case we have to check if the directory_path starts with http / https.
+        return true
+    # Is it possible to submit a Google Doc?
+#    removed because google doc not implemented
+#    elsif assignment.wiki_type == 4 #GOOGLE_DOC
+#      return true
+    else
+      return false
+    end
+ end
+ 
+ def is_google_doc
+   # This is its own method so that it can be refactored later.
+   # Google Document code should never directly check the wiki_type_id
+   # and should instead always call is_google_doc.
+   self.wiki_type_id == 4
+ end
+
  
  def get_teams
    AssignmentTeam.find_all_by_parent_id(self.id)

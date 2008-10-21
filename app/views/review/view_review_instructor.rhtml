@@ -6,7 +6,7 @@ Edit his review , other wise he has a link to Begin his review -->
 
 <h1>View Review</h1>
 <%if @assgt.wiki_type.name == "No"%>
-<%if @files.size == 0%>
+<%if @file != nil and @files.size == 0%>
 
 <%else%>
 Submitted Files<br />

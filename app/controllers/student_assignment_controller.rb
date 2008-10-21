@@ -3,8 +3,9 @@ require 'uri'
 
 class StudentAssignmentController < ApplicationController
   helper :wiki
-  helper :student_assignment	
-  helper :google
+  helper :student_assignment
+# removed because google docs completely not implemented 
+  #helper :google
   auto_complete_for :user, :name
   
 #  def auto_complete_for_user_name
@@ -281,14 +282,14 @@ class StudentAssignmentController < ApplicationController
     @submission = params[:submission]
     @files = Array.new
     @assignment_id = @student.parent_id
-    
+    # removed as google doc not completely implemented
     # Return URI depending on link type.
-    @assignment = Assignment.find(@assignment_id)
-    if @assignment.is_google_doc
-      @link = google_id_to_url(@student.submitted_hyperlink)
-    else
+#    @assignment = Assignment.find(@assignment_id)
+#    if @assignment.is_google_doc
+#      @link = google_id_to_url(@student.submitted_hyperlink)
+#    else
       @link = @student.submitted_hyperlink
-    end
+#    end
     
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
     @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
@@ -373,9 +374,9 @@ class StudentAssignmentController < ApplicationController
       #end      
       #safe_filename = FileHelper::sanitize_filename(file.full_original_filename)
       if @assignment.team_assignment
-    curr_directory = @student.get_path.to_s+ @current_folder.name
+        curr_directory = @student.get_path.to_s+ @current_folder.name
       else
-    curr_directory = @student.get_path.to_s+ @current_folder.name
+        curr_directory = @student.get_path.to_s+ @current_folder.name
       end
 
       if !File.exists? curr_directory
@@ -386,7 +387,7 @@ class StudentAssignmentController < ApplicationController
       full_filename =  curr_directory + File.split(safe_filename).last.gsub(" ",'_') #safe_filename #curr_directory +
       File.open(full_filename, "wb") { |f| f.write(file.read) }
       if params['unzip']
-  StudentAssignmentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
+        StudentAssignmentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
       end
       update_resubmit_times
     end

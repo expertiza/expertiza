@@ -1,4 +1,19 @@
 class StudentTeamController < ApplicationController
+  def view
+    @student = AssignmentParticipant.find(params[:id])
+    @teams = AssignmentTeam.find_all_by_parent_id(@student.parent_id)
+    for team in @teams
+      @teamuser = TeamsUser.find(:first, :conditions => ['team_id = ? and user_id = ?', team.id, @student.user_id])
+      if @teamuser != nil
+        @team_id = @teamuser.team_id
+      end
+    end
+    
+    @team_members = TeamsUser.find(:all, :conditions => ['team_id = ?', @team_id])
+    @send_invs = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', @student.user_id, @student.parent_id])
+    @received_invs = Invitation.find(:all, :conditions => ['to_id = ? and assignment_id = ? and reply_status = "W"', @student.user_id, @student.parent_id])
+  end
+  
   def new
     @student = AssignmentParticipant.find(params[:id])
     @team = Team.new 

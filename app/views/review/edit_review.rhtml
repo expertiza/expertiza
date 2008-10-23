@@ -13,7 +13,7 @@ if (specs != nil && specs != "")
 <%=review_feedback_text%></div>
 <% end%>
 <%= start_form_tag :action => 'update_review' %>
-<%= render :partial => 'reviewContent' %>    
+<%= render :partial => 'review_content' %>    
 <%= hidden_field_tag('review_id', @review.id) %>
     <%= hidden_field_tag('mapping_id', @mapping.id) %>
     <%= hidden_field_tag('assgt_id', @assgt.id) %>

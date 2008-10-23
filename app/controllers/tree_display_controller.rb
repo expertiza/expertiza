@@ -8,6 +8,13 @@ class TreeDisplayController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
   
+  # direct access to teammate reviews
+  def goto_teammate_reviews
+    node_object = QuestionnaireType.find_by_name('Teammate Review')
+    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end    
+  
   # direct access to review rubrics
   def goto_review_rubrics
     node_object = QuestionnaireType.find_by_name('Review')

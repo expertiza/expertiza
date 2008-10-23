@@ -20,10 +20,23 @@
 		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).name%></td>
 		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).fullname%></td>
 		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).email%></td>
-		<td><%= link_to "Review", 
-			{:controller => 'student_team', :action => 'review', :team_id => @team_id, 
-			:reviewer_id => @student.id, :reviewee_id => member.user_id, 
-			:assignment_id => @student.parent_id}%></td>
+		<% if @student.assignment.teammate_review_questionnaire_id != nil and member.user_id != session[:user].id %>
+		
+		   <% review = TeammateReview.find(:first, :conditions => ['reviewer_id = ? and reviewee_id = ? and assignment_id = ?',@student.user_id, member.user_id, @student.assignment.id]) 
+   		     if review.nil? %>
+   		     <td>
+		     <%= link_to "Review", {:controller => 'teammate_review', :action => 'new', 
+			                        :team_id => @team_id, :reviewee_id => member.user_id, :assignment_id => @student.assignment.id}%>
+			 </td>
+			 <% else %>
+			 <td>
+			   <%= link_to "View", {:controller => 'teammate_review', :action => 'view', :id => review.id }%> 
+			 </td>
+			 <td>
+			   <%= link_to "Edit", {:controller => 'teammate_review', :action => 'edit', :id => review.id } %>
+			 </td>
+		     <% end %>	                       	    
+	    <% end %>
 		</tr>
 	<%end%>
 	</table>

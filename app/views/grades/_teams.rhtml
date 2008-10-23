@@ -10,11 +10,11 @@
          <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><img src="/images/expand.png"/></a>
          <%= team.name %></TD>
          <% if t_score %>
-        	<TD COLSPAN="3" ALIGN="CENTER"><%= sprintf("%.2f",t_score*100) %>%</TD>
-        	<TD COLSPAN="3" ALIGN="CENTER"><%= sprintf("%.0f",t_min*100) %>% - <%= sprintf("%.0f",t_max*100) %>%</TD>
+        	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.2f",t_score*100) %>%</TD>
+        	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.0f",t_min*100) %>% - <%= sprintf("%.0f",t_max*100) %>%</TD>
         <% else %>
-            <TD COLSPAN="3" ALIGN="CENTER">---</TD>
-            <TD COLSPAN="3" ALIGN="CENTER">---</TD>
+            <TD COLSPAN="4" ALIGN="CENTER">---</TD>
+            <TD COLSPAN="4" ALIGN="CENTER">---</TD>
         <% end %>
         <TD WIDTH="9">&nbsp;</TD></TR>  
     <%= render :partial => 'participant_title', :locals => {:prefix => prefix } %>        
@@ -23,7 +23,7 @@
          pindex += 1  	              
          r_avg, r_max, r_min = participant.compute_metareview_scores
          f_avg, f_max, f_min = participant.compute_author_feedback_scores 
-#        tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores
+         tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores
          
     %>
       	 <%= render :partial => 'participant', 
@@ -32,7 +32,7 @@
      	 			            :participant => participant,
      	 			            :s_avg => t_score, :s_max => t_max, :s_min => t_min,
      	 			            :r_avg => r_avg, :r_max => r_max, :r_min => r_min,
-#                               :tr_avg => tr_avg, :tr_max => tr_max, :tr_min => tr_min,     	 			            
+                                :tr_avg => tr_avg, :tr_max => tr_max, :tr_min => tr_min,     	 			            
      	 			            :f_avg => f_avg, :f_min => f_min, :f_max => f_max
      	 			            }
 								%>   

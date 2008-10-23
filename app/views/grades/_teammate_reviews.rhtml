@@ -1,3 +1,21 @@
 <!-- TeammateReviewS --> 
-
+<% if participant.get_teammate_reviews.length > 0 %>
+  <BR/>
+  <%= render :partial => 'review_table',
+           :locals => {
+           :submission => '4',
+           :prefix => prefix,
+           :assignment => participant.assignment,
+           :reviews => participant.get_teammate_reviews,
+           :collabel => "Feedback",
+           :rowlabel => "Author"
+           }%>
+  <BR/>         
+  <HR/> 
+  <% for review in participant.get_teammate_reviews %>
+    <a name="<%=prefix+"_"+review.reviewer.name%>"></a><%= render :partial => 'teammate_review/display', :locals => {:review => review, :prefix => prefix } %><BR/><BR/>  
+  <% end %>
+<% else %>
+  <i>No author feedback has been provided for this user's reviews.</i>
+<% end %>
 <!-- END TeammateReviewS -->

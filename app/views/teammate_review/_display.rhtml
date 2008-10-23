@@ -1,0 +1,15 @@
+<B>Reviewer:</B><%= review.reviewer.fullname %>&nbsp;&nbsp;&nbsp;
+   <a href="#" name= "review<%= review.id %>Link" onClick="toggleElement('review<%= review.id %>','review');return false;">hide teammate review</a>
+    <div id="review<%= review.id %>" style="">
+    <BR/><BR/>
+    <% scores = Score.find_by_sql("select * from scores where instance_id = "+review.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Teammate Review").id.to_s)
+       scores.each{
+         | entry | %>      
+         <I><%= entry.question.txt %></I><BR/><BR/>
+         (<FONT style="BACKGROUND-COLOR:gold"><%= entry.score.to_s %></FONT> out of <B> <%= entry.question.questionnaire.max_question_score.to_s %></B>): <%= entry.comments %><BR/><BR/>    
+    <% }   
+      comment = review.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')
+      if comment != nil %>
+    <B>Additional Comment:</B><BR/><%=comment %>
+    <% end %>
+    </div>

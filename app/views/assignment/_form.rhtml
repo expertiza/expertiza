@@ -108,7 +108,11 @@
   <% end %>
   <label for="teammate_review_questionnaire">Teammate-review questionnaire:</label>
       <!--select name="teammate_review_questionnaire_id"></select-->
-      <%=@questionnaires = Questionnaire.find(:all, :conditions => ["type_id = 6"]).map {|u| [u.name, u.id] }
+      <%=
+         type = QuestionnaireType.find_by_name('Teammate Review')
+         
+         @questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] }
+      
          select('assignment', 'teammate_review_questionnaire_id', @questionnaires)%>
   </div>
   </tr>

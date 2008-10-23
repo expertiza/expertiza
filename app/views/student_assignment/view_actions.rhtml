@@ -7,7 +7,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @stud
 <% end %>
 <ul>
 	<%if Assignment.find(:all, :conditions => ['id= ?', @student.parent_id])[0].team_assignment == true%>
-		<li> <%= link_to 'Your team', :action => 'view_team', :id => @student.id %> 
+		<li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @student.id %> 
 		(View and manage your team)
 		</li>
 	<%end%>	

@@ -1,12 +1,11 @@
 class TeammateReviewController < ApplicationController
   
   def new
-    @reviewer = User.find_by_id(params[:reviewer_id])
-    @reviewee = User.find_by_id(params[:reviewee_id])
-    #@team = Team.find_by_id(params[:team_id])
-    @assgt = Assignment.find_by_id(params[:assignment_id])
+    @reviewer = session[:user]
+    @reviewee = User.find(params[:reviewee_id])
+    @assgt = Assignment.find(params[:assignment_id])
     
-    @student = Participant.find(:first, :conditions => ['user_id =? and parent_id =?', @reviewer.id, @assgt.id])
+    @student = AssignmentParticipant.find(:first, :conditions => ['user_id =? and parent_id =?', @reviewer.id, @assgt.id])
   
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.teammate_review_questionnaire_id]) 
     @questionnaire = Questionnaire.find(@assgt.teammate_review_questionnaire_id)
@@ -76,7 +75,7 @@ class TeammateReviewController < ApplicationController
       # that should be saved to the database
       for teammate_review_key in params[:new_teammate_review_score].keys
         question_id = params[:new_question][teammate_review_key]
-        prs = Score.find(:first,:conditions => ["teammate_review_id = ? AND question_id = ? and questionnaire_type_id=?", @teammate_review.id, question_id, @teammate_review_scores = Score.find(:all,:conditions =>["instance_id =? and questionnaire_type_id=?", @teammate_review_id, QuestionnaireType.find_by_name("Teammate Review").id])])
+        prs = Score.find(:first,:conditions => ["instance_id = ? AND question_id = ? and questionnaire_type_id=?", @teammate_review.id, question_id, QuestionnaireType.find_by_name("Teammate Review").id])
         prs.comments = params[:new_teammate_review_score][teammate_review_key][:comments]
         prs.score = params[:new_score][teammate_review_key]
         prs.update
@@ -85,7 +84,7 @@ class TeammateReviewController < ApplicationController
     if @teammate_review.update
       flash[:notice] = 'Teammate review was successfully saved.'
       @student = Participant.find(:first, :conditions => ['user_id =? and parent_id =?', @teammate_review.reviewer_id, @teammate_review.assignment_id])
-      redirect_to :controller => 'student_assignment', :action => 'view_team', :id => @student.id
+      redirect_to :controller => 'student_team', :action => 'view', :id => @student.id
     else # If something goes wrong, stay at same page
       render :action => 'edit', :id => @teammate_review.id
     end

@@ -269,9 +269,10 @@ class StudentAssignmentController < ApplicationController
     @submission = params[:submission]
     @files = Array.new
     @assignment_id = @student.parent_id
+    # uncommented to remove the problem reported by kees
+    @assignment = Assignment.find(@assignment_id)
     # removed as google doc not completely implemented
     # Return URI depending on link type.
-#    @assignment = Assignment.find(@assignment_id)
 #    if @assignment.is_google_doc
 #      @link = google_id_to_url(@student.submitted_hyperlink)
 #    else

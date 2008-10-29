@@ -1,3 +1,5 @@
-<h1>View Review</h1>
+<h1>View Teammate Review</h1>
+<h2>Teammate: <%= User.find(@teammate_review.reviewee_id).name %></h2>
+
 <%= render :partial => 'teammate_review/scores' %> 
 Additional Comment : <br><%=@teammate_review.additional_comment.gsub(/\n/, '<br>')%>

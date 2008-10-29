@@ -1,4 +1,5 @@
-<h1>Edit Review</h1>
+<h1>Edit Teammate Review</h1>
+<h2>Teammate: <%= User.find(@teammate_review.reviewee_id).name %></h2>
 <%= start_form_tag :action => 'update' %>
 <%= render :partial => 'teammate_review_content' %>    
 <%= hidden_field_tag('teammate_review_id', @teammate_review.id) %>

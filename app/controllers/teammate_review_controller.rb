@@ -36,7 +36,7 @@ class TeammateReviewController < ApplicationController
       end
       flash[:notice] = 'Teammate review was successfully saved.'
       @student = Participant.find(:first, :conditions => ['user_id =? and parent_id =?', @teammate_review.reviewer_id, @teammate_review.assignment_id])
-      redirect_to :controller => 'student_assignment', :action => 'view_team', :id => @student.id
+      redirect_to :controller => 'student_team', :action => 'view', :id => @student.id
     else # If something goes wrong, stay at same page
       render :action => 'new', :reviewer_id => @teammate_review.reviewer_id, 
                                :reviewer_id => @teammate_review.reviewer_id, 

@@ -3,7 +3,7 @@ class QuestionnaireTypeNode < Node
     "questionnaire_types"
   end
   
-  def self.get(sortvar = nil,sortorder = nil,user_id = nil,parent_id = nil)    
+  def self.get(sortvar = nil,sortorder = nil,user_id = nil,show=nil,parent_id = nil)    
     query = "select nodes.* from nodes, "+self.table
     query = query+" where nodes.node_object_id = "+self.table+".id"
     query = query+" and nodes.type = '"+self.to_s+"'"            
@@ -15,7 +15,7 @@ class QuestionnaireTypeNode < Node
     QuestionnaireType.find(self.node_object_id).name    
   end  
   
-  def get_children(sortvar = nil,sortorder = nil,user_id = nil,parent_id = nil)
-    QuestionnaireNode.get(sortvar,sortorder,user_id,self.node_object_id)
+  def get_children(sortvar = nil,sortorder = nil,user_id = nil,show=nil,parent_id = nil)
+    QuestionnaireNode.get(sortvar,sortorder,user_id,show,self.node_object_id)
   end
 end

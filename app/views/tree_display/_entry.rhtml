@@ -1,4 +1,4 @@
-<% child_nodes = node.get_children(@sortvar,@sortorder,@show) %>
+<% child_nodes = node.get_children(@sortvar,@sortorder,session[:user].id,@show) %>
 <%= render :partial => '/tree_display/row_header', 
            :locals => {
                :depth => depth, 

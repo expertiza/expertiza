@@ -10,11 +10,11 @@ class Node < ActiveRecord::Base
   belongs_to :parent, :class_name => 'Node', :foreign_key => 'parent_id'
 
   # Retrieves the nodes of this type
-  def self.get(sortvar = nil,sortorder =nil,user_id = nil,parent_id = nil)       
+  def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil)       
   end
   
   # Retrieves the children of this node
-  def get_children(sortvar = nil,sortorder =nil,user_id = nil,parent_id = nil)    
+  def get_children(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil)    
   end
   
   # Retrieves the action partial for this node

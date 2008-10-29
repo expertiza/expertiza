@@ -3,7 +3,7 @@ class FolderNode < Node
     "tree_folders"
   end
   
-  def self.get(sortvar = nil,sortorder =nil,user_id = nil,parent_id = nil)
+  def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil) 
     query = "select nodes.* from nodes, "+self.table
     query = query+" where nodes.node_object_id = "+self.table+".id"
     query = query+" and nodes.type = '"+self.to_s+"'"                       
@@ -22,7 +22,7 @@ class FolderNode < Node
     TreeFolder.find(self.node_object_id).child_type
   end
   
-  def get_children(sortvar = nil,sortorder =nil,user_id = nil,parent_id = nil)      
-    Object.const_get(self.get_child_type).get(sortvar,sortorder,user_id,parent_id)
+  def get_children(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil)        
+    Object.const_get(self.get_child_type).get(sortvar,sortorder,user_id,show,parent_id)
   end
 end

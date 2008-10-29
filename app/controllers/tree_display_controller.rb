@@ -73,7 +73,7 @@ class TreeDisplayController < ApplicationController
       if session[:display][:check] == "1"
         @show = nil
       else
-        @show = session[:user].id
+        @show = true
       end
     end
     if params[:display]      
@@ -82,13 +82,13 @@ class TreeDisplayController < ApplicationController
       if params[:display][:check] == "1"
         @show = nil
       else
-        @show = session[:user].id
+        @show = true
       end
       session[:display] = params[:display]      
     end
   
     if session[:display].nil? and params[:display].nil?
-      @show = session[:user].id
+      @show = true
     end
     
     if @sortvar == nil
@@ -100,7 +100,7 @@ class TreeDisplayController < ApplicationController
         
     if session[:root]
       @root_node = Node.find(session[:root])
-      @child_nodes = @root_node.get_children(@sortvar,@sortorder,@show)
+      @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show)
     else
       @child_nodes = FolderNode.get()
     end    

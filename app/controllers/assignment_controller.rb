@@ -177,9 +177,11 @@ class AssignmentController < ApplicationController
       oldpath = nil
     end
     # The update call below updates only the assignment table. The due dates must be updated separately.
-    if @assignment.update_attributes(params[:assignment])
+    if @assignment.update_attributes(params[:assignment])      
       begin
         newpath = @assignment.get_path
+        puts "***************" 
+        puts newpath
       rescue
         newpath = nil
       end

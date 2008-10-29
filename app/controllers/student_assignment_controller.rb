@@ -353,7 +353,7 @@ class StudentAssignmentController < ApplicationController
       #@student.set_student_directory_num
       
       if @student.directory_num == nil or @student.directory_num < 0
-        set_student_directory_num
+        @student.set_student_directory_num
       end  
         #send message to reviewers(s) when submission has been updated
         #ajbudlon, sept 07, 2007
@@ -504,35 +504,6 @@ private
         FileUtils.rm_r(filename)
   end
 
-  def set_student_directory_num
-    # If a student or team member has not submitted anything
-    # a directory number needs to be assigned to the participants
-    # this is done by determining the last directory number 
-    # created and incrementing it.
-
-    participants = Participant.find(:all, :conditions => ['parent_id = ?',@assignment_id], :order => 'directory_num DESC')
-    instructor = User.find(@assignment.instructor_id).name
-    if participants != nil and participants[0].directory_num != nil
-      if @assignment.team_assignment
-         @student.directory_num = participants[0].directory_num + 1
-         assign_team_directories (participants[0].directory_num + 1)
-         if Dir[RAILS_ROOT + "/pg_data/" + instructor + "/" +@assignment.directory_path+ "/" +@student.directory_num.to_s] != nil  
-          Dir.mkdir (RAILS_ROOT + "/pg_data/" + instructor + "/" + @assignment.directory_path+ "/" +@student.directory_num.to_s) 
-  end
-      else
-         @student.directory_num = participants[0].directory_num + 1
-      end
-    else
-      if @assignment.team_assignment
-         Dir.mkdir (RAILS_ROOT + "/pg_data/" + instructor + "/" + @assignment.directory_path+ "/0")
-         @student.directory_num = 0
-         assign_team_directories(0)
-      else
-         @student.directory_num = 0
-      end
-    end
-  end
-
   def assign_team_directories(dir_num)
     # handles a team assignment so that each member
     # of the team has the same submission directory
@@ -548,11 +519,6 @@ private
   def get_student_directory(participant)
     # This assumed that the directory num has already been set
     return RAILS_ROOT + "/pg_data/" + participant.assignment.directory_path + "/" + participant.directory_num.to_s
-  end
-
-  def create_student_directory
-    print "\n\n" + get_student_directory(@student)
-    Dir.mkdir(get_student_directory(@student))
   end
 
   def get_student_files

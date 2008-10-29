@@ -17,27 +17,30 @@ class CourseNode < Node
   #   parent_id: not used for this type of object
   
   # returns: list of CourseNodes based on query
-  def self.get(sortvar = nil,sortorder =nil,user_id = nil,parent_id = nil)    
+  def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil) 
+    puts "*** GETTING COURSES ***"
     query = "select nodes.* from nodes, "+self.table
     query = query+" where nodes.node_object_id = "+self.table+".id"
     query = query+" and nodes.type = '"+self.to_s+"'"
-    if user_id
+    if show
       query = query+" and "+self.table+".instructor_id = "+user_id.to_s
     else
-      query = query+" and "+self.table+".private = 0"
+      query = query+" and ("+self.table+".private = 0 or "+self.table+".instructor_id = "+user_id.to_s+")"
     end    
     if sortvar            
       query = query+" order by "+self.table+"."+sortvar
       if sortorder
         query = query+" "+sortorder
       end
-    end       
+    end   
+    puts query
+    puts "*******************"
     find_by_sql(query)
   end  
   
   # Gets any children associated with this object
-  def get_children(sortvar = nil,sortorder =nil,user_id = nil,parent_id = nil)
-    AssignmentNode.get(sortvar,sortorder,user_id,self.node_object_id)
+  def get_children(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil)
+    AssignmentNode.get(sortvar,sortorder,user_id,show,self.node_object_id)
   end
   
   # Gets the name from the associated object  

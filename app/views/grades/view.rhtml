@@ -16,8 +16,8 @@
   <% for participant in @participants
     index += 1
     s_avg, s_max, s_min = participant.compute_review_scores
-    r_avg, r_max, r_min = participant.compute_metareview_scores
-    t_avg, t_max, t_min = participant.compute_teammate_review_scores
+    r_avg, r_max, r_min = participant.compute_metareview_scores    
+    tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores
     f_avg, f_max, f_min = participant.compute_author_feedback_scores
   %>
     <%= render :partial => 'participant',

@@ -1,5 +1,5 @@
 actHover = function() {
-	var actEls = document.getElementById("actionbar").getElementsByTagName("LI");
+	var actEls = document.getElementById("actionmenu").getElementsByTagName("LI");
 	for (var i=0; i<actEls.length; i++) {
 		actEls[i].onmouseover=function() {
 			this.className+=" acthover";

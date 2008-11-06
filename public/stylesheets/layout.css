@@ -78,6 +78,10 @@ a:hover {
   text-decoration: none ;
 }
 
+#suckerfish li:hover, #suckerfish li.over { 
+  position: static;
+}
+
 #suckerfish li {
   padding: 0 .75em 0 .75em ;
   float: left ;
@@ -166,11 +170,16 @@ a:hover {
   position: absolute ;
   width: 17em ;
   left: -999em ;
-  margin: -1.5em 0 0 9em ;
+  margin: -1.5em 0 0 8em ;
 }
 
 #actionmenu li:hover ul ul, #actionmenu li.acthover ul ul {
   left: -999em ;
+}
+
+#actionmenu li:hover, #actionmenu li.over {
+  left: -999em ;
+  position: static;
 }
 
 #actionmenu li:hover ul, #actionmenu li li:hover ul, #actionmenu li.acthover ul, #actionmenu li li.acthover ul {

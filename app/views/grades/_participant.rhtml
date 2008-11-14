@@ -5,10 +5,10 @@
     </TD>
     
     <% if s_avg %>
-  	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg*100) %>%
+  	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%
   	<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a></FONT>
   	</TD>    
-   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min*100) %>% - <%= sprintf("%.0f",s_max*100) %>% 
+   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>% 
    	<BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => '1' %></FONT>  	 
    	</TD>
     <% else %>
@@ -17,10 +17,10 @@
     <% end %>
     
     <% if r_avg %>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",r_avg*100) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",r_avg) %>%
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a></FONT>
     </TD>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min*100) %>% - <%= sprintf("%.0f",r_max*100) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
     <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => '2' %></FONT>  	    
     </TD>
     <% else %>
@@ -29,10 +29,10 @@
     <% end %>
     
     <% if f_avg %>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",f_avg*100) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",f_avg) %>%
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedbacks</a></FONT>
     </TD>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min*100) %>% - <%= sprintf("%.0f",f_max*100) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%
     <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => '3' %></FONT>  	    
     </TD>
     <% else %>
@@ -41,10 +41,10 @@
     <% end %>
     
     <% if tr_avg %>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",tr_avg*100) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",tr_avg) %>%
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a></FONT>
     </TD>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min*100) %>% - <%= sprintf("%.0f",tr_max*100) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min) %>% - <%= sprintf("%.0f",tr_max) %>%
     <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => '4' %></FONT>  	    
     </TD>
     <% else %>
@@ -59,7 +59,7 @@
       	<% if participant.grade %>
 	        <FONT COLOR="#0033FF"><%= sprintf("%.2f",participant.grade) %>%</FONT>
       	<% else %>
-	    	<%= sprintf("%.2f",participant.compute_total_score*100) %>% 
+	    	<%= sprintf("%.2f",participant.compute_total_score (s_avg, r_avg)) %>% 
       	<% end %>   
       	<BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
     	<% else %>

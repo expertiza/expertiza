@@ -10,8 +10,8 @@
          <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><img src="/images/expand.png"/></a>
          <%= team.name %></TD>
          <% if t_score %>
-        	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.2f",t_score*100) %>%</TD>
-        	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.0f",t_min*100) %>% - <%= sprintf("%.0f",t_max*100) %>%</TD>
+        	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.2f",t_score) %>%</TD>
+        	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.0f",t_min) %>% - <%= sprintf("%.0f",t_max) %>%</TD>
         <% else %>
             <TD COLSPAN="4" ALIGN="CENTER">---</TD>
             <TD COLSPAN="4" ALIGN="CENTER">---</TD>

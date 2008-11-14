@@ -1,6 +1,6 @@
 class Score < ActiveRecord::Base
   belongs_to :question
-  # Computes the total score for a questionnaire
+  # Computes the total score for an assessment
   # params
   #  questionnaire_instance_id - specifies the rubric for which the total score is being calculated
   #  questionnaire - specifies the questionnaire

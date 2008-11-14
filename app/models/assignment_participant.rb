@@ -247,8 +247,14 @@ class AssignmentParticipant < Participant
     end
   end  
   
+  # Computes the total score for a list of assessments
+  # parameters
+  #  list - a list of assessments of some type (e.g., author feedback, teammate review)
+  #  questionnaire - the questionnaire that was filled out in the process of doing those assessments
+  #  questionnaire_type - an integer value representing REVIEW, AUTHOR_FEEDBACK, etc.
+  #  total_weight - the total weight of the questions in the questionnaire
   def self.compute_scores(list, questionnaire, questions, questionnaire_type, total_weight)
-    max_score = 0
+    max_score = -999999999
     min_score = 999999999
     total_score = 0
     list.each {

@@ -52,7 +52,7 @@ class AssignmentTeam < Team
       max_assignment_score, total_weight = assignment.get_max_score_possible(questionnaire, questions)
       avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews, questionnaire, questions, QuestionnaireType.find_by_name("Review").id, total_weight)
       puts "max assignment score = "+max_assignment_score.to_s
-      return avg_review_score/max_assignment_score,max_score/max_assignment_score,min_score/max_assignment_score
+      return avg_review_score, max_score, min_score
     else
       return nil,nil,nil
     end

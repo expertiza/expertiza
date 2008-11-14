@@ -219,15 +219,12 @@ class AssignmentParticipant < Participant
    end    
   end
   
-  def compute_total_score   
-    review_score,max,min = self.compute_review_scores
-     
+  def compute_total_score (review_score, metareview_score) 
     if review_score
-      r_score = review_score.to_f #* (self.assignment.review_weight / 100).to_f
+      r_score = review_score.to_f * (self.assignment.review_weight / 100).to_f
     end    
-    metareview_score,max,min = self.compute_metareview_scores
     if metareview_score
-      m_score = metareview_score.to_f #* ((100 - self.assignment.review_weight) / 100).to_f
+      m_score = metareview_score.to_f * ((100 - self.assignment.review_weight) / 100).to_f
     end
     
     if r_score and m_score

@@ -236,12 +236,12 @@ class ReviewController < ApplicationController
     return @review_phase
   end
   
-  def create_review
+  def create_review       
     @review = Review.new
     @review.review_mapping_id = params[:mapping_id]
     @review.additional_comment = params[:new_review][:comments]
     @mapping = ReviewMapping.find(params[:mapping_id])
-    @assignment = Assignment.find(@mapping.assignment_id)
+    @assignment = Assignment.find(@mapping.assignment_id)    
     # code  for dynamic reviewer mapping has been commented out because code for it has not been implemented
 #    if @assignment.mapping_strategy_id == MappingStrategy.find_by_name ("Dynamic, fewest extant reviews").id
 #      # compare the timeout value in the session to the mapping so we can verify that we still own it
@@ -278,14 +278,36 @@ class ReviewController < ApplicationController
       end
       #null out the mapping's timeout value to indicate that its been submitted
 #      @mapping.timeout = nil
-      @mapping.save
+      @mapping.save            
+      
+      #determine if the new review meets the criteria set by the instructor's 
+      #notification limits      
+      compare_scores
       
       #send message to author(s) when review has been updated
-      @review.email
+      @review.email            
       flash[:notice] = 'Review was successfully saved.'
       redirect_to :action => 'list_reviews', :id => params[:assgt_id]
     else # If something goes wrong, stay at same page
       render :action => 'view_review'
+    end
+  end
+  
+  # Compute the currently awarded scores for the reviewee
+  # If the new review's score is greater than or less than 
+  # the existing scores by a given percentage (defined by
+  # the instructor) then notify the instructor.
+  # ajbudlon, nov 18, 2008
+  def compare_scores  
+    if @assignment.team_assignment 
+      participant = AssignmentTeam.find(@mapping.team_id)
+    else
+      participant = AssignmentParticipant.find_by_user_id_and_parent_id(@mapping.author_id,@assignment.id)      
+    end          
+    total, count = ReviewHelper.get_total_scores(participant.get_reviews,@review)     
+    if count > 0
+      questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
+      ReviewHelper.notify_instructor(@assignment,questionnaire)
     end
   end
   

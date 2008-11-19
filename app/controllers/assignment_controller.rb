@@ -41,6 +41,13 @@ class AssignmentController < ApplicationController
     @questionnaire = Questionnaire.find_all
     @wiki_types = WikiType.find_all
     @private = params[:private] == true        
+    default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',session[:user].id])
+    @limits = Hash.new
+    @limits = {:review => default.limit,
+               :metareview => default.limit,
+               :teammate => default.limit,
+               :feedback => default.limit}
+
   end
   
   def toggle_access
@@ -73,7 +80,9 @@ class AssignmentController < ApplicationController
     @Rereview_deadline=4;
     @Review_of_review_deadline=5;   
     
-    if @assignment.save                      
+    if @assignment.save  
+      set_limits
+      
       submit_duedate=DueDate.new(params[:submit_deadline]);
       submit_duedate.deadline_type_id=@Submission_deadline;
       submit_duedate.assignment_id=@assignment.id;
@@ -159,7 +168,91 @@ class AssignmentController < ApplicationController
     
   def edit
     @assignment = Assignment.find(params[:id])
+    get_limits                                                  
     @wiki_types = WikiType.find_all
+  end
+  
+  def define_limit(assignment_id, questionnaire_id, limit)
+     existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
+     if existing.nil?
+       NotificationLimit.create(:user_id => session[:user].id,
+                                :assignment_id => assignment_id,
+                                :questionnaire_id => questionnaire_id,
+                                :limit => limit)
+     else
+        existing.limit = limit
+        existing.save
+     end    
+  end
+  
+  def set_limits
+    if params[:limits]
+        if @assignment.review_questionnaire_id and (params[:limits][:review] != params[:review_limit])          
+          define_limit(@assignment.id, @assignment.review_questionnaire_id, params[:limits][:review])                       
+        end 
+        
+        if @assignment.review_of_review_questionnaire_id and (params[:limits][:metareview] != params[:metareview_limit])
+          define_limit(@assignment.id, @assignment.review_of_review_questionnaire_id, params[:limits][:metareview])                             
+        end
+        
+        if @assignment.teammate_review_questionnaire_id and (params[:limits][:teammate] != params[:teammate_limit])           
+          define_limit(@assignment.id, @assignment.teammate_review_questionnaire_id, params[:limits][:teammate])
+        end
+               
+        if @assignment.author_feedback_questionnaire_id and (params[:limits][:feedback] != params[:feedback_limit])                      
+          define_limit(@assignment.id, @assignment.author_feedback_questionnaire_id, params[:limits][:feedback])
+        end
+      end    
+  end  
+  
+  def get_limits
+    @limits = Hash.new
+    
+    default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',session[:user].id])
+    
+    review = NotificationLimit.find(:first, 
+                                 :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',
+                                                 session[:user].id,
+                                                 @assignment.id,
+                                                 @assignment.review_questionnaire_id])
+    if review != nil                                                 
+       @limits[:review] = review.limit
+    else
+       @limits[:review] = default.limit
+    end
+    
+    metareview = NotificationLimit.find(:first, 
+                                 :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',
+                                                 session[:user].id,
+                                                 @assignment.id,
+                                                 @assignment.review_of_review_questionnaire_id])
+    if metareview != nil                                                 
+       @limits[:metareview] = metareview.limit
+    else
+       @limits[:metareview] = default.limit
+    end
+    
+    teammate = NotificationLimit.find(:first, 
+                                 :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',
+                                                 session[:user].id,
+                                                 @assignment.id,
+                                                 @assignment.teammate_review_questionnaire_id])
+    if teammate != nil                                                 
+       @limits[:teammate] = teammate.limit
+    else
+       @limits[:teammate] = default.limit
+    end 
+    
+    feedback = NotificationLimit.find(:first, 
+                                 :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',
+                                                 session[:user].id,
+                                                 @assignment.id,
+                                                 @assignment.author_feedback_questionnaire_id])
+    if feedback != nil                                                 
+       @limits[:feedback] = feedback.limit
+    else
+       @limits[:feedback] = default.limit
+    end              
   end
   
   def update  
@@ -177,11 +270,10 @@ class AssignmentController < ApplicationController
       oldpath = nil
     end
     # The update call below updates only the assignment table. The due dates must be updated separately.
-    if @assignment.update_attributes(params[:assignment])      
+    if @assignment.update_attributes(params[:assignment]) 
+      set_limits
       begin
-        newpath = @assignment.get_path
-        puts "***************" 
-        puts newpath
+        newpath = @assignment.get_path        
       rescue
         newpath = nil
       end

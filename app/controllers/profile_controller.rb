@@ -5,12 +5,20 @@ class ProfileController < ApplicationController
 #only valid if user is logged in
  def edit 
     @user = session[:user]    
-    @user.confirm_password = ''     
+    @user.confirm_password = ''   
+    @notification = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])     
  end
   
  #store parameters to user object
  def update
     @user = session[:user]
+    
+    if params[:notification] and params[:notification][:limit]
+      notification = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])
+      notification.limit = params[:notification][:limit]
+      notification.save
+    end
+    
     if params[:user][:clear_password] == ''
       params[:user].delete('clear_password')
     end

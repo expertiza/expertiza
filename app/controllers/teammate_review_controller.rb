@@ -34,6 +34,7 @@ class TeammateReviewController < ApplicationController
           prs.save
         end      
       end
+      compare_scores
       flash[:notice] = 'Teammate review was successfully saved.'
       @student = Participant.find(:first, :conditions => ['user_id =? and parent_id =?', @teammate_review.reviewer_id, @teammate_review.assignment_id])
       redirect_to :controller => 'student_team', :action => 'view', :id => @student.id
@@ -45,6 +46,20 @@ class TeammateReviewController < ApplicationController
                                #:team_id => @teammate_review.team_id       
     end
   end
+  
+  # Compute the currently awarded scores for the reviewee
+  # If the new teammate review's score is greater than or less than 
+  # the existing scores by a given percentage (defined by
+  # the instructor) then notify the instructor.
+  # ajbudlon, nov 18, 2008
+  def compare_scores      
+    participant = AssignmentParticipant.find_by_user_id_and_parent_id(@teammate_review.reviewer_id,@assignment.id)                    
+    total, count = ReviewHelper.get_total_scores(participant.get_teammate_reviews,@teammate_review)     
+    if count > 0
+      questionnaire = Questionnaire.find(@assignment.teammate_review_questionnaire_id)
+      ReviewHelper.notify_instructor(@assignment,questionnaire)
+    end
+  end 
 
   def view
     #@links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])

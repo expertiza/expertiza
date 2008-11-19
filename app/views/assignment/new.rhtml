@@ -1,7 +1,10 @@
 <h1>New Assignment</h1>
 
 <%= start_form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();', :onload => 'addElement();')%>
-  <%= render :partial => 'form' %>
+  <%= render :partial => 'content' %>
+  <hr/>
+  <%= render :partial => 'rubrics' %>
+  <hr/>
   <%= render :partial => 'due_dates' %>
   <% if @course != nil %>
   	<%= hidden_field_tag('assignment[course_id]', @course.id) %>

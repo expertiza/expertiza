@@ -118,11 +118,31 @@ class ReviewFeedbackController < ApplicationController
             rs.questionnaire_type_id = QuestionnaireType.find_by_name("Author Feedback").id        
             rs.save        
           end
+          compare_scores
           flash[:notice] = 'ReviewFeedback was successfully created.'
           redirect_to :action=> 'view_feedback', :id1 =>params[:assgt_id], :id2 =>params[:author_id], :id3=>params[:review_id], :id4=>params[:team_id]
         end
     end
   end
+  
+  # Compute the currently awarded scores for the reviewee
+  # If the new review's score is greater than or less than 
+  # the existing scores by a given percentage (defined by
+  # the instructor) then notify the instructor.
+  # ajbudlon, nov 18, 2008
+  def compare_scores  
+    @assignment = Assignment.find(@assgt_id)
+    if @assignment.team_assignment 
+      participant = AssignmentTeam.find(@review_feedback.team_id)
+    else
+      participant = AssignmentParticipant.find_by_user_id_and_parent_id(@review_feedback.author_id,@assignment.id)      
+    end          
+    total, count = ReviewHelper.get_total_scores(participant.get_feedbacks,@review_feedback)     
+    if count > 0
+      questionnaire = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
+      ReviewHelper.notify_instructor(@assignment,questionnaire)
+    end
+  end  
  
   #Action for updating a previous feedback and inserting new values in the ReviewFeedback and Scores table
   def update_feedback

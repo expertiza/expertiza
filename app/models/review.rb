@@ -85,11 +85,11 @@ class Review < ActiveRecord::Base
   # is made
   #ajbudlon, sept 07, 2007   
   def email
-   mapping = ReviewMapping.find_by_id(self.review_mapping_id)   
+   mapping = ReviewMapping.find(self.review_mapping_id)   
    assignment = Assignment.find(mapping.assignment_id)
    if !assignment.team_assignment
-   for author_id in mapping.get_author_ids
-    if User.find_by_id(author_id).email_on_review
+    for author_id in mapping.get_author_ids
+     if User.find_by_id(author_id).email_on_review
         user = User.find_by_id(author_id)
         Mailer.deliver_message(
             {:recipients => user.email,
@@ -104,10 +104,32 @@ class Review < ActiveRecord::Base
               }
             }
         )
-    end  
-  end
-  end
-  end
+     end  
+    end
+   end
+ end
+ 
+ #Generate an email to the instructor when a new review exceeds the allowed difference
+ #ajbudlon, nov 18, 2008
+ def notify_on_difference(new_pct,avg_pct,limit)
+   mapping = ReviewMapping.find(self.review_mapping_id)
+   instructor = User.find(mapping.assignment.instructor_id)  
+   puts "*** in sending method ***"
+   Mailer.deliver_message(
+     {:recipients => instructor.email,
+      :subject => "Expertiza Notification: A review score is outside the acceptable range",
+      :body => {
+        :mapping => mapping,
+        :first_name => ApplicationHelper::get_user_first_name(instructor),
+        :new_pct => new_pct,
+        :avg_pct => avg_pct,
+        :limit => limit,
+        :partial_name => 'limit_notify'
+      }
+     }
+   )
+          
+ end
   
   # Get all review mappings for this assignment & author
   # required to give reviewer location of new submission content

@@ -65,6 +65,7 @@ class UsersController < ApplicationController
   
   def show
     @user = User.find(params[:id])
+    @notification = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])
     getRole
   end
   
@@ -88,7 +89,7 @@ class UsersController < ApplicationController
     end
     @user = User.new(params[:user])
     @user.parent_id = (session[:user]).id
-
+    
     if params[:user][:clear_password].length == 0 or
         params[:user][:confirm_password] != params[:user][:clear_password]
       flash[:error] = 'Passwords do not match.!'
@@ -96,6 +97,7 @@ class UsersController < ApplicationController
       render :action => 'new'
     else
       if @user.save
+        NotificationLimit.create(:user_id = > @user.id)
         flash[:notice] = 'User was successfully created.'
         redirect_to :action => 'list'
       else
@@ -104,9 +106,6 @@ class UsersController < ApplicationController
       end
     end
   end
-  
-  
-  
 
   def edit
     @user = User.find(params[:id])
@@ -117,7 +116,7 @@ class UsersController < ApplicationController
   end
 
   def update
-    @user = User.find(params[:id])
+    @user = User.find(params[:id])   
     if params[:user]['clear_password'] == ''
       params[:user].delete('clear_password')
     end

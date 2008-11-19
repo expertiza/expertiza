@@ -1,0 +1,63 @@
+<table>
+ <tr><th width="20%">&nbsp;</th><th>Selected questionnaire</th><th>Weight</th><th>Notification percent</th></tr>
+ <tr>
+   <td>Review:</td>
+   <td style="padding: 15px;">
+      <% type = QuestionnaireType.find_by_name('Review')
+         questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
+      <%= select('assignment', 'review_questionnaire_id', questionnaires)%>
+   </td>
+   <td style="padding: 15px;"><%= text_field 'assignment', 'review_weight', :size=>5%>%</td>
+   <td style="padding: 15px;">
+       <input id="limits_review" name="limits[review]" size="5" type="text" value="<%= @limits[:review] %>"/>%                         
+   </td>
+ </tr>
+ 
+<tr>
+   <td>Metareview:</td>
+   <td style="padding: 15px;">
+      <% type = QuestionnaireType.find_by_name('Metareview')
+         questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
+      <%= select('assignment', 'review_of_review_questionnaire_id', questionnaires)%>
+   </td>
+   <td style="padding: 15px;">&nbsp;</td>
+   <td style="padding: 15px;">
+       <input id="limits_review" name="limits[metareview]" size="5" type="text" value="<%= @limits[:metareview] %>"/>%                         
+   </td></tr> 
+ <tr>
+   <td>Feedback:</td>
+   <td style="padding: 15px;">
+      <% type = QuestionnaireType.find_by_name('Author Feedback')
+         questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
+      <%= select('assignment', 'author_feedback_questionnaire_id', questionnaires)%>
+   </td>
+   <td style="padding: 15px;">&nbsp;</td>
+   <td style="padding: 15px;">
+       <input id="limits_review" name="limits[feedback]" size="5" type="text" value="<%= @limits[:feedback] %>"/>%                         
+   </td>
+ </tr> 
+ <tr id="teammate_review" <%if !@assignment.team_assignment %>style="display:none"<% end %>>  
+   <td>Teammate Review:</td>
+   <td style="padding: 15px;">
+      <% type = QuestionnaireType.find_by_name('Teammate Review')
+         questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
+      <%= select('assignment', 'teammate_review_questionnaire_id', questionnaires)%>
+   </td>
+   <td style="padding: 15px;">&nbsp;</td>
+   <td style="padding: 15px;">
+       <input id="limits_review" name="limits[teammate]" size="5" type="text" value="<%= @limits[:teammate] %>"/>%                         
+   </td>
+  </tr>
+</table>
+<br/>
+  
+<table>
+ <tr>
+  <td><label for="reviews_visible_to_all">Reviews should be visible to all other reviewers</label></td>
+  <td><%= check_box 'assignment', 'reviews_visible_to_all', {}, true, false %></td>
+ </tr>
+ <tr>
+  <td><label for="require_signup">Users must sign up before submitting</label></td>
+  <td><%= check_box 'assignment', 'require_signup', {}, true, false %></td>
+ <tr>
+</table>

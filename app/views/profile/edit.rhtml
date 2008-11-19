@@ -1,5 +1,7 @@
 <h1>User Profile Information</h1>
 
+<%= @user.id %>
+
 <br/>
 
 <%= start_form_tag({:action => 'update', :id => @user}) %>
@@ -11,5 +13,8 @@
   <%= render :partial => 'users/email' %>
   <hr/>
   <%= render :partial => 'users/prefs' %>
+  <% if @user.role.parent_id != nil %>
+    <%= render :partial => 'limit' %>
+  <% end %>    
   <%= submit_tag 'Save' %>
-<%= end_form_tag %>
+</form>

@@ -13,6 +13,7 @@ class Mailer < ActionMailer::Base
   #               this message. Do not include the message type (_html or _plain)
   #           <optional> Other content can be included as needed by the partial
   def message(defn)
+     puts "*** in mailer method ***"
      @subject = defn[:subject]
      @recipients = defn[:recipients]
      if defn[:bcc] != nil

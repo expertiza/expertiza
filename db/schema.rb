@@ -2,7 +2,7 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 85) do
+ActiveRecord::Schema.define(:version => 86) do
 
   create_table "assignments", :force => true do |t|
     t.column "created_at",                        :datetime
@@ -290,6 +290,13 @@ ActiveRecord::Schema.define(:version => 85) do
     t.column "type",           :string
   end
 
+  create_table "notification_limits", :force => true do |t|
+    t.column "user_id",          :integer, :null => false
+    t.column "assignment_id",    :integer
+    t.column "questionnaire_id", :integer
+    t.column "limit",            :integer, :null => false
+  end
+
   create_table "participants", :force => true do |t|
     t.column "submit_allowed",      :boolean,                :default => true
     t.column "review_allowed",      :boolean,                :default => true
@@ -437,9 +444,9 @@ ActiveRecord::Schema.define(:version => 85) do
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
 
   create_table "scores", :force => true do |t|
-    t.column "instance_id",           :integer, :null => false
-    t.column "question_id",           :integer, :null => false
-    t.column "questionnaire_type_id", :integer, :null => false
+    t.column "instance_id",           :integer, :default => 0, :null => false
+    t.column "question_id",           :integer, :default => 0, :null => false
+    t.column "questionnaire_type_id", :integer, :default => 0, :null => false
     t.column "score",                 :integer
     t.column "comments",              :text
   end

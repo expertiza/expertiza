@@ -1,26 +1,22 @@
 <% if submission == '1' %>
    <%       
       controller = 'review'
-      action = 'view_review'
-      max_score = assignment.get_max_review_score
+      action = 'view_review'      
    %>
 <% elsif submission == '2' %>
    <%     
       controller = 'review_of_review' 
       action = 'view'
-      max_score = assignment.get_max_metareview_score
     %>
 <% elsif submission == '3' %>
    <%     
       controller = 'review_feedback' 
       action = 'view'
-      max_score = assignment.get_max_feedback_score
     %>    
 <% elsif submission == '4' %>
    <%     
       controller = 'teammate_review' 
       action = 'view'
-      max_score = assignment.get_max_teammate_review_score
     %>
 <% end %>
 
@@ -67,9 +63,10 @@
                rev_user = User.find(review.reviewer_id)
              end
            %>  		
-		   <td align="center">
-		       <input type="hidden" id="mailer_<%= rev_user.fullname %>_grade" name="mailer[<%= rev_user.fullname %>_grade]" value="<%= review.get_total_score.to_f*100/max_score %>" %>   
-	  	       <%= sprintf("%.2f",review.get_total_score.to_f*100/max_score) %>% &nbsp;
+		   <td align="center">		       
+		       <% score = Score.get_total_score(review.id,questionnaire,weight) %>
+		       <input type="hidden" id="mailer_<%= rev_user.fullname %>_grade" name="mailer[<%= rev_user.fullname %>_grade]" value="<%= score  %>" %>   
+	  	       <%= sprintf("%.2f",score) %>% &nbsp;
 	  	   </td>
 	    <% end %>
 	</tr>

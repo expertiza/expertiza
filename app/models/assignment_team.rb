@@ -43,15 +43,10 @@ class AssignmentTeam < Team
   #computes this participants current review scores:
   # avg_review_score
   # difference
-  def compute_review_scores
-    assignment = Assignment.find(self.parent_id)
+  def compute_review_scores(total_weight, questionnaire, questions)
     reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (select id from review_mappings where team_id = #{self.id} and assignment_id = #{self.parent_id})")
     if reviews.length > 0 
-      questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
-      questions = questionnaire.questions
-      max_assignment_score, total_weight = assignment.get_max_score_possible(questionnaire, questions)
-      avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews, questionnaire, questions, QuestionnaireType.find_by_name("Review").id, total_weight)
-      puts "max assignment score = "+max_assignment_score.to_s
+      avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews, questionnaire, total_weight)
       return avg_review_score, max_score, min_score
     else
       return nil,nil,nil

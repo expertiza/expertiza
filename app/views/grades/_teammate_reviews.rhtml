@@ -8,7 +8,10 @@
            :assignment => participant.assignment,
            :reviews => participant.get_teammate_reviews,
            :collabel => "Feedback",
-           :rowlabel => "Author"
+           :rowlabel => "Author",
+           :questionnaire => @teammate_questionnaire,
+           :questions => @teammate_questions,
+           :weight => @teammate_weight
            }%>
   <BR/>         
   <HR/> 

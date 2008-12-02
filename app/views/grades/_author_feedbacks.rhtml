@@ -8,7 +8,10 @@
            :assignment => participant.assignment,
            :reviews => participant.get_feedbacks,
            :collabel => "Feedback",
-           :rowlabel => "Author"
+           :rowlabel => "Author",
+           :questionnaire => @feedback_questionnaire,
+           :questions => @feedback_questions,
+           :weight => @feedback_weight
            }%>
   <BR/>         
   <HR/> 

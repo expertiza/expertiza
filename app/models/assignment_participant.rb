@@ -143,18 +143,12 @@ class AssignmentParticipant < Participant
   end
     
   #computes this participant's current teammate review scores:
-  # avg_review_score
-  # difference
-  def compute_teammate_review_scores
+  def compute_teammate_review_scores(total_weight, questionnaire, questions)
     assignment = Assignment.find(self.parent_id) 
     if assignment.team_assignment 
       teammate_reviews = TeammateReview.find_by_sql("select * from teammate_reviews where reviewee_id = #{self.user_id} and assignment_id = #{self.parent_id}")
       if teammate_reviews.length > 0
-        questionnaire = Questionnaire.find(assignment.teammate_review_questionnaire_id)
-        questions = questionnaire.questions
-        max_assignment_score, total_weight = assignment.get_max_score_possible(questionnaire, questions)
-        avg_review_score, max_score, min_score = AssignmentParticipant.compute_scores(teammate_reviews, questionnaire, questions, QuestionnaireType.find_by_name("Teammate Review").id, total_weight)
-        puts "max assignment score = "+max_assignment_score.to_s
+        avg_review_score, max_score, min_score = AssignmentParticipant.compute_scores(teammate_reviews, questionnaire, total_weight)
         return avg_review_score, max_score, min_score
       else
         return nil, nil, nil
@@ -164,18 +158,13 @@ class AssignmentParticipant < Participant
   
   #computes this participants current metareview score
   #metareview = review_of_review
-  def compute_metareview_scores    
+  def compute_metareview_scores(total_weight, questionnaire, questions)
     review_mapping_query = "select id from review_mappings where assignment_id = #{self.parent_id} and reviewer_id = #{self.user_id}"
     metareview_mapping_query = "select id from review_of_review_mappings where review_mapping_id in ("+review_mapping_query+")"
     metareview_query = "select * from review_of_reviews where review_of_review_mapping_id in ("+metareview_mapping_query+")"
     metareviews = ReviewOfReview.find_by_sql(metareview_query)
     if metareviews.length > 0
-      assignment = Assignment.find(parent_id)
-      questionnaire = Questionnaire.find(assignment.review_of_review_questionnaire_id)
-      questions = questionnaire.questions
-      max_assignment_score, total_weight = assignment.get_max_score_possible(questionnaire, questions)
-      avg_metareview_score, max_score,min_score = AssignmentParticipant.compute_scores(metareviews, questionnaire, questions, QuestionnaireType.find_by_name("Metareview").id, total_weight)
-      puts "max assignment score = "+max_assignment_score.to_s
+      avg_metareview_score, max_score,min_score = AssignmentParticipant.compute_scores(metareviews, questionnaire, total_weight)
       return avg_metareview_score, max_score, min_score
     else
       return nil, nil, nil
@@ -183,36 +172,28 @@ class AssignmentParticipant < Participant
   end
  
   #computes this participants current author feedback score
-  def compute_author_feedback_scores   
+  def compute_author_feedback_scores(total_weight, questionnaire, questions)
     review_mapping_query = "select id from review_mappings where assignment_id = "+self.assignment.id.to_s+" and reviewer_id = "+self.user.id.to_s    
     review_query = "select id from reviews where review_mapping_id in ("+review_mapping_query+")"
     feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where review_id in ("+review_query+")")
     if feedbacks.length > 0
-      assignment = Assignment.find(parent_id)
-      questionnaire = Questionnaire.find(assignment.author_feedback_questionnaire_id)
-      questions = questionnaire.questions
-      max_assignment_score, total_weight = assignment.get_max_score_possible(questionnaire, questions)
-      avg_feedback_score, max_score,min_score = AssignmentParticipant.compute_scores(feedbacks, questionnaire, questions, QuestionnaireType.find_by_name("Author Feedback").id, total_weight)
-      puts "max assignment score = "+max_assignment_score.to_s
+      avg_feedback_score, max_score,min_score = AssignmentParticipant.compute_scores(feedbacks, questionnaire, total_weight)
       return avg_feedback_score, max_score, min_score
     else
       return nil, nil, nil
     end
   end  
   
-  def compute_review_scores
+  #computes this participants current review score  
+  def compute_review_scores(total_weight, questionnaire, questions)
     assignment = Assignment.find(parent_id)
     if assignment.team_assignment
       return self.team.compute_review_scores
     else
       reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (select id from review_mappings where author_id = #{self.user_id} and assignment_id = #{self.parent_id})")
       if reviews.length > 0
-        questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
-        questions = questionnaire.questions
-        max_assignment_score, total_weight = assignment.get_max_score_possible(questionnaire, questions)
-        avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews, questionnaire, questions, QuestionnaireType.find_by_name("Review").id, total_weight)
-        puts "max assignment score = "+max_assignment_score.to_s
-        return avg_review_score, max_score, min_score
+        avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews, questionnaire, total_weight)
+        return avg_review_score.to_f, max_score, min_score
       else
         return nil, nil, nil
     end
@@ -228,17 +209,9 @@ class AssignmentParticipant < Participant
     end
     
     if r_score and m_score
-      #if self.assignment.team_assignment and teammate_review_score
-      # return (r_score + m_score)*teammate_review_score
-      #else
-       return r_score + m_score
-      #end
+      return r_score + m_score     
     elsif r_score
-      #if self.assignment.team_assignment and teammate_review_score
-      #  return (review_score)*teammate_review_score
-      #else
-        return review_score
-      #end        
+      return review_score             
     else
       return 0
     end
@@ -250,13 +223,13 @@ class AssignmentParticipant < Participant
   #  questionnaire - the questionnaire that was filled out in the process of doing those assessments
   #  questionnaire_type - an integer value representing REVIEW, AUTHOR_FEEDBACK, etc.
   #  total_weight - the total weight of the questions in the questionnaire
-  def self.compute_scores(list, questionnaire, questions, questionnaire_type, total_weight)
+  def self.compute_scores(list, questionnaire, total_weight)
     max_score = -999999999
     min_score = 999999999
     total_score = 0
     list.each {
       | item | 
-       curr_score = Score.get_total_score(item.id, questionnaire, questions, questionnaire_type, total_weight)       
+       curr_score = Score.get_total_score(item.id, questionnaire, total_weight)       
        if curr_score > max_score
          max_score = curr_score
        end
@@ -265,10 +238,7 @@ class AssignmentParticipant < Participant
        end        
        total_score += curr_score       
     }
-    puts "xxxxxxxxxxxxx length "+list.length.to_s
-    puts "xxxxxxxxxxxxx score total "+total_score.to_s
     average_score = total_score.to_f / list.length.to_f
-    puts "xxxxxxxxxxxxx average scores "+average_score.to_s
     return average_score, max_score, min_score
   end
   

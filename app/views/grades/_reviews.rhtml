@@ -8,7 +8,10 @@
            :assignment => Assignment.find(participant.parent_id),
            :reviews => participant.get_reviews,
            :collabel => "Review",
-           :rowlabel => "Reviewer"
+           :rowlabel => "Reviewer",
+           :questionnaire => @review_questionnaire,
+           :questions => @review_questions,
+           :weight => @review_weight
            }%>
   <BR/>         
   <HR/> 

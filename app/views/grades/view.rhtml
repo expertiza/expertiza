@@ -1,6 +1,5 @@
 <%= render :partial => 'scripts' %>
 <h1>Summary report for <%= @assignment.name %></h1>
-
 <BR/>  
 <%if @teams and @teams.length > 0 %>
 <a href="#" onClick="toggleAll(<%= @teams.length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
@@ -15,10 +14,9 @@
   <% index = 0 %>
   <% for participant in @participants
     index += 1
-    s_avg, s_max, s_min = participant.compute_review_scores
-    r_avg, r_max, r_min = participant.compute_metareview_scores    
-    tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores
-    f_avg, f_max, f_min = participant.compute_author_feedback_scores
+    s_avg, s_max, s_min = participant.compute_review_scores(@review_weight, @review_questionnaire, @review_questions)
+    r_avg, r_max, r_min = participant.compute_metareview_scores(@metareview_weight, @metareview_questionnaire, @metareview_questions)   
+    f_avg, f_max, f_min = participant.compute_author_feedback_scores(@feedback_weight, @feedback_questionnaire, @feedback_questions)
   %>
     <%= render :partial => 'participant',
                :locals => {:prefix => 'user_'+index.to_s,
@@ -26,8 +24,8 @@
                            :participant => participant,
                            :s_avg => s_avg, :s_min => s_min, :s_max => s_max,
                            :r_avg => r_avg, :r_min => r_min, :r_max => r_max,
-                           :f_avg => f_avg, :f_min => f_min, :f_max => f_max,
-                           :tr_avg => tr_avg, :tr_min => tr_min, :tr_max => tr_max}%>
+                           :f_avg => f_avg, :f_min => f_min, :f_max => f_max
+                           }%>
 
   <% end %>
 <% end %>

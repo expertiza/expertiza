@@ -8,7 +8,11 @@
            :assignment => Assignment.find(participant.parent_id),
            :reviews => participant.get_metareviews,
            :collabel => "Metareview1",
-           :rowlabel => "Metareviewer"
+           :rowlabel => "Metareviewer",
+           :questionnaire => @metareview_questionnaire,
+           :questions => @metareview_questions,
+           :weight => @metareview_weight
+           
            }%>
   <BR/>         
   <HR/> 

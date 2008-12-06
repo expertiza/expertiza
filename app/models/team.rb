@@ -73,7 +73,7 @@ class Team < ActiveRecord::Base
             currUser.user_id = user.id
             currUser.save   
             
-            Participant.create(:assignment_id => assignment.id, :user_id => user.id, :permission_granted => true)
+            AssignmentParticipant.create(:assignment_id => assignment.id, :user_id => user.id, :permission_granted => true)
           end                      
         end
         index = index+1      

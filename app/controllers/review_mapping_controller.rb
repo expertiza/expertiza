@@ -16,7 +16,10 @@ class ReviewMappingController < ApplicationController
   def add_reviewer
     assignment = Assignment.find(params[:assignment_id])        
     reviewer = User.find_by_name(params[:user][:name])
-    if reviewer != nil && assignment != nil        
+    if reviewer != nil && assignment != nil  
+       if AssignmentParticipant.find_by_parent_id_and_user_id(assignment.id,reviewer.id) == nil
+         AssignmentParticipant.create(:parent_id => assignment.id, :user_id => reviewer.id)
+       end       
        if assignment.team_assignment
         exists = ReviewMapping.find(:first, :conditions => ['team_id = ? and reviewer_id = ? and assignment_id = ?',params[:contributor_id],reviewer.id,assignment.id])
         if exists == nil
@@ -98,11 +101,10 @@ class ReviewMappingController < ApplicationController
     end
     begin
       mapping.delete
-    rescue
+      flash[:note] = "All review mappings for "+contributor.get_author_name+" and "+mapping.reviewer.name+" have been deleted."        
+    rescue      
       flash[:error] = "A delete action failed." + $! 
     end
-    
-    flash[:note] = "All review mappings for "+contributor.get_author_name+" and "+mapping.reviewer.name+" have been deleted."    
     redirect_to :action => 'list_reviewers', :assignment_id => assignment.id, :id => contributor.id
   end
   

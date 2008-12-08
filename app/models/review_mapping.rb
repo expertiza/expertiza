@@ -17,7 +17,7 @@ class ReviewMapping < ActiveRecord::Base
   def delete
     review = Review.find(:all, :conditions => ['review_mapping_id = ?',self.id])    
     if review.length > 0
-      raise "At least one review has already been performed."
+      raise "At least one review has already been performed for this mapping."
     end  
     mappings = ReviewOfReviewMapping.find(:all, :conditions => ['review_mapping_id = ?',self.id])
     mappings.each { |mapping| mapping.delete  }
@@ -74,7 +74,7 @@ class ReviewMapping < ActiveRecord::Base
           
       mapping = ReviewMapping.new
       if assignment.team_assignment
-         author = Team.find(:first, :conditions => ['name = ? and assignment_id = ?',row[0].to_s.strip, assignment.id])
+         author = AssignmentTeam.find(:first, :conditions => ['name = ? and parent_id = ?',row[0].to_s.strip, assignment.id])
          if author == nil
            raise ImportError, "The author \""+row[0].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"                   
          end

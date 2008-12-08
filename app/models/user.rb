@@ -1,7 +1,6 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
-  has_and_belongs_to_many :courses
   has_many :participants
   has_many :assignments, :through => :participants
   validates_presence_of :name

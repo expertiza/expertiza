@@ -111,10 +111,12 @@ class QuestionnaireController < ApplicationController
     if params[:questionnaire][:id] != nil and params[:questionnaire][:id].to_i > 0
       # questionnaire already exists in the database
       @questionnaire = get(Questionnaire, params[:id])
+    else
+      @questionnaire = Questionnaire.new
     end
-    @questionnaire = Questionnaire.new if @questionnaire == nil
     
-    @questionnaire.update_attributes(params[:questionnaire])   
+    
+    @questionnaire.update_attributes(params[:questionnaire])
     # Don't save until Save button is pressed
     if params[:save]
       save_questionnaire 'new_questionnaire', true
@@ -165,13 +167,18 @@ class QuestionnaireController < ApplicationController
     end
     save_questions @questionnaire.id if @questionnaire.id != nil and @questionnaire.id > 0
     
-    if @questionnaire.save
+    begin
+      @questionnaire.save!    
       parent = QuestionnaireTypeNode.find_by_node_object_id(@questionnaire.type_id)
-      QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)             
+      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
+        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+      end
+      
       flash[:notice] = 'questionnaire was successfully saved.'
       redirect_to :controller => 'tree_display', :action => 'list'
-    else # If something goes wrong, stay at same page
-      render :action => failure_action
+    rescue # If something goes wrong, stay at same page
+      flash[:error] = $!
+      redirect_to :action => failure_action, :private => @questionnaire.private, :type_id => @questionnaire.type_id
     end
   end
   

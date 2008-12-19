@@ -22,7 +22,8 @@ module FileHelper
   #           forward slash
   #           alphanumeric characters
   def self.clean_path(file_name)
-    file_name.gsub(/[^\w\.\_\/]/,'_') 
+    newstr = file_name.gsub(/[^\w\.\_\/]/,'_')
+    newstr.gsub("'","_")
   end
   
   

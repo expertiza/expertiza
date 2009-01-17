@@ -7,7 +7,6 @@ class Question < ActiveRecord::Base
     
     validates_presence_of :txt
     validates_presence_of :weight
-    validates_uniqueness_of :txt
     validates_numericality_of :weight
     
     NUMERIC = 'Numeric'

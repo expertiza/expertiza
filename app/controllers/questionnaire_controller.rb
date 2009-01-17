@@ -4,6 +4,7 @@ class QuestionnaireController < ApplicationController
   
   def copy
     orig_questionnaire = Questionnaire.find(params[:id])
+    questions = Question.find_all_by_questionnaire_id(params[:id])               
     new_questionnaire = orig_questionnaire.clone
     if (session[:user]).role_id != 6
       new_questionnaire.instructor_id = session[:user].id
@@ -13,7 +14,20 @@ class QuestionnaireController < ApplicationController
     new_questionnaire.name = 'Copy of '+orig_questionnaire.name
     if new_questionnaire.save
       parent = QuestionnaireTypeNode.find_by_node_object_id(new_questionnaire.type_id)
-      QuestionnaireNode.create(:node_object_id => new_questionnaire.id, :parent_id => parent.id)
+      puts "***************"
+      puts parent
+      puts new_questionnaire.id      
+      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,new_questionnaire.id) == nil
+        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => new_questionnaire.id)
+        puts "********** ADDED *************"
+      end
+      puts "***************"      
+      questions.each{
+        | question |
+        newquestion = question.clone
+        newquestion.questionnaire_id = new_questionnaire.id
+        newquestion.save           
+      }      
       redirect_to :controller => 'questionnaire', :action => 'edit', :id => new_questionnaire.id
     else
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'
@@ -170,9 +184,14 @@ class QuestionnaireController < ApplicationController
     begin
       @questionnaire.save!    
       parent = QuestionnaireTypeNode.find_by_node_object_id(@questionnaire.type_id)
+      puts "***************"
+      puts parent
+      puts @questionnaire.id      
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+        puts "********** ADDED *************"
       end
+      puts "***************"
       
       flash[:notice] = 'questionnaire was successfully saved.'
       redirect_to :controller => 'tree_display', :action => 'list'

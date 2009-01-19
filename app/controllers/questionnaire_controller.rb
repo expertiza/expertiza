@@ -40,24 +40,7 @@ class QuestionnaireController < ApplicationController
     @questionnaires = super(Questionnaire)
   end
   ## There needs to be an option for administrators to list all questionnaires (public & private)
-  
-  def copy_questionnaire
-    @questionnaire = get(Questionnaire, params[:id])
     
-    if params['save']
-      @questionnaire = Questionnaire.new
-      # Take attributes from form filled in by user
-      @questionnaire.update_attributes(params[:questionnaire])
-      @questionnaire.instructor_id = session[:user].id
-      @questionnaire.save
-      copy_questions(params[:id], @questionnaire.id)
-      save_new_questions(@questionnaire.id)
-      
-      flash[:notice] = 'questionnaire was successfully copied.'
-      redirect_to :action => 'list'
-    end
-  end
-  
   def delete
     questionnaire = get(Questionnaire, params[:id])
     node = QuestionnaireNode.find_by_node_object_id(questionnaire.id)             
@@ -198,18 +181,6 @@ class QuestionnaireController < ApplicationController
     rescue # If something goes wrong, stay at same page
       flash[:error] = $!
       redirect_to :action => failure_action, :private => @questionnaire.private, :type_id => @questionnaire.type_id
-    end
-  end
-  
-  def copy_questions(old_id, new_id)
-    # Creates a new copy of each question belonging to the copied questionnaire.
-    # Each new question will belong to the newly created rubri
-    questions = Question.find(:all, :conditions => ["questionnaire_id = ?", old_id])
-    
-    for question in questions
-      q = Question.new(question.attributes)
-      q.questionnaire_id = new_id
-      q.save
     end
   end
   

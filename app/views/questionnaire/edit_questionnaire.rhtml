@@ -1,4 +1,4 @@
-<% @q_type=QuestionnaireType.find(Questionnaire.find(params[:id]).type_id).name %>
+<% @q_type = @questionnaire.type.name %>
 
 <h1>Edit an existing <%= @q_type.downcase %></h1>
 

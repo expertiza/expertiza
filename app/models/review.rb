@@ -12,8 +12,12 @@ class Review < ActiveRecord::Base
       | reviewScore |      
       code = code + "<I>"+Question.find_by_id(reviewScore.question_id).txt+"</I><BR/><BR/>"
       code = code + '(<FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find_by_id(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B>): "+reviewScore.comments+"<BR/><BR/>"
-    }          
-    comment = self.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')    
+    }     
+    if self.additional_comment != nil
+      comment = self.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')
+    else
+      comment = ''
+    end
     code = code + "<B>Additional Comment:</B><BR/>"+comment+""
     code = code + "</div>"
     return code

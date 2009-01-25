@@ -26,7 +26,8 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :name
   validates_presence_of :review_questionnaire_id
   validates_presence_of :review_of_review_questionnaire_id
-  validates_numericality_of :review_weight      
+  validates_numericality_of :review_weight    
+  validates_uniqueness_of :scope => [:directory_path, :instructor_id]
   
   # parameterized by questionnaire
   def get_max_score_possible (questionnaire, questions)

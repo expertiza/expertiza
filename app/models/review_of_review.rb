@@ -60,7 +60,7 @@ class ReviewOfReview < ActiveRecord::Base
      recipient = User.find_by_id(review_mapping.reviewer_id).email
      Mailer.deliver_message(
          {:recipients => recipient,
-          :subject => "An new review of review is available for #{self.name}",
+          :subject => "A new review of review is available for #{self.name}",
           :body => {
            :obj_name => Assignment.find_by_id(review_mapping.assignment_id).name,
            :type => "review of review",

@@ -216,7 +216,7 @@ class Assignment < ActiveRecord::Base
           user = User.find(mapping.reviewer_id)
           Mailer.deliver_message(
             {:recipients => user.email,
-             :subject => "An new submission is available for #{self.name}",
+             :subject => "A new submission is available for #{self.name}",
              :body => {
               :obj_name => self.name,
               :type => "submission",

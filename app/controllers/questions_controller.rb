@@ -1,6 +1,12 @@
 class QuestionsController < ApplicationController
 scaffold :answers
 
+  # A question is a single entry within a questionnaire
+  # Questions provide a way of scoring an object 
+  # based on either a numeric value or a true/false
+  # state.
+
+  # Default action, same as list
   def index
     list
     render :action => 'list'
@@ -10,10 +16,15 @@ scaffold :answers
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :list }
 
+
+  # List all questions in paginated view
   def list
     @question_pages, @questions = paginate :questions, :per_page => 10
   end
 
+  # List questions for this user
+  # ?? Need clarification of what this task
+  #    actually does. 
   def listuser
          @question = Array.new
          @i = 0
@@ -23,19 +34,25 @@ scaffold :answers
                               
    end
 
-
+  # ?? Unknown as of 2/1/2009
+  # Need further investigation
   def SignupSheet
     @question_pages, @questions = paginate :questions, :per_page => 10
   end
-
+ 
+  # Display a given question
   def show
     @question = Question.find(params[:id])
   end
 
+  # Provide the user with the ability to define
+  # a new question
   def new
     @question = Question.new    
   end
 
+  # Save a question created by the user
+  # follows from new
   def create
     @question = Question.new(params[:question])
     if @question.save
@@ -46,10 +63,13 @@ scaffold :answers
     end
   end
 
+  # edit an existing question
   def edit
     @question = Question.find(params[:id])
   end
 
+  # save the update to an existing question
+  # follows from edit
   def update
     @question = Question.find(params[:id])
     if @question.update_attributes(params[:question])
@@ -60,6 +80,8 @@ scaffold :answers
     end
   end
 
+  # Remove question from database and 
+  # return to list
   def destroy
     Question.find(params[:id]).destroy
     redirect_to :action => 'list'

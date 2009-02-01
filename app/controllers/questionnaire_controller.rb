@@ -1,7 +1,12 @@
 class QuestionnaireController < ApplicationController
-  
+  # Controller for Questionnaire objects
+  # A Questionnaire can be of several types (QuestionnaireType)
+  # Each Questionnaire contains zero or more questions (Question)
+  # Generally a questionnaire is associated with an assignment (Assignment)  
   before_filter :authorize
   
+  # Create a clone of the given questionnaire, copying all associated
+  # questions. The name and creator are updated.
   def copy
     orig_questionnaire = Questionnaire.find(params[:id])
     questions = Question.find_all_by_questionnaire_id(params[:id])               
@@ -35,12 +40,14 @@ class QuestionnaireController < ApplicationController
     end      
   end
   
+  # Display the questionnaires
   def list
     set_up_display_options("QUESTIONNAIRE")
     @questionnaires = super(Questionnaire)
   end
   ## There needs to be an option for administrators to list all questionnaires (public & private)
-    
+   
+  # Remove a given questionnaire
   def delete
     questionnaire = get(Questionnaire, params[:id])
     node = QuestionnaireNode.find_by_node_object_id(questionnaire.id)             
@@ -59,10 +66,12 @@ class QuestionnaireController < ApplicationController
     end
   end
   
+  # View a questionnaire
   def view
     @questionnaire = get(Questionnaire, params[:id])
   end
   
+  # Edit a questionnaire
   def edit
     @questionnaire = get(Questionnaire, params[:id])
     redirect_to :action => 'list' if @questionnaire == nil
@@ -91,8 +100,8 @@ class QuestionnaireController < ApplicationController
     end
   end
     
-  def new_questionnaire
-    
+  # Define a new questionnaire
+  def new_questionnaire    
     if params[:type_id] && params[:type_id] == "3" && session[:user].role_id != 3 && session[:user].role_id != 4
       redirect_to '/'
       return
@@ -100,10 +109,10 @@ class QuestionnaireController < ApplicationController
     
     @questionnaire = Questionnaire.new
     @questionnaire.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
-    @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE
-    
+    @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE    
   end
 
+  # Save the new questionnaire to the database
   def create_questionnaire
     if params[:questionnaire][:id] != nil and params[:questionnaire][:id].to_i > 0
       # questionnaire already exists in the database
@@ -111,8 +120,7 @@ class QuestionnaireController < ApplicationController
     else
       @questionnaire = Questionnaire.new
     end
-    
-    
+        
     @questionnaire.update_attributes(params[:questionnaire])
     # Don't save until Save button is pressed
     if params[:save]
@@ -120,6 +128,7 @@ class QuestionnaireController < ApplicationController
     end
   end
   
+  # Modify the advice associated with a questionnaire
   def edit_advice
     @questionnaire = get(Questionnaire, params[:id])
     
@@ -141,6 +150,7 @@ class QuestionnaireController < ApplicationController
     @questionnaire = get(Questionnaire, params[:id])
   end
   
+  # save the advice for a questionnaire
   def save_advice
     begin
       for advice_key in params[:advice].keys
@@ -156,6 +166,7 @@ class QuestionnaireController < ApplicationController
   end
   
   private
+  # Save the content of a questionnaire
   def save_questionnaire(failure_action, save_instructor_id)
     if (session[:user]).role_id == 6
       @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
@@ -184,6 +195,7 @@ class QuestionnaireController < ApplicationController
     end
   end
   
+  # save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id)
     if params[:new_question]
       # The new_question array contains all the new questions
@@ -196,6 +208,7 @@ class QuestionnaireController < ApplicationController
     end
   end
   
+  # delete questions from a questionnaire
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
     questions = Question.find(:all, :conditions => "questionnaire_id = " + questionnaire_id.to_s)
@@ -216,8 +229,8 @@ class QuestionnaireController < ApplicationController
     end
   end
   
+  # Handles questions whose wording changed as a result of the edit    
   def save_questions(questionnaire_id)
-    # Handles questions whose wording changed as a result of the edit
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
     

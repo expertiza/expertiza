@@ -33,7 +33,11 @@
                rev_user = User.find(mapping.reviewer_id)
              elsif submission == '2'
                mapping = ReviewOfReviewMapping.find(review.review_of_review_mapping_id) 
-               rev_user = User.find(mapping.review_reviewer_id)
+               if mapping.review_reviewer_id != nil
+                 rev_user = User.find(mapping.review_reviewer_id)
+               else 
+                 rev_user = User.find(mapping.reviewer_id)
+               end
              elsif submission == '3'
                rev_user = review.reviewer
              elsif submission == '4'
@@ -56,7 +60,11 @@
                rev_user = User.find(mapping.reviewer_id)
              elsif submission == '2'
                mapping = ReviewOfReviewMapping.find(review.review_of_review_mapping_id) 
-               rev_user = User.find(mapping.review_reviewer_id)
+               if mapping.review_reviewer_id != nil
+                 rev_user = User.find(mapping.review_reviewer_id)
+               else 
+                 rev_user = User.find(mapping.reviewer_id)
+               end
              elsif submission == '3'
                rev_user = review.reviewer
              elsif submission == '4'

@@ -2,8 +2,13 @@ class ReviewOfReview < ActiveRecord::Base
     has_many :review_of_review_scores
     belongs_to :review_of_review_mapping
 
-  def display_as_html(prefix)         
-    code = "<B>Metareviewer:</B> "+self.review_of_review_mapping.review_reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+prefix+"_"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
+  def display_as_html(prefix)
+    if self.review_of_review_mapping.review_reviewer != nil
+       review_reviewer = self.review_of_review_mapping.review_reviewer
+    else
+       review_reviewer = User.find(self.review_of_review_mapping.reviewer_id)
+    end
+    code = "<B>Metareviewer:</B> "+review_reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+prefix+"_"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
     code = code + '<div id="metareview_'+prefix+"_"+self.id.to_s+'" style="">'
     code = code +"<BR/><BR/>"
     scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Metareview").id.to_s)

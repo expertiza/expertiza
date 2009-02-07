@@ -2,6 +2,14 @@ class AssignmentParticipant < Participant
   require 'wiki_helper'
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   
+  #Copy this participant to a course
+  def copy(course_id)
+    part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
+    if part.nil?
+       CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id)       
+    end
+  end  
+  
   def get_course_string
     # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
     if self.assignment.course == nil or self.assignment.course.name == nil or self.assignment.course.name.strip == ""

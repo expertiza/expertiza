@@ -1,6 +1,14 @@
 class CourseParticipant < Participant
   belongs_to :course, :class_name => 'Course', :foreign_key => 'parent_id'
   
+  # Copy this participant to an assignment
+  def copy(assignment_id)
+    part = AssignmentParticipant.find_by_user_id_and_parent_id(self.user_id,assignment_id)
+    if part.nil?
+       AssignmentParticipant.create(:user_id => self.user_id, :parent_id => assignment_id)       
+    end
+  end  
+  
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row,session,id)

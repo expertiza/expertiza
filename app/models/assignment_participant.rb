@@ -255,11 +255,15 @@ class AssignmentParticipant < Participant
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row,session,id)
-    if row.length != 4
-       raise ArgumentError, "Not enough items" 
+    puts "*** "+row.length.to_s+" ***"
+    if row.length < 1
+       raise ArgumentError, "No user id has been specified." 
     end
     user = User.find_by_name(row[0])        
     if (user == nil)
+      if row.length < 4
+        raise ArgumentError, "The record containing #{row[0]} does not have enough items."
+      end
       attributes = ImportFileHelper::define_attributes(row)
       user = ImportFileHelper::create_new_user(attributes,session)
     end                  

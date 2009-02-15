@@ -16,7 +16,7 @@
     <td ><%= User.yesorno(user.email_on_submission) %></td>
     <td ><%= User.yesorno(user.email_on_review_of_review) %></td>
            
-    <td ><%= link_to 'Remove', :controller => controller, :action => 'delete', :post => true, :id => user.id %></td>
+    <td ><%= link_to 'Remove', :controller => controller, :action => 'delete', :post => true, :id => participant.id %></td>
   </tr>
 <% end -%>
 </table>

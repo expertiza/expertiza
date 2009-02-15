@@ -19,14 +19,14 @@ class ParticipantsController < ApplicationController
   end
     
   def delete
-    participant = Participant.find_by_user_id(params[:id])
+    participant = Participant.find(params[:id])
     parent_id = participant.parent_id
     if participant.type.to_s == 'AssignmentParticipant'
       model = 'Assignment'
     else
       model = 'Course'
     end
-    participant.destroy
+    participant.delete
     redirect_to :action => 'list', :id => parent_id, :model => model
   end
   

@@ -16,7 +16,7 @@
 <tr>
    <td>Metareview:</td>
    <td style="padding: 15px;">
-      <% type = QuestionnaireType.find_by_name('Metareview')
+      <% type = QuestionnaireType.find_by_name('Review')
          questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
       <%= select('assignment', 'review_of_review_questionnaire_id', questionnaires)%>
    </td>

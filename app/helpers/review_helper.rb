@@ -44,7 +44,7 @@ module ReviewHelper
     count = 0
     item_list.each {
       | item | 
-      if review.id != curr_item.id
+      if item.id != curr_item.id
         count += 1
         total += item.get_total_score                
       end

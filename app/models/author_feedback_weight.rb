@@ -1,0 +1,2 @@
+class AuthorFeedbackWeight < QuestionnaireWeight  
+end

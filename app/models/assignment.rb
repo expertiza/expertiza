@@ -23,11 +23,52 @@ class Assignment < ActiveRecord::Base
   has_many :review_of_review_mappings
   has_many :assignments_questionnairess
   
+  has_many :questionnaire_weights  
+    
   validates_presence_of :name
   validates_presence_of :review_questionnaire_id
-  validates_presence_of :review_of_review_questionnaire_id
-  validates_numericality_of :review_weight    
+  validates_presence_of :review_of_review_questionnaire_id     
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
+  
+  # get review weight
+  def review_weight
+    weight = 0
+    item = ReviewWeight.find_by_assignment_id(self.id)
+    if item
+      weight = item.weight
+    end
+    return weight
+  end
+  
+  # get metareview weight
+  def metareview_weight
+    weight = 0
+    item = MetareviewWeight.find_by_assignment_id(self.id)
+    if item
+      weight = item.weight
+    end
+    return weight
+  end
+  
+  # get author feedback weight
+  def author_feedback_weight
+    weight = 0
+    item = AuthorFeedbackWeight.find_by_assignment_id(self.id)
+    if item
+      weight = item.weight
+    end
+    return weight
+  end
+  
+  # get teammate review weight
+  def teammate_review_weight
+    weight = 0
+    item = TeammateReviewWeight.find_by_assignment_id(self.id)
+    if item
+      weight = item.weight
+    end
+    return weight
+  end
   
   # parameterized by questionnaire
   def get_max_score_possible (questionnaire, questions)
@@ -110,8 +151,25 @@ class Assignment < ActiveRecord::Base
     rescue
       raise $!
     end
-      due_dates = DueDate.find(:all, :conditions => ['assignment_id = ?',self.id])
-      
+    
+    #delete notifcation limits
+    limits = NotificationLimit.find_all_by_assignment_id(self.id)
+    begin
+      limits.each {|limit| limit.destroy}
+    rescue 
+      rase $!
+    end
+    
+    #delete weights limits
+    weights = QuestionnaireWeight.find_all_by_assignment_id(self.id)
+    begin
+      weights.each {|limit| limit.destroy}
+    rescue 
+      rase $!
+    end    
+    
+    due_dates = DueDate.find(:all, :conditions => ['assignment_id = ?',self.id])
+    
     begin
       due_dates.each{ |date| date.destroy }
     rescue

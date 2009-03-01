@@ -1,0 +1,2 @@
+class ReviewWeight < QuestionnaireWeight  
+end

@@ -47,7 +47,12 @@ class AssignmentController < ApplicationController
                :metareview => default.limit,
                :teammate => default.limit,
                :feedback => default.limit}
-
+               
+    @weights = Hash.new
+    @weights = {:review => 100,
+                :metareview => 0,
+                :teammate => 0,
+                :feedback => 0}               
   end
   
   def toggle_access
@@ -61,7 +66,7 @@ class AssignmentController < ApplicationController
   def create
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.    
-    @assignment = Assignment.new(params[:assignment])
+    @assignment = Assignment.new(params[:assignment])    
     if (session[:user]).role_id != 6
       @assignment.instructor_id = (session[:user]).id
     else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
@@ -82,7 +87,7 @@ class AssignmentController < ApplicationController
     
     if @assignment.save  
       set_limits
-      
+      set_weights
       submit_duedate=DueDate.new(params[:submit_deadline]);
       submit_duedate.deadline_type_id=@Submission_deadline;
       submit_duedate.assignment_id=@assignment.id;
@@ -168,7 +173,8 @@ class AssignmentController < ApplicationController
     
   def edit
     @assignment = Assignment.find(params[:id])
-    get_limits                                                  
+    get_limits 
+    get_weights
     @wiki_types = WikiType.find_all
   end
   
@@ -184,6 +190,30 @@ class AssignmentController < ApplicationController
         existing.save
      end    
   end
+  
+  def define_weight(assignment_id, questionnaire_id, weight)    
+     existing = QuestionnaireWeight.find(:first, :conditions => ['assignment_id = ? and questionnaire_id = ?',assignment_id,questionnaire_id])
+     if existing.nil?
+       qw = QuestionnaireWeight.create(:assignment_id => assignment_id,
+                                       :questionnaire_id => questionnaire_id,
+                                       :weight => weight)
+                                       
+                                             
+       if Assignment.find(assignment_id).review_questionnaire_id == questionnaire_id
+         qw.type = "ReviewWeight"
+       elsif Assignment.find(assignment_id).review_of_review_questionnaire_id == questionnaire_id
+          qw.type = "MetareviewWeight"
+       elsif Assignment.find(assignment_id).author_feedback_questionnaire_id == questionnaire_id
+         qw.type = "AuthorFeedbackWeight"
+       elsif Assignment.find(assignment_id).teammate_review_questionnaire_id == questionnaire_id
+         qw.type = "TeammateReviewWeight"         
+       end
+       qw.save                                
+     else
+        existing.weight = weight
+        existing.save
+     end    
+  end  
   
   def set_limits
     if params[:limits]
@@ -204,6 +234,26 @@ class AssignmentController < ApplicationController
         end
       end    
   end  
+  
+  def set_weights
+    if params[:weights]
+        if @assignment.review_questionnaire_id          
+          define_weight(@assignment.id, @assignment.review_questionnaire_id, params[:weights][:review])                       
+        end 
+        
+        if @assignment.review_of_review_questionnaire_id 
+          define_weight(@assignment.id, @assignment.review_of_review_questionnaire_id, params[:weights][:metareview])                             
+        end
+        
+        if @assignment.teammate_review_questionnaire_id 
+          define_weight(@assignment.id, @assignment.teammate_review_questionnaire_id , params[:weights][:teammate])
+        end
+               
+        if @assignment.author_feedback_questionnaire_id 
+          define_weight(@assignment.id, @assignment.author_feedback_questionnaire_id  , params[:weights][:feedback])
+        end
+      end    
+  end    
   
   def get_limits
     @limits = Hash.new
@@ -255,6 +305,38 @@ class AssignmentController < ApplicationController
     end              
   end
   
+  def get_weights
+    @weights = Hash.new
+    review = ReviewWeight.find_by_assignment_id(@assignment.id)
+    metareview = MetareviewWeight.find_by_assignment_id(@assignment.id)
+    feedback = AuthorFeedbackWeight.find_by_assignment_id(@assignment.id)
+    teammate = TeammateReviewWeight.find_by_assignment_id(@assignment.id)
+    
+    if review != nil
+      @weights[:review] = review.weight
+    else
+      @weights[:review] = 100
+    end
+    
+    if metareview != nil
+      @weights[:metareview] = metareview.weight
+    else
+      @weights[:metareview] = 0
+    end
+    
+    if feedback != nil
+      @weights[:feedback] = feedback.weight
+    else
+      @weights[:feedback] = 0
+    end
+    
+    if teammate != nil
+      @weights[:teammate] = teammate.weight
+    else
+      @weights[:teammate] = 0
+    end    
+  end  
+  
   def update  
     if params[:assignment][:course_id]
      begin
@@ -272,6 +354,7 @@ class AssignmentController < ApplicationController
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment]) 
       set_limits
+      set_weights
       begin
         newpath = @assignment.get_path        
       rescue

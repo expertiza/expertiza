@@ -7,7 +7,9 @@
          questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
       <%= select('assignment', 'review_questionnaire_id', questionnaires)%>
    </td>
-   <td style="padding: 15px;"><%= text_field 'assignment', 'review_weight', :size=>5%>%</td>
+   <td style="padding: 15px;">
+      <input id="weights_review" name="weights[review]" size="5" type="text" value="<%= @weights[:review] %>"/>%   
+   </td>   
    <td style="padding: 15px;">
        <input id="limits_review" name="limits[review]" size="5" type="text" value="<%= @limits[:review] %>"/>%                         
    </td>
@@ -20,9 +22,11 @@
          questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
       <%= select('assignment', 'review_of_review_questionnaire_id', questionnaires)%>
    </td>
-   <td style="padding: 15px;">&nbsp;</td>
    <td style="padding: 15px;">
-       <input id="limits_review" name="limits[metareview]" size="5" type="text" value="<%= @limits[:metareview] %>"/>%                         
+       <input id="weights_metareview" name="weights[metareview]" size="5" type="text" value="<%= @weights[:metareview] %>"/>%   
+   </td>
+   <td style="padding: 15px;">
+       <input id="limits_metareview" name="limits[metareview]" size="5" type="text" value="<%= @limits[:metareview] %>"/>%                         
    </td></tr> 
  <tr>
    <td>Feedback:</td>
@@ -31,9 +35,11 @@
          questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
       <%= select('assignment', 'author_feedback_questionnaire_id', questionnaires)%>
    </td>
-   <td style="padding: 15px;">&nbsp;</td>
    <td style="padding: 15px;">
-       <input id="limits_review" name="limits[feedback]" size="5" type="text" value="<%= @limits[:feedback] %>"/>%                         
+   	   <input id="weights_feedback" name="weights[feedback]" size="5" type="text" value="<%= @weights[:feedback] %>"/>% 
+   </td>
+   <td style="padding: 15px;">
+       <input id="limits_feedback" name="limits[feedback]" size="5" type="text" value="<%= @limits[:feedback] %>"/>%                         
    </td>
  </tr> 
  <tr id="teammate_review" <%if !@assignment.team_assignment %>style="display:none"<% end %>>  
@@ -43,9 +49,11 @@
          questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
       <%= select('assignment', 'teammate_review_questionnaire_id', questionnaires)%>
    </td>
-   <td style="padding: 15px;">&nbsp;</td>
    <td style="padding: 15px;">
-       <input id="limits_review" name="limits[teammate]" size="5" type="text" value="<%= @limits[:teammate] %>"/>%                         
+   	   <input id="weights_teammate" name="weights[teammate]" size="5" type="text" value="<%= @weights[:teammate] %>"/>%     
+   </td>
+   <td style="padding: 15px;">
+       <input id="limits_teammate" name="limits[teammate]" size="5" type="text" value="<%= @limits[:teammate] %>"/>%                         
    </td>
   </tr>
 </table>

@@ -59,7 +59,7 @@
       	<% if participant.grade %>
 	        <FONT COLOR="#0033FF"><%= sprintf("%.2f",participant.grade) %>%</FONT>
       	<% else %>
-	    	<%= sprintf("%.2f",participant.compute_total_score(s_avg, r_avg)) %>% 
+	    	<%= sprintf("%.2f",participant.compute_total_score(s_avg, r_avg, f_avg, tr_avg)) %>% 
       	<% end %>   
       	<BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
     	<% else %>

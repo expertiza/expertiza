@@ -140,7 +140,7 @@ class ReviewFeedbackController < ApplicationController
     total, count = ReviewHelper.get_total_scores(participant.get_feedbacks,@review_feedback)     
     if count > 0
       questionnaire = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
-      ReviewHelper.notify_instructor(@assignment,questionnaire)
+      ReviewHelper.notify_instructor(@assignment,@review_feedback,questionnaire,total,count)
     end
   end  
  

@@ -54,10 +54,10 @@ module ReviewHelper
   
   # determine if the instructor should be notified
   # ajbudlon, nov 18, 2008
-  def self.notify_instructor(assignment,curr_item,questionnaire)
+  def self.notify_instructor(assignment,curr_item,questionnaire,total,count)
       
       max_possible_score,weights = assignment.get_max_score_possible(questionnaire,questionnaire.questions)
-      new_score = curr_item.get_total_score.to_f*weights    
+      new_score = curr_item.get_total_score.to_f*weights            
       existing_score = (total.to_f/count).to_f*weights 
       notification = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',assignment.instructor_id, assignment.id, questionnaire.id])
       if notification == nil

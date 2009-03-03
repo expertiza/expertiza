@@ -307,7 +307,7 @@ class ReviewController < ApplicationController
     total, count = ReviewHelper.get_total_scores(participant.get_reviews,@review)     
     if count > 0
       questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
-      ReviewHelper.notify_instructor(@assignment,@review,questionnaire)
+      ReviewHelper.notify_instructor(@assignment,@review,questionnaire,total,count)
     end
   end
   

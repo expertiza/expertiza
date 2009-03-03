@@ -127,7 +127,7 @@ class AssignmentParticipant < Participant
        submissions = Array.new
        self.team.get_team_users().each {
          | user |
-         val = WikiType.review_mediawiki_group(Assignment.find(self.parent_id).directory_path, _time, user.name)
+         val = WikiType.review_mediawiki_group(Assignment.find(self.parent_id).directory_path, currenttime, user.name)
          submissions << val if val.nil?
                   
        }

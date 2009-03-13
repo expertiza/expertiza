@@ -59,7 +59,11 @@
       	<% if participant.grade %>
 	        <FONT COLOR="#0033FF"><%= sprintf("%.2f",participant.grade) %>%</FONT>
       	<% else %>
-	    	<%= sprintf("%.2f",participant.compute_total_score(s_avg, r_avg, f_avg, tr_avg)) %>% 
+      	    <% if @assignment.team_assignment %>      		
+	    	   <%= sprintf("%.2f",participant.compute_total_score(s_avg, r_avg, f_avg, tr_avg)) %>%
+	    	<% else %>
+	    	   <%= sprintf("%.2f",participant.compute_total_score(s_avg, r_avg, f_avg,0)) %>%
+	    	<% end %> 
       	<% end %>   
       	<BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
     	<% else %>
@@ -70,7 +74,19 @@
    	    <% if participant.grade %>
    	    	<TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10) %>% </TD>
    	    <% else %>
-   	        <TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f",participant.compute_total_score*100)) %>% </TD>
+   	        <% 
+   	            s_avg, s_max, s_min = participant.compute_review_scores(@review_weight, @review_questionnaire, @review_questions)
+    			r_avg, r_max, r_min = participant.compute_metareview_scores(@metareview_weight, @metareview_questionnaire, @metareview_questions)   
+                f_avg, f_max, f_min = participant.compute_author_feedback_scores(@feedback_weight, @feedback_questionnaire, @feedback_questions)
+             %>
+   	           
+			<% if @assignment.team_assignment %>  
+			   <% s_avg, s_max, s_min = team.compute_review_scores(@review_weight, @review_questionnaire, @review_questions)
+			      tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores(@teammate_weight, @teammate_questionnaire, @teammate_questions) %>    		
+	    	   <TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f",participant.compute_total_score(s_avg, r_avg, f_avg, tr_avg))) %>% </TD>
+	    	<% else %>
+	    	   <TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f",participant.compute_total_score(s_avg, r_avg, f_avg, 0))) %>% </TD>
+	    	<% end %> 
    	    <% end %>   	        
    	<% end %>
 </TR>

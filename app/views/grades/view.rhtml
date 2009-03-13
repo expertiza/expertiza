@@ -16,7 +16,7 @@
     index += 1
     s_avg, s_max, s_min = participant.compute_review_scores(@review_weight, @review_questionnaire, @review_questions)
     r_avg, r_max, r_min = participant.compute_metareview_scores(@metareview_weight, @metareview_questionnaire, @metareview_questions)   
-    f_avg, f_max, f_min = participant.compute_author_feedback_scores(@feedback_weight, @feedback_questionnaire, @feedback_questions)
+    f_avg, f_max, f_min = participant.compute_author_feedback_scores(@feedback_weight, @feedback_questionnaire, @feedback_questions)    
   %>
     <%= render :partial => 'participant',
                :locals => {:prefix => 'user_'+index.to_s,

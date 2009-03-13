@@ -1,5 +1,6 @@
 class ReviewOfReviewController < ApplicationController
   helper :wiki
+  helper :student_assignment
   # This method returns the 
   def get_student_directory(directory_path, directory_num)
     # This assumed that the directory num has already been set

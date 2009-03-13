@@ -144,13 +144,13 @@ class UsersController < ApplicationController
        participant = AssignmentParticipant.find_by_user_id(user.id)
        team_user = TeamsUser.find_by_user_id(user.id)
        if participant 
-         participant.destroy()  
+         participant.delete 
        end
        if team_user
-         team_user.destroy()
+         team_user.delete
        end
     
-       user.destroy!
+       user.destroy
     rescue
       flash[:error] = $!
     end

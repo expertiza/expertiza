@@ -206,7 +206,7 @@ class AssignmentParticipant < Participant
         return nil, nil, nil
     end
    end    
-  end
+ end
   
   def compute_total_score (review_score, metareview_score, authorfeedback_score, teammate_review_score) 
     r_score = 0;
@@ -214,39 +214,18 @@ class AssignmentParticipant < Participant
     a_score = 0;
     t_score = 0;
     if review_score            
-      puts "********** REVIEW SCORE *************"
-      puts review_score
-      puts self.assignment.review_weight
-      r_score = review_score.to_f * (self.assignment.review_weight / 100).to_f
-      
+      r_score = review_score.to_f * (self.assignment.review_weight / 100).to_f      
     end    
     if metareview_score
-      puts "********** METAREVIEW SCORE *************"
-      puts metareview_score
-      puts self.assignment.metareview_weight
-      m_score = metareview_score.to_f * (self.assignment.metareview_weight / 100).to_f
-      
+      m_score = metareview_score.to_f * (self.assignment.metareview_weight / 100).to_f      
     end
     if authorfeedback_score
-      puts "********** AUTHOR FEEDBACK SCORE *************"
-      puts authorfeedback_score
-      puts self.assignment.author_feedback_weight
       a_score = authorfeedback_score.to_f * (self.assignment.author_feedback_weight / 100).to_f
     end    
-    if teammate_review_score
-      puts "********** TEAMMATE REVIEW SCORE *************"
-      puts teammate_review_score
-      puts self.assignment.teammate_review_score
+    if self.assignment.team_assignment && teammate_review_score
       t_score = teammate_review_score.to_f * (self.assignment.teammate_review_weight / 100).to_f
     end    
-    puts "************* WEIGHTED SCORES *******************"
-    puts r_score
-    puts m_score
-    puts a_score
-    puts t_score
-    puts "************ TOTAL SCORE *******************"
     total = r_score + m_score + a_score + t_score
-    puts total
     return total;
   end  
   

@@ -73,7 +73,6 @@ class GradesController < ApplicationController
     end
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = Assignment.find(@participant.parent_id)  
-    
     @reviews = Array.new    
     @reviewers_email_hash = Hash.new 
     
@@ -93,7 +92,33 @@ class GradesController < ApplicationController
   end
   
   def edit    
-    @participant = AssignmentParticipant.find(params[:id])        
+    @participant = AssignmentParticipant.find(params[:id]) 
+    @assignment = @participant.assignment
+    
+    get_questionnaires
+  end
+  
+  def get_questionnaires
+    @review_questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
+    @review_questions = @review_questionnaire.questions    
+    @max_review_score, @review_weight = @assignment.get_max_score_possible(@review_questionnaire, @review_questions)
+    
+    @metareview_questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
+    @metareview_questions = @metareview_questionnaire.questions    
+    @max_metareview_score, @metareview_weight = @assignment.get_max_score_possible(@metareview_questionnaire, @metareview_questions)
+    
+    @feedback_questionnaire = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
+    @feedback_questions = @feedback_questionnaire.questions    
+    @max_feedback_score, @feedback_weight = @assignment.get_max_score_possible(@feedback_questionnaire, @feedback_questions) 
+    
+    if @assignment.team_assignment
+      @teams = @assignment.get_teams
+      if @assignment.teammate_review_questionnaire_id
+         @teammate_questionnaire = Questionnaire.find(@assignment.teammate_review_questionnaire_id)
+         @teammate_questions = @teammate_questionnaire.questions    
+         @max_teammate_score, @teammate_weight = @assignment.get_max_score_possible(@teammate_questionnaire, @teammate_questions)
+      end
+    end          
   end
   
   def update
@@ -127,7 +152,9 @@ private
           @reviewers_email_hash[mapping.reviewer.fullname.to_s+" <"+mapping.reviewer.email.to_s+">"] = mapping.reviewer.email.to_s        
         end
       }    
-      @reviews = @reviews.sort {|a,b| a.review_mapping.reviewer.fullname <=> b.review_mapping.reviewer.fullname}    
+      @reviews = @reviews.sort {|a,b| a.review_mapping.reviewer.fullname <=> b.review_mapping.reviewer.fullname}
+      @questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
+      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire, @questionnaire.questions)      
   end
 
   def process_author_feedback
@@ -141,6 +168,9 @@ private
       }
         
       @reviews = @reviews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}
+      @questionnaire = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
+      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire, @questionnaire.questions  )
+      
   end
 
   def process_metareview
@@ -157,7 +187,9 @@ private
            @reviewers_email_hash[mapping.review_reviewer.fullname.to_s+" <"+mapping.review_reviewer.email.to_s+">"] = mapping.review_reviewer.email.to_s
         end    
       }
-      @reviews = @reviews.sort {|a,b| a.review_of_review_mapping.review_reviewer.fullname <=> b.review_of_review_mapping.review_reviewer.fullname}    
+      @reviews = @reviews.sort {|a,b| a.review_of_review_mapping.review_reviewer.fullname <=> b.review_of_review_mapping.review_reviewer.fullname}
+      @questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
+      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire, @questionnaire.questions)    
   end
   
   def process_teammate_review
@@ -174,7 +206,9 @@ private
           @reviewers_email_hash[review.reviewer.fullname.to_s+" <"+review.reviewer.email.to_s+">"] = review.reviewer.email.to_s        
         end
       }    
-      @reviews = @reviews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}    
+      @reviews = @reviews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}   
+      @questionnaire = Questionnaire.find(@assignment.teammate_review_questionnaire_id)
+      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire, @questionnaire.questions)      
   end
 
   def get_body_text(submission)

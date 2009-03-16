@@ -35,7 +35,7 @@ class InvitationController < ApplicationController
         end
       end
     end
-    redirect_to :controller => 'student_assignment', :action => 'view_team', :id=> student.id
+    redirect_to :controller => 'student_team', :action => 'view', :id=> student.id
   end
   
   def auto_complete_for_user_name
@@ -83,7 +83,7 @@ class InvitationController < ApplicationController
     @team_user.user_id = @inv.to_id
     @team_user.save
     
-    redirect_to :controller => 'student_assignment', :action => 'view_team', :id => student.id
+    redirect_to :controller => 'student_team', :action => 'view', :id => student.id
   end
   
   def decline
@@ -91,12 +91,12 @@ class InvitationController < ApplicationController
     @inv.reply_status = 'D'
     @inv.update
     student = Participant.find(params[:student_id])
-    redirect_to :controller => 'student_assignment', :action => 'view_team' , :id => student.id
+    redirect_to :controller => 'student_team', :action => 'view', :id => student.id
   end
 
   def cancel
     Invitation.find(params[:inv_id]).destroy
-    redirect_to :controller => 'student_assignment', :action => 'view_team' , :id => params[:student_id]
+    edirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
   end
 
 end

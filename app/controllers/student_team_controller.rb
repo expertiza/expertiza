@@ -3,7 +3,7 @@ class StudentTeamController < ApplicationController
    
   def view
     @student = AssignmentParticipant.find(params[:id])
-    @teams = AssignmentTeam.find_all(@student.parent_id)    
+    @teams = AssignmentTeam.find_all_by_parent_id(@student.parent_id)    
     for team in @teams
       @teamuser = TeamsUser.find(:first, :conditions => ['team_id = ? and user_id = ?', team.id, @student.user_id])
       if @teamuser != nil

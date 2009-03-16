@@ -26,7 +26,7 @@ function checkIfFileExists()
   </td>
  </tr>
  </table>
- <% if @model == 'Team' %>
+ <% if @model == 'AssignmentTeam' or @model == 'CourseTeam'%>
    <br/>
    <label for="column_one_has_name">Interpret first column as team name:</label>
    <%= check_box 'options','has_column_names', {:checked => 'checked'},  "true", "false"  %><br/>

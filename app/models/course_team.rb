@@ -37,10 +37,12 @@ class CourseTeam < Team
     end     
     
     if currTeam == nil
-       currTeam = Team.new
+       currTeam = CourseTeam.new
        currTeam.name = name
-       currTeam.assignment_id = course.id
+       currTeam.parent_id = course.id
        currTeam.save
+       parent = CourseNode.find_by_node_object_id(course.id)
+       TeamNode.create(:parent_id => parent.id, :node_object_id => currTeam.id)
     end
       
     while(index < row.length) 
@@ -50,12 +52,7 @@ class CourseTeam < Team
         elsif currTeam != nil         
           currUser = TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])          
           if currUser == nil
-            currUser = TeamsUser.new
-            currUser.team_id = currTeam.id
-            currUser.user_id = user.id
-            currUser.save   
-            
-            CourseParticipant.create(:parent_id => course.id, :user_id => user.id, :permission_granted => true)
+            currTeam.add_member(user)            
           end                      
         end
         index = index+1      

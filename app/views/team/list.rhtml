@@ -12,12 +12,15 @@
 <BR/>
 <%= link_to 'New Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>
 <% if @root_node.type == AssignmentNode %>
+  <% modelType = 'AssignmentTeam' %>
 | <%= link_to 'Copy Teams from Course', :action => 'inherit', :id => @root_node.node_object_id %>
+<% else %>
+  <% modelType = 'CourseTeam' %>
 <% end %>
 | <%= link_to 'Import Teams', 
             :controller=>'import_file', 
             :action=>'start', 
-            :model => 'Team', 
+            :model => modelType, 
             :title => 'Teams',
             :expected_fields =>  "&lt;Team Name - optional, &gt; Team Member1, Team Member2, ... , Team Member3",
             :id => @root_node.node_object_id %> 

@@ -8,7 +8,7 @@ class ImportFileController < ApplicationController
   end
   
   def import
-    begin
+    #begin
       errors = importFile(session,params)
       err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
       errors.each{
@@ -20,10 +20,10 @@ class ImportFileController < ApplicationController
         flash[:error] = err_msg
       end
       redirect_to session[:return_to]
-    rescue
-        flash[:error] = $!
-        redirect_to session[:return_to]
-    end
+    #rescue
+    #    flash[:error] = $!
+    #    redirect_to session[:return_to]
+    #end
   end
   
   protected  
@@ -35,15 +35,15 @@ class ImportFileController < ApplicationController
     while (line = file.gets)      
       row = parse_line(line,delimiter)      
       
-      begin
-        if params[:model] == 'Team'
+      #begin
+        if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
           Object.const_get(params[:model]).import(row,session,params[:id],params[:options])
         else
           Object.const_get(params[:model]).import(row,session,params[:id])
         end
-      rescue ImportError
-        errors << $!             
-      end      
+      #rescue ImportError
+      #  errors << $!             
+      #end      
     end 
     return errors
   end

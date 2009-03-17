@@ -17,6 +17,7 @@ class TeammateReviewController < ApplicationController
     @teammate_review = TeammateReview.new 
     @teammate_review.reviewer_id = params[:reviewer_id]
     @teammate_review.reviewee_id = params[:reviewee_id]
+    @assignment = Assignment.find(params[:assgt_id])
     @teammate_review.assignment_id = params[:assgt_id]
     #@teammate_review.team_id = params[:team_id]
     @teammate_review.additional_comment = params[:new_teammate_review][:comments]
@@ -96,7 +97,9 @@ class TeammateReviewController < ApplicationController
         prs.update
       end      
     end
+    @assignment = Assignment.find(@teammate_review.assignment_id)
     if @teammate_review.update
+      compare_scores
       flash[:notice] = 'Teammate review was successfully saved.'
       @student = Participant.find(:first, :conditions => ['user_id =? and parent_id =?', @teammate_review.reviewer_id, @teammate_review.assignment_id])
       redirect_to :controller => 'student_team', :action => 'view', :id => @student.id

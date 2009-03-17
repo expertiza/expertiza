@@ -25,14 +25,14 @@ class StudentTeamController < ApplicationController
     @student = AssignmentParticipant.find(params[:id])
     check = AssignmentTeam.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @student.parent_id])        
     @team = AssignmentTeam.new(params[:team])
-    @team.parent_id = @student.parent_id
+    @team.parent_id = @student.parent_id    
     #check if the team name is in use
     if (check.length == 0)      
       @team.save
-      @team_user = TeamsUser.new
-      @team_user.user_id = @student.user_id
-      @team_user.team_id = @team.id
-      @team_user.save
+      parent = AssignmentNode.find_by_node_object_id(@student.parent_id)
+      TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
+      user = User.find(@student.user_id)
+      @team.add_member(user)      
       redirect_to :controller => 'student_team', :action => 'view' , :id=> @student.id
     else
       flash[:notice] = 'Team name is already in use.'

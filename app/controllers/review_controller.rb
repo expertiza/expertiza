@@ -300,7 +300,8 @@ class ReviewController < ApplicationController
   # ajbudlon, nov 18, 2008
   def compare_scores  
     if @assignment.team_assignment 
-      participant = AssignmentTeam.find(@mapping.team_id)
+      team = AssignmentTeam.find(@mapping.team_id)
+      participant = team.get_participants.first
     else
       participant = AssignmentParticipant.find_by_user_id_and_parent_id(@mapping.author_id,@assignment.id)      
     end          

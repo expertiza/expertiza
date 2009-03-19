@@ -10,20 +10,27 @@
  <tr><ul>
   <%review_no = 1%>
   <%for review_map in @review_mapping %>
-  <% @review = Review.find_by_review_mapping_id(review_map.id) %>
-  <% if (@review)%>
-  <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%= review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
-  <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
-  	<%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %></li>
-  <% end %>	
-  <% else %>
-  	<% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
-		 <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id, :assignment => @assignment_id} %></li>
-  	<% else %>
-		<li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%=review_no%> &nbsp;Begin</li>
-  	<% end %>
-  <% end %>
-  <%review_no += 1
+  <% if @assignment.team_assignment
+       author = AssignmentTeam.find(review_map.team_id)
+     else 
+       author = AssignmentParticipant.find_by_user_id_and_parent_id(review_map.author_id,@assignment.id)
+     end 
+     if author != nil %>
+    <% @review = Review.find_by_review_mapping_id(review_map.id) %>
+    <% if (@review)%>
+      <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%= review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
+      <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
+     	<%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %></li>
+      <% end %>	
+    <% else %>    
+  	  <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
+		<li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id, :assignment => @assignment_id} %></li>
+  	  <% else %>
+   		<li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%=review_no%> &nbsp;Begin</li>
+  	  <% end 
+     end   	
+    review_no += 1   
+   end 
   end %></ul>
  </tr>
  <% if @can_view_metareview == true && @review_of_review_mappings.size > 0 %>

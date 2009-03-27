@@ -25,7 +25,7 @@ function collapseSubDirectory(row) {
 <%if @file != nil and @assgt.wiki_type.name == "No" and @files.size == 0 %>
 
 <%else%>
-Submitted Files<br />
+Submitted files<br />
 <%end%>
 
 <%
@@ -87,7 +87,7 @@ Submitted Files<br />
 	<% submitted = @link
 	if submitted !=nil
 	%>
-	URL to file submission (if available):</label><a href="<%= submitted %>" target="new"><%= submitted %></a>
+	URL of file submission (if available):</label><a href="<%= submitted %>" target="new"><%= submitted %></a>
 	<br/>
         <%break%>
 	<% end%>

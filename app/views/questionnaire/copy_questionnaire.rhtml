@@ -1,6 +1,6 @@
 <% @q_type=QuestionnaireType.find(Questionnaire.find(params[:id]).type_id).name %>
 
-<h1>Copy an Existing <%= @q_type %></h1>
+<h1>Copy an existing <%= @q_type %></h1>
 
 <%= start_form_tag :action => 'copy_questionnaire', ::id=>@questionnaire.id %>
   <%= render :partial => 'questionnaire' %>

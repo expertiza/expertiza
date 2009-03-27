@@ -19,8 +19,8 @@
 <br/>
 <% session[:return_to] = request.request_uri %>
 <% if params[:model] == 'Assignment' and  @parent.course_id > 0 %>
-  <%= link_to 'Copy Participants from Course', :action => 'inherit', :id => @root_node.node_object_id %>  |
-  <%= link_to 'Copy Participants to Course', :action => 'bequeath_all', :id => @root_node.node_object_id %>  |
+  <%= link_to 'Copy participants from course', :action => 'inherit', :id => @root_node.node_object_id %>  |
+  <%= link_to 'Copy participants to course', :action => 'bequeath_all', :id => @root_node.node_object_id %>  |
 <% end %>
 <%= link_to 'Import '+@model+' Participants', 
             :controller=>'import_file', 

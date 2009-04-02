@@ -75,11 +75,18 @@ class User < ActiveRecord::Base
       if row.length != 4
        raise ArgumentError, "Not enough items" 
       end    
-      user = User.find_by_name(row[0])        
-      if (user == nil)
+      user = User.find_by_name(row[0])    
+      
+      if user == nil
         attributes = ImportFileHelper::define_attributes(row)
         user = ImportFileHelper::create_new_user(attributes,session)
-      end          
+      else
+        user.clear_password = row[3].strip
+        user.email = row[2].strip
+        user.fullname = row[1].strip
+        user.parent_id = (session[:user]).id
+        user.save
+      end
   end  
   
   def get_author_name

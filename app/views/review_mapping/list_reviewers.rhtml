@@ -26,10 +26,10 @@
 %>
 <%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :delete_options => delete_options, :elements => @items} %>
 
-<%= start_form_tag ({:action => 'add_reviewer'}, {:method => 'post'}) %>
+<%= start_form_tag({:action => 'add_reviewer'}, {:method => 'post'}) %>
   Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-  <%= hidden_field_tag ('contributor_id', @contributor.id) %>
-  <%= hidden_field_tag ('assignment_id',@assignment.id) %>
+  <%= hidden_field_tag('contributor_id', @contributor.id) %>
+  <%= hidden_field_tag('assignment_id',@assignment.id) %>
   <input type='submit' value='Add Reviewer'/>
 <%= end_form_tag %>
 

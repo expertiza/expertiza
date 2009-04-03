@@ -257,12 +257,16 @@ class AssignmentController < ApplicationController
   
   def get_limits
     @limits = Hash.new
+        
+    default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',session[:user].id])   
     
-    default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',session[:user].id])
-    
+    #handle TAs
+    if default == nil
+      default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@assignment.instructor_id])
+    end
+
     review = NotificationLimit.find(:first, 
-                                 :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',
-                                                 session[:user].id,
+                                 :conditions => ['assignment_id = ? and questionnaire_id = ?',                                                
                                                  @assignment.id,
                                                  @assignment.review_questionnaire_id])
     if review != nil                                                 
@@ -272,8 +276,7 @@ class AssignmentController < ApplicationController
     end
     
     metareview = NotificationLimit.find(:first, 
-                                 :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',
-                                                 session[:user].id,
+                                 :conditions => ['assignment_id = ? and questionnaire_id = ?',
                                                  @assignment.id,
                                                  @assignment.review_of_review_questionnaire_id])
     if metareview != nil                                                 
@@ -283,8 +286,7 @@ class AssignmentController < ApplicationController
     end
     
     teammate = NotificationLimit.find(:first, 
-                                 :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',
-                                                 session[:user].id,
+                                 :conditions => ['assignment_id = ? and questionnaire_id = ?',
                                                  @assignment.id,
                                                  @assignment.teammate_review_questionnaire_id])
     if teammate != nil                                                 
@@ -294,8 +296,7 @@ class AssignmentController < ApplicationController
     end 
     
     feedback = NotificationLimit.find(:first, 
-                                 :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',
-                                                 session[:user].id,
+                                 :conditions => ['assignment_id = ? and questionnaire_id = ?',
                                                  @assignment.id,
                                                  @assignment.author_feedback_questionnaire_id])
     if feedback != nil                                                 

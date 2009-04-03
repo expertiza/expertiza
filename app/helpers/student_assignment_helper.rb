@@ -88,7 +88,7 @@ module StudentAssignmentHelper
                         ret += "<a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory("+@i.to_s+"); return false;'><img id='expand."+@i.to_s+"' alt='Expand/Collapse' title='Expand/Collapse' src='/images/up.png'></a>&nbsp;"
                         ret += link_to path, :controller=>'student_assignment', :action => 'submit', :id => student.id, :download => File.basename(path), "current_folder[name]" =>  File.dirname(disp)
                         ret += "</li>"
-                        ret += list_sub_directories (disp, student)
+                        ret += list_sub_directories(disp, student)
                 else
                         ret += link_to path, :controller=>'student_assignment', :action => 'submit', :id => student.id, :download => File.basename(path), "current_folder[name]" =>  File.dirname(disp)
                         ret += "</li>"
@@ -98,7 +98,7 @@ module StudentAssignmentHelper
         }
         ret += "</ul>"
   end
-  def display_directory_tree (files, student, flag)
+  def display_directory_tree(files, student, flag)
         @i = 0
         @check_stage = StudentAssignmentHelper.get_current_stage(student.assignment.id)
         ret = ""
@@ -115,7 +115,7 @@ module StudentAssignmentHelper
                 if File.directory?(file)
                         ret += "<a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory("+@i.to_s+"); return false;'><img id='expand."+@i.to_s+"' alt='Expand/Collapse' title='Expand/Collapse' src='/images/up.png'></a>&nbsp;"
                         ret += link_to File.basename(file), :controller=>'student_assignment', :action => 'submit', :id => student.id, :download => File.basename(file), "current_folder[name]" =>  File.dirname(file)
-                        ret += list_sub_directories (file, student)
+                        ret += list_sub_directories(file, student)
                 else
                         ret += link_to File.basename(file), :controller=>'student_assignment', :action => 'submit', :id => student.id, :download => File.basename(file), "current_folder[name]" =>  File.dirname(file)
                 end

@@ -22,7 +22,7 @@ class Mailer < ActionMailer::Base
      if defn[:from] != nil
        @from = defn[:from]
      else
-       @from = "expertiza@ncsu.edu"
+       @from = "root@pg-server.csc.ncsu.edu"
      end
      @body = defn[:body]
      @sent_on = Time.now 

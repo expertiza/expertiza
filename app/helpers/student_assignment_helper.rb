@@ -58,7 +58,8 @@ module StudentAssignmentHelper
    #begin
       Zip::ZipFile::open(file_name) {
         |zf| zf.each { |e|
-          fpath = File.join(unzip_dir, e.name)
+          safename = FileHelper::sanitize_filename(e.name);
+          fpath = File.join(unzip_dir, safename)
           FileUtils.mkdir_p(File.dirname(fpath))
           zf.extract(e, fpath) } }
 

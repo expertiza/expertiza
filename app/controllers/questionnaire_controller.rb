@@ -50,6 +50,10 @@ class QuestionnaireController < ApplicationController
   # Remove a given questionnaire
   def delete
     questionnaire = get(Questionnaire, params[:id])
+    joiner = AssignmentQuestionnaire.find_by_questionnaire_id(questionnaire.id)
+    if joiner
+       joiner.destroy
+    end
     node = QuestionnaireNode.find_by_node_object_id(questionnaire.id)             
     if node
       node.destroy

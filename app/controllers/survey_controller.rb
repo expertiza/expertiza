@@ -1,6 +1,6 @@
 class SurveyController < ApplicationController
 
-  def list
+  def assign
     @assignment = Assignment.find(params[:id])
     @assigned_surveys = SurveyHelper::get_assigned_surveys(@assignment.id)
     @surveys = Array.new
@@ -50,5 +50,7 @@ class SurveyController < ApplicationController
     end    
     @surveys.sort!{|a,b| a.name <=> b.name}
   end
+  
+  
 
 end

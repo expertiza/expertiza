@@ -1,5 +1,5 @@
 <h1>Surveys for Assignment: <%= @assignment.name %></h1>
-<%= form_tag(:action=>'assign_survey') %>
+<%= form_tag(:action=>'assign') %>
 <select name="subset" onchange="document.forms[0].submit()">
 	<option value="assigned" 
 		<% if params[:subset] == "assigned" -%>
@@ -19,7 +19,7 @@
 </select>
 <%= end_form_tag %>
 <% if @surveys.length != 0 -%>
-	<%= form_tag(:action=>'assign_survey')%>
+	<%= form_tag(:action=>'assign')%>
 		<br />
 		<table id="surveys_table">
 		<tr>

@@ -301,7 +301,8 @@ class StudentAssignmentController < ApplicationController
     if params['download']
       #folder_name = FileHelper::sanitize_folder(@current_folder.name)
       folder_name = params['current_folder']['name']
-      file_name = FileHelper::sanitize_filename(params['download'])
+      # -- This code removed on 4/10/09 ... was breaking downloads of files with hyphens in them ...file_name = FileHelper::sanitize_filename(params['download'])
+      file_name = params['download']
             
       file_split = file_name.split('.')
       if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')

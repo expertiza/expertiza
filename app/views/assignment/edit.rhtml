@@ -15,7 +15,10 @@
         <th style="padding:10px">Review of review allowed</th>
     </tr>
   <% 	i = 0;
-		for @due_date in @assignment.due_dates
+        duedates = @assignment.due_dates
+        duedates.sort! {|a,b| a.due_at <=> b.due_at}
+        
+		for @due_date in duedates
 		  
 		      if  @due_date.deadline_type_id == 1
 		         heading = "Submission deadline"

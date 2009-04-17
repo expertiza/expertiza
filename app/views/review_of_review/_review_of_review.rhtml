@@ -8,8 +8,13 @@ for @ror_question in @ror_questions %>
   <%end%>
   <% if @ror_question.true_false? %>
       <select id=new_score_<%=i%> name=new_score[<%=i%>]>
-         <option value="<%=@ror_min%>" <%if @ror_min==@ror_review_scores.score%>selected="selected"<%end%> ><%=@ror_min%></option>
-         <option value="<%=@ror_max%>" <%if @ror_max==@ror_review_scores.score%>selected="selected"<%end%> ><%=@ror_max%></option>     
+         <%if params[:action] != 'new' %>
+           <option value="<%=@ror_min%>" <%if @ror_min==@ror_review_scores.score%>selected="selected"<%end%> ><%=@ror_min%></option>
+           <option value="<%=@ror_max%>" <%if @ror_max==@ror_review_scores.score%>selected="selected"<%end%> ><%=@ror_max%></option>    
+         <%else%>
+           <option value="<%=@ror_min%>"><%=@ror_min%></option>
+           <option value="<%=@ror_max%>"><%=@ror_max%></option> 
+         <%end%> 
       </select><br />  
   <% else %>
       <select id=new_score_<%=i%> name=new_score[<%=i%>]>

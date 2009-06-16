@@ -34,11 +34,13 @@ class Review < ActiveRecord::Base
     return total_score
   end
   
-    def delete
-      mappings = ReviewOfReviewMapping.find(:all, :conditions => ['review_id = ?',self.id])
-      mappings.each {|mapping| mapping.delete}
-      self.destroy
-    end
+  def delete
+    scores = Score.find_all_by_instance_id(self.id)
+    scores.each {|score| score.destroy}
+    feedback = ReviewFeedback.find_all_by_review_id(self.id)
+    feedback.each {|fb| fb.destroy}
+    self.destroy
+  end
   
     def self.review_view_helper(review_id,fname,control_folder)
     @review = Review.find(review_id)

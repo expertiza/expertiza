@@ -1,0 +1,18 @@
+<% 
+   assignment = Assignment.find(@contributor.parent_id)
+   session[:mapping] = Hash.new
+   session[:mapping][:contributor] = @contributor
+   session[:mapping][:assignment] = assignment
+%>
+
+<h1>Add Reviewer</h1>
+<h2>Contributor: <%= @contributor.name %></h2>
+<h2>Assignment: <%= Assignment.find(@contributor.parent_id).name %></h2>
+<br/>
+
+<%= start_form_tag({:action => 'add_reviewer'}, {:method => 'post'}) %>
+  Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+  <%= hidden_field_tag('contributor_id', @contributor.user_id) %>
+  <%= hidden_field_tag('assignment_id', @contributor.parent_id) %>
+  <input type='submit' value='Add Reviewer'/>
+<%= end_form_tag %>

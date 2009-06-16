@@ -5,107 +5,218 @@ class ReviewMappingController < ApplicationController
     query = "select users.* from users, participants"
     query = query + " where participants.type = 'AssignmentParticipant'"
     query = query + " and users.name like '"+params[:user][:name]+"%'"
-    query = query + " and users.id = participants.user_id"
-    query = query + " and participants.parent_id = "+session[:mapping][:assignment].id.to_s
+    query = query + " and users.id = participants.user_id"    
     query = query + " and participants.parent_id <> "+session[:mapping][:contributor].id.to_s
     query = query + " order by users.name"
    @users = User.find_by_sql(query)
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
   
+  def select_reviewer
+    author = params[:id]
+    if author.class == AssignmentTeam  
+      @contributor = AssignmentTeam.find(author)
+    else
+      @contributor = AssignmentParticipant.find(author)      
+    end
+  end
+  
+  def select_metareviewer
+    @mapping = ReviewMapping.find(params[:id])    
+  end  
+  
   def add_reviewer
     assignment = Assignment.find(params[:assignment_id])        
-    reviewer = User.find_by_name(params[:user][:name])
+    reviewer = User.find_by_name(params[:user][:name])    
     if reviewer != nil && assignment != nil  
-       if AssignmentParticipant.find_by_parent_id_and_user_id(assignment.id,reviewer.id) == nil
-         AssignmentParticipant.create(:parent_id => assignment.id, :user_id => reviewer.id)
-       end       
+       #if AssignmentParticipant.find_by_parent_id_and_user_id(assignment.id,reviewer.id) == nil
+       #  AssignmentParticipant.create(:parent_id => assignment.id, :user_id => reviewer.id)
+       #end       
        if assignment.team_assignment
         exists = ReviewMapping.find(:first, :conditions => ['team_id = ? and reviewer_id = ? and assignment_id = ?',params[:contributor_id],reviewer.id,assignment.id])
         if exists == nil
            mapping = ReviewMapping.create(:team_id => params[:contributor_id], :reviewer_id => reviewer.id, :assignment_id => assignment.id, :round => 0)
         else
-          flash[:note] = "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+          flash[:error] = "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
         end
       else
         exists = ReviewMapping.find(:first, :conditions => ['author_id = ? and reviewer_id = ? and assignment_id = ?',params[:contributor_id],reviewer.id,assignment.id])
         if exists == nil
            mapping = ReviewMapping.create(:author_id => params[:contributor_id], :reviewer_id => reviewer.id, :assignment_id => assignment.id, :round => 0)
         else
-           flash[:note] = "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+           flash[:error] = "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
         end
       end
       if mapping
         mapping.save
-      end
-    end   
-          
-    redirect_to :action => 'list_reviewers', :assignment_id => assignment.id, :id => params[:contributor_id]    
+      end     
+    else
+      flash[:error] = "Something didn't work"
+    end
+    redirect_to :action => 'list_mappings', :id => assignment.id    
   end
   
-  def add_rofreviewer    
+  def add_metareviewer    
     reviewmapping = ReviewMapping.find(params[:id])
     rofreviewer = User.find_by_name(params[:user][:name])
-    ReviewOfReviewMapping.create(:review_mapping_id => reviewmapping.id,
-                                 :review_reviewer_id => rofreviewer.id,                          
-                                 :reviewer_id => reviewmapping.reviewer_id
-                                 )
-   
-    redirect_to :action => 'list_rofreviewers', :id => reviewmapping.id                                            
-  end  
-  
-  def list_reviewers        
-    @assignment = Assignment.find(params[:assignment_id])
-    if @assignment.team_assignment
-      @contributor = Team.find(params[:id])
-      query = 'team_id = ? and assignment_id = ?'
-    else
-      @contributor = User.find(params[:id])
-      query = 'author_id = ? and assignment_id = ?'
+    include = params[:options][:include]
+    puts "*******************"
+    puts include
+    if include == "true"
+      pExist = AssignmentParticipant.find_by_user_id_and_parent_id(rofreviewer.id,reviewmapping.assignment_id)
+      if pExist == nil
+        AssignmentParticipant.create(:user_id => rofreviewer.id,
+                                     :parent_id => reviewmapping.assignment_id)
+      end
     end
-    @items = ReviewMapping.find(:all, :conditions => [query,@contributor.id,@assignment.id])   
-  end
-  
-  def list_rofreviewers    
-    @reviewmapping = ReviewMapping.find(params[:id])
-    @assignment = Assignment.find(@reviewmapping.assignment_id)
-    @items = ReviewOfReviewMapping.find(:all, :conditions => ['review_mapping_id = ?',@reviewmapping.id])
+    exists = ReviewOfReviewMapping.find(:first, :conditions => ['review_mapping_id = ? and review_reviewer_id = ?',reviewmapping.id,rofreviewer.id])
+    if exists == nil
+        ReviewOfReviewMapping.create(:review_mapping_id => reviewmapping.id,
+                                     :review_reviewer_id => rofreviewer.id,                          
+                                     :reviewer_id => reviewmapping.reviewer_id
+                                    )
+    else
+       flash[:error] = "The metareviewer, \""+rofreviewer.name+"\", is already assigned to this reviewer."
+    end
+   
+    redirect_to :action => 'list_mappings', :id => reviewmapping.assignment_id                                            
   end  
   
   def delete_all_reviewers    
-    mappings = ReviewMapping.get_mappings(params[:assignment_id],params[:id]) 
+    author = params[:id]
+    if author.class == AssignmentTeam
+      contributor = AssignmentTeam.find(params[:id])
+      assignment_id = contributor.parent_id
+    else
+      participant = AssignmentParticipant.find(params[:id])
+      assignment_id = participant.parent_id
+      contributor = User.find(participant.user_id)
+    end
+    assignment = Assignment.find(assignment_id)
+    
+    title = "A delete action failed:<br/>"
+    msg = ""
+    
+    mappings = ReviewMapping.get_mappings(assignment.id,contributor.id)
     mappings.each{ 
        |mapping|
        begin
          mapping.delete
        rescue
-         flash[:error] = "A delete action failed." + $!
+         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Continue</a>?<br/>"
        end
     }
-    if Assignment.find(params[:assignment_id]).team_assignment
-      contributor = Team.find(params[:id])
+    if msg.length > 0
+      title += msg
+      flash[:error] = title      
     else
-      contributor = User.find(params[:id])
+      flash[:note] = "All review mappings for \""+contributor.name+"\" have been deleted."
+      
     end
-    flash[:note] = "All review mappings for "+contributor.get_author_name+" have been deleted."
-    redirect_to :action => 'list_mappings', :id => params[:assignment_id]
+    redirect_to :action => 'list_mappings', :id => assignment_id
+  end
+  
+  def delete_all_metareviewers    
+    mapping = ReviewMapping.find(params[:id])    
+    assignment_id = mapping.assignment_id
+    
+    title = "A delete action failed:<br/>"
+    msg = ""
+    
+    rmappings = ReviewOfReviewMapping.find_all_by_review_mapping_id(mapping.id)
+    rmappings.each{ 
+       |rmapping|
+       begin
+         rmapping.delete
+       rescue
+         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_metareview/"+mapping.id.to_s+"'>Continue</a>?<br/>"
+       end
+    }
+    if msg.length > 0
+      title += msg
+      flash[:error] = title      
+    else
+      flash[:note] = "All metareview mappings for contributor, \""+mapping.reviewee.name+"\", and reviewer, \""+mapping.reviewer.name+"\", have been deleted."
+      
+    end
+    redirect_to :action => 'list_mappings', :id => assignment_id
+  end  
+      
+  def delete_participant
+    participant = AssignmentParticipant.find(params[:id])
+    assignment_id = participant.parent_id
+    contributor = User.find(participant.user_id)
+
+    title = "A delete action failed:<br/>"
+    msg = ""
+    
+    mappings = ReviewMapping.get_mappings(assignment_id,contributor.id)
+    mappings.each{ 
+       |mapping|
+       begin
+         mapping.delete
+       rescue
+         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Continue</a>?<br/>"
+       end
+    }
+    if msg.length > 0
+      title += msg
+      flash[:error] = title      
+    else
+      participant.delete
+      flash[:note] = "All review mappings for \""+contributor.name+"\" have been deleted."      
+    end             
+    redirect_to :action => 'list_mappings', :id => assignment_id
   end
   
   def delete_reviewer
     mapping = ReviewMapping.find(params[:id]) 
-    assignment = Assignment.find(mapping.assignment_id)
-    if assignment.team_assignment
+    assignment_id = mapping.assignment_id
+    if mapping.assignment.team_assignment
       contributor = Team.find(mapping.team_id)
     else
       contributor = User.find(mapping.author_id)
     end
     begin
       mapping.delete
-      flash[:note] = "All review mappings for "+contributor.get_author_name+" and "+mapping.reviewer.name+" have been deleted."        
+      flash[:note] = "The review mapping for \""+contributor.name+"\" and \""+mapping.reviewer.name+"\" have been deleted."        
     rescue      
-      flash[:error] = "A delete action failed." + $! 
+      flash[:error] = "A delete action failed.<br/>&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Continue</a>?"     
     end
-    redirect_to :action => 'list_reviewers', :assignment_id => assignment.id, :id => contributor.id
+    redirect_to :action => 'list_mappings', :id => assignment_id
+  end
+  
+  def delete_metareviewer
+    mapping = ReviewOfReviewMapping.find(params[:id])
+    assignment_id = mapping.review_mapping.assignment_id
+    flash[:note] = "The metareview mapping for "+mapping.reviewer.name+" and "+mapping.review_reviewer.name+" have been deleted."
+    
+    begin 
+      mapping.delete
+    rescue
+      flash[:error] = "A delete action failed.<br/>&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_metareview/"+mapping.id.to_s+"'>Continue</a>?"     
+    end
+    
+    redirect_to :action => 'list_mappings', :id => assignment_id
+  end
+
+  
+  def delete_review
+    mapping = ReviewMapping.find(params[:id])
+    review = Review.find_by_review_mapping_id(mapping.id)
+    review.delete
+    mapping.delete
+    assignment = Assignment.find(mapping.assignment_id)
+    redirect_to :action => 'list_mappings', :id => assignment.id
+  end
+  
+  def delete_metareview
+    mapping = ReviewOfReviewMapping.find(params[:id])
+    assignment_id = mapping.review_mapping.assignment_id
+    metareview = ReviewOfReview.find_by_review_of_review_mapping_id(mapping.id)
+    metareview.delete
+    mapping.delete
+    redirect_to :action => 'list_mappings', :id => assignment.id
   end
   
   def delete_rofreviewer
@@ -138,12 +249,13 @@ class ReviewMappingController < ApplicationController
   end     
   
   def list_mappings
-    @assignment = Assignment.find(params[:id])
-        
+    @assignment = Assignment.find(params[:id])       
     if @assignment.team_assignment
       @items = AssignmentTeam.find_by_sql('select * from `teams` where `parent_id` = '+@assignment.id.to_s)
+      @items.sort!{|a,b| a.name <=> b.name}
     else
-      @items = User.find_by_sql('select * from `users` where id in (select `user_id` from `participants` where `parent_id` = '+@assignment.id.to_s+')')
+      @items = AssignmentParticipant.find_by_sql('select * from `participants` where `parent_id` = '+@assignment.id.to_s)
+      @items.sort!{|a,b| a.fullname <=> b.fullname}
     end
   end
   

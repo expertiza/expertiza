@@ -103,7 +103,7 @@ class ReviewMappingController < ApplicationController
        begin
          mapping.delete
        rescue
-         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Continue</a>?<br/>"
+         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Delete these reviews</a>?<br/>"
        end
     }
     if msg.length > 0
@@ -129,7 +129,7 @@ class ReviewMappingController < ApplicationController
        begin
          rmapping.delete
        rescue
-         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_metareview/"+mapping.id.to_s+"'>Continue</a>?<br/>"
+         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_metareview/"+mapping.id.to_s+"'>Delete these metareviews</a>?<br/>"
        end
     }
     if msg.length > 0
@@ -156,7 +156,7 @@ class ReviewMappingController < ApplicationController
        begin
          mapping.delete
        rescue
-         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Continue</a>?<br/>"
+         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Delete these reviews</a>?<br/>"
        end
     }
     if msg.length > 0
@@ -181,7 +181,7 @@ class ReviewMappingController < ApplicationController
       mapping.delete
       flash[:note] = "The review mapping for \""+contributor.name+"\" and \""+mapping.reviewer.name+"\" have been deleted."        
     rescue      
-      flash[:error] = "A delete action failed.<br/>&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Continue</a>?"     
+      flash[:error] = "A delete action failed.<br/>&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Delete these reviews</a>?"     
     end
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
@@ -194,7 +194,7 @@ class ReviewMappingController < ApplicationController
     begin 
       mapping.delete
     rescue
-      flash[:error] = "A delete action failed.<br/>&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_metareview/"+mapping.id.to_s+"'>Continue</a>?"     
+      flash[:error] = "A delete action failed.<br/>&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_metareview/"+mapping.id.to_s+"'>Delete these metareviews</a>?"     
     end
     
     redirect_to :action => 'list_mappings', :id => assignment_id

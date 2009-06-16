@@ -17,7 +17,7 @@ class ReviewMapping < ActiveRecord::Base
   def delete
     review = Review.find(:all, :conditions => ['review_mapping_id = ?',self.id])    
     if review.length > 0
-      raise "At least one review has already been performed for this mapping."
+      raise "At least one review has already been performed by \""+self.reviewer.name+"\" for \""+self.reviewee.name+"\"."     
     end  
     mappings = ReviewOfReviewMapping.find(:all, :conditions => ['review_mapping_id = ?',self.id])
     mappings.each { |mapping| mapping.delete  }

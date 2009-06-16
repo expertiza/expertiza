@@ -2,20 +2,97 @@
 <%= render :partial => 'shared_scripts/checkIfFileExists' %>
 </script>
 
-<h1>Contributors</h1>
-<h2>Assignment <%= @assignment.name %></h2>
+<h1>Participants</h1>
+<h2>Assignment: <%= @assignment.name %></h2>
 <br/>
-
-<% 
-   column_definitions = Array.new
-   column_definitions << {:name => 'Contributor', :type => 'display', :field => 'name'}
-   column_definitions << {:name => 'Modify Reviewers', :action => 'list_reviewers', :controller => 'review_mapping', :hidden => {:name => 'assignment_id', :id => @assignment.id}}      
-   column_definitions << {:name => 'Delete Mappings', :action => 'delete_all_reviewers',  :controller => 'review_mapping', :hidden => {:name => 'assignment_id', :id => @assignment.id}}   
-     
-   delete_options = {:enabled => false}
-%>
-<%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :delete_options => delete_options, :elements => @items, :delete_controller => 'review_mapping'} %>
-
+<table width="100%" cellpadding="10">
+  <tr CLASS="head" ><th width="30%">Contributor</th><th width="30%">Reviewed By</th><th width="30%">Metareviewed By</th></tr>
+  <% index1 = 0 
+     index2 = 0
+     index3 = 0
+  @items.each{
+    | contrib |
+       index1+=1 
+       if index1 % 2 == 0
+          bgcolor1 = "#FAFAE8"
+       else 
+          bgcolor1 = "#E8E8D1"
+       end
+       %>       
+      <tr style="background-color:<%=bgcolor1%>">
+      <td style="vertical-align:top;"><%= contrib.name %>
+        <% if !@assignment.team_assignment %>          
+           (<%= contrib.fullname %>)
+        <% end %>
+         <div style="text-align:right">
+           <% if !@assignment.team_assignment %>
+             <%= link_to 'delete', :action => 'delete_participant', :id => contrib.id %><br/>
+           <% end %>
+           <%= link_to 'add reviewer', :action => 'select_reviewer', :id => contrib %><br/>
+           <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => contrib %>
+         </div>
+       </td>
+    <td colspan="2">
+    <table width="100%" cellpadding="10">
+    <% if @assignment.team_assignment
+          mappings = ReviewMapping.find_all_by_assignment_id_and_team_id(@assignment.id,contrib.id)
+       else
+          mappings = ReviewMapping.find_all_by_assignment_id_and_author_id(@assignment.id,contrib.user_id)
+       end     
+       mappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname }      
+       mappings.each{
+         | map |
+         if map
+           index2 += 1 
+           if index2 % 2 == 0
+              bgcolor2 = "#FAFAD1"
+           else 
+              bgcolor2 = "#E8E8BA"
+           end
+           %>           
+           <tr style="background-color:<%=bgcolor2%>">
+             <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
+             <div style="text-align:right">
+               <%= link_to 'delete', :action => 'delete_reviewer', :id => map.id %><br/>
+               <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.id %><br/>               
+               <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.id %>
+             </div>             
+             </td>
+             <td width="50%">
+               <table width="100%">
+               <% rmappings = ReviewOfReviewMapping.find_all_by_review_mapping_id(map.id) 
+                  rmappings.sort! {|a,b| a.review_reviewer.fullname <=> b.review_reviewer.fullname } %>
+               <% rmappings.each{
+                  | rmap |
+                  if rmap 
+                    index3+=1 
+                    if index3 % 2 == 0
+                      bgcolor3 = "#FFFFFF"
+                    else 
+                      bgcolor3 = "#DDDDDD"
+                    end
+               %>              
+                   <tr style="background-color:<%=bgcolor3%>">
+                     <td><%= rmap.review_reviewer.name %> (<%= rmap.review_reviewer.fullname %>)
+                     <div style="text-align:right">
+                       <%= link_to 'delete', :action => 'delete_metareviewer', :id => rmap.id %><br/>
+                     </div>      
+                     </td>
+                   </tr>
+               <% end
+                } %>
+               </table>
+             </td>
+           </tr>
+           <%
+         end
+       }
+    %>       
+    </table>
+    </td>
+    </tr>    
+   <% } %>   
+</table>
 <% 
   session[:return_to] = request.request_uri    
 %>

@@ -35,11 +35,14 @@
     <td colspan="2">
     <table width="100%" cellpadding="10">
     <% if @assignment.team_assignment
-          mappings = ReviewMapping.find_all_by_assignment_id_and_team_id(@assignment.id,contrib.id)
+          mappings = ReviewMapping.find(:all, :conditions => ['assignment_id = ? and team_id = ? and reviewer_id != 0',@assignment.id,contrib.id])
        else
-          mappings = ReviewMapping.find_all_by_assignment_id_and_author_id(@assignment.id,contrib.user_id)
+          mappings = ReviewMapping.find(:all, :conditions => ['assignment_id = ? and author_id = ? and reviewer_id != 0',@assignment.id,contrib.user_id])
        end     
-       mappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname }      
+
+       if mappings.length > 0
+       	 mappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}
+       end      
        mappings.each{
          | map |
          if map
@@ -50,7 +53,7 @@
               bgcolor2 = "#E8E8BA"
            end
            %>           
-           <tr style="background-color:<%=bgcolor2%>">
+           <tr style="background-color:<%=bgcolor2%>">            
              <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
              <div style="text-align:right">
                <%= link_to 'delete', :action => 'delete_reviewer', :id => map.id %><br/>

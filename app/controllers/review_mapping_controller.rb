@@ -71,9 +71,8 @@ class ReviewMappingController < ApplicationController
     end
     exists = ReviewOfReviewMapping.find(:first, :conditions => ['review_mapping_id = ? and review_reviewer_id = ?',reviewmapping.id,rofreviewer.id])
     if exists == nil
-        ReviewOfReviewMapping.create(:review_mapping_id => reviewmapping.id,
-                                     :review_reviewer_id => rofreviewer.id,                          
-                                     :reviewer_id => reviewmapping.reviewer_id
+        ReviewOfReviewMapping.create(:review_mapping_id => reviewmapping.id,                        
+                                     :reviewer_id => rofreviewer.id
                                     )
     else
        flash[:error] = "The metareviewer, \""+rofreviewer.name+"\", is already assigned to this reviewer."
@@ -129,14 +128,14 @@ class ReviewMappingController < ApplicationController
        begin
          rmapping.delete
        rescue
-         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_metareview/"+mapping.id.to_s+"'>Delete these metareviews</a>?<br/>"
+         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_metareview/"+rmapping.id.to_s+"'>Delete these metareviews</a>?<br/>"
        end
     }
     if msg.length > 0
       title += msg
       flash[:error] = title      
     else
-      flash[:note] = "All metareview mappings for contributor, \""+mapping.reviewee.name+"\", and reviewer, \""+mapping.reviewer.name+"\", have been deleted."
+      flash[:note] = "All metareview mappings for contributor, \""+rmapping.review_mapping.reviewer.name+"\", and reviewer, \""+rmapping.reviewer.name+"\", have been deleted."
       
     end
     redirect_to :action => 'list_mappings', :id => assignment_id
@@ -189,7 +188,7 @@ class ReviewMappingController < ApplicationController
   def delete_metareviewer
     mapping = ReviewOfReviewMapping.find(params[:id])
     assignment_id = mapping.review_mapping.assignment_id
-    flash[:note] = "The metareview mapping for "+mapping.reviewer.name+" and "+mapping.review_reviewer.name+" have been deleted."
+    flash[:note] = "The metareview mapping for "+mapping.review_mapping.reviewer.name+" and "+mapping.reviewer.name+" have been deleted."
     
     begin 
       mapping.delete
@@ -246,15 +245,74 @@ class ReviewMappingController < ApplicationController
           @letters << first  
        end
     }       
-  end     
+  end    
+  
+  def list_sortable
+    @assignment = Assignment.find(params[:id])
+    @entries = Array.new 
+    index = 0
+    if @assignment.team_assignment
+      contributors = AssignmentTeam.find_all_by_parent_id(@assignment.id)       
+    else
+      contributors = AssignmentParticipant.find_all_by_parent_id(@assignment.id)
+    end
+    contributors.sort!{|a,b| a.name <=> b.name}    
+    contributors.each{
+      |contrib|
+      if @assignment.team_assignment
+        review_mappings = ReviewMapping.find_all_by_assignment_id_and_team_id(@assignment.id,contrib.id)
+      else
+        review_mappings = ReviewMapping.find_all_by_assignment_id_and_author_id(@assignment.id,contrib.user_id)
+      end
+      puts "********************"
+      puts review_mappings.size
+      if review_mappings.length == 0
+        single = Array.new
+        single[0] = contrib.name
+        single[1] = "&nbsp;"
+        single[2] = "&nbsp;"
+        @entries[index] = single
+        index += 1
+      else
+      review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
+      review_mappings.each{
+        |review_map|
+        metareview_mappings = ReviewOfReviewMapping.find_all_by_review_mapping_id(review_map.id)
+        if metareview_mappings.length == 0
+          single = Array.new
+          single[0] = contrib.name
+          single[1] = review_map.reviewer.name
+          single[2] = "&nbsp;"
+          @entries[index] = single
+          index += 1
+        else
+          metareview_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
+          metareview_mappings.each{
+            |metareview_map|
+              single = Array.new
+              single[0] = contrib.name
+              single[1] = review_map.reviewer.name
+              if metareview_map.review_reviewer == nil
+                single[2] = metareview_map.reviewer.name
+              else
+                single[2] = metareview_map.review_reviewer.name
+              end
+              @entries[index] = single
+              index += 1
+          }
+        end
+      }
+      end
+    }
+  end
   
   def list_mappings
     @assignment = Assignment.find(params[:id])       
     if @assignment.team_assignment
-      @items = AssignmentTeam.find_by_sql('select * from `teams` where `parent_id` = '+@assignment.id.to_s)
+      @items = AssignmentTeam.find_all_by_parent_id(@assignment.id) 
       @items.sort!{|a,b| a.name <=> b.name}
     else
-      @items = AssignmentParticipant.find_by_sql('select * from `participants` where `parent_id` = '+@assignment.id.to_s)
+      @items = AssignmentParticipant.find_all_by_parent_id(@assignment.id) 
       @items.sort!{|a,b| a.fullname <=> b.fullname}
     end
   end

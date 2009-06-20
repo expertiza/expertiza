@@ -6,14 +6,14 @@
  
 <%= render :partial => '/tree_display/page_footer' %> 
 
+
 <% 
   session[:return_to] = request.request_uri    
 %>
 <BR/>
-<%= link_to 'New Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>
+<%= link_to 'Create Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>
 <% if @root_node.type == AssignmentNode %>
   <% modelType = 'AssignmentTeam' %>
-| <%= link_to 'Copy Teams from Course', :action => 'inherit', :id => @root_node.node_object_id %>
 <% else %>
   <% modelType = 'CourseTeam' %>
 <% end %>
@@ -24,4 +24,5 @@
             :title => 'Teams',
             :expected_fields =>  "&lt;Team Name - optional, &gt; Team Member1, Team Member2, ... , Team Member3",
             :id => @root_node.node_object_id %> 
-| <%= render :partial => '/shared_scripts/back' %>
+|<%= link_to 'Delete All Teams', :action => 'delete_all', :id=> @root_node.node_object_id, :model => @model %>
+|<%= render :partial => '/shared_scripts/back' %>

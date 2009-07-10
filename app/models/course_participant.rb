@@ -21,7 +21,7 @@ class CourseParticipant < Participant
       user = ImportFileHelper::create_new_user(attributes,session)
     end              
     course = Course.find(id)
-    if assignment == nil
+    if course == nil
        raise ImportError, "The assignment with id \""+id.to_s+"\" was not found."
     end
     if (find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, course.id]}).size == 0)

@@ -22,7 +22,7 @@ class CourseParticipant < Participant
     end              
     course = Course.find(id)
     if course == nil
-       raise ImportError, "The assignment with id \""+id.to_s+"\" was not found."
+       raise ImportError, "The course with id \""+id.to_s+"\" was not found."
     end
     if (find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, course.id]}).size == 0)
        create(:user_id => user.id, :parent_id => course.id)

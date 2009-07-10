@@ -1,6 +1,9 @@
 class AddNewQuestionnaireTypes < ActiveRecord::Migration
   def self.up
     type = QuestionnaireType.find_by_name('Review Rubric')
+    if type == nil
+      type = QuestionnaireType.find_by_name('Rubric')
+    end
     if type
       type.name = 'Review'
       type.save

@@ -17,12 +17,7 @@ class UpdateControllersTeammateReview < ActiveRecord::Migration
     item = MenuItem.find_by_name('manage/questionnaires')    
     maxseq = MenuItem.find_all_by_parent_id(item.id).length
     MenuItem.create(:name => 'manage/questionnaires/teammate reviews', :label => 'Teammate Review', :parent_id => item.id, :seq => maxseq+1, :controller_action_id => action.id)
-    
-    folder = TreeFolder.find_by_name('Questionnaires')
-    parent = FolderNode.find_by_node_object_id(folder.id)
-    type = QuestionnaireType.find_by_name('Teammate Review')
-    QuestionnaireTypeNode.create(:parent_id => parent.id, :node_object_id => type.id)
-    
+        
     Role.rebuild_cache 
   end
 

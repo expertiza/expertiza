@@ -8,9 +8,9 @@
 <li><%= link_to 'Add Participants',:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment'%></li>            
 <% if Assignment.find(node.node_object_id).team_assignment %><li><%= link_to 'Create Teams',:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Assignment' %></li><% end %>
 <% if Assignment.find(node.node_object_id).course_id > 0%>
-<li><%= link_to 'Remove from Course', :controller => 'assignment', :action => 'remove', :id => node.node_object_id %>
+<li><%= link_to 'Remove from Course', :controller => 'assignment', :action => 'remove_assignment_from_course', :id => node.node_object_id %>
 <% else %>
-<li><%= link_to 'Assign to Course', :controller => 'assignment', :action => 'assign', :id => node.node_object_id %> 
+<li><%= link_to 'Assign to Course', :controller => 'assignment', :action => 'associate_assignment_to_course', :id => node.node_object_id %> 
 <% end %> 
 <li><%= link_to 'Assign Reviewers',:controller=>'review_mapping', :action=>'list_mappings', :id => node.node_object_id %></li>
 <li><%= link_to 'View Scores',:controller=>'grades', :action=>'view', :id => node.node_object_id %></li>   

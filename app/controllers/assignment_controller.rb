@@ -55,6 +55,7 @@ class AssignmentController < ApplicationController
                 :feedback => 0}               
   end
   
+  # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
     assignment = Assignment.find(params[:id])
     assignment.private = !assignment.private
@@ -173,12 +174,12 @@ class AssignmentController < ApplicationController
     
   def edit
     @assignment = Assignment.find(params[:id])
-    get_limits 
+    get_instructor_notification_limits
     get_weights
     @wiki_types = WikiType.find_all
   end
   
-  def define_limit(assignment_id, questionnaire_id, limit)
+  def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
      existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
      if existing.nil?
        NotificationLimit.create(:user_id => session[:user].id,
@@ -191,23 +192,13 @@ class AssignmentController < ApplicationController
      end    
   end
   
-  def define_weight(assignment_id, questionnaire_id, weight)    
+  def define_weight(assignment_id, questionnaire_id, type, weight)    
      existing = QuestionnaireWeight.find(:first, :conditions => ['assignment_id = ? and questionnaire_id = ?',assignment_id,questionnaire_id])
      if existing.nil?
        qw = QuestionnaireWeight.create(:assignment_id => assignment_id,
                                        :questionnaire_id => questionnaire_id,
-                                       :weight => weight)
-                                       
-                                             
-       if Assignment.find(assignment_id).review_questionnaire_id == questionnaire_id
-         qw.type = "ReviewWeight"
-       elsif Assignment.find(assignment_id).review_of_review_questionnaire_id == questionnaire_id
-          qw.type = "MetareviewWeight"
-       elsif Assignment.find(assignment_id).author_feedback_questionnaire_id == questionnaire_id
-         qw.type = "AuthorFeedbackWeight"
-       elsif Assignment.find(assignment_id).teammate_review_questionnaire_id == questionnaire_id
-         qw.type = "TeammateReviewWeight"         
-       end
+                                       :weight => weight)                                      
+       qw.type = type                                      
        qw.save                                
      else
         existing.weight = weight
@@ -218,19 +209,17 @@ class AssignmentController < ApplicationController
   def set_limits
     if params[:limits]
         if @assignment.review_questionnaire_id and (params[:limits][:review] != params[:review_limit])          
-          define_limit(@assignment.id, @assignment.review_questionnaire_id, params[:limits][:review])                       
-        end 
-        
+          define_instructor_notification_limit(@assignment.id, @assignment.review_questionnaire_id, params[:limits][:review])                       
+        end         
         if @assignment.review_of_review_questionnaire_id and (params[:limits][:metareview] != params[:metareview_limit])
-          define_limit(@assignment.id, @assignment.review_of_review_questionnaire_id, params[:limits][:metareview])                             
-        end
-        
+          define_instructor_notification_limit(@assignment.id, @assignment.review_of_review_questionnaire_id, params[:limits][:metareview])                             
+        end        
         if @assignment.teammate_review_questionnaire_id and (params[:limits][:teammate] != params[:teammate_limit])           
-          define_limit(@assignment.id, @assignment.teammate_review_questionnaire_id, params[:limits][:teammate])
+          define_instructor_notification_limit(@assignment.id, @assignment.teammate_review_questionnaire_id, params[:limits][:teammate])
         end
-               
+              
         if @assignment.author_feedback_questionnaire_id and (params[:limits][:feedback] != params[:feedback_limit])                      
-          define_limit(@assignment.id, @assignment.author_feedback_questionnaire_id, params[:limits][:feedback])
+          define_instructor_notification_limit(@assignment.id, @assignment.author_feedback_questionnaire_id, params[:limits][:feedback])
         end
       end    
   end  
@@ -238,24 +227,24 @@ class AssignmentController < ApplicationController
   def set_weights
     if params[:weights]
         if @assignment.review_questionnaire_id          
-          define_weight(@assignment.id, @assignment.review_questionnaire_id, params[:weights][:review])                       
+          define_weight(@assignment.id, @assignment.review_questionnaire_id, "ReviewWeight", params[:weights][:review])                       
         end 
         
         if @assignment.review_of_review_questionnaire_id 
-          define_weight(@assignment.id, @assignment.review_of_review_questionnaire_id, params[:weights][:metareview])                             
+          define_weight(@assignment.id, @assignment.review_of_review_questionnaire_id, "MetareviewWeight", params[:weights][:metareview])                             
         end
         
         if @assignment.teammate_review_questionnaire_id 
-          define_weight(@assignment.id, @assignment.teammate_review_questionnaire_id , params[:weights][:teammate])
+          define_weight(@assignment.id, @assignment.teammate_review_questionnaire_id , "AuthorFeedbackWeight", params[:weights][:teammate])
         end
                
         if @assignment.author_feedback_questionnaire_id 
-          define_weight(@assignment.id, @assignment.author_feedback_questionnaire_id  , params[:weights][:feedback])
+          define_weight(@assignment.id, @assignment.author_feedback_questionnaire_id, "TeammateReviewWeight", params[:weights][:feedback])
         end
       end    
   end    
   
-  def get_limits
+  def get_instructor_notification_limits
     @limits = Hash.new
         
     default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',session[:user].id])   
@@ -396,28 +385,15 @@ class AssignmentController < ApplicationController
     end
     
     redirect_to :controller => 'tree_display', :action => 'list'
-  end
-  
+  end  
   
   def list
     set_up_display_options("ASSIGNMENT")
     @assignments=super(Assignment)
     #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
-    
-  def ror_for_instructors
-    @reviewer_id = session[:user].id
-    @assignment_id = params[:id]
-    @reviews = Array.new
-    review_mappings = ReviewMapping.find(:all,:conditions => ["assignment_id = ?", params[:id]])
-    for review_mapping in review_mappings
-      if Review.find_by_review_mapping_id(review_mapping.id)
-        @reviews << Review.find_by_review_mapping_id(review_mapping.id)
-      end
-    end    
-  end
   
-  def assign
+  def associate_assignment_to_course
     @assignment = Assignment.find(params[:id])
     if session[:user].role_id != 6 # for other that TA
        @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
@@ -426,7 +402,7 @@ class AssignmentController < ApplicationController
     end   
   end
   
-  def remove    
+  def remove_assignment_from_course    
     assignment = Assignment.find(params[:id])
     oldpath = assignment.get_path
     assignment.course_id = nil    

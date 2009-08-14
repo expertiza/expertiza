@@ -63,15 +63,15 @@ class CourseController < ApplicationController
   def create
     course = Course.new(params[:course])
     course.instructor_id = session[:user].id
-    #begin
+    begin
       course.save!
       course.create_node
       FileHelper.create_directory(course) 
       redirect_to :controller => 'tree_display', :action => 'list'
-    #rescue
-    #  flash[:error] = "An error occurred while saving the course: "+$!
-    #  redirect_to :action => 'new'
-    #end        
+    rescue
+      flash[:error] = "The following error occurred while saving the course: "+$!
+      redirect_to :action => 'new'
+    end        
   end
   
   # delete the course

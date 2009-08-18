@@ -64,4 +64,15 @@ class ParticipantsController < ApplicationController
    end
    redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment' 
  end     
+  
+  # Allow participant to change handle for this assignment
+  # If the participant parameters are available, update the participant
+  # and redirect to the view_actions page
+  def change_handle
+    @participant = AssignmentParticipant.find(params[:id])  
+    if params[:participant] != nil
+      @participant.update_attributes(params[:participant])
+      redirect_to :controller => 'student_assignment', :action => 'view_actions', :id => @participant      
+    end
+  end   
 end

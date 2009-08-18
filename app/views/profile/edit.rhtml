@@ -11,6 +11,7 @@
   <%= render :partial => 'users/email' %>
   <hr/>
   <%= render :partial => 'users/prefs' %>
+  <%= render :partial => 'handle' %>  
   <% if @user.role.parent_id != nil %>
     <%= render :partial => 'limit' %>
   <% end %>    

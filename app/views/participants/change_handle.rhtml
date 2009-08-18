@@ -1,0 +1,13 @@
+<h1>Assignment Handle</h1>
+
+<br/>
+
+<%= start_form_tag({:action => 'change_handle', :id =>  @participant}) %>
+  <p>The handle is used for Wiki assignments and other activities. By default
+  your handle is your account ID. You can change the handle for this assignment here. 
+  You can select a different default handle in your <%= link_to "Profile", :controller=> 'profile', :action => 'edit' %>.</p><br/>
+  <p><label for="handle">Your current handle</label>:
+  <%= text_field 'participant','handle' %></p>
+
+  <%= submit_tag 'Save' %>
+</form>

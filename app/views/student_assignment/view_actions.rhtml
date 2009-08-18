@@ -35,5 +35,6 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @stud
 	<!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment_id, session[:user].id)  -->
 		<li><%= link_to "Take Survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment_id} %> (This will log you out)</li>
 	<% end %>
+	<li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @student.id} %> (Provide a different handle for this assignment)</li>
 </ul>
 <br>

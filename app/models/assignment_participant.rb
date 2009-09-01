@@ -275,7 +275,13 @@ class AssignmentParticipant < Participant
        raise ImportError, "The assignment with id \""+id.to_s+"\" was not found."
     end
     if (find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, id]}).size == 0)
-       create(:user_id => user.id, :parent_id => id)
+       newpart = create(:user_id => user.id, :parent_id => id)
+       if user.handle.nil?
+          newpart.handle = user.name
+       else
+          newpart.handle = user.handle
+       end
+       newpart.save
     end   
   end   
   

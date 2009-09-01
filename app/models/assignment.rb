@@ -356,10 +356,17 @@ class Assignment < ActiveRecord::Base
   end
   participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)    
   if !participant
-    AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
+    newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
+    if user.handle.nil?
+      newpart.handle = user.name
+    else
+      newpart.handle = user.handle    
+    end
+    newpart.save
   else
     raise "The user \""+user.name+"\" is already a participant."
   end
+
  end 
  
  def create_node()

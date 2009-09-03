@@ -34,11 +34,15 @@ class ReviewController < ApplicationController
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
       @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
-      @author_name = User.find(@author_first_user_id).name;
+      #use @author.handle to spider by participant handle
+      #@author_name = User.find(@author_first_user_id).name;
       @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @mapping.assignment_id])
+      @author_name = @author.handle
     else
-      @author_name = User.find(@mapping.author_id).name
+      #user @author.handle to spider by participant handle
+      #@author_name = User.find(@mapping.author_id).name
       @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @mapping.assignment_id])
+      @author_name = @author.handle
     end
     @link = @author.submitted_hyperlink
     @max = @questionnaire.max_question_score

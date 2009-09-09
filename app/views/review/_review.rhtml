@@ -3,10 +3,10 @@ Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
 <% end %> -->
 
 <script type="text/javascript"> 
-		function updateDropDownMenu(advice,question)
+		function updateDropDownMenu(advice,question,min)
 		{			
 			var id = 'new_score_' + question			
-			document.getElementById(id).selectedIndex = advice
+			document.getElementById(id).selectedIndex = advice - min
 		}
 		function toggleVis(id) { 
 		var elem = document.getElementById(id+"_myDiv");
@@ -62,7 +62,7 @@ Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
 				<% for @advice in @question.question_advices.sort {|x,y| y.score <=> x.score } %>				
 					<%if j!=@max%><br/><%end%>					
 					<%=j%>: <%if @advice.advice.to_s.length>0%> 
-								<a href="javascript:updateDropDownMenu(<%=j%>,<%=i%>)">
+								<a href="javascript:updateDropDownMenu(<%=j%>,<%=i%>,<%=@min%>)">
 									<%=@advice.advice.to_s%>
 								</a>
 							<% else %>

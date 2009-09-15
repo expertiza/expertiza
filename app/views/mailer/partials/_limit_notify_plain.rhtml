@@ -1,9 +1,12 @@
 Hi <%= @first_name %>,
 
-<%= @mapping.reviewer.fullname %> has just submitted a review of XXX.  The score on this review differs from the
+<% if @mapping %>
+<%= @mapping.reviewer.fullname %> has just submitted a review of <%= mapping.reviewee.fullname %>.  The score on this review differs from the
 previous average score by more than the threshold of <%= @limit %>%. The new score is <%= sprintf("%.2f",@new_pct) %>, compared
 to a current average of <%= sprintf("%.2f",@avg_pct) %>.  It might be advisable to look over all the reviews of this work to
 determine if any of them are out of line, and if so, to notify the reviewers.
 
 Assignment: <%= @mapping.assignment.name %>
-
+<% else %>
+Review Feedback difference - TBD
+<% end %>

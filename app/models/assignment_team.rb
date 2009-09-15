@@ -87,6 +87,7 @@ class AssignmentTeam < Team
     }
     return participants    
   end
+
    
   def copy(course_id)
    new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})    
@@ -98,6 +99,19 @@ class AssignmentTeam < Team
      AssignmentParticipant.create(:parent_id => assignment_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
    end    
   end
+ 
+   
+  def assignment
+    Assignment.find(self.parent_id)
+  end
+ 
+  def get_feedbacks
+    review_mapping_query = "select id from review_mappings where assignment_id = "+self.assignment.id.to_s+" and reviewer_id in (select user_id from teams_users where team_id = "+self.id.to_s+")"   
+    review_query = "select id from reviews where review_mapping_id in ("+review_mapping_query+")"
+    
+    feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where review_id in ("+review_query+")")
+    return feedbacks.sort {|a,b| a.reviewer.name <=> b.reviewer.name}    
+  end 
  
   #computes this participants current review scores:
   # avg_review_score

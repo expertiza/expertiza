@@ -1,6 +1,7 @@
 class AssignmentParticipant < Participant  
   require 'wiki_helper'
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
+  validates_presence_of :handle
   
   #Copy this participant to a course
   def copy(course_id)

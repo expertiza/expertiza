@@ -51,7 +51,7 @@ Submitted files<br />
     This allows wiki-specific behavior to be kept in the wiki classes. -->
 <%if @assgt.team_assignment  # The lookup of all team members should be put in a wiki helper
   	for team_member in @team_members
-		member_name = User.find(team_member.user_id).name 
+		member_name = AssignmentParticipant.find_by_user_id_and_parent_id(team_member.user_id, @assgt.id).handle
 %>
 	<%= review_mediawiki_group @assgt.directory_path, _time, member_name  %>
 	<%end%>

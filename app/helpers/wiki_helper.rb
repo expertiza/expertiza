@@ -283,7 +283,6 @@ module WikiHelper
 
   end
   def review_mediawiki_group(_assignment_url, _start_date = nil, _wiki_user = nil)
-    line_items = review_mediawiki(_assignment_url, _start_date , _wiki_user)
-    return line_items.first(3)
+    review_mediawiki(_assignment_url, _start_date , _wiki_user)    
   end
 end

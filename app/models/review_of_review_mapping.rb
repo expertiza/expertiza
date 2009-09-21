@@ -41,17 +41,11 @@ belongs_to :review_mapping
         raise ImportError, "Review of Reviewer,  "+row[index].to_s+", for author, "+author.name+", and reviewer, "+row[1].to_s+", was not found."
       end
       
-      puts "*********************************"
-      puts "Team: " 
-      puts author.name
-      puts "*********************************"
-      
       reviewmapping = ReviewMapping.find(:first, :conditions => [query, assignment.id, reviewer.id, author.id])
       if reviewmapping == nil
         raise ImportError, "No review mapping was found for author, "+author.name+", and reviewer, "+row[1].to_s+"."
       end
       
-      rvm_query = "select id from review_mappings where assignment_id = "+assignment.id.to_s
       query = "select * from review_of_review_mappings where review_mapping_id in ("+reviewmapping.id.to_s+") and reviewer_id = "+reviewer.id.to_s+" and review_reviewer_id = "+rofreviewer.id.to_s
             
       existing_mappings = ReviewOfReviewMapping.find_by_sql(query)

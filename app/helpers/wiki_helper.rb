@@ -41,6 +41,7 @@ module WikiHelper
     wiki_url = _assignment_url.scan(/(.*?)doku.php/)
     namespace = _assignment_url.split(/\//)
     namespace_url = namespace.last
+    _wiki_user.gsub!(" ","+")
 
     #Doku Wiki Specific
     index = "?idx=" + namespace_url
@@ -128,8 +129,7 @@ module WikiHelper
       if _wiki_user
         
         #Remove line items that do not contain this user
-        line_items.each_with_index do |item, index| 
-          
+        line_items.each_with_index do |item, index|           
           scan_result = item[0].scan(_wiki_user) #scan current item
           
           if not _wiki_user === scan_result[0] #no match for wiki user --> eliminate
@@ -189,7 +189,7 @@ module WikiHelper
   # @args: _wiki_user (wiki user id to crawl)
   ##
   def review_mediawiki(_assignment_url, _start_date = nil, _wiki_user = nil)
-
+    
     response = '' #the response from the URL
 
     #Check to make sure we were passed a valid URL
@@ -203,6 +203,7 @@ module WikiHelper
     wiki_url = _assignment_url.scan(/(.*?)index.php/)
     namespace = _assignment_url.split(/\//)
     namespace_url = namespace.last
+    _wiki_user.gsub!(" ","+")
 
     #Media Wiki Specific
     review = "index.php?title=Special:Contributions&target=" + _wiki_user+"&offset=0&limit=1000"

@@ -2,6 +2,7 @@ class ReviewFeedback < ActiveRecord::Base
     has_many :review_scores
     belongs_to :review
     belongs_to :assignment
+    belongs_to :user
     
   def display_as_html(prefix) 
     code = "<B>Author:</B> "+self.review.review_mapping.reviewee.name+'&nbsp;&nbsp;&nbsp;<a href="#" name= "feedback_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'feedback_"+prefix+"_"+self.id.to_s+"','feedback'"+');return false;">hide feedback'
@@ -57,9 +58,9 @@ class ReviewFeedback < ActiveRecord::Base
       :subject => "Expertiza Notification: A review feedback score is outside the acceptable range",
       :body => {
         :first_name => ApplicationHelper::get_user_first_name(instructor),
-        :reviewer => self.user,
+        :reviewer_name => User.find(self.author_id).fullname,
         :type => "feedback",
-        :reviewee => self.review.review_mapping.reviewer,
+        :reviewee_name => self.review.review_mapping.reviewer.fullname,
         :limit => limit,
         :new_pct => new_pct,
         :avg_pct => avg_pct,

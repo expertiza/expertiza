@@ -1,27 +1,40 @@
-
-
-
-<% i = 0;
-for @question in @questions %>
-  <%=@question.txt%><br />        
-  <input id=new_review_score_<%=i%>_comments name=new_review_score[<%=i%>][comments] size=70 type=text />
-  <% if @question.true_false? %>
-      <select id=new_score_<%=i%> name=new_score[<%=i%>]>
-         <option value="<%=@min%>"><%=@min%></option>
-         <option value="<%=@max%>"><%=@max%></option>     
+<% i = 0
+   @questions.each{
+    | question | %>
+    <%= question.txt %><BR/>
+    <% if params[:action] != 'new' %>
+        <input id=responses_<%=i%>_comments name=responses[<%=i%>][comment] size=70 type=text value="<%= @review_scores[i].comments.gsub(/\"/,'&quot;')%>" />
+    <% else %>
+        <input id=responses_<%=i%>_comments name=responses[<%=i%>][comment] size=70 type=text />
+    <% end %>
+    <% if question.true_false? %>
+      <select id=responses_<%=i%>_score name=responses[<%=i%>][score]>
+         <%if params[:action] != 'new' %>
+           <option value="<%=@min%>" <%if @min==@review_scores[i].score%>selected="selected"<%end%> ><%=@min%></option>
+           <option value="<%=@max%>" <%if @max==@review_scores[i].score%>selected="selected"<%end%> ><%=@max%></option>    
+         <%else%>
+           <option value="<%=@min%>"><%=@min%></option>
+           <option value="<%=@max%>"><%=@max%></option> 
+         <%end%> 
       </select><br />  
   <% else %>
-      <select id=new_score_<%=i%> name=new_score[<%=i%>]>
+      <select id=responses_<%=i%>_score name=responses[<%=i%>][score]>
           <% for j in @min..@max %>
-            <option value="<%=j%>"><%=j%></option>
+	        <%if params[:action] != 'new' %>
+            	<option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
+            <%else%>
+		        <option value="<%=j%>" ><%=j%></option>
+	        <% end %>
           <% end %>
-      </select><br />  
-  <% end %>
-  <input id=new_question_<%=i%> name=new_question[<%=i%>] value=<%=@question.id%> type=hidden />
-<% i += 1;
-end %>
+      </select>
+      <br />       
+  <% end %>    
+  <BR/><BR/>
+  <% i+=1 
+   } %>
 
-<p> Additional Comment </p>
-<p><textarea cols="70" rows="5" id="new_review_comments" name="new_feedback[comments]"></textarea></p>
-
-
+       
+<p>
+	<label for="review_comments">Additional Comments</label><BR/>
+	<textarea cols="70" rows="5" id=review_comments name=review[comments]><% if params[:action] != 'new' %><%=@feedback.additional_comment.strip%><% end %></textarea>
+</p>

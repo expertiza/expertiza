@@ -117,9 +117,9 @@ class ReviewOfReview < ActiveRecord::Base
       :subject => "Expertiza Notification: A metareview score is outside the acceptable range",
       :body => {
         :first_name => ApplicationHelper::get_user_first_name(instructor),
-        :reviewer => reviewer,
+        :reviewer_name => reviewer.fullname,
         :type => "metareview",
-        :reviewee => mapping.review_mapping.reviewer,
+        :reviewee_name => mapping.review_mapping.reviewer.fullname,
         :limit => limit,
         :new_pct => new_pct,
         :avg_pct => avg_pct,

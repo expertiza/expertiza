@@ -137,85 +137,70 @@ class StudentAssignmentController < ApplicationController
  
   def view_scores
     @author_id = session[:user].id
-    @assignment_id = AssignmentParticipant.find(params[:id]).parent_id
-    @assignment = Assignment.find(@assignment_id)
+    @participant = AssignmentParticipant.find(params[:id])
+    @assignment = @participant.assignment    
     if @assignment.team_assignment
-      @team_id = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where parent_id=?)", @author_id, @assignment_id]).team_id
-      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
-      @student = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @assignment_id])
-      @user_name= session[:user].name
-      #@user_name = User.find(@author_first_user_id).name
-      @review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", @team_id, @assignment_id])
+      teamuser = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where parent_id=?)", @author_id, @participant.assignment.id])
+      if teamuser
+        @team_id = teamuser.team_id
+        @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
+        @student = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @participant.assignment.id])
+        @user_name= session[:user].name
+        #@user_name = User.find(@author_first_user_id).name
+        @review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", @team_id, @participant.assignment.id])
+      end
     else
       @student = AssignmentParticipant.find(params[:id])
       @user_name= session[:user].name
-      @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", session[:user].id, @assignment_id])
+      @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", session[:user].id, @participant.assignment.id])
     end
-    @late_policy = LatePolicy.find(1)
-    # removed until late policies are implemented
-    #late_policy = LatePolicy.find(Assignment.find(@assignment_id).due_dates[0].late_policy_id)
-    @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes
-
-    #the code below finds the sum of the maximum scores of all questions in the questionnaire
-    @sum_of_max = 0
-    for question in Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).questions
-      @sum_of_max += Questionnaire.find(Assignment.find(@assignment_id).review_questionnaire_id).max_question_score
-    end
-
-    if @student.penalty_accumulated/@late_policy.penalty_period_in_minutes*@late_policy.penalty_per_unit < @late_policy.max_penalty
-      @final_penalty = @penalty_units*@late_policy.penalty_per_unit
-    elsif @penalty_units ==0
-      @final_penalty = 0
-    else
-      @final_penalty = @late_policy.max_penalty
-    end
-
-    @review_of_review_mappings = Array.new
-
-    for review_mapping_for_author in @review_mapping
-      if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
-        @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
+    
+    if @student
+      @late_policy = LatePolicy.find(1)
+      # removed until late policies are implemented
+      #late_policy = LatePolicy.find(Assignment.find(@assignment_id).due_dates[0].late_policy_id)
+      @penalty_units = @student.penalty_accumulated/@late_policy.penalty_period_in_minutes
+  
+      #the code below finds the sum of the maximum scores of all questions in the questionnaire
+      @sum_of_max = 0
+      for question in Questionnaire.find(@participant.assignment.review_questionnaire_id).questions
+        @sum_of_max += Questionnaire.find(@participant.assignment.review_questionnaire_id).max_question_score
       end
-    end
 
+      if @student.penalty_accumulated/@late_policy.penalty_period_in_minutes*@late_policy.penalty_per_unit < @late_policy.max_penalty
+        @final_penalty = @penalty_units*@late_policy.penalty_per_unit
+      elsif @penalty_units ==0
+        @final_penalty = 0
+      else
+        @final_penalty = @late_policy.max_penalty
+      end
+      @review_of_review_mappings = Array.new
+      for review_mapping_for_author in @review_mapping
+        if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
+          @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])
+        end
+      end
+    else
+      flash[:note] = 'No scores are available for this assignment.'
+      redirect_to :action => 'view_actions', :id => params[:id]
+    end
   end 
-  
-  def set_feedback
-    @participant_id = params[:participant_id]
-    @review_id = params[:review_id]
-    @assignment_id = params[:assignment_id]
-    update_author_feedback(@review_id,@assignment_id,params['author']['text'])
-    redirect_to :action => 'view_scores', :id => @participant_id
-  end
-  
-  def update_author_feedback(review_id,assignment_id,text)
-    if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review_id, assignment_id]))
-      @review_feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review_id, assignment_id])
-      @review_feedback.txt = text
-      @review_feedback.update
-    else
-      @review_feedback = ReviewFeedback.new
-      @review_feedback.review_id = review_id
-      @review_feedback.assignment_id = assignment_id
-      @review_feedback.txt = text
-      if @review_feedback.save
-        flash[:notice] = 'feedback has been updated'
-      end
-    end
-  end
   
   def view_feedback
     @author_id = session[:user].id
     @student =  AssignmentParticipant.find(params[:id])
     @assignment_id = @student.parent_id
     @assignment = Assignment.find(@assignment_id)
-     if @assignment.team_assignment 
-      @team_id = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where parent_id=?)", @author_id, @assignment_id]).team_id
-      @team_members = TeamsUser.find(:all,:conditions => ["user_id=? and team_id in (select id from teams where parent_id=?)", @author_id, @assignment_id])
-      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
-      @user_name= session[:user].name
-      #@user_name = User.find(@author_first_user_id).name
-      @review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", @team_id, @assignment_id])
+     if @assignment.team_assignment
+      teamuser = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where parent_id=?)", @author_id, @assignment_id])
+      if teamuser
+        @team_id = teamuser.team_id
+        @team_members = TeamsUser.find(:all,:conditions => ["user_id=? and team_id in (select id from teams where parent_id=?)", @author_id, @assignment_id])
+        @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
+        @user_name= session[:user].name
+        #@user_name = User.find(@author_first_user_id).name
+        @review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", @team_id, @assignment_id])
+      end
     elsif !@assignment.team_assignment
       @user_name= session[:user].name
       @user_name = User.find(@student.user_id).name
@@ -239,6 +224,11 @@ class StudentAssignmentController < ApplicationController
 
     if params['fname']
       view_submitted_file(@current_folder,@student)
+    end
+    
+    if @user_name.nil?
+      flash[:note] = 'No feedback is available for this assignment.'
+      redirect_to :action => 'submit', :id => params[:id]
     end
   end
   

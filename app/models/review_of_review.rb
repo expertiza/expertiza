@@ -101,4 +101,36 @@ class ReviewOfReview < ActiveRecord::Base
     return review_num
   end  
   
+ #Generate an email to the instructor when a new review exceeds the allowed difference
+ #ajbudlon, nov 18, 2008
+ def notify_on_difference(new_pct,avg_pct,limit)
+   mapping = ReviwOfReviewMapping.find(self.review_of_review_mapping_id)
+   if mapping.review_reviewer_id.nil?
+      reviewer = mapping.reviewer
+   else
+      reviewer = mapping.review_reviewer
+   end   
+   instructor = User.find(self.assignment.instructor_id)  
+   puts "*** in sending method ***"
+   Mailer.deliver_message(
+     {:recipients => instructor.email,
+      :subject => "Expertiza Notification: A metareview score is outside the acceptable range",
+      :body => {
+        :first_name => ApplicationHelper::get_user_first_name(instructor),
+        :reviewer => reviewer,
+        :type => "metareview",
+        :reviewee => mapping.review_mapping.reviewer,
+        :limit => limit,
+        :new_pct => new_pct,
+        :avg_pct => avg_pct,
+        :types => "metareviews",
+        :performer => "metareviewer",
+        :assignment => mapping.review_mapping.assignment,              
+        :partial_name => 'limit_notify'
+      }
+     }
+   )
+          
+ end   
+  
 end

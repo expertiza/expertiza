@@ -1,10 +1,9 @@
-<h1>Editing review_feedback</h1>
-
-<%= start_form_tag :action => 'update', :id => @review_feedback %>
-  <%= render :partial => 'form' %>
-  <%= submit_tag 'Edit' %>
+<h1>Feedback to Reviewer</h1>
+<%= start_form_tag :action => 'update' %>
+<%= render :partial => 'feedback' %>
+<br/>
+<%= submit_tag "Save Feedback", :name=>"save" %>  
+<%= hidden_field_tag('id', @feedback.id) %>     
 <%= end_form_tag %>
-
-<%= link_to 'Show', :action => 'show', :id => @review_feedback %> |
-<%= link_to 'Back', :action => 'list' %>
-
+<br/>
+<a href="javascript:window.history.back()">Back</a>

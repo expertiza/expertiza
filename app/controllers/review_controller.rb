@@ -138,6 +138,11 @@ class ReviewController < ApplicationController
       #send message to author(s) when review has been updated
       #ajbudlon, sept 07, 2007
       @review.email
+      
+      #determine if the new review meets the criteria set by the instructor's 
+      #notification limits  
+      compare_scores      
+      
       flash[:notice] = 'Review was successfully saved.'
       redirect_to :action => 'list_reviews', :id => params[:assgt_id]
     else # If something goes wrong, stay at same page
@@ -265,7 +270,7 @@ class ReviewController < ApplicationController
     @review_phase = find_review_phase(@due_dates)
     if @review.save
       if params[:new_review_score]
-        latest_review_id = Review.find_by_sql ("select max(id) as id from reviews")[0].id
+        latest_review_id = Review.find_by_sql("select max(id) as id from reviews")[0].id
         # The new_question array contains all the new questions
         # that should be saved to the database
         for review_key in params[:new_review_score].keys
@@ -303,16 +308,16 @@ class ReviewController < ApplicationController
   # the instructor) then notify the instructor.
   # ajbudlon, nov 18, 2008
   def compare_scores  
-    if @assignment.team_assignment 
-      team = AssignmentTeam.find(@mapping.team_id)
+    if @review.review_mapping.assignment.team_assignment 
+      team = AssignmentTeam.find(@review.review_mapping.assignment.team_id)
       participant = team.get_participants.first
     else
-      participant = AssignmentParticipant.find_by_user_id_and_parent_id(@mapping.author_id,@assignment.id)      
+      participant = AssignmentParticipant.find_by_user_id_and_parent_id(@review.review_mapping.author_id,@review.review_mapping.assignment.team_assignment.id)      
     end          
     total, count = ReviewHelper.get_total_scores(participant.get_reviews,@review)     
     if count > 0
-      questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
-      ReviewHelper.notify_instructor(@assignment,@review,questionnaire,total,count)
+      questionnaire = Questionnaire.find(@review.review_mapping.assignment.team_assignment.review_questionnaire_id)
+      ReviewHelper.notify_instructor(@review.review_mapping.assignment.team_assignment,@review,questionnaire,total,count)
     end
   end
   
@@ -356,7 +361,7 @@ class ReviewController < ApplicationController
       @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])
     end
     reviews_left = @assignment.num_reviews - @review_mapping.size()
-    if (reviews_left > 0 && @assignment.mapping_strategy_id == MappingStrategy.find_by_name ("Dynamic, fewest extant reviews").id)
+    if (reviews_left > 0 && @assignment.mapping_strategy_id == MappingStrategy.find_by_name("Dynamic, fewest extant reviews").id)
       for i in 1..reviews_left do
         @placeholder = ReviewMapping.new
         @placeholder.id = 999
@@ -494,7 +499,7 @@ class ReviewController < ApplicationController
     @review_phase = find_review_phase(@due_dates)
     if @review.save
       if params[:new_review_score]
-        latest_review_id = Review.find_by_sql ("select max(id) as id from reviews")[0].id
+        latest_review_id = Review.find_by_sql("select max(id) as id from reviews")[0].id
         # The new_question array contains all the new questions
         # that should be saved to the database
         for review_key in params[:new_review_score].keys

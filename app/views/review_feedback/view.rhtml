@@ -1,0 +1,5 @@
+<h1> View Feedback </h1>
+<%= render :partial => 'review/scores' %> 
+<th>Additional Comment: </th><% review_feedback_text = @feedback.additional_comment %>
+<br><%= review_feedback_text.gsub(/\n/, '<br>')%><br/>
+<a href="javascript:window.history.back()">Back</a>

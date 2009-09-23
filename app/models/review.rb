@@ -126,9 +126,9 @@ class Review < ActiveRecord::Base
       :subject => "Expertiza Notification: A review score is outside the acceptable range",
       :body => {        
         :first_name => ApplicationHelper::get_user_first_name(instructor),
-        :reviewer => mapping.reviewer,
+        :reviewer_name => mapping.reviewer.fullname,
         :type => "review",
-        :reviewee => mapping.reviewee,
+        :reviewee_name => mapping.reviewee.fullname,
         :limit => limit,
         :new_pct => new_pct,
         :avg_pct => avg_pct,

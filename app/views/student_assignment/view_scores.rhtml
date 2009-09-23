@@ -13,7 +13,7 @@ function toggleVis(id) {
         }
 </SCRIPT>
 
-<h1>Scores for <%= Assignment.find(@assignment_id).name %></h1>
+<h1>Scores for <%= @assignment.name %></h1>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
 	<%= flash[:notice] %>
@@ -53,9 +53,8 @@ function toggleVis(id) {
             <tr><td><em>Total</em></td><td align = 'right'><%=total%>&nbsp;&nbsp;</td><td><em>Score:</em> <%=sprintf("%.2f",total.to_f*100/@sum_of_max.to_f)%>%</td></tr>
            </table><br/>
            Additional comment : <%=review.additional_comment%><br/>
-           <% @mapping = ReviewMapping.find(review_map.id) %>
-           <% @assgt_id = @mapping.assignment_id %>
-           <% @assignment = Assignment.find(@assgt_id)
+           <% @mapping = ReviewMapping.find(review_map.id) %>  
+       <%         
 		if @assignment.team_assignment 
 			@team_id = @mapping.team_id
 		else
@@ -66,13 +65,13 @@ function toggleVis(id) {
 			<!-- Checking to see if a Feedback is given by the author. Check for an entry in the Review Feedback Table. If there is no entry give a link Begin to allow the author to give a Feedback via a Feedback rubric -->
 			<!-- If previously Feedback has been provided , give links to View and Edit to View the previous feedback and edit the feedback -->	  
 				
-		     <%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review.id, @assignment_id]))%>
-		     <p> View feedback : <%= link_to "View", {:controller =>'review_feedback', :action=>'view_feedback', :id1 =>@assgt_id, :id2 =>@author_id, :id3=>review.id, :id4=>@team_id} %><p>
-		           <p> Edit feedback : <%= link_to "Edit", {:controller =>'review_feedback', :action =>'edit_feedback', :id1 =>@assgt_id, :id2 =>@author_id, :id3=>review.id, :id4=>@team_id} %></p>      
+		     <% feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review.id, @assignment.id])%>
+		     <% if feedback %>
+		           <p> View feedback : <%= link_to "View", {:controller =>'review_feedback', :action=>'view', :id => feedback.id} %><p>
+		           <p> Edit feedback : <%= link_to "Edit", {:controller =>'review_feedback', :action =>'edit', :id => feedback.id} %></p>      
 		     <% else %>
-			<p><label>Give feedback to reviewer:<%= link_to "Begin", {:controller => 'review_feedback', :action => 'new_feedback',:id1 =>@assgt_id, :id2 =>@author_id, :id3=>review.id, :id4=>@team_id} %></label></p>	
-				      <% end
-					%>
+			       <p><label>Give feedback to reviewer:<%= link_to "Begin", {:controller => 'review_feedback', :action => 'new',:id => @participant.id,:mapping_id => @mapping.id } %></label></p>	
+		     <% end	%>
 			 </div>
 		   <%review_no +=1
         end

@@ -1,17 +1,12 @@
 Hi <%= @first_name %>,<br/>
 
 <p>
-<% if @mapping %>
-<%= @mapping.reviewer.fullname %> has just submitted a review of <%= mapping.reviewee.fullname %>.  The score on this review differs from the
+<%= @reviewer.fullname %> has just submitted a <%= @type %> of <%= @reviewee.fullname %>.  The score on this <%= @type %> differs from the
 previous average score by more than the threshold of <%= @limit %>%. The new score is <%= sprintf("%.2f",@new_pct) %>, compared
-to a current average of <%= sprintf("%.2f",@avg_pct) %>.  It might be advisable to look over all the reviews of this work to
-determine if any of them are out of line, and if so, to notify the reviewers.
+to a current average of <%= sprintf("%.2f",@avg_pct) %>.  It might be advisable to look over all the <%= types %> of this work to
+determine if any of them are out of line, and if so, to notify the <%= performers %>.
 </p>
 
 <BR/>
-Assignment: <%= @mapping.assignment.name %><BR/>
-
-<% else %>
-Review Feedback difference - TBD
-<% end %>
-
+Assignment: <%= @assignment.name %>
+<BR/>

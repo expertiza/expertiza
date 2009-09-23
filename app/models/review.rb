@@ -124,12 +124,17 @@ class Review < ActiveRecord::Base
    Mailer.deliver_message(
      {:recipients => instructor.email,
       :subject => "Expertiza Notification: A review score is outside the acceptable range",
-      :body => {
-        :mapping => mapping,
+      :body => {        
         :first_name => ApplicationHelper::get_user_first_name(instructor),
+        :reviewer => mapping.reviewer,
+        :type => "review",
+        :reviewee => mapping.reviewee,
+        :limit => limit,
         :new_pct => new_pct,
         :avg_pct => avg_pct,
-        :limit => limit,
+        :types => "reviews",
+        :performer => "reviewer",
+        :assignment => mapping.assignment,    
         :partial_name => 'limit_notify'
       }
      }

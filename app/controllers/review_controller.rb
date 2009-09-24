@@ -309,15 +309,15 @@ class ReviewController < ApplicationController
   # ajbudlon, nov 18, 2008
   def compare_scores  
     if @review.review_mapping.assignment.team_assignment 
-      team = AssignmentTeam.find(@review.review_mapping.assignment.team_id)
+      team = AssignmentTeam.find(@review.review_mapping.team_id)
       participant = team.get_participants.first
     else
-      participant = AssignmentParticipant.find_by_user_id_and_parent_id(@review.review_mapping.author_id,@review.review_mapping.assignment.team_assignment.id)      
+      participant = AssignmentParticipant.find_by_user_id_and_parent_id(@review.review_mapping.author_id,@review.review_mapping.assignment.id)      
     end          
     total, count = ReviewHelper.get_total_scores(participant.get_reviews,@review)     
     if count > 0
-      questionnaire = Questionnaire.find(@review.review_mapping.assignment.team_assignment.review_questionnaire_id)
-      ReviewHelper.notify_instructor(@review.review_mapping.assignment.team_assignment,@review,questionnaire,total,count)
+      questionnaire = Questionnaire.find(@review.review_mapping.assignment.review_questionnaire_id)
+      ReviewHelper.notify_instructor(@review.review_mapping.assignment,@review,questionnaire,total,count)
     end
   end
   

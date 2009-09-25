@@ -192,17 +192,10 @@ class StudentAssignmentController < ApplicationController
     @assignment_id = @student.parent_id
     @assignment = Assignment.find(@assignment_id)
      if @assignment.team_assignment
-      teamuser = TeamsUser.find(:first,:conditions => ["user_id=? and team_id in (select id from teams where parent_id=?)", @author_id, @assignment_id])
-      if teamuser
-        @team_id = teamuser.team_id
-        @team_members = TeamsUser.find(:all,:conditions => ["user_id=? and team_id in (select id from teams where parent_id=?)", @author_id, @assignment_id])
-        @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @team_id]).user_id
-        @user_name= session[:user].name
-        #@user_name = User.find(@author_first_user_id).name
-        @review_mapping = ReviewMapping.find(:all,:conditions => ["team_id = ? and assignment_id = ?", @team_id, @assignment_id])
-      end
-    elsif !@assignment.team_assignment
-      @user_name= session[:user].name
+      @review_mapping = ReviewMapping.find_by_sql("SELECT * FROM review_mappings WHERE team_id IN(SELECT team_id FROM teams_users WHERE user_id = #{@author_id}) AND assignment_id = #{@assignment_id}");
+      @team_members = TeamsUser.find_by_sql("SELECT * FROM teams_users WHERE team_id = (SELECT id FROM teams WHERE parent_id = #{@assignment_id} AND id IN (SELECT team_id FROM teams_users WHERE user_id = #{@author_id}))")
+      @user_name= session[:user].name      
+    elsif !@assignment.team_assignment      
       @user_name = User.find(@student.user_id).name
       @review_mapping = ReviewMapping.find(:all,:conditions => ["author_id = ? and assignment_id = ?", @author_id, @assignment_id])
     end

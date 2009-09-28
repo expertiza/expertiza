@@ -21,7 +21,7 @@ function toggleVis(id) {
     review_no = 1
     grade = 0
     for review_map in @review_mapping
-        reviews = Review.find_by_sql("SELECT * FROM reviews r,review_mappings m WHERE m.id = #{review_map.id} AND r.review_mapping_id = m.id AND m.assignment_id = 220 AND updated_at = (SELECT max(updated_at) FROM reviews WHERE review_mapping_id = m.id GROUP BY review_mapping_id)")
+        reviews = Review.find_by_sql("SELECT r.* FROM reviews r,review_mappings m WHERE m.id = #{review_map.id} AND r.review_mapping_id = m.id AND m.assignment_id = 220 AND updated_at = (SELECT max(updated_at) FROM reviews WHERE review_mapping_id = m.id GROUP BY review_mapping_id)")
         for review in reviews%>
                 <b>Review <%=review_no%></b> done on <b><%= review.created_at.strftime('%A %B %d %Y, %I:%M%p') %></b>  <a href="#1" onClick="toggleVis('<%=review_no %>');">
                                 <span class="inline" id="<%=review_no %>_show">View</span>

@@ -12,7 +12,7 @@
 %>
 <BR/>
 <%= link_to 'Create Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>
-<% if @root_node.type == AssignmentNode %>
+<% if @root_node.class == AssignmentNode %>
   <% modelType = 'AssignmentTeam' %>
 <% else %>
   <% modelType = 'CourseTeam' %>

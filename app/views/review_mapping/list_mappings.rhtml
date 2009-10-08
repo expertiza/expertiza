@@ -5,6 +5,7 @@
 <h1>Participants</h1>
 <h2>Assignment: <%= @assignment.name %></h2>
 <br/>
+<br/> 
 <table width="100%" cellpadding="10">
   <tr CLASS="head" ><th width="30%">Contributor</th><th width="30%">Reviewed By</th><th width="30%">Metareviewed By</th></tr>
   <% index1 = 0 
@@ -29,7 +30,7 @@
              <%= link_to 'delete', :action => 'delete_participant', :id => contrib.id %><br/>
            <% end %>
            <%= link_to 'add reviewer', :action => 'select_reviewer', :id => contrib %><br/>
-           <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => contrib %>
+           <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => contrib, :assignment => @assignment.id %>
          </div>
        </td>
     <td colspan="2">
@@ -114,5 +115,6 @@
             :title => 'Metareviewer Mappings',
             :expected_fields => 'Contributor, Reviewer, Metareviewer1, Metareviewer2, ... MetareviewerN',
             :id => @assignment.id %>
-| <%= link_to 'Back', :controller => 'tree_display', :action => 'list' %>
+| <%= link_to 'Delete all reviewers and metareviewers', :action => 'delete_all_reviewers_and_metareviewers', :id => @assignment.id %>            
+<BR/> <%= link_to 'Back', :controller => 'tree_display', :action => 'list' %>
 

@@ -81,9 +81,17 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => reviewmapping.assignment_id                                            
   end  
   
-  def delete_all_reviewers    
-    author = params[:id]
-    if author.class == AssignmentTeam
+ 
+  def delete_all_reviewers_and_metareviewers
+    mappings = ReviewMapping.find_all_by_assignment_id(params[:id])
+    ReviewMappingHelper::delete_mappings(mappings,flash)
+    redirect_to :action => 'list_mappings', :id => params[:id]   
+  end  
+  
+  def delete_all_reviewers  
+    assignment = Assignment.find(params[:assignment])
+   
+    if assignment.team_assignment
       contributor = AssignmentTeam.find(params[:id])
       assignment_id = contributor.parent_id
     else
@@ -92,28 +100,15 @@ class ReviewMappingController < ApplicationController
       contributor = User.find(participant.user_id)
     end
     assignment = Assignment.find(assignment_id)
-    
-    title = "A delete action failed:<br/>"
-    msg = ""
+
     
     mappings = ReviewMapping.get_mappings(assignment.id,contributor.id)
-    mappings.each{ 
-       |mapping|
-       begin
-         mapping.delete
-       rescue
-         msg += "&nbsp;&nbsp;&nbsp;" + $! + "<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Delete these reviews</a>?<br/>"
-       end
-    }
-    if msg.length > 0
-      title += msg
-      flash[:error] = title      
-    else
-      flash[:note] = "All review mappings for \""+contributor.name+"\" have been deleted."
-      
-    end
-    redirect_to :action => 'list_mappings', :id => assignment_id
+    ReviewMappingHelper::delete_mappings(mappings,flash,contributor)
+    redirect_to :action => 'list_mappings', :id => assignment_id 
   end
+  
+
+ 
   
   def delete_all_metareviewers    
     mapping = ReviewMapping.find(params[:id])    
@@ -336,7 +331,7 @@ class ReviewMappingController < ApplicationController
       rescue
         flash[:error] = "Reviewer assignment failed. Cause: " + $!
       ensure
-        redirect_to :action => 'list', :id => @assignment.id
+        redirect_to :action => 'list_mappings', :id => @assignment.id
       end
     else
       @wiki_types = WikiType.find_all

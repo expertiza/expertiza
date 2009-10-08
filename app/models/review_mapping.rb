@@ -29,6 +29,10 @@ class ReviewMapping < ActiveRecord::Base
     self.destroy
   end
     
+  def self.get_mappings(assignment_id)    
+    return ReviewMapping.find_all_by_assignment_id(assignment_id)
+  end    
+    
   def self.get_mappings(assignment_id,contributor_id)
     assignment = Assignment.find(assignment_id)
     if assignment.team_assignment

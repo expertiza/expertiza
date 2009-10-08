@@ -1,7 +1,7 @@
 class AssignmentTeam < Team
 
   def self.import(row,session,id,options)
-    if row.length < 2
+    if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
        raise ArgumentError, "Not enough items" 
     end
     

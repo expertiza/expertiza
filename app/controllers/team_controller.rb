@@ -16,10 +16,10 @@ class TeamController < ApplicationController
  
  def min(a,b)
    if a<b
-     return a
+     return a   
+   else
+     return b
    end
- else
-   return b
  end
  
 def create_teams_view

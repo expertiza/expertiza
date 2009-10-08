@@ -354,15 +354,15 @@ class Assignment < ActiveRecord::Base
   if (user == nil) 
     raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."      
   end
-  participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)    
+  participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
   if !participant
     newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
-    if user.handle.nil?
+    if user.handle != nil
       newpart.handle = user.name
     else
       newpart.handle = user.handle    
     end
-    newpart.save
+    newpart.save!
   else
     raise "The user \""+user.name+"\" is already a participant."
   end

@@ -277,7 +277,7 @@ class AssignmentParticipant < Participant
     end
     if (find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, id]}).size == 0)
        newpart = create(:user_id => user.id, :parent_id => id)
-       if user.handle.nil?
+       if user.handle != nil
           newpart.handle = user.name
        else
           newpart.handle = user.handle

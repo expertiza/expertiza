@@ -61,18 +61,8 @@ class AssignmentParticipant < Participant
   end
   
   def get_metareviews    
-    mreviews = Array.new  
-    
-    rm_query = "select id from review_mappings where assignment_id = "+self.parent_id.to_s+" and reviewer_id = "+self.user_id.to_s
-    query = "select * from review_of_review_mappings where review_mapping_id in("+rm_query+")"    
-    ReviewOfReviewMapping.find_by_sql(query).each{    
-      | mrmapping |
-      mreview = ReviewOfReview.find_by_review_of_review_mapping_id(mrmapping.id)
-      if mreview        
-        mreviews << mreview
-      end
-    }
-    return mreviews.sort {|a,b| a.review_of_review_mapping.reviewer.fullname <=> b.review_of_review_mapping.reviewer.fullname }      
+    reviews = ReviewOfReview.find_by_sql("SELECT ror.* FROM `review_of_reviews` ror, review_of_review_mappings m, review_mappings r WHERE m.review_mapping_id = r.id AND r.reviewer_id = #{self.user_id} AND r.assignment_id = #{self.parent_id} AND ror.review_of_review_mapping_id = m.id")
+    return reviews.sort {|a,b| a.review_of_review_mapping.reviewer.fullname <=> b.review_of_review_mapping.reviewer.fullname }      
   end
   
   def get_teammate_reviews    
@@ -152,12 +142,12 @@ class AssignmentParticipant < Participant
   end
     
   #computes this participant's current teammate review scores:
-  def compute_teammate_review_scores(total_weight, questionnaire, questions)
+  def compute_teammate_review_scores(questionnaire, questions)
     assignment = Assignment.find(self.parent_id) 
     if assignment.team_assignment 
       teammate_reviews = TeammateReview.find_by_sql("select * from teammate_reviews where reviewee_id = #{self.user_id} and assignment_id = #{self.parent_id}")
       if teammate_reviews.length > 0
-        avg_review_score, max_score, min_score = AssignmentParticipant.compute_scores(teammate_reviews, questionnaire, total_weight)
+        avg_review_score, max_score, min_score = AssignmentParticipant.compute_scores(teammate_reviews, questionnaire)
         return avg_review_score, max_score, min_score
       else
         return nil, nil, nil
@@ -167,13 +157,10 @@ class AssignmentParticipant < Participant
   
   #computes this participants current metareview score
   #metareview = review_of_review
-  def compute_metareview_scores(total_weight, questionnaire, questions)
-    review_mapping_query = "select id from review_mappings where assignment_id = #{self.parent_id} and reviewer_id = #{self.user_id}"
-    metareview_mapping_query = "select id from review_of_review_mappings where review_mapping_id in ("+review_mapping_query+")"
-    metareview_query = "select * from review_of_reviews where review_of_review_mapping_id in ("+metareview_mapping_query+")"
-    metareviews = ReviewOfReview.find_by_sql(metareview_query)
+  def compute_metareview_scores(questionnaire, questions)
+    metareviews = self.get_metareviews
     if metareviews.length > 0
-      avg_metareview_score, max_score,min_score = AssignmentParticipant.compute_scores(metareviews, questionnaire, total_weight)
+      avg_metareview_score, max_score,min_score = AssignmentParticipant.compute_scores(metareviews, questionnaire)
       return avg_metareview_score, max_score, min_score
     else
       return nil, nil, nil
@@ -181,12 +168,12 @@ class AssignmentParticipant < Participant
   end
  
   #computes this participants current author feedback score
-  def compute_author_feedback_scores(total_weight, questionnaire, questions)
+  def compute_author_feedback_scores(questionnaire, questions)
     review_mapping_query = "select id from review_mappings where assignment_id = "+self.assignment.id.to_s+" and reviewer_id = "+self.user.id.to_s    
     review_query = "select id from reviews where review_mapping_id in ("+review_mapping_query+")"
     feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where review_id in ("+review_query+")")
     if feedbacks.length > 0
-      avg_feedback_score, max_score,min_score = AssignmentParticipant.compute_scores(feedbacks, questionnaire, total_weight)
+      avg_feedback_score, max_score,min_score = AssignmentParticipant.compute_scores(feedbacks, questionnaire)
       return avg_feedback_score, max_score, min_score
     else
       return nil, nil, nil
@@ -194,14 +181,14 @@ class AssignmentParticipant < Participant
   end  
   
   #computes this participants current review score  
-  def compute_review_scores(total_weight, questionnaire, questions)
+  def compute_review_scores(questionnaire, questions)
     assignment = Assignment.find(parent_id)
     if assignment.team_assignment
-      return self.team.compute_review_scores(total_weight, questionnaire, questions)
+      return self.team.compute_review_scores(questionnaire, questions)
     else
       reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (select id from review_mappings where author_id = #{self.user_id} and assignment_id = #{self.parent_id})")
       if reviews.length > 0
-        avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews, questionnaire, total_weight)
+        avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews, questionnaire)
         return avg_review_score.to_f, max_score, min_score
       else
         return nil, nil, nil
@@ -235,14 +222,13 @@ class AssignmentParticipant < Participant
   #  list - a list of assessments of some type (e.g., author feedback, teammate review)
   #  questionnaire - the questionnaire that was filled out in the process of doing those assessments
   #  questionnaire_type - an integer value representing REVIEW, AUTHOR_FEEDBACK, etc.
-  #  total_weight - the total weight of the questions in the questionnaire
-  def self.compute_scores(list, questionnaire, total_weight)
+  def self.compute_scores(list, questionnaire)
     max_score = -999999999
     min_score = 999999999
     total_score = 0
     list.each {
       | item | 
-       curr_score = Score.get_total_score(item.id, questionnaire, total_weight)       
+       curr_score = Score.get_total_score(item.id, questionnaire)       
        if curr_score > max_score
          max_score = curr_score
        end

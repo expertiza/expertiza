@@ -72,7 +72,7 @@
              end
            %>  		
 		   <td align="center">		       
-		       <% score = Score.get_total_score(review.id,questionnaire,weight) %>
+		       <% score = Score.get_total_score(review.id,questionnaire) %>
 		       <input type="hidden" id="mailer_<%= rev_user.fullname %>_grade" name="mailer[<%= rev_user.fullname %>_grade]" value="<%= score  %>" %>   
 	  	       <%= sprintf("%.2f",score) %>% &nbsp;
 	  	   </td>

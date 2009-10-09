@@ -51,6 +51,11 @@ class Questionnaire < ActiveRecord::Base
       return true
     end
     
+    def max_possible_score
+      results = Questionnaire.find_by_sql("SELECT (SUM(q.weight)*rs.max_question_score) as max_score FROM  questions q, questionnaires rs WHERE q.questionnaire_id = rs.id AND rs.id = #{self.id}")
+      return results[0].max_score
+    end
+    
     # validate the entries for this questionnaire
     def validate  
       if max_question_score < 1

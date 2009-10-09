@@ -29,7 +29,11 @@ class AssignmentParticipant < Participant
   
   def get_reviews
     if self.assignment.team_assignment
-      author_id = self.team.id
+      if self.team != nil
+        author_id = self.team.id        
+      else
+        author_id = nil        
+      end
       query = "team_id = ? and assignment_id = ?"
     else
       author_id = self.user_id
@@ -38,13 +42,15 @@ class AssignmentParticipant < Participant
     
     reviews = Array.new
     
-    ReviewMapping.find(:all, :conditions => [query,author_id,self.parent_id]).each{
-      |mapping|
-      review = Review.find_by_review_mapping_id(mapping.id)     
-      if review
-        reviews << review
-      end
-    }
+    if author_id != nil
+      ReviewMapping.find(:all, :conditions => [query,author_id,self.parent_id]).each{
+        |mapping|
+        review = Review.find_by_review_mapping_id(mapping.id)     
+        if review
+          reviews << review
+        end
+      }
+    end
     return reviews.sort {|a,b| a.review_mapping.reviewer.fullname <=> b.review_mapping.reviewer.fullname }
   end
   
@@ -289,21 +295,13 @@ class AssignmentParticipant < Participant
         self.directory_num = 0
       end
       self.save
-      
-      if Assignment.find(self.parent_id).team_assignment
-         query = "select teams_users.* from teams_users, teams"
-         query = query + " where teams.type = 'AssignmentTeam'"
-         query = query + " and teams.parent_id = '"+self.parent_id.to_s+"'"
-         query = query + " and teams.id = teams_users.team_id"
-         TeamsUser.find_by_sql(query).each{
+      self.team.get_participants.each{
           | member |
-          participant = AssignmentParticipant.find_by_user_id_and_parent_id(member.user_id, self.parent_id)
-          if participant.directory_num == nil or participant.directory_num < 0
-            participant.directory_num = self.directory_num
-            participant.save
+          if member.directory_num == nil or member.directory_num < 0
+            member.directory_num = self.directory_num
+            member.save
           end
-         }
-      end
+      }
     end
   end   
 end

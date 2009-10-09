@@ -60,8 +60,6 @@ class ReviewMappingController < ApplicationController
     reviewmapping = ReviewMapping.find(params[:id])
     rofreviewer = User.find_by_name(params[:user][:name])
     include = params[:options][:include]
-    puts "*******************"
-    puts include
     if include == "true"
       pExist = AssignmentParticipant.find_by_user_id_and_parent_id(rofreviewer.id,reviewmapping.assignment_id)
       if pExist == nil

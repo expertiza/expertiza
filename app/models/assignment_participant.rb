@@ -197,7 +197,7 @@ class AssignmentParticipant < Participant
   def compute_review_scores(total_weight, questionnaire, questions)
     assignment = Assignment.find(parent_id)
     if assignment.team_assignment
-      return self.team.compute_review_scores
+      return self.team.compute_review_scores(total_weight, questionnaire, questions)
     else
       reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (select id from review_mappings where author_id = #{self.user_id} and assignment_id = #{self.parent_id})")
       if reviews.length > 0
@@ -209,7 +209,7 @@ class AssignmentParticipant < Participant
    end    
  end
   
-  def compute_total_score (review_score, metareview_score, authorfeedback_score, teammate_review_score) 
+  def compute_total_score(review_score, metareview_score, authorfeedback_score, teammate_review_score) 
     r_score = 0;
     m_score = 0;
     a_score = 0;

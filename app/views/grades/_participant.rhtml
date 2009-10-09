@@ -81,7 +81,7 @@
              %>
    	           
 			<% if @assignment.team_assignment %>  
-			   <% s_avg, s_max, s_min = team.compute_review_scores(@review_weight, @review_questionnaire, @review_questions)
+			   <% s_avg, s_max, s_min = participant.compute_review_scores(@review_weight, @review_questionnaire, @review_questions)
 			      tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores(@teammate_weight, @teammate_questionnaire, @teammate_questions) %>    		
 	    	   <TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f",participant.compute_total_score(s_avg, r_avg, f_avg, tr_avg))) %>% </TD>
 	    	<% else %>

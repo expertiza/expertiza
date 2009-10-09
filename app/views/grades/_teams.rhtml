@@ -4,7 +4,7 @@
 <% for team in @teams %>    
     <% index += 1 %>    
     <% if team.get_participants.length > 0 %>    
-    <% t_score, t_max, t_min = team.compute_review_scores(@review_weight, @review_questionnaire, @review_questions) %>
+    <% t_score, t_max, t_min = team.compute_review_scores(@review_questionnaire, @review_questions) %>
     <TR class="row"><TD>
          <% prefix = 'team'+index.to_s %>          
          <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><img src="/images/expand.png"/></a>
@@ -21,9 +21,9 @@
     <% pindex = 2 %>
     <% for participant in team.get_participants 
          pindex += 1  	    
-         r_avg, r_max, r_min = participant.compute_metareview_scores(@metareview_weight, @metareview_questionnaire, @metareview_questions)
-         f_avg, f_max, f_min = participant.compute_author_feedback_scores(@feedback_weight, @feedback_questionnaire, @feedback_questions)         
-         tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores(@teammate_weight, @teammate_questionnaire, @teammate_questions)                  
+         r_avg, r_max, r_min = participant.compute_metareview_scores(@metareview_questionnaire, @metareview_questions)
+         f_avg, f_max, f_min = participant.compute_author_feedback_scores(@feedback_questionnaire, @feedback_questions)         
+         tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores(@teammate_questionnaire, @teammate_questions)                  
     %>
       	 <%= render :partial => 'participant', 
      	 			:locals => {:prefix => prefix+"_"+pindex.to_s,

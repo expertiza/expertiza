@@ -9,26 +9,7 @@ class GradesController < ApplicationController
     @assignment = Assignment.find(params[:id])
     @participants = @assignment.get_participants
 
-    @review_questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
-    @review_questions = @review_questionnaire.questions    
-    @max_review_score, @review_weight = @assignment.get_max_score_possible(@review_questionnaire, @review_questions)
-    
-    @metareview_questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
-    @metareview_questions = @metareview_questionnaire.questions    
-    @max_metareview_score, @metareview_weight = @assignment.get_max_score_possible(@metareview_questionnaire, @metareview_questions)
-    
-    @feedback_questionnaire = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
-    @feedback_questions = @feedback_questionnaire.questions    
-    @max_feedback_score, @feedback_weight = @assignment.get_max_score_possible(@feedback_questionnaire, @feedback_questions) 
-    
-    if @assignment.team_assignment
-      @teams = @assignment.get_teams
-      if @assignment.teammate_review_questionnaire_id
-         @teammate_questionnaire = Questionnaire.find(@assignment.teammate_review_questionnaire_id)
-         @teammate_questions = @teammate_questionnaire.questions    
-         @max_teammate_score, @teammate_weight = @assignment.get_max_score_possible(@teammate_questionnaire, @teammate_questions)
-      end
-    end    
+    get_questionnaires 
   end  
   
   def open
@@ -101,24 +82,24 @@ class GradesController < ApplicationController
   def get_questionnaires
     @review_questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
     @review_questions = @review_questionnaire.questions    
-    @max_review_score, @review_weight = @assignment.get_max_score_possible(@review_questionnaire, @review_questions)
+    @max_review_score = @review_questionnaire.max_possible_score
     
     @metareview_questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
     @metareview_questions = @metareview_questionnaire.questions    
-    @max_metareview_score, @metareview_weight = @assignment.get_max_score_possible(@metareview_questionnaire, @metareview_questions)
+    @max_metareview_score = @metareview_questionnaire.max_possible_score
     
     @feedback_questionnaire = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
     @feedback_questions = @feedback_questionnaire.questions    
-    @max_feedback_score, @feedback_weight = @assignment.get_max_score_possible(@feedback_questionnaire, @feedback_questions) 
+    @max_feedback_score = @feedback_questionnaire.max_possible_score 
     
     if @assignment.team_assignment
       @teams = @assignment.get_teams
       if @assignment.teammate_review_questionnaire_id
          @teammate_questionnaire = Questionnaire.find(@assignment.teammate_review_questionnaire_id)
          @teammate_questions = @teammate_questionnaire.questions    
-         @max_teammate_score, @teammate_weight = @assignment.get_max_score_possible(@teammate_questionnaire, @teammate_questions)
+         @max_teammate_score = @teammate_questionnaire.max_possible_score
       end
-    end          
+    end            
   end
   
   def update

@@ -122,12 +122,13 @@ class GradesController < ApplicationController
   end
   
   def update
-    @participant = AssignmentParticipant.find(params[:id])
-    if sprintf("%.2f",@participant.compute_total_score*100) != params[:participant][:grade]
-      @participant.grade = params[:participant][:grade]
-      @participant.save
+    participant = AssignmentParticipant.find(params[:id])
+    total_score = params[:total_score]
+    if sprintf("%.2f",total_score) != params[:participant][:grade]
+      participant.grade = params[:participant][:grade]
+      participant.save!
+      flash[:note] = "A score of "+params[:participant][:grade]+"% has been saved for "+participant.user.name
     end
-    
     redirect_to :action => 'edit', :id => params[:id]
   end
   

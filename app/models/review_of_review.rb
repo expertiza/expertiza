@@ -9,6 +9,12 @@ class ReviewOfReview < ActiveRecord::Base
        review_reviewer = User.find(self.review_of_review_mapping.reviewer_id)
     end
     code = "<B>Metareviewer:</B> "+review_reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+prefix+"_"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
+    code = code + "<BR/><I>Last updated:</I> "
+    if self.updated_at.nil?
+      code = code + "Not available"
+    else
+      code = code + self.updated_at.to_s
+    end   
     code = code + '<div id="metareview_'+prefix+"_"+self.id.to_s+'" style="">'
     code = code +"<BR/><BR/>"
     scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Metareview").id.to_s)

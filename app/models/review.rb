@@ -5,6 +5,12 @@ class Review < ActiveRecord::Base
   
   def display_as_html(prefix) 
     code = "<B>Reviewer:</B> "+self.review_mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+prefix+"_"+self.id.to_s+"','review'"+');return false;">hide review</a>'
+    code = code + "<BR/><I>Last updated:</I> "
+    if self.updated_at.nil?
+      code = code + "Not available"
+    else
+      code = code + self.updated_at.to_s
+    end
     code = code + '<div id="review_'+prefix+"_"+self.id.to_s+'" style="">'   
     code = code + '<BR/><BR/>'
     scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Review").id.to_s)

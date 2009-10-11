@@ -3,12 +3,12 @@
 <%= start_form_tag :action => 'update', :id => @participant.id %>
 <TABLE class="grades" >
 <%= render :partial => 'participant_title', :locals => {:prefix => nil} %>
-<%  s_avg, s_max, s_min = @participant.compute_review_scores(@review_weight, @review_questionnaire, @review_questions)
-    r_avg, r_max, r_min = @participant.compute_metareview_scores(@metareview_weight, @metareview_questionnaire, @metareview_questions)
-    f_avg, f_max, f_min = @participant.compute_author_feedback_scores(@feedback_weight, @feedback_questionnaire, @feedback_questions)
+<%  s_avg, s_max, s_min = @participant.compute_review_scores(@review_questionnaire, @review_questions)
+    r_avg, r_max, r_min = @participant.compute_metareview_scores(@metareview_questionnaire, @metareview_questions)
+    f_avg, f_max, f_min = @participant.compute_author_feedback_scores(@feedback_questionnaire, @feedback_questions)
 
     if @assignment.team_assignment
-       tr_avg, tr_max, tr_min = @participant.compute_teammate_review_scores(@teammate_weight, @teammate_questionnaire, @teammate_questions)                  
+       tr_avg, tr_max, tr_min = @participant.compute_teammate_review_scores(@teammate_questionnaire, @teammate_questions)                  
     end
  
     

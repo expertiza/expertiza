@@ -66,8 +66,10 @@ class AssignmentParticipant < Participant
     return ReviewMapping.find(:all, :conditions => [query,author_id,self.parent_id])
   end
   
-  def get_metareviews    
-    reviews = ReviewOfReview.find_by_sql("SELECT ror.* FROM `review_of_reviews` ror, review_of_review_mappings m, review_mappings r WHERE m.review_mapping_id = r.id AND r.reviewer_id = #{self.user_id} AND r.assignment_id = #{self.parent_id} AND ror.review_of_review_mapping_id = m.id")
+  def get_metareviews
+    inner = "SELECT MAX(ror.updated_at) FROM `review_of_reviews` ror, review_of_review_mappings m, review_mappings r WHERE m.review_mapping_id = r.id AND r.reviewer_id = #{self.user_id} AND r.assignment_id = #{self.parent_id} AND ror.review_of_review_mapping_id = m.id GROUP BY m.review_reviewer_id"
+    outer = "SELECT ror.* FROM `review_of_reviews` ror, review_of_review_mappings m, review_mappings r WHERE m.review_mapping_id = r.id AND r.reviewer_id = #{self.user_id} AND r.assignment_id = #{self.parent_id} AND ror.review_of_review_mapping_id = m.id AND ror.updated_at = ("+inner+")"
+    reviews = ReviewOfReview.find_by_sql(outer)
     return reviews.sort {|a,b| a.review_of_review_mapping.reviewer.fullname <=> b.review_of_review_mapping.reviewer.fullname }      
   end
   

@@ -5,7 +5,13 @@ class ReviewFeedback < ActiveRecord::Base
     belongs_to :user
     
   def display_as_html(prefix) 
-    code = "<B>Author:</B> "+self.review.review_mapping.reviewee.name+'&nbsp;&nbsp;&nbsp;<a href="#" name= "feedback_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'feedback_"+prefix+"_"+self.id.to_s+"','feedback'"+');return false;">hide feedback'
+    code = "<B>Author:</B> "+self.review.review_mapping.reviewee.name+'&nbsp;&nbsp;&nbsp;<a href="#" name= "feedback_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'feedback_"+prefix+"_"+self.id.to_s+"','feedback'"+');return false;">hide feedback</a>'
+    code = code + "<BR/><I>Last updated:</I> "
+    if self.updated_at.nil?
+      code = code + "Not available"
+    else
+      code = code + self.updated_at.to_s
+    end
     code = code + '<div id="feedback_'+prefix+"_"+self.id.to_s+'" style="">'   
     code = code + '<BR/><BR/>'
     questions_query = "select id from questions where questionnaire_id = "+self.assignment.author_feedback_questionnaire_id.to_s    

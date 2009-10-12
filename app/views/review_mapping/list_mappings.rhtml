@@ -29,7 +29,7 @@
            <% if !@assignment.team_assignment %>
              <%= link_to 'delete', :action => 'delete_participant', :id => contrib.id %><br/>
            <% end %>
-           <%= link_to 'add reviewer', :action => 'select_reviewer', :id => contrib %><br/>
+           <%= link_to 'add reviewer', :action => 'select_reviewer', :id => contrib, :assignment => @assignment.id %><br/>
            <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => contrib, :assignment => @assignment.id %>
          </div>
        </td>

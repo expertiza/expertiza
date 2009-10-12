@@ -1,4 +1,4 @@
-class ReviewController < ApplicationController
+class ReviewController < ApplicationController  
   helper :wiki
   helper :student_assignment
   def list
@@ -191,7 +191,7 @@ class ReviewController < ApplicationController
       @author = @mapping.team.get_participants.first
       @author_first_user_id = @author.user_id
       @author_name = @author.user.name
-      @team_members = @mapping.team.get_participant
+      @team_members = @mapping.team.get_participants
     else
       @author_name = User.find(@mapping.author_id).name
       @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @mapping.assignment_id])

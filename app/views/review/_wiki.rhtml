@@ -53,10 +53,10 @@ Submitted files<br />
   	for team_member in @team_members
 		member_name = AssignmentParticipant.find_by_user_id_and_parent_id(team_member.user_id, @assgt.id).handle
 %>
-	<%= review_mediawiki_group @assgt.directory_path, _time, member_name  %>
+	<%= review_mediawiki_group @assgt.directory_path, @assgt.created_at, member_name  %>
 	<%end%>
 <%else%>
-	<%= review_mediawiki @assgt.directory_path, _time, @author_name  %>
+	<%= review_mediawiki @assgt.directory_path, @assgt.created_at, @author_name  %>
 <%end%>
 <br>
 <% end %>

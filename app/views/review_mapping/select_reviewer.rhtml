@@ -12,7 +12,11 @@
 
 <%= start_form_tag({:action => 'add_reviewer'}, {:method => 'post'}) %>
   Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-  <%= hidden_field_tag('contributor_id', @contributor.user_id) %>
+  <% if assignment.team_assignment %>
+    <%= hidden_field_tag('contributor_id', @contributor.id) %>
+  <% else %>
+    <%= hidden_field_tag('contributor_id', @contributor.user_id) %>
+  <% end %>
   <%= hidden_field_tag('assignment_id', @contributor.parent_id) %>
   <input type='submit' value='Add Reviewer'/>
 <%= end_form_tag %>

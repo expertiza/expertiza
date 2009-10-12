@@ -13,11 +13,11 @@ class ReviewMappingController < ApplicationController
   end
   
   def select_reviewer
-    author = params[:id]
-    if author.class == AssignmentTeam  
-      @contributor = AssignmentTeam.find(author)
+    assignment = Assignment.find(params[:assignment])
+    if assignment.team_assignment
+      @contributor = AssignmentTeam.find(params[:id])
     else
-      @contributor = AssignmentParticipant.find(author)      
+      @contributor = AssignmentParticipant.find(params[:id])      
     end
   end
   

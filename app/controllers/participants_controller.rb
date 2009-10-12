@@ -71,8 +71,13 @@ class ParticipantsController < ApplicationController
   def change_handle
     @participant = AssignmentParticipant.find(params[:id])  
     if params[:participant] != nil
-      @participant.update_attributes(params[:participant])
-      redirect_to :controller => 'student_assignment', :action => 'view_actions', :id => @participant      
+      if AssignmentParticipant.find_all_by_parent_id_and_handle(@participant.parent_id, params[:participant][:handle]).length > 0
+        flash[:error] = "<b>#{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different handle."
+        redirect_to :controller => 'participants', :action => 'change_handle', :id => @participant
+      else
+        @participant.update_attributes(params[:participant])
+        redirect_to :controller => 'student_assignment', :action => 'view_actions', :id => @participant
+      end            
     end
   end   
 end

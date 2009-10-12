@@ -188,11 +188,10 @@ class ReviewController < ApplicationController
     @max = @questionnaire.max_question_score
     @min = @questionnaire.min_question_score  
     if @assgt.team_assignment 
-      team_user = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id])
-      @author_first_user_id = team_user.user_id
-      @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
-      @author_name = User.find(@author_first_user_id).name;
-      @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @mapping.assignment_id])
+      @author = @mapping.team.get_participants.first
+      @author_first_user_id = @author.user_id
+      @author_name = @author.user.name
+      @team_members = @mapping.team.get_participant
     else
       @author_name = User.find(@mapping.author_id).name
       @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @mapping.assignment_id])

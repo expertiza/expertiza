@@ -350,7 +350,7 @@ class Assignment < ActiveRecord::Base
    AssignmentTeam.find_all_by_parent_id(self.id)
  end
  
- def add_participant(user_name)
+def add_participant(user_name)
   user = User.find_by_name(user_name)
   if (user == nil) 
     raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."      
@@ -358,17 +358,23 @@ class Assignment < ActiveRecord::Base
   participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
   if !participant
     newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
+      
     if user.handle != nil
       newpart.handle = user.name
     else
-      newpart.handle = user.handle    
-    end
+      if AssignmentParticipant.find_all_by_assignment_id_and_handle(self.id, user.handle).length > 0
+        newpart.handle = user.name
+      else
+        newpart.handle = user.handle
+      end
+    end      
+    
     newpart.save!
   else
     raise "The user \""+user.name+"\" is already a participant."
   end
 
- end 
+ end
  
  def create_node()
       parent = CourseNode.find_by_node_object_id(self.course_id)      

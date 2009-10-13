@@ -350,6 +350,9 @@ class Assignment < ActiveRecord::Base
    AssignmentTeam.find_all_by_parent_id(self.id)
  end
  
+#add a new participant to this assignment
+#manual addition
+# user_name - the user account name of the participant to add
 def add_participant(user_name)
   user = User.find_by_name(user_name)
   if (user == nil) 
@@ -357,23 +360,11 @@ def add_participant(user_name)
   end
   participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
   if !participant
-    newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
-      
-    if user.handle != nil
-      newpart.handle = user.name
-    else
-      if AssignmentParticipant.find_all_by_parent_id_and_handle(self.id, user.handle).length > 0
-        newpart.handle = user.name
-      else
-        newpart.handle = user.handle
-      end
-    end      
-    
-    newpart.save!
+    newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)      
+    newpart.set_handle(user)         
   else
     raise "The user \""+user.name+"\" is already a participant."
   end
-
  end
  
  def create_node()

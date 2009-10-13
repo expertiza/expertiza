@@ -362,7 +362,7 @@ def add_participant(user_name)
     if user.handle != nil
       newpart.handle = user.name
     else
-      if AssignmentParticipant.find_all_by_assignment_id_and_handle(self.id, user.handle).length > 0
+      if AssignmentParticipant.find_all_by_parent_id_and_handle(self.id, user.handle).length > 0
         newpart.handle = user.name
       else
         newpart.handle = user.handle

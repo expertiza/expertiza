@@ -21,7 +21,7 @@ class ParticipantsController < ApplicationController
   def delete
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id
-    if participant.type.to_s == 'AssignmentParticipant'
+    if participant.class == AssignmentParticipant
       model = 'Assignment'
     else
       model = 'Course'

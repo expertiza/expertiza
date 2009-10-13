@@ -253,8 +253,7 @@ class AssignmentParticipant < Participant
   
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
-  def self.import(row,session,id)
-    puts "*** "+row.length.to_s+" ***"
+  def self.import(row,session,id)    
     if row.length < 1
        raise ArgumentError, "No user id has been specified." 
     end
@@ -270,15 +269,25 @@ class AssignmentParticipant < Participant
        raise ImportError, "The assignment with id \""+id.to_s+"\" was not found."
     end
     if (find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, id]}).size == 0)
-       newpart = create(:user_id => user.id, :parent_id => id)
-       if user.handle != nil
-          newpart.handle = user.name
-       else
-          newpart.handle = user.handle
-       end
-       newpart.save
-    end   
-  end   
+          newpart = AssignmentParticipant.create(:user_id => user.id, :parent_id => id)
+          newpart.set_handle(user)
+    end             
+  end  
+  
+  #define a handle for a new participant
+  # user - The user to which this participant is associated
+  def set_handle(user)
+    if user.handle == nil or user.handle == ""
+      self.handle = user.name
+    else
+      if AssignmentParticipant.find_all_by_parent_id_and_handle(self.assignment.id, user.handle).length > 0
+        self.handle = user.name
+      else
+        self.handle = user.handle
+      end
+    end  
+    self.save!
+  end  
   
   def get_path
      path = self.assignment.get_path + "/"+ self.directory_num.to_s

@@ -17,11 +17,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @stud
 		<% else %>
 			<font color="gray">Your work</font>
 		<% end%> 
-		<% if @student.assignment.wiki_type_id == 1%> <!-- i.e., if assignment is not a wiki assignment -->
-				(Submit and view feedback)
-		<% else %>
-		        (View feedback)
-		<% end %>
+		(Submit and view your work)
 	</li>
 	<li>
 		<% if @can_view_others_work == true %>
@@ -30,7 +26,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @stud
 			<font color="gray">Others' work</font>
 		<% end %> (Give feedback to others on their work)
 	</li>
-	<li><%= link_to "View scores",{:action => 'view_scores', :id => @student.id} %></li>
+	<li><%= link_to "View scores",{:action => 'view_scores', :id => @student.id} %>(View feedback on your work)</li>
 	<% if StudentAssignmentHelper::get_current_stage(@assignment_id) == "Complete" -%>
 	<!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment_id, session[:user].id)  -->
 		<li><%= link_to "Take Survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment_id} %> (This will log you out)</li>

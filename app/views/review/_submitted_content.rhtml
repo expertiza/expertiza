@@ -1,0 +1,8 @@
+<% if @assignment.wiki_type_id == 1%>
+  <%= render :partial => 'submitted_files', :locals => {:stage => stage} %>
+<% else %> 
+  <%= render :partial => 'review/wiki' %>
+<% end %>
+<BR/>
+<%= render :partial => 'review/hyperlink' %>
+<BR/>

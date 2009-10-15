@@ -1,13 +1,15 @@
 <h1>Edit Review</h1>
 
-<% specs = @assgt.spec_location 
-if (specs != nil && specs != "") 
+<% 
+  specs = @assignment.spec_location 
+  if (specs != nil && specs != "") 
 %>
 <p><strong><a href = "<%= specs %>">Assignment Specification</a></strong></p>
 <%end%>
-<%= render :partial => 'wiki' %>
-<%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]))
-                        review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assgt.id]).additional_comment
+<%= render :partial => 'submitted_content', :locals => {:stage => nil} %>
+
+<%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assignment.id]))
+                        review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assignment.id]).additional_comment
 %>
 <div class="flash_note"><strong>Feedback from author:</strong><br/>
 <%=review_feedback_text%></div>
@@ -16,7 +18,7 @@ if (specs != nil && specs != "")
 <%= render :partial => 'review_content' %>    
 <%= hidden_field_tag('review_id', @review.id) %>
     <%= hidden_field_tag('mapping_id', @mapping.id) %>
-    <%= hidden_field_tag('assgt_id', @assgt.id) %>
+    <%= hidden_field_tag('assignment_id', @assignment.id) %>
     <br/>
     <%= submit_tag "Save", :name=>"save" %>       
 <%= end_form_tag %>
@@ -24,5 +26,5 @@ if (specs != nil && specs != "")
 <% if session[:return_to] %>
   <%= link_to 'Back', session[:return_to] %>
 <% else %>
-  <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
+  <%= link_to 'Back', :action => 'list_reviews', :id => @assignment.id %>
 <% end %>

@@ -18,7 +18,6 @@ class CourseNode < Node
   
   # returns: list of CourseNodes based on query
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil) 
-    puts "*** GETTING COURSES ***"
     query = "select nodes.* from nodes, "+self.table
     query = query+" where nodes.node_object_id = "+self.table+".id"
     query = query+" and nodes.type = '"+self.to_s+"'"
@@ -33,8 +32,6 @@ class CourseNode < Node
         query = query+" "+sortorder
       end
     end   
-    puts query
-    puts "*******************"
     find_by_sql(query)
   end  
   

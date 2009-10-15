@@ -51,10 +51,10 @@ class ImportFileController < ApplicationController
   def get_delimiter(params)
     delim_type = params[:delim_type]
     delimiter = case delim_type
-      when "comma": ","
-      when "space": " "
-      when "tab": "\t"
-      when "other": params[:other_char]
+      when "comma" then ","
+      when "space" then " "
+      when "tab" then "\t"
+      when "other" then params[:other_char]
     end 
     return delimiter
   end

@@ -1,5 +1,2 @@
-<h1>View Teammate Review</h1>
-<h2>Teammate: <%= User.find(@teammate_review.reviewee_id).name %></h2>
-
-<%= render :partial => 'teammate_review/scores' %> 
-Additional Comment : <br><%=@teammate_review.additional_comment.gsub(/\n/, '<br>')%>
+<h1>Teammate: <%= @teammate_review.mapping.reviewee.user.name %></h1>
+<%= @teammate_review.display_as_html() %>

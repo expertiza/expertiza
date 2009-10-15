@@ -1,7 +1,7 @@
 <!-- METAREVIEWS --> 
 <% if participant.get_metareviews.length > 0 %>
   <BR/>
-  <%= render :partial => 'review_table',
+  <%= render :partial => 'grades/review_table',
            :locals => {
            :submission => '2',
            :prefix => prefix,
@@ -16,8 +16,14 @@
            }%>
   <BR/>         
   <HR/> 
+  <% count = 0 %>
   <% for metareview in participant.get_metareviews %>
-    <a name="<%=prefix+"_"+metareview.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/>  
+    <% count = count + 1 %>
+    <% if controller.controller_name != "student_assignment" %>
+      <a name="<%=prefix+"_"+metareview.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/> 
+    <% else %>
+      <%= metareview.display_as_html(nil,count) %><BR/><BR/>
+    <% end %>        
   <% end %>
 <% else %>
   <i>No metareviews have been completed for this user's reviews.</i>

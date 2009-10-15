@@ -1,0 +1,18 @@
+<b>Hyperlink(s):</b>&nbsp;&nbsp;&nbsp;<a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">show links</a><br/>
+  <div id="url" style="display:none">
+<% if @author.assignment.team_assignment %>   
+  <% for team_member in @team_members %>      
+    <% if team_member.submitted_hyperlink != nil and team_member.submitted_hyperlink.strip.length > 0 %>      
+      <ul>
+        <li><a href="<%= team_member.submitted_hyperlink %>" target="new"><%= team_member.submitted_hyperlink %></a></li>
+      </ul>
+    <% end %>  
+  <% end %>
+<% else %>
+  <% if @author.submitted_hyperlink != nil and @author.submitted_hyperlink.strip.length > 0 %>    
+    <ul>
+      <li>Participant: <%= @author.id %><a href="<%= @author.submitted_hyperlink %>" target="new"><%= @author.submitted_hyperlink %></a></li>
+    </ul>
+  <% end %>
+<% end %>
+</div>

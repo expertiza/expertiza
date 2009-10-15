@@ -136,7 +136,7 @@ private
       }    
       @reviews = @reviews.sort {|a,b| a.review_mapping.reviewer.fullname <=> b.review_mapping.reviewer.fullname}
       @questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
-      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire, @questionnaire.questions)      
+      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)      
   end
 
   def process_author_feedback
@@ -151,7 +151,7 @@ private
         
       @reviews = @reviews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}
       @questionnaire = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
-      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire, @questionnaire.questions  )
+      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
       
   end
 
@@ -171,7 +171,7 @@ private
       }
       @reviews = @reviews.sort {|a,b| a.review_of_review_mapping.review_reviewer.fullname <=> b.review_of_review_mapping.review_reviewer.fullname}
       @questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
-      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire, @questionnaire.questions)    
+      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)    
   end
   
   def process_teammate_review
@@ -190,7 +190,7 @@ private
       }    
       @reviews = @reviews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}   
       @questionnaire = Questionnaire.find(@assignment.teammate_review_questionnaire_id)
-      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire, @questionnaire.questions)      
+      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)      
   end
 
   def get_body_text(submission)

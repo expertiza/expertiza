@@ -73,17 +73,18 @@ class AssignmentParticipant < Participant
     return reviews.sort {|a,b| a.review_of_review_mapping.reviewer.fullname <=> b.review_of_review_mapping.reviewer.fullname }      
   end
   
-  def get_teammate_reviews    
-    previews = Array.new  
-    pr_query = "select * from teammate_reviews where assignment_id = "+self.parent_id.to_s+" and reviewee_id = "+self.user_id.to_s
-    TeammateReview.find_by_sql(pr_query).each{    
-      | pr |
-      if pr        
-        previews << pr
+  def get_teammate_reviews   
+    maps = TeammateReviewMapping.find(:all, :conditions => ['reviewer_id = ?',self.id])
+    reviews = Array.new
+    maps.each{    
+      | map |
+      review = TeammateReview.find_by_mapping_id(map.id)  
+      if review
+        reviews << review
       end
     }
-    return previews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname }      
-  end  
+    return reviews.sort {|a,b| a.mapping.reviewer.fullname <=> b.mapping.reviewer.fullname}     
+  end
   
   def has_submissions    
     if (self.submitted_hyperlink and self.submitted_hyperlink.strip.length > 0)
@@ -118,23 +119,24 @@ class AssignmentParticipant < Participant
       return files
   end
   
-  def get_wiki_submissions     
+  def get_wiki_submissions
     currenttime = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
  
-    if Assignment.find(self.parent_id).team_assignment and Assignment.find(self.parent_id).wiki_type.name == "MediaWiki"
-
+    if self.assignment.team_assignment and self.assignment.wiki_type.name == "MediaWiki"
        submissions = Array.new
-       self.team.get_team_users().each {
+       self.team.get_participants.each {
          | user |
-         val = WikiType.review_mediawiki_group(Assignment.find(self.parent_id).directory_path, currenttime, user.name)
-         submissions << val if val.nil?
-                  
+         val = WikiType.review_mediawiki_group(self.assignment.directory_path, currenttime, user.handle)
+         puts val
+         if val != nil
+            submissions << val
+         end                 
        }
        return submissions
-    elsif Assignment.find(self.parent_id).wiki_type.name == "MediaWiki"
-       return WikiType.review_mediawiki(Assignment.find(self.parent_id).directory_path, currenttime, self.name)       
-    elsif Assignment.find(self.parent_id).wiki_type.name == "DocuWiki"
-       return WikiType.review_docuwiki(Assignment.find(self.parent_id).directory_path, currenttime, self.name)             
+    elsif self.assignment.wiki_type.name == "MediaWiki"
+       return WikiType.review_mediawiki(self.assignment.directory_path, currenttime, self.handle)       
+    elsif self.assignment.wiki_type.name == "DocuWiki"
+       return WikiType.review_docuwiki(self.assignment.directory_path, currenttime, self.handle)             
     else
        return Array.new
     end
@@ -153,7 +155,7 @@ class AssignmentParticipant < Participant
   def compute_teammate_review_scores(questionnaire, questions)
     assignment = Assignment.find(self.parent_id) 
     if assignment.team_assignment 
-      teammate_reviews = TeammateReview.find_by_sql("select * from teammate_reviews where reviewee_id = #{self.user_id} and assignment_id = #{self.parent_id}")
+      teammate_reviews = self.get_teammate_reviews
       if teammate_reviews.length > 0
         avg_review_score, max_score, min_score = AssignmentParticipant.compute_scores(teammate_reviews, questionnaire)
         return avg_review_score, max_score, min_score
@@ -161,7 +163,7 @@ class AssignmentParticipant < Participant
         return nil, nil, nil
     end
    end
-  end
+  end 
   
   #computes this participants current metareview score
   #metareview = review_of_review
@@ -202,7 +204,7 @@ class AssignmentParticipant < Participant
         return nil, nil, nil
     end
    end    
- end
+ end 
   
   def compute_total_score(review_score, metareview_score, authorfeedback_score, teammate_review_score) 
     r_score = 0;

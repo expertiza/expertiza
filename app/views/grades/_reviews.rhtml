@@ -1,7 +1,7 @@
 <!-- REVIEWS --> 
 <% if participant.get_reviews.length > 0 %>
   <BR/>
-  <%= render :partial => 'review_table',
+  <%= render :partial => 'grades/review_table',
            :locals => {
            :submission => '1',
            :prefix => prefix,
@@ -15,8 +15,14 @@
            }%>
   <BR/>         
   <HR/> 
+  <% count = 0 %>
   <% for review in participant.get_reviews %>
-    <a name="<%=prefix+"_"+review.review_mapping.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/> 
+    <% count = count + 1 %>
+    <% if controller.controller_name != "student_assignment" %>
+      <a name="<%=prefix+"_"+review.review_mapping.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
+    <% else %>
+      <%= review.display_as_html(nil,count) %><BR/><BR/>
+    <% end %>     
   <% end %>
 <% else %>
   <i>No reviews have been completed for this user's submissions.</i>

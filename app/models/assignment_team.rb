@@ -1,12 +1,13 @@
 class AssignmentTeam < Team
-
+  belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
+  
   def self.import(row,session,id,options)
     if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
        raise ArgumentError, "Not enough items" 
     end
     
-    assignment = Assignment.find(id)
-    if assignment == nil
+    
+    if self.assignment == nil
       raise ImportError, "The assignment with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
     
@@ -112,7 +113,13 @@ class AssignmentTeam < Team
     feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where review_id in ("+review_query+")")
     return feedbacks.sort {|a,b| a.reviewer.name <=> b.reviewer.name}    
   end 
- 
+
+  #revision to use ComputedScores table - not fully implemented
+  def compute_scores(questionnaire, model)
+    participant = self.get_participants.first
+    participant.compute_scores(questionnaire,model)
+  end  
+  
   #computes this participants current review scores:
   # avg_review_score
   # difference
@@ -125,4 +132,5 @@ class AssignmentTeam < Team
       return nil,nil,nil
     end
    end
-end
+end  
+

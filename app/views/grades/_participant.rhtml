@@ -9,7 +9,9 @@
   	<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a></FONT>
   	</TD>    
    	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>% 
-   	<BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => '1' %></FONT>  	 
+   	<% if controller.controller_name != "student_assignment" %>
+   	  <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => '1' %></FONT>
+   	<% end %>  	 
    	</TD>
     <% else %>
    	<TD ALIGN="CENTER">---</TD>
@@ -21,7 +23,9 @@
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a></FONT>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
-    <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => '2' %></FONT>  	    
+    <% if controller.controller_name != "student_assignment" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => '2' %></FONT>
+    <% end %>  	    
     </TD>
     <% else %>
     <TD ALIGN="CENTER">---</TD>
@@ -33,7 +37,9 @@
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedbacks</a></FONT>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%
-    <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => '3' %></FONT>  	    
+    <% if controller.controller_name != "student_assignment" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => '3' %></FONT>
+    <% end %>  	    
     </TD>
     <% else %>
     <TD ALIGN="CENTER">---</TD>
@@ -45,7 +51,9 @@
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a></FONT>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min) %>% - <%= sprintf("%.0f",tr_max) %>%
-    <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => '4' %></FONT>  	    
+    <% if controller.controller_name != "student_assignment" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => '4' %></FONT>
+    <% end %>  	    
     </TD>
     <% else %>
     <TD ALIGN="CENTER">---</TD>
@@ -53,19 +61,23 @@
     <% end %>    
     <% end %>
     <% stage = Assignment.find(participant.parent_id).get_current_stage() %>
-    <% if controller.action_name == 'view' %>
+    <% if controller.action_name == 'view' or controller.action_name == "view_scores" %>
     	<TD ALIGN="CENTER">
     	<% if stage == "Complete" %>      
       	<% if participant.grade %>
-	        <FONT COLOR="#0033FF"><%= sprintf("%.2f",participant.grade) %>%</FONT>
+      	    <% if controller.controller_name != "student_assignment" %><FONT COLOR="#0033FF"><% end %>
+      	    <%= sprintf("%.2f",participant.grade) %>%
+	        <% if controller.controller_name != "student_assignment" %></FONT><% end %>
       	<% else %>
       	    <% if @assignment.team_assignment %>      		
 	    	   <%= sprintf("%.2f",participant.compute_total_score(s_avg, r_avg, f_avg, tr_avg)) %>%
 	    	<% else %>
 	    	   <%= sprintf("%.2f",participant.compute_total_score(s_avg, r_avg, f_avg,0)) %>%
 	    	<% end %> 
-      	<% end %>   
-      	<BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
+      	<% end %> 
+      	<% if controller.controller_name != "student_assignment" %>  
+      	  <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
+      	<% end %>
     	<% else %>
       	<FONT SIZE="-1">(in <%= stage %>)</FONT>
     	<% end %>      
@@ -91,18 +103,18 @@
    	<% end %>
 </TR>
 <TR  class="row" id="<%= prefix %>_files" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'submissions', :locals => {:participant => participant} %></TD>
+	<TD COLSPAN="9"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_reviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'reviews', :locals => {:prefix => 'user', :participant => participant} %></TD>
+	<TD COLSPAN="9"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'metareviews', :locals => {:prefix => prefix, :participant => participant} %></TD>
+	<TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_feedback" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'author_feedbacks', :locals => {:prefix => 'user', :participant => participant} %></TD>
+	<TD COLSPAN="9"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'teammate_reviews', :locals => {:prefix => prefix, :participant => participant} %></TD>
+	<TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant} %></TD>
 </TR>
 <!-- END PARTICIPANT -->

@@ -1,28 +1,3 @@
-<!-- <% if @link != nil %>
-Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
-<% end %> -->
-
-<script type="text/javascript"> 
-		function updateDropDownMenu(advice,question,min)
-		{			
-			var id = 'new_score_' + question			
-			document.getElementById(id).selectedIndex = advice - min
-		}
-		function toggleVis(id) { 
-		var elem = document.getElementById(id+"_myDiv");
-		if(elem.style.display == 'none'){
-			elem.style.display = '';
-			document.getElementById(id+"_show").style.display = 'none';
-			document.getElementById(id+"_hide").style.display = '';
-		} else {
-			elem.style.display = 'none';
-			document.getElementById(id+"_show").style.display = '';
-			document.getElementById(id+"_hide").style.display = 'none';
-		}
-	} 
-		
-	
-</script>
 <% i = 0;%>
 <%for @question in @questions %>
   <%=@question.txt%><br />        
@@ -38,44 +13,7 @@ Hyperlink: <a href="<%= @link %>" target="new"><%= @link %></a><br/><br/>
             <option value="<%=j%>"><%=j%></option>
           <% end %>
       </select>
-		<a href="javascript:testpanel<%=i%>.togglepanelplus()" onClick="toggleVis('<%=i%>');">		
-			<span class="inline" id="<%=i%>_show">Show advice</span>
-			<span class="inline" id="<%=i%>_hide" style="display: none">Hide advice</span>
-			<span id="<%=i%>_myDiv" style="display:none"></span>
-		</a>
-		<div id="mypanel<%=i%>" class="ddpanel">
-			<div id="mypanelcontent<%=i%>" class="ddpanelcontentalt">		              		 
-			<div id="mypaneltab<%=i%>" class="ddpaneltab ddpaneltabalt"> 
-			<span></span>
-		
-			<script type="text/javascript"> 
-				var testpanel<%=i%>=new ddpanel({
-					ids: ["mypanel<%=i%>", "mypanelcontent<%=i%>", "mypaneltab<%=i%>"], 
-					stateconfig: {initial: "5px", persiststate: true}, 
-					animate: {enabled: true, steps: 4}, 
-					pointerimage: {enabled: true, src: ["arrow-down.gif", "arrow-up.gif"]},
-					closepanelonclick: {enabled: false} 
-				})				
-			</script>				          
-			<div style="padding:12px">			
-			<%j=@max%>										
-				<% for @advice in @question.question_advices.sort {|x,y| y.score <=> x.score } %>				
-					<%if j!=@max%><br/><%end%>					
-					<%=j%>: <%if @advice.advice.to_s.length>0%> 
-								<a href="javascript:updateDropDownMenu(<%=j%>,<%=i%>,<%=@min%>)">
-									<%=@advice.advice.to_s%>
-								</a>
-							<% else %>
-								No advice supplied
-							<% end %>
-							</a>
-					<%j-=1;%>
-				<%end%>
-				
-				</div>
-				</div>
-			</div> 
-		</div> 
+      <%= render :partial => 'advice', :locals => {:i => i} %>
   <% end %>
 	<br/>
   <input id=new_question_<%=i%> name=new_question[<%=i%>] value=<%=@question.id%> type=hidden />

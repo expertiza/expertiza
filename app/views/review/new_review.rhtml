@@ -1,14 +1,16 @@
 <h1>New Review</h1>
-<% specs = @assgt.spec_location 
-if (specs != nil && specs != "") 
+<% 
+  specs = @assignment.spec_location 
+  if (specs != nil && specs != "") 
 %>
-<p><strong><a href = "<%= specs %>">Assignment Specification</a></strong></p>
+  <p><strong><a href = "<%= specs %>">Assignment Specification</a></strong></p>
 <%end%>
-<%= render :partial => 'wiki' %>
+<%= render :partial => 'submitted_content', :locals => {:stage => nil} %>
+
 <%= start_form_tag :action => 'create_review' %>
   	<%= render :partial => 'review' %>
          <%= hidden_field_tag('mapping_id', @mapping.id) %>
-         <%= hidden_field_tag('assgt_id', @assgt.id) %>
+         <%= hidden_field_tag('assgt_id', @assignment.id) %>
 		 
   	<%= submit_tag "Save", :name=>"save" %>       
 <%= end_form_tag %>
@@ -16,6 +18,6 @@ if (specs != nil && specs != "")
 <% if session[:return_to] %>
   <%= link_to 'Back', session[:return_to] %>
 <% else %>
-  <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %>
+  <%= link_to 'Back', :action => 'list_reviews', :id => @assignment.id %>
 <% end %>
 

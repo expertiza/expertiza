@@ -14,9 +14,13 @@
   <% index = 0 %>
   <% for participant in @participants
     index += 1
-    s_avg, s_max, s_min = participant.compute_review_scores(@review_weight, @review_questionnaire, @review_questions)
-    r_avg, r_max, r_min = participant.compute_metareview_scores(@metareview_weight, @metareview_questionnaire, @metareview_questions)   
-    f_avg, f_max, f_min = participant.compute_author_feedback_scores(@feedback_weight, @feedback_questionnaire, @feedback_questions)    
+    s_avg, s_max, s_min = participant.compute_review_scores(@review_questionnaire, @review_questions)
+    r_avg, r_max, r_min = participant.compute_metareview_scores(@metareview_questionnaire, @metareview_questions)   
+    f_avg, f_max, f_min = participant.compute_author_feedback_scores(@feedback_questionnaire, @feedback_questions)
+    
+    if @assignment.team_assignment and participant.assignment.teammate_review_questionnaire_id != nil
+       tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores(@teammate_questionnaire, @teammate_questions)                  
+    end        
   %>
     <%= render :partial => 'participant',
                :locals => {:prefix => 'user_'+index.to_s,
@@ -24,7 +28,8 @@
                            :participant => participant,
                            :s_avg => s_avg, :s_min => s_min, :s_max => s_max,
                            :r_avg => r_avg, :r_min => r_min, :r_max => r_max,
-                           :f_avg => f_avg, :f_min => f_min, :f_max => f_max
+                           :f_avg => f_avg, :f_min => f_min, :f_max => f_max,
+                           :tr_avg => tr_avg, :tr_min => tr_min, :tr_max => tr_max                                                  
                            }%>
 
   <% end %>

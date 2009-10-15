@@ -4,15 +4,23 @@ class ReviewFeedback < ActiveRecord::Base
     belongs_to :assignment
     belongs_to :user
     
-  def display_as_html(prefix) 
-    code = "<B>Author:</B> "+self.review.review_mapping.reviewee.name+'&nbsp;&nbsp;&nbsp;<a href="#" name= "feedback_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'feedback_"+prefix+"_"+self.id.to_s+"','feedback'"+');return false;">hide feedback</a>'
-    code = code + "<BR/><I>Last updated:</I> "
+  def display_as_html(prefix = nil,count = nil) 
+    if prefix
+      code = "<B>Author:</B> "+self.review.review_mapping.reviewee.name+'&nbsp;&nbsp;&nbsp;<a href="#" name= "feedback_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'feedback_"+prefix+"_"+self.id.to_s+"','feedback'"+');return false;">hide feedback</a>'
+    else
+      code = '<B>Feedback '+count.to_s+'</B>&nbsp;&nbsp;&nbsp;<a href="#" name= "feedback_'+self.id.to_s+'Link" onClick="toggleElement('+"'feedback_"+self.id.to_s+"','feedback'"+');return false;">show feedback</a>'          
+    end      
+    code = code + "<BR/><B>Last updated:</B> "
     if self.updated_at.nil?
       code = code + "Not available"
     else
-      code = code + self.updated_at.to_s
+      code = code + self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end
-    code = code + '<div id="feedback_'+prefix+"_"+self.id.to_s+'" style="">'   
+    if prefix
+      code = code + '<div id="feedback_'+prefix+"_"+self.id.to_s+'" style="">'
+    else
+      code = code + '<div id="feedback_'+self.id.to_s+'" style="display:none">'
+    end
     code = code + '<BR/><BR/>'
     questions_query = "select id from questions where questionnaire_id = "+self.assignment.author_feedback_questionnaire_id.to_s    
     scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and question_id in ("+questions_query+") and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Author Feedback").id.to_s)
@@ -31,7 +39,14 @@ class ReviewFeedback < ActiveRecord::Base
     code = code + "<B>Additional Comment:</B><BR/>"+comment+""
     code = code + "</div>"
     return code
-  end     
+  end  
+  
+  def delete
+    type_id = QuestionnaireType.find_by_name("Author Feedback").id
+    scores = Score.find_all_by_instance_id_and_questionnaire_type_id(self.id,type_id)
+    scores.each {|score| score.destroy}    
+    self.destroy
+  end
     
     def reviewer
       self.review.review_mapping.reviewee      

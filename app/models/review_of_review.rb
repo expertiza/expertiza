@@ -2,20 +2,28 @@ class ReviewOfReview < ActiveRecord::Base
     has_many :review_of_review_scores
     belongs_to :review_of_review_mapping
 
-  def display_as_html(prefix)
+  def display_as_html(prefix = nil, count = nil)
     if self.review_of_review_mapping.review_reviewer != nil
        review_reviewer = self.review_of_review_mapping.review_reviewer
     else
        review_reviewer = User.find(self.review_of_review_mapping.reviewer_id)
     end
-    code = "<B>Metareviewer:</B> "+review_reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+prefix+"_"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
-    code = code + "<BR/><I>Last updated:</I> "
+    if prefix 
+      code = "<B>Metareviewer:</B> "+review_reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+prefix+"_"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
+    else
+      code = '<B>Metareview '+count.to_s+'</B>&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+self.id.to_s+"','metareview'"+');return false;">show metareview</a>'      
+    end
+    code = code + "<BR/><B>Last updated:</B> "
     if self.updated_at.nil?
       code = code + "Not available"
     else
-      code = code + self.updated_at.to_s
+      code = code + self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end   
-    code = code + '<div id="metareview_'+prefix+"_"+self.id.to_s+'" style="">'
+    if prefix
+      code = code + '<div id="metareview_'+prefix+"_"+self.id.to_s+'" style="">'
+    else
+      code = code + '<div id="metareview_'+self.id.to_s+'" style="display:none">'
+    end
     code = code +"<BR/><BR/>"
     scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Metareview").id.to_s)
     scores.each{
@@ -34,6 +42,10 @@ class ReviewOfReview < ActiveRecord::Base
       User.find(self.review_of_review_mapping.reviewer_id)
     end
   end
+  
+  def reviewee
+    self.review_of_review_mapping.reviewee
+  end
 
   # Computes the total score awarded for a metareview
   def get_total_score
@@ -51,8 +63,9 @@ class ReviewOfReview < ActiveRecord::Base
   end
 
   def delete
-    rOfRScores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Metareview").id)
-    rOfRScores.each {|review| rOfRScores.delete }
+    type_id = QuestionnaireType.find_by_name("Metareview").id
+    scores = Score.find_all_by_instance_id_and_questionnaire_type_id(self.id,type_id)
+    scores.each {|score| score.destroy}
     self.destroy
   end
 

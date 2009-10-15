@@ -72,16 +72,15 @@ class Assignment < ActiveRecord::Base
   
   # parameterized by questionnaire
   def get_max_score_possible(questionnaire)
-    results = Questionnaire.execute("SELECT (SUM(q.weight)*rs.max_question_score) as max_score FROM  questions q, questionnaires rs WHERE q.questionnaire_id = rs.id AND rs.id = 6")
     max = 0
     sum_of_weights = 0
     num_questions = 0
-    questions.each { |question| #type identifies the type of questionnaire  
+    questionnaire.questions.each { |question| #type identifies the type of questionnaire  
       sum_of_weights += question.weight
       num_questions+=1
     }
     max = num_questions * questionnaire.max_question_score * sum_of_weights
-    return max
+    return max, sum_of_weights
   end
     
   def get_max_review_score

@@ -277,9 +277,8 @@ def create_teams
  
  protected
  
- def check_for_existing_team_name(parent,name)
-    model = Object.const_get(session[:team_type]+'Team')    
-    list = model.find(:all, :conditions => ['parent_id = ? and name = ?',parent.id,name])
+ def check_for_existing_team_name(parent,name)    
+    list = Object.const_get(session[:team_type]+'Team').find(:all, :conditions => ['parent_id = ? and name = ?',parent.id,name])
     if list.length > 0     
       raise TeamExistsError, 'Team name, "'+name+'", is already in use.'
     end

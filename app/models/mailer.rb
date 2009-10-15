@@ -19,11 +19,7 @@ class Mailer < ActionMailer::Base
      if defn[:bcc] != nil
        @bcc = defn[:bcc]
      end
-     if defn[:from] != nil
-       @from = defn[:from]
-     else
-       @from = "root@pg-server.csc.ncsu.edu"
-     end
+     @from = "root@pg-server.csc.ncsu.edu"     
      @body = defn[:body]
      @sent_on = Time.now 
   end

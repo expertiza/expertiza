@@ -32,11 +32,10 @@ class ReviewController < ApplicationController
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
     @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
     if @assgt.team_assignment 
-      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
-      @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
+      @team_members = @mapping.team.get_participants 
       #use @author.handle to spider by participant handle
       #@author_name = User.find(@author_first_user_id).name;
-      @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @mapping.assignment_id])
+      @author = @team_members.first 
       @author_name = @author.handle
     else
       #user @author.handle to spider by participant handle
@@ -54,7 +53,7 @@ class ReviewController < ApplicationController
   end
   
   def view_review
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assignment,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
     
     @review_id=params[:id]
     
@@ -100,7 +99,7 @@ class ReviewController < ApplicationController
   end
   
   def edit_review
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assignment,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -143,8 +142,8 @@ class ReviewController < ApplicationController
       #notification limits  
       compare_scores      
       
-      flash[:notice] = 'Review was successfully saved.'
-      redirect_to :action => 'list_reviews', :id => params[:assgt_id]
+      flash[:note] = 'Review was successfully saved.'
+      redirect_to :action => 'list_reviews', :id => params[:assignment_id]
     else # If something goes wrong, stay at same page
       render :action => 'view_review'
     end
@@ -182,12 +181,12 @@ class ReviewController < ApplicationController
 #      session[:review_timeout] = @mapping.timeout.to_s()
 #    end 
     
-    @assgt = Assignment.find(@mapping.assignment_id)
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
-    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
+    @assignment = Assignment.find(@mapping.assignment_id)
+    @questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
+    @questions = @questionnaire.questions
     @max = @questionnaire.max_question_score
     @min = @questionnaire.min_question_score  
-    if @assgt.team_assignment 
+    if @assignment.team_assignment 
       @author = @mapping.team.get_participants.first
       @author_first_user_id = @author.user_id
       @author_name = @author.user.name

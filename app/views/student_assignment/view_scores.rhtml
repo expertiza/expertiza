@@ -1,114 +1,39 @@
-<SCRIPT LANGUAGE="JavaScript">
-function toggleVis(id) {
-                var elem = document.getElementById(id+"_myDiv");
-                if(elem.style.display == 'none'){
-                        elem.style.display = '';
-                        document.getElementById(id+"_show").style.display = 'none';
-                        document.getElementById(id+"_hide").style.display = '';
-                } else {
-                        elem.style.display = 'none';
-                        document.getElementById(id+"_show").style.display = '';
-                        document.getElementById(id+"_hide").style.display = 'none';
-                }
-        }
-</SCRIPT>
+<H1>Score for <%= @assignment.name %></H1>
 
-<h1>Scores for <%= @assignment.name %></h1>
-<% if flash[:notice] != nil and flash[:notice].strip != "" %>
-<div class="flash_error">
-	<%= flash[:notice] %>
-</div>
-<% end %>
-<%
-    review_no = 1
-	grade = 0
-    _time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
-    for review_map in @review_mapping 
-        for review in review_map.reviews%>
-            <b>Review <%=review_no%></b> done on <b><%= review.created_at.strftime('%A %B %d %Y, %I:%M%p') %></b><a href="#1" onClick="toggleVis('<%=review_no %>');">	
-		<span class="inline" id="<%=review_no %>_show">View</span>
-              	<span class="inline" id="<%=review_no %>_hide" style="display: none">Hide</span>
-            </a>
-            <br/>
-			<div id="<%=review_no%>_myDiv" style="display:none">
-            <table class="listing" cellpadding=2>
-             <tr>
-                <th>Question</th>
-                <th>Score</th>
-				<th>Comment</th>
-             </tr>
-         
-             <%
-             total = 0
-             for review_score in Score.find(:all, :conditions=>["instance_id=? and questionnaire_type_id=?",review.id, QuestionnaireType.find_by_name("Review").id])
-                #if (!Question.find(review_score.question_id).true_false)
-                    total += review_score.score 
-                #end%>
-                <tr class="listingRow">
-                    <td><%=Question.find(review_score.question_id).txt%></td><td align = 'right'><%=review_score.score%>&nbsp;&nbsp;</td><td><%=review_score.comments%></td>
-                </tr>
-            <%end
-			  grade += total%>
-			  
-            <tr><td><em>Total</em></td><td align = 'right'><%=total%>&nbsp;&nbsp;</td><td><em>Score:</em> <%=sprintf("%.2f",total.to_f*100/@sum_of_max.to_f)%>%</td></tr>
-           </table><br/>
-           Additional comment : <%=review.additional_comment%><br/>
-           <% @mapping = ReviewMapping.find(review_map.id) %>  
-       <%         
-		if @assignment.team_assignment 
-			@team_id = @mapping.team_id
-		else
-			@author_id = @mapping.author_id
-		end
-	   %>
-                    		   
-			<!-- Checking to see if a Feedback is given by the author. Check for an entry in the Review Feedback Table. If there is no entry give a link Begin to allow the author to give a Feedback via a Feedback rubric -->
-			<!-- If previously Feedback has been provided , give links to View and Edit to View the previous feedback and edit the feedback -->	  
-				
-		     <% feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", review.id, @assignment.id])%>
-		     <% if feedback %>
-		           <p> View feedback : <%= link_to "View", {:controller =>'review_feedback', :action=>'view', :id => feedback.id} %><p>
-		           <p> Edit feedback : <%= link_to "Edit", {:controller =>'review_feedback', :action =>'edit', :id => feedback.id} %></p>      
-		     <% else %>
-			       <p><label>Give feedback to reviewer:<%= link_to "Begin", {:controller => 'review_feedback', :action => 'new',:id => @participant.id,:mapping_id => @mapping.id } %></label></p>	
-		     <% end	%>
-			 </div>
-		   <%review_no +=1
-        end
-	end%>
-    <% if review_no-1 > 0 %>
-		<h3>Grade</h3> 
-		<strong>Average (of all reviews)</strong> = <%=sprintf("%.2f",grade.to_f/(review_no-1).to_f) %>
-		<%if @final_penalty !=0%>
-			<li>Penalty units= <%=@penalty_units%>&nbsp;Penalty per unit=<%=@late_policy.penalty_per_unit%>&nbsp;Maximum penalty=<%=@late_policy.max_penalty%></li>
-		<%end%>
-		&nbsp;&nbsp;<strong>Final grade</strong> = <%=sprintf("%.2f",(grade.to_f/(review_no-1).to_f)*100/@sum_of_max.to_f-@final_penalty.to_f)%>%</li>
-   	<%else%>
-		<%if @assignment.wiki_type_id == 2 %>
-			<%if @assignment.team_assignment %>
-				<label>There are no reviews of your work yet.</label>
-			<%else%>
-				<%if review_mediawiki @assignment.directory_path, _time, @user_name == ''%>	
-					<label>There are no reviews of your work because it seems that you have not submitted anything for this assignment.</label>
-				<%else%>
-					<label>There are no reviews of your work yet.</label>
-				<%end%>
-			<%end%>
-		<%else%>
-			<label>There are no reviews on your work yet.</label>
-		<%end%>
-	<%end%>
-<%if(@review_of_review_mappings.size > 0)%>
-<h2>Reviews of reviews</h2>
- <tr><ul>
-  <%ror_no = 1%>
-   <% for ror_map in @review_of_review_mappings %>
-  <% 
-  @ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id) %>
-  <% if (@ror)%>
-  <li>Review of Review <%=ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view', :id => @ror.id} %> &nbsp;
-  <% end %>
-  <%ror_no += 1
-  	end 
-  end%>
+<% @review_questionnaire = Questionnaire.find(@participant.assignment.review_questionnaire_id)
+   @metareview_questionnaire = Questionnaire.find(@participant.assignment.review_of_review_questionnaire_id)
+   @feedback_questionnaire = Questionnaire.find(@participant.assignment.author_feedback_questionnaire_id) %>
 
+<%= start_form_tag :action => 'update', :id => @participant.id %>
+<TABLE class="grades" >
+<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>
+<%  s_avg, s_max, s_min = @participant.compute_review_scores(@review_questionnaire, @review_questions)
+    r_avg, r_max, r_min = @participant.compute_metareview_scores(@metareview_questionnaire, @metareview_questions)   
+    f_avg, f_max, f_min = @participant.compute_author_feedback_scores(@feedback_questionnaire, @feedback_questions)    
+
+    if @assignment.team_assignment and @participant.assignment.teammate_review_questionnaire_id != nil
+       @teammate_questionnaire = Questionnaire.find(@participant.assignment.teammate_review_questionnaire_id)
+       tr_avg, tr_max, tr_min = @participant.compute_teammate_review_scores(@teammate_questionnaire, @teammate_questions)      
+    end
+ 
+    
+    
+    %>
+                       
+    <%= render :partial => 'grades/participant',
+               :locals => {:prefix => 'user_',
+                           :team => false,
+                           :participant => @participant,
+                           :s_avg => s_avg, :s_min => s_min, :s_max => s_max,
+                           :r_avg => r_avg, :r_min => r_min, :r_max => r_max,
+                           :f_avg => f_avg, :f_min => f_min, :f_max => f_max,
+                           :tr_avg => tr_avg, :tr_min => tr_min, :tr_max => tr_max}%>                       
+
+
+   <%= hidden_field_tag 'total_score', @participant.compute_total_score(s_avg, r_avg, f_avg, tr_avg) %>
+</TABLE>
+<BR/>
+<%= submit_tag "Update" %>
+<%= end_form_tag %>
+<BR/><BR/>
+<%= link_to 'Back', :action => 'view_actions', :id => @participant.parent_id %>

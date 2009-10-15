@@ -247,32 +247,23 @@ class StudentAssignmentController < ApplicationController
   end
  
   def submit
-    @student = AssignmentParticipant.find(params[:id])
-    @link = @student.submitted_hyperlink
+    @author = AssignmentParticipant.find(params[:id])
     @submission = params[:submission]
     @files = Array.new
-    @assignment_id = @student.parent_id
     # uncommented to remove the problem reported by kees
-    @assignment = Assignment.find(@assignment_id)
-    # removed as google doc not completely implemented
-    # Return URI depending on link type.
-#    if @assignment.is_google_doc
-#      @link = google_id_to_url(@student.submitted_hyperlink)
-#    else
-      @link = @student.submitted_hyperlink
-#    end
+    @assignment = @author.assignment
     
     # assignment_id below is the ID of the assignment retrieved from the participants table (the assignment in which this student is participating)
-    @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
-    @submit_due_date = DueDate.find(:all, :conditions => ["assignment_id = ? and deadline_type_id = ?",@assignment_id,1])
-    @resubmission_times = ResubmissionTime.find(:all,:order => "resubmitted_at ASC",:conditions => ["participant_id= ?",@student.id])
+    @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
+    @submit_due_date = DueDate.find(:all, :conditions => ["assignment_id = ? and deadline_type_id = ?",@assignment.id,1])
+    @resubmission_times = ResubmissionTime.find(:all,:order => "resubmitted_at ASC",:conditions => ["participant_id= ?",@author.id])
 
     @review_phase = find_review_phase(@due_dates)
     
     #If the student is submitting his work for the first time and is late, the time difference is recorded in the field penalty accumulated in the Participants table
     if Time.now > @submit_due_date[0].due_at and !@resubmission_times[0]
       diff_minutes = (Time.now - @submit_due_date[0].due_at).round/60
-      @student.penalty_accumulated += diff_minutes
+      @author.penalty_accumulated += diff_minutes
     end
     
     @current_folder = DisplayOption.new
@@ -336,19 +327,19 @@ class StudentAssignmentController < ApplicationController
       file = params['uploaded_file']
       #@student.set_student_directory_num
       
-      if @student.directory_num == nil or @student.directory_num < 0
-        @student.set_student_directory_num
+      if @author.directory_num == nil or @author.directory_num < 0
+        @author.set_student_directory_num
       end  
         #send message to reviewers(s) when submission has been updated
         #ajbudlon, sept 07, 2007
       logger.info "Sending submission e-mail"    
-      Assignment.find_by_id(@assignment_id).email(@student.user_id)
+      @assignment.email(@author.user_id)
       #end      
       #safe_filename = FileHelper::sanitize_filename(file.full_original_filename)
       if @assignment.team_assignment
-        curr_directory = @student.get_path.to_s+ @current_folder.name
+        curr_directory = @author.get_path.to_s+ @current_folder.name
       else
-        curr_directory = @student.get_path.to_s+ @current_folder.name
+        curr_directory = @author.get_path.to_s+ @current_folder.name
       end
 
       if !File.exists? curr_directory
@@ -364,14 +355,14 @@ class StudentAssignmentController < ApplicationController
       update_resubmit_times
     end
     
-    if @student.directory_num != nil and @student.directory_num >= 0
+    if @author.directory_num != nil and @author.directory_num >= 0
       get_student_folders
       get_student_files 
     end
     
     @review_of_review_mappings = Array.new
     
-    @review_mappings_for_author = ReviewMapping.find(:all, :conditions => ["author_id = ? and assignment_id = ?",session[:user].id,@assignment_id])
+    @review_mappings_for_author = ReviewMapping.find(:all, :conditions => ["author_id = ? and assignment_id = ?",session[:user].id,@assignment.id])
     for review_mapping_for_author in @review_mappings_for_author
       if(ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ?",review_mapping_for_author.id])!= nil)
         @review_of_review_mappings << ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id = ? ",review_mapping_for_author.id])
@@ -391,13 +382,13 @@ private
   
   def update_resubmit_times
     new_submit = ResubmissionTime.new(:resubmitted_at => Time.now.to_s)
-    @student.resubmission_times << new_submit
+    @author.resubmission_times << new_submit
   end
 
   def create_new_folder
     new_folder = params[:new_folder]
-    if !File.exist?(@student.get_path + @current_folder.name + "/" + new_folder)
-      FileUtils.mkdir_p(@student.get_path + @current_folder.name + "/" + new_folder)
+    if !File.exist?(@author.get_path + @current_folder.name + "/" + new_folder)
+      FileUtils.mkdir_p(@author.get_path + @current_folder.name + "/" + new_folder)
     else 
       flash[:notice] = "Directory name is already taken"
     end
@@ -405,7 +396,7 @@ private
   
   def move_file
     old_filename = params[:filenames][params[:chk_files]].to_s
-        new_filename = @student.get_path + (params[:moved_file])
+        new_filename = @author.get_path + (params[:moved_file])
         #if (file_op "mv", old_filename, new_filename)
   FileUtils.mv old_filename, new_filename, :force => true
         #end  
@@ -413,21 +404,10 @@ private
   
   def save_weblink
     weblink = params['submission']
-    if check_validity(weblink.strip)
-      if @assignment.team_assignment
-  teams_member = TeamsUser.find_by_sql("select * from teams_users where team_id in (select team_id from teams_users where user_id="+session[:user].id.to_s+") and team_id in (select id from teams where parent_id="+@assignment_id.to_s+")")
-    teams_member.each{
-        |member|
-        participant = Participant.find(:first, :conditions => ['user_id = ? and parent_id = ?', member.user_id, @assignment.id])
-        participant.submitted_hyperlink = weblink
-  participant.save
-     }
-
-      else
-        participant = Participant.find(params[:id])   
+    if check_validity(weblink.strip)      
+      participant = Participant.find(params[:id])   
       participant.submitted_hyperlink = weblink
-      participant.save
-      end
+      participant.save      
     end
     redirect_to :action => 'submit'
   end
@@ -449,7 +429,7 @@ private
   
   def copy_file
     old_filename = params[:filenames][params[:chk_files]].to_s
-        new_filename = @student.get_path + params[:copy_file]
+        new_filename = @author.get_path + params[:copy_file]
         if File.exist?(old_filename)
           #if (file_op "cp_r", old_filename, new_filename)
     FileUtils.cp_r old_filename, new_filename 
@@ -506,7 +486,7 @@ private
   end
 
   def get_student_files
-    temp_files = Dir[@student.get_path + @current_folder.name + "/*"]
+    temp_files = Dir[@author.get_path + @current_folder.name + "/*"]
     for file in temp_files
       if not File.directory?(Dir.pwd + "/" + file) then
         @files << file
@@ -516,7 +496,7 @@ private
   end
   def get_submitted_file_list(direc,author,files)
     if(author!=nil && author.directory_num)
-      direc = @student.get_path
+      direc = @author.get_path
       temp_files = Dir[direc + "/*"]
       for file in temp_files
         if not File.directory?(Dir.pwd + "/" + file) then
@@ -528,12 +508,12 @@ private
   end
 
   def get_student_folders
-    temp_files = Dir[@student.get_path + "/*"]
+    temp_files = Dir[@author.get_path + "/*"]
     @folders = Array.new
     @folders << "/"
     for file in temp_files
       if File.directory?(Dir.pwd + "/" + file) then
-        @folders << file.gsub(get_student_directory(@student), "")
+        @folders << file.gsub(get_student_directory(@author), "")
         find_student_folders file
       end
     end
@@ -544,7 +524,7 @@ private
     temp_files = Dir[dir + "/*"]
     for file in temp_files
       if File.directory?(file) then
-        @folders << file.gsub(get_student_directory(@student), "")
+        @folders << file.gsub(get_student_directory(@author), "")
         find_student_folders file
       end
     end

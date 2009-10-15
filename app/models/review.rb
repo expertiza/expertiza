@@ -3,21 +3,31 @@ class Review < ActiveRecord::Base
   has_many :review_scores
   belongs_to :review_mapping
   
-  def display_as_html(prefix) 
-    code = "<B>Reviewer:</B> "+self.review_mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+prefix+"_"+self.id.to_s+"','review'"+');return false;">hide review</a>'
-    code = code + "<BR/><I>Last updated:</I> "
+  def display_as_html(prefix = nil, count = nil)
+    if prefix
+       code = "<B>Reviewer:</B> "+self.review_mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+prefix+"_"+self.id.to_s+"','review'"+');return false;">hide review</a><BR/>'
+    else
+       code = '<B>Review '+count.to_s+'</B> &nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+self.id.to_s+"','review'"+');return false;">show review</a><BR/>'           
+    end
+    code = code + "<B>Last reviewed:</B> "
     if self.updated_at.nil?
       code = code + "Not available"
     else
-      code = code + self.updated_at.to_s
+      code = code + self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end
-    code = code + '<div id="review_'+prefix+"_"+self.id.to_s+'" style="">'   
+    if prefix
+      code = code + '<div id="review_'+prefix+"_"+self.id.to_s+'" style="">'
+    else
+      code = code + '<div id="review_'+self.id.to_s+'" style="display:none">'
+    end
     code = code + '<BR/><BR/>'
     scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Review").id.to_s)
+    count = 0
     scores.each{
-      | reviewScore |      
-      code = code + "<I>"+Question.find_by_id(reviewScore.question_id).txt+"</I><BR/><BR/>"
-      code = code + '(<FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find_by_id(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B>): "+reviewScore.comments+"<BR/><BR/>"
+      | reviewScore |
+      count = count + 1
+      code = code + "<B>Question "+count.to_s+": </B><I>"+Question.find_by_id(reviewScore.question_id).txt+"</I><BR/><BR/>"
+      code = code + '&nbsp;&nbsp;&nbsp;(<FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find_by_id(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B>): "+reviewScore.comments.gsub("<","&lt;").gsub(">","&gt;")+"<BR/><BR/>"
     }     
     if self.additional_comment != nil
       comment = self.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')
@@ -41,10 +51,11 @@ class Review < ActiveRecord::Base
   end
   
   def delete
-    scores = Score.find_all_by_instance_id(self.id)
+    type_id = QuestionnaireType.find_by_name("Review").id
+    scores = Score.find_all_by_instance_id_and_questionnaire_type_id(self.id,type_id)
     scores.each {|score| score.destroy}
     feedback = ReviewFeedback.find_all_by_review_id(self.id)
-    feedback.each {|fb| fb.destroy}
+    feedback.each {|fb| fb.delete}
     self.destroy
   end
   
@@ -119,6 +130,16 @@ class Review < ActiveRecord::Base
      end  
     end
    end
+ end
+ 
+ #return the reviewer for this review
+ def reviewer 
+   self.review_mapping.reviewer
+ end
+ 
+ #return the reviewee for this review
+ def reviewee
+   self.review_mapping.reviewee
  end
  
  #Generate an email to the instructor when a new review exceeds the allowed difference

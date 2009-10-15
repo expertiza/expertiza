@@ -83,6 +83,10 @@ class CourseController < ApplicationController
       flash[:error] = $!
     end
     CourseNode.find_by_node_object_id(course.id).destroy
+    course.ta_mappings.each{
+      | map |
+      map.destroy
+    }
     course.destroy    
     redirect_to :controller => 'tree_display', :action => 'list'   
   end

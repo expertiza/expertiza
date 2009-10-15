@@ -1,12 +1,12 @@
 <h1>View team for <%= @student.assignment.name %></h1>
 
 <h2>Team members</h2>
-<% if @team_id == nil%>
+<% if @student.team == nil%>
 	You don't have a team yet!
 <%else%>
-	<b>Team Name: </b><%=Team.find_by_id(@team_id).name%> 
+	<b>Team Name: </b><%= @student.team.name %> 
 	<%= link_to "Edit Name", 
-					{:controller => 'student_team', :action => 'edit', :team_id => @team_id, :student_id => @student.id}%>
+					{:controller => 'student_team', :action => 'edit', :team_id => @student.team.id, :student_id => @student.id}%>
 	<br><br>
 	<table>
 	<tr>
@@ -15,20 +15,20 @@
 	<td><b>Email &nbsp</b></td>
 	<td></td>
 	</tr>
-	<%for member in @team_members%>
+	<%for member in @student.team.get_participants%>
 		<tr>
-		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).name%></td>
-		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).fullname%></td>
-		<td><%= User.find(:first, :conditions => ['id = ?', member.user_id]).email%></td>
-		<% if @student.assignment.teammate_review_questionnaire_id != nil and member.user_id != session[:user].id %>
+		<td><%= member.user.name%></td>
+		<td><%= member.user.fullname%></td>
+		<td><%= member.user.email%></td>
+		<% if @student.assignment.teammate_review_questionnaire_id != nil and member.user.id != session[:user].id %>
 		
-		   <% review = TeammateReview.find(:first, :conditions => ['reviewer_id = ? and reviewee_id = ? and assignment_id = ?',@student.user_id, member.user_id, @student.assignment.id]) 
-   		     if review.nil? %>
+		   <%  map = TeammateReviewMapping.find(:first, :conditions => ['reviewer_id = ? and reviewee_id = ?',@student.id, member.id])
+           if map.nil? %>
    		     <td>
-		     <%= link_to "Review", {:controller => 'teammate_review', :action => 'new', 
-			                        :team_id => @team_id, :reviewee_id => member.user_id, :assignment_id => @student.assignment.id}%>
+		     <%= link_to "Review", {:controller => 'teammate_review', :action => 'new', :reviewee_id => member.id, :id => @student.id }%>
 			 </td>
-			 <% else %>
+			 <% else 
+           review = TeammateReview.find_by_mapping_id(map.id) %>
 			 <td>
 			   <%= link_to "View", {:controller => 'teammate_review', :action => 'view', :id => review.id }%> 
 			 </td>
@@ -42,7 +42,7 @@
 	</table>
 	<br>
 	<%= link_to "Leave Team", 
-					{:controller => 'student_team', :action => 'leave', :team_id => @team_id, :student_id => @student.id}%>
+					{:controller => 'student_team', :action => 'leave', :id  => @student.team.id}%>
 <%end%>
 
 <table>
@@ -59,7 +59,7 @@
 <%else%>
 	<%for inv in @send_invs%>
 		<tr>
-		<td><%= User.find(:first, :conditions => ['id =?', inv.to_id]).name%></td>
+		<td><%= inv.to_user.name%></td>
 		<%if inv.reply_status == 'A'%>
 			<td>Accepted</td>
 		<%elsif inv.reply_status == 'D'%>
@@ -67,7 +67,7 @@
 		<%else%>
 			<td>Waiting for reply</td>
 			<td><%= link_to "Retract", 
-				{:controller => 'invitation', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id}%></td>
+				{:controller => 'invitation', :action => 'cancel', :id => inv.id, :student_id => @student.id}%></td>
 		<%end%>
 		</tr>
 	<%end%>
@@ -91,20 +91,20 @@
 	<%for inv in @received_invs%>
 	    <!--> <% if inv.reply_status == 'W'%> <-->
 			<tr>
-			<td><%= User.find(:first, :conditions => ['id =?', inv.from_id]).name%></td>
-			<td><%users_teams = TeamsUser.find(:all, :conditions => ['user_id = ?', inv.from_id])%>
-			    <%for team in users_teams%>
-			      <%current_team = Team.find(:first, :conditions => ['id = ? and parent_id = ?', team.team_id, @student.parent_id])%>
+			<td><%= inv.from_user.name%></td>
+			<td><%teamsusers = TeamsUser.find(:all, :conditions => ['user_id = ?', inv.from_id])%>
+			    <%for teamsuser in teamsusers%>
+			      <%current_team = Team.find(:first, :conditions => ['id = ? and parent_id = ?', teamsuser.team_id, @student.assignment.id])%>
 			      <%if current_team != nil%>
-			        <%=Team.find(:first, :conditions => ['id = ?', current_team.id]).name%>
+			        <%=Team.find(current_team.id).name%>
 			      <%end%>
 			    <%end%></td>
 			<td>
 			<%= link_to "Accept", 
-					{:controller => 'invitation', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id =>@team_id}%>
+					{:action => 'accept', :id => inv.id, :student_id => @student.id, :team_id =>@student.team.id}%>
 			|
 			<%= link_to "Decline", 
-						{:controller => 'invitation', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}%>
+						{:action => 'decline', :id => inv.id, :student_id => @student.id}%>
 			</td>
 			</tr>
 		<!--> <%end%> <-->

@@ -205,7 +205,7 @@ class ParticipantChoicesController < ApplicationController
   
   def getNewTeam()
     countArr = Team.find_by_sql("select max(id) as id from teams")
-    count = countArr[0].id
+    return countArr[0].id
   end
   
   def restructureTeam(team_id, addOn)

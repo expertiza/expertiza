@@ -2,7 +2,7 @@
 
 <h1>Copy an existing <%= @q_type %></h1>
 
-<%= start_form_tag :action => 'copy_questionnaire', ::id=>@questionnaire.id %>
+<%= start_form_tag :action => 'copy_questionnaire', :id=>@questionnaire.id %>
   <%= render :partial => 'questionnaire' %>
   <%= submit_tag "Save "+@q_type, :name=>"save" %>
 <%= end_form_tag %>

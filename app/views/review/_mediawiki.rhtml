@@ -1,0 +1,14 @@
+<!--The following checks a wiki type.  If we add a new wiki type, we need to modify this code, which is in
+    a very unexpected place.  This should be done by polymorphism, based on a Wiki class that is subclassed
+    for various kinds of wikis. 
+    
+    Make a generic review_wiki function, with a parameter specifying wiki type.  The review_wiki function
+    then makes callbacks to the various wiki classes, depending on what kind of a wiki it is working on.
+    This allows wiki-specific behavior to be kept in the wiki classes. -->
+    <%if @assignment.team_assignment  # The lookup of all team members should be put in a wiki helper
+    	for team_member in @author.team.get_participants %>
+	     <%= review_mediawiki @assignment.directory_path, nil, team_member.handle  %>
+	   <%end%>
+    <%else%>
+	    <%= review_mediawiki @assignment.directory_path, nil, @author.user.name  %>
+    <%end%>

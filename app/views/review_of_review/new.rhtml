@@ -1,50 +1,16 @@
-<SCRIPT LANGUAGE="JavaScript">
-function toggleVis(id) { 
-		var elem = document.getElementById(id+"_myDiv");
-		if(elem.style.display == 'none'){
-			elem.style.display = '';
-			document.getElementById(id+"_show").style.display = 'none';
-			document.getElementById(id+"_hide").style.display = '';
-		} else {
-			elem.style.display = 'none';
-			document.getElementById(id+"_show").style.display = '';
-			document.getElementById(id+"_hide").style.display = 'none';
-		}
-	} 
-</SCRIPT>
-
 <h1>New review of review</h1>
-<% if flash[:notice] != nil and flash[:notice].strip != "" %>
-<div class="flash_error">
-	<%= flash[:notice] %>
-</div>
-<% end %>
 
-<%= render :partial => 'review/wiki' %>
-
-<a href="#1" onClick="toggleVis('1');">
-        <p class="inline" id="1_show" >View review</p>
-        <p class="inline" id="1_hide" style="display: none;">Hide review</p>
-</a>
-<div id="1_myDiv" style="display: none;">
-<strong>Reviewed <%= @review.review_num_for_author %> at <%= @review.updated_at.strftime('%A %B %d %Y, %I:%M%p') %></strong>
-<%= render :partial => 'review/scores' %>
-Additional Comment : <br><%=@review.additional_comment.gsub(/\n/, '<br>')%><br/>
-<br/>
-</div>
-
+<%= render :partial => 'review/submitted_content' %>
+<%= @review.display_as_html %>
+<BR/><BR/>
 
 <%= start_form_tag :action => 'create_review_of_review' %>
 	<%= render :partial => 'review_of_review' %>
-    <%= hidden_field_tag('assgt_id', @assgt.id) %>
-    <%= hidden_field_tag('review_mapping_id', @eligible_review_mapping.id) %>
-    <%= hidden_field_tag('user', @user) %>
-    <%= hidden_field_tag('review_id', @eligible_review.id) %>
-    <%= hidden_field_tag('instructor_review', @instructor_review) %>
+    <%= hidden_field_tag('id', @ror_mapping.id) %>
   	<%= submit_tag "Create review of review", :name=>"save" %>   	
 <%= end_form_tag %>
 <br />
 
-<%= link_to 'Back', :controller=>'review', :action => 'list_reviews', :id => @assgt.id %>
+<%= link_to 'Back', :controller=>'review', :action => 'list_reviews', :id => @assignment.id %>
 
 

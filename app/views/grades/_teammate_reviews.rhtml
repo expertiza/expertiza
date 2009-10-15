@@ -1,7 +1,7 @@
 <!-- TeammateReviewS --> 
 <% if participant.get_teammate_reviews.length > 0 %>
   <BR/>
-  <%= render :partial => 'review_table',
+  <%= render :partial => 'grades/review_table',
            :locals => {
            :submission => '4',
            :prefix => prefix,
@@ -15,9 +15,15 @@
            }%>
   <BR/>         
   <HR/> 
+  <% count = 0 %>
   <% for review in participant.get_teammate_reviews %>
-    <a name="<%=prefix+"_"+review.reviewer.name%>"></a><%= render :partial => 'teammate_review/display', :locals => {:review => review, :prefix => prefix } %><BR/><BR/>  
-  <% end %>
+    <% count = count + 1 %>
+    <% if controller.controller_name != "student_assignment" %>
+      <a name="<%=prefix+"_"+review.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
+    <% else %>
+      <%= teammate_review.display_as_html(nil,count) %><BR/><BR/>
+    <% end %>    
+    <<% end %>
 <% else %>
   <i>No author feedback has been provided for this user's reviews.</i>
 <% end %>

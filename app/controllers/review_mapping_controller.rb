@@ -59,7 +59,9 @@ class ReviewMappingController < ApplicationController
   def add_metareviewer    
     reviewmapping = ReviewMapping.find(params[:id])
     rofreviewer = User.find_by_name(params[:user][:name])
-    include = params[:options][:include]
+    if params[:options]
+      include = params[:options][:include]
+    end
     if include == "true"
       pExist = AssignmentParticipant.find_by_user_id_and_parent_id(rofreviewer.id,reviewmapping.assignment_id)
       if pExist == nil
@@ -70,7 +72,7 @@ class ReviewMappingController < ApplicationController
     exists = ReviewOfReviewMapping.find(:first, :conditions => ['review_mapping_id = ? and review_reviewer_id = ?',reviewmapping.id,rofreviewer.id])
     if exists == nil
         ReviewOfReviewMapping.create(:review_mapping_id => reviewmapping.id,                        
-                                     :reviewer_id => rofreviewer.id
+                                     :review_reviewer_id => rofreviewer.id
                                     )
     else
        flash[:error] = "The metareviewer, \""+rofreviewer.name+"\", is already assigned to this reviewer."
@@ -181,7 +183,7 @@ class ReviewMappingController < ApplicationController
   def delete_metareviewer
     mapping = ReviewOfReviewMapping.find(params[:id])
     assignment_id = mapping.review_mapping.assignment_id
-    flash[:note] = "The metareview mapping for "+mapping.review_mapping.reviewer.name+" and "+mapping.reviewer.name+" have been deleted."
+    flash[:note] = "The metareview mapping for "+mapping.review_mapping.reviewer.name+" and "+mapping.review_reviewer.name+" have been deleted."
     
     begin 
       mapping.delete
@@ -204,11 +206,10 @@ class ReviewMappingController < ApplicationController
   
   def delete_metareview
     mapping = ReviewOfReviewMapping.find(params[:id])
-    assignment_id = mapping.review_mapping.assignment_id
     metareview = ReviewOfReview.find_by_review_of_review_mapping_id(mapping.id)
     metareview.delete
     mapping.delete
-    redirect_to :action => 'list_mappings', :id => assignment.id
+    redirect_to :action => 'list_mappings', :id => mapping.review_mapping.assignment_id
   end
   
   def delete_rofreviewer

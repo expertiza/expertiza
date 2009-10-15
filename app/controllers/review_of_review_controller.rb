@@ -61,30 +61,22 @@ class ReviewOfReviewController < ApplicationController
 #    end
     
     @user = session[:user].id
-    @eligible_review = Review.find_by_review_mapping_id(@ror_mapping.review_mapping_id)
-    begin   
-      review_mapping = ReviewMapping.find(@ror_mapping.review_mapping_id)
-      @eligible_review_mapping = review_mapping
-      @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(@eligible_review.id)
-      @current_folder = DisplayOption.new
-      @current_folder.name = "/"
-      if params[:current_folder]
-        @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
-      end
-      
-      if params['fname']
-        view_submitted_file(@current_folder,@author)
-      end
-      
-      
-      @ror_questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_of_review_questionnaire_id]) 
-      @ror_questionnaire = Questionnaire.find(@assgt.review_of_review_questionnaire_id)
-      @ror_max = @ror_questionnaire.max_question_score
-      @ror_min = @ror_questionnaire.min_question_score
-    rescue
-      flash[:notice] = "Review of review cannot be created now. Cause: "+ $!
-      redirect_to :controller =>'review', :action => 'list_reviews', :assignment => params[:assignment]
+    review = Review.find_by_review_mapping_id(@ror_mapping.review_mapping_id)
+    @links,@review,@mapping_id,@review_scores,@mapping,@assignment,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(review)
+    @current_folder = DisplayOption.new
+    @current_folder.name = "/"
+    if params[:current_folder]
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
+    
+    if params['fname']
+      view_submitted_file(@current_folder,@author)
+    end      
+      
+    @ror_questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
+    @ror_questions =  @ror_questionnaire.questions
+    @ror_max = @ror_questionnaire.max_question_score
+    @ror_min = @ror_questionnaire.min_question_score    
   end
   
   #follows a link
@@ -122,15 +114,13 @@ class ReviewOfReviewController < ApplicationController
     @ror_map_id = ReviewOfReview.find(params[:id]).review_of_review_mapping_id
     @review_mapping_id = ReviewOfReviewMapping.find(@ror_map_id).review_mapping_id
     @review = Review.find_by_review_mapping_id(@review_mapping_id)
-    @links,@review,@mapping_id,@review_scores,@mapping,@assgt,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.show_review(@review.id)
-    if @assgt.team_assignment 
-      @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
-      @team_members = TeamsUser.find(:all,:conditions => ["team_id=?", @mapping.team_id])
-      @author_name = User.find(@author_first_user_id).name;
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @author_first_user_id, @mapping.assignment_id])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assignment,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@current_folder,@files,@direc = ReviewController.show_review(@review.id)
+    if @assignment.team_assignment 
+      @team_members = @author.team.get_participants
+      @author_first_user_id = @team_members.first.user_id
+      @author_name = User.find(@author_first_user_id).name;      
     else
-      @author_name = User.find(@mapping.author_id).name
-      @author = Participant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @mapping.assignment_id])
+      @author_name = @author.user.name
     end
     
     @max = @questionnaire.max_question_score
@@ -145,10 +135,9 @@ class ReviewOfReviewController < ApplicationController
     end   
     @review_of_review = ReviewOfReview.find(params[:id])
     @ror_review_scores = Score.find(:all,:conditions => ["instance_id = ? AND questionnaire_type_id = ?", @review_of_review.id, QuestionnaireType.find_by_name("Metareview").id])
-    @ror_mapping = ReviewOfReviewMapping.find(@review_of_review.review_of_review_mapping_id)
-    @ror_assgt = Assignment.find(@assgt.id)    
-    @ror_questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @ror_assgt.review_of_review_questionnaire_id]) 
-    @ror_questionnaire = Questionnaire.find(@ror_assgt.review_of_review_questionnaire_id)
+    @ror_mapping = ReviewOfReviewMapping.find(@review_of_review.review_of_review_mapping_id)      
+    @ror_questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assignment.review_of_review_questionnaire_id]) 
+    @ror_questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
     @ror_max = @ror_questionnaire.max_question_score
     @ror_min = @ror_questionnaire.min_question_score
   end
@@ -175,19 +164,18 @@ class ReviewOfReviewController < ApplicationController
       end      
     end
     if @review_of_review.update
-      flash[:notice] = 'Review of review was successfully saved.'
-      redirect_to :controller=>'review', :action => 'list_reviews', :id => params[:assgt_id]
+      flash[:note] = 'Review of review was successfully saved.'
+      puts "*******************"
+      puts @review_of_review.review_of_review_mapping.review_mapping.assignment.id
+      redirect_to :controller=>'review', :action => 'list_reviews', :id => @review_of_review.review_of_review_mapping.review_mapping.assignment.id
     else # If something goes wrong, stay at same page
-      render :action => 'edit', :id=> params[:review_of_review_id]
+      render :action => 'edit', :id=> @review_of_review.id
     end
   end  
   
   def create_review_of_review
-#    @ror_mapping = ReviewOfReviewMapping.find(:first, :conditions => ["review_id = ? and review_reviewer_id = ? ", params[:review_id], params[:user]])
-    review = Review.find(params[:review_id])
-    review_mapping = ReviewMapping.find(review.review_mapping_id)
-    @ror_mapping = ReviewOfReviewMapping.find(:first, :conditions => ["review_mapping_id
-      = ? and review_reviewer_id = ? ", review_mapping.id, params[:user]])
+    @ror_mapping = ReviewOfReviewMapping.find(params[:id])
+    review_mapping = ReviewMapping.find(@ror_mapping.review_mapping_id)   
     @assignment = Assignment.find(review_mapping.assignment_id)  
 #    code  for dynamic reviewer mapping has been commented out because code for it has not been implemented  
 #    if @assignment.mapping_strategy_id == MappingStrategy.find_by_name ("Dynamic, fewest extant reviews").id
@@ -201,13 +189,12 @@ class ReviewOfReviewController < ApplicationController
 #      session[:review_of_review_timeout] = nil
 #    end
     
-    @review_of_review = ReviewOfReview.new
-    @review_of_review.review_of_review_mapping_id = @ror_mapping.id
+    @review_of_review = ReviewOfReview.create(:review_of_review_mapping_id => @ror_mapping.id)
     if @review_of_review.save
       if params[:new_metareview_score]
         # The new_question array contains all the new questions
         # that should be saved to the database
-        latest_metareview_id = ReviewOfReview.find_by_sql ("select max(id) as id from review_of_reviews")[0].id
+        latest_metareview_id = ReviewOfReview.find_by_sql("select max(id) as id from review_of_reviews")[0].id
         for review_key in params[:new_metareview_score].keys
           rs = Score.new(params[:new_metareview_score][review_key])
           rs.question_id = params[:new_question][review_key]
@@ -224,8 +211,8 @@ class ReviewOfReviewController < ApplicationController
       #notification limits      
       compare_scores
       
-      flash[:notice] = 'Review of review was successfully saved.' + params['instructor_review']
-      redirect_to :controller => 'review', :action => 'list_reviews', :id => params[:assgt_id]
+      flash[:notice] = 'Review of review was successfully saved.'
+      redirect_to :controller => 'review', :action => 'list_reviews', :id => @assignment.id
     else # If something goes wrong, stay at same page
       render :action => 'view_review'
     end

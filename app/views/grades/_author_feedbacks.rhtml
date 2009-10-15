@@ -1,7 +1,7 @@
 <!-- FEEDBACKS --> 
 <% if participant.get_feedbacks.length > 0 %>
   <BR/>
-  <%= render :partial => 'review_table',
+  <%= render :partial => 'grades/review_table',
            :locals => {
            :submission => '3',
            :prefix => prefix,
@@ -15,8 +15,14 @@
            }%>
   <BR/>         
   <HR/> 
+  <% count = 0 %>
   <% for feedback in participant.get_feedbacks %>
-    <a name="<%=prefix+"_"+feedback.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>  
+    <% count = count + 1 %>
+    <% if controller.controller_name != "student_assignment" %>
+      <a name="<%=prefix+"_"+feedback.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
+    <% else %>
+      <%= feedback.display_as_html(nil,count) %><BR/><BR/>
+    <% end %>      
   <% end %>
 <% else %>
   <i>No author feedback has been provided for this user's reviews.</i>

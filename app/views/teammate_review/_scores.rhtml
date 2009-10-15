@@ -3,15 +3,15 @@
     <tr>
         <th>Questions</th><th>Comments</th><th>Score</th>
     </tr>
-    <% for @prs in @teammate_review_scores %>
+    <% for prs in @teammate_review_scores %>
         <tr>
             <td>
-                <%=Question.find(@prs.question_id).txt%>                
+                <%=prs.question.txt%>                
             </td>
             <td>
-                <%=@prs.comments%>
+                <%=prs.comments%>
             </td>
-            <td><%=@prs.score%></td>
+            <td><%=prs.score%></td>
         </tr>
     <% end %>
 </table>

@@ -395,7 +395,7 @@ class AssignmentController < ApplicationController
   
   def associate_assignment_to_course
     @assignment = Assignment.find(params[:id])
-    if session[:user].role_id != 6 # for other that TA
+    if session[:user].role_id != Role.find_by_name('Teaching Assistant').id # for other that TA
        @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
     else
        @courses = TaMapping.get_courses(session[:user].id)

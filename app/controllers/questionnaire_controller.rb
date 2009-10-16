@@ -49,25 +49,19 @@ class QuestionnaireController < ApplicationController
    
   # Remove a given questionnaire
   def delete
-    questionnaire = get(Questionnaire, params[:id])
-    joiner = AssignmentsQuestionnaires.find_by_questionnaire_id(questionnaire.id)
-    if joiner
-       joiner.destroy
-    end
-    node = QuestionnaireNode.find_by_node_object_id(questionnaire.id)             
-    if node
-      node.destroy
-    end
-    if questionnaire == nil
-      redirect_to :action => 'list', :controller => 'tree_display'
-    else 
-      if questionnaire.assignments_exist? == false or params['delete']
-        questionnaire.delete_assignments
-        questionnaire.delete_questions
-        questionnaire.destroy
-        redirect_to :action => 'list', :controller => 'tree_display'
+    questionnaire = Questionnaire.find(params[:id])
+    
+    if questionnaire
+       begin
+          name = questionnaire.name
+          questionnaire.delete
+          flash[:note] = "Questionnaire <B>#{name}</B> was deleted."
+      rescue
+          flash[:error] = $!
       end
     end
+    
+    redirect_to :action => 'list', :controller => 'tree_display'   
   end
   
   # View a questionnaire

@@ -20,8 +20,10 @@ class AssignmentController < ApplicationController
     
     
     new_assign.name = 'Copy of '+new_assign.name 
-   
+    new_assign.created_at = new_assign.updated_at
     if new_assign.save    
+      new_assign.created_at = new_assign.updated_at
+      new_assign.save
       DueDate.copy(old_assign.id, new_assign.id)           
       new_assign.create_node()
       

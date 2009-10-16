@@ -6,7 +6,6 @@ class Questionnaire < ActiveRecord::Base
     belongs_to :questionnaire_type, :foreign_key => "type_id" # the type of this Questionnaire
     has_many :assignments_questionnaires # the join between Assignment and Questionnaire - 2/1/2009 may no longer be in use
     belongs_to :instructor, :class_name => "User", :foreign_key => "instructor_id" # the creator of this questionnaire
-
     
     validates_presence_of :name
     validates_numericality_of :max_question_score
@@ -26,30 +25,41 @@ class Questionnaire < ActiveRecord::Base
       return false
     end
     
-    # Remove question and advice associated with this
-    # questionnaire
-    def delete_questions
-      for question in questions
-        for advice in question.question_advices
-          advice.destroy
-        end
-        question.destroy
+    def delete
+      assignment = Assignment.find_by_review_questionnaire_id(self.id)
+      if assignment
+        raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
       end
-    end
-    
-    # remove assignments associated with this
-    # questionnaire
-    def delete_assignments
-      for assignment in assignments
-        assignment.destroy
+      
+      assignment = Assignment.find_by_review_of_review_questionnaire_id(self.id)
+      if assignment
+        raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+      end       
+      
+      assignment = Assignment.find_by_teammate_review_questionnaire_id(self.id)
+      if assignment
+        raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+      end      
+      
+      assignment = Assignment.find_by_author_feedback_questionnaire_id(self.id)
+      if assignment
+        raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+      end  
+      
+      self.questions.each{
+        | question |
+          question.destroy        
+      }
+       
+     
+      node = QuestionnaireNode.find_by_node_object_id(self.id)
+      if node
+        node.destroy
       end
+                
+      self.destroy      
     end
-    
-    # if the associated assignments exist, return true
-    def assignments_exist?
-      return false if assignments == nil or assignments.length == 0
-      return true
-    end
+
     
     def max_possible_score
       results = Questionnaire.find_by_sql("SELECT (SUM(q.weight)*rs.max_question_score) as max_score FROM  questions q, questionnaires rs WHERE q.questionnaire_id = rs.id AND rs.id = #{self.id}")

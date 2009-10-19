@@ -4,43 +4,42 @@ class ReviewFeedbackController < ApplicationController
          :redirect_to => { :action => :list }
          
   def new
-    @participant = AssignmentParticipant.find(params[:id])
-    @mapping = ReviewMapping.find(params[:mapping_id])
-    questionnaire = Questionnaire.find(@participant.assignment.author_feedback_questionnaire_id)
+    @review = Review.find(params[:id])    
+    questionnaire = Questionnaire.find(@review.review_mapping.assignment.author_feedback_questionnaire_id)
     @questions = Question.find_all_by_questionnaire_id(questionnaire.id)
     @min = questionnaire.min_question_score
     @max = questionnaire.max_question_score
   end
   
   def create
-      participant = AssignmentParticipant.find(params[:id])
-      mapping = ReviewMapping.find(params[:mapping_id])
-      
-      questionnaire = Questionnaire.find(mapping.assignment.author_feedback_questionnaire_id)
-      questions = Question.find_all_by_questionnaire_id(questionnaire.id)     
-      
-      review = Review.find_by_review_mapping_id(mapping.id)
-      if review.nil?
-        flash[:error] = "No review has been performed."
-      else
-        @feedback = ReviewFeedback.create(:assignment_id => mapping.assignment.id, :review_id => review.id,
-                                          :additional_comment => params[:review][:comments], :author_id => participant.user_id);
-        if mapping.assignment.team_assignment
-          @feedback.team_id = participant.team.id
-          @feedback.save
-        end
-        
-        params[:responses].each_pair do |k,v|
-          score = Score.create(:instance_id => @feedback.id, :question_id => questions[k.to_i].id,
-                               :questionnaire_type_id => questionnaire.type_id, :score => v[:score], :comments => v[:comment])
-        end          
-            
-        #determine if the new review meets the criteria set by the instructor's 
-        #notification limits      
-        compare_scores
+    review = Review.find(params[:id])
+    mapping = review.review_mapping
+    questionnaire = Questionnaire.find(review.review_mapping.assignment.author_feedback_questionnaire_id)
+    questions = Question.find_all_by_questionnaire_id(questionnaire.id)     
+     
+    participant = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, mapping.assignment.id)
+     
+    if review.nil?
+      flash[:error] = "No review has been performed."
+    else
+      @feedback = ReviewFeedback.create(:assignment_id => mapping.assignment.id, :review_id => review.id,
+                                        :additional_comment => params[:review][:comments], :author_id => session[:user].id);
+      if mapping.assignment.team_assignment
+        @feedback.team_id = mapping.team_id
+        @feedback.save
       end
+        
+      params[:responses].each_pair do |k,v|
+        score = Score.create(:instance_id => @feedback.id, :question_id => questions[k.to_i].id,
+                             :questionnaire_type_id => questionnaire.type_id, :score => v[:score], :comments => v[:comment])
+      end          
+            
+    #determine if the new review meets the criteria set by the instructor's 
+    #notification limits      
+      compare_scores
+    end
       
-      redirect_to :controller => 'student_assignment', :action => 'view_scores', :id => participant.id
+    redirect_to :controller => 'student_assignment', :action => 'view_scores', :id => participant.id
   end
   
   def edit

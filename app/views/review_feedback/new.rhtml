@@ -1,10 +1,8 @@
 <h1>New Feedback to Reviewer</h1>
-<%= start_form_tag :action => 'create' %>
+<%= start_form_tag :action => 'create', :id => @review.id %>
 <%= render :partial => 'feedback' %>
 <br/>
-<%= submit_tag "Save Feedback", :name=>"save" %> 
-<%= hidden_field_tag('id', @participant.id) %>  
-<%= hidden_field_tag('mapping_id', @mapping.id) %>    
+<%= submit_tag "Save Feedback", :name=>"save" %>   
 <%= end_form_tag %>
 <br/>
 <a href="javascript:window.history.back()">Back</a>

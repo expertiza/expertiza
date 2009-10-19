@@ -21,7 +21,7 @@ belongs_to :review_mapping
     index = 2
     while index < row.length
       if assignment.team_assignment
-        author = Team.find_by_name(row[0].to_s.strip)
+        author = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, assignment.id)
         query = "assignment_id = ? and reviewer_id = ? and team_id = ?"
       else
         author = User.find_by_name(row[0].to_s.strip)

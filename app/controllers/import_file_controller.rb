@@ -35,15 +35,15 @@ class ImportFileController < ApplicationController
     while (line = file.gets)      
       row = parse_line(line,delimiter)      
       
-      #begin
+      begin
         if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
           Object.const_get(params[:model]).import(row,session,params[:id],params[:options])
         else
           Object.const_get(params[:model]).import(row,session,params[:id])
         end
-      #rescue ImportError
-      #  errors << $!             
-      #end      
+      rescue ImportError
+        errors << $!             
+      end      
     end 
     return errors
   end

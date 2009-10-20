@@ -476,10 +476,12 @@ Calendar.prototype.IsLeapYear=IsLeapYear;
 
 function FormatDate(pDate)
 {
-	if(this.Month+1<10)
-	{
+	if(this.Month+1<10)	{
 		var month='0'+ (this.Month+1);
+	} else {
+		var month = (this.Month+1);
 	}
+		
 	if(pDate<10)
 	{
 		pDate='0'+pDate;

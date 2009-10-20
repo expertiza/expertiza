@@ -19,14 +19,9 @@ class QuestionnaireController < ApplicationController
     new_questionnaire.name = 'Copy of '+orig_questionnaire.name
     if new_questionnaire.save
       parent = QuestionnaireTypeNode.find_by_node_object_id(new_questionnaire.type_id)
-      puts "***************"
-      puts parent
-      puts new_questionnaire.id      
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,new_questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => new_questionnaire.id)
-        puts "********** ADDED *************"
       end
-      puts "***************"      
       questions.each{
         | question |
         newquestion = question.clone

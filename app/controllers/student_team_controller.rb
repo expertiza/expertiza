@@ -73,6 +73,14 @@ class StudentTeamController < ApplicationController
     for old_inv in old_invs
       old_inv.destroy
     end
+    
+    #reset the participants submission directory to nil
+    #per EFG:
+    #the participant is responsible for resubmitting their work
+    #no restriction is placed on when a participant can leave
+    @student.directory_num = nil
+    @student.save
+    
     redirect_to :controller => 'student_team', :action => 'view' , :id => @student.id
   end
   

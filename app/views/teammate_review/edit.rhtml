@@ -1,10 +1,8 @@
-<h1>Edit Teammate Review</h1>
-<h2>Teammate: <%= User.find(@teammate_review.reviewee_id).name %></h2>
-<%= start_form_tag :action => 'update' %>
-<%= render :partial => 'teammate_review_content' %>    
-<%= hidden_field_tag('teammate_review_id', @teammate_review.id) %>
-    <br/>
-    <%= submit_tag "Save", :name=>"save" %>       
+<h1>Teammate Review for <%= @mapping.reviewee.name %></h1>
+<%= start_form_tag :action => 'update', :id => @mapping.id %>
+<%= render :partial => 'teammate_review' %>
+<br/>
+<%= submit_tag "Save Review", :name=>"save" %> 
 <%= end_form_tag %>
-<%= link_to 'Back', :controller => 'student_team', :action => 'view',  :id => @student.id %>
-
+<br/>
+<a href="javascript:window.history.back()">Back</a>

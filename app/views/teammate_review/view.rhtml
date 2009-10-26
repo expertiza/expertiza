@@ -1,3 +1,4 @@
-<%= render :partial => 'view' %>
+<h1>Teammate review for <%= @response.mapping.reviewee.user.name %></h1>
+<%= @response.display_as_html() %>
 <BR/>
-<%= link_to 'Back', :controller => 'student_team', :action => 'view',  :id => @student.id %>
+<a href="javascript:window.history.back()">Back</a>

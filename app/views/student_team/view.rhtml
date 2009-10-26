@@ -23,12 +23,15 @@
 		<% if @student.assignment.teammate_review_questionnaire_id != nil and member.user.id != session[:user].id %>
 		
 		   <%  map = TeammateReviewMapping.find(:first, :conditions => ['reviewer_id = ? and reviewee_id = ?',@student.id, member.id])
-           if map.nil? %>
+		       if map.nil?
+		         map = TeammateReviewMapping.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)			   		   
+		       end		         
+		       review = TeammateReview.find_by_mapping_id(map.id) 
+               if review.nil? %>
    		     <td>
-		     <%= link_to "Review", {:controller => 'teammate_review', :action => 'new', :reviewee_id => member.id, :id => @student.id }%>
+		     <%= link_to "Review", {:controller => 'teammate_review', :action => 'new', :id => map.id }%>
 			 </td>
-			 <% else 
-           review = TeammateReview.find_by_mapping_id(map.id) %>
+			 <% else %>
 			 <td>
 			   <%= link_to "View", {:controller => 'teammate_review', :action => 'view', :id => review.id }%> 
 			 </td>

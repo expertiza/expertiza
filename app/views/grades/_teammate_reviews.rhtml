@@ -21,10 +21,10 @@
     <% if controller.controller_name != "student_assignment" %>
       <a name="<%=prefix+"_"+review.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
     <% else %>
-      <%= teammate_review.display_as_html(nil,count) %><BR/><BR/>
+      <%= review.display_as_html(nil,count) %><BR/><BR/>
     <% end %>    
-    <<% end %>
+  <% end %>
 <% else %>
   <i>No author feedback has been provided for this user's reviews.</i>
 <% end %>
-<!-- END TeammateReviewS -->
+<!-- END TeammateReviews -->

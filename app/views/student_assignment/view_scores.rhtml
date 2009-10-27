@@ -13,7 +13,7 @@
 
     if @assignment.team_assignment and @participant.assignment.teammate_review_questionnaire_id != nil
        @teammate_questionnaire = Questionnaire.find(@participant.assignment.teammate_review_questionnaire_id)
-       tr_avg, tr_max, tr_min = @participant.compute_teammate_review_scores(@teammate_questionnaire, @teammate_questions)      
+       tr_avg, tr_max, tr_min = @participant.compute_teammate_review_scores(@teammate_questionnaire, @teammate_questions)           
     end
  
     
@@ -36,4 +36,4 @@
 <%= submit_tag "Update" %>
 <%= end_form_tag %>
 <BR/><BR/>
-<%= link_to 'Back', :action => 'view_actions', :id => @participant.parent_id %>
+<%= link_to 'Back', :action => 'view_actions', :id => @participant.id %>

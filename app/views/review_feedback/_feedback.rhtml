@@ -36,5 +36,5 @@
        
 <p>
 	<label for="review_comments">Additional Comments</label><BR/>
-	<textarea cols="70" rows="5" id=review_comments name=review[comments]><% if params[:action] != 'new' %><%=@feedback.additional_comment.strip%><% end %></textarea>
+	<textarea cols="70" rows="5" id=review_comments name=review[comments]><% if params[:action] != 'new' %><%=@response.additional_comment.strip%><% end %></textarea>
 </p>

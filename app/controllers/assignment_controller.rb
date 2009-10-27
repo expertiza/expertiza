@@ -30,9 +30,9 @@ class AssignmentController < ApplicationController
       DueDate.copy(old_assign.id, new_assign.id)           
       new_assign.create_node()
       if new_assign.directory_path.nil?
-        flash[:note] = 'The assignment is not currently associated with a directory location. This could cause errors for furture submissions.'
+        flash[:note] = 'The assignment is not currently associated with a directory location. This could cause errors for future submissions.'
       else
-        flash[:note] = 'The assignment is currently associated with an existing location. This could cause errors for furture submissions.'
+        flash[:note] = 'The assignment is currently associated with an existing location. This could cause errors for future submissions.'
       end
       redirect_to :action => 'edit', :id => new_assign.id
     else

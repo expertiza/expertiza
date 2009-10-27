@@ -22,7 +22,10 @@
       <a name="<%=prefix+"_"+review.review_mapping.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
     <% else %>
       <%= review.display_as_html(nil,count) %><BR/><BR/>
-      <% review_feedback = ReviewFeedback.find_by_review_id(review.id) %>
+      <% map = FeedbackMapping.find_by_reviewed_object_id(review.id)
+         if map
+         	review_feedback = ReviewFeedback.find_by_mapping_id(map.id)
+         end %>
       <% if review_feedback %>
       	<%= link_to "View", :controller => 'review_feedback', :action => 'view', :id => review_feedback.id %> or
       	<%= link_to "Edit", :controller => 'review_feedback', :action => 'edit', :id => review_feedback.id %> feedback for Review <%= count %>

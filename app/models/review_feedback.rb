@@ -1,8 +1,6 @@
 class ReviewFeedback < ActiveRecord::Base
     has_many :review_scores
-    belongs_to :review
-    belongs_to :assignment
-    belongs_to :user
+    belongs_to :mapping, :class_name => 'FeedbackMapping', :foreign_key => 'mapping_id'
     
   def display_as_html(prefix = nil,count = nil) 
     if prefix
@@ -19,11 +17,20 @@ class ReviewFeedback < ActiveRecord::Base
     if prefix
       code = code + '<div id="feedback_'+prefix+"_"+self.id.to_s+'" style="">'
     else
-      code = code + '<div id="feedback_'+self.id.to_s+'" style="display:none">'
+      code = code + '<div id="feedback_'+self.id.to_s+'" style="">'
     end
     code = code + '<BR/><BR/>'
-    questions_query = "select id from questions where questionnaire_id = "+self.assignment.author_feedback_questionnaire_id.to_s    
-    scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and question_id in ("+questions_query+") and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Author Feedback").id.to_s)
+    questionnaire = Questionnaire.find(self.mapping.assignment.author_feedback_questionnaire.id)
+    questions = questionnaire.questions
+    scores = Array.new
+    questions.each{
+       | question |
+       score = Score.find_by_question_id_and_instance_id(question.id, self.id)
+       if score
+         scores << score
+       end
+    }
+    
     scores.each{
       | reviewScore |      
       code = code + "<I>"+Question.find_by_id(reviewScore.question_id).txt+"</I><BR/><BR/>"

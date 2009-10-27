@@ -131,6 +131,10 @@ class AssignmentTeam < Team
     else
       return nil,nil,nil
     end
-   end
+  end
+  
+  def self.get_team(participant)
+    find(:first, :include => [:teams_users], :conditions => ['parent_id = ? and user_id = ?',participant.parent_id, participant.user_id])            
+  end
 end  
 

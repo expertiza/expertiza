@@ -39,6 +39,9 @@ class CreateTeammateReviewMappings < ActiveRecord::Migration
 
       
     remove_column :teammate_reviews, :assignment_id
+    
+    add_column :teammate_reviews, :created_at, :datetime, :null => true
+    add_column :teammate_reviews, :updated_at, :datetime, :null => true
   end
 
   def self.down

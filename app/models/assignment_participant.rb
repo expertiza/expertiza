@@ -20,10 +20,15 @@ class AssignmentParticipant < Participant
   end
   
   def get_feedbacks
-    review_mapping_query = "select id from review_mappings where assignment_id = "+self.assignment.id.to_s+" and reviewer_id = "+self.user.id.to_s    
-    review_query = "select id from reviews where review_mapping_id in ("+review_mapping_query+")"
-    
-    feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where review_id in ("+review_query+")")
+    maps = FeedbackMapping.find_all_by_reviewee_id(self.id)
+    feedbacks = Array.new
+    maps.each{
+      | map | 
+      feedback = ReviewFeedback.find_by_mapping_id(map.id)
+      if feedback
+        feedbacks << feedback
+      end
+    }
     return feedbacks.sort {|a,b| a.reviewer.name <=> b.reviewer.name}    
   end
   
@@ -74,7 +79,7 @@ class AssignmentParticipant < Participant
   end
   
   def get_teammate_reviews   
-    maps = TeammateReviewMapping.find(:all, :conditions => ['reviewer_id = ?',self.id])
+    maps = TeammateReviewMapping.find(:all, :conditions => ['reviewee_id = ?',self.id])
     reviews = Array.new
     maps.each{    
       | map |
@@ -143,19 +148,14 @@ class AssignmentParticipant < Participant
   end    
     
   def team
-       query = "select distinct teams.* from teams, teams_users"
-       query = query + " where teams.type = 'AssignmentTeam'"
-       query = query + " and teams.parent_id = "+self.parent_id.to_s
-       query = query + " and teams.id = teams_users.team_id"
-       query = query + " and teams_users.user_id = "+self.user_id.to_s       
-       Team.find_by_sql(query).first    
+       AssignmentTeam.get_team(self)  
   end
     
   #computes this participant's current teammate review scores:
   def compute_teammate_review_scores(questionnaire, questions)
     assignment = Assignment.find(self.parent_id) 
     if assignment.team_assignment 
-      teammate_reviews = self.get_teammate_reviews
+      teammate_reviews = self.get_teammate_reviews      
       if teammate_reviews.length > 0
         avg_review_score, max_score, min_score = AssignmentParticipant.compute_scores(teammate_reviews, questionnaire)
         return avg_review_score, max_score, min_score
@@ -178,10 +178,8 @@ class AssignmentParticipant < Participant
   end
  
   #computes this participants current author feedback score
-  def compute_author_feedback_scores(questionnaire, questions)
-    review_mapping_query = "select id from review_mappings where assignment_id = "+self.assignment.id.to_s+" and reviewer_id = "+self.user.id.to_s    
-    review_query = "select id from reviews where review_mapping_id in ("+review_mapping_query+")"
-    feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where review_id in ("+review_query+")")
+  def compute_author_feedback_scores(questionnaire, questions)    
+    feedbacks = self.get_feedbacks
     if feedbacks.length > 0
       avg_feedback_score, max_score,min_score = AssignmentParticipant.compute_scores(feedbacks, questionnaire)
       return avg_feedback_score, max_score, min_score

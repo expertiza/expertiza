@@ -21,13 +21,19 @@ class AssignmentController < ApplicationController
     
     new_assign.name = 'Copy of '+new_assign.name 
     new_assign.created_at = new_assign.updated_at
+    if new_assign.wiki_type_id == WikiType.find_by_name("No")
+      new_assign.directory_path = nil
+    end
     if new_assign.save    
       new_assign.created_at = new_assign.updated_at
       new_assign.save
       DueDate.copy(old_assign.id, new_assign.id)           
       new_assign.create_node()
-      
-      flash[:note] = 'The assignment is currently associated with an existing location. This could cause errors for furture submissions.'
+      if new_assign.directory_path.nil?
+        flash[:note] = 'The assignment is not currently associated with a directory location. This could cause errors for furture submissions.'
+      else
+        flash[:note] = 'The assignment is currently associated with an existing location. This could cause errors for furture submissions.'
+      end
       redirect_to :action => 'edit', :id => new_assign.id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
@@ -352,7 +358,7 @@ class AssignmentController < ApplicationController
       rescue
         newpath = nil
       end
-      if oldpath != nil and newpath != nil
+      if newpath != nil
         FileHelper.update_file_location(oldpath,newpath)
       end
       # Iterate over due_dates, from due_date[0] to the maximum due_date

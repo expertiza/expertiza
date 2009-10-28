@@ -13,7 +13,11 @@
             <option value="<%=j%>"><%=j%></option>
           <% end %>
       </select>
-      <%= render :partial => 'advice', :locals => {:i => i} %>
+      <%if @question.question_advices.size > 0%>
+        <%= render :partial => 'advice', :locals => {:i => i} %>
+      <% else %>
+            <br/>
+      <% end %>
   <% end %>
 	<br/>
   <input id=new_question_<%=i%> name=new_question[<%=i%>] value=<%=@question.id%> type=hidden />

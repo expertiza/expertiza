@@ -22,7 +22,7 @@ class AssignmentController < ApplicationController
     new_assign.name = 'Copy of '+new_assign.name 
     new_assign.created_at = new_assign.updated_at
     if new_assign.wiki_type_id == WikiType.find_by_name("No")
-      new_assign.directory_path = nil
+      new_assign.directory_path = ''
     end
     if new_assign.save    
       new_assign.created_at = new_assign.updated_at

@@ -1,5 +1,6 @@
 class RemoveAdditionalFeedback < ActiveRecord::Migration
-  def self.up 
+  # delete any duplicate feedback objects. Keep only the most current
+  def self.up     
     entries = ReviewFeedback.find_by_sql("SELECT * FROM review_feedbacks f1 WHERE review_id IN (SELECT review_id FROM `review_feedbacks` GROUP BY review_id HAVING count(*) > 1)")
     
     max_update = nil

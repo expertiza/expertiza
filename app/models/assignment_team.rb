@@ -1,5 +1,7 @@
 class AssignmentTeam < Team
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
+  has_many :review_mappings, :class_name => 'TeamReviewMapping', :foreign_key => 'reviewee_id'
+
   
   def self.import(row,session,id,options)
     if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
@@ -113,6 +115,11 @@ class AssignmentTeam < Team
     feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where review_id in ("+review_query+")")
     return feedbacks.sort {|a,b| a.reviewer.name <=> b.reviewer.name}    
   end 
+  
+  def get_reviews
+    reviews = Review.find(:all, :include => :mapping, :conditions => ['reviewee_id = ? and reviewed_object_id = ?',self.id, self.assignment.id])
+    return reviews.sort {|a,b| a.mapping.reviewer.fullname <=> b.mapping.reviewer.fullname }    
+  end
 
   #revision to use ComputedScores table - not fully implemented
   def compute_scores(questionnaire, model)
@@ -123,8 +130,8 @@ class AssignmentTeam < Team
   #computes this participants current review scores:
   # avg_review_score
   # difference
-  def compute_review_scores(questionnaire, questions)
-    reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (select id from review_mappings where team_id = #{self.id} and assignment_id = #{self.parent_id})")
+  def compute_review_scores(questionnaire, questions)    
+    reviews = Review.find(:all, :include => :mapping, :conditions => ['reviewee_id = ? and reviewed_object_id = ?',self.id, self.parent_id])
     if reviews.length > 0 
       avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews, questionnaire)
       return avg_review_score, max_score, min_score

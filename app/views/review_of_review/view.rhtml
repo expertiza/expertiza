@@ -3,8 +3,7 @@
 <br/>	
 <%= @review.display_as_html() %>
 <br/><br/>
-<%= @review_of_review.display_as_html() %>
+<%= @response.display_as_html() %>
 <br/>
 <br/>
-<%= link_to 'Back', :controller => 'review', :action => 'list_reviews', :id => @assignment.id %>
-
+<a href="javascript:window.history.back()">Back</a>

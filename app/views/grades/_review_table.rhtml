@@ -26,14 +26,14 @@
 			<th><%= collabel %>&nbsp;<%=i+1%></th>
 		<% end %>
 	</tr>
-	<% if controller.controller_name != "student_assignment" %>
+	<% if controller.controller_name != "student_task" %>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
            <td align="center">                       
            <% if prefix %>         
-             <a href="#<%= prefix+"_"+review.reviewer.name %>"><%= review.reviewer.fullname %></a>      		   		     
+             <a href="#<%= prefix+"_"+review.mapping.reviewer.name %>"><%= review.mapping.reviewer.fullname %></a>      		   		     
 		   <% else %>
-		     <%= link_to review.reviewer.fullname, :controller=>ctrl, :action => action, :id=> review.id%>
+		     <%= link_to review.mapping.reviewer.fullname, :controller=>ctrl, :action => action, :id=> review.id%>
 		   <% end %>
 		   </td>	    
 	    <% end %>
@@ -43,8 +43,8 @@
 		<% for review in reviews %>
 		   <td align="center">		       
 		       <% score = Score.get_total_score(review.id,questionnaire) %>
-		       <% if controller.controller_name != "student_assignment" %>
-		       	<input type="hidden" id="mailer_<%= review.reviewer.fullname %>_grade" name="mailer[<%= review.reviewer.fullname %>_grade]" value="<%= score  %>" %>
+		       <% if controller.controller_name != "student_task" %>
+		       	<input type="hidden" id="mailer_<%= review.mapping.reviewer.fullname %>_grade" name="mailer[<%= review.mapping.reviewer.fullname %>_grade]" value="<%= score  %>" %>
 		       <% end %>   
 	  	       <%= sprintf("%.2f",score) %>% &nbsp;
 	  	   </td>

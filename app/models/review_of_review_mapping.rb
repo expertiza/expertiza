@@ -1,23 +1,28 @@
 class ReviewOfReviewMapping < ActiveRecord::Base
-has_many :review_of_reviews
-belongs_to :reviewer, :class_name => "User", :foreign_key => "reviewer_id"
-belongs_to :review_reviewer, :class_name => "User", :foreign_key => "review_reviewer_id"
-belongs_to :review_mapping
+has_one :metareview, :class_name => "ReviewOfReview", :foreign_key => "mapping_id"
+belongs_to :reviewer, :class_name => "AssignmentParticipant", :foreign_key => "reviewer_id"
+belongs_to :reviewee, :class_name => "AssignmentParticipant", :foreign_key => "reviewee_id"
+belongs_to :review_mapping, :class_name => "ReviewMapping", :foreign_key => "reviewed_object_id"
 
-  def delete
-    reviewofreviews = ReviewOfReview.find(:all, :conditions => ['review_of_review_mapping_id =?',self.id])
-    if reviewofreviews.length > 0
-      raise "At least one review of review has been performed."
+
+  def assignment
+    self.review_mapping.assignment
+  end
+
+  def delete(force = nil)
+    if self.metareview != nil and !force
+      raise "A metareview exists for this mapping."
+    elsif self.metareview != nil
+      self.metareview.delete
     end
     self.destroy
-  end
+  end  
   
   def self.import(row,session,id)
     if row.length < 3
        raise ArgumentError, "Not enough items. The string should contain: Author, Reviewer, ReviewOfReviewer1 <, ..., ReviewerOfReviewerN>" 
     end
     
-    assignment = Assignment.find(id)
     index = 2
     while index < row.length
       if assignment.team_assignment
@@ -27,6 +32,7 @@ belongs_to :review_mapping
         author = User.find_by_name(row[0].to_s.strip)
         query = "assignment_id = ? and reviewer_id = ? and author_id = ?"
       end
+      
       if author == nil
         raise ImportError, "Author, "+row[0].to_s+", was not found."     
       end      
@@ -65,5 +71,25 @@ belongs_to :review_mapping
       index += 1
     end 
   end
+  
+  # provide export functionality for Review Mappings
+  def self.export(csv,parent_id)
+    
+    mappings = find(:all, :include => :review_mapping, :conditions => ['review_mappings.reviewed_object_id=?',parent_id])
+    mappings = mappings.sort_by{|a| [a.review_mapping.reviewee.name,a.reviewee.name,a.reviewer.name]} 
+    mappings.each{
+          |map|          
+          csv << [
+            map.review_mapping.reviewee.name,
+            map.reviewee.name,
+            map.reviewer.name
+          ]
+      } 
+  end
+  
+  def self.get_export_fields
+    fields = ["contributor","reviewed by","metareviewed by"]
+    return fields            
+  end   
   
 end

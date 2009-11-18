@@ -1,0 +1,74 @@
+<h1>Publishing Rights</h1>
+
+<table class="listing" cellpadding=2>
+	<tr>
+		<td colspan=4>
+			<div class="flash_note">
+				In order for your work to be published on our website, you need to need to grant us 
+				publishing rights for your work. You may do this on a per assignment basis, or if
+				you wish you can grant or deny rights to all your past and/or future work.
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3><h3>Future work</h3></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan=3>
+			<% if session[:user].master_permission_granted.nil? %>
+				You currently do not have auto publishing permissions set. <br>
+				Click <%= link_to 'grant', :action =>'set_master_publish_permission', :id => 1 %> 
+				or <%= link_to 'deny', :action =>'set_master_publish_permission', :id => 0%> 
+				to automatically set publishing rights for all your future work.
+			<% elsif session[:user].master_permission_granted == 1%>
+			  You currently have auto publishing permissions set to <b>grant</b>. <br>
+				Click <%= link_to 'deny', :action =>'set_master_publish_permission', :id => 0 %> 
+				to automatically deny publishing rights for all your future work.
+			<% else %>
+			  You currently have auto publishing permissions set to <b>deny</b>. <br>
+				Click <%= link_to 'grant', :action =>'set_master_publish_permission', :id => 1 %> 
+				to automatically grant publishing rights for all your future work.
+			<% end %>
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan=3><h3>Past assignments</h3></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan=3><%= link_to 'Grant', :action =>'update_publish_permissions', :id => 1 %> publishing rights to all my past work.</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan=3><%= link_to 'Deny', :action =>'update_publish_permissions', :id => 0 %> publishing rights to all my past work.</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan=3></td>
+		<td></td>
+	</tr>
+  <tr>
+		<th></th>
+	  <th>Assignment</th>
+	  <th>Publishing Rights</th>
+		<td></td>
+  </tr>
+	
+<% @participants.each{
+    |participant| %>
+  <tr class="listingRow">
+		<td>&nbsp;</td>
+		<td><%= link_to participant.assignment.name, :controller => 'student_task', :action => 'view', :id => participant.id %></td>
+	  <td align=center>
+	  	<%if participant.permission_granted %>
+	  		<%= link_to 'deny', :action =>'set_publish_permission', :id => participant.id, :allow => 0 %> 
+	    <% else %>
+	    	<%= link_to 'grant', :action =>'set_publish_permission', :id => participant.id, :allow => 1 %> 
+		<% end %>
+		</td>
+		<td width=50%>&nbsp;</td>
+	</tr>
+<% } %>
+</table>

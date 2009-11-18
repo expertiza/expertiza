@@ -7,9 +7,9 @@
 <h3>Reviews for <%= @assignment.name %></h3>
 
 <table class="listing" cellpadding=2 width =100%>
- <tr><ul>
+<tr><ul>
   <%review_no = 1%>
-  <%for review_map in @review_mapping %>
+  <%for review_map in @review_mappings %>
   <% if @assignment.team_assignment
        author = AssignmentTeam.find(review_map.team_id)
      else 
@@ -18,15 +18,15 @@
      if author != nil %>
     <% @review = Review.find_by_review_mapping_id(review_map.id) %>
     <% if (@review)%>
-      <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%= review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
+      <li><%= @assignment.name %> Review <%= review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
       <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
      	<%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %></li>
       <% end %>	
     <% else %>    
   	  <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
-		<li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id, :assignment => @assignment_id} %></li>
+		<li><%= @assignment.name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id, :assignment => @assignment.id} %></li>
   	  <% else %>
-   		<li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review <%=review_no%> &nbsp;Begin</li>
+   		<li><%= @assignment.name %> Review <%=review_no%> &nbsp;Begin</li>
   	  <% end 
      end   	
     review_no += 1   
@@ -50,7 +50,7 @@
               <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
                  <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review of Review
                      <%= ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new',
-                                         :id => ror_map.id, :assignment => @assignment_id} %>
+                                         :id => ror_map.id, :assignment => @assignment.id} %>
                 </li>
               <%else%>
                 <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Review of Review <%=ror_no%> &nbsp;Begin</li>
@@ -65,4 +65,4 @@
   <%end%> 
 </table>
 <BR/>
-<%= link_to "Back", :controller=>'student_assignment', :action => 'view_actions', :id => @student.id %>
+<%= link_to "Back", :controller=>'student_assignment', :action => 'view_actions', :id => @participant.id %>

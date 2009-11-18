@@ -18,7 +18,7 @@
   <% count = 0 %>
   <% for review in participant.get_teammate_reviews %>
     <% count = count + 1 %>
-    <% if controller.controller_name != "student_assignment" %>
+    <% if controller.controller_name != "student_task" %>
       <a name="<%=prefix+"_"+review.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
     <% else %>
       <%= review.display_as_html(nil,count) %><BR/><BR/>

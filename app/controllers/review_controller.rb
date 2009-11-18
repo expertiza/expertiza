@@ -1,6 +1,6 @@
 class ReviewController < ApplicationController  
   helper :wiki
-  helper :student_assignment
+  helper :submitted_content
   def list
     # lists the reviews that the current user is assigned to do
     user_id = session[:user].id
@@ -24,15 +24,14 @@ class ReviewController < ApplicationController
   
   def self.show_review(id)   
     @review = Review.find(id)
-    @mapping_id = id
     @review_scores = Score.find(:all, :conditions=>["instance_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review").id])
-    @mapping = ReviewMapping.find(@review.review_mapping_id)
-    @assgt = Assignment.find(@mapping.assignment_id)    
-    @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @assgt.id])
+    @mapping = @review.mapping
+    @assgt = @mapping.assignment
+    @author = @mapping.reviewee
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
     @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
     if @assgt.team_assignment 
-      @team_members = @mapping.team.get_participants 
+      @team_members = @mapping.reviewee.get_participants 
       #use @author.handle to spider by participant handle
       #@author_name = User.find(@author_first_user_id).name;
       @author = @team_members.first 
@@ -40,7 +39,6 @@ class ReviewController < ApplicationController
     else
       #user @author.handle to spider by participant handle
       #@author_name = User.find(@mapping.author_id).name
-      @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @mapping.assignment_id])
       @author_name = @author.handle
     end
     @link = @author.submitted_hyperlink
@@ -53,32 +51,21 @@ class ReviewController < ApplicationController
   end
   
   def view_review
-    @links,@review,@mapping_id,@review_scores,@mapping,@assignment,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assignment,@participant,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
     
     @review_id=params[:id]
     
     # determine whether the rubric is a review rubric  
     @review_scores1 = Score.find(:all,:conditions =>["instance_id =? AND questionnaire_type_id = ?", @review_id, QuestionnaireType.find_by_name("Review").id])
-    if( ReviewFeedback.find_by_review_id(@review_id))
-      if (ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id = ?", @review_id,  @a]))
-        @reviewfeedback_id_1 = ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id = ?", @review_id,  @a])
-        @review_scores2 = Score.find(:all,:conditions =>["instance_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_1.id, QuestionnaireType.find_by_name("Author Feedback").id])
-      end
-      if (ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id != ?", @review_id,  @a]))
-        @reviewfeedback_id_2 = ReviewFeedback.find(:first,:conditions =>["review_id = ? and author_id != ?", @review_id,  @a])
-        @review_scores3 = Score.find(:all,:conditions =>["instance_id =? AND questionnaire_type_id = ?", @reviewfeedback_id_2.id, QuestionnaireType.find_by_name("Author Feedback").id])
-      end     
-    end
     
-    @current_folder = DisplayOption.new
-    @current_folder.name = "/"
-    if params[:current_folder]
-      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
+    current_folder = DisplayOption.new
+    current_folder.name = "/"
+    @files = Array.new
+    begin
+      @files = @participant.get_files(@participant.get_path + current_folder.name)
+    rescue
     end
-    
-    if params['fname']
-      view_submitted_file(@author,params['fname'],@current_folder)
-    end   
+   
   end
   
   def view_file
@@ -99,7 +86,7 @@ class ReviewController < ApplicationController
   end
   
   def edit_review
-    @links,@review,@mapping_id,@review_scores,@mapping,@assignment,@author,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
+    @links,@review,@mapping_id,@review_scores,@mapping,@assignment,@participant,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -143,7 +130,7 @@ class ReviewController < ApplicationController
       compare_scores      
       
       flash[:note] = 'Review was successfully saved.'
-      redirect_to :action => 'list_reviews', :id => params[:assignment_id]
+      redirect_to :controller => 'student_review', :action => 'list', :id => @review.mapping.reviewer.id
     else # If something goes wrong, stay at same page
       render :action => 'view_review'
     end
@@ -181,21 +168,21 @@ class ReviewController < ApplicationController
 #      session[:review_timeout] = @mapping.timeout.to_s()
 #    end 
     
-    @assignment = Assignment.find(@mapping.assignment_id)
+    @assignment = @mapping.assignment
     @questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
     @questions = @questionnaire.questions
     @max = @questionnaire.max_question_score
     @min = @questionnaire.min_question_score  
     if @assignment.team_assignment 
-      @author = @mapping.team.get_participants.first
-      @author_first_user_id = @author.user_id
-      @author_name = @author.user.name
-      @team_members = @mapping.team.get_participants
+      @team_members = @mapping.reviewee.get_participants
+      @participant = @team_members.first
+      @author_first_user_id = @participant.user_id
+      @author_name = @participant.user.name      
     else
-      @author_name = User.find(@mapping.author_id).name
-      @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @mapping.assignment_id])
+      @author_name = @mapping.reviewee.user.name
+      @participant = @mapping.reviewee
     end
-    @link = @author.submitted_hyperlink
+    @link = @participant.submitted_hyperlink
     
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
@@ -203,15 +190,15 @@ class ReviewController < ApplicationController
       @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
     @files = Array.new
-    @files = @author.get_submitted_files()
+    @files = @participant.get_submitted_files()
     
     if params['fname']
       view_submitted_file(@author,params['fname'],@current_folder)
     end
     
     ##anitha - getting previous scores to populate in the text box.
-    
-    @old_mapping = ReviewMapping.find(:all, :conditions => ["reviewer_id = ? and assignment_id = ? and author_id = ?", (session[:user]).id, @mapping.assignment_id, @mapping.author_id])
+    reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @mapping.assignment.id)
+    @old_mapping = ReviewMapping.find(:all, :conditions => ["reviewer_id = ? and reviewed_object_id = ? and reviewee_id = ?", reviewer.id, @mapping.assignment.id, @mapping.reviewee.id])
     @old_review_mapping = @old_mapping[0]
     i = 1
     for mapping in @old_mapping
@@ -243,28 +230,11 @@ class ReviewController < ApplicationController
     return @review_phase
   end
   
-  def create_review       
-    @review = Review.new
-    @review.review_mapping_id = params[:mapping_id]
-    @review.additional_comment = params[:new_review][:comments]
-    @mapping = ReviewMapping.find(params[:mapping_id])
-    @assignment = Assignment.find(@mapping.assignment_id)    
-    # code  for dynamic reviewer mapping has been commented out because code for it has not been implemented
-#    if @assignment.mapping_strategy_id == MappingStrategy.find_by_name ("Dynamic, fewest extant reviews").id
-#      # compare the timeout value in the session to the mapping so we can verify that we still own it
-#      if session[:review_timeout] != @mapping.timeout.to_s() || session[:user].id != @mapping.reviewer_id
-#        flash[:notice] = 'The time for submitting the review has been exceeded. Please select another review.'
-#        session[:review_timeout] = nil
-#        redirect_to :action => 'list_reviews', :id => @assignment.id 
-#        return
-#      end
-#      session[:review_timeout] = nil
-#    end
+  def create_review
+    mapping = ReviewMapping.find(params[:mapping_id])    
+    @review = Review.create(:mapping_id => mapping.id, :additional_comment => params[:new_review][:comments])
     
-    if @assignment.team_assignment && params[:team_id] != nil
-      @mapping.team_id = params[:team_id]
-    end 
-    @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
+    @due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",mapping.assignment.id])
     @review_phase = find_review_phase(@due_dates)
     if @review.save
       if params[:new_review_score]
@@ -282,10 +252,7 @@ class ReviewController < ApplicationController
           ##
           rs.save
         end      
-      end
-      #null out the mapping's timeout value to indicate that its been submitted
-#      @mapping.timeout = nil
-      @mapping.save            
+      end       
       
       #determine if the new review meets the criteria set by the instructor's 
       #notification limits      
@@ -293,8 +260,8 @@ class ReviewController < ApplicationController
       
       #send message to author(s) when review has been updated
       @review.email            
-      flash[:notice] = 'Review was successfully saved.'
-      redirect_to :action => 'list_reviews', :id => params[:assgt_id]
+      flash[:note] = 'Review was successfully saved.'
+      redirect_to :controller => 'student_review', :action => 'list', :id => mapping.reviewer.id
     else # If something goes wrong, stay at same page
       render :action => 'view_review'
     end
@@ -305,17 +272,11 @@ class ReviewController < ApplicationController
   # the existing scores by a given percentage (defined by
   # the instructor) then notify the instructor.
   # ajbudlon, nov 18, 2008
-  def compare_scores  
-    if @review.review_mapping.assignment.team_assignment 
-      team = AssignmentTeam.find(@review.review_mapping.team_id)
-      participant = team.get_participants.first
-    else
-      participant = AssignmentParticipant.find_by_user_id_and_parent_id(@review.review_mapping.author_id,@review.review_mapping.assignment.id)      
-    end          
-    total, count = ReviewHelper.get_total_scores(participant.get_reviews,@review)     
+  def compare_scores              
+    total, count = ReviewHelper.get_total_scores(@review.mapping.reviewee.get_reviews,@review)     
     if count > 0
-      questionnaire = Questionnaire.find(@review.review_mapping.assignment.review_questionnaire_id)
-      ReviewHelper.notify_instructor(@review.review_mapping.assignment,@review,questionnaire,total,count)
+      questionnaire = Questionnaire.find(@review.mapping.assignment.review_questionnaire_id)
+      ReviewHelper.notify_instructor(@review.mapping.assignment,@review,questionnaire,total,count)
     end
   end
   
@@ -325,61 +286,7 @@ class ReviewController < ApplicationController
     @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_questionnaire_id])
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
   end
-  
-  def list_reviews
-    @reviewer_id = session[:user].id
-    @assignment_id = params[:id]
-    @student = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',@reviewer_id,@assignment_id])
-    @assignment = Assignment.find(@assignment_id)
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_questionnaire_id])
-    # Finding the current phase that we are in
-    due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?",@assignment_id])
-    @very_last_due_date = DueDate.find(:all,:order => "due_at DESC", :limit =>1, :conditions => ["assignment_id = ?",@assignment_id])
-    next_due_date = @very_last_due_date[0]
-    for due_date in due_dates
-      if due_date.due_at > Time.now
-        if due_date.due_at < next_due_date.due_at
-          next_due_date = due_date
-        end
-      end
-    end
-    @review_phase = next_due_date.deadline_type_id;
-    if next_due_date.review_of_review_allowed_id == LATE or next_due_date.review_of_review_allowed_id == OK
-      if @review_phase == DeadlineType.find_by_name("metareview").id
-        @can_view_metareview = true
-      end
-    end    
-    if @assignment.team_assignment
-      query = "SELECT distinct review_mappings.* FROM `review_mappings`, `teams_users`"
-      query = query + " WHERE review_mappings.assignment_id = "+@assignment_id.to_s
-      query = query + " and review_mappings.reviewer_id = "+@reviewer_id.to_s
-      query = query + " and review_mappings.team_id = teams_users.team_id"
-      @review_mapping = ReviewMapping.find_by_sql(query)
-    else
-      @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])
-    end
-    reviews_left = @assignment.num_reviews - @review_mapping.size()
-    if (reviews_left > 0 && @assignment.mapping_strategy_id == MappingStrategy.find_by_name("Dynamic, fewest extant reviews").id)
-      for i in 1..reviews_left do
-        @placeholder = ReviewMapping.new
-        @placeholder.id = 999
-        @placeholder.assignment_id = @assignment_id
-        @review_mapping << @placeholder
-      end
-    end
-    mapping_ids = Array.new
-    @review_mapping.each{
-      |mapping|
-      mapping_ids << mapping.id
-    }
-    
-    query = "select distinct review_of_review_mappings.* from review_of_review_mappings, review_mappings"
-    query = query + " where review_mappings.id = review_of_review_mappings.review_mapping_id"
-    query = query + " and review_mappings.assignment_id = "+@assignment_id.to_s
-    query = query + " and review_of_review_mappings.review_reviewer_id = "+@reviewer_id.to_s
-    @review_of_review_mappings = ReviewOfReviewMapping.find_by_sql(query)
-    
-  end
+
   
   
   #viewing review and giving feedback by the instructor to the reviewer 
@@ -519,15 +426,4 @@ class ReviewController < ApplicationController
       render :action => 'view_review'
     end
   end    
-  
-  def view_submitted_file(author, fname, current_folder)
-    folder_name = FileHelper::sanitize_folder(current_folder.name)
-    file_name = FileHelper::sanitize_filename(fname)
-    file_split = file_name.split('.')
-    if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
-      send_file(author.get_path + folder_name + file_name, :type => Mime::HTML.to_s, :disposition => 'inline') 
-    else
-      send_file(author.get_path + folder_name + file_name) 
-    end
-  end  
 end #class ends

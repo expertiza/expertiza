@@ -1,15 +1,8 @@
-<h1>Edit review of review</h1>
-
-<%= render :partial => 'review/submitted_content' %>
-<%= @review.display_as_html() %>
-<BR/><BR/>
-
-<%= start_form_tag :action => 'update_review_of_review' %>
-	<%= render :partial => 'review_of_review' %>
-    <%= hidden_field_tag('review_of_review_id', @review_of_review.id) %>
-  	<%= submit_tag "Update review of review", :name=>"save" %>   	
+<h1>Edit Metareview for <%= @mapping.assignment.name %></h1>
+<%= start_form_tag :action => 'update', :id => @mapping.id %>
+<%= render :partial => 'metareview' %>
+<br/>
+<%= submit_tag "Save Metareview", :name=>"save" %>   
 <%= end_form_tag %>
-<br />
-<%= link_to 'Back', :controller=>'review', :action => 'list_reviews', :id => @assignment.id %>
-
-
+<br/>
+<a href="javascript:window.history.back()">Back</a>

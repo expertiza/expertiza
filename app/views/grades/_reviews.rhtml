@@ -18,8 +18,8 @@
   <% count = 0 %>
   <% for review in participant.get_reviews %>
     <% count = count + 1 %>
-    <% if controller.controller_name != "student_assignment" %>
-      <a name="<%=prefix+"_"+review.review_mapping.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
+    <% if controller.controller_name != "student_task" %>
+      <a name="<%=prefix+"_"+review.mapping.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
     <% else %>
       <%= review.display_as_html(nil,count) %><BR/><BR/>
       <% map = FeedbackMapping.find_by_reviewed_object_id(review.id)

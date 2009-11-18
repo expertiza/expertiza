@@ -1,5 +1,4 @@
-<%= render :partial => 'student_assignment/scripts' %>
-<b>Links to review</b>&nbsp;&nbsp;&nbsp;<a href="#" id="linksLink" name="linksLink" onClick="toggleElement('links','links');return false;">show links</a><br/>
+<b>Wiki pages</b>&nbsp;&nbsp;&nbsp;<a href="#" id="linksLink" name="linksLink" onClick="toggleElement('links','links');return false;">show links</a><br/>
   <div id="links" style="display:none">
   <%= render :partial => 'review/'+@assignment.wiki_type.name.downcase %>
   </div>

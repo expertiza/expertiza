@@ -18,8 +18,8 @@
   <% count = 0 %>
   <% for feedback in participant.get_feedbacks %>
     <% count = count + 1 %>
-    <% if controller.controller_name != "student_assignment" %>
-      <a name="<%=prefix+"_"+feedback.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
+    <% if controller.controller_name != "student_task" %>
+      <a name="<%=prefix+"_"+feedback.mapping.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
     <% else %>
       <%= feedback.display_as_html(nil,count) %><BR/><BR/>
     <% end %>      

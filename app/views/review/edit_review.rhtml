@@ -8,12 +8,6 @@
 <%end%>
 <%= render :partial => 'submitted_content', :locals => {:stage => nil} %>
 
-<%if(ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assignment.id]))
-                        review_feedback_text = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assignment.id]).additional_comment
-%>
-<div class="flash_note"><strong>Feedback from author:</strong><br/>
-<%=review_feedback_text%></div>
-<% end%>
 <%= start_form_tag :action => 'update_review' %>
 <%= render :partial => 'review_content' %>    
 <%= hidden_field_tag('review_id', @review.id) %>
@@ -23,8 +17,10 @@
     <%= submit_tag "Save", :name=>"save" %>       
 <%= end_form_tag %>
 
-<% if session[:return_to] %>
-  <%= link_to 'Back', session[:return_to] %>
-<% else %>
-  <%= link_to 'Back', :action => 'list_reviews', :id => @assignment.id %>
+<BR/><BR/>
+<% feedback = ReviewFeedback.find(:first, :include => :mapping, :conditions =>["reviewed_object_id = ?", @review.id]) 
+   if feedback %>  
+<%= feedback.display_as_html() %><BR/><BR/>
 <% end %>
+
+<a href="javascript:window.history.back()">Back</a>

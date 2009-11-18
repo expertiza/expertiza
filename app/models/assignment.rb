@@ -30,6 +30,14 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :review_of_review_questionnaire_id     
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
   
+  def get_contributor(contrib_id)
+    if team_assignment
+      return AssignmentTeam.find(contrib_id)
+    else
+      return AssignmentParticipant.find(contrib_id)
+    end
+  end
+  
   # get review weight
   def review_weight
     weight = 0
@@ -128,6 +136,34 @@ class Assignment < ActiveRecord::Base
        path = RAILS_ROOT + "/pg_data/" +  FileHelper.clean_path(User.find(self.instructor_id).name) + "/"
     end         
     return path + FileHelper.clean_path(self.directory_path)      
+  end
+  
+  def get_next_due_date(allowance_type)
+    query = 'assignment_id = ? and due_at > ? and ('+allowance_type+' IN (SELECT id FROM deadline_rights WHERE name in ("Late","OK")))'
+    DueDate.find(:first, :conditions => [query,self.id,Time.now])    
+  end
+    
+  # Determine if the next due date from now allows for submissions
+  def submission_allowed    
+    due_date1 = get_next_due_date("submission_allowed_id")
+    due_date2 = get_next_due_date("resubmission_allowed_id")    
+    
+    return (due_date1 != nil or due_date2 != nil)
+  end
+  
+  # Determine if the next due date from now allows for reviews or metareviews
+  def review_allowed
+    due_date1 = get_next_due_date("review_allowed_id")
+    due_date2 = get_next_due_date("rereview_allowed_id")
+    
+    return (due_date1 != nil or due_date2 != nil or self.metareview_allowed)     
+  end  
+  
+  # Determine if the next due date from now allows for metareviews
+  def metareview_allowed    
+    due_date = get_next_due_date("review_of_review_allowed_id")
+    
+    return (due_date != nil)      
   end
     
   def get_participants
@@ -360,7 +396,7 @@ def add_participant(user_name)
   participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
   if !participant
     newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)      
-    newpart.set_handle(user)         
+    newpart.set_handle()         
   else
     raise "The user \""+user.name+"\" is already a participant."
   end

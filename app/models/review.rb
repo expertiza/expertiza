@@ -1,11 +1,11 @@
 class Review < ActiveRecord::Base
   has_many :review_feedbacks
   has_many :review_scores
-  belongs_to :review_mapping
+  belongs_to :mapping, :class_name => 'ReviewMapping', :foreign_key => 'mapping_id'
   
   def display_as_html(prefix = nil, count = nil)
     if prefix
-       code = "<B>Reviewer:</B> "+self.review_mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+prefix+"_"+self.id.to_s+"','review'"+');return false;">hide review</a><BR/>'
+       code = "<B>Reviewer:</B> "+self.mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+prefix+"_"+self.id.to_s+"','review'"+');return false;">hide review</a><BR/>'
     else
        code = '<B>Review '+count.to_s+'</B> &nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+self.id.to_s+"','review'"+');return false;">show review</a><BR/>'           
     end
@@ -21,7 +21,18 @@ class Review < ActiveRecord::Base
       code = code + '<div id="review_'+self.id.to_s+'" style="display:none">'
     end
     code = code + '<BR/><BR/>'
-    scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Review").id.to_s)
+    
+    questionnaire = Questionnaire.find(self.mapping.assignment.review_questionnaire_id)
+    questions = questionnaire.questions
+    scores = Array.new
+    questions.each{
+       | question |
+       score = Score.find_by_question_id_and_instance_id(question.id, self.id)
+       if score
+         scores << score
+       end
+    } 
+    
     count = 0
     scores.each{
       | reviewScore |
@@ -54,12 +65,17 @@ class Review < ActiveRecord::Base
     type_id = QuestionnaireType.find_by_name("Review").id
     scores = Score.find_all_by_instance_id_and_questionnaire_type_id(self.id,type_id)
     scores.each {|score| score.destroy}
-    feedback = ReviewFeedback.find_all_by_review_id(self.id)
-    feedback.each {|fb| fb.delete}
+    fmaps = FeedbackMapping.find_all_by_reviewed_object_id(self.id)
+    fmaps.each{
+      |fmap|
+       feedback = ReviewFeedback.find_by_mapping_id(fmap.id)
+       feedback.delete
+       fmap.destroy
+    }        
     self.destroy
   end
   
-    def self.review_view_helper(review_id,fname,control_folder)
+  def self.review_view_helper(review_id,fname,control_folder)
     @review = Review.find(review_id)
     @mapping_id = review_id
     @review_scores = Score.find(:all, :conditions=>["instance_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review").id])
@@ -91,7 +107,8 @@ class Review < ActiveRecord::Base
     end 
     return @files,@assgt,@author_name,@team_member,@rs,@mapping_id,@review_scores,@questionnaire,@max,@min
   end
-   def self.get_submitted_file_list(direc,author,files)
+  
+  def self.get_submitted_file_list(direc,author,files)
     if(author.directory_num)
       direc = RAILS_ROOT + "/pg_data/" + author.assignment.directory_path + "/" + author.directory_num.to_s
       temp_files = Dir[direc + "/*"]
@@ -108,21 +125,19 @@ class Review < ActiveRecord::Base
   # is made
   #ajbudlon, sept 07, 2007   
   def email
-   mapping = ReviewMapping.find(self.review_mapping_id)   
-   assignment = Assignment.find(mapping.assignment_id)
-   if !assignment.team_assignment
-    for author_id in mapping.get_author_ids
-     if User.find_by_id(author_id).email_on_review
-        user = User.find_by_id(author_id)
+   mapping = ReviewMapping.find(self.mapping_id)   
+   if !mapping.assignment.team_assignment
+    for participant in mapping.get_participants
+     if participant.user.email_on_review
         Mailer.deliver_message(
-            {:recipients => user.email,
-             :subject => "A new review is available for #{user.name}",
+            {:recipients => participant.user.email,
+             :subject => "A new review is available for #{participant.user.name}",
              :body => {
-              :obj_name => user.name,
+              :obj_name => participant.user.name,
               :type => "review",
               :location => get_review_number(mapping).to_s,
               :review_scores => Score.find(:all, :conditions=>["instance_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review").id]),
-              :user => ApplicationHelper::get_user_first_name(user),
+              :user => ApplicationHelper::get_user_first_name(participant.user),
               :partial_name => "update"
               }
             }
@@ -130,16 +145,6 @@ class Review < ActiveRecord::Base
      end  
     end
    end
- end
- 
- #return the reviewer for this review
- def reviewer 
-   self.review_mapping.reviewer
- end
- 
- #return the reviewee for this review
- def reviewee
-   self.review_mapping.reviewee
  end
  
  #Generate an email to the instructor when a new review exceeds the allowed difference

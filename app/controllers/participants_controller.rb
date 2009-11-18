@@ -8,7 +8,7 @@ class ParticipantsController < ApplicationController
     @model = params[:model]    
   end
   
-  def add    
+  def add   
     curr_object = Object.const_get(params[:model]).find(params[:id])    
     begin
       curr_object.add_participant(params[:user][:name])
@@ -17,7 +17,7 @@ class ParticipantsController < ApplicationController
     end
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
   end
-    
+     
   def delete
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id

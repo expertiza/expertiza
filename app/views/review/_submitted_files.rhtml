@@ -1,14 +1,6 @@
 <% if @files %>
 <b>Submitted Files</b>&nbsp;&nbsp;&nbsp;<a href="#" id="filesLink" name="filesLink" onClick="toggleElement('files','files');return false;">show files</a><br/>
   <div id="files" style="display:none">
-  <table id="file_table">
-  <tr>
-	<th>Name</th>
-	<th>Size</th>
-	<th>Type</th>
-	<th>Date Modified</th>
-	</tr>
-  <%= display_directory_tree(@files, @author, true) %>
-  </table>
+     <%= display_directory_tree(@participant, @files, true) %>
   </div>
 <% end %>

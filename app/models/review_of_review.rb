@@ -1,15 +1,9 @@
 class ReviewOfReview < ActiveRecord::Base
-    has_many :review_of_review_scores
-    belongs_to :review_of_review_mapping
-
-  def display_as_html(prefix = nil, count = nil)
-    if self.review_of_review_mapping.review_reviewer != nil
-       review_reviewer = self.review_of_review_mapping.review_reviewer
-    else
-       review_reviewer = User.find(self.review_of_review_mapping.reviewer_id)
-    end
+    belongs_to :mapping, :class_name => 'ReviewOfReviewMapping', :foreign_key => 'mapping_id'
+    
+  def display_as_html(prefix = nil, count = nil)    
     if prefix 
-      code = "<B>Metareviewer:</B> "+review_reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+prefix+"_"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
+      code = "<B>Metareviewer:</B> "+self.mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+prefix+"_"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
     else
       code = '<B>Metareview '+count.to_s+'</B>&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+self.id.to_s+"','metareview'"+');return false;">show metareview</a>'      
     end
@@ -25,28 +19,32 @@ class ReviewOfReview < ActiveRecord::Base
       code = code + '<div id="metareview_'+self.id.to_s+'" style="display:none">'
     end
     code = code +"<BR/><BR/>"
-    scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Metareview").id.to_s)
+    questionnaire = Questionnaire.find(self.mapping.assignment.review_of_review_questionnaire_id)
+    questions = questionnaire.questions
+    scores = Array.new
+    questions.each{
+       | question |
+       score = Score.find_by_question_id_and_instance_id(question.id, self.id)
+       if score
+         scores << score
+       end
+    }
+    
     scores.each{
       | reviewScore |      
       code = code + "<I>"+Question.find_by_id(reviewScore.question_id).txt+"</I><BR/><BR/>"
       code = code + '(<FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find_by_id(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B>): "+reviewScore.comments+"<BR/><BR/>"
     }  
-    code = code + "</div>"
-    return code
-  end
-  
-  def reviewer
-    if self.review_of_review_mapping.review_reviewer_id != nil
-      User.find(self.review_of_review_mapping.review_reviewer_id)
+    if self.additional_comment != nil
+      comment = self.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')
     else
-      User.find(self.review_of_review_mapping.reviewer_id)
+      comment = ''
     end
+    code = code + "<B>Additional Comment:</B><BR/>"+comment+""
+    code = code + "</div>"
+    return code    
   end
   
-  def reviewee
-    self.review_of_review_mapping.reviewee
-  end
-
   # Computes the total score awarded for a metareview
   def get_total_score
     scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Metareview").id.to_s)
@@ -76,7 +74,6 @@ class ReviewOfReview < ActiveRecord::Base
    review_mapping = ReviewMapping.find_by_id(review_of_review_mapping.review_mapping_id)
       
    if User.find_by_id(review_mapping.reviewer_id).email_on_review_of_review
-     review_num = get_review_number(review_of_review_mapping)     
      review_id = review_of_review_mapping.review_id
      review = Review.find(review_id)
      
@@ -123,28 +120,22 @@ class ReviewOfReview < ActiveRecord::Base
  #Generate an email to the instructor when a new review exceeds the allowed difference
  #ajbudlon, nov 18, 2008
  def notify_on_difference(new_pct,avg_pct,limit)
-   mapping = ReviwOfReviewMapping.find(self.review_of_review_mapping_id)
-   if mapping.review_reviewer_id.nil?
-      reviewer = mapping.reviewer
-   else
-      reviewer = mapping.review_reviewer
-   end   
-   instructor = User.find(self.assignment.instructor_id)  
+   instructor = User.find(self.mapping.assignment.instructor_id)  
    puts "*** in sending method ***"
    Mailer.deliver_message(
      {:recipients => instructor.email,
       :subject => "Expertiza Notification: A metareview score is outside the acceptable range",
       :body => {
         :first_name => ApplicationHelper::get_user_first_name(instructor),
-        :reviewer_name => reviewer.fullname,
+        :reviewer_name => self.mapping.reviewer.fullname,
         :type => "metareview",
-        :reviewee_name => mapping.review_mapping.reviewer.fullname,
+        :reviewee_name => self.mapping.reviewee.fullname,
         :limit => limit,
         :new_pct => new_pct,
         :avg_pct => avg_pct,
         :types => "metareviews",
         :performer => "metareviewer",
-        :assignment => mapping.review_mapping.assignment,              
+        :assignment => self.mapping.assignment,              
         :partial_name => 'limit_notify'
       }
      }

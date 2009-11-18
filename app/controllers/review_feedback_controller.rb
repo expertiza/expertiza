@@ -4,10 +4,10 @@ class ReviewFeedbackController < ApplicationController
          :redirect_to => { :action => :list }
          
   def new
-    review = Review.find(params[:id]) 
-    reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, review.review_mapping.assignment.id)
-    reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(review.review_mapping.reviewer.id, review.review_mapping.assignment.id)
-    @mapping = FeedbackMapping.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => reviewee.id)
+    @review = Review.find(params[:id]) 
+    reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @review.review_mapping.assignment.id)
+    reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(@review.review_mapping.reviewer.id, @review.review_mapping.assignment.id)
+    @mapping = FeedbackMapping.create(:reviewed_object_id => @review.id, :reviewer_id => reviewer.id, :reviewee_id => reviewee.id)
     @questionnaire = Questionnaire.find(@mapping.assignment.author_feedback_questionnaire_id)
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score
@@ -30,12 +30,14 @@ class ReviewFeedbackController < ApplicationController
     redirect_to :controller => 'student_assignment', :action => 'view_scores', :id => map.reviewer.id
   end
   
-  def view
+  def view    
     @response = ReviewFeedback.find(params[:id])
+    @review = @response.mapping.review
   end
   
   def edit
     @response = ReviewFeedback.find(params[:id]) 
+    @review = @response.mapping.review
     @mapping = @response.mapping
     @questionnaire = Questionnaire.find(@response.mapping.assignment.author_feedback_questionnaire_id)
     @questions = @questionnaire.questions
@@ -68,12 +70,12 @@ class ReviewFeedbackController < ApplicationController
   end
   
   # Compute the currently awarded scores for the reviewee
-  # If the new review's score is greater than or less than 
+  # If the new feedback's score is greater than or less than 
   # the existing scores by a given percentage (defined by
   # the instructor) then notify the instructor.
   def compare_scores      
-    participant = @response.mapping.reviewer                    
-    total, count = ReviewHelper.get_total_scores(participant.get_teammate_reviews,@response)     
+    participant = @response.mapping.reviewee                    
+    total, count = ReviewHelper.get_total_scores(participant.get_feedbacks,@response)     
     if count > 0
       ReviewHelper.notify_instructor(@response.mapping.assignment,@response,@questionnaire,total,count)
     end

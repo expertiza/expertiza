@@ -70,7 +70,7 @@ class TeammateReviewController < ApplicationController
   # the instructor) then notify the instructor.
   # ajbudlon, nov 18, 2008
   def compare_scores      
-    participant = @response.mapping.reviewer                    
+    participant = @response.mapping.reviewee                    
     total, count = ReviewHelper.get_total_scores(participant.get_teammate_reviews,@response)     
     if count > 0
       ReviewHelper.notify_instructor(@response.mapping.assignment,@response,@questionnaire,total,count)

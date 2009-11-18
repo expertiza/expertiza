@@ -29,18 +29,14 @@
            <% if !@assignment.team_assignment %>
              <%= link_to 'delete', :action => 'delete_participant', :id => contrib.id %><br/>
            <% end %>
-           <%= link_to 'add reviewer', :action => 'select_reviewer', :id => contrib, :assignment => @assignment.id %><br/>
-           <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => contrib, :assignment => @assignment.id %>
+           <%= link_to 'add reviewer', :action => 'select_reviewer', :id => @assignment.id, :contributor_id => contrib.id %><br/>
+           <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => @assignment.id, :contributor_id => contrib.id %>
          </div>
        </td>
     <td colspan="2">
     <table width="100%" cellpadding="10">
-    <% if @assignment.team_assignment
-          mappings = ReviewMapping.find(:all, :conditions => ['assignment_id = ? and team_id = ? and reviewer_id != 0',@assignment.id,contrib.id])
-       else
-          mappings = ReviewMapping.find(:all, :conditions => ['assignment_id = ? and author_id = ? and reviewer_id != 0',@assignment.id,contrib.user_id])
-       end     
-
+    <% mappings = contrib.review_mappings
+    
        if mappings.length > 0
        	 mappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}
        end      
@@ -64,8 +60,8 @@
              </td>
              <td width="50%">
                <table width="100%">
-               <% rmappings = ReviewOfReviewMapping.find_all_by_review_mapping_id(map.id) 
-                  rmappings.sort! {|a,b| a.review_reviewer.fullname <=> b.review_reviewer.fullname } %>
+               <% rmappings = ReviewOfReviewMapping.find_all_by_reviewed_object_id(map.id) 
+                  rmappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname } %>
                <% rmappings.each{
                   | rmap |
                   if rmap 
@@ -77,7 +73,7 @@
                     end
                %>              
                    <tr style="background-color:<%=bgcolor3%>">
-                     <td><%= rmap.review_reviewer.name %> (<%= rmap.review_reviewer.fullname %>)
+                     <td><%= rmap.reviewer.name %> (<%= rmap.reviewer.fullname %>)
                      <div style="text-align:right">
                        <%= link_to 'delete', :action => 'delete_metareviewer', :id => rmap.id %><br/>
                      </div>      
@@ -115,6 +111,16 @@
             :title => 'Metareviewer Mappings',
             :expected_fields => 'Contributor, Reviewer, Metareviewer1, Metareviewer2, ... MetareviewerN',
             :id => @assignment.id %>
+<BR/><%= link_to 'Export review mappings',
+            :controller=>'export_file',
+            :action=>'start',
+            :model=> 'ReviewMapping',
+            :id=>@assignment.id %>
+| <%= link_to 'Export metareview mappings',
+            :controller=>'export_file',
+            :action=>'start',
+            :model=> 'ReviewOfReviewMapping',
+            :id=>@assignment.id %>            
 | <%= link_to 'Delete all reviewers and metareviewers', :action => 'delete_all_reviewers_and_metareviewers', :id => @assignment.id %>            
-<BR/> <%= link_to 'Back', :controller => 'tree_display', :action => 'list' %>
+<BR/><%= link_to 'Back', :controller => 'tree_display', :action => 'list' %>
 

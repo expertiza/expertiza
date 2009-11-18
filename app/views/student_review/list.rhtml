@@ -1,0 +1,15 @@
+<% if @assignment.review_allowed %>
+<h3>Reviews for <%= @assignment.name %></h3>
+<%= render :partial => 'reviews' %>
+<% else %>
+<h3>Reviews cannot be performed at this time</h3>
+<% end %>
+<BR/>
+<% if @assignment.metareview_allowed %>
+  <h3>Metareviews for <%= @assignment.name %></h3>
+  <%= render :partial => 'metareviews' %>
+<% else %> 
+  <h3>Metareviews cannot be performed at this time</h3>
+<% end %>
+<BR/>
+<a href="javascript:window.history.back()">Back</a>

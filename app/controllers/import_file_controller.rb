@@ -7,23 +7,18 @@ class ImportFileController < ApplicationController
     @title = params[:title]
   end
   
-  def import
-    #begin
-      errors = importFile(session,params)
-      err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
-      errors.each{
-        |error|
-        err_msg = err_msg+"<li>"+error+"<br/>"
-      }
-      err_msg = err_msg+"</ul>"
-      if errors.length > 0
-        flash[:error] = err_msg
-      end
-      redirect_to session[:return_to]
-    #rescue
-    #    flash[:error] = $!
-    #    redirect_to session[:return_to]
-    #end
+  def import    
+    errors = importFile(session,params)
+    err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
+    errors.each{
+      |error|
+      err_msg = err_msg+"<li>"+error+"<br/>"
+    }
+    err_msg = err_msg+"</ul>"
+    if errors.length > 0
+      flash[:error] = err_msg
+    end
+    redirect_to session[:return_to]    
   end
   
   protected  

@@ -7,7 +7,7 @@
            :prefix => prefix,
            :assignment => Assignment.find(participant.parent_id),
            :reviews => participant.get_metareviews,
-           :collabel => "Metareview1",
+           :collabel => "Metareview",
            :rowlabel => "Metareviewer",
            :questionnaire => @metareview_questionnaire,
            :questions => @metareview_questions,
@@ -19,8 +19,8 @@
   <% count = 0 %>
   <% for metareview in participant.get_metareviews %>
     <% count = count + 1 %>
-    <% if controller.controller_name != "student_assignment" %>
-      <a name="<%=prefix+"_"+metareview.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/> 
+    <% if controller.controller_name != "student_task" %>
+      <a name="<%=prefix+"_"+metareview.mapping.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/> 
     <% else %>
       <%= metareview.display_as_html(nil,count) %><BR/><BR/>
     <% end %>        

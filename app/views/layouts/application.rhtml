@@ -73,6 +73,11 @@
           <%= render :partial => 'menu_items/breadcrumbs', 
 	      :locals => {:crumbs => session[:menu].crumbs} %>
         </div>
+<%
+puts "******************"
+puts flash
+puts "******************"
+%>       
 <% if flash[:note] -%>
 <div class="flash_note"><%= flash[:note] %></div>
 <% elsif flash[:error] -%>

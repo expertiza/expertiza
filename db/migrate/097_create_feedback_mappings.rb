@@ -22,14 +22,15 @@ class CreateFeedbackMappings < ActiveRecord::Migration
     add_column :review_feedbacks, :mapping_id, :integer, :null => false     
     
     ReviewFeedback.find(:all).each{
-       | feedback |       
-       reviewmap = feedback.review.review_mapping
+       | feedback |      
+       review = Review.find(feedback.review_id)
+       reviewmap = ReviewMapping.find(review.review_mapping_id)
        if reviewmap != nil?
          reviewer = get_reviewer(reviewmap, feedback)
-         reviewee = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',reviewmap.reviewer.id, feedback.assignment_id])         
+         reviewee = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',reviewmap.reviewer_id, feedback.assignment_id])         
        end       
        if reviewer != nil and reviewee != nil            
-         map = FeedbackMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => feedback.review.id)
+         map = FeedbackMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => review.id)
          execute "update review_feedbacks set mapping_id = #{map.id} where id = #{feedback.id}"
        else
          feedback.delete
@@ -61,18 +62,20 @@ class CreateFeedbackMappings < ActiveRecord::Migration
        
   end
   
-  def self.get_reviewer(map, feedback)
+  def self.get_reviewer(map, feedback)    
     reviewer = nil
-    if map.assignment.team_assignment 
+    assignment = Assignment.find(map.assignment_id)    
+    if assignment.team_assignment 
        if feedback.user_id.nil?
-          if map.reviewee != nil
-             reviewer = map.reviewee.get_participants.first
+          if map.team_id != nil
+             team = AssignmentTeam.find(map.team_id)
+             reviewer = team.get_participants.first
           end              
        else
           reviewer = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',feedback.user_id, feedback.assignment_id])  
        end                          
     else
-       reviewer = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',map.reviewee.id, feedback.assignment_id])
+       reviewer = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',map.author_id, feedback.assignment_id])
     end
     return reviewer
   end

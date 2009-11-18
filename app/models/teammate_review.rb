@@ -32,7 +32,17 @@ class TeammateReview < ActiveRecord::Base
       code = code + '<div id="teammate_review_'+self.id.to_s+'" style="">'
     end
     code = code + '<BR/><BR/>'
-    scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Teammate Review").id.to_s)
+    questionnaire = Questionnaire.find(self.mapping.assignment.teammate_review_questionnaire_id)
+    questions = questionnaire.questions
+    scores = Array.new
+    questions.each{
+       | question |
+       score = Score.find_by_question_id_and_instance_id(question.id, self.id)
+       if score
+         scores << score
+       end
+    }    
+
     count = 0
     scores.each{
       | reviewScore |

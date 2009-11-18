@@ -4,6 +4,6 @@ class FeedbackMapping < ActiveRecord::Base
   belongs_to :reviewee, :class_name => "Participant", :foreign_key => "reviewee_id"
   
   def assignment
-    self.review.review_mapping.assignment
+    self.review.mapping.assignment
   end
 end

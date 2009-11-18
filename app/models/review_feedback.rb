@@ -4,7 +4,7 @@ class ReviewFeedback < ActiveRecord::Base
     
   def display_as_html(prefix = nil,count = nil) 
     if prefix
-      code = "<B>Author:</B> "+self.review.review_mapping.reviewee.name+'&nbsp;&nbsp;&nbsp;<a href="#" name= "feedback_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'feedback_"+prefix+"_"+self.id.to_s+"','feedback'"+');return false;">hide feedback</a>'
+      code = "<B>Author:</B> "+self.mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "feedback_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'feedback_"+prefix+"_"+self.id.to_s+"','feedback'"+');return false;">hide feedback</a>'
     else
       code = '<B>Feedback '+count.to_s+'</B>&nbsp;&nbsp;&nbsp;<a href="#" name= "feedback_'+self.id.to_s+'Link" onClick="toggleElement('+"'feedback_"+self.id.to_s+"','feedback'"+');return false;">show feedback</a>'          
     end      
@@ -17,10 +17,10 @@ class ReviewFeedback < ActiveRecord::Base
     if prefix
       code = code + '<div id="feedback_'+prefix+"_"+self.id.to_s+'" style="">'
     else
-      code = code + '<div id="feedback_'+self.id.to_s+'" style="">'
+      code = code + '<div id="feedback_'+self.id.to_s+'" style="display:none">'
     end
     code = code + '<BR/><BR/>'
-    questionnaire = Questionnaire.find(self.mapping.assignment.author_feedback_questionnaire.id)
+    questionnaire = Questionnaire.find(self.mapping.assignment.author_feedback_questionnaire_id)
     questions = questionnaire.questions
     scores = Array.new
     questions.each{
@@ -54,18 +54,10 @@ class ReviewFeedback < ActiveRecord::Base
     scores.each {|score| score.destroy}    
     self.destroy
   end
-    
-    def reviewer
-      self.review.review_mapping.reviewee      
-    end
-  
-    def reviewee
-      self.review.review_mapping.reviewer
-    end
   
  # Computes the total score awarded for a feedback
   def get_total_score
-    questions_query = "select id from questions where questionnaire_id = "+self.assignment.author_feedback_questionnaire_id.to_s
+    questions_query = "select id from questions where questionnaire_id = "+self.mapping.assignment.author_feedback_questionnaire_id.to_s
     
     scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and question_id in ("+questions_query+") and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Author Feedback").id.to_s)
     total_score = 0
@@ -79,22 +71,22 @@ class ReviewFeedback < ActiveRecord::Base
  #Generate an email to the instructor when a new review exceeds the allowed difference
  #ajbudlon, nov 18, 2008
  def notify_on_difference(new_pct,avg_pct,limit)   
-   instructor = User.find(self.assignment.instructor_id)  
+   instructor = User.find(self.mapping.assignment.instructor_id)  
    puts "*** in sending method ***"
    Mailer.deliver_message(
      {:recipients => instructor.email,
       :subject => "Expertiza Notification: A review feedback score is outside the acceptable range",
       :body => {
         :first_name => ApplicationHelper::get_user_first_name(instructor),
-        :reviewer_name => User.find(self.author_id).fullname,
+        :reviewer_name => self.mapping.reviewer.user.fullname,
         :type => "feedback",
-        :reviewee_name => self.review.review_mapping.reviewer.fullname,
+        :reviewee_name => self.mapping.review.review_mapping.reviewer.fullname,
         :limit => limit,
         :new_pct => new_pct,
         :avg_pct => avg_pct,
         :types => "review feedback",
         :performer => "author",
-        :assignment => self.assignment,              
+        :assignment => self.mapping.assignment,              
         :partial_name => 'limit_notify'
       }
      }

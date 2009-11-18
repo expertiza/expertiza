@@ -1,8 +1,9 @@
 class AssignmentParticipant < Participant  
   require 'wiki_helper'
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
+  has_many :review_mappings, :class_name => 'ParticipantReviewMapping', :foreign_key => 'reviewee_id'
   validates_presence_of :handle
-  
+
   #Copy this participant to a course
   def copy(course_id)
     part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
@@ -29,34 +30,16 @@ class AssignmentParticipant < Participant
         feedbacks << feedback
       end
     }
-    return feedbacks.sort {|a,b| a.reviewer.name <=> b.reviewer.name}    
+    return feedbacks.sort {|a,b| a.mapping.reviewer.name <=> b.mapping.reviewer.name}    
   end
   
   def get_reviews
     if self.assignment.team_assignment
-      if self.team != nil
-        author_id = self.team.id        
-      else
-        author_id = nil        
-      end
-      query = "team_id = ? and assignment_id = ?"
+      return self.team.get_reviews
     else
-      author_id = self.user_id
-      query = "author_id = ? and assignment_id = ?"
+      reviews = Review.find(:all, :include => :mapping, :conditions => ['reviewee_id = ? and reviewed_object_id = ?',self.id, self.assignment.id])
+      return reviews.sort {|a,b| a.mapping.reviewer.fullname <=> b.mapping.reviewer.fullname }
     end
-    
-    reviews = Array.new
-    
-    if author_id != nil
-      ReviewMapping.find(:all, :conditions => [query,author_id,self.parent_id]).each{
-        |mapping|
-        review = Review.find_by_review_mapping_id(mapping.id)     
-        if review
-          reviews << review
-        end
-      }
-    end
-    return reviews.sort {|a,b| a.review_mapping.reviewer.fullname <=> b.review_mapping.reviewer.fullname }
   end
   
   def get_reviews_by_me
@@ -72,10 +55,8 @@ class AssignmentParticipant < Participant
   end
   
   def get_metareviews
-    inner = "SELECT MAX(ror.updated_at) FROM `review_of_reviews` ror, review_of_review_mappings m1, review_mappings r WHERE m1.review_mapping_id = r.id AND r.reviewer_id = #{self.user_id} AND r.assignment_id = #{self.parent_id} AND ror.review_of_review_mapping_id = m1.id AND m1.review_reviewer_id = m.review_reviewer_id GROUP BY m1.review_reviewer_id"
-    outer = "SELECT ror.* FROM `review_of_reviews` ror, review_of_review_mappings m, review_mappings r WHERE m.review_mapping_id = r.id AND r.reviewer_id = #{self.user_id} AND r.assignment_id = #{self.parent_id} AND ror.review_of_review_mapping_id = m.id AND ror.updated_at = ("+inner+")"
-    reviews = ReviewOfReview.find_by_sql(outer)
-    return reviews.sort {|a,b| a.review_of_review_mapping.reviewer.fullname <=> b.review_of_review_mapping.reviewer.fullname }      
+    reviews = ReviewOfReview.find(:all, :include => :mapping, :conditions => ['reviewee_id = ?',self.id])
+    return reviews.sort {|a,b| a.mapping.reviewer.fullname <=> b.mapping.reviewer.fullname }      
   end
   
   def get_teammate_reviews   
@@ -146,6 +127,10 @@ class AssignmentParticipant < Participant
        return Array.new
     end
   end    
+  
+  def name
+    self.user.name
+  end
     
   def team
        AssignmentTeam.get_team(self)  
@@ -194,7 +179,7 @@ class AssignmentParticipant < Participant
     if assignment.team_assignment
       return self.team.compute_review_scores(questionnaire, questions)
     else
-      reviews = Review.find_by_sql("select * from reviews where review_mapping_id in (select id from review_mappings where author_id = #{self.user_id} and assignment_id = #{self.parent_id})")
+      reviews = self.get_reviews
       if reviews.length > 0
         avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews, questionnaire)
         return avg_review_score.to_f, max_score, min_score
@@ -270,20 +255,43 @@ class AssignmentParticipant < Participant
     end
     if (find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, id]}).size == 0)
           newpart = AssignmentParticipant.create(:user_id => user.id, :parent_id => id)
-          newpart.set_handle(user)
+          newpart.set_handle()
     end             
   end  
   
+  # provide export functionality for Assignment Participants
+  def self.export(csv,parent_id)
+     find_all_by_parent_id(parent_id).each{
+          |part|
+          user = User.find(part.user_id)
+          csv << [
+            user.name,
+            user.fullname,          
+            user.email,
+            user.role.name,
+            user.parent.name,
+            user.email_on_submission,
+            user.email_on_review,
+            user.email_on_review_of_review,
+            part.handle
+          ]
+      } 
+  end
+  
+  def self.get_export_fields
+    fields = ["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"]
+    return fields            
+  end
+  
   #define a handle for a new participant
-  # user - The user to which this participant is associated
-  def set_handle(user)
-    if user.handle == nil or user.handle == ""
-      self.handle = user.name
+  def set_handle()
+    if self.user.handle == nil or self.user.handle == ""
+      self.handle = self.user.name
     else
-      if AssignmentParticipant.find_all_by_parent_id_and_handle(self.assignment.id, user.handle).length > 0
-        self.handle = user.name
+      if AssignmentParticipant.find_all_by_parent_id_and_handle(self.assignment.id, self.user.handle).length > 0
+        self.handle = self.user.name
       else
-        self.handle = user.handle
+        self.handle = self.user.handle
       end
     end  
     self.save!

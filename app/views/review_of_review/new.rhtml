@@ -1,16 +1,8 @@
-<h1>New review of review</h1>
-
-<%= render :partial => 'review/submitted_content' %>
-<%= @review.display_as_html %>
-<BR/><BR/>
-
-<%= start_form_tag :action => 'create_review_of_review' %>
-	<%= render :partial => 'review_of_review' %>
-    <%= hidden_field_tag('id', @ror_mapping.id) %>
-  	<%= submit_tag "Create review of review", :name=>"save" %>   	
+<h1>New Metareview for <%= @mapping.assignment.name %></h1>
+<%= start_form_tag :action => 'create', :id => @mapping.id %>
+<%= render :partial => 'metareview' %>
+<br/>
+<%= submit_tag "Save Metareview", :name=>"save" %>   
 <%= end_form_tag %>
-<br />
-
-<%= link_to 'Back', :controller=>'review', :action => 'list_reviews', :id => @assignment.id %>
-
-
+<br/>
+<a href="javascript:window.history.back()">Back</a>

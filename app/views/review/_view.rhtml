@@ -1,21 +1,12 @@
 <%= render :partial => 'submitted_content', :locals => {:stage => nil} %>
 <br/>
-<%= @review.display_as_html() %>
-<%
-review_feedback = ReviewFeedback.find(:first,:conditions =>["review_id = ? and assignment_id = ?", @review.id, @assignment.id])
-if(review_feedback) %>
+<%= @review.display_as_html() %><BR/><BR/><BR/>
+<% map = FeedbackMapping.find_by_reviewed_object_id(@review.id)
+   if map
+   		review_feedback = ReviewFeedback.find_by_mapping_id(map.id)
+   	    if review_feedback  %>	     
+   		  <%= review_feedback.display_as_html() %><BR/><BR/>
+   		<% end %>
+   <% end %>
 
-<a href="#2" onClick="toggleVis('2');">
-	<p class="inline" id="2_show">View author feedback</p>
-	<p class="inline" id="2_hide" style="display: none">Hide author feedback</p>
-</a>
-
-<br/>
-<% @review_scores1 = Score.find(:all,:conditions =>["instance_id =? AND questionnaire_type_id = ?", review_feedback.id, QuestionnaireType.find_by_name("Author Feedback").id])
-%>		     
-<div id="2_myDiv" style="display:none">
-<%= review_feedback.display_as_html() %>
-</div>
-<br/>
-<% end%>
 

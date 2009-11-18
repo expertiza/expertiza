@@ -1,0 +1,20 @@
+<table cellspacing="5">
+<% review_no = 1%>
+<% @review_mappings.each{
+     | map | 
+     review = Review.find_by_mapping_id(map.id) %>  
+     <tr><td><%= @assignment.name %> Review <%= review_no %></td>
+     <% if review %>            
+       <td><%= link_to "View",{:controller => 'review', :action => 'view_review', :id => review.id} %></td>
+       <% if @assignment.get_current_stage != "Complete" %>
+       <td><%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => review.id} %></td>
+       <% end %>
+     <% elsif @assignment.get_current_stage != "Complete" %>
+       <td><%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => map.id, :assignment => @assignment.id} %></td>
+  	 <% else %>
+  	   Begin
+     <% end %>       
+     </tr>  
+     <% review_no += 1 %>
+<% } %>
+</table>

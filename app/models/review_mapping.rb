@@ -1,68 +1,40 @@
 class ReviewMapping < ActiveRecord::Base
-  belongs_to :assignment
-  belongs_to :author, :class_name => "User", :foreign_key => "author_id"
-  belongs_to :team, :class_name => "Team", :foreign_key => "team_id"
-  belongs_to :reviewer, :class_name => "User", :foreign_key => "reviewer_id"
-  has_many :reviews
-  has_many :review_of_review_mappings 
-    
-  def reviewee
-    if self.assignment.team_assignment
-      return team
-    else
-      return author
+  belongs_to :assignment, :class_name => "Assignment", :foreign_key => "reviewed_object_id" 
+  belongs_to :reviewer, :class_name => "Participant", :foreign_key => "reviewer_id"
+  has_one :review, :class_name => "Review", :foreign_key => "mapping_id" 
+  has_many :review_of_review_mappings, :class_name => "ReviewOfReviewMapping", :foreign_key => "reviewed_object_id"
+   
+  def delete(force = nil)
+    if self.review != nil and !force
+      raise "A review exists for this mapping."
+    elsif self.review != nil
+      self.review.delete
     end
-  end
     
-  def delete
-    review = Review.find(:all, :conditions => ['review_mapping_id = ?',self.id])    
-    if review.length > 0
-      if review.length == 1
-        msg = "One review has already been performed"
-      else
-        msg = "#{review.length} reviews have already been performed"
-      end
-      raise msg + " by \""+self.reviewer.name+"\" for \""+self.reviewee.name+"\"."     
-    end  
-    mappings = ReviewOfReviewMapping.find(:all, :conditions => ['review_mapping_id = ?',self.id])
-    mappings.each { |mapping| mapping.delete  }
+    rmappings = self.review_of_review_mappings
+    rmappings.each{
+      |rmapping|
+      rmapping.delete(force)
+    }
     self.destroy
-  end
-    
-  def self.get_mappings(assignment_id)    
-    return ReviewMapping.find_all_by_assignment_id(assignment_id)
   end    
-    
-  def self.get_mappings(assignment_id,contributor_id)
-    assignment = Assignment.find(assignment_id)
-    if assignment.team_assignment
-      query = 'team_id = ? and assignment_id = ?'      
-    else
-      query = 'author_id = ? and assignment_id = ?'
-#      assign_reviewers_of_review(assignment_id, num_review_of_reviews)
-    end
-    return ReviewMapping.find(:all, :conditions => [query,contributor_id,assignment_id])
-  end
   
+  # Removed round information until fully implemented
   def self.assign_reviewers(assignment_id, num_reviews, num_review_of_reviews, mapping_strategy)  
       assignment = Assignment.find_by_id(assignment_id)
-      round = max_review_round_allowed(assignment_id) 
-      for round_num in 1..round
-        if (!assignment.team_assignment)        
-          assign_individual_reviewer(assignment_id, num_reviews, round_num) 
-        else
-          assign_reviewers_for_team(assignment_id, num_reviews, round_num)
+      #round = max_review_round_allowed(assignment_id) 
+      #for round_num in 1..round
+      #  puts "**************"
+      #  puts round_num
+      #  puts "**************"
+        if (assignment.team_assignment)      
+          #assign_reviewers_for_team(assignment_id, num_reviews, round_num)
+          assign_reviewers_for_team(assignment_id, num_reviews, 1)
+        else          
+          #assign_individual_reviewer(assignment_id, num_reviews, round_num) 
+          assign_individual_reviewer(assignment_id, num_reviews, 1) 
         end
-      end   
-  end
-  
-  def get_creator_id
-    assignment = Assignment.find(self.assignment_id)
-    if assignment.team_assignment
-      return team_id
-    else
-      return author_id
-    end
+      #end   
   end
   
   def self.import(row,session,id)    
@@ -72,54 +44,62 @@ class ReviewMapping < ActiveRecord::Base
     
     assignment = Assignment.find(id)
     if assignment == nil
-      raise ImportError, "The assignment with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+      raise ImportError, "The assignment with id \"#{id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
     index = 1
     while index < row.length
-      reviewer = User.find_by_name(row[index].to_s.strip)  
+      user = User.find_by_name(row[index].to_s.strip)      
+      if user == nil
+        raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
+      end
+      reviewer = AssignmentParticipant.find_by_user_id(user.id)
       if reviewer == nil
-        raise ImportError, "The reviewer \""+row[index].to_s+"\" was not found. <a href='/users/new'>Create</a> this user?"
-      end
-          
-      mapping = ReviewMapping.new
+        raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
+      end           
       if assignment.team_assignment
-         author = AssignmentTeam.find(:first, :conditions => ['name = ? and parent_id = ?',row[0].to_s.strip, assignment.id])
-         if author == nil
-           raise ImportError, "The author \""+row[0].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"                   
+         reviewee = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, assignment.id)
+         if reviewee == nil
+           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"                   
          end
-         existing = ReviewMapping.find(:all, :conditions => ['assignment_id = ? and team_id = ? and reviewer_id = ?',assignment.id, author.id, reviewer.id])
-         mapping.team_id = author.id
+         existing = TeamReviewMapping.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',reviewee.id, reviewer.id]) 
+         if existing.nil?
+           TeamReviewMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
+         end
       else
-         author = User.find_by_name(row[0].to_s.strip)
-         if author == nil
-           raise ImportError, "The author \""+row[0].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"                   
+         puser = User.find_by_name(row[0].to_s.strip)
+         if user == nil
+           raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
+         end
+         reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(puser.id, assignment.id)
+         if reviewee == nil
+           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"                   
          end  
-         existing = ReviewMapping.find(:all, :conditions => ['assignment_id = ? and author_id = ? and reviewer_id = ?',assignment.id, author.id, reviewer.id])         
-         mapping.author_id = author.id
-      end
-      mapping.reviewer_id = reviewer.id
-      mapping.assignment_id = assignment.id
-      if existing.size == 0
-        mapping.save
+         existing = ParticipantReviewMapping.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',reviewee.id, reviewer.id])
+         if existing.nil?
+           ParticipantReviewMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
+         end         
       end
       index += 1
     end 
   end  
   
-  #return an array of authors for this mapping
-  #ajbudlon, sept 07, 2007  
-  def get_author_ids
-    author_ids = Array.new
-    if (self.team_id)
-      team_users = TeamsUser.find_by_sql("select * from teams_users where team_id = " + self.team_id.to_s)
-      for member in team_users
-        author_id << member.user_id
-      end
-    else
-      author_ids << self.author_id
-    end
-    return author_ids
+  # provide export functionality for Review Mappings
+  def self.export(csv,parent_id)
+    mappings = find(:all, :conditions => ['reviewed_object_id=?',parent_id])
+    mappings.sort!{|a,b| a.reviewee.name <=> b.reviewee.name} 
+    mappings.each{
+          |map|          
+          csv << [
+            map.reviewee.name,
+            map.reviewer.name
+          ]
+      } 
   end
+  
+  def self.get_export_fields
+    fields = ["contributor","reviewed by"]
+    return fields            
+  end  
   
   private
   class CellDescriptor
@@ -135,7 +115,7 @@ class ReviewMapping < ActiveRecord::Base
     @r = num_reviews # indicates the num of reviews to be done
     @teams = Team.find(:all, :conditions=>['parent_id = ?', assignment_id])
     @t = @teams.size if @teams != nil # indicates the num of teams
-    @students = TeamsUser.find(:all, :conditions => ['team_id in (select id from teams where parent_id= ?)', assignment_id])
+    @students = AssignmentParticipant.find_all_by_parent_id(assignment_id)
     @n = @students.size if @students != nil # indicates the num of students participating in the assignment
     @team_review = Array.new(@n).map!{ Array.new(@t)} 
     populate_review_matrix() # the matrix that maps reviewers and teams
@@ -204,8 +184,7 @@ class ReviewMapping < ActiveRecord::Base
         end
       end
     end
-    save_mapping(assignment_id, round_num)
-    print_matrix()
+    save_mapping(assignment_id, round_num)    
   end
   
   def assign_reviewers_of_review (assignment_id, num_review_of_reviews)
@@ -218,7 +197,7 @@ class ReviewMapping < ActiveRecord::Base
     for student in @students do
       for team in @teams do
         if (@team_review[i][j] == 1)
-          ReviewMapping.create(:reviewer_id => student.user_id, :assignment_id => assignment_id, :team_id=>team.id, :round => round_num)     
+          TeamReviewMapping.create(:reviewer_id => student.id, :reviewed_object_id => assignment_id, :reviewee_id =>team.id)     
         end
         j += 1  
       end
@@ -245,27 +224,21 @@ class ReviewMapping < ActiveRecord::Base
     i = 0
     j = 0
     for student in @students do
-      for team in @teams do
-        if (student.team_id == team.id)
-          @team_review[i][j] = 0;   
-        else
-          @team_review[i][j] = -1;
+      if student.team != nil    
+        for team in @teams do
+          if (student.team.id == team.id)
+            @team_review[i][j] = 0;   
+          else
+            @team_review[i][j] = -1;
+          end
+          j += 1  
         end
-        j += 1  
+        j = 0
+        i += 1
       end
-      j = 0
-      i += 1
-    end
-    
+    end    
   end
   
-  def self.print_matrix()
-    for i in 0..@n-1 do
-      for j in 0..@t-1 do
-        logger.info " Initial @@@@@@@!!!!!!!!!!!!)))))))))))) team_review["+i.to_s+"]["+j.to_s+"] = "+@team_review[i][j].to_s
-      end
-    end
-  end
   
   def self.populate_supporting_matrices ()
     # populating first row wise
@@ -287,15 +260,7 @@ class ReviewMapping < ActiveRecord::Base
           @columns_ones[j] += 1
         end
       end
-    end
-    for i in 0..@n-1 do
-      logger.info "@@@@@@@!!!!!!!!!!!!%%%%%%%%%%%%% ROWS_zeros["+i.to_s+"] = "+@rows_zeros[i].to_s
-      logger.info "@@@@@@@!!!!!!!!!!!!%%%%%%%%%%%%% ROWS_ones["+i.to_s+"] = "+@rows_ones[i].to_s
-    end
-    for i in 0..@t-1 do
-      logger.info "@@@@@@@!!!!!!!!!!!!%%%%%%%%%%%%% COLUMNS_zeros["+i.to_s+"] = "+@columns_zeros[i].to_s
-      logger.info "@@@@@@@!!!!!!!!!!!!%%%%%%%%%%%%% COLUMNS_ones["+i.to_s+"] = "+@columns_ones[i].to_s
-    end
+    end    
   end
   
   def self.assign_individual_reviewer (assignment_id,num_reviews, round_num)
@@ -310,7 +275,7 @@ class ReviewMapping < ActiveRecord::Base
       current_author_candidate = current_reviewer_candidate
       for j in 0 .. (reviewers.size * num_reviews / authors.size) - 1  # This method potentially assigns authors different #s of reviews, if limit is non-integer
         current_author_candidate = (current_author_candidate + stride) % authors.size   
-        ReviewMapping.create(:author_id => authors[current_author_candidate].user_id, :reviewer_id => reviewers[i].user_id, :assignment_id => assignment_id, :round => round_num)
+        ParticipantReviewMapping.create(:reviewee_id => authors[current_author_candidate].id, :reviewer_id => reviewers[i].id, :reviewed_object_id => assignment_id)
       end
     end
   end
@@ -338,10 +303,7 @@ class ReviewMapping < ActiveRecord::Base
       @num_max = @t
     else
       @max = @min+1
-    end
-    logger.info "####%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@ num_max = "+@num_max.to_s
-    logger.info "####%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@ max = "+@max.to_s
-    logger.info "####%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@ min = "+@min.to_s
+    end    
   end
   def self.num_of_other_cols_with_max_num_of_ones (j)
     count = 0
@@ -389,8 +351,6 @@ class ReviewMapping < ActiveRecord::Base
     # returns -1 if # of '1's in row i is more than enough
     # returns 0 otherwise
     toggle_val = (@t-@r)
-    logger.info "hererererererer @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ row_enough_zeros t-r = "+toggle_val.to_s
-    logger.info "hererererererer @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ row_enough_zeros i of row_zeros = "+@rows_zeros[i].to_s
     if (@rows_zeros[i] == toggle_val)
       return 1
     elsif (@rows_zeros[i] > toggle_val)

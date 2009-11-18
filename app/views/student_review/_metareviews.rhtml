@@ -1,0 +1,20 @@
+<table cellspacing="5">
+<% review_no = 1%>
+<% @metareview_mappings.each{
+     | map | 
+     review = ReviewOfReview.find_by_mapping_id(map.id) %>  
+     <tr><td><%= @assignment.name %> Metareview <%= review_no %></td>
+     <% if review %>            
+       <td><%= link_to "View",{:controller => 'review_of_review', :action => 'view', :id => review.id} %></td>
+       <% if @assignment.get_current_stage != "Complete" %>
+       <td><%= link_to "Edit",{:controller => 'review_of_review', :action => 'edit', :id => review.id} %></td>
+       <% end %>
+     <% elsif @assignment.get_current_stage != "Complete" %>
+       <td><%= link_to "Begin",{:controller => 'review_of_review', :action => 'new', :id => map.id} %></td>
+  	 <% else %>
+  	   Begin
+     <% end %>       
+     </tr>  
+     <% review_no += 1 %>
+<% } %>
+</table>

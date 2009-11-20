@@ -74,7 +74,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
   def self.delete(mapping, reason)
     puts reason
     begin
-      mapping.delete
+      mapping.delete(true)
     rescue
       puts $!
     end

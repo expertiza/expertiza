@@ -45,9 +45,9 @@ class StandardizeReviewMappings < ActiveRecord::Migration
             end
             delete(mapping, reason)
           else
-            mapping.update_attribute('type',type)
             mapping.update_attribute('reviewee_id', reviewee.id)
             mapping.update_attribute('reviewer_id', reviewer.id)
+            mapping.update_attribute('type',type)
           end
        end
     }      
@@ -62,7 +62,12 @@ class StandardizeReviewMappings < ActiveRecord::Migration
              
     execute "ALTER TABLE `review_mappings` 
              ADD CONSTRAINT `fk_review_mappings_assignments`
-             FOREIGN KEY (reviewed_object_id) references assignments(id)"             
+             FOREIGN KEY (reviewed_object_id) references assignments(id)"  
+             
+
+    execute "ALTER TABLE `reviews` 
+             ADD CONSTRAINT `fk_review_review_mapping`
+             FOREIGN KEY (mapping_id) references review_mappings(id)"             
     
   end
   

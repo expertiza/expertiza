@@ -10,10 +10,7 @@ class StandardizeReviews < ActiveRecord::Migration
              DROP INDEX `fk_review_mappings`"  
              
     rename_column :reviews, :review_mapping_id, :mapping_id
-    
-    execute "ALTER TABLE `reviews` 
-             ADD CONSTRAINT `fk_review_review_mapping`
-             FOREIGN KEY (mapping_id) references review_mappings(id)"    
+        
   end
 
   def self.down

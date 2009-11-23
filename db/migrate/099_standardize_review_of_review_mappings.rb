@@ -1,10 +1,18 @@
 class StandardizeReviewOfReviewMappings < ActiveRecord::Migration  
   def self.up
 
-    execute "ALTER TABLE `review_of_review_mappings` 
-             DROP FOREIGN KEY `fk_review_of_review_mapping_review_mappings`"             
-    execute "ALTER TABLE `review_of_review_mappings` 
-             DROP INDEX `fk_review_of_review_mapping_review_mappings`"    
+    begin
+       execute "ALTER TABLE `review_of_review_mappings` 
+                DROP FOREIGN KEY `fk_review_of_review_mapping_review_mappings`"
+    rescue
+    end
+  
+    begin
+      execute "ALTER TABLE `review_of_review_mappings` 
+               DROP INDEX `fk_review_of_review_mapping_review_mappings`"
+    rescue
+    end
+                         
     
     add_column :review_of_review_mappings, :reviewee_id, :integer, :null => false
     rename_column :review_of_review_mappings, :review_mapping_id, :reviewed_object_id

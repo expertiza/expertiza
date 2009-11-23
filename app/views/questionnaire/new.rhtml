@@ -1,0 +1,12 @@
+<%= render :partial => 'scripts' %>
+<h1>New <%= @questionnaire.display_type %></h1>
+<%= start_form_tag :action => 'create_questionnaire' %>
+  	<%= render :partial => 'questionnaire' %>
+  	<%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
+    <script>
+      for (var x = 1; x <= 5; x++) {addQuestions();}
+    </script>
+<%= end_form_tag %>
+<br />
+<a href="javascript:window.history.back()">Back</a>
+

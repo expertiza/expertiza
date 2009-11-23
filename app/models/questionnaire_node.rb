@@ -1,44 +1,35 @@
 class QuestionnaireNode < Node 
+  belongs_to :questionnaire, :class_name => "Questionnaire", :foreign_key => "node_object_id"
+  
   def self.table
     "questionnaires"
   end
   
-  def self.get(sortvar = nil,sortorder = nil, user_id = nil,show = nil,parent_id = nil)    
-    query = "select nodes.* from nodes, "+self.table
-    query = query+" where nodes.node_object_id = "+self.table+".id"
-    query = query+" and nodes.type = '"+self.to_s+"'"
-    if show 
-      if User.find(user_id).role_id != 6 # if not teaching assistant
-        # in an TA we have to get all the questionnaires of my instructor who is registered
-        # for a course
-        query = query+" and "+self.table+".instructor_id = "+user_id.to_s
-      else
-        query = query+" and "+self.table+".instructor_id = "+Ta.get_my_instructor(user_id).to_s
-      end
+  def self.get(sortvar = nil,sortorder = nil, user_id = nil,show = nil,parent_id = nil)
+    if show
+      conditions = 'questionnaires.instructor_id = ?'
     else
-       if User.find(user_id).role_id != 6 # if not teaching assistant
-        # in an TA we have to get all the questionnaires of my instructor who is registered
-        # for a course
-        query = query+" and ("+self.table+".private = 0 or "+self.table+".instructor_id = "+user_id.to_s+")"
-      else
-        query = query+" and ("+self.table+".private = 0 or "+self.table+".instructor_id = "+Ta.get_my_instructor(user_id).to_s+")"
-      end
-      
-    end   
-    
+      conditions = '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+    end
+        
     if parent_id
-      query = query+ " and "+self.table+".type_id = "+parent_id.to_s
+      name = TreeFolder.find(parent_id).name+"Questionnaire"
+      name.gsub!(/[^\w]/,'')
+      conditions +=  " and questionnaires.type = \"#{name}\""
     end  
-    if sortvar        
-      if sortvar == 'directory_path'
-        sortvar = 'name'
-      end
-      query = query+" order by "+self.table+"."+sortvar      
-      if sortorder
-        query = query+" "+sortorder
-      end
-    end  
-    find_by_sql(query)
+    
+    if sortvar.nil? or sortvar == 'directory_path'
+      sortvar = 'name'
+    end
+    if sortorder.nil?
+      sortorder = 'ASC'
+    end               
+    
+    if User.find(user_id).role.name != "Teaching Assistant"  
+      find(:all, :include => :questionnaire, :conditions => [conditions, user_id], :order => "questionnaires.#{sortvar} #{sortorder}")
+    else
+      find(:all, :include => :questionnaire, :conditions => [conditions, Ta.get_my_instructor(user_id)], :order => "questionnaires.#{sortvar} #{sortorder}")
+    end
   end 
   
   def get_name

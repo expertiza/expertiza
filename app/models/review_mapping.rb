@@ -24,9 +24,7 @@ class ReviewMapping < ActiveRecord::Base
       assignment = Assignment.find_by_id(assignment_id)
       #round = max_review_round_allowed(assignment_id) 
       #for round_num in 1..round
-      #  puts "**************"
-      #  puts round_num
-      #  puts "**************"
+      
         if (assignment.team_assignment)      
           #assign_reviewers_for_team(assignment_id, num_reviews, round_num)
           assign_reviewers_for_team(assignment_id, num_reviews, 1)

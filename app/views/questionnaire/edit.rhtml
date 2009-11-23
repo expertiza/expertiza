@@ -1,12 +1,11 @@
-<% @q_type=QuestionnaireType.find(Questionnaire.find(params[:id]).type_id).name %>
-
-<h1>Edit an existing <%= @q_type.downcase %></h1>
+<%= render :partial => 'scripts' %>
+<h1>Edit <%= @questionnaire.display_type %></h1>
 
 
 <%= form_tag({:action=>'edit', :id=>@questionnaire.id}, :multipart => true)%>
 	<%= render :partial => 'questionnaire' %>
 	
-	<%= submit_tag "Save "+@q_type, :name=>"save" %>
+	<%= submit_tag "Save #{@questionnaire.display_type.downcase}", :name=>"save" %>
     <input style="margin-left:36em" type="submit" name="view_advice" value="View advice"/>	
 
   	<h4>Import/Export (from/to CSV format)</h4>

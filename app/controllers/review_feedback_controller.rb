@@ -5,8 +5,8 @@ class ReviewFeedbackController < ApplicationController
          
   def new
     @review = Review.find(params[:id]) 
-    reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @review.review_mapping.assignment.id)
-    reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(@review.review_mapping.reviewer.id, @review.review_mapping.assignment.id)
+    reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @review.mapping.assignment.id)
+    reviewee = @review.mapping.reviewer
     @mapping = FeedbackMapping.create(:reviewed_object_id => @review.id, :reviewer_id => reviewer.id, :reviewee_id => reviewee.id)
     @questionnaire = Questionnaire.find(@mapping.assignment.author_feedback_questionnaire_id)
     @questions = @questionnaire.questions
@@ -21,13 +21,12 @@ class ReviewFeedbackController < ApplicationController
     questions = @questionnaire.questions     
     
     params[:responses].each_pair do |k,v|
-      score = Score.create(:instance_id => @response.id, :question_id => questions[k.to_i].id,
-                           :questionnaire_type_id => @questionnaire.type_id, :score => v[:score], :comments => v[:comment])
+      score = Score.create(:instance_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
     end      
     
     compare_scores
     flash[:note] = 'Feedback was successfully saved.'
-    redirect_to :controller => 'student_assignment', :action => 'view_scores', :id => map.reviewer.id
+    redirect_to :controller => 'student_task', :action => 'view_scores', :id => map.reviewer.id
   end
   
   def view    
@@ -41,7 +40,11 @@ class ReviewFeedbackController < ApplicationController
     @mapping = @response.mapping
     @questionnaire = Questionnaire.find(@response.mapping.assignment.author_feedback_questionnaire_id)
     @questions = @questionnaire.questions
-    @review_scores = Score.find_all_by_instance_id_and_questionnaire_type_id(@response.id, @questionnaire.type_id)
+    @review_scores = Array.new
+    @questions.each{
+      | question |
+      @review_scores << Score.find_by_instance_id_and_question_id(@response.id, question.id)    
+    }
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score    
   end 
@@ -56,7 +59,7 @@ class ReviewFeedbackController < ApplicationController
     questions = @questionnaire.questions
 
     params[:responses].each_pair do |k,v|
-      score = Score.find_by_instance_id_and_question_id_and_questionnaire_type_id(@response.id, questions[k.to_i].id, @questionnaire.type_id)
+      score = Score.find_by_instance_id_and_question_id(@response.id, questions[k.to_i].id)
       score.score = v[:score]
       score.comments = v[:comment]
       score.save
@@ -66,7 +69,7 @@ class ReviewFeedbackController < ApplicationController
     #notification limits      
     compare_scores
     
-    redirect_to :controller => 'student_assignment', :action => 'view_scores', :id => map.reviewer.id
+    redirect_to :controller => 'student_task', :action => 'view_scores', :id => map.reviewer.id
   end
   
   # Compute the currently awarded scores for the reviewee

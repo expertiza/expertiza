@@ -1,4 +1,4 @@
-<%= render :partial => 'submitted_content', :locals => {:stage => nil} %>
+<%= render :partial => 'submitted_content/main', :locals => {:stage => nil} %>
 <br/>
 <%= @review.display_as_html() %><BR/><BR/><BR/>
 <% map = FeedbackMapping.find_by_reviewed_object_id(@review.id)

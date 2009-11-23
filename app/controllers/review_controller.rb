@@ -24,12 +24,20 @@ class ReviewController < ApplicationController
   
   def self.show_review(id)   
     @review = Review.find(id)
-    @review_scores = Score.find(:all, :conditions=>["instance_id=? and questionnaire_type_id=?",@review.id, QuestionnaireType.find_by_name("Review").id])
     @mapping = @review.mapping
     @assgt = @mapping.assignment
+
+    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)    
+    @questions = @questionnaire.questions
+    
+    @review_scores = Array.new
+    @questions.each{
+      | question |
+      @review_scores << Score.find_by_instance_id_and_question_id(@review.id,question.id)
+    }
+    
     @author = @mapping.reviewee
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
-    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
+
     if @assgt.team_assignment 
       @team_members = @mapping.reviewee.get_participants 
       #use @author.handle to spider by participant handle
@@ -54,10 +62,7 @@ class ReviewController < ApplicationController
     @links,@review,@mapping_id,@review_scores,@mapping,@assignment,@participant,@questions,@questionnaire,@author_first_user_id,@team_members,@author_name,@max,@min,@files,@direc = ReviewController.show_review(params[:id])
     
     @review_id=params[:id]
-    
-    # determine whether the rubric is a review rubric  
-    @review_scores1 = Score.find(:all,:conditions =>["instance_id =? AND questionnaire_type_id = ?", @review_id, QuestionnaireType.find_by_name("Review").id])
-    
+       
     current_folder = DisplayOption.new
     current_folder.name = "/"
     @files = Array.new
@@ -110,13 +115,10 @@ class ReviewController < ApplicationController
       # that should be saved to the database
       for review_key in params[:new_review_score].keys
         question_id = params[:new_question][review_key]
-        rs = Score.find(:first,:conditions => ["instance_id = ? AND question_id = ?", @review.id, question_id])
+        rs = Score.find_by_instance_id_and_question_id(@review.id, question_id)
         rs.comments = params[:new_review_score][review_key][:comments]
         rs.score = params[:new_score][review_key]
-        ## feedback added
-        # determine whether the rubric is a review rubric
-        rs.questionnaire_type_id = QuestionnaireType.find_by_name("Review").id
-        ##
+        ## feedback added                
         rs.update
       end      
     end
@@ -137,36 +139,10 @@ class ReviewController < ApplicationController
     
   end
   
-  def new_review
-    
+  def new_review    
     @review = Review.new
     @mapping_id = params[:id]
-    # code  for dynamic reviewer mapping has been commented out because code for it has not been implemented
     @mapping = ReviewMapping.find(params[:id])
-#    @mapping = 
-#    begin 
-#      ReviewMapping.find(params[:id])
-#    rescue ActiveRecord::RecordNotFound
-#      nil    
-#    end    
-#    # if we did'nt find the mapping, we must be doing dynamic reviewer assignment
-#    if (@mapping == nil)    
-#      
-#      @assignment = Assignment.find(params[:assignment])
-#      if (@assignment.team_assignment)
-#        rm = TeamReviewMappingManager.new
-#      else
-#        rm = IndividualReviewMappingManager.new
-#      end
-#      @mapping = rm.generateReviewMapping(@assignment, session[:user].id)
-#      if (@mapping == nil)
-#        flash[:notice] = 'There are no submissions available for review available at this time. Please check back later.'
-#        redirect_to :action => 'list_reviews', :id => @assignment.id 
-#        return
-#      end   
-#      # record the timeout value in the session so we can verify that we still own this mapping when we submit it
-#      session[:review_timeout] = @mapping.timeout.to_s()
-#    end 
     
     @assignment = @mapping.assignment
     @questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
@@ -247,9 +223,6 @@ class ReviewController < ApplicationController
           rs.question_id = params[:new_question][review_key]
           rs.score = params[:new_score][review_key]
           ## feed back added
-          # determine whether the rubric is a review rubric
-          rs.questionnaire_type_id = QuestionnaireType.find_by_name("Review").id
-          ##
           rs.save
         end      
       end       

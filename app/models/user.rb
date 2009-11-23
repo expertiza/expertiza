@@ -3,7 +3,6 @@ require 'digest/sha1'
 class User < ActiveRecord::Base
   has_many :participants
   has_many :assignments, :through => :participants
-  belongs_to :parent, :class_name => "User", :foreign_key => "parent_id"
   validates_presence_of :name
   validates_uniqueness_of :name
 
@@ -118,5 +117,17 @@ class User < ActiveRecord::Base
          end
       end
       return user     
-  end    
+  end 
+  
+  def set_instructor (new_assign)  
+    new_assign.instructor_id = self.id  
+  end
+  
+  def get_instructor
+    self.id
+  end
+  
+  def set_courses_to_assignment 
+    @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')    
+  end
 end

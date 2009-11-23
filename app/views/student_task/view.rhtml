@@ -12,10 +12,6 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 		</li>
 	<%end%>	
 	<li>
-	    <% puts "*****************************"
-	       puts @assignment.submission_allowed
-	       puts @assignment.submission_allowed == true
-	       puts "*****************************" %>
 	    <% if @assignment.submission_allowed == true %>
 	    	<%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>
 	    <% else %>

@@ -1,4 +1,4 @@
-<h1><%= @questionnaire.questionnaire_type.name %>: <%= @questionnaire.name %></h1>
+<h1><%= @questionnaire.display_type %>: <%= @questionnaire.name %></h1>
 <BR/>
 <B>Created by:</B> <%= link_to @questionnaire.instructor.name,"mailto:"+@questionnaire.instructor.email %><BR/>
 <B>Created at:</B> <%= @questionnaire.created_at %><BR/>

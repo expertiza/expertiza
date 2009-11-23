@@ -1,21 +1,34 @@
-class QuestionnaireTypeNode < Node  
+class QuestionnaireTypeNode < FolderNode  
+  belongs_to :table, :class_name => "TreeFolder", :foreign_key => "node_object_id"
+  
   def self.table
-    "questionnaire_types"
+    "tree_folders"
   end
   
-  def self.get(sortvar = nil,sortorder = nil,user_id = nil,show=nil,parent_id = nil)    
-    query = "select nodes.* from nodes, "+self.table
-    query = query+" where nodes.node_object_id = "+self.table+".id"
-    query = query+" and nodes.type = '"+self.to_s+"'"            
-    query = query+" order by "+self.table+".name asc"
-    find_by_sql(query)
-  end
+  def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil)
+    parent = TreeFolder.find_by_name("Questionnaires")
+    folders = TreeFolder.find_all_by_parent_id(parent.id)
+    nodes = Array.new
+    folders.each{
+      | folder |
+      node = FolderNode.find_by_node_object_id(folder.id)
+      if node != nil
+        nodes << node
+      end
+    }
+    return nodes  
+  end  
   
+  def get_partial_name
+    "questionnaire_type_actions"   
+  end      
+    
   def get_name
-    QuestionnaireType.find(self.node_object_id).name    
+    TreeFolder.find(self.node_object_id).name    
   end  
   
   def get_children(sortvar = nil,sortorder = nil,user_id = nil,show=nil,parent_id = nil)
+    puts "********** TYPE NODE *********"
     QuestionnaireNode.get(sortvar,sortorder,user_id,show,self.node_object_id)
   end
 end

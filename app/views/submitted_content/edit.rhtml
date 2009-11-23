@@ -1,4 +1,3 @@
-<%= render :partials => 'scripts' %>
 <h1>Submit work for <%= @assignment.name %></h1>
     
 <% if(session[:user].master_permission_granted == nil && !@participant.permission_granted)%>
@@ -7,12 +6,7 @@
      <br/>Click <%= link_to 'always', :action =>'set_publish_master_permission_yes', :id => @participant.id%> to grant permission for <b>all</b> your work. 
      <br/>Click <%= link_to 'never', :action =>'set_publish_master_permission_no', :id => @participant.id%> to deny permission for <b>all</b> your work. </div>
 <% end %>    
-    
-
-<%= render :partial => 'review/submitted_content', :locals => {:stage => @assignment.get_current_stage} %>
-
-<form action="/student_assignment/submit/<%=params[:id] %>" enctype="multipart/form-data" method="post" onsubmit = "return checkIfFileExists(submission.value,0);">        
-Submit a Hyperlink (optional): <input type="text" name="submission" size=40/><input type="submit" name="upload_link" value="Upload link"/>     
-</form><BR/>
+<%= render :partial => 'submitted_content/main', :locals => {:stage => @assignment.get_current_stage} %>     
+<BR/>
 <BR/>
 <a href="javascript:window.history.back()">Back</a>

@@ -1,7 +1,8 @@
 <% i = 0;%>
 <%for @question in @questions %>	
-	<%=@question.txt%><br />  
-	<% @rs = Score.find(:first,:conditions => ["instance_id = ? AND question_id = ? and questionnaire_type_id=?", @review.id, @question.id, QuestionnaireType.find_by_name("Review").id])%>
+	<%=@question.txt%><br />
+    <% @rs = Score.find_by_instance_id_and_question_id(@review.id,@question.id) %>    
+	
 	<input id=new_review_score_<%=i%>_comments name=new_review_score[<%=i%>][comments] value = "<%=@rs.comments.gsub(/\"/,'&quot;')%>"  size=70 type=text />
 	<% if @question.true_false? %>
 		<select id=new_score_<%=i%> name=new_score[<%=i%>]>

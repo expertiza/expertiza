@@ -1,9 +1,4 @@
 <h1>Review for <%= @assignment.name %></h1>
 <%= render :partial => 'view' %>
 <BR/>
-<% if session[:return_to] %>
-  <%= link_to 'Back', session[:return_to] %>
-<% elsif params[:where] == nil%>
-  <%= link_to 'Back', :action => 'list_reviews', :id => @assgt.id %> 
-<%end%>
-
+<a href="javascript:window.history.back()">Back</a>

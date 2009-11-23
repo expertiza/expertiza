@@ -5,22 +5,20 @@ class Review < ActiveRecord::Base
   
   def display_as_html(prefix = nil, count = nil)
     if prefix
-       code = "<B>Reviewer:</B> "+self.mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+prefix+"_"+self.id.to_s+"','review'"+');return false;">hide review</a><BR/>'
+      identifier = "<B>Reviewer:</B> "+self.mapping.reviewer.fullname
+      str = prefix+"_"+self.id.to_s
     else
-       code = '<B>Review '+count.to_s+'</B> &nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+self.id.to_s+'Link" onClick="toggleElement('+"'review_"+self.id.to_s+"','review'"+');return false;">show review</a><BR/>'           
-    end
-    code = code + "<B>Last reviewed:</B> "
+      identifier = '<B>Review</B> '+count.to_s+'</B>'
+      str = self.id.to_s
+    end    
+    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">hide review</a><BR/>'                
+    code += "<B>Last reviewed:</B> "
     if self.updated_at.nil?
-      code = code + "Not available"
+      code += "Not available"
     else
-      code = code + self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
+      code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end
-    if prefix
-      code = code + '<div id="review_'+prefix+"_"+self.id.to_s+'" style="">'
-    else
-      code = code + '<div id="review_'+self.id.to_s+'" style="display:none">'
-    end
-    code = code + '<BR/><BR/>'
+    code += '<div id="review_'+str+'" style=""><BR/><BR/>'
     
     questionnaire = Questionnaire.find(self.mapping.assignment.review_questionnaire_id)
     questions = questionnaire.questions
@@ -36,29 +34,32 @@ class Review < ActiveRecord::Base
     count = 0
     scores.each{
       | reviewScore |
-      count = count + 1
-      code = code + "<B>Question "+count.to_s+": </B><I>"+Question.find_by_id(reviewScore.question_id).txt+"</I><BR/><BR/>"
-      code = code + '&nbsp;&nbsp;&nbsp;(<FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find_by_id(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B>): "+reviewScore.comments.gsub("<","&lt;").gsub(">","&gt;")+"<BR/><BR/>"
+      count += 1
+      code += "<B>Question "+count.to_s+": </B><I>"+Question.find_by_id(reviewScore.question_id).txt+"</I><BR/><BR/>"
+      code += '&nbsp;&nbsp;&nbsp;(<FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find_by_id(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B>): "+reviewScore.comments.gsub("<","&lt;").gsub(">","&gt;")+"<BR/><BR/>"
     }     
     if self.additional_comment != nil
       comment = self.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')
     else
       comment = ''
     end
-    code = code + "<B>Additional Comment:</B><BR/>"+comment+""
-    code = code + "</div>"
+    code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
     return code
   end 
     
   # Computes the total score awarded for a review
   def get_total_score
-    scores = Score.find(:all,:conditions=>["instance_id=? and questionnaire_type_id=?",self.id, QuestionnaireType.find_by_name("Review").id])
+    questionnaire = Questionnaire.find(self.mapping.assignment.review_questionnaire_id)
+    questions = questionnaire.questions
+    
     total_score = 0
-    scores.each{
-      |item|
-      total_score += item.score
-    }   
-    return total_score
+    
+    questions.each{
+      | question |
+      item = Score.find_by_instance_id_and_question_id(self.id, question.id)
+      total_score += item.score      
+    }    
+    return total_score        
   end
   
   def delete
@@ -150,9 +151,8 @@ class Review < ActiveRecord::Base
  #Generate an email to the instructor when a new review exceeds the allowed difference
  #ajbudlon, nov 18, 2008
  def notify_on_difference(new_pct,avg_pct,limit)
-   mapping = ReviewMapping.find(self.review_mapping_id)
+   mapping = self.mapping
    instructor = User.find(mapping.assignment.instructor_id)  
-   puts "*** in sending method ***"
    Mailer.deliver_message(
      {:recipients => instructor.email,
       :subject => "Expertiza Notification: A review score is outside the acceptable range",

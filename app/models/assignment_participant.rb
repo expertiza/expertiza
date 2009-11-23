@@ -4,6 +4,17 @@ class AssignmentParticipant < Participant
   has_many :review_mappings, :class_name => 'ParticipantReviewMapping', :foreign_key => 'reviewee_id'
   validates_presence_of :handle
 
+  def get_hyperlinks             
+    if self.team     
+      links = self.team.get_hyperlinks     
+    else        
+      links = Array.new  
+      links << self.submitted_hyperlink
+    end
+    
+    return links
+  end
+
   #Copy this participant to a course
   def copy(course_id)
     part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
@@ -91,17 +102,16 @@ class AssignmentParticipant < Participant
     return files
   end  
   
-  def get_files(directory)
+  def get_files(directory)      
       files_list = Dir[directory + "/*"]
       files = Array.new
-      for file in files_list
-        if not File.directory?(Dir.pwd + "/" + file) then
-          files << file
-        else
-          dir_files = get_files(file)
+      for file in files_list            
+        if File.directory?(file) then          
+          dir_files = get_files(file)          
           dir_files.each{|f| files << f}
         end
-      end
+        files << file               
+      end      
       return files
   end
   
@@ -112,8 +122,7 @@ class AssignmentParticipant < Participant
        submissions = Array.new
        self.team.get_participants.each {
          | user |
-         val = WikiType.review_mediawiki_group(self.assignment.directory_path, currenttime, user.handle)
-         puts val
+         val = WikiType.review_mediawiki_group(self.assignment.directory_path, currenttime, user.handle)         
          if val != nil
             submissions << val
          end                 
@@ -298,11 +307,13 @@ class AssignmentParticipant < Participant
   end  
   
   def get_path
-     path = self.assignment.get_path + "/"+ self.directory_num.to_s
-     if self.id == 1117
-        puts path
-     end
+     path = self.assignment.get_path + "/"+ self.directory_num.to_s     
      return path
+  end
+  
+  def update_resubmit_times
+    new_submit = ResubmissionTime.new(:resubmitted_at => Time.now.to_s)
+    self.resubmission_times << new_submit
   end
   
   def set_student_directory_num

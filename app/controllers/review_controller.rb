@@ -1,6 +1,8 @@
 class ReviewController < ApplicationController  
   helper :wiki
   helper :submitted_content
+  helper :file
+  
   def list
     # lists the reviews that the current user is assigned to do
     user_id = session[:user].id
@@ -282,7 +284,7 @@ class ReviewController < ApplicationController
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
-      @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
     
     if params['fname']
@@ -320,7 +322,7 @@ class ReviewController < ApplicationController
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
-      @current_folder.name = StudentAssignmentHelper::sanitize_folder(params[:current_folder][:name])
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
     
     if params['fname']

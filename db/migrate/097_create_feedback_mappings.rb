@@ -51,15 +51,30 @@ class CreateFeedbackMappings < ActiveRecord::Migration
              DROP FOREIGN KEY `fk_review_feedback_reviews`"             
     execute "ALTER TABLE `review_feedbacks` 
              DROP INDEX `fk_review_feedback_reviews`"            
+    begin
+      remove_column :review_feedbacks, :assignment_id
+    rescue
+    end
+   
+    begin
+      remove_column :review_feedbacks, :review_id
+    rescue
+    end
+  
+    begin
+      remove_column :review_feedbacks, :user_id
+    rescue
+    end
+  
+    begin
+      remove_column :review_feedbacks, :author_id
+    rescue
+    end
     
-    remove_column :review_feedbacks, :assignment_id
-    remove_column :review_feedbacks, :review_id
-    remove_column :review_feedbacks, :user_id
-    remove_column :review_feedbacks, :author_id
-    remove_column :review_feedbacks, :team_id
-
-             
-       
+    begin
+      remove_column :review_feedbacks, :team_id
+    rescue 
+    end                   
   end
   
   def self.get_reviewer(map, feedback)    

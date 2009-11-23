@@ -1,11 +1,53 @@
 class StandardizeReviewMappings < ActiveRecord::Migration
   def self.up
-    execute "ALTER TABLE `review_mappings` 
-             DROP FOREIGN KEY `fk_review_mapping_assignments`"             
-    execute "ALTER TABLE `review_mappings` 
-             DROP INDEX `fk_review_mapping_assignments`"   
-     
+    begin
+      execute "ALTER TABLE `review_mappings` 
+               DROP FOREIGN KEY `fk_review_mapping_assignments`"
+    rescue
+    end
     
+    begin
+      execute "ALTER TABLE `review_mappings` 
+               DROP INDEX `fk_review_mapping_assignments`"
+    rescue
+    end
+     
+    begin
+      execute "ALTER TABLE `review_mappings`
+               DROP FOREIGN KEY `fk_review_users_reviewer`"
+    rescue               
+    end
+  
+    begin
+      execute "ALTER TABLE `review_mappings`
+               DROP INDEX `fk_review_users_reviewer`"
+    rescue               
+    end
+ 
+    begin
+      execute "ALTER TABLE `review_mappings`
+               DROP FOREIGN KEY `fk_review_users_author`"
+    rescue               
+    end
+  
+    begin
+      execute "ALTER TABLE `review_mappings`
+               DROP INDEX `fk_review_users_author`"
+    rescue               
+    end    
+     
+    begin
+      execute "ALTER TABLE `review_mappings`
+               DROP FOREIGN KEY `fk_review_teams`"
+    rescue               
+    end
+  
+    begin
+      execute "ALTER TABLE `review_mappings`
+               DROP INDEX `fk_review_teams`"
+    rescue               
+    end        
+     
     rename_column :review_mappings, :reviewer_id, :old_reviewer_id
     add_column :review_mappings, :reviewer_id, :integer, :null => false
     add_column :review_mappings, :reviewee_id, :integer, :null => false

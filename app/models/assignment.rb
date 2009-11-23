@@ -211,7 +211,13 @@ class Assignment < ActiveRecord::Base
     rescue
       raise $!
     end
-      
+  
+      review_feedbacks = ReviewFeedback.find(:all, :conditions => ['assignment_id = ?',self.id])
+      begin
+      review_feedbacks.each{ |review| review.destroy }
+    rescue
+      raise $!
+    end            
     # The size of an empty directory is 2
     # Delete the directory if it is empty
     begin 
@@ -297,17 +303,13 @@ class Assignment < ActiveRecord::Base
   def email(author_id) 
   
     # Get all review mappings for this assignment & author
-    review_mappings = ReviewMapping.find_by_sql(
-        "select * from review_mappings where assignment_id = " + self.id.to_s + 
-        " and author_id =" + author_id.to_s
-        )   
-  
+    review_mappings = ReviewMapping.find_all_by_reviewee_id_and_reviewed_object_id(author_id, self.id)    
     for mapping in review_mappings
 
        # If the reviewer has requested an e-mail deliver a notification
        # that includes the assignment, and which item has been updated.
-       if User.find_by_id(mapping.reviewer_id).email_on_submission
-          user = User.find(mapping.reviewer_id)
+       if mapping.reviewer.user.email_on_submission
+          user = mapping.reviwer.user
           Mailer.deliver_message(
             {:recipients => user.email,
              :subject => "A new submission is available for #{self.name}",

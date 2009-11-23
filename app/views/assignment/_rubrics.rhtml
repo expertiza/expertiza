@@ -3,8 +3,7 @@
  <tr>
    <td>Review:</td>
    <td style="padding: 15px;">
-      <% type = QuestionnaireType.find_by_name('Review')
-         questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
+      <% questionnaires = ReviewQuestionnaire.find(:all).map {|u| [u.name, u.id] } %>
       <%= select('assignment', 'review_questionnaire_id', questionnaires)%>
    </td>
    <td style="padding: 15px;">
@@ -18,8 +17,7 @@
 <tr>
    <td>Metareview:</td>
    <td style="padding: 15px;">
-      <% type = QuestionnaireType.find_by_name('Metareview')
-         questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
+      <% questionnaires = MetareviewQuestionnaire.find(:all).map {|u| [u.name, u.id] } %>
       <%= select('assignment', 'review_of_review_questionnaire_id', questionnaires)%>
    </td>
    <td style="padding: 15px;">
@@ -31,8 +29,7 @@
  <tr>
    <td>Feedback:</td>
    <td style="padding: 15px;">
-      <% type = QuestionnaireType.find_by_name('Author Feedback')
-         questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
+      <% questionnaires = AuthorFeedbackQuestionnaire.find(:all).map {|u| [u.name, u.id] } %>
       <%= select('assignment', 'author_feedback_questionnaire_id', questionnaires)%>
    </td>
    <td style="padding: 15px;">
@@ -45,8 +42,7 @@
  <tr id="teammate_review" <%if !@assignment.team_assignment %>style="display:none"<% end %>>  
    <td>Teammate Review:</td>
    <td style="padding: 15px;">
-      <% type = QuestionnaireType.find_by_name('Teammate Review')
-         questionnaires = Questionnaire.find_all_by_type_id(type.id).map {|u| [u.name, u.id] } %>
+      <% questionnaires = TeammateReviewQuestionnaire.find(:all).map {|u| [u.name, u.id] } %>
       <%= select('assignment', 'teammate_review_questionnaire_id', questionnaires)%>
    </td>
    <td style="padding: 15px;">

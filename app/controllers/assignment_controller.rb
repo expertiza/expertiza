@@ -3,37 +3,20 @@ class AssignmentController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
   
-  @no_dl="1" # a value of "no" for whether an action is permitted prior to a deadline
-  @late_dl="2" # a value of "late" for whether an action is permitted prior to a deadline (it is permitted, but marked late)
-  @ok_dl="3" # a value of "OK" for whether an action is permitted prior to a deadline
-  
-  
-  def copy    
+  def copy
+    #creating a copy of an assignment; along with the dates and submission directory too
     old_assign = Assignment.find(params[:id])
     new_assign = old_assign.clone
-    if (session[:user]).role_id != 6
-      new_assign.instructor_id = session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      new_assign.instructor_id = Ta.get_my_instructor((session[:user]).id)
-      new_assign.course_id = TaMapping.get_course_id((session[:user]).id)
-    end 
-    
-    
+    @user =  ApplicationHelper::get_user_role(session[:user])
+    @user = session[:user]
+    @user.set_instructor(new_assign)
     new_assign.name = 'Copy of '+new_assign.name 
-    new_assign.created_at = new_assign.updated_at
-    if new_assign.wiki_type_id == WikiType.find_by_name("No")
-      new_assign.directory_path = ''
-    end
+    
     if new_assign.save    
-      new_assign.created_at = new_assign.updated_at
-      new_assign.save
       DueDate.copy(old_assign.id, new_assign.id)           
       new_assign.create_node()
-      if new_assign.directory_path.nil?
-        flash[:note] = 'The assignment is not currently associated with a directory location. This could cause errors for future submissions.'
-      else
-        flash[:note] = 'The assignment is currently associated with an existing location. This could cause errors for future submissions.'
-      end
+      
+      flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
       redirect_to :action => 'edit', :id => new_assign.id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
@@ -42,25 +25,19 @@ class AssignmentController < ApplicationController
   end  
   
   def new
+    #creating new assignment and setting default values using helper functions
     if params[:parent_id]
       @course = Course.find(params[:parent_id])           
     end    
+    
     @assignment = Assignment.new
+    
     @questionnaire = Questionnaire.find_all
     @wiki_types = WikiType.find_all
     @private = params[:private] == true        
-    default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',session[:user].id])
-    @limits = Hash.new
-    @limits = {:review => default.limit,
-               :metareview => default.limit,
-               :teammate => default.limit,
-               :feedback => default.limit}
-               
-    @weights = Hash.new
-    @weights = {:review => 100,
-                :metareview => 0,
-                :teammate => 0,
-                :feedback => 0}               
+    #calling the defalut values mathods
+    get_instructor_notification_limits 
+    get_weights 
   end
   
   # Toggle the access permission for this assignment from public to private, or vice versa
@@ -76,92 +53,51 @@ class AssignmentController < ApplicationController
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.    
     @assignment = Assignment.new(params[:assignment])    
-    if (session[:user]).role_id != 6
-      @assignment.instructor_id = (session[:user]).id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      @assignment.instructor_id = Ta.get_my_instructor((session[:user]).id)
-      @assignment.course_id = TaMapping.get_course_id((session[:user]).id)
-    end  
+    @user =  ApplicationHelper::get_user_role(session[:user])
+    @user = session[:user]
+    @user.set_instructor(@assignment) 
     @assignment.submitter_count = 0    
     ## feedback added
     ##
-    @duedate=DueDate.new
     
     # Deadline types used in the deadline_types DB table
-    @Submission_deadline=1;
-    @Review_deadline=2;
-    @Resubmission_deadline=3;
-    @Rereview_deadline=4;
-    @Review_of_review_deadline=5;   
+    deadline = DeadlineType.find_by_name("submission")
+    @Submission_deadline= deadline.id
+    deadline = DeadlineType.find_by_name("review")
+    @Review_deadline = deadline.id
+    deadline = DeadlineType.find_by_name("resubmission")
+    @Resubmission_deadline= deadline.id
+    deadline = DeadlineType.find_by_name("rereview")
+    @Rereview_deadline = deadline.id
+    deadline = DeadlineType.find_by_name("metareview")
+    @Review_of_review_deadline = deadline.id
     
     if @assignment.save  
       set_limits
       set_weights
-      submit_duedate=DueDate.new(params[:submit_deadline]);
-      submit_duedate.deadline_type_id=@Submission_deadline;
-      submit_duedate.assignment_id=@assignment.id;
-      # ajbudlon 5/28/2008 commented out late policy
-      #submit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];      
-      ## feedback added
-      submit_duedate.round = 1;
-      ##
-      submit_duedate.save;
       
-      review_duedate=DueDate.new(params[:review_deadline]);
-      review_duedate.deadline_type_id=@Review_deadline;
-      review_duedate.assignment_id=@assignment.id;
-      # ajbudlon 5/28/2008 commented out late policy
-      #review_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
-      ## feedback added
-      review_duedate.round = 1;
-      ##
-      review_duedate.save;
-      ## feedback added
+      max_round = 1
+      #setting the Due Dates with a helper function written in DueDate.rb
+      DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
+      DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
       max_round = 2;
-      ##
       
+     
       if params[:assignment_helper][:no_of_reviews].to_i >= 2
         for resubmit_duedate_key in params[:additional_submit_deadline].keys
-          resubmit_duedate=DueDate.new(params[:additional_submit_deadline][resubmit_duedate_key]);
-          resubmit_duedate.deadline_type_id=@Resubmission_deadline;
-          resubmit_duedate.assignment_id=@assignment.id;
-          # ajbudlon 5/28/2008 commented out late policy
-          #resubmit_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
-          ## feedback added
-          resubmit_duedate.round = max_round
+          #setting the Due Dates with a helper function written in DueDate.rb
+          DueDate::set_duedate(params[:additional_submit_deadline][resubmit_duedate_key],@Resubmission_deadline, @assignment.id, max_round )
           max_round = max_round + 1
-          ##
-          resubmit_duedate.save;
         end
-        ## feedback added
         max_round = 2
-        ##
         for rereview_duedate_key in params[:additional_review_deadline].keys
-          rereview_duedate=DueDate.new(params[:additional_review_deadline][rereview_duedate_key]);
-          rereview_duedate.deadline_type_id=@Rereview_deadline;
-          rereview_duedate.assignment_id=@assignment.id;
-          # ajbudlon 5/28/2008 commented out late policy
-          #rereview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
-          ## feedback added
-          rereview_duedate.round = max_round
+          #setting the Due Dates with a helper function written in DueDate.rb
+          DueDate::set_duedate (params[:additional_review_deadline][rereview_duedate_key],@Rereview_deadline, @assignment.id, max_round )
           max_round = max_round + 1
-          ##
-          rereview_duedate.save;
         end
-        ## feedback added
-       
-        
-      end      
-      reviewofreview_duedate=DueDate.new(params[:reviewofreview_deadline]);
-      reviewofreview_duedate.deadline_type_id=@Review_of_review_deadline;
-      reviewofreview_duedate.assignment_id=@assignment.id;
-      # ajbudlon 5/28/2008 commented out late policy
-      #reviewofreview_duedate.late_policy_id=params[:for_due_date][:late_policy_id];
-      ## feedback added
-      reviewofreview_duedate.round = max_round
-      ##
-      reviewofreview_duedate.save;        
-            
+      end
+      #setting the Due Dates with a helper function written in DueDate.rb
+      DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
       # Create submission directory for this assignment
       # If assignment is a Wiki Assignment (or has no directory)
       # the helper will not create a path
@@ -169,7 +105,7 @@ class AssignmentController < ApplicationController
       
       # Creating node information for assignment display
       @assignment.create_node()
-       
+      
       flash[:notice] = 'Assignment was successfully created.'
       redirect_to :action => 'list', :controller => 'tree_display'
       
@@ -179,127 +115,125 @@ class AssignmentController < ApplicationController
     end
     
   end
-    
+  
   def edit
     @assignment = Assignment.find(params[:id])
-    get_instructor_notification_limits
-    get_weights
+    get_instructor_notification_limits 
+    get_weights 
     @wiki_types = WikiType.find_all
   end
   
   def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
-     existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
-     if existing.nil?
-       NotificationLimit.create(:user_id => session[:user].id,
+    existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
+    if existing.nil?
+      NotificationLimit.create(:user_id => session[:user].id,
                                 :assignment_id => assignment_id,
                                 :questionnaire_id => questionnaire_id,
                                 :limit => limit)
-     else
-        existing.limit = limit
-        existing.save
-     end    
+    else
+      existing.limit = limit
+      existing.save
+    end    
   end
   
   def define_weight(assignment_id, questionnaire_id, type, weight)    
-     existing = QuestionnaireWeight.find(:first, :conditions => ['assignment_id = ? and questionnaire_id = ?',assignment_id,questionnaire_id])
-     if existing.nil?
-       qw = QuestionnaireWeight.create(:assignment_id => assignment_id,
+    existing = QuestionnaireWeight.find(:first, :conditions => ['assignment_id = ? and questionnaire_id = ?',assignment_id,questionnaire_id])
+    if existing.nil?
+      qw = QuestionnaireWeight.create(:assignment_id => assignment_id,
                                        :questionnaire_id => questionnaire_id,
                                        :weight => weight)                                      
-       qw.type = type                                      
-       qw.save                                
-     else
-        existing.weight = weight
-        existing.save
-     end    
+      qw.type = type                                      
+      qw.save                                
+    else
+      existing.weight = weight
+      existing.save
+    end    
   end  
   
   def set_limits
     if params[:limits]
-        if @assignment.review_questionnaire_id and (params[:limits][:review] != params[:review_limit])          
-          define_instructor_notification_limit(@assignment.id, @assignment.review_questionnaire_id, params[:limits][:review])                       
-        end         
-        if @assignment.review_of_review_questionnaire_id and (params[:limits][:metareview] != params[:metareview_limit])
-          define_instructor_notification_limit(@assignment.id, @assignment.review_of_review_questionnaire_id, params[:limits][:metareview])                             
-        end        
-        if @assignment.teammate_review_questionnaire_id and (params[:limits][:teammate] != params[:teammate_limit])           
-          define_instructor_notification_limit(@assignment.id, @assignment.teammate_review_questionnaire_id, params[:limits][:teammate])
-        end
-              
-        if @assignment.author_feedback_questionnaire_id and (params[:limits][:feedback] != params[:feedback_limit])                      
-          define_instructor_notification_limit(@assignment.id, @assignment.author_feedback_questionnaire_id, params[:limits][:feedback])
-        end
-      end    
+      if @assignment.review_questionnaire_id and (params[:limits][:review] != params[:review_limit])          
+        define_instructor_notification_limit(@assignment.id, @assignment.review_questionnaire_id, params[:limits][:review])                       
+      end         
+      if @assignment.review_of_review_questionnaire_id and (params[:limits][:metareview] != params[:metareview_limit])
+        define_instructor_notification_limit(@assignment.id, @assignment.review_of_review_questionnaire_id, params[:limits][:metareview])                             
+      end        
+      if @assignment.teammate_review_questionnaire_id and (params[:limits][:teammate] != params[:teammate_limit])           
+        define_instructor_notification_limit(@assignment.id, @assignment.teammate_review_questionnaire_id, params[:limits][:teammate])
+      end
+      
+      if @assignment.author_feedback_questionnaire_id and (params[:limits][:feedback] != params[:feedback_limit])                      
+        define_instructor_notification_limit(@assignment.id, @assignment.author_feedback_questionnaire_id, params[:limits][:feedback])
+      end
+    end    
   end  
   
   def set_weights
     if params[:weights]
-        if @assignment.review_questionnaire_id          
-          define_weight(@assignment.id, @assignment.review_questionnaire_id, "ReviewWeight", params[:weights][:review])                       
-        end 
-        
-        if @assignment.review_of_review_questionnaire_id 
-          define_weight(@assignment.id, @assignment.review_of_review_questionnaire_id, "MetareviewWeight", params[:weights][:metareview])                             
-        end
-        
-        if @assignment.teammate_review_questionnaire_id 
-          define_weight(@assignment.id, @assignment.teammate_review_questionnaire_id , "AuthorFeedbackWeight", params[:weights][:teammate])
-        end
-               
-        if @assignment.author_feedback_questionnaire_id 
-          define_weight(@assignment.id, @assignment.author_feedback_questionnaire_id, "TeammateReviewWeight", params[:weights][:feedback])
-        end
-      end    
+      if @assignment.review_questionnaire_id          
+        define_weight(@assignment.id, @assignment.review_questionnaire_id, "ReviewWeight", params[:weights][:review])                       
+      end 
+      
+      if @assignment.review_of_review_questionnaire_id 
+        define_weight(@assignment.id, @assignment.review_of_review_questionnaire_id, "MetareviewWeight", params[:weights][:metareview])                             
+      end
+      
+      if @assignment.teammate_review_questionnaire_id 
+        define_weight(@assignment.id, @assignment.teammate_review_questionnaire_id , "TeammateReviewWeight", params[:weights][:teammate])
+      end
+      
+      if @assignment.author_feedback_questionnaire_id 
+        define_weight(@assignment.id, @assignment.author_feedback_questionnaire_id, "AuthorFeedbackWeight", params[:weights][:feedback])
+      end
+    end    
   end    
   
-  def get_instructor_notification_limits
+  def get_instructor_notification_limits 
     @limits = Hash.new
-        
     default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',session[:user].id])   
-    
     #handle TAs
     if default == nil
       default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@assignment.instructor_id])
     end
-
+    
     review = NotificationLimit.find(:first, 
                                  :conditions => ['assignment_id = ? and questionnaire_id = ?',                                                
-                                                 @assignment.id,
-                                                 @assignment.review_questionnaire_id])
+    @assignment.id,
+    @assignment.review_questionnaire_id])
     if review != nil                                                 
-       @limits[:review] = review.limit
+      @limits[:review] = review.limit
     else
-       @limits[:review] = default.limit
+      @limits[:review] = default.limit
     end
     
     metareview = NotificationLimit.find(:first, 
                                  :conditions => ['assignment_id = ? and questionnaire_id = ?',
-                                                 @assignment.id,
-                                                 @assignment.review_of_review_questionnaire_id])
+    @assignment.id,
+    @assignment.review_of_review_questionnaire_id])
     if metareview != nil                                                 
-       @limits[:metareview] = metareview.limit
+      @limits[:metareview] = metareview.limit
     else
-       @limits[:metareview] = default.limit
+      @limits[:metareview] = default.limit
     end
     
     teammate = NotificationLimit.find(:first, 
                                  :conditions => ['assignment_id = ? and questionnaire_id = ?',
-                                                 @assignment.id,
-                                                 @assignment.teammate_review_questionnaire_id])
+    @assignment.id,
+    @assignment.teammate_review_questionnaire_id])
     if teammate != nil                                                 
-       @limits[:teammate] = teammate.limit
+      @limits[:teammate] = teammate.limit
     else
-       @limits[:teammate] = default.limit
+      @limits[:teammate] = default.limit
     end 
     
     feedback = NotificationLimit.find(:first, 
                                  :conditions => ['assignment_id = ? and questionnaire_id = ?',
-                                                 @assignment.id,
-                                                 @assignment.author_feedback_questionnaire_id])
+    @assignment.id,
+    @assignment.author_feedback_questionnaire_id])
     if feedback != nil                                                 
-       @limits[:feedback] = feedback.limit
+      @limits[:feedback] = feedback.limit
     else
-       @limits[:feedback] = default.limit
+      @limits[:feedback] = default.limit
     end              
   end
   
@@ -337,11 +271,11 @@ class AssignmentController < ApplicationController
   
   def update  
     if params[:assignment][:course_id]
-     begin
-       Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
-     rescue
-       flash[:error] = $!
-     end
+      begin
+        Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
+      rescue
+        flash[:error] = $!
+      end
     end
     @assignment = Assignment.find(params[:id])
     begin 
@@ -358,7 +292,7 @@ class AssignmentController < ApplicationController
       rescue
         newpath = nil
       end
-      if newpath != nil
+      if oldpath != nil and newpath != nil
         FileHelper.update_file_location(oldpath,newpath)
       end
       # Iterate over due_dates, from due_date[0] to the maximum due_date
@@ -385,8 +319,20 @@ class AssignmentController < ApplicationController
     # If the assignment is already deleted, go back to the list of assignments
     if assignment 
       begin
+        @user =  ApplicationHelper::get_user_role(session[:user])
+        @user = session[:user]
+#   update_page do |page|
+#   page << "prompt('hrlkj');";
+#   end
+      id = @user.get_instructor
+    if(id != assignment.instructor_id)
+      raise "Not authorised to delete this assignment"
+    end
         assignment.delete_assignment
-        AssignmentNode.find_by_node_object_id(params[:id]).destroy
+        @a = Node.find(:first, :conditions => ['node_object_id = ? and type = ?',params[:id],'AssignmentNode'])
+     
+        @a.destroy
+        flash[:notice] = "The assignment is deleted"
       rescue
         flash[:error] = "The assignment could not be deleted. Cause: "+$!
       end
@@ -403,11 +349,14 @@ class AssignmentController < ApplicationController
   
   def associate_assignment_to_course
     @assignment = Assignment.find(params[:id])
-    if session[:user].role_id != Role.find_by_name('Teaching Assistant').id # for other that TA
-       @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
-    else
-       @courses = TaMapping.get_courses(session[:user].id)
-    end   
+    @user =  ApplicationHelper::get_user_role(session[:user])
+    @user = session[:user]
+    @courses = @user.set_courses_to_assignment
+#    if session[:user].role_id != 6 # for other that TA
+#      @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
+#    else
+#      @courses = TaMapping.get_courses(session[:user].id)
+#    end   
   end
   
   def remove_assignment_from_course    

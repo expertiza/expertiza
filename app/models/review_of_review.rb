@@ -1,24 +1,22 @@
 class ReviewOfReview < ActiveRecord::Base
     belongs_to :mapping, :class_name => 'ReviewOfReviewMapping', :foreign_key => 'mapping_id'
     
-  def display_as_html(prefix = nil, count = nil)    
-    if prefix 
-      code = "<B>Metareviewer:</B> "+self.mapping.reviewer.fullname+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+prefix+"_"+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+prefix+"_"+self.id.to_s+"','metareview'"+');return false;">hide metareview</a>'
-    else
-      code = '<B>Metareview '+count.to_s+'</B>&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+self.id.to_s+'Link" onClick="toggleElement('+"'metareview_"+self.id.to_s+"','metareview'"+');return false;">show metareview</a>'      
-    end
-    code = code + "<BR/><B>Last updated:</B> "
-    if self.updated_at.nil?
-      code = code + "Not available"
-    else
-      code = code + self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
-    end   
+  def display_as_html(prefix = nil, count = nil) 
     if prefix
-      code = code + '<div id="metareview_'+prefix+"_"+self.id.to_s+'" style="">'
+      identifier = "<B>Metareviewer:</B> "+self.mapping.reviewer.fullname
+      str = prefix+"_"+self.id.to_s
     else
-      code = code + '<div id="metareview_'+self.id.to_s+'" style="display:none">'
-    end
-    code = code +"<BR/><BR/>"
+      identifier = '<B>Metareview '+count.to_s+'</B>'
+      str = self.id.to_s
+    end    
+    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "metareview_'+str+'Link" onClick="toggleElement('+"'metareview_"+str+"','metareview'"+');return false;">hide metareview</a>'    
+    code += "<BR/><B>Last updated:</B> "
+    if self.updated_at.nil?
+      code += "Not available"
+    else
+      code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
+    end   
+    code += '<div id="metareview_'+str+'" style=""><BR/><BR/>'         
     questionnaire = Questionnaire.find(self.mapping.assignment.review_of_review_questionnaire_id)
     questions = questionnaire.questions
     scores = Array.new
@@ -40,20 +38,23 @@ class ReviewOfReview < ActiveRecord::Base
     else
       comment = ''
     end
-    code = code + "<B>Additional Comment:</B><BR/>"+comment+""
-    code = code + "</div>"
+    code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
     return code    
   end
   
   # Computes the total score awarded for a metareview
   def get_total_score
-    scores = Score.find_by_sql("select * from scores where instance_id = "+self.id.to_s+" and questionnaire_type_id= "+ QuestionnaireType.find_by_name("Metareview").id.to_s)
+    questionnaire = Questionnaire.find(self.mapping.assignment.review_of_review_questionnaire_id)
+    questions = questionnaire.questions
+    
     total_score = 0
-    scores.each{
-      |item|
-      total_score += item.score
-    }   
-    return total_score
+    
+    questions.each{
+      | question |
+      item = Score.find_by_instance_id_and_question_id(self.id, question.id)
+      total_score += item.score      
+    }    
+    return total_score        
   end
 
   def self.get_metareivew_mapping
@@ -121,7 +122,6 @@ class ReviewOfReview < ActiveRecord::Base
  #ajbudlon, nov 18, 2008
  def notify_on_difference(new_pct,avg_pct,limit)
    instructor = User.find(self.mapping.assignment.instructor_id)  
-   puts "*** in sending method ***"
    Mailer.deliver_message(
      {:recipients => instructor.email,
       :subject => "Expertiza Notification: A metareview score is outside the acceptable range",

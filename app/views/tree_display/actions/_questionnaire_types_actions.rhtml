@@ -2,8 +2,10 @@
   <ul id="actionmenu">
     <li class="daddy">&nbsp;
       <ul>        
-        <li><%= link_to 'Create Public '+node.get_name, :controller=>'questionnaire', :action=>'new_questionnaire', :type_id => node.node_object_id, :private => 0 %></li>  
-        <li><%= link_to 'Create Private '+node.get_name, :controller=>'questionnaire', :action=>'new_questionnaire', :type_id => node.node_object_id, :private => 1 %></li>          
+        <% model = TreeFolder.find(node.node_object_id).name+"Questionnaire"
+           model.gsub!(/[^\w]/,'') %>
+        <li><%= link_to 'Create Public '+node.get_name, :controller=>'questionnaire', :action=>'new', :model => model, :private => 0 %></li>  
+        <li><%= link_to 'Create Private '+node.get_name, :controller=>'questionnaire', :action=>'new', :model => model, :private => 1 %></li>          
       </ul>
     </li>
   </ul>        

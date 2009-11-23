@@ -6,7 +6,7 @@
 %>
 <p><strong><a href = "<%= specs %>">Assignment Specification</a></strong></p>
 <%end%>
-<%= render :partial => 'submitted_content', :locals => {:stage => nil} %>
+<%= render :partial => 'submitted_content/main', :locals => {:stage => nil} %>
 
 <%= start_form_tag :action => 'update_review' %>
 <%= render :partial => 'review_content' %>    

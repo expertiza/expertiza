@@ -46,4 +46,17 @@ class Ta < User
     Course.find(course_id).instructor_id
   end
   
+  def get_instructor
+    Ta.get_my_instructor(self.id)
+  end
+  
+  def set_instructor (new_assign)
+    new_assign.instructor_id = Ta.get_my_instructor(self.id)
+    new_assign.course_id = TaMapping.get_course_id(self.id)
+  end
+  
+  def set_courses_to_assignment
+    @courses = TaMapping.get_courses(self.id)    
+  end
+  
 end

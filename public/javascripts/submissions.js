@@ -1,4 +1,3 @@
-<script type="text/javascript">
 function collapseSubDirectory(row) {
   var image = $('expand.'+row);
   var index = 0;
@@ -26,7 +25,7 @@ function createNewFolder(){
 	input1 = document.createElement("input");
 	var form = document.getElementsByTagName('form')[2];
 	input1.type = "hidden";
-	input1.name = "new_folder";
+	input1.name = "faction[create]";
 	input1.value = new_folder;
 	form.appendChild(input1);
 	if ((new_folder!=null) && (new_folder!='')) {
@@ -52,14 +51,13 @@ function getSelectedName(){
 	}
 }
 
-function moveSelectedFile(){
-	if (!checkIfFileSelected('Move')) return;
+function moveSelectedFile(){	
 	var old_filename = getSelectedName();
-	var new_filename = prompt("Enter a new location for " + old_filename + "\nExample: /folder1/file.doc","");
+	var new_filename = prompt("Enter a new location for " + old_filename + "\nExample: folder1/file.doc","");
 	var form = document.getElementsByTagName('form')[2];
 	input1 = document.createElement("input");
 	input1.type = "hidden";
-	input1.name = "moved_file";
+	input1.name = "faction[move]";
 	input1.value = new_filename;
 	form.appendChild(input1);
 	if ((new_filename!=null) && (new_filename!='')) {
@@ -67,14 +65,13 @@ function moveSelectedFile(){
 	}
 }
 
-function copySelectedFile(){
-	if (!checkIfFileSelected('Copy')) return;
+function copySelectedFile(){	
 	var old_filename = getSelectedName();
 	var new_filename = prompt("Enter a new location for the copy of " + old_filename + "\nExample: /folder1/file.doc","");
 	var form = document.getElementsByTagName('form')[2];
 	input1 = document.createElement("input");
 	input1.type = "hidden";
-	input1.name = "copy_file";
+	input1.name = "faction[copy]";
 	input1.value = new_filename;
 	form.appendChild(input1);
 	if ((new_filename!=null) && (new_filename!='')) {
@@ -82,8 +79,7 @@ function copySelectedFile(){
 	}
 }
 
-function renameFile(){
-        if (!checkIfFileSelected('Rename')) return;
+function renameFile(){        
 	var old_filename = getSelectedName();
 	var new_filename = prompt("Enter a new name for " + old_filename,"");
 	var form = document.getElementsByTagName('form')[2];	
@@ -94,8 +90,8 @@ function renameFile(){
 	else {
 		input1 = document.createElement("input");
 		input1.type = "hidden";
-                input1.name = "new_filename";
-                input1.value = new_filename;
+        input1.name = "faction[rename]";
+        input1.value = new_filename;
 		form.appendChild(input1);
 	}
 	if ((new_filename!=null) && (new_filename!='')) {
@@ -103,26 +99,15 @@ function renameFile(){
 	}
 }
 
-function deleteSelectedFile(){
-        if (!checkIfFileSelected('Delete')) 
-		return;
-        else
-	{	
-		if (confirm("Are you sure. If directory all its children will be deleted.  Do you want to delete?"))
+function deleteSelectedFile(){     
+	if (confirm("Are you sure. If directory all its children will be deleted.  Do you want to delete?"))
 		{
 	        	var form = document.getElementsByTagName('form')[2];
-			input1 = document.createElement("input");
-			input1.type = "hidden";
-	        	input1.name = "delete_files";
-        		input1.value = "delete_files";
+	        	input1 = document.createElement("input");
+	        	input1.type = "hidden";
+	        	input1.name = "faction[delete]";
         		form.appendChild(input1);
         		form.submit();
 		}
-		else
-			return false;
-	}
+	else return false;	
 }
-
-<%= render :partial => 'shared_scripts/checkIfFileExists' %>
-
-</script>

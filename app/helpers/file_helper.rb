@@ -5,6 +5,21 @@ module FileHelper
       FileHelper.clean_path(just_filename) 
   end
   
+  def self.move_file(oldloc, newloc)
+    items = newloc.split(/\//)
+    filename = items[items.length-1]
+    items.delete_at(items.length-1)
+    
+    newdir = String.new
+    items.each{
+      | item |
+      newdir += FileHelper::clean_path(item)+"/"      
+    }
+    
+    FileHelper::create_directory_from_path(newdir)
+    FileUtils.mv oldloc, newdir+filename     
+  end
+  
   def self.update_file_location(oldpath,newpath)
     begin
       create_directory_from_path(newpath)    

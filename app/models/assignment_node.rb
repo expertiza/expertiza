@@ -4,7 +4,7 @@
 #Date: 7/18/2008
 
 class AssignmentNode < Node   
-  
+  belongs_to :assignment, :class_name => "Assignment", :foreign_key => "node_object_id"
   # Returns the table in which to locate Assignments
   def self.table
     "assignments"
@@ -18,32 +18,32 @@ class AssignmentNode < Node
   
   # returns: list of AssignmentNodes based on query
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil)    
-    query = "select nodes.* from nodes, "+self.table
-    query = query+" where nodes.node_object_id = "+self.table+".id"
-    query = query+" and nodes.type = '"+self.to_s+"'"
-    if show
-      if User.find(user_id).role.name != "Teaching Assistant" # if not teaching assistant
-        query = query+" and "+self.table+".instructor_id = "+user_id.to_s
-      else #for teaching assistant
-        query = query+ " and "+self.table+".id in (select assignments.id from assignments, "+"ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id="+user_id.to_s+")"
-      end        
+    if show      
+      conditions = 'assignments.instructor_id = ?'      
     else
-      if User.find(user_id).role.name != "Teaching Assistant" # if not teaching assistant
-        query = query+" and ("+self.table+".private = 0 or "+self.table+".instructor_id = "+user_id.to_s+")"
-      else
-        query = query+" and ("+self.table+".private = 0 or "+self.table+".instructor_id = "+Ta.get_my_instructor(user_id).to_s+")"
-      end
-    end  
-    if parent_id
-      query = query+ " and course_id = "+parent_id.to_s
+      conditions = '(assignments.private = 0 or assignments.instructor_id = ?)'     
     end
-    if sortvar            
-      query = query+" order by "+self.table+"."+sortvar
-      if sortorder
-        query = query+" "+sortorder
-      end
-    end              
-    find_by_sql(query)
+    
+    
+    #query = query+ " and "+self.table+".id in (select assignments.id from assignments, "+"ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id="+user_id.to_s+")"
+      
+        
+    if parent_id
+      conditions += " and course_id = #{parent_id}"
+    end
+    
+    if sortvar.nil?
+      sortvar = 'name'
+    end
+    if sortorder.nil?
+      sortorder = 'ASC'
+    end       
+    
+    if User.find(user_id).role.name != "Teaching Assistant"  
+      find(:all, :include => :assignment, :conditions => [conditions, user_id], :order => "assignments.#{sortvar} #{sortorder}")
+    else
+      find(:all, :include => :assignment, :conditions => [conditions, Ta.get_my_instructor(user_id)], :order => "assignments.#{sortvar} #{sortorder}")
+    end
   end
   
   # Indicates that this object is always a leaf

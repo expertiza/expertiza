@@ -31,6 +31,10 @@
 <script type="text/javascript" src="/javascripts/CalendarPopup.js"></script>
 <script type="text/javascript" src="/javascripts/ajaxtabs.js"></script>
 <script type="text/javascript" src="/javascripts/sorttable.js"></script>
+<script type="text/javascript" src="/javascripts/shared.js"></script>
+<% if controller.controller_name == "submitted_content" %>
+	<script type="text/javascript" src="/javascripts/submissions.js"></script>
+<% end %>
 <SCRIPT LANGUAGE="JavaScript">
 	var cal = new CalendarPopup();
 	</SCRIPT>
@@ -73,11 +77,7 @@
           <%= render :partial => 'menu_items/breadcrumbs', 
 	      :locals => {:crumbs => session[:menu].crumbs} %>
         </div>
-<%
-puts "******************"
-puts flash
-puts "******************"
-%>       
+      
 <% if flash[:note] -%>
 <div class="flash_note"><%= flash[:note] %></div>
 <% elsif flash[:error] -%>

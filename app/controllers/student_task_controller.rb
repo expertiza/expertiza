@@ -9,10 +9,7 @@ class StudentTaskController < ApplicationController
   
   def view
     @participant = AssignmentParticipant.find(params[:id])
-    @assignment = @participant.assignment
-    puts "***************"
-    puts @assignment.id
-    puts "***************"
+    @assignment = @participant.assignment    
   end
   
   def others_work

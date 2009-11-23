@@ -17,7 +17,7 @@ class TeammateReviewController < ApplicationController
     
     params[:responses].each_pair do |k,v|
       score = Score.create(:instance_id => @response.id, :question_id => questions[k.to_i].id,
-                           :questionnaire_type_id => @questionnaire.type_id, :score => v[:score], :comments => v[:comment])
+                           :score => v[:score], :comments => v[:comment])
     end      
     
     compare_scores
@@ -34,8 +34,12 @@ class TeammateReviewController < ApplicationController
     @response = TeammateReview.find(params[:id]) 
     @mapping = @response.mapping
     @questionnaire = Questionnaire.find(@response.mapping.assignment.teammate_review_questionnaire_id)
-    @questions = @questionnaire.questions
-    @review_scores = Score.find_all_by_instance_id_and_questionnaire_type_id(@response.id, @questionnaire.type_id)
+    @questions = @questionnaire.questions    
+    @review_scores = Array.new
+    @questions.each{
+      | question |
+      @review_scores << Score.find_by_instance_id_and_question_id(@response.id, question.id)
+    }
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score    
   end 
@@ -50,7 +54,7 @@ class TeammateReviewController < ApplicationController
     questions = @questionnaire.questions
 
     params[:responses].each_pair do |k,v|
-      score = Score.find_by_instance_id_and_question_id_and_questionnaire_type_id(@response.id, questions[k.to_i].id, @questionnaire.type_id)
+      score = Score.find_by_instance_id_and_question_id(@response.id, questions[k.to_i].id)
       score.score = v[:score]
       score.comments = v[:comment]
       score.save

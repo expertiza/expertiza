@@ -1,4 +1,4 @@
-<%= render :partial => 'review/submitted_content', :locals => {:stage =>  @assignment.get_current_stage()} %>
+<%= render :partial => 'submitted_content/main', :locals => {:stage =>  @assignment.get_current_stage()} %>
 <%= @review.display_as_html() %><BR/><BR/><BR/>
 <% i = 0
    @questions.each{
@@ -38,5 +38,5 @@
        
 <p>
 	<label for="review_comments">Additional Comments</label><BR/>
-	<textarea cols="70" rows="5" id=review_comments name=review[comments]><% if controller.action_name != 'new' %><%=@response.additional_comment.strip%><% end %></textarea>
+	<textarea cols="70" rows="5" id=review_comments name=review[comments]><% if controller.action_name != 'new' and @response.additional_comment != nil %><%=@response.additional_comment.strip%><% end %></textarea>
 </p>

@@ -51,25 +51,7 @@ module StudentAssignmentHelper
     return t.strftime("%Y-%m-%d")
   end
 
-  # Installing RubyZip
-  # run the command,  gem install rubyzip
-  # restart the server
-  def self.unzip_file(file_name, unzip_dir, should_delete)
-   #begin
-      Zip::ZipFile::open(file_name) {
-        |zf| zf.each { |e|
-          safename = FileHelper::sanitize_filename(e.name);
-          fpath = File.join(unzip_dir, safename)
-          FileUtils.mkdir_p(File.dirname(fpath))
-          zf.extract(e, fpath) } }
 
-          if should_delete
-            # The zip file is no longer needed, so delete it
-            File.delete(file_name)
-          end
-    #rescue
-    #end
-  end
   
   def list_sub_directories (file, student)
         index = 0

@@ -2,6 +2,15 @@ class AssignmentTeam < Team
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many :review_mappings, :class_name => 'TeamReviewMapping', :foreign_key => 'reviewee_id'
 
+  def get_hyperlinks
+    links = Array.new
+    for team_member in self.get_participants 
+     if team_member.submitted_hyperlink != nil and team_member.submitted_hyperlink.strip.length > 0      
+      links << team_member.submitted_hyperlink
+     end
+    end
+    return links
+  end
   
   def self.import(row,session,id,options)
     if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")

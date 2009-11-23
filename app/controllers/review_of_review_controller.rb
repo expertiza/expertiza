@@ -19,8 +19,7 @@ class ReviewOfReviewController < ApplicationController
     questions = @questionnaire.questions     
     
     params[:responses].each_pair do |k,v|
-      score = Score.create(:instance_id => @response.id, :question_id => questions[k.to_i].id,
-                           :questionnaire_type_id => @questionnaire.type_id, :score => v[:score], :comments => v[:comment])
+      score = Score.create(:instance_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
     end      
     
     compare_scores
@@ -49,7 +48,12 @@ class ReviewOfReviewController < ApplicationController
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score     
-    @review_scores = Score.find_all_by_instance_id_and_questionnaire_type_id(@response.id, @questionnaire.type_id)   
+    
+    @review_scores = Array.new
+    @questions.each{
+      | question |
+      @review_scores << Score.find_by_instance_id_and_question_id(@response.id, question.id)
+    }
   end 
  
   def update
@@ -62,7 +66,7 @@ class ReviewOfReviewController < ApplicationController
     questions = @questionnaire.questions
 
     params[:responses].each_pair do |k,v|
-      score = Score.find_by_instance_id_and_question_id_and_questionnaire_type_id(@response.id, questions[k.to_i].id, @questionnaire.type_id)
+      score = Score.find_by_instance_id_and_question_id(@response.id, questions[k.to_i].id)
       score.score = v[:score]
       score.comments = v[:comment]
       score.save
@@ -72,7 +76,7 @@ class ReviewOfReviewController < ApplicationController
     #notification limits      
     compare_scores
     
-    redirect_to :controller => 'student_team', :action => 'view', :id => map.reviewer.id
+    redirect_to :controller => 'student_review', :action => 'list', :id => map.reviewer.id
   end
   
   

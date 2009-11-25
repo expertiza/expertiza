@@ -27,7 +27,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 		<% end %> (Give feedback to others on their work)
 	</li>
 	<li><%= link_to "View scores",{:action => 'view_scores', :id => @participant.id} %>(View feedback on your work)</li>
-	<% if StudentAssignmentHelper::get_current_stage(@assignment.id) == "Complete" -%>
+	<% if @assignment.get_current_stage() == "Complete" -%>
 	<!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
 		<li><%= link_to "Take Survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
 	<% end %>

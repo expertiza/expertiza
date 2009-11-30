@@ -1,5 +1,6 @@
 class ReviewOfReviewController < ApplicationController
   helper :review
+  helper :wiki
   
   def new
     @mapping = ReviewOfReviewMapping.find(params[:id])

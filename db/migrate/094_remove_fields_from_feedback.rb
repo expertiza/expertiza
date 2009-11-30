@@ -4,7 +4,12 @@ class RemoveFieldsFromFeedback < ActiveRecord::Migration
       remove_column :review_feedbacks, :feedback_at
     rescue
     end
-    
+   
+    begin 
+      rename_column :review_feedbacks, :additional_comments, :additional_comment
+    rescue      
+    end
+      
     ReviewFeedback.find(:all).each{
       |feedback|
       if feedback.txt != nil

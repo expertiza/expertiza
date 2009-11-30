@@ -25,13 +25,14 @@ class CreateFeedbackMappings < ActiveRecord::Migration
        | feedback |      
        review = Review.find(feedback.review_id)
        reviewmap = ReviewMapping.find(review.review_mapping_id)
-       if reviewmap != nil?
+       if reviewmap != nil
          reviewer = get_reviewer(reviewmap, feedback)
          reviewee = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',reviewmap.reviewer_id, feedback.assignment_id])         
        end       
        if reviewer != nil and reviewee != nil            
          map = FeedbackMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => review.id)
-         execute "update review_feedbacks set mapping_id = #{map.id} where id = #{feedback.id}"
+         feedback.update_attribute('mapping_id',map.id)
+         #execute "update review_feedbacks set mapping_id = #{map.id} where id = #{feedback.id}"
        else
          feedback.delete
        end

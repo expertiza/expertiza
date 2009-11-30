@@ -10,11 +10,24 @@ class CreateTeammateReviewMappings < ActiveRecord::Migration
     
     TeammateReview.find(:all).each{
        | review |
-       reviewer = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',review.reviewer_id, review.assignment_id])
-       reviewee = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',review.reviewee_id, review.assignment_id])
-       map = TeammateReviewMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => review.assignment_id)
-       review.mapping_id = map.id
-       review.save
+       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(review.reviewer_id, review.assignment_id)
+       if reviewer.nil?
+         reviewer = AssignmentParticipant.create(:user_id => review.reviewer_id, :parent_id => review.assignment_id)
+         reviewer.set_handle()
+       end
+       reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(review.reviewee_id, review.assignment_id)
+       if reviewee.nil?
+         reviewee = AssignmentParticipant.create(:user_id => review.reviewee_id, :parent_id => review.assignment_id)
+         reviewee.set_handle()
+       end
+       if reviewer != nil and reviewee != nil
+          map = TeammateReviewMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => review.assignment_id)
+       else
+          puts "REVIEWER: #{review.reviewer_id}"
+          puts "REVIEWEE: #{review.reviewee_id}"
+          puts review.id
+       end
+       review.update_attribute('mapping_id',map.id)
     }
                 
     execute "ALTER TABLE `teammate_reviews` 

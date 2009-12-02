@@ -41,7 +41,7 @@ class Ta < User
                                      id, user_id])
   end
   
-  def self.get_my_instructor (user_id)
+  def self.get_my_instructor(user_id)
     course_id = TaMapping.get_course_id(user_id)
     Course.find(course_id).instructor_id
   end

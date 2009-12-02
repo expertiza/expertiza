@@ -1,54 +1,24 @@
 <!-- SUBMISSIONS --> 
 <% session[:return_to] = request.request_uri %>
-<% if participant.get_submitted_files.length > 0 %>
-	<B>File Submissions:</B></BR>
-		<ul>
-		<% for file in participant.get_submitted_files() %>			
-	   	<li><%= link_to file.gsub(participant.get_path+"/"," "), :action => 'open', :fname => file %></li>	   
-		<% end %>    
-		</ul>
-<% end %>
-<% if participant.get_wiki_submissions.length > 0 %>
-	<B>Wiki Submissions:</B><BR/>
-	<ul>
-	<% for wiki_subs in participant.get_wiki_submissions() %>
-	<li><%= wiki_subs %></li>
-	<% end %>
-	</ul>
-<% end %>
-<% if participant.submitted_hyperlink and  participant.submitted_hyperlink.strip.length > 0 %>
-	<B>Hyperlink Submissions:</B><BR/>
-	<ul>
-	<li><A HREF="<%= participant.submitted_hyperlink %>" target="new"><%= participant.submitted_hyperlink %></A></li>
-	</ul>			
-<% end %>
-<% if controller.controller_name != "student_task"
+<%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => participant.assignment.get_current_stage} %>     
+
+<% if controller.action_name != "view_my_scores" %>
+   <% reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, participant.assignment.id) 
       if participant.assignment.team_assignment
-         reviewee = participant.team 
+         reviewee = participant.team          
       else
          reviewee = participant
-      end   
-   
-      reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, participant.assignment.id)
-      if reviewer.nil?
-         reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
-         reviewer.set_handle()
-      end
-
-      review_mapping = ReviewMapping.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ? and reviewed_object_id = ?',reviewee.id, reviewer.id, participant.assignment.id])
-        
-      if review_mapping.nil?
-         if Assignment.find(participant.parent_id).team_assignment
-     	    review_mapping = TeamReviewMapping.create(:reviewee_id => participant.team, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-         else
-            review_mapping = ParticipantReviewMapping.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-         end      
       end 
-      review = Review.find_by_mapping_id(review_mapping.id)       
-      if review.nil? %>      
-  	     <%= link_to "create review", :controller => 'review', :action => 'new_review', :id => review_mapping.id %>
-      <% else %>
-         <%= link_to "edit review", :controller => 'review', :action => 'edit_review', :id => review.id %>	
-      <% end %>     
+      review_mapping = ReviewMapping.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+      if review_mapping != nil 
+      	review = Review.find_by_mapping_id(review_mapping.id)
+      end 
+      if review != nil
+      	display = "Edit Review"
+      else
+        display = "Create Review"
+      end
+   %>      
+      <%= link_to display, :action => "instructor_review", :id => participant.id %> 
 <% end %>   	     
 <!-- END SUBMISSIONS --> 

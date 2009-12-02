@@ -20,7 +20,7 @@ class Review < ActiveRecord::Base
     end
     code += '<div id="review_'+str+'" style=""><BR/><BR/>'
     
-    questionnaire = Questionnaire.find(self.mapping.assignment.review_questionnaire_id)
+    questionnaire = self.mapping.assignment.questionnaires.find_by_type('ReviewQuestionnaire')
     questions = questionnaire.questions
     scores = Array.new
     questions.each{
@@ -46,10 +46,19 @@ class Review < ActiveRecord::Base
     code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
     return code
   end 
+  
+  def self.get_assessments_for(participant)
+    if participant
+      assessments = find(:all, :include => :mapping, :conditions => ['reviewee_id = ? and type = ?',participant.id, participant.get_review_map_type])
+      return assessments.sort {|a,b| a.mapping.reviewer.fullname <=> b.mapping.reviewer.fullname }
+    else
+      return Array.new
+    end
+  end  
     
   # Computes the total score awarded for a review
   def get_total_score
-    questionnaire = Questionnaire.find(self.mapping.assignment.review_questionnaire_id)
+    questionnaire = self.mapping.assignment.questionnaires.find_by_type('ReviewQuestionnaire')
     questions = questionnaire.questions
     
     total_score = 0
@@ -83,8 +92,8 @@ class Review < ActiveRecord::Base
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @assgt.id])
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
-    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
+    @questionnaire = @assgt.questionnaires.find_by_type('ReviewQuestionnaire')
+    @questions = @questionnaire.questions
     @control_folder = control_folder
     
     if @assgt.team_assignment 

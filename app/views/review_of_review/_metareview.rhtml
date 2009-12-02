@@ -1,4 +1,4 @@
-<%= render :partial => 'submitted_content/main', :locals => {:stage =>  @assignment.get_current_stage()} %>
+<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @assignment.get_current_stage()} %>
 <%= @review.display_as_html() %><BR/><BR/><BR/>
 <% i = 0
    @questions.each{

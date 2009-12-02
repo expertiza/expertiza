@@ -1,16 +1,80 @@
 class GradesController < ApplicationController
-  helper :file
+  helper :file   
+  helper :submitted_content
   
   #the view grading report provides the instructor with an overall view of all the grades for
   #an assignment. It lists all participants of an assignment and all the reviews they recieved.
   #It also gives a final score which is an average of all the reviews and greatest difference
   #in the scores of all the reviews.  
   def view    
-    @assignment = Assignment.find(params[:id])
-    @participants = @assignment.get_participants
-
-    get_questionnaires 
+    @assignment = Assignment.find(params[:id])  
+    @questions = Hash.new    
+    questionnaires = @assignment.questionnaires
+    questionnaires.each{
+       |questionnaire|
+       @questions[questionnaire.symbol] = questionnaire.questions
+    }    
+    
+    @scores = @assignment.get_scores(@questions)
   end  
+  
+  def view_my_scores
+    @participant = AssignmentParticipant.find(params[:id])
+    @assignment = @participant.assignment
+    
+    @questions = Hash.new    
+    questionnaires = @assignment.questionnaires
+    questionnaires.each{
+       |questionnaire|
+       @questions[questionnaire.symbol] = questionnaire.questions
+    }     
+  end  
+    
+  def edit    
+    @participant = AssignmentParticipant.find(params[:id]) 
+    @assignment = @participant.assignment  
+    @questions = Hash.new    
+    questionnaires = @assignment.questionnaires
+    questionnaires.each{
+       |questionnaire|
+       @questions[questionnaire.symbol] = questionnaire.questions
+    }    
+    
+    @scores = @participant.get_scores(@questions)
+  end  
+  
+  def instructor_review
+    participant = AssignmentParticipant.find(params[:id])
+    
+    if participant.assignment.team_assignment
+         reviewee = participant.team          
+      else
+         reviewee = participant
+      end   
+   
+      reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, participant.assignment.id)
+      if reviewer.nil?
+         reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
+         reviewer.set_handle()
+      end
+
+      review_mapping = ReviewMapping.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+        
+      if review_mapping.nil?
+         if participant.assignment.team_assignment
+          review_mapping = TeamReviewMapping.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+         else
+            review_mapping = ParticipantReviewMapping.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+         end      
+      end 
+      review = Review.find_by_mapping_id(review_mapping.id) 
+      
+      if review.nil?
+        redirect_to :controller => 'review', :action => 'new_review', :id => review_mapping.id 
+      else
+        redirect_to :controller => 'review', :action => 'edit_review', :id => review.id
+      end
+  end
   
   def open
     send_file(params['fname'],:disposition => 'inline')
@@ -46,151 +110,75 @@ class GradesController < ApplicationController
   
   # ther grading conflict email form provides the instructor a way of emailing
   # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.  
-  def conflict_notification
-    
+  def conflict_notification    
     if session[:user].role_id !=6
       @instructor = session[:user]
     else @instructor = Ta.get_my_instructor(session[:user].id)  
     end
     @participant = AssignmentParticipant.find(params[:id])
-    @assignment = Assignment.find(@participant.parent_id)  
-    @reviews = Array.new    
+    @assignment = Assignment.find(@participant.parent_id)
+
+    
+    @questions = Hash.new    
+    questionnaires = @assignment.questionnaires
+    questionnaires.each{
+       |questionnaire|
+       @questions[questionnaire.symbol] = questionnaire.questions
+    }      
+      
     @reviewers_email_hash = Hash.new 
     
-    if params[:submission] == '1'      
-      process_review()   
-    elsif params[:submission] == '2'
-      process_metareview()
-    elsif params[:submission] == '3'
-      process_author_feedback()           
-    elsif params[:submission] == '4'
-      process_teammate_review()
+    @caction = "view"
+    @submission = params[:submission]
+    if @submission == "review"
+      @caction = "view_review"
+      @symbol = "review"
+      process_response("Review","Reviewer",@participant.get_reviews,"ReviewQuestionnaire") 
+    elsif @submission == "review_of_review"
+      @symbol = "metareview"
+      process_response("Metareview","Metareviewer",@participant.get_metareviews,"MetareviewQuestionnaire")
+    elsif @submission == "review_feedback"
+      @symbol = "feedback"
+      process_response("Feedback","Author",@participant.get_feedback,"AuthorFeedbackQuestionnaire")  
+    elsif @submission == "teammate_review"
+      @symbol = "teammate"
+      process_response("Teammate Review","Reviewer",@participant.get_teammate_reviews,"TeammateReviewQuestionnaire")  
     end       
   
     @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."
     @body = get_body_text(params[:submission])
-    @submission = params[:submission]
+    
   end
-  
-  def edit    
-    @participant = AssignmentParticipant.find(params[:id]) 
-    @assignment = @participant.assignment
-    
-    get_questionnaires
-  end
-  
-  def get_questionnaires
-    @review_questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
-    @review_questions = @review_questionnaire.questions    
-    @max_review_score = @review_questionnaire.max_possible_score
-    
-    @metareview_questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
-    @metareview_questions = @metareview_questionnaire.questions    
-    @max_metareview_score = @metareview_questionnaire.max_possible_score
-    
-    @feedback_questionnaire = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
-    @feedback_questions = @feedback_questionnaire.questions    
-    @max_feedback_score = @feedback_questionnaire.max_possible_score 
-    
-    if @assignment.team_assignment
-      @teams = @assignment.get_teams
-      if @assignment.teammate_review_questionnaire_id
-         @teammate_questionnaire = Questionnaire.find(@assignment.teammate_review_questionnaire_id)
-         @teammate_questions = @teammate_questionnaire.questions    
-         @max_teammate_score = @teammate_questionnaire.max_possible_score
-      end
-    end            
-  end
+
   
   def update
     participant = AssignmentParticipant.find(params[:id])
     total_score = params[:total_score]
     if sprintf("%.2f",total_score) != params[:participant][:grade]
-      participant.grade = params[:participant][:grade]
-      participant.save!
-      flash[:note] = "A score of "+params[:participant][:grade]+"% has been saved for "+participant.user.name
+      participant.update_attribute('grade',params[:participant][:grade])      
+      if participant.grade.nil?
+        message = "The computed score will be used for "+participant.user.name
+      else
+        message = "A score of "+params[:participant][:grade]+"% has been saved for "+participant.user.name
+      end      
     end
+    flash[:note] = message
     redirect_to :action => 'edit', :id => params[:id]
   end
   
 private  
-  def process_review
-      @collabel = "Review"
-      @rowlabel = "Reviewer"
-      if @assignment.team_assignment       
-         @author = AssignmentTeam.find_by_sql("select distinct teams.* from teams, teams_users where teams.id = teams_users.team_id and teams.type = 'AssignmentTeam' and teams.parent_id = "+@assignment.id.to_s+" and teams_users.user_id = "+@participant.user_id.to_s).first      
-         query = "assignment_id = ? and team_id = ?"
-      else
-         @author = @participant.user
-         query = "assignment_id = ? and author_id = ?"
-      end   
-      mappings = ReviewMapping.find(:all, :conditions => [query,@assignment.id,@author.id])    
-   
-      mappings.each{
-        | mapping |
-        review = Review.find_by_review_mapping_id(mapping.id)
-        if review
-          @reviews << review
-          @reviewers_email_hash[mapping.reviewer.fullname.to_s+" <"+mapping.reviewer.email.to_s+">"] = mapping.reviewer.email.to_s        
-        end
-      }    
-      @reviews = @reviews.sort {|a,b| a.review_mapping.reviewer.fullname <=> b.review_mapping.reviewer.fullname}
-      @questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
-      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)      
-  end
-
-  def process_author_feedback
-      @collabel = "Feedback"
-      @rowlabel = "Author"
-      @author = @participant.user
-      @reviews = @participant.get_feedbacks
-      @reviews.each{
-        |review|
-        @reviewers_email_hash[review.reviewer.fullname.to_s+" <"+review.reviewer.email.to_s+">"] = review.reviewer.email.to_s
-      }
-        
-      @reviews = @reviews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}
-      @questionnaire = Questionnaire.find(@assignment.author_feedback_questionnaire_id)
-      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
-      
-  end
-
-  def process_metareview
-      @collabel = "Metareview"
-      @rowlabel = "Metareviewer"
-      @author = @participant.user
-     
-      mappings = ReviewOfReviewMapping.find_by_sql("select * from review_of_review_mappings where review_mapping_id in (select id from review_mappings where assignment_id = "+@assignment.id.to_s+" and reviewer_id = "+@author.id.to_s+")") 
-      mappings.each {
-        | mapping |
-        review = ReviewOfReview.find_by_review_of_review_mapping_id(mapping.id)
-        if review
-           @reviews << review
-           @reviewers_email_hash[mapping.review_reviewer.fullname.to_s+" <"+mapping.review_reviewer.email.to_s+">"] = mapping.review_reviewer.email.to_s
-        end    
-      }
-      @reviews = @reviews.sort {|a,b| a.review_of_review_mapping.review_reviewer.fullname <=> b.review_of_review_mapping.review_reviewer.fullname}
-      @questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
-      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)    
-  end
-  
-  def process_teammate_review
-      @collabel = "Teammate Review"
-      @rowlabel = "Reviewer"
-      @author = User.find(@participant.user_id)
-      
-      reviews = TeammateReview.find(:all, :conditions => ['reviewee_id =? and assignment_id =?',@author.id, @assignment.id])    
-   
-      reviews.each{
-        | review |
-        if review
-          @reviews << review
-          @reviewers_email_hash[review.reviewer.fullname.to_s+" <"+review.reviewer.email.to_s+">"] = review.reviewer.email.to_s        
-        end
-      }    
-      @reviews = @reviews.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}   
-      @questionnaire = Questionnaire.find(@assignment.teammate_review_questionnaire_id)
-      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)      
+  def process_response(collabel,rowlabel,responses,questionnaire_type)
+    @collabel = collabel
+    @rowlabel = rowlabel
+    @reviews = responses
+    @reviews.each{
+      | response |
+      user = response.mapping.reviewer.user
+      @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
+    }    
+    @reviews.sort!{|a,b| a.mapping.reviewer.user.fullname <=> b.mapping.reviewer.user.fullname}
+    @questionnaire =  @assignment.questionnaires.find_by_type(questionnaire_type)
+    @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)         
   end
 
   def get_body_text(submission)

@@ -1,5 +1,6 @@
 class Team < ActiveRecord::Base
   has_many :teams_users
+  has_many :users, :through => :teams_users
   
   def delete
     for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", self.id])       
@@ -27,10 +28,6 @@ class Team < ActiveRecord::Base
       end
       counter=counter+1
     end      
-  end
-  
-  def get_team_users
-   User.find_by_sql("select * from users where id in (select user_id from teams_users where team_id = #{self.id}) order by users.fullname")   
   end
   
   def get_possible_team_members(name)

@@ -12,7 +12,7 @@
      <% elsif @assignment.get_current_stage != "Complete" %>
        <td><%= link_to "Begin",{:controller => 'review_of_review', :action => 'new', :id => map.id} %></td>
   	 <% else %>
-  	   Begin
+  	   <td><i>No actions available at this time</i></td>
      <% end %>       
      </tr>  
      <% review_no += 1 %>

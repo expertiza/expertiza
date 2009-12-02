@@ -3,6 +3,10 @@ require 'digest/sha1'
 class User < ActiveRecord::Base
   has_many :participants
   has_many :assignments, :through => :participants
+  
+  has_many :teams_users
+  has_many :teams, :through => :teams_users
+  
   validates_presence_of :name
   validates_uniqueness_of :name
 

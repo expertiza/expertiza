@@ -7,7 +7,7 @@ class ReviewOfReviewController < ApplicationController
     @review = Review.find_by_mapping_id(@mapping.review_mapping.id)
     @assignment = @mapping.assignment
     @participant = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id,@assignment.id)    
-    @questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
+    @questionnaire = @assignment.questionnaires.find_by_type('MetareviewQuestionnaire')
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score    
@@ -16,7 +16,7 @@ class ReviewOfReviewController < ApplicationController
   def create
     map = ReviewOfReviewMapping.find(params[:id])
     @response = ReviewOfReview.create(:mapping_id => map.id, :additional_comment => params[:review][:comments])
-    @questionnaire = Questionnaire.find(map.assignment.review_of_review_questionnaire_id)
+    @questionnaire = map.assignment.questionnaires.find_by_type('MetareviewQuestionnaire')
     questions = @questionnaire.questions     
     
     params[:responses].each_pair do |k,v|
@@ -45,7 +45,7 @@ class ReviewOfReviewController < ApplicationController
     @assignment = @mapping.assignment
     @participant = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id,@assignment.id)    
         
-    @questionnaire = Questionnaire.find(@assignment.review_of_review_questionnaire_id)
+    @questionnaire = @assignment.questionnaires.find_by_type('MetareviewQuestionnaire')
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score     
@@ -63,7 +63,7 @@ class ReviewOfReviewController < ApplicationController
     @response.additional_comment = params[:review][:comments]
     @response.save
     
-    @questionnaire = Questionnaire.find(@response.mapping.assignment.review_of_review_questionnaire_id)
+    @questionnaire = @response.mapping.assignment.questionnaires.find_by_type('MetareviewQuestionnaire')
     questions = @questionnaire.questions
 
     params[:responses].each_pair do |k,v|

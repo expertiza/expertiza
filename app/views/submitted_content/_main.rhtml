@@ -1,16 +1,16 @@
-<% if @participant.get_hyperlinks.length > 0 %>
-	<%= render :partial => 'submitted_content/hyperlink' %>
+<% if participant.get_hyperlinks.length > 0 %>
+	<%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant} %>
 <% end %>
 <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
-     <%= form_tag :action=>'submit_hyperlink', :id => @participant.id %> 
+     <%= form_tag :action=>'submit_hyperlink', :id => participant.id %> 
 	 Submit a Hyperlink (optional): <input type="text" name="submission" size=40/><input type="submit" name="upload_link" value="Upload link"/>     
 	 </form>
 <% end %>	
 <BR/><BR/>
-<% if @assignment.wiki_type_id == 1%>
-  <%= render :partial => 'submitted_files', :locals => {:stage => stage} %>
+<% if participant.assignment.wiki_type_id == 1%>
+  <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>
 <% else %> 
-  <%= render :partial => 'submitted_content/wiki' %>
+  <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
 <% end %>
 <BR/>
 

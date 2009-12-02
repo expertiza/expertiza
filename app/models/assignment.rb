@@ -1,34 +1,74 @@
 class Assignment < ActiveRecord::Base
   require 'ftools'
-  
-  belongs_to :course 
+  belongs_to :course
   belongs_to :wiki_type
-  belongs_to :questionnaire, :foreign_key => "review_questionnaire_id"
-  belongs_to :author_feedback_questionnaire, 
-             :class_name => "Questionnaire", 
-             :foreign_key => "author_feedback_questionnaire_id"
-  # wiki_type needs to be removed. When an assignment is created, it needs to
+   # wiki_type needs to be removed. When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically" set the type field to the value that
   # designates an assignment of the appropriate type.
-  belongs_to :user, :foreign_key => "instructor_id"
-  has_one :late_policy
-  has_one :survey_distribution
   has_many :participants  
   has_many :users, :through => :participants
   has_many :due_dates
-  has_many :review_feedbacks
-  has_many :review_mappings
-  has_many :signup_sheets
-  has_many :review_of_review_mappings
-  has_many :assignments_questionnairess
   
-  has_many :questionnaire_weights  
+  has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaires', :foreign_key => 'assignment_id'
+  has_many :questionnaires, :through => :assignment_questionnaires
     
   validates_presence_of :name
-  validates_presence_of :review_questionnaire_id
-  validates_presence_of :review_of_review_questionnaire_id     
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
+    
+  COMPLETE = "Complete"
+  
+  def get_scores(questions)
+    scores = Hash.new
+   
+    scores[:participants] = Hash.new    
+    self.get_participants.each{
+      | participant |
+      scores[:participants][participant.id.to_s.to_sym] = Hash.new
+      scores[:participants][participant.id.to_s.to_sym][:participant] = participant
+      questionnaires.each{
+        | questionnaire |
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+      } 
+      scores[:participants][participant.id.to_s.to_sym][:total_score] = participant.compute_total_score(scores[:participants][participant.id.to_s.to_sym])
+    }        
+    
+    if self.team_assignment
+      scores[:teams] = Hash.new
+      index = 0
+      self.get_teams.each{
+        | team |
+        scores[:teams][index.to_s.to_sym] = Hash.new
+        scores[:teams][index.to_s.to_sym][:team] = team
+        assessments = Review.get_assessments_for(team)
+        scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
+        index += 1
+      }
+    end
+    return scores
+  end
+   
+  def after_initialize
+    self.review_strategy_id = nil 
+    self.mapping_strategy_id = nil
+  end
+  
+  def compute_scores
+    scores = Hash.new
+    questionnaires = self.questionnaires
+    
+    self.participants.each{
+      | participant |
+      pScore = Hash.new
+      pScore[:id] = participant.id
+      
+      
+      scores << pScore
+    }
+  end
+  
   
   def get_contributor(contrib_id)
     if team_assignment
@@ -37,47 +77,7 @@ class Assignment < ActiveRecord::Base
       return AssignmentParticipant.find(contrib_id)
     end
   end
-  
-  # get review weight
-  def review_weight
-    weight = 0
-    item = ReviewWeight.find_by_assignment_id(self.id)
-    if item
-      weight = item.weight
-    end
-    return weight
-  end
-  
-  # get metareview weight
-  def metareview_weight
-    weight = 0
-    item = MetareviewWeight.find_by_assignment_id(self.id)
-    if item
-      weight = item.weight
-    end
-    return weight
-  end
-  
-  # get author feedback weight
-  def author_feedback_weight
-    weight = 0
-    item = AuthorFeedbackWeight.find_by_assignment_id(self.id)
-    if item
-      weight = item.weight
-    end
-    return weight
-  end
-  
-  # get teammate review weight
-  def teammate_review_weight
-    weight = 0
-    item = TeammateReviewWeight.find_by_assignment_id(self.id)
-    if item
-      weight = item.weight
-    end
-    return weight
-  end
-  
+   
   # parameterized by questionnaire
   def get_max_score_possible(questionnaire)
     max = 0
@@ -89,38 +89,6 @@ class Assignment < ActiveRecord::Base
     }
     max = num_questions * questionnaire.max_question_score * sum_of_weights
     return max, sum_of_weights
-  end
-    
-  def get_max_review_score
-    max = 0
-    Questionnaire.find(self.review_questionnaire_id).questions.each{
-      max += Questionnaire.find(self.review_questionnaire_id).max_question_score
-    }    
-    return max.to_f
-  end
-  
-  def get_max_feedback_score
-    max = 0
-    Questionnaire.find(self.author_feedback_questionnaire_id).questions.each{
-      max += Questionnaire.find(self.author_feedback_questionnaire_id).max_question_score
-    }    
-    return max.to_f
-  end
-  
-  def get_max_metareview_score
-    max = 0
-    Questionnaire.find(self.review_of_review_questionnaire_id).questions.each{
-      max += Questionnaire.find(self.review_of_review_questionnaire_id).max_question_score
-    }    
-    return max.to_f
-  end
-  
-  def get_max_teammate_review_score
-    max = 0
-    Questionnaire.find(self.teammate_review_questionnaire_id).questions.each{
-      max += Questionnaire.find(self.teammate_review_questionnaire_id).max_question_score
-    }    
-    return max.to_f
   end
     
   def get_path
@@ -167,7 +135,7 @@ class Assignment < ActiveRecord::Base
   end
     
   def get_participants
-    AssignmentParticipant.find_by_sql("select participants.* from participants, users where participants.user_id = users.id and participants.type = 'AssignmentParticipant' and participants.parent_id = "+self.id.to_s+" order by users.fullname")
+    AssignmentParticipant.find(:all, :include => :user, :conditions => ['participants.parent_id = ?',self.id], :order => 'users.fullname')
   end
     
   def delete_assignment
@@ -384,7 +352,7 @@ class Assignment < ActiveRecord::Base
 
  
  def get_teams
-   AssignmentTeam.find_all_by_parent_id(self.id)
+   AssignmentTeam.find(:all, :conditions => ['parent_id = ?',self.id], :order => 'name')
  end
  
 #add a new participant to this assignment
@@ -412,8 +380,6 @@ def add_participant(user_name)
       end
       node.save   
  end
- 
- COMPLETE = "Complete"
  
  def get_current_stage()
     due_date = find_current_stage()

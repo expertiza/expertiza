@@ -10,14 +10,14 @@
 
 <%= render :partial => 'review_table',
            :locals => {
-           :submission => @submission,
+           :ctrl => @submission,
+           :caction => @caction,
+           :symbol => @symbol.to_sym,
            :assignment => @assignment,
            :reviews => @reviews,
            :collabel => @collabel,
-           :rowlabel => @rowlabel,
-           :questionnaire => @questionnaire,
-           :weight => @weight
-           }%>
+           :rowlabel => @rowlabel
+           }%>             
 
 <br/>
 	<table>
@@ -44,7 +44,7 @@
 	</table>
 	<br/>
 	<%= form.hidden_field :assignment, :value => @assignment.id %>
-	<%= form.hidden_field :author, :value => @author.id %>	
+	<%= form.hidden_field :author, :value => @participant.id %>	
     <%= submit_tag "Send Email" %> | 
 	<%= link_to 'Back', :action=>'view', :id => @assignment.id %>
 <% end %>

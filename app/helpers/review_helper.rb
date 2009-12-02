@@ -6,8 +6,8 @@ module ReviewHelper
     @mapping = ReviewMapping.find(@review.review_mapping_id)
     @assgt = Assignment.find(@mapping.assignment_id)    
     @author = AssignmentParticipant.find(:first,:conditions => ["user_id = ? AND parent_id = ?", @mapping.author_id, @assgt.id])
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", @assgt.review_questionnaire_id]) 
-    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)
+    @questionnaire =  @assgt.questionnaires.find_by_type('ReviewQuestionnaire')
+    @questions = @questionnaire.questions
     
     if @assgt.team_assignment 
       @author_first_user_id = TeamsUser.find(:first,:conditions => ["team_id=?", @mapping.team_id]).user_id
@@ -55,19 +55,19 @@ module ReviewHelper
   # determine if the instructor should be notified
   # ajbudlon, nov 18, 2008
   def self.notify_instructor(assignment,curr_item,questionnaire,total,count)
-      
      max_possible_score, weights = assignment.get_max_score_possible(questionnaire)
      new_score = curr_item.get_total_score.to_f*weights            
      existing_score = (total.to_f/count).to_f*weights 
-     notification = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',assignment.instructor_id, assignment.id, questionnaire.id])
-     if notification == nil
-       notification = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',assignment.instructor_id])
+     aq = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(assignment.instructor_id, assignment.id, questionnaire.id)
+    
+     if aq == nil
+       aq = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(assignment.instructor_id, nil, nil)
      end
-     allowed_difference = max_possible_score.to_f * notification.limit / 100      
+     allowed_difference = max_possible_score.to_f * aq.notification_limit / 100      
      if new_score < (existing_score - allowed_difference) or new_score > (existing_score + allowed_difference)
        new_pct = new_score.to_f/max_possible_score
        avg_pct = existing_score.to_f/max_possible_score
-       curr_item.notify_on_difference(new_pct,avg_pct,notification.limit)
+       curr_item.notify_on_difference(new_pct,avg_pct,aq.notification_limit)
      end    
   end  
 end

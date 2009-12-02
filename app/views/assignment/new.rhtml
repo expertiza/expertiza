@@ -8,6 +8,8 @@
   <%= render :partial => 'due_dates' %>
   <% if @course != nil %>
   	<%= hidden_field_tag('assignment[course_id]', @course.id) %>
+  <% else %>
+    <%= hidden_field_tag('assignment[course_id]', nil) %>
   <% end %>
   <%= hidden_field_tag('assignment[private]',@private) %>
   &nbsp;&nbsp;<%= submit_tag "Save assignment", :name=>"save" %>

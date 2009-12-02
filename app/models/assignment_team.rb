@@ -1,16 +1,20 @@
 class AssignmentTeam < Team
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many :review_mappings, :class_name => 'TeamReviewMapping', :foreign_key => 'reviewee_id'
-
+ 
   def get_hyperlinks
     links = Array.new
     for team_member in self.get_participants 
      if team_member.submitted_hyperlink != nil and team_member.submitted_hyperlink.strip.length > 0      
-      links << team_member.submitted_hyperlink
+      links << team_member.submitted_hyperlink      
      end
     end
     return links
   end
+  
+  def get_review_map_type
+    return 'TeamReviewMapping'
+  end  
   
   def self.import(row,session,id,options)
     if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
@@ -87,8 +91,8 @@ class AssignmentTeam < Team
     self.name
   end
   
-  def get_participants
-    users = self.get_team_users
+  def get_participants 
+    users = self.users        
     participants = Array.new
     users.each{
       | user | 
@@ -117,36 +121,8 @@ class AssignmentTeam < Team
     Assignment.find(self.parent_id)
   end
  
-  def get_feedbacks
-    review_mapping_query = "select id from review_mappings where assignment_id = "+self.assignment.id.to_s+" and reviewer_id in (select user_id from teams_users where team_id = "+self.id.to_s+")"   
-    review_query = "select id from reviews where review_mapping_id in ("+review_mapping_query+")"
-    
-    feedbacks = ReviewFeedback.find_by_sql("select * from review_feedbacks where review_id in ("+review_query+")")
-    return feedbacks.sort {|a,b| a.reviewer.name <=> b.reviewer.name}    
-  end 
-  
   def get_reviews
-    reviews = Review.find(:all, :include => :mapping, :conditions => ['reviewee_id = ? and reviewed_object_id = ?',self.id, self.assignment.id])
-    return reviews.sort {|a,b| a.mapping.reviewer.fullname <=> b.mapping.reviewer.fullname }    
-  end
-
-  #revision to use ComputedScores table - not fully implemented
-  def compute_scores(questionnaire, model)
-    participant = self.get_participants.first
-    participant.compute_scores(questionnaire,model)
-  end  
-  
-  #computes this participants current review scores:
-  # avg_review_score
-  # difference
-  def compute_review_scores(questionnaire, questions)    
-    reviews = Review.find(:all, :include => :mapping, :conditions => ['reviewee_id = ? and reviewed_object_id = ?',self.id, self.parent_id])
-    if reviews.length > 0 
-      avg_review_score, max_score,min_score = AssignmentParticipant.compute_scores(reviews, questionnaire)
-      return avg_review_score, max_score, min_score
-    else
-      return nil,nil,nil
-    end
+    Review.get_assessments_for(self)
   end
   
   def self.get_team(participant)

@@ -1,2 +1,0 @@
-class TeammateReviewWeight < QuestionnaireWeight  
-end

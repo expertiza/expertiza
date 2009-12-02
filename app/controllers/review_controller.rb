@@ -29,7 +29,7 @@ class ReviewController < ApplicationController
     @mapping = @review.mapping
     @assgt = @mapping.assignment
 
-    @questionnaire = Questionnaire.find(@assgt.review_questionnaire_id)    
+    @questionnaire = @assgt.questionnaires.find_by_type('ReviewQuestionnaire')    
     @questions = @questionnaire.questions
     
     @review_scores = Array.new
@@ -146,8 +146,8 @@ class ReviewController < ApplicationController
     @mapping_id = params[:id]
     @mapping = ReviewMapping.find(params[:id])
     
-    @assignment = @mapping.assignment
-    @questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
+    @assignment = @mapping.assignment    
+    @questionnaire = @assignment.questionnaires.find_by_type('ReviewQuestionnaire')
     @questions = @questionnaire.questions
     @max = @questionnaire.max_question_score
     @min = @questionnaire.min_question_score  
@@ -250,7 +250,7 @@ class ReviewController < ApplicationController
   def compare_scores              
     total, count = ReviewHelper.get_total_scores(@review.mapping.reviewee.get_reviews,@review)     
     if count > 0
-      questionnaire = Questionnaire.find(@review.mapping.assignment.review_questionnaire_id)
+      questionnaire = @review.mapping.assignment.questionnaires.find_by_type('ReviewQuestionnaire')
       ReviewHelper.notify_instructor(@review.mapping.assignment,@review,questionnaire,total,count)
     end
   end
@@ -258,7 +258,7 @@ class ReviewController < ApplicationController
   def feedback
     @reviewer_id = session[:user].id
     @assignment_id = params[:id]
-    @questions = Question.find(:all,:conditions => ["questionnaire_id = ?", Assignment.find(@assignment_id).review_questionnaire_id])
+    @questions = Assignment.find(@assignment_id).questionnaires.find_by_type('ReviewQuestionnaire').questions
     @review_mapping = ReviewMapping.find(:all,:conditions => ["reviewer_id = ? and assignment_id = ?", @reviewer_id, @assignment_id])   
   end
    

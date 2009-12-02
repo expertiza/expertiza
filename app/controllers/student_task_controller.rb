@@ -1,4 +1,5 @@
 class StudentTaskController < ApplicationController
+  helper :submitted_content
   
   def list
     if session[:user].is_new_user
@@ -42,8 +43,5 @@ class StudentTaskController < ApplicationController
     
   end
   
-  def view_scores
-    @participant = AssignmentParticipant.find(params[:id])
-    @assignment = @participant.assignment
-  end
+
 end

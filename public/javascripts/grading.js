@@ -1,4 +1,3 @@
-<SCRIPT>
   function toggleAll(numteams){    
     var maintag = document.getElementById('teamAll');
     hidden = maintag.innerHTML == 'Show all teams';    
@@ -73,4 +72,3 @@
   	  var obj = document.getElementById(elementId+"_"+sublistsize);	    
   	}  	  
   }  
-</SCRIPT>

@@ -20,33 +20,26 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
     
     ReviewOfReviewMapping.find(:all).each{
       | mapping |
+     
       review_mapping = ReviewMapping.find(mapping.reviewed_object_id)
       if mapping.review_reviewer_id != nil
         reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(mapping.review_reviewer_id, review_mapping.assignment_id)        
       else
         reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(mapping.reviewer_id, review_mapping.assignment_id)      
       end
-     
-      reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(review_mapping.reviewer, review_mapping.assignment_id)
-      
+
+      reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(review_mapping.reviewer_id, review_mapping.assignment_id)
+ 
       if reviewer != nil and reviewee != nil
         mapping.reviewer_id = reviewer.id 
         mapping.reviewee_id = reviewee.id
         mapping.save
-      elsif reviewer.nil?
-        rors = ReviewOfReview.find_all_by_mapping_id(mapping.id)
-        rors.each{
-            |ror|
-             ror.delete
-        }        
-        mapping.destroy
       else
-        rors = ReviewOfReview.find_all_by_mapping_id(mapping.id)
-        rors.each{
-            |ror|
-             ror.delete
+        ReviewOfReview.find_all_by_mapping_id(mapping.id).each{
+         |ror|
+         ror.delete
         }        
-        mapping.destroy        
+        mapping.destroy          
       end
         
     }

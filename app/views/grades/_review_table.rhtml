@@ -1,39 +1,17 @@
-<% if submission == '1' %>
-   <%       
-      ctrl = 'review'
-      action = 'view_review'      
-   %>
-<% elsif submission == '2' %>
-   <%     
-      ctrl = 'review_of_review' 
-      action = 'view'
-    %>
-<% elsif submission == '3' %>
-   <%     
-      ctrl = 'review_feedback' 
-      action = 'view'
-    %>    
-<% elsif submission == '4' %>
-   <%     
-      ctrl = 'teammate_review' 
-      action = 'view'
-    %>
-<% end %>
-
 <table class="grades">    
 	<tr><th>&nbsp;</th>
 		<% for i in 0...reviews.size%>
 			<th><%= collabel %>&nbsp;<%=i+1%></th>
 		<% end %>
 	</tr>
-	<% if controller.controller_name != "student_task" %>
+	<% if controller.action_name != "view_my_scores" %>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
            <td align="center">                       
            <% if prefix %>         
              <a href="#<%= prefix+"_"+review.mapping.reviewer.name %>"><%= review.mapping.reviewer.fullname %></a>      		   		     
 		   <% else %>
-		     <%= link_to review.mapping.reviewer.fullname, :controller=>ctrl, :action => action, :id=> review.id%>
+		     <%= link_to review.mapping.reviewer.fullname, :controller=>ctrl, :action => caction, :id=> review.id%>
 		   <% end %>
 		   </td>	    
 	    <% end %>
@@ -41,9 +19,9 @@
 	<% end %>
 	<tr class="head"><td align="right"><b>Average score</b></td>
 		<% for review in reviews %>
-		   <td align="center">		       
-		       <% score = Score.get_total_score(review.id,questionnaire) %>
-		       <% if controller.controller_name != "student_task" %>
+		   <td align="center">
+		       <% score = Score.get_total_score(review, @questions[symbol]) %>
+		       <% if controller.action_name != "view_my_scores" %>
 		       	<input type="hidden" id="mailer_<%= review.mapping.reviewer.fullname %>_grade" name="mailer[<%= review.mapping.reviewer.fullname %>_grade]" value="<%= score  %>" %>
 		       <% end %>   
 	  	       <%= sprintf("%.2f",score) %>% &nbsp;

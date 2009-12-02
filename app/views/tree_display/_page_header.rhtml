@@ -1,5 +1,5 @@
 <BR/>
-<%= start_form_tag({:action => 'list'}) %>
+<%= form_tag({:action => 'list'}) %>
 <TABLE width="80%">
 <TR>
 <TD width="30%" align="left">
@@ -24,4 +24,4 @@ Sort by:
 <% if @root %>
 	<%= hidden_field_tag('root', @root_node.id) %>	
 <% end %>	
-<%= end_form_tag %>
+</form>

@@ -1,0 +1,21 @@
+<TR class="row"><TD>       
+     <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><img src="/images/expand.png"/></a>
+     <%= tscore[:team].name %></TD>
+     <% if tscore[:scores][:avg] %>
+      	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.2f",tscore[:scores][:avg]) %>%</TD>
+       	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.0f",tscore[:scores][:min]) %>% - <%= sprintf("%.0f",tscore[:scores][:max]) %>%</TD>
+     <% else %>
+        <TD COLSPAN="4" ALIGN="CENTER">---</TD>
+        <TD COLSPAN="4" ALIGN="CENTER">---</TD>
+     <% end %>
+     <TD WIDTH="9">&nbsp;</TD></TR>  
+     
+<%= render :partial => 'participant_title', :locals => {:prefix => prefix } %>        
+<% pindex = 3 %>
+  <% for participant in tscore[:team].get_participants %>     
+     <%= render :partial => 'grades/participant',
+                :locals => {:prefix => prefix+"_"+pindex.to_s,
+     	 			        :team => true,
+                            :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>  
+     <% pindex += 1 %>                            
+<% end %>        

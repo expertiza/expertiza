@@ -22,7 +22,6 @@ module SubmittedContentHelper
                 else
                         ret += "\n      "
                         parentFolder = File.dirname(file)
-                        puts parentFolder
                         if parentFolder != participant.get_path
                           parentFolder.sub!(participant.get_path+"/","")
                           parentFolder += "/"
@@ -30,7 +29,6 @@ module SubmittedContentHelper
                           parentFolder = ""
                         end
                         
-                        puts parentFolder
                         location = parentFolder + File.basename(file)
                         ret += link_to location, :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" =>  File.dirname(file)
                 end

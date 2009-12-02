@@ -20,14 +20,14 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 		(Submit and view your work)
 	</li>
 	<li>
-		<% if @assignment.review_allowed == true %>
+		<% if @assignment.review_allowed == true or @assignment.get_current_stage == "Complete" %>
 			<%= link_to "Others' work",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
 		<% else %>
 			<font color="gray">Others' work</font>
 		<% end %> (Give feedback to others on their work)
 	</li>
-	<li><%= link_to "View scores",{:action => 'view_scores', :id => @participant.id} %>(View feedback on your work)</li>
-	<% if @assignment.get_current_stage() == "Complete" -%>
+	<li><%= link_to "View scores",{:controller => 'grades', :action => 'view_my_scores', :id => @participant.id} %>(View feedback on your work)</li>
+	<% if @assignment.get_current_stage == "Complete" -%>
 	<!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
 		<li><%= link_to "Take Survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
 	<% end %>

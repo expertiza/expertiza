@@ -17,7 +17,7 @@ class ReviewOfReview < ActiveRecord::Base
       code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end   
     code += '<div id="metareview_'+str+'" style=""><BR/><BR/>'         
-    questionnaire = Questionnaire.find(self.mapping.assignment.review_of_review_questionnaire_id)
+    questionnaire = self.mapping.assignment.questionnaires.find_by_type('MetareviewQuestionnaire')
     questions = questionnaire.questions
     scores = Array.new
     questions.each{
@@ -42,9 +42,14 @@ class ReviewOfReview < ActiveRecord::Base
     return code    
   end
   
+  def self.get_assessments_for(participant)
+    assessments = find(:all, :include => :mapping, :conditions => ['reviewee_id = ?',participant.id])
+    return assessments.sort {|a,b| a.mapping.reviewer.fullname <=> b.mapping.reviewer.fullname }    
+  end  
+  
   # Computes the total score awarded for a metareview
   def get_total_score
-    questionnaire = Questionnaire.find(self.mapping.assignment.review_of_review_questionnaire_id)
+    questionnaire = self.mapping.assignment.questionnaires.find_by_type('MetareviewQuestionnaire')
     questions = questionnaire.questions
     
     total_score = 0

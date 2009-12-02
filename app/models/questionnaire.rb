@@ -1,11 +1,11 @@
 class Questionnaire < ActiveRecord::Base
     # for doc on why we do it this way, 
     # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
-    has_many :assignments, :foreign_key => "review_questionnaire_id" # Associates to assignments through review_questionnaire_id - 2/1/2009 this is no longer accurate as we have more than review_questionnaire types
     has_many :questions # the collection of questions associated with this Questionnaire
-    belongs_to :questionnaire_type, :foreign_key => "type_id" # the type of this Questionnaire
-    has_many :assignments_questionnaires # the join between Assignment and Questionnaire - 2/1/2009 may no longer be in use
     belongs_to :instructor, :class_name => "User", :foreign_key => "instructor_id" # the creator of this questionnaire
+    
+    has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaires', :foreign_key => 'questionnaire_id'  
+    has_many :assignments, :through => :assignment_questionnaires
     
     validates_presence_of :name
     validates_numericality_of :max_question_score
@@ -13,6 +13,15 @@ class Questionnaire < ActiveRecord::Base
     
     DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
     DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
+    
+    def compute_weighted_score(symbol, assignment, scores)
+      aq = self.assignment_questionnaires.find_by_assignment_id(assignment.id)      
+      if scores[symbol][:scores][:avg]
+        return scores[symbol][:scores][:avg] * (aq.questionnaire_weight  / 100).to_f
+      else 
+        return 0
+      end
+    end
     
     # Does this questionnaire contain true/false questions?
     def true_false_questions?
@@ -26,25 +35,10 @@ class Questionnaire < ActiveRecord::Base
     end
     
     def delete
-      assignment = Assignment.find_by_review_questionnaire_id(self.id)
-      if assignment
+      self.assignments.each{
+        | assignment |
         raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
-      end
-      
-      assignment = Assignment.find_by_review_of_review_questionnaire_id(self.id)
-      if assignment
-        raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
-      end       
-      
-      assignment = Assignment.find_by_teammate_review_questionnaire_id(self.id)
-      if assignment
-        raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
-      end      
-      
-      assignment = Assignment.find_by_author_feedback_questionnaire_id(self.id)
-      if assignment
-        raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
-      end  
+      }
       
       self.questions.each{
         | question |
@@ -79,5 +73,18 @@ class Questionnaire < ActiveRecord::Base
                             :conditions => ["id <> ? and name = ? and instructor_id = ?", 
                             id, name, instructor_id])
       errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
-  end   
+  end  
+  
+    def set_notification_limit(user, assignment, limit)
+      existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',user.id,assignment.id,self.id])
+      if existing.nil?
+        NotificationLimit.create(:user_id => user.id,
+                                 :assignment_id => assignment.id,
+                                 :questionnaire_id => self.id,
+                                 :limit => limit)
+      else
+        existing.limit = limit
+        existing.save
+      end      
+    end
 end

@@ -20,7 +20,7 @@
 		<td><%= member.user.name%></td>
 		<td><%= member.user.fullname%></td>
 		<td><%= member.user.email%></td>
-		<% if @student.assignment.teammate_review_questionnaire_id != nil and member.user.id != session[:user].id %>
+		<% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
 		
 		   <%  map = TeammateReviewMapping.find(:first, :conditions => ['reviewer_id = ? and reviewee_id = ?',@student.id, member.id])
 		       if map.nil?

@@ -20,7 +20,7 @@ class ReviewFeedback < ActiveRecord::Base
     end
     
     code += '<div id="feedback_'+str+'" style=""><BR/><BR/>'    
-    questionnaire = Questionnaire.find(self.mapping.assignment.author_feedback_questionnaire_id)
+    questionnaire = self.mapping.assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire')
     questions = questionnaire.questions
     scores = Array.new
     questions.each{
@@ -47,6 +47,11 @@ class ReviewFeedback < ActiveRecord::Base
     return code
   end  
   
+  def self.get_assessments_for(participant)
+    assessments = find(:all, :include => :mapping, :conditions => ['reviewee_id = ?',participant.id])
+    return assessments.sort {|a,b| a.mapping.reviewer.fullname <=> b.mapping.reviewer.fullname }    
+  end
+  
   def delete
     type_id = QuestionnaireType.find_by_name("Author Feedback").id
     scores = Score.find_all_by_instance_id_and_questionnaire_type_id(self.id,type_id)
@@ -56,7 +61,7 @@ class ReviewFeedback < ActiveRecord::Base
   
  # Computes the total score awarded for a feedback
   def get_total_score
-    questionnaire = Questionnaire.find(self.mapping.assignment.author_feedback_questionnaire_id)
+    questionnaire = self.mapping.assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire')
     questions = questionnaire.questions
     
     total_score = 0

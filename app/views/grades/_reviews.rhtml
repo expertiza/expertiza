@@ -1,24 +1,23 @@
 <!-- REVIEWS --> 
-<% if participant.get_reviews.length > 0 %>
+<% if rscore[:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
            :locals => {
-           :submission => '1',
+           :ctrl => 'review',
+           :caction => 'view_review',
+           :symbol => "review".to_sym,
            :prefix => prefix,
-           :assignment => Assignment.find(participant.parent_id),
-           :reviews => participant.get_reviews,
+           :assignment => participant.assignment,
+           :reviews => rscore[:assessments],
            :collabel => "Review",
-           :rowlabel => "Reviewer",
-           :questionnaire => @review_questionnaire,
-           :questions => @review_questions,
-           :weight => @review_weight
+           :rowlabel => "Reviewer"
            }%>
   <BR/>         
   <HR/> 
   <% count = 0 %>
-  <% for review in participant.get_reviews %>
+  <% for review in rscore[:assessments] %>
     <% count = count + 1 %>
-    <% if controller.controller_name != "student_task" %>
+    <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+review.mapping.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
     <% else %>
       <%= review.display_as_html(nil,count) %><BR/><BR/>

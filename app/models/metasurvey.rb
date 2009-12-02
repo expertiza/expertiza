@@ -12,11 +12,6 @@ class Metasurvey < Questionnaire
     # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
     
     # can these be inherited too?
-    has_many :assignments, :foreign_key => "review_questionnaire_id"
-    has_many :questions, :foreign_key => "questionnaire_id"
-    
-    has_many :assignment_questionnaires
-    
     validates_presence_of :name
     validates_numericality_of :max_question_score
     validates_numericality_of :min_question_score

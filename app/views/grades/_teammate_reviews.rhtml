@@ -1,24 +1,23 @@
 <!-- TeammateReviewS --> 
-<% if participant.get_teammate_reviews.length > 0 %>
+<% if rscore and rscore[:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
            :locals => {
-           :submission => '4',
+           :ctrl => 'teammate_review',
+           :caction => 'view',
+           :symbol => "teammate".to_sym,
            :prefix => prefix,
            :assignment => participant.assignment,
-           :reviews => participant.get_teammate_reviews,
+           :reviews => rscore[:assessments],
            :collabel => "Feedback",
-           :rowlabel => "Author",
-           :questionnaire => @teammate_questionnaire,
-           :questions => @teammate_questions,
-           :weight => @teammate_weight
+           :rowlabel => "Author"
            }%>
   <BR/>         
   <HR/> 
   <% count = 0 %>
-  <% for review in participant.get_teammate_reviews %>
+  <% for review in rscore[:assessments] %>
     <% count = count + 1 %>
-    <% if controller.controller_name != "student_task" %>
+    <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+review.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
     <% else %>
       <%= review.display_as_html(nil,count) %><BR/><BR/>

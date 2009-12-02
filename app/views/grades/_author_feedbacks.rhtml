@@ -1,24 +1,23 @@
 <!-- FEEDBACKS --> 
-<% if participant.get_feedbacks.length > 0 %>
+<% if rscore[:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
            :locals => {
-           :submission => '3',
+           :ctrl => 'review_feedback',
+           :caction => 'view',
+           :symbol => "feedback".to_sym,
            :prefix => prefix,
            :assignment => participant.assignment,
-           :reviews => participant.get_feedbacks,
+           :reviews => rscore[:assessments],
            :collabel => "Feedback",
-           :rowlabel => "Author",
-           :questionnaire => @feedback_questionnaire,
-           :questions => @feedback_questions,
-           :weight => @feedback_weight
+           :rowlabel => "Author"
            }%>
   <BR/>         
   <HR/> 
   <% count = 0 %>
-  <% for feedback in participant.get_feedbacks %>
+  <% for feedback in rscore[:assessments] %>
     <% count = count + 1 %>
-    <% if controller.controller_name != "student_task" %>
+    <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+feedback.mapping.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
     <% else %>
       <%= feedback.display_as_html(nil,count) %><BR/><BR/>

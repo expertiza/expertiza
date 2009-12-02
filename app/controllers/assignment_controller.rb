@@ -32,7 +32,6 @@ class AssignmentController < ApplicationController
     
     @assignment = Assignment.new
     
-    @questionnaire = Questionnaire.find_all
     @wiki_types = WikiType.find_all
     @private = params[:private] == true        
     #calling the defalut values mathods
@@ -72,7 +71,8 @@ class AssignmentController < ApplicationController
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
     
-    if @assignment.save  
+    if @assignment.save 
+      set_questionnaires   
       set_limits
       set_weights
       
@@ -92,7 +92,7 @@ class AssignmentController < ApplicationController
         max_round = 2
         for rereview_duedate_key in params[:additional_review_deadline].keys
           #setting the Due Dates with a helper function written in DueDate.rb
-          DueDate::set_duedate (params[:additional_review_deadline][rereview_duedate_key],@Rereview_deadline, @assignment.id, max_round )
+          DueDate::set_duedate(params[:additional_review_deadline][rereview_duedate_key],@Rereview_deadline, @assignment.id, max_round )
           max_round = max_round + 1
         end
       end
@@ -118,8 +118,7 @@ class AssignmentController < ApplicationController
   
   def edit
     @assignment = Assignment.find(params[:id])
-    get_instructor_notification_limits 
-    get_weights 
+    get_limits_and_weights    
     @wiki_types = WikiType.find_all
   end
   
@@ -134,142 +133,71 @@ class AssignmentController < ApplicationController
       existing.limit = limit
       existing.save
     end    
-  end
-  
-  def define_weight(assignment_id, questionnaire_id, type, weight)    
-    existing = QuestionnaireWeight.find(:first, :conditions => ['assignment_id = ? and questionnaire_id = ?',assignment_id,questionnaire_id])
-    if existing.nil?
-      qw = QuestionnaireWeight.create(:assignment_id => assignment_id,
-                                       :questionnaire_id => questionnaire_id,
-                                       :weight => weight)                                      
-      qw.type = type                                      
-      qw.save                                
-    else
-      existing.weight = weight
-      existing.save
-    end    
   end  
   
-  def set_limits
-    if params[:limits]
-      if @assignment.review_questionnaire_id and (params[:limits][:review] != params[:review_limit])          
-        define_instructor_notification_limit(@assignment.id, @assignment.review_questionnaire_id, params[:limits][:review])                       
-      end         
-      if @assignment.review_of_review_questionnaire_id and (params[:limits][:metareview] != params[:metareview_limit])
-        define_instructor_notification_limit(@assignment.id, @assignment.review_of_review_questionnaire_id, params[:limits][:metareview])                             
-      end        
-      if @assignment.teammate_review_questionnaire_id and (params[:limits][:teammate] != params[:teammate_limit])           
-        define_instructor_notification_limit(@assignment.id, @assignment.teammate_review_questionnaire_id, params[:limits][:teammate])
+  def set_questionnaires
+    @assignment.assignment_questionnaires.clear
+    params[:questionnaires].each{
+      | key, value |       
+      if value.to_i > 0 and Questionnaire.find(value)
+        @assignment.questionnaires << Questionnaire.find(value)
       end
-      
-      if @assignment.author_feedback_questionnaire_id and (params[:limits][:feedback] != params[:feedback_limit])                      
-        define_instructor_notification_limit(@assignment.id, @assignment.author_feedback_questionnaire_id, params[:limits][:feedback])
-      end
-    end    
-  end  
+    }     
+  end   
   
-  def set_weights
-    if params[:weights]
-      if @assignment.review_questionnaire_id          
-        define_weight(@assignment.id, @assignment.review_questionnaire_id, "ReviewWeight", params[:weights][:review])                       
-      end 
-      
-      if @assignment.review_of_review_questionnaire_id 
-        define_weight(@assignment.id, @assignment.review_of_review_questionnaire_id, "MetareviewWeight", params[:weights][:metareview])                             
-      end
-      
-      if @assignment.teammate_review_questionnaire_id 
-        define_weight(@assignment.id, @assignment.teammate_review_questionnaire_id , "TeammateReviewWeight", params[:weights][:teammate])
-      end
-      
-      if @assignment.author_feedback_questionnaire_id 
-        define_weight(@assignment.id, @assignment.author_feedback_questionnaire_id, "AuthorFeedbackWeight", params[:weights][:feedback])
-      end
-    end    
-  end    
-  
-  def get_instructor_notification_limits 
-    @limits = Hash.new
-    default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',session[:user].id])   
-    #handle TAs
-    if default == nil
-      default = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@assignment.instructor_id])
-    end
-    
-    review = NotificationLimit.find(:first, 
-                                 :conditions => ['assignment_id = ? and questionnaire_id = ?',                                                
-    @assignment.id,
-    @assignment.review_questionnaire_id])
-    if review != nil                                                 
-      @limits[:review] = review.limit
-    else
-      @limits[:review] = default.limit
-    end
-    
-    metareview = NotificationLimit.find(:first, 
-                                 :conditions => ['assignment_id = ? and questionnaire_id = ?',
-    @assignment.id,
-    @assignment.review_of_review_questionnaire_id])
-    if metareview != nil                                                 
-      @limits[:metareview] = metareview.limit
-    else
-      @limits[:metareview] = default.limit
-    end
-    
-    teammate = NotificationLimit.find(:first, 
-                                 :conditions => ['assignment_id = ? and questionnaire_id = ?',
-    @assignment.id,
-    @assignment.teammate_review_questionnaire_id])
-    if teammate != nil                                                 
-      @limits[:teammate] = teammate.limit
-    else
-      @limits[:teammate] = default.limit
-    end 
-    
-    feedback = NotificationLimit.find(:first, 
-                                 :conditions => ['assignment_id = ? and questionnaire_id = ?',
-    @assignment.id,
-    @assignment.author_feedback_questionnaire_id])
-    if feedback != nil                                                 
-      @limits[:feedback] = feedback.limit
-    else
-      @limits[:feedback] = default.limit
-    end              
-  end
-  
-  def get_weights
+  def get_limits_and_weights 
+    @limits = Hash.new   
     @weights = Hash.new
-    review = ReviewWeight.find_by_assignment_id(@assignment.id)
-    metareview = MetareviewWeight.find_by_assignment_id(@assignment.id)
-    feedback = AuthorFeedbackWeight.find_by_assignment_id(@assignment.id)
-    teammate = TeammateReviewWeight.find_by_assignment_id(@assignment.id)
     
-    if review != nil
-      @weights[:review] = review.weight
+    if session[:user].role.name == "Teaching Assistant"
+      user_id = TA.get_my_instructor(session[:user]).id
     else
-      @weights[:review] = 100
+      user_id = session[:user].id
     end
     
-    if metareview != nil
-      @weights[:metareview] = metareview.weight
-    else
-      @weights[:metareview] = 0
-    end
+    default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)   
     
-    if feedback != nil
-      @weights[:feedback] = feedback.weight
-    else
-      @weights[:feedback] = 0
-    end
+    @limits[:review] = default.notification_limit
+    @limits[:metareview] = default.notification_limit
+    @limits[:feedback] = default.notification_limit
+    @limits[:teammate] = default.notification_limit
+   
+    @weights[:review] = 100
+    @weights[:metareview] = 0
+    @weights[:feedback] = 0
+    @weights[:teammate] = 0    
     
-    if teammate != nil
-      @weights[:teammate] = teammate.weight
-    else
-      @weights[:teammate] = 0
-    end    
-  end  
+    @assignment.questionnaires.each{
+      | questionnaire |
+      aq = AssignmentQuestionnaires.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
+      @limits[questionnaire.symbol] = aq.notification_limit   
+      @weights[questionnaire.symbol] = aq.questionnaire_weight
+    }             
+  end
   
-  def update  
+  def set_limits_and_weights
+    if session[:user].role.name == "Teaching Assistant"
+      user_id = TA.get_my_instructor(session[:user]).id
+    else
+      user_id = session[:user].id
+    end
+    
+    default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil) 
+    
+    @assignment.questionnaires.each{
+      | questionnaire |
+      aq = AssignmentQuestionnaires.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
+      if params[:limits][questionnaire.symbol].length > 0
+        aq.update_attribute('notification_limit',params[:limits][questionnaire.symbol])
+      else
+        aq.update_attribute('notification_limit',default.notification_limit)
+      end
+      aq.update_attribute('questionnaire_weight',params[:weights][questionnaire.symbol])
+      aq.update_attribute('user_id',user_id)
+    }
+  end
+  
+  def update      
     if params[:assignment][:course_id]
       begin
         Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
@@ -284,9 +212,9 @@ class AssignmentController < ApplicationController
       oldpath = nil
     end
     # The update call below updates only the assignment table. The due dates must be updated separately.
-    if @assignment.update_attributes(params[:assignment]) 
-      set_limits
-      set_weights
+    if @assignment.update_attributes(params[:assignment])     
+      set_questionnaires
+      set_limits_and_weights
       begin
         newpath = @assignment.get_path        
       rescue

@@ -1,25 +1,23 @@
 <!-- METAREVIEWS --> 
-<% if participant.get_metareviews.length > 0 %>
+<% if rscore[:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
            :locals => {
-           :submission => '2',
+           :ctrl => 'review_of_review',
+           :caction => 'view',
+           :symbol => "metareview".to_sym,
            :prefix => prefix,
-           :assignment => Assignment.find(participant.parent_id),
-           :reviews => participant.get_metareviews,
+           :assignment => participant.assignment,
+           :reviews => rscore[:assessments],
            :collabel => "Metareview",
-           :rowlabel => "Metareviewer",
-           :questionnaire => @metareview_questionnaire,
-           :questions => @metareview_questions,
-           :weight => @metareview_weight
-           
+           :rowlabel => "Metareviewer",                      
            }%>
   <BR/>         
   <HR/> 
   <% count = 0 %>
-  <% for metareview in participant.get_metareviews %>
+  <% for metareview in rscore[:assessments] %>
     <% count = count + 1 %>
-    <% if controller.controller_name != "student_task" %>
+    <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+metareview.mapping.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/> 
     <% else %>
       <%= metareview.display_as_html(nil,count) %><BR/><BR/>

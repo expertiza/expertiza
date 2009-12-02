@@ -1,44 +1,17 @@
-<%= render :partial => 'scripts' %>
 <h1>Summary report for <%= @assignment.name %></h1>
-<BR/>  
-<%if @teams and @teams.length > 0 %>
-<a href="#" onClick="toggleAll(<%= @teams.length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
+<BR/>
+<% if @scores[:teams] %>
+	<a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
+    <BR/><BR/>
 <% end %>
-<BR/><BR/>
-<% if @participants.length > 0 %>
 <TABLE class="grades" width="100%">
-<% if @teams and @teams.length > 0 %>   
-  <%= render :partial => 'teams' %>  
+<% if @assignment.team_assignment && @scores[:teams].length > 0 %>
+  <%= render :partial => 'teams' %>
+<% elsif !@assignment.team_assignment && @scores[:participants].length > 0 %>  
+  <%= render :partial => 'participants' %>
 <% else %>
-  <%= render :partial => 'participant_title', :locals => {:prefix => nil} %>
-  <% index = 0 %>
-  <% for participant in @participants
-    index += 1
-    s_avg, s_max, s_min = participant.compute_review_scores(@review_questionnaire, @review_questions)
-    r_avg, r_max, r_min = participant.compute_metareview_scores(@metareview_questionnaire, @metareview_questions)   
-    f_avg, f_max, f_min = participant.compute_author_feedback_scores(@feedback_questionnaire, @feedback_questions)
-    
-    if @assignment.team_assignment and participant.assignment.teammate_review_questionnaire_id != nil
-       tr_avg, tr_max, tr_min = participant.compute_teammate_review_scores(@teammate_questionnaire, @teammate_questions)                  
-    end        
-  %>
-    <%= render :partial => 'participant',
-               :locals => {:prefix => 'user_'+index.to_s,
-               			   :team => false,
-                           :participant => participant,
-                           :s_avg => s_avg, :s_min => s_min, :s_max => s_max,
-                           :r_avg => r_avg, :r_min => r_min, :r_max => r_max,
-                           :f_avg => f_avg, :f_min => f_min, :f_max => f_max,
-                           :tr_avg => tr_avg, :tr_min => tr_min, :tr_max => tr_max                                                  
-                           }%>
-
-  <% end %>
+  <TR><TD>No  are defined for this assignment</TD></TR>
 <% end %>
 </TABLE>
-<BR/>
-<FONT SIZE="-1">** A <FONT COLOR="#0033FF">blue</FONT> score indicates that the instructor has provided additional comments or modified the score for the participant.</FONT><BR/> 
-<% end %>
-<BR/>
-<%= render :partial => 'shared_scripts/back' %> 
-<!-- # When teammate reviews are inserted, this line needs to go after the one starting with ":r_avg" -->
-<!--  :t_avg => t_avg, :t_min => t_min, :t_max => t_max} -->
+<a href="javascript:window.history.back()">Back</a>
+

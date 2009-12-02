@@ -8,7 +8,7 @@ class ReviewFeedbackController < ApplicationController
     reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @review.mapping.assignment.id)
     reviewee = @review.mapping.reviewer
     @mapping = FeedbackMapping.create(:reviewed_object_id => @review.id, :reviewer_id => reviewer.id, :reviewee_id => reviewee.id)
-    @questionnaire = Questionnaire.find(@mapping.assignment.author_feedback_questionnaire_id)
+    @questionnaire = @mapping.assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire')
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
@@ -17,7 +17,7 @@ class ReviewFeedbackController < ApplicationController
   def create
     map = FeedbackMapping.find(params[:id])
     @response = ReviewFeedback.create(:mapping_id => map.id, :additional_comment => params[:review][:comments])
-    @questionnaire = Questionnaire.find(map.assignment.author_feedback_questionnaire_id)
+    @questionnaire = map.assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire')
     questions = @questionnaire.questions     
     
     params[:responses].each_pair do |k,v|
@@ -26,7 +26,7 @@ class ReviewFeedbackController < ApplicationController
     
     compare_scores
     flash[:note] = 'Feedback was successfully saved.'
-    redirect_to :controller => 'student_task', :action => 'view_scores', :id => map.reviewer.id
+    redirect_to :controller => 'grades', :action => 'view_my_scores', :id => map.reviewer.id
   end
   
   def view    
@@ -38,7 +38,7 @@ class ReviewFeedbackController < ApplicationController
     @response = ReviewFeedback.find(params[:id]) 
     @review = @response.mapping.review
     @mapping = @response.mapping
-    @questionnaire = Questionnaire.find(@response.mapping.assignment.author_feedback_questionnaire_id)
+    @questionnaire = @response.mapping.assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire')
     @questions = @questionnaire.questions
     @review_scores = Array.new
     @questions.each{
@@ -55,7 +55,7 @@ class ReviewFeedbackController < ApplicationController
     @response.additional_comment = params[:review][:comments]
     @response.save
     
-    @questionnaire = Questionnaire.find(@response.mapping.assignment.author_feedback_questionnaire_id)
+    @questionnaire = @response.mapping.assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire')
     questions = @questionnaire.questions
 
     params[:responses].each_pair do |k,v|
@@ -78,7 +78,7 @@ class ReviewFeedbackController < ApplicationController
   # the instructor) then notify the instructor.
   def compare_scores      
     participant = @response.mapping.reviewee                    
-    total, count = ReviewHelper.get_total_scores(participant.get_feedbacks,@response)     
+    total, count = ReviewHelper.get_total_scores(participant.get_feedback,@response)     
     if count > 0
       ReviewHelper.notify_instructor(@response.mapping.assignment,@response,@questionnaire,total,count)
     end

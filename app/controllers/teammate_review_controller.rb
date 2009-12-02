@@ -3,7 +3,7 @@ class TeammateReviewController < ApplicationController
   
   def new
     @mapping = TeammateReviewMapping.find(params[:id])
-    @questionnaire = Questionnaire.find(@mapping.assignment.teammate_review_questionnaire_id)
+    @questionnaire = @mapping.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire')
     @questions = @questionnaire.questions
     @max = @questionnaire.max_question_score
     @min = @questionnaire.min_question_score
@@ -12,7 +12,7 @@ class TeammateReviewController < ApplicationController
   def create
     map = TeammateReviewMapping.find(params[:id])
     @response = TeammateReview.create(:mapping_id => map.id, :additional_comment => params[:review][:comments])
-    @questionnaire = Questionnaire.find(map.assignment.teammate_review_questionnaire_id)
+    @questionnaire = map.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire')
     questions = @questionnaire.questions     
     
     params[:responses].each_pair do |k,v|
@@ -33,7 +33,7 @@ class TeammateReviewController < ApplicationController
   def edit
     @response = TeammateReview.find(params[:id]) 
     @mapping = @response.mapping
-    @questionnaire = Questionnaire.find(@response.mapping.assignment.teammate_review_questionnaire_id)
+    @questionnaire = @response.mapping.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire')
     @questions = @questionnaire.questions    
     @review_scores = Array.new
     @questions.each{
@@ -50,7 +50,7 @@ class TeammateReviewController < ApplicationController
     @response.additional_comment = params[:review][:comments]
     @response.save
     
-    @questionnaire = Questionnaire.find(@response.mapping.assignment.teammate_review_questionnaire_id)
+    @questionnaire = @response.mapping.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire')
     questions = @questionnaire.questions
 
     params[:responses].each_pair do |k,v|

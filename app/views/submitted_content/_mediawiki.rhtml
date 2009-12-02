@@ -6,9 +6,9 @@
     then makes callbacks to the various wiki classes, depending on what kind of a wiki it is working on.
     This allows wiki-specific behavior to be kept in the wiki classes. -->
     <%if @assignment.team_assignment  # The lookup of all team members should be put in a wiki helper
-    	for team_member in @participant.team.get_participants %>
-	     <%= review_mediawiki @assignment.directory_path, nil, team_member.handle  %>
+    	for team_member in participant.team.get_participants %>
+	     <%= WikiHelper::review_mediawiki participant.assignment.directory_path, nil, team_member.handle  %>
 	   <%end%>
     <%else%>
-	    <%= review_mediawiki @assignment.directory_path, nil, @participant.handle  %>
+	    <%= WikiHelper::review_mediawiki participant.assignment.directory_path, nil, participant.handle  %>
     <%end%>

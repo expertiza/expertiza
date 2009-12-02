@@ -26,7 +26,7 @@ module WikiHelper
   # @args: _start_date (all review items older will be filtered out)
   # @args: _wiki_user (wiki user id to crawl)
   ##
-  def review_dokuwiki(_assignment_url, _start_date = nil, _wiki_user = nil)
+  def self.review_dokuwiki(_assignment_url, _start_date = nil, _wiki_user = nil)
 
     response = '' #the response from the URL
 
@@ -188,7 +188,7 @@ module WikiHelper
   # @args: _start_date (all review items older will be filtered out)
   # @args: _wiki_user (wiki user id to crawl)
   ##
-  def review_mediawiki(_assignment_url, _start_date = nil, _wiki_user = nil)
+  def self.review_mediawiki(_assignment_url, _start_date = nil, _wiki_user = nil)
     
     response = '' #the response from the URL
 
@@ -282,8 +282,5 @@ module WikiHelper
     formatted_line_items << "</ul>"
     return formatted_line_items
 
-  end
-  def review_mediawiki_group(_assignment_url, _start_date = nil, _wiki_user = nil)
-    review_mediawiki(_assignment_url, _start_date , _wiki_user)    
   end
 end

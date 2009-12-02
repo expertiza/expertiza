@@ -28,7 +28,6 @@ class QuestionnaireTypeNode < FolderNode
   end  
   
   def get_children(sortvar = nil,sortorder = nil,user_id = nil,show=nil,parent_id = nil)
-    puts "********** TYPE NODE *********"
     QuestionnaireNode.get(sortvar,sortorder,user_id,show,self.node_object_id)
   end
 end

@@ -4,7 +4,7 @@ class TeammateReview < ActiveRecord::Base
   
   # Computes the total score awarded for a  teammate review
   def get_total_score
-    questionnaire = Questionnaire.find(self.mapping.assignment.teammate_review_questionnaire_id)
+    questionnaire = self.mapping.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire')
     questions = questionnaire.questions
     
     total_score = 0
@@ -16,6 +16,11 @@ class TeammateReview < ActiveRecord::Base
     }    
     return total_score        
   end 
+  
+  def self.get_assessments_for(participant)
+    assessments = find(:all, :include => :mapping, :conditions => ['reviewee_id = ?',participant.id])
+    return assessments.sort {|a,b| a.mapping.reviewer.fullname <=> b.mapping.reviewer.fullname }    
+  end  
   
   def display_as_html(prefix = nil, count = nil)
     if prefix
@@ -34,7 +39,7 @@ class TeammateReview < ActiveRecord::Base
     end     
         
     code += '<div id="teammate_review_'+str+'" style=""><BR/><BR/>'
-    questionnaire = Questionnaire.find(self.mapping.assignment.teammate_review_questionnaire_id)
+    questionnaire = self.mapping.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire')
     questions = questionnaire.questions
     scores = Array.new
     questions.each{

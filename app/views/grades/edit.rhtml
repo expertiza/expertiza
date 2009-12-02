@@ -1,33 +1,15 @@
 <H1>Score for <%= @participant.fullname %></H1>
-
+<% pscore = @participant.get_scores(@questions) %>
 <%= start_form_tag :action => 'update', :id => @participant.id %>
 <TABLE class="grades" >
-<%= render :partial => 'participant_title', :locals => {:prefix => nil} %>
-<%  s_avg, s_max, s_min = @participant.compute_review_scores(@review_questionnaire, @review_questions)
-    r_avg, r_max, r_min = @participant.compute_metareview_scores(@metareview_questionnaire, @metareview_questions)
-    f_avg, f_max, f_min = @participant.compute_author_feedback_scores(@feedback_questionnaire, @feedback_questions)
-
-    if @assignment.team_assignment
-       tr_avg, tr_max, tr_min = @participant.compute_teammate_review_scores(@teammate_questionnaire, @teammate_questions)                  
-    end
- 
-    
-    
-    %>
-                           
-    <%= render :partial => 'participant',
-               :locals => {:prefix => 'user_',
-                           :team => false,
-                           :participant => @participant,
-                           :s_avg => s_avg, :s_min => s_min, :s_max => s_max,
-                           :r_avg => r_avg, :r_min => r_min, :r_max => r_max,
-                           :f_avg => f_avg, :f_min => f_min, :f_max => f_max,
-                           :tr_avg => tr_avg, :tr_min => tr_min, :tr_max => tr_max}%>                       
-
-
-   <%= hidden_field_tag 'total_score', @participant.compute_total_score(s_avg, r_avg, f_avg, tr_avg) %>
+<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
+<%= render :partial => 'grades/participant',
+                       :locals => {:prefix => 'user', 
+                                   :team => false,
+                                   :pscore => pscore} %>                                                                                   
 </TABLE>
 <BR/>
+<%= hidden_field_tag 'total_score', pscore[:total_score] %>
 <%= submit_tag "Update" %>
 <%= end_form_tag %>
 <BR/><BR/>

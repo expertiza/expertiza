@@ -8,7 +8,8 @@ class StandardizeReviewOfReview < ActiveRecord::Migration
     add_column :review_of_reviews, :created_at, :datetime, :null => true
     add_column :review_of_reviews, :updated_at, :datetime, :null => true
     rescue
-    rescue
+    end
+    
     execute "ALTER TABLE `review_of_reviews` 
              DROP FOREIGN KEY `fk_review_of_review_review_of_review_mappings`"             
     execute "ALTER TABLE `review_of_reviews` 

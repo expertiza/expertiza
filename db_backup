@@ -1051,8 +1051,10 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `review_of_reviews`;
 CREATE TABLE `review_of_reviews` (
   `id` int(11) NOT NULL auto_increment,
-  `mapping_id` int(11) default NULL,
+  `mapping_id` int(11) default NULL, 
   `additional_comment` varchar(255) default NULL,
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`),
   KEY `fk_review_of_review_review_of_review_mappings` (`mapping_id`),
   CONSTRAINT `fk_review_of_review_review_of_review_mappings` FOREIGN KEY (`mapping_id`) REFERENCES `review_of_review_mappings` (`id`)

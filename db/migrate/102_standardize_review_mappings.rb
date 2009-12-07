@@ -55,11 +55,17 @@ class StandardizeReviewMappings < ActiveRecord::Migration
     remove_column :review_mappings, :round
     add_column :review_mappings, :type, :string, :null => false
     
+    today = Time.now             
+    oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0)     
+    
     ReviewMapping.find(:all).each{
        | mapping |
        assignment = Assignment.find(mapping.reviewed_object_id)
+       review = Review.find_by_mapping_id(mapping.id)       
        if assignment.nil?
-         delete(mapping,"No assignment found for "+mapping.id.to_s+": "+mapping.reviewed_object_id.to_s)               
+         delete(mapping,"No assignment found for "+mapping.id.to_s+": "+mapping.reviewed_object_id.to_s)    
+       elsif review.nil? and (mapping.assignment.created_at.nil? or mapping.assignment.created_at < oldest_allowed_time)
+         delete(mapping,"IGNORE: #{mapping.type} #{mapping.id} is at least a year old and has no review associated with it.")             
        else
           if mapping.old_reviewer_id == 0
             delete(mapping, "No reviewer ID")            

@@ -27,7 +27,10 @@ class CreateTeammateReviewMappings < ActiveRecord::Migration
           puts "REVIEWEE: #{review.reviewee_id}"
           puts review.id
        end
+       TeammateReview.record_timestamps = false         
        review.update_attribute('mapping_id',map.id)
+       TeammateReview.record_timestamps = false
+         
     }
                 
     execute "ALTER TABLE `teammate_reviews` 

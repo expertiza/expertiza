@@ -31,8 +31,9 @@ class CreateFeedbackMappings < ActiveRecord::Migration
        end       
        if reviewer != nil and reviewee != nil            
          map = FeedbackMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => review.id)
+         ReviewFeedback.record_timestamps = false
          feedback.update_attribute('mapping_id',map.id)
-         #execute "update review_feedbacks set mapping_id = #{map.id} where id = #{feedback.id}"
+         ReviewFeedback.record_timestamps = true
        else
          feedback.delete
        end

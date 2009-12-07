@@ -1,6 +1,9 @@
 class CreateAssignmentQuestionnaires < ActiveRecord::Migration
   def self.up
+    begin
     drop_table :assignments_questionnaires
+    rescue
+    end
     create_table :assignment_questionnaires do |t|
       t.column :assignment_id,        :integer, :null => true
       t.column :questionnaire_id,     :integer, :null => true

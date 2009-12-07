@@ -13,8 +13,9 @@ class RemoveFieldsFromFeedback < ActiveRecord::Migration
     ReviewFeedback.find(:all).each{
       |feedback|
       if feedback.txt != nil
-        feedback.additional_comment = feedback.txt
-        feedback.save
+        ReviewFeedback.record_timestamps = false
+        feedback.update_attribute('additional_comment',feedback.txt)
+        ReviewFeedback.record_timestamps = true
       end
     }
     

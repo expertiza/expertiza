@@ -17,8 +17,7 @@ class UpdateRubricTypes < ActiveRecord::Migration
             | score | 
             metareview = ReviewOfReview.find(score.instance_id)
             if metareview != nil
-              score.questionnaire_type_id = metareview_type.id
-              score.save
+              score.update_attribute('questionnaire_type_id',metareview_type.id)              
             end
          }
        }

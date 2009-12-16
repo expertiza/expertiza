@@ -55,49 +55,15 @@ class StandardizeReviewMappings < ActiveRecord::Migration
     remove_column :review_mappings, :round
     add_column :review_mappings, :type, :string, :null => false
     
-    today = Time.now             
-    oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0)     
+    
     
     ReviewMapping.find(:all).each{
        | mapping |
-       assignment = Assignment.find(mapping.reviewed_object_id)
-       review = Review.find_by_mapping_id(mapping.id)       
-       if assignment.nil?
-         delete(mapping,"No assignment found for "+mapping.id.to_s+": "+mapping.reviewed_object_id.to_s)    
-       elsif review.nil? and (mapping.assignment.created_at.nil? or mapping.assignment.created_at < oldest_allowed_time)
-         delete(mapping,"IGNORE: #{mapping.type} #{mapping.id} is at least a year old and has no review associated with it.")             
-       else
-          if mapping.old_reviewer_id == 0
-            delete(mapping, "No reviewer ID")            
-          end
-          
-          reviewer = get_participant_reviewer(mapping)
-          
-          if assignment.team_assignment
-            type = 'TeamReviewMapping'
-            reviewee = get_team_reviewee(mapping)       
-          else
-            type = 'ParticipantReviewMapping'
-            reviewee = get_participant_reviewee(mapping)
-          end
-       
-          
-         
-          if reviewee.nil? or reviewer.nil?
-            reason = "Removing: "+mapping.id.to_s+" for assignment "+mapping.reviewed_object_id.to_s
-            if reviewee.nil?
-              reason = reason + "\n   No reviewee: author("+mapping.author_id.to_s+") team("+mapping.team_id.to_s+")"
-            end
-            if reviewer.nil?
-              reason = reason + "\n   No reviewer: "+mapping.old_reviewer_id.to_s
-            end
-            delete(mapping, reason)
-          else
-            mapping.update_attribute('reviewee_id', reviewee.id)
-            mapping.update_attribute('reviewer_id', reviewer.id)
-            mapping.update_attribute('type',type)
-          end
-       end
+      begin
+        update_mapping(mapping)
+      rescue
+        delete(mapping,$!)
+      end
     }      
     
     remove_column :review_mappings, :author_id
@@ -117,6 +83,45 @@ class StandardizeReviewMappings < ActiveRecord::Migration
              ADD CONSTRAINT `fk_review_review_mapping`
              FOREIGN KEY (mapping_id) references review_mappings(id)"             
     
+  end
+  
+  def self.update_mapping(mapping)
+       today = Time.now             
+       oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0) 
+       assignment = Assignment.find(mapping.reviewed_object_id)
+       review = Review.find_by_mapping_id(mapping.id)       
+       if assignment.nil?
+         raise "DELETE ReviewMapping #{mapping.id}: No assignment found with ID = #{mapping.reviewed_object_id}"    
+       elsif review.nil? and (assignment.created_at.nil? or assignment.created_at < oldest_allowed_time)
+         raise "DELETE ReviewMapping #{mapping.id}: This mapping is at least a year old and has no review associated with it."            
+       else
+          if mapping.old_reviewer_id == 0
+            raise "DELETE ReviewMapping #{mapping.id}: Invalid reviewer ID"            
+          end
+          
+          reviewer = get_participant_reviewer(mapping)
+          
+          if reviewer.nil?
+            raise "DELETE ReviewMapping #{mapping.id}: The reviewer does not exist as a participant: assignment_id: #{assignment.id}, user_id #{mapping.old_reviewer_id}"            
+          end
+          
+          if assignment.team_assignment
+            type = 'TeamReviewMapping'
+            reviewee = get_team_reviewee(mapping)       
+          else
+            type = 'ParticipantReviewMapping'
+            reviewee = get_participant_reviewee(mapping)
+          end
+       
+          if reviewee.nil?
+            raise "DELETE ReviewMapping #{mapping.id}: The reviewee does not exist as a participant: assignment_id: #{assignment.id}, user_id #{mapping.author_id} or team_id: #{mapping.team_id}"
+          end       
+          
+          
+          mapping.update_attribute('reviewee_id', reviewee.id)
+          mapping.update_attribute('reviewer_id', reviewer.id)
+          mapping.update_attribute('type',type)          
+       end    
   end
   
   def self.delete(mapping, reason)

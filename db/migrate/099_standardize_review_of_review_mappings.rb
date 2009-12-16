@@ -16,32 +16,16 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
     
     add_column :review_of_review_mappings, :reviewee_id, :integer, :null => false
     rename_column :review_of_review_mappings, :review_mapping_id, :reviewed_object_id
+
     
     
     ReviewOfReviewMapping.find(:all).each{
       | mapping |
-     
-      review_mapping = ReviewMapping.find(mapping.reviewed_object_id)
-      if mapping.review_reviewer_id != nil
-        reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(mapping.review_reviewer_id, review_mapping.assignment_id)        
-      else
-        reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(mapping.reviewer_id, review_mapping.assignment_id)      
+      begin
+        update_mapping(mapping)
+      rescue
+        delete(mapping,$!)
       end
-
-      reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(review_mapping.reviewer_id, review_mapping.assignment_id)
- 
-      if reviewer != nil and reviewee != nil
-        mapping.reviewer_id = reviewer.id 
-        mapping.reviewee_id = reviewee.id
-        mapping.save
-      else
-        ReviewOfReview.find_all_by_mapping_id(mapping.id).each{
-         |ror|
-         ror.delete
-        }        
-        mapping.destroy          
-      end
-        
     }
     
     remove_column :review_of_review_mappings, :review_reviewer_id           
@@ -60,6 +44,68 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
              ADD CONSTRAINT `fk_review_of_review_mappings_review_mappings`
              FOREIGN KEY (reviewed_object_id) references review_mappings(id)"           
   end
+  
+  def self.update_mapping(mapping)
+      today = Time.now             
+      oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0)     
+
+    
+      review = ReviewOfReview.find_by_mapping_id(mapping.id)
+      review_mapping = ReviewMapping.find(mapping.reviewed_object_id)
+      assignment = Assignment.find(review_mapping.assignment_id)
+      if assignment.nil?
+         raise "DELETE ReviewOfReviewMapping #{mapping.id}: No assignment found for #{mapping.id.to_s}: #{mapping.reviewed_object_id.to_s}"
+      end
+       
+      if review.nil? and (assignment.created_at.nil? or assignment.created_at < oldest_allowed_time)
+        raise "DELETE ReviewOfReviewMapping #{mapping.id}: The mapping is at least a year old and has no review associated with it."
+      end
+      
+      if mapping.review_reviewer_id != nil
+        reviewer = make_participant(mapping.review_reviewer_id, assignment.id)        
+      else
+        reviewer = make_participant(mapping.reviewer_id, assignment.id)      
+      end      
+
+      if reviewer.nil?        
+        raise "DELETE ReviewOfReviewMapping #{mapping.id}: The reviewer does not exist as a participant: assignment_id: #{assignment.id}, user_id #{mapping.reviewer_id} or user_id: #{mapping.review_reviewer_id}"
+      end            
+           
+      reviewee = make_participant(review_mapping.reviewer_id, assignment.id)      
+      
+      if reviewee.nil?
+        raise "DELETE ReviewOfReviewMapping #{mapping.id}: The reviewee does not exist as a participant: assignment_id: #{assignment.id}, user_id #{review_mapping.reviewer_id}"
+      end
+      
+      mapping.update_attribute('reviewer_id',reviewer.id) 
+      mapping.update_attribute('reviewee_id',reviewee.id)    
+  end
+  
+  # create a participant based on a user and assignment
+  def self.make_participant(user_id, assignment_id)
+    participant = nil
+    if user_id.to_i > 0
+      user = User.find(user_id)
+      if user
+        participant = AssignmentParticipant.find_by_user_id_and_parent_id(user_id,assignment_id)
+        
+        if participant.nil?       
+          participant = AssignmentParticipant.create(:user_id => user_id, :parent_id => assignment_id)
+          participant.set_handle()      
+        end
+      end     
+    end
+    return participant
+  end  
+  
+  def self.delete(mapping, reason)
+    puts reason
+    begin
+      mapping.delete(true)
+    rescue
+      puts $!
+    end
+  end  
 
   def self.down
   end

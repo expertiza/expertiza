@@ -76,7 +76,7 @@ class ParticipantsController < ApplicationController
         redirect_to :controller => 'participants', :action => 'change_handle', :id => @participant
       else
         @participant.update_attributes(params[:participant])
-        redirect_to :controller => 'student_assignment', :action => 'view_actions', :id => @participant
+        redirect_to :controller => 'student_task', :action => 'view', :id => @participant
       end            
     end
   end   

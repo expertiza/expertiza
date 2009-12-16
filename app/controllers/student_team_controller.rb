@@ -41,7 +41,7 @@ class StudentTeamController < ApplicationController
     check = AssignmentTeam.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @team.parent_id])    
     if (check.length == 0)
        if @team.update_attributes(params[:team])
-          redirect_to :controller => 'student_assignment', :action => 'view_team', :id => params[:student_id]
+          redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
        end
     elsif (check.length == 1 && (check[0].name <=> @team.name) == 0)
       redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]

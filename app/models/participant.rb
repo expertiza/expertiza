@@ -58,15 +58,4 @@ class Participant < ActiveRecord::Base
             }
     )   
   end  
-  
-
-  
-  protected
-  def validate
-    #need to find a way to only validate this when it is called
-    #from a certain controller or action. For example, we only
-    #want this validated when save_final_grade is called from the 
-    #student_assignment controller
-    #errors.add(:grade, "should be greater or equal to zero") if grade < 0
-  end
 end

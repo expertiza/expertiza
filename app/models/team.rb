@@ -7,7 +7,9 @@ class Team < ActiveRecord::Base
        teamsuser.delete
     end    
     node = TeamNode.find_by_node_object_id(self.id)
-    node.destroy    
+    if node
+      node.destroy
+    end
     self.destroy
   end
   

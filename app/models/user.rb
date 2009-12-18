@@ -1,8 +1,10 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
-  has_many :participants
+  has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id'
   has_many :assignments, :through => :participants
+  
+  belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
   
   has_many :teams_users
   has_many :teams, :through => :teams_users

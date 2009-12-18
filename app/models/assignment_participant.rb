@@ -1,8 +1,17 @@
 class AssignmentParticipant < Participant  
   require 'wiki_helper'
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
-  has_many :review_mappings, :class_name => 'ParticipantReviewMapping', :foreign_key => 'reviewee_id'
+  has_many :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
+  belongs_to :user
   validates_presence_of :handle
+  
+  def fullname
+    self.user.fullname
+  end
+  
+  def name
+    self.user.name
+  end
 
   def get_scores(questions)
       scores = Hash.new
@@ -29,10 +38,6 @@ class AssignmentParticipant < Participant
     
     return links
   end
-  
-  def get_review_map_type
-    return 'ParticipantReviewMapping'
-  end
 
   #Copy this participant to a course
   def copy(course_id)
@@ -51,23 +56,23 @@ class AssignmentParticipant < Participant
   end
   
   def get_feedback
-    return ReviewFeedback.get_assessments_for(self)      
+    return FeedbackResponseMap.get_assessments_for(self)      
   end
   
   def get_reviews
     if self.assignment.team_assignment
-      Review.get_assessments_for(self.team)          
+      return TeamReviewResponseMap.get_assessments_for(self.team)          
     else
-      Review.get_assessments_for(self)
+      return ParticipantReviewResponseMap.get_assessments_for(self)
     end
   end
    
   def get_metareviews
-    ReviewOfReview.get_assessments_for(self)  
+    MetareviewResponseMap.get_assessments_for(self)  
   end
   
   def get_teammate_reviews
-    TeammateReview.get_assessments_for(self)
+    TeammateReviewResponseMap.get_assessments_for(self)
   end
   
   def has_submissions    
@@ -131,7 +136,7 @@ class AssignmentParticipant < Participant
   end
     
   def team
-    AssignmentTeam.get_team(self)  
+    AssignmentTeam.get_team(self)
   end
   
   def compute_total_score(scores)     
@@ -170,7 +175,8 @@ class AssignmentParticipant < Participant
   def self.export(csv,parent_id)
      find_all_by_parent_id(parent_id).each{
           |part|
-          user = User.find(part.user_id)
+          user = part.user
+          puts "***#{user.id}***#{user.parent.id}***"
           csv << [
             user.name,
             user.fullname,          
@@ -218,18 +224,20 @@ class AssignmentParticipant < Participant
     if self.directory_num.nil? or self.directory_num < 0           
       maxnum = AssignmentParticipant.find(:first, :conditions=>['parent_id = ?',self.parent_id], :order => 'directory_num desc').directory_num
       if maxnum
-        self.directory_num = maxnum + 1
+        dirnum = maxnum + 1
       else
-        self.directory_num = 0
+        dirnum = 0
       end
-      self.save
-      self.team.get_participants.each{
-          | member |
-          if member.directory_num == nil or member.directory_num < 0
-            member.directory_num = self.directory_num
-            member.save
-          end
-      }
+      self.update_attribute('directory_num',dirnum)
+      if self.assignment.team_assignment
+        self.team.get_participants.each{
+            | member |
+            if member.directory_num == nil or member.directory_num < 0
+              member.directory_num = self.directory_num
+              member.save
+            end
+        }
+      end
     end
   end   
 end

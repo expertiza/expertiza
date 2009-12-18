@@ -1,8 +1,0 @@
-<h1>New Teammate Review for <%= @mapping.reviewee.name %></h1>
-<%= start_form_tag :action => 'create', :id => @mapping.id %>
-<%= render :partial => 'teammate_review' %>
-<br/>
-<%= submit_tag "Save Review", :name=>"save" %>   
-<%= end_form_tag %>
-<br/>
-<a href="javascript:window.history.back()">Back</a>

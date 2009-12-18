@@ -65,7 +65,6 @@ class UsersController < ApplicationController
   
   def show
     @user = User.find(params[:id])
-    @notification = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])
     getRole
   end
   

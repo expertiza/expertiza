@@ -1,28 +1,53 @@
 class Assignment < ActiveRecord::Base
   require 'ftools'
+  include DynamicReviewMapping
+  
   belongs_to :course
   belongs_to :wiki_type
    # wiki_type needs to be removed. When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically" set the type field to the value that
   # designates an assignment of the appropriate type.
-  has_many :participants  
+  has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
   has_many :users, :through => :participants
   has_many :due_dates
-  
+  has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
+  has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
   has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaires', :foreign_key => 'assignment_id'
   has_many :questionnaires, :through => :assignment_questionnaires
+  belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
+    
     
   validates_presence_of :name
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
     
   COMPLETE = "Complete"
   
+  def review_mappings
+    if team_assignment
+      TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+    else
+      ParticipantReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+    end
+  end
+  
+  def metareview_mappings
+     mappings = Array.new
+     self.review_mappings.each{
+       | map |
+       mmap = MetareviewResponseMap.find_by_reviewed_object_id(map.id)
+       if mmap != nil
+         mappings << mmap
+       end
+     }
+     return mappings     
+  end
+  
   def get_scores(questions)
     scores = Hash.new
    
     scores[:participants] = Hash.new    
-    self.get_participants.each{
+    self.participants.each{
       | participant |
       scores[:participants][participant.id.to_s.to_sym] = Hash.new
       scores[:participants][participant.id.to_s.to_sym][:participant] = participant
@@ -38,11 +63,11 @@ class Assignment < ActiveRecord::Base
     if self.team_assignment
       scores[:teams] = Hash.new
       index = 0
-      self.get_teams.each{
+      self.teams.each{
         | team |
         scores[:teams][index.to_s.to_sym] = Hash.new
         scores[:teams][index.to_s.to_sym][:team] = team
-        assessments = Review.get_assessments_for(team)
+        assessments = TeamReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
         index += 1
       }
@@ -104,180 +129,100 @@ class Assignment < ActiveRecord::Base
        path = RAILS_ROOT + "/pg_data/" +  FileHelper.clean_path(User.find(self.instructor_id).name) + "/"
     end         
     return path + FileHelper.clean_path(self.directory_path)      
-  end
-  
-  def get_next_due_date(allowance_type)
-    query = 'assignment_id = ? and due_at > ? and ('+allowance_type+' IN (SELECT id FROM deadline_rights WHERE name in ("Late","OK")))'
-    DueDate.find(:first, :conditions => [query,self.id,Time.now])    
+  end 
+    
+  def check_condition(column)
+    next_due_date = DueDate.find(:first, :conditions => ['assignment_id = ? and due_at >= ?',self.id,Time.now], :order => 'due_at')
+    condition = 0
+    next_due_date.attributes.each{
+      | key, value |
+      if key == column
+        condition = value
+      end
+    }
+    
+    right = DeadlineRight.find(condition)
+    return (right!= nil and (right.name == "OK" or right.name == "Late"))    
   end
     
   # Determine if the next due date from now allows for submissions
-  def submission_allowed    
-    due_date1 = get_next_due_date("submission_allowed_id")
-    due_date2 = get_next_due_date("resubmission_allowed_id")    
-    
-    return (due_date1 != nil or due_date2 != nil)
+  def submission_allowed   
+    return (check_condition("submission_allowed_id") or check_condition("resubmission_allowed_id"))
   end
   
   # Determine if the next due date from now allows for reviews or metareviews
   def review_allowed
-    due_date1 = get_next_due_date("review_allowed_id")
-    due_date2 = get_next_due_date("rereview_allowed_id")
-    
-    return (due_date1 != nil or due_date2 != nil or self.metareview_allowed)     
+    return (check_condition("review_allowed_id") or check_condition("rereview_allowed_id") or self.metareview_allowed)    
   end  
   
   # Determine if the next due date from now allows for metareviews
   def metareview_allowed    
-    due_date = get_next_due_date("review_of_review_allowed_id")
-    
-    return (due_date != nil)      
+    return check_condition("review_of_review_allowed_id")  
   end
     
-  def get_participants
-    AssignmentParticipant.find(:all, :include => :user, :conditions => ['participants.parent_id = ?',self.id], :order => 'users.fullname')
-  end
-    
-  def delete_assignment
+  def delete(force = nil)
     begin
-      if self.team_assignment
-        teams = Team.find(:all,:conditions => ["parent_id = ?",self.id])
-        teams.each {|team|
-          team.delete
-        }
-      end  
+      maps = ParticipantReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+      maps.each{|map| map.delete(force)}
     rescue
-      raise $!
-    end
-      participants = AssignmentParticipant.find(:all, :conditions => ["parent_id = ?",self.id])
-    begin
-      participants.each {|participant| participant.delete }
-    rescue
-      raise $!
+      raise "At least one review response exists for #{self.name}."
     end
     
-    #delete notifcation limits
-    limits = NotificationLimit.find_all_by_assignment_id(self.id)
     begin
-      limits.each {|limit| limit.destroy}
-    rescue 
-      rase $!
+      maps = TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+      maps.each{|map| map.delete(force)}
+    rescue
+      raise "At least one review response exists for #{self.name}."
     end
     
-    #delete weights limits
-    weights = QuestionnaireWeight.find_all_by_assignment_id(self.id)
     begin
-      weights.each {|limit| limit.destroy}
-    rescue 
-      rase $!
-    end    
-    
-    due_dates = DueDate.find(:all, :conditions => ['assignment_id = ?',self.id])
-    
-    begin
-      due_dates.each{ |date| date.destroy }
+      maps = TeammateReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+      maps.each{|map| map.delete(force)}
     rescue
-      raise $!
+      raise "At least one teammate review response exists for #{self.name}."
     end
-  
-      review_feedbacks = ReviewFeedback.find(:all, :conditions => ['assignment_id = ?',self.id])
-      begin
-      review_feedbacks.each{ |review| review.destroy }
-    rescue
-      raise $!
-    end            
+    self.invitations.each{|invite| invite.destroy}
+    self.teams.each{| team | team.delete}
+    self.participants.each {|participant| participant.delete}
+    self.due_dates.each{ |date| date.destroy}   
+           
     # The size of an empty directory is 2
     # Delete the directory if it is empty
-    begin 
+    begin
       directory = Dir.entries(RAILS_ROOT + "/pg_data/" + self.directory_path)
     rescue
-      # directory does not exist
+      # directory is empty
     end
-    
+        
     if !(self.wiki_type_id == 2 or self.wiki_type_id == 3) and directory != nil and directory.size == 2 
         Dir.delete(RAILS_ROOT + "/pg_data/" + self.directory_path)          
     elsif !(self.wiki_type_id == 2 or self.wiki_type_id == 3) and directory != nil and directory.size != 2
         raise "Assignment directory is not empty."
-    end
-    begin
-      self.delete_review_mappings
-    rescue
-      raise $!
-    end
+    end 
+    
+    self.assignment_questionnaires.each{|aq| aq.destroy}
     
     self.destroy
-  end
-    
-  def due_dates_exist?
-    return false if due_dates == nil or due_dates.length == 0
-    return true
-  end
-  
-  def delete_due_dates
-    for due_date in due_dates
-      due_date.destroy
-    end
-  end
-  
-  def review_feedback_exist?
-    return false if review_feedbacks == nil or review_feedbacks.length == 0
-    return true
-  end
-  
-  def delete_review_feedbacks
-    for review_feedback in review_feedbacks
-      review_feedback.destroy
-    end
-  end
-  
-  def participants_exist?
-    return false if participants == nil or participants.length == 0
-    return true
-  end
-  
-  def delete_participants
-    for participant in participants
-      for resubmission_time in participant.resubmission_times
-        resubmission_time.destroy
-      end
-      participant.destroy
-    end
-  end
-  
-  def delete_review_mappings
-    review_mappings = ReviewMapping.find(:all, :conditions => ['assignment_id =?',self.id])
-    review_mappings.each{
-      |mapping| mapping.delete
-    }
-  end
-
-  def delete_review_of_review_mapping
-    for review_of_review_mapping in review_of_review_mappings
-      for review_of_review in review_of_review_mapping.review_of_reviews
-        for review_of_review_score in review_of_review.review_of_review_scores
-          review_of_review_score.destroy
-        end
-        review_of_review.destroy
-      end
-      for review_of_review_mapping in review_mapping.review_of_review_mappings
-        review_of_review_mapping.destroy
-      end
-      review_of_review_mapping.destroy
-    end
-  end
+  end      
   
   # Generate emails for reviewers when new content is available for review
   #ajbudlon, sept 07, 2007   
   def email(author_id) 
   
     # Get all review mappings for this assignment & author
-    review_mappings = ReviewMapping.find_all_by_reviewee_id_and_reviewed_object_id(author_id, self.id)    
-    for mapping in review_mappings
+    participant = AssignmentParticipant.find(author_id)
+    if team_assignment
+      author = participant.team
+    else
+      author = participant
+    end
+    
+    for mapping in author.review_mappings
 
        # If the reviewer has requested an e-mail deliver a notification
        # that includes the assignment, and which item has been updated.
        if mapping.reviewer.user.email_on_submission
-          user = mapping.reviwer.user
+          user = mapping.reviewer.user
           Mailer.deliver_message(
             {:recipients => user.email,
              :subject => "A new submission is available for #{self.name}",
@@ -300,13 +245,10 @@ class Assignment < ActiveRecord::Base
   # available to them.  
   #ajbudlon, sept 07, 2007      
   def get_review_number(mapping)
-    reviewer_mappings = ReviewMapping.find_by_sql(
-      "select * from review_mappings where assignment_id = " +self.id.to_s +
-      " and reviewer_id = " + mapping.reviewer_id.to_s
-    )
+    reviewer_mappings = ResponseMap.find_all_by_reviewer_id(mapping.reviewer.id)
     review_num = 1
     for rm in reviewer_mappings
-      if rm.author_id != mapping.author_id
+      if rm.reviewee.id != mapping.reviewee.id
         review_num += 1
       else
         break
@@ -348,11 +290,6 @@ class Assignment < ActiveRecord::Base
    # Google Document code should never directly check the wiki_type_id
    # and should instead always call is_google_doc.
    self.wiki_type_id == 4
- end
-
- 
- def get_teams
-   AssignmentTeam.find(:all, :conditions => ['parent_id = ?',self.id], :order => 'name')
  end
  
 #add a new participant to this assignment
@@ -399,7 +336,7 @@ def add_participant(user_name)
     end
   end
   
-def find_current_stage()
+ def find_current_stage()
     due_dates = DueDate.find(:all, 
                  :conditions => ["assignment_id = ?", self.id],
                  :order => "due_at DESC")
@@ -418,5 +355,15 @@ def find_current_stage()
         end
       end
     end
+  end  
+  
+ def assign_reviewers(mapping_strategy)  
+      if (team_assignment)      
+          #defined in DynamicReviewMapping module
+          assign_reviewers_for_team(1)
+      else          
+          #defined in DynamicReviewMapping module
+          assign_individual_reviewer(1) 
+      end  
   end  
 end

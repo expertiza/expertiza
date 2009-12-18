@@ -1,9 +1,0 @@
-<h1>Metareview for <%= @assignment.name %></h1>
-<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @assignment.get_current_stage()} %>
-<br/>	
-<%= @review.display_as_html() %>
-<br/><br/>
-<%= @response.display_as_html() %>
-<br/>
-<br/>
-<a href="javascript:window.history.back()">Back</a>

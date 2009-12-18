@@ -35,12 +35,12 @@ class Score < ActiveRecord::Base
   # params
   #  assessment - specifies the assessment for which the total score is being calculated
   #  questions  - specifies the list of questions being evaluated in the assessment
-  def self.get_total_score(assessment, questions)
+  def self.get_total_score(response, questions)
     weighted_score = 0
     sum_of_weights = 0
     questions.each{
       | question |
-      item = Score.find_by_instance_id_and_question_id(assessment.id, question.id)
+      item = Score.find_by_response_id_and_question_id(response.id, question.id)
       if item != nil
         weighted_score += item.score * question.weight
       end      

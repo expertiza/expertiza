@@ -8,7 +8,7 @@
      index2 = 0
      index3 = 0
   @items.each{
-    | contrib |
+    | contributor |
        index1+=1 
        if index1 % 2 == 0
           bgcolor1 = "#FAFAE8"
@@ -17,21 +17,21 @@
        end
        %>       
       <tr style="background-color:<%=bgcolor1%>">
-      <td style="vertical-align:top;"><%= contrib.name %>
+      <td style="vertical-align:top;"><%= contributor.name %>
         <% if !@assignment.team_assignment %>          
-           (<%= contrib.fullname %>)
+           (<%= contributor.fullname %>)
         <% end %>
          <div style="text-align:right">
            <% if !@assignment.team_assignment %>
-             <%= link_to 'delete', :action => 'delete_participant', :id => contrib.id %><br/>
+             <%= link_to 'delete', :action => 'delete_participant', :id => contributor.id %><br/>
            <% end %>
-           <%= link_to 'add reviewer', :action => 'select_reviewer', :id => @assignment.id, :contributor_id => contrib.id %><br/>
-           <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => @assignment.id, :contributor_id => contrib.id %>
+           <%= link_to 'add reviewer', :action => 'select_reviewer', :id => @assignment.id, :contributor_id => contributor.id %><br/>
+           <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => @assignment.id, :contributor_id => contributor.id %>
          </div>
        </td>
     <td colspan="2">
     <table width="100%" cellpadding="10">
-    <% mappings = contrib.review_mappings
+    <% mappings = contributor.review_mappings
     
        if mappings.length > 0
        	 mappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}
@@ -56,7 +56,7 @@
              </td>
              <td width="50%">
                <table width="100%">
-               <% rmappings = ReviewOfReviewMapping.find_all_by_reviewed_object_id(map.id) 
+               <% rmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(map.id) 
                   rmappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname } %>
                <% rmappings.each{
                   | rmap |
@@ -96,26 +96,26 @@
 | <%= link_to 'Import reviewer mappings', 
             :controller=>'import_file', 
             :action=>'start', 
-            :model => 'ReviewMapping', 
+            :model => 'ReviewResponseMap', 
             :title => 'Reviewer Mappings',
             :expected_fields =>  "Contributor, Reviewer1, Reviewer2, ... , ReviewerN",
             :id => @assignment.id %> 
 | <%= link_to 'Import metareviewer mappings', 
             :controller=>'import_file', 
             :action=>'start', 
-            :model => 'ReviewOfReviewMapping', 
+            :model => 'MetareviewResponseMap', 
             :title => 'Metareviewer Mappings',
             :expected_fields => 'Contributor, Reviewer, Metareviewer1, Metareviewer2, ... MetareviewerN',
             :id => @assignment.id %>
 <BR/><%= link_to 'Export review mappings',
             :controller=>'export_file',
             :action=>'start',
-            :model=> 'ReviewMapping',
+            :model=> 'ReviewResponseMap',
             :id=>@assignment.id %>
 | <%= link_to 'Export metareview mappings',
             :controller=>'export_file',
             :action=>'start',
-            :model=> 'ReviewOfReviewMapping',
+            :model=> 'MetareviewResponseMap',
             :id=>@assignment.id %>            
 | <%= link_to 'Delete all reviewers and metareviewers', :action => 'delete_all_reviewers_and_metareviewers', :id => @assignment.id %>            
 <BR/><%= link_to 'Back', :controller => 'tree_display', :action => 'list' %>

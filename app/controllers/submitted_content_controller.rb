@@ -83,6 +83,26 @@ class SubmittedContentController < ApplicationController
     redirect_to :action => 'edit', :id => @participant.id    
   end  
   
+  def download    
+      #folder_name = FileHelper::sanitize_folder(@current_folder.name)
+      folder_name = params['current_folder']['name']
+      # -- This code removed on 4/10/09 ... was breaking downloads of files with hyphens in them ...file_name = FileHelper::sanitize_filename(params['download'])
+      file_name = params['download']
+            
+      file_split = file_name.split('.')
+      if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
+        send_file(folder_name+ "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline')
+      else
+        if !File.directory?(folder_name + "/" + file_name)
+          send_file( folder_name + "/" + file_name, :disposition => 'inline')
+        else
+           Net::SFTP.start("http://pg-server.csc.ncsu.edu", "*****", "****") do |sftp|
+              sftp.download!(folder_name + "/" + file_name, "C:/expertiza", :recursive => true)
+           end
+        end
+      end 
+  end  
+  
 private  
   
   def get_file_type file_name

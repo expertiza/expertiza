@@ -18,7 +18,7 @@
   <% for feedback in rscore[:assessments] %>
     <% count = count + 1 %>
     <% if controller.action_name != "view_my_scores" %>
-      <a name="<%=prefix+"_"+feedback.mapping.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
+      <a name="<%=prefix+"_"+feedback.map.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
     <% else %>
       <%= feedback.display_as_html(nil,count) %><BR/><BR/>
     <% end %>      

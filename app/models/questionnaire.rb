@@ -42,7 +42,7 @@ class Questionnaire < ActiveRecord::Base
       
       self.questions.each{
         | question |
-          question.destroy        
+          question.delete        
       }
        
      

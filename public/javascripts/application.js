@@ -10,11 +10,8 @@ function checkWeights()
 	var reviewWeight = document.getElementById('weights_review').value
 	var metareviewWeight = document.getElementById('weights_metareview').value
 	var feedbackWeight = document.getElementById('weights_feedback').value
-	var teammateWeight = 0;
+	var teammateWeight = document.getElementById('weights_teammate').value
 	
-	if(document.getElementById('weights_teammate'))
-	   teamamteWeight = document.getElementById('weights_teammate').value
-	  
 	var total = parseFloat(reviewWeight) + parseFloat(metareviewWeight) + parseFloat(feedbackWeight) + parseFloat(teammateWeight)
 	if (total == 100) return true
 	else {
@@ -156,4 +153,9 @@ function addElement() {
 						'</select></TD>'+
 						'</TR>';
   }
+}
+
+function updateDropDownMenu(advice,question,min){			
+	var id = 'responses_' + question + '_score'			
+	document.getElementById(id).selectedIndex = advice - min
 }

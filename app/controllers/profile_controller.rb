@@ -6,17 +6,16 @@ class ProfileController < ApplicationController
  def edit 
     @user = session[:user]    
     @user.confirm_password = ''   
-    @notification = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])     
+    @assignment_questionnaires = AssignmentQuestionnaires.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])     
  end
   
  #store parameters to user object
  def update
     @user = session[:user]
     
-    if params[:notification] and params[:notification][:limit]
-      notification = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])
-      notification.limit = params[:notification][:limit]
-      notification.save
+    if params[:assignment_questionnaires] and params[:assignment_questionnaires][:notification_limit]
+      aq = AssignmentQuestionnaires.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])
+      aq.update_attribute('notification_limit',params[:assignment_questionnaires][:notification_limit])                    
     end
     
     if params[:user][:clear_password] == ''

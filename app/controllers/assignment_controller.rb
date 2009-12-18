@@ -35,9 +35,9 @@ class AssignmentController < ApplicationController
     @wiki_types = WikiType.find_all
     @private = params[:private] == true        
     #calling the defalut values mathods
-    get_instructor_notification_limits 
-    get_weights 
+    get_limits_and_weights 
   end
+  
   
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
@@ -73,8 +73,7 @@ class AssignmentController < ApplicationController
     
     if @assignment.save 
       set_questionnaires   
-      set_limits
-      set_weights
+      set_limits_and_weights
       
       max_round = 1
       #setting the Due Dates with a helper function written in DueDate.rb
@@ -244,25 +243,26 @@ class AssignmentController < ApplicationController
   
   def delete
     assignment = Assignment.find(params[:id])
+    
     # If the assignment is already deleted, go back to the list of assignments
     if assignment 
       begin
         @user =  ApplicationHelper::get_user_role(session[:user])
         @user = session[:user]
-#   update_page do |page|
-#   page << "prompt('hrlkj');";
-#   end
-      id = @user.get_instructor
-    if(id != assignment.instructor_id)
-      raise "Not authorised to delete this assignment"
-    end
-        assignment.delete_assignment
+        id = @user.get_instructor
+        if(id != assignment.instructor_id)
+          raise "Not authorised to delete this assignment"
+        end
+        assignment.delete(params[:force])
         @a = Node.find(:first, :conditions => ['node_object_id = ? and type = ?',params[:id],'AssignmentNode'])
      
         @a.destroy
         flash[:notice] = "The assignment is deleted"
       rescue
-        flash[:error] = "The assignment could not be deleted. Cause: "+$!
+        url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
+        url_no  = url_for :action => 'delete', :id => params[:id]        
+        error = $!
+        flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
       end
     end
     

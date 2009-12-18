@@ -58,16 +58,16 @@ class GradesController < ApplicationController
          reviewer.set_handle()
       end
 
-      review_mapping = ReviewMapping.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+      review_mapping = ReviewResponseMapping.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
         
       if review_mapping.nil?
          if participant.assignment.team_assignment
-          review_mapping = TeamReviewMapping.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+          review_mapping = TeamReviewResponseMapping.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
          else
-            review_mapping = ParticipantReviewMapping.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+            review_mapping = ParticipantReviewResponseMapping.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
          end      
       end 
-      review = Review.find_by_mapping_id(review_mapping.id) 
+      review = Response.find_by_map_id(review_mapping.id) 
       
       if review.nil?
         redirect_to :controller => 'review', :action => 'new_review', :id => review_mapping.id 
@@ -173,10 +173,10 @@ private
     @reviews = responses
     @reviews.each{
       | response |
-      user = response.mapping.reviewer.user
+      user = response.map.reviewer.user
       @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
     }    
-    @reviews.sort!{|a,b| a.mapping.reviewer.user.fullname <=> b.mapping.reviewer.user.fullname}
+    @reviews.sort!{|a,b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname}
     @questionnaire =  @assignment.questionnaires.find_by_type(questionnaire_type)
     @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)         
   end

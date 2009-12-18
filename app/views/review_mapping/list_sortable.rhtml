@@ -32,14 +32,14 @@
 | <%= link_to 'Import reviewer mappings', 
             :controller=>'import_file', 
             :action=>'start', 
-            :model => 'ReviewMapping', 
+            :model => 'ReviewResponseMap', 
             :title => 'Reviewer Mappings',
             :expected_fields =>  "Contributor, Reviewer1, Reviewer2, ... , ReviewerN",
             :id => @assignment.id %> 
 | <%= link_to 'Import metareviewer mappings', 
             :controller=>'import_file', 
             :action=>'start', 
-            :model => 'ReviewOfReviewMapping', 
+            :model => 'MetareviewresponseMap', 
             :title => 'Metareviewer Mappings',
             :expected_fields => 'Contributor, Reviewer, Metareviewer1, Metareviewer2, ... MetareviewerN',
             :id => @assignment.id %>

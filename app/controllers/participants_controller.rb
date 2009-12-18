@@ -4,7 +4,7 @@ class ParticipantsController < ApplicationController
   def list
     @root_node = Object.const_get(params[:model]+"Node").find_by_node_object_id(params[:id])     
     @parent = Object.const_get(params[:model]).find(params[:id])
-    @participants = @parent.get_participants  
+    @participants = @parent.participants  
     @model = params[:model]    
   end
   

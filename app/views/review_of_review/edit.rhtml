@@ -1,8 +1,0 @@
-<h1>Edit Metareview for <%= @mapping.assignment.name %></h1>
-<%= start_form_tag :action => 'update', :id => @mapping.id %>
-<%= render :partial => 'metareview' %>
-<br/>
-<%= submit_tag "Save Metareview", :name=>"save" %>   
-<%= end_form_tag %>
-<br/>
-<a href="javascript:window.history.back()">Back</a>

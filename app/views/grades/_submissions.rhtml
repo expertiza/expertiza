@@ -1,19 +1,19 @@
 <!-- SUBMISSIONS --> 
+<% puts "***** #{participant} *****" %>
 <% session[:return_to] = request.request_uri %>
 <%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => participant.assignment.get_current_stage} %>     
 
 <% if controller.action_name != "view_my_scores" %>
-   <% reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, participant.assignment.id) 
-      if participant.assignment.team_assignment
-         reviewee = participant.team          
-      else
+   <% reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @assignment.id) 
+      if reviewer != nil and participant.assignment.team_assignment
+         reviewee = participant.team  
+         map = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)        
+      elsif reviewer != nil
          reviewee = participant
-      end 
-      review_mapping = ReviewMapping.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
-      if review_mapping != nil 
-      	review = Review.find_by_mapping_id(review_mapping.id)
-      end 
-      if review != nil
+         map = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+      end       
+            
+      if map != nil and map.response != nil
       	display = "Edit Review"
       else
         display = "Create Review"

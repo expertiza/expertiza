@@ -6,13 +6,13 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
   <a href="<%= @assignment.spec_location %>" target="new">Assignment Description</a>
 <% end %>
 <ul>
-	<%if @assignment.team_assignment == true%>
+	<%if @assignment.team_assignment %>
 		<li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %> 
 		(View and manage your team)
 		</li>
 	<%end%>	
 	<li>
-	    <% if @assignment.submission_allowed == true %>
+	    <% if @assignment.submission_allowed %>
 	    	<%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>
 	    <% else %>
 	        <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %>
@@ -20,16 +20,18 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 		(Submit and view your work)
 	</li>
 	<li>
-		<% if @assignment.review_allowed == true or @assignment.get_current_stage == "Complete" %>
+	    <% puts "*** IN VIEW ***" %>
+	    <% puts @assignment.review_allowed %>
+		<% if @assignment.review_allowed or @assignment.get_current_stage == "Complete" %>
 			<%= link_to "Others' work",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
 		<% else %>
 			<font color="gray">Others' work</font>
 		<% end %> (Give feedback to others on their work)
 	</li>
-	<li><%= link_to "View scores",{:controller => 'grades', :action => 'view_my_scores', :id => @participant.id} %>(View feedback on your work)</li>
+	<li><%= link_to "Your scores",{:controller => 'grades', :action => 'view_my_scores', :id => @participant.id} %>(View feedback on your work)</li>
 	<% if @assignment.get_current_stage == "Complete" -%>
 	<!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
-		<li><%= link_to "Take Survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
+		<li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
 	<% end %>
 	<li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
 </ul>

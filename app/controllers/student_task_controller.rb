@@ -35,8 +35,8 @@ class StudentTaskController < ApplicationController
       end
     end    
     
-    @review_mappings = ReviewMapping.find_all_by_reviewer_id_and_assignment_id(@participant.user_id, @assignment.id)
-    @review_of_review_mappings = ReviewOfReviewMapping.find_all_by_reviewer_id(@participant.id)    
+    @review_mappings = ResponseMap.find_all_by_reviewer_id(@participant.id)
+    @review_of_review_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)    
   end
   
   def your_work

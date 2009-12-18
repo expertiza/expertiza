@@ -1,8 +1,0 @@
-<h1>New Feedback for <%= @mapping.assignment.name %></h1>
-<%= start_form_tag :action => 'create', :id => @mapping.id %>
-<%= render :partial => 'feedback' %>
-<br/>
-<%= submit_tag "Save Feedback", :name=>"save" %>   
-<%= end_form_tag %>
-<br/>
-<a href="javascript:window.history.back()">Back</a>

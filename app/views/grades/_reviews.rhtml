@@ -18,18 +18,18 @@
   <% for review in rscore[:assessments] %>
     <% count = count + 1 %>
     <% if controller.action_name != "view_my_scores" %>
-      <a name="<%=prefix+"_"+review.mapping.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
+      <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
     <% else %>
       <%= review.display_as_html(nil,count) %><BR/><BR/>
-      <% map = FeedbackMapping.find_by_reviewed_object_id(review.id)
+      <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
          if map
-         	review_feedback = ReviewFeedback.find_by_mapping_id(map.id)
+         	review_feedback = map.response
          end %>
       <% if review_feedback %>
-      	<%= link_to "View", :controller => 'review_feedback', :action => 'view', :id => review_feedback.id %> or
-      	<%= link_to "Edit", :controller => 'review_feedback', :action => 'edit', :id => review_feedback.id %> feedback for Review <%= count %>
+      	<%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
+      	<%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>
       <% else %>
-        <%= link_to "Give feedback", :controller => 'review_feedback', :action => 'new', :id => review.id %> for Review <%= count %>
+        <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
       <% end %> 
       <BR/><HR/><BR/>  	 
     <% end %>     

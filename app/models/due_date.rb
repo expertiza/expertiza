@@ -16,6 +16,5 @@ class DueDate < ActiveRecord::Base
     submit_duedate.assignment_id = assign_id
     submit_duedate.round = max_round; 
     submit_duedate.save;
-
   end
 end

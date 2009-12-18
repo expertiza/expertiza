@@ -9,9 +9,9 @@
 		<% for review in reviews %>
            <td align="center">                       
            <% if prefix %>         
-             <a href="#<%= prefix+"_"+review.mapping.reviewer.name %>"><%= review.mapping.reviewer.fullname %></a>      		   		     
+             <a href="#<%= prefix+"_"+review.map.reviewer.name %>"><%= review.map.reviewer.fullname %></a>      		   		     
 		   <% else %>
-		     <%= link_to review.mapping.reviewer.fullname, :controller=>ctrl, :action => caction, :id=> review.id%>
+		     <%= link_to review.map.reviewer.fullname, :controller=>ctrl, :action => caction, :id=> review.id%>
 		   <% end %>
 		   </td>	    
 	    <% end %>
@@ -22,7 +22,7 @@
 		   <td align="center">
 		       <% score = Score.get_total_score(review, @questions[symbol]) %>
 		       <% if controller.action_name != "view_my_scores" %>
-		       	<input type="hidden" id="mailer_<%= review.mapping.reviewer.fullname %>_grade" name="mailer[<%= review.mapping.reviewer.fullname %>_grade]" value="<%= score  %>" %>
+		       	<input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>" %>
 		       <% end %>   
 	  	       <%= sprintf("%.2f",score) %>% &nbsp;
 	  	   </td>

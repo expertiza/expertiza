@@ -18,7 +18,7 @@
   <% for metareview in rscore[:assessments] %>
     <% count = count + 1 %>
     <% if controller.action_name != "view_my_scores" %>
-      <a name="<%=prefix+"_"+metareview.mapping.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/> 
+      <a name="<%=prefix+"_"+metareview.map.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/> 
     <% else %>
       <%= metareview.display_as_html(nil,count) %><BR/><BR/>
     <% end %>        

@@ -16,7 +16,11 @@ class Participant < ActiveRecord::Base
   def delete
     times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])
     times.each {|time| time.destroy }
-    self.destroy
+    begin
+      self.destroy
+    rescue
+      puts self.id
+    end
   end
 
   def get_topic_string

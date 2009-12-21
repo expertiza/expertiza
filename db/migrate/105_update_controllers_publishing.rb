@@ -6,6 +6,7 @@ class UpdateControllersPublishing < ActiveRecord::Migration
     controller.permission_id = perm.id
     controller.save      
     
+    Role.rebuild_cache
   end
 
   def self.down

@@ -1,6 +1,5 @@
 
 class Ta < User
-
   has_many :ta_mappings
   
   QUESTIONNAIRE = [['My questionnaires','list_mine'],
@@ -44,6 +43,26 @@ class Ta < User
   def self.get_my_instructor(user_id)
     course_id = TaMapping.get_course_id(user_id)
     Course.find(course_id).instructor_id
+  end
+  
+  def self.get_mapped_instructor_ids(user_id)
+    ids = Array.new
+    mappings = TaMapping.find_all_by_ta_id(user_id)
+    mappings.each{
+      |map|
+      ids << map.course.instructor.id
+    }
+    return ids
+  end  
+  
+  def self.get_mapped_courses(user_id)
+    ids = Array.new
+    mappings = TaMapping.find_all_by_ta_id(user_id)
+    mappings.each{
+      |map|
+      ids << map.course.id
+    }
+    return ids
   end
   
   def get_instructor

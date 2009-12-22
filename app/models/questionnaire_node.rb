@@ -6,30 +6,40 @@ class QuestionnaireNode < Node
   end
   
   def self.get(sortvar = nil,sortorder = nil, user_id = nil,show = nil,parent_id = nil)
-    if show
-      conditions = 'questionnaires.instructor_id = ?'
+    if show   
+      if User.find(user_id).role.name != "Teaching Assistant"
+        conditions = 'questionnaires.instructor_id = ?'
+      else
+        conditions = 'questionnaires.instructor_id in (?)'
+      end
     else
-      conditions = '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+      if User.find(user_id).role.name != "Teaching Assistant"
+        conditions = '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+      else
+        conditions = '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+      end   
     end
-        
+    
+    if User.find(user_id).role.name != "Teaching Assistant"
+      values = user_id
+    else
+      values = Ta.get_mapped_instructor_ids(user_id)
+    end
+          
     if parent_id
       name = TreeFolder.find(parent_id).name+"Questionnaire"
       name.gsub!(/[^\w]/,'')
       conditions +=  " and questionnaires.type = \"#{name}\""
-    end  
+    end 
     
     if sortvar.nil? or sortvar == 'directory_path'
       sortvar = 'name'
     end
     if sortorder.nil?
       sortorder = 'ASC'
-    end               
-    
-    if User.find(user_id).role.name != "Teaching Assistant"  
-      find(:all, :include => :questionnaire, :conditions => [conditions, user_id], :order => "questionnaires.#{sortvar} #{sortorder}")
-    else
-      find(:all, :include => :questionnaire, :conditions => [conditions, Ta.get_my_instructor(user_id)], :order => "questionnaires.#{sortvar} #{sortorder}")
-    end
+    end         
+        
+    find(:all, :include => :questionnaire, :conditions => [conditions,values], :order => "questionnaires.#{sortvar} #{sortorder}")       
   end 
   
   def get_name

@@ -4,6 +4,7 @@
 #Date: 7/18/2008
 
 class CourseNode < Node 
+  belongs_to :course, :class_name => "Course", :foreign_key => "node_object_id"
   
   # Returns the table in which to locate Courses
   def self.table
@@ -18,21 +19,42 @@ class CourseNode < Node
   
   # returns: list of CourseNodes based on query
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil) 
-    query = "select nodes.* from nodes, "+self.table
-    query = query+" where nodes.node_object_id = "+self.table+".id"
-    query = query+" and nodes.type = '"+self.to_s+"'"
-    if show
-      query = query+" and "+self.table+".instructor_id = "+user_id.to_s
+    if show      
+      conditions = 'courses.instructor_id in (?)'      
     else
-      query = query+" and ("+self.table+".private = 0 or "+self.table+".instructor_id = "+user_id.to_s+")"
-    end    
-    if sortvar            
-      query = query+" order by "+self.table+"."+sortvar
-      if sortorder
-        query = query+" "+sortorder
-      end
+      conditions = '(courses.private = 0 or courses.instructor_id in (?))'     
     end   
-    find_by_sql(query)
+
+    if show   
+      if User.find(user_id).role.name != "Teaching Assistant"
+        conditions = 'courses.instructor_id = ?'
+      else
+        conditions = 'courses.id in (?)'
+      end
+    else
+      if User.find(user_id).role.name != "Teaching Assistant"
+        conditions = '(courses.private = 0 or courses.instructor_id = ?)'
+      else
+        conditions = '(courses.private = 0 or courses.id in (?))'
+      end   
+    end    
+    
+    
+    if sortvar.nil?
+      sortvar = 'name'
+    end
+    if sortorder.nil?
+      sortorder = 'ASC'
+    end         
+    
+    
+    if User.find(user_id).role.name != "Teaching Assistant"
+      values = user_id
+    else
+      values = Ta.get_mapped_courses(user_id)
+    end
+    
+    find(:all, :include => :course, :conditions => [conditions,values], :order => "courses.#{sortvar} #{sortorder}")       
   end  
   
   # Gets any children associated with this object

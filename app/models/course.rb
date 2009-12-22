@@ -2,6 +2,7 @@ class Course < ActiveRecord::Base
   has_many :ta_mappings
   validates_presence_of :name
   has_many :assignments
+  belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
  
   # Return any predefined teams associated with this course
   # Author: ajbudlon

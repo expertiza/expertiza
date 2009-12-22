@@ -18,16 +18,26 @@ class AssignmentNode < Node
   
   # returns: list of AssignmentNodes based on query
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil)    
-    if show      
-      conditions = 'assignments.instructor_id = ?'      
+    if show   
+      if User.find(user_id).role.name != "Teaching Assistant"
+        conditions = 'assignments.instructor_id = ?'
+      else
+        conditions = 'assignments.course_id in (?)'
+      end
     else
-      conditions = '(assignments.private = 0 or assignments.instructor_id = ?)'     
+      if User.find(user_id).role.name != "Teaching Assistant"
+        conditions = '(assignments.private = 0 or assignments.instructor_id = ?)'
+      else
+        conditions = '(assignments.private = 0 or assignments.course_id in (?))'
+      end   
     end
     
-    
-    #query = query+ " and "+self.table+".id in (select assignments.id from assignments, "+"ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id="+user_id.to_s+")"
-      
-        
+    if User.find(user_id).role.name != "Teaching Assistant"
+      values = user_id
+    else
+      values = Ta.get_mapped_courses(user_id)
+    end
+          
     if parent_id
       conditions += " and course_id = #{parent_id}"
     end
@@ -37,13 +47,9 @@ class AssignmentNode < Node
     end
     if sortorder.nil?
       sortorder = 'ASC'
-    end       
-    
-    if User.find(user_id).role.name != "Teaching Assistant"  
-      find(:all, :include => :assignment, :conditions => [conditions, user_id], :order => "assignments.#{sortvar} #{sortorder}")
-    else
-      find(:all, :include => :assignment, :conditions => [conditions, Ta.get_my_instructor(user_id)], :order => "assignments.#{sortvar} #{sortorder}")
-    end
+    end         
+        
+    find(:all, :include => :assignment, :conditions => [conditions,values], :order => "assignments.#{sortvar} #{sortorder}")    
   end
   
   # Indicates that this object is always a leaf

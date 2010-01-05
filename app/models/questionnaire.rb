@@ -73,18 +73,5 @@ class Questionnaire < ActiveRecord::Base
                             :conditions => ["id <> ? and name = ? and instructor_id = ?", 
                             id, name, instructor_id])
       errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
-  end  
-  
-    def set_notification_limit(user, assignment, limit)
-      existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',user.id,assignment.id,self.id])
-      if existing.nil?
-        NotificationLimit.create(:user_id => user.id,
-                                 :assignment_id => assignment.id,
-                                 :questionnaire_id => self.id,
-                                 :limit => limit)
-      else
-        existing.limit = limit
-        existing.save
-      end      
-    end
+  end    
 end

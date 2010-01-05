@@ -1,2 +1,0 @@
-class AuthorFeedbackWeight < QuestionnaireWeight  
-end

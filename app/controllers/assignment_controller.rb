@@ -121,19 +121,6 @@ class AssignmentController < ApplicationController
     @wiki_types = WikiType.find_all
   end
   
-  def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
-    existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
-    if existing.nil?
-      NotificationLimit.create(:user_id => session[:user].id,
-                                :assignment_id => assignment_id,
-                                :questionnaire_id => questionnaire_id,
-                                :limit => limit)
-    else
-      existing.limit = limit
-      existing.save
-    end    
-  end  
-  
   def set_questionnaires
     @assignment.assignment_questionnaires.clear
     params[:questionnaires].each{

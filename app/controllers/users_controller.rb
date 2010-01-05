@@ -96,7 +96,9 @@ class UsersController < ApplicationController
       render :action => 'new'
     else
       if @user.save
-        NotificationLimit.create(:user_id => @user.id)
+        if @user.role.name == "Instructor" or @user.role.name = "Administrator"
+          AssignmentQuestionnaires.create(:user_id => @user.id)
+        end
         flash[:notice] = 'User was successfully created.'
         redirect_to :action => 'list'
       else
@@ -140,15 +142,9 @@ class UsersController < ApplicationController
   def destroy
     begin
        user = User.find(params[:id])
-       participant = AssignmentParticipant.find_by_user_id(user.id)
-       team_user = TeamsUser.find_by_user_id(user.id)
-       if participant 
-         participant.delete 
-       end
-       if team_user
-         team_user.delete
-       end
-    
+       AssignmentParticipant.find_all_by_user_id(user.id).each{|participant| participant.delete}
+       TeamsUser.find_all_by_user_id(user.id).each{|teamuser| teamuser.delete}
+       AssignmentQuestionnaires.find_all_by_user_id(user.id).each{|aq| aq.destroy}           
        user.destroy
     rescue
       flash[:error] = $!

@@ -133,13 +133,16 @@ class Assignment < ActiveRecord::Base
     
   def check_condition(column)
     next_due_date = DueDate.find(:first, :conditions => ['assignment_id = ? and due_at >= ?',self.id,Time.now], :order => 'due_at')
+    if next_due_date.nil?
+      return false
+    end
     condition = 0
     next_due_date.attributes.each{
       | key, value |
       if key == column
         condition = value
       end
-    }
+    }   
     
     right = DeadlineRight.find(condition)
     return (right!= nil and (right.name == "OK" or right.name == "Late"))    

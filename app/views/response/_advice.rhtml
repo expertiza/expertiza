@@ -1,12 +1,10 @@
 &nbsp;&nbsp;&nbsp;<a href="#" id="advice_<%= i %>Link" name="advice_<%= i %>Link" onClick="toggleElement('advice_<%= i %>','advice');return false;">show advice</a><br/>							         
 <div id="advice_<%= i %>" style="display:none;padding:12px">			
-<%j=@max%>	
 <b>Click advice to adjust score</b><br/><br/>									
-<% advice_list.each{ | item | %>				
-  <%if j!=@max%><br/><%end%>							
-  <div onClick="updateDropDownMenu(<%=j%>,<%=i%>,<%=@min%>)" onMouseover="style.color = '#986633'" onMouseOut="style.color = 'black'">			
-  <%=j%>:&nbsp;<%=item.advice %>
+<% advice_list.each{ | item | %>  						
+  <div onClick="updateDropDownMenu(<%=item.score%>,<%=i%>,<%=@min%>)" onMouseover="style.color = '#986633'" onMouseOut="style.color = 'black'">			
+  <%=item.score%>:&nbsp;<%=item.advice %>  
   </div>
-  <%j-=1;%>
+  <% if item.score < @max %><br/><% end %>
 <%}%>				
 </div> 

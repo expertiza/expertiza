@@ -1,0 +1,2 @@
+class MetareviewWeight < QuestionnaireWeight  
+end

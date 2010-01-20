@@ -1,0 +1,2 @@
+class TeammateReviewWeight < QuestionnaireWeight  
+end

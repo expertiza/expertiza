@@ -9,15 +9,8 @@ class RemoveFieldsFromFeedback < ActiveRecord::Migration
       rename_column :review_feedbacks, :additional_comments, :additional_comment
     rescue      
     end
-      
-    ReviewFeedback.find(:all).each{
-      |feedback|
-      if feedback.txt != nil
-        ReviewFeedback.record_timestamps = false
-        feedback.update_attribute('additional_comment',feedback.txt)
-        ReviewFeedback.record_timestamps = true
-      end
-    }
+    
+    execute "update `review_feedbacks` set `additional_comment` = `txt` where `txt` IS NOT NULL"             
     
     begin
       remove_column :review_feedbacks, :txt

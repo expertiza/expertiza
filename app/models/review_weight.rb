@@ -1,2 +1,0 @@
-class ReviewWeight < QuestionnaireWeight  
-end

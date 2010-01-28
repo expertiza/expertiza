@@ -3,28 +3,40 @@ class UpdateControllersForResponse < ActiveRecord::Migration
     perm = Permission.find_by_name("do assignments")
     
     controller = SiteController.find_or_create_by_name("response")
-    controller.permission_id = perm.id
-    controller.save    
+    if controller
+      controller.permission_id = perm.id
+      controller.save
+    end
     
     controller = SiteController.find_by_name("review")
-    ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
-    controller.destroy
+    if controller 
+      ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
+      controller.destroy
+    end
     
     controller = SiteController.find_by_name("reviewing")
-    ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
-    controller.destroy
+    if controller
+      ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
+      controller.destroy
+    end
     
     controller = SiteController.find_by_name("review_feedback")
-    ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
-    controller.destroy
+    if controller
+      ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
+      controller.destroy
+    end
     
     controller = SiteController.find_by_name("review_of_review")
-    ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
-    controller.destroy    
+    if controller
+      ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
+      controller.destroy    
+    end
     
     controller = SiteController.find_by_name("teammate_review")
-    ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
-    controller.destroy      
+    if controller
+      ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
+      controller.destroy
+    end
     
     Role.rebuild_cache
   end

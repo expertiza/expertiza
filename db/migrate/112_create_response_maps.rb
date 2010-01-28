@@ -30,34 +30,43 @@ class CreateResponseMaps < ActiveRecord::Migration
     execute 'ALTER TABLE `scores`
              ADD CONSTRAINT fk_score_response
              FOREIGN KEY (response_id) REFERENCES responses(id)'              
-   
-    ReviewOfReviewMapping.find(:all).each{
+    
+    ActiveRecord::Base.connection.select_all("select * from review_of_review_mappings").each{
        | map | 
-       create_response_map(map,"ReviewOfReview","MetareviewResponseMap", "MetareviewQuestionnaire")       
+       rmap = ActiveRecord::Base.connection.select_all("select * from review_mappings where id = #{map['reviewed_object_id']}")       
+       assignment = Assignment.find(rmap[0]['reviewed_object_id'].to_i) 
+       create_response_map(map,"review_of_reviews","MetareviewResponseMap", "MetareviewQuestionnaire",assignment)       
     }
     
-    FeedbackMapping.find(:all).each{
+    ActiveRecord::Base.connection.select_all("select * from feedback_mappings").each{
        | map | 
-       create_response_map(map,"ReviewFeedback","FeedbackResponseMap", "AuthorFeedbackQuestionnaire")
+       review = ActiveRecord::Base.connection.select_all("select * from reviews where id = #{map['reviewed_object_id']}")
+       rmap = ActiveRecord::Base.connection.select_all("select * from review_mappings where id = #{review[0]['mapping_id']}")
+       assignment = Assignment.find(rmap[0]['reviewed_object_id'].to_i)              
+       create_response_map(map,"review_feedbacks","FeedbackResponseMap", "AuthorFeedbackQuestionnaire",assignment)
     }  
     
-    TeammateReviewMapping.find(:all).each{
+    ActiveRecord::Base.connection.select_all("select * from teammate_review_mappings").each{
        | map | 
-       create_response_map(map,"TeammateReview","TeammateReviewResponseMap", "TeammateReviewQuestionnaire")        
+       assignment = Assignment.find(map['reviewed_object_id'].to_i)               
+       create_response_map(map,"teammate_reviews","TeammateReviewResponseMap", "TeammateReviewQuestionnaire",assignment)        
     }     
    
     # create response mappings as associate to a given review object
-    ReviewMapping.find(:all).each{
+    ActiveRecord::Base.connection.select_all("select * from review_mappings").each{
        | map | 
-       review = Review.find_by_mapping_id(map.id)
-       if map.instance_of? ParticipantReviewMapping
+       
+       assignment = Assignment.find(map['reviewed_object_id'].to_i) 
+       
+       review = ActiveRecord::Base.connection.select_all("select * from reviews where mapping_id = #{map['id']}")
+       if map['type'] = 'ParticipantReviewMapping'
           map_type = "ParticipantReviewResponseMap"
        else
           map_type = "TeamReviewResponseMap"
        end
-       rmap, response = create_response_map(map,"Review",map_type, "ReviewQuestionnaire")
+       rmap, response = create_response_map(map,"reviews",map_type, "ReviewQuestionnaire",assignment)
        
-       MetareviewResponseMap.find_all_by_reviewed_object_id(map.id).each{
+       MetareviewResponseMap.find_all_by_reviewed_object_id(map['id'].to_i).each{
          | metamap |
          if rmap != nil
            metamap.update_attribute('reviewed_object_id',rmap.id)
@@ -66,8 +75,8 @@ class CreateResponseMaps < ActiveRecord::Migration
          end   
        }
        
-       if review != nil
-       FeedbackResponseMap.find_all_by_reviewed_object_id(review.id).each{
+       if review.length > 0 && review[0] != nil         
+       FeedbackResponseMap.find_all_by_reviewed_object_id(review[0]['id'].to_i).each{
          | fmap |
          if response != nil
           fmap.update_attribute('reviewed_object_id',response.id)
@@ -102,25 +111,24 @@ class CreateResponseMaps < ActiveRecord::Migration
     map.destroy    
   end
   
-  def self.create_response_map(map, review_type, map_type, questionnaire_type)
+  def self.create_response_map(map, review_type, map_type, questionnaire_type, assignment)
     response = nil
     rmap = nil 
    
     today = Time.now             
     oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0)    
-    
-       review = Object.const_get(review_type).find_by_mapping_id(map.id)       
-       if review.nil? and (map.assignment.created_at.nil? or map.assignment.created_at < oldest_allowed_time)
-         puts "IGNORE: #{map.type} #{map.id} is at least a year old and has no review associated with it."         
+       review = ActiveRecord::Base.connection.select_all("select * from #{review_type} where mapping_id = #{map['id']}")
+       if review[0] == nil and (assignment.created_at.nil? or assignment.created_at < oldest_allowed_time)
+         puts "IGNORE: #{map['type']} #{map['id']} is at least a year old and has no review associated with it."         
        else       
         rmap = Object.const_get(map_type).create(
-                  :reviewed_object_id => map.reviewed_object_id,
-                  :reviewer_id => map.reviewer_id,
-                  :reviewee_id => map.reviewee_id)                 
-        if review != nil     
-          questionnaire = map.assignment.questionnaires.find_by_type(questionnaire_type)          
+                  :reviewed_object_id => map['reviewed_object_id'].to_i,
+                  :reviewer_id => map['reviewer_id'].to_i,
+                  :reviewee_id => map['reviewee_id'].to_i)                 
+        if review[0] != nil     
+          questionnaire = assignment.questionnaires.find_by_type(questionnaire_type)          
           if questionnaire != nil
-            response = create_response(review, rmap, questionnaire.questions)
+            response = create_response(review[0], rmap, questionnaire.questions)
           end
         end
       end
@@ -128,15 +136,15 @@ class CreateResponseMaps < ActiveRecord::Migration
   end
   
   def self.create_response(review, response_map, questions)      
-      response = Response.create(:map_id => response_map.id, :additional_comment => review.additional_comment)
+      response = Response.create(:map_id => response_map.id, :additional_comment => review['additional_comment'])
       Response.record_timestamps = false
-      response.update_attribute('created_at',review.created_at)
-      response.update_attribute('updated_at',review.updated_at)            
+      response.update_attribute('created_at',review['created_at'])
+      response.update_attribute('updated_at',review['updated_at'])            
       Response.record_timestamps = true
       score_found = false      
       questions.each{
         | question |
-        score = Score.find_by_instance_id_and_question_id(review.id, question.id) 
+        score = Score.find_by_instance_id_and_question_id(review['id'].to_i, question.id) 
         if score != nil
           score_found = true
           score.update_attribute('response_id',response.id)

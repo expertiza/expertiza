@@ -2,7 +2,19 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 105) do
+ActiveRecord::Schema.define(:version => 114) do
+
+  create_table "assignment_questionnaires", :force => true do |t|
+    t.column "assignment_id",        :integer
+    t.column "questionnaire_id",     :integer
+    t.column "user_id",              :integer
+    t.column "notification_limit",   :integer, :default => 15, :null => false
+    t.column "questionnaire_weight", :integer, :default => 0,  :null => false
+  end
+
+  add_index "assignment_questionnaires", ["user_id"], :name => "fk_aq_user_id"
+  add_index "assignment_questionnaires", ["assignment_id"], :name => "fk_aq_assignments_id"
+  add_index "assignment_questionnaires", ["questionnaire_id"], :name => "fk_aq_questionnaire_id"
 
   create_table "assignments", :force => true do |t|
     t.column "created_at",                        :datetime
@@ -10,14 +22,14 @@ ActiveRecord::Schema.define(:version => 105) do
     t.column "name",                              :string
     t.column "directory_path",                    :string
     t.column "submitter_count",                   :integer,  :limit => 10, :default => 0,     :null => false
-    t.column "course_id",                         :integer,                :default => 0,     :null => false
-    t.column "instructor_id",                     :integer,                :default => 0,     :null => false
+    t.column "course_id",                         :integer,                :default => 0
+    t.column "instructor_id",                     :integer,                :default => 0
     t.column "private",                           :boolean,                :default => false, :null => false
     t.column "num_reviews",                       :integer,                :default => 0,     :null => false
     t.column "num_review_of_reviews",             :integer,  :limit => 10, :default => 0,     :null => false
     t.column "num_review_of_reviewers",           :integer,                :default => 0,     :null => false
-    t.column "review_strategy_id",                :integer,                :default => 0,     :null => false
-    t.column "mapping_strategy_id",               :integer,                :default => 0,     :null => false
+    t.column "review_strategy_id",                :integer,                :default => 0
+    t.column "mapping_strategy_id",               :integer,                :default => 0
     t.column "review_questionnaire_id",           :integer
     t.column "review_of_review_questionnaire_id", :integer
     t.column "teammate_review_questionnaire_id",  :integer,  :limit => 10
@@ -34,14 +46,10 @@ ActiveRecord::Schema.define(:version => 105) do
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
-
-  create_table "assignments_questionnaires", :force => true do |t|
-    t.column "questionnaire_id", :integer, :default => 0, :null => false
-    t.column "assignment_id",    :integer, :default => 0, :null => false
-  end
-
-  add_index "assignments_questionnaires", ["questionnaire_id"], :name => "fk_assignments_questionnaires_questionnaires"
-  add_index "assignments_questionnaires", ["assignment_id"], :name => "fk_assignments_questionnaires_assignments"
+  add_index "assignments", ["instructor_id"], :name => "fk_assignments_instructors"
+  add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
+  add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
+  add_index "assignments", ["mapping_strategy_id"], :name => "fk_assignments_mapping_strategies"
 
   create_table "comments", :force => true do |t|
     t.column "participant_id", :integer, :default => 0,     :null => false
@@ -114,16 +122,6 @@ ActiveRecord::Schema.define(:version => 105) do
   add_index "due_dates", ["resubmission_allowed_id"], :name => "fk_due_date_resubmission_allowed"
   add_index "due_dates", ["rereview_allowed_id"], :name => "fk_due_date_rereview_allowed"
   add_index "due_dates", ["review_of_review_allowed_id"], :name => "fk_due_date_review_of_review_allowed"
-
-  create_table "feedback_mappings", :force => true do |t|
-    t.column "reviewer_id",        :integer, :null => false
-    t.column "reviewee_id",        :integer, :null => false
-    t.column "reviewed_object_id", :integer, :null => false
-  end
-
-  add_index "feedback_mappings", ["reviewed_object_id"], :name => "fk_feedback_mappings_review"
-  add_index "feedback_mappings", ["reviewer_id"], :name => "fk_feedback_mappings_reviewer_participant"
-  add_index "feedback_mappings", ["reviewee_id"], :name => "fk_feedback_mappings_reviewee_participant"
 
   create_table "goldberg_content_pages", :force => true do |t|
     t.column "title",           :string
@@ -299,13 +297,6 @@ ActiveRecord::Schema.define(:version => 105) do
     t.column "type",           :string
   end
 
-  create_table "notification_limits", :force => true do |t|
-    t.column "user_id",          :integer, :default => 0,  :null => false
-    t.column "assignment_id",    :integer
-    t.column "questionnaire_id", :integer
-    t.column "limit",            :integer, :default => 15, :null => false
-  end
-
   create_table "participants", :force => true do |t|
     t.column "submit_allowed",      :boolean,                :default => true
     t.column "review_allowed",      :boolean,                :default => true
@@ -341,17 +332,6 @@ ActiveRecord::Schema.define(:version => 105) do
 
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
-  create_table "questionnaire_types", :force => true do |t|
-    t.column "name", :string, :default => "", :null => false
-  end
-
-  create_table "questionnaire_weights", :force => true do |t|
-    t.column "assignment_id",    :integer, :default => 0,   :null => false
-    t.column "questionnaire_id", :integer, :default => 0,   :null => false
-    t.column "weight",           :float,   :default => 0.0, :null => false
-    t.column "type",             :string
-  end
-
   create_table "questionnaires", :force => true do |t|
     t.column "name",                :string,   :limit => 64
     t.column "instructor_id",       :integer,                :default => 0,     :null => false
@@ -361,7 +341,8 @@ ActiveRecord::Schema.define(:version => 105) do
     t.column "created_at",          :datetime
     t.column "updated_at",          :datetime,                                  :null => false
     t.column "default_num_choices", :integer
-    t.column "type_id",             :integer,                :default => 0,     :null => false
+    t.column "type",                :string
+    t.column "display_type",        :string
   end
 
   create_table "questions", :force => true do |t|
@@ -373,6 +354,24 @@ ActiveRecord::Schema.define(:version => 105) do
 
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
+  create_table "response_maps", :force => true do |t|
+    t.column "reviewed_object_id", :integer,                 :null => false
+    t.column "reviewer_id",        :integer,                 :null => false
+    t.column "reviewee_id",        :integer,                 :null => false
+    t.column "type",               :string,  :default => "", :null => false
+  end
+
+  add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"
+
+  create_table "responses", :force => true do |t|
+    t.column "map_id",             :integer,  :null => false
+    t.column "additional_comment", :string
+    t.column "created_at",         :datetime
+    t.column "updated_at",         :datetime
+  end
+
+  add_index "responses", ["map_id"], :name => "fk_response_response_map"
+
   create_table "resubmission_times", :force => true do |t|
     t.column "participant_id", :integer
     t.column "resubmitted_at", :datetime
@@ -380,56 +379,9 @@ ActiveRecord::Schema.define(:version => 105) do
 
   add_index "resubmission_times", ["participant_id"], :name => "fk_resubmission_times_participants"
 
-  create_table "review_feedbacks", :force => true do |t|
-    t.column "additional_comment", :text
-    t.column "created_at",         :datetime
-    t.column "updated_at",         :datetime
-    t.column "mapping_id",         :integer,  :null => false
-  end
-
-  add_index "review_feedbacks", ["mapping_id"], :name => "fk_review_feedback_mappings"
-
-  create_table "review_mappings", :force => true do |t|
-    t.column "reviewed_object_id", :integer
-    t.column "reviewer_id",        :integer,                 :null => false
-    t.column "reviewee_id",        :integer,                 :null => false
-    t.column "type",               :string,  :default => "", :null => false
-  end
-
-  add_index "review_mappings", ["reviewer_id"], :name => "fk_review_mappings_participant_reviewers"
-  add_index "review_mappings", ["reviewed_object_id"], :name => "fk_review_mappings_assignments"
-
-  create_table "review_of_review_mappings", :force => true do |t|
-    t.column "reviewed_object_id", :integer, :null => false
-    t.column "reviewer_id",        :integer, :null => false
-    t.column "reviewee_id",        :integer, :null => false
-  end
-
-  add_index "review_of_review_mappings", ["reviewer_id"], :name => "fk_review_of_review_mappings_participant_reviewers"
-  add_index "review_of_review_mappings", ["reviewee_id"], :name => "fk_review_of_review_mappings_participant_reviewees"
-  add_index "review_of_review_mappings", ["reviewed_object_id"], :name => "fk_review_of_review_mappings_review_mappings"
-
-  create_table "review_of_reviews", :force => true do |t|
-    t.column "mapping_id",         :integer
-    t.column "created_at",         :datetime
-    t.column "updated_at",         :datetime
-    t.column "additional_comment", :string
-  end
-
-  add_index "review_of_reviews", ["mapping_id"], :name => "fk_review_of_review_review_of_review_mappings"
-
   create_table "review_strategies", :force => true do |t|
     t.column "name", :string
   end
-
-  create_table "reviews", :force => true do |t|
-    t.column "mapping_id",         :integer
-    t.column "additional_comment", :text
-    t.column "updated_at",         :datetime
-    t.column "created_at",         :datetime
-  end
-
-  add_index "reviews", ["mapping_id"], :name => "fk_review_review_mapping"
 
   create_table "roles", :force => true do |t|
     t.column "name",            :string,   :default => "", :null => false
@@ -453,15 +405,14 @@ ActiveRecord::Schema.define(:version => 105) do
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
 
   create_table "scores", :force => true do |t|
-    t.column "instance_id",           :integer, :default => 0, :null => false
-    t.column "question_id",           :integer, :default => 0, :null => false
-    t.column "questionnaire_type_id", :integer, :default => 0, :null => false
-    t.column "score",                 :integer
-    t.column "comments",              :text
+    t.column "question_id", :integer, :default => 0, :null => false
+    t.column "score",       :integer
+    t.column "comments",    :text
+    t.column "response_id", :integer
   end
 
   add_index "scores", ["question_id"], :name => "fk_score_questions"
-  add_index "scores", ["questionnaire_type_id"], :name => "fk_score_questionnaire_types"
+  add_index "scores", ["response_id"], :name => "fk_score_response"
 
   create_table "site_controllers", :force => true do |t|
     t.column "name",          :string,  :default => "", :null => false
@@ -523,19 +474,6 @@ ActiveRecord::Schema.define(:version => 105) do
   add_index "ta_mappings", ["ta_id"], :name => "fk_ta_mappings_ta_id"
   add_index "ta_mappings", ["course_id"], :name => "fk_ta_mappings_course_id"
 
-  create_table "teammate_review_mappings", :force => true do |t|
-    t.column "reviewer_id",        :integer, :null => false
-    t.column "reviewee_id",        :integer, :null => false
-    t.column "reviewed_object_id", :integer, :null => false
-  end
-
-  create_table "teammate_reviews", :force => true do |t|
-    t.column "additional_comment", :text
-    t.column "mapping_id",         :integer,  :null => false
-    t.column "created_at",         :datetime
-    t.column "updated_at",         :datetime
-  end
-
   create_table "teams", :force => true do |t|
     t.column "name",      :string
     t.column "parent_id", :integer
@@ -553,6 +491,7 @@ ActiveRecord::Schema.define(:version => 105) do
   create_table "tree_folders", :force => true do |t|
     t.column "name",       :string
     t.column "child_type", :string
+    t.column "parent_id",  :integer
   end
 
   create_table "users", :force => true do |t|

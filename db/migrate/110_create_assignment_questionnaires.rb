@@ -35,10 +35,12 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
       make_association('TeammateReviewQuestionnaire', assignment, assignment.teammate_review_questionnaire_id)        
     }
     
-    NotificationLimit.find(:all).each{
+    l_records = ActiveRecord::Base.connection.select_all("select * from notification_limits")
+        
+    l_records.each{
       |l|
       begin
-        association = AssignmentQuestionnaires.create(:user_id => l.user_id, :notification_limit => l.limit)
+        association = AssignmentQuestionnaires.create(:user_id => l['user_id'], :notification_limit => l['limit'])
       rescue
         puts $!
       end
@@ -52,20 +54,18 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
       begin
         q = Object.const_get(model).find(questionnaire_id)
         association = AssignmentQuestionnaires.create(:assignment_id => assignment.id, :questionnaire_id => q.id)
-                      
-        l = NotificationLimit.find_by_assignment_id_and_questionnaire_id(assignment.id, q.id)
-        w = QuestionnaireWeight.find_by_assignment_id_and_questionnaire_id(assignment.id, q.id)
+        l_records = ActiveRecord::Base.connection.select_all("select * from notification_limits where assignment_id = #{assignment.id} and questionnaire_id = #{q.id}")
+        w_records = ActiveRecord::Base.connection.select_all("select * from questionnaire_weights where assignment_id = #{assignment.id} and questionnaire_id = #{q.id}")         
         
-        
-        if l
-          association.update_attribute("user_id",l.user_id)
-          association.update_attribute("notification_limit",l.limit)  
-          l.destroy
+        if l_records.length > 0
+          association.update_attribute("user_id",l_records[0]['user_id'])
+          association.update_attribute("notification_limit",l_records[0]['limit'])  
+          execute "delete from notification_limits where assignment_id = #{assignment.id} and questionnaire_id = #{q.id}"
         end       
         
-        if w
-          association.update_attribute("questionnaire_weight",w.weight)    
-          w.destroy
+        if w_records.length > 0
+          association.update_attribute("questionnaire_weight",w_records[0]['weight'])    
+          execute "delete from questionnaire_weights where assignment_id = #{assignment.id} and questionnaire_id = #{q.id}"
         end   
         
         if association.user_id.nil?

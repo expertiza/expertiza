@@ -10,50 +10,50 @@ class TreeDisplayController < ApplicationController
   
   # direct access to review rubrics
   def goto_review_rubrics
-    node_object = QuestionnaireType.find_by_name('Review')
-    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    node_object = TreeFolder.find_by_name('Review')
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to :controller => 'tree_display', :action => 'list'
   end  
   
   # direct access to metareview rubrics
   def goto_metareview_rubrics
-    node_object = QuestionnaireType.find_by_name('Metareview')
-    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    node_object = TreeFolder.find_by_name('Metareview')
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to :controller => 'tree_display', :action => 'list'
   end   
   
   # direct access to teammate review rubrics
   def goto_teammatereview_rubrics
-    node_object = QuestionnaireType.find_by_name('Teammate Review')
-    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    node_object = TreeFolder.find_by_name('Teammate Review')
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to :controller => 'tree_display', :action => 'list'
   end   
   
   # direct access to author feedbacks
   def goto_author_feedbacks
-    node_object = QuestionnaireType.find_by_name('Author Feedback')
-    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    node_object = TreeFolder.find_by_name('Author Feedback')
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to :controller => 'tree_display', :action => 'list'
   end  
   
   # direct access to global survey
   def goto_global_survey
-    node_object = QuestionnaireType.find_by_name('Global Survey')
-    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    node_object = TreeFolder.find_by_name('Global Survey')
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to :controller => 'tree_display', :action => 'list'
   end  
   
   # direct access to surveys
   def goto_surveys
-    node_object = QuestionnaireType.find_by_name('Survey')
-    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    node_object = TreeFolder.find_by_name('Survey')
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to :controller => 'tree_display', :action => 'list'
   end  
   
   # direct access to course evaluations
   def goto_course_evaluations
-    node_object = QuestionnaireType.find_by_name('Course Evaluation')
-    session[:root] = QuestionnaireTypeNode.find_by_node_object_id(node_object.id).id
+    node_object = TreeFolder.find_by_name('Course Evaluation')
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to :controller => 'tree_display', :action => 'list'
   end    
   

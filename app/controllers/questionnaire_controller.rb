@@ -26,7 +26,12 @@ class QuestionnaireController < ApplicationController
         | question |
         newquestion = question.clone
         newquestion.questionnaire_id = @questionnaire.id
-        newquestion.save           
+        newquestion.save        
+        
+        advice = QuestionAdvice.find_by_question_id(question.id)
+        newadvice = advice.clone
+        newadvice.question_id = newquestion.id
+        newadvice.save
       }       
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)

@@ -46,33 +46,33 @@ class GradesController < ApplicationController
   def instructor_review
     participant = AssignmentParticipant.find(params[:id])
     
-    if participant.assignment.team_assignment
-         reviewee = participant.team          
-      else
-         reviewee = participant
-      end   
-   
       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, participant.assignment.id)
       if reviewer.nil?
          reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
          reviewer.set_handle()
-      end
+      end    
+    
+      if participant.assignment.team_assignment
+         reviewee = participant.team    
+         review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+      else
+         reviewee = participant
+         review_mapping = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)              
+      end   
 
-      review_mapping = ReviewResponseMapping.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
-        
       if review_mapping.nil?
          if participant.assignment.team_assignment
-          review_mapping = TeamReviewResponseMapping.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+            review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
          else
-            review_mapping = ParticipantReviewResponseMapping.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+            review_mapping = ParticipantReviewResponseMap.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
          end      
       end 
       review = Response.find_by_map_id(review_mapping.id) 
       
       if review.nil?
-        redirect_to :controller => 'review', :action => 'new_review', :id => review_mapping.id 
+        redirect_to :controller => 'response', :action => 'new', :id => review_mapping.id, :return => "instructor"
       else
-        redirect_to :controller => 'review', :action => 'edit_review', :id => review.id
+        redirect_to :controller => 'response', :action => 'edit', :id => review.id, :return => "instructor"
       end
   end
   

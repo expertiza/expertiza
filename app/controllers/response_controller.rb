@@ -73,6 +73,7 @@ class ResponseController < ApplicationController
     @next_action = "create"    
     @feedback = params[:feedback]
     @map = ResponseMap.find(params[:id])
+    @return = params[:return]
     @modified_object = @map.id
     get_content    
     render :action => 'response'
@@ -108,6 +109,8 @@ class ResponseController < ApplicationController
       redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
       redirect_to :controller => 'student_team', :action => 'view', :id => @map.reviewer.id
+    elsif params[:return] == "instructor"
+      redirect_to :controller => 'grades', :action => 'view', :id => @map.assignment.id
     else
       redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
     end    

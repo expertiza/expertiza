@@ -9,6 +9,13 @@ class ResponseController < ApplicationController
     get_content  
   end   
   
+  def delete    
+    @response = Response.find(params[:id])
+    map_id = @response.map.id
+    @response.delete
+    redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
+  end
+  
   def edit    
     @header = "Edit"
     @next_action = "update"
@@ -46,12 +53,11 @@ class ResponseController < ApplicationController
 
     begin
       ResponseHelper.compare_scores(@response, @questionnaire)
-      flash[:note] = "#{@map.get_title} was successfully saved."
+      msg = "#{@map.get_title} was successfully saved."
     rescue
-      flash[:error] = "An error occurred while saving the response: "+$!
+      msg = "An error occurred while saving the response: "+$!
     end
-    
-    redirect
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end  
   
   def new_feedback
@@ -94,17 +100,22 @@ class ResponseController < ApplicationController
     
     begin
       ResponseHelper.compare_scores(@response, @questionnaire)
-      flash[:note] = "#{@map.get_title} was successfully saved."
+      msg = "#{@map.get_title} was successfully saved."
     rescue
       @response.delete
-      flash[:error] = "#{@map.get_title} was not saved. Cause: "+$!
+      msg = "#{@map.get_title} was not saved. Cause: "+$!
     end
-    redirect
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end      
   
-  private
+  def saving
+    @map = ResponseMap.find(params[:id])
+    @return = params[:return]
+    @msg = params[:msg]
+  end
   
-  def redirect
+  def redirection
+    @map = ResponseMap.find(params[:id])
     if params[:return] == "feedback"
       redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
@@ -113,9 +124,11 @@ class ResponseController < ApplicationController
       redirect_to :controller => 'grades', :action => 'view', :id => @map.assignment.id
     else
       redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
-    end    
+    end 
   end
   
+  private
+    
   def get_content    
     @title = @map.get_title 
     @assignment = @map.assignment

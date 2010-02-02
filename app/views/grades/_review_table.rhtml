@@ -9,7 +9,7 @@
 		<% for review in reviews %>
            <td align="center">                       
            <% if prefix %>         
-             <a href="#<%= prefix+"_"+review.map.reviewer.name %>"><%= review.map.reviewer.fullname %></a>      		   		     
+             <a href="#<%= prefix+"_"+review.map.reviewer.name %>"><%= review.map.reviewer.fullname %></a>&nbsp;<%=link_to '<img src="/images/delete_icon.png"/>', :controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor' %>     		   		     
 		   <% else %>
 		     <%= link_to review.map.reviewer.fullname, :controller=>ctrl, :action => caction, :id=> review.id%>
 		   <% end %>

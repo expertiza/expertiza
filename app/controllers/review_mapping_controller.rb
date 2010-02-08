@@ -1,5 +1,6 @@
 class ReviewMappingController < ApplicationController
   auto_complete_for :user, :name
+  use_google_charts
   
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
@@ -359,4 +360,116 @@ class ReviewMappingController < ApplicationController
     @review_strategies = ReviewStrategy.find(:all, :order => 'name')
     @mapping_strategies = MappingStrategy.find(:all, :order => 'name')    
   end
+
+  #Start of Review report code
+  #Author Uma Mahesh Katakam
+  def review_report
+    @id = params[:id]  #contains the assignment id
+    @assignment = Assignment.find(params[:id])
+    if @assignment.team_assignment
+      @type = "TeamReviewResponseMap"
+    else
+      @type = "ParticipantReviewResponseMap"
+    end
+
+
+
+
+    #find all reviewers for this assignment
+    @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", @id, @type] )
+    @revqids = []
+
+    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
+    @revqids.each do |rqid|
+      rtype = Questionnaire.find(rqid.questionnaire_id).type
+      if( rtype == ReviewQuestionnaire)
+        @review_questionnaire_id = rqid.questionnaire_id
+      end
+    end
+    if(@review_questionnaire_id)
+      @review_questionnaire = Questionnaire.find(@review_questionnaire_id)
+      @maxscore = @review_questionnaire.max_question_score
+      @review_questions = @review_questionnaire.questions
+    end
+    @userid = session[:user].id
+  end
+
+  def distribution
+    @assignment = Assignment.find(params[:id])
+    @revqids = []
+
+    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
+    @revqids.each do |rqid|
+      rtype = Questionnaire.find(rqid.questionnaire_id).type
+      if( rtype == ReviewQuestionnaire)
+        @review_questionnaire_id = rqid.questionnaire_id
+      end
+    end
+
+    @review_questionnaire = Questionnaire.find(@review_questionnaire_id)
+    @review_questions = @review_questionnaire.questions
+    @scores = [0,0,0,0,0,0,0,0,0,0]
+    t_score = 0
+    if(@assignment.team_assignment)# IF TEAM aSS
+      @teams = Team.find_all_by_parent_id(params[:id])
+      @objtype = "TeamReviewResponseMap"
+    else
+      @teams = Participant.find_all_by_parent_id(params[:id])
+      @objtype = "ParticipantReviewResponseMap"
+    end
+      @teams.each do |team|
+        #@qid = QuestionnaireType.find_by_name("Review").id
+
+        @sc = ScoreCache.find(:first, :conditions => ["object_id = ? and assignment_id = ? and object_type = ?",team.id, @assignment.id, @objtype])
+        if @sc!= nil
+          t_score = @sc.score
+        end
+        if (t_score)
+          @scores[t_score/10] =  @scores[t_score/10] + 1
+        end
+      end
+
+   
+    dataset = GoogleChartDataset.new :data => @scores, :color => '9A0000'
+    data = GoogleChartData.new :datasets => [dataset]
+    axis = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
+    @chart = GoogleBarChart.new :width => 500, :height => 200, :title => ['Team average','score distribution']
+    @chart.data = data
+    @chart.axis = axis
+    end
+
+  def search
+    @assignment = Assignment.find(params[:id])
+    @id = params[:id]
+
+    if @assignment.team_assignment
+      @type = "TeamReviewResponseMap"
+    else
+      @type = "ParticipantReviewResponseMap"
+    end
+
+    @us = User.find(:all, :select => "DISTINCT id", :conditions => ["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
+    @participants = Participant.find(:all, :select => "DISTINCT id", :conditions => ["user_id IN (?) and parent_id = ?", @us, @assignment.id] )
+    
+    @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, @participants] )
+    @revqids = []
+
+    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
+    @revqids.each do |rqid|
+      rtype = Questionnaire.find(rqid.questionnaire_id).type
+      if( rtype == ReviewQuestionnaire)
+        @review_questionnaire_id = rqid.questionnaire_id
+      end
+    end
+
+    @review_questionnaire = Questionnaire.find(@review_questionnaire_id)
+    @review_questions = @review_questionnaire.questions
+    render :action => 'review_report'
+  end
+
+
+
+#end of my code
+
+
 end

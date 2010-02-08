@@ -14,6 +14,7 @@
 <% end %> 
 <li><%= link_to 'Assign Reviewers',:controller=>'review_mapping', :action=>'list_mappings', :id => node.node_object_id %></li>
 <li><%= link_to 'View Scores',:controller=>'grades', :action=>'view', :id => node.node_object_id %></li>   
+<li> <%= link_to 'Review Report', :controller=>'review_mapping', :action=>'review_report', :id => node.node_object_id %></li>
 <li><%= link_to 'Assign Surveys',:controller=>'survey', :action=>'assign', :id => node.node_object_id %></li>
 <li><%= link_to 'View Survey Responses',:controller=>'survey_response', :action=>'view_responses', :id => node.node_object_id %></li>
 <% end %>

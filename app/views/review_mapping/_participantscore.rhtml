@@ -1,0 +1,48 @@
+<% @qid = "ParticipantReviewResponseMap" %>
+ <%@myuser%>
+<%@id%>
+<%@sc = ScoreCache.find(:first, :conditions => ["object_id = ? and assignment_id = ? and object_type = ?",@myuser, @id, @qid  ])%>
+
+<%if @sc %>
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center'>
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>					
+			<%= @sc.score %>%
+			</td> 
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+			(<%= @sc.range%>)
+		</td>
+
+<%else%>
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center'>
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>					
+			--
+			</td> 
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+			--
+		</td>
+	
+
+<%end%>
+					
+
+ 
+
+		

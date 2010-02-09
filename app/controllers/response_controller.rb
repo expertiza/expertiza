@@ -51,16 +51,16 @@ class ResponseController < ApplicationController
       end    
    update_cache(@myid)
     rescue
-      flash[:error] = "#{@map.get_title} was not saved."
+      msg = "#{@map.get_title} was not saved."
     end
 
     begin
-      ResponseHelper.compare_scores(@response, @questionnaire)
+       ResponseHelper.compare_scores(@response, @questionnaire)
    #   ScoreCache.update_cache(@response.id)
        update_cache(@myid)
-      flash[:note] = "#{@map.get_title} was successfully saved -- #{@myid}."
+      msg = "#{@map.get_title} was successfully saved -- #{@myid}."
     rescue
-      flash[:error] = "An error occurred while saving the response: "+$!
+      msg = "An error occurred while saving the response: "+$!
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end  
@@ -102,16 +102,16 @@ class ResponseController < ApplicationController
         score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
       end  
     rescue
-      flash[:error] = "#{@map.get_title} was not saved. Cause: "+$!
+      msg = "#{@map.get_title} was not saved. Cause: "+$!
     end
     
     begin
       ResponseHelper.compare_scores(@response, @questionnaire)
       update_cache(@res)
-      flash[:note] = "#{@map.get_title} was successfully saved == #{@res} ."
+      msg = "#{@map.get_title} was successfully saved == #{@res} ."
     rescue
       @response.delete
-      flash[:error] = "#{@map.get_title} was not saved. Cause: "+$!
+      msg = "#{@map.get_title} was not saved. Cause: "+$!
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end      

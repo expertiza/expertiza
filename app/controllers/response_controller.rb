@@ -36,6 +36,7 @@ class ResponseController < ApplicationController
   def update
     @response = Response.find(params[:id])
     @myid = @response.id
+    msg = ""
     begin 
         @myid = @response.id
       @map = @response.map
@@ -93,6 +94,7 @@ class ResponseController < ApplicationController
   def create     
     @map = ResponseMap.find(params[:id])
     @res = 0
+    msg = ""
     begin      
       @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
       @res = @response.id

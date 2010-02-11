@@ -2,7 +2,7 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 114) do
+ActiveRecord::Schema.define(:version => 115) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.column "assignment_id",        :integer
@@ -355,17 +355,17 @@ ActiveRecord::Schema.define(:version => 114) do
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
   create_table "response_maps", :force => true do |t|
-    t.column "reviewed_object_id", :integer,                 :null => false
-    t.column "reviewer_id",        :integer,                 :null => false
-    t.column "reviewee_id",        :integer,                 :null => false
+    t.column "reviewed_object_id", :integer, :default => 0,  :null => false
+    t.column "reviewer_id",        :integer, :default => 0,  :null => false
+    t.column "reviewee_id",        :integer, :default => 0,  :null => false
     t.column "type",               :string,  :default => "", :null => false
   end
 
   add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"
 
   create_table "responses", :force => true do |t|
-    t.column "map_id",             :integer,  :null => false
-    t.column "additional_comment", :string
+    t.column "map_id",             :integer,  :default => 0, :null => false
+    t.column "additional_comment", :text
     t.column "created_at",         :datetime
     t.column "updated_at",         :datetime
   end
@@ -403,6 +403,15 @@ ActiveRecord::Schema.define(:version => 114) do
 
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
+
+  create_table "score_caches", :force => true do |t|
+    t.column "object_id",     :integer, :default => 0,   :null => false
+    t.column "assignment_id", :integer, :default => 0
+    t.column "course_id",     :integer, :default => 0
+    t.column "score",         :float,   :default => 0.0, :null => false
+    t.column "range",         :string,  :default => ""
+    t.column "object_type",   :string,  :default => "",  :null => false
+  end
 
   create_table "scores", :force => true do |t|
     t.column "question_id", :integer, :default => 0, :null => false

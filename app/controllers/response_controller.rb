@@ -95,7 +95,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @res = 0
     msg = ""
-    begin      
+    #begin      
       @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
       @res = @response.id
       @questionnaire = @map.questionnaire
@@ -103,18 +103,18 @@ class ResponseController < ApplicationController
       params[:responses].each_pair do |k,v|
         score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
       end  
-    rescue
-      msg = "#{@map.get_title} was not saved. Cause: "+$!
-    end
+    #rescue
+    #  msg = "#{@map.get_title} was not saved. Cause: "+$!
+    #end
     
-    begin
+    #begin
       ResponseHelper.compare_scores(@response, @questionnaire)
       update_cache(@res)
-      msg = "#{@map.get_title} was successfully saved == #{@res} ."
-    rescue
-      @response.delete
-      msg = "#{@map.get_title} was not saved. Cause: "+$!
-    end
+      msg = "#{@map.get_title} was successfully saved."
+    #rescue
+    #  @response.delete
+    #  msg = "#{@map.get_title} was not saved. Cause: "+$!
+    #end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end      
   
@@ -287,7 +287,7 @@ def update_cache(rid)
                 @p_max = scorehash[:metareview][:scores][:max]
             end
       elsif (map_type == "FeedbackResponseMap")
-         if (@scorehash[:feedback])
+         if (scorehash[:feedback])
                 @p_score = scorehash[:feedback][:scores][:avg]               
                 @p_min = scorehash[:feedback][:scores][:min]
                 @p_max = scorehash[:feedback][:scores][:max]

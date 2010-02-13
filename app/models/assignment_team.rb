@@ -20,9 +20,8 @@ class AssignmentTeam < Team
     if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
        raise ArgumentError, "Not enough items" 
     end
-    
-    
-    if self.assignment == nil
+        
+    if Assignment.find(id) == nil
       raise ImportError, "The assignment with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
     
@@ -34,7 +33,7 @@ class AssignmentTeam < Team
         index = 0
     end 
     
-    currTeam = AssignmentTeam.find(:first, :conditions => ["name =? and parent_id =?",name,assignment.id])
+    currTeam = AssignmentTeam.find(:first, :conditions => ["name =? and parent_id =?",name,id])
     
     if options[:handle_dups] == "ignore" && currTeam != nil
       return
@@ -53,11 +52,8 @@ class AssignmentTeam < Team
     end     
     
     if currTeam == nil
-       currTeam = AssignmentTeam.new
-       currTeam.name = name
-       currTeam.parent_id = assignment.id
-       currTeam.save   
-       parent = AssignmentNode.find_by_node_object_id(assignment.id)
+       currTeam = AssignmentTeam.create(:name => name, :parent_id => id)
+       parent = AssignmentNode.find_by_node_object_id(id)
        TeamNode.create(:parent_id => parent.id, :node_object_id => currTeam.id)
     end
       

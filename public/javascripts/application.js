@@ -103,7 +103,7 @@ function addElement() {
   	                    '<TD ALIGN=CENTER WIDTH=5%><input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]"  onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"/></TD>'+
   	                    
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_submission_allowed_id" name ="additional_submit_deadline['+j+'][submission_allowed_id]">'+
-						'<option value=2 SELECTED>Late</option<option value=1>No</option>'+
+						'<option value=2 SELECTED>Late</option><option value=1>No</option>'+
                         '<option value=3>OK</option>'+
 						'</select></TD>'+
 						
@@ -130,7 +130,7 @@ function addElement() {
 						'<TD ALIGN=CENTER WIDTH=5%><input type="text" id="additional_review_deadline_'+j+'_due_at" name ="additional_review_deadline['+j+'][due_at]" onClick="NewCal(\'additional_review_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"/></TD>'+
 						
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_submission_allowed_id" name ="additional_review_deadline['+j+'][submission_allowed_id]">'+
-						'<option value=2 SELECTED >Late</option<option value=1>No</option>'+
+						'<option value=2 SELECTED >Late</option><option value=1>No</option>'+
                         '<option value=3>OK</option>'+
 						'</select></TD>'+
 						
@@ -158,4 +158,17 @@ function addElement() {
 function updateDropDownMenu(advice,question,min){			
 	var id = 'responses_' + question + '_score'			
 	document.getElementById(id).selectedIndex = advice - min
+}
+
+function toggleVis(id) {
+    var elem = document.getElementById(id + "_myDiv");
+    if (elem.style.display == 'none') {
+        elem.style.display = '';
+        document.getElementById(id + "_show").style.display = 'none';
+        document.getElementById(id + "_hide").style.display = '';
+    } else {
+        elem.style.display = 'none';
+        document.getElementById(id + "_show").style.display = '';
+        document.getElementById(id + "_hide").style.display = 'none';
+    }
 }

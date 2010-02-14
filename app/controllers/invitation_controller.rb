@@ -30,7 +30,7 @@ class InvitationController < ApplicationController
             @invitation.reply_status = 'W' 
             @invitation.save
           else
-            flash[:notice] = "You have already send an invitation to \"#{user.name}\"."  
+            flash[:notice] = "You have already sent an invitation to \"#{user.name}\"."
           end   
         end
       end
@@ -58,10 +58,29 @@ class InvitationController < ApplicationController
     
     #if you are on a team and you accept another invitation and if your old team does not have any members, delete the entry for the team
     other_members = TeamsUser.find(:all, :conditions => ['team_id = ?', params[:team_id]])
-    if other_members.length == 0
+    if !other_members.nil? && other_members.length == 0
       old_team = AssignmentTeam.find(:first, :conditions => ['id = ?', params[:team_id]])
       if old_team != nil
         old_team.destroy
+      end
+
+
+      #if a sign_up sheet exists then release all the topics selected by this team into the pool.
+      selected_topics = SignedUpUser.find_all_by_creator_id(params[:team_id])
+      if !selected_topics.nil?
+        for selected_topic in selected_topics
+          if selected_topic.is_waitlisted == false
+            first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(selected_topic.topic_id, true)
+            if !first_waitlisted_user.nil?
+              #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+              first_waitlisted_user.is_waitlisted = false
+              first_waitlisted_user.save
+
+              SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id, SignUpTopic.find(selected_topic.topic_id)['assignment_id'])
+            end
+          end
+          selected_topic.destroy
+        end
       end
     end
     
@@ -77,11 +96,12 @@ class InvitationController < ApplicationController
     for team in users_teams
       current_team = AssignmentTeam.find(:first, :conditions => ['id = ? and parent_id = ?', team.team_id, student.parent_id])
       if current_team != nil
-        @team_user.team_id = current_team.id
+       #@team_user.team_id = current_team.id
+       current_team.add_member(User.find(@inv.to_id)) 
       end
     end
-    @team_user.user_id = @inv.to_id
-    @team_user.save
+    #@team_user.user_id = @inv.to_id
+    #@team_user.save
     
     redirect_to :controller => 'student_team', :action => 'view', :id => student.id
   end
@@ -96,7 +116,7 @@ class InvitationController < ApplicationController
 
   def cancel
     Invitation.find(params[:inv_id]).destroy
-    edirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
+    redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
   end
 
 end

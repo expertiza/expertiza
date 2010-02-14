@@ -65,6 +65,17 @@ class StudentTeamController < ApplicationController
       old_team = AssignmentTeam.find(:first, :conditions => ['id = ?', params[:team_id]])
       if old_team != nil
         old_team.destroy
+        #if assignment has signup sheet then the topic selected by the team has to go back to the pool
+        #or to the first team in the waitlist
+        signups = SignedUpUser.find(:all, :conditions => {:creator_id => params[:team_id]})
+        signups.each {|signup|
+          first_waitlisted_user = SignedUpUser.find(:first, :conditions => {:topic_id => signup.topic_id, :is_waitlisted => true})
+          if !first_waitlisted_user.nil?
+            first_waitlisted_user.is_waitlisted = false
+            first_waitlisted_user.save
+          end
+          signup.destroy
+        }
       end
     end
     

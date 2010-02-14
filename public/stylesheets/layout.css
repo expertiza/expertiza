@@ -6,7 +6,7 @@ body {
 
 a {
   color: #986633 ;
-  background-color: trasnsparent ;
+  background-color: transparent ;
   text-decoration: none ;
   margin: 0 ;
   padding: 0 1px 2px 1px ;
@@ -399,4 +399,20 @@ text-decoration: none;
   margin:0px;
   color: black;
   background-color: #EAEADA;
+}
+
+table.general {
+    border: 1px solid #999999;
+    border-collapse: collapse;
+}
+
+table.general th {
+    background-color: #cccccc;
+    border: 1px solid #999999;
+    padding: 3px;
+}
+
+table.general td {
+    border: 1px solid #999999;
+    padding: 3px;
 }

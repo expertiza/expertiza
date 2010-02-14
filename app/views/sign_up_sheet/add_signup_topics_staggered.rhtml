@@ -1,0 +1,130 @@
+<link href="/stylesheets/jquery.multiselect.css" rel="stylesheet" type="text/css"/>
+<link type="text/css" rel="stylesheet" href="http://jqueryui.com/themes/base/ui.all.css"/>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js" type="text/javascript"></script>
+<script src="/javascripts/jquery.bgiframe.js" type="text/javascript"></script>
+<script src="/javascripts/jquery.multiselect.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $('select').multiSelect({ selectedList:5, minWidth:235, noneSelected:"No dependency"});
+    });
+</script>
+
+<% @assignment = Assignment.find(params[:id]) %>
+<form id="dependency" action="/sign_up_sheet/save_topic_dependencies/dependency?assignment_id=<%= @assignment.id %>" method="post">  
+  <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
+
+  <% if flash[:notice] %>
+      <div class="flash_note"><%= flash[:notice] %></div>
+  <% end %>
+
+  <% if @sign_up_topics.size != 0 %>
+      <table class="general">
+        <tr><%= render :partial => 'table_header' %></tr>
+
+        <% i=1 %>
+        <% for topic in @sign_up_topics %>
+        <tr>
+              <td><%= topic.topic_identifier %></td>
+
+              <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
+
+              <td align="center"><%= topic.max_choosers %></td>
+
+              <%= render :partial => 'num_of_choosers', :locals => {:topic=>topic} %>
+
+              <%= render :partial => 'waitlisted_choosers' %>
+
+              <td align="center">
+                  <% topic_identifier = SignUpTopic.find_all_by_assignment_id(@assignment.id).map {|u| [u.topic_identifier, u.id] } %>
+                  <% topic_identifier.delete([topic.topic_identifier, topic.id]) %>
+                  <% select = TopicDependency.find_by_topic_id(topic.id)%>
+                  <% selected = Array.new%>
+                  <% if !select.nil?
+                      selected = select[:dependent_on].to_a 
+                  end%>
+                  <%= select_tag 'topic_dependencies_' + topic.id.to_s + '[dependent_on][]', options_for_select( topic_identifier, selected), :multiple => true %>
+              </td>
+
+              <td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>
+            </tr>
+            <% i=i+1 %>
+        <% end %>
+      </table>
+      <br/>
+      <input type="submit" id="submit" value="Save dependencies"/>
+
+    <% else %>
+      <div class="flash_note"><%= "Signup topics have not yet been created." %></div>
+    <% end %>
+</form>
+
+  <% session[:return_to] = request.request_uri %>
+  <br/><br/>
+  <%= render :partial => 'add_topics' %>
+
+  <% if @assignment.staggered_deadline == true %>
+      | <a href="#image" onClick="toggleVis('image');">
+  <span class="inline" id="image_show">Show dependency graph</span>
+  <span class="inline" id="image_hide" style="display: none">Hide dependency graph</span>
+</a>
+
+      <div id="image_myDiv" style="display:none" align="center">
+        <img src='/images/staggered_deadline_assignment_graph/graph_<%= @assignment.id %>.jpg'/>
+      </div>
+
+      | <a href="#due_date" onClick="toggleVis('due_date');">
+  <span class="inline" id="due_date_show">Show start/due date</span>
+  <span class="inline" id="due_date_hide" style="display: none">Hide start/due date</span>
+</a>
+
+      <%= start_form_tag :action => 'save_topic_deadlines', :assignment_id => @assignment.id %>
+      <div id="due_date_myDiv" style="display:none" align="left">
+
+        <br/>
+        <table class=general>
+          <tr>
+            <th>topic#</th>
+            <th>start date</th>
+            <th>submission deadline</th>
+            <th>review deadline</th>
+            <th>resubmission deadline</th>
+          </tr>
+          <% j=0 %>
+          <% for @due_date in @duedates %>
+
+              <tr>
+                <% topic_identifier = SignUpTopic.find(@due_date['topic_id'])['topic_identifier'] %>
+                <td><%= topic_identifier %></td>
+                <%= hidden_field('due_date[]', 'topic_id', :id => 'due_date_' + @due_date['topic_id'].to_s) %>
+                <td>
+                  <%= text_field 'due_date[]', 'start_date', :size=>20, :id => 'due_date_' + @due_date['topic_id'].to_s + '_start_date' %>
+                  <img src="/images/cal.gif" onClick="NewCal('due_date_<%=@due_date['topic_id'].to_s + '_start_date'%>','YYYYMMDD',true,24); return false;"/>
+                </td>
+
+                <td>
+                  <% if !@submission_due_dates[j].nil? %>
+                      <%= @submission_due_dates[j].strftime('%Y/%m/%d') %>
+                  <% end %>
+                </td>
+                <td>
+                  <% if !@review_due_dates[j].nil? %>
+                      <%= @review_due_dates[j].strftime('%Y/%m/%d') %>
+                  <% end %>
+                </td>
+
+                <td>
+                  <%= text_field 'due_date[]', 'due_date', :size=>20, :id => 'due_date_' + @due_date['topic_id'].to_s + '_due_date' %>
+                  <img src="/images/cal.gif" onClick="NewCal('due_date_<%=@due_date['topic_id'].to_s + '_due_date'%>','YYYYMMDD',true,24); return false;"/>
+                </td>
+              </tr>
+              <% j=j+1 %>
+          <% end %>
+        </table>
+        <br/>
+        <%= submit_tag "Save start/due dates" %>
+      </div>
+      <br/>
+      <%= end_form_tag %>
+
+  <% end %>

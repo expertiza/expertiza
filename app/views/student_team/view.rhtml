@@ -45,7 +45,7 @@
 	</table>
 	<br>
 	<%= link_to "Leave Team", 
-					{:controller => 'student_team', :action => 'leave', :id  => @student.team.id}%>
+					{:controller => 'student_team', :action => 'leave', :student_id  => @student.id, :team_id => @student.team.id}%>
 <%end%>
 
 <table>
@@ -70,7 +70,7 @@
 		<%else%>
 			<td>Waiting for reply</td>
 			<td><%= link_to "Retract", 
-				{:controller => 'invitation', :action => 'cancel', :id => inv.id, :student_id => @student.id}%></td>
+				{:controller => 'invitation', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id}%></td>
 		<%end%>
 		</tr>
 	<%end%>
@@ -103,11 +103,17 @@
 			      <%end%>
 			    <%end%></td>
 			<td>
+            <% if @student.team == nil
+                @team_id = 0
+               else
+                @team_id = @student.team.id
+               end
+            %>
 			<%= link_to "Accept", 
-					{:action => 'accept', :id => inv.id, :student_id => @student.id, :team_id =>@student.team.id}%>
+					{:controller => 'invitation', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id}%>
 			|
 			<%= link_to "Decline", 
-						{:action => 'decline', :id => inv.id, :student_id => @student.id}%>
+						{:controller => 'invitation', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}%>
 			</td>
 			</tr>
 		<!--> <%end%> <-->
@@ -115,7 +121,7 @@
 <%end%>
 </table>
 
-<% if @team_id == nil%>
+<% if @student.team == nil%>
 	<h2>Create Team</h2>
 	<%= form_tag :controller => 'student_team', :action => 'create'%>
 	<%= hidden_field_tag 'id', @student.id %>
@@ -126,7 +132,7 @@
 <%else%>
 	<h2>Invite people</h2>
 	<%= form_tag :controller => 'invitation', :action => 'create' %>
-	<%= hidden_field_tag 'team_id', @team_id %>
+	<%= hidden_field_tag 'team_id', @student.team.id %>
 	<%= hidden_field_tag 'student_id', @student.id %>
 	<%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
 	

@@ -46,13 +46,13 @@
         <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
             <% for selected_topic in @selected_topics %>
                 <% if selected_topic.topic_id == topic.id %>
-                    <td align="center"><%= link_to image_tag('leave_topic.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+                    <td align="center"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
                     <%action_symbol_added = true%>
                 <% end %>
             <% end %>
         <% end %>
         <%if action_symbol_added == false %>
-            <td align="center"><%= link_to image_tag('signup.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
+            <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
         <% end %>
       </tr>
       <% i=i+1 %>

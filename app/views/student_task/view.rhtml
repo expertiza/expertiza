@@ -7,8 +7,8 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 <% end %>
 <ul>
 	<%if SignUpTopic.find_by_assignment_id(@assignment.id)%>
-		<li> <%= link_to 'Sign up sheet', :controller=>'sign_up_sheet', :action => 'signup_topics', :id => @participant.parent_id%>
-		(Sign up for a topic)
+		<li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'signup_topics', :id => @participant.parent_id%>
+		(Signup for a topic)
 		</li>
 	<%end%>
 	<%if @assignment.team_assignment %>

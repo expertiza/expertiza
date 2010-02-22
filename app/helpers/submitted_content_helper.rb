@@ -1,9 +1,6 @@
 module SubmittedContentHelper
   
   def display_directory_tree(participant, files, flag)        
-     puts "*************"
-     puts files.length
-     puts "*************"
         index = 0
         check_stage = participant.assignment.get_current_stage()
         ret = "\n<table id='file_table' cellspacing='5'>"

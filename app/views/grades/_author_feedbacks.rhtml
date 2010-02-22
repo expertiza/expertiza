@@ -1,5 +1,5 @@
 <!-- FEEDBACKS --> 
-<% if rscore[:assessments].length > 0 %>
+<% if rscore and rscore[:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
            :locals => {

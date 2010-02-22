@@ -1,6 +1,9 @@
 module SubmittedContentHelper
   
   def display_directory_tree(participant, files, flag)        
+     puts "*************"
+     puts files.length
+     puts "*************"
         index = 0
         check_stage = participant.assignment.get_current_stage()
         ret = "\n<table id='file_table' cellspacing='5'>"
@@ -17,7 +20,7 @@ module SubmittedContentHelper
                 ret += "\n      <input type=hidden id='directories_#{index}' name='directories[#{index}]' value='#{File.dirname(file)}'>"
                 if File.directory?(file)
                         #ret += "\n      <a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory(#{index}); return false;'><img id='expand.#{index}' alt='Expand/Collapse' title='Expand/Collapse' src='/images/up.png'></a>&nbsp;"
-                        ret += link_to File.basename(file), :action => 'edit', :id => participant.id, "current_folder[name]" =>  file
+                        ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" =>  file
                         #ret += list_sub_directories(file, participant)
                 else
                         ret += "\n      "
@@ -30,7 +33,7 @@ module SubmittedContentHelper
                         end
                         
                         location = parentFolder + File.basename(file)
-                        ret += link_to location, :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" =>  File.dirname(file)
+                        ret += link_to location, :controller => 'submitted_content', :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" =>  File.dirname(file)
                 end
                 ret += "\n   </td>\n   <td valign = top>\n"
                 ret += File.size(file).to_s

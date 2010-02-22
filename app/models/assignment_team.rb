@@ -12,6 +12,10 @@ class AssignmentTeam < Team
     return links
   end
   
+  def get_path
+    self.get_participants.first.get_path
+  end
+  
   def get_review_map_type
     return 'TeamReviewResponseMap'
   end  

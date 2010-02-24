@@ -4,15 +4,18 @@ class AssignmentController < ApplicationController
   before_filter :authorize
   
   def copy
+    Assignment.record_timestamps = false
     #creating a copy of an assignment; along with the dates and submission directory too
     old_assign = Assignment.find(params[:id])
     new_assign = old_assign.clone
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(new_assign)
-    new_assign.name = 'Copy of '+new_assign.name 
-    
-    if new_assign.save    
+    new_assign.update_attribute('name','Copy of '+new_assign.name)     
+    new_assign.update_attribute('created_at',Time.now)
+    new_assign.update_attribute('updated_at',Time.now)
+    if new_assign.save 
+      Assignment.record_timestamps = true
       DueDate.copy(old_assign.id, new_assign.id)           
       new_assign.create_node()
       
@@ -21,7 +24,7 @@ class AssignmentController < ApplicationController
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
       redirect_to :action => 'list', :controller => 'tree_display'
-    end
+    end    
   end  
   
   def new

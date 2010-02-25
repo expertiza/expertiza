@@ -6,13 +6,11 @@
 <% end %>
 <TABLE class="grades" width="100%">
 <% if @assignment.team_assignment && @scores[:teams].length > 0 %>
-  <% type = "teams" %>
   <%= render :partial => 'teams' %>
 <% elsif !@assignment.team_assignment && @scores[:participants].length > 0 %>
-   <% type = "participants" %>  
   <%= render :partial => 'participants' %>
 <% else %>
-  <TR><TD>No <%= type %> are defined for this assignment</TD></TR>
+  <TR><TD>No <%if @assignment.team_assignment%>teams<%else%>participants<%end%> are defined for this assignment</TD></TR>
 <% end %>
 </TABLE>
 <a href="javascript:window.history.back()">Back</a>

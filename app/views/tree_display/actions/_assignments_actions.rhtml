@@ -29,6 +29,7 @@
         <li><%= link_to 'Edit signup sheet',:controller=>'sign_up_sheet', :action=>'add_signup_topics', :id => node.node_object_id %></li>
     <% end %>
 <% end %>
+<li><%= link_to 'View suggestions',:controller=>'suggestion', :action=>'list', :id => node.node_object_id %></li>      
 <li><%= link_to 'Assign surveys',:controller=>'survey', :action=>'assign', :id => node.node_object_id %></li>
 <li><%= link_to 'View survey responses',:controller=>'survey_response', :action=>'view_responses', :id => node.node_object_id %></li>
 <% end %>

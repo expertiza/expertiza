@@ -11,6 +11,7 @@ class StudentTaskController < ApplicationController
   def view
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment    
+    @can_provide_suggestions = Assignment.find(@assignment.id).allow_suggestions
   end
   
   def others_work

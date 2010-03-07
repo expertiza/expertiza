@@ -1,7 +1,13 @@
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
 <% if !(@map.instance_of? TeammateReviewResponseMap) %>
-  <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.reviewee, :stage =>  @assignment.get_current_stage()} %>
+  <% if @map.instance_of? MetareviewResponseMap
+        reviewee = @map.review_mapping.reviewee
+     else
+        reviewee = @map.reviewee 
+     end %>        
+         
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => reviewee, :stage =>  @assignment.get_current_stage()} %>
   <br/><hr/><br/>
 <% end %>
 <%= @map.show_review() %>

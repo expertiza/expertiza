@@ -10,6 +10,10 @@ class MetareviewResponseMap < ResponseMap
     end
   end  
   
+  def contributor
+    self.review_mapping.reviewee
+  end
+  
   def questionnaire
     self.assignment.questionnaires.find_by_type('MetareviewQuestionnaire')
   end  

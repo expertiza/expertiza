@@ -6,6 +6,10 @@ class TeammateReviewResponseMap < ResponseMap
     self.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire')
   end  
   
+  def contributor
+    nil
+  end
+  
   def get_title
     return "Teammate Review"
   end  

@@ -21,4 +21,8 @@ class FeedbackResponseMap < ResponseMap
   def questionnaire
     self.assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire')
   end
+  
+  def contributor
+    self.review.map.reviewee
+  end 
 end

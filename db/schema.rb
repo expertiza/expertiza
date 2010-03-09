@@ -2,7 +2,7 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 115) do
+ActiveRecord::Schema.define(:version => 124) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.column "assignment_id",        :integer
@@ -41,6 +41,9 @@ ActiveRecord::Schema.define(:version => 115) do
     t.column "spec_location",                     :text
     t.column "author_feedback_questionnaire_id",  :integer
     t.column "team_count",                        :integer,                :default => 0,     :null => false
+    t.column "staggered_deadline",                :boolean
+    t.column "start_date",                        :datetime
+    t.column "allow_suggestions",                 :boolean
   end
 
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
@@ -423,6 +426,27 @@ ActiveRecord::Schema.define(:version => 115) do
   add_index "scores", ["question_id"], :name => "fk_score_questions"
   add_index "scores", ["response_id"], :name => "fk_score_response"
 
+  create_table "sign_up_topics", :force => true do |t|
+    t.column "topic_name",       :text,                   :default => "", :null => false
+    t.column "assignment_id",    :integer,                                :null => false
+    t.column "max_choosers",     :integer,                                :null => false
+    t.column "category",         :text
+    t.column "topic_identifier", :string,   :limit => 10
+    t.column "start_date",       :datetime
+    t.column "due_date",         :datetime
+  end
+
+  add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"
+
+  create_table "signed_up_users", :force => true do |t|
+    t.column "topic_id",                   :integer, :null => false
+    t.column "creator_id",                 :integer, :null => false
+    t.column "is_waitlisted",              :boolean, :null => false
+    t.column "preference_priority_number", :integer
+  end
+
+  add_index "signed_up_users", ["topic_id"], :name => "fk_signed_up_users_sign_up_topics"
+
   create_table "site_controllers", :force => true do |t|
     t.column "name",          :string,  :default => "", :null => false
     t.column "permission_id", :integer, :default => 0,  :null => false
@@ -430,6 +454,23 @@ ActiveRecord::Schema.define(:version => 115) do
   end
 
   add_index "site_controllers", ["permission_id"], :name => "fk_site_controller_permission_id"
+
+  create_table "suggestion_comments", :force => true do |t|
+    t.column "comments",      :text
+    t.column "commenter",     :string
+    t.column "vote",          :string
+    t.column "suggestion_id", :integer
+    t.column "created_at",    :datetime
+  end
+
+  create_table "suggestions", :force => true do |t|
+    t.column "assignment_id",     :integer
+    t.column "title",             :string
+    t.column "description",       :string,  :limit => 750
+    t.column "status",            :string
+    t.column "unityID",           :string
+    t.column "signup_preference", :string
+  end
 
   create_table "survey_deployments", :force => true do |t|
     t.column "course_evaluation_id", :integer
@@ -496,6 +537,11 @@ ActiveRecord::Schema.define(:version => 115) do
 
   add_index "teams_users", ["team_id"], :name => "fk_users_teams"
   add_index "teams_users", ["user_id"], :name => "fk_teams_users"
+
+  create_table "topic_dependencies", :force => true do |t|
+    t.column "topic_id",     :integer,                 :null => false
+    t.column "dependent_on", :string,  :default => "", :null => false
+  end
 
   create_table "tree_folders", :force => true do |t|
     t.column "name",       :string

@@ -17,4 +17,11 @@ class DueDate < ActiveRecord::Base
     submit_duedate.round = max_round; 
     submit_duedate.save;
   end
+  
+  def setFlag()
+     puts"~~~~~~~~~enter setFlag"
+      self.flag = true
+      self.save
+     puts"~~~~~~~~~#{self.flag.to_s}"
+    end
 end

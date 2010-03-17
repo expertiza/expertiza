@@ -4,9 +4,9 @@ class AuthorFeedback < ActiveRecord::Migration
      
      execute "ALTER TABLE assignments ADD CONSTRAINT `fk_assignments_author_feedback` FOREIGN KEY (author_feedback_questionnaire_id) REFERENCES questionnaire_types(id);"
      
-     QuestionnaireType.create(
-      :name => 'Author Feedback'
-     )
+     #QuestionnaireType.create(
+      #:name => 'Author Feedback'
+     #)
   end
 
   def self.down

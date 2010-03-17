@@ -340,6 +340,7 @@ def add_participant(user_name)
   end
   
  def find_current_stage()
+    puts "~~~~~~~~~~Enter find_current_stage()\n"
     due_dates = DueDate.find(:all, 
                  :conditions => ["assignment_id = ?", self.id],
                  :order => "due_at DESC")
@@ -370,3 +371,55 @@ def add_participant(user_name)
       end  
   end  
 end
+
+  def get_current_due_date()
+    puts "~~~~~~~~~~Enter get_current_due_date()\n"
+    due_date = self.find_current_stage()
+    if due_date == nil or due_date == COMPLETE
+      return COMPLETE
+    else
+      return due_date
+    end
+    
+  end
+  
+  def get_next_due_date()
+    #puts "~~~~~~~~~~Enter get_next_due_date()\n"
+    due_date = self.find_next_stage()
+    
+    if due_date == nil or due_date == COMPLETE
+      return nil
+    else
+      return due_date
+    end
+    
+  end
+  
+  def find_next_stage()
+    puts "~~~~~~~~~~Enter find_next_stage()\n"
+    due_dates = DueDate.find(:all, 
+                 :conditions => ["assignment_id = ?", self.id],
+                 :order => "due_at DESC")
+                 
+    if due_dates != nil and due_dates.size > 0
+      if Time.now > due_dates[0].due_at
+        return COMPLETE
+      else
+        i = 0
+        for due_date in due_dates
+          if Time.now < due_date.due_at and
+             (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
+             if (i > 0)
+               return due_dates[i-1]
+             else
+               return nil  
+             end
+          end
+          i = i + 1
+        end
+        
+        return nil
+      end
+    end
+  end
+  

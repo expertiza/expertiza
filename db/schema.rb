@@ -2,7 +2,7 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 124) do
+ActiveRecord::Schema.define(:version => 125) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.column "assignment_id",        :integer
@@ -54,6 +54,14 @@ ActiveRecord::Schema.define(:version => 124) do
   add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
   add_index "assignments", ["mapping_strategy_id"], :name => "fk_assignments_mapping_strategies"
 
+  create_table "assignments_questionnaires", :force => true do |t|
+    t.column "questionnaire_id", :integer, :default => 0, :null => false
+    t.column "assignment_id",    :integer, :default => 0, :null => false
+  end
+
+  add_index "assignments_questionnaires", ["questionnaire_id"], :name => "fk_assignments_questionnaires_questionnaires"
+  add_index "assignments_questionnaires", ["assignment_id"], :name => "fk_assignments_questionnaires_assignments"
+
   create_table "comments", :force => true do |t|
     t.column "participant_id", :integer, :default => 0,     :null => false
     t.column "private",        :boolean, :default => false, :null => false
@@ -96,6 +104,15 @@ ActiveRecord::Schema.define(:version => 124) do
 
   add_index "courses", ["instructor_id"], :name => "fk_course_users"
 
+  create_table "courses_users", :force => true do |t|
+    t.column "user_id",   :integer
+    t.column "course_id", :integer
+    t.column "active",    :boolean
+  end
+
+  add_index "courses_users", ["user_id"], :name => "fk_courses_users"
+  add_index "courses_users", ["course_id"], :name => "fk_users_courses"
+
   create_table "deadline_rights", :force => true do |t|
     t.column "name", :string, :limit => 32
   end
@@ -115,6 +132,8 @@ ActiveRecord::Schema.define(:version => 124) do
     t.column "rereview_allowed_id",         :integer
     t.column "review_of_review_allowed_id", :integer
     t.column "round",                       :integer
+    t.column "flag",                        :boolean,  :default => false
+    t.column "threshold",                   :integer,  :default => 1
   end
 
   add_index "due_dates", ["deadline_type_id"], :name => "fk_deadline_type_due_date"
@@ -335,6 +354,10 @@ ActiveRecord::Schema.define(:version => 124) do
 
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
+  create_table "questionnaire_types", :force => true do |t|
+    t.column "name", :string, :default => "", :null => false
+  end
+
   create_table "questionnaires", :force => true do |t|
     t.column "name",                :string,   :limit => 64
     t.column "instructor_id",       :integer,                :default => 0,     :null => false
@@ -368,7 +391,7 @@ ActiveRecord::Schema.define(:version => 124) do
 
   create_table "responses", :force => true do |t|
     t.column "map_id",             :integer,  :default => 0, :null => false
-    t.column "additional_comment", :text
+    t.column "additional_comment", :string
     t.column "created_at",         :datetime
     t.column "updated_at",         :datetime
   end
@@ -382,9 +405,83 @@ ActiveRecord::Schema.define(:version => 124) do
 
   add_index "resubmission_times", ["participant_id"], :name => "fk_resubmission_times_participants"
 
+  create_table "review_feedbacks", :force => true do |t|
+    t.column "assignment_id", :integer
+    t.column "review_id",     :integer
+    t.column "user_id",       :integer
+    t.column "feedback_at",   :datetime
+    t.column "txt",           :text
+  end
+
+  add_index "review_feedbacks", ["assignment_id"], :name => "fk_review_feedback_assignments"
+  add_index "review_feedbacks", ["review_id"], :name => "fk_review_feedback_reviews"
+
+  create_table "review_mappings", :force => true do |t|
+    t.column "author_id",     :integer
+    t.column "team_id",       :integer
+    t.column "reviewer_id",   :integer
+    t.column "assignment_id", :integer
+  end
+
+  add_index "review_mappings", ["assignment_id"], :name => "fk_review_mapping_assignments"
+  add_index "review_mappings", ["reviewer_id"], :name => "fk_review_users_reviewer"
+  add_index "review_mappings", ["author_id"], :name => "fk_review_users_author"
+  add_index "review_mappings", ["team_id"], :name => "fk_review_teams"
+
+  create_table "review_of_review_mappings", :force => true do |t|
+    t.column "review_mapping_id",  :integer
+    t.column "review_reviewer_id", :integer
+    t.column "review_id",          :integer
+    t.column "assignment_id",      :integer, :limit => 10
+  end
+
+  add_index "review_of_review_mappings", ["review_id"], :name => "fk_review_of_review_mapping_reviews"
+  add_index "review_of_review_mappings", ["review_mapping_id"], :name => "fk_review_of_review_mapping_review_mappings"
+
+  create_table "review_of_review_scores", :force => true do |t|
+    t.column "review_of_review_id", :integer
+    t.column "question_id",         :integer
+    t.column "score",               :integer
+    t.column "comments",            :text
+  end
+
+  add_index "review_of_review_scores", ["review_of_review_id"], :name => "fk_review_of_review_score_reviews"
+  add_index "review_of_review_scores", ["question_id"], :name => "fk_review_of_review_score_questions"
+
+  create_table "review_of_reviews", :force => true do |t|
+    t.column "reviewed_at",                 :datetime
+    t.column "review_of_review_mapping_id", :integer
+    t.column "review_num_for_author",       :integer
+    t.column "review_num_for_reviewer",     :integer
+  end
+
+  add_index "review_of_reviews", ["review_of_review_mapping_id"], :name => "fk_review_of_review_review_of_review_mappings"
+
+  create_table "review_scores", :force => true do |t|
+    t.column "review_id",   :integer
+    t.column "question_id", :integer
+    t.column "score",       :integer
+    t.column "comments",    :text
+  end
+
+  add_index "review_scores", ["review_id"], :name => "fk_review_score_reviews"
+  add_index "review_scores", ["question_id"], :name => "fk_review_score_questions"
+
   create_table "review_strategies", :force => true do |t|
     t.column "name", :string
   end
+
+  create_table "reviews", :force => true do |t|
+    t.column "review_mapping_id",       :integer
+    t.column "review_num_for_author",   :integer
+    t.column "review_num_for_reviewer", :integer
+    t.column "ignore",                  :boolean,  :default => false
+    t.column "additional_comment",      :text
+    t.column "updated_at",              :datetime
+    t.column "created_at",              :datetime
+  end
+
+  add_index "reviews", ["review_mapping_id"], :name => "fk_review_mappings"
 
   create_table "roles", :force => true do |t|
     t.column "name",            :string,   :default => "", :null => false

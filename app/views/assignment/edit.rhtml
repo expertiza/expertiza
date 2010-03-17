@@ -13,6 +13,7 @@
         <th style="padding:10px">Resubmission allowed</th>
         <th style="padding:10px">Re-review allowed</th>
         <th style="padding:10px">Review of review allowed</th>
+		<th style="padding:10px">Reminder (hrs)</th>
     </tr>
   <% 	i = 0;
         duedates = @assignment.due_dates
@@ -45,6 +46,8 @@
 		<td align ="center"><%= select('due_date[]', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 		<td align ="center"><%= select('due_date[]', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 		<td align ="center"><%= select('due_date[]', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
+		<td align ="center"><%= select('due_date[]', 'threshold', [ [1, 1],[2, 2],[3, 3],[4, 4],[5, 5],[6, 6],[7, 7],[8, 8],[9, 9],[10, 10],[11, 11],[12, 12]])%></td>
+		<td align ="center"><%= hidden_field('due_date[]', 'flag', 'value' => 0)%></td>
 	</tr>
 	<% 	i += 1;
 		end %>

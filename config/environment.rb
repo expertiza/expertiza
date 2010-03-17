@@ -51,13 +51,30 @@ Rails::Initializer.run do |config|
   # without authentication
   # Comment out the test line once 
   
-  config.action_mailer.delivery_method = :test
-  #config.action_mailer.server_settings = {
-  #  :address => "smtp.ncsu.edu",
-  #  :port => 25,
-  #  :domain => "localhost"
-  #}
+   config.action_mailer.delivery_method = :smtp
+  config.action_mailer.server_settings = {
+    :address => "smtp.ncsu.edu",
+    :port => 25,
+    :domain => "localhost"
+  }
 end
+
+ #Running background process to send e-mails constantly
+#ActionBase::SpawnHelper.background()
+#ActionController::SpawnHelper.background()
+#
+#include Spawn
+#spawn do    
+#  while 1
+#    ActionController::Mailer.deliver_message(
+#        {:recipients => "lramach@ncsu.edu",
+#         :subject => "Testing the E-mail System!",
+#         :body => "Helllooooooo!"
+#        }
+#    )
+#    sleep 60
+#  end
+#end
 
 # Add new inflection rules using the following format 
 # (all these examples are active by default):

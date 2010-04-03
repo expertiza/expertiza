@@ -8,7 +8,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 <ul>
 	<%if SignUpTopic.find_by_assignment_id(@assignment.id)%>
 		<li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'signup_topics', :id => @participant.parent_id%>
-		(Signup for a topic)
+		(Sign up for a topic)
 		</li>
 	<%end%>
 	<%if @assignment.team_assignment %>
@@ -35,7 +35,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 	</li>
 	<li><%= link_to "Your scores",{:controller => 'grades', :action => 'view_my_scores', :id => @participant.id} %>(View feedback on your work)</li>
     <%if @can_provide_suggestions == true %>
-	<li><%= link_to "Suggest a Topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
+	<li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
 	<% end %>
 	<% if @assignment.get_current_stage == "Complete" -%>
 	<!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->

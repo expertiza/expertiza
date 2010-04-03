@@ -1,4 +1,4 @@
-<h3>Listing suggestions for <%=h @assignment.name %></h3>
+<h3>Suggested topics for <%=h @assignment.name %></h3>
 <%if @suggestions.size > 0 %>
 <div class="flash_note">
 	Click View link to view the suggestion and to comment and/or approve
@@ -22,5 +22,5 @@
 <% end %>
 </table>
 <%else%>
-	<b>No suggestions as of now</b>
+	<b>No suggestions yet.</b>
 <%end%>

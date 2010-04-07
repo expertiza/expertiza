@@ -114,7 +114,14 @@ class AssignmentController < ApplicationController
         end
       end
       #setting the Due Dates with a helper function written in DueDate.rb
-      DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
+      @assignment.questionnaires.each{
+         |questionnaire|
+         if questionnaire.instance_of? MetareviewQuestionnaire
+           DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
+         end
+      }
+      
+      
       # Create submission directory for this assignment
       # If assignment is a Wiki Assignment (or has no directory)
       # the helper will not create a path

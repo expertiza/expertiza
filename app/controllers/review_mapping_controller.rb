@@ -371,21 +371,14 @@ class ReviewMappingController < ApplicationController
     else
       @type = "ParticipantReviewResponseMap"
     end
-
-
-
-
+    
+    
     #find all reviewers for this assignment
     @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", @id, @type] )
-    @revqids = []
-
-    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
-    @revqids.each do |rqid|
-      rtype = Questionnaire.find(rqid.questionnaire_id).type
-      if( rtype == ReviewQuestionnaire)
-        @review_questionnaire_id = rqid.questionnaire_id
-      end
-    end
+    @review_questionnaire_id =get_review_questionnaire_id_for_assignment(@assignment) 
+    # by Abhishek, to get the scores given by each reviewer
+    #arranged as the hash @review_scores[reveiwer_id][reviewee_id] = score for this particular assignment
+    @review_scores = compute_reviews_hash( @assignment.id)    
     if(@review_questionnaire_id)
       @review_questionnaire = Questionnaire.find(@review_questionnaire_id)
       @maxscore = @review_questionnaire.max_question_score
@@ -393,19 +386,84 @@ class ReviewMappingController < ApplicationController
     end
     @userid = session[:user].id
   end
-
-  def distribution
+  
+  def search
     @assignment = Assignment.find(params[:id])
+    @id = params[:id]
+    
+    if @assignment.team_assignment
+      @type = "TeamReviewResponseMap"
+    else
+      @type = "ParticipantReviewResponseMap"
+    end
+    
+    @us = User.find(:all, :select => "DISTINCT id", :conditions => ["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
+    @participants = Participant.find(:all, :select => "DISTINCT id", :conditions => ["user_id IN (?) and parent_id = ?", @us, @assignment.id] )
+    @review_scores = compute_reviews_hash( @assignment.id)
+    @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, @participants] )
+    @review_questionnaire_id =get_review_questionnaire_id_for_assignment(@assignment) 
+    @review_questionnaire = Questionnaire.find(@review_questionnaire_id)
+    @review_questions = @review_questionnaire.questions
+    render :action => 'review_report'
+  end
+  
+  #end of my code
+  
+  ##### Abhishek - To get the scores by each reviewer - Populating "scores-awarded" column ####
+  ##### returning hash review_scores[reviewer_id][reviewee_id] = score ##############
+  def compute_reviews_hash(assignment_id)
+    
+    @assignment = Assignment.find(assignment_id)
+    review_questionnaire_id =get_review_questionnaire_id_for_assignment(@assignment) 
+    @questions = Question.find(:all, :conditions =>["questionnaire_id = ?", review_questionnaire_id])
+    @review_scores = Hash.new
+    if (@assignment.team_assignment)
+      @response_type = "TeamReviewResponseMap"
+    else
+      @response_type = "ParticipantReviewResponseMap"
+    end
+    
+    
+    @myreviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", @assignment.id, @type] )
+    
+    @response_maps=ResponseMap.find(:all, :conditions =>["reviewed_object_id = ? and type = ?", @assignment.id, @response_type])
+    for response_map in @response_maps
+      ## checking if response is there
+      @corresponding_response = Response.find(:first, :conditions =>["map_id = ?", response_map.id])
+      @respective_scores = Hash.new
+      if (@review_scores[response_map.reviewer_id] != nil)
+        @respective_scores = @review_scores[response_map.reviewer_id]
+      end
+      if (@corresponding_response != nil)
+        @this_review_score_raw = Score.get_total_score(@corresponding_response, @questions)
+        @this_review_score = ((@this_review_score_raw*100).round/100.0)
+      else
+        @this_review_score = 0.0
+      end
+      @respective_scores[response_map.reviewee_id] = @this_review_score
+      @review_scores[response_map.reviewer_id] = @respective_scores
+    end
+    return @review_scores
+  end
+  
+  def get_review_questionnaire_id_for_assignment(assignment)
     @revqids = []
-
-    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
+    
+    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",assignment.id])
     @revqids.each do |rqid|
       rtype = Questionnaire.find(rqid.questionnaire_id).type
       if( rtype == ReviewQuestionnaire)
         @review_questionnaire_id = rqid.questionnaire_id
       end
+      
     end
-
+    return @review_questionnaire_id
+  end
+  
+  def distribution
+  
+    @assignment = Assignment.find(params[:id])
+    @review_questionnaire_id =get_review_questionnaire_id_for_assignment(@assignment)   
     @review_questionnaire = Questionnaire.find(@review_questionnaire_id)
     @review_questions = @review_questionnaire.questions
     @scores = [0,0,0,0,0,0,0,0,0,0]
@@ -417,59 +475,70 @@ class ReviewMappingController < ApplicationController
       @teams = Participant.find_all_by_parent_id(params[:id])
       @objtype = "ParticipantReviewResponseMap"
     end
-      @teams.each do |team|
-        #@qid = QuestionnaireType.find_by_name("Review").id
-
-        @sc = ScoreCache.find(:first, :conditions => ["object_id = ? and assignment_id = ? and object_type = ?",team.id, @assignment.id, @objtype])
-        if @sc!= nil
-          t_score = @sc.score
-        end
-        if (t_score)
-          @scores[t_score/10] =  @scores[t_score/10] + 1
+    
+    @teams.each do |team|
+      #@qid = QuestionnaireType.find_by_name("Review").id
+      @sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",team.id,  @objtype])
+      @score_distribution = Hash.new
+      t_score = 0
+      if @sc!= nil
+        t_score = @sc.score
+      end
+      if (t_score != 0)
+        
+        @scores[(t_score/10).to_i] =  @scores[(t_score/10).to_i] + 1
+        if(@score_distribution[(t_score/10).to_i] == nil)
+          @score_distribution[(t_score/10).to_i] = 1
+        else
+          @score_distribution[(t_score/10).to_i] = @score_distribution[(t_score/10).to_i] + 1
         end
       end
-
-   
+    end
+    
+    
     dataset = GoogleChartDataset.new :data => @scores, :color => '9A0000'
     data = GoogleChartData.new :datasets => [dataset]
     axis = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
-    @chart = GoogleBarChart.new :width => 500, :height => 200, :title => ['Team average','score distribution']
-    @chart.data = data
-    @chart.axis = axis
-    end
-
-  def search
-    @assignment = Assignment.find(params[:id])
-    @id = params[:id]
-
-    if @assignment.team_assignment
-      @type = "TeamReviewResponseMap"
-    else
-      @type = "ParticipantReviewResponseMap"
-    end
-
-    @us = User.find(:all, :select => "DISTINCT id", :conditions => ["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
-    @participants = Participant.find(:all, :select => "DISTINCT id", :conditions => ["user_id IN (?) and parent_id = ?", @us, @assignment.id] )
+    @chart1 = GoogleBarChart.new :width => 500, :height => 200
+    @chart1.data = data
+    @chart1.axis = axis
     
-    @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, @participants] )
-    @revqids = []
-
-    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
-    @revqids.each do |rqid|
-      rtype = Questionnaire.find(rqid.questionnaire_id).type
-      if( rtype == ReviewQuestionnaire)
-        @review_questionnaire_id = rqid.questionnaire_id
+    
+    
+    
+    ###################### Second Graph ####################
+    
+    
+    
+    @max_score = 0
+    @review_distribution =[0,0,0,0,0,0,0,0,0,0]
+    ### For every responsemapping for this assgt, find the reviewer_id and reviewee_id #####
+    @reviews_not_done = 0
+    @response_maps =  ResponseMap.find(:all, :conditions =>["reviewed_object_id = ? and type = ?", @assignment.id, @objtype])
+    review_report = compute_reviews_hash(@assignment.id)
+    for response_map in @response_maps
+      @score_for_this_review = review_report[response_map.reviewer_id][response_map.reviewee_id]  
+      if(@score_for_this_review != 0)
+        @review_distribution[(@score_for_this_review/10).to_i] = @review_distribution[(@score_for_this_review/10).to_i] + 1 
+        if (@review_distribution[(@score_for_this_review/10).to_i] > @max_score)
+          @max_score = @review_distribution[(@score_for_this_review/10).to_i]
+        end
+      else
+        @reviews_not_done +=1
       end
     end
-
-    @review_questionnaire = Questionnaire.find(@review_questionnaire_id)
-    @review_questions = @review_questionnaire.questions
-    render :action => 'review_report'
+    
+    dataset2 = GoogleChartDataset.new :data => @review_distribution, :color => '9A0000'
+    data2 = GoogleChartData.new :datasets => [dataset2]
+    axis2 = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
+    
+    @chart2 = GoogleBarChart.new :width => 500, :height => 200
+    @chart2.data = data2
+    @chart2.axis = axis2
+    
+    
+    
   end
-
-
-
-#end of my code
-
-
+  
+  
 end

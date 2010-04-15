@@ -1,7 +1,7 @@
 class PopupController < ApplicationController
   layout 'standard'
   def team_users_popup
-
+  @maxscore = 0
   @sum = 0  
   @count = 0
   @teamid = params[:id]
@@ -70,7 +70,7 @@ def participants_popup
   @user = User.find(@uid)
   @myuser = @user.id
   @temp = 0;
-  
+  @maxscore = 0
   
   if(params[:id2] == nil)
     @scores = nil

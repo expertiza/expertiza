@@ -14,7 +14,7 @@
 <% end %> 
 <li><%= link_to 'Assign reviewers',:controller=>'review_mapping', :action=>'list_mappings', :id => node.node_object_id %></li>
 <li><%= link_to 'View scores',:controller=>'grades', :action=>'view', :id => node.node_object_id %></li>
-<li> <%= link_to 'Review report', :controller=>'review_mapping', :action=>'review_report', :id => node.node_object_id %></li>
+<li> <%= link_to 'View review report', :controller=>'review_mapping', :action=>'review_report', :id => node.node_object_id %></li>
 <%@assignment = Assignment.find(node.node_object_id)%>      
 <% if (SignUpTopic.find(:first, :conditions => ['assignment_id = ?',node.node_object_id])).nil? %>
     <% if @assignment.staggered_deadline == true %>

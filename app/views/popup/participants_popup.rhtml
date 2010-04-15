@@ -7,7 +7,7 @@
 		<td>
 			<table>
 				<% @qid = "ParticipantReviewResponseMap"
-                @sc = ScoreCache.find(:first, :conditions => ["object_id = ? and assignment_id = ? and object_type = ?",@participantid, @assignment_id, @qid  ])%>
+                @sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ?  and object_type = ?",@participantid, @qid  ])%>
                 <% if(@sc) %>
 			        <% t_score= @sc.score %>
                 <%else%>
@@ -69,7 +69,7 @@
 	<%end%>
 	<tr>
 		<th>Reviewer Score</th>
-		<td align = "center"><%= @temp%>/<%=@count*5%> </td>
+		<td align = "center"><%= @temp%>/<%=@count*@maxscore%> </td>
 		<td align = "left"> = <%= sprintf("%.2f", @sum1) %>%</td>
 	
 	</table>

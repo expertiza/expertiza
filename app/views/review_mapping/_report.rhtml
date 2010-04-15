@@ -1,28 +1,38 @@
+
+
 <div class = "reviewreport">
-    <table width="100%" cellspacing="0" cellpadding="2" border="1">
+    <table width="100%" cellspacing="0" cellpadding="2" border="0">
         <tr bgcolor="#CCCCCC">
-            <th width = "25%">
+            <th width = "22%">
                 Reviewer
             </th>
-            <th width = "5%">
-                Submissions 
+            <th width = "16%">
+               # reviews done
             </th>
-            <th width = "30%">
-            	
-                Teams/participants reviewed
+            <th width = "22%">
+            	<% if @assignment.team_assignment %>
+                Team reviewed
+				<% else %>
+				Participant reviewed
+				<% end %>
             </th>
-            <th width = "10%">
-                Avg. score 
+            <th width = "8%">
+                Score awarded
+            </th>
+			<th width = "14%">
+                Avg. score received
             </th>
             <th width = "20%">
-                Range 
+                Range of scores received
             </th>
             <th width = "10%">
                 Review completed 
             </th>
         </tr>
+		
         <%@l = -1 %>
         <% @reviewers.each do |r| %>
+		<% @this_reviewer = r.reviewer_id %>
             <% @count = 0 %>
             <%@l = @l+1 %>
             
@@ -133,7 +143,12 @@
                             <% @myuser = ri.reviewee_id%>
                             
                             <% participant = User.find(@participantid) %>
-                            <td id = "red" style ="color:#DD3300" align = 'center' colspan=1>
+                            
+                            	<% if (@l%2) == 0 %>
+			                        <td id = "red" style ="color:#DD3300" align = 'center' colspan=1 bgcolor="#ffffff" >
+		                        <%else%>
+			                        <td  id = "red" style ="color:#DD3300" align = 'center' colspan=1 bgcolor="#DDDDBB"  >
+	                           	<%end%>
                                 <%= link_to_remote_redbox participant.fullname, :url => {:controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => nil} %>
                             </td><!-- write ur partial here to print score -->
 							<%= render :partial => 'participantscore' %>
@@ -150,5 +165,6 @@
               <%end %>
           <%end %>
       <%end %>
+	
     </table>
 </div>

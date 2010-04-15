@@ -1,7 +1,24 @@
 <% @qid = "ParticipantReviewResponseMap" %>
  <%@myuser%>
 <%@id%>
-<%@sc = ScoreCache.find(:first, :conditions => ["object_id = ? and assignment_id = ? and object_type = ?",@myuser, @id, @qid  ])%>
+<%@this_reviewer%>
+<%@sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",@myuser, @qid  ])%>
+
+
+<% #########################################    %>
+<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+<% if @review_scores[@this_reviewer][@myuser] != 0 %>
+   <%=@review_scores[@this_reviewer][@myuser] %>
+   <% else%>
+   --
+<% end %>
+</td>
+<% #####################################        %>
+
 
 <%if @sc %>
 
@@ -10,7 +27,7 @@
 		<%else%>
 			<td  bgcolor="#DDDDBB" align = 'center' >
 		<%end%>					
-			<%= @sc.score %>%
+			<%= @sc.score %>
 			</td> 
 
 		<% if (@l%2) == 0%>

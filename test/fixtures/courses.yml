@@ -1,15 +1,20 @@
-first:
-  id: 1
-  name: My Course
-  instructor_id: 1
-  directory_path: abc123
-  info: This is info
-  private: 1
-  
-public:
-  id: 2
-  name: My Public Course
-  instructor_id: 1
-  directory_path: abc123
-  info: This is info
-  private: 0 
+#names : CSC110-4; CSC210-4; CSC310-4; CSC410-4; CSC510-4; CSC610-4
+#instuctor: 
+<% instructor_list = [] %>
+<% instructor_list << Fixtures.identify(:instructor3) %>
+<% instructor_list << Fixtures.identify(:instructor2) %>
+<% instructor_list << Fixtures.identify(:instructor1) %>
+<% for i in 0..29 %>
+course<%= i %>:
+  name: CSC<%= i/5+1%>1<%= i%5 %>
+  instructor_id: <%= instructor_list[i%3] %>
+  directory_path: csc<%= i/5+1%>1<%= i%5 %>
+  info: CSC<%= i/5+1%>1<%= i%5 %> Programming Class
+  private: <%= i%2 %>
+<% end %>
+course_e_commerce:
+  name: E-Commerce
+  instructor_id: <%= instructor_list[0] %>
+  directory_path: csc511
+  info: E Commerce Class
+  private: 0

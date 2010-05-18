@@ -1,7 +1,5 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+institution0:
+  name: North Carolina State University
 institution1:
-  id: 1
-  name: Computer Science
-institution2:
-  id: 2
-  name: Electrical Engineering
+  name: Test state university

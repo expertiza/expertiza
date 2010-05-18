@@ -1,15 +1,14 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 first:
- id: 1
  site_name: "Goldberg"
  site_subtitle: "A website development tool for Ruby on Rails"
- public_role_id: 1
+ public_role_id: <%= Fixtures.identify(:Student_role) %>
  session_timeout: 7200
- default_markup_style_id: 1
- site_default_page_id: 1
- not_found_page_id: 3
- permission_denied_page_id: 4
- session_expired_page_id: 2
+ default_markup_style_id: <%= Fixtures.identify(:markup_style1) %>
+ site_default_page_id: <%= Fixtures.identify(:content_home) %>
+ not_found_page_id: <%= Fixtures.identify(:content_notfound) %>
+ permission_denied_page_id: <%= Fixtures.identify(:content_denied) %>
+ session_expired_page_id: <%= Fixtures.identify(:content_expired) %>
  menu_depth: 3
  start_path: "http://localhost:3000/"
  site_url_prefix: 0

@@ -1,141 +1,188 @@
 superadmin:
-    id: 1
-    name: suadmin
-    parent_id:
-    password: <%= Digest::SHA1.hexdigest("suadmin") %>
-    role_id: <%= Role.find_by_name("Super-Administrator").id %>
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
+  name: suadmin
+  parent_id: <%= Fixtures.identify(:superadmin) %>
+  password: <%= Digest::SHA1.hexdigest("suadmin") %>
+  email: suadmin@foo.edu
+  password_salt: 
+  role_id: <%= Fixtures.identify(:SuperAdministrator_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review: 1
 
 admin:
-    id: 2
-    name: admin
-    parent_id: 1
-    password: <%= Digest::SHA1.hexdigest("admin") %>
-    role_id: <%= Role.find_by_name("Administrator").id %>
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
+  name: admin
+  parent_id: <%= Fixtures.identify(:admin) %>
+  password: <%= Digest::SHA1.hexdigest("admin") %>
+  password_salt: ""
+  email: admin@foo.edu
+  role_id: <%= Fixtures.identify(:Administrator_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review: 1
  
-instructor:
-    id: 3
-    name: instr1
-    parent_id: 1
-    fullname: Instructor, Joe
-    password: <%= Digest::SHA1.hexdigest("instr1") %>
-    email: instr1@foo.edu
-    role_id: <%= Role.find_by_name("Instructor").id %>
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
+instructor1:
+  name: instructor1
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: instructor1_fullname
+  password: <%= Digest::SHA1.hexdigest("instructor1") %>
+  password_salt: ""
+  email: instr1@foo.edu
+  role_id: <%= Fixtures.identify(:Instructor_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review: 1
 
-student:
-    id: 4
-    name: student1
-    parent_id: 1
-    fullname: Student, Joe
-    password: <%= Digest::SHA1.hexdigest("student1") %>
-    email: student1@foo.edu
-    role_id: <%= Role.find_by_name("Student").id %>
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
+instructor2:
+  name: instructor2
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: instructor2_fullname
+  password: <%= Digest::SHA1.hexdigest("instructor2") %>
+  password_salt: ""
+  email: instr2@foo.edu
+  role_id: <%= Fixtures.identify(:Instructor_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review: 1
 
-noreview_note_student:
-    id: 5
-    parent_id: 3
-    name: student2
-    fullname: Student, Bill
-    password: <%= Digest::SHA1.hexdigest("student2") %>
-    email: student2@foo.edu
-    role_id: <%= Role.find_by_name("Student").id %>
-    email_on_review: 0
-    email_on_submission: 1
-    email_on_review: 1
+instructor3:
+  name: instructor3
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: instructor3_fullname
+  password: <%= Digest::SHA1.hexdigest("instructor3") %>
+  password_salt: ""
+  email: instr3@foo.edu
+  role_id: <%= Fixtures.identify(:Instructor_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review: 1
+    
+student1:
+  name: student1
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: student1_fullname
+  password: <%= Digest::SHA1.hexdigest("student1") %>
+  password_salt: 
+  email: student1@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review: 1
+  master_permission_granted: 1
+  handle: stu1
+  
+student2:
+  parent_id: <%= Fixtures.identify(:admin) %>
+  name: student2
+  fullname: student2_fullname
+  password: <%= Digest::SHA1.hexdigest("student2") %>
+  password_salt:
+  email: student2@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 0
+  email_on_submission: 1
+  email_on_review: 1
+  master_permission_granted: 1
+  handle: stu2
 
-nosubmission_note_student:
-    id: 6
-    name: student3
-    parent_id: 3
-    fullname: Student, Mary
-    password: <%= Digest::SHA1.hexdigest("student3") %>
-    email: student3@foo.edu
-    role_id: <%= Role.find_by_name("Student").id %>
-    email_on_review: 1
-    email_on_submission: 0
-    email_on_review: 1
+student3:
+  name: student3
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: student3_fullname
+  password: <%= Digest::SHA1.hexdigest("student3") %>
+  password_salt:
+  email: student3@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 0
+  email_on_review: 1
+  handle: stu3
+  is_new_user: 1
 
-norofreview_note_student:
-    id: 7
-    name: student4
-    parent_id: 3
-    fullname: Student, Peter
-    password: <%= Digest::SHA1.hexdigest("student4") %>
-    email: student4@foo.edu
-    role_id: <%= Role.find_by_name("Student").id %>
-    email_on_review: 1
-    email_on_submission: 0
-    email_on_review_of_review: 1
+student4:
+  name: student4
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: student4_fullname
+  password: <%= Digest::SHA1.hexdigest("student4") %>
+  password_salt:
+  email: student4@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 0
+  email_on_review: 1
+  is_new_user: 0
 
-norofreview_note_student:
-    id: 7
-    name: student4
-    parent_id: 3
-    fullname: Student, Peter
-    password: <%= Digest::SHA1.hexdigest("student4") %>
-    email: student4@foo.edu
-    role_id: <%= Role.find_by_name("Student").id %>
-    email_on_review: 1
-    email_on_submission: 0
-    email_on_review_of_review: 1
+student5:
+  name: student5
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: student5_fullname
+  password: <%= Digest::SHA1.hexdigest("student5") %>
+  password_salt: 
+  email: student5@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 0
+  email_on_review_of_review: 1
 
-noemailstudent:
-    id: 8
-    name: student5
-    parent_id: 3
-    fullname: Student, Susan
-    password: <%= Digest::SHA1.hexdigest("student5") %>
-    role_id: <%= Role.find_by_name("Student").id %>
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review: 1
+student6:
+  name: student6
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: student6_fullname
+  password: <%= Digest::SHA1.hexdigest("student6") %>
+  password_salt:
+  email: student6@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review: 1
 
-new_student:
-    id: 9
-    name: student6
-    parent_id: 3
-    fullname: Student, Edmund
-    password: <%= Digest::SHA1.hexdigest("student6") %>
-    email: student6@foo.edu
-    role_id: <%= Role.find_by_name("Student").id %>
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review_of_review: 1   
-    is_new_user: 1
 
-master_permission_denied_student:
-    id: 10
-    name: student7
-    parent_id: 3
-    fullname: Student, Lucy
-    password: <%= Digest::SHA1.hexdigest("student7") %>
-    email: student7@foo.edu
-    role_id: <%= Role.find_by_name("Student").id %>
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review_of_review: 1   
-    master_permission_granted: 0
+student7:
+  name: student7
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: student7_fullname
+  password: <%= Digest::SHA1.hexdigest("student7") %>
+  password_salt: 
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email: student7@foo.edu
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review_of_review: 1   
+  is_new_user: 1
 
-master_permission_granted_student:
-    id: 11
-    name: student8
-    parent_id: 3
-    fullname: Student, Wendy
-    password: <%= Digest::SHA1.hexdigest("student8") %>
-    email: student8@foo.edu
-    role_id: <%= Role.find_by_name("Student").id %>
-    email_on_review: 1
-    email_on_submission: 1
-    email_on_review_of_review: 1   
-    master_permission_granted: 1
+student8:
+  name: student8
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: student8_fullname
+  password: <%= Digest::SHA1.hexdigest("student8") %>
+  password_salt:
+  email: student8@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review_of_review: 1   
+  master_permission_granted: 0
+
+student9:
+  name: student9
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: student9_fullname
+  password: <%= Digest::SHA1.hexdigest("student9") %>
+  password_salt: 
+  email: student9@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review_of_review: 1   
+  master_permission_granted: 1
+  
+
+admin_test:
+  name: admin_test
+  parent_id: <%= Fixtures.identify(:admin) %>
+  password: <%= Digest::SHA1.hexdigest("admin_test") %>
+  email: admin_test@foo.edu
+  password_salt:
+  role_id: <%= Fixtures.identify(:Administrator_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review: 1

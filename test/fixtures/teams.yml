@@ -1,13 +1,29 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-team1:
-  id: 1
+team0:
   name: team1
-  assignment_id: 1
-team2:
-  id: 2
+  parent_id: <%= Fixtures.identify(:assignment0) %>
+  type: AssignmentTeam
+team1:
   name: team2
-  assignment_id: 1
-team3:
-  id: 3
+  parent_id: <%= Fixtures.identify(:assignment0) %>
+  type: AssignmentTeam
+  
+team2:
   name: team3
-  assignment_id: 1
+  parent_id: <%= Fixtures.identify(:course0) %>
+  type: CourseTeam
+
+team3:
+  name: team4
+  parent_id: <%= Fixtures.identify(:assignment2) %>
+  type: AssignmentTeam
+
+team4:
+  name: team5
+  parent_id: <%= Fixtures.identify(:assignment2) %>
+  type: AssignmentTeam
+
+team5:
+  name: team6
+  parent_id: <%= Fixtures.identify(:assignment2) %>
+  type: AssignmentTeam

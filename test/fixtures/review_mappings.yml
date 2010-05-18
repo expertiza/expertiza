@@ -1,8 +1,5 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 first:
   id: 1
-  author_id: 8
-  reviewer_id: 8
-  assignment_id: 1
 another:
   id: 2

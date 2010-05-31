@@ -1,17 +1,24 @@
 <link href="/stylesheets/jquery.multiselect.css" rel="stylesheet" type="text/css"/>
-<link type="text/css" rel="stylesheet" href="http://jqueryui.com/themes/base/ui.all.css"/>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js" type="text/javascript"></script>
+
+<link href="/stylesheets/style.css" rel="stylesheet" type="text/css"/>
+
+<link href="/stylesheets/jquery-ui-1.8rc3.custom.css" rel="stylesheet" type="text/css"/>
+<script src="/javascripts/jquery.min.js" type="text/javascript"></script>                                        
 <script src="/javascripts/jquery.bgiframe.js" type="text/javascript"></script>
 <script src="/javascripts/jquery.multiselect.js" type="text/javascript"></script>
+<script src="/javascripts/jquery.dataTables.js" type="text/javascript"></script>
+
 
 <script type="text/javascript">
     $(function() {
         $('select').multiSelect({ selectedList:5, minWidth:235, noneSelected:"No dependency"});
     });
+
+
 </script>
 
 <% @assignment = Assignment.find(params[:id]) %>
-<form id="dependency" action="/sign_up_sheet/save_topic_dependencies/dependency?assignment_id=<%= @assignment.id %>" method="post">  
+<form id="dependency" action="/sign_up_sheet/save_topic_dependencies/dependency?assignment_id=<%= @assignment.id %>" method="post">
   <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
 
   <% if flash[:notice] %>
@@ -19,9 +26,8 @@
   <% end %>
 
   <% if @sign_up_topics.size != 0 %>
-      <table class="general">
+      <table class="general" id="topics">
         <tr><%= render :partial => 'table_header' %></tr>
-
         <% i=1 %>
         <% for topic in @sign_up_topics %>
         <tr>
@@ -33,7 +39,7 @@
 
               <%= render :partial => 'num_of_choosers', :locals => {:topic=>topic} %>
 
-              <%= render :partial => 'waitlisted_choosers' %>
+              <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic}  %>
 
               <td align="center">
                   <% topic_identifier = SignUpTopic.find_all_by_assignment_id(@assignment.id).map {|u| [u.topic_identifier, u.id] } %>
@@ -80,51 +86,19 @@
 
       <%= start_form_tag :action => 'save_topic_deadlines', :assignment_id => @assignment.id %>
       <div id="due_date_myDiv" style="display:none" align="left">
-
         <br/>
-        <table class=general>
-          <tr>
-            <th>topic#</th>
-            <th>start date</th>
-            <th>submission deadline</th>
-            <th>review deadline</th>
-            <th>resubmission deadline</th>
-          </tr>
-          <% j=0 %>
-          <% for @due_date in @duedates %>
 
-              <tr>
-                <% topic_identifier = SignUpTopic.find(@due_date['topic_id'])['topic_identifier'] %>
-                <td><%= topic_identifier %></td>
-                <%= hidden_field('due_date[]', 'topic_id', :id => 'due_date_' + @due_date['topic_id'].to_s) %>
-                <td>
-                  <%= text_field 'due_date[]', 'start_date', :size=>20, :id => 'due_date_' + @due_date['topic_id'].to_s + '_start_date' %>
-                  <img src="/images/cal.gif" onClick="NewCal('due_date_<%=@due_date['topic_id'].to_s + '_start_date'%>','YYYYMMDD',true,24); return false;"/>
-                </td>
+        <%if !@duedates.nil?%>
 
-                <td>
-                  <% if !@submission_due_dates[j].nil? %>
-                      <%= @submission_due_dates[j].strftime('%Y/%m/%d') %>
-                  <% end %>
-                </td>
-                <td>
-                  <% if !@review_due_dates[j].nil? %>
-                      <%= @review_due_dates[j].strftime('%Y/%m/%d') %>
-                  <% end %>
-                </td>
-
-                <td>
-                  <%= text_field 'due_date[]', 'due_date', :size=>20, :id => 'due_date_' + @due_date['topic_id'].to_s + '_due_date' %>
-                  <img src="/images/cal.gif" onClick="NewCal('due_date_<%=@due_date['topic_id'].to_s + '_due_date'%>','YYYYMMDD',true,24); return false;"/>
-                </td>
-              </tr>
-              <% j=j+1 %>
-          <% end %>
-        </table>
-        <br/>
-        <%= submit_tag "Save start/due dates" %>
+            <%if !@duedates[0].nil? && !@duedates[0]['submission_1'].nil?%>
+                <%= render :partial => 'due_dates', :locals => {} %>
+            <%end%>
+        <%else%>
+            Please set the dependencies and click 'Save dependencies'.
+        <%end%>
       </div>
       <br/>
       <%= end_form_tag %>
 
   <% end %>
+

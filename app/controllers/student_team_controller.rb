@@ -73,6 +73,10 @@ class StudentTeamController < ApplicationController
           if !first_waitlisted_user.nil?
             first_waitlisted_user.is_waitlisted = false
             first_waitlisted_user.save
+
+            user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+            participant = Participant.find_by_user_id(user_id)
+            participant.update_topic_id(nil)
           end
           signup.destroy
         }

@@ -1,4 +1,5 @@
 <div>
+ <div style="font-size:large;"><b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b></div><br/>
     <div style="padding: 5px">Number of rounds of review:
         <input type="text" id="assignment_helper_no_of_reviews" name="assignment_helper[no_of_reviews]" maxlength="5" size="5" value="1" onchange="addElement();" />
         <input type="button" name="selectButton" value="Edit" onclick="addElement();" />
@@ -105,4 +106,13 @@
            </TR>
        </table>
     </div>
+<br/>
+
+<div id="days_between_chapters" style="position:relative">
+  <label>Number of {weeks, days} between submission of successive chapters:</label>
+  <input type="text" id="weeks" name ="weeks" maxlength="2" size="3"/> week(s) &nbsp;
+  <input type="text" id="days" name ="days" maxLength="2" size="3"/> day(s)      
 </div>
+<br/>
+<script>get_assignment_startdate();</script>
+    

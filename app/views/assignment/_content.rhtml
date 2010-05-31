@@ -15,6 +15,23 @@ function onChange(){
 		document.poppedLayer3.style.display = "none";
 	}
 }
+
+function get_assignment_startdate() {
+    //var start_date = document.getElementById("assignment_startdate");
+    var staggered_label = document.getElementById("staggered_label");
+    var days_between_chapters = document.getElementById("days_between_chapters");
+    var dropdownIndex = document.getElementById('staggered_deadline').selectedIndex;
+	var dropdownValue = document.getElementById('staggered_deadline')[dropdownIndex].value;
+	if(dropdownValue == "true"){
+		//start_date.style.display = "";
+        staggered_label.style.display = "";
+        days_between_chapters.style.display = "";
+	}else{
+		//start_date.style.display = "none";
+        staggered_label.style.display = "none";
+        days_between_chapters.style.display = "none";
+	}
+}
 </script>
 
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
@@ -75,6 +92,17 @@ function onChange(){
         </select>
   </td>  
 </tr>
+
+ <tr><td><label for="staggered">Staggered deadline?</label></td>
+
+ <td>
+  		<select id="staggered_deadline" name="assignment[staggered_deadline]" onchange="get_assignment_startdate();">
+  		 <option value=false style="width:75px">No</option>
+         <option value=true style="width:75px" <% if @assignment.staggered_deadline %>SELECTED<%end%>>Yes</option>
+        </select>
+  </td>
+
+ </tr>
 
 <tr id="team_count1" style="display:none">  
   <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>   

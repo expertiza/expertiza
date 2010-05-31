@@ -353,6 +353,17 @@ class ReviewMappingController < ApplicationController
       redirect_to :action => 'list_mappings', :id => assignment.id
     end    
   end  
+
+  #this is for staggered deadline assignment. Can be merged later
+  def automatic_reviewer_mapping
+    assignment = Assignment.find(params[:id])
+    assignment.update_attribute('review_strategy_id',1)
+    assignment.update_attribute('mapping_strategy_id',1)
+
+    message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_review_of_reviews])
+    flash[:note] = message
+    redirect_to :action => 'list_mappings', :id => assignment.id
+  end
   
   
   def select_mapping

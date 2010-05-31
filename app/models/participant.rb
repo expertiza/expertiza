@@ -61,5 +61,29 @@ class Participant < ActiveRecord::Base
              }
             }
     )   
-  end  
+  end
+
+  #This function updates the topic_id for a participant in assignments where a signup sheet exists
+  #If the assignment is not a team assignment then this method should be called on the object of the participant
+  #If the assignment is a team assignment then this method should be called on the participant object of one of the team members.
+  #Other team members records will be updated automatically.
+  def update_topic_id(topic_id)
+    assignment = Assignment.find(self.parent_id)
+
+    if assignment.team_assignment?
+      team = Team.find_by_sql("SELECT u.team_id as team_id
+                                  FROM teams as t,teams_users as u
+                                  WHERE t.parent_id = " + assignment.id.to_s + " and t.id = u.team_id and u.user_id = " + self.user_id.to_s )
+
+      team_id = team[0]["team_id"]
+      team_members = TeamsUser.find_all_by_team_id(team_id)
+      
+      team_members.each { |team_member|
+        participant = Participant.find_by_user_id_and_parent_id(team_member.user_id,assignment.id)
+        participant.update_attribute(:topic_id, topic_id)
+      }
+    else
+      self.update_attribute(:topic_id, topic_id)
+    end
+  end
 end

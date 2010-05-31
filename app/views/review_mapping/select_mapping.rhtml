@@ -1,7 +1,12 @@
 <h1>Mapping Strategies for <%= @assignment.name %></h1>
 
-<%= start_form_tag({:action => 'generate_reviewer_mappings'}, {:method => 'post' }) %>
-Number of reviews done by a student: <%= text_field 'assignment', 'num_reviews', "size" => 1 %><BR/>
+
+<%if !(SignUpTopic.find(:first, :conditions => ['assignment_id = ?',@assignment.id])).nil?%>
+    <%= start_form_tag({:action => 'automatic_reviewer_mapping'}, {:method => 'post' }) %>
+<%else%>
+    <%= start_form_tag({:action => 'generate_reviewer_mappings'}, {:method => 'post' }) %>
+<%end%>
+Number of reviews done by a student: <%= text_field 'assignment', 'num_reviews', "size" => 1 %><br/> <br/>
 Number of metareviews done by a student: <%= text_field 'assignment', 'num_review_of_reviews', "size" => 1 %>
 
 <%due_date = DueDate.find(:all,:conditions => ["assignment_id = ?",@assignment.id], :order => "round DESC", :limit =>1)
@@ -37,4 +42,4 @@ end%>
 <%= end_form_tag %>
 <br/><br/>
 
-<%= link_to 'Back', :action => 'assign_reviewers', :id => @assignment.id %>
+<%= link_to 'Back', :action => 'list_mappings', :id => @assignment.id %>

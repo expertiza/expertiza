@@ -1,6 +1,9 @@
 class SignUpTopic < ActiveRecord::Base
-  
-  
+  has_many :signed_up_users, :foreign_key => 'topic_id', :dependent => :destroy
+  has_many :topic_dependencies, :foreign_key => 'topic_id', :dependent => :destroy
+  has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy  
+
+
   def self.import(row,session,id = nil)
 
       if row.length != 4
@@ -63,12 +66,23 @@ class SignUpTopic < ActiveRecord::Base
     num_of_users_promotable = max_choosers.to_i - self.max_choosers.to_i
 
     num_of_users_promotable.times {
-      next_waitlisted_user = SignedUpUser.find(:first, :conditions => {:topic_id => self.id, :is_waitlisted => true})
-      if !next_waitlisted_user.nil?
-        next_waitlisted_user.is_waitlisted = false
-        next_waitlisted_user.save
+      next_wait_listed_user = SignedUpUser.find(:first, :conditions => {:topic_id => self.id, :is_waitlisted => true})
+      if !next_wait_listed_user.nil?
+        next_wait_listed_user.is_waitlisted = false
+        next_wait_listed_user.save
+
+        #update participants
+        assignment = Assignment.find(self.assignment_id)
+
+        if assignment.team_assignment?
+          user_id = TeamsUser.find(:first, :conditions => {:team_id => next_wait_listed_user.creator_id}).user_id
+          participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
+        else
+          participant = Participant.find_by_user_id_and_parent_id(next_wait_listed_user.creator_id,assignment.id)
+        end
+        participant.update_topic_id(self.id)
       end
     }
-  end
+  end  
 
 end

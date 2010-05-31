@@ -76,6 +76,13 @@ class InvitationController < ApplicationController
               first_waitlisted_user.is_waitlisted = false
               first_waitlisted_user.save
 
+               #Also update the participant table. But first_waitlisted_user.creator_id is the team id
+               #so find one of the user in the team because the update_topic_id function in participant
+               #will take care of updating all the participants in the team
+               user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+               participant = Participant.find_by_user_id_and_parent_id(user_id,old_team.assignment.id)
+               participant.update_topic_id(topic_id)
+
               SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id, SignUpTopic.find(selected_topic.topic_id)['assignment_id'])
             end
           end
@@ -100,6 +107,10 @@ class InvitationController < ApplicationController
        current_team.add_member(User.find(@inv.to_id)) 
       end
     end
+
+    #also update the user's topic id
+    participant = Participant.find_by_user_id_and_parent_id(student.user_id,student.parent_id)
+    participant.update_topic_id(Participant.find_by_user_id_and_parent_id(@inv.from_id,student.parent_id).topic_id)
     #@team_user.user_id = @inv.to_id
     #@team_user.save
     

@@ -95,13 +95,15 @@ function addElement() {
 
 	if(limit>2)
 	{
-		submission_var= 'Re-submission-'+j+' deadline'
-		rereview_var = 'Re-review-'+j+' deadline'
+		submission_var= 'Re-submission-'+j+' deadline '
+		rereview_var = 'Re-review-'+j+' deadline '
 	}
   	ni.innerHTML = ni.innerHTML + 
-  	                    '<TR><TD ALIGN=LEFT WIDTH=20%>'+submission_var+'</TD>'+
-  	                    '<TD ALIGN=CENTER WIDTH=5%><input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]"  onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"/></TD>'+
-  	                    
+  	                    '<TR><TD ALIGN=LEFT WIDTH=20%> '+submission_var+' </TD>'+
+  	                    '<TD ALIGN=CENTER WIDTH=20%><input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]"/>' +
+                        ' <img src="/images/cal.gif" onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>'+
+
+
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_submission_allowed_id" name ="additional_submit_deadline['+j+'][submission_allowed_id]">'+
 						'<option value=2 SELECTED>Late</option><option value=1>No</option>'+
                         '<option value=3>OK</option>'+
@@ -123,11 +125,18 @@ function addElement() {
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_review_of_review_allowed_id" name ="additional_submit_deadline['+j+'][review_of_review_allowed_id]">'+
 						'<option value=2>Late</option><option value=1 SELECTED>No</option><option value=3>OK</option>'+
 						'</select></TD>'+
+
+                        '<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_threshold" name ="additional_submit_deadline['+j+'][threshold]">'+
+						'<option value="1" selected="selected">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>'+
+						'</select></TD>'+                     
+
 						'</TR>'+
 						
 						'<TR><TD ALIGN=LEFT WIDTH=20%>'+rereview_var+'</TD>'+
 						
-						'<TD ALIGN=CENTER WIDTH=5%><input type="text" id="additional_review_deadline_'+j+'_due_at" name ="additional_review_deadline['+j+'][due_at]" onClick="NewCal(\'additional_review_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"/></TD>'+
+						//'<TD ALIGN=CENTER WIDTH=5%><input type="text" id="additional_review_deadline_'+j+'_due_at" name ="additional_review_deadline['+j+'][due_at]" onClick="NewCal(\'additional_review_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"/></TD>'+
+                        '<TD ALIGN=CENTER WIDTH=20%><input type="text" id="additional_review_deadline_'+j+'_due_at" name ="additional_review_deadline['+j+'][due_at]">' +
+                        ' <img src="/images/cal.gif" onClick=\"NewCal(\'additional_review_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>'+
 						
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_submission_allowed_id" name ="additional_review_deadline['+j+'][submission_allowed_id]">'+
 						'<option value=2 SELECTED >Late</option><option value=1>No</option>'+
@@ -151,6 +160,13 @@ function addElement() {
 						'<select id="additional_review_deadline_'+j+'_review_of_review_allowed_id" name ="additional_review_deadline['+j+'][review_of_review_allowed_id]">'+
 						'<option value=2>Late</option><option value=1 SELECTED>No</option><option value=3>OK</option>'+
 						'</select></TD>'+
+
+                        '<TD ALIGN=CENTER WIDTH=10%>'+
+						'<select id="additional_review_deadline_'+j+'_threshold" name ="additional_review_deadline['+j+'][threshold]">'+
+						'<option value="1" selected="selected">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>'+
+						'</select></TD>'+
+
+
 						'</TR>';
   }
 }

@@ -84,7 +84,7 @@
     <TD ALIGN="CENTER">---</TD>
     <% end %>    
     <% end %>
-    <% stage = participant.assignment.get_current_stage() %>
+    <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
     	<TD ALIGN="CENTER">
     	<% if stage == "Complete" %>      

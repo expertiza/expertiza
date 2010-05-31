@@ -12,6 +12,32 @@ class StudentTaskController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment    
     @can_provide_suggestions = Assignment.find(@assignment.id).allow_suggestions
+    @reviewee_topic_id = nil
+    #Even if one of the reviewee's work is ready for review "Other's work" link should be active
+    if @assignment.staggered_deadline?
+      if @assignment.team_assignment
+        review_mappings = TeamReviewResponseMap.find_all_by_reviewer_id(@participant.id)
+      else
+        review_mappings = ParticipantReviewResponseMap.find_all_by_reviewer_id(@participant.id)
+      end
+
+      review_mappings.each { |review_mapping|
+          if @assignment.team_assignment
+            user_id = TeamsUser.find_all_by_team_id(review_mapping.reviewee_id)[0].user_id
+            participant = Participant.find_by_user_id_and_parent_id(user_id,@assignment.id)
+          else
+            participant = Participant.find_by_id(review_mapping.reviewee_id)
+          end
+
+          if !participant.topic_id.nil?
+            review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id,1)
+
+            if review_due_date.due_at < Time.now && @assignment.get_current_stage(participant.topic_id) != 'Complete'
+              @reviewee_topic_id = participant.topic_id
+            end
+          end
+        }
+    end
   end
   
   def others_work

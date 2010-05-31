@@ -3,7 +3,15 @@
 <br/>
 <br/> 
 <table width="100%" cellpadding="10">
-  <tr CLASS="head" ><th width="30%">Contributor</th><th width="30%">Reviewed By</th><th width="30%">Metareviewed By</th></tr>
+  <tr CLASS="head" >
+    <% has_signup_sheet = !(SignUpTopic.find(:first, :conditions => ['assignment_id = ?', @assignment.id])).nil?
+       if has_signup_sheet %>
+        <th width="20%">Topic selected</th>
+    <%end%>
+    <th width="30%">Contributor</th>
+    <th width="30%">Reviewed By</th>
+    <th width="30%">Metareviewed By</th>
+  </tr>
   <% index1 = 0 
      index2 = 0
      index3 = 0
@@ -17,9 +25,51 @@
        end
        %>       
       <tr style="background-color:<%=bgcolor1%>">
-      <td style="vertical-align:top;"><%= contributor.name %>
+      <% if has_signup_sheet%>
+            <%
+              @topics = nil
+              if contributor.type.to_s == "AssignmentTeam"
+                  @contributor = contributor.id
+              elsif contributor.type.to_s == "AssignmentParticipant"
+                  @contributor = contributor.user_id
+              else
+                @topics = nil
+              end
+              %>
+              <%if !@contributor.nil?
+                topics = SignedUpUser.find_user_signup_topics(@assignment.id,@contributor)
+
+                if !topics.nil?
+                    @topics = ""
+                    topics.each {|topic|
+                        if topic.is_waitlisted?
+                            @topics = @topics + topic.topic_name + " " + "<font color='red'>(waitlisted)</font> <br/>"
+                        else
+                            @topics = @topics + topic.topic_name + "<br/>"
+                        end
+                    }
+                else
+                    @topics = nil
+                end
+              end
+             %>
+
+            <%if @topics == ""%>
+                </tr><%index1-=1%>
+                <%next%>                
+            <%else%>
+                <td><%=@topics%></td>
+            <%end%>
+        <%end%>
+
+      <td style="vertical-align:top;"><%= contributor.name %><br/>
         <% if !@assignment.team_assignment %>          
            (<%= contributor.fullname %>)
+        <%else%>
+            <%team_members = TeamsUser.find_all_by_team_id(contributor.id)%>
+            <%team_members.each{|team_member|
+                %><font size="1"><%=User.find(team_member['user_id']).fullname%></font><br/><%
+            }%>
         <% end %>
          <div style="text-align:right">
            <% if !@assignment.team_assignment %>

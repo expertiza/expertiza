@@ -77,6 +77,21 @@ class AssignmentController < ApplicationController
     ## feedback added
     ##
     
+    if params[:days].nil? && params[:weeks].nil?
+      @days = 0
+      @weeks = 0
+    elsif params[:days].nil?
+      @days = 0
+    elsif params[:weeks].nil?
+      @weeks = 0
+    else
+      @days = params[:days].to_i
+      @weeks = params[:weeks].to_i      
+    end
+
+
+    @assignment.days_between_submissions = @days + (@weeks*7)
+    
     # Deadline types used in the deadline_types DB table
     deadline = DeadlineType.find_by_name("submission")
     @Submission_deadline= deadline.id
@@ -142,6 +157,15 @@ class AssignmentController < ApplicationController
   
   def edit
     @assignment = Assignment.find(params[:id])
+
+    if !@assignment.days_between_submissions.nil?
+      @weeks = @assignment.days_between_submissions/7
+      @days = @assignment.days_between_submissions - @weeks*7
+    else
+      @weeks = 0
+      @days = 0
+    end
+
     get_limits_and_weights    
     @wiki_types = WikiType.find_all
   end
@@ -222,6 +246,22 @@ class AssignmentController < ApplicationController
     rescue
       oldpath = nil
     end
+
+    if params[:days].nil? && params[:weeks].nil?
+      @days = 0
+      @weeks = 0
+    elsif params[:days].nil?
+      @days = 0
+    elsif params[:weeks].nil?
+      @weeks = 0
+    else
+      @days = params[:days].to_i
+      @weeks = params[:weeks].to_i
+    end
+
+
+    @assignment.days_between_submissions = @days + (@weeks*7)
+
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])     
       set_questionnaires

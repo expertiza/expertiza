@@ -16,7 +16,7 @@ class Assignment < ActiveRecord::Base
   has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaires', :foreign_key => 'assignment_id'
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
-    
+  has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy  
     
   validates_presence_of :name
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
@@ -131,8 +131,13 @@ class Assignment < ActiveRecord::Base
     return path + FileHelper.clean_path(self.directory_path)      
   end 
     
-  def check_condition(column)
-    next_due_date = DueDate.find(:first, :conditions => ['assignment_id = ? and due_at >= ?',self.id,Time.now], :order => 'due_at')
+  def check_condition(column,topic_id=nil)
+    if !self.staggered_deadline?
+      next_due_date = DueDate.find(:first, :conditions => ['assignment_id = ? and due_at >= ?',self.id,Time.now], :order => 'due_at')
+    else
+      next_due_date = TopicDeadline.find(:first, :conditions => ['topic_id = ? and due_at >= ?',topic_id,Time.now], :order => 'due_at')
+    end
+
     if next_due_date.nil?
       return false
     end
@@ -149,18 +154,18 @@ class Assignment < ActiveRecord::Base
   end
     
   # Determine if the next due date from now allows for submissions
-  def submission_allowed   
-    return (check_condition("submission_allowed_id") or check_condition("resubmission_allowed_id"))
+  def submission_allowed(topic_id=nil)
+    return (check_condition("submission_allowed_id",topic_id) or check_condition("resubmission_allowed_id",topic_id))
   end
   
   # Determine if the next due date from now allows for reviews or metareviews
-  def review_allowed
-    return (check_condition("review_allowed_id") or check_condition("rereview_allowed_id") or self.metareview_allowed)    
+  def review_allowed(topic_id=nil)
+    return (check_condition("review_allowed_id",topic_id) or check_condition("rereview_allowed_id",topic_id) or self.metareview_allowed)
   end  
   
   # Determine if the next due date from now allows for metareviews
-  def metareview_allowed    
-    return check_condition("review_of_review_allowed_id")  
+  def metareview_allowed(topic_id=nil)
+    return check_condition("review_of_review_allowed_id",topic_id)
   end
     
   def delete(force = nil)
@@ -301,7 +306,7 @@ class Assignment < ActiveRecord::Base
 def add_participant(user_name)
   user = User.find_by_name(user_name)
   if (user == nil) 
-    raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."      
+    raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."
   end
   participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
   if !participant
@@ -320,31 +325,61 @@ def add_participant(user_name)
       end
       node.save   
  end
- 
- def get_current_stage()
-    due_date = find_current_stage()
+
+
+
+  def get_current_stage(topic_id=nil)
+    if self.staggered_deadline?
+      if topic_id.nil?
+        return "Unknown"
+      end
+    end
+    due_date = find_current_stage(topic_id)
     if due_date == nil or due_date == COMPLETE
       return COMPLETE
     else
       return DeadlineType.find(due_date.deadline_type_id).name
     end
-  end 
-  
-  def get_stage_deadline()
-    due_date = find_current_stage()
+  end
+
+
+  def get_stage_deadline(topic_id=nil)
+     if self.staggered_deadline?
+        if topic_id.nil?
+          return "Unknown"
+        end
+     end
+
+    due_date = find_current_stage(topic_id)
     if due_date == nil or due_date == COMPLETE
       return due_date
     else
       return due_date.due_at.to_s
     end
   end
+
+   def get_review_rounds
+    due_dates = DueDate.find_all_by_assignment_id(self.id)
+    rounds = (due_dates.size - 2)/2 + 1
+    if rounds < 0
+       return 0
+    end
+    rounds
+  end
+
   
- def find_current_stage()
-    puts "~~~~~~~~~~Enter find_current_stage()\n"
-    due_dates = DueDate.find(:all, 
-                 :conditions => ["assignment_id = ?", self.id],
-                 :order => "due_at DESC")
-                 
+ def find_current_stage(topic_id=nil)
+    if self.staggered_deadline?
+      due_dates = TopicDeadline.find(:all,
+                   :conditions => ["topic_id = ?", topic_id],
+                   :order => "due_at DESC")
+    else
+      due_dates = DueDate.find(:all,
+                   :conditions => ["assignment_id = ?", self.id],
+                   :order => "due_at DESC")
+    end
+
+
     if due_dates != nil and due_dates.size > 0
       if Time.now > due_dates[0].due_at
         return COMPLETE
@@ -370,6 +405,12 @@ def add_participant(user_name)
           assign_individual_reviewer(1) 
       end  
   end  
+
+#this is for staggered deadline assignments or assignments with signup sheet
+def assign_reviewers_staggered(num_reviews,num_review_of_reviews)
+    #defined in DynamicReviewMapping module
+    message = assign_reviewers_automatically(num_reviews,num_review_of_reviews)
+    return message
 end
 
   def get_current_due_date()
@@ -421,5 +462,6 @@ end
         return nil
       end
     end
-  end
+    end
+end
   

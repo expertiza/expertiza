@@ -10,6 +10,7 @@ class StudentReviewController < ApplicationController
     else           
       @review_mappings = ParticipantReviewResponseMap.find_all_by_reviewer_id(@participant.id)
     end
+    @metareview_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)    
 
     if @assignment.staggered_deadline?
       @review_mappings.each { |review_mapping|
@@ -58,7 +59,6 @@ class StudentReviewController < ApplicationController
        }
     end
 
-    @metareview_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)    
   end  
   
 end

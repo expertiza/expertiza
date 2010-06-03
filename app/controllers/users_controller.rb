@@ -101,7 +101,7 @@ class UsersController < ApplicationController
         # ensures that these users have a default value of 15% for notifications.
         #TAs and Students do not need a default. TAs inherit the default from the instructor,
         # Students do not have any checks for this information.
-        if @user.role.name == "Instructor" or @user.role.name = "Administrator"
+        if @user.role.name == "Instructor" or @user.role.name == "Administrator"
           AssignmentQuestionnaires.create(:user_id => @user.id)
         end
         flash[:notice] = 'User was successfully created.'

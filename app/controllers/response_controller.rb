@@ -38,7 +38,7 @@ class ResponseController < ApplicationController
     @myid = @response.id
     msg = ""
     begin 
-        @myid = @response.id
+      @myid = @response.id
       @map = @response.map
       @response.update_attribute('additional_comment',params[:review][:comments])
       
@@ -51,14 +51,14 @@ class ResponseController < ApplicationController
         score.update_attribute('comments',v[:comment])
       end    
     rescue
-      msg = "#{@map.get_title} was not saved."
+      msg = "Your response was not saved. Cause: "+ $!
     end
 
     begin
        ResponseHelper.compare_scores(@response, @questionnaire)
-    ScoreCache.update_cache(@response.id)
-    #  update_cache(@myid)
-      msg = "#{@map.get_title} was successfully saved -- #{@myid}."
+       ScoreCache.update_cache(@response.id)
+    
+      msg = "Your response was successfully saved."
     rescue
       msg = "An error occurred while saving the response: "+$!
     end
@@ -94,7 +94,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @res = 0
     msg = ""
-    #begin      
+    begin      
       @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
       @res = @response.id
       @questionnaire = @map.questionnaire
@@ -102,18 +102,18 @@ class ResponseController < ApplicationController
       params[:responses].each_pair do |k,v|
         score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
       end  
-    #rescue
-    #  msg = "#{@map.get_title} was not saved. Cause: "+$!
-    #end
+    rescue
+      msg = "Your response was not saved. Cause: "+$!
+    end
     
-    #begin
+    begin
       ResponseHelper.compare_scores(@response, @questionnaire)
      ScoreCache.update_cache(@res)
-      msg = "#{@map.get_title} was successfully saved."
-    #rescue
-    #  @response.delete
-    #  msg = "#{@map.get_title} was not saved. Cause: "+$!
-    #end
+      msg = "Your response was successfully saved."
+    rescue
+      @response.delete
+      msg = "Your response was not saved. Cause: "+$!
+    end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end      
   
@@ -146,10 +146,5 @@ class ResponseController < ApplicationController
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score     
-  end
-    
-  
-    
-  
-  
+  end      
 end

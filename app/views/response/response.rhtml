@@ -20,13 +20,15 @@
    @questions.each{
     | question | %>
     <%= question.txt %><BR/>
-    <% if controller.action_name != 'new' %>
-        <input id=responses_<%=i%>_comments name=responses[<%=i%>][comment] size=70 type=text value="<%= @review_scores[i].comments.gsub(/\"/,'&quot;')%>" />
+    <% if controller.action_name != 'new' and @review_scores[i].comments != nil %>  	    
+	    <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
+	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
     <% else %>
-        <input id=responses_<%=i%>_comments name=responses[<%=i%>][comment] size=70 type=text />
+	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" >
+		</textarea>	
     <% end %>
     <% if question.true_false? %>
-      <select id=responses_<%=i%>_score name=responses[<%=i%>][score]>
+      <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
          <%if controller.action_name != 'new' %>
            <option value="<%=@min%>" <%if @min==@review_scores[i].score%>selected="selected"<%end%> ><%=@min%></option>
            <option value="<%=@max%>" <%if @max==@review_scores[i].score%>selected="selected"<%end%> ><%=@max%></option>    
@@ -36,7 +38,7 @@
          <%end%> 
       </select>  
   <% else %>
-      <select id=responses_<%=i%>_score name=responses[<%=i%>][score]>
+      <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
           <% for j in @min..@max %>
 	        <%if controller.action_name != 'new' %>
             	<option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
@@ -58,7 +60,7 @@
        
 <p>
 	<label for="review_comments">Additional Comments</label><BR/>
-	<textarea cols="70" rows="5" id=review_comments name=review[comments]><% if controller.action_name != 'new' and @response.additional_comment != nil %><%=@response.additional_comment.strip%><% end %></textarea>
+	<textarea cols="70" rows="1" id="review_comments" name="review[comments]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><% if controller.action_name != 'new' and @response.additional_comment != nil %><%=@response.additional_comment.strip%><% end %></textarea>
 </p>
 
 <br/>

@@ -1,16 +1,29 @@
+<script type="text/javascript">
+  function UpdateButton(){
+  	if (document.getElementById("impersonate_name").value.length > 0)
+		document.getElementById("revert_button").value = "Impersonate";
+	else 
+		document.getElementById("revert_button").value = "Revert";
+  } 
+</script>
+
 <% if session[:user] -%>
 <% unless session[:user] == "" %>
-	<p> User:&nbsp;<%= h(session[:user].name) %>
-    <% if session[:super_user] -%>
-      <%= start_form_tag :controller => 'impersonate', :action => 'restore' %>
-      <%= submit_tag "Revert" %>
+   <table>
+   <tr><td>User:&nbsp;<%= h(session[:user].name) %></td></tr>
+    <% if session[:super_user] -%>	  
+      <%= start_form_tag :controller => 'impersonate', :action => 'impersonate' %>
+	  <tr><td><input id="impersonate_name" name="impersonate[name]" size="12" 
+	                 title="Enter a user account to impersonate" type="text" 					 
+					 onKeyUp="UpdateButton();" /></td></tr>
+      <tr><td><input name="commit" id="revert_button" type="submit" value="Revert" /></td></tr>	  
       <%= end_form_tag %>
     <% else %>
-	  <%= start_form_tag :controller => 'auth', :action => 'logout' %>
-  	  <%= submit_tag "Logout" %>
+	  <%= start_form_tag :controller => 'auth', :action => 'logout' %></td></tr>
+  	  <tr><td><%= submit_tag "Logout" %></td></tr>
 	  <%= end_form_tag %>	
     <% end -%>
-</p>
+	</table>
 <% else %>
 <p>(not logged in)
 <%= start_form_tag :controller => 'auth', :action => 'logout' %>

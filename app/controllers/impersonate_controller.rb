@@ -11,34 +11,53 @@ class ImpersonateController < ApplicationController
   end
  
   def impersonate 
-     user = User.find_by_name(params[:user][:name])
-     if user
-        if session[:super_user] == nil
-          session[:super_user] = session[:user]
-        end
-        
-        AuthController.clear_user_info(session, nil)
-        session[:user] = user
-        AuthController.set_current_role(user.role_id, session)   
-        redirect_to :action => AuthHelper::get_home_action(session[:user]), 
-                    :controller => AuthHelper::get_home_controller(session[:user])
-     else 
-        flash[:error] = "No user exists with the name '#{params[:user][:name]}'"
-        redirect_to :back
-     end
-   
-  end
-  
-  def restore
-      if session[:super_user] != nil
-        AuthController.clear_user_info(session, nil)
-        session[:user] = session[:super_user]
-        session[:super_user] = nil       
-        AuthController.set_current_role(session[:user].role_id, session)   
-        redirect_to :action => AuthHelper::get_home_action(session[:user]), 
-                    :controller => AuthHelper::get_home_controller(session[:user])
-     else
-        redirect_to :back
-      end 
+    # default error message
+    flash[:error] = "No user exists with the name '#{params[:user][:name]}'"
+    
+    begin
+       # Initial impersonation
+       if params[:impersonate].nil?
+          user = User.find_by_name(params[:user][:name])
+          if user
+             if session[:super_user] == nil
+                session[:super_user] = session[:user]
+             end          
+             AuthController.clear_user_info(session, nil)
+             session[:user] = user
+          else              
+             raise
+          end
+       else
+          # Impersonate a new account
+          if params[:impersonate][:name].length > 0
+             user = User.find_by_name(params[:impersonate][:name])
+             if user
+               AuthController.clear_user_info(session, nil)
+               session[:user] = user          
+             else                
+               raise
+             end                  
+          # Revert to original account
+          else      
+             if session[:super_user] != nil
+                AuthController.clear_user_info(session, nil)
+                session[:user] = session[:super_user]                
+                user = session[:user]
+                session[:super_user] = nil               
+             else
+                flash[:error] = "No original account was found. Please close your browser and start a new session."
+                raise
+             end       
+          end
+       end   
+       # Navigate to user's home location
+       AuthController.set_current_role(user.role_id, session)   
+       redirect_to :action => AuthHelper::get_home_action(session[:user]), 
+                   :controller => AuthHelper::get_home_controller(session[:user])
+    rescue
+       
+       redirect_to :back      
+    end
+ 
   end
 end

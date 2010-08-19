@@ -1,5 +1,11 @@
 <H3>Impersonate User</H3>
+
+<TABLE>
+<TR>
 <%= form_tag :action => 'impersonate' %>
-Enter user account: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-<input type='submit' value='Impersonate'/>
-<%= end_form_tag %>
+<TD>Enter user account: <%= text_field_with_auto_complete :user, :name, {:size => 41} %></TD>
+<TD><input type='submit' value='Impersonate'/></TD>
+</form>
+</TR>
+</TABLE>
+<BR/>

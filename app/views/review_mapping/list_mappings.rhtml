@@ -68,7 +68,7 @@
         <%else%>
             <%team_members = TeamsUser.find_all_by_team_id(contributor.id)%>
             <%team_members.each{|team_member|
-                %><font size="1"><%=User.find(team_member['user_id']).fullname%></font><br/><%
+                %><font size="1"><%=User.find(team_member['user_id']).fullname%>(<%=User.find(team_member['user_id']).name%>)</font><br/><%
             }%>
         <% end %>
          <div style="text-align:right">

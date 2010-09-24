@@ -181,7 +181,6 @@ class AssignmentParticipant < Participant
      find_all_by_parent_id(parent_id).each{
           |part|
           user = part.user
-          puts "***#{user.id}***#{user.parent.id}***"
           csv << [
             user.name,
             user.fullname,          

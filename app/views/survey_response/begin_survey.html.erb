@@ -1,6 +1,6 @@
 <h1>Begin Survey</h1>
 
-<%= form_tag(:action=>'create', :id=>params[:id])%>
+<% form_tag(:action=>'create', :id=>params[:id])do %>
 
 
 <p id="email_request">If you are willing to help us further by letting us contact you about your responses, 
@@ -16,4 +16,4 @@ your Expertiza id so that your responses will remain anonymous.</p>
 
 <%= submit_tag "Continue", :name=>"continue" %>
 
-<%= end_form_tag %>
+<% end %>

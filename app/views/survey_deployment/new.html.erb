@@ -3,7 +3,7 @@
 
 <h1> New Survey Deployment </h1>
 
-<%= start_form_tag :action => 'create' %>
+<% form_tag :action => 'create' do %>
 	
 	
 	<table>
@@ -75,7 +75,7 @@
 	
 	
 	
-<%= end_form_tag %>
+<% end %>
 <br />
 <%= link_to 'Back', :action => 'list' %>
  

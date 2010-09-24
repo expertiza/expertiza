@@ -1,6 +1,6 @@
 <H1>Score for <%= @participant.fullname %></H1>
 <% pscore = @participant.get_scores(@questions) %>
-<%= start_form_tag :action => 'update', :id => @participant.id %>
+<% form_tag :action => 'update', :id => @participant.id do %>
 <TABLE class="grades" >
 <%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
 <%= render :partial => 'grades/participant',
@@ -11,6 +11,6 @@
 <BR/>
 <%= hidden_field_tag 'total_score', pscore[:total_score] %>
 <%= submit_tag "Update" %>
-<%= end_form_tag %>
+<% end %>
 <BR/><BR/>
 <%= link_to 'Back', :action => 'view', :id => @participant.parent_id %>

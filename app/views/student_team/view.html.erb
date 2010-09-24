@@ -123,22 +123,22 @@
 
 <% if @student.team == nil%>
 	<h2>Create Team</h2>
-	<%= form_tag :controller => 'student_team', :action => 'create'%>
+	<% form_tag :controller => 'student_team', :action => 'create'do %>
 	<%= hidden_field_tag 'id', @student.id %>
 	<label for="team_name">Team Name:</label>&nbsp;
 	<%= text_field 'team', 'name'  %>
 	<%= submit_tag "Create Team" %>
-	<%= end_form_tag %>
+	<% end %>
 <%else%>
 	<h2>Invite people</h2>
-	<%= form_tag :controller => 'invitation', :action => 'create' %>
+	<% form_tag :controller => 'invitation', :action => 'create' do %>
 	<%= hidden_field_tag 'team_id', @student.team.id %>
 	<%= hidden_field_tag 'student_id', @student.id %>
 	<%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
 	
 	Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
 	<input type='submit' value='Invite'/>
-	<%= end_form_tag %>
+	<% end %>
 <%end%>
 <a href="javascript:window.history.back()">Back</a>
 

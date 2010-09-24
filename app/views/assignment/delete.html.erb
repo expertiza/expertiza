@@ -4,7 +4,7 @@
 	<%= flash[:notice] %>
 </div>
 <% end %>
-<%= form_tag({:action=>'delete'})%>
+<% form_tag({:action=>'delete'})do %>
   	Are you sure you want to delete <%= @assignment.name.capitalize %>?<br/><br/>
 	<table>
 	   <tr>

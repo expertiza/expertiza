@@ -5,14 +5,14 @@
  <% end %>
 
 <%= flash[:notice] %>
-<%= start_form_tag :action => 'create_instructor' %>
+<% form_tag :action => 'create_instructor' do %>
   <%= render :partial => 'users/user' %>
   <% if @found %>
    <%= submit_tag "Save", :name=>"save" %>
  <% else %>
    <%= submit_tag "Create" %>
  <% end %>
-<%= end_form_tag %>
+<% end %>
 
 <br />
 <%= link_to 'Back', :action => 'list_instructors' %>

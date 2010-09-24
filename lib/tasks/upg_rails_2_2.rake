@@ -53,10 +53,9 @@ namespace :upg_rails_2_2 do
     
   end
 
-
   desc 'Renames (with SVN) all .rhtml views to .html.erb, .rjs to .js.rjs, .rxml to .xml.builder, and .haml to .html.haml'
-  task :git_rename do
-    
+  task :svn_rename do
+
     Dir.glob('app/views/**/*.rhtml').each do |file|
       puts `svn move #{file} #{file.gsub(/\.rhtml$/, '.html.erb')}`
     end
@@ -68,10 +67,49 @@ namespace :upg_rails_2_2 do
     Dir.glob('app/views/**/[^_]*.rjs').each do |file|
       puts `svn move #{file} #{file.gsub(/\.rjs$/, '.js.rjs')}`
     end
+
     Dir.glob('app/views/**/[^_]*.haml').each do |file|
       puts `svn move #{file} #{file.gsub(/\.haml$/, '.html.haml')}`
     end
 
   end
 
+  desc 'Fixes the files that have deprecated code'
+  task :update_deprecated_code do
+    end_form_tag = 0
+    start_form_tag = 0
+    form_tag = 0
+  
+    puts 'Replacing old "start_form_tag", "form_tag" and "end_form_tag" tags ...'
+  
+    Dir.glob('app/views/**/[^_]*.erb').each do |file|
+      form_tag_reg_exp = "<%=[\\ ]\\{0,1\\}form_tag\\(.*\\)[\\ ]\\{0,1\\}%>/<% form_tag\\1do %>"
+      form_tag_result = `sed -n 's/#{form_tag_reg_exp}/p' < #{file}`
+      unless form_tag_result.empty?
+        `sed -i 's/#{form_tag_reg_exp}/' #{file}`
+        form_tag += 1
+        puts "\tform_tag: #{file}"
+      end
+      
+      start_form_tag_reg_exp = "<%=[\\ ]\\{0,1\\}start_form_tag\\(.*\\)[\\ ]\\{0,1\\}%>/<% form_tag\\1do %>"
+      start_form_tag_result = `sed -n 's/#{start_form_tag_reg_exp}/p' < #{file}`
+      unless start_form_tag_result.empty?
+        `sed -i 's/#{start_form_tag_reg_exp}/' #{file}`
+        start_form_tag += 1
+        puts "\tstart_form_tag: #{file}"
+      end
+
+      end_form_tag_reg_exp = "<%=[\\ ]\\{0,1\\}end_form_tag[\\ ]\\{0,1\\}%>/<% end %>"
+      end_form_tag_result = `sed -n 's/#{end_form_tag_reg_exp}/p' < #{file}`
+      unless end_form_tag_result.empty?
+        `sed -i 's/#{end_form_tag_reg_exp}/' #{file}`
+        end_form_tag += 1
+        puts "\tend_form_tag: #{file}"
+      end
+    end
+
+    puts "<%= start_form_tag ... %> has been replaced by <% <% form_tag ... do %> %> #{start_form_tag} times"
+    puts "<%= form_tag ... %> has been replaced by <% <% form_tag ... do %> %> #{form_tag} times"
+    puts "<%= end_form_tag %> has been replaced by <% end %> #{end_form_tag} times"
+  end
 end

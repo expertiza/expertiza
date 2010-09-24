@@ -1,8 +1,8 @@
 <h1>Survey for all students</h1>
 <% if params[:course_eval] #Check if its a course evaluation%>
-	<%= form_tag(:action=>'submit', :survey_id=> @survey.id)%>
+	<% form_tag(:action=>'submit', :survey_id=> @survey.id)do %>
 <% else %>
-	<%= form_tag(:action=>'create', :survey_id=> @survey.id)%>
+	<% form_tag(:action=>'create', :survey_id=> @survey.id)do %>
 <% end %>
 
 <% @min= @survey.min_question_score %>
@@ -94,4 +94,4 @@
 <br />
 <%= submit_tag "Submit Answers", :name=>"submit" %>
 
-<%= end_form_tag %>
+<% end %>

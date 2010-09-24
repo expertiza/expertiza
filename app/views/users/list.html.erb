@@ -1,10 +1,10 @@
 <h1>Manage users</h1>
 
 <br/>
-<%= form_tag :action => 'show_selection' %>
+<% form_tag :action => 'show_selection' do %>
 Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
 <input type='submit' value='Edit'/>
-<%= end_form_tag %>
+<% end %>
   
 <%= render :partial => 'shared_scripts/letters' %>
 

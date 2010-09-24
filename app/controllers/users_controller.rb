@@ -130,7 +130,7 @@ class UsersController < ApplicationController
     if params[:user][:clear_password] and
         params[:user][:clear_password].length > 0 and
         params[:user][:confirm_password] != params[:user][:clear_password]
-      flash[:error] = 'Password invalid!'
+      flash[:error] = "The passwords you entered don't match"
       foreign
       render :action => 'edit'
     else

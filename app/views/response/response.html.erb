@@ -4,9 +4,9 @@
   <%if @map.assignment.team_assignment?
         team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
         topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
-  else%>
+    else%>
         <% topic_id = Participant.find(@map.contributor).topic_id%>
-  <%end%>
+  <%end%>  
   <%if !topic_id.nil?%>
     <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
   <%end%>
@@ -40,9 +40,9 @@
   <% else %>
       <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
           <% for j in @min..@max %>
-	        <%if controller.action_name != 'new' %>
+	         <%if controller.action_name != 'new' %>
             	<option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
-            <%else%>
+             <%else%>
 		        <option value="<%=j%>" ><%=j%></option>
 	        <% end %>
           <% end %>
@@ -66,6 +66,7 @@
 <br/>
 <%= submit_tag "Save "+@title, :name=>"save" %>
 <%= hidden_field_tag('return', @return) %>
-</form>
+<% end %>
+
 <%= @map.show_feedback() %>
 <a href="javascript:window.history.back()">Back</a>

@@ -130,7 +130,16 @@ class AssignmentTeam < Team
   end
   
   def self.get_team(participant)
-    find(:first, :include => [:teams_users], :conditions => ['parent_id = ? and user_id = ?',participant.parent_id, participant.user_id])            
+    team = nil
+    teams_users = TeamsUser.find_all_by_user_id(participant.user_id)
+    teams_users.each {
+      | tuser |
+      fteam = Team.find(:first, :conditions => ['parent_id = ? and id = ?',participant.parent_id,tuser.team_id])
+      if fteam
+        team = fteam
+      end      
+    }
+    team  
   end
 end  
 

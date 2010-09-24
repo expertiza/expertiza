@@ -10,7 +10,7 @@
     	<%= submit_tag 'Upload file' %>
     	<br><br>
     </form>
-  <%end%>
+  <% end %>
   <% form_tag({:action=>'folder_action', :id => participant.id},{:multipart => true})do %>
   <% if participant.directory_num != nil and participant.directory_num >= 0 %>
 	<% if stage != "Complete" %>
@@ -21,7 +21,7 @@
 		<input type="button" onclick="renameFile()"          value="Rename selected file" />
 		<input type="button" onclick="deleteSelectedFile();" value="Delete selected file" />
 		<input type="reset" value="Reset"></div><br>
-	<%end%>
+	<% end %>
 	<BR/>
     <table>
 	  <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, false) %> </div></td></tr>

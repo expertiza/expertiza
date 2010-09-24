@@ -12,23 +12,23 @@
    <table>
    <tr><td>User:&nbsp;<%= h(session[:user].name) %></td></tr>
     <% if session[:super_user] -%>	  
-      <%= start_form_tag :controller => 'impersonate', :action => 'impersonate' %>
+      <% form_tag :controller => 'impersonate', :action => 'impersonate' do %>
 	  <tr><td><input id="impersonate_name" name="impersonate[name]" size="12" 
 	                 title="Enter a user account to impersonate" type="text" 					 
 					 onKeyUp="UpdateButton();" /></td></tr>
       <tr><td><input name="commit" id="revert_button" type="submit" value="Revert" /></td></tr>	  
-      <%= end_form_tag %>
+      <% end %>
     <% else %>
-	  <%= start_form_tag :controller => 'auth', :action => 'logout' %></td></tr>
+	  <% form_tag :controller => 'auth', :action => 'logout' do %></td></tr>
   	  <tr><td><%= submit_tag "Logout" %></td></tr>
-	  <%= end_form_tag %>	
+	  <% end %>	
     <% end -%>
 	</table>
 <% else %>
 <p>(not logged in)
-<%= start_form_tag :controller => 'auth', :action => 'logout' %>
+<% form_tag :controller => 'auth', :action => 'logout' do %>
   <%= submit_tag "Log in" %>
-<%= end_form_tag %>
+<% end %>
 </p>
 <% end %>
 <% else -%>
@@ -38,7 +38,7 @@
    <div id="ErrorExplanation"><%= flash[:notice] %></div>
 <% end -%>
 
-<%= start_form_tag :controller => 'auth', :action => 'login' %>
+<% form_tag :controller => 'auth', :action => 'login' do %>
     <p><label for="login_name">User Name</label><br/>
     <%= text_field 'login', 'name', :size => 12 %></p>
 
@@ -46,7 +46,7 @@
     <%= password_field 'login', 'password', :size => 12 %></p>
 
   <%= submit_tag "Login" %>
-<%= end_form_tag %>
+<% end %>
 <p><%= link_to "Forgotten your password?", 
        :controller => 'password_retrieval', :action => 'forgotten' %></p>
 <% end %>

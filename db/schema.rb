@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 135) do
+ActiveRecord::Schema.define(:version => 20100920141223) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -61,6 +61,14 @@ ActiveRecord::Schema.define(:version => 135) do
   add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
 
+  create_table "assignments_questionnaires", :force => true do |t|
+    t.integer "questionnaire_id", :default => 0, :null => false
+    t.integer "assignment_id",    :default => 0, :null => false
+  end
+
+  add_index "assignments_questionnaires", ["assignment_id"], :name => "fk_assignments_questionnaires_assignments"
+  add_index "assignments_questionnaires", ["questionnaire_id"], :name => "fk_assignments_questionnaires_questionnaires"
+
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
     t.boolean "private",        :default => false, :null => false
@@ -102,6 +110,15 @@ ActiveRecord::Schema.define(:version => 135) do
   end
 
   add_index "courses", ["instructor_id"], :name => "fk_course_users"
+
+  create_table "courses_users", :force => true do |t|
+    t.integer "user_id"
+    t.integer "course_id"
+    t.boolean "active"
+  end
+
+  add_index "courses_users", ["course_id"], :name => "fk_users_courses"
+  add_index "courses_users", ["user_id"], :name => "fk_courses_users"
 
   create_table "deadline_rights", :force => true do |t|
     t.string "name", :limit => 32
@@ -351,6 +368,10 @@ ActiveRecord::Schema.define(:version => 135) do
 
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
+  create_table "questionnaire_types", :force => true do |t|
+    t.string "name", :default => "", :null => false
+  end
+
   create_table "questionnaires", :force => true do |t|
     t.string   "name",                :limit => 64
     t.integer  "instructor_id",                     :default => 0,     :null => false
@@ -398,9 +419,83 @@ ActiveRecord::Schema.define(:version => 135) do
 
   add_index "resubmission_times", ["participant_id"], :name => "fk_resubmission_times_participants"
 
+  create_table "review_feedbacks", :force => true do |t|
+    t.integer  "assignment_id"
+    t.integer  "review_id"
+    t.integer  "user_id"
+    t.datetime "feedback_at"
+    t.text     "txt"
+  end
+
+  add_index "review_feedbacks", ["assignment_id"], :name => "fk_review_feedback_assignments"
+  add_index "review_feedbacks", ["review_id"], :name => "fk_review_feedback_reviews"
+
+  create_table "review_mappings", :force => true do |t|
+    t.integer "author_id"
+    t.integer "team_id"
+    t.integer "reviewer_id"
+    t.integer "assignment_id"
+  end
+
+  add_index "review_mappings", ["assignment_id"], :name => "fk_review_mapping_assignments"
+  add_index "review_mappings", ["author_id"], :name => "fk_review_users_author"
+  add_index "review_mappings", ["reviewer_id"], :name => "fk_review_users_reviewer"
+  add_index "review_mappings", ["team_id"], :name => "fk_review_teams"
+
+  create_table "review_of_review_mappings", :force => true do |t|
+    t.integer "review_mapping_id"
+    t.integer "review_reviewer_id"
+    t.integer "review_id"
+    t.integer "assignment_id"
+  end
+
+  add_index "review_of_review_mappings", ["review_id"], :name => "fk_review_of_review_mapping_reviews"
+  add_index "review_of_review_mappings", ["review_mapping_id"], :name => "fk_review_of_review_mapping_review_mappings"
+
+  create_table "review_of_review_scores", :force => true do |t|
+    t.integer "review_of_review_id"
+    t.integer "question_id"
+    t.integer "score"
+    t.text    "comments"
+  end
+
+  add_index "review_of_review_scores", ["question_id"], :name => "fk_review_of_review_score_questions"
+  add_index "review_of_review_scores", ["review_of_review_id"], :name => "fk_review_of_review_score_reviews"
+
+  create_table "review_of_reviews", :force => true do |t|
+    t.datetime "reviewed_at"
+    t.integer  "review_of_review_mapping_id"
+    t.integer  "review_num_for_author"
+    t.integer  "review_num_for_reviewer"
+  end
+
+  add_index "review_of_reviews", ["review_of_review_mapping_id"], :name => "fk_review_of_review_review_of_review_mappings"
+
+  create_table "review_scores", :force => true do |t|
+    t.integer "review_id"
+    t.integer "question_id"
+    t.integer "score"
+    t.text    "comments"
+  end
+
+  add_index "review_scores", ["question_id"], :name => "fk_review_score_questions"
+  add_index "review_scores", ["review_id"], :name => "fk_review_score_reviews"
+
   create_table "review_strategies", :force => true do |t|
     t.string "name"
   end
+
+  create_table "reviews", :force => true do |t|
+    t.integer  "review_mapping_id"
+    t.integer  "review_num_for_author"
+    t.integer  "review_num_for_reviewer"
+    t.boolean  "ignore",                  :default => false
+    t.text     "additional_comment"
+    t.datetime "updated_at"
+    t.datetime "created_at"
+  end
+
+  add_index "reviews", ["review_mapping_id"], :name => "fk_review_mappings"
 
   create_table "roles", :force => true do |t|
     t.string   "name",            :default => "", :null => false
@@ -422,6 +517,10 @@ ActiveRecord::Schema.define(:version => 135) do
 
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
+
+  create_table "schema_info", :id => false, :force => true do |t|
+    t.integer "version"
+  end
 
   create_table "score_caches", :force => true do |t|
     t.integer "reviewee_id", :default => 0,   :null => false

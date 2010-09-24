@@ -56,7 +56,7 @@ class StudentTaskController < ApplicationController
     end
     
     @review_phase = next_due_date.deadline_type_id;
-    if next_due_date.review_of_review_allowed_id == LATE or next_due_date.review_of_review_allowed_id == OK
+    if next_due_date.review_of_review_allowed_id == DueDate::LATE or next_due_date.review_of_review_allowed_id == DueDate::OK
       if @review_phase == DeadlineType.find_by_name("metareview").id
         @can_view_metareview = true
       end

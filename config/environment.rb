@@ -95,6 +95,3 @@ end
 
 # Include your application configuration below
 #ActionController::AbstractRequest.relative_url_root = "/blog"
-NO = 1
-LATE = 2
-OK = 3

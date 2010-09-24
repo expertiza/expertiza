@@ -4,9 +4,6 @@ class ReviewMappingController < ApplicationController
   
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
-    puts "************"
-    puts session[:contributor]    
-    puts "************"
     assignment_id = session[:contributor].parent_id
     @users = User.find(:all, :include => :participants, 
       :conditions => ['participants.type = "AssignmentParticipant" and users.name like ? and participants.parent_id = ?',name,assignment_id], 

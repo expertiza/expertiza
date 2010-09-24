@@ -32,7 +32,7 @@ def delete_all
 #  parent = Object.const_get(session[:team_type]).find(params[:id])
 #  redirect_to :action => 'list' , :id => parent.id
   
-#  participants = Participant.find_all(["parent_id=?",parent.id])
+#  participants = Participant.find(:all, :conditions => ["parent_id=?",parent.id])
 #  no_of_teams = (participants.length)/(parent.team_count)
 #  diff = (participants.length)%(parent.team_count)
   
@@ -47,7 +47,7 @@ def delete_all
 #   end
 
   parent = Object.const_get(session[:team_type]).find(params[:id])  
-  teams = Team.find_all(["parent_id=?",parent.id])
+  teams = Team.find(:all, :conditions => ["parent_id=?",parent.id])
   
   for team in teams
     team.delete
@@ -61,7 +61,7 @@ end
 def randomize_teams
   
    parent = Object.const_get(session[:team_type]).find(params[:id])  
-   participants = Participant.find_all(["parent_id=?",parent.id])
+   participants = Participant.find(:all, :conditions => ["parent_id=?",parent.id])
    
    participants = participants.sort{rand(3) - 1 }
    

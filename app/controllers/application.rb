@@ -1,7 +1,9 @@
 # Filters added to this controller will be run for all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
-  
+
+protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
+
   def authorize 
     unless session[:user]
       flash[:notice] = "Please log in."

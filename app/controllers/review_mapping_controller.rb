@@ -349,7 +349,7 @@ class ReviewMappingController < ApplicationController
         redirect_to :action => 'list_mappings', :id => assignment.id
       #end
     else
-      @wiki_types = WikiType.find_all
+      @wiki_types = WikiType.find(:all)
       redirect_to :action => 'list_mappings', :id => assignment.id
     end    
   end  

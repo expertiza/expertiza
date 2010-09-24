@@ -69,15 +69,12 @@ end
   
  # Copies existing participants from a course down to an assignment
  def inherit
-   assignment = Assignment.find(params[:id])
-   if assignment.course_id > 0
-    course = Course.find(assignment.course_id)
-    participants = course.get_participants
-    if participants.length > 0 
-      participants.each{
-        |participant|
-        participant.copy(assignment.id)
-      }
+   assignment = Assignment.find(params[:id])    
+   course = assignment.course
+   if course     
+    participants = course.participants
+    if participants.length > 0      
+      participants.each{|participant| participant.copy(params[:id])}
     else
       flash[:note] = "No participants were found to inherit."
     end
@@ -89,9 +86,9 @@ end
  
  def bequeath_all   
    assignment = Assignment.find(params[:id])
-   if assignment.course_id
-      course = Course.find(assignment.course_id)
-      assignment.get_participants.each{
+   if assignment.course
+      course = assignment.course
+      assignment.participants.each{
         |participant|
         participant.copy(course.id)
       }
@@ -100,7 +97,7 @@ end
       flash[:error] = "This assignment is not associated with a course."
    end
    redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment' 
- end     
+ end    
   
   # Allow participant to change handle for this assignment
   # If the participant parameters are available, update the participant

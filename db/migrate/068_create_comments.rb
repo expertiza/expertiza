@@ -6,7 +6,7 @@ class CreateComments < ActiveRecord::Migration
       t.column :comment, :text, :null => false
     end
     
-    participants = Participant.find_all()
+    participants = Participant.find(:all)
     participants.each{
       |participant|
       if participant.comments_to_student
@@ -30,7 +30,7 @@ class CreateComments < ActiveRecord::Migration
     add_column :participants, :comments_to_student, :text
     add_column :participants, :private_instructor_comments, :text
   
-    comments = Comment.find_all()
+    comments = Comment.find(:all)
     comments.each{
       |item|
       participant = Participant.find(item.participant_id)

@@ -32,7 +32,7 @@ scaffold :participants
   
   def new
     @assignment_signup = AssignmentSignup.new
-    @signup_sheets = SignupSheet.find_all
+    @signup_sheets = SignupSheet.find(:all)
     @assignments = Assignment.find_by_sql("select * from assignments where id not in (select assignment_id from assignment_signups where signup_id = "+@params[:id].to_s+")")
   end
 
@@ -46,14 +46,14 @@ scaffold :participants
       flash[:notice] = 'Assignment Signup was successfully created for assignment '+@assignments.name                   
       redirect_to :controller => 'signup_sheets', :action => 'list'
     else
-      @signup_sheets = SignupSheet.find_all
-      @assignments = Assignment.find_all
+      @signup_sheets = SignupSheet.find(:all)
+      @assignments = Assignment.find(:all)
       render :action => 'new'
     end
   end
 
   def edit
-    @assignments = Assignment.find_all
+    @assignments = Assignment.find(:all)
     @assignment_signup = AssignmentSignup.find(params[:id])
   end
 
@@ -65,7 +65,7 @@ scaffold :participants
       flash[:notice] = 'AssignmentSignup was successfully updated.'
       redirect_to :action => 'show', :id => @assignment_signup
     else
-      @assignments = Assignment.find_all
+      @assignments = Assignment.find(:all)
       render :action => 'edit'
     end
   end

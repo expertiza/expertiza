@@ -50,7 +50,7 @@ class AssignmentController < ApplicationController
     
     @assignment = Assignment.new
     
-    @wiki_types = WikiType.find_all
+    @wiki_types = WikiType.find(:all)
     @private = params[:private] == true        
     #calling the defalut values mathods
     get_limits_and_weights 
@@ -149,7 +149,7 @@ class AssignmentController < ApplicationController
       redirect_to :action => 'list', :controller => 'tree_display'
       
     else
-      @wiki_types = WikiType.find_all
+      @wiki_types = WikiType.find(:all)
       render :action => 'new'
     end
     
@@ -167,7 +167,7 @@ class AssignmentController < ApplicationController
     end
 
     get_limits_and_weights    
-    @wiki_types = WikiType.find_all
+    @wiki_types = WikiType.find(:all)
   end
   
   def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
@@ -297,7 +297,7 @@ class AssignmentController < ApplicationController
       flash[:notice] = 'Assignment was successfully updated.'
       redirect_to :action => 'show', :id => @assignment                  
     else # Simply refresh the page
-      @wiki_types = WikiType.find_all
+      @wiki_types = WikiType.find(:all)
       render :action => 'edit'
     end    
   end

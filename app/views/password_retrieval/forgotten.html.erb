@@ -6,8 +6,8 @@
 
 <h1> Forgotten Your Password? </h1>
 
-<%= start_form_tag :action => 'send_password' %>
+<% form_tag :action => 'send_password' do %>
 <p><label for="login_name">Enter the e-mail address associated with your account</label><br/>
 <%= text_field 'user', 'email'  %></p>
 <%= submit_tag "Request password" %>
-<%= end_form_tag %>
+<% end %>

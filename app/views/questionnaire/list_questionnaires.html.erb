@@ -1,10 +1,10 @@
 <h1>Questionnaires</h1>
 
-<%= start_form_tag :action => 'list_questionnaires' %>
+<% form_tag :action => 'list_questionnaires' do %>
 	<%= select(:display_option, :name, 
 			   @display_options, {}, 
 			   {:onchange => "document.forms[0].submit()"} ) %>
-<%= end_form_tag %>
+<% end %>
 
 <table class="listing" cellpadding=2>
   <tr>

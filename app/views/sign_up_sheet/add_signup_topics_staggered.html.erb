@@ -84,7 +84,7 @@
   <span class="inline" id="due_date_hide" style="display: none">Hide start/due date</span>
 </a>
 
-      <%= start_form_tag :action => 'save_topic_deadlines', :assignment_id => @assignment.id %>
+      <% form_tag :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
       <div id="due_date_myDiv" style="display:none" align="left">
         <br/>
 
@@ -98,7 +98,7 @@
         <%end%>
       </div>
       <br/>
-      <%= end_form_tag %>
+      <% end %>
 
   <% end %>
 

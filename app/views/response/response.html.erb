@@ -15,7 +15,7 @@
 <% end %>
 <%= @map.show_review() %>
 
-<%= form_tag :action => @next_action, :id => @modified_object %>
+<% form_tag :action => @next_action, :id => @modified_object do %>
 <% i = 0
    @questions.each{
     | question | %>

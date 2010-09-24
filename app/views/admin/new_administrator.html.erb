@@ -4,14 +4,14 @@
    <h1>New Administrator</h1>
  <% end %>
 <%= flash[:notice] %>
-<%= start_form_tag :action => 'create_administrator' %>
+<% form_tag :action => 'create_administrator' do %>
   <%= render :partial => 'm' %>
   <% if @found %>
    <%= submit_tag "Save", :name=>"save" %>
  <% else %>
    <%= submit_tag "Create" %>
  <% end %>
-<%= end_form_tag %>
+<% end %>
 
 <br />
 <%= link_to 'Back', :action => 'list_administrators' %>

@@ -1,5 +1,5 @@
 <h1>Surveys for Assignment: <%= @assignment.name %></h1>
-<%= form_tag(:action=>'assign_survey') %>
+<% form_tag(:action=>'assign_survey') do %>
 <select name="subset" onchange="document.forms[0].submit()">
 	<option value="assigned" 
 		<% if params[:subset] == "assigned" -%>
@@ -17,9 +17,9 @@
 		<% end -%>
 	>All public surveys</option>
 </select>
-<%= end_form_tag %>
+<% end %>
 <% if @surveys.length != 0 -%>
-	<%= form_tag(:action=>'assign_survey')%>
+	<% form_tag(:action=>'assign_survey')do %>
 		<br />
 		<table id="surveys_table">
 		<tr>
@@ -41,7 +41,7 @@
 		<%= submit_tag "Assign Survey", :name=>"update" %>
 		<input type="hidden" name="submit_subset" value="<%= params[:subset] %>" />
 		<input type="hidden" name="subset" value="assigned" />
-	<%= end_form_tag %>
+	<% end %>
 <br />
 <% else -%>
 	<p>No surveys match the selected criteria.</p>

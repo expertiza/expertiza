@@ -1,5 +1,5 @@
 <h2>Import <%= @title %></h2>
-<%= start_form_tag({:controller => 'import_file', :action => 'import'}, {:method => 'post', :multipart => true, :name => 'import_form'}) %>
+<% form_tag({:controller => 'import_file', :action => 'import'}, {:method => 'post', :multipart => true, :name => 'import_form'}) do %>
 <table>
  <tr>
   <td valign='Top'>Delimiter:</td>
@@ -34,7 +34,7 @@
  &nbsp;&nbsp;&nbsp;<%= @expected_fields %>
  <br/><br/>
  <input type='submit' value='Import' onclick='if (checkIfFileExists(file)) {import_form.submit();} else {alert("Please select a file before clicking Next.");}'/>
- <%= end_form_tag %>
+ <% end %>
  <br/><br/>
 
  <a href="<%= session[:return_to]%>">Back</a>

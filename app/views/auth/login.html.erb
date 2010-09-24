@@ -4,9 +4,9 @@
    <div id="ErrorExplanation"><%= flash[:notice] %></div>
 <% end -%>
 
-<%= start_form_tag :action => 'login' %>
+<% form_tag :action => 'login' do %>
   <%= render :partial => 'form' %>
   <%= submit_tag "Login" %>
-<%= end_form_tag %>
+<% end %>
 
 <%= link_to 'Back', :action => 'list' %>

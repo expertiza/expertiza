@@ -1,12 +1,12 @@
 <h1>Editing user</h1>
 
-<%= start_form_tag :action => 'update', :id => @user %>
+<% form_tag :action => 'update', :id => @user do %>
   <p><label for="role_id">Role</label><br/>
   <%= collection_select 'user', 'role_id', @all_roles, :id, :name %></p>
 
   <%= render :partial => 'user' %>
   <%= submit_tag 'Edit' %>
-<%= end_form_tag %>
+<% end %>
 
 <%= link_to 'Show', :action => 'show', :id => @user %> |
 <%= link_to 'Back', :action => 'list' %>

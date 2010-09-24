@@ -25,9 +25,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 		(Submit and view your work)
 	</li>
 	<li>
-	    <% puts "*** IN VIEW ***" %>
-	    <% puts @assignment.review_allowed(@reviewee_topic_id) %>
-		<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
+	    <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
 			<%= link_to "Others' work",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
 		<% else %>
 			<font color="gray">Others' work</font>

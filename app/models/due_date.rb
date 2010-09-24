@@ -22,9 +22,9 @@ class DueDate < ActiveRecord::Base
   end
   
   def setFlag()
-     puts"~~~~~~~~~enter setFlag"
+     #puts"~~~~~~~~~enter setFlag"
       self.flag = true
       self.save
-     puts"~~~~~~~~~#{self.flag.to_s}"
+     #puts"~~~~~~~~~#{self.flag.to_s}"
     end
 end

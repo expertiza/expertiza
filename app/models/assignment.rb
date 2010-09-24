@@ -414,7 +414,7 @@ def assign_reviewers_staggered(num_reviews,num_review_of_reviews)
 end
 
   def get_current_due_date()
-    puts "~~~~~~~~~~Enter get_current_due_date()\n"
+    #puts "~~~~~~~~~~Enter get_current_due_date()\n"
     due_date = self.find_current_stage()
     if due_date == nil or due_date == COMPLETE
       return COMPLETE
@@ -437,7 +437,7 @@ end
   end
   
   def find_next_stage()
-    puts "~~~~~~~~~~Enter find_next_stage()\n"
+    #puts "~~~~~~~~~~Enter find_next_stage()\n"
     due_dates = DueDate.find(:all, 
                  :conditions => ["assignment_id = ?", self.id],
                  :order => "due_at DESC")

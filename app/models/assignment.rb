@@ -399,10 +399,10 @@ def add_participant(user_name)
  def assign_reviewers(mapping_strategy)  
       if (team_assignment)      
           #defined in DynamicReviewMapping module
-          assign_reviewers_for_team(1)
+          assign_reviewers_for_team(mapping_strategy)
       else          
           #defined in DynamicReviewMapping module
-          assign_individual_reviewer(1) 
+          assign_individual_reviewer(mapping_strategy) 
       end  
   end  
 

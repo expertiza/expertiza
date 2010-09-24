@@ -329,22 +329,27 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:id])
     assignment.update_attribute('review_strategy_id',1)
     assignment.update_attribute('mapping_strategy_id',1)    
-   
-    mapping_strategy = {}
-    params[:selection].each{|a|
+       
+    if params[:selection]
+      
+      mapping_strategy = {}
+      params[:selection].each{|a|
       if a[0] =~ /^m_/
         mapping_strategy[a[0]] = a[1]
       end
     }
-    
+    else
+      mapping_strategy = 1
+    end      
+      
     if assignment.update_attributes(params[:assignment])
-      #begin
+      begin
         assignment.assign_reviewers(mapping_strategy)        
-      #rescue
-        #flash[:error] = "Reviewer assignment failed. Cause: " + $!
-      #ensure
+      rescue
+        flash[:error] = "Reviewer assignment failed. Cause: " + $!
+      ensure
         redirect_to :action => 'list_mappings', :id => assignment.id
-      #end
+      end
     else
       @wiki_types = WikiType.find(:all)
       redirect_to :action => 'list_mappings', :id => assignment.id

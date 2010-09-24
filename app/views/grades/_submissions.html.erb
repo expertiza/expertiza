@@ -1,5 +1,4 @@
 <!-- SUBMISSIONS --> 
-<% puts "***** #{participant} *****" %>
 <% session[:return_to] = request.request_uri %>
 <%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => participant.assignment.get_current_stage(participant.topic_id)} %>
 

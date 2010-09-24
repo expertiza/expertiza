@@ -22,8 +22,7 @@ module ResponseHelper
     item_list.each {
       | item | 
       if item.id != curr_item.id
-        count += 1
-        puts "*** #{item} ***"
+        count += 1        
         total += item.get_total_score                
       end
     } 

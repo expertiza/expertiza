@@ -182,11 +182,11 @@ class Leaderboard < ActiveRecord::Base
                    end
    	    end
     end
-    puts "************looking at all the csEntries elements***********"
-    for csEntry in csEntries
-    puts "csEntry -> #{csEntry.participant_id} , #{csEntry.questionnaire_id}, #{csEntry.total_score}"
-    end
-   ####################### end of Code Abhishek #############
+    #puts "************looking at all the csEntries elements***********"
+    #for csEntry in csEntries
+    #puts "csEntry -> #{csEntry.participant_id} , #{csEntry.questionnaire_id}, #{csEntry.total_score}"
+    #end
+    ####################### end of Code Abhishek #############
     #qtype => course => user => score
     
     qtypeHash = Hash.new

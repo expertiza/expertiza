@@ -20,15 +20,52 @@ class ParticipantsController < ApplicationController
      
   def delete
     participant = Participant.find(params[:id])
-    parent_id = participant.parent_id
-    if participant.class == AssignmentParticipant
-      model = 'Assignment'
-    else
-      model = 'Course'
+    name = participant.user.name
+    parent_id = participant.parent_id    
+    begin
+      participant.delete(params[:force])
+      flash[:note] = "#{name} has been removed as a participant."
+    rescue      
+      url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
+      url_show = url_for :action => 'delete_display', :id => params[:id], :model => participant.class.to_s.gsub("Participant","")
+      url_no  = url_for :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
+      flash[:error] = "A delete action failed: At least one (1) review mapping or team membership exist for this participant. <br/><a href='#{url_yes}'>Delete this participant</a>&nbsp;|&nbsp;<a href='#{url_show}'>Show me the associated items</a>|&nbsp;<a href='#{url_no}'>Do nothing</a><BR/>"                  
     end
-    participant.delete
-    redirect_to :action => 'list', :id => parent_id, :model => model
+    redirect_to :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
+  end  
+  
+  def delete_display
+    @participant = Participant.find(params[:id]) 
+    @model = params[:model]
   end
+  
+  def delete_items
+    participant = Participant.find(params[:id])
+    maps = params[:ResponseMap]
+    teamsusers = params[:TeamsUser]      
+    
+    if !maps.nil?
+      maps.each{
+        |rmap_id|
+        begin
+          ResponseMap.find(rmap_id[0].to_i).delete(true)
+        rescue
+        end
+      }
+    end
+  
+    if !teamsusers.nil?
+      teamsusers.each{
+        |tuser_id|
+        begin
+          TeamsUser.find(tuser_id[0].to_i).delete
+        rescue
+        end 
+      }
+    end
+    
+    redirect_to :action => 'delete', :id => participant.id, :method => :post
+end
   
  # Copies existing participants from a course down to an assignment
  def inherit

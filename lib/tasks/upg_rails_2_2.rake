@@ -79,10 +79,10 @@ namespace :upg_rails_2_2 do
     end_form_tag = 0
     start_form_tag = 0
     form_tag = 0
-  
+
     puts 'Replacing old "start_form_tag", "form_tag" and "end_form_tag" tags ...'
-  
-    Dir.glob('app/views/**/[^_]*.erb').each do |file|
+
+    Dir.glob('app/views/**/*.erb').each do |file|
       form_tag_reg_exp = "<%=[\\ ]\\{0,1\\}form_tag\\(.*\\)[\\ ]\\{0,1\\}%>/<% form_tag\\1do %>"
       form_tag_result = `sed -n 's/#{form_tag_reg_exp}/p' < #{file}`
       unless form_tag_result.empty?
@@ -90,7 +90,7 @@ namespace :upg_rails_2_2 do
         form_tag += 1
         puts "\tform_tag: #{file}"
       end
-      
+
       start_form_tag_reg_exp = "<%=[\\ ]\\{0,1\\}start_form_tag\\(.*\\)[\\ ]\\{0,1\\}%>/<% form_tag\\1do %>"
       start_form_tag_result = `sed -n 's/#{start_form_tag_reg_exp}/p' < #{file}`
       unless start_form_tag_result.empty?

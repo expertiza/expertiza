@@ -9,7 +9,7 @@ class WaitlistsController < ApplicationController
          :redirect_to => { :action => :list }
 
   def list
-    @waitlist_pages, @waitlists = paginate :waitlists, :per_page => 10
+    @waitlists = Waitlist.paginate(:page => params[:page], :per_page => 10)
   end
 
   def show

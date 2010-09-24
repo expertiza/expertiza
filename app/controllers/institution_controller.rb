@@ -9,7 +9,7 @@ class InstitutionController < ApplicationController
          :redirect_to => { :action => :list }
 
   def list
-    @institution_pages, @institutions = paginate :institutions, :per_page => 10
+    @institutions = Institution.paginate(:page => params[:page],:per_page => 10)
   end
 
   def show

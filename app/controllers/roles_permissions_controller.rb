@@ -10,7 +10,7 @@ class RolesPermissionsController < ApplicationController
   end
 
   def list
-    @roles_permission_pages, @roles_permissions = paginate :roles_permissions, :per_page => 10
+    @roles_permissions = RolesPermission.paginate(:page => params[:page], :per_page => 10)
   end
 
   def show

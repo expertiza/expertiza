@@ -55,6 +55,8 @@ Rails::Initializer.run do |config|
        :key => 'pg_session',
        :secret => '3d70fee70cddd63552e8dd6ae6c788060af8fb015da5fef83d368abf37aa10c112d842d7c038420845109147779552cdd687ec4e2034cec3046dc439d8a468e'
   }
+
+  config.action_controller.session_store = :p_store
   
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {

@@ -10,7 +10,7 @@ class MarkupStylesController < ApplicationController
   end
 
   def list
-    @markup_style_pages, @markup_styles = paginate :markup_styles, :per_page => 10
+    @markup_styles = MarkupStyle.paginate(:page => params[:page],:per_page => 10)
   end
 
   def show

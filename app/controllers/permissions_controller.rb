@@ -10,7 +10,7 @@ class PermissionsController < ApplicationController
   end
 
   def list
-    @permission_pages, @permissions = paginate :permissions, :per_page => 10
+    @permissions = Permission.paginate(:page => params[:page],:per_page => 10)
   end
 
   def show

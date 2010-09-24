@@ -70,7 +70,7 @@ class AdminController < ApplicationController
   
   def list_instructors
    user_id = session[:user].id
-   @user_pages, @users = paginate :users, :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role::INSTRUCTOR], :per_page => 50
+   @users = User.paginate(:page => params[:page], :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role::INSTRUCTOR], :per_page => 50)
   end
 
   def search_administrator
@@ -87,11 +87,11 @@ class AdminController < ApplicationController
 
   def list_administrators    
     user_id = session[:user].id    
-    @user_pages, @users = paginate :users, :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role::ADMINISTRATOR], :per_page => 50
+    @users = User.paginate(:page => params[:page], :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role::ADMINISTRATOR], :per_page => 50)
   end
    
   def list_users(conditions)
-    @user_pages, @users = paginate :users, :order => 'name',:conditions => conditions, :per_page => 50
+    @users = User.paginate(:page => params[:page], :order => 'name',:conditions => conditions, :per_page => 50)
   end
 
   def search_super_administrator

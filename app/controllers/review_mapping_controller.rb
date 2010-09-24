@@ -249,7 +249,7 @@ class ReviewMappingController < ApplicationController
     end 
     
     @letters = Array.new
-    @pages, @assignments = paginate :assignments, :order => 'name', :per_page => 10,  :conditions => ["instructor_id = ? and substring(name,1,1) = ?",session[:user].id, letter]    
+    @assignments = Assignment.paginate(:page => params[:page], :order => 'name',:per_page => 10, :conditions => ["instructor_id = ? and substring(name,1,1) = ?",session[:user].id, letter])    
   
     all_assignments.each {
        | assignObj |

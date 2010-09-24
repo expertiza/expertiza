@@ -19,7 +19,7 @@ scaffold :answers
 
   # List all questions in paginated view
   def list
-    @question_pages, @questions = paginate :questions, :per_page => 10
+    @questions = Question.paginate(:page => params[:page],:per_page => 10)
   end
 
   # List questions for this user
@@ -37,7 +37,7 @@ scaffold :answers
   # ?? Unknown as of 2/1/2009
   # Need further investigation
   def SignupSheet
-    @question_pages, @questions = paginate :questions, :per_page => 10
+    @questions = Question.paginate(:page => params[:page],:per_page => 10)
   end
  
   # Display a given question

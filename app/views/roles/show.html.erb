@@ -42,7 +42,7 @@ for each:</p>
 	    { :controller => 'roles_permissions', 
               :action => 'destroy', :id => rp.id }, 
 	    :confirm => 'Remove this Permission from this Role?', 
-	    :post => true %></td>
+	    :method => :post %></td>
   </tr>
 <% end -%>
 </table>
@@ -72,7 +72,7 @@ for each:</p>
 <hr/>
 <p><%= link_to 'Edit', :action => 'edit', :id => @role %> |
 <%= link_to 'Delete', {:action => 'destroy', :id => @role}, 
-    :confirm => 'Are you sure?', :post => true %> </p>
+    :confirm => 'Are you sure?', :method => :post %> </p>
 
 <p><%= link_to 'Back', :action => 'list' %> to Roles list</p>
 

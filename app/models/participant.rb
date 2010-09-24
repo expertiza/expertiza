@@ -12,15 +12,41 @@ class Participant < ActiveRecord::Base
   def fullname
     User.find(self.user_id).fullname
   end 
-
-  def delete
-    times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])
-    times.each {|time| time.destroy }
-    begin
-      self.destroy
-    rescue
-      puts self.id
+  
+  def delete(force = nil)     
+    maps = ResponseMap.find(:all, :conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
+    
+    if force or ((maps.nil? or maps.length == 0) and 
+                 self.team.nil?)
+      force_delete(maps)
+    else
+      raise "Associations exist for this participant"        
     end
+  end
+  
+  def force_delete(maps)
+    times = ResubmissionTime.find(:first, :conditions => ['participant_id = ?',self.id])    
+    
+    if times
+      times.each { |time| time.destroy }
+    end
+    
+    if maps
+      maps.each { |map| map.delete(true) }
+    end
+    
+    if self.team
+      if self.team.teams_users.length == 1
+        self.team.delete
+      else
+        self.team.teams_users.each{ |tuser| 
+          if tuser.user_id == self.id
+            tuser.delete
+          end
+        }
+      end
+     end
+     self.destroy
   end
 
   def get_topic_string

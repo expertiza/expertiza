@@ -5,6 +5,8 @@
   <div onClick="updateDropDownMenu(<%=item.score%>,<%=i%>,<%=@min%>)" onMouseover="style.color = '#986633'" onMouseOut="style.color = 'black'">			
   <%=item.score%>:&nbsp;<%=item.advice %>  
   </div>
-  <% if item.score < @max %><br/><% end %>
+  <% if item.score < @max %>
+  	<br/>
+  <% end %>
 <%}%>				
 </div> 

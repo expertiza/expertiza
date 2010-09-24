@@ -32,7 +32,7 @@
 <hr/>
 <p><%= link_to 'Edit', :action => 'edit', :id => @permission %> |
 <%= link_to 'Delete', {:action => 'destroy', :id => @permission}, 
-    :confirm => 'Are you sure?', :post => true %> </p>
+    :confirm => 'Are you sure?', :method => :post %> </p>
 
 <p><%= link_to 'Back', :action => 'list' %> to Permissions list</p>
 

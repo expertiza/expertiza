@@ -33,6 +33,6 @@
 <hr/>
 <p><%= link_to 'Edit', :action => 'edit', :id => @site_controller %> |
 <%= link_to 'Delete', {:action => 'destroy', :id => @site_controller}, 
-    :confirm => 'Are you sure?', :post => true %> </p>
+    :confirm => 'Are you sure?', :method => :post %> </p>
 
 <p><%= link_to 'Back', :action => 'list' %> to Controllers list</p>

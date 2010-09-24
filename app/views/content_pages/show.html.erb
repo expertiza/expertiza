@@ -52,6 +52,6 @@ dependants to use some other page.</p>
 <hr/>
 <p><%= link_to 'Edit', :action => 'edit', :id => @content_page %> |
 <%= link_to 'Delete', {:action => 'destroy', :id => @content_page}, 
-    :confirm => 'Delete this Content Page?', :post => true %></p>
+    :confirm => 'Delete this Content Page?', :method => :post %></p>
 
 <p><%= link_to 'Back', :action => 'list' %> to Content Pages list</p>

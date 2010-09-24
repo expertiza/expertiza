@@ -20,20 +20,20 @@ for item_id in items do
 <td><% if counter > 0 -%>
 <%= link_to image_tag("/images/up.png"), 
     {:action => 'move_up', :id => item.id},
-    :post => true %>
+    :method => :post %>
 <% end %></td>
 
 <td><% if counter < (items.length - 1) -%>
 <%= link_to image_tag("/images/down.png"), 
     {:action => 'move_down', :id => item.id},
-    :post => true %>
+    :method => :post %>
 <% end %></td>
 
 <td>
 <% if not item.children or item.children.length == 0 -%>
 <%= link_to image_tag("/images/delete.png"), 
     {:action => 'destroy', :id => item.id},
-    :confirm => 'Delete this menu item?', :post => true %>
+    :confirm => 'Delete this menu item?', :method => :post %>
 <% end -%>
 </td>
 

@@ -21,6 +21,7 @@ Rails::Initializer.run do |config|
   config.gem 'RedCloth'
   config.gem 'rgl', :lib => 'rgl/adjacency'
   config.gem 'rubyzip', :lib => "zip/zip"
+  raise 'graphviz dependency is not installed - missing dot executable' unless %x(which dot).any?
 
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named

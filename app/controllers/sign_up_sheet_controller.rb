@@ -418,6 +418,9 @@ class SignUpSheetController < ApplicationController
   end
 
   def save_topic_dependencies
+    # Prevent injection attacks - we're using this in a system() call later
+    params[:assignment_id] = params[:assignment_id].to_i.to_s
+
     topics = SignUpTopic.find_all_by_assignment_id(params[:assignment_id])
     topics = topics.collect {|topic|
       #if there is no dependency for a topic then there wont be a post for that tag.
@@ -435,13 +438,10 @@ class SignUpSheetController < ApplicationController
 
     node = 'id'
     dg = build_dependency_graph(topics,node)
-    #Clone the graph    
-    dg_clone = RGL::DirectedAdjacencyGraph.new
-    dg_clone = dg.clone
 
     if dg.acyclic?
       #This method produces sets of vertexes which should have common start time/deadlines
-      set_of_topics = create_common_start_time_topics(dg_clone)
+      set_of_topics = create_common_start_time_topics(dg)
       set_start_due_date(params[:assignment_id],set_of_topics)
       @top_sort = dg.topsort_iterator.to_a
     else
@@ -450,17 +450,11 @@ class SignUpSheetController < ApplicationController
 
 
     node = 'topic_name'
-    dg = build_dependency_graph(topics,node)
+    dg = build_dependency_graph(topics,node) # rebuild with new node name
 
-    dg.write_to_graphic_file('jpg',"graph_" + params[:assignment_id])
-
-    #http://www.graphviz.org/pdf/dotguide.pdf
-    begin
-      #TODO: figure our how to do this in linux
-      cmd = "C:\\Graphviz2.26\\bin\\dot.exe -Tjpg C:\\InstantRails\\rails_apps\\pg\\graph_" + params[:assignment_id] + ".dot -o C:\\InstantRails\\rails_apps\\pg\\public\\images\\staggered_deadline_assignment_graph\\graph_"+ params[:assignment_id] +".jpg"
-      system(cmd)
-      cmd    
-    end
+    graph_output_path = 'public/images/staggered_deadline_assignment_graph'
+    FileUtils::mkdir_p graph_output_path
+    dg.write_to_graphic_file('jpg', "#{graph_output_path}/graph_#{params[:assignment_id]}")
 
     redirect_to_sign_up(params[:assignment_id])
   end
@@ -524,8 +518,8 @@ class SignUpSheetController < ApplicationController
     dg
   end
 
-  def create_common_start_time_topics(dg_clone)
-    dg_reverse = dg_clone.reverse()
+  def create_common_start_time_topics(dg)
+    dg_reverse = dg.clone.reverse()
     set_of_topics = Array.new
 
     while !dg_reverse.empty?

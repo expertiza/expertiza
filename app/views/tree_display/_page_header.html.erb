@@ -3,8 +3,12 @@
 <TABLE width="80%">
 <TR>
 <TD width="30%" align="left">
-<input type='radio' name='display[check]' value='1' onclick='submit();' <% if @show == nil %>checked<% end %>>Show public and private items<br/>
-<input type='radio' name='display[check]' value='0' onclick='submit();' <% if @show != nil %>checked<% end %>>Show private items only<br/>
+<input type='radio' name='display[check]' id='public_radio' value='1' onclick='submit();' <% if @show == nil %>checked<% end %>>
+
+<label for='public_radio'>Show public and private items</label>
+<br/>
+<input type='radio' name='display[check]' id='private_radio' value='0' onclick='submit();' <% if @show != nil %>checked<% end %>>
+<label for='private_radio'>Show private items only</label>
 </TD>
 <TD width="50%" align="right">
 Sort by: 

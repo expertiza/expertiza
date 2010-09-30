@@ -18,7 +18,7 @@
 </script>
 
 <% @assignment = Assignment.find(params[:id]) %>
-<form id="dependency" action="/sign_up_sheet/save_topic_dependencies/dependency?assignment_id=<%= @assignment.id %>" method="post">
+<% form_tag({:action => 'save_topic_dependencies', :id => 'dependency', :assignment_id => @assignment.id}, { :id => 'dependency' }) do %>
   <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
 
   <% if flash[:notice] %>
@@ -63,7 +63,7 @@
     <% else %>
       <div class="flash_note"><%= "Signup topics have not yet been created." %></div>
     <% end %>
-</form>
+<% end %>
 
   <% session[:return_to] = request.request_uri %>
   <br/><br/>

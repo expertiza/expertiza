@@ -3,13 +3,20 @@ class ResponseMap < ActiveRecord::Base
   has_one :response, :class_name => 'Response', :foreign_key => 'map_id'
   
   def self.get_assessments_for(participant)
+    responses = Array.new   
+    
     if participant
-      responses = Response.find(:all, :include => :map, :conditions => ['reviewee_id = ? and type = ?',participant.id, self.to_s])      
-      return responses.sort {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
-    else
-      return Array.new
+      maps = find(:all, :conditions => ['reviewee_id = ? and type = ?',participant.id,self.to_s])
+      maps.each{ |map|
+        if map.response
+          responses << map.response
+        end
+      }
+      #responses = Response.find(:all, :include => :map, :conditions => ['reviewee_id = ? and type = ?',participant.id, self.to_s])      
+      responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
-  end  
+    return responses    
+  end 
   
   def delete(force = nil)
     if self.response != nil and !force

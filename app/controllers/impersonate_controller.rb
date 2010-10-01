@@ -12,7 +12,9 @@ class ImpersonateController < ApplicationController
  
   def impersonate 
     # default error message
-    message = "No user exists with the name '#{params[:user][:name]}'"
+    if params[:user] and params[:user][:name]
+      message = "No user exists with the name '#{params[:user][:name]}'"
+    end    
     
     begin
        # Initial impersonation

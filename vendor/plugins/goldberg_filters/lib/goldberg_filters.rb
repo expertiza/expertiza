@@ -9,6 +9,9 @@ module GoldbergFilters
     if @settings
       make_public = false  # Going to check if we need to
 
+      # Work around a bug that causes session[:credentials] to become a YAML Object
+      session[:credentials] = nil if session[:credentials].is_a? YAML::Object
+
       # If there's already a session, check that it's still up to date
       if session[:credentials] and session[:credentials].role_id
         role = Role.find(session[:credentials].role_id)

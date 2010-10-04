@@ -46,7 +46,7 @@ class InvitationController < ApplicationController
   def accept
     @inv = Invitation.find(params[:inv_id])
     @inv.reply_status = 'A'
-    @inv.update
+    @inv.save
     
     student = Participant.find(params[:student_id])
     

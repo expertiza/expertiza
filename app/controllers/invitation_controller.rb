@@ -120,7 +120,7 @@ class InvitationController < ApplicationController
   def decline
     @inv = Invitation.find(params[:inv_id])
     @inv.reply_status = 'D'
-    @inv.update
+    @inv.save
     student = Participant.find(params[:student_id])
     redirect_to :controller => 'student_team', :action => 'view', :id => student.id
   end

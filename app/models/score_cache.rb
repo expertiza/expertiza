@@ -80,7 +80,7 @@ class ScoreCache < ActiveRecord::Base
       sc.range =    range_string
       sc.score = (@p_score*100).round/100.0
       presenceflag = 2
-      sc.update
+      sc.save
       #look for a consolidated score and change
     end               
     

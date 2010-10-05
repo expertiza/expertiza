@@ -13,7 +13,7 @@ class ProfileController < ApplicationController
  def update
     @user = session[:user]
     
-    if params[:assignment_questionnaires] and params[:assignment_questionnaires][:notification_limit]
+    if params[:assignment_questionnaires] and params[:assignment_questionnaires][:notification_limit] and params[:assignment_questionnaires][:notification_limit].strip.length > 0
       aq = AssignmentQuestionnaires.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])
       aq.update_attribute('notification_limit',params[:assignment_questionnaires][:notification_limit])                    
     end

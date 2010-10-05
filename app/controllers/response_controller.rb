@@ -141,7 +141,8 @@ class ResponseController < ApplicationController
   def get_content    
     @title = @map.get_title 
     @assignment = @map.assignment
-    @participant = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id,@assignment.id)    
+    @participant = @map.reviewer
+    @contributor = @map.contributor
     @questionnaire = @map.questionnaire
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score

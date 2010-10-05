@@ -1,6 +1,6 @@
 <h1><%= @title %> for <%= @assignment.name %></h1>
 <% if !(@map.instance_of? TeammateReviewResponseMap) %>
-  <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
   <br/><hr/><br/>  
 <% end %>
 <%= @map.show_review() %>

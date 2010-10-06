@@ -276,7 +276,7 @@ module WikiHelper
 
     line_items.compact!
     
-    # Only keep the first instance of each page
+    # Only keep the most recently updated instance of each page
     pages = Array.new
     line_items_kept = Array.new
     

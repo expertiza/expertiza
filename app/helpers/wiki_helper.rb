@@ -281,11 +281,15 @@ module WikiHelper
     line_items_kept = Array.new
     
     line_items.each{|item|        
-       x = item.split("<a href=\"")
-       y = x[3].split("\"") 
-       if !pages.index(y[0])
+       URLs = item.split("<a href=\"")
+       #select the line containing the URL for the page
+       pageArray = x[3].split("\"") 
+       # select the URL itself from the line of text
+       # if it exists within the pages list, we don't need it
+       # otherwise include it in the kept lines
+       if !pages.index(pageArray[0])
          line_items_kept << item
-         pages << y[0]
+         pages << pageArray[0]
        end
     }       
     line_items = line_items_kept    

@@ -276,6 +276,20 @@ module WikiHelper
 
     line_items.compact!
     
+    # Only keep the first instance of each page
+    pages = Array.new
+    line_items_kept = Array.new
+    
+    line_items.each{|item|        
+       x = item.split("<a href=\"")
+       y = x[3].split("\"") 
+       if !pages.index(y[0])
+         line_items_kept << item
+         pages << y[0]
+       end
+    }       
+    line_items = line_items_kept    
+    
     formatted_line_items =Array.new
     formatted_line_items << "<ul>"
     formatted_line_items << line_items

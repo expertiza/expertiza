@@ -13,17 +13,16 @@ class ProfileController < ApplicationController
  def update
     @user = session[:user]
     
-    if params[:assignment_questionnaires] and params[:assignment_questionnaires][:notification_limit] and params[:assignment_questionnaires][:notification_limit].strip.length > 0
+    unless params[:assignment_questionnaires].nil? or params[:assignment_questionnaires][:notification_limit].blank?
       aq = AssignmentQuestionnaires.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])
       aq.update_attribute('notification_limit',params[:assignment_questionnaires][:notification_limit])                    
     end
     
-    if params[:user][:clear_password] == ''
+    if params[:user][:clear_password].blank?
       params[:user].delete('clear_password')
     end
 
-    if params[:user][:clear_password] and
-        params[:user][:clear_password].length > 0 and
+    if !params[:user][:clear_password].blank? and
         params[:user][:confirm_password] != params[:user][:clear_password]
       flash[:error] = 'Password does not match.'
       render :action => 'edit' 

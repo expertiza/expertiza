@@ -9,7 +9,7 @@
     	<br/><input type="file" id="uploaded_file" name="uploaded_file" size=40 />
     	<%= submit_tag 'Upload file' %>
     	<br><br>
-    <% end %>>
+    <% end %>
   <% end %>
   <% form_tag({:action=>'folder_action', :id => participant.id},{:multipart => true})do %>
   <% if participant.directory_num != nil and participant.directory_num >= 0 %>

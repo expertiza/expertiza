@@ -1,5 +1,6 @@
 class CreateNotifications < ActiveRecord::Migration
   def self.up
+        
     create_table :notification_limits do |t|
       t.column :user_id, :integer, :null => false
       t.column :assignment_id, :integer, :null => true
@@ -11,7 +12,8 @@ class CreateNotifications < ActiveRecord::Migration
     
     User.find_by_sql("select * from users where role_id in (select id from roles where not (parent_id is null))").each{
       |user|
-      NotificationLimit.create(:user_id => user.id)                             
+      execute "INSERT INTO `notification_limits` (`user_id`, `limit`) VALUES
+            (#{user.id}, 15);"       
     }
   end
 

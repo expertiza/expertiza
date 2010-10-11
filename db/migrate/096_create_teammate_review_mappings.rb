@@ -7,30 +7,28 @@ class CreateTeammateReviewMappings < ActiveRecord::Migration
     end
     
     add_column :teammate_reviews, :mapping_id, :integer, :null => false
-    
-    TeammateReview.find(:all).each{
+    records = ActiveRecord::Base.connection.select_all("select * from `teammate_reviews`")
+      
+    records.each{
        | review |
-       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(review.reviewer_id, review.assignment_id)
+       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(review["reviewer_id"], review["assignment_id"])
        if reviewer.nil?
-         reviewer = AssignmentParticipant.create(:user_id => review.reviewer_id, :parent_id => review.assignment_id)
+         reviewer = AssignmentParticipant.create(:user_id => review["reviewer_id"], :parent_id => review["assignment_id"])
          reviewer.set_handle()
        end
-       reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(review.reviewee_id, review.assignment_id)
+       reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(review["reviewer_id"], review["assignment_id"])
        if reviewee.nil?
-         reviewee = AssignmentParticipant.create(:user_id => review.reviewee_id, :parent_id => review.assignment_id)
+         reviewee = AssignmentParticipant.create(:user_id => review["reviewer_id"], :parent_id => review["assignment_id"])
          reviewee.set_handle()
        end
        if reviewer != nil and reviewee != nil
-          map = TeammateReviewMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => review.assignment_id)
+          map = TeammateReviewMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => review["assignment_id"])
        else
-          puts "REVIEWER: #{review.reviewer_id}"
-          puts "REVIEWEE: #{review.reviewee_id}"
+          puts "REVIEWER: #{review["reviewer_id"]}"
+          puts "REVIEWEE: #{review["reviewe3_id"]}"
           puts review.id
        end
-       TeammateReview.record_timestamps = false         
-       review.update_attribute('mapping_id',map.id)
-       TeammateReview.record_timestamps = false
-         
+       execute "update `teammate_reviews` set `mapping_id` = #{map.id} where `id` = #{review["id"]}"           
     }
                 
     execute "ALTER TABLE `teammate_reviews` 

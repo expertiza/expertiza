@@ -18,8 +18,9 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
     rename_column :review_of_review_mappings, :review_mapping_id, :reviewed_object_id
 
     
-    
-    ReviewOfReviewMapping.find(:all).each{
+    records = ActiveRecord::Base.connection.select_all("select * from `review_of_review_mappings`")
+
+    records.each{
       | mapping |
       begin
         update_mapping(mapping)
@@ -49,32 +50,32 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
       today = Time.now             
       oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0)     
 
-    
-      review = ReviewOfReview.find_by_mapping_id(mapping.id)
-      review_mapping = ReviewMapping.find(mapping.reviewed_object_id)
+      review = ActiveRecord::Base.connection.select_one("select * from `review_of_reviews` where mapping_id = #{mapping["id"]}")
+      review_mapping = ActiveRecord::Base.connection.select_one("select * from `review_mappings` where id = #{mapping["reviewed_object_id"]}")
+
       assignment = Assignment.find(review_mapping.assignment_id)
       if assignment.nil?
-         raise "DELETE ReviewOfReviewMapping #{mapping.id}: No assignment found for #{mapping.id.to_s}: #{mapping.reviewed_object_id.to_s}"
+         raise "DELETE ReviewOfReviewMapping #{mapping["id"]}: No assignment found for #{mapping["id"]}: #{mapping["reviewed_object_id"]}"
       end
        
       if review.nil? and (assignment.created_at.nil? or assignment.created_at < oldest_allowed_time)
-        raise "DELETE ReviewOfReviewMapping #{mapping.id}: The mapping is at least a year old and has no review associated with it."
+        raise "DELETE ReviewOfReviewMapping #{mapping["id"]}: The mapping is at least a year old and has no review associated with it."
       end
       
-      if mapping.review_reviewer_id != nil
-        reviewer = make_participant(mapping.review_reviewer_id, assignment.id)        
+      if mapping["review_reviewer_id"] != nil
+        reviewer = make_participant(mapping["review_reviewer_id"], assignment.id)        
       else
-        reviewer = make_participant(mapping.reviewer_id, assignment.id)      
+        reviewer = make_participant(mapping["reviewer_id"], assignment.id)      
       end      
 
       if reviewer.nil?        
-        raise "DELETE ReviewOfReviewMapping #{mapping.id}: The reviewer does not exist as a participant: assignment_id: #{assignment.id}, user_id #{mapping.reviewer_id} or user_id: #{mapping.review_reviewer_id}"
+        raise "DELETE ReviewOfReviewMapping #{mapping["id"]}: The reviewer does not exist as a participant: assignment_id: #{assignment.id}, user_id #{mapping["reviewer_id"]} or user_id: #{mapping["review_reviewer_id"]}"
       end            
            
-      reviewee = make_participant(review_mapping.reviewer_id, assignment.id)      
+      reviewee = make_participant(review_mapping["reviewer_id"], assignment.id)      
       
       if reviewee.nil?
-        raise "DELETE ReviewOfReviewMapping #{mapping.id}: The reviewee does not exist as a participant: assignment_id: #{assignment.id}, user_id #{review_mapping.reviewer_id}"
+        raise "DELETE ReviewOfReviewMapping #{mapping["id"]}: The reviewee does not exist as a participant: assignment_id: #{assignment.id}, user_id #{review_mapping["reviewer_id"]}"
       end
       
       mapping.update_attribute('reviewer_id',reviewer.id) 
@@ -101,6 +102,7 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
   def self.delete(mapping, reason)
     puts reason
     begin
+      execute "delete from `review_of_review_mappings` where id = #{mapping["id"]}"
       mapping.delete(true)
     rescue
       puts $!

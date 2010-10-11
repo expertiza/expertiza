@@ -13,23 +13,19 @@ class CreateTopicDeadlines < ActiveRecord::Migration
       t.column "round", :integer
     end
 
-    add_index "topic_deadlines", ["deadline_type_id"], :name => "fk_deadline_type_topic_deadlines"
-
-    execute "alter table topic_deadlines
-             add constraint fk_deadline_type_due_date
-             foreign key (deadline_type_id) references deadline_types(id)"
-
-    add_index "topic_deadlines", ["topic_id"], :name => "fk_topic_deadlines_topics"
+    # fails to execute
+    #execute "alter table topic_deadlines
+    #         add constraint fk_deadline_type_due_date
+    #         foreign key (deadline_type_id) references deadline_types(id)"
 
     execute "alter table topic_deadlines
              add constraint fk_topic_deadlines_topics
              foreign key (topic_id) references sign_up_topics(id)"
-
-    add_index "topic_deadlines", ["late_policy_id"], :name => "fk_topic_deadlines_late_policies"
-
-    execute "alter table topic_deadlines
-             add constraint fk_due_date_late_policies
-             foreign key (late_policy_id) references late_policies(id)"
+    
+    # fails to execute
+    #execute "alter table topic_deadlines
+    #         add constraint fk_due_date_late_policies
+    #         foreign key (late_policy_id) references late_policies(id)"
 
     add_index "topic_deadlines", ["submission_allowed_id"], :name => "idx_submission_allowed"
     add_index "topic_deadlines", ["review_allowed_id"], :name => "idx_review_allowed"

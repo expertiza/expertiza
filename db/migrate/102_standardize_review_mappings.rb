@@ -56,8 +56,9 @@ class StandardizeReviewMappings < ActiveRecord::Migration
     add_column :review_mappings, :type, :string, :null => false
     
     
-    
-    ReviewMapping.find(:all).each{
+    records = ActiveRecord::Base.connection.select_all("select * from `review_mappings`")
+
+    records.each{
        | mapping |
       begin
         update_mapping(mapping)
@@ -88,21 +89,22 @@ class StandardizeReviewMappings < ActiveRecord::Migration
   def self.update_mapping(mapping)
        today = Time.now             
        oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0) 
-       assignment = Assignment.find(mapping.reviewed_object_id)
-       review = Review.find_by_mapping_id(mapping.id)       
+       assignment = Assignment.find(mapping["reviewed_object_id"])
+       review = ActiveRecord::Base.connection.select_one("select * from `reviews` where id = #{mapping["id"]}")       
+       
        if assignment.nil?
-         raise "DELETE ReviewMapping #{mapping.id}: No assignment found with ID = #{mapping.reviewed_object_id}"    
+         raise "DELETE ReviewMapping #{mapping["id"]}: No assignment found with ID = #{mapping["reviewed_object_id"]}"    
        elsif review.nil? and (assignment.created_at.nil? or assignment.created_at < oldest_allowed_time)
-         raise "DELETE ReviewMapping #{mapping.id}: This mapping is at least a year old and has no review associated with it."            
+         raise "DELETE ReviewMapping #{mapping["id"]}: This mapping is at least a year old and has no review associated with it."            
        else
-          if mapping.old_reviewer_id == 0
-            raise "DELETE ReviewMapping #{mapping.id}: Invalid reviewer ID"            
+          if mapping["old_reviewer_id"] == 0
+            raise "DELETE ReviewMapping #{mapping["id"]}: Invalid reviewer ID"            
           end
           
           reviewer = get_participant_reviewer(mapping)
           
           if reviewer.nil?
-            raise "DELETE ReviewMapping #{mapping.id}: The reviewer does not exist as a participant: assignment_id: #{assignment.id}, user_id #{mapping.old_reviewer_id}"            
+            raise "DELETE ReviewMapping #{mapping["id"]}: The reviewer does not exist as a participant: assignment_id: #{assignment.id}, user_id #{mapping["old_reviewer_id"]}"            
           end
           
           if assignment.team_assignment
@@ -114,19 +116,18 @@ class StandardizeReviewMappings < ActiveRecord::Migration
           end
        
           if reviewee.nil?
-            raise "DELETE ReviewMapping #{mapping.id}: The reviewee does not exist as a participant: assignment_id: #{assignment.id}, user_id #{mapping.author_id} or team_id: #{mapping.team_id}"
+            raise "DELETE ReviewMapping #{mapping["id"]}: The reviewee does not exist as a participant: assignment_id: #{assignment.id}, user_id #{mapping["author_id"]} or team_id: #{mapping["team_id"]}"
           end       
           
-          
-          mapping.update_attribute('reviewee_id', reviewee.id)
-          mapping.update_attribute('reviewer_id', reviewer.id)
-          mapping.update_attribute('type',type)          
+          execute "Update `review_mappings` set reviewee_id = #{reviewee.id}, reviewer_id = #{reviewer.id}, type = #{type} where id = #{mapping["id"]}"
+                   
        end    
   end
   
   def self.delete(mapping, reason)
     puts reason
     begin
+      execute "delete from `review_mappings` where id = #{mapping["id"]}"
       mapping.delete(true)
     rescue
       puts $!
@@ -135,24 +136,24 @@ class StandardizeReviewMappings < ActiveRecord::Migration
   
   # return the participant acting as reviewer for this mapping
   def self.get_participant_reviewer(mapping)
-    return make_participant(mapping.old_reviewer_id, mapping.reviewed_object_id)
+    return make_participant(mapping["old_reviewer_id"], mapping["reviewed_object_id"])
   end
   
   # return the participant acting as reviewee for this mapping
   def self.get_participant_reviewee(mapping)
-    return make_participant(mapping.author_id, mapping.reviewed_object_id)
+    return make_participant(mapping["author_id"], mapping["reviewed_object_id"])
   end
   
   # return the team acting as reviewee for this mapping
   def self.get_team_reviewee(mapping)
-    if mapping.team_id != nil
+    if mapping["team_id"] != nil
        begin
-        reviewee = AssignmentTeam.find(mapping.team_id)
+        reviewee = AssignmentTeam.find(mapping["team_id"])
        rescue
         puts "   "+$!
        end
-    elsif mapping.author_id != nil
-       participant = make_participant(mapping.author_id,mapping.reviewed_object_id)
+    elsif mapping["author_id"] != nil
+       participant = make_participant(mapping["author_id"],mapping["reviewed_object_id"])
        reviewee = participant.team
     else
        mapping.destroy
@@ -184,20 +185,20 @@ class StandardizeReviewMappings < ActiveRecord::Migration
   # if a team does not already exist to act as a reviewee, create it based on the author id provided
   def self.create_team(mapping)
      # if the author is not available, no team can be made
-     if mapping.author_id == 0 or mapping.author_id.nil?
+     if mapping["author_id"] == 0 or mapping["author_id"].nil?
        return nil
      end
      
      # create a participant for this user, all users have to be a participant in order to interact with an assignment
-     user = User.find(mapping.author_id)     
-     if AssignmentParticipant.find_by_user_id_and_parent_id(mapping.author_id, mapping.reviewed_object_id).nil?
-        make_participant(mapping.author_id, mapping.reviewed_object_id)
+     user = User.find(mapping["author_id"])     
+     if AssignmentParticipant.find_by_user_id_and_parent_id(mapping["author_id"], mapping["reviewed_object_id"]).nil?
+        make_participant(mapping["author_id"], mapping["reviewed_object_id"])
      end
      
      # if the user was found, create a team based on the user
      if user != nil
-         team = AssignmentTeam.create(:name => 'Team'+mapping.author_id.to_s, :parent_id => mapping.reviewed_object_id)
-         TeamsUser.create(:team_id => team.id, :user_id => mapping.author_id)         
+         team = AssignmentTeam.create(:name => 'Team'+mapping["author_id"].to_s, :parent_id => mapping["reviewed_object_id"])
+         TeamsUser.create(:team_id => team.id, :user_id => mapping["author_id"])         
      end    
      return team
   end

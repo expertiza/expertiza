@@ -27,10 +27,11 @@ class ImportFileController < ApplicationController
     
     file = params['file']
     errors = Array.new
-    while (line = file.gets)      
-      row = parse_line(line,delimiter)      
-      
-      begin
+    while (line = file.gets(sep_string="\r"))            
+      if line.gsub!("\n","") and line.length > 0
+        row = parse_line(line,delimiter)
+                  
+        begin
         if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
           Object.const_get(params[:model]).import(row,session,params[:id],params[:options])
         elsif params[:model] == 'SignUpTopic'
@@ -39,9 +40,10 @@ class ImportFileController < ApplicationController
         else
           Object.const_get(params[:model]).import(row,session,params[:id])
         end
-      rescue ImportError
+        rescue ImportError
         errors << $!             
-      end      
+        end  
+      end
     end 
     return errors
   end

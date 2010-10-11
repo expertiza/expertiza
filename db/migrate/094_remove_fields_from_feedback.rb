@@ -10,7 +10,10 @@ class RemoveFieldsFromFeedback < ActiveRecord::Migration
     rescue      
     end
     
-    execute "update `review_feedbacks` set `additional_comment` = `txt` where `txt` IS NOT NULL"             
+    begin
+      execute "update `review_feedbacks` set `additional_comment` = `txt` where `txt` IS NOT NULL"
+    rescue
+    end
     
     begin
       remove_column :review_feedbacks, :txt

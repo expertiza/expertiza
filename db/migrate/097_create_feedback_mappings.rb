@@ -20,22 +20,24 @@ class CreateFeedbackMappings < ActiveRecord::Migration
              FOREIGN KEY (reviewee_id) references participants(id)"    
     
     add_column :review_feedbacks, :mapping_id, :integer, :null => false     
+    records = ActiveRecord::Base.connection.select_all("select * from `review_feedbacks`")
     
-    ReviewFeedback.find(:all).each{
-       | feedback |      
-       review = Review.find(feedback.review_id)
-       reviewmap = ReviewMapping.find(review.review_mapping_id)
+    records.each{
+       | feedback | 
+       review = ActiveRecord::Base.connection.select_one("select * from `reviews` where id = #{feedback["review_id"]}")
+       reviewmap = ActiveRecord::Base.connection.select_one("select * from `review_mappings` where id = #{review["review_mapping_id"]}")
+       
        if reviewmap != nil
          reviewer = get_reviewer(reviewmap, feedback)
-         reviewee = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',reviewmap.reviewer_id, feedback.assignment_id])         
+         reviewee = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',reviewmap["reviewer_id"], feedback["assignment_id"]])         
        end       
-       if reviewer != nil and reviewee != nil            
-         map = FeedbackMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => review.id)
-         ReviewFeedback.record_timestamps = false
-         feedback.update_attribute('mapping_id',map.id)
-         ReviewFeedback.record_timestamps = true
+       if reviewer != nil and reviewee != nil 
+         execute "INSERT INTO `feedback_mappings (`reviewer_id`, `reviewee_id`, `reviewed_object_id`) VALUES
+            (#{reviewer.id}, #{reviewee.id}, #{review["id"]});" 
+         map = ActiveRecord::Base.connection.select_one("select * from `feedback_mappings` where id = (select max(id) from `feedback_mappings`)")
+         execute "update `review_feedbacks` set mapping_id = #{map.id} where id = #{feedback["id"]}"         
        else
-         feedback.delete
+         execute "delete from `review_feedbacks where id = #{feedback["id"]}"         
        end
     }
     
@@ -81,18 +83,18 @@ class CreateFeedbackMappings < ActiveRecord::Migration
   
   def self.get_reviewer(map, feedback)    
     reviewer = nil
-    assignment = Assignment.find(map.assignment_id)    
+    assignment = Assignment.find(map["assignment_id"])    
     if assignment.team_assignment 
-       if feedback.user_id.nil?
-          if map.team_id != nil
-             team = AssignmentTeam.find(map.team_id)
+       if feedback["user_id"].nil?
+          if map["team_id"] != nil
+             team = AssignmentTeam.find(map["team_id"])
              reviewer = team.get_participants.first
           end              
        else
-          reviewer = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',feedback.user_id, feedback.assignment_id])  
+          reviewer = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',feedback["user_id"], feedback["assignment_id"]])  
        end                          
     else
-       reviewer = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',map.author_id, feedback.assignment_id])
+       reviewer = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',map["author_id"], feedback["assignment_id"]])
     end
     return reviewer
   end

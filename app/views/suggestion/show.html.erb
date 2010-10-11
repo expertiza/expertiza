@@ -42,11 +42,11 @@
 </table>
 <p>
 	<% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
-	<% form_tag :action => 'submit', :id => @suggestion do %>
-		<%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
-		&nbsp; &nbsp; 
-		<%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
-	<% form_tag do %>
+		<% form_tag :action => 'submit', :id => @suggestion do %>
+			<%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
+			&nbsp; &nbsp; 
+			<%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+		<% end %>
 	<% end %>
 </p>
 
@@ -86,16 +86,16 @@
 <%end%>
 <br>
 <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' %>
-<b>Add new comment and vote</b> <br>
-<% form_tag :action => 'submit', :id => @suggestion do %>
-   <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %> 
-   <p>
-	   <%= "Vote"%>
-	   <%= select ("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
-   </p>
-   
-   <%= submit_tag "Submit vote", :name => 'add_comment' %>
-<% form_tag do %>
+  <b>Add new comment and vote</b> <br>
+  <% form_tag :action => 'submit', :id => @suggestion do %>
+     <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %> 
+     <p>
+       <%= "Vote"%>
+       <%= select ("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
+     </p>
+     
+     <%= submit_tag "Submit vote", :name => 'add_comment' %>
+  <% end %>
 
 <% end %>
 <p>

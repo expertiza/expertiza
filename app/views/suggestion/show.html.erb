@@ -1,0 +1,103 @@
+<h3>Suggestion</h3>
+
+<table border=0 cellspacing=10>
+	<colgroup>
+		<col width=25%>
+		<col width=60%>
+	</colgroup>
+	<tr>
+		<td><b>Title:</b></td>
+		<td><%=h @suggestion.title %></td>
+	</tr>
+	<tr>
+		<td><b>Description:</b></td>
+		<td><%=h @suggestion.description %></td>
+	</tr>
+	<tr>
+		<td><b>Submitter's unity ID:</b></td>
+		<td>
+			<%if @suggestion.unityID != "" %>
+				<%=h @suggestion.unityID %>
+			<%else%>
+				--
+			<%end%>
+		</td>
+	</tr>
+	<tr>
+		<td><b>Submitter's sign-up preference:</b></td>
+		<td>
+			<%if @suggestion.signup_preference == 'Y' %>
+				Yes
+			<%elsif @suggestion.signup_preference == 'N' %>
+				No
+			<%else%>
+				No preference
+			<%end%>
+		</td>
+	</tr>
+	<tr>
+		<td><b>Suggestion's status:</b></td>
+		<td><%=h @suggestion.status %></td>
+	</tr>	
+</table>
+<p>
+	<% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
+		<% form_tag :action => 'submit', :id => @suggestion do %>
+			<%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
+			&nbsp; &nbsp; 
+			<%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+		<% end %>
+	<% end %>
+</p>
+
+<br><br>
+<h3>Comments</h3>
+<%if @suggestion.suggestion_comments.size > 0 %>
+<table class="general" cellpadding=5 border="1">
+	<colgroup>
+		<col width=15% />
+		<col width=15% />
+		<col width=25% />
+	</colgroup>
+  <tr>
+    <th>Commenter</th>
+    <th>Vote</th>
+	<th>Comment</th>
+  </tr>
+
+<% for suggestion_comment in @suggestion.suggestion_comments %>
+  <tr class="listingRow">
+    <td align="center"><%=suggestion_comment.commenter %></td>
+    <td align="center">
+		<%if suggestion_comment.vote == 'Y' %>
+			Yes
+		<%elsif suggestion_comment.vote == 'N'%>
+			No
+		<%elsif suggestion_comment.vote == 'R'%>
+			Revise
+		<%else%>
+			--
+		<%end%>
+	</td>
+    <td><%= suggestion_comment.comments %></td>
+  </tr>
+<% end %>
+</table>
+<%end%>
+<br>
+<% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' %>
+  <b>Add new comment and vote</b> <br>
+  <% form_tag :action => 'submit', :id => @suggestion do %>
+     <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %> 
+     <p>
+       <%= "Vote"%>
+       <%= select ("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
+     </p>
+     
+     <%= submit_tag "Submit vote", :name => 'add_comment' %>
+  <% end %>
+
+<% end %>
+<p>
+	<%= link_to 'Back', :action => 'list', :id => @suggestion.assignment_id %>
+</p>

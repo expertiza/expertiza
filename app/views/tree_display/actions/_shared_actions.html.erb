@@ -1,0 +1,10 @@
+<li><%= link_to 'Copy '+model.downcase , :controller => controller, :action=>'copy', :id => node.node_object_id %></li>
+<% if is_available(session[:user],owner_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),owner_id))%>  
+  <li><%= link_to 'Edit '+model.downcase, :controller => controller, :action=>'edit', :id => node.node_object_id %></li>
+  <li><%= link_to 'Delete '+model.downcase,  :controller => controller, :action=>'delete', :id => node.node_object_id %></li>   
+  <% if Object.const_get(model).find(node.node_object_id).private %>  
+    <li><%= link_to 'Make public',  :controller => controller, :action=>'toggle_access', :id => node.node_object_id %></li>
+  <% else %>
+    <li><%= link_to 'Make private', :controller => controller, :action=>'toggle_access', :id => node.node_object_id %></li>
+  <% end %>
+<% end %>

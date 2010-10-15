@@ -1,0 +1,65 @@
+<% @qid = "ParticipantReviewResponseMap" %>
+ <%@myuser%>
+<%@id%>
+<%@this_reviewer%>
+<%@sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",@myuser, @qid  ])%>
+
+
+<% #########################################    %>
+<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+<% if @review_scores[@this_reviewer][@myuser] != 0 %>
+   <%=@review_scores[@this_reviewer][@myuser] %>
+   <% else%>
+   --
+<% end %>
+</td>
+<% #####################################        %>
+
+
+<%if @sc %>
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center'>
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>					
+			<%= @sc.score %>
+			</td> 
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+			(<%= @sc.range%>)
+		</td>
+
+<%else%>
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center'>
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>					
+			--
+			</td> 
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+			--
+		</td>
+	
+
+<%end%>
+					
+
+ 
+
+		

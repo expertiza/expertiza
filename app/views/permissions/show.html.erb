@@ -1,0 +1,38 @@
+<h1>Permission: <%=h @permission.name %></h1>
+
+<h2> Actions for Permission: <%=@permission.name%> </h2>
+<% if @actions.length > 0 -%>
+<ul>
+  <% for action in @actions do -%>
+  <li> <%= link_to action.name, {:controller => 'controller_actions', 
+       :action => 'show', :id => action.id} %> </li>
+  <% end %>
+</ul>
+<% else -%>
+<p>(none)</p>
+<% end -%>
+<p> <%= link_to 'Show all Actions', :controller => 'controller_actions', 
+       :action => 'list' %></p>
+
+<hr/>
+<h2> Pages for Permission: <%=@permission.name%> </h2>
+<% if @pages.length > 0 -%>
+<ul>
+  <% for page in @pages do -%>
+  <li> <%= page.name %> </li>
+  <% end %>
+</ul>
+<% else -%>
+<p>(none)</p>
+<% end -%>
+
+<p> <%= link_to 'Show all Pages', :controller => 'content_pages', 
+       :action => 'list' %></p>
+
+<hr/>
+<p><%= link_to 'Edit', :action => 'edit', :id => @permission %> |
+<%= link_to 'Delete', {:action => 'destroy', :id => @permission}, 
+    :confirm => 'Are you sure?', :method => :post %> </p>
+
+<p><%= link_to 'Back', :action => 'list' %> to Permissions list</p>
+

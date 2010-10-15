@@ -1,0 +1,27 @@
+<h1>Questionnaires</h1>
+
+<% form_tag :action => 'list_questionnaires' do %>
+	<%= select(:display_option, :name, 
+			   @display_options, {}, 
+			   {:onchange => "document.forms[0].submit()"} ) %>
+<% end %>
+
+<table class="listing" cellpadding=2>
+  <tr>
+	<th></th>
+    <th>questionnaire Name</th>
+  </tr>
+  
+<% for questionnaire in @questionnaires %>
+  <tr class="listingRow">
+	<td></td>
+	<td><%= questionnaire.name %></td>
+	<td><%= link_to 'Edit', :action => 'edit_questionnaire', :id => questionnaire %></td>
+	<td><%= link_to 'Copy', :action => 'copy_questionnaire', :id => questionnaire %></td>
+	<td><%= link_to 'Advice', :action => 'edit_advice', :id => questionnaire %></td>
+  </tr>
+<% end %>
+</table>
+<br />
+
+<%= link_to 'New questionnaire', :action => 'new_questionnaire' %>

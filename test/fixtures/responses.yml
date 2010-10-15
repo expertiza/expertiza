@@ -1,0 +1,24 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+response0:
+ map_id: <%= Fixtures.identify(:response_maps0)%>
+ additional_comment: "review0"
+
+response1:
+ map_id: <%= Fixtures.identify(:response_maps1)%>
+ additional_comment: "review1"
+
+response2:
+ map_id: <%= Fixtures.identify(:response_maps2)%>
+ additional_comment: "review2" 
+ 
+response3:
+ map_id: <%= Fixtures.identify(:response_maps3)%>
+ additional_comment: "review3" 
+ 
+response4:
+ map_id: <%= Fixtures.identify(:response_maps4)%>
+ additional_comment: "review4"
+ 
+response5:
+ map_id: <%= Fixtures.identify(:response_maps5)%>
+ additional_comment: "review5"

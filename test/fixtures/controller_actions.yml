@@ -1,0 +1,285 @@
+controller_action_menu_items_list:
+  name: menu_items_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_menu_items) %>
+controller_action_menu_items_link:
+  name: menu_items_link
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_public_actions_execute) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_menu_items) %>
+controller_action_roles_list:
+  name: roles_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_roles) %>
+controller_action_tree_display_goto_author_feedbacks:
+  name: tree_display_goto_author_feedbacks
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_tree_display_goto_questionnaires:
+  name: tree_display_goto_questionnaires
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_tree_display_list:
+  name: tree_display_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_tree_display_goto_assignments:
+  name: tree_display_goto_assignments
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_tree_display_goto_course_evaluations:
+  name: tree_display_goto_course_evaluations
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_tree_display_goto_global_survey:
+  name: tree_display_goto_global_survey
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_tree_display_drill:
+  name: tree_display_drill
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_tree_display_goto_surveys:
+  name: tree_display_goto_surveys
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_tree_display_goto_teammate_reviews:
+  name: tree_display_goto_teammate_reviews
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_tree_display_goto_review_rubrics:
+  name: tree_display_goto_review_rubrics
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_tree_display_goto_courses:
+  name: tree_display_goto_courses
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+controller_action_auth_logout:
+  name: auth_logout
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_public_actions_execute) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_auth) %>
+controller_action_auth_login_failed:
+  name: auth_login_failed
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_public_actions_execute) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_auth) %>
+controller_action_auth_login:
+  name: auth_login
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_public_actions_execute) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_auth) %>
+controller_action_profile_edit:
+  name: profile_edit
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_profile) %>
+controller_action_institution_list:
+  name: institution_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_institution) %>
+controller_action_assignment_new:
+  name: assignment_new
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_assignment) %>
+controller_action_assignment_list:
+  name: assignment_list
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_assignment) %>
+controller_action_assignment_create:
+  name: assignment_create
+  url_to_use:
+  permission_id:  <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_assignment) %>
+controller_action_site_controllers_list:
+  name: site_controllers_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_site_controllers) %>
+controller_action_teammate_review_new:
+  name: teammate_review_new
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_teammate_review) %>
+controller_action_teammate_review_goto_teammate_reviews:
+  name: teammate_review_goto_teammate_reviews
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_teammate_review) %>
+controller_action_statistics_list_surveys:
+  name: statistics_list_surveys
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_statistics) %>
+controller_action_impersonate_start:
+  name: impersonate_start
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_impersonate) %>
+controller_action_impersonate_restore:
+  name: impersonate_restore
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_impersonate) %>
+controller_action_questionnaire_list:
+  name: questionnaire_list
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_questionnaire) %>
+controller_action_questionnaire_copy_questionnaire:
+  name: questionnaire_copy_questionnaire
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_questionnaire) %>
+controller_action_questionnaire_edit_questionnaire:
+  name: questionnaire_edit_questionnaire
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_questionnaire) %>
+controller_action_questionnaire_create_questionnaire:
+  name: questionnaire_create_questionnaire
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_questionnaire) %>
+controller_action_questionnaire_save_questionnaire:
+  name: questionnaire_save_questionnaire
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_questionnaire) %>
+controller_action_participants_add_student:
+  name: participants_add_student
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_participants) %>
+controller_action_participants_change_handle:
+  name: participants_change_handle
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_participants) %>
+controller_action_participants_edit_team_members:
+  name: participants_edit_team_members
+  url_to_use:
+  permission_id:  <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_participants) %>
+controller_action_participants_list_assignments:
+  name: participants_list_assignments
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_participants) %>
+controller_action_participants_list_courses:
+  name: participants_list_courses
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_participants) %>
+controller_action_participants_list_students:
+  name: participants_list_students
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_participants) %>
+controller_action_admin_list_instructors:
+  name: admin_list_instructors
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_instructors) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_admin) %>
+controller_action_admin_list_super_administrators:
+  name: admin_list_super_administrators
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_admin) %>
+controller_action_admin_list_administrators:
+  name: admin_list_administrators
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_admin) %>
+controller_action_student_assignment_list:
+  name: student_assignment_list
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_student_assignment) %>
+controller_action_review_mapping_list:
+  name: review_mapping_list
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_review_mapping) %>
+controller_action_team_list:
+  name: team_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_team) %>
+controller_action_team_list_assignments:
+  name: team_list_assignments
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_team) %>
+controller_action_users_list:
+  name: users_list
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_admininster_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_users) %>
+controller_action_system_settings_list:
+  name: system_settings_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_system_settings) %>
+controller_action_controller_actions_list:
+  name: controller_actions_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_controller_actions) %>
+controller_action_permissions_list:
+  name: permissions_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_permissions) %>
+controller_action_content_pages_list:
+  name: content_pages_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_content_pages) %>
+controller_action_content_pages_view_default:
+  name: content_pages_view_default
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_content_pages) %>
+controller_action_content_pages_view:
+  name: content_pages_view
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_content_pages) %>
+controller_action_teams_users_list:
+  name: teams_users_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_teams_users) %>
+controller_action_course_list_folders:
+  name: course_list_folders
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_course) %>
+controller_action_survey_deployment_list:
+  name: survey_deployment_list
+  url_to_use:
+  permission_id:
+  site_controller_id: <%= Fixtures.identify(:site_controller_survey_deployment) %>
+controller_action_survey_response_submit:
+  name: survey_response_submit
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_survey_response) %>

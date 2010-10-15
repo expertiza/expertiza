@@ -1,0 +1,29 @@
+<h1>Questionnaires</h1>
+
+<% form_tag :action => 'list' do %>
+	<%= select(:display_option, :name, 
+			   @display_options, {}, 
+			   {:onchange => "document.forms[0].submit()"} ) %>
+<% end %>
+<br />
+
+<% if @questionnaires.length == 0 %>	
+	No questionnaires match the criteria.<br/>
+<% else %>
+
+<% 
+   column_definitions = Array.new
+   column_definitions << {:name => 'Name', :type => 'display', :field => 'name'}
+   column_definitions << {:name => 'Type', :type => 'fetch', :column => 'type_id', :model => 'QuestionnaireType', :field => 'name'}
+   column_definitions << {:name => 'Edit', :action => 'edit_questionnaire', :controller => 'questionnaire'}
+   column_definitions << {:name => 'Copy', :action => 'copy_questionnaire', :controller => 'questionnaire'}
+   column_definitions << {:name => 'Advice', :action => 'edit_advice', :controller => 'questionnaire' }
+   column_definitions << {:name => 'Delete', :action => 'delete_questionnaire', :controller => 'questionnaire' }
+   
+   delete_options = {:enabled => false}  
+%>
+<%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :delete_options => delete_options, :elements => @questionnaires} %>
+<% end %>
+<br />
+
+<%= link_to 'New questionnaire', :action => 'new_questionnaire' %>

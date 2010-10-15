@@ -1,0 +1,12 @@
+<H1>Edit Team</H1>
+<% form_tag :action => 'update' do %>
+<%= hidden_field_tag 'team_id', @team.id %>
+<%= hidden_field_tag 'student_id', @student.id %>
+<label for="team_name">Team Name:</label>&nbsp;
+<%= text_field 'team', 'name'%>
+<br>
+<br>
+<%= submit_tag "Save" %>
+<% end %>
+<br/>
+<a href="javascript:window.history.back()">Back</a>

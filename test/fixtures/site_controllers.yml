@@ -1,0 +1,164 @@
+site_controller_import_file:
+  name: import_file
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_roles:
+  name: roles
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_menu_items:
+  name: menu_items
+  permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+  builtin: "1"
+site_controller_tree_display:
+  name: tree_display
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_auth:
+  name: auth
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  builtin: "0"
+site_controller_profile:
+  name: profile
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  builtin: "0"
+site_controller_institution:
+  name: institution
+  permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+  builtin: "0"
+site_controller_review:
+  name: review
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  builtin: "0"
+site_controller_assignment:
+  name: assignment
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_site_controllers:
+  name: site_controllers
+  permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+  builtin: "1"
+site_controller_teammate_review:
+  name: teammate_review
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  builtin: "0"
+site_controller_statistics:
+  name: statistics
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_impersonate:
+  name: impersonate
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_reviewing:
+  name: reviewing
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_questionnaire:
+  name: questionnaire
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_markup_styles:
+  name: markup_styles
+  permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+  builtin: "1"
+site_controller_course_evaluation:
+  name: course_evaluation
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  builtin: "0"
+site_controller_participants:
+  name: participants
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_admin:
+  name: admin
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_student_team:
+  name: student_team
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  builtin: "0"
+site_controller_review_feedback:
+  name: review_feedback
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  builtin: "0"
+site_controller_student_assignment:
+  name: student_assignment
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  builtin: "0"
+site_controller_roles_permissions:
+  name: roles_permissions
+  permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+  builtin: "1"
+site_controller_invitation:
+  name: invitation
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  builtin: "0"
+site_controller_review_mapping:
+  name: review_mapping
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_team:
+  name: team
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_review_of_review:
+  name: review_of_review
+  permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+  builtin: "0"
+site_controller_survey:
+  name: survey
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_users:
+  name: users
+  permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+  builtin: "1"
+site_controller_system_settings:
+  name: system_settings
+  permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+  builtin: "1"
+site_controller_permissions:
+  name: permissions
+  permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+  builtin: "1"
+site_controller_controller_actions:
+  name: controller_actions
+  permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+  builtin: "1"
+site_controller_content_pages:
+  name: content_pages
+  permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+  builtin: "1"
+site_controller_password_retrieval:
+  name: password_retrieval
+  permission_id: <%= Fixtures.identify(:permission_public_actions_execute) %>
+  builtin: "0"
+site_controller_teams_users:
+  name: teams_users
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_reports:
+  name: reports
+  permission_id: <%= Fixtures.identify(:permission_do_assignment) %>
+  builtin: "0"
+site_controller_course:
+  name: course
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_survey_deployment:
+  name: survey_deployment
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_participant_choices:
+  name: participant_choices
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_grades:
+  name: grades
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
+site_controller_survey_response:
+  name: survey_response
+  permission_id: <%= Fixtures.identify(:permission_public_actions_execute) %>
+  builtin: "0"

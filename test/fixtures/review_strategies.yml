@@ -1,0 +1,4 @@
+review_strategy_dynamic:
+ name: dynamic
+review_strategy_static:
+ name: static

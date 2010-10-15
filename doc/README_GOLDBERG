@@ -1,0 +1,20 @@
+WELCOME TO GOLDBERG!
+
+All the files for your site should now be in place.  The following
+steps are required to complete your setup:
+
+1. Create your database and edit config/database.yml accordingly.
+
+2. Execute the following Rake task to complete the setup of Goldberg:
+
+    rake goldberg:install
+
+
+There may be extra steps required to get Rails working, especially if
+you are using shared hosting and/or FastCGI.  Check your provider's
+Rails documentation.
+
+Good luck using Goldberg!
+
+
+Dave Nelson, urbanus at 240gl dot org

@@ -3,7 +3,8 @@ require 'uri'
 
 class SubmittedContentController < ApplicationController
   helper :wiki
-  
+  helper :google_docs
+
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
@@ -49,7 +50,8 @@ class SubmittedContentController < ApplicationController
        FileUtils.mkdir_p(curr_directory)
     end
    
-    safe_filename = file.original_filename.gsub(/\\/,"/")
+    #safe_filename = file.full_original_filename.gsub(/\\/,"/")
+	safe_filename = file.original_filename.gsub(/\\/,"/")
     safe_filename = FileHelper::sanitize_filename(safe_filename) # new code to sanitize file path before upload*
     full_filename =  curr_directory + File.split(safe_filename).last.gsub(" ",'_') #safe_filename #curr_directory +
     File.open(full_filename, "wb") { |f| f.write(file.read) }
@@ -59,8 +61,41 @@ class SubmittedContentController < ApplicationController
     participant.update_resubmit_times       
     redirect_to :action => 'edit', :id => participant.id
   end
-  
-  
+
+  # CSC/ECE-517 - Add support for hosted documents (ie Google Docs)
+  def submit_hosted_document
+    participant = AssignmentParticipant.find(params[:id]) 
+    url = URI.parse(params['doc_url'].strip)
+    begin
+      Net::HTTP.start(url.host, url.port)
+    rescue 
+      flash[:error] = "The URL or URI is not valid. Reason: "+$!
+    end
+    if ( ! flash[:error] )
+		begin
+		  doc = ParticipantHostedDocument.new
+		  doc.assignment_participant_id = params[:id]
+		  doc.url = params['doc_url'].strip
+		  doc.label = params['doc_label'].strip
+		  doc.service = params['doc_service'].strip
+		  doc.document_type = params['doc_type'].strip
+		  if ( ! doc.save )
+			flash[:error] = "An error occurred saving the URL"
+		  end
+		rescue
+		end
+	end
+    redirect_to :action => 'edit', :id => participant.id
+  end
+
+  def remove_hosted_document
+    doc = ParticipantHostedDocument.find(params[:id])
+	if ! doc.destroy
+      flash[:error] = "An error occurred deleting the Hosted Document"
+	end
+    redirect_to :action => 'edit', :id => doc.assignment_participant_id
+  end
+
   def folder_action
     @participant = AssignmentParticipant.find(params[:id])       
     @current_folder = DisplayOption.new

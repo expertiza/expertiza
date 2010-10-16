@@ -4,6 +4,9 @@ class AssignmentParticipant < Participant
   has_many :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
   belongs_to :user
   validates_presence_of :handle
+
+  # CSC/ECE-517 - Add support for hosted documents (ie Google Docs)
+  has_many :participant_hosted_documents
   
   def fullname
     self.user.fullname

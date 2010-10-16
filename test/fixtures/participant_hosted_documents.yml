@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  assignment_participant_id: 
+  url: MyString
+  label: MyString
+
+two:
+  assignment_participant_id: 
+  url: MyString
+  label: MyString

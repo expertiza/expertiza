@@ -1,0 +1,112 @@
+<b>Hosted Documents</b>&nbsp;&nbsp;&nbsp;<a href="#" id="urlLink" name="urlLink" onClick="toggleElement('hosted_docs','links');return false;">hide hosted documents</a><br/>
+  <div id="hosted_docs" style="">
+  <% if documents && documents.length > 0 %>
+  <table id="hosteddocuments" cellpadding="0" cellspacing="0" border="0">
+    <tr class="title">
+      <th class="icon">&nbsp;</td>
+      <th class="document-title">Title</td>
+      <th class="service">Service</td>
+      <th class="view" style="border-right:1px solid black;">Actions</td>
+    </tr>
+  <% documents.each_with_index{ | document, i | %>
+    <tr class="<%= i % 2 ? 'even' : 'odd' %>">
+      <td class="icon"><image src='/images/google/icon_6_<%= document.document_type ? document.document_type : 'generic' %>.gif'/></td>
+      <td class="document-title"><%= document.label %></td>
+      <td class="service"><%= document.service %></td>
+      <td class="actions"><%= link_to "delete", {:action => 'remove_hosted_document', :id => document.id} %>|<a href="<%= document.url %>" target="_blank">view</a></td>
+    </tr>
+  <% } %>
+  </table>
+  <% else %>
+  <div style="font-style:italic;margin:1em;">No hosted documents submitted</div>
+  <% end %>
+</div>
+<% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
+  <% if ! gdocs_authenticated %>
+    <image style="border:none;" src="/images/google/docs_logo_disabled_sm.gif" title="Not authenticated"/>
+	<a href="<%= gdocs_authentication_link %>">[Authenticate]</a>
+  <% else %>
+	<a href="javascript:void(0)" onclick="load_gdocs();"><image style="border:none;" src="/images/google/docs_logo_sm.gif" title="Reload Google Docs"/></a>
+	<script type="text/javascript">window.onload = function(){load_gdocs();}</script>
+  <% end %>
+<% end %>
+<table id="googledocs" cellspacing="0" cellpadding="0" border="0">
+</table>
+<% form_tag :action=>'submit_hosted_document', :id => participant_id do %>
+  <div>Submit a Hosted Document (optional):</div>
+  <table cellpadding="0" cellspacing="0" border="0"><tr>
+  <td><label for="doc_label">Label:&nbsp;</label></td>
+  <td><input id="doc_label" type="text" name="doc_label" size=40/></td>
+  </tr><tr>
+  <td><label for="doc_url">URL:&nbsp;</label></td>
+  <td><input id="doc_url" type="text" readonly="true" name="doc_url" size=40/></td>
+  </tr><tr>
+  <td><label for="doc_service">Service:&nbsp;</label></td>
+  <td><input id="doc_service" type="text" name="doc_service" size=40/></td>
+  </tr><tr>
+  <td><label for="doc_type">Type:&nbsp;</label></td>
+  <td><input id="doc_type" type="text" name="doc_type" size=40/></td>
+  </tr><tr>
+  <td colspan="2"><input type="submit" name="submit" value="Submit Document"/></td>
+  </tr></table>
+<% end %>
+<br/><br/>
+<style type="text/css">
+#hosteddocuments {border-top:1px solid #000;border-left:1px solid #000;margin:1em;width:80%}
+#hosteddocuments td {border-bottom:1px solid #000;padding:3px;}
+#hosteddocuments th {border-bottom:1px solid #000;padding:3px;}
+#googledocs {border-top:1px solid #000;border-left:1px solid #000;margin:1em;width:80%}
+#googledocs td {border-bottom:1px solid #000;padding:3px;}
+#googledocs th {border-bottom:1px solid #000;padding:3px;}
+.icon {width:16px;border-right:none;}
+.document-title {border-right:none;}
+.service {border-right:none;text-align:center;}
+.actions {text-align:center;border-right:1px solid black;}
+.title {background-color:#ccc;}
+</style>
+<script type="text/javascript">
+function load_gdocs() {
+	//document.getElementById('googledocs').display = 'block';
+	document.getElementById('googledocs').innerHTML = "<tr><td style='border-right:1px solid black;'><i>Loading...</i></td></tr>";
+	new Ajax.Request("<%= url_for :controller=>'google_docs', :action=>'documents', :format => 'xml' %>",
+		{
+			method:'get',
+			onSuccess: function(transport) {
+				if (transport.responseText) {
+				try {
+					var docList = "<tr class='title'><th colspan='4' style='font-weight:bold;font-style:italic;border-right:1px solid black;'>Google Docs - Click document to select then Submit Document to attach</th></tr><tr class='title'><th class='icon'>&nbsp;</td><th class='document-title'>Title</td><th class='service'>Service</td><th class='view' style='border-right:1px solid black;'>Actions</td></tr>";
+					var records = transport.responseXML.getElementsByTagName("record");
+					for ( i = 0; i < records.length; ++i ) {
+						var title = get_text(records[i],"title");
+						var alternate = get_text(records[i],"alternate");
+						var doc_type = get_text(records[i],"document-type");
+						docList += "<tr class='"+(i%2?'even':'odd')+"'>" +
+						"<td class='icon'><image src='/images/google/icon_6_" + doc_type + ".gif'/></td>" +
+						"<td class='document-title'><a href='javascript:void(0)'" +
+						"onclick=\"select_doc('" + title + "','" + alternate + "','Google','" + doc_type + "')\">" + get_text(records[i],"title") +
+						"</a></td>" +
+						"<td class='service'>Google</td>" +
+						"<td class='actions'><a target='_blank' href='"+alternate+"'>view</a></td>" +
+						"</tr>\n";
+					}
+					document.getElementById('googledocs').innerHTML = docList;
+				} catch (e) {
+					alert('An error occurred processing the list of Google Docs:\n'+e);
+				}
+				}
+			},
+			onFailure: function() {
+				alert('An error occurred retrieving the list of Google Docs');
+			}
+		});
+}
+function get_text(record, name) {
+	return record.getElementsByTagName(name)[0].childNodes[0].nodeValue;
+}
+function select_doc(title, link, service, type) {
+	document.getElementById('doc_label').value = title;
+	document.getElementById('doc_url').value = link;
+	document.getElementById('doc_service').value = service;
+	document.getElementById('doc_type').value = type;
+}
+</script>

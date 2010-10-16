@@ -7,6 +7,7 @@
 	 <% end %>
 <% end %>	
 <BR/><BR/>
+<%= render :partial => 'hosted_documents', :locals => {:documents => participant.participant_hosted_documents, :participant_id => participant.id, :stage => stage} %>
 <% if participant.assignment.wiki_type_id == 1%>
   <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>
 <% else %> 

@@ -59,6 +59,8 @@ class SuggestionController < ApplicationController
       reject_suggestion
     elsif !params[:edit_suggestion].nil?
       edit_suggestion
+    elsif !params[:defer_suggestion].nil?
+      defer_suggestion
     end
   end
   
@@ -85,6 +87,17 @@ class SuggestionController < ApplicationController
       flash[:notice] = 'Successfully rejected the suggestion'
     else
       flash[:error] = 'Error when rejecting the suggestion'
+    end
+    redirect_to :action => 'show', :id => @suggestion
+  end
+  
+  def defer_suggestion
+    @suggestion = Suggestion.find(params[:id])
+    
+    if @suggestion.update_attribute('status', 'Future')
+      flash[:notice] = 'Successfully deferred the suggestion'
+    else
+      flash[:error] = 'Error when deferring the suggestion'
     end
     redirect_to :action => 'show', :id => @suggestion
   end

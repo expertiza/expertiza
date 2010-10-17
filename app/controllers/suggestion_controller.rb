@@ -57,6 +57,8 @@ class SuggestionController < ApplicationController
       approve_suggestion
     elsif !params[:reject_suggestion].nil?
       reject_suggestion
+    elsif !params[:edit_suggestion].nil?
+      edit_suggestion
     end
   end
   
@@ -85,5 +87,47 @@ class SuggestionController < ApplicationController
       flash[:error] = 'Error when rejecting the suggestion'
     end
     redirect_to :action => 'show', :id => @suggestion
+  end
+  
+  def edit_suggestion
+    @suggestion = Suggestion.find(params[:id])
+    if @suggestion.unityID != session[:user].name
+      if not @suggestion.unityID.nil? and not @suggestion.unityID.empty?
+        user = User.find_by_name(@suggestion.unityID)
+        @toemail = user.id
+      else
+        @toemail = nil
+      end
+      @editor = "instructor"
+      @suggestion.status = 'Reviewed'
+    else
+      assnt = Assignment.find(@suggestion.assignment_id)
+      course = Course.find(assnt.course_id)
+      instructor = User.find(course.instructor_id)
+      @toemail = instructor.id
+      @editor = session[:user].name
+      @suggestion.status = 'Resubmitted'
+    end
+    
+    if @suggestion.update_attributes(params[:suggestion_edit])
+      flash[:notice] = 'Successfully updated the suggestion'
+      if not @toemail.nil?
+        @suggestion.email(@toemail, @editor)
+      end
+      #call log function here
+    else
+      flash[:error] = 'Error when updating the suggestion'
+    end
+    if @editor == "instructor"
+      redirect_to :action => "show", :id => params[:id]
+    else
+      redirect_to :action => "view_comments", :id => @suggestion.assignment_id
+    end
+  end
+  
+  def view_comments
+    assignment = Assignment.find(params[:id])
+    @suggestions = Suggestion.find(:all, :conditions =>
+              "unityID = '#{session[:user].name}' and status not in ('Approved', 'Rejected') and assignment_id = #{params[:id]}")
   end
 end

@@ -1,0 +1,7 @@
+
+<h3>Edit Suggestion</h3>
+	<b>Title: </b><br />
+	 <%= text_field "suggestion_edit", "title", :value => @suggestion.title %> <br />
+     <b>Description: </b><br />
+	 <%= text_area "suggestion_edit", "description", :value => @suggestion.description, :rows => 5, :cols => 50 %>
+	 <br />

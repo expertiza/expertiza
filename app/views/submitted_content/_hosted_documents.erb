@@ -1,4 +1,4 @@
-<b>Hosted Documents</b>&nbsp;&nbsp;&nbsp;<a href="#" id="urlLink" name="urlLink" onClick="toggleElement('hosted_docs','links');return false;">hide hosted documents</a><br/>
+<b>Hosted Documents</b>&nbsp;&nbsp;&nbsp;<a href="#" id="urlLink" name="urlLink" onClick="toggleElement('hosted_docs','links');return false;">toggle hosted documents</a><br/>
   <div id="hosted_docs" style="">
   <% if documents && documents.length > 0 %>
   <table id="hosteddocuments" cellpadding="0" cellspacing="0" border="0">
@@ -22,11 +22,18 @@
   <% end %>
 <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
   <% if ! gdocs_authenticated %>
-    <image style="border:none;" src="/images/google/docs_logo_disabled_sm.gif" title="Not authenticated"/>
-	<a href="<%= gdocs_authentication_link %>">[Authenticate]</a>
+    <div class='flash_error' style="background-color:#fff;">
+    <a href="javascript:void(0)" onclick="<%= gdocs_authentication_link %>"><image style="border:none;" src="/images/google/docs_logo_disabled_sm.gif" title="Not authenticated"/></a>
+    <p>The greyed out logo indicates Expertiza is not currently authenticated to work with Google Docs.  Please click the Authenticate link to redirect this page to a Google Docs page giving Expertiza access to work with the Google Docs API.</P>
+    <a href="<%= gdocs_authentication_link %>">Authenticate</a>
+    </div>
   <% else %>
-	<a href="javascript:void(0)" onclick="load_gdocs();"><image style="border:none;" src="/images/google/docs_logo_sm.gif" title="Reload Google Docs"/></a>
-	<script type="text/javascript">window.onload = function(){load_gdocs();}</script>
+    <div class='flash_note' style="background-color:#fff;">
+    <a href="javascript:void(0)" onclick="load_gdocs();"><image style="border:none;" src="/images/google/docs_logo_sm.gif" title="Reload Google Docs"/></a>
+    <p>The colored logo indicates Expertiza is currently authenticated to work with Google Docs.  The list of Google Docs will automatically be loaded, but may be reloaded by clicking the Reload link.  To select a document for uploading just click the document's name and then the Submit Document button.</p>
+    <a href="javascript:void(0)" onclick="load_gdocs();">Reload</a>
+    </div>
+    <script type="text/javascript">window.onload = function(){load_gdocs();}</script>
   <% end %>
 <% end %>
 <table id="googledocs" cellspacing="0" cellpadding="0" border="0">
@@ -82,18 +89,17 @@ function load_gdocs() {
 			onSuccess: function(transport) {
 				if (transport.responseText) {
 				try {
-					var docList = "<tr class='title'><th colspan='5' style='font-weight:bold;font-style:italic;border-right:1px solid black;'>Google Docs - Click document to select then Submit Document to attach</th></tr>" +
-					"<tr class='title'><th class='icon'>&nbsp;</th><th class='icon'>&nbsp;</th><th class='document-title'>Title</th><th class='service'>Service</th><th class='view' style='border-right:1px solid black;'>Actions</th></tr>";
+					var docList = "<tr class='title'><th class='icon'>&nbsp;</th><th class='icon'>&nbsp;</th><th class='document-title'>Title</th><th class='service'>Service</th><th class='view' style='border-right:1px solid black;'>Actions</th></tr>";
 					var records = transport.responseXML.getElementsByTagName("record");
 					for ( i = 0; i < records.length; ++i ) {
 						var title = get_text(records[i],"title");
 						var alternate = get_text(records[i],"alternate");
 						var doc_type = get_text(records[i],"document-type");
-						docList += "<tr class='"+((i+2)%2?'even':'odd')+"'>" +
-						"<td class='icon'><input type='radio' id='button"+(i+2)+"' name='gdocs' value='"+(i+2)+"' onclick=\"highlight_and_select("+(i+2)+", '" + title + "','" + alternate + "','Google','" + doc_type + "');\"/></td>" +
+						docList += "<tr class='"+((i+1)%2?'even':'odd')+"'>" +
+						"<td class='icon'><input type='radio' id='button"+(i+1)+"' name='gdocs' value='"+(i+1)+"' onclick=\"highlight_and_select("+(i+1)+", '" + title + "','" + alternate + "','Google','" + doc_type + "');\"/></td>" +
 						"<td class='icon'><image src='/images/google/icon_6_" + doc_type + ".gif'/></td>" +
 						"<td class='document-title'><a href='javascript:void(0)'" +
-						"onclick=\"highlight_and_select("+(i+2)+", '" + title + "','" + alternate + "','Google','" + doc_type + "');\">" + get_text(records[i],"title") +
+						"onclick=\"highlight_and_select("+(i+1)+", '" + title + "','" + alternate + "','Google','" + doc_type + "');\">" + get_text(records[i],"title") +
 						"</a></td>" +
 						"<td class='service'>Google</td>" +
 						"<td class='actions'><a target='_blank' href='"+alternate+"'>view</a></td>" +

@@ -46,8 +46,12 @@
 			<%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
 			&nbsp; &nbsp; 
 			<%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+			<% if @suggestion.status != 'Future' %>
+					&nbsp; &nbsp;
+					<%= submit_tag "Defer suggestion for future", :name => 'defer_suggestion' %>
+			<% end %>  
 		<% end %>
-	<% end %>
+    <% end %>
 </p>
 
 <br><br>

@@ -2,8 +2,8 @@
 
 <table border=0 cellspacing=10>
 	<colgroup>
-		<col width=25%>
-		<col width=60%>
+		<col width=25%/>
+		<col width=60%/>
 	</colgroup>
 	<tr>
 		<td><b>Title:</b></td>
@@ -96,7 +96,11 @@
      
      <%= submit_tag "Submit vote", :name => 'add_comment' %>
   <% end %>
-
+  <br />
+  <% form_tag :action => 'submit', :id => @suggestion do %>
+  	 <%= render :partial => 'edit', :suggestion => @suggestion %>
+	 <%= submit_tag "Submit edits", :name => 'edit_suggestion' %>
+  <% end %>
 <% end %>
 <p>
 	<%= link_to 'Back', :action => 'list', :id => @suggestion.assignment_id %>

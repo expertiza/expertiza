@@ -34,8 +34,12 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 	<li><%= link_to "Your scores",{:controller => 'grades', :action => 'view_my_scores', :id => @participant.id} %> (View feedback on your work)</li>
     <%if @can_provide_suggestions == true %>
 	<li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
+		<% @user = User.find(session[:user]) 
+			@suggestions = Suggestion.find(:all, :conditions => "assignment_id = #{@assignment.id} and unityid = '#{@user.name}'")
+		   if not @suggestions.nil? %>
+			  <li><%= link_to "View your suggestions",{:controller => 'suggestion', :action => 'view_comments', :id => @assignment.id} %></li>
+		<% end %>
 	<% end %>
-
 
     <% if @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
 	<!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->

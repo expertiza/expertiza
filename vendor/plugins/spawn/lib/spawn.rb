@@ -3,8 +3,7 @@ module Spawn
   RAILS_2_2 = (::Rails::VERSION::MAJOR > 2 || (::Rails::VERSION::MAJOR == 2 && ::Rails::VERSION::MINOR >= 2)) unless defined?(RAILS_2_2)
 
   # default to forking (unless windows or jruby)
-# @@method = (RUBY_PLATFORM =~ /(win32|java)/) ? :thread : :fork
-  @@method = :thread
+  @@method = (RUBY_PLATFORM =~ /(win32|java)/) ? :thread : :fork
   # things to close in child process
   @@resources = []
   # in some environments, logger isn't defined

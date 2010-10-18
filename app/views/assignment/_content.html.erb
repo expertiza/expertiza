@@ -103,7 +103,10 @@ function get_assignment_startdate() {
   </td>
 
  </tr>
-
+<tr><!-- E12 -->
+  <td><label for="assignment_allow_hosted_docs">Allow Hosted Documents:</label></td>
+  <td><%= check_box_tag 'assignment[allow_hosted_docs]', '1', @assignment.allow_hosted_docs %></td>
+</tr>
 <tr id="team_count1" style="display:none">  
   <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>   
   <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5%></td>  

@@ -1,0 +1,12 @@
+tree_folder_questionnaires:
+  name: "Questionnaires"
+  child_type: "QuestionnaireTypeNode"
+tree_folder_courses:
+  name: "Courses"
+  child_type: "CourseNode"
+tree_folder_assignments:
+  name: "Assignments"
+  child_Type: "AssignmentNode"
+tree_folder_questionnaire:
+  name: "Questionnaire"
+  child_type: "QuestionnaireNode"

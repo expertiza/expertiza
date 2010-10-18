@@ -1,0 +1,50 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+#12 Assignments will be making 12 Due Date Groups
+#Assignment0 - Submission
+<% dline_type_list = [] %>
+<% dline_type_list << Fixtures.identify(:deadline_type_submission) %>
+<% dline_type_list << Fixtures.identify(:deadline_type_review) %>
+<% dline_type_list << Fixtures.identify(:deadline_type_resubmission) %>
+<% dline_type_list << Fixtures.identify(:deadline_type_rereview) %>
+<% dline_type_list << Fixtures.identify(:deadline_type_metareview) %>
+<% offset = [] %>
+<% offset << -5 %>
+<% offset << -4 %>
+<% offset << -3 %>
+<% offset << -2 %>
+<% offset << -1 %>
+<% offset << 0 %>
+
+
+# 6 Single Assignments
+<% for i in 0..5 %>
+# 5 deadlines
+<% for j in 0..4 %>
+due_date<%= i*5+j %>:
+  due_at: <%= StudentAssignmentHelper::date_plus_days(offset[i]+j+0.5) %>
+  deadline_type_id: <%= dline_type_list[j] %>
+  assignment_id: <%= Fixtures.identify("assignment"+i.to_s) %>
+  late_policy_id: <%= Fixtures.identify("late_policy"+i.to_s) %>
+  round: 1
+<% team_num = i*5+j+ 25 %>
+due_date<%= team_num %>:
+  due_at: <%= StudentAssignmentHelper::date_plus_days(offset[i]+j+0.5) %>
+  deadline_type_id: <%= dline_type_list[j] %>
+  assignment_id: <%= Fixtures.identify("assignment"+team_num.to_s) %>
+  late_policy_id: <%= Fixtures.identify("late_policy"+i.to_s) %>
+<%end%>
+<%end%>
+
+<% for j in 0..4 %>
+due_date_review<%= j %>:
+  due_at: <%= StudentAssignmentHelper::date_plus_days(j+0.5) %>
+  deadline_type_id: <%= dline_type_list[j] %>
+  assignment_id: <%= Fixtures.identify("assignment_review0") %>
+  late_policy_id: <%= Fixtures.identify("late_policy0") %>
+  submission_allowed_id: 2
+  review_allowed_id: 2
+  resubmission_allowed_id: 2
+  rereview_allowed_id: 2
+  review_of_review_allowed_id: 1
+  round: 2
+<%end%>

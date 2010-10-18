@@ -1,0 +1,15 @@
+<% for item_id in items do 
+     item = session[:menu].get_item(item_id)
+     selected = session[:menu].selected?(item.id) -%>
+<li>
+  <a href="/menu/<%= item.name %>"<%= if item.children
+    ' class="daddy"' 
+    end %>><%= item.label %></a>
+  <% if item.children -%>
+<ul>
+  <%= render :partial => 'menu_items/suckerfish', 
+      :locals => {:items => item.children} %>
+</ul>
+  <% end -%>
+</li>
+<% end -%>

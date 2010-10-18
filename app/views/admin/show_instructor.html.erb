@@ -1,0 +1,7 @@
+<%= render :partial => 'show' %>
+<hr/>
+<p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
+<%= link_to 'Delete', {:action => 'remove_instructor', :id => @user},
+:confirm => 'Delete this user?', :method => :post %> </p>
+
+<p><%= link_to 'Back', :action => 'list_instructors' %> to Users list</p>

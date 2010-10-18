@@ -27,7 +27,7 @@ class GoogleDocsController < ApplicationController
         links = {}
         entry.elements.each('link') do |link|
           if ( link.attribute('rel').value.index(/\//) )
-            puts "Dropping link because it's rel is [#{link.attribute('rel').value}"
+            # puts "Dropping link because it's rel is [#{link.attribute('rel').value}"
           else
             links[link.attribute('rel').value] = link.attribute('href').value
           end

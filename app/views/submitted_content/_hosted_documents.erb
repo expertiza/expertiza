@@ -85,7 +85,7 @@ function load_gdocs() {
 	document.getElementById('googledocs').innerHTML = "<tr><td style='border-right:1px solid black;'><i>Loading...</i></td></tr>";
 	new Ajax.Request("<%= url_for :controller=>'google_docs', :action=>'documents', :format => 'xml' %>",
 		{
-			method:'get', 
+			method:'get',
 			onSuccess: function(transport) {
 				if (transport.responseXML) {
 				try {

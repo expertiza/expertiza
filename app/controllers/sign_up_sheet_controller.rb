@@ -71,6 +71,10 @@ class SignUpSheetController < ApplicationController
     load_add_signup_topics(params[:id])
   end
 
+  def view_publishing_rights
+    load_add_signup_topics(params[:id])
+  end
+
   def load_add_signup_topics(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', assignment_id])

@@ -1,4 +1,4 @@
-class E13DigitalSignature < ActiveRecord::Migration
+class DigitalSignature < ActiveRecord::Migration
   def self.up
     begin
     execute "ALTER TABLE users

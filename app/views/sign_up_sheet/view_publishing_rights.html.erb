@@ -1,0 +1,66 @@
+<% @assignment = Assignment.find(params[:id]) %>
+<h1>Publishing rights for <%= @assignment.name %> assignment</h1>
+
+<% if flash[:notice] %>
+    <div class="flash_note"><%= flash[:notice] %></div>
+<% end %>
+
+
+<% if @sign_up_topics.size != 0 %>
+
+    <table class="general">
+    	<tr>
+  <th width="5%" rowspan="2">Topic #</th>
+  <th width="60%" rowspan="2">Topic name(s)</th>
+  <th width="35%" colspan="3">Participant</th>
+	</tr>
+    	<tr>
+  <th>Name</th>
+  <th>Fullname</th>
+  <th>Publishing Rights</th>
+	</tr>
+	
+      <% i=1 %>
+      <% for topic in @sign_up_topics %>
+          <tr>
+            <td><%= topic.topic_identifier %></td>
+            <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+          </tr>
+
+          <% 
+			participants = AssignmentParticipant.find_all_by_parent_id(@assignment.id)
+			if (participants.length > 0)
+
+			  for signed_up_user in topic.signed_up_users
+				user = User.find(signed_up_user.creator_id)
+		  %>
+		  	    <tr>
+	 	  		  <th>&nbsp;</th>
+	 	  		  <th>&nbsp;</th>
+				  <td><%=user.name%></td>
+				  <td><%=user.fullname%></td>
+	      <%
+				  permissionGranted = false
+				  for participant in participants
+					if (user.id == participant.user.id)
+					  permissionGranted = participant.permission_granted?
+					end
+				  end
+	      %>
+			   <td><%=(permissionGranted ? "granted" : "denied") %></td>
+			</tr>
+		  <% 
+			  end
+			 end
+		  %>
+
+
+          <% i=i+1 %>
+      <% end %>
+
+    </table>
+<% end %>
+

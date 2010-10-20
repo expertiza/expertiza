@@ -127,7 +127,7 @@ class SuggestionController < ApplicationController
       if not @toemail.nil?
         @suggestion.email(@toemail, @editor)
       end
-      #call log function here
+      log_suggestion
     else
       flash[:error] = 'Error when updating the suggestion'
     end
@@ -142,5 +142,12 @@ class SuggestionController < ApplicationController
     assignment = Assignment.find(params[:id])
     @suggestions = Suggestion.find(:all, :conditions =>
               "unityID = '#{session[:user].name}' and status not in ('Approved', 'Rejected') and assignment_id = #{params[:id]}")
+  end
+  
+  def log_suggestion
+    @log = SuggestionLog.new
+    @log.suggestion_id = @suggestion.id
+    @log.user_id = session[:user].id
+    @log.save
   end
 end

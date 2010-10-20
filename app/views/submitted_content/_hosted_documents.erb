@@ -13,7 +13,11 @@
       <td class="icon"><image src='/images/google/icon_6_<%= document.document_type ? document.document_type : 'generic' %>.gif'/></td>
       <td class="document-title"><%= document.label %></td>
       <td class="service"><%= document.service %></td>
-      <td class="actions"><%= link_to "delete", {:action => 'remove_hosted_document', :id => document.id} %>|<a href="<%= document.url %>" target="_blank">view</a></td>
+      <td class="actions">
+	    <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
+		  <%= link_to "delete", {:action => 'remove_hosted_document', :id => document.id} %>|
+		<%end %>
+		<a href="<%= document.url %>" target="_blank">view</a></td>
     </tr>
   <% } %>
   </table>

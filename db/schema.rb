@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101006040659) do
+ActiveRecord::Schema.define(:version => 20101018010541) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(:version => 20101006040659) do
     t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions"
+    t.boolean  "allow_hosted_docs"
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -326,20 +327,22 @@ ActiveRecord::Schema.define(:version => 20101006040659) do
   end
 
   create_table "participants", :force => true do |t|
-    t.boolean  "submit_allowed",                     :default => true
-    t.boolean  "review_allowed",                     :default => true
+    t.boolean  "submit_allowed",                            :default => true
+    t.boolean  "review_allowed",                            :default => true
     t.integer  "user_id"
     t.integer  "parent_id"
     t.integer  "directory_num"
     t.datetime "submitted_at"
     t.string   "topic"
     t.boolean  "permission_granted"
-    t.integer  "penalty_accumulated",                :default => 0,    :null => false
+    t.integer  "penalty_accumulated",                       :default => 0,    :null => false
     t.string   "submitted_hyperlink", :limit => 500
     t.float    "grade"
     t.string   "type"
     t.string   "handle"
     t.integer  "topic_id"
+    t.datetime "time_stamp"
+    t.text     "digital_signature",   :limit => 2147483647
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
@@ -605,22 +608,23 @@ ActiveRecord::Schema.define(:version => 20101006040659) do
   end
 
   create_table "users", :force => true do |t|
-    t.string  "name",                                     :default => "",    :null => false
-    t.string  "password",                  :limit => 40,  :default => "",    :null => false
-    t.integer "role_id",                                  :default => 0,     :null => false
+    t.string  "name",                                      :default => "",    :null => false
+    t.string  "password",                  :limit => 40,   :default => "",    :null => false
+    t.integer "role_id",                                   :default => 0,     :null => false
     t.string  "password_salt"
     t.string  "fullname"
     t.string  "email"
     t.integer "parent_id"
-    t.boolean "private_by_default",                       :default => false
+    t.boolean "private_by_default",                        :default => false
     t.string  "mru_directory_path",        :limit => 128
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                              :default => true
+    t.boolean "is_new_user",                               :default => true
     t.boolean "master_permission_granted"
     t.string  "handle"
-    t.boolean "leaderboard_privacy",                      :default => false
+    t.boolean "leaderboard_privacy",                       :default => false
+    t.string  "digital_certificate",       :limit => 1000
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

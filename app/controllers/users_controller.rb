@@ -158,6 +158,29 @@ class UsersController < ApplicationController
     redirect_to :action => 'list'
   end
 
+  def keys
+    @user = User.find(params[:id])
+    @private_key = @user.generate_keys
+    puts @private_key
+    digital_signature = @user.generate_digital_signature(@private_key)
+    verified = @user.verify_digital_signature(digital_signature)
+    puts verified
+  end
+  
+  # references:
+  # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
+  # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
+  def verify_digital_signature
+    @user = User.find(params[:id])
+    digital_signature = @user.generate_digital_signature(params[:private_key])
+    verified = @user.verify_digital_signature(digital_signature)
+    if (verified)
+        redirect_to :action => 'verify', :id => @user
+    else
+        redirect_to :action => 'verify', :id => @user
+    end
+  end
+  
   protected
 
   def foreign
@@ -165,4 +188,11 @@ class UsersController < ApplicationController
     @all_roles = Role.find(:all, :conditions => ['id in (?) or id = ?',role.get_available_roles,role.id])
   end
   
+  # references:
+  # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
+  # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
+  def self.generate_digtal_signature
+   cipher_text = User.generate_digital_signature(params[:id], params[:private_key])
+ end
+ 
 end

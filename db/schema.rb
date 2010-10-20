@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101001183244) do
+ActiveRecord::Schema.define(:version => 20101006040659) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -315,6 +315,16 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
     t.string  "type"
   end
 
+  create_table "participant_hosted_documents", :force => true do |t|
+    t.integer  "assignment_participant_id"
+    t.string   "url"
+    t.string   "label"
+    t.string   "service"
+    t.string   "document_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "participants", :force => true do |t|
     t.boolean  "submit_allowed",                     :default => true
     t.boolean  "review_allowed",                     :default => true
@@ -374,10 +384,10 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
   create_table "response_maps", :force => true do |t|
-    t.integer "reviewed_object_id",                 :null => false
-    t.integer "reviewer_id",                        :null => false
-    t.integer "reviewee_id",                        :null => false
-    t.string  "type",               :default => "", :null => false
+    t.integer "reviewed_object_id", :null => false
+    t.integer "reviewer_id",        :null => false
+    t.integer "reviewee_id",        :null => false
+    t.string  "type",               :null => false
   end
 
   add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"
@@ -427,7 +437,7 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
     t.integer "reviewee_id", :default => 0,   :null => false
     t.float   "score",       :default => 0.0, :null => false
     t.string  "range",       :default => ""
-    t.string  "object_type", :default => "",  :null => false
+    t.string  "object_type",                  :null => false
   end
 
   create_table "scores", :force => true do |t|
@@ -441,7 +451,7 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "scores", ["response_id"], :name => "fk_score_response"
 
   create_table "sessions", :force => true do |t|
-    t.string   "session_id", :default => "", :null => false
+    t.string   "session_id", :null => false
     t.text     "data"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -584,8 +594,8 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "topic_deadlines", ["topic_id"], :name => "fk_topic_deadlines_topics"
 
   create_table "topic_dependencies", :force => true do |t|
-    t.integer "topic_id",                     :null => false
-    t.string  "dependent_on", :default => "", :null => false
+    t.integer "topic_id",     :null => false
+    t.string  "dependent_on", :null => false
   end
 
   create_table "tree_folders", :force => true do |t|

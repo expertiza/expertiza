@@ -10,18 +10,18 @@
 <td><%= @user.email %></td>
 </tr>
 
-<tr><th>Role:</th>
-<td><%= link_to @role.name, :controller => 'roles',
-        :action => 'show', :id => @role.id %></td>
+<tr><th valign="top">Private Key:</th>
+<td><textarea rows="10" cols="65"><%= @private_key %></textarea></td>
 </tr>
 
 </table>
 
+<p>The digital certificate containing the student's public key has been saved, 
+give this private key to the student to keep.</p>
+
 <hr/>
 <p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
 <%= link_to 'Delete', {:action => 'destroy', :id => @user}, 
-    :confirm => 'Delete this user?', :method => :post %> |
-<%= link_to 'Generate Keys', :action => 'keys', :id => @user %>
-	</p>
+    :confirm => 'Delete this user?', :method => :post %> </p>
 
 <p><%= link_to 'Back', :action => 'list' %> to Users list</p>

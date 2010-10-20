@@ -1,0 +1,41 @@
+<h1>Grant Publishing Rights to <%= @participant.assignment.name %></h1>
+
+<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+<div class="flash_error">
+	<%= flash[:notice] %>
+</div>
+<% end %>
+
+<table class="listing" cellpadding=2>
+	<tr>
+	  <td><b>Preferred:</b> To grant publishing rights for this assignment, digitally sign the assignment name (above) using your private key and enter the digital signature below:</td>
+	</tr>
+	<tr>
+	  <td>
+		<% form_tag :action => 'grant_with_signature', :id => @participant do %>
+		<%= text_area_tag :digital_signature, nil, :rows => 10, :cols => 65 %>
+  		<%= submit_tag 'Grant' %>
+		<% end %>
+	  </td>
+	<tr>
+	  <td>&nbsp;</td>
+	</tr>
+	<tr>
+	  <td>&nbsp;&nbsp;&nbsp;or</td>
+	</tr>
+	<tr>
+	  <td>&nbsp;</td>
+	</tr>
+	<tr>
+	  <td>Supply your private key and a digital signature will be generated for you 
+	  (private key will not be saved in the database):</td>
+	</tr>
+	<tr>
+	  <td>
+		<% form_tag :action => 'grant_with_private_key', :id => @participant do %>
+		<%= text_area_tag :private_key, nil, :rows => 10, :cols => 65 %>
+  		<%= submit_tag 'Grant' %>
+		<% end %>
+	  </td>
+	</tr>
+</table>

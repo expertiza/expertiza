@@ -65,7 +65,7 @@
 	  	<%if participant.permission_granted %>
 	  		<%= link_to 'deny', :action =>'set_publish_permission', :id => participant.id, :allow => 0 %> 
 	    <% else %>
-	    	<%= link_to 'grant', :action =>'set_publish_permission', :id => participant.id, :allow => 1 %> 
+	    	<%= link_to 'grant', :action =>'grant', :id => participant.id %> 
 		<% end %>
 		</td>
 		<td width=50%>&nbsp;</td>

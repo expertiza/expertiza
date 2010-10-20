@@ -1,6 +1,7 @@
 class Suggestion < ActiveRecord::Base
   validates_presence_of :title, :description
    has_many :suggestion_comments 
+   has_many :suggestion_logs
    
    def find_all_by_assignment_id(assignment_id)
       find(:all, :conditions => ["assignment_id = ?", assignment_id])
@@ -28,4 +29,5 @@ class Suggestion < ActiveRecord::Base
         )
      end
   end 
+
 end

@@ -136,4 +136,31 @@ class User < ActiveRecord::Base
   def set_courses_to_assignment 
     @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')    
   end
+
+  # generate a new public and private key and save a digital certificate in the database
+  # return the private key.
+  # references:
+  # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
+  # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
+  def generate_keys
+      new_key = OpenSSL::PKey::RSA.generate( 1024 )
+      new_public = new_key.public_key
+      new_private = new_key.to_pem
+      puts new_public
+      puts new_private
+
+      # creating the digital certificate      
+      cert = OpenSSL::X509::Certificate.new
+      cert.version = 1
+      cert.subject = cert.issuer = OpenSSL::X509::Name.parse("/C="+self.id.to_s)
+      cert.public_key = new_public
+      cert.not_before = Time.now
+      cert.not_after = Time.now+3600*24*365
+      cert.sign(new_key, OpenSSL::Digest::SHA1.new)
+      self.digital_certificate = cert.to_pem
+      puts self.digital_certificate
+      self.save
+      new_private
+  end 
+
 end

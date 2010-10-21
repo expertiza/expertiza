@@ -1,6 +1,6 @@
 class SetPermissionForUserKeys < ActiveRecord::Migration
   def self.up
-    permission = Permission.find_by_name('public actions - execute')
+    permission = Permission.find_by_name('do assignments')
     controller = SiteController.find_or_create_by_name('users')
     controller.permission_id = permission.id
     controller.save

@@ -39,7 +39,9 @@ module GoldbergFilters
         public_role = Role.find(@settings.public_role_id)
         if not public_role or not public_role.cache or 
             not public_role.cache[:credentials] or 
-            not public_role.cache[:menu]
+            not public_role.cache[:menu] or
+            public_role.cache[:credentials].is_a?(YAML::Object) or
+            public_role.cache[:menu].is_a?(YAML::Object)
           Role.rebuild_cache
           public_role = Role.find(@settings.public_role_id)
         end

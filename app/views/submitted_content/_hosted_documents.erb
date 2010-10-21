@@ -14,10 +14,10 @@
       <td class="document-title"><%= document.label %></td>
       <td class="service"><%= document.service %></td>
       <td class="actions">
-	    <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
-		  <%= link_to "delete", {:action => 'remove_hosted_document', :id => document.id} %>|
-		<%end %>
-		<a href="<%= document.url %>" target="_blank">view</a></td>
+        <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
+          <%= link_to "delete", {:action => 'remove_hosted_document', :id => document.id} %>|
+        <%end %>
+        <a href="<%= document.url %>" target="_blank">view</a></td>
     </tr>
   <% } %>
   </table>
@@ -35,6 +35,7 @@
     <div class='flash_note' style="background-color:#fff;">
     <a href="javascript:void(0)" onclick="load_gdocs();"><image style="border:none;" src="/images/google/docs_logo_sm.gif" title="Reload Google Docs"/></a>
     <p>The colored logo indicates Expertiza is currently authenticated to work with Google Docs.  The list of Google Docs will automatically be loaded, but may be reloaded by clicking the Reload link.  To select a document for uploading just click the document's name and then the Submit Document button.</p>
+    <p>Note: Only the first 100 documents from the repository are retrieved.<p>
     <a href="javascript:void(0)" onclick="load_gdocs();">Reload</a>
     </div>
     <script type="text/javascript">window.onload = function(){load_gdocs();}</script>
@@ -85,65 +86,66 @@
 </style>
 <script type="text/javascript">
 function load_gdocs() {
-	//document.getElementById('googledocs').display = 'block';
-	document.getElementById('googledocs').innerHTML = "<tr><td style='border-right:1px solid black;'><i>Loading...</i></td></tr>";
-	new Ajax.Request("<%= url_for :controller=>'google_docs', :action=>'documents', :format => 'xml' %>",
-		{
-			method:'get',
-			onSuccess: function(transport) {
-				if (transport.responseXML) {
-				try {
-					var docList = "<tr class='title'><th class='icon'>&nbsp;</th><th class='icon'>&nbsp;</th><th class='document-title'>Title</th><th class='service'>Service</th><th class='view' style='border-right:1px solid black;'>Actions</th></tr>";
-					var records = transport.responseXML.getElementsByTagName("record");
-					for ( i = 0; i < records.length; ++i ) {
-						var title = get_text(records[i],"title");
-						var alternate = get_text(records[i],"alternate");
-						var doc_type = get_text(records[i],"document-type");
-						docList += "<tr class='"+((i+1)%2?'even':'odd')+"'>" +
-						"<td class='icon'><input type='radio' id='button"+(i+1)+"' name='gdocs' value='"+(i+1)+"' onclick=\"highlight_and_select("+(i+1)+", '" + title + "','" + alternate + "','Google','" + doc_type + "');\"/></td>" +
-						"<td class='icon'><image src='/images/google/icon_6_" + doc_type + ".gif'/></td>" +
-						"<td class='document-title'><a href='javascript:void(0)'" +
-						"onclick=\"highlight_and_select("+(i+1)+", '" + title + "','" + alternate + "','Google','" + doc_type + "');\">" + get_text(records[i],"title") +
-						"</a></td>" +
-						"<td class='service'>Google</td>" +
-						"<td class='actions'><a target='_blank' href='"+alternate+"'>view</a></td>" +
-						"</tr>\n";
+    //document.getElementById('googledocs').display = 'block';
+    document.getElementById('googledocs').innerHTML = "<tr><td style='border-right:1px solid black;'><i>Loading...</i></td></tr>";
+    new Ajax.Request("<%= url_for :controller=>'google_docs', :action=>'documents', :format => 'xml' %>",
+        {
+            method:'get',
+            onSuccess: function(transport) {
+                if (transport.responseXML) {
+                try {
+                    var docList = "<tr class='title'><th class='icon'>&nbsp;</th><th class='icon'>&nbsp;</th><th class='document-title'>Title</th><th class='service'>Service</th><th class='view' style='border-right:1px solid black;'>Actions</th></tr>";
+                    var records = transport.responseXML.getElementsByTagName("record");
+                    for ( i = 0; i < records.length; ++i ) {
+                        var title = get_text(records[i],"title");
+                        var alternate = get_text(records[i],"alternate");
+						//var alternate = get_text(records[i],"content");
+                        var doc_type = get_text(records[i],"document-type");
+                        docList += "<tr class='"+((i+1)%2?'even':'odd')+"'>" +
+                        "<td class='icon'><input type='radio' id='button"+(i+1)+"' name='gdocs' value='"+(i+1)+"' onclick=\"highlight_and_select("+(i+1)+", '" + title + "','" + alternate + "','Google','" + doc_type + "');\"/></td>" +
+                        "<td class='icon'><image src='/images/google/icon_6_" + doc_type + ".gif'/></td>" +
+                        "<td class='document-title'><a href='javascript:void(0)'" +
+                        "onclick=\"highlight_and_select("+(i+1)+", '" + title + "','" + alternate + "','Google','" + doc_type + "');\">" + get_text(records[i],"title") +
+                        "</a></td>" +
+                        "<td class='service'>Google</td>" +
+                        "<td class='actions'><a target='_blank' href='"+alternate+"'>view</a></td>" +
+                        "</tr>\n";
 
-						//"onclick=\"select_doc('" + title + "','" + alternate + "','Google','" + doc_type + "')\">" + get_text(records[i],"title") +
-					}
-					document.getElementById('googledocs').innerHTML = docList;
-				} catch (e) {
-					alert('An error occurred processing the list of Google Docs:\n'+e);
-					document.getElementById('googledocs').innerHTML = "<tr><td style='border-right:1px solid black;'><span style='font-style:italic;font-weight:bold;color:red;'>An error occurred</span></td></tr>";
-				}
-				}
-			},
-			onFailure: function() {
-				alert('An error occurred retrieving the list of Google Docs');
-				document.getElementById('googledocs').innerHTML = "<tr><td style='border-right:1px solid black;'><span style='font-style:italic;font-weight:bold;color:red;'>An error occurred</span></td></tr>";
-			}
-		});
+                        //"onclick=\"select_doc('" + title + "','" + alternate + "','Google','" + doc_type + "')\">" + get_text(records[i],"title") +
+                    }
+                    document.getElementById('googledocs').innerHTML = docList;
+                } catch (e) {
+                    alert('An error occurred processing the list of Google Docs:\n'+e);
+                    document.getElementById('googledocs').innerHTML = "<tr><td style='border-right:1px solid black;'><span style='font-style:italic;font-weight:bold;color:red;'>An error occurred</span></td></tr>";
+                }
+                }
+            },
+            onFailure: function() {
+                alert('An error occurred retrieving the list of Google Docs');
+                document.getElementById('googledocs').innerHTML = "<tr><td style='border-right:1px solid black;'><span style='font-style:italic;font-weight:bold;color:red;'>An error occurred</span></td></tr>";
+            }
+        });
 }
 function get_text(record, name) {
-	return record.getElementsByTagName(name)[0].childNodes[0].nodeValue;
+    return record.getElementsByTagName(name)[0].childNodes[0].nodeValue;
 }
 function select_doc(title, link, service, type) {
-	document.getElementById('doc_label').value = title;
-	document.getElementById('doc_url').value = link;
-	document.getElementById('doc_service').value = service;
-	document.getElementById('doc_type').value = type;
+    document.getElementById('doc_label').value = title;
+    document.getElementById('doc_url').value = link;
+    document.getElementById('doc_service').value = service;
+    document.getElementById('doc_type').value = type;
 }
 var selected_row = -1;
 function highlight_and_select(row, title, link, service, type) {
-	var table = document.getElementById('googledocs');
-	if ( -1 != selected_row ) {
-		table.getElementsByTagName('tr')[selected_row].className = (selected_row%2?'even':'odd');
-		selected_row = -1;
-	}
-	var rowEl = table.getElementsByTagName('tr')[row];
-	rowEl.className = 'selected';
-	select_doc(title, link, service, type);
-	document.getElementById('button'+row).checked = true;
-	selected_row = row;
+    var table = document.getElementById('googledocs');
+    if ( -1 != selected_row ) {
+        table.getElementsByTagName('tr')[selected_row].className = (selected_row%2?'even':'odd');
+        selected_row = -1;
+    }
+    var rowEl = table.getElementsByTagName('tr')[row];
+    rowEl.className = 'selected';
+    select_doc(title, link, service, type);
+    document.getElementById('button'+row).checked = true;
+    selected_row = row;
 }
 </script>

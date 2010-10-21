@@ -201,14 +201,14 @@ class AssignmentParticipant < Participant
   end
   
   def get_hash
-    Digest::SHA1.digest(self.assignment.name)
+      Digest::SHA1.digest(self.assignment.name)
   end
   
   # references:
   # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
   # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
   def generate_digital_signature(privateKey)
-    hash_data = (self.assignment.name+fullname)
+    hash_data = get_hash
     private_key2 = OpenSSL::PKey::RSA.new(privateKey)
     cipher_text = Base64.encode64(private_key2.private_encrypt(hash_data))
     cipher_text
@@ -218,7 +218,7 @@ class AssignmentParticipant < Participant
   # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
   # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
   def verify_digital_signature(cipher_text)
-    hash_data = (self.assignment.name + fullname)
+    hash_data = get_hash
 
     # get the public key from the digital certificate
     certificate1 = self.user.digital_certificate 

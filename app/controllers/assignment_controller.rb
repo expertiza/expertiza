@@ -277,8 +277,11 @@ class AssignmentController < ApplicationController
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])     
-      set_questionnaires
-      set_limits_and_weights
+      if params[:questionnaires] and params[:limits] and params[:weights]
+        set_questionnaires
+        set_limits_and_weights
+      end
+
       begin
         newpath = @assignment.get_path        
       rescue

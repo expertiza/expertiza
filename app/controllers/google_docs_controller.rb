@@ -26,12 +26,15 @@ class GoogleDocsController < ApplicationController
         # Extract the href value from each <atom:link>
         links = {}
         entry.elements.each('link') do |link|
+          # puts link
           if ( link.attribute('rel').value.index(/\//) )
             # puts "Dropping link because it's rel is [#{link.attribute('rel').value}"
           else
             links[link.attribute('rel').value] = link.attribute('href').value
           end
         end
+        revisions = Array.new
+        #revisions = get_revisions(entry.elements['gd:resourceId'].text)
         document_type = 'generic'
         entry.elements.each('category') do |category|
           if category.attribute('scheme').value.eql? "http://schemas.google.com/g/2005#kind"
@@ -43,7 +46,9 @@ class GoogleDocsController < ApplicationController
           :title => entry.elements['title'].text, 
           :document_type => document_type,
           :updated => entry.elements['updated'].text,
-          :links => links
+          :content => entry.elements['content'].attribute('src').value,
+          :links => links,
+          :revisions => revisions
         }
       end
 
@@ -58,6 +63,29 @@ class GoogleDocsController < ApplicationController
         format.xml { head :failure }
       end
     end
+  end
+
+  # Probably shouldn't be in the controller...
+  # This method will only work with Google Docs Protocol 3.0 or higher.  This
+  # is currently in Google Labs and not available.
+  def get_revisions(resourceId)
+    revisions = Array.new
+    if ( gdocs_authenticated )
+      client = GData::Client::DocList.new
+      client.authsub_token = session[:google_docs_token]
+	  puts "Requesting: http://docs.google.com/feeds/default/private/full/#{resourceId}/revisions"
+      feed = client.get("http://docs.google.com/feeds/default/private/full/#{resourceId}/revisions").to_xml
+      feed.elements.each('entry') do |entry|
+        revisions << {
+          :title => entry.elements['entry'].text,
+          :updated => entry.elements['updated'].text,
+          :content => entry.elements['content'].attribute('src').value
+        }
+      end
+    end
+    return revisions
+  rescue
+    return Array.new
   end
 
 end

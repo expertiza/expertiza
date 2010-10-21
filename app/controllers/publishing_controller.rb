@@ -1,6 +1,7 @@
 class PublishingController < ApplicationController
   
   def view   
+    @user = User.find_by_id(session[:user].id) 
     @participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)
   end
   

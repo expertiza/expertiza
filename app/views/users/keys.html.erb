@@ -16,12 +16,9 @@
 
 </table>
 
-<p>The digital certificate containing the student's public key has been saved, 
-give this private key to the student to keep.</p>
+<p>The digital certificate containing your public key has been saved.
+SAVE this private key so you can use it to digitally sign the publishing rights.</p>
 
 <hr/>
-<p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
-<%= link_to 'Delete', {:action => 'destroy', :id => @user}, 
-    :confirm => 'Delete this user?', :method => :post %> </p>
 
-<p><%= link_to 'Back', :action => 'list' %> to Users list</p>
+<p><%= link_to 'Back', {:controller=>:publishing, :action=>:view }%> to publising rights</p>

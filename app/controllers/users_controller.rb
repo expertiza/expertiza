@@ -161,10 +161,6 @@ class UsersController < ApplicationController
   def keys
     @user = User.find(params[:id])
     @private_key = @user.generate_keys
-    puts @private_key
-    digital_signature = @user.generate_digital_signature(@private_key)
-    verified = @user.verify_digital_signature(digital_signature)
-    puts verified
   end
   
   # references:

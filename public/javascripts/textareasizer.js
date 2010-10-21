@@ -1,9 +1,12 @@
 function checkRows(textArea){
+	if(textArea.name!='digital_signature' && textArea.name!='private_key'){
+		   
 	while(textArea.rows > 1 && textArea.scrollHeight < textArea.offsetHeight)
 	   textArea.rows--;
 	   
 	while(textArea.scrollHeight > textArea.offsetHeight)
 	   textArea.rows++;
+}
 }
 
 function loopRows(){

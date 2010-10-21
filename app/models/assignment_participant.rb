@@ -208,12 +208,8 @@ class AssignmentParticipant < Participant
   # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
   # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
   def generate_digital_signature(privateKey)
-    hash_data = get_hash
-    output_private = File.new("./new_private.pem", "w")
-    output_private.puts privateKey
-    output_private.close
-    private_key2 = OpenSSL::PKey::RSA.new(File.read("./new_private.pem"))
-
+    hash_data = (self.assignment.name+fullname)
+    private_key2 = OpenSSL::PKey::RSA.new(privateKey)
     cipher_text = Base64.encode64(private_key2.private_encrypt(hash_data))
     cipher_text
   end
@@ -222,20 +218,14 @@ class AssignmentParticipant < Participant
   # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
   # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
   def verify_digital_signature(cipher_text)
-    hash_data = get_hash
+    hash_data = (self.assignment.name + fullname)
 
     # get the public key from the digital certificate
     certificate1 = self.user.digital_certificate 
-    output_cert = File.new("./new_cert.pem", "w")
-    output_cert.puts certificate1
-    output_cert.close
-    cert = OpenSSL::X509::Certificate.new(File.read("./new_cert.pem"))
+    cert = OpenSSL::X509::Certificate.new(certificate1)
     begin
       public_key1 = cert.public_key 
-      output_public = File.new("./new_public.pem", "w")
-      output_public.puts public_key1
-      output_public.close
-      public_key = OpenSSL::PKey::RSA.new(File.read("./new_public.pem"))
+      public_key = OpenSSL::PKey::RSA.new(public_key1)
        
       clear_text = public_key.public_decrypt(Base64.decode64(cipher_text))
       if (hash_data == clear_text)

@@ -13,7 +13,7 @@
 	<tr>
 	  <td>
 		<% form_tag :action => 'grant_with_signature', :id => @participant do %>
-		<%= text_area_tag :digital_signature, nil, :rows => 10, :cols => 65 %>
+		<%= text_area_tag :digital_signature, nil, :rows => 20, :cols => 65 %>
   		<%= submit_tag 'Grant' %>
 		<% end %>
 	  </td>
@@ -33,7 +33,7 @@
 	<tr>
 	  <td>
 		<% form_tag :action => 'grant_with_private_key', :id => @participant do %>
-		<%= text_area_tag :private_key, nil, :rows => 10, :cols => 65 %>
+		<%= text_area_tag :private_key, '', :rows => 20, :cols => 65, :style =>'scrollHeight:40' %>
   		<%= submit_tag 'Grant' %>
 		<% end %>
 	  </td>

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101018010541) do
+ActiveRecord::Schema.define(:version => 201010180105450) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -343,6 +343,7 @@ ActiveRecord::Schema.define(:version => 20101018010541) do
     t.integer  "topic_id"
     t.datetime "time_stamp"
     t.text     "digital_signature",   :limit => 2147483647
+    t.integer  "quiz_id"
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
@@ -496,6 +497,13 @@ ActiveRecord::Schema.define(:version => 20101018010541) do
     t.string   "vote"
     t.integer  "suggestion_id"
     t.datetime "created_at"
+  end
+
+  create_table "suggestion_logs", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "suggestion_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "suggestions", :force => true do |t|

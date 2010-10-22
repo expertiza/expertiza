@@ -14,4 +14,8 @@ class QuizQuestionnaire < Questionnaire
 
     self.destroy      
   end
+  
+  def get_participant_by_user_id(the_user_id)
+    Participant.find_by_user_id_and_quiz_id(the_user_id, id)
+  end
 end

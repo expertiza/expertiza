@@ -19,7 +19,7 @@
 <br />
 
 <% if @questionnaire.type == "QuizQuestionnaire" %>
-	<%= link_to 'Back', :controller => 'submitted_content', :action => 'edit', :id => session[:user].id %>
+	<%= link_to 'Back', :controller => 'submitted_content', :action => 'edit', :id => @questionnaire.get_participant_by_user_id(session[:user].id).id %>
 <% else %>
 	<%= render :partial => '/shared_scripts/back' %>
 <% end %>

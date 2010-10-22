@@ -14,11 +14,37 @@ class SuggestionController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :list }
+         
 
-  def list
-    @suggestions = Suggestion.find_all_by_assignment_id(params[:id])
-    @assignment = Assignment.find(params[:id])
-  end
+# def list
+#   @suggestions = Suggestion.find_all_by_assignment_id(params[:id])
+#   @assignment = Assignment.find(params[:id])
+# end
+
+ def list
+#   @suggestions = Suggestion.find_all_by_assignment_id(params[:id])   #commented out rsjohns3
+#   Set Default values for Sort_by variable and Sort_order
+     sort_var = 'title'
+     sort_order = ' ASC'
+     
+      if (params[:suggestions] != nil)
+        if (params[:suggestions][:sortvar] != nil and params[:suggestions][:sortvar] != 'blank')
+            puts "Value of params[:suggestions][:sortvar] -> #{params[:suggestions][:sortvar]}... "
+            sort_var = params[:suggestions][:sortvar]
+        end
+      end
+
+      if (params[:suggestions] != nil)
+        if (params[:suggestions][:sortorder] != nil and params[:suggestions][:sortorder] != 'blank')
+            puts "Value of params[:suggestions][:sortorder] -> #{params[:suggestions][:sortorder]}... "
+            sort_order = " " + params[:suggestions][:sortorder]
+        end
+      end    
+    @suggestions = Suggestion.find(:all, 
+                            :conditions => 'assignment_id = '+params[:id],
+                            :order => sort_var + sort_order)
+   @assignment = Assignment.find(params[:id])
+ end
 
   def show
     @suggestion = Suggestion.find(params[:id])
@@ -33,6 +59,7 @@ class SuggestionController < ApplicationController
     @suggestion = Suggestion.new(params[:suggestion])
     @suggestion.assignment_id = session[:assignment_id]
 	  @suggestion.status = 'Initiated'
+    @suggestion.createdDate = DateTime.now
     if params[:suggestion_anonymous].nil?
       @suggestion.unityID = session[:user].name      
     else
@@ -65,12 +92,16 @@ class SuggestionController < ApplicationController
   end
   
   def approve_suggestion
+    puts "Now entering Suggestion Controller Method approve_suggestion...."
     @suggestion = Suggestion.find(params[:id])
     @signuptopic = SignUpTopic.new
     @signuptopic.topic_identifier = 'S' + @suggestion.id.to_s
     @signuptopic.topic_name = @suggestion.title
+    @signuptopic.topic_description = @suggestion.description  # rsjohns3 csc517-601 OSS Project 1 10/21/2010
     @signuptopic.assignment_id = @suggestion.assignment_id
     @signuptopic.max_choosers = 3;
+    puts "@signuptopic.topic_description = #{@signuptopic.topic_description}..."
+    puts "@suggestion.description = #{@suggestion.description}..."    
     
     if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
       flash[:notice] = 'Successfully approved the suggestion.'

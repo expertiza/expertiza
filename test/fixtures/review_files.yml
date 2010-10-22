@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  file_path: MyString
+  accepted: false
+  file_comment: MyText
+
+two:
+  file_path: MyString
+  accepted: false
+  file_comment: MyText

@@ -1,5 +1,6 @@
 class Participant < ActiveRecord::Base
   belongs_to :user
+  belongs_to :code_review # code_review can have many participants
   has_many :comments
   has_many :resubmission_times 
   

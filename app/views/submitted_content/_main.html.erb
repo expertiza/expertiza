@@ -6,7 +6,8 @@
 	 Submit a Hyperlink (optional): <input type="text" name="submission" size=40/><input type="submit" name="upload_link" value="Upload link"/>     
 	 <% end %>
 <% end %>	
-<BR/><BR/>
+<BR/>
+
 <% if participant.assignment.allow_hosted_docs %>
   <%= render :partial => 'submitted_content/hosted_documents', :locals => {:documents => participant.participant_hosted_documents, :participant_id => participant.id, :stage => stage} %>
 <% end %>
@@ -15,6 +16,4 @@
 <% else %> 
   <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
 <% end %>
-<%= render :partial => 'quiz', :locals => {:participant => participant} %>
-<BR/>
 

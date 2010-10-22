@@ -5,7 +5,7 @@
 	<tr>
 		<td valign="top"><label for="questionnaire_name">Name:</label>	</td>
 		<td>
-			<%= text_field 'questionnaire', 'name'  %>
+			<%= text_field 'questionnaire', 'name', :value=>"#{session[:user].name}'s quiz"  %>
 			<%= hidden_field 'questionnaire', 'id' %>
 			<%= hidden_field 'questionnaire', 'type' %>
 		</td>		
@@ -13,10 +13,17 @@
 </table>
 <table>
 	<tr>
+		<% if @questionnaire.type == "QuizQuestionnaire" %>
+		<td>Number of answers per question</td>
+		<td><%= text_field 'questionnaire', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
+		<td></td>
+		<td></td>
+		<% else %>
 		<td>Min question score:</td>
 		<td><%= text_field 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
 		<td>Max question score:</td>
 		<td><%= text_field 'questionnaire', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
+		<% end %>
 		<td>Is this <%= @questionnaire.display_type %> private:</td> 
 		<td><%= select(:questionnaire, :private, [ ['no', false], 
 									 		['yes',  true]])%>
@@ -33,13 +40,37 @@
 		  more question(s)</td>
 		<td colspan=2><input type="button" value="Delete selected questions" onclick="deleteQuestions()"></td>
 	</tr>
+	
+	<% if @questionnaire.type == "QuizQuestionnaire" %>
+	<tr>
+		<td></td>
+		<td>
+			<ul>
+				<li>
+					Quiz questions are specified in the following format:
+					<ul>
+						<li>Who's buried in Grant's tomb? {~Churchill =Grant ~Napoleon ~No one}</li>
+					</ul>
+					This follows the pattern of the simple multiple choice questions specified by the
+					<a href="http://docs.moodle.org/en/GIFT#Multiple_choice">Moodle GIFT format</a>.
+					Answers are enclosed in {}.  A ~ precedes incorrect answers, while an = precedes
+					the correct answer.
+				</li>
+				<li>All questions are multiple choice.</li>
+				<li>You must provide exactly one correct answer.</li>
+				<li>You must provide exactly the number of answers that you indicate above for each question.</li>
+			</ul>
+		</td>
+	</tr>
+	<% end %>
+	
 	<tr>
 		<td align=left width=30>Delete</td>
 		<td align=center width=300>Question</td>
 		<td align=center width=100>Scoring</td>
 		<td align=left>Weight</td>
 	</tr>
-	
+		
 	<% 	i = 1;
 		for @question in @questionnaire.questions %>
 	<tr>

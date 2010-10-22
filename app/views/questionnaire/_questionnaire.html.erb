@@ -5,7 +5,11 @@
 	<tr>
 		<td valign="top"><label for="questionnaire_name">Name:</label>	</td>
 		<td>
-			<%= text_field 'questionnaire', 'name', :value=>"#{session[:user].name}'s quiz"  %>
+			<% if @questionnaire.type == "QuizQuestionnaire" and @questionnaire.name.nil? %>
+				<%= text_field 'questionnaire', 'name', :value=>"#{session[:user].name}'s quiz"  %>
+			<% else %>
+				<%= text_field 'questionnaire', 'name' %>
+			<% end %>
 			<%= hidden_field 'questionnaire', 'id' %>
 			<%= hidden_field 'questionnaire', 'type' %>
 		</td>		

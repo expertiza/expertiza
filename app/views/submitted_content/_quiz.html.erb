@@ -1,0 +1,15 @@
+<b>Quiz</b><br/>
+<div id="url" style="">
+    <% if participant.quiz_id %>
+    <ul>
+        <li><%= link_to 'View Quiz', :controller => 'questionnaire', :action => 'view', :id => participant.quiz_id %></li>
+        <li><%= link_to 'Edit Quiz', :controller => 'questionnaire', :action => 'edit', :id => participant.quiz_id %></li>
+		<li><%= link_to 'Delete Quiz', :controller => 'questionnaire', :action => 'delete', :id => participant.quiz_id %></li>
+    </ul>
+    <% else %>
+    <ul>
+        <li><%= link_to 'Create Public Quiz', :controller => 'questionnaire', :action => 'new', :model => 'QuizQuestionnaire', :assignment_id => participant.parent_id, :private => 0 %></li>
+        <li><%= link_to 'Create Private Quiz', :controller => 'questionnaire', :action => 'new', :model => 'QuizQuestionnaire', :assignment_id => participant.parent_id, :private => 1 %></li>
+    </ul>
+    <% end %>
+</div>

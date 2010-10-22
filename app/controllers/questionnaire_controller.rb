@@ -48,18 +48,38 @@ class QuestionnaireController < ApplicationController
   # Remove a given questionnaire
   def delete
     questionnaire = Questionnaire.find(params[:id])
+    is_quiz = false
     
     if questionnaire
-       begin
-          name = questionnaire.name
-          questionnaire.delete
-          flash[:note] = "Questionnaire <B>#{name}</B> was deleted."
+      is_quiz = (questionnaire.type == "QuizQuestionnaire")
+      if is_quiz
+        participants = Participant.find_all_by_quiz_id(questionnaire.id)
+        if not participants.nil?
+          participants.each do |participant|
+            participant.quiz_id = nil
+            participant.save!
+          end
+        end
+      end
+      
+      begin
+        name = questionnaire.name
+        questionnaire.delete
+        flash[:note] = "Questionnaire <B>#{name}</B> was deleted."
       rescue
-          flash[:error] = $!
+        flash[:error] = $!
       end
     end
     
-    redirect_to :action => 'list', :controller => 'tree_display'   
+    if is_quiz
+      if not participants.nil?
+        redirect_to :action => 'edit', :controller => 'submitted_content', :id => session[:user].id
+      else
+        redirect_to :action => 'list', :controller => 'student_task'
+      end
+    else
+      redirect_to :action => 'list', :controller => 'tree_display'
+    end
   end
   
   # View a questionnaire
@@ -101,21 +121,43 @@ class QuestionnaireController < ApplicationController
   def new
     @questionnaire = Object.const_get(params[:model]).new
     @questionnaire.private = params[:private] 
-    @questionnaire.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
-    @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE    
+    if @questionnaire.type == "QuizQuestionnaire"
+      @questionnaire.min_question_score = QuizQuestionnaire::DEFAULT_MIN_QUESTION_SCORE
+      @questionnaire.max_question_score = QuizQuestionnaire::DEFAULT_MAX_QUESTION_SCORE    
+    else
+      @questionnaire.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
+      @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE    
+    end
   end
 
   # Save the new questionnaire to the database
   def create_questionnaire
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
 
-    if (session[:user]).role.name == "Teaching Assistant"
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    else
+    if @questionnaire.type == "QuizQuestionnaire"
       @questionnaire.instructor_id = session[:user].id
-    end       
-    save_questionnaire    
-    redirect_to :controller => 'tree_display', :action => 'list'
+      participant = Participant.find_by_user_id_and_parent_id(session[:user].id, params[:assignment_id])
+      if participant.nil?
+        raise "User #{session[:user].name} is not participating in this assignment!"
+      end
+      if not participant.quiz_id.nil?
+        # raise "A quiz (#{p.quiz_id}) already exists for this participant (#{p.id})for this assignment (#{params[:assignment_id]})!"
+        quiz = Quiz.find_by_id(participant.quiz_id)
+        quiz.delete
+      end
+      save_questionnaire
+      participant.quiz_id = @questionnaire.id
+      participant.save!
+      redirect_to :controller => 'submitted_content', :action => 'edit', :id => session[:user].id
+    else
+      if (session[:user]).role.name == "Teaching Assistant"
+        @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+      else
+        @questionnaire.instructor_id = session[:user].id
+      end       
+      save_questionnaire    
+      redirect_to :controller => 'tree_display', :action => 'list'
+    end
   end
   
   # Modify the advice associated with a questionnaire
@@ -162,11 +204,13 @@ class QuestionnaireController < ApplicationController
       @questionnaire.save!
       save_questions @questionnaire.id if @questionnaire.id != nil and @questionnaire.id > 0
       
-      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
-      parent = FolderNode.find_by_node_object_id(pFolder.id)
-      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
-        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end      
+      if @questionnaire.type != "QuizQuestionnaire"
+        pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
+        parent = FolderNode.find_by_node_object_id(pFolder.id)
+        if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
+          QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+        end
+      end
     rescue
       flash[:error] = $!
     end

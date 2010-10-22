@@ -16,6 +16,7 @@
       <b>Your topic(s):</b>
       <% for selected_topic in @selected_topics %>
           <br/><%= selected_topic.topic_name %>
+          <br/><%= "Description: #{selected_topic.topic_description}" %>		  
           <%if selected_topic.is_waitlisted == true%>
             <font color='red'>(waitlisted)</font>
           <%end%>
@@ -27,7 +28,8 @@
   <% for topic in @sign_up_topics %>
       <tr>
         <td><%=topic.topic_identifier%></td>
-        <td><%= topic.topic_name %></td>
+        <td><%= topic.topic_name %>
+		<br/><br/><%= "Description: #{topic.topic_description}" %></td>
         <td align="center"><%= topic.max_choosers %></td>
 
         <% found_in_slots = false %>

@@ -1,4 +1,6 @@
+require "digest"
 require 'digest/sha1'
+require 'openssl'
 
 class User < ActiveRecord::Base
   has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id'
@@ -136,4 +138,60 @@ class User < ActiveRecord::Base
   def set_courses_to_assignment 
     @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')    
   end
+  
+  # SDN generate new keys and certificate for user
+  #  public key and certificate are stored
+  #  private_key is emailed to user
+  def gen_keys_and_certificate
+    
+    user_id = self.name
+    
+    # generate new keys
+    new_key = OpenSSL::PKey::RSA.generate( 1024 )
+    new_public = new_key.public_key
+    new_private = new_key.to_pem
+      
+    # creating the digital certificate      
+    cert = OpenSSL::X509::Certificate.new
+    cert.version = 1
+    cert.subject = cert.issuer = OpenSSL::X509::Name.parse("/C="+user_id.to_s)
+    cert.public_key = new_public
+    cert.not_before = Time.now
+    cert.not_after = Time.now+3600*24*365
+    cert.sign(new_key, OpenSSL::Digest::SHA1.new)
+     
+    # save the public key and certificate
+    self.public_key = new_key.public_key.to_pem
+    self.certificate = cert.to_pem
+    self.save
+    
+    # now send an email with the private key
+    # TODO Mailer code doesn't work in dev environmant, so just dump to console
+    puts "Keys and certificate created for #{self.name}"
+    puts new_key.to_pem
+    send_pkey(new_key.to_pem)
+                
+  end
+
+  # allow key to be directly passed for debug
+  #def self.get_key
+  #  @@pass_private_key
+  #end
+  
+  def send_pkey(priv_key) 
+    
+    Mailer.deliver_message(
+        {:recipients => self.email,
+         :subject => "Your Expertiza signature key",
+         :body => {
+           :user => self,
+           :pkey => priv_key,
+           :first_name => ApplicationHelper::get_user_first_name(self),
+           :partial_name => "send_pkey"           
+         }
+        }
+    )
+    
+  end   
+
 end

@@ -114,4 +114,53 @@ end
       end            
     end
   end   
+  
+  # SDN list publication rights
+  def list_pub_rights
+    @root_node = Object.const_get(params[:model]+"Node").find_by_node_object_id(params[:id])
+    @parent = Object.const_get(params[:model]).find(params[:id])
+    @participants = @parent.participants  
+    @model = params[:model]    
+    @num_granted = num_pub_rights_granted(@participants, Time.now)
+    @num_participants = @participants.size
+  end
+
+  def num_pub_rights_granted(plist, checktime) 
+    count = 0
+    if !plist.nil? 
+    # if permission has been granted before checktime then count this participant
+     plist.each do |x| 
+       if x.permission_granted? 
+         if x.permission_updated_at.nil? ||  (x.permission_updated_at < checktime)
+           count += 1
+         end
+       end #if
+     end #do       
+     end
+     return count
+   end
+ 
+   def pub_rights_trend
+    @root_node = Object.const_get(params[:model]+"Node").find_by_node_object_id(params[:id])     
+    @parent = Object.const_get(params[:model]).find(params[:id])
+    @participants = @parent.participants  
+    @model = params[:model]
+    @num_participants = @participants.size
+    # generate trend for last 30 days / use array to keep order
+    p_trend = Array.new
+    (0..30).collect  do |days_ago| 
+       p_trend[days_ago] = { "date" => (DateTime.now - days_ago),\
+                             "num" => num_pub_rights_granted(@participants, (DateTime.now - days_ago)) }
+    end
+    #puts p_trend
+    #@pub_trend = { (DateTime.now) => num_pub_rights_granted(@participants, (DateTime.now)),\
+    #(DateTime.now - 1) => num_pub_rights_granted(@participants, (DateTime.now - 1)),\
+    #(DateTime.now - 2) => num_pub_rights_granted(@participants, (DateTime.now - 2)),\
+    #(DateTime.now - 3) => num_pub_rights_granted(@participants, (DateTime.now - 3)),\
+    #(DateTime.now - 4) => num_pub_rights_granted(@participants, (DateTime.now - 4)) }
+    # sort the trend
+    @pub_trend = p_trend
+    puts @pub_trend
+  end
+  
 end

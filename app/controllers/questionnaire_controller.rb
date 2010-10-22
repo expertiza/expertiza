@@ -54,6 +54,7 @@ class QuestionnaireController < ApplicationController
       is_quiz = (questionnaire.type == "QuizQuestionnaire")
       if is_quiz
         participants = Participant.find_all_by_quiz_id(questionnaire.id)
+        this_participant = questionnaire.get_participant_by_user_id(session[:user].id)
         if not participants.nil?
           participants.each do |participant|
             participant.quiz_id = nil
@@ -72,8 +73,8 @@ class QuestionnaireController < ApplicationController
     end
     
     if is_quiz
-      if not participants.nil?
-        redirect_to :action => 'edit', :controller => 'submitted_content', :id => session[:user].id
+      if this_participant
+        redirect_to :action => 'edit', :controller => 'submitted_content', :id => this_participant.id
       else
         redirect_to :action => 'list', :controller => 'student_task'
       end
@@ -148,7 +149,7 @@ class QuestionnaireController < ApplicationController
       save_questionnaire
       participant.quiz_id = @questionnaire.id
       participant.save!
-      redirect_to :controller => 'submitted_content', :action => 'edit', :id => session[:user].id
+      redirect_to :controller => 'submitted_content', :action => 'edit', :id => participant.id
     else
       if (session[:user]).role.name == "Teaching Assistant"
         @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)

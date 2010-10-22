@@ -225,8 +225,8 @@ class SignUpSheetController < ApplicationController
     assignment = Assignment.find(params[:id])
 
 
-    if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
-      @show_actions = false
+   if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
+     @show_actions = false
     end
     
     #Find whether the user has signed up for any topics, if so the user won't be able to

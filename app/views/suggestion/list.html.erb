@@ -4,23 +4,43 @@
 	Click View link to view the suggestion and to comment, edit, and/or approve
 </div>
 
+<% form_tag({:action => 'list'}) do %>
+Sort by: 
+<select name='suggestions[sortvar]' style="width: 10em">
+  <option value='blank' <% if @sortvar == 'blank'%>selected<% end %>> </option>
+  <option value='title' <% if @sortvar == 'title'%>selected<% end %>>Title</option>
+    <option value='status' <% if @sortvar == 'status'%>selected<% end %>>Status</option>  
+  <option value='createdDate' <% if @sortvar == 'createdDate'%>selected<% end %>>Date created</option>
+  <option value='unityID' <% if @sortvar == 'unityID'%>selected<% end %>>Submitter's unity ID</option>
+</select>
+<select name='suggestions[sortorder]' style="width: 10em">
+  <option value='blank' <% if @sortvar == 'blank'%>selected<% end %>> </option>	
+  <option value='asc' <% if @sortorder == 'asc'%>selected<% end %>>ascending</option>
+  <option value='desc' <% if @sortorder == 'desc'%>selected<% end %>>descending</option>
+</select>
+<%= submit_tag "Sort" %>
+<br><br>
 <table class="general" cellpadding=5 width=100% border=1>
+	
   <tr>
     <th>Title</th>
 	<th>Status</th>
+	<th>Created</th>	
 	<th>Submitter's unity ID</th>
-	<th>Action</th>
+	<th>Action</th>	
   </tr>
 
 <% for suggestion in @suggestions %>
   <tr class="listingRow">
     <td><%=h suggestion.title %></td>
     <td align="center"><%=h suggestion.status %></td>
+    <td align="center"><%=h suggestion.createdDate%></td>	
 	<td align="center"><%=h suggestion.unityID %></td>
 	<td align="center"><%= link_to 'View', :action => 'show', :id => suggestion %></td>	
   </tr>
 <% end %>
 </table>
+<% end %>
 <%else%>
 	<b>No suggestions yet.</b>
 <%end%>

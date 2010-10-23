@@ -23,8 +23,12 @@
      <% if map.response %>            
        <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
        <% if @assignment.get_current_stage(@participant.topic_id) != "Complete" %>
-       <td><%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
+        <td><%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
+        <% if @participant.quiz_id %>
+            <td><%= link_to 'Take Quiz', :controller => 'response', :action => 'new_quiz', :id => map.id %></td>
+        <% end %>
        <% end %>
+           
      <% elsif @assignment.get_current_stage(@participant.topic_id) != "Complete" %>
        <%if @assignment.staggered_deadline?%>
            <%if map.type.to_s == "MetareviewResponseMap"%>

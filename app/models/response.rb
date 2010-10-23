@@ -84,7 +84,7 @@ class Response < ActiveRecord::Base
 
 def display_as_table(reviews,prefix)
 
-  String code ='<table border=1 width=100% class="grades"> <tr><th>Questions</th>'
+  String code ='<table width=100% class="grades"> <tr><th>Questions</th>'
   count=0
   for review in reviews
     count=count+1

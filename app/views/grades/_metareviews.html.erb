@@ -14,15 +14,13 @@
            }%>
   <BR/>         
   <HR/> 
-  <% count = 0 %>
-  <% for metareview in rscore[:assessments] %>
-    <% count = count + 1 %>
-    <% if controller.action_name != "view_my_scores" %>
-      <a name="<%=prefix+"_"+metareview.map.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/> 
+   <% if controller.action_name != "view_my_scores" %>
+      <a name="<%=prefix+"_"+rscore[:assessments][0].map.reviewer.name%>"></a><%= rscore[:assessments][0].display_as_table(rscore[:assessments],prefix) %><BR/><BR/>
     <% else %>
-      <%= metareview.display_as_html(nil,count) %><BR/><BR/>
-    <% end %>        
-  <% end %>
+      <%= rscore[:assessments][0].display_as_table(rscore[:assessments],nil) %><BR/><BR/>
+    <% end %>
+   </table>
+    <br/>
 <% else %>
   <i>No metareviews have been completed for this user's reviews.</i>
 <% end %>

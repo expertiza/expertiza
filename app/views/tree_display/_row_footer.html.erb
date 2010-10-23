@@ -6,7 +6,7 @@
 %>
 
 <!-- Start Listing -->
-<%= render :partial=> '/tree_display/entry', :locals => {:node => node, :prefix => prefix+"_"+index.to_s, :depth => depth + 1, :rowtype => rowtype } %>
+<%= render :partial=> '/tree_display/entry', :locals => {:node => node, :prefix => prefix+"_"+index.to_s, :depth => depth + 1, :rowtype => rowtype, :main_nodes =>child_nodes } %>
 <!-- End Listing -->
 <% 
    index+=1   

@@ -80,5 +80,71 @@ class Response < ActiveRecord::Base
   def delete
     self.scores.each {|score| score.destroy}
     self.destroy
-  end  
+  end
+
+def display_as_table(reviews,prefix)
+
+  String code ='<table border=1 width=100% class="grades"> <tr><th>Questions</th>'
+  count=0
+  for review in reviews
+    count=count+1
+    if prefix
+      identifier = "<B>Reviewer:</B> "+review.map.reviewer.fullname
+    else
+      identifier = '<B>'+review.map.get_title+'</B> '+count.to_s+'</B>'
+
+    end
+    code+= '<th>'+identifier+'</th>'
+  end
+   code+='</tr>'
+
+  quescnt=reviews[0].get_score_count
+  for i in 0..quescnt-1
+     code+='<tr class ="head"><td>'+ (i+1).to_s+ ".  " +Question.find_by_id(reviews[0].scores[i].question_id).txt+ '</td>'
+     for review in reviews
+       if review.scores[i].comments != nil
+        code +='<td>'+review.scores[i].comments.gsub("<","&lt;").gsub(">","&gt;").gsub(/\n/,'<BR/>')+'</td>'
+       end
+      end
+      code+='</tr>'
+  end
+
+  code+='<tr  class ="head"><td><b>Additional Comments</b></td>'
+  for review in reviews
+    code+='<td>'
+    if review.additional_comment != nil
+      code += review.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')
+    end
+    code+='</td>' 
+  end
+
+  code+='</tr>'
+  code += "<tr class ='head'><td><B>Last reviewed</B> "
+  for review in reviews
+    if review.updated_at.nil?
+      code += "<td> Not available</td>"
+    else
+      code += "<td>"+review.updated_at.strftime('%A %B %d %Y, %I:%M%p') + "</td>"
+    end
+  end
+  code+='</tr>'
+end
+
+ def prepare_score
+       String code1=""
+      self.scores.each do |reviewScore|
+        code1+=reviewScore.score.to_s+','
+      end
+        return code1.chop + '|'
+ end
+
+ def get_score_count
+         cnt=0
+        self.scores.each do |reviewScore|
+          cnt+=1
+        end
+          return cnt
+ end
+
+
 end

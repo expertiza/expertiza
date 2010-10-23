@@ -21,13 +21,49 @@
 <% width = 66 - depth * 2 %>
 <TD COLSPAN="<%= 3 - depth %>" WIDTH="<%= width %>%">     
   <% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
-  <%else%>
-	  <%= parent_node.get_name %>
-	  <% if parent_node.get_directory != nil%>
-	    <BR/><I>Directory:</I> <%= parent_node.get_directory %>
-	  <% end %>
-	  <% if parent_node.get_creation_date != nil %>
-	    <BR/><I>Creation Date:</I> <%= parent_node.get_creation_date %>
-	  <% end %>
+  <%else
+      if parent_node.class.to_s=='AssignmentNode'
+   %>
+    <table width=100% border =0 cellspacing=5 border=0 style='WORD-BREAK:BREAK-ALL'>
+     <%  if parent_node==main_nodes[0] %>
+        <Tr>
+        <Th>  Name </Th> <Th> Directory</Th><Th>Creation <br>Date</Th>
+        <Th> Course </Th> <Th>Instructor</th>
+        </Tr>
+    <% end %>
+     <Tr>
+       <Td width=21%><%= parent_node.get_name %> </Td>
+       <Td width=28%>
+       <% if parent_node.get_directory != nil%>
+          <%= parent_node.get_directory %>
+       <% end %>
+       </Td>
+       <Td width=26%>
+       <% if parent_node.get_creation_date != nil %>
+         <%= parent_node.get_creation_date %>
+       <% end %>
+       </Td>
+        <Td width=14%>
+          <% if parent_node.get_course != ""%>
+             <%= parent_node.get_course%> &nbsp;&nbsp;
+           <% end %>
+          </Td>
+          <Td width=16%>
+          <% if parent_node.get_instructor != ""%>
+              <%= parent_node.get_instructor%> &nbsp;&nbsp;
+           <% end %>
+          </Td>
+
+      </TR>
+     </table>
+    <% else %>
+      <%= parent_node.get_name %>
+       <% if parent_node.get_directory != nil%>
+         <BR/><I>Directory:</I> <%= parent_node.get_directory %>
+       <% end %>
+       <% if parent_node.get_creation_date != nil %>
+         <BR/><I>Creation Date:</I> <%= parent_node.get_creation_date %>
+       <% end %>
+     <% end %>
   <%end%>		  
 </TD>

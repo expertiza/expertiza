@@ -106,9 +106,16 @@ class TreeDisplayController < ApplicationController
     end
         
     if session[:root]
-      @root_node = Node.find(session[:root])
-      @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show)
+     node_object = TreeFolder.find_by_name('Assignments')
+     if session[:root].to_s != FolderNode.find_by_node_object_id(node_object.id).id.to_s and (@sortvar=="course" or @sortvar=="instructor")
+        @sortvar='name'
+     end
+     @root_node = Node.find(session[:root])
+     @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show)
     else
+      if @sortvar=="course" or @sortvar=="instructor" 
+        @sortvar= 'name'
+      end
       @child_nodes = FolderNode.get()
     end    
   end   

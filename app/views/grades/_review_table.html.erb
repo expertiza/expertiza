@@ -15,6 +15,37 @@
 		   <% end %>
 		   </td>	    
 	    <% end %>
+
+      <%
+         String scores =""
+         String color =""
+         String name =""
+         cnt=0
+         for review in reviews
+             scores+= review.prepare_score
+             cntrev=review.get_score_count
+             cnt+=1
+         end
+         scores=scores.chop
+
+         color_code =['4D89F9','B03A3A','FF9900','9A2EFE','000000','FFC6A5','FFFF42','DEF3BD']
+         for i in 1..reviews.length
+              color+=color_code[i-1].to_s+ ','
+               name+='Reviewer_'+i.to_s+'%20|'
+          end
+          color=color.chop
+          name=name.chop.chop.chop.chop
+
+          String url ='http://chart.apis.google.com/chart?chd=t:'+scores+'&cht=bvg&chds=0,5&chxr=0,0,5,1|1,1,'+cntrev.to_s+'&chxt=y,x,y&chxl=1:|2:|score&chtt=Score%20per%20Question%20by%20each%20Reviewer&chco='+color+'&chdl='+name+'&chbh=a,0,15&chma=1:|20,20'
+          String thumb_size='&chs=200x100&chts=676767,8';
+          String large_img_size=url+'&chs=500x500&chts=676767,12';
+      %>
+
+      <td rowspan=2>
+          <a href="javascript:void(0)" onclick="window.open('<%=large_img_size%>','Scores per question by each reviewer','width=700, height=500').focus();return false;">
+            <img src= <%=url%>+<%=thumb_size%> alt='score per question given by reviewers'/img>
+          </a>
+       </td>
 	</tr>
 	<% end %>
 	<tr class="head"><td align="right"><b>Average score</b></td>
@@ -29,3 +60,4 @@
 	    <% end %>
 	</tr>
 </table>
+

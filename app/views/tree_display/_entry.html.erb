@@ -5,7 +5,8 @@
                :prefix => prefix, 
                :rowtype => rowtype,               
                :parent_node => node,
-               :child_nodes => child_nodes               
+               :child_nodes => child_nodes,
+               :main_nodes => main_nodes              
             } %>			
 <% if node.get_partial_name %>
 	<%if node.get_partial_name == 'courses_folder_actions' && session[:user].role_id == 6 %>           

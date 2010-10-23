@@ -78,7 +78,27 @@ class ResponseController < ApplicationController
       redirect_to :back
     end
   end
-  
+
+  def new_quiz
+    @header = "Quiz on"
+    @next_action = "create"
+    @feedback = params[:feedback]
+    @map = ResponseMap.find(params[:id])
+    @modified_object = @map.id
+    @return = params[:return]
+    
+    get_content
+
+    #replace the questionnaire found by the get_content tied to the response map
+    @title = "Quiz"
+    @questionnaire = Questionnaire.find(@map.reviewee.quiz_id)
+    @questions = @questionnaire.questions
+    @min = @questionnaire.min_question_score
+    @max = @questionnaire.max_question_score
+
+    render :action => 'response'
+  end
+
   def new
     @header = "New"
     @next_action = "create"    

@@ -13,29 +13,36 @@
            :rowlabel => "Reviewer"
            }%>
   <BR/>         
-  <HR/> 
-  <% count = 0 %>
-  <% for review in rscore[:assessments] %>
-    <% count = count + 1 %>
-    <% if controller.action_name != "view_my_scores" %>
-      <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
-    <% else %>
-      <% review_feedback = nil %>
-      <%= review.display_as_html(nil,count) %><BR/><BR/>
-      <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)         
-         if map
-                review_feedback = map.response         
-         end %>
-      <% if review_feedback %>       
-      	<%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
-      	<%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>
-      <% else %>
-        <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
-      <% end %> 
-      <BR/><HR/><BR/>  	 
-    <% end %>     
-  <% end %>
-<% else %>
+  <HR/>
+
+
+
+    <br><br><B>Reviewer's Comments: </B>
+        <% if controller.action_name != "view_my_scores" %>
+            <a name="<%=prefix+"_"+rscore[:assessments][0].map.reviewer.name%>"></a>   <%=rscore[:assessments][0].display_as_table(rscore[:assessments],prefix)%><BR/><BR/>
+        <% else %>
+             <% review_feedback = nil %>
+             <%=rscore[:assessments][0].display_as_table(rscore[:assessments],prefix)%><BR/><BR/>  <tr><td></td>
+              <% for a_review in rscore[:assessments]
+                   map = FeedbackResponseMap.find_by_reviewed_object_id(a_review.id)
+                   if map
+                    review_feedback = map.response
+                   end %>  <td>
+                   <% if review_feedback %>
+                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
+                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>
+                  <% else %>
+                    <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+                     </td>
+                  <% end %>
+
+              <% end %>
+              </tr>
+          <% end %>
+     </table>
+
+ <br/>
+ <% else %>
   <i>No reviews have been completed for this user's submissions.</i>
 <% end %>
 <!-- END REVIEWS --> 

@@ -110,20 +110,45 @@
    	        <TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f", pscore[:total_score])) %>% </TD>	    	
    	    <% end %>   	        
    	<% end %>
+
+  <%String url =''
+    temp_s_avg=0
+    temp_r_avg=0
+    temp_f_avg=0
+    temp_tr_avg=0
+
+    if s_avg then temp_s_avg=s_avg  end
+    if r_avg then temp_r_avg=r_avg  end
+    if f_avg then temp_f_avg=f_avg  end
+    if tr_avg then temp_tr_avg=tr_avg end
+
+    if @assignment.team_assignment
+      url+='http://chart.apis.google.com/chart?chxp=2,10,50.83,90&chxt=x,y&chxl=0:|R|M|F|T&chxr=0:|1:0,0,100,25&cht=bvg&chco=FFC6A5|FFFF42|DEF3BD|00A5C6&chd=t:'+temp_s_avg.to_s+','+temp_r_avg.to_s+','+temp_f_avg.to_s+','+temp_tr_avg.to_s+'&chg=20,50&chdl=R-Review|M-MetaReview|F-Feedback|T-Teammate&chtt=%20Average%20Review%20Scores&chbh=a&chdlp=b'
+    else
+      url+='http://chart.apis.google.com/chart?chxp=2,10,50.83,90&chxt=x,y&chxl=0:|R|M|F&chxr=0:|1:0,0,100,25&cht=bvg&chco=FFC6A5|FFFF42|DEF3BD&chd=t:'+temp_s_avg.to_s+','+temp_r_avg.to_s+','+temp_f_avg.to_s+'&chg=20,50&chdl=R-Review|M-MetaReview|F-Feedback&chtt=%20Average%20Review%20Scores&chbh=a&chdlp=b'
+    end
+    String thumb_size='&chs=220x80&chts=676767,8';
+    String large_img_size=url+'&chs=500x500&chts=676767,12';
+  %>
+  <TD ALIGN="CENTER">
+    <a href="javascript:void(0)" onclick="window.open('<%=large_img_size%>','Scores per question by each reviewer','width=700, height=500').focus();return false;">
+            <img src= <%=url%>+<%=thumb_size%> alt='average review score'/img>
+    </a>
+  </TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_files" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
+	<TD COLSPAN="10"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_reviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
+	<TD COLSPAN="11"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
+	<TD COLSPAN="11"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_feedback" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
+	<TD COLSPAN="11"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
+	<TD COLSPAN="11"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
 </TR>
 <!-- END PARTICIPANT -->

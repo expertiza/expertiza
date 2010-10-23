@@ -48,8 +48,14 @@ class AssignmentNode < Node
     if sortorder.nil?
       sortorder = 'ASC'
     end         
-        
-    find(:all, :include => :assignment, :conditions => [conditions,values], :order => "assignments.#{sortvar} #{sortorder}")    
+
+    if(sortvar=="course")
+      find(:all, :include =>{ :assignment, :course}, :conditions => [conditions,values], :order => "courses.name #{sortorder}")
+    elsif sortvar=='instructor'
+      find(:all, :include => {:assignment,:instructor}, :conditions => [conditions,values], :order => "users.name #{sortorder}")
+    else
+      find(:all, :include => :assignment, :conditions => [conditions,values], :order => "assignments.#{sortvar} #{sortorder}")
+     end
   end
   
   # Indicates that this object is always a leaf
@@ -80,5 +86,21 @@ class AssignmentNode < Node
   # Gets any TeamNodes associated with this object   
   def get_teams
     TeamNode.get(self.node_object_id)
-  end  
+  end
+
+  def get_course
+    if Assignment.find(self.node_object_id).course_id
+      Course.find(Assignment.find(self.node_object_id).course_id).name
+    else
+      ""
+     end
+  end
+
+  def get_instructor
+    if Assignment.find(self.node_object_id).instructor_id
+      User.find(Assignment.find(self.node_object_id).instructor_id).name
+    else
+      ""
+     end
+  end
 end

@@ -14,15 +14,14 @@
            }%>
   <BR/>         
   <HR/> 
-  <% count = 0 %>
-  <% for feedback in rscore[:assessments] %>
-    <% count = count + 1 %>
-    <% if controller.action_name != "view_my_scores" %>
-      <a name="<%=prefix+"_"+feedback.map.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
-    <% else %>
-      <%= feedback.display_as_html(nil,count) %><BR/><BR/>
-    <% end %>      
-  <% end %>
+
+  <% if controller.action_name != "view_my_scores" %>
+          <a name="<%=prefix+"_"+rscore[:assessments][0].map.reviewer.name%>"></a><%= rscore[:assessments][0].display_as_table(rscore[:assessments],prefix) %><BR/><BR/>
+        <% else %>
+          <%= rscore[:assessments][0].display_as_table(rscore[:assessments],nil) %><BR/><BR/>
+    <% end %>
+       </table>
+
 <% else %>
   <i>No author feedback has been provided for this user's reviews.</i>
 <% end %>

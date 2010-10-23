@@ -8,12 +8,13 @@
 <% end %>	
 <BR/>
 
+
 <% if participant.assignment.allow_hosted_docs %>
   <%= render :partial => 'submitted_content/hosted_documents', :locals => {:documents => participant.participant_hosted_documents, :participant_id => participant.id, :stage => stage} %>
 <% end %>
 <% if participant.assignment.wiki_type_id == 1%>
   <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>
-<% else %> 
+<% else %>
   <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
 <% end %>
 

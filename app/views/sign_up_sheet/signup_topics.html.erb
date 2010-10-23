@@ -16,7 +16,6 @@
       <b>Your topic(s):</b>
       <% for selected_topic in @selected_topics %>
           <br/><%= selected_topic.topic_name %>
-          <br/><%= "Description: #{selected_topic.topic_description}" %>		  
           <%if selected_topic.is_waitlisted == true%>
             <font color='red'>(waitlisted)</font>
           <%end%>
@@ -29,7 +28,7 @@
       <tr>
         <td><%=topic.topic_identifier%></td>
         <td><%= topic.topic_name %>
-		<br/><br/><%= "Description: #{topic.topic_description}" %></td>
+		<br/><br/><%= render :partial => 'topic_description', :locals => {:i => i, :topic_desc => topic.topic_description} %></td>
         <td align="center"><%= topic.max_choosers %></td>
 
         <% found_in_slots = false %>

@@ -2,6 +2,11 @@
 <br/>
 <div class="flash_note">To begin, click on an assignment from the list above or <%= link_to 'click here', :controller => 'publishing', :action => 'view' %> to set <b>publishing rights</b> for your work.</div>
 <br/>
+<%= link_to "Generate Student Summary Report", :action => 'reportgen'%>
+<br/>
+<%= link_to "Percentage of reviews", :action => "percentage" %>
+<br/>
+
 <table class="listing" cellpadding=2>
   <tr>
 	<th>&nbsp;</th>

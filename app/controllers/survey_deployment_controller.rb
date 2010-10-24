@@ -81,6 +81,69 @@ class SurveyDeploymentController < ApplicationController
    redirect_to :action=>'reminder_thread'
   end
    
+def reportgen
+  @assgn = []
+  @scores = []
+  @ranges = []
+  @type = []
+  @teams = []
+  @user = User.new(params[:userform])
+  @res = User.find_by_name(@user.name)
+  if @user.name!=""
+  @participant = Participant.find_all_by_user_id(@res.id)
+  for participant in @participant do
+    @temp=ScoreCache.find_all_by_reviewee_id(participant.id)
+    @teams=AssignmentParticipant.find(:all, :conditions => ["parent_id=? and user_id=?", participant.parent_id, participant.user_id])
+    puts @temp.size
+    puts @teams.size
+    for tscore in @temp do
+      @assgn<<Assignment.find(participant.parent_id).name
+      @scores<<tscore.score
+      @ranges<<tscore.range
+      @type<<tscore.object_type
+    end
+    for team in @teams do
+      @temp=ScoreCache.find_all_by_reviewee_id(team.team)
+    end
+    for tscore in @temp do
+      @assgn<<Assignment.find(participant.parent_id).name
+      @scores<<tscore.score
+      @ranges<<tscore.range
+      @type<<tscore.object_type
+    end
+  end
   
+  end
+
+end
+
+def viewreviews
+  @scoreid = []
+  @additionalcomment = []
+  if params[:id]=="TeammateReviewResponseMap" || params[:id]=="ParticipantReviewResponseMap"
+     @participant_id = Participant.find(:all, :conditions=> ["parent_id=? and user_id=?", Assignment.find_by_name(params[:assgn]).id, params[:user]])
+  else
+     @participant_id = AssignmentParticipant.find(:all, :conditions => ["parent_id=? and user_id=?", Assignment.find_by_name(params[:assgn]).id, params[:user]])
+  end
+  for participant in @participant_id do 
+    if params[:id]== "TeammateReviewResponseMap" || params[:id]=="ParticipantReviewResponseMap"
+      @validresponses = ResponseMap.find(:all, :conditions => ["reviewed_object_id=? and reviewee_id=? and type=?", Assignment.find_by_name(params[:assgn]).id, participant.id, params[:id]] )
+    else
+      @validresponses = ResponseMap.find(:all, :conditions => ["reviewed_object_id=? and reviewee_id=? and type=?", Assignment.find_by_name(params[:assgn]).id, participant.team, params[:id]] )
+    end
+    #@validresponses = @validresponses.sort!(&:reviewer_id)
+  for validresponse in @validresponses do
+    @responseid = Response.find(:all, :conditions=> ["map_id=?", validresponse.id])
+  for response in @responseid
+    @indivresponses = Score.find(:all, :conditions => ["response_id=?", response.id])  
+    @additionalcomment << response.additional_comment
+  for responses in @indivresponses do
+    @scoreid << responses.id
+  end
+  end
+  end
+  end
+puts @scoreid.size
+end
 
 end

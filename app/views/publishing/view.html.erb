@@ -13,7 +13,7 @@
 		<% else %>
 	<tr>
 					
-		<td colspan=4>
+		<td colspan=5>
 			<div class="flash_note">
 				In order for your work to be published on our website, you need to need to grant us 
 				publishing rights for your work. You may do this on a per assignment basis, or if
@@ -22,11 +22,11 @@
 		</td>
 	</tr>
 	<tr>
-		<td colspan=3><h3>Future work</h3></td>
+		<td colspan=4><h3>Future work</h3></td>
 		<td></td>
 	</tr>
 	<tr>
-		<td colspan=3>
+		<td colspan=4>
 			<% if session[:user].master_permission_granted.nil? %>
 				You currently do not have auto publishing permissions set. <br>
 				Click <%= link_to 'grant', :action =>'set_master_publish_permission', :id => 1 %> 
@@ -45,25 +45,26 @@
 		<td></td>
 	</tr>
 	<tr>
-		<td colspan=3><h3>Past assignments</h3></td>
+		<td colspan=4><h3>Past assignments</h3></td>
 		<td></td>
 	</tr>
 	<tr>
-		<td colspan=3><%= link_to 'Grant', :action =>'update_publish_permissions', :allow => 1 %> publishing rights to all my past work.</td>
+		<td colspan=4><%= link_to 'Grant', :action =>'update_publish_permissions', :allow => 1 %> publishing rights to all my past work.</td>
 		<td></td>
 	</tr>
 	<tr>
-		<td colspan=3><%= link_to 'Deny', :action =>'update_publish_permissions', :allow => 0 %> publishing rights to all my past work.</td>
+		<td colspan=4><%= link_to 'Deny', :action =>'update_publish_permissions', :allow => 0 %> publishing rights to all my past work.</td>
 		<td></td>
 	</tr>
 	<tr>
-		<td colspan=3></td>
+		<td colspan=4></td>
 		<td></td>
 	</tr>
   <tr>
 		<th></th>
 	  <th>Assignment</th>
 	  <th>Publishing Rights</th>
+	  <th>Digital Signature</th>
 		<td></td>
   </tr>
 	
@@ -75,12 +76,15 @@
 	  <td align=center>
 	  	<%if participant.permission_granted %>
 	  		<%= link_to 'deny', :action =>'set_publish_permission', :id => participant.id, :allow => 0 %> 
+		</td>
+		<td align=center><%= (participant.verify_digital_signature(participant.digital_signature) ? "verified" : "invalid") %></td>
 	    <% else %>
 	    	<%= link_to 'grant', :action =>'grant', :id => participant.id %> 
-		<% end %>
 		</td>
-		<td width=50%>&nbsp;</td>
-
+		<td>&nbsp;</td>
+		<% end %>
+		
+		<td width=30%>&nbsp;</td>
 	</tr>
 <% } %>
 <% end %>

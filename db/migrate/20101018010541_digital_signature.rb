@@ -8,7 +8,7 @@ class DigitalSignature < ActiveRecord::Migration
     execute "ALTER TABLE participants
               ADD COLUMN digital_signature LONGTEXT"  
     rescue
-      put $!
+      puts $!
     end    
   end
 

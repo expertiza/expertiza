@@ -310,7 +310,11 @@ def add_participant(user_name)
   end
   participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
   if !participant
-    newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)      
+      if !user.master_permission_granted.nil?
+        p_permission_updated_at = user.permission_updated_at;
+        p_digital_signature = user.digital_signature;
+      end
+    newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted, :permission_updated_at => p_permission_updated_at, :digital_signature => p_digital_signature)      
     newpart.set_handle()         
   else
     raise "The user \""+user.name+"\" is already a participant."

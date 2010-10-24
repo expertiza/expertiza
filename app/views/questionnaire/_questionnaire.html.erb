@@ -83,6 +83,20 @@
 		<td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
 		<td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
 	</tr>
+	<% if @questionnaire.type == "QuizQuestionnaire" %>
+	<% p = @question.parse %>
+	<tr>
+		<td></td>
+		<td>
+			<% if p[:correct].length != 1 %>
+			WARNING: Questions must have exactly one correct answer! <br /> 
+			<% end %>
+			<% if p[:answers].length != @questionnaire.max_question_score %>
+			WARNING: Questions must have exactly the number of answers you have indicated above! <br />
+			<% end %>
+		</td>
+	</tr>
+	<% end %>
 	<% 	i += 1;
 		end %>
 </table>

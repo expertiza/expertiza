@@ -22,9 +22,29 @@
   	tr_avg = pscore[:teammate][:scores][:avg]   
   end  	
 %>
+<%
+s_avg ? revw=s_avg : revw=0
+r_avg ? mtrevw=r_avg : mtrevw=0
+f_avg ? authfdbk=f_avg : authfdbk=0
+tr_avg ? teamrevw=tr_avg : teamrevw=0
+dataset1 = GC4R::API::GoogleChartDataset.new :data => revw, :title => 'R'
+dataset2 = GC4R::API::GoogleChartDataset.new :data => mtrevw, :title => 'M'
+dataset3 = GC4R::API::GoogleChartDataset.new :data => authfdbk, :title => 'A'
+dataset4 = GC4R::API::GoogleChartDataset.new :data => teamrevw, :title => 'T'
 
+data = GC4R::API::GoogleChartData.new :datasets => [dataset1,dataset2,dataset3,dataset4]
+
+axis = GC4R::API::GoogleChartAxis.new :axis => [GC4R::API::GoogleChartAxis::LEFT, GC4R::API::GoogleChartAxis::BOTTOM]
+
+@chart = GC4R::API::GoogleBarChart.new :width => 140, :height => 75
+@chart.data = data
+@chart.axis = axis
+%>
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
     <TD><%= participant.fullname %>
+	<%if session[:user].role_id != 1%>
+       <%= image_tag @chart.to_url %>
+    <%end%>
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a></FONT>  	
     </TD>
     

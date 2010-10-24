@@ -1,0 +1,17 @@
+<b>Reviews</b>
+<br>
+<br>
+<% for score in @scoreid %>
+<b>Question</b> :
+<br>
+<%= Question.find(Score.find(score).question_id).txt %>
+<br>
+<b>Score</b> :
+<br>
+<%= Score.find(score).score %>
+<br>
+<b>Comments</b> :
+<br>
+<%= Score.find(score).comments %>
+<br>
+<% end %>

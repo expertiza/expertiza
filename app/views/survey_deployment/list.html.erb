@@ -40,7 +40,9 @@ Survey Deployment
 <p>
 
 <%= link_to "Add New Deployment", :action=>"new" %><p>
-
+<%= link_to "Generate Student Report", :action=>"reportgen"%>
+<br>
+<br>
 <% if session[:user].role_id==4 # only super admin can start/restart thread for now %>
 <%= link_to "Reminder thread status", :action=>"reminder_thread" %>
 <% end %>

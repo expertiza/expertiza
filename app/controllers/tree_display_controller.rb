@@ -12,6 +12,14 @@ class TreeDisplayController < ApplicationController
   def goto_review_rubrics
     node_object = TreeFolder.find_by_name('Review')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+        puts session[:root]
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end  
+  
+  def goto_Instructor_rubrics
+    node_object = TreeFolder.find_by_name('Instructor')
+    puts node_object.id
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to :controller => 'tree_display', :action => 'list'
   end  
   

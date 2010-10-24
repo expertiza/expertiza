@@ -27,6 +27,7 @@ class PublishingController < ApplicationController
 
   def grant
       @participant = AssignmentParticipant.find(params[:id])
+      @user = User.find_by_id(session[:user].id) 
   end
   
   def grant_with_signature

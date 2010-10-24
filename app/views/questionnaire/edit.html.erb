@@ -8,15 +8,26 @@
 	<%= submit_tag "Save #{@questionnaire.display_type.downcase}", :name=>"save" %>
     <input style="margin-left:36em" type="submit" name="view_advice" value="View advice"/>	
 
-  	<h4>Import/Export (from/to CSV format)</h4>
-  	<input type="submit" name="import" value="Import questions"/>
+  	
+	<%if @questionnaire.type == "QuizQuestionnaire" %>
+	<h4>Export quiz in specific formats </h4>
+	<select id="QuizFormat" name="Format" >
+		<option value="GIFT", selected="selected">GIFT</option>
+		<option value="Blackboard" >TXT</option>
+	</select>
+	<%= submit_tag "Export Quiz ", :name=>"export", :controller =>"questionnaire", :action => "edit", :id=>"export"%>
+	<%else%>
+	<h4>Import/Export (from/to CSV format) for quiz specific formats mentioned</h4>
+	<input type="submit" name="import" value="Import questions"/>
   	<input type="file" name="csv" />
+	<%= submit_tag "Export questions", :name=>"export" %>
+	<%end%>
   	<br />
 
-  	<%= submit_tag "Export questions to CSV", :name=>"export" %>
+  	
   	<br />
-<% end %>
-<br />
+	<%end%>
+
 
 <% if @questionnaire.type == "QuizQuestionnaire" %>
 	<%= link_to 'Back', :controller => 'submitted_content', :action => 'edit', :id => @questionnaire.get_participant_by_user_id(session[:user].id).id %>

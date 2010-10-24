@@ -1,0 +1,281 @@
+<head>
+<script type="text/javascript">
+var cnt = 0;
+var tops = new Array(256); //set to the number of comments + 1
+var starts = new Array(256);
+var ends = new Array(256);
+var origcode = "";
+
+var currTop = 0;
+var currStart = 0;
+var currEnd = 0;
+
+function bodyload()
+{
+	origcode = document.getElementById("code").innerHTML;
+}
+
+function bClick()
+{
+	//not used currently
+	//document.getElementById("codewindow").scrollTop = 40;	
+	//var shtml = document.getElementById("code").innerHTML;
+	//var finds = shtml.substring(0 + 12, 60 + 12);
+	//var nhtml = shtml.replace(finds, "<span id=\"colorred\">" + finds + "</span>");
+	//document.getElementById("code").innerHTML = nhtml;
+}
+
+function hiClick(idx)
+{
+	clearHi();
+	document.getElementById("codewindow").scrollTop = tops[idx];
+	var shtml = HtmlEncode(origcode);
+	var begin = HtmlDecode(shtml.substring(0, starts[idx]));
+	var middle = HtmlDecode(shtml.substring(starts[idx], ends[idx]));
+	var end = HtmlDecode(shtml.substring(ends[idx], shtml.length));
+	var nhtml = begin + "<span id=\"colorred\">" + middle + "</span>" + end;
+	document.getElementById("code").innerHTML = nhtml;
+}
+
+function hiClickNumber(top, start, end)
+{
+	clearHi();
+	document.getElementById("codewindow").scrollTop = top;
+	var shtml = HtmlEncode(origcode);
+	var begin = HtmlDecode(shtml.substring(0, start));
+	var middle = HtmlDecode(shtml.substring(start, end));
+	var end = HtmlDecode(shtml.substring(end, shtml.length));
+	var nhtml = begin + "<span id=\"colorred\">" + middle + "</span>" + end;
+	document.getElementById("code").innerHTML = nhtml;
+}
+
+function clearHi()
+{
+	if(document.getElementById("code").innerHTML != origcode)
+		document.getElementById("code").innerHTML = origcode.replace(/\t/g, "");
+	return true;
+}
+
+function captureSelection()
+{
+	var selection;
+	if (window.getSelection) {
+		selection = window.getSelection();
+		if(selection != "")
+		{
+			var range = selection.getRangeAt(0);	
+			currTop = document.getElementById("codewindow").scrollTop;
+			currStart = range.startOffset;
+			currEnd = range.endOffset;
+			document.getElementById("currSelection").innerHTML = "Character " + currStart + " through " + currEnd;
+			document.getElementById("topentry").value = currTop;
+			document.getElementById("startentry").value = currStart;
+			document.getElementById("endentry").value = currEnd;
+		}
+	}
+	else if (document.selection) { // should come last; Opera!
+		tempr = document.selection.createRange();
+		alert(getIECharOffset());
+	}
+}
+
+function getIECharOffset() {
+  var offset = 0;
+
+  // get the users selection - this handles empty selections
+  var userSelection = document.selection.createRange();
+
+	alert(userSelection.parentElement());
+  // get a selection from the contents of the parent element
+  var parentSelection = userSelection.parentElement().createTextRange();
+	alert("hello");
+
+  // loop - moving the parent selection on a character at a time until the offsets match
+  while (!offsetEqual(parentSelection, userSelection)) {
+    parentSelection.move('character');
+    offset++;
+  }
+
+  // return the number of char you have moved through
+  return offset;
+}
+
+function addRow()
+{
+	var newhtml = document.getElementById("commentslist").innerHTML;
+	newhtml += "<div id=\"commententry\" onclick=\"hiClick(" + cnt + ")\">";
+	newhtml += "<span id=\"fakelink\">Comment " + (cnt+1) + "</span><br/>";
+	newhtml += "Text of the comment just al ine or so...";
+	newhtml += "</div>";
+	document.getElementById("commentslist").innerHTML = newhtml;
+	/*
+	var tbody = document.getElementById("commentstable").getElementsByTagName("TBODY")[0];
+    var row = document.createElement("TR");
+    var td1 = document.createElement("TD");
+    td1.appendChild(document.createTextNode("Comment " + cnt));
+    row.appendChild(td1);
+    tbody.appendChild(row);*/
+}
+
+function loadComment(top, start, end)
+{
+	alert(start);
+	tops[cnt] = top;
+	starts[cnt] = start;
+	ends[cnt] = end;
+	cnt++;
+}
+
+function submitComment()
+{
+	tops[cnt] = currTop;
+	starts[cnt] = currStart;
+	ends[cnt] = currEnd;
+	var newhtml = document.getElementById("commentslist").innerHTML;
+	newhtml += "<div id=\"commententry\" onclick=\"hiClick(" + cnt + ")\">";
+	newhtml += "<span id=\"fakelink\">Comment " + (cnt+1) + "</span><br/>";
+	newhtml += document.getElementById("newcommenttext").value;
+	newhtml += "</div>";
+	document.getElementById("commentslist").innerHTML = newhtml;
+	
+	currTop = currStart = currEnd = 0;
+	document.getElementById("currSelection").innerHTML = "Nothing Currently Selected";
+}
+
+function HtmlEncode(s)
+{
+	s = s.replace(/&lt;/g, "<");
+	s = s.replace(/&gt;/g, ">");
+	return s;
+}
+function HtmlDecode(s)
+{
+	s = s.replace(/</g, "&lt;");
+	s = s.replace(/>/g, "&gt;");	
+	return s;	
+}
+</script>
+<style type="text/css">
+#main
+{
+	width:1050px;
+	margin:0 auto;	
+}
+#colorred
+{
+	background:#3297FD;
+	color:#FFF;
+}
+#code
+{
+	position:relative;
+	margin:0px;
+	margin-left:5px;
+	padding-top:0px;
+	width:675px;
+}
+
+#linenumbers
+{
+	position:relative;
+	margin:0px;
+	padding-left:2px;
+	padding-right:2px;
+	float:left;
+	width:25px;
+	background:#A5D894;
+	border-right:1px solid #000;
+}
+#codewindow
+{
+	width:750px;
+	border:1px solid #000;
+	height:750px;
+	overflow: auto;
+}
+#comments
+{
+	position:relative;
+	float:right;
+}
+#commentslist
+{
+
+	border:1px solid #000;
+	width:275px;
+	height:550px;
+	overflow:auto;
+}
+#commententry
+{
+	border-bottom:1px solid #000;	
+	padding-left:10px;
+}
+
+#fakelink
+{
+	color:#00F;
+	text-decoration:underline;
+	cursor:pointer;	
+}
+#submitcomment
+{
+
+	margin-top:0px;
+	padding-top:10px;
+	padding-left:10px;	
+	border:1px solid #000;
+	width:265px;
+}
+</style>
+<%= javascript_include_tag "prototype" %>
+</head>
+
+<body onLoad="bodyload()">
+<%= link_to 'Home', :controller => 'login', :action => 'index' %> | 
+<%= link_to 'Main', :controller => 'codefiles', :action => 'index' %>
+
+<h2>Name: <%=h  @code_review_file.name %></h2><br><br>
+<div id="main">
+
+<div id="comments">
+<div id="commentslist">
+<% @count = 1 %>
+<% @comments.each do |comment| %>
+    <div id="commententry" onClick="hiClickNumber(<%= comment.r_scroll.to_s + ", " + comment.r_begins.to_s + ", " + comment.r_end.to_s %>)">
+		<span id="fakelink">Comment <%= @count %></span><br/>
+		<%= comment.body %>
+	</div>
+	<% @count = @count + 1 %>
+<% end %>
+</div>
+
+<div id="submitcomment">
+<button onClick="captureSelection()">Capture Code Selection</button>
+<div id="currSelection">Nothing Currently Selected</div>
+
+<% form_remote_tag(:update => "commentslist", :url => { :action => :create_code_review_file_comment }, :position => "bottom" ) do %>
+  <%= text_area_tag(:commenttext, nil, :rows => 7, :cols => 28) %>
+  <%= hidden_field_tag :topentry %>
+  <%= hidden_field_tag :startentry %>
+  <%= hidden_field_tag :endentry %>
+  <%= hidden_field_tag :codefileid, @code_review_file.id %>
+  <%= hidden_field_tag :participantid, @code_review_file.participantid %>
+  <%= submit_tag "Submit Comment" -%>
+<% end %>
+
+
+</div>
+</div>
+
+<div id="codewindow" onMouseDown="clearHi()">
+<pre><div id="linenumbers"><% for i in 0 .. @code_review_file.getNumLines %><%= i.to_s + "\n"%><% end %>
+</div><div id="code"><%=h @code_review_file.contents %></div>
+</pre>
+</div>
+
+</div>
+
+<br />
+<a href="javascript:window.history.back()">Back</a>
+</body>

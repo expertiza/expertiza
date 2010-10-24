@@ -10,17 +10,20 @@ module QuestionnaireHelper
   def self.create_questionnaire_csv(questionnaire, user_name,format)
     #questionnaireHelper::delete_expired_csv_files
     questionnaireS_FOLDER = "./"
+    
+    
     filename = questionnaireS_FOLDER + user_name + "-" + questionnaire.name + "."+format
    
     buf = File.new(filename, 'w')
     
+   if(format=="GIFT") 
    for question in questionnaire.questions
       # Each row is formatted as follows
       # Question, question advice (from high score to low), type, weight
       row = Array.new
       row << question.txt
-      row << "True/False" if question.true_false
-      row << "Numeric" if !question.true_false
+      #row << "True/False" if question.true_false
+      #row << "Numeric" if !question.true_false
       row << question.weight
       
       # loop through all the question advice from highest score to lowest score
@@ -28,13 +31,55 @@ module QuestionnaireHelper
       for advice in question.question_advices.sort {|x,y| y.score <=> x.score }
        row << advice.advice
       end
-      row << "\n"
+      row << "\n\n"
       buf.write (row)
       #CSV.generate_row(row, 3 + question.question_advices.length, buf)
     end
-    
+  end
+  
+  if(format=="txt")
+   for question in questionnaire.questions
+      # Each row is formatted as follows
+      # Question, question advice (from high score to low), type, weight
+      row = Array.new
+      row << "MC"+"\t"
+      row << question.txt.split("?")[0]+"?\t"
+      answers=question.txt.split("?")[1]
+      answers= answers.split("{")[1]
+      answers=answers.split("}")[0]
+      answers=answers.split("~")
+      for ans in answers
+        if(!ans.empty?)
+          if(ans.index("="))
+              ans=ans.split("=")
+              if(!ans[0].empty?)
+              row<< ans[0].strip+"\t"
+              row<<"Incorrect"+"\t"
+              end
+              row<< ans[1].strip+"\t"
+              row<<"Correct"+"\t"
+          else  
+              row<< ans.strip+"\t"
+              row<<"Incorrect"+"\t"
+          end 
+        end                
+      end
+     row << question.weight
+      
+      # loop through all the question advice from highest score to lowest score
+      adjust_advice_size(questionnaire, question)
+      for advice in question.question_advices.sort {|x,y| y.score <=> x.score }
+       row << advice.advice
+      end
+      row << "\n\n"
+      buf.write (row)
+      #CSV.generate_row(row, 3 + question.question_advices.length, buf)
+    end
+  end
     buf.close
+    
     return filename
+    
   end
   
   def self.get_questions_from_csv(questionnaire, file)

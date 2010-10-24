@@ -1,18 +1,20 @@
 module QuestionnaireHelper
   
-  questionnaireS_FOLDER = "public/temp-questionnaires/" # CSV files are stored in a temporary public directory
+  questionnaireS_FOLDER = "Public/" # CSV files are stored in a temporary public directory
   CSV_ALLOWED_AGE = 60 * 5 # CSV files may be deleted if they are 5 minutes old
 
   CSV_QUESTION = 0
   CSV_TYPE = 1
   CSV_WEIGHT = 2
 
-  def self.create_questionnaire_csv(questionnaire, user_name)
-    questionnaireHelper::delete_expired_csv_files
-    filename = questionnaireS_FOLDER + user_name + "-" + questionnaire.name + ".csv"
+  def self.create_questionnaire_csv(questionnaire, user_name,format)
+    #questionnaireHelper::delete_expired_csv_files
+    questionnaireS_FOLDER = "./"
+    filename = questionnaireS_FOLDER + user_name + "-" + questionnaire.name + "."+format
+   
     buf = File.new(filename, 'w')
     
-    for question in questionnaire.questions
+   for question in questionnaire.questions
       # Each row is formatted as follows
       # Question, question advice (from high score to low), type, weight
       row = Array.new
@@ -24,10 +26,11 @@ module QuestionnaireHelper
       # loop through all the question advice from highest score to lowest score
       adjust_advice_size(questionnaire, question)
       for advice in question.question_advices.sort {|x,y| y.score <=> x.score }
-        row << advice.advice
+       row << advice.advice
       end
-      
-      CSV.generate_row(row, 3 + question.question_advices.length, buf)
+      row << "\n"
+      buf.write (row)
+      #CSV.generate_row(row, 3 + question.question_advices.length, buf)
     end
     
     buf.close

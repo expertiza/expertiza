@@ -204,12 +204,14 @@ class AssignmentController < ApplicationController
     end
     
     default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)   
-    
+
+    if default!= nil    
     @limits[:review] = default.notification_limit
     @limits[:metareview] = default.notification_limit
     @limits[:feedback] = default.notification_limit
     @limits[:teammate] = default.notification_limit
-   
+    end
+
     @weights[:review] = 100
     @weights[:metareview] = 0
     @weights[:feedback] = 0

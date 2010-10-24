@@ -8,33 +8,18 @@
 
 <table class="listing" cellpadding=2>
 	<tr>
-	  <td><b>Preferred:</b> To grant publishing rights for this assignment, digitally sign the assignment name (above) using your private key and enter the digital signature below:</td>
+	  <td colspan="2">Please supply your Private key to so a digital signature can be generated
+	  (private key will not be saved in the database). If you have lost your private 
+	  key, click <%= link_to 'here',{:controller=>:users, :action=>:keys, :id=>@user.id} %>
+	  to generate new keys.</td>
 	</tr>
+	<tr><td>&nbsp;</td></tr>
 	<tr>
-	  <td>
-		<% form_tag :action => 'grant_with_signature', :id => @participant do %>
-		<%= text_area_tag :digital_signature, nil, :rows => 20, :cols => 65 %>
-  		<%= submit_tag 'Grant' %>
-		<% end %>
-	  </td>
-	<tr>
-	  <td>&nbsp;</td>
-	</tr>
-	<tr>
-	  <td>&nbsp;&nbsp;&nbsp;or</td>
-	</tr>
-	<tr>
-	  <td>&nbsp;</td>
-	</tr>
-	<tr>
-	  <td>Supply your private key and a digital signature will be generated for you 
-	  (private key will not be saved in the database):</td>
-	</tr>
-	<tr>
+	  <td valign="top"><b>Private Key:</b></td>
 	  <td>
 		<% form_tag :action => 'grant_with_private_key', :id => @participant do %>
-		<%= text_area_tag :private_key, '', :rows => 20, :cols => 65, :style =>'scrollHeight:40' %>
-  		<%= submit_tag 'Grant' %>
+		<%= text_area_tag :private_key, '', :rows => 20, :cols => 65, :style =>'scrollHeight:40' %><br />
+		<%= submit_tag 'Grant' %>
 		<% end %>
 	  </td>
 	</tr>

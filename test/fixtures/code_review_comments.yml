@@ -1,0 +1,19 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  userid: 1
+  codefileid: 1
+  title: MyString
+  body: MyText
+  r_begin: 1
+  r_end: 1
+  r_scroll: 1
+
+two:
+  userid: 1
+  codefileid: 1
+  title: MyString
+  body: MyText
+  r_begin: 1
+  r_end: 1
+  r_scroll: 1

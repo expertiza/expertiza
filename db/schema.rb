@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(:version => 20101023031100) do
     t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions"
+    t.boolean  "codereview"
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -60,6 +61,26 @@ ActiveRecord::Schema.define(:version => 20101023031100) do
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
+
+  create_table "code_review_comments", :force => true do |t|
+    t.integer  "participantid"
+    t.integer  "codefileid"
+    t.string   "title"
+    t.text     "body"
+    t.integer  "r_begins"
+    t.integer  "r_end"
+    t.integer  "r_scroll"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "code_review_files", :force => true do |t|
+    t.text     "contents"
+    t.string   "name"
+    t.integer  "participantid"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :null => false

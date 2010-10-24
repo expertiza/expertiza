@@ -84,6 +84,15 @@ function get_assignment_startdate() {
   </td>
 </tr>
 <tr>
+  <td><label for="codereview">Code Review assignment:</label></td>
+  <td>
+  		<select id="codereviewselect" name="assignment[codereview]">
+  		 <option value=false style="width:75px">No</option>
+         <option value=true style="width:75px" <% if @assignment.codereview %>SELECTED<%end%>>Yes</option>      
+        </select>
+  </td>  
+</tr>
+<tr>
   <td><label for="team_assignment">Team assignment:</label></td>
   <td>
   		<select id="teamselect" name="assignment[team_assignment]" onchange="onChange();">

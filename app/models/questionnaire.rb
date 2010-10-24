@@ -75,5 +75,5 @@ class Questionnaire < ActiveRecord::Base
                             :conditions => ["id <> ? and name = ? and instructor_id = ?", 
                             id, name, instructor_id])
       errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
-  end    
+    end
 end

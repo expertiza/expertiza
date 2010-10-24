@@ -1,0 +1,8 @@
+<b>Topic:</b> <%=@topic.topic_name%>
+<br>
+
+<%= render :partial => 'results' %>
+ <%= hidden_field_tag "id", @assignment_id %>
+ 
+<!--<%= link_to 'Back', :controller=>'sign_up_sheet', :action => 'signup_topics'  %>
+  -->

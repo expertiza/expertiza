@@ -98,8 +98,9 @@ class QuestionnaireController < ApplicationController
     end
     
     if params['export']
-      filename = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
-      send_file(filename) 
+      #filename = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name 
+     filename = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name , params['Format']
+     send_file(filename) 
     end
     
     if params['import']

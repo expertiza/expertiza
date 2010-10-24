@@ -1,4 +1,4 @@
-class CreateNotifications < ActiveRecord::Migration
+class CreateNotificationLimits < ActiveRecord::Migration
   def self.up
         
     create_table :notification_limits do |t|

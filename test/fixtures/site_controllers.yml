@@ -167,3 +167,8 @@ site_controller_code_review_files:
   permission_id: <%= Fixtures.identify(:permission_do_assignment) %>
   builtin: "0"
 
+site_controller_code_review_files:
+  name: code_review_files
+  permission_id: <%= Fixtures.identify(:permission_do_assignment) %>
+  builtin: "0"
+

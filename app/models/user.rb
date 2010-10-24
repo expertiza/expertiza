@@ -145,24 +145,38 @@ class User < ActiveRecord::Base
   # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
   # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
   def generate_keys
-      new_key = OpenSSL::PKey::RSA.generate( 1024 )
-      new_public = new_key.public_key
-      new_private = new_key.to_pem
-      puts new_public
-      puts new_private
+    replacing_key = true if (!self.digital_certificate.nil?)
 
-      # creating the digital certificate      
-      cert = OpenSSL::X509::Certificate.new
-      cert.version = 1
-      cert.subject = cert.issuer = OpenSSL::X509::Name.parse("/C="+self.id.to_s)
-      cert.public_key = new_public
-      cert.not_before = Time.now
-      cert.not_after = Time.now+3600*24*365
-      cert.sign(new_key, OpenSSL::Digest::SHA1.new)
-      self.digital_certificate = cert.to_pem
-      puts self.digital_certificate
-      self.save
-      new_private
+    new_key = OpenSSL::PKey::RSA.generate( 1024 )
+    new_public = new_key.public_key
+    new_private = new_key.to_pem
+
+    # creating the digital certificate      
+    cert = OpenSSL::X509::Certificate.new
+    cert.version = 1
+    cert.subject = cert.issuer = OpenSSL::X509::Name.parse("/C="+self.id.to_s)
+    cert.public_key = new_public
+    cert.not_before = Time.now
+    cert.not_after = Time.now+3600*24*365
+    cert.sign(new_key, OpenSSL::Digest::SHA1.new)
+    self.digital_certificate = cert.to_pem
+    puts self.digital_certificate
+    self.save
+    
+    # when replacing an existing key, update any digital signatures made
+    if (replacing_key)
+      participants = AssignmentParticipant.find_all_by_user_id(self.id)
+      for participant in participants
+        if (!participant.digital_signature.nil?)
+          puts "updating"
+          puts participant.assignment.name
+          digital_signature = participant.generate_digital_signature(new_private)
+          participant.verify_digital_signature(digital_signature)
+        end
+      end
+    end
+      
+    new_private
   end 
 
 end

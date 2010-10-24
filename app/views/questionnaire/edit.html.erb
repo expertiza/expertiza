@@ -12,8 +12,8 @@
 	<%if @questionnaire.type == "QuizQuestionnaire" %>
 	<h4>Export quiz in specific formats </h4>
 	<select id="QuizFormat" name="Format" >
-		<option value="GIFT", selected="selected">GIFT</option>
-		<option value="Blackboard" >TXT</option>
+		<option value="GIFT", selected="selected">MOODLE GIFT</option>
+		<option value="txt" >BLACKBOARD TXT</option>
 	</select>
 	<%= submit_tag "Export Quiz ", :name=>"export", :controller =>"questionnaire", :action => "edit", :id=>"export"%>
 	<%else%>

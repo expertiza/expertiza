@@ -25,7 +25,12 @@
        <% if @assignment.get_current_stage(@participant.topic_id) != "Complete" %>
         <td><%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
         <% if @participant.quiz_id %>
-            <td><%= link_to 'Take Quiz', :controller => 'response', :action => 'new_quiz', :id => map.id %></td>
+            <% quizResponse = Response.find_by_map_id(QuizResponseMap.find(:first, :conditions => ["reviewed_object_id=? AND reviewer_id=?", map.assignment.id, map.reviewer_id]).id) %>
+            <% if quizResponse != nil %>
+                <td><%= quizResponse.additional_comment  %></td>
+            <% else %>
+                <td><%= link_to 'Take Quiz', :controller => 'response', :action => 'new_quiz', :id => map.id %></td>
+            <% end %>
         <% end %>
        <% end %>
            

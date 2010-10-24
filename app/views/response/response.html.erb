@@ -21,9 +21,10 @@
     | question | %>
     <% if controller.action_name == 'new_quiz'  %>
         <%= question.txt.split("{")[0] %><BR/>
+        <% answerCounter=0 %>
         <% question.txt.split("{")[1].split(//,2)[1].chop.split(%r{~|=}).each{ | answer | %>
-            <input type="checkbox" name=<%= "question"+i.to_s %> value=<%= answer %>><%= answer %><br>
-
+            <input type="checkbox" name=<%= "responses["+question.id.to_s+"]["+answerCounter.to_s+"]" %> value=<%= answer %>><%= answer %><br>
+            <% answerCounter+=1 %>
         <% } %>
     <% else %>
 
@@ -32,8 +33,7 @@
             <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
             <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
         <% else %>
-            <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" >
-            </textarea>
+            <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>
 
         <% end %>
 
@@ -73,18 +73,19 @@
     <BR/>
     <p>
         <label for="review_comments">Additional Comments</label><BR/>
-        <textarea cols="70" rows="1" id="review_comments" name="review[comments]"  style="overflow:hidden;" onkeyup="checkRows(this)" >
-        <% if controller.action_name != 'new' and @response.additional_comment != nil %>
-            <%=@response.additional_comment.strip%>
-        <% end %>
-        </textarea>
+        <textarea cols="70" rows="1" id="review_comments" name="review[comments]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><% if controller.action_name != 'new' and @response.additional_comment != nil %><%=@response.additional_comment.strip%><% end %></textarea>
     </p>
 <% end %>
 
 <br/>
-<%= submit_tag "Save "+@title, :name=>"save" %>
+<% if controller.action_name == 'new_quiz'  %>
+    <%= submit_tag "Save Quiz", :name=>"save" %>
+<% else %>
+    <%= submit_tag "Save "+@title, :name=>"save" %>
+<% end %>
 <%= hidden_field_tag('return', @return) %>
 <% end %>
 
 <%= @map.show_feedback() %>
+<br/>
 <a href="javascript:window.history.back()">Back</a>

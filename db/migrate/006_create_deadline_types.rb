@@ -4,7 +4,7 @@ class CreateDeadlineTypes < ActiveRecord::Migration
     t.column "name", :string, :limit => 32
   end
   
-  execute "INSERT INTO `deadline_types` VALUES (1,'submission'),(2,'review'),(3,'resubmission'),(4,'rereview'),(5,'review of review');"
+  execute "INSERT INTO `deadline_types` VALUES (1,'submission'),(2,'review'),(3,'resubmission'),(4,'rereview'),(5,'review of review'), (6,'switch_topics');"
   
   end
 

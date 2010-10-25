@@ -1,0 +1,95 @@
+<script type="text/javascript">
+<% if delete_options[:enabled] %>
+function markAllRows( container_id ) {
+    var rows = document.getElementById(container_id).getElementsByTagName('tr');
+    var checkbox;
+
+    for ( var i = 0; i < rows.length; i++ ) {
+        checkbox = rows[i].getElementsByTagName( 'input' )[0];
+        if ( checkbox && checkbox.type == 'checkbox') {            
+                checkbox.checked = true;        
+        }
+    }
+
+    return false;
+}
+  
+function unMarkAllRows( container_id ) {
+    var rows = document.getElementById(container_id).getElementsByTagName('tr');
+    var checkbox;
+    for ( var i = 0; i < rows.length; i++ ) {
+        checkbox = rows[i].getElementsByTagName( 'input' )[0];
+        if ( checkbox && checkbox.type == 'checkbox' ) {
+            checkbox.checked = false;            
+        }
+    }
+
+    return false;
+}
+<% end %>
+function submitAction(container_id, action_url){
+  var myform = document.getElementById(container_id);
+  myform.action = action_url;
+  myform.submit();  
+}
+</script>
+
+
+<% if elements.length > 0 %>
+<form id="tableForm" name="tableForm" method="post">
+<DIV CLASS="exp">
+<TABLE>
+  <TR><!-- Header Row -->
+    <% if delete_options[:enabled] %>
+       <TH CLASS="head">&nbsp;</TH>
+    <% end %>
+    <% for definition in column_definitions %>
+	   <TH CLASS="head"><%= definition[:name] %></TH>
+    <% end %>
+  </TR>
+  
+  <% for element in elements %>
+  <TR>
+     <% if delete_options[:enabled] %>
+     <!-- Selection Box -->
+     <TD> 
+        <input id="item" name="item[<%= element.id %>]" type="checkbox" value="<%= element.id %>" />        
+     </TD> 
+     <!-- End Selection Box -->
+     <% end %>
+     <!-- Names and Actions -->
+	 <% for definition in column_definitions %>          
+     <TD align="center"> 
+     <% if definition[:type] == "display" %>       
+       <%= element[definition[:field].to_sym] %>
+     <% elsif definition[:type] == "fetch" %>
+       <%= ApplicationHelper.get_field(element,definition[:field],definition[:model],definition[:column]) %>       
+     <% else %>            
+         <% 
+            disabled = false
+            if definition[:disabled] != nil
+              disabled = element[definition[:disabled].to_sym]             
+            end                                  
+         %>
+         <input id="<%= definition[:action] %>" 
+                name="<%= definition[:action] %>" 
+                value="<%= definition[:name] %>" type="radio" 
+                onClick="submitAction('tableForm', '<%= url_for(:controller => definition[:controller], :action => definition[:action], :id => element.id,:edit => nil, :list => nil) %>');"/>                
+       	 <% if definition[:hidden] %>
+       	 <%= hidden_field_tag(definition[:hidden][:name], definition[:hidden][:id]) %>
+       	 <% end %>         
+     <% end %>     
+     </TD>     
+     <% end %>         
+     <!-- End Names and Actions --> 
+  </TR>
+  <% end %>
+</TABLE>
+</DIV>
+<% if delete_options[:enabled] %>
+<a href="" onClick="return markAllRows('tableForm');">Check All</a> | <a href="" onClick="return unMarkAllRows('tableForm');">Uncheck All</a>
+<br/>With selected: <a href="" onClick="submitAction('tableForm','<%= url_for(:controller => delete_options[:controller], :action => 'delete_selected', :edit => nil, :list => nil) %>')">Delete</a>
+<% end %>
+<% end %>
+<% end %> 
+<br/>

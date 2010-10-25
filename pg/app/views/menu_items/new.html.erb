@@ -1,0 +1,9 @@
+<h1>New menu_item</h1>
+
+<% form_tag :action => 'create' do %>
+  <%= render :partial => 'form' %>
+  <%= submit_tag "Create" %>
+<% end %>
+
+<hr/>
+<%= link_to 'Back', :action => 'list' %>

@@ -31,11 +31,7 @@ class Course < ActiveRecord::Base
     end
     participant = CourseParticipant.find_by_parent_id_and_user_id(self.id, user.id)
     if !participant
-      if !user.master_permission_granted.nil?
-        p_permission_updated_at = user.permission_updated_at;
-        p_digital_signature = user.digital_signature;
-      end
-      CourseParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted, :permission_updated_at => p_permission_updated_at, :digital_signature => p_digital_signature)
+      CourseParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
     else
       raise "The user \""+user.name+"\" is already a participant."
     end    

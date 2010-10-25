@@ -12,17 +12,6 @@ class AssignmentTeam < Team
     return links
   end
   
-  def get_codefiles
-    codefiles = Codefile.new
-    for team_member in self.get_participants 
-      for codefile in team_member.get_codefiles
-        codefiles << codefile
-      end
-      #codefiles << CodeReviewFile.getParticipantCodeFiles(team_member.id)    
-    end
-    return links
-  end
-  
   def get_path
     self.get_participants.first.get_path
   end
@@ -127,11 +116,7 @@ class AssignmentTeam < Team
  
   def add_participant(assignment_id, user)
    if AssignmentParticipant.find_by_parent_id_and_user_id(assignment_id, user.id) == nil
-      if !user.master_permission_granted.nil?
-        p_permission_updated_at = user.permission_updated_at;
-        p_digital_signature = user.digital_signature;
-      end
-     AssignmentParticipant.create(:parent_id => assignment_id, :user_id => user.id, :permission_granted => user.master_permission_granted, :permission_updated_at => p_permission_updated_at, :digital_signature => p_digital_signature)
+     AssignmentParticipant.create(:parent_id => assignment_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
    end    
   end
  

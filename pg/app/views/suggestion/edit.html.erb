@@ -1,7 +1,0 @@
-<h3>Editing a suggestion !!!</h3>
-<% form_tag :action => 'update', :id => @suggestion do %>
-  <%= render :partial => 'formedit' %>
-  <%= submit_tag 'Update' %>
-<% end %>
-
-<td><%= link_to 'Back', :controller => "suggestion", :action => "show" , :id =>@suggestion.id %> </td>

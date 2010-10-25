@@ -1,6 +1,6 @@
-<div id='rating_div_<%= asset.id.to_s %>'
+<div id='rating_div_'>
+<% if asset!=nil %>
 <%= number_with_precision(asset.rating, 3) %>/5 Stars<br/>
-<%= number_with_precision(asset.rating, 3) %>/5 Stars<br>
 
 <ul class='star-rating'>
     <li class='current-rating' style='width:<%= (asset.rating * 30).to_i -%>px;'>
@@ -10,7 +10,7 @@
         <%= link_to_remote("1",     	
         	{:url => { :controller => "ratings",  
             :action => "rate", :id => asset.id, :rating => 1 },  
-            :update => "rating_div_" + asset.id.to_s } , :class => 'one-star', :name => '1 star out of 5')
+            :update => "rating_div_"} , :class => 'one-star', :name => '1 star out of 5')
              %>                        
     </li>    
             
@@ -18,29 +18,30 @@
        <%= link_to_remote("2",     	
         	{:url => { :controller => "ratings",  
             :action => "rate", :id => asset.id, :rating => 2 },  
-            :update => "rating_div_" + asset.id.to_s } , :class => 'two-stars', :name => '2 stars out of 5')
+            :update => "rating_div_"} , :class => 'two-stars', :name => '2 stars out of 5')
              %>                
     </li>
     <li>
         <%= link_to_remote("3",     	
         	{:url => { :controller => "ratings",  
             :action => "rate", :id => asset.id, :rating => 3 },  
-            :update => "rating_div_" + asset.id.to_s } , :class => 'three-stars', :name => '3 stars out of 5')
+            :update => "rating_div_"} , :class => 'three-stars', :name => '3 stars out of 5')
          %>
     </li>
     <li>
         <%= link_to_remote("4",     	
         	{:url => { :controller => "ratings",  
             :action => "rate", :id => asset.id, :rating => 4 },  
-            :update => "rating_div_" + asset.id.to_s } , :class => 'four-stars', :name => '4 stars out of 5')
+            :update => "rating_div_"} , :class => 'four-stars', :name => '4 stars out of 5')
          %>
     </li>
     <li>
         <%= link_to_remote("5",     	
         	{:url => { :controller => "ratings",  
             :action => "rate", :id => asset.id, :rating => 5 },  
-            :update => "rating_div_" + asset.id.to_s } , :class => 'five-stars', :name => '5 stars out of 5')
+            :update => "rating_div_"} , :class => 'five-stars', :name => '5 stars out of 5')
          %>     
     </li>
 </ul>
+<% end %>
 </div>   

@@ -1,0 +1,19 @@
+<h1>Begin Survey</h1>
+
+<% form_tag(:action=>'create', :id=>params[:id])do %>
+
+
+<p id="email_request">If you are willing to help us further by letting us contact you about your responses, 
+please enter your email address below.  Your email address will not be used for any other
+purposes.  We suggest you use an email address that is not associated with
+your Expertiza id so that your responses will remain anonymous.</p> 
+<p>Email Address (optional): <input name="email" />
+</p>
+
+
+<input name="id" value=<%= params[:id] %> type=hidden />
+<input name="count" value=0 type=hidden />
+
+<%= submit_tag "Continue", :name=>"continue" %>
+
+<% end %>

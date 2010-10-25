@@ -1,0 +1,50 @@
+<%= error_messages_for 'system_settings' %>
+
+<!--[form:system_settings]-->
+<p><label for="system_settings_site_name">Site name</label><br/>
+<%= text_field 'system_settings', 'site_name'  %></p>
+
+<p><label for="system_settings_site_logo">Site subtitle</label><br/>
+<%= text_field 'system_settings', 'site_subtitle'  %></p>
+
+<p><label for="system_settings_footer_messasge">Footer Message</label><br/>
+<%= text_field 'system_settings', 'footer_message'  %></p>
+
+<p><label for="system_settings_public_role_id">Public
+Role</label><br/>
+<%= collection_select :system_settings, :public_role_id,
+    @roles, :id, :name %> </p>
+
+<p><label for="system_settings_session_timeout">Session timeout</label><br/>
+<%= text_field 'system_settings', 'session_timeout'  %></p>
+
+<p><label for="system_settings_default_markup_style_id"> Default
+Markup Style</label><br/>
+<%= collection_select :system_settings, :default_markup_style_id,
+    @markup_styles, :id, :name %></p>
+
+<p><label for="system_settings_site_default_page_id"> Default Page
+</label><br/>
+<%= collection_select :system_settings, :site_default_page_id,
+   @pages, :id, :name %> </p>
+
+<p><label for="system_settings_not_found_page_id"> Not Found Page
+</label><br/>
+<%= collection_select :system_settings, :not_found_page_id,
+   @pages, :id, :name %> </p>
+
+<p><label for="system_settings_permission_denied_page_id"> Permission
+Denied Page </label><br/>
+<%= collection_select :system_settings, :permission_denied_page_id,
+   @pages, :id, :name %> </p>
+
+<p><label for="system_settings_session_expired_page_id"> Session Expired Page
+</label><br/>
+<%= collection_select :system_settings, :session_expired_page_id,
+   @pages, :id, :name %> </p>
+
+<p><label for="system_settings_menu_depth">Menu Depth</label><br/>
+<%= text_field 'system_settings', 'menu_depth'  %></p>
+
+<!--[eoform:system_settings]-->
+

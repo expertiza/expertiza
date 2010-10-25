@@ -1,0 +1,40 @@
+<h2>Import <%= @title %></h2>
+<% form_tag({:controller => 'import_file', :action => 'import'}, {:method => 'post', :multipart => true, :name => 'import_form'}) do %>
+<table>
+ <tr>
+  <td valign='Top'>Delimiter:</td>
+  <td>
+     <%= radio_button_tag 'delim_type','comma',true %> Comma<br/>
+     <%= radio_button_tag 'delim_type','space' %> Space<br/>
+     <%= radio_button_tag 'delim_type','tab' %> Tab<br/>
+     <%= radio_button_tag 'delim_type','other' %> Other <%= text_field_tag 'other_char' %><br/>
+  </td>
+ </tr>
+ </table>
+ <% if @model == 'AssignmentTeam' or @model == 'CourseTeam'%>
+   <br/>
+   <label for="column_one_has_name">Interpret first column as team name:</label>
+   <%= check_box 'options','has_column_names', {:checked => 'checked'},  "true", "false"  %><br/>
+   <label for="options[handle_dups]">If a duplicate team name is found in the roster,</label></td>
+   <select id="options_handle_dups" name="options[handle_dups]">
+     <option value="ignore">ignore the new team
+     <option value="replace">replace the existing team with the new team
+     <option value="insert">insert any new members into the existing team
+     <option value="rename">rename the new team and import
+   </select>   
+   <br/>   
+ <% end %>
+ <br/>
+ <label for="file">File to Import: </label><%= file_field_tag 'file', :size => 40 %><br/><br/>
+ <%= hidden_field_tag('model', @model) %>
+ <%= hidden_field_tag('id', @id) %>
+
+
+ * The import process expects the following columns:<br/>
+ &nbsp;&nbsp;&nbsp;<%= @expected_fields %>
+ <br/><br/>
+ <input type='submit' value='Import' onclick='if (checkIfFileExists(file)) {import_form.submit();} else {alert("Please select a file before clicking Next.");}'/>
+ <% end %>
+ <br/><br/>
+
+ <a href="<%= session[:return_to]%>">Back</a>

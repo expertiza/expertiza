@@ -1,0 +1,31 @@
+<BR/>
+<% form_tag({:action => 'list'}) do %>
+<TABLE width="80%">
+<TR>
+<TD width="30%" align="left">
+<input type='radio' name='display[check]' id='public_radio' value='1' onclick='submit();' <% if @show == nil %>checked<% end %>>
+
+<label for='public_radio'>Show public and private items</label>
+<br/>
+<input type='radio' name='display[check]' id='private_radio' value='0' onclick='submit();' <% if @show != nil %>checked<% end %>>
+<label for='private_radio'>Show private items only</label>
+</TD>
+<TD width="50%" align="right">
+Sort by: 
+<select name='display[sortvar]' style="width: 10em">
+  <option value='name' <% if @sortvar == 'name'%>selected<% end %>>name</option>
+  <option value='created_at' <% if @sortvar == 'created_at'%>selected<% end %>>date created</option>
+  <option value='directory_path' <% if @sortvar == 'directory_path'%>selected<% end %>>directory path</option>
+</select>
+<select name='display[sortorder]' style="width: 10em">
+  <option value='asc' <% if @sortorder == 'asc'%>selected<% end %>>ascending</option>
+  <option value='desc' <% if @sortorder == 'desc'%>selected<% end %>>descending</option>
+</select>
+</TD>
+<TD width="5%" align="left"><%= submit_tag "Sort" %></TD>
+</TR>
+</TABLE>
+<% if @root %>
+	<%= hidden_field_tag('root', @root_node.id) %>	
+<% end %>	
+<% end %>

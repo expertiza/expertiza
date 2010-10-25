@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<div>
+
+<h3>Members of <%= @team.name %></h3>
+
+<table width = "100%">
+	<tr>
+		<td>
+			<table>
+			<% if(@teamusers.nil?) %>
+				<tr>No team members</tr>
+			<%else%>		
+				<% @teamusers.each do |t|%>
+					<tr>
+					<td> - </td> 
+					<td><%= User.find(t.user_id).fullname%></td>
+					</tr>
+				<%end%>		
+			<%end%>
+			</table>
+		</td>
+	
+		<td>
+			<table>
+				<% @qid ="TeamReviewResponseMap"
+                @sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ?  and object_type= ?",@teamid, @qid  ])%>
+                <%if @sc %>
+			    <% t_score= @sc.score %>
+                <%else%>
+                  <%t_score = nil%>
+                <%end%>
+			
+			<tr>
+				<th>Team's Average Score:</th>
+				<td>
+					<%if t_score  %>
+						<%= t_score %>%
+					<%else%>
+					--
+					<%end%>
+				</td> 
+			</tr>
+			
+			</table>
+		</td>
+	</tr>
+</table>
+
+<%if @scores == nil%>
+
+<tr> <td align = "center">No review done yet.</td> </tr>
+<br/>
+<tr> 
+		<th align = "left"> Reviewer score </th>	
+	</tr>
+	<tr>
+		<td align = "center">--</td>
+	</tr>
+  <br/>
+<%else%>
+<h3> Reviewed by <%= User.find(@reviewer_id).fullname%></h3>
+
+<table>
+<tr>
+	
+	<th align = 'left' width = "50%"> Question </th>
+	<th width = "5%"> Score </th>
+	<th width = "45%"> Comments </th>
+	
+</tr>
+		
+	<% @scores.each do |s|%>
+
+	<tr>
+	
+		<td align = 'left'> <%= Question.find(s.question_id).txt%></td>
+		<td align = 'center'> <%= s.score%>/<%=@maxscore%></td>
+		<td align = 'left'> <%= s.comments %> </td>
+	
+	</tr>	
+	<%end%>
+	<tr>
+		<th>Reviewer Score</th>
+		<td align = "center"><%= @s%>/<%=@count*@maxscore%> </td>
+		<td align = "left"> = <%= sprintf("%.2f", @sum1) %>%</td>
+	
+	</table>
+	
+	<table >
+		<tr>
+		<th> Additional Comment</th>
+	</tr>
+	<tr>
+		<%if (Response.find(@reviewid).additional_comment)== nil%>
+			<td> No Comments </td>
+			<%else%>
+			<td> <%= Response.find(@reviewid).additional_comment%> </td>
+		<%end%>
+	</tr>
+	</table>
+<%end%>
+
+
+
+<br/>
+
+</div>

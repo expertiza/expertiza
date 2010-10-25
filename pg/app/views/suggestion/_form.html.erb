@@ -1,0 +1,26 @@
+<%= error_messages_for 'suggestion' %>
+
+<!--[form:suggestion]-->
+<table>
+	<tr>
+		<td><label for="suggestion_title">Title</label></td>
+		<td><%= text_field 'suggestion', 'title' , :size => 75 %></td>
+	</tr>
+	
+	<tr>
+		<td><label for="suggestion_topic">Description</label></td>
+		<td><%= text_area 'suggestion', 'description',:rows => 10, :cols => 75 %></td>
+	</tr>
+	
+	<tr>
+		<td><label for="suggestion_anonymous">Submit suggestion anonymously</label></td>
+		<td><input type=checkbox name="suggestion_anonymous" value=""></td>
+	</tr>
+	
+	<tr>
+		<td><label for="suggestion_signup_preference">Do you wish to work on this topic?</label></td>
+		<td><%= select ("suggestion","signup_preference",{"Yes" =>"Y","No"=>"N","--"=>""}) %> </td>
+	</tr>
+</table>
+<!--[eoform:suggestion]-->
+

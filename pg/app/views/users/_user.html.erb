@@ -1,0 +1,12 @@
+<%= error_messages_for 'user' %>
+
+<!--[form:user]-->
+<p><label for="user_name">Username</label><br/>
+<%= text_field 'user', 'name'  %></p>
+
+<%= render :partial => 'users/name' %>
+<%= render :partial => 'users/email' %>
+<%= render :partial => 'users/password' %>
+<%= render :partial => 'users/prefs' %>
+<!--[eoform:user]-->
+<br/>

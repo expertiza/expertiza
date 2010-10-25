@@ -1,0 +1,10 @@
+<h1>New Action</h1>
+
+<% form_tag :action => 'create' do %>
+  <%= render :partial => 'form' %>
+  <%= submit_tag "Create" %>
+<% end %>
+
+<hr/>
+<p><%= link_to 'Back', :controller => 'site_controllers', 
+       :action => 'list' %> to Controllers/Actions list</p>

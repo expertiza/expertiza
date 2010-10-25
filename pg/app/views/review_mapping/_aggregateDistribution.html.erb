@@ -1,0 +1,52 @@
+<h3> Aggregate score distribution </h3>
+
+<div>
+	<img src= "<%= @chart1.to_url << "&chxr=0,0,100,10" %>"/>
+		
+</div>
+
+<br/>
+
+<div>
+	<%j=0%>
+	<table cellspacing="0" cellpadding="3" border="1" style = "font-size:small;">
+		<tr bgcolor="#cccccc">
+			<th> Range </th>
+			<%@scores.each do |s|%>
+			    <% if s != 0%>
+				<td align = "center">(<%=j*10%>-<%=(j+1)*10 %>)%</td>
+				<% end%>
+				<% j+= 1%>
+			<%end%>
+		</tr>
+		
+		<tr>
+			<th> Count </th>
+			<%@scores.each do |s|%>
+			     <% if s != 0 %>
+				<td align = "center"><%= s %></td>
+				<% end %>
+			<%end%>
+		</tr>
+	</table>
+</div>
+
+<!--
+<div>
+	<%i=0%>
+	<table>
+		<tr bgcolor="#cccccc"> 
+		<th> Range </th>
+		<th> Count </th>
+		</tr>
+		<% @scores.each do |s|%>
+			<tr>
+			<td align = "center">(<%= i*10 %> - <%= (i+1) * 10 %>) </td> 
+			<td align = "center"><%= s %></td>
+			</tr>
+			<% i = i+1 %>
+		<%end%>
+	</table>
+</div>
+-->
+  

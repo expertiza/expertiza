@@ -39,22 +39,17 @@
 		      if  @due_date.deadline_type_id == 5
 		         heading = "Review of review deadline"
 		      end
-				if  @due_date.deadline_type_id == 6
-		         heading = "Switch Topic Deadline"
-		      end
 		      
 		 %>
 	<tr>
 		<td align ="center"><%= heading%></td>
 		<td align ="center"><%= text_field 'due_date[]', 'due_at', :size=>30%></td>
-		<%if @due_date.deadline_type_id != 6%>
 		<td align ="center"><%= select('due_date[]', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 		<td align ="center"><%= select('due_date[]', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 		<td align ="center"><%= select('due_date[]', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 		<td align ="center"><%= select('due_date[]', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 		<td align ="center"><%= select('due_date[]', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 		<td align ="center"><%= select('due_date[]', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96]])%></td>
-		<%end%>
 		<td align ="center"><%= hidden_field('due_date[]', 'flag', 'value' => 0)%></td>
 	</tr>
 	<% 	i += 1;

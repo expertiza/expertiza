@@ -10,8 +10,6 @@ class InitializeCustom < ActiveRecord::Migration
   execute "INSERT INTO `permissions` VALUES (7,'Administer assignments')"
   execute "INSERT INTO `permissions` VALUES (8,'Do assignments')"
   execute "INSERT INTO `permissions` VALUES (9,'Administer instructors')"
-  #execute "INSERT INTO `permissions` VALUES (666,'Topic suggestions')"
-
   
   create_table "markup_styles", :force => true do |t|
     t.column "name", :string, :default => "", :null => false
@@ -79,8 +77,6 @@ class InitializeCustom < ActiveRecord::Migration
   execute "INSERT INTO `site_controllers` VALUES (27,'survey_response',4,0)"
   execute "INSERT INTO `site_controllers` VALUES (28,'team',7,0)"
   execute "INSERT INTO `site_controllers` VALUES (29,'teams_users',7,0)"
-  execute "INSERT INTO `site_controllers` VALUES (66,'suggestion',3,0)"
-  execute "INSERT INTO `site_controllers` VALUES (67,'sign_up_sheet',3,0)"
  
   create_table "controller_actions", :force => true do |t|
     t.column "site_controller_id", :integer, :default => 0, :null => false
@@ -131,14 +127,6 @@ class InitializeCustom < ActiveRecord::Migration
   execute "INSERT INTO `controller_actions` VALUES (39,28,'list',NULL,'')"
   execute "INSERT INTO `controller_actions` VALUES (40,28,'list_assignments',NULL,'')"
   execute "INSERT INTO `controller_actions` VALUES (41,29,'list',NULL,'')"
-  execute "INSERT INTO `controller_actions` VALUES (606,66,'view_suggestion',3,'')"
-  execute "INSERT INTO `controller_actions` VALUES (607,66,'show',3,'')"
-  execute "INSERT INTO `controller_actions` VALUES (608,66,'edit',3,'')"
-  execute "INSERT INTO `controller_actions` VALUES (609,66,'update',3,'')"
-  execute "INSERT INTO `controller_actions` VALUES (610,66,'back_send',3,'')"
-  execute "INSERT INTO `controller_actions` VALUES (611,66,'list',3,'')"
-  execute "INSERT INTO `controller_actions` VALUES (612,67,'show',3,'')"
-  execute "INSERT INTO `controller_actions` VALUES (613,66,'activity',3,'')"
 
   create_table "institutions", :force => true do |t|
     t.column "name", :string, :default => "", :null => false

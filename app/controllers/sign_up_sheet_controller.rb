@@ -8,13 +8,6 @@ class SignUpSheetController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :list }
-         
- def show
-         @topic = SignUpTopic.find(params[:id])
-         @assignment = Assignment.find(@topic.assignment_id)
-        
-
- end
 
   def add_signup_topics_staggered
     load_add_signup_topics(params[:id])
@@ -95,7 +88,6 @@ class SignUpSheetController < ApplicationController
   def new
     @id = params[:id]
     @sign_up_topic = SignUpTopic.new
-   
   end
 
   #This method is used to create signup topics
@@ -131,7 +123,6 @@ class SignUpSheetController < ApplicationController
     else
       @sign_up_topic = SignUpTopic.new
       @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
-      @sign_up_topic.description = params[:topic][:description]
       @sign_up_topic.topic_name = params[:topic][:topic_name]
       @sign_up_topic.max_choosers = params[:topic][:max_choosers]
       @sign_up_topic.category = params[:topic][:category]
@@ -228,21 +219,12 @@ class SignUpSheetController < ApplicationController
 
     #find whether assignment is team assignment
     assignment = Assignment.find(params[:id])
-    
 
-@due_date = DueDate.find_by_assignment_id_and_deadline_type_id(@assignment_id,1)
-#puts @due_date.id
- @switch_date = DueDate.find_by_assignment_id_and_deadline_type_id(@assignment_id,6)
- 
+
     if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
       @show_actions = false
     end
     
-    #if @switch_date
-     # if @switch_date.due_at < Time.now
-      #  @show_actions = false
-      #end
-    #end
     #Find whether the user has signed up for any topics, if so the user won't be able to
     #signup again unless the former was a waitlisted topic
     #if team assignment, then team id needs to be passed as parameter else the user's id
@@ -269,36 +251,15 @@ class SignUpSheetController < ApplicationController
   def delete_signup_for_topic(assignment_id,topic_id)
     #find whether assignment is team assignment
     assignment = Assignment.find(assignment_id)
-    
-    
+
     #if team assignment find the creator id from teamusers table and teams
     if assignment.team_assignment == true
       #users_team will contain the team id of the team to which the user belongs
       users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
       signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
-    
     else
       signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, session[:user].id)
-    
     end
-
-#############DO NOT MOVE THIS CODE . IT HAS TO BE AFTER THE AboVE IF ELSE STATEMENT
- @switch_date = DueDate.find_by_assignment_id_and_deadline_type_id(assignment_id,6)
-  if @switch_date
-      if @switch_date.due_at < Time.now
-        if !(signup_record.is_waitlisted)
-        @bind = SwitchTopic.new
-        @bind.userid = session[:user].id
-        @bind.unityid = session[:user].name
-        @bind.assignment_id = assignment_id
-        @bind.topic_id = topic_id
-        @bind.save
-        flash[:error] = "Deadline to switch topics has passed. You can only signup for your original Topic if slots are available"
-        end
-      end
-    end
-##################
-
 
     #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
     if signup_record.is_waitlisted == false
@@ -333,24 +294,6 @@ class SignUpSheetController < ApplicationController
 
   def signup
     #find the assignment to which user is signing up
-    @switch_date = DueDate.find_by_assignment_id_and_deadline_type_id(params[:assignment_id],6)
-  if @switch_date
-      if @switch_date.due_at < Time.now
-           @bind = SwitchTopic.find_all_by_userid_and_assignment_id(session[:user].id,params[:assignment_id])
-           if @bind.size > 0 #record found and this guy has dropped something after submission deadline for this assignment
-               if (@bind[0].topic_id != params[:id].to_i)
-                 @topic = SignUpTopic.find(@bind[0].topic_id)
-                 flash[:error] = "Cannot Switch topics after deadline! Please select your original topic #{@topic.topic_name}"
-               redirect_to :action => 'signup_topics', :id => params[:assignment_id]
-           return  
-           end
-           end
-           
-      end
-    end
- #flash[:error] = "You chose your original assignment! Good!"
- #redirect_to :action => 'signup_topics', :id => params[:assignment_id]
- #return
     assignment = Assignment.find(params[:assignment_id])
 
     #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
@@ -360,7 +303,7 @@ class SignUpSheetController < ApplicationController
       users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
 
       if users_team.size == 0
-        #if team is not yet created, create  team.
+        #if team is not yet created, create new team.
         team = create_team(params[:assignment_id])
         user = User.find(session[:user].id)
         teamuser = create_team_users(user, team.id)

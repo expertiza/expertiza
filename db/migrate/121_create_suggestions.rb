@@ -3,13 +3,11 @@ class CreateSuggestions < ActiveRecord::Migration
     create_table :suggestions do |t|
      t.column  :id,                 :int
      t.column  :assignment_id,      :int
-     t.column  :title,              :text
-     t.column  :description,        :text
+     t.column  :title,              :string
+     t.column  :description,        :string, :limit=>750
      t.column  :status,             :string
      t.column  :unityID,            :string
      t.column  :signup_preference,  :string
-     t.column  :control,            :int, :default=>0
-     t.timestamps
     end
   end
 

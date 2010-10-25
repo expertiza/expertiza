@@ -26,6 +26,8 @@
             <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
 
             <td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>
+			<td align="center">Show Bookmark Link</td>
+			<td align="center"><%= link_to "Suggest Bookmark Link", :controller => 'bookmarks', :action => 'new', :id => params[:id] %></td>
           </tr>
           <% i=i+1 %>
       <% end %>

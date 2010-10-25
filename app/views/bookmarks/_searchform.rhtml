@@ -1,0 +1,9 @@
+<h3> Search Among All Bookmarks </h3>
+<br />
+Enter tags you want to search for separated by a comma ","
+ <% form_tag(:action =>'search_bookmarks')do%>
+  <%= text_field_tag(:s) %><br />
+ <%= hidden_field_tag(:users, :value =>"all_users")  %>
+  <%= submit_tag("Search", :name => nil) %>
+  <% end %>
+ 

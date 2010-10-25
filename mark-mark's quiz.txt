@@ -1,0 +1,6 @@
+MC	Who's buried in Grant's tomb?	Churchill	Incorrect	Grant	Correct	Napoleon	Incorrect	No one	Incorrect	1
+
+MC	When did the War of 1812 start?	1812	Correct	1218	Incorrect	1492	Incorrect	1811	Incorrect	1
+
+MC	How long do you cook a three-minute egg?	1 minute	Incorrect	2 minutes	Incorrect	3 minutes	Correct	4 minutes	Incorrect	1
+

@@ -94,15 +94,4 @@
   <td><label for="allow_suggestions">Students can suggest topics for this assignment</label></td>
   <td><%= check_box 'assignment', 'allow_suggestions', {}, true, false %></td>
  </tr> 	
-
- <tr>
-  <td><label for="dynamic_reviewer_assignments_enabled">Use dynamic reviewers for this assignment?</label></td>
-  <td><%= check_box 'assignment', 'dynamic_reviewer_assignments_enabled', {}, true, false %></td>
- </tr> 
-
- <tr>
-  <td><label for="dynamic_reviewer_response_time_limit_hours">Length of time that a submission is reserved <br>for review (dynamic reviewer assignment only)</label></td>
-  <td><%= text_field 'assignment', 'dynamic_reviewer_response_time_limit_hours', :size=>5, :value => 48 %> hours</td>
- </tr> 
-
 </table>

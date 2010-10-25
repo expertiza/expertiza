@@ -3,7 +3,12 @@ class CodeReviewFilesController < ApplicationController
   def show_code_review_file
     @code_review_file = CodeReviewFile.find(params[:id])
     @participant = Participant.find(@code_review_file.participantid)
-    @comments = CodeReviewComment.find_all_by_codefileid_and_participantid(@code_review_file.id, @participant.id)
+	@currentparticipant = 
+	if(session[:user].id != @participant.user_id)
+      @comments = CodeReviewComment.find_all_by_codefileid_and_participantid(@code_review_file.id, session[:user].id)
+	else
+	  @comments = CodeReviewComment.find_all_by_codefileid(@code_review_file.id)
+	end
   end
 
   def create_code_review_file

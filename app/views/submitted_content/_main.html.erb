@@ -1,16 +1,32 @@
-<% if participant.get_hyperlinks.length > 0 %>
-	<%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant} %>
+<% if assignment.codereview %>
+	<h2>Upload CodeReview File</h2>
+	<% form_for(:code_review_file, @code_review_file, :url => {:controller => 'code_review_files', :action=>'create_code_review_file'}, :html=> {:multipart=>true}) do |form| %>
+	<input type="hidden" id="code_review_file_participantid" name="code_review_file[participantid]" value="<%= participant.id %>">
+	<table>
+		<tr><td>Name:</td><td><%= form.text_field :name, :value => "" %></td><td>&nbsp;</td></tr>
+		<tr><td>File:</td><td><%= form.file_field :contents %></td><td><%= form.submit( 'Upload' ) %></td></tr>
+	</table>
+	<% end %>
+        <% if participant.get_codefiles.length > 0 %>
+                <h2>Current CodeReview Files</h2>
+                <% for eachcodefile in participant.get_codefiles %>
+                        <%= link_to eachcodefile.name, :controller => 'code_review_files', :action => 'show_code_review_file', :id => eachcodefile.id %><br/>
+                <% end %>
+        <% end %>
+<% else %>
+	<% if participant.get_hyperlinks.length > 0 %>
+		<%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant} %>
+	<% end %>
+	<% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
+		 <% form_tag :action=>'submit_hyperlink', :id => participant.id do %> 
+		 Submit a Hyperlink (optional): <input type="text" name="submission" size=40/><input type="submit" name="upload_link" value="Upload link"/>     
+		 <% end %>
+	<% end %>	
+	<BR/><BR/>
+	<% if participant.assignment.wiki_type_id == 1%>
+	  <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>
+	<% else %> 
+	  <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
+	<% end %>
 <% end %>
-<% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
-     <% form_tag :action=>'submit_hyperlink', :id => participant.id do %> 
-	 Submit a Hyperlink (optional): <input type="text" name="submission" size=40/><input type="submit" name="upload_link" value="Upload link"/>     
-	 <% end %>
-<% end %>	
-<BR/><BR/>
-<% if participant.assignment.wiki_type_id == 1%>
-  <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>
-<% else %> 
-  <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
-<% end %>
-<BR/>
-
+<br/>

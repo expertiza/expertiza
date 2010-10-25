@@ -250,6 +250,7 @@ function HtmlDecode(s)
 <% end %>
 </div>
 
+<% 	if(session[:user].id != @participant.user_id) %>
 <div id="submitcomment">
 <button onClick="captureSelection()">Capture Code Selection</button>
 <div id="currSelection">Nothing Currently Selected</div>
@@ -260,8 +261,10 @@ function HtmlDecode(s)
   <%= hidden_field_tag :startentry %>
   <%= hidden_field_tag :endentry %>
   <%= hidden_field_tag :codefileid, @code_review_file.id %>
-  <%= hidden_field_tag :participantid, @code_review_file.participantid %>
+  <%= hidden_field_tag :participantid, session[:user].id %>
   <%= submit_tag "Submit Comment" -%>
+<% end %>
+
 <% end %>
 
 

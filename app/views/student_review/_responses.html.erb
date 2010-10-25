@@ -41,8 +41,16 @@
                 <%end%>
            <%end%>
        <%else%>
-           <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
-       <%end%>
+	    <% if @assignment.codereview %>
+		    <td><table>
+	        <% for eachcodefile in @participant.get_codefiles %>
+		        <tr><td><%= link_to eachcodefile.name, :controller => 'code_review_files', :action => 'show_code_review_file', :id => eachcodefile.id %></td></tr>
+            <% end %>
+			</table></td>
+	    <% else %>
+            <td><%= link_to "BeginTest",{:controller => 'response', :action => 'new', :id => map.id} %></td>
+        <% end %>
+	   <%end%>
   	 <% else %>
   	   <td>Begin</td><td> (Work has not yet been submitted)</td>
      <% end %>       

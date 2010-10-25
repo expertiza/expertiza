@@ -69,7 +69,7 @@
                    <%= select('review_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
                </TD>
 			   <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('review_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
+                   <%= select('review_deadline', 'threshold', [ [8, 8] ],:selected =>1 )%>
                </TD>
            </TR>
        </TABLE>
@@ -103,9 +103,41 @@
 			   <TD ALIGN=CENTER WIDTH=10%>
                    <%= select('reviewofreview_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
                </TD>
+			   
            </TR>
-       </table>
+		   
+      
+
+	    <TD ALIGN=LEFT WIDTH=20%>
+                   Switch Topic deadline
+				   <FONT COLOR="blue">(Enter a date less than submission deadline)</FONT>
+               </TD>
+               <TD ALIGN="CENTER">
+                    <input type="text" id="switch_deadline_due_at" name ="switch_deadline[due_at]"/>
+                    <img src="/images/cal.gif"  onClick="NewCal('switch_deadline_due_at','YYYYMMDD',true,24); return false;"/>
+               <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('switch_deadline', 'submission_allowed_id', [ ['OK', 1]],:selected =>1 )%>
+               </TD>
+               <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('switch_deadline', 'review_allowed_id', [['OK', 1]],:selected =>1 )%>
+               </TD>
+               <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('switch_deadline', 'resubmission_allowed_id', [['OK', 1]],:selected =>1 )%>
+               </TD>
+               <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('switch_deadline', 'rereview_allowed_id', [ ['OK', 1]],:selected =>1 )%>
+               </TD>
+               <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('switch_deadline', 'review_of_review_allowed_id', [ ['OK', 1]],:selected =>1 )%>
+               </TD>
+			   <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('switch_deadline', 'threshold', [ [8, 8] ],:selected =>1 )%>
+               </TD>
+			   
+           </TR>
+		  </table>
     </div>
+	 
 <br/>
 
 <div id="days_between_chapters" style="position:relative">

@@ -6,25 +6,9 @@
 			<div class="flash_note">
 				In order for your work to be published on our website, you need to need to grant us 
 				publishing rights for your work. You may do this on a per assignment basis, or if
-				you wish you can grant or deny rights to all your past and/or future work.  To change
-				any publishing rights you must provide a digital signature. 
+				you wish you can grant or deny rights to all your past and/or future work.
 			</div>
 		</td>
-	</tr>
-	<tr>
-		<td colspan=3><h3>Digital Signature</h3></td>
-		<td></td>
-	</tr>
-	<tr>
-		<td colspan=3>
-			<% if session[:dsig].nil? %>
-				You have not provided a digital signature. <br>
-				Click <%= link_to 'sign', :action =>'get_private_key'%> to validate. 
-			<% else %>
-			    Your digital signature is validated.
-			<% end %>
-		</td>
-		<td></td>
 	</tr>
 	<tr>
 		<td colspan=3><h3>Future work</h3></td>
@@ -34,16 +18,16 @@
 		<td colspan=3>
 			<% if session[:user].master_permission_granted.nil? %>
 				You currently do not have auto publishing permissions set. <br>
-				Click <%= link_to 'grant', :action =>'set_master_publish_permission', :set_master => 1 %> 
-				or <%= link_to 'deny', :action =>'set_master_publish_permission', :set_master => 0 %> 
+				Click <%= link_to 'grant', :action =>'set_master_publish_permission', :id => 1 %> 
+				or <%= link_to 'deny', :action =>'set_master_publish_permission', :id => 0%> 
 				to automatically set publishing rights for all your future work.
-			<% elsif session[:user].master_permission_granted %>
+			<% elsif session[:user].master_permission_granted == 1%>
 			  You currently have auto publishing permissions set to <b>grant</b>. <br>
-				Click <%= link_to 'deny', :action =>'set_master_publish_permission', :set_master => 0 %> 
+				Click <%= link_to 'deny', :action =>'set_master_publish_permission', :id => 0 %> 
 				to automatically deny publishing rights for all your future work.
 			<% else %>
 			  You currently have auto publishing permissions set to <b>deny</b>. <br>
-				Click <%= link_to 'grant', :action =>'set_master_publish_permission', :set_master => 1 %> 
+				Click <%= link_to 'grant', :action =>'set_master_publish_permission', :id => 1 %> 
 				to automatically grant publishing rights for all your future work.
 			<% end %>
 		</td>

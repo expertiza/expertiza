@@ -10,7 +10,7 @@
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => @stage} %>
 <BR/>
 
-<%= render :partial => 'quiz', :locals => {:participant => participant} %>
+<%= render :partial => 'quiz', :locals => {:participant => @participant} %>
 <BR/>
 	
 <%= render :partial => 'codereview', :locals => {:participant => @participant}%>

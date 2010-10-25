@@ -20,7 +20,11 @@
 	    <td><%= link_to participant.assignment.name, :action => 'view', :id => participant %></td>
 	    <td><%= participant.get_course_string %></td>
 	    <td><%= participant.get_topic_string %></td>
+		<%if participant.assignment.get_current_stage(participant.topic_id)== "switch_topics"%>
+		<td>submission</td>
+		<%else%>
         <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
+		<%end%>
 	    <td><%= participant.assignment.get_stage_deadline(participant.topic_id) %></td>
 	    <td align=center><%if participant.permission_granted %>granted<% else %>denied<% end %></td>
       </tr>

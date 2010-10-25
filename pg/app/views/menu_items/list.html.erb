@@ -1,0 +1,16 @@
+<h1>Menu Editor</h1>
+
+<table class="table_as_list">
+<tr>
+<td><strong>(root)</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><%= link_to image_tag("/images/add.png"), 
+	{:action => 'new'} %></td>
+</tr>
+
+<%= render :partial => 'item_list', :locals => {:items => @items,
+    :depth => 0} %>
+</table>

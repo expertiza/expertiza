@@ -1,0 +1,22 @@
+<% 
+if session[:menu]
+   menu = session[:menu].get_menu(level)
+   if menu
+%>
+<ul<%= if class_attr then " class=\"#{class_attr}\"" end%>>
+  <% for item_id in menu do 
+       item = session[:menu].get_item(item_id)
+       selected = session[:menu].selected?(item.id)%>
+  <li<%= if selected then ' class="selected"' end %>>
+    <a href="/menu/<%= item.name %>"><%= item.label %></a>
+    <%= if selected and depth > 0 
+	  render :partial => 'menu_items/menubar', 
+            :locals => {:level => level + 1, :depth => depth - 1,
+		        :class_attr => class_attr }
+        end %>
+  </li>
+  <% end %>
+</ul>
+<% 
+   end
+end %>

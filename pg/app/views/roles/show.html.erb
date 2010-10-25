@@ -1,0 +1,78 @@
+<h1> <%= @role.name %> </h1>
+
+<table>
+<tr><th>Description</th><td> <%= @role.description %></td></tr>
+<tr><th>Created At</th><td> <%= @role.created_at %></td></tr>
+<tr><th>Updated At</th><td> <%= @role.updated_at %></td></tr>
+</table>
+
+<hr />
+<h2> Hierarchy </h2>
+
+<p> This Role and the Roles on which it is based, and the Permissions
+for each:</p>
+
+<ul class="roles_list"> <% for role in @roles do %>
+  <li> <%= link_to role.name, :controller => 'roles',
+             :action => 'show', :id => role.id %> 
+  <% role_perms = Permission.find_for_role(role.id) 
+    if role_perms.size > 0 -%>
+    <ul class="permissions_list"> <% for p in role_perms do %>
+      <li> <%= link_to p.name, :controller => 'permissions',
+                 :action => 'show', :id => p.id %> </li>
+      <% end -%>
+    </ul>
+    <% end -%>
+  </li>
+<% end -%>
+</ul>
+
+<hr />
+
+<h2> Permissions for <%= @role.name %></h2>
+
+<% if @rps.size > 0 -%>
+<table>
+<% for rp in @rps do %>
+  <tr>
+    <td><%= image_tag("/images/permission.png") %></td>
+    <td><%= link_to rp.name, :controller => 'permissions',
+              :action => 'show', :id => rp.permission_id %> </td>
+    <td><%= link_to image_tag("/images/delete.png") + ' Remove', 
+	    { :controller => 'roles_permissions', 
+              :action => 'destroy', :id => rp.id }, 
+	    :confirm => 'Remove this Permission from this Role?', 
+	    :method => :post %></td>
+  </tr>
+<% end -%>
+</table>
+<% else -%>
+<p>(None)</p>
+<% end -%>
+
+<br/>
+<p><%= link_to image_tag("/images/add.png") + ' Add Permission', { :controller => 'roles_permissions',
+       :action => 'new_permission_for_role',
+       :id => @role.id
+       }%> for this Role</p>
+
+<hr/>
+<h2> <%= @role.name %> Users </h2>
+<% if @users and @users.length > 0 -%>
+<ul>
+  <% for user in @users do -%>
+  <li><%= link_to user.name, :controller => 'users',
+          :action => 'show', :id => user.id %></li>
+  <% end -%>
+</ul>
+<% else -%>
+<p>(No Users for this Role)</p>
+<% end -%>
+
+<hr/>
+<p><%= link_to 'Edit', :action => 'edit', :id => @role %> |
+<%= link_to 'Delete', {:action => 'destroy', :id => @role}, 
+    :confirm => 'Are you sure?', :method => :post %> </p>
+
+<p><%= link_to 'Back', :action => 'list' %> to Roles list</p>
+

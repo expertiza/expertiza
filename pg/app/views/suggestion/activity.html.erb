@@ -1,0 +1,47 @@
+<h3>Listing Suggestions and Comments Activity  </h3>
+
+<%if @activity.size > 0 %>
+
+
+<table class="general" cellpadding=5 width=100% border=1>
+  <tr>
+    <th>UnityID</th>
+	<th>Title</th>
+	<th>Type</th>
+	<th>Description/Comment</th>
+	<th>Status</th>
+	<th>Timestamp</th>
+
+  </tr>
+
+<% for activity in @activity %>
+  <tr>
+    <td><%=h activity.unityID %></td>
+	<% if (activity.title).nil?%>
+	<td align="center">--</td>
+	<%else%>
+    <td align="center"><%=h activity.title %></td>
+	<%end%>
+	<% if (activity.is_comment == false)%>
+	<td align="center">Suggestion</td>
+	<%else%>
+	<td align="center">Comment</td>
+	<%end%>
+	<td align="center"><%=h activity.description %></td>
+	<% if (activity.status == "comment")%>
+	<td align="center">--</td>
+	<%else%>
+	<td align="center"><%=h activity.status %></td>
+	<%end%>
+	<td align="center"><%=h activity.updated_at %></td>
+
+	
+  </tr>
+<% end %>
+</table>
+<%else%>
+	<b>No data to display</b>
+<%end%>
+<br />
+<br />
+<%=link_to 'Back', :action => 'list', :id => @assignment_id %></td>

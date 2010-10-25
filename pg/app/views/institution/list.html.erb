@@ -1,0 +1,24 @@
+<h1>Listing institutions</h1>
+
+<table>
+  <tr>
+  <% for column in Institution.content_columns %>
+    <th><%= column.human_name %></th>
+  <% end %>
+  </tr>
+  
+<% for institution in @institutions %>
+  <tr>
+  <% for column in Institution.content_columns %>
+    <td><%=h institution.send(column.name) %></td>
+  <% end %>
+    <td><%= link_to 'Show', :action => 'show', :id => institution %></td>
+    <td><%= link_to 'Edit', :action => 'edit', :id => institution %></td>
+    <td><%= link_to 'Delete', { :action => 'destroy', :id => institution }, :confirm => 'Are you sure?', :method => :post %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New institution', :action => 'new' %>

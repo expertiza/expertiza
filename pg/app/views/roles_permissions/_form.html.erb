@@ -1,0 +1,13 @@
+<%= error_messages_for 'roles_permission' %>
+
+<!--[form:roles_permission]-->
+
+<p><label for="role_id">Role:</label> (<%= @role.name %>)<br/>
+<%= hidden_field 'roles_permission', 'role_id'  %></p>
+
+<p><label for="role_id">Permission</label><br/>
+<%= collection_select 'roles_permission', 'permission_id',
+      @permissions, :id, :name  %></p>
+
+<!--[eoform:roles_permission]-->
+

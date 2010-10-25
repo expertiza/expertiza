@@ -5,10 +5,10 @@ class User < ActiveRecord::Base
   has_many :assignments, :through => :participants
   
   belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
-  
+  has_many :bookmark_users
   has_many :teams_users
   has_many :teams, :through => :teams_users
-  
+  has_many :bmappings
   validates_presence_of :name
   validates_uniqueness_of :name
 

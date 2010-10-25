@@ -1,6 +1,4 @@
 <h3>Suggested topics for <%=h @assignment.name %></h3>
-
-<%= render :partial => 'page_header'%>
 <%if @suggestions.size > 0 %>
 <div class="flash_note">
 	Click View link to view the suggestion and to comment and/or approve
@@ -11,9 +9,7 @@
     <th>Title</th>
 	<th>Status</th>
 	<th>Submitter's unity ID</th>
-	<th>Date</th>
 	<th>Action</th>
-
   </tr>
 
 <% for suggestion in @suggestions %>
@@ -21,9 +17,7 @@
     <td><%=h suggestion.title %></td>
     <td align="center"><%=h suggestion.status %></td>
 	<td align="center"><%=h suggestion.unityID %></td>
-	<td align="center"><%=h suggestion.updated_at %></td>
-	<td align="center"><%= link_to 'View', :action => 'show', :id => suggestion %>&nbsp;&nbsp;&nbsp;
-	<%=link_to 'Activity Log', :action => 'activity', :id => suggestion, :assignment_id => @assignment.id %></td>	
+	<td align="center"><%= link_to 'View', :action => 'show', :id => suggestion %></td>	
   </tr>
 <% end %>
 </table>

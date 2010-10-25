@@ -78,11 +78,7 @@ class CourseTeam < Team
  
  def add_participant(course_id, user)
    if CourseParticipant.find_by_parent_id_and_user_id(course_id, user.id) == nil
-      if !user.master_permission_granted.nil?
-        p_permission_updated_at = user.permission_updated_at;
-        p_digital_signature = user.digital_signature;
-      end
-     CourseParticipant.create(:parent_id => course_id, :user_id => user.id, :permission_granted => user.master_permission_granted, :permission_updated_at => p_permission_updated_at, :digital_signature => p_digital_signature)
+     CourseParticipant.create(:parent_id => course_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
    end    
  end
 end

@@ -10,6 +10,8 @@
     <%if @show_actions%>
     <th width="5%">Action</th>
     <%end%>
+    <th width="5%">View Bookmark</th> 
+    <th width="5%">Suggest Bookmark</th> 
   </tr>
 
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
@@ -27,8 +29,7 @@
   <% for topic in @sign_up_topics %>
       <tr>
         <td><%=topic.topic_identifier%></td>
-        <td><%= topic.topic_name %>
-		<br/><br/><%= render :partial => 'topic_description', :locals => {:i => i, :topic_desc => topic.topic_description} %></td>
+        <td><%= topic.topic_name %></td>
         <td align="center"><%= topic.max_choosers %></td>
 
         <% found_in_slots = false %>
@@ -58,7 +59,9 @@
                 <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
             <% end %>
         <% end %>
-      </tr>
+        <td align="center"><%= link_to "View Bookmarks", :controller => 'bookmarks', :action => 'view_bookmarks', :id => topic.id   %></td>
+		<td align="center"><%= link_to "Suggest Bookmarks", :controller => 'bookmarks', :action => 'new', :id => topic.id   %></td>
+       </tr>
       <% i=i+1 %>
   <% end %>
 

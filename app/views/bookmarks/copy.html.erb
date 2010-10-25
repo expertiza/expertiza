@@ -1,0 +1,16 @@
+
+<h1>Adding new bookmarkinto your repository - Copying existing bookmark</h1>
+
+<h5>Please edit the following fields to add this  bookmark</h5>
+<table>
+<%form_tag(:action => "copybookmark", :method => "post")do %>
+
+<tr><td>Bookmark URL</td><td>    <%= text_field_tag("b_url", @b_url, :size => 100, :maxlength => 300 ) %></td></tr>
+<tr><td>Bookmark Title </td><td>  <%= text_field_tag("b_title", @b_title,  :size => 100, :maxlength => 300 ) %></td></tr>
+<tr><td>tags            </td><td> <%= text_field_tag("b_tags_text", @b_tags_text,  :size => 100, :maxlength => 300 ) %></td></tr>
+<tr colspan = 6><td>Description     </td><td>   <%= text_area_tag("b_description", @b_description, :rows=>300, :cols=>100) %></td></tr>
+
+<tr><td> <%= submit_tag("Add", :name => nil) %>  <br /></td></tr>
+  <%end %>
+  </table>
+  

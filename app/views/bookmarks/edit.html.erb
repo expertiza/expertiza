@@ -1,0 +1,13 @@
+<h1>Edit this bookmark</h1>
+<% form_tag (:action => "editbookmark", :method => "post")do %>
+<table>
+<tr><td>Bookmark URL</td><td>    <%= text_field_tag("b_url",@edit_tuple["b_url"], :size => 100, :maxlength => 300,:readonly => 'true' ) %></td></tr>
+<tr><td>Bookmark Title </td><td>  <%= text_field_tag("b_title",@edit_tuple["b_title"],  :size => 100, :maxlength => 300 ) %></td></tr>
+<tr><td>Tags            </td><td> <%= text_field_tag("b_tags_text",@edit_tuple["b_tags_text"],  :size => 100, :maxlength => 300 ) %></td></tr>
+<tr colspan = 6><td>Description     </td><td>   <%= text_area_tag("b_description",@edit_tuple["b_description"], :rows=>300, :cols=>100) %></td></tr>
+
+<tr><td> <%= submit_tag("Edit", :name => nil) %>  <br /></td></tr>
+  <% end %>
+
+</table>
+

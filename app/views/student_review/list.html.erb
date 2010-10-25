@@ -1,15 +1,33 @@
-<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage() == "Complete" %>
-  <h3>Reviews for <%= @assignment.name %></h3>
+<h2>Reviews for <%= @assignment.name %></h2>
+
+<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage() == "Complete" %> 
+  <p>
+    You have completed <b><%=h pluralize(@num_reviews_completed, 'review') %></b>, 
+    with <b><%=h pluralize(@num_reviews_in_progress, 'review') %></b> outstanding.
+  </p>  
+  
   <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
+  
+  <% if @assignment.dynamic_reviewer_assignments_enabled? %>
+    <h3>Review a New Submission</h3>
+    <% if @num_reviews_in_progress == 0 %>
+      <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment} %>
+    <% else %>
+      <em>Please complete (or release the reservation on) your current review before requesting another submission to review.</em> 
+    <% end %>  
+  <% end %>
+
 <% else %>
-  <h3>Reviews cannot be performed at this time</h3>
+  <p><em>Reviews cannot be performed at this time</em></p>
 <% end %>
-<BR/>
+
+<h2>Metareviews for <%= @assignment.name %></h2>
+
 <% if @assignment.metareview_allowed(@meta_reviewee_topic_id) or @assignment.get_current_stage() == "Complete" %>
-  <h3>Metareviews for <%= @assignment.name %></h3>
   <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
+  <br/>
 <% else %> 
-  <h3>Metareviews cannot be performed at this time</h3>
+  <p><em>Metareviews cannot be performed at this time.</em></p>
 <% end %>
-<BR/>
+
 <a href="javascript:window.history.back()">Back</a>

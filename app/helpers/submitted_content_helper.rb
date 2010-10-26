@@ -2,7 +2,10 @@ module SubmittedContentHelper
   
   def display_directory_tree(participant, files, flag)        
         index = 0
-        check_stage = participant.assignment.get_current_stage(participant.topic_id)
+        assignment = participant.assignment # participant is @map.contributor
+        topic_id = @participant.topic_id    # @participant is @map.reviewer
+        check_stage = assignment.get_current_stage(topic_id)
+
         ret = "\n<table id='file_table' cellspacing='5'>"
         ret += "\n   <tr><th>Name</th><th>Size</th><th>Type</th><th>Date Modified</th></tr>"
         for file in files

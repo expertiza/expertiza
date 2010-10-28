@@ -1,0 +1,105 @@
+<script language="JavaScript">
+	function expand(file_id) {
+		div_block = document.getElementById("file_info_" + file_id);
+		if(div_block.style.display == 'block') {
+			div_block.style.display = 'none';
+		}
+		else {
+			div_block.style.display = 'block';
+			load_info(file_id);
+		}
+	}
+	
+	function load_info(file_id) {
+		div_block = document.getElementById("file_info_" + file_id);
+		$.ajax({
+		  url: '/code_review/get_review_info/' + (file_id),
+		  success: function(data) {
+		    $('#' + "file_info_" + file_id).html(data);
+		  },
+		  error:function (xhr, ajaxOptions, thrownError){
+            alert('Error loading info. Please try again.\nOn Repeated errors, contact Administrator.');
+       	  }
+		});
+	}
+	
+</script>
+
+<style type="text/css">
+	.file_info {
+		display: none;
+	}	
+</style>
+
+<% if not participant.code_review.nil? %>
+<h4>Code Review Assignment Information</h4>
+<% form_for(participant.code_review, 
+	:url=>((participant.code_review.nil? or participant.code_review.id.nil?) ? "/code_review/create" : "/code_review/update")) do |f| %>
+	<input type="hidden" name="participant_id" value="<%= participant.id %>" />
+	<%= f.hidden_field :id %>
+	<table>
+		<tr>
+		<td><label for="cr_content">Title</label></td>
+		<td><%=  f.text_field :title %></td>
+		</tr>
+		<tr>
+		<td><label for="cr_change">Change Highlights</label></td>
+		<td><%= f.text_area :changes, :cols=>40, :rows=>50 %></td>
+		</tr>
+		<tr>
+		<td></td>
+		<td><%= f.submit (participant.code_review.id.nil? ? "Create Review" : "Update Review") %></td>
+		</tr>
+	</table>
+<% end %>
+<% end %>
+
+<div>
+	<% if participant.code_review %>
+	<% if not participant.code_review.id.nil? %>
+		<% if participant.code_review.review_files.length > 0  %>
+			<h4>Uploaded Files (Click File for more info)</h4>
+				<table border="0">
+					<%for review_file in participant.code_review.review_files %>
+						<tr>
+						<td width="400px">
+							<a href="#" onclick="javascript: expand('<%= review_file.id %>'); return false;">
+								<%= review_file.file_name %>
+							</a>
+							<div id="file_info_<%= review_file.id %>" class="file_info">
+								Loading.. Please wait..
+							</div>
+						</td>
+						<td><%= link_to "Download", :controller => "code_review", :action => "download_file", :id => review_file %></td>
+						<td><%= link_to "Review", :controller => "code_review", :action => "review_file", :id => review_file %></td>
+						<td><%= link_to "Delete", :controller => "code_review", :action => "delete_file", :id => review_file %></td>
+						</li>
+						</tr>
+					<% end %>
+				</table>
+			</table>
+		<% else %>
+			No files uploaded.<br /><br />
+		<% end %>
+		<br />
+		<div style="border-width: 2px; border-color: black; background-color: #FFFFCC; width: 400px;">
+		<table border="0">
+		<% form_tag ({:controller=>"code_review", :action=>"upload_file", :id=>participant.code_review.id}, 
+				{:method => 'post', :enctype => "multipart/form-data"}) do |f| %>
+			<tr>
+			<td valign="top"><%= label_tag(:comment_label, 'Comment') %></td>
+			<td><%= text_area 'comment','txt', :cols => 40, :rows => 15 %></td>
+			</tr>
+			<tr><td><%= label_tag(:upload_file, "Upload File : ") %></td>
+			<td><%= file_field_tag 'datafile' %></td>
+			</tr>
+			<tr><td colspan="2">  
+			<%= submit_tag 'Upload File' %>
+			</td></tr>	
+		</table>	
+		<% end %>
+		</div>
+		<% end %>
+	<% end %>
+</div>
+

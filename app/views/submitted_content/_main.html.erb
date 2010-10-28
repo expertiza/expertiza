@@ -6,11 +6,10 @@
 	 Submit a Hyperlink (optional): <input type="text" name="submission" size=40/><input type="submit" name="upload_link" value="Upload link"/>     
 	 <% end %>
 <% end %>	
-<BR/><BR/>
+<BR/>
+
 <% if participant.assignment.wiki_type_id == 1%>
   <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>
 <% else %> 
   <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
 <% end %>
-<BR/>
-

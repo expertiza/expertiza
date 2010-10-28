@@ -1,0 +1,194 @@
+<style type="text/css">
+  a[class="review"]:link, a[class="review"]:active, a[class="review"]:visited {
+	color: #FFFFFF;
+	}
+	
+	.comment {
+		float: right;
+		background-color: #00FF00;
+		margin: 5px;
+	}
+	
+	.minor {
+		float: right;
+		background-color: #00FFFF;
+		margin: 5px;
+	}
+	
+	.severe {
+		float: right;
+		background-color: #FF0000;
+		margin: 5px;
+	}
+
+	.total {
+		float: right;
+		background-color: #EEEEEE;
+		margin: 5px;
+	}
+	
+	.review_area {
+		display: none;
+		margin-left: 30px;
+		margin-top: 0px;
+		margin-bottom: 10px;
+	}
+	
+	.review_block {
+		border-color: #FFFFCC;
+		border-width: 2px;
+		background-color: #FFFFCC;
+		width: 600px;
+	}
+</style>
+
+<script language="JavaScript">
+	
+	function toggle_display(div_id) {
+		div_block = document.getElementById(div_id);
+		
+		if (div_block.style.display == 'block') {
+			div_block.style.display = 'none';
+		} else {
+			div_block.style.display = 'block';
+		}
+	}
+	
+	function load_comment(line) {
+		rb = "review_block_" + line;
+		$.ajax({
+		  url: '/code_review/get_review_content/<%= params[:id] %>',
+		  data: "line="+line,
+		  success: function(data) {
+		    $('#' + rb).html(data);
+		  },
+		  error:function (xhr, ajaxOptions, thrownError){
+            alert('Error while posting comment. Please try again.\nOn Repeated errors, contact Administrator.');
+       	  }
+		});
+	}
+	
+	function show_hide(line) {
+		comment_id = "comment_" + line
+		row_id = "line_" + line
+		
+		div_block = document.getElementById(comment_id);
+		row_block = document.getElementById(row_id);
+		img_block = document.getElementById("img_" + line);
+		review_block = document.getElementById("review_block_" + line);
+		
+		if (div_block.style.display == 'block') {
+			div_block.style.display = 'none';
+			row_block.style.backgroundColor = 'white';
+			img_block.src = img_block.src.replace("_d.png", ".png");
+		} else {
+			div_block.style.display = 'block';
+			row_block.style.backgroundColor = '#FFFFCC';
+			img_block.src = img_block.src.replace(".png", "_d.png");
+			load_comment(line);
+		}
+	}
+	
+	function goto_line(data) {
+		line = "#mark_" + data.value;
+		tmp = window.location + "#";
+		var pattern = /#.*/;
+		window.location = tmp.replace(pattern, line);
+	}
+	
+	function show_hide_all(div_id) {
+		toggle_display(div_id);
+		div_block = document.getElementById(div_id);
+		if (div_block.style.display == 'block') {
+			load_all();
+		}
+	}
+	
+	function load_all() {
+		rb = "all_comments";
+		$.ajax({
+		  url: '/code_review/get_review_summary/<%= params[:id] %>',
+		  success: function(data) {
+		    $('#' + rb).html(data);
+		  },
+		  error:function (xhr, ajaxOptions, thrownError){
+            alert('Error while loading comments. Please try again.\nOn Repeated errors, contact Administrator.');
+       	  }
+		});
+	}
+	
+	function show_comments_line(line) {
+		div_id = "line_comment_" + line;
+		div_block = document.getElementById(div_id);
+		toggle_display(div_id);
+		if (div_block.style.display == 'block') {
+			$.ajax({
+			  url: '/code_review/get_review_at_line/<%= params[:id] %>',
+			  data: 'line=' + line,
+			  success: function(data) {
+			    $('#' + div_id).html(data);
+			  },
+			  error:function (xhr, ajaxOptions, thrownError) {
+			  	$('#' + div_id).html("Error loading comments.");
+	            alert('Error while loading comments. Please try again.\nOn Repeated errors, contact Administrator.');
+	       	  }
+			});
+		}
+	}
+</script>
+<h4>Review file <%= @file_to_review.file_name %></h4>
+	<div class="total"><%= @comments + @minors + @severes %> Total</div>
+	<div class="comment"><%= @comments %> Comment</div>
+	<div class="minor">&nbsp;&nbsp;<%= @minors %> Minor</div>
+	<div class="severe">&nbsp;&nbsp;<%= @severes %> Severe</div>
+<a href="#" onclick="javascript: show_hide_all('all_comments'); return false;">View Comments</a>
+<div id="all_comments" class="review_area">
+	Fetching Comments.. Please wait..
+</div>
+<br /><br />
+<div>
+	<% if @line_comment.keys.length > 0 %>
+		Lines with Review Comments:
+		<select onchange="javascript: goto_line(this);"> 
+		<% sorted_lines = @line_comment.keys.sort() %>
+		<% for sl in sorted_lines %>
+			<option value="<%= sl %>"><%= sl.to_s + " line" %></option>
+		<% end %>
+		</select>
+	<% end %>
+</div>
+<br />
+<table>
+<% lc = 0 %>
+<% for line in @lines %>
+<tr>
+<td valign="top">
+	<a name="mark_<%= lc %>" />
+
+	<a href="#" class="review" onclick="javascript: show_hide('<%= lc %>'); return false;">
+		<% if @line_comment.has_key?(lc) %>
+			<img id="img_<%= lc %>" src="/images/red_arrow.png" />			
+		<% else %>
+			<img id="img_<%= lc %>" src="/images/green_arrow.png" />
+		<% end %>
+	</a>
+</td>
+<td valign="top">
+	<%= lc %>:
+</td>
+<td>
+	<div id="line_<%= lc %>"><%= line %></div>
+	<div id="comment_<%= lc %>" class="review_area">
+		<div class="review_block" id="review_block_<%= lc %>">
+			<i>Loading Review Comment...</i>
+		</div>
+	</div>
+</td>
+<% lc = lc + 1%>
+<% end %>
+	
+</tr>
+</table>
+
+<br />
+<%= link_to "Back to assignment", :controller => "submitted_content", :action=>"edit", :id=>@participant.id %>

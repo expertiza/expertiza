@@ -9,5 +9,7 @@
 <%@stage = @assignment.get_current_stage(@participant.topic_id)%>
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => @stage} %>
 <BR/>
-<BR/>
+
+<%= render :partial => 'submitted_content/codereview', :locals => {:participant => @participant, :code_review => @participant.code_review}%>
+
 <a href="javascript:window.history.back()">Back</a>

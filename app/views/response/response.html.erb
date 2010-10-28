@@ -15,6 +15,36 @@
 <% end %>
 <%= @map.show_review() %>
 
+<% if @code_to_review %>
+<b>Code Review</b>
+<table border="0">
+	<tr>
+		<td width="200px">Title</td>
+		<td width="400px"><%= @code_to_review.title %></td>
+	</tr>
+	<tr>
+		<td>Change highlights</td>
+		<td><%= @code_to_review.changes %></td>
+	</tr>
+	<tr>
+		<td colspan="2"><b>Attached Files</b></td>
+	</tr>
+	<% if @code_to_review.review_files.length() == 0 %>
+		<tr><td>No Files Attached.</td></tr>
+	<% else %>
+		<% for file in @code_to_review.review_files %>
+			<tr>
+				<td><%= file.file_name %>
+				<td><%= link_to "Review", :controller => "code_review", :action => "review_file", :id => file %>
+				&nbsp;<%= link_to "Download", :controller => "code_review", :action => "download_file", :id => file %></td>
+			</tr>
+		<% end %>
+	<% end %>
+</table>
+<br />
+
+<% end %>
+
 <% form_tag :action => @next_action, :id => @modified_object do %>
 <% i = 0
    @questions.each{

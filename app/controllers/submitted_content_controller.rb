@@ -7,7 +7,11 @@ class SubmittedContentController < ApplicationController
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
+    if (@participant.code_review.nil?) # code review assignment 
+      @participant.code_review = CodeReview.new
+    end
   end
+  
   
   def view
     @participant = AssignmentParticipant.find(params[:id])

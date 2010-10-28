@@ -142,6 +142,11 @@ class ResponseController < ApplicationController
     @title = @map.get_title 
     @assignment = @map.assignment
     @participant = @map.reviewer
+    @reviewee = @map.reviewee
+    @code_to_review = nil
+    if (@reviewee)
+      @code_to_review = @reviewee.code_review
+    end
     @contributor = @map.contributor
     @questionnaire = @map.questionnaire
     @questions = @questionnaire.questions

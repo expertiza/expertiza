@@ -9,6 +9,8 @@ class User < ActiveRecord::Base
   has_many :teams_users
   has_many :teams, :through => :teams_users
   
+  has_many :review_comments
+  
   validates_presence_of :name
   validates_uniqueness_of :name
 

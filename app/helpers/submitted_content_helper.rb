@@ -3,7 +3,7 @@ module SubmittedContentHelper
   def display_directory_tree(participant, files, flag)        
         index = 0
         assignment = participant.assignment # participant is @map.contributor
-        topic_id = @participant.topic_id    # @participant is @map.reviewer
+        topic_id = participant.topic_id     # participant is @map.reviewer
         check_stage = assignment.get_current_stage(topic_id)
 
         ret = "\n<table id='file_table' cellspacing='5'>"

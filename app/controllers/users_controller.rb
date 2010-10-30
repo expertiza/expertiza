@@ -103,7 +103,9 @@ class UsersController < ApplicationController
         # Students do not have any checks for this information.
         if @user.role.name == "Instructor" or @user.role.name == "Administrator"
           AssignmentQuestionnaires.create(:user_id => @user.id)
-        end
+        end      
+       # user sucessfully created, so generate info for digital signing
+        @user.gen_keys_and_certificate
         flash[:notice] = 'User was successfully created.'
         redirect_to :action => 'list'
       else

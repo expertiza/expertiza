@@ -163,15 +163,12 @@ class User < ActiveRecord::Base
     puts self.digital_certificate
     self.save
     
-    # when replacing an existing key, update any digital signatures made
+    # when replacing an existing key, update any digital signatures made previously with the new key
     if (replacing_key)
       participants = AssignmentParticipant.find_all_by_user_id(self.id)
       for participant in participants
         if (!participant.digital_signature.nil?)
-          puts "updating"
-          puts participant.assignment.name
-          digital_signature = participant.generate_digital_signature(new_private)
-          participant.verify_digital_signature(digital_signature)
+          AssignmentParticipant.grant_publishing_rights(new_private, [ participant ]) 
         end
       end
     end

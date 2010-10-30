@@ -5,11 +5,6 @@ class PublishingController < ApplicationController
     @participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)
   end
   
-  def set_master_publish_permission
-    session[:user].update_attribute('master_permission_granted',params[:id])    
-    redirect_to :action => 'view'
-  end
-  
   def set_publish_permission
     participant = AssignmentParticipant.find(params[:id])
     participant.update_attribute('permission_granted',params[:allow])  
@@ -17,51 +12,50 @@ class PublishingController < ApplicationController
   end  
   
   def update_publish_permissions
-    participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)
-    participants.each{
-      | participant |
-      participant.update_attribute('permission_granted',params[:allow])  
-    }    
-    redirect_to :action => 'view'
-  end
-
-  def grant
-      @participant = AssignmentParticipant.find(params[:id])
-      @user = User.find_by_id(session[:user].id) 
-  end
-  
-  def grant_with_signature
-    participant = AssignmentParticipant.find(params[:id])
-    digital_signature = params[:digital_signature]
-
-    verified = participant.verify_digital_signature(digital_signature)
-    if (verified)
-      participant.update_attribute('permission_granted', 1)
-      redirect_to :action => 'view'
+    if (params[:allow] == '1')
+      redirect_to :action => 'grant'
     else
-      flash[:notice] = 'Digital signature was not valid.'
-      redirect_to :action => 'grant', :id => participant.id
+      participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)
+      participants.each{
+        | participant |
+        participant.update_attribute('permission_granted',params[:allow])  
+        participant.digital_signature = nil
+        participant.time_stamp = nil
+        participant.save
+      }
+      redirect_to :action => 'view'
     end
   end
 
+  # Put up the page where the user can supply their private key and grant publishing rights
+  def grant
+    # Lookup the specific assignment (if any) that the user is granting publishing rights to.
+    # This will be nil when the user is granting to all past assignments.
+    if (!params[:id].nil?) 
+      @participant = AssignmentParticipant.find(params[:id])
+    end
+    @user = User.find_by_id(session[:user].id) 
+  end
+  
+  # Grant publishing rights using the private key supplied by the student
   def grant_with_private_key
-    participant = AssignmentParticipant.find(params[:id])
+    if (params[:id])
+      participants = [ AssignmentParticipant.find(params[:id]) ]
+    else
+      participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)
+    end
     private_key = params[:private_key]
 
     begin
-      digital_signature = participant.generate_digital_signature(private_key)
-
-      verified = participant.verify_digital_signature(digital_signature)
-      if (verified)
-        participant.update_attribute('permission_granted', 1)
-        redirect_to :action => 'view'
-      else
-        flash[:notice] = 'Digital signature was not valid.'
-        redirect_to :action => 'grant', :id => participant.id
-      end
+      AssignmentParticipant.grant_publishing_rights(private_key, participants)
+      redirect_to :action => 'view'
     rescue
       flash[:notice] = 'Invalid private key.'
-      redirect_to :action => 'grant', :id => participant.id
+      if (!params[:id].nil?) 
+        redirect_to :action => 'grant', :id => participants[0].id
+      else
+        redirect_to :action => 'grant'
+      end
     end
   end
 end

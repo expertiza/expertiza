@@ -2,6 +2,7 @@ module SubmittedContentHelper
   
   def display_directory_tree(participant, files, flag)        
         index = 0
+        participant = @participant if @participant # TODO: Verify why this is needed
         assignment = participant.assignment # participant is @map.contributor
         topic_id = participant.topic_id     # participant is @map.reviewer
         check_stage = assignment.get_current_stage(topic_id)

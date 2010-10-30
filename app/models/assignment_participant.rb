@@ -200,25 +200,39 @@ class AssignmentParticipant < Participant
     return fields            
   end
   
-  def get_hash
-      Digest::SHA1.digest(self.assignment.name)
+  def get_hash(time_stamp)
+    #Digest::SHA1.digest(self.assignment.name)
+    
+    hash_data = Digest::SHA1.digest(self.assignment.name.to_s)
+    sign = hash_data + self.user.name.to_s + time_stamp.strftime("%Y-%m-%d %H:%M:%S")
+    puts "-----------------------------------------------------"
+    puts time_stamp.strftime("%Y-%m-%d %H:%M:%S")
+    Digest::SHA1.digest(sign)
+  end
+  
+  # grant publishing rights to one or more assignments. Using the supplied private key, 
+  # digitial signatures are generated.
+  # references:
+  # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
+  # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
+  def self.grant_publishing_rights(privateKey, participants)
+    for participant in participants
+      time_now = Time.now.utc
+      hash_data = participant.get_hash(time_now)
+      private_key2 = OpenSSL::PKey::RSA.new(privateKey)
+      cipher_text = Base64.encode64(private_key2.private_encrypt(hash_data))
+      participant.digital_signature = cipher_text
+      participant.time_stamp = time_now
+      participant.update_attribute('permission_granted', 1)
+      participant.save
+    end
   end
   
   # references:
   # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
   # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
-  def generate_digital_signature(privateKey)
-    hash_data = get_hash
-    private_key2 = OpenSSL::PKey::RSA.new(privateKey)
-    cipher_text = Base64.encode64(private_key2.private_encrypt(hash_data))
-    cipher_text
-  end
-
-  # references:
-  # http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
-  # http://rubyforge.org/tracker/?func=detail&atid=1698&aid=7218&group_id=426
   def verify_digital_signature(cipher_text)
-    hash_data = get_hash
+    hash_data = get_hash(self.time_stamp)
 
     # get the public key from the digital certificate
     certificate1 = self.user.digital_certificate 
@@ -229,9 +243,6 @@ class AssignmentParticipant < Participant
        
       clear_text = public_key.public_decrypt(Base64.decode64(cipher_text))
       if (hash_data == clear_text)
-        self.digital_signature = cipher_text
-        self.time_stamp = Time.now
-        self.save
         true
       else
         false;

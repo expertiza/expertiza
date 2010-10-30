@@ -465,7 +465,7 @@ class ReviewMappingController < ApplicationController
     @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",assignment.id])
     @revqids.each do |rqid|
       rtype = Questionnaire.find(rqid.questionnaire_id).type
-      if( rtype == ReviewQuestionnaire)
+      if( rtype == "ReviewQuestionnaire")
         @review_questionnaire_id = rqid.questionnaire_id
       end
       

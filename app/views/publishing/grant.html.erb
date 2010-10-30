@@ -1,5 +1,8 @@
+<% if (!@participant.nil?) %>
 <h1>Grant Publishing Rights to <%= @participant.assignment.name %></h1>
-
+<% else %>
+<h1>Grant Publishing Rights to all Past Assignments</h1>
+<% end %>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
 <div class="flash_error">
 	<%= flash[:notice] %>
@@ -17,7 +20,10 @@
 	<tr>
 	  <td valign="top"><b>Private Key:</b></td>
 	  <td>
-		<% form_tag :action => 'grant_with_private_key', :id => @participant do %>
+		<% form_tag :action => 'grant_with_private_key' do %>
+		<% if (!@participant.nil?) %>
+		  <%= hidden_field_tag :id, @participant.id %> 
+        <% end %>
 		<%= text_area_tag :private_key, '', :rows => 20, :cols => 65, :style =>'scrollHeight:40' %><br />
 		<%= submit_tag 'Grant' %>
 		<% end %>

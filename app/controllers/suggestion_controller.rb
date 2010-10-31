@@ -122,6 +122,8 @@ class SuggestionController < ApplicationController
     redirect_to :action => 'show', :id => @suggestion
   end
   
+  # Set suggestions status to future, to be added to a later
+  # topic list
   def defer_suggestion
     @suggestion = Suggestion.find(params[:id])
     
@@ -133,8 +135,11 @@ class SuggestionController < ApplicationController
     redirect_to :action => 'show', :id => @suggestion
   end
   
+  # Edit a suggestion, so that it is acceptable for approval
   def edit_suggestion
     @suggestion = Suggestion.find(params[:id])
+    # if current user's unity ID is not the same as the suggestion's,
+    # instructor or TA is logged in
     if @suggestion.unityID != session[:user].name
       if not @suggestion.unityID.nil? and not @suggestion.unityID.empty?
         user = User.find_by_name(@suggestion.unityID)
@@ -144,6 +149,7 @@ class SuggestionController < ApplicationController
       end
       @editor = "instructor"
       @suggestion.status = 'Reviewed'
+    # else the submitter is logged in
     else
       assnt = Assignment.find(@suggestion.assignment_id)
       course = Course.find(assnt.course_id)
@@ -153,6 +159,8 @@ class SuggestionController < ApplicationController
       @suggestion.status = 'Resubmitted'
     end
     
+    # edit the suggestion, send notification to student/instructor,
+    # and add the edit to the suggestion log
     if @suggestion.update_attributes(params[:suggestion_edit])
       flash[:notice] = 'Successfully updated the suggestion'
       if not @toemail.nil?
@@ -169,12 +177,15 @@ class SuggestionController < ApplicationController
     end
   end
   
+  # view all comments on the suggestions submitted by logged in student
+  # for the currently selected assignment
   def view_comments
     assignment = Assignment.find(params[:id])
     @suggestions = Suggestion.find(:all, :conditions =>
               "unityID = '#{session[:user].name}' and status not in ('Approved', 'Rejected') and assignment_id = #{params[:id]}")
   end
   
+  # keep track of edits made to a suggestion by logging each edit
   def log_suggestion
     @log = SuggestionLog.new
     @log.suggestion_id = @suggestion.id

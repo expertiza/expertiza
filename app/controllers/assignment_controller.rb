@@ -246,8 +246,11 @@ class AssignmentController < ApplicationController
   end
   
   def update
-    # Fixup for the checkbox input
-    #params[:assignment][:allow_hosted_docs] = '0' unless params[:assignment][:allow_hosted_docs]
+    # Fixup for the checkbox input - If a checkbox in a form is not
+	# checked then if won't be submitted with the form, hence we set
+	# it to 0 indicating false.  If it is checked then it's value is
+	# set to 1 already.
+    params[:assignment][:allow_hosted_docs] = '0' unless params[:assignment][:allow_hosted_docs]
     if params[:assignment][:course_id]
       begin
         Course.find(params[:assignment][:course_id]).copy_participants(params[:id])

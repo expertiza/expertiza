@@ -65,37 +65,50 @@ class SubmittedContentController < ApplicationController
     redirect_to :action => 'edit', :id => participant.id
   end
 
-  # CSC/ECE-517 - Add support for hosted documents (ie Google Docs)
+  # Add a hosted document object to the associated participant
   def submit_hosted_document
+    # First find the participant for the assignment
     participant = AssignmentParticipant.find(params[:id]) 
+
+    # Retrieve the submitted document URL
     url = URI.parse(params['doc_url'].strip)
+
+    # Check that the URL is valid
     begin
       Net::HTTP.start(url.host, url.port)
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end
+
     if ( ! flash[:error] )
-		begin
-		  doc = ParticipantHostedDocument.new
-		  doc.assignment_participant_id = params[:id]
-		  doc.url = params['doc_url'].strip
-		  doc.label = params['doc_label'].strip
-		  doc.service = params['doc_service'].strip
-		  doc.document_type = params['doc_type'].strip
-		  if ( ! doc.save )
-			flash[:error] = "An error occurred saving the URL"
-		  end
-		rescue
-		end
-	end
+        begin
+          # If the URL is valid then create a new Hosted Document object
+          doc = ParticipantHostedDocument.new
+          doc.assignment_participant_id = params[:id]
+          doc.url = params['doc_url'].strip
+          doc.label = params['doc_label'].strip
+          doc.service = params['doc_service'].strip
+          doc.document_type = params['doc_type'].strip
+
+          # Try to save the document
+          if ( ! doc.save )
+            flash[:error] = "An error occurred saving the URL"
+          end
+        rescue
+        end
+    end
     redirect_to :action => 'edit', :id => participant.id
   end
 
+  # Remove a hosted document object from the associated participant
   def remove_hosted_document
+    # Find the document passed in
     doc = ParticipantHostedDocument.find(params[:id])
-	if ! doc.destroy
+
+    # Destroy the link
+    if ! doc.destroy
       flash[:error] = "An error occurred deleting the Hosted Document"
-	end
+    end
     redirect_to :action => 'edit', :id => doc.assignment_participant_id
   end
 

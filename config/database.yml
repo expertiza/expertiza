@@ -13,8 +13,8 @@
 development:
   adapter: mysql
   database: pg_development
-  username: root
-  password:
+  username: root # Username of MySQL
+  password: root     # Password of Mysql
   host: localhost
 
 # Warning: The database defined as 'test' will be erased and

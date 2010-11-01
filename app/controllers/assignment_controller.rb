@@ -45,7 +45,7 @@ class AssignmentController < ApplicationController
   def new
     #creating new assignment and setting default values using helper functions
     if params[:parent_id]
-      @course = Course.find(params[:parent_id])           
+      @course = Course.find(params[:parent_id])   
     end    
     
     @assignment = Assignment.new
@@ -67,8 +67,24 @@ class AssignmentController < ApplicationController
   end
   
   def create
+    
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
-    # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.    
+    # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.
+    
+    
+    #CHECK TO ENSURE THAT BOTH SWITCH AND SUBMISSION DEADLINE ARE PROVIDED FOR SURE
+if params[:submit_deadline][:due_at] == "" || params[:submit_deadline][:due_at].nil? 
+  flash[:error] = " You have to give a submit Deadline" 
+  redirect_to :action => 'new', :private => params[:assignment][:private]
+  return
+end
+if params[:switch_deadline][:due_at] == "" || params[:switch_deadline][:due_at].nil? 
+  flash[:error] = " You have to give a switch Deadline" 
+  redirect_to :action => 'new', :private => params[:assignment][:private]
+  return
+end
+    
+  
     @assignment = Assignment.new(params[:assignment])    
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
@@ -103,6 +119,12 @@ class AssignmentController < ApplicationController
     @Rereview_deadline = deadline.id
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
+    #PART OF IMPROVEMENT TO SUGGEST AND APPROVE
+    #This is the new deadline added as part of improving suggestion project. Switch topic deadline
+    #refers to the final date after which a student will not be able to switch topics for an assignment
+    deadline = DeadlineType.find_by_name("switch_topics")
+    @switch_topics_deadline = deadline.id
+    
     
     if @assignment.save 
       set_questionnaires   
@@ -111,7 +133,10 @@ class AssignmentController < ApplicationController
       max_round = 1
       #setting the Due Dates with a helper function written in DueDate.rb
       DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
+      
       DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
+      #Setting the due date to switch topics,#PART OF IMPROVEMENT TO SUGGEST AND APPROVE
+      DueDate::set_duedate(params[:switch_deadline],@switch_topics_deadline, @assignment.id, max_round )
       max_round = 2;
       
      
@@ -278,7 +303,8 @@ class AssignmentController < ApplicationController
     @assignment.days_between_submissions = @days + (@weeks*7)
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
-    if @assignment.update_attributes(params[:assignment])     
+    if @assignment.update_attributes(params[:assignment])
+      
       set_questionnaires
       set_limits_and_weights
       begin
@@ -293,6 +319,9 @@ class AssignmentController < ApplicationController
       if params[:due_date]
         for due_date_key in params[:due_date].keys
           due_date_temp = DueDate.find(due_date_key)
+          puts due_date_temp
+          puts due_date_key
+          puts params[:due_date][due_date_key]
           due_date_temp.update_attributes(params[:due_date][due_date_key])
         end
       end

@@ -1,4 +1,7 @@
-<h3>Editing a suggestion is prohibited !!!</h3>
+<h3>Editing a suggestion !!!</h3>
+<% form_tag :action => 'update', :id => @suggestion do %>
+  <%= render :partial => 'formedit' %>
+  <%= submit_tag 'Update' %>
+<% end %>
 
-<%= link_to 'Show', :action => 'show', :id => @suggestion %> |
-<%= link_to 'Back', :action => 'list' %>
+<td><%= link_to 'Back', :controller => "suggestion", :action => "show" , :id =>@suggestion.id %> </td>

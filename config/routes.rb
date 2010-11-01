@@ -1,4 +1,11 @@
 ActionController::Routing::Routes.draw do |map|
+
+  map.connect '/suggestion/edit', :controller =>'suggestion', :action =>'edit' # added edit method to the suggestion controller
+  map.connect '/suggestion/view_suggestion', :controller =>'suggestion', :action =>'view_suggestion' # added view_suggestion method to the
+  # suggestion controller
+  map.resource :suggestion
+  map.resource :fixnum
+  map.resource :role_id
   # The priority is based upon order of creation: first created -> highest priority.
   
   # Sample of regular route:
@@ -19,4 +26,5 @@ ActionController::Routing::Routes.draw do |map|
 
   # Install the default route as the lowest priority.
   map.connect ':controller/:action/:id'
+  map.connect ':controller/:action/:id.:format'
 end

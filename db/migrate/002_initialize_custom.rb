@@ -78,6 +78,7 @@ class InitializeCustom < ActiveRecord::Migration
   execute "INSERT INTO `site_controllers` VALUES (28,'team',7,0)"
   execute "INSERT INTO `site_controllers` VALUES (29,'teams_users',7,0)"
  
+  
   create_table "controller_actions", :force => true do |t|
     t.column "site_controller_id", :integer, :default => 0, :null => false
     t.column "name", :string, :default => "", :null => false
@@ -127,6 +128,7 @@ class InitializeCustom < ActiveRecord::Migration
   execute "INSERT INTO `controller_actions` VALUES (39,28,'list',NULL,'')"
   execute "INSERT INTO `controller_actions` VALUES (40,28,'list_assignments',NULL,'')"
   execute "INSERT INTO `controller_actions` VALUES (41,29,'list',NULL,'')"
+   
 
   create_table "institutions", :force => true do |t|
     t.column "name", :string, :default => "", :null => false

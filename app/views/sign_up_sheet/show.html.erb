@@ -1,0 +1,8 @@
+<h1>Description</h1>
+
+<%=@topic .description%><br /><br />
+<%if (session[:user].id == @assignment.instructor_id)%>
+<%= link_to 'Back', :action => 'add_signup_topics', :id => @assignment%>
+<%else%>
+<%= link_to 'Back', :action => 'signup_topics', :id => @assignment%>
+<%end%>

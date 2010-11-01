@@ -4,5 +4,16 @@ class Suggestion < ActiveRecord::Base
    
    def find_all_by_assignment_id(assignment_id)
       find(:all, :conditions => ["assignment_id = ?", assignment_id])
-   end
+  end
+ 
+#   def email_start(fullname, email, assign_name)      
+#      subject = "Message regarding  suggestion"
+#      body = "Hi has just been created."    
+#    
+#      Mailer.deliver_message(
+#        {:recipients => email,
+#         :subject => subject,
+#         :body => body
+#        })        
+#  end
 end

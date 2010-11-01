@@ -5,6 +5,8 @@ RAILS_GEM_VERSION = '2.2.2'
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
+#require 'win32/process'
+
 
 Rails::Initializer.run do |config|
   # Settings in config/environments/* take precedence over those specified here.
@@ -21,7 +23,7 @@ Rails::Initializer.run do |config|
   config.gem 'RedCloth'
   config.gem 'rgl', :lib => 'rgl/adjacency'
   config.gem 'rubyzip', :lib => "zip/zip"
-  raise 'graphviz dependency is not installed - missing dot executable' unless RUBY_PLATFORM =~ /mswin/ or %x(which dot).to_s.any?
+  #raise 'graphviz dependency is not installed - missing dot executable' unless RUBY_PLATFORM =~ /mswin/ or %x(which dot).to_s.any?
 
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named
@@ -48,11 +50,28 @@ Rails::Initializer.run do |config|
   }
 
   config.action_controller.session_store = :p_store
+ #  config.action_mailer.raise_delivery_errors = false
+ config.action_mailer.delivery_method = :smtp
+ 
+#  config.action_mailer.smtp_settings = {
+#   :enable_starttls_auto => true,
+#    :address => "smtp.ncsu.edu",
+#    :port => 25,
+#    :domain => "localhost"
+#
+#  }
+ # the below setting is to receive mails to Gmail account. This has been added for testing as the ncsu server 
+#cannot be connected. For review please add the username and password of your gmail account and give the same emailid while
+# creating a new user or instructor.
+ config.action_mailer.smtp_settings = {
+  :enable_starttls_auto => true,
+   :address        => "smtp.gmail.com",
+   :port           => 587,
+   :domain         => "gmail.com",
+   :authentication => :plain,
+   :user_name      => "*********",# add your gmail userid
+   :password       => "**********",
+   :default_content_type => "text/html"
+ }
   
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-    :address => "smtp.ncsu.edu",
-    :port => 25,
-    :domain => "localhost"
-  }
 end

@@ -5,6 +5,7 @@ class DueDate < ActiveRecord::Base
   
   belongs_to :assignment
 
+
   def self.copy(old_assignment_id, new_assignment_id)    
     duedates = find(:all, :conditions => ['assignment_id = ?',old_assignment_id])
     duedates.each{

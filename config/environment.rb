@@ -53,25 +53,25 @@ Rails::Initializer.run do |config|
  #  config.action_mailer.raise_delivery_errors = false
  config.action_mailer.delivery_method = :smtp
  
-#  config.action_mailer.smtp_settings = {
-#   :enable_starttls_auto => true,
-#    :address => "smtp.ncsu.edu",
-#    :port => 25,
-#    :domain => "localhost"
-#
-#  }
+  config.action_mailer.smtp_settings = {
+   :enable_starttls_auto => true,
+    :address => "smtp.ncsu.edu",
+    :port => 25,
+    :domain => "localhost"
+
+  }
  # the below setting is to receive mails to Gmail account. This has been added for testing as the ncsu server 
 #cannot be connected. For review please add the username and password of your gmail account and give the same emailid while
 # creating a new user or instructor.
- config.action_mailer.smtp_settings = {
-  :enable_starttls_auto => true,
-   :address        => "smtp.gmail.com",
-   :port           => 587,
-   :domain         => "gmail.com",
-   :authentication => :plain,
-   :user_name      => "*********",# add your gmail userid
-   :password       => "**********",
-   :default_content_type => "text/html"
- }
+# config.action_mailer.smtp_settings = {
+#  :enable_starttls_auto => true,
+#  :address        => "smtp.gmail.com",
+#   :port           => 587,
+#   :domain         => "gmail.com",
+#   :authentication => :plain,
+#   :user_name      => "*********",# add your gmail userid
+#   :password       => "**********",
+#   :default_content_type => "text/html"
+# }
   
 end

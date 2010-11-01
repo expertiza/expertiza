@@ -155,6 +155,8 @@ class ResponseController < ApplicationController
       if params[:save]!="Save Quiz" then ResponseHelper.compare_scores(@response, @questionnaire) end
       ScoreCache.update_cache(@response.id)
       msg = "Your response was successfully saved."
+      @map.potential_response_deadline = nil
+      @map.save
     rescue
       @response.delete
       msg = "Your response was not saved. Cause: "+$!

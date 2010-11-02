@@ -24,6 +24,8 @@ class SuggestionController < ApplicationController
  def list
 #   @suggestions = Suggestion.find_all_by_assignment_id(params[:id])   #commented out rsjohns3
 #   Set Default values for Sort_by variable and Sort_order
+#   OSS project_Team1 (rsjohns3) CSC517 Fall 2010
+#   Following code adds sort drop down box when admin's are viewing suggestions
      sort_var = 'title'
      sort_order = ' ASC'
      

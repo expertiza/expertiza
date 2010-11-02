@@ -1,6 +1,8 @@
 <h1>Publishing Rights</h1>
 
 <table class="listing" cellpadding=2>
+<!-- if the user has a certificate then we wil display the options to grant, otherwise they will get a notice
+and have to follow a link to generate their private keys -->
 <% if @user.digital_certificate.nil?  %>
 <tr><td>
 	<div class="flash_note">

@@ -47,10 +47,12 @@ class PublishingController < ApplicationController
     private_key = params[:private_key]
 
     begin
+      #check to see if key is valid, if so, then grant
       if(verify_digital_signature(private_key))
         AssignmentParticipant.grant_publishing_rights(private_key, participants)
         redirect_to :action => 'view'
       else
+      	#key not valid, let user know and return to page
         flash[:notice] = 'Invalid private key.'
         if (!params[:id].nil?) 
           redirect_to :action => 'grant', :id => participants[0].id

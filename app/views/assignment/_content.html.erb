@@ -9,10 +9,25 @@ function onChange(){
 		count.style.display = "";
 		hidden.style.display = "none";
 		document.poppedLayer3.style.display = "";
+		var rdolist = document.getElementsByName("radio_rotcond");
+		if(rdolist[1].checked == false && rdolist[2].checked == false)
+			rdolist[0].checked = true;
+		rdolist[0].disabled = false;
+		rdolist[1].disabled = false;
+		rdolist[2].disabled = false;
+		
 	}else{
 		count.style.display = "none";
 		hidden.style.display  = "";
 		document.poppedLayer3.style.display = "none";
+		var rdolist = document.getElementsByName("radio_rotcond");
+		rdolist[0].checked = true;
+		rdolist[0].disabled = true;
+		rdolist[1].disabled = true;
+		rdolist[2].disabled = true;
+		document.getElementsByName("max_num")[0].style.visibility = "hidden";
+		document.getElementsByName("select_categories")[0].style.visibility = "hidden";
+		document.getElementsByName("other_category")[0].style.visibility = "hidden";
 	}
 }
 

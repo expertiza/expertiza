@@ -7,7 +7,6 @@ function checkForm()
 
 function checkTeamRotationInput()
 {
-	alert("checking input");
 	var category = document.getElementById("select_categories");
 	var other_category = document.getElementById("category_name");
 	var max_allowed_rot = document.getElementById("assignment_max_allowed_rotation");
@@ -22,8 +21,6 @@ function checkTeamRotationInput()
 		return false;
 	}
 	var len = other_category.value.length;
-	alert(category.selectedIndex.toString);
-	alert(len.toString);
 	if (((other_category.value == null) || (typeof(other_category) == 'undefined') || (other_category.value != "") ) && category.style.visibility == "visible" && category.value == 100) {
 		alert("Please specify other category");
 		return false;

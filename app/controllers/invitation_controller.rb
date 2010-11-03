@@ -9,7 +9,7 @@ class InvitationController < ApplicationController
     student = AssignmentParticipant.find(params[:student_id])
     #check if the invited user is valid
     if !user
-      flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct." 
+      flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist\. Please make sure the name entered is correct." 
     else
       participant = AssignmentParticipant.find(:first, :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
       if !participant
@@ -21,14 +21,51 @@ class InvitationController < ApplicationController
           flash[:notice] = "\"#{user.name}\" is already a member of team."
         else
           current_invs = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.parent_id])
-          #check if the invited user is already invited (i.e. awaiting reply)
+          #check if the invited user is already invited (i\.e\. awaiting reply)
+          
+					#finding the course, category, rotation condition and max allowed rotation of the current assignment
+          currentCourse = Assignment.find(student.parent_id).course_id
+          currentCategory = Assignment.find(student.parent_id).category_id
+          rotationCondition = Assignment.find(student.parent_id).rotation_condition
+          maxAllowedRotation = Assignment.find(student.parent_id).max_allowed_rotation
+        
+          #rotationCondition 0=> rotation not required, 1 => course wise, 2 => course + category wise
+
           if current_invs.length == 0
-            @invitation = Invitation.new
-            @invitation.to_id = user.id
-            @invitation.from_id = student.user_id
-            @invitation.assignment_id = student.parent_id
-            @invitation.reply_status = 'W' 
-            @invitation.save
+            allTeamsUsersOfStudent = TeamsUser.find(:all, :conditions => ['user_id =?',student.user_id])
+            if(rotationCondition != 0)
+              count = 1 # starting from 1 as we are sending invite currently which should also be considered
+              for teamsuser in allTeamsUsersOfStudent do   
+                # Person sending invite - student; person being invited - user
+                pastTeam = Team.find(teamsuser.team_id)
+                pastTeamAssignment = Assignment.find(pastTeam.parent_id)
+                if(rotationCondition == 1 ) # checking course wise
+                  if(currentCourse != nil and pastTeamAssignment.course_id == currentCourse)                  
+                    isInvitedUserPresent = TeamsUser.find(:all, :conditions => ['team_id =? and user_id =?',teamsuser.id, user.id])
+                      if(isInvitedUserPresent.length > 0)
+                        count = count+1
+                      end          
+                  end
+                elsif(rotationCondition == 2) # checking course + categorey wise
+                  if(currentCourse != nil and pastTeamAssignment.course_id == currentCourse && pastTeamAssignment.category_id == currentCategory)                  
+                    isInvitedUserPresent = TeamsUser.find(:all, :conditions => ['user_id =? and team_id =?',user.id,teamsuser.id])
+                    if(isInvitedUserPresent.length > 0)
+                      count = count+1
+                    end          
+                  end
+                end #rotation condition if-elseif end
+              end # end for
+            end #rotationCondition != 0 end
+            if((rotationCondition != 0) and (Role.find(user.role_id).name == "Student" or Role.find(user.role_id).name == "Teaching Assistant") and count > maxAllowedRotation) #k
+              flash[:notice] = "You can not team up with this person anymore."
+            else  
+              @invitation = Invitation.new
+              @invitation.to_id = user.id
+              @invitation.from_id = student.user_id
+              @invitation.assignment_id = student.parent_id
+              @invitation.reply_status = 'W' 
+              @invitation.save
+            end
           else
             flash[:notice] = "You have already sent an invitation to \"#{user.name}\"."
           end   
@@ -65,7 +102,7 @@ class InvitationController < ApplicationController
       end
 
 
-      #if a sign_up sheet exists then release all the topics selected by this team into the pool.
+      #if a sign_up sheet exists then release all the topics selected by this team into the pool
       selected_topics = SignedUpUser.find_all_by_creator_id(params[:team_id])
       if !selected_topics.nil?
         for selected_topic in selected_topics
@@ -76,7 +113,7 @@ class InvitationController < ApplicationController
               first_waitlisted_user.is_waitlisted = false
               first_waitlisted_user.save
 
-               #Also update the participant table. But first_waitlisted_user.creator_id is the team id
+               #Also update the participant table\. But first_waitlisted_user.creator_id is the team id
                #so find one of the user in the team because the update_topic_id function in participant
                #will take care of updating all the participants in the team
                user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id

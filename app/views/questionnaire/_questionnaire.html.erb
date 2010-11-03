@@ -17,12 +17,7 @@
 </table>
 <table>
 	<tr>
-		<% if @questionnaire.type == "QuizQuestionnaire" %>
-		<td>Number of answers per question</td>
-		<td><%= text_field 'questionnaire', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
-		<td></td>
-		<td></td>
-		<% else %>
+		<% if @questionnaire.type != "QuizQuestionnaire" %>
 		<td>Min question score:</td>
 		<td><%= text_field 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
 		<td>Max question score:</td>
@@ -49,8 +44,6 @@
 	<tr>
 		<td></td>
 		<td>
-			<ul>
-				<li>
 					Quiz questions are specified in the following format:
 					<ul>
 						<li>Who's buried in Grant's tomb? {~Churchill =Grant ~Napoleon ~No one}</li>
@@ -59,11 +52,6 @@
 					<a href="http://docs.moodle.org/en/GIFT#Multiple_choice">Moodle GIFT format</a>.
 					Answers are enclosed in {}.  A ~ precedes incorrect answers, while an = precedes
 					the correct answer.
-				</li>
-				<li>All questions are multiple choice.</li>
-				<li>You must provide exactly one correct answer.</li>
-				<li>You must provide exactly the number of answers that you indicate above for each question.</li>
-			</ul>
 		</td>
 	</tr>
 	<% end %>
@@ -71,8 +59,10 @@
 	<tr>
 		<td align=left width=30>Delete</td>
 		<td align=center width=300>Question</td>
+		<% if @questionnaire.type != "QuizQuestionnaire" %>
 		<td align=center width=100>Scoring</td>
 		<td align=left>Weight</td>
+		<% end %>
 	</tr>
 		
 	<% 	i = 1;
@@ -80,25 +70,26 @@
 	<tr>
 		<td align=center><input type=checkbox id="question_chk<%= i %>"></td>
 		<td><%= text_field "question[]", 'txt', :size=>70 %></td>
-		<td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
-		<td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
+		<% if @questionnaire.type != "QuizQuestionnaire" %>
+			<td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
+			<td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
+		<% end %>
 	</tr>
 	<% if @questionnaire.type == "QuizQuestionnaire" %>
 	<% p = @question.parse %>
 	<tr>
 		<td></td>
 		<td>
-			<% if p[:correct].length != 1 %>
-			WARNING: Questions must have exactly one correct answer! <br /> 
-			<% end %>
-			<% if p[:answers].length != @questionnaire.max_question_score %>
-			WARNING: Questions must have exactly the number of answers you have indicated above! <br />
+			<% if p.nil? %>
+			WARNING: Improperly formatted question! <br />
+			<% elsif p[:correct].length == 0 %>
+			WARNING: Question has no correct answer! <br /> 
 			<% end %>
 		</td>
 	</tr>
 	<% end %>
 	<% 	i += 1;
-		end %>
+		 end %>
 </table>
 <BR/>
 <!--[eoform:course]-->

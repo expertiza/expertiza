@@ -227,7 +227,15 @@ class AssignmentParticipant < Participant
       participant.digital_signature = cipher_text
       participant.time_stamp = time_now
       participant.update_attribute('permission_granted', 1)
-      participant.save
+     #now, check to make sure the digital signature is valid, if not raise error
+     if(participant.verify_digital_signature(cipher_text))
+        participant.save
+      else
+      	participant.digital_signature-nil
+      	participant.time_stamp=nil
+      	raise "invalid key"
+      end
+      
     end
   end
   

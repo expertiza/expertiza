@@ -168,7 +168,9 @@ class SuggestionController < ApplicationController
       if not @toemail.nil?
         @suggestion.email(@toemail, @editor)
       end
-      log_suggestion
+      # OSS project_Team1 (jmfoste2) CSC517 Fall 2010
+      # Add logging to suggestion
+      log_suggestion 
     else
       flash[:error] = 'Error when updating the suggestion'
     end
@@ -187,7 +189,8 @@ class SuggestionController < ApplicationController
               "unityID = '#{session[:user].name}' and status not in ('Approved', 'Rejected') and assignment_id = #{params[:id]}")
   end
   
-  # keep track of edits made to a suggestion by logging each edit
+  # OSS project_Team1 (jmfoste2) CSC517 Fall 2010
+  # Add logging functionality to suggestions to track change history
   def log_suggestion
     @log = SuggestionLog.new
     @log.suggestion_id = @suggestion.id

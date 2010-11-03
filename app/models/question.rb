@@ -26,6 +26,9 @@ class Question < ActiveRecord::Base
   def parse
     q_and_a = txt.split(/\{|\}/).collect do |x| x.strip end
     answers = q_and_a[1]
+    if answers.nil?
+      return nil
+    end
     offset = answers.index(/=|~/)
     output = {:question => q_and_a[0], :answers => [], :correct => []}
     count = 0

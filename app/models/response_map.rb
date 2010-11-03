@@ -34,4 +34,11 @@ class ResponseMap < ActiveRecord::Base
   def show_feedback()
     return nil
   end
+  
+  #unset notification_not_sent flag,this ensures we don't send duplicate review mails to reviewers.
+  def setFlag()
+    self.notification_not_sent = false
+    self.save
+  end
+
 end

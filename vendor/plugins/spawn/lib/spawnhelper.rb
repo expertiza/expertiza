@@ -8,7 +8,56 @@ module SpawnHelper
     # thread for deadline emails
     spawn do        
       while true do        
-        #puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
+        
+        #code for sending mails to reviewers.
+        #This module here sends mails to reviewers indicating they have been assigned to review.
+        #From ResponseMap table we get Reviewer and Reviewee information for each assignment.Using this information we send out mails
+        #to reviewers indicating review is pending and needs to be completed.Once mail is sent we set a flag in database indicating 
+        #mail has been sent to reviewer , this ensures we don't send duplicate review mails to reviewers. 
+        allAssign = Assignment.find(:all)
+        for assign in allAssign
+          #Get the mapping information <Reviewer, Reviewee> for each assignment.
+          allReviewers = ResponseMap.find(:all, :conditions => ["reviewed_object_id =?", assign.id])
+          for reviewer in allReviewers
+            if (reviewer.notification_not_sent == true)
+              user_id = Participant.find(reviewer.reviewer_id).user_id    
+              userdetails = User.find(user_id)    
+              assign_name = assign.name
+              subject = "You have been assigned to review the assignment"
+              body = "Hi #{userdetails.fullname}, You have been assigned to review the following assignment :#{assign_name}.\n For more details you can log onto the expertiza and check the details ."    
+              # Setting the flag indicating we have sent a mail to reviewer.
+              reviewer.setFlag
+              #sending mail to indicate review is pending.
+              general_email(userdetails.fullname, userdetails.email, subject, body)
+            end
+          end
+        end      
+         
+        
+     
+        #code for sending mail, when user moves from waitlist to confirmed slot .
+        #we does this using the 2 attributes of the the singedup user table 
+        #1)is_waitlisted: is_waitlisted column tracks the current signup status for the topic.
+        #2)was_waitlisted: was_waitlisted tracks the initial state of singup status.
+        #Eg: when user signup for a topic and he is in waitlist both is_waitlisted and was_waitlisted will be equal to '1'.
+        #once the user moves to conformed slot from waitlist , we will have 1)is_waitlisted = 0 2)was_waitlisted = 1
+        #We check for this above condition before sending out mail.
+        #once we send the mail , we change was_waitlist = 0 so we don't send duplicate mails and flood users inbox. 
+        signUpTable = SignedUpUser.find(:all)
+        for eachEntry in signUpTable 
+          #check for waitlist moved to conformed slot condition.
+          if((eachEntry.was_waitlisted  == true) && (eachEntry.is_waitlisted == false) ) 
+            topicName = SignUpTopic.find(eachEntry.topic_id).topic_name;	
+            body = "You have been moved out of waiting list for the following topic #{topicName} ,\nfor more details login to expertiza and view the details\n";
+            subject = "Moved out of waiting list \n";
+            userdetails = User.find(eachEntry.creator_id);
+            #set the flag so we don't set duplicate mails to user.    
+            eachEntry.setFlag
+            #send a mail to user indicating user of conformed slot.
+            general_email(userdetails.fullname, userdetails.email, subject,body)
+          end
+        end
+         
         # find all assignments in database                
         allAssign = Assignment.find(:all)
         for assign in allAssign
@@ -212,5 +261,18 @@ module SpawnHelper
          :body => body
         })        
   end
-  
+  #code maninapultion :added general_email function.
+  def general_email(fullname, email, subject,body)      
+    
+    #     puts "Email -> #{email} " 
+    #     puts "Subject -> #{subject} " 
+    #     puts "reciepients -> #{email} " 
+    #     puts "body -> #{body} " 
+    Mailer.deliver_message(
+    {:recipients => email,
+         :subject => subject,
+         :body => body
+    })        
+  end
+  #end of general_email function.
 end #end of class

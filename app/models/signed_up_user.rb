@@ -56,5 +56,11 @@ class SignedUpUser < ActiveRecord::Base
     TeamsUser.find_by_sql("SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id =" + assignment_id.to_s + " and user_id =" + user_id.to_s)
   end
 
+#unset was_waitlisted flag,this ensures we don't send duplicate  mails when user moves out of waiting list.
+def setFlag()
+  self.was_waitlisted  = false 
+  self.save
+end
+
   
 end

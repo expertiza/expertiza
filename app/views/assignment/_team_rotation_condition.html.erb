@@ -1,0 +1,107 @@
+<script type="text/javascript">
+	function onclickRadioValue(choice){
+		if (choice == 0) {
+			document.getElementById("max_num_label").style.visibility = "hidden";
+			document.getElementById("max_num").style.visibility = "hidden";
+			document.getElementById("other_category_label").style.visibility = "hidden";
+			document.getElementById("other_category").style.visibility = "hidden";
+			document.getElementById("select_categories_label").style.visibility = "hidden";
+			document.getElementById("select_categories").style.visibility = "hidden";
+			document.getElementById("select_categories").selectedIndex = 0;
+			
+		}
+		else if (choice == 1){
+			document.getElementById("max_num_label").style.visibility = "visible";
+			document.getElementById("max_num").style.visibility = "visible";
+			document.getElementById("other_category_label").style.visibility = "hidden";
+			document.getElementById("other_category").style.visibility = "hidden";
+			document.getElementById("select_categories_label").style.visibility = "hidden";
+			document.getElementById("select_categories").style.visibility = "hidden";
+			document.getElementById("select_categories").selectedIndex = 0;
+		}
+		else if (choice == 2){
+			document.getElementById("max_num_label").style.visibility = "visible";
+			document.getElementById("max_num").style.visibility = "visible";			
+			document.getElementById("select_categories_label").style.visibility = "visible";
+			document.getElementById("select_categories").style.visibility = "visible";
+		}
+	}
+function onchangeDropdownValue(){
+		
+		var dropdownValue = document.getElementById('category_id').value;
+		
+		if (dropdownValue == "100") 
+		{
+			document.getElementById("other_category_label").style.visibility = "visible";
+			document.getElementById("other_category").style.visibility = "visible";
+			document.getElementById("other_category").focus();
+		}
+		else 
+		{
+			document.getElementById("other_category_label").style.visibility = "hidden";
+			document.getElementById("other_category").style.visibility = "hidden";
+		}	
+	}
+</script>
+<hr>
+<div id = "team_rotation" class = "exp">
+    <h3>Team Rotation Constraint</h3>
+    <form>
+        <table align ="center">
+            <tr>
+                <td>
+                	<label id= "label_rotcond">
+                        Team Rotation Constraint
+                    </label>
+                </td>
+                <td>
+                    <input type="radio" name="radio_rotcond" value="0" onclick="onclickRadioValue(0);" checked disabled/> None<input type="radio" name="radio_rotcond" value="1" onclick="onclickRadioValue(1);" disabled/> By Course<input type="radio" name="radio_rotcond" value="2" onclick="onclickRadioValue(2);" disabled/> By Course and Category
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div id ="select_categories_label" name="select_categories" style="visibility: hidden">
+                        Category
+                    </div>
+                </td>
+                <td>
+                    <div id ="select_categories" name="select_categories" style="visibility: hidden">
+                        <%= select("category", "id", Category.find(:all).collect{ |c| [ c.name, c.id] },{:include_blank => "-Select Category-"}, {:onchange => "onchangeDropdownValue()"}) %>
+                    </div>
+                </td>
+                <td align="center">
+                    <div id="other_category_label" name="other_category" style="visibility: hidden">
+                        Specific Category &nbsp;&nbsp;
+                    </div>
+                </td>
+                <td>
+                    <div id="other_category" name="other_category" style="visibility: hidden">
+                        <%= text_field 'category', 'name' %>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div id="max_num_label" name="max_num" style="visibility: hidden">
+                        Maximum Number of times one can team with another
+                    </div>
+                </td>
+                <td>
+                <div id="max_num" name="max_num" style="visibility: hidden">
+                <%= text_field 'assignment', 'max_allowed_rotation' %>
+				</div>
+                </td>
+            </tr>
+            </div>
+        </table>
+    </form>
+</div>
+<hr>

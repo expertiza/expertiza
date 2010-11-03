@@ -5,7 +5,9 @@
   <hr/>
   <%= render :partial => 'rubrics' %>
   <hr/>
-  <%= render :partial => 'due_dates' %>
+  <%= render :partial => 'due_dates' %>  
+  <%= render :partial => 'team_rotation_condition' %>  
+  <br>
   <% if @course != nil %>
   	<%= hidden_field_tag('assignment[course_id]', @course.id) %>
   <% else %>
@@ -18,4 +20,3 @@
 <div style="padding: 15px">
 <%= render :partial => '/shared_scripts/back' %>
 </div>
-

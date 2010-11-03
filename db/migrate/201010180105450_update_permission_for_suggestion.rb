@@ -1,3 +1,6 @@
+# OSS project_Team1 (jmfoste2) CSC517 Fall 2010
+# Created to update permission settings for the new suggestion functionality
+
 class UpdatePermissionForSuggestion < ActiveRecord::Migration
   def self.up
     controller = SiteController.find_or_create_by_name('suggestion')

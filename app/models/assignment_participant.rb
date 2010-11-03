@@ -223,11 +223,13 @@ class AssignmentParticipant < Participant
       cipher_text = Base64.encode64(private_key2.private_encrypt(hash_data))
       participant.digital_signature = cipher_text
       participant.time_stamp = time_now
-      participant.update_attribute('permission_granted', 1)
+      
      #now, check to make sure the digital signature is valid, if not raise error
      if(participant.verify_digital_signature(cipher_text))
+        participant.update_attribute('permission_granted', 1)
         participant.save
       else
+      	participant.update_attribute('permission_granted', 0)
       	participant.digital_signature-nil
       	participant.time_stamp=nil
       	raise "invalid key"

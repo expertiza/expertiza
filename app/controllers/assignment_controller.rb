@@ -93,6 +93,9 @@ end
     ## feedback added
     ##
     
+    #Save team rotation constraints parameters in assignment table
+    saveTeamRotation
+    
     if params[:days].nil? && params[:weeks].nil?
       @days = 0
       @weeks = 0
@@ -179,10 +182,34 @@ end
     end
     
   end
+  def saveTeamRotation
+    #Checking if team rotation constraint is specified
+    if(params[:radio_rotcond] != nil or params[:radio_rotcond] != "0")
+      @assignment.rotation_condition = params[:radio_rotcond]
+      #Choosing already available category
+      if(params[:category][:id] != "100") #category - Other Default id - 100                 
+        @assignment.category_id = params[:category][:id]
+        puts "Choosing already available category"
+      #Specifying new category
+      elsif(params[:category][:name] != '')
+          @category = Category.new
+          @category.name = params[:category][:name]
+          puts "Specifying new category"
+          puts @category.id
+          @category.save        
+          @assignment.category_id = @category.id
+      end                
+    end
+  end
+  
+ 
   
   def edit
     @assignment = Assignment.find(params[:id])
 
+ 		if(@assignment.category_id != nil)
+      @category = Category.find(@assignment.category_id)
+    end
     if !@assignment.days_between_submissions.nil?
       @weeks = @assignment.days_between_submissions/7
       @days = @assignment.days_between_submissions - @weeks*7
@@ -271,8 +298,9 @@ end
       aq.update_attribute('user_id',user_id)
     }
   end
+
   
-  def update      
+def update      
     if params[:assignment][:course_id]
       begin
         Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
@@ -304,7 +332,26 @@ end
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])
-      
+           #This is added to edit and save team rotation constraint related information
+      if(params[:radio_rotcond] == nil or params[:radio_rotcond] == "0")
+        @assignment.rotation_condition = 0
+        @assignment.category_id = nil
+        @assignment.max_allowed_rotation = nil
+      elsif(params[:radio_rotcond] == "1")
+        @assignment.rotation_condition = 1
+        @assignment.category_id = nil
+      else
+        @assignment.rotation_condition = 2
+        if(params[:category][:id] != 100)
+          @assignment.category_id = params[:category][:id]
+        elsif(params[:category][:name] != '')
+          @category = Category.new
+          @category.name = params[:category][:name]
+          @category.save        
+          @assignment.category_id = @category.id
+        end   
+      end     
+      @assignment.save 
       set_questionnaires
       set_limits_and_weights
       begin

@@ -349,6 +349,9 @@ class SignUpSheetController < ApplicationController
       else
         sign_up.is_waitlisted = true
       end
+      #Added code to capture the initial status of the signed up topic for the user.
+      sign_up.was_waitlisted = sign_up.is_waitlisted
+      
       if sign_up.save
         return true
       else
@@ -365,6 +368,8 @@ class SignUpSheetController < ApplicationController
       #check whether user is clicking on a topic which is not going to place him in the waitlist
       if !slotExist?(topic_id)
         sign_up.is_waitlisted = true
+        #Added code to capture the initial status of the signed up topic for the user.
+        sign_up.was_waitlisted = sign_up.is_waitlisted 
         if sign_up.save
           return true
         else

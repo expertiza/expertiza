@@ -7,6 +7,7 @@
 		<td>
 			<% if @questionnaire.type == "QuizQuestionnaire" and @questionnaire.name.nil? %>
 				<%= text_field 'questionnaire', 'name', :value=>"#{session[:user].name}'s quiz"  %>
+				<%= hidden_field 'questionnaire', 'max_question_score', :value=>4 %>
 			<% else %>
 				<%= text_field 'questionnaire', 'name' %>
 			<% end %>

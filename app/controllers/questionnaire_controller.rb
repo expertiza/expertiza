@@ -100,7 +100,16 @@ class QuestionnaireController < ApplicationController
     
     if params['export']
       #filename = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name 
-     filename = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name , params['Format']
+     #filename = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name , params['Format']
+     if(params['Format']=='txt')
+         strategy=QuestionnaireHelper.method(:create_questionnaire_TXT) # assigns the TXT method in questionnaire_helper module
+     end
+     if(params['Format']=='GIFT')
+         strategy=QuestionnaireHelper.method(:create_questionnaire_GIFT) #assigns the GIFT method in questionnaire_helper module
+   end
+   
+   filename=strategy.call @questionnaire, session[:user].name  #calls the apprpriate assigned method
+   #filename=strategy.call @questionnaire, session[:user].name
      send_file(filename) 
     end
     
@@ -273,4 +282,8 @@ class QuestionnaireController < ApplicationController
       end
     end
   end
+end
+
+class General 
+  include QuestionnaireHelper
 end

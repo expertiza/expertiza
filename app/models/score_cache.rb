@@ -64,8 +64,9 @@ class ScoreCache < ActiveRecord::Base
       
       range_string = ((@p_min*100).round/100.0).to_s + "-" + ((@p_max*100).round/100.0).to_s
       
-      
-      
+      # added code to update the max and min values...SRS 10312010
+      sc.range_max = (@p_max*100).round/100.0
+      sc.range_min = (@p_min*100).round/100.0
       sc.range =    range_string
       sc.score = (@p_score*100).round/100.0
       
@@ -74,9 +75,11 @@ class ScoreCache < ActiveRecord::Base
       sc.save
       # make another new tuple for new score
     else
-      
       range_string = ((@p_min*100).round/100.0).to_s + "-" + ((@p_max*100).round/100.0).to_s
       
+      # added code to update the max and min values...SRS 10312010
+      sc.range_max = (@p_max*100).round/100.0
+      sc.range_min = (@p_min*100).round/100.0
       sc.range =    range_string
       sc.score = (@p_score*100).round/100.0
       presenceflag = 2
@@ -141,5 +144,49 @@ class ScoreCache < ActiveRecord::Base
     @scoreset[:max] = @p_max
     return @scoreset
   end
- 
+
+  def self.get_participant_score(participant, assgtid, type)
+    scores = Hash.new
+    assgt = Assignment.find(assgtid)
+    
+    if type == 'Review'
+      if assgt[:team_assignment]
+        type = 'ParticipantReviewResponseMap'
+      else
+        type = 'TeamReviewResponseMap'
+      end
+    elsif type == 'Metareview'
+      type = 'MetareviewResponseMap'
+    elsif type == 'AuthorFeedback'
+      type = 'FeedbackResponseMap'
+    elsif type == 'TeammateReview'
+      type = 'TeammateReviewResponseMap'
+    else
+      type = 'ParticipantReviewResponseMap'
+    end
+    
+    if assgt[:team_assignment]
+      assignment_teams = Team.find(:all, 
+             :conditions => ["parent_id = ? and type = ?", assgt.id, 'AssignmentTeam']) 
+      participant_entries = ScoreCache.find(:all, 
+             :conditions =>["reviewee_id in (?) and object_type = ?", assignment_teams, type ])
+    else
+      participant_entries = ScoreCache.find(:all, 
+             :conditions =>["reviewee_id in (?) and object_type = ?", participant, type])
+    end
+       
+    if participant_entries != nil
+       scores = Hash.new
+       for participant_entry in participant_entries
+          scores[:max] = participant_entry.range_max
+          scores[:min] = participant_entry.range_min
+          scores[:avg] = participant_entry.score
+       end
+    else
+       scores[:max] = nil
+       scores[:min] = nil
+       scores[:avg] = nil
+    end
+    return scores 
+  end
 end

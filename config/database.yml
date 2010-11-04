@@ -24,12 +24,12 @@ test:
   adapter: mysql
   database: pg_test
   username: root
-  password:
+  password: moonbath91
   host: localhost
 
 production:
   adapter: mysql
   database: pg_production
   username: root
-  password: 
+  password: moonbath91
   host: localhost

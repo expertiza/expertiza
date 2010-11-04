@@ -55,7 +55,9 @@ class Assignment < ActiveRecord::Base
         | questionnaire |
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
-        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+        #scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+        #Changed code to use the score_cache instead of computing scores individually...10312010 SRS
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = ScoreCache.get_participant_score(participant, id, questionnaire.display_type)
       } 
       scores[:participants][participant.id.to_s.to_sym][:total_score] = participant.compute_total_score(scores[:participants][participant.id.to_s.to_sym])
     }        
@@ -68,7 +70,7 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym] = Hash.new
         scores[:teams][index.to_s.to_sym][:team] = team
         assessments = TeamReviewResponseMap.get_assessments_for(team)
-        scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
+        scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])  #    ScoreCache.get_participant_score(team, id, questionnaire.display_type)
         index += 1
       }
     end

@@ -6,7 +6,7 @@ class UpdateAssignmentRotationTeams < ActiveRecord::Migration
     execute "ALTER TABLE assignments
               ADD COLUMN category_id INT"
     execute "ALTER TABLE assignments
-              ADD COLUMN max_allowed_rotation INT"
+              ADD COLUMN max_num_times_can_partner INT"
     execute "ALTER TABLE assignments
               ADD CONSTRAINT fk_category_id
               FOREIGN KEY (category_id) REFERENCES categories(id)"  
@@ -16,8 +16,7 @@ class UpdateAssignmentRotationTeams < ActiveRecord::Migration
     execute "ALTER TABLE assignments
               DROP FOREIGN KEY fk_category_id"
     execute "ALTER TABLE assignments
-              REMOVE COLUMN max_allowed_rotation"
-    
+              REMOVE COLUMN max_num_times_can_partner"    
     execute "ALTER TABLE assignments
               REMOVE COLUMN rotation_condition"
     execute "ALTER TABLE assignments

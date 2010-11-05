@@ -45,7 +45,7 @@ function onchangeDropdownValue(){
 </script>
 <hr>
 <div id = "team_rotation" class = "exp">
-    <h3>Team Rotation Constraint</h3>
+    <h3>Should students be limited in the number of times they can work with a specific partner?</h3>
     <form>
         <table align ="center">
             <tr>
@@ -54,8 +54,8 @@ function onchangeDropdownValue(){
                         Team Rotation Constraint
                     </label>
                 </td>
-                <td>
-                    <input type="radio" name="radio_rotcond" value="0" onclick="onclickRadioValue(0);" checked disabled/> None<input type="radio" name="radio_rotcond" value="1" onclick="onclickRadioValue(1);" disabled/> By Course<input type="radio" name="radio_rotcond" value="2" onclick="onclickRadioValue(2);" disabled/> By Course and Category
+                <td colspan="3">
+                    <input type="radio" name="radio_rotcond" value="0" onclick="onclickRadioValue(0);" checked disabled/> No<input type="radio" name="radio_rotcond" value="1" onclick="onclickRadioValue(1);" disabled/> Yes, k times during the course<input type="radio" name="radio_rotcond" value="2" onclick="onclickRadioValue(2);" disabled/> Yes, k times per category of the assignment
                 </td>
             </tr>
             <tr>
@@ -96,7 +96,7 @@ function onchangeDropdownValue(){
                 </td>
                 <td>
                 <div id="max_num" name="max_num" style="visibility: hidden">
-                <%= text_field 'assignment', 'max_allowed_rotation' %>
+                <%= text_field 'assignment', 'max_num_times_can_partner' %>
 				</div>
                 </td>
             </tr>

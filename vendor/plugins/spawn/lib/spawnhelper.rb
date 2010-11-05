@@ -10,32 +10,33 @@ module SpawnHelper
       while true do        
         #puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
         # find all assignments in database                
-        allAssign = Assignment.find(:all, :conditions => ["created_at >= ? AND created_at <= ?", Time.now - 3600, Time.now + 3600])#Time.Now is in UTC (eg: 12:00:00 -0400)and when we subtract, only the time gets subtracted!!:( 
+        allAssign = Assignment.find(:all) 
         for assign in allAssign
-          #puts "~~~~~~~~~~assignment name #{assign.name}"
-          #puts "~~~~~~~~~~Enter assignment, time.now is #{Time.now}\n and assign.created_at #{assign.created_at} and diff #{Time.now - assign.created_at}\n"
+          #puts "~~~~~~~~~~assignment name #{assign.name}, id #{assign.id}"
+          #puts "~~~~~~~~~~Enter assignment, time.now is #{Time.now}\n and assign.created_at #{assign.created_at} and diff #{(Time.now - 14400) - assign.created_at}\n"
           
-          if(Time.now - assign.created_at <= 3600 && Time.now - assign.created_at >= 0)#if any assignment was created in the last 1hr
-            # get all participants
-            allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
-                #puts "~~~~~~~~~~Participants found"
-            for participant in allParticipants
-                userInfo = User.find(participant.user_id)
-                # get users full name
-                fullname = userInfo.fullname    
-                #puts "~~~~~~~~~~Participant name: #{fullname}\n"
-                
-                # get users email address
-                email    = userInfo.email      
-                #puts "~~~~~~~~~~Email: #{email}\n"
-                
-                # get name of assignment
-                assign_name = assign.name
-                #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                
-                
-                email_start(fullname, email, assign_name)
-            end 
-         end #end for the 'if' condition
+#          if((((Time.now - 14400) - assign.created_at) <= 3600) && (((Time.now - 14400) - assign.created_at) >= 0))#if any assignment was created in the last 1hr
+#            # get all participants
+#                #puts "looking for participants"
+#            allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
+#                #puts "~~~~~~~~~~Participants found"
+#            for participant in allParticipants
+#                userInfo = User.find(participant.user_id)
+#                # get users full name
+#                fullname = userInfo.fullname    
+#                #puts "~~~~~~~~~~Participant name: #{fullname}\n"
+#                
+#                # get users email address
+#                email    = userInfo.email      
+#                #puts "~~~~~~~~~~Email: #{email}\n"
+#                
+#                # get name of assignment
+#                assign_name = assign.name
+#                #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                
+#                
+#                email_start(fullname, email, assign_name)
+#            end 
+#         end #end for the 'if' condition
 
           #puts "Before get_current_due_date()\n"
           #due_date = assign.find_current_stage()#get_current_due_date()
@@ -45,16 +46,16 @@ module SpawnHelper
           #fetching all due dates for the current assignment
           due_dates = DueDate.find(:all, 
                  :conditions => ["assignment_id = ?", assign.id])
-          #puts "~~~~~~~~~~~~~~~~~~~~~due dates size #{due_dates.size} and due_at #{due_dates[0].due_at} and date.due_at - Time.now is #{due_dates[0].due_at - Time.now}\n"
+          #puts "~~~~~~~~~~~~~~~~~~~~~due dates size #{due_dates.size} and due_at #{due_dates[0].due_at} and date.due_at - Time.now is #{due_dates[0].due_at - (Time.now-14400)}\n"
           
           if(due_dates.size > 0)#making sure that the assignmefnt does have due dates
             #the above query picks all deadlines for an asisgnment and we check for each and based on the assignment type we perform specific checks and then send email reminders
             for date in due_dates 
-              #puts "~~~~~~~~~~Date is: #{date.due_at} and date.due_at - Time.now is: #{date.due_at - Time.now} and flag is #{date.flag}\n"
-              if(date.due_at - Time.now <= date.threshold * 3600 && date.due_at - Time.now > 0 && date.flag == false)#send reminder
+              #puts "~~~~~~~~~~Date is: #{date.due_at} and date.due_at - Time.now is: #{date.due_at - (Time.now-14400)} and flag is #{date.flag}\n"
+              if((date.due_at - Time.now) <= date.threshold * 3600 && (date.due_at - Time.now) > 0 && date.flag == false)#send reminder
                 #puts "~~~~~~~~~~Deadline type is: #{date.deadline_type_id} threshold is: #{date.threshold}\n"
                 deadlinetype = date.deadline_type_id
-                if(deadlinetype == 1)
+                if(deadlinetype == 1)#1 is submission
                   submission_reminder(assign, date)
                 elsif(deadlinetype == 2)#2 is review
                   review_reminder(assign, date)
@@ -96,8 +97,8 @@ module SpawnHelper
         #check if he has already edited the wiki
         #if he hasn't send him an email reminder
         #puts " ~~~~~~~~~~~~~~parts.has_submissions #{participant.has_submissions} \n"
-        #puts "~~~~~~~~~~Sending submission_reminder if no submissions found\n"
-        if(participant.has_submissions == false)
+        #puts "~~~~~~~~~~Sending submission_reminder if no submissions found ... submitted at nil #{(participant.submitted_at == nil)} .. hyperlink nil #{participant.submitted_hyperlink == nil}\n"
+        if(participant.submitted_at == nil || participant.submitted_hyperlink == nil)#if(participant.has_submissions == false)
           email_remind(fullname, email, assign_name, due_date, assign_type)
         end
     end
@@ -123,7 +124,7 @@ module SpawnHelper
       #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"
       
       #check if the participant/reviewer has reviewed the latest version of the resubmitted file, else send him a reminder
-      allresponsemaps = ResponseMap.find(:all, :conditions => ["reviewer_id = ? AND type = 'ParticipantReviewResponseMap'", participant.id])
+      allresponsemaps = ResponseMap.find(:all, :conditions => ["reviewer_id = ? AND type = 'ParticipantReviewResponseMap' AND reviewed_object_id = ?", participant.id, assign.id])
       #puts" ~~~~~number of response maps #{allresponsemaps.size}\n"
       if(allresponsemaps.size > 0)
         for eachresponsemap in allresponsemaps
@@ -133,8 +134,15 @@ module SpawnHelper
               if(allresponses[0].updated_at < resubmission_times[0].resubmitted_at) #participant/reviewer has reviewed an older version
                   email_remind(fullname, email, assign_name, due_date, assign_type)
               end
-            elsif(allresponses.size == 0 && resubmission_times.size > 0) #where the reviewee has submitted and reviewer has provided no response
-              email_remind(fullname, email, assign_name, due_date, assign_type)
+            elsif(allresponses.size == 0) #where the reviewee has submitted and reviewer has provided no response
+              if(resubmission_times.size > 0)
+                email_remind(fullname, email, assign_name, due_date, assign_type)
+              else #if the reviewee has made som sort of submission
+                reviewee = Participant.find(:all, :conditions => ["user_id = ?", eachresponsemap.reviewee_id])
+                if(reviewee.submitted_at != nil || reviewee.submitted_hyperlink != nil)
+                  email_remind(fullname, email, assign_name, due_date, assign_type)
+                end
+              end
             end
         end #endof the response maps loop
       end
@@ -175,7 +183,7 @@ module SpawnHelper
   end
 
   def email_remind(fullname, email, assign_name, due_date, assign_type)
-      #puts "~~~~~~~~~~~~~inside email reminder"
+      #puts "~~~~~~~~~~~~~inside email reminder email #{email}"
       due_date_string = due_date.due_at.to_s
       subject = "Message regarding #{assign_type} for #{assign_name}"
       #puts "#{subject}\n"
@@ -201,8 +209,7 @@ module SpawnHelper
         {:recipients => email,
          :subject => subject,
          :body => body
-        })   
-       
+        })      
   end
   
   def email_start(fullname, email, assign_name)      

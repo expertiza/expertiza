@@ -336,7 +336,7 @@ def update
       if(params[:radio_rotcond] == nil or params[:radio_rotcond] == "0")
         @assignment.rotation_condition = 0
         @assignment.category_id = nil
-        @assignment.max_allowed_rotation = nil
+        @assignment.max_num_times_can_partner = nil
       elsif(params[:radio_rotcond] == "1")
         @assignment.rotation_condition = 1
         @assignment.category_id = nil

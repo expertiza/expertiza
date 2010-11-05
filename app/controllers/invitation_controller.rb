@@ -27,15 +27,16 @@ class InvitationController < ApplicationController
           currentCourse = Assignment.find(student.parent_id).course_id
           currentCategory = Assignment.find(student.parent_id).category_id
           rotationCondition = Assignment.find(student.parent_id).rotation_condition
-          maxAllowedRotation = Assignment.find(student.parent_id).max_allowed_rotation
-        
+          maxAllowedRotation = Assignment.find(student.parent_id).max_num_times_can_partner
+          
           #rotationCondition 0=> rotation not required, 1 => course wise, 2 => course + category wise
-
+          #no rotaion required - no k
+          
           if current_invs.length == 0
             allTeamsUsersOfStudent = TeamsUser.find(:all, :conditions => ['user_id =?',student.user_id])
             if(rotationCondition != 0)
               count = 1 # starting from 1 as we are sending invite currently which should also be considered
-              for teamsuser in allTeamsUsersOfStudent do   
+              for teamsuser in allTeamsUsersOfStudent do    
                 # Person sending invite - student; person being invited - user
                 pastTeam = Team.find(teamsuser.team_id)
                 pastTeamAssignment = Assignment.find(pastTeam.parent_id)
@@ -56,8 +57,10 @@ class InvitationController < ApplicationController
                 end #rotation condition if-elseif end
               end # end for
             end #rotationCondition != 0 end
-            if((rotationCondition != 0) and (Role.find(user.role_id).name == "Student" or Role.find(user.role_id).name == "Teaching Assistant") and count > maxAllowedRotation) #k
-              flash[:notice] = "You can not team up with this person anymore."
+            if((rotationCondition == 1) and count > maxAllowedRotation) #maxAllowedRotation = k
+              flash[:notice] = "Sorry; you have already partnered with this student #{maxAllowedRotation} number of times."
+            elsif((rotationCondition == 2) and count > maxAllowedRotation) #maxAllowedRotation = k
+              flash[:notice] = "Sorry; you have already partnered with this student #{maxAllowedRotation} number of times [for assignment type #{Category.find(currentCategory).name}]."
             else  
               @invitation = Invitation.new
               @invitation.to_id = user.id

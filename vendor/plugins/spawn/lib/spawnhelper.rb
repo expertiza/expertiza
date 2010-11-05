@@ -10,22 +10,23 @@ module SpawnHelper
       while true do        
         #puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
         # find all assignments in database                
-        allAssign = Assignment.find(:all)
+        allAssign = Assignment.find(:all, :conditions => ["created_at >= ? AND created_at <= ?", Time.now - 3600, Time.now + 3600])#Time.Now is in UTC (eg: 12:00:00 -0400)and when we subtract, only the time gets subtracted!!:( 
         for assign in allAssign
           #puts "~~~~~~~~~~assignment name #{assign.name}"
           #puts "~~~~~~~~~~Enter assignment, time.now is #{Time.now}\n and assign.created_at #{assign.created_at} and diff #{Time.now - assign.created_at}\n"
           
-          if(Time.now - assign.created_at <= 3600)#if any assignment was created in the last 1hr
+          if(Time.now - assign.created_at <= 3600 && Time.now - assign.created_at >= 0)#if any assignment was created in the last 1hr
             # get all participants
             allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
-
+                #puts "~~~~~~~~~~Participants found"
             for participant in allParticipants
+                userInfo = User.find(participant.user_id)
                 # get users full name
-                fullname = User.find(participant.user_id).fullname    
+                fullname = userInfo.fullname    
                 #puts "~~~~~~~~~~Participant name: #{fullname}\n"
                 
                 # get users email address
-                email    = User.find(participant.user_id).email      
+                email    = userInfo.email      
                 #puts "~~~~~~~~~~Email: #{email}\n"
                 
                 # get name of assignment
@@ -44,7 +45,7 @@ module SpawnHelper
           #fetching all due dates for the current assignment
           due_dates = DueDate.find(:all, 
                  :conditions => ["assignment_id = ?", assign.id])
-          puts "~~~~~~~~~~~~~~~~~~~~~due dates size #{due_dates.size} and due_at #{due_dates[0].due_at} and date.due_at - Time.now is #{due_dates[0].due_at - Time.now}\n"
+          #puts "~~~~~~~~~~~~~~~~~~~~~due dates size #{due_dates.size} and due_at #{due_dates[0].due_at} and date.due_at - Time.now is #{due_dates[0].due_at - Time.now}\n"
           
           if(due_dates.size > 0)#making sure that the assignmefnt does have due dates
             #the above query picks all deadlines for an asisgnment and we check for each and based on the assignment type we perform specific checks and then send email reminders
@@ -79,10 +80,11 @@ module SpawnHelper
     allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
     #puts "~~~~~~~~~~Getting All participants details:\n"
     for participant in allParticipants 
-      fullname = User.find(participant.user_id).fullname    
+      userInfo = User.find(participant.user_id)
+      fullname = userInfo.fullname    
       #puts "~~~~~~~~~~Participant name: #{fullname}\n"
                   
-      email = User.find(participant.user_id).email      
+      email = userInfo.email      
       #puts "~~~~~~~~~~Email: #{email}\n"
                   
       assign_name = assign.name        
@@ -176,7 +178,7 @@ module SpawnHelper
       #puts "~~~~~~~~~~~~~inside email reminder"
       due_date_string = due_date.due_at.to_s
       subject = "Message regarding #{assign_type} for #{assign_name}"
-      puts "#{subject}\n"
+      #puts "#{subject}\n"
       if(assign_type == "submission")
         body = "Hi #{fullname}, this is a reminder to complete #{assign_type} for #{assign_name}. "
         body = body + "Deadline is #{due_date_string}." 
@@ -199,18 +201,19 @@ module SpawnHelper
         {:recipients => email,
          :subject => subject,
          :body => body
-        })        
+        })   
+       
   end
   
   def email_start(fullname, email, assign_name)      
       subject = "Message regarding new assignment"
       body = "Hi #{fullname}, #{assign_name} has just been created."    
-    
+      #puts "~~~ Inside email start email is #{email} , fullname #{fullname} and assign_name #{assign_name}"
       Mailer.deliver_message(
         {:recipients => email,
          :subject => subject,
          :body => body
-        })        
+        })
   end
   
 end #end of class

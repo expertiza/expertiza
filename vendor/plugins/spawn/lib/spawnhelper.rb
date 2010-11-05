@@ -10,7 +10,9 @@ module SpawnHelper
       while true do        
         #puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
         # find all assignments in database                
-        allAssign = Assignment.find(:all) 
+        #allAssign = Assignment.find(:all)
+        #query to pick only those assignments that were created in the last 2 weeks - to avoid picking all assignments
+        allAssign = Assignment.find(:all, :conditions => ["created_at >= ? AND created_at <= ?", Time.now - 1209600, Time.now]) 
         for assign in allAssign
           #puts "~~~~~~~~~~assignment name #{assign.name}, id #{assign.id}"
           #puts "~~~~~~~~~~Enter assignment, time.now is #{Time.now}\n and assign.created_at #{assign.created_at} and diff #{(Time.now - 14400) - assign.created_at}\n"

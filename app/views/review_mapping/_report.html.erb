@@ -3,13 +3,13 @@
 <div class = "reviewreport">
     <table width="100%" cellspacing="0" cellpadding="2" border="0">
         <tr bgcolor="#CCCCCC">
-            <th width = "22%">
+            <th width = "16%">
                 Reviewer
             </th>
-            <th width = "16%">
+            <th width = "14%">
                # reviews done
             </th>
-            <th width = "22%">
+            <th width = "20%">
             	<% if @assignment.team_assignment %>
                 Team reviewed
 				<% else %>
@@ -19,14 +19,14 @@
             <th width = "8%">
                 Score awarded
             </th>
-			<th width = "14%">
-                Avg. score received
+			<th width = "8%">
+                Avg. score
+            </th>
+            <th width = "16%">
+                Score range
             </th>
             <th width = "20%">
-                Range of scores received
-            </th>
-            <th width = "10%">
-                Review completed 
+                Reviewed at 
             </th>
         </tr>
 		
@@ -89,8 +89,8 @@
                             <%else %>
                                 <td bgcolor="#DDDDBB" align = 'center'>
                             <%end %>
-                            Yes 
-                        </td>
+                            <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+                               </td>
                         <tr/>
 
                         <%else %>
@@ -112,7 +112,8 @@
                             <%else %>
                                 <td bgcolor="#DDDDBB" align = 'center'>
                             <%end %>
-                                    Yes 
+                                   <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+                            
                             </td>
                             <tr/>
                         <%end %>
@@ -134,7 +135,7 @@
                             <%else %>
                                 <td bgcolor="#DDDDBB" style ="color:#DD3300" align = 'center'>
                             <%end %>
-                            No
+                            --
                             </td>
                             <tr/>
                         <%else %>
@@ -157,7 +158,7 @@
                            <%else %>
                                 <td bgcolor="#DDDDBB" align = 'center'>
                            <%end %>
-                                No
+                                --
                                 </td>
                                 <tr/>
                       <%end %>

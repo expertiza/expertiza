@@ -15,7 +15,7 @@ module SpawnHelper
         allAssign = Assignment.find(:all, :conditions => ["created_at >= ? AND created_at <= ?", Time.now - 1209600, Time.now]) 
         for assign in allAssign
           #puts "~~~~~~~~~~assignment name #{assign.name}, id #{assign.id}"
-          #puts "~~~~~~~~~~Enter assignment, time.now is #{Time.now}\n and assign.created_at #{assign.created_at} and diff #{(Time.now - 14400) - assign.created_at}\n"
+          #puts "~~~~~~~~~~Enter assignment #{assign.name}, time.now is #{Time.now}\n and assign.created_at #{assign.created_at} and diff #{(Time.now - 14400) - assign.created_at}\n"
           
 #          if((((Time.now - 14400) - assign.created_at) <= 3600) && (((Time.now - 14400) - assign.created_at) >= 0))#if any assignment was created in the last 1hr
 #            # get all participants
@@ -57,13 +57,17 @@ module SpawnHelper
               if((date.due_at - Time.now) <= date.threshold * 3600 && (date.due_at - Time.now) > 0 && date.flag == false)#send reminder
                 #puts "~~~~~~~~~~Deadline type is: #{date.deadline_type_id} threshold is: #{date.threshold}\n"
                 deadlinetype = date.deadline_type_id
-                if(deadlinetype == 1)#1 is submission
+                if deadlinetype == 1 #1 is submission
                   submission_reminder(assign, date)
-                elsif(deadlinetype == 2)#2 is review
+                  #puts "~~~~~~~~~~back here!"
+                end
+                if deadlinetype == 2 #2 is review
                   review_reminder(assign, date)
-                elsif(deadlinetype == 5)#5 is for metareview
+                end
+                if deadlinetype == 5 #5 is for metareview
                   metareview_reminder(assign, date)
                 end
+                #puts "~~~~~~~~~~~~~setting flag"
                 date.setFlag
               end
             end #end of for loop
@@ -77,54 +81,36 @@ module SpawnHelper
   end #end of 'def'
 
   def submission_reminder(assign, due_date)
-    #look for wiki submissions of each participant
-    # get all participants
-    #puts "~~~~~~~~~~Inside submission_reminder method\n"
-    allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
-    #puts "~~~~~~~~~~Getting All participants details:\n"
+    allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])
+    emails = Array.new
     for participant in allParticipants 
-      userInfo = User.find(participant.user_id)
-      fullname = userInfo.fullname    
-      #puts "~~~~~~~~~~Participant name: #{fullname}\n"
-                  
-      email = userInfo.email      
-      #puts "~~~~~~~~~~Email: #{email}\n"
-                  
+      userInfo = User.find(participant.user_id)                
+      email = userInfo.email.to_s     
+      #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
-      #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"
-                                  
+      #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       assign_type = DeadlineType.find(due_date.deadline_type_id).name
-      #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"
-      
-        #check if he has already edited the wiki
-        #if he hasn't send him an email reminder
-        #puts " ~~~~~~~~~~~~~~parts.has_submissions #{participant.has_submissions} \n"
-        #puts "~~~~~~~~~~Sending submission_reminder if no submissions found ... submitted at nil #{(participant.submitted_at == nil)} .. hyperlink nil #{participant.submitted_hyperlink == nil}\n"
-        if(participant.submitted_at == nil || participant.submitted_hyperlink == nil)#if(participant.has_submissions == false)
-          email_remind(fullname, email, assign_name, due_date, assign_type)
-        end
-    end
+      #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
+      #puts "~~~~~~~~~~Sending submission_reminder if no submissions found ... submitted at nil #{(participant.submitted_at == nil)} .. hyperlink nil #{participant.submitted_hyperlink == nil} hyperlink empty #{participant.submitted_hyperlink != ""}\n"
+      if(participant.submitted_at == nil && (participant.submitted_hyperlink == nil || participant.submitted_hyperlink == ""))#if(participant.has_submissions == false)
+        emails << email
+      end
+    end#end of for loop
+    #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
+    email_remind(emails, assign_name, due_date, assign_type)
+    #puts "~~~~~~~~~~done submission reminders\n"
   end
 
   def review_reminder(assign, due_date)
-    #look to see if the student has reviewed the latest resubmitted version before sending an email reminder
-    # get all participants
-    #puts "~~~~~~~~~~Inside review_reminder method\n"
     allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
-    #puts "~~~~~~~~~~Getting All participants details:\n"
-    for participant in allParticipants 
-      fullname = User.find(participant.user_id).fullname    
-      #puts "~~~~~~~~~~Participant name: #{fullname}\n"
-                  
-      email = User.find(participant.user_id).email      
-      #puts "~~~~~~~~~~Email: #{email}\n"
-                  
+    emails = Array.new
+    for participant in allParticipants                
+      email = User.find(participant.user_id).email     
+      #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
-      #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"
-                                  
+      #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       assign_type = DeadlineType.find(due_date.deadline_type_id).name
-      #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"
-      
+      #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
       #check if the participant/reviewer has reviewed the latest version of the resubmitted file, else send him a reminder
       allresponsemaps = ResponseMap.find(:all, :conditions => ["reviewer_id = ? AND type = 'ParticipantReviewResponseMap' AND reviewed_object_id = ?", participant.id, assign.id])
       #puts" ~~~~~number of response maps #{allresponsemaps.size}\n"
@@ -134,95 +120,79 @@ module SpawnHelper
             resubmission_times = ResubmissionTime.find(:all, :conditions => ["participant_id = ?", eachresponsemap.reviewee_id], :order => "resubmitted_at DESC")           
             if(allresponses.size > 0)#meaning the reviewer has submitted a response for that map_id  
               if(allresponses[0].updated_at < resubmission_times[0].resubmitted_at) #participant/reviewer has reviewed an older version
-                  email_remind(fullname, email, assign_name, due_date, assign_type)
-              end
-            elsif(allresponses.size == 0) #where the reviewee has submitted and reviewer has provided no response
-              if(resubmission_times.size > 0)
-                email_remind(fullname, email, assign_name, due_date, assign_type)
-              else #if the reviewee has made som sort of submission
-                reviewee = Participant.find(:all, :conditions => ["user_id = ?", eachresponsemap.reviewee_id])
-                if(reviewee.submitted_at != nil || reviewee.submitted_hyperlink != nil)
-                  email_remind(fullname, email, assign_name, due_date, assign_type)
-                end
+                  emails << email
               end
             end
+            if(allresponses.size == 0) #where the reviewee has submitted and reviewer has provided no response
+              if(resubmission_times.size > 0)
+                emails << email
+              else #if the reviewee has made som sort of submission
+                reviewee = Participant.find(:all, :conditions => ["user_id = ?", eachresponsemap.reviewee_id])
+              end
+              if(reviewee.submitted_at != nil || (reviewee.submitted_hyperlink != nil && reviewee.submitted_hyperlink != ""))
+                emails << email
+              end
+           end
         end #endof the response maps loop
       end
     end #end of the for loop for all participants of the assignment
+    #puts "~~~~~~~~~~Emails #{emails}\n"
+    email_remind(emails, assign_name, due_date, assign_type)
   end
 
   def metareview_reminder(assign, due_date)
-    #puts "~~~~~~~~~~Inside metareview_reminder method\n"
-    # get all participants
     allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
-    #puts "~~~~~~~~~~Getting All participants details:\n"
-    for participant in allParticipants 
-      fullname = User.find(participant.user_id).fullname    
-      #puts "~~~~~~~~~~Participant name: #{fullname}\n"
-                  
+    emails = Array.new
+    for participant in allParticipants               
       email = User.find(participant.user_id).email      
-      #puts "~~~~~~~~~~Email: #{email}\n"
-                  
+      #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
-      #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"
-                                  
+      #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       assign_type = DeadlineType.find(due_date.deadline_type_id).name
-      #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"
-      
+      #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
       #check if the participant/reviewer has completed the meta-review
       allresponsemaps = ResponseMap.find(:all, :conditions => ["reviewer_id = ? AND type = 'MetareviewResponseMap'", participant.id])
       if(allresponsemaps.size > 0)
         for eachresponsemap in allresponsemaps
             allresponses = Response.find(:all, :conditions => ["map_id = ?", eachresponsemap.id])
             if !(allresponses.size > 0)#meaning the reviewer has not submitted a response for that map_id
-              email_remind(fullname, email, assign_name, due_date, assign_type)
-            #else
-              #puts "~~~~~~~~~~~~~metareviewer #{fullname} has submitted a response"            
+              emails << email
             end
         end
       end
     end #end of the for loop
+    email_remind(emails, assign_name, due_date, assign_type)
   end
 
-  def email_remind(fullname, email, assign_name, due_date, assign_type)
-      #puts "~~~~~~~~~~~~~inside email reminder email #{email}"
+  def email_remind(emails, assign_name, due_date, assign_type)
+      #puts "~~~~~~~~~~~~~inside email reminder email #{emails}"
       due_date_string = due_date.due_at.to_s
       subject = "Message regarding #{assign_type} for #{assign_name}"
-      #puts "#{subject}\n"
-      if(assign_type == "submission")
-        body = "Hi #{fullname}, this is a reminder to complete #{assign_type} for #{assign_name}. "
-        body = body + "Deadline is #{due_date_string}." 
-        #puts "~~~~~~~~Message Body: #{body}\n"
-      elsif(assign_type == "review")
-        body = "Hi #{fullname}, this is a reminder to complete review of the latest resubmission of author in #{assign_type} for #{assign_name}. "
-        body = body + "Deadline is #{due_date_string}." 
-        #puts "~~~~~~~~Message Body: #{body}\n"
-      elsif(assign_type == "metareview")
-        body = "Hi #{fullname}, this is a reminder to complete metareview of assignment #{assign_type} for #{assign_name}. "
-        body = body + "Deadline is #{due_date_string}." 
-        #puts "~~~~~~~~Message Body: #{body}\n"
+      if assign_type == "submission"
+        body = "This is a reminder to complete #{assign_type} for #{assign_name}. Deadline is #{due_date_string}."
       end
-      #if(next_due_date != nil)
-       # next_due_date_string = next_due_date.due_at.to_s
-       # body = body + "\n\rDeadline for #{next_assign_type} is #{next_due_date_string}.\n"
-      #end
-    
+      if assign_type == "review"
+        body = "This is a reminder to complete review of the latest resubmission of author in #{assign_type} for #{assign_name}. Deadline is #{due_date_string}."
+      end
+      if assign_type == "metareview"
+        body = "This is a reminder to complete metareview of assignment #{assign_type} for #{assign_name}. Deadline is #{due_date_string}." 
+      end  
+      #puts "~~~~~~~~Message Body: #{body}\n"
       Mailer.deliver_message(
-        {:recipients => email,
+        {:recipients => emails,
          :subject => subject,
          :body => body
-        })      
+        })         
+     #puts "DONE!!"
   end
   
-  def email_start(fullname, email, assign_name)      
+  def email_start(emails, assign_name)      
       subject = "Message regarding new assignment"
-      body = "Hi #{fullname}, #{assign_name} has just been created."    
-      #puts "~~~ Inside email start email is #{email} , fullname #{fullname} and assign_name #{assign_name}"
+      body = "Hi, #{assign_name} has just been created."    
       Mailer.deliver_message(
-        {:recipients => email,
+        {:recipients => emails,
          :subject => subject,
          :body => body
         })
   end
-  
 end #end of class

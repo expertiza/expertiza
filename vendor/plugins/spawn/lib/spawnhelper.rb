@@ -120,18 +120,18 @@ module SpawnHelper
             #puts" ~~~~~number of responses #{allresponses.size}\n"
             resubmission_times = ResubmissionTime.find(:all, :conditions => ["participant_id = ?", eachresponsemap.reviewee_id], :order => "resubmitted_at DESC")           
             #puts" ~~~~~resubmission times: #{resubmission_times.size}\n"
-            if(allresponses.size > 0)#meaning the reviewer has submitted a response for that map_id  
+            if(allresponses.size > 0 && resubmission_times.size > 0)#meaning the reviewer has submitted a response for that map_id  
               if(allresponses[0].updated_at < resubmission_times[0].resubmitted_at) #participant/reviewer has reviewed an older version
                   emails << email
               end
-            end
-            if(allresponses.size == 0) #where the reviewee has submitted and reviewer has provided no response
+            elsif(allresponses.size == 0) #where the reviewee has submitted and reviewer has provided no response
               if(resubmission_times.size > 0)
                 emails << email
               else #if the reviewee has made some sort of submission
                 reviewee = Participant.find(:all, :conditions => ["id = ?", eachresponsemap.reviewee_id])
                 #puts "~~~~~~~~~~Sending review_reminder if no responses found ... submitted at nil #{(reviewee[0].submitted_at == nil)} .. hyperlink nil #{reviewee[0].submitted_hyperlink == nil} hyperlink empty #{reviewee[0].submitted_hyperlink == ""}\n"
                 if(reviewee[0].submitted_at != nil || (reviewee[0].submitted_hyperlink != nil && reviewee[0].submitted_hyperlink != ""))
+                  #puts "~~~~~~~~~~Email: #{email}\n"   
                   emails << email
                 end
               end
@@ -139,7 +139,7 @@ module SpawnHelper
         end #endof the response maps loop
       end
     end #end of the for loop for all participants of the assignment
-    puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
+    #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
     email_remind(emails, assign_name, due_date, assign_type)
   end
 

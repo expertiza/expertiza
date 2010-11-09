@@ -62,6 +62,16 @@ ActiveRecord::Schema.define(:version => 20101023031100) do
   add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
 
+  #table for ability to store code review file information
+  create_table "code_review_files", :force => true do |t|
+    t.text     "contents"
+    t.string   "name"
+    t.integer  "participantid"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  #table for ability to store code comments for code review files
   create_table "code_review_comments", :force => true do |t|
     t.integer  "participantid"
     t.integer  "codefileid"
@@ -70,14 +80,6 @@ ActiveRecord::Schema.define(:version => 20101023031100) do
     t.integer  "r_begins"
     t.integer  "r_end"
     t.integer  "r_scroll"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "code_review_files", :force => true do |t|
-    t.text     "contents"
-    t.string   "name"
-    t.integer  "participantid"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

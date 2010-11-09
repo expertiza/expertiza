@@ -39,6 +39,7 @@ class AssignmentParticipant < Participant
     return links
   end
 
+  #used to get the code files associated with a particular assignment
   def get_codefiles             
     if self.team     
       codefiles = self.team.get_codefiles     

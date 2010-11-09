@@ -154,16 +154,22 @@ module SpawnHelper
       assign_type = DeadlineType.find(due_date.deadline_type_id).name
       #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
       #check if the participant/reviewer has completed the meta-review
+      #puts "~~~~~~~~~participant id #{participant.id}"
       allresponsemaps = ResponseMap.find(:all, :conditions => ["reviewer_id = ? AND type = 'MetareviewResponseMap'", participant.id])
       if(allresponsemaps.size > 0)
         for eachresponsemap in allresponsemaps
-            allresponses = Response.find(:all, :conditions => ["map_id = ?", eachresponsemap.id])
-            if !(allresponses.size > 0)#meaning the reviewer has not submitted a response for that map_id
-              emails << email
+            #checking to see if the response map was for a review in the same assignment
+            checkresponsemap = ResponseMap.find(:all, :conditions => ["id = ? AND type = 'ParticipantReviewResponseMap' AND reviewed_object_id = ?", eachresponsemap.reviewed_object_id, assign.id])
+            if(checkresponsemap.size > 0)
+              allresponses = Response.find(:all, :conditions => ["map_id = ?", eachresponsemap.id])
+              if !(allresponses.size > 0)#meaning the reviewer has not submitted a response for that map_id
+                emails << email
+              end
             end
         end
       end
     end #end of the for loop
+    #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
     email_remind(emails, assign_name, due_date, assign_type)
   end
 
@@ -172,13 +178,13 @@ module SpawnHelper
       due_date_string = due_date.due_at.to_s
       subject = "Message regarding #{assign_type} for #{assign_name}"
       if assign_type == "submission"
-        body = "This is a reminder to complete #{assign_type} for #{assign_name}. Deadline is #{due_date_string}."
+        body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}."
       end
       if assign_type == "review"
-        body = "This is a reminder to complete review of the latest resubmission of author in #{assign_type} for #{assign_name}. Deadline is #{due_date_string}."
+        body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}."
       end
       if assign_type == "metareview"
-        body = "This is a reminder to complete metareview of assignment #{assign_type} for #{assign_name}. Deadline is #{due_date_string}." 
+        body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}." 
       end  
       #puts "~~~~~~~~Message Body: #{body}\n"
       Mailer.deliver_message(

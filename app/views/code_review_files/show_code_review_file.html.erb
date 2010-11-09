@@ -1,42 +1,25 @@
 <head>
 <script type="text/javascript">
 var cnt = 0;
-var tops = new Array(256); //set to the number of comments + 1
-var starts = new Array(256);
-var ends = new Array(256);
-var origcode = "";
+var tops = new Array(256); //the amount to scroll in the code window for each comment
+var starts = new Array(256); //the starting position of each comment's code section
+var ends = new Array(256); //the end position of each comment's code section
+var origcode = ""; //represents the original html code that is used to wipe out comment div's
 
+//used during a capture to submit the top, start, and end to the db
 var currTop = 0;
 var currStart = 0;
 var currEnd = 0;
 
 function bodyload()
 {
+   //set the original code object to replace the code div when we need to clear a comment
 	origcode = document.getElementById("code").innerHTML;
 }
 
-function bClick()
-{
-	//not used currently
-	//document.getElementById("codewindow").scrollTop = 40;	
-	//var shtml = document.getElementById("code").innerHTML;
-	//var finds = shtml.substring(0 + 12, 60 + 12);
-	//var nhtml = shtml.replace(finds, "<span id=\"colorred\">" + finds + "</span>");
-	//document.getElementById("code").innerHTML = nhtml;
-}
-
-function hiClick(idx)
-{
-	clearHi();
-	document.getElementById("codewindow").scrollTop = tops[idx];
-	var shtml = HtmlEncode(origcode);
-	var begin = HtmlDecode(shtml.substring(0, starts[idx]));
-	var middle = HtmlDecode(shtml.substring(starts[idx], ends[idx]));
-	var end = HtmlDecode(shtml.substring(ends[idx], shtml.length));
-	var nhtml = begin + "<span id=\"colorred\">" + middle + "</span>" + end;
-	document.getElementById("code").innerHTML = nhtml;
-}
-
+//This method takes the comment that was clicked and scrolls to the appropriate section
+//and puts divs around the correct range which gives the appearance of being selected
+//using css.
 function hiClickNumber(top, start, end)
 {
 	clearHi();
@@ -49,6 +32,7 @@ function hiClickNumber(top, start, end)
 	document.getElementById("code").innerHTML = nhtml;
 }
 
+//clears the hilighting divs from the code in the code window
 function clearHi()
 {
 	if(document.getElementById("code").innerHTML != origcode)
@@ -56,6 +40,7 @@ function clearHi()
 	return true;
 }
 
+//capture the current selection
 function captureSelection()
 {
 	var selection;
@@ -67,13 +52,14 @@ function captureSelection()
 			currTop = document.getElementById("codewindow").scrollTop;
 			currStart = range.startOffset;
 			currEnd = range.endOffset;
+         //Set the hidden tags so that when the comment is submitted they will be valid
 			document.getElementById("currSelection").innerHTML = "Character " + currStart + " through " + currEnd;
 			document.getElementById("topentry").value = currTop;
 			document.getElementById("startentry").value = currStart;
 			document.getElementById("endentry").value = currEnd;
 		}
 	}
-	else if (document.selection) { // should come last; Opera!
+	else if (document.selection) { // Tried to get IE working but couldn't figure out the javascript issues.
 		tempr = document.selection.createRange();
 		alert(getIECharOffset());
 	}
@@ -81,67 +67,31 @@ function captureSelection()
 
 function getIECharOffset() {
   var offset = 0;
-
   // get the users selection - this handles empty selections
   var userSelection = document.selection.createRange();
-
 	alert(userSelection.parentElement());
   // get a selection from the contents of the parent element
   var parentSelection = userSelection.parentElement().createTextRange();
 	alert("hello");
-
   // loop - moving the parent selection on a character at a time until the offsets match
   while (!offsetEqual(parentSelection, userSelection)) {
     parentSelection.move('character');
     offset++;
   }
-
   // return the number of char you have moved through
   return offset;
 }
 
-function addRow()
+function deleteComment(number)
 {
-	var newhtml = document.getElementById("commentslist").innerHTML;
-	newhtml += "<div id=\"commententry\" onclick=\"hiClick(" + cnt + ")\">";
-	newhtml += "<span id=\"fakelink\">Comment " + (cnt+1) + "</span><br/>";
-	newhtml += "Text of the comment just al ine or so...";
-	newhtml += "</div>";
-	document.getElementById("commentslist").innerHTML = newhtml;
-	/*
-	var tbody = document.getElementById("commentstable").getElementsByTagName("TBODY")[0];
-    var row = document.createElement("TR");
-    var td1 = document.createElement("TD");
-    td1.appendChild(document.createTextNode("Comment " + cnt));
-    row.appendChild(td1);
-    tbody.appendChild(row);*/
+   var bDelete = confirm("Are you sure you want to delete this comment?");
+   if(bDelete)
+   {
+      window.location = "../delete_code_review_file_comment/" + number;
+   }
 }
 
-function loadComment(top, start, end)
-{
-	alert(start);
-	tops[cnt] = top;
-	starts[cnt] = start;
-	ends[cnt] = end;
-	cnt++;
-}
-
-function submitComment()
-{
-	tops[cnt] = currTop;
-	starts[cnt] = currStart;
-	ends[cnt] = currEnd;
-	var newhtml = document.getElementById("commentslist").innerHTML;
-	newhtml += "<div id=\"commententry\" onclick=\"hiClick(" + cnt + ")\">";
-	newhtml += "<span id=\"fakelink\">Comment " + (cnt+1) + "</span><br/>";
-	newhtml += document.getElementById("newcommenttext").value;
-	newhtml += "</div>";
-	document.getElementById("commentslist").innerHTML = newhtml;
-	
-	currTop = currStart = currEnd = 0;
-	document.getElementById("currSelection").innerHTML = "Nothing Currently Selected";
-}
-
+//Functions to encode and decode the html.
 function HtmlEncode(s)
 {
 	s = s.replace(/&lt;/g, "<");
@@ -238,25 +188,32 @@ function HtmlDecode(s)
 <h2>Name: <%=h  @code_review_file.name %></h2><br><br>
 <div id="main">
 
+<!--List out the comments-->
 <div id="comments">
 <div id="commentslist">
 <% @count = 1 %>
 <% @comments.each do |comment| %>
-    <div id="commententry" onClick="hiClickNumber(<%= comment.r_scroll.to_s + ", " + comment.r_begins.to_s + ", " + comment.r_end.to_s %>)">
-		<span id="fakelink">Comment <%= @count %></span><br/>
+    <div id="commententry" >
+		<span id="fakelink" onClick="hiClickNumber(<%= comment.r_scroll.to_s + ", " + comment.r_begins.to_s + ", " + comment.r_end.to_s %>)">Comment <%= @count %></span>
+<% if(session[:user].id == comment.participantid) %>
+      <span id="fakelink" onClick="deleteComment(<%= comment.id %>)">(delete)</span>
+<% end %>
+      <br/>
 		<%= comment.body %>
 	</div>
 	<% @count = @count + 1 %>
 <% end %>
 </div>
 
-<% 	if(session[:user].id != @participant.user_id) %>
+<!-- Do not allow an author to submit comments-->
+<% if(session[:user].id != @participant.user_id) %>
 <div id="submitcomment">
 <button onClick="captureSelection()">Capture Code Selection</button>
 <div id="currSelection">Nothing Currently Selected</div>
 
+<!--Ajax Form to submit a comment. Hidden fields for different attributes.-->
 <% form_remote_tag(:update => "commentslist", :url => { :action => :create_code_review_file_comment }, :position => "bottom" ) do %>
-  <%= text_area_tag(:commenttext, nil, :rows => 7, :cols => 28) %>
+  <%= text_area_tag(:commenttext, nil, :rows => 7, :cols => 28, :onmousedown => "captureSelection()") %>
   <%= hidden_field_tag :topentry %>
   <%= hidden_field_tag :startentry %>
   <%= hidden_field_tag :endentry %>
@@ -271,6 +228,7 @@ function HtmlDecode(s)
 </div>
 </div>
 
+<!--For loop to generate the line numbers in the codewindow-->
 <div id="codewindow" onMouseDown="clearHi()">
 <pre><div id="linenumbers"><% for i in 0 .. @code_review_file.getNumLines %><%= i.to_s + "\n"%><% end %>
 </div><div id="code"><%=h @code_review_file.contents %></div>

@@ -12,13 +12,13 @@ class AssignmentTeam < Team
     return links
   end
   
+  #used to get the files for the codereview
   def get_codefiles
     codefiles = Codefile.new
     for team_member in self.get_participants 
       for codefile in team_member.get_codefiles
         codefiles << codefile
       end
-      #codefiles << CodeReviewFile.getParticipantCodeFiles(team_member.id)    
     end
     return links
   end

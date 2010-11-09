@@ -1,19 +1,44 @@
-<% if assignment.codereview %>
-	<h2>Upload CodeReview File</h2>
-	<% form_for(:code_review_file, @code_review_file, :url => {:controller => 'code_review_files', :action=>'create_code_review_file'}, :html=> {:multipart=>true}) do |form| %>
-	<input type="hidden" id="code_review_file_participantid" name="code_review_file[participantid]" value="<%= participant.id %>">
-	<table>
-		<tr><td>Name:</td><td><%= form.text_field :name, :value => "" %></td><td>&nbsp;</td></tr>
-		<tr><td>File:</td><td><%= form.file_field :contents %></td><td><%= form.submit( 'Upload' ) %></td></tr>
-	</table>
-	<% end %>
+<!-- if the assignment is a code review assignment -->
+<% if participant.assignment and participant.assignment.codereview %>
+    <!-- if the user is a student, show ability to upload files, otherwise graders will not be able to upload files -->
+    <% if session[:user].role_id == 1 %>
+    	<h2>Upload CodeReview File</h2>
+        <!-- form to upload files -->
+        <% form_for(:code_review_file, @code_review_file, :url => {:controller => 'code_review_files', :action=>'create_code_review_file'}, :html=> {:multipart=>true}) do |form| %>
+    	<input type="hidden" id="code_review_file_participantid" name="code_review_file[participantid]" value="<%= participant.id %>">
+    	<table>
+    		<tr><td>Name:</td><td><%= form.text_field :name, :value => "" %></td><td>&nbsp;</td></tr>
+    		<tr><td>File:</td><td><%= form.file_field :contents %></td><td><%= form.submit( 'Upload' ) %></td></tr>
+    	</table>
+    	<% end %>
+    <% end %>
+       <!-- display the list of files that are currently associated with this assignment -->
         <% if participant.get_codefiles.length > 0 %>
-                <h2>Current CodeReview Files</h2>
+                <h2>Current Code Review Files</h2>
+                <table cellspacing="20">
+                <tr>
+                    <th>File</th>
+                    <th>Size</th>
+                    <th>Created Date</th>
+                    <% if session[:user].role_id == 1 %>
+                      <th>&nbsp;</th>
+                    <% end %>
+                </tr>
                 <% for eachcodefile in participant.get_codefiles %>
-                        <%= link_to eachcodefile.name, :controller => 'code_review_files', :action => 'show_code_review_file', :id => eachcodefile.id %><br/>
+                    <tr>
+                        <td><%= link_to eachcodefile.name, :controller => 'code_review_files', :action => 'show_code_review_file', :id => eachcodefile.id %></td>
+                        <td><%= eachcodefile.contents.length %></td>
+                        <td><%= eachcodefile.created_at %></td>
+                        <!-- only the student can delete the file -->
+                        <% if session[:user].role_id == 1 %>
+                          <td><%= link_to 'delete', :controller => 'code_review_files', :action => 'delete_code_review_file', :id => eachcodefile.id%></td>
+                        <% end %>
+                    </tr>
                 <% end %>
+                </table>
         <% end %>
 <% else %>
+    <!-- the rest of the assignment is as it was before adding code review -->
 	<% if participant.get_hyperlinks.length > 0 %>
 		<%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant} %>
 	<% end %>

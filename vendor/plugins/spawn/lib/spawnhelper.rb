@@ -188,7 +188,7 @@ module SpawnHelper
       end  
       #puts "~~~~~~~~Message Body: #{body}\n"
       Mailer.deliver_message(
-        {:recipients => emails,
+        {:bcc => emails,
          :subject => subject,
          :body => body
         })         
@@ -199,7 +199,7 @@ module SpawnHelper
       subject = "Message regarding new assignment"
       body = "Hi, #{assign_name} has just been created."    
       Mailer.deliver_message(
-        {:recipients => emails,
+        {:bcc => emails,
          :subject => subject,
          :body => body
         })

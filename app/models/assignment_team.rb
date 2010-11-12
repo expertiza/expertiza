@@ -4,7 +4,7 @@ class AssignmentTeam < Team
 
   def delete
     if read_attribute(:type) == 'AssignmentTeam' # whose idea was it to use a ruby keyword for an attribute name?
-      signup = SignedUpUser.find_team_participants("308").select{|p| p.creator_id == self.id}
+      signup = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
       signup.each &:destroy
     end
 

@@ -8,7 +8,8 @@ module SpawnHelper
     # thread for deadline emails
     spawn do        
       while true do        
-        #puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
+        puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
+        logger.info "Thread running, time #{Time.now}.\n"
         # find all assignments in database                
         #allAssign = Assignment.find(:all)
         #query to pick only those assignments that were created in the last 2 weeks - to avoid picking all assignments
@@ -53,7 +54,7 @@ module SpawnHelper
           if(due_dates.size > 0)#making sure that the assignmefnt does have due dates
             #the above query picks all deadlines for an asisgnment and we check for each and based on the assignment type we perform specific checks and then send email reminders
             for date in due_dates 
-              #puts "~~~~~~~~~~Date is: #{date.due_at} and date.due_at - Time.now is: #{date.due_at - (Time.now-14400)} and flag is #{date.flag}\n"
+              puts "~~~~~~~~~~Date is: #{date.due_at} and date.due_at - Time.now is: #{date.due_at - Time.now} and flag is #{date.flag}\n"
               if((date.due_at - Time.now) <= date.threshold * 3600 && (date.due_at - Time.now) > 0 && date.flag == false)#send reminder
                 #puts "~~~~~~~~~~Deadline type is: #{date.deadline_type_id} threshold is: #{date.threshold}\n"
                 deadlinetype = date.deadline_type_id
@@ -75,6 +76,7 @@ module SpawnHelper
           #MUST SET A FLAG TO INDICATE THAT REMINDERS HAVE BEEN SENT TO A PARTICIPANT OF AN ASSIGNMENT FOR A SPECIFIC ASSIGNMENT TYPE
           #ELSE THEY WILL GET SPAMMED WITH MESSAGES EVERY HOUR
         end #end 'for' loop for all assignmnets
+        logger.info "Thread going to sleep, time #{Time.now}.\n"
         sleep 3600 #sleeps for 1 hour after all reminders have been sent
       end #end of 'while' loop
     end #end of spawn do loop
@@ -83,6 +85,7 @@ module SpawnHelper
   def submission_reminder(assign, due_date)
     allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])
     emails = Array.new
+    logger.info "Inside submission_reminder for assignment #{assign.name}"
     for participant in allParticipants 
       userInfo = User.find(participant.user_id)                
       email = userInfo.email.to_s     
@@ -98,12 +101,13 @@ module SpawnHelper
     end#end of for loop
     #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
     email_remind(emails, assign_name, due_date, assign_type)
-    #puts "~~~~~~~~~~done submission reminders\n"
+    logger.info "Sent submission reminders for assignment #{assign.name}"
   end
 
   def review_reminder(assign, due_date)
     allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
     emails = Array.new
+    logger.info "Inside review_reminder for assignment #{assign.name}"
     for participant in allParticipants                
       email = User.find(participant.user_id).email     
       #puts "~~~~~~~~~~Email: #{email}\n"                  
@@ -141,11 +145,13 @@ module SpawnHelper
     end #end of the for loop for all participants of the assignment
     #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
     email_remind(emails, assign_name, due_date, assign_type)
+    logger.info "Sent review reminders for assignment #{assign.name}"
   end
 
   def metareview_reminder(assign, due_date)
     allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
     emails = Array.new
+    logger.info "Inside metareview_reminder for assignment #{assign.name}"
     for participant in allParticipants               
       email = User.find(participant.user_id).email      
       #puts "~~~~~~~~~~Email: #{email}\n"                  
@@ -171,6 +177,7 @@ module SpawnHelper
     end #end of the for loop
     #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
     email_remind(emails, assign_name, due_date, assign_type)
+    logger.info "Sent metareview reminders for assignment #{assign.name}"
   end
 
   def email_remind(emails, assign_name, due_date, assign_type)
@@ -186,13 +193,11 @@ module SpawnHelper
       if assign_type == "metareview"
         body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}." 
       end  
-      #puts "~~~~~~~~Message Body: #{body}\n"
       Mailer.deliver_message(
         {:bcc => emails,
          :subject => subject,
          :body => body
         })         
-     #puts "DONE!!"
   end
   
   def email_start(emails, assign_name)      

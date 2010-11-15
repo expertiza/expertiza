@@ -75,3 +75,5 @@ Rails::Initializer.run do |config|
 # }
   
 end
+
+require 'google_chart'

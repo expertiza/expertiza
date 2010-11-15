@@ -6,21 +6,21 @@ class Participant < ActiveRecord::Base
   	# Join to Assignments Table
 	# Added by: Jason Vorenkamp
 	# Added on: November 1, 2010
-	# Project: CSC 517 - OSS Project - 320 Assemssment
+	# Project: CSC 517 - OSS Project - 320 Assessment
 
 	belongs_to :assignment, :foreign_key => 'parent_id'
 
 	# Join to Response_Maps Table
 	# Added by: Jason Vorenkamp
 	# Added on: November 1, 2010
-	# Project: CSC 517 - OSS Project - 320 Assemssment
+	# Project: CSC 517 - OSS Project - 320 Assessment
 
 	has_many :response_maps, :foreign_key => 'reviewee_id'
 
 	# Join to Response Table
 	# Added by: Jason Vorenkamp
 	# Added on: November 1, 2010
-	# Project: CSC 517 - OSS Project - 320 Assemssment
+	# Project: CSC 517 - OSS Project - 320 Assessment
 
 	# TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
 	#has_many :responses, :through => :response_maps
@@ -139,7 +139,7 @@ class Participant < ActiveRecord::Base
 	# Returns the average score of all reviews for this user on this assignment
 	# Created by: Jason Vorenkamp
 	# Created on: November 1, 2010
-	# Project: CSC 517 - OSS Project - 320 Assemssment
+	# Project: CSC 517 - OSS Project - 320 Assessment
 
 	def getAverageScore()
 
@@ -164,7 +164,7 @@ class Participant < ActiveRecord::Base
 	# Params: question - The Question object to retrieve the scores from
 	# Created by: Jason Vorenkamp
 	# Created on: November 1, 2010
-	# Project: CSC 517 - OSS Project - 320 Assemssment
+	# Project: CSC 517 - OSS Project - 320 Assessment
 
 	def getAverageQuestionScore(question)
 

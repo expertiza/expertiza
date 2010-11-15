@@ -18,6 +18,21 @@ class Assignment < ActiveRecord::Base
   belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy  
     
+    # Join to Response_Maps Table
+	# Added by: Jason Vorenkamp
+	# Added on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
+
+	# Join to Response Table
+	# Added by: Jason Vorenkamp
+	# Added on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	# TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
+	# has_many :responses, :through => :response_maps, :source => 'response'
+    
   validates_presence_of :name
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
     
@@ -469,5 +484,174 @@ end
       end
     end
     end
+    
+    	# getTotalReviewsAssigned()
+	# Returns the number of reviewers assigned to a particular assignment
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getTotalReviewsAssigned()
+
+		self.response_maps.size
+
+	end
+
+	# getTotalReviewsAssignedByType()
+	# Returns the number of reviewers assigned to a particular assignment by the type of review
+	# Param: type - String (ParticipantReviewResponseMap, etc.)
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getTotalReviewsAssignedByType(type)
+
+		count = 0
+
+		self.response_maps.each { |x| if x.type == type then count = count + 1 end }
+
+		count
+
+	end
+
+	# getTotalReviewsCompleted()
+	# Returns the number of reviews completed for a particular assignment
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getTotalReviewsCompleted()
+
+		# TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+
+		# self.responses.size
+
+		responseCount = 0
+
+		self.response_maps.each do |response_map|
+
+			if !response_map.response.nil? then responseCount = responseCount + 1
+
+			end
+
+		end
+
+		responseCount
+
+	end
+
+	# getTotalReviewsCompletedByType()
+	# Returns the number of reviews completed for a particular assignment by type of review
+	# Param: type - String (ParticipantReviewResponseMap, etc.)
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getTotalReviewsCompletedByType(type)
+
+		# TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+
+		# self.responses.size
+
+		responseCount = 0
+
+		self.response_maps.each do |response_map|
+
+			if !response_map.response.nil? then 
+
+				if response_map.type == type then 
+
+					responseCount = responseCount + 1
+
+				end
+
+			end
+
+		end
+
+		responseCount
+
+	end
+
+	# getTotalReviewsCompletedByTypeByDate()
+	# Returns the number of reviews completed for a particular assignment by type of review
+	# Param: type - String (ParticipantReviewResponseMap, etc.)
+	# Param: date - Filter reviews that were not created on this date
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getTotalReviewsCompletedByTypeByDate(type, date)
+
+
+		# TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+
+		# self.responses.size
+
+		responseCount = 0
+
+		self.response_maps.each do |response_map|
+
+			if !response_map.response.nil? then 
+
+				if response_map.type == type then
+
+					if (response_map.response.created_at.to_datetime.to_date <=> date) == 0 then
+
+						responseCount = responseCount + 1
+
+					end
+
+				end
+
+			end
+
+		end
+
+		responseCount
+
+	end
+
+	# getPercentageReviewsCompleted()
+	# Returns the percentage of reviews completed as an integer (0-100)
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getPercentageReviewsCompleted()
+
+		if getTotalReviewsAssigned() == 0 then 0
+
+		else ((getTotalReviewsCompleted().to_f / getTotalReviewsAssigned().to_f) * 100).to_i
+
+		end
+
+	end
+
+	# getAverageScore()
+	# Returns the average of all responses for this assignment as an integer (0-100)
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getAverageScore()
+
+		sumOfScores = 0
+
+		self.response_maps.each do |response_map|
+
+			if !response_map.response.nil? then
+
+				sumOfScores = sumOfScores + response_map.response.getAverageScore
+
+			end
+
+		end
+
+		(sumOfScores / getTotalReviewsCompleted).to_i
+
+	end
+    
+    
 end
   

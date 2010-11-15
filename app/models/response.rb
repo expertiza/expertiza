@@ -120,7 +120,7 @@ class Response < ActiveRecord::Base
 	# Returns the average score for this response as an integer (0-100)
 	# Created by: Jason Vorenkamp
 	# Created on: November 1, 2010
-	# Project: CSC 517 - OSS Project - 320 Assemssment
+	# Project: CSC 517 - OSS Project - 320 Assessment
 
 	def getAverageScore()
 

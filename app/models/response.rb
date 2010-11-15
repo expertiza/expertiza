@@ -86,7 +86,7 @@ class Response < ActiveRecord::Base
 	# Returns the total score from this response
 	# Created by: Jason Vorenkamp
 	# Created on: November 1, 2010
-	# Project: CSC 517 - OSS Project - 320 Assemssment
+	# Project: CSC 517 - OSS Project - 320 Assessment
 
 	def getTotalScore()
 
@@ -104,7 +104,7 @@ class Response < ActiveRecord::Base
 	# Returns the maximum possible score for this response
 	# Created by: Jason Vorenkamp
 	# Created on: November 1, 2010
-	# Project: CSC 517 - OSS Project - 320 Assemssment
+	# Project: CSC 517 - OSS Project - 320 Assessment
 
 	def getMaximumScore()
 

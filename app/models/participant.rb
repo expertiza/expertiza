@@ -3,6 +3,28 @@ class Participant < ActiveRecord::Base
   has_many :comments
   has_many :resubmission_times 
   
+  	# Join to Assignments Table
+	# Added by: Jason Vorenkamp
+	# Added on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assemssment
+
+	belongs_to :assignment, :foreign_key => 'parent_id'
+
+	# Join to Response_Maps Table
+	# Added by: Jason Vorenkamp
+	# Added on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assemssment
+
+	has_many :response_maps, :foreign_key => 'reviewee_id'
+
+	# Join to Response Table
+	# Added by: Jason Vorenkamp
+	# Added on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assemssment
+
+	# TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
+	#has_many :responses, :through => :response_maps
+  
   validates_numericality_of :grade, :allow_nil => true
 
   def name
@@ -112,4 +134,64 @@ class Participant < ActiveRecord::Base
       self.update_attribute(:topic_id, topic_id)
     end
   end
+  
+  	# getAverageScore()
+	# Returns the average score of all reviews for this user on this assignment
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assemssment
+
+	def getAverageScore()
+
+		sumOfScores = 0
+
+		self.response_maps.each do |response_map|
+
+			if !response_map.response.nil? then
+
+				sumOfScores = sumOfScores + response_map.response.getAverageScore
+
+			end
+
+		end
+
+		(sumOfScores / self.response_maps.size).to_i
+
+	end
+
+	# getAverageScore(question)
+	# Returns the average score of one question from all reviews for this user on this assignment as an floating point number
+	# Params: question - The Question object to retrieve the scores from
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assemssment
+
+	def getAverageQuestionScore(question)
+
+		sumOfScores = 0
+
+		numberOfScores = 0
+
+		self.response_maps.each do |response_map|
+
+			# TODO There must be a more elegant way of doing this...
+
+			response_map.response.scores.each do |score|
+
+				if score.question == question then
+
+					sumOfScores = sumOfScores + score.score
+
+					numberOfScores = numberOfScores + 1
+
+				end
+
+			end
+
+		end
+
+		(((sumOfScores.to_f / numberOfScores.to_f) * 100).to_i) / 100.0
+
+	end
+  
 end

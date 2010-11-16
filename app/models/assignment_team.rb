@@ -1,6 +1,15 @@
 class AssignmentTeam < Team
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
+
+  def delete
+    if read_attribute(:type) == 'AssignmentTeam' # whose idea was it to use a ruby keyword for an attribute name?
+      signup = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
+      signup.each &:destroy
+    end
+
+    super
+  end
  
   def get_hyperlinks
     links = Array.new

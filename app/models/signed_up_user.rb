@@ -1,4 +1,5 @@
 class SignedUpUser < ActiveRecord::Base
+  belongs_to :topic, :class_name => 'SignUpTopic'
 
   def cancel_waitlists_of_users(creator_id, assignment_id)
     waitlisted_topics = SignedUpUser.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.creator_id = " + creator_id.to_s)
@@ -13,11 +14,12 @@ class SignedUpUser < ActiveRecord::Base
   end
 
   def self.find_team_participants(assignment_id)
-    @participants = SignedUpUser.find_by_sql("SELECT t.id as topic_id, t.topic_name as name , s.is_waitlisted as is_waitlisted, s.creator_id as team_id FROM signed_up_users s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = " + assignment_id)
+    @participants = SignedUpUser.find_by_sql("SELECT s.id as id, t.id as topic_id, t.topic_name as name , s.is_waitlisted as is_waitlisted, s.creator_id, s.creator_id as team_id FROM signed_up_users s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = " + assignment_id)
       i=0
       for participant in @participants
         participant_names = SignedUpUser.find_by_sql("SELECT s.name as u_name, t.name as team_name FROM users s, teams t, teams_users u WHERE t.id = u.team_id and u.user_id = s.id and t.id = " + participant.team_id)
         team_name_added = false
+        names = '(missing team)'
         for participant_name in participant_names
           if team_name_added == false
             names = "<br/> <b>" + participant_name.team_name + "</b>" + "<br/>" + participant_name.u_name + " "

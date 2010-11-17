@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101001183244) do
+ActiveRecord::Schema.define(:version => 20101016234906) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -60,6 +60,14 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
+
+  create_table "code_reviews", :force => true do |t|
+    t.text     "title"
+    t.text     "changes"
+    t.integer  "files_uploaded", :default => 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -330,6 +338,7 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
     t.string   "type"
     t.string   "handle"
     t.integer  "topic_id"
+    t.integer  "code_review_id"
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
@@ -397,6 +406,27 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   end
 
   add_index "resubmission_times", ["participant_id"], :name => "fk_resubmission_times_participants"
+
+  create_table "review_comments", :force => true do |t|
+    t.text     "comment"
+    t.text     "severity"
+    t.integer  "line_number"
+    t.integer  "review_file_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "review_files", :force => true do |t|
+    t.string   "file_path"
+    t.string   "file_name"
+    t.boolean  "accepted"
+    t.text     "file_comment"
+    t.integer  "code_review_id"
+    t.datetime "upload_time"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "review_strategies", :force => true do |t|
     t.string "name"

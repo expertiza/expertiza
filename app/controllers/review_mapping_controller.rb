@@ -58,7 +58,7 @@ class ReviewMappingController < ApplicationController
     reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
     requested_topic_id = params[:topic_id]
     
-    submission = DynamicReviewAssignmentHelper::dynamic_review_assignment( assignment.id , reviewer.id, requested_topic_id)
+    submission = DynamicReviewAssignmentHelper::dynamic_review_assignment(assignment.id, reviewer.id, requested_topic_id)
     
     if submission.nil?
         flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
@@ -67,7 +67,6 @@ class ReviewMappingController < ApplicationController
       contributor = AssignmentParticipant.find_by_id_and_parent_id(submission.id, assignment.id)
     
       potentialResponseDeadline = (DateTime.now.to_time + assignment.dynamic_reviewer_response_time_limit_hours.hours).to_datetime
-      msg = String.new
     
       begin
         if assignment.team_assignment
@@ -77,7 +76,7 @@ class ReviewMappingController < ApplicationController
                                          :reviewed_object_id => assignment.id, 
                                          :potential_response_deadline => potentialResponseDeadline)
           else
-            raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+            raise "The reviewer is already assigned to this contributor. This shouldn't happen."
           end
         else
           if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',contributor.id,reviewer.id]).nil?
@@ -86,14 +85,14 @@ class ReviewMappingController < ApplicationController
                                                 :reviewed_object_id => assignment.id, 
                                                 :potential_response_deadline => potentialResponseDeadline)
           else
-            raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+            raise "The reviewer is already assigned to this contributor. This shouldn't happen."
           end
         end
       rescue
-        msg = $!
+        flash[:error] = $!
       end
 
-      redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :msg => msg
+      redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
     end
   end
  

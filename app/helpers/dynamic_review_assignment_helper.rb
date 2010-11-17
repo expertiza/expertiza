@@ -1,6 +1,7 @@
 module DynamicReviewAssignmentHelper
 
   #  * The article was not written by the potential reviewer.
+  #  * The article was not already reviewed by the potential reviewer.
   #  * The article is not on the same topic as the potential reviewer has previously written about.
   #  * The article does not already have the maximum number of potential reviews in progress.
   #  * The article has the minimum number of reviews for that assignment.
@@ -65,21 +66,21 @@ module DynamicReviewAssignmentHelper
     return review_in_progress
   end
 
-  #  Sort the [submission = > review_count] pair
+  #  Sort the {submission => review_count} pair
   #  return the first submission that does not violate the conditions
-  #  After sorting , we have submissions with least review count at the top .
-  #  we can return the submission that does not violate the condition .
+  #  After sorting, we have submissions with least review count at the top.
+  #  we can return the submission that does not violate the condition.
   #TODO
   # You cannot review your own submission
   # The submission is currently on hold for review
   def self.find_submission_to_review()
-    if(@submissions_in_current_cycle.nil? == false &&  @submissions_in_current_cycle.size > 0)
-      @submissions_in_current_cycle.each { |submission|
-        if submission[0] != @reviewer_id # Check for more conditions here
+    unless @submissions_in_current_cycle.blank?
+      @submissions_in_current_cycle.each do |submission|
+        if submission[0] != @reviewer_id # TODO Check for the rest of the conditions here
           @submission_ready = submission[0]
           break
         end
-      }
+      end
     end
     return AssignmentParticipant.find_by_id_and_parent_id(@submission_ready,@assignment_id)
   end

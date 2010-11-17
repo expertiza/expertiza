@@ -110,6 +110,8 @@ class ResponseController < ApplicationController
       ResponseHelper.compare_scores(@response, @questionnaire)
      ScoreCache.update_cache(@res)
       msg = "Your response was successfully saved."
+      @map.potential_response_deadline = nil
+      @map.save
     rescue
       @response.delete
       msg = "Your response was not saved. Cause: "+$!

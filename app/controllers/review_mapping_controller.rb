@@ -376,7 +376,7 @@ class ReviewMappingController < ApplicationController
     }
   end  
   
-  def generate_reviewer_mappings
+  def generate_reviewer_mapping
     assignment = Assignment.find(params[:id])
     assignment.update_attribute('review_strategy_id',1)
     assignment.update_attribute('mapping_strategy_id',1)    

@@ -5,23 +5,26 @@ class ResponseController < ApplicationController
   
   def view
     @response = Response.find(params[:id])
+    return unless current_user_id?(@response.map.reviewer.user_id)
+
     @map = @response.map
     get_content  
   end   
   
-  def delete    
+  def delete
     @response = Response.find(params[:id])
     map_id = @response.map.id
     @response.delete
     redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
   end
   
-  def edit    
+  def edit
     @header = "Edit"
     @next_action = "update"
     
     @return = params[:return]
     @response = Response.find(params[:id]) 
+    return unless current_user_id?(@response.map.reviewer.user_id)
     @modified_object = @response.id
     @map = @response.map           
     get_content    

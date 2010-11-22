@@ -4,6 +4,8 @@ class StudentReviewController < ApplicationController
     DynamicReviewAssignmentHelper::remove_all_expired_reservations
   
     @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
+    
     @assignment  = @participant.assignment
     
     # Find the current phase that the assignment is in.

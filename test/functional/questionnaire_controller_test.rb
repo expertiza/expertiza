@@ -10,24 +10,29 @@ class QuestionnaireControllerTest < Test::Unit::TestCase
   fixtures :questionnaires
   fixtures :users
   fixtures :question_advices
+  fixtures :questions
   
   def setup
     @controller = QuestionnaireController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
     @Questionnaire = questionnaires(:questionnaire1).id
-    @request.session[:user] = User.find( users(:suadmin_user).id )
+    @request.session[:user] = User.find( users(:superadmin).id )
+    roleid = User.find(users(:superadmin).id).role_id
+    Role.rebuild_cache
+    Role.find(roleid).cache[:credentials]
+    @request.session[:credentials] = Role.find(roleid).cache[:credentials]
+    AuthController.set_current_role(roleid,@request.session)
   end
   #901 edit an questionnaire’s data
   def test_edit_questionnaire
-    post :edit_questionnaire, :id => @Questionnaire, :save => true, 
+    post :edit, {:id => @Questionnaire, :save => true, 
                        :questionnaire => {:name => "test edit name", 
-                                   :type_id => 2,
+                                   :type => "ReviewQuestionnaire",
                                    :min_question_score => 1,
-                                   :max_question_score => 3}
-                                  
-    assert_equal flash[:notice], 'questionnaire was successfully saved.'
-    assert_response :redirect
+                                   :max_question_score => 3}}
+    assert_response(:success)
+    assert_not_nil(Questionnaire.find(:first, :conditions => ["name = ?", "test edit name"]))
   end
   #802 Add an questionnaire with existing name  
   def test_create_questionnaire_with_existing_name
@@ -35,7 +40,8 @@ class QuestionnaireControllerTest < Test::Unit::TestCase
    # Because the goldberg variables didn't been initialized  in the test framework
     assert_raise (ActionView::TemplateError){
       post :create_questionnaire, :save => true, 
-                           :questionnaire => {:name => questionnaires(:questionnaire2).name, 
+                           :questionnaire => {:name => questionnaires(:questionnaire2).name,
+                                       :instructor_id => users(:instructor2).id,
                                        :type_id => 2,
                                        :min_question_score => 1,
                                        :max_question_score => 3, 
@@ -60,13 +66,12 @@ class QuestionnaireControllerTest < Test::Unit::TestCase
     assert_raise (ActionView::TemplateError){
       post :edit_questionnaire, :id => @Questionnaire, :save => true,:questionnaire => {:name => ""}
     }
-    assert_template 'questionnaire/edit_questionnaire'
   end
   
   # 1001 edit(save) rurbic's advice
   def test_save_advice
     
-    post :save_advice, :id => @Questionnaire, :advice =>  { "1"=> { :advice => "test" } }   
+    post :save_advice, :id => @Questionnaire, :advice =>  { "#{Fixtures.identify(:advice0)}"=> { :advice => "test" } }   
     
     assert_response :redirect
     assert_equal "The questionnaire's question advice was successfully saved", flash[:notice]

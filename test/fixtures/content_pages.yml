@@ -56,13 +56,13 @@ content_contact_us:
     content: |
       h1. Contact Us
       
-      Visit the Goldberg Project Homepage at "http://goldberg.rubyforge.org":http://goldberg.rubyforge.org for further information on Goldberg.  Visit the Goldberg RubyForge Project Info Page at "http://rubyforge.org/projects/goldberg":http://rubyforge.org/projects/goldberg to access the project's files and development information.
+      Visit the Goldberg Project Homepage at "http://goldberg.rubyforge.org":http://goldberg.rubyforge.org for further information on Goldberg.  Visit the Goldberg RubyForge Project Info Page at "http://rubyforge.org/projects/goldberg":http://rubyforge.org/projects/goldberg to access the project's files and development information.:
 
 content_site_admin:
     markup_style_id: <%= Fixtures.identify(:markup_style1) %>
     name: site_admin
     title: Site Administration
-    permission_id: <%= Fixtures.identify(:administer_site) %>
+    permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
     content: |
       h1. Goldberg Setup
       
@@ -113,13 +113,13 @@ content_site_admin:
       
       h2. System Settings
       
-      Go here to view and edit the settings that determine how Goldberg operates.
+      Go here to view and edit the settings that determine how Goldberg operates.:
 
 content_admin:
     markup_style_id: <%= Fixtures.identify(:markup_style1) %>
     name: admin
     title: Administration
-    permission_id: <%= Fixtures.identify(:administer_site) %>
+    permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
     content: |
       h1. Site Administration
       

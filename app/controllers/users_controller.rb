@@ -5,8 +5,7 @@ class UsersController < ApplicationController
          :redirect_to => { :action => :list }
 
   def index
-    list
-    render :action => 'list'
+    redirect_to :action => 'list'
   end
   
   def self.participants_in(assignment_id)
@@ -82,67 +81,52 @@ class UsersController < ApplicationController
   end
 
   def create
+    # if the user name already exists, register the user by email address
     check = User.find_by_name(params[:user][:name])
     if check != nil
       params[:user][:name] = params[:user][:email]
     end
-    @user = User.new(params[:user])
-    @user.parent_id = (session[:user]).id
     
-    if params[:user][:clear_password].length == 0 or
-        params[:user][:confirm_password] != params[:user][:clear_password]
-      flash[:error] = 'Passwords do not match.!'
+    @user = User.new(params[:user])
+    # record the person who created this new user
+    @user.parent_id = (session[:user]).id
+
+    if @user.save
+      #Instructor and Administrator users need to have a default set for their notifications
+      # the creation of an AssignmentQuestionnaires object with only the User ID field populated
+      # ensures that these users have a default value of 15% for notifications.
+      #TAs and Students do not need a default. TAs inherit the default from the instructor,
+      # Students do not have any checks for this information.
+      if @user.role.name == "Instructor" or @user.role.name == "Administrator"
+        AssignmentQuestionnaires.create(:user_id => @user.id)
+      end
+      flash[:notice] = 'User was successfully created.'
+      redirect_to :action => 'list'
+    else
       foreign
       render :action => 'new'
-    else
-      if @user.save
-        #Instructor and Administrator users need to have a default set for their notifications
-        # the creation of an AssignmentQuestionnaires object with only the User ID field populated
-        # ensures that these users have a default value of 15% for notifications.
-        #TAs and Students do not need a default. TAs inherit the default from the instructor,
-        # Students do not have any checks for this information.
-        if @user.role.name == "Instructor" or @user.role.name == "Administrator"
-          AssignmentQuestionnaires.create(:user_id => @user.id)
-        end
-        flash[:notice] = 'User was successfully created.'
-        redirect_to :action => 'list'
-      else
-        foreign
-        render :action => 'new'
-      end
     end
   end
 
+
   def edit
     @user = User.find(params[:id])
-    if @user.role_id
-      @role = Role.find(@user.role_id)
-    end
+    getRole
     foreign
   end
 
   def update
     @user = User.find(params[:id])   
-    if params[:user]['clear_password'] == ''
-      params[:user].delete('clear_password')
-    end
 
-    if params[:user][:clear_password] and
-        params[:user][:clear_password].length > 0 and
-        params[:user][:confirm_password] != params[:user][:clear_password]
-      flash[:error] = "The passwords you entered don't match"
+    if @user.update_attributes(params[:user])
+      flash[:notice] = 'User was successfully updated.'
+      redirect_to :action => 'show', :id => @user
+    else
       foreign
       render :action => 'edit'
-    else
-      if @user.update_attributes(params[:user])
-        flash[:notice] = 'User was successfully updated.'
-        redirect_to :action => 'show', :id => @user
-      else
-        foreign
-        render :action => 'edit'
-      end
     end
   end
+
 
   def destroy
     begin

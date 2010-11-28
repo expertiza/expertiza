@@ -8,11 +8,11 @@ class SurveyResponseController < ApplicationController
     
     @participants = AssignmentParticipant.find(:all, :conditions => ["user_id = ? and parent_id = ?", session[:user].id, params[:id]])
     if @participants.length == 0   #make sure the user is a participant of the assignment
-      AuthController.logout(session)  #otherwise kick them out for their tomfoolery!
+      #AuthController.logout(session)  #otherwise kick them out for their tomfoolery!
       redirect_to '/'
       return
     end
-    AuthController.clear_user_info(session, params[:id]) #ties the session to an assignment
+    #AuthController.clear_user_info(session, params[:id]) #ties the session to an assignment
   end
 
   def create
@@ -22,7 +22,7 @@ class SurveyResponseController < ApplicationController
        @survey = Questionnaire.find(params[:questionnaire_id])
        @questions = @survey.questions
        @course_eval=params[:course_eval]   
-       AuthController.clear_user_info(session, nil)
+       #AuthController.clear_user_info(session, nil)
        #@assigned_surveys = SurveyHelper::get_course_surveys(params[:course_id], 1)
        return
     end
@@ -67,7 +67,7 @@ class SurveyResponseController < ApplicationController
       @survey = @assigned_surveys[params[:count].to_i]
       @questions = @survey.questions
     rescue
-      AuthController.logout(session)
+      #AuthController.logout(session)
       redirect_to '/'
       return
     end

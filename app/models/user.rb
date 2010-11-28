@@ -1,6 +1,11 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
+  
+  acts_as_authentic do |c|
+    c.crypto_provider = Authlogic::CryptoProviders::Sha1
+  end
+
   has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id'
   has_many :assignments, :through => :participants
   
@@ -9,9 +14,6 @@ class User < ActiveRecord::Base
   has_many :teams_users
   has_many :teams, :through => :teams_users
   
-  validates_presence_of :name
-  validates_uniqueness_of :name
-
   attr_accessor :clear_password
   attr_accessor :confirm_password
   
@@ -39,19 +41,8 @@ class User < ActiveRecord::Base
     end
     return @role
   end
-    
-  def before_save
-    if self.clear_password  # Only update the password if it has been changed
-      self.password_salt = self.object_id.to_s + rand.to_s
-      self.password = Digest::SHA1.hexdigest(self.password_salt +
-                                             self.clear_password)
-    end
-  end
 
-  def after_save
-    self.clear_password = nil
-  end
-
+  ### WE WILL PROBABLY REMOVE THIS FUNCTION BECAUSE IT IS HANDLED BY AUTHLOGIC
   def check_password(clear_password)
     self.password == Digest::SHA1.hexdigest(self.password_salt.to_s +
                                                  clear_password)
@@ -135,5 +126,12 @@ class User < ActiveRecord::Base
   
   def set_courses_to_assignment 
     @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')    
+  end
+
+  def initialize(attributes = nil)
+    super(attributes)
+    @email_on_review = true
+    @email_on_submission = true
+    @email_on_review_of_review = true
   end
 end

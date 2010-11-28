@@ -19,7 +19,7 @@
       <tr><td><input name="commit" id="revert_button" type="submit" value="Revert" /></td></tr>	  
       <% end %>
     <% else %>
-	  <% form_tag :controller => 'auth', :action => 'logout' do %></td></tr>
+	  <tr><td><% form_tag :controller => 'auth', :action => 'logout' do %></td></tr>
   	  <tr><td><%= submit_tag "Logout" %></td></tr>
 	  <% end %>	
     <% end -%>

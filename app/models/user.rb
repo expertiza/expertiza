@@ -1,5 +1,3 @@
-require 'digest/sha1'
-
 class User < ActiveRecord::Base
   
   acts_as_authentic do |c|
@@ -16,7 +14,7 @@ class User < ActiveRecord::Base
   
   attr_accessor :clear_password
   attr_accessor :confirm_password
-  
+
   def list_mine(object_type, user_id)
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end
@@ -42,16 +40,14 @@ class User < ActiveRecord::Base
     return @role
   end
 
-  ### WE WILL PROBABLY REMOVE THIS FUNCTION BECAUSE IT IS HANDLED BY AUTHLOGIC
   def check_password(clear_password)
-    self.password == Digest::SHA1.hexdigest(self.password_salt.to_s +
-                                                 clear_password)
+    Authlogic::CryptoProviders::Sha1.matches?(password, *[password_salt, clear_password].compact)
   end
   
   # Generate email to user with new password
   #ajbudlon, sept 07, 2007   
   def send_password(clear_password) 
-    self.password = Digest::SHA1.hexdigest(self.password_salt.to_s + clear_password)
+    self.password = Authlogic::CryptoProviders::Sha1.encrypt(self.password_salt.to_s + clear_password)
     self.save
     
     Mailer.deliver_message(

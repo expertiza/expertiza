@@ -1,4 +1,5 @@
 class ExportFileController < ApplicationController
+=begin
   require 'fastercsv'
   
   def start    
@@ -13,4 +14,5 @@ class ExportFileController < ApplicationController
       :type => 'text/csv; charset=iso-8859-1; header=present',
       :disposition => "attachment; filename=#{filename}"              
   end
+=end
 end

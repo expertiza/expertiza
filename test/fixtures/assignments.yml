@@ -36,9 +36,9 @@ assignment<%= i %>:
   require_signup: <%= i==5 %>
   num_reviewers: <%= i%5+1 %>
   spec_location:
-  team_assignment: <=% i > 5 %>
+  team_assignment: <%= i > 5 %>
   wiki_type_id: <%= Fixtures.identify(:MediaWiki) %>
-  team_count: <=% 2*i %>
+  team_count: <%= 2*i %>
   
 <% end %>
 
@@ -62,7 +62,7 @@ assignment_team_count:
   require_signup: <%= 1 %>
   num_reviewers: <%= 2 %>
   spec_location:
-  team_assignment: <=% 1 %>
+  team_assignment: <%= 1 %>
   wiki_type_id: <%= Fixtures.identify(:MediaWiki) %>
   team_count: 2
  
@@ -86,7 +86,7 @@ assignment_review0:
   require_signup: <%= 1 %>
   num_reviewers: <%= 3 %>
   spec_location:
-  team_assignment: <=% 1 %>
+  team_assignment: <%= 1 %>
   team_count: 2
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %> 
  

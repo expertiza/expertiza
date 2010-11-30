@@ -12,15 +12,18 @@ class AssignmentParticipantTest < Test::Unit::TestCase
     row[3] = "s1"
     
     session = Hash.new
-    session[:user] = users(:superadmin)
+    session[:user] = User.find_by_name("suadmin")
     
-    id = assignments(:first).id
+#   newAssignment = Assignment.first
+#   id = newAssignment.id  
+    id = Assignment.first.id    
     
     pc = AssignmentParticipant.count
     AssignmentParticipant.import(row,session,id)
     # verify that a single user was added to participants table
     assert_equal pc+1,AssignmentParticipant.count 
     user = User.find_by_name("s1")
+#   user = User.find_by_name("student1")    
     # verify that correct user was added
     assert AssignmentParticipant.find_by_user_id(user.id)
   end

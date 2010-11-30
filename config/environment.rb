@@ -1,7 +1,7 @@
 # Be sure to restart your server when you modify this file
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.2.2'
+RAILS_GEM_VERSION = '2.3.10'
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
@@ -16,7 +16,7 @@ Rails::Initializer.run do |config|
 
   # Specify gems that this application depends on and have them installed with rake gems:install
   # config.gem "hpricot", :lib, :version => '0.6', :source => "http://code.whytheluckystiff.net"
-  config.gem 'fastercsv'
+  ########config.gem 'fastercsv'
   config.gem 'mysql'
   config.gem 'RedCloth'
   config.gem 'rgl', :lib => 'rgl/adjacency'
@@ -48,12 +48,13 @@ Rails::Initializer.run do |config|
        :secret => '3d70fee70cddd63552e8dd6ae6c788060af8fb015da5fef83d368abf37aa10c112d842d7c038420845109147779552cdd687ec4e2034cec3046dc439d8a468e'
   }
 
-  config.action_controller.session_store = :p_store
-  
+  config.action_controller.session_store = :active_record_store
+
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     :address => "smtp.ncsu.edu",
     :port => 25,
     :domain => "localhost"
   }
+
 end

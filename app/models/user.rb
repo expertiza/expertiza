@@ -41,7 +41,7 @@ class User < ActiveRecord::Base
   end
 
   def check_password(clear_password)
-    Authlogic::CryptoProviders::Sha1.matches?(password, *[password_salt, clear_password].compact)
+    Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + clear_password])
   end
   
   # Generate email to user with new password
@@ -126,6 +126,7 @@ class User < ActiveRecord::Base
 
   def initialize(attributes = nil)
     super(attributes)
+    Authlogic::CryptoProviders::Sha1.stretches = 1
     @email_on_review = true
     @email_on_submission = true
     @email_on_review_of_review = true

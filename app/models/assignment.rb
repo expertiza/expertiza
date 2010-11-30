@@ -1,5 +1,5 @@
 class Assignment < ActiveRecord::Base
-  require 'ftools'
+  #require 'ftools'
   include DynamicReviewMapping
   
   belongs_to :course, :class_name => 'Course', :foreign_key => 'course_id'

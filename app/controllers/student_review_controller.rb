@@ -35,13 +35,12 @@ class StudentReviewController < ApplicationController
     if @assignment.staggered_deadline?
       @review_mappings.each { |review_mapping|
           if @assignment.team_assignment
-            user_id = TeamsUser.find_all_by_team_id(review_mapping.reviewee_id)[0].user_id
-            participant = Participant.find_by_user_id_and_parent_id(user_id,@assignment.id)
+            participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
           else
-            participant = Participant.find_by_id(review_mapping.reviewee_id)
+            participant = review_mapping.reviewee_id
           end
 
-          if !participant.topic_id.nil?
+          if !participant.nil? and !participant.topic_id.nil?
             review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id,1)
 
             #The logic here is that if the user has at least one reviewee to review then @reviewee_topic_id should

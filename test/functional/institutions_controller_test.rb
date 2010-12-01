@@ -6,12 +6,13 @@ class InstitutionController; def rescue_action(e) raise e end; end
 
 class InstitutionsControllerTest < Test::Unit::TestCase
   fixtures :institutions
-  fixtures :users
+  fixtures :users, :roles
   def setup
     @controller = InstitutionController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
     @request.session[:user] = User.find(users(:superadmin).id)
+    Role.rebuild_cache
     AuthController.set_current_role(User.find(users(:superadmin).id).role_id,@request.session)
   end
 
@@ -37,39 +38,39 @@ class InstitutionsControllerTest < Test::Unit::TestCase
   # 403 Add a new institution with a name that already exists.
   def test_add_institution_with_duplicate_name
     number_of_institution = Institution.count
-    assert Institution.find(:all, :conditions => "name = 'Computer Science'");
-    post :create, :institution => { :name => 'Computer Science'}
+    assert_equal 1, Institution.count(:all, :conditions => "name = 'Test state university'");
+    post :create, :institution => { :name => 'Test state university'}
     #assert_template 'institution/new'
     #assert_equal Institution.count, number_of_institution
-    assert_equal 1, Institution.count(:all, :conditions => "name = 'Computer Science'");
+    assert_equal 1, Institution.count(:all, :conditions => "name = 'Test state university'");
   end
   
   # 404 Edit the name of a institution
   def test_edit_institution_with_valid_name
     number_of_institution = Institution.count
-    post :update,:id => 1, :institution => { :name => 'Biomedical Engineer'}
+    post :update,:id => institutions(:institution1).id, :institution => { :name => 'Biomedical Engineer'}
     assert_equal flash[:notice], 'Institution was successfully updated.'
-    assert_redirected_to :action => 'show', :id =>1
+    assert_redirected_to :action => 'show', :id => institutions(:institution1).id
     assert_equal Institution.count, number_of_institution
-    assert Institution.find(:all, :conditions => "name = 'Biomedical Engineer'");
+    assert_equal 1, Institution.count(:all, :conditions => "name = 'Biomedical Engineer'");
     #assert !Institution.find(:all, :conditions => "name = 'Computer Science'");
   end
 
   # 405 Change the name of a institution to an invalid institution name (name='')
   def test_edit_institution_with_invalid_name
     number_of_institution = Institution.count
-    post :update,:id => 1, :institution => { :name => ''}
+    post :update,:id => institutions(:institution0).id, :institution => { :name => ''}
     assert_equal Institution.count, number_of_institution
-    assert Institution.find(:all, :conditions => "name = 'Computer Science'");
+    assert_equal 1, Institution.count(:all, :conditions => "name = 'North Caroline State University'");
     assert !Institution.find(:all, :conditions => "name = ''");
   end
   
   # 406 Change the name of a institution to an existing institution name
   def test_edit_institution_with_duplicate_name
     number_of_institution = Institution.count
-    post :update,:id => 1, :institution => { :name => 'Electrical Engineering'}
+    post :update,:id => institutions(:institution0).id, :institution => { :name => institutions(:institution1).name}
     assert_equal Institution.count, number_of_institution
-    assert_equal 1, Institution.count(:all, :conditions => "name = 'Electrical Engineering'");
+    assert_equal 1, Institution.count(:all, :conditions => "name = 'Test state university'");
     #assert !Institution.find(:all, :conditions => "name = 'Computer Science'");
   end
   
@@ -78,7 +79,7 @@ class InstitutionsControllerTest < Test::Unit::TestCase
   # 501 Delete a institution
   def test_delete_institution
     number_of_institution = Institution.count
-    post :destroy,:id => 1
+    post :destroy,:id => institutions(:institution1)
     assert_redirected_to :action => 'list'
     assert_equal number_of_institution-1, Institution.count
     assert_raise(ActiveRecord::RecordNotFound){ Institution.find(1) }

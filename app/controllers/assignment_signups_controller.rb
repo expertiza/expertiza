@@ -1,9 +1,5 @@
 class AssignmentSignupsController < ApplicationController
 
-scaffold :signup_sheets
-scaffold :assignments
-scaffold :participants
-
   def index
     list
     render :action => 'list'

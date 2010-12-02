@@ -37,7 +37,7 @@ assignment<%= i %>:
   num_reviewers: <%= i%5+1 %>
   spec_location:
   team_assignment: <%= i > 5 %>
-  wiki_type_id: <%= Fixtures.identify(:MediaWiki) %>
+  wiki_type_id: 1
   team_count: <%= 2*i %>
   
 <% end %>

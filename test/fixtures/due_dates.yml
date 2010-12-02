@@ -21,14 +21,14 @@
 # 5 deadlines
 <% for j in 0..4 %>
 due_date<%= i*5+j %>:
-  due_at: <%= Time.now + 100000 %>
+  due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= dline_type_list[j] %>
   assignment_id: <%= Fixtures.identify("assignment"+i.to_s) %>
   late_policy_id: <%= Fixtures.identify("late_policy"+i.to_s) %>
   round: 1
 <% team_num = i*5+j+ 25 %>
 due_date<%= team_num %>:
-  due_at: <%= Time.now + 100000 %>
+  due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= dline_type_list[j] %>
   assignment_id: <%= Fixtures.identify("assignment"+team_num.to_s) %>
   late_policy_id: <%= Fixtures.identify("late_policy"+i.to_s) %>
@@ -37,7 +37,7 @@ due_date<%= team_num %>:
 
 <% for j in 0..4 %>
 due_date_review<%= j %>:
-  due_at: <%= Time.now + 100000 %>
+  due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= dline_type_list[j] %>
   assignment_id: <%= Fixtures.identify("assignment_review0") %>
   late_policy_id: <%= Fixtures.identify("late_policy0") %>

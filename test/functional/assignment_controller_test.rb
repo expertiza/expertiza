@@ -19,8 +19,8 @@ class AssignmentControllerTest < Test::Unit::TestCase
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
 
-    @request.session[:user] = User.find(users(:admin).id ) 
-    roleid = User.find(users(:admin).id).role_id 
+    @request.session[:user] = User.find(users(:instructor3).id ) 
+    roleid = User.find(users(:instructor3).id).role_id 
     Role.rebuild_cache
 
     Role.find(roleid).cache[:credentials] 
@@ -29,7 +29,7 @@ class AssignmentControllerTest < Test::Unit::TestCase
     @request.session[:credentials] = nil if @request.session[:credentials].is_a? YAML::Object
     @settings = SystemSettings.find(:first)    
     AuthController.set_current_role(roleid,@request.session) 
-    @request.session[:user] = User.find_by_name("suadmin")
+#   @request.session[:user] = User.find_by_name("suadmin")   #rsjohns3
   end
   
   # Test Case 1101

@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 require 'assignment_participant'
 
 class AssignmentParticipantTest < Test::Unit::TestCase
-  fixtures :assignments, :users
+  fixtures :assignments, :users, :roles
   
   def test_import
     row = Array.new

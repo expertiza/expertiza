@@ -42,7 +42,7 @@ class QuestionnaireControllerTest < Test::Unit::TestCase
       post :create_questionnaire, :save => true, 
                            :questionnaire => {:name => questionnaires(:questionnaire2).name,
                                        :instructor_id => users(:instructor2).id,
-                                       :type_id => 2,
+                                       :type => "ReviewQuestionnaire",
                                        :min_question_score => 1,
                                        :max_question_score => 3, 
                                        :id => @Questionnaire }

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class ReviewOfReviewScoreTest < Test::Unit::TestCase
   fixtures :review_of_review_scores

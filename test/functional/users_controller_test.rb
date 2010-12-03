@@ -5,8 +5,7 @@ require 'users_controller'
 class UsersController; def rescue_action(e) raise e end; end
 
 class UsersControllerTest < Test::Unit::TestCase
-  fixtures :users
-  fixtures :goldberg_system_settings
+  fixtures :users, :participants, :assignments, :wiki_types, :response_maps
   fixtures :roles
 # --------------------------------------------------------------
   set_fixture_class:system_settings => 'SystemSettings'    
@@ -72,19 +71,15 @@ class UsersControllerTest < Test::Unit::TestCase
     assert_equal "The passwords you entered don't match", flash[:error]
     assert_template 'users/edit'
   end
-  # 302 Remove a user whose role is lower than actor’s.
-  # This should work and is legal to do - CSC517 rsjohns3 11/20/2010
+  # test removing a user
   def test_destroy
-    assert_nothing_raised {
-      User.find(@testUser)
-    }
-  post :destroy, :id => @testUser
+    
+    user = User.find(users(:student9).id)
+    
+    numUsers = User.count
+    post :destroy,:id => user.id, :force => 1
     assert_response :redirect
     assert_redirected_to :action => 'list'
-#   assert_raise (ActiveRecord::RecordNotFound) {      
-#    User.find(@testUser)
-#  }
+    assert_equal numUsers-1, User.count
   end
-  # 303 Remove a user whose role is higher than or is the same with actor’s role.
-  # handle by goldberg, only super administrator can add/edit/delete users
 end

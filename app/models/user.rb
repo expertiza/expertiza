@@ -41,12 +41,14 @@ class User < ActiveRecord::Base
   end
 
   def check_password(clear_password)
+    Authlogic::CryptoProviders::Sha1.stretches = 1
     Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + clear_password])
   end
   
   # Generate email to user with new password
   #ajbudlon, sept 07, 2007   
   def send_password(clear_password) 
+    Authlogic::CryptoProviders::Sha1.stretches = 1
     self.password = Authlogic::CryptoProviders::Sha1.encrypt(self.password_salt.to_s + clear_password)
     self.save
     

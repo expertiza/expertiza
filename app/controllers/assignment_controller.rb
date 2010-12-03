@@ -1,5 +1,5 @@
 class AssignmentController < ApplicationController
-  require 'ftools'
+  #require 'ftools'
   auto_complete_for :user, :name
   before_filter :authorize
   

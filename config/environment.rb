@@ -22,7 +22,7 @@ Rails::Initializer.run do |config|
   config.gem 'rgl', :lib => 'rgl/adjacency'
   config.gem 'rubyzip', :lib => "zip/zip"
   config.gem 'authlogic'
-  raise 'graphviz dependency is not installed - missing dot executable' unless RUBY_PLATFORM =~ /mswin|i386-mingw32/ or %x(which dot).to_s.any?
+  raise 'graphviz dependency is not installed - missing dot executable' unless RUBY_PLATFORM =~ /mswin|i386-mingw32/ or not %x(which dot).to_s.empty?
 
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named

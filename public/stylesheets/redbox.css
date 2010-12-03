@@ -122,5 +122,9 @@ div#plus {
 	background-color: #999999;
 }
 
+.taskheader {
+    font-family: verdana; font-size: 13px; text-align:left;
+}
+
 
 

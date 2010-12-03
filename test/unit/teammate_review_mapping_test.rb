@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class TeammateReviewMappingTest < Test::Unit::TestCase
   fixtures :teammate_review_mappings

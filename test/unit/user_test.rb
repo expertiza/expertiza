@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class UserTest < Test::Unit::TestCase
   
@@ -30,7 +30,7 @@ class UserTest < Test::Unit::TestCase
                     :fullname => "test admin 1",
                     :role_id => "3")
     assert !user.save
-    assert_equal ActiveRecord::Errors.default_error_messages[:taken], user.errors.on(:name)
+    assert_equal I18n.translate('activerecord.errors.messages')[:taken], user.errors.on(:name)
   end
   
   # 103 Check valid user name and password   

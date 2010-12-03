@@ -3,7 +3,7 @@
 class ApplicationController < ActionController::Base
 
   helper_method :current_user_session, :current_user
-  protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
+  protect_from_forgery
 
   def authorize 
     unless session[:user]

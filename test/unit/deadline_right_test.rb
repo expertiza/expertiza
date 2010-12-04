@@ -1,4 +1,4 @@
-require 'test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 
 class DeadlineRightTest < Test::Unit::TestCase
   fixtures :deadline_rights

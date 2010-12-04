@@ -1,4 +1,4 @@
-require 'test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 
 class AuthorFeedbackQuestionnaireTest < Test::Unit::TestCase
   fixtures :author_feedback_questionnaires

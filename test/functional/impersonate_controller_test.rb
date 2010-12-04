@@ -2,7 +2,7 @@
 # Author: ajbudlon
 # Date: 7/18/2008
 
-require 'test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'impersonate_controller'
 
 # Re-raise errors caught by the controller.

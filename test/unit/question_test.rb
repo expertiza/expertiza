@@ -1,4 +1,4 @@
-require 'test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 
 class QuestionTest < Test::Unit::TestCase
   fixtures :questions

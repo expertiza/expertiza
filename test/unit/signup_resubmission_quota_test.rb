@@ -1,4 +1,4 @@
-require 'test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 
 class SignupResubmissionQuotaTest < Test::Unit::TestCase
   fixtures :signup_resubmission_quotas

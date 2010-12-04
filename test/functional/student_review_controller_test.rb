@@ -1,4 +1,4 @@
-require 'test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'student_review_controller'
 
 # Re-raise errors caught by the controller.

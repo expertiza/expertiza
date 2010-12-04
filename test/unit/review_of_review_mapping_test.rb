@@ -1,4 +1,4 @@
-require 'test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 
 class ReviewOfReviewMappingTest < Test::Unit::TestCase
   fixtures :review_of_review_mappings

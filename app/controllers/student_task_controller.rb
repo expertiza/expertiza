@@ -68,12 +68,14 @@ class StudentTaskController < ApplicationController
           #Checking metareview notifications
           rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(participant.id, participant.parent_id)
           for rmap in rmaps
-            mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id,rmap.id)
-            for mmap in mmaps
-              if mmap.notification_not_sent == false
-              @notifications << participant
-              break
-            end
+            mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.id)
+            if !mmaps.nil?
+              for mmap in mmaps
+                if mmap.notification_not_sent == false
+                  @notifications << participant
+                  break
+                end
+              end
 
             end
 

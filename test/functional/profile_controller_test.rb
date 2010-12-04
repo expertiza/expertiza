@@ -1,4 +1,4 @@
-require 'test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'profile_controller'
 
 # Re-raise errors caught by the controller.

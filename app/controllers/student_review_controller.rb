@@ -22,15 +22,9 @@ class StudentReviewController < ApplicationController
     # efficient way to do this.
     @num_reviews_completed = 0
     @review_mappings.each do |map|
-      @num_reviews_completed += 1 if map.potential_response_deadline.nil?
+      @num_reviews_completed += 1 if map.response
     end
-
-    # Calculate the number of reviews that are in progress for the current user for
-    # this assignment.
-    @num_reviews_in_progress = 0
-    @review_mappings.each do |map|
-      @num_reviews_in_progress += 1 unless map.potential_response_deadline.nil?
-    end
+    @num_reviews_in_progress = @review_mappings.size - @num_reviews_completed
 
     if @assignment.staggered_deadline?
       @review_mappings.each { |review_mapping|

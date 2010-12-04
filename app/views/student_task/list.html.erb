@@ -1,29 +1,102 @@
 <h1>Assignments</h1>
 <br/>
-<div class="flash_note">To begin, click on an assignment from the list above or <%= link_to 'click here', :controller => 'publishing', :action => 'view' %> to set <b>publishing rights</b> for your work.</div>
+<div class="flash_note">To begin, click on an assignment from the list above
+  or <%= link_to 'click here', :controller => 'publishing', :action => 'view' %> to set <b>publishing rights</b> for
+  your work.
+</div>
 <br/>
-<table class="listing" cellpadding=2>
-  <tr>
-	<th>&nbsp;</th>
-	<th>Assignment</th>
-	<th>Course</th>
-	<th>Topic</th>
-	<th>Current Stage</th>
-	<th>Stage Deadline</th>
-	<th>Publishing Rights</th>
-   </tr>
-	
-  <% for participant in @participants %>
-    <% if participant.assignment != nil %>
-      <tr class="listingRow">
-	    <td>&nbsp;</td>
-	    <td><%= link_to participant.assignment.name, :action => 'view', :id => participant %></td>
-	    <td><%= participant.get_course_string %></td>
-	    <td><%= participant.get_topic_string %></td>
-        <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
-	    <td><%= participant.assignment.get_stage_deadline(participant.topic_id) %></td>
-	    <td align=center><%if participant.permission_granted %>granted<% else %>denied<% end %></td>
-      </tr>
+
+
+<div style="width: 1024px">
+  <div class="taskbox">
+    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
+
+    <% for participant in @tasknotstarted
+        stage = participant.assignment.get_current_stage(participant.topic_id)
+        duedate = participant.assignment.get_stage_deadline(participant.topic_id)
+        controller = ""
+        action = ""
+        if stage == "submission" or stage == "resubmission"
+            controller = "submitted_content"
+            action = "edit"
+        elsif stage == "review" or stage == "rereview" or stage == "metareview"
+            controller = "student_review"
+            action = "list"
+        end
+    %>
+
+     <span>&nbsp; &raquo; <%= link_to participant.assignment.name + " " +
+             stage, :controller => controller, :action => action, :id => participant.id %>(<%=
+         time_ago_in_words(duedate) %> left) </span><br/>
+
     <% end %>
-  <% end %>
-</table>
+
+    <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
+    <% for participant in @taskrevisions
+        stage = participant.assignment.get_current_stage(participant.topic_id)
+        duedate = participant.assignment.get_stage_deadline(participant.topic_id)
+        controller = ""
+        action = ""
+        if stage == "submission" or stage == "resubmission"
+            controller = "submitted_content"
+            action = "edit"
+        elsif stage == "review" or stage == "rereview" or stage == "metareview"
+            controller = "student_review"
+            action = "list"
+        end
+    %>
+
+     <span>&nbsp; &raquo; <%= link_to participant.assignment.name + " " +
+             stage, :controller => controller, :action => action, :id => participant.id %>(<%=
+         time_ago_in_words(duedate) %> left) </span><br/>
+
+    <% end %>
+    <br/>
+
+    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @notifications.size.to_s %>&nbsp;</span> Notifications<br></strong><br>
+
+    <% for participant in @notifications
+        stage = participant.assignment.get_current_stage(participant.topic_id) %>
+
+     <span class="notification">&nbsp; &raquo; <%= link_to participant.assignment.name + ": " +
+             stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => participant.id %></span><br/>
+
+    <% end %>
+
+  </div>
+
+  <div class="topictable">
+    <span style="text-align:center; padding-left:10px;"><%= link_to "Generate Student Summary Report", :action => 'reportgen' %>
+      | <%= link_to "Percentage of reviews", :action => "percentage" %></span>
+    <br/>
+    <table class="listing" cellpadding="2">
+      <tr class="taskheader">
+        <th>&nbsp;</th>
+        <th>Assignment</th>
+        <th>Course</th>
+        <th>Topic</th>
+        <th>Current Stage</th>
+        <th>Stage Deadline</th>
+        <th>Publishing Rights</th>
+      </tr>
+
+      <% for participant in @participants %>
+          <% if participant.assignment != nil %>
+              <tr class="listingRow">
+                <td>&nbsp;</td>
+                <td><b><%= link_to participant.assignment.name, :action => 'view', :id => participant %></b></td>
+                <td>
+                  <% participant.get_course_string %></td>
+                <td><%= participant.get_topic_string %></td>
+                <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
+                <td><%= participant.assignment.get_stage_deadline(participant.topic_id) %></td>
+                <td align=center>
+                  <% if participant.permission_granted %>granted
+                  <% else %>denied
+                  <% end %></td>
+              </tr>
+          <% end %>
+      <% end %>
+    </table>
+  </div>
+</div>

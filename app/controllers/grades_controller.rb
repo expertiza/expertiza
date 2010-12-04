@@ -40,13 +40,13 @@ class GradesController < ApplicationController
 
     #deleting all metareview notifications
     rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
-    for rmap in rmaps
-      mmap = MetareviewResponseMap.find_by_reviewee_id_and_reviewer_id_and_reviewed_object_id(rmap.reviewer_id, rmap.reviewee_id, rmap.id)
-      if !mmap.nil?
-        mmap.notification_not_sent = true
-        mmap.save
-      end
-    end
+          for rmap in rmaps
+            mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id,rmap.id)
+            for mmap in mmaps
+              mmap.notification_not_sent = true
+              mmap.save
+            end
+          end
 
 end
     

@@ -22,13 +22,33 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     
-    @questions = Hash.new    
+    @questions = Hash.new
     questionnaires = @assignment.questionnaires
-    questionnaires.each{
-       |questionnaire|
-       @questions[questionnaire.symbol] = questionnaire.questions
-    }     
-  end  
+    questionnaires.each {
+            |questionnaire|
+      @questions[questionnaire.symbol] = questionnaire.questions
+    }
+
+    ## When user clicks on the notification, it should go away
+    #deleting all review notifications
+    rmaps = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(@participant.id, @participant.assignment.id)
+    for rmap in rmaps
+      rmap.notification_not_sent = true
+      rmap.save
+    end
+    ############
+
+    #deleting all metareview notifications
+    rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
+    for rmap in rmaps
+      mmap = MetareviewResponseMap.find_by_reviewee_id_and_reviewer_id_and_reviewed_object_id(rmap.reviewer_id, rmap.reviewee_id, rmap.id)
+      if !mmap.nil?
+        mmap.notification_not_sent = true
+        mmap.save
+      end
+    end
+
+end
     
   def edit    
     @participant = AssignmentParticipant.find(params[:id]) 

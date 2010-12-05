@@ -1,0 +1,30 @@
+<% currentUser = session[:user] %>
+<!--% form_tag :controller => 'review_mapping', :action => 'add_dynamic_reviewer', :assignment_id => assignment.id, :reviewer_id => session[:user].id do %-->
+<p>
+    Topics Available for Review 
+</p>
+<!-- Find all topics available in this assignment and list them-->
+<!-- TODO : if there are no topic , list submissions here -->
+<%@j = 0%>
+<% topics = SignUpTopic.find_all_by_assignment_id(assignment.id) %>
+<% if (topics != nil && topics.size >= 1) %>
+<% topics.each do |topic| %>
+<%@j = @j + 1%>
+<div>
+    <%= link_to "Topic" + @j.to_s, {:controller => 'review_mapping' , :action => '_show_available_submissions',
+    :topic_id => topic.id, :assignment_id => assignment.id, :reviewer_id => session[:user].id } %>
+</div>
+<div>
+    <%="Description of Topic : " + topic.topic_description.to_s %>
+</div>
+<br>
+
+<% end %>
+
+<% else %>
+<%= link_to "All Submissions", {:controller => 'review_mapping' , :action => '_show_available_submissions',
+    :topic_id => nil, :assignment_id => assignment.id, :reviewer_id => session[:user].id } %>
+<% end %>
+
+
+<!--% end %-->

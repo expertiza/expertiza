@@ -6,22 +6,81 @@ module DynamicReviewAssignmentHelper
   #  * The article does not already have the maximum number of potential reviews in progress.
   #  * The article has the minimum number of reviews for that assignment.
 
-  def self.dynamic_review_assignment(assignment_id , reviewer_id , topic_id)
-    @assignment_id = assignment_id
-    @current_assignment = Assignment.find(assignment_id)
-    @reviewer_id = reviewer_id
-    @topic_id = topic_id
-
-    # Check if any of the reserved submissions have passed the allocated time , if yes remove the record
-    remove_all_expired_reservations()
-
-    # Get all the submissions available
-    @submissions_in_current_cycle = find_submissions_in_current_cycle()
-    @submissions_in_progress = find_reviews_in_progress()
-
-    # Find the most suited submission which is ready for review based on round robin
-    find_submission_to_review()
-  end
+  def self.review_assignment(assignment_id , reviewer_id , topic_id, review_type )
+     @assignment_id = assignment_id
+     @current_assignment = Assignment.find(assignment_id)
+     @reviewer_id = reviewer_id
+     @topic_id = topic_id
+ 
+     if( review_type == "dynamic")
+      return dynamic_review_assignment(assignment_id , reviewer_id , topic_id)
+     elsif (review_type == "self")
+      return self_review_assignment(assignment_id , reviewer_id , topic_id)
+     end
+   end 
+   
+   def self.dynamic_review_assignment(assignment_id , reviewer_id , topic_id)
+     
+     # Check if any of the reserved submissions have passed the allocated time , if yes remove the record
+     remove_all_expired_reservations()
+ 
+     # Get all the submissions available
+     @submissions_in_current_cycle = find_submissions_in_current_cycle()
+     @submissions_in_progress = find_reviews_in_progress()
+ 
+     # Find the most suited submission which is ready for review based on round robin
+     find_submission_to_review()
+   end
+   
+   def self.self_review_assignment(assignment_id , reviewer_id , topic_id)
+         
+     # Get all the submissions available
+     @submissions_in_current_cycle = find_submissions_in_current_cycle()
+     puts @submissions_in_current_cycle
+     # Based on round robin , build a Map ( paricipant_id , {0/1/-1} )
+     # The submissions in current cycle is already a sorted Map ( paricipant_id , review_count)
+     # Once a submission is picked , it has a higher review count and thus until all the
+     # existing submissions reach the same number , it is unavailable. If the review_count reaches the max #reviews required
+     #  it is not available . ( 0 - available , 1 - currently not available & -1 not available)
+     
+     return build_submissions_availability()
+   end
+ 
+   # Max no of reviews ? currently assuming 5 
+   # The first element will have the least_review_count (as it is sorted) 
+   # based on this build the Map
+   
+   def self.build_submissions_availability()
+     least_review_count = -1;
+     max_no_reviews = 5
+     @submissions_availability = Hash.new
+     if(@submissions_in_current_cycle.nil? == false &&  @submissions_in_current_cycle.size > 0)
+       @submissions_in_current_cycle.each { |submission|
+ 
+         if( least_review_count == -1)
+           least_review_count = submission[1]
+         end
+         if submission[0] != @reviewer_id # Check for more conditions here
+           @submissions_availability[submission[0]] = get_state(least_review_count,submission[1],max_no_reviews)
+         end
+       }
+     end
+     return @submissions_availability
+   end
+      
+   # The current submissions are sorted , it the #review_count == max_review_count 
+   # it is not available and similarly #review_count > #least_review_count Currently 
+   # not avaliable , else equal available.
+       
+   def self.get_state(least_review_count,current_review_count,max_review_count)
+     if(current_review_count != -1 && current_review_count == max_review_count)
+       return -1
+     elsif(current_review_count != -1 && current_review_count > least_review_count)
+       return 1
+     elsif(current_review_count != -1 && current_review_count == least_review_count)
+       return 0
+     end
+   end 
 
   #
   #  Removes all dynamic response mappings that have expired.

@@ -2,6 +2,7 @@ class ReviewMappingController < ApplicationController
   auto_complete_for :user, :name
   use_google_charts
   helper :dynamic_review_assignment
+  helper :submitted_content
   
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
@@ -52,7 +53,61 @@ class ReviewMappingController < ApplicationController
     end    
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg    
   end
-
+  # Get all the available submissions 
+    def _show_available_submissions
+  
+      assignment = Assignment.find(params[:assignment_id])
+      reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+      requested_topic_id = params[:topic_id]
+      @available_submissions =  Hash.new
+      @available_submissions = DynamicReviewAssignmentHelper::review_assignment(assignment.id , reviewer.id, requested_topic_id , "self")
+      
+    end 
+  
+    # Add the entry into the Response Map
+    # TODO : remove the time_limit logic
+    def add_self_reviewer
+      assignment = Assignment.find(params[:assignment_id])
+      reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+      requested_topic_id = params[:topic_id]
+      submission = AssignmentParticipant.find_by_id_and_parent_id(params[:submission_id],assignment.id)
+      if submission.nil?
+        flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
+        redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
+      else
+        contributor = AssignmentParticipant.find_by_id_and_parent_id(submission.id, assignment.id)
+  
+        potentialResponseDeadline = (DateTime.now.to_time + assignment.dynamic_reviewer_response_time_limit_hours.hours).to_datetime
+        msg = String.new
+  
+        begin
+          if assignment.team_assignment
+            if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
+              TeamReviewResponseMap.create(:reviewee_id => contributor.id,
+              :reviewer_id => reviewer.id,
+              :reviewed_object_id => assignment.id,
+              :potential_response_deadline => potentialResponseDeadline)
+            else
+              raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+            end
+          else
+            if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',contributor.id,reviewer.id]).nil?
+              ParticipantReviewResponseMap.create(:reviewee_id => contributor.id,
+              :reviewer_id => reviewer.id,
+              :reviewed_object_id => assignment.id,
+              :potential_response_deadline => potentialResponseDeadline)
+            else
+              raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+            end
+          end
+        rescue
+          msg = $!
+        end
+  
+        redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :msg => msg
+      end
+    end 
+    
   def add_dynamic_reviewer
     assignment = Assignment.find(params[:assignment_id])
     reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)

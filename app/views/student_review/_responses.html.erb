@@ -41,7 +41,7 @@
                    <td>Begin</td><td> (Work has not yet been submitted)</td>
                 <%end%>
            <%end%>
-       <% else # no staggered deadline %>
+       <% else %><%# no staggered deadline %>
          <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
        <% end %>
 
@@ -50,7 +50,7 @@
          <td><%= link_to "Release Review Reservation",{:controller => 'review_mapping', :action => 'release_reservation', :id => map.id} %></td>
        <% end %>
 
-  	 <% else # Deadline has passed, and the work was not submitted %>
+  	 <% else %><% # Deadline has passed, and the work was not submitted %>
   	   <td>Begin</td><td> (Work has not yet been submitted)</td>
      <% end %>       
      </tr>  

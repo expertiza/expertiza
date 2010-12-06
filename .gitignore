@@ -1,3 +1,4 @@
 log
 tmp
 *.swp
+pg_data

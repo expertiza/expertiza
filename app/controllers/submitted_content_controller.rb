@@ -40,10 +40,6 @@ class SubmittedContentController < ApplicationController
     file = params[:uploaded_file]
     participant.set_student_directory_num
 
-    #send message to reviewers(s) when submission has been updated
-    #ajbudlon, sept 07, 2007
-    participant.assignment.email(participant.id)
-
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
@@ -65,6 +61,10 @@ class SubmittedContentController < ApplicationController
       SubmittedContentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
     participant.update_resubmit_times       
+
+    #send message to reviewers when submission has been updated
+    participant.assignment.email(participant.id)
+
     redirect_to :action => 'edit', :id => participant.id
   end
   

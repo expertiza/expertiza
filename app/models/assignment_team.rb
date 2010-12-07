@@ -14,7 +14,7 @@ class AssignmentTeam < Team
   def self.get_first_member(team_id)
     participant = nil
     begin
-      team = Team.find(review_mapping.reviewee_id)
+      team = Team.find(team_id)
       user_id = team.teams_users[0].user_id
       participant = Participant.find_by_user_id_and_parent_id(user_id,team.parent_id)
     rescue

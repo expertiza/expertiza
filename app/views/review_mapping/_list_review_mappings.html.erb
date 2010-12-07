@@ -43,9 +43,9 @@
                     @topics = ""
                     topics.each do |topic|
                         if topic.is_waitlisted?
-                            @topics = @topics + topic.topic_name + " " + "<font color='red'>(waitlisted)</font> <br/>"
+                            @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name} <font color='red'>(waitlisted)</font> <br/>"
                         else
-                            @topics = @topics + topic.topic_name + "<br/>"
+                            @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name}<br/>"
                         end
                     end
                 else

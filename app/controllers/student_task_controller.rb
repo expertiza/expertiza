@@ -25,9 +25,9 @@ class StudentTaskController < ApplicationController
 
       review_mappings.each { |review_mapping|
           if @assignment.team_assignment
-            participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)                     
+            participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
           else
-            participant = review_mapping.reviewee_id
+            participant = review_mapping.reviewee
           end
 
           if !participant.nil? and !participant.topic_id.nil?

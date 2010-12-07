@@ -31,7 +31,7 @@ class StudentReviewController < ApplicationController
           if @assignment.team_assignment
             participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
           else
-            participant = review_mapping.reviewee_id
+            participant = review_mapping.reviewee
           end
 
           if !participant.nil? and !participant.topic_id.nil?

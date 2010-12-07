@@ -15,7 +15,7 @@ class AssignmentTeam < Team
     participant = nil
     begin
       team = Team.find(team_id)
-      user_id = team.teams_users[0].user_id
+      user_id = team.teams_users.first.user_id
       participant = Participant.find_by_user_id_and_parent_id(user_id,team.parent_id)
     rescue NoMethodError => e
       puts "Ignoring error: #{e}"

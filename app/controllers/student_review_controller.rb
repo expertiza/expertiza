@@ -55,11 +55,13 @@ class StudentReviewController < ApplicationController
 
       @metareview_mappings.each do |metareview_mapping|
         #
-        review_mapping = ResponseMap.find(metareview_mapping.reviewed_object_id)
-        if @assignment.team_assignment?
-          participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
-        else
-          participant = review_mapping.reviewee
+        review_mapping = ResponseMap.find_by_id(metareview_mapping.reviewed_object_id)
+        if review_mapping
+          if @assignment.team_assignment?
+            participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
+          else
+            participant = review_mapping.reviewee
+          end
         end
 
         if participant && participant.topic_id

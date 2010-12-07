@@ -3,7 +3,7 @@ class AssignmentTeam < Team
   has_many :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
 
   def delete
-    if read_attribute(:type) == 'AssignmentTeam' # whose idea was it to use a ruby keyword for an attribute name?
+    if read_attribute(:type) == 'AssignmentTeam'
       signup = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
       signup.each &:destroy
     end
@@ -17,7 +17,10 @@ class AssignmentTeam < Team
       team = Team.find(team_id)
       user_id = team.teams_users[0].user_id
       participant = Participant.find_by_user_id_and_parent_id(user_id,team.parent_id)
-    rescue
+    rescue NoMethodError => e
+      puts "Ignoring error: #{e}"
+    rescue ActiveRecord::RecordNotFound => e
+      puts "Ignoring error: #{e}"
     end
     return participant
   end

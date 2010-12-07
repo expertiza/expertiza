@@ -28,7 +28,7 @@ class StudentReviewController < ApplicationController
 
     if @assignment.staggered_deadline?
       @review_mappings.each { |review_mapping|
-          if @assignment.team_assignment
+          if @assignment.team_assignment?
             participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
           else
             participant = review_mapping.reviewee
@@ -53,23 +53,23 @@ class StudentReviewController < ApplicationController
       end
 
 
-      @metareview_mappings.each { |metareview_mapping|
+      @metareview_mappings.each do |metareview_mapping|
         #
         review_mapping = ResponseMap.find(metareview_mapping.reviewed_object_id)
         if @assignment.team_assignment?
-          team = TeamsUser.find_all_by_team_id(review_mapping.reviewee_id)
-          participant = Participant.find_by_user_id_and_parent_id(team.first.user_id,@assignment.id)
+          participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
         else
-          participant = Participant.find(review_mapping.reviewee_id)
+          participant = review_mapping.reviewee
         end
-         if !participant.topic_id.nil?
-            meta_review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(participant.topic_id,deadline_type_id,review_rounds)
 
-            if meta_review_due_date.due_at < Time.now
-              @meta_reviewee_topic_id = participant.topic_id
-            end
+        if participant && participant.topic_id
+          meta_review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(participant.topic_id,deadline_type_id,review_rounds)
+
+          if meta_review_due_date.due_at < Time.now
+            @meta_reviewee_topic_id = participant.topic_id
           end
-       }
+        end
+      end
     end
 
   end  

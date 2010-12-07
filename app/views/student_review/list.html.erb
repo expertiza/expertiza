@@ -1,6 +1,6 @@
 <h2>Reviews for <%= @assignment.name %></h2>
 
-<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage() == "Complete" %> 
+<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@reviewee_topic_id) == "Complete" %> 
   <p>
     You have completed <b><%=h pluralize(@num_reviews_completed, 'review') %></b>, 
     with <b><%=h pluralize(@num_reviews_in_progress, 'review') %></b> outstanding.

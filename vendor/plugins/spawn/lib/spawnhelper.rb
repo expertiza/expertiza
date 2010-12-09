@@ -13,7 +13,7 @@ module SpawnHelper
         # find all assignments in database                
         #allAssign = Assignment.find(:all)
         #query to pick only those assignments that were created in the last 2 weeks - to avoid picking all assignments
-        allAssign = Assignment.find(:all, :conditions => ["created_at >= ? AND created_at <= ?", Time.now - 1209600, Time.now]) 
+        allAssign = Assignment.find(:all, :include => {:participants => :user}, :conditions => ["created_at >= ? AND created_at <= ?", Time.now - 1209600, Time.now]) 
         for assign in allAssign
           #puts "~~~~~~~~~~assignment name #{assign.name}, id #{assign.id}"
           #puts "~~~~~~~~~~Enter assignment #{assign.name}, time.now is #{Time.now}\n and assign.created_at #{assign.created_at} and diff #{(Time.now - 14400) - assign.created_at}\n"
@@ -86,13 +86,13 @@ module SpawnHelper
     allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])
     emails = Array.new
     Rails.logger.info "Inside submission_reminder for assignment #{assign.name}"
+    assign_type = DeadlineType.find(due_date.deadline_type_id).name
     for participant in allParticipants 
       userInfo = User.find(participant.user_id)                
       email = userInfo.email.to_s     
       #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
-      assign_type = DeadlineType.find(due_date.deadline_type_id).name
       #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
       #puts "~~~~~~~~~~Sending submission_reminder if no submissions found ... submitted at nil #{(participant.submitted_at == nil)} .. hyperlink nil #{participant.submitted_hyperlink == nil} hyperlink empty #{participant.submitted_hyperlink != ""}\n"
       if(participant.submitted_at == nil && (participant.submitted_hyperlink == nil || participant.submitted_hyperlink == ""))#if(participant.has_submissions == false)

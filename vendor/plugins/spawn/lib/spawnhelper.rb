@@ -9,7 +9,7 @@ module SpawnHelper
     spawn do        
       while true do        
         puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
-        logger.info "Thread running, time #{Time.now}.\n"
+        Rails.logger.info "Thread running, time #{Time.now}.\n"
         # find all assignments in database                
         #allAssign = Assignment.find(:all)
         #query to pick only those assignments that were created in the last 2 weeks - to avoid picking all assignments
@@ -76,7 +76,7 @@ module SpawnHelper
           #MUST SET A FLAG TO INDICATE THAT REMINDERS HAVE BEEN SENT TO A PARTICIPANT OF AN ASSIGNMENT FOR A SPECIFIC ASSIGNMENT TYPE
           #ELSE THEY WILL GET SPAMMED WITH MESSAGES EVERY HOUR
         end #end 'for' loop for all assignmnets
-        logger.info "Thread going to sleep, time #{Time.now}.\n"
+        Rails.logger.info "Thread going to sleep, time #{Time.now}.\n"
         sleep 3600 #sleeps for 1 hour after all reminders have been sent
       end #end of 'while' loop
     end #end of spawn do loop
@@ -85,7 +85,7 @@ module SpawnHelper
   def submission_reminder(assign, due_date)
     allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])
     emails = Array.new
-    logger.info "Inside submission_reminder for assignment #{assign.name}"
+    Rails.logger.info "Inside submission_reminder for assignment #{assign.name}"
     for participant in allParticipants 
       userInfo = User.find(participant.user_id)                
       email = userInfo.email.to_s     
@@ -101,13 +101,13 @@ module SpawnHelper
     end#end of for loop
     #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
     email_remind(emails, assign_name, due_date, assign_type)
-    logger.info "Sent submission reminders for assignment #{assign.name}"
+    Rails.logger.info "Sent submission reminders for assignment #{assign.name}"
   end
 
   def review_reminder(assign, due_date)
     allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
     emails = Array.new
-    logger.info "Inside review_reminder for assignment #{assign.name}"
+    Rails.logger.info "Inside review_reminder for assignment #{assign.name}"
     for participant in allParticipants                
       email = User.find(participant.user_id).email     
       #puts "~~~~~~~~~~Email: #{email}\n"                  
@@ -145,13 +145,13 @@ module SpawnHelper
     end #end of the for loop for all participants of the assignment
     #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
     email_remind(emails, assign_name, due_date, assign_type)
-    logger.info "Sent review reminders for assignment #{assign.name}"
+    Rails.logger.info "Sent review reminders for assignment #{assign.name}"
   end
 
   def metareview_reminder(assign, due_date)
     allParticipants = Participant.find(:all, :conditions => ["parent_id = ?", assign.id])      
     emails = Array.new
-    logger.info "Inside metareview_reminder for assignment #{assign.name}"
+    Rails.logger.info "Inside metareview_reminder for assignment #{assign.name}"
     for participant in allParticipants               
       email = User.find(participant.user_id).email      
       #puts "~~~~~~~~~~Email: #{email}\n"                  
@@ -177,7 +177,7 @@ module SpawnHelper
     end #end of the for loop
     #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
     email_remind(emails, assign_name, due_date, assign_type)
-    logger.info "Sent metareview reminders for assignment #{assign.name}"
+    Rails.logger.info "Sent metareview reminders for assignment #{assign.name}"
   end
 
   def email_remind(emails, assign_name, due_date, assign_type)

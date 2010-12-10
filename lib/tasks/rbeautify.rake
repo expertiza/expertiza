@@ -22,7 +22,7 @@
 PVERSION = "Version 2.9, 10/24/2008"
 
 namespace :utils do
-  desc 'Modify a ruby source code file to enforce the ruby coding style. Usage: rake utils:rbeautify[file_path]'
+  desc 'Modify a ruby source code file to enforce the ruby coding style'
   task :rbeautify, :file_name do |t, args|
     error = false
     error = RBeautify.beautify_file(args[:file_name])
@@ -30,6 +30,7 @@ namespace :utils do
       return error
     else
       puts "File #{args[:file_name]} modified successfully"
+      %x[rm #{args[:file_name]}~]
     end
   end
 end

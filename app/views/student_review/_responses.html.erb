@@ -1,21 +1,23 @@
 <table cellspacing="5">
 <% review_no = 1%>
 <% mappings.each do | map | %> 
-   <%if @assignment.team_assignment?%>
-     <%if map.type.to_s == "MetareviewResponseMap"%>
-       <% review_mapping = ResponseMap.find(map.reviewed_object_id) %>
+  <tr>
+    <td><%= title %> <%= review_no %></td>
+     <%if @assignment.team_assignment?%>
+       <%if map.type.to_s == "MetareviewResponseMap"%>
+          <%review_mapping = ResponseMap.find(map.reviewed_object_id)%>
        <% participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id) %>
-     <%else%>
+       <%else%>
        <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
-     <%end%>
-   <%else%>
-     <%if map.type.to_s == "MetareviewResponseMap"%>
-       <% review_mapping = ResponseMap.find(map.reviewed_object_id) %>
-       <% participant = review_mapping.reviewee %>
+       <%end%>
      <%else%>
+       <%if map.type.to_s == "MetareviewResponseMap"%>
+          <%review_mapping = ResponseMap.find(map.reviewed_object_id)%>
+       <% participant = review_mapping.reviewee %>
+       <%else%>
        <% participant = map.reviewee %>
+       <%end%>
      <%end%>
-   <%end%>
 
    <% if participant %>
      <tr><td><%= @assignment.name %> <%= title %> <%= review_no %></td>
@@ -23,9 +25,9 @@
      <% if map.response %>            
        <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
        <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
-         <td><%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
-       <% end %>
-
+        <td><%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
+			<% end %>
+           
      <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
        <%if @assignment.staggered_deadline?%>
            <%if map.type.to_s == "MetareviewResponseMap"%>
@@ -41,21 +43,16 @@
                    <td>Begin</td><td> (Work has not yet been submitted)</td>
                 <%end%>
            <%end%>
-       <% else %><%# no staggered deadline %>
+       <% else %>
          <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
        <% end %>
 
-       <% if @assignment.dynamic_reviewer_assignments_enabled %>
-         <td>Reserved for review until: <%=h map.potential_response_deadline %></td>
-         <td><%= link_to "Release Review Reservation",{:controller => 'review_mapping', :action => 'release_reservation', :id => map.id} %></td>
-       <% end %>
-
      <% else %><% # Deadline has passed, and the work was not submitted %>
-       <td>Begin</td><td> (Work has not yet been submitted)</td>
+  	   <td>Begin</td><td> (Work has not yet been submitted)</td>
      <% end %>       
 
      </tr>  
      <% review_no += 1 %>
-   <% end %>
+<% end %>
 <% end %>
 </table>

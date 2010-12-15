@@ -1,0 +1,34 @@
+<script type="text/javascript">
+function onReviewTypeChange(){
+	document.poppedLayer5 = eval('document.getElementById("max_reviews_table_row")');
+	var dropdownIndex = document.getElementById('assignment_review_assignment_strategy').selectedIndex;
+	var dropdownValue = document.getElementById('assignment_review_assignment_strategy')[dropdownIndex].value;
+
+	if(dropdownValue == "<%= Assignment::RS_INSTRUCTOR_SELECTED %>"){
+		document.poppedLayer5.style.display = "none";
+	}else{
+		document.poppedLayer5.style.display = "";
+	}
+}
+</script>
+
+<hr />
+
+<table>
+ <tr>
+  <td style="width:250px"><label for="review_assignment_strategy">Choose a review strategy:</label></td>
+  <td>
+    <select id="assignment_review_assignment_strategy" name="assignment[review_assignment_strategy]" onchange="onReviewTypeChange();">
+  	  <% Assignment::REVIEW_STRATEGIES.each do | strategy | %>
+        <option value="<%= strategy %>"><%= strategy %></option>
+      <% end %>
+    </select>
+  </td>
+ </tr>
+  
+ <!--<tr id="max_reviews_table_row" style="display:none">
+  <td><label for="max_reviews_per_submission">Maximum number of reviews per submission:</label></td>
+  <td><%= text_field :assignment, :max_reviews_per_submission, :size => 5, :value => Assignment::DEFAULT_MAX_REVIEWERS.to_s  %></td>
+ </tr>-->
+
+</table>

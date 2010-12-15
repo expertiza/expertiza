@@ -6,33 +6,36 @@ module DynamicReviewAssignmentHelper
   #  * The article does not already have the maximum number of potential reviews in progress.
   #  * The article has the minimum number of reviews for that assignment.
 
-  def self.review_assignment(assignment_id , reviewer_id , topic_id, review_type )
+  def self.review_assignment(assignment_id, reviewer_id, topic_id, review_type )
      @assignment_id = assignment_id
      @current_assignment = Assignment.find(assignment_id)
      @reviewer_id = reviewer_id
      @topic_id = topic_id
+
+     puts "Assignment ID      " + @assignment_id.to_s
+     puts "Current Assignment " + @current_assignment.to_s
+     puts "Reviewer ID        " + @reviewer_id.to_s
+     puts "Topic ID           " + @topic_id.to_s
  
-     if( review_type == "dynamic")
-      return dynamic_review_assignment(assignment_id , reviewer_id , topic_id)
-     elsif (review_type == "self")
-      return self_review_assignment(assignment_id , reviewer_id , topic_id)
+     if( review_type == Assignment::RS_AUTO_SELECTED)
+       return auto_selected_review_assignment( )
+     elsif (review_type == Assignment::RS_STUDENT_SELECTED)
+       return student_selected_review_assignment( )
+     else
+       return nil
      end
    end 
    
-   def self.dynamic_review_assignment(assignment_id , reviewer_id , topic_id)
+   def self.auto_selected_review_assignment( )
      
-     # Check if any of the reserved submissions have passed the allocated time , if yes remove the record
-     remove_all_expired_reservations()
- 
      # Get all the submissions available
-     @submissions_in_current_cycle = find_submissions_in_current_cycle()
-     @submissions_in_progress = find_reviews_in_progress()
- 
+     candidates_for_review = find_submissions_in_current_cycle()
+
      # Find the most suited submission which is ready for review based on round robin
-     find_submission_to_review()
+     return find_submission_to_review( candidates_for_review )
    end
    
-   def self.self_review_assignment(assignment_id , reviewer_id , topic_id)
+   def self.student_selected_review_assignment( )
          
      # Get all the submissions available
      @submissions_in_current_cycle = find_submissions_in_current_cycle()
@@ -82,27 +85,27 @@ module DynamicReviewAssignmentHelper
      end
    end 
 
-  #
-  #  Removes all dynamic response mappings that have expired.
-  #  NOTE: This is not assignment specific, and clears ALL expired potential responses.
-  #
-  def self.remove_all_expired_reservations()
-    mappings_to_delete = ResponseMap.find(:all, :conditions => ["potential_response_deadline IS NOT NULL and potential_response_deadline < ?", DateTime.now])
-    mappings_to_delete.each { |rm| rm.delete }
-  end
- 
   # Find all the submissions for this cycle
   # Build a Map from  (participant_id  => review_count)
   # TODO On Max no of Reviews ,  no longer can be reviewed
   def self.find_submissions_in_current_cycle()
+
+    #
+    #  If the user selected a topic, then filter by that topic first to get a list of all
+    #  submissions that have been made for this particular assignment. The 'AssignmentParticipant'
+    #  model represents a submission for an assignment (among other things).
+    #
     if @topic_id.blank?
       submissions_in_current_cycle = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
     else
       submissions_in_current_cycle = AssignmentParticipant.find_all_by_topic_id_and_parent_id(@topic_id , @assignment_id)
     end
 
+    #  Create a new Hash to store the number of reviews that have already been done (or are in progress) for
+    #  each submission.
     @submission_review_count = Hash.new
-    submissions_in_current_cycle.each do |submission| 
+    submissions_in_current_cycle.each do |submission|
+      # Each 'ResponseMap' entry indicates a review has been performed or is in progress.
       existing_maps = ResponseMap.find_all_by_reviewee_id_and_reviewed_object_id( submission.id, @assignment_id )
       if existing_maps.nil?
         @submission_review_count[submission.id] = 0 # There are no reviews in progress (potential or completed).
@@ -110,19 +113,10 @@ module DynamicReviewAssignmentHelper
         @submission_review_count[submission.id] = existing_maps.size
       end
     end
+
+    # Sort and return the list of submissions by the number of reviews that they have.
     sorted_review_count =  @submission_review_count.sort {|a, b| a[1]<=>b[1]}
     return sorted_review_count
-  end
-
-  # Find all the submissions that are in progress
-  # build a list of [ResponseMap.reviewed_object_id]
-  def self.find_reviews_in_progress()
-    review_in_progress  = Array.new
-    submission_in_progress =  ResponseMap.find(:all, :conditions => ["potential_response_deadline IS NOT NULL and reviewed_object_id = ?", @assignment_id])
-    submission_in_progress.each do |in_progress|
-      review_in_progress << in_progress.reviewed_object_id
-    end
-    return review_in_progress
   end
 
   #  Sort the {submission => review_count} pair
@@ -132,15 +126,47 @@ module DynamicReviewAssignmentHelper
   #TODO
   # You cannot review your own submission
   # The submission is currently on hold for review
-  def self.find_submission_to_review()
-    unless @submissions_in_current_cycle.blank?
-      @submissions_in_current_cycle.each do |submission|
-        if submission[0] != @reviewer_id # TODO Check for the rest of the conditions here
-          @submission_ready = submission[0]
-          break
-        end
+  def self.find_submission_to_review( candidates_for_review )
+
+    #  If there are no submissions ready for review, then return nil.
+    if candidates_for_review.size == 0
+      return nil
+    end
+
+    #  Go through the list of submissions that are candidates for review and return the
+    #  first one that meets all of the specified criteria.
+    candidates_for_review.each do |candidate_submission|
+      submission_to_review = is_candidate_submission_valid_for_review(candidate_submission[0],
+                                                                      @assignment_id,
+                                                                      @reviewer_id)
+      #  If this candidate passed all of the checks, then it should
+      #  be reviewed.
+      if !submission_to_review.nil?
+        return submission_to_review
       end
     end
-    return AssignmentParticipant.find_by_id_and_parent_id(@submission_ready,@assignment_id)
+
+    #  No candidates were found to review.
+    return nil
   end
+
+  #  Determine if the given submission can be reviewed by the current
+  #  reviewer.
+  def self.is_candidate_submission_valid_for_review(submission_id, assignment_id, reviewer_id)
+    submission = AssignmentParticipant.find_by_id_and_parent_id(submission_id, assignment_id)
+
+    #  If the submission was done by the reviewer, then do not continue.
+    if submission.id == reviewer_id
+      return nil
+    end
+
+    #  If the submission was already reviewed by the reviewer, then do not continue.
+    if !ResponseMap.find_by_reviewed_object_id_and_reviewer_id( submission.parent_id, reviewer_id ).nil?
+      return nil
+    end
+
+    #  Found a valid submission, return it.
+    return submission
+  end
+
 end

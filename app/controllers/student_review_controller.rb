@@ -1,8 +1,5 @@
 class StudentReviewController < ApplicationController
-  def list
-    #  Clean up any stale review reservations first.
-    DynamicReviewAssignmentHelper::remove_all_expired_reservations
-  
+  def list 
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     
@@ -18,13 +15,15 @@ class StudentReviewController < ApplicationController
     end
     @metareview_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)  
 
-    # Calculate the number of reviews that the user has completed so far. Probably a more
-    # efficient way to do this.
-    @num_reviews_completed = 0
+    # Calculate the number of reviews that the user has completed so far.
+    @num_reviews_total       = @review_mappings.size
+
+    @num_reviews_completed   = 0
     @review_mappings.each do |map|
       @num_reviews_completed += 1 if map.response
     end
-    @num_reviews_in_progress = @review_mappings.size - @num_reviews_completed
+
+    @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
 
     if @assignment.staggered_deadline?
       @review_mappings.each { |review_mapping|

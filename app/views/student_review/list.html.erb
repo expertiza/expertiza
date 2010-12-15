@@ -1,27 +1,24 @@
-<h2>Reviews for <%= @assignment.name %></h2>
+<h2>Reviews for "<%= @assignment.name %>"</h2>
 
 <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@reviewee_topic_id) == "Complete" %> 
-  <p>
-    You have completed <b><%=h pluralize(@num_reviews_completed, 'review') %></b>, 
-    with <b><%=h pluralize(@num_reviews_in_progress, 'review') %></b> outstanding.
-  </p>  
-  
+ 
   <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
   
-  <% if @assignment.dynamic_reviewer_assignments_enabled? %>
-    <h3>Review a New Submission</h3>
-    <% if @num_reviews_in_progress == 0 %>
-      <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment} %>
-    <% else %>
-      <em>Please complete (or release the reservation on) your current review before requesting another submission to review.</em> 
-    <% end %>  
+  <% if @assignment.is_using_dynamic_reviewer_assignment? %>
+    <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
+      <% if @num_reviews_in_progress == 0 %>
+        <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment} %>
+      <% end %>
+    <% elsif @assignment.review_assignment_strategy == Assignment::RS_STUDENT_SELECTED %>
+      <%= render :partial => 'set_self_review', :locals => {:assignment => @assignment} %>
+    <% end %>
   <% end %>
 
 <% else %>
   <p><em>Reviews cannot be performed at this time</em></p>
 <% end %>
 
-<h2>Metareviews for <%= @assignment.name %></h2>
+<h2>Metareviews for "<%= @assignment.name %>"</h2>
 
 <% if @assignment.metareview_allowed(@meta_reviewee_topic_id) or @assignment.get_current_stage() == "Complete" %>
   <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>

@@ -25,7 +25,7 @@ class Participant < ActiveRecord::Base
   end
   
   def force_delete(maps)
-    times = ResubmissionTime.find(:first, :conditions => ['participant_id = ?',self.id])    
+    times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])    
     
     if times
       times.each { |time| time.destroy }

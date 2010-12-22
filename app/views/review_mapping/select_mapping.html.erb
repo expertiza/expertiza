@@ -1,11 +1,13 @@
 <h1>Mapping Strategies for <%= @assignment.name %></h1>
 
+<% if !(SignUpTopic.find(:first, :conditions => ['assignment_id = ?',@assignment.id])).nil?%>
+    <% mapping_type = 'automatic_reviewer_mapping' %>
+<% else %>
+    <% mapping_type = 'generate_reviewer_mapping' %>
+<% end %>
 
-<%if !(SignUpTopic.find(:first, :conditions => ['assignment_id = ?',@assignment.id])).nil?%>
-    <% form_tag({:action => 'automatic_reviewer_mapping'}, {:method => 'post' }) do %>
-<%else%>
-    <% form_tag({:action => 'generate_reviewer_mappings'}, {:method => 'post' }) do %>
-<%end%>
+<% form_tag(:action => mapping_type, :method => 'post') do %>
+
 Number of reviews done by a student: <%= text_field 'assignment', 'num_reviews', "size" => 1 %><br/> <br/>
 Number of metareviews done by a student: <%= text_field 'assignment', 'num_review_of_reviews', "size" => 1 %>
 

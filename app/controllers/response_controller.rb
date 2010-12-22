@@ -121,7 +121,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @msg = params[:msg]
-    @map.notification_not_sent = false;
+    @map.notification_accepted = false;
     @map.save
   end
   

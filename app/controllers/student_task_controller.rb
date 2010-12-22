@@ -39,7 +39,7 @@ class StudentTaskController < ApplicationController
           rmaps = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(participant.id, participant.assignment.id)
 
           for rmap in rmaps
-            if rmap.notification_not_sent == false
+            if rmap.notification_accepted == false
               @notifications << participant
               break;
             end
@@ -71,7 +71,7 @@ class StudentTaskController < ApplicationController
             mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.id)
             if !mmaps.nil?
               for mmap in mmaps
-                if mmap.notification_not_sent == false
+                if mmap.notification_accepted == false
                   @notifications << participant
                   break
                 end

@@ -1,9 +1,12 @@
 <h1>Survey for all students</h1>
-<% if params[:course_eval] #Check if its a course evaluation%>
-	<% form_tag(:action=>'submit', :survey_id=> @survey.id)do %>
-<% else %>
-	<% form_tag(:action=>'create', :survey_id=> @survey.id)do %>
-<% end %>
+<%
+  if params[:course_eval] #Check if its a course evaluation
+    action = 'submit'
+  else
+    action = 'create'
+  end
+%>
+<% form_tag(:action => action, :survey_id => @survey.id) do %>
 
 <% @min= @survey.min_question_score %>
 <% @max= @survey.max_question_score %>
@@ -64,19 +67,19 @@
 	<tr class="center"><td colspan="100">Progress: <%= percent %>%</td></tr>
 	<tr class="graphRow">
 	<td></td>
-<% j = 0
-	while j < percent 
-		if (j+1) % 25 == 0 %>
-	<td class="darkGraphFill">&nbsp;</td>
-<% else %>	
-	<td class="graphFill">&nbsp;</td>
-<% end %>
-<% j += 1 
-	end
-	while j < 100 %>	
-	<td class="graphEmpty">&nbsp;</td>
-<% j += 1 
-	end %>
+    <% j = 0 %>
+    <% while j < percent %>
+      <% if (j+1) % 25 == 0 %>
+        <td class="darkGraphFill">&nbsp;</td>
+      <% else %>	
+        <td class="graphFill">&nbsp;</td>
+      <% end %>
+    <% j += 1 %>
+    <% end %>
+    <% while j < 100 %>	
+      <td class="graphEmpty">&nbsp;</td>
+      <% j += 1 %>
+    <% end %>
 	<td></td>
 	</tr>
 	<tr>

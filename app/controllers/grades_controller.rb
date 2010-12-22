@@ -20,6 +20,8 @@ class GradesController < ApplicationController
 
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
+
     @assignment = @participant.assignment
 
     @questions = Hash.new

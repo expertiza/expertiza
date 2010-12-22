@@ -39,7 +39,7 @@ class StudentTaskController < ApplicationController
           rmaps = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(participant.id, participant.assignment.id)
 
           for rmap in rmaps
-            if rmap.notification_accepted == false
+            if (!rmap.response.nil? && rmap.notification_accepted == false)
               @notifications << participant
               break;
             end

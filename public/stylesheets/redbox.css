@@ -112,30 +112,5 @@ div#plus {
 	float: right; 
 }
 
-.tasknum {
-	color: #FFFFFF;
-	background-color: #B73204;
-}
-
-.revnum {
-	color: #FFFFFF;
-	background-color: #999999;
-}
-
-.taskheader {
-    font-family: verdana; font-size: 13px; text-align:left;
-}
-
-.notification a {
-color:#0066CC
-}
-.topictable {
-    float: left; margin-left: 0; font-size: 11px; width: 743px;
-}
-.taskbox {
-    font: 11px tahoma; padding: 5px; margin-bottom: 39px; border: 1px dashed rgb(153, 153, 153);
-    float: left; width: 230px; margin-left: 16px; background: none repeat scroll 0pt 0pt rgb(250, 250, 234);
-}
-
 
 

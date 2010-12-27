@@ -41,4 +41,13 @@ protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
     @display_option.name = 'list_mine'
     @display_option.name = params[:display_option][:name] if params[:display_option]
   end
+
+  def log_an_event(user, location, info)
+    new_log_entry = LogEntry.new
+    new_log_entry.user = user
+    new_log_entry.location = location
+    new_log_entry.entry = info
+    new_log_entry.save
+  end
+  
 end

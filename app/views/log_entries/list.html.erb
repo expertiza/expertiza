@@ -1,0 +1,22 @@
+<%= render :partial => 'shared_scripts/pages' %>
+<h1>Listing log_entries</h1>
+
+<table>
+  <tr>
+    <th>User</th>
+    <th>Location</th>
+    <th>Entry</th>
+  </tr>
+
+<% for log_entry in @log_entries %>
+  <tr>
+    <td><%=h log_entry.user.id %></td>
+    <td><%=h log_entry.location %></td>
+    <td><%=h log_entry.entry %></td>
+    <td><%=h log_entry.created_at %></td>
+    <td><%= link_to 'Destroy', :controller => "log_entries", :action => "destroy", :id => log_entry%></td>
+  </tr>
+<% end %>
+</table>
+
+<br />

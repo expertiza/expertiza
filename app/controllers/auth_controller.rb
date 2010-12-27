@@ -14,6 +14,7 @@ class AuthController < ApplicationController
       
       if user and user.check_password(params[:login][:password])
         logger.info "User #{params[:login][:name]} successfully logged in"
+        log_an_event(user, "auth_controller/login", "User logged in");
         session[:user] = user
         AuthController.set_current_role(user.role_id,session)
         
@@ -47,6 +48,7 @@ class AuthController < ApplicationController
   end
 
   def logout
+    log_an_event(session[:user], "auth_controller/logout", "User logged out");
     AuthController.logout(session)
     redirect_to '/'
   end

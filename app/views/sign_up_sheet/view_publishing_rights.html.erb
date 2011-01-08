@@ -12,12 +12,13 @@
     	<tr>
   <th width="5%" rowspan="2">Topic #</th>
   <th width="60%" rowspan="2">Topic name(s)</th>
-  <th width="35%" colspan="3">Participant</th>
+  <th width="35%" colspan="4">Participant</th>
 	</tr>
     	<tr>
   <th>Name</th>
   <th>Fullname</th>
-  <th>Publishing Rights</th>
+  <th>Publish Rights</th>
+  <th>Verified</th>
 	</tr>
 	
       <% i=1 %>
@@ -25,6 +26,7 @@
           <tr>
             <td><%= topic.topic_identifier %></td>
             <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
+            <th>&nbsp;</th>
             <th>&nbsp;</th>
             <th>&nbsp;</th>
             <th>&nbsp;</th>
@@ -47,11 +49,25 @@
 				  for participant in participants
 					if (user.id == participant.user.id)
 					  permissionGranted = participant.permission_granted?
+					  hasSignature = !participant.digital_signature.nil?
+					  if (permissionGranted && hasSignature)
+						  signatureValid = participant.verify_digital_signature(participant.digital_signature)
+					  end
 					end
 				  end
 	      %>
-			   <td><%=(permissionGranted ? "granted" : "denied") %></td>
-			</tr>
+			      <td><%=(permissionGranted ? "granted" : "denied") %></td>
+			      <td>
+			      	<% if (permissionGranted && hasSignature)
+					     if (signatureValid) %>
+			      	       <img src="/images/Check-icon.png"/>
+				         <% else %>
+			      	       <img src="/images/delete_icon.png"/>
+				         <% end
+                       end %>
+				    &nbsp;
+			      </td>
+			   </tr>
 		  <% 
 			  end
 			 end

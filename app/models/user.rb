@@ -165,7 +165,7 @@ class User < ActiveRecord::Base
     if (replacing_key)
       participants = AssignmentParticipant.find_all_by_user_id(self.id)
       for participant in participants
-        if (!participant.digital_signature.nil?)
+        if (participant.permission_granted && !participant.digital_signature.nil?)
           AssignmentParticipant.grant_publishing_rights(new_private, [ participant ]) 
         end
       end

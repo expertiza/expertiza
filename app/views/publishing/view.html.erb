@@ -52,18 +52,19 @@ and have to follow a link to generate their private keys -->
   <tr class="listingRow">
 		<td>&nbsp;</td>
 		<td><%= link_to participant.assignment.name, :controller => 'student_task', :action => 'view', :id => participant.id %></td>
-	  <td align=center>
 	  	<%if participant.permission_granted %>
-	  		<%= link_to 'deny', :action =>'set_publish_permission', :id => participant.id, :allow => 0 %> 
+  	    <td align="center">granted</td>
+		<td align="center">
+			<% if (!participant.digital_signature.nil?) %>
+			  <%= (participant.verify_digital_signature(participant.digital_signature) ? "verified" : "invalid") %>
+		    <% end %>
+		  &nbsp;	  
 		</td>
-		<td align=center><% if (participant.digital_signature.nil?) %>&nbsp;<% else %>
-		<%= (participant.verify_digital_signature(participant.digital_signature) ? "verified" : "invalid") %>
-		<% end %>
-		</td>
+	  	<td><%= link_to 'Deny', :action =>'set_publish_permission', :id => participant.id, :allow => 0 %></td>
 	    <% else %>
-	    	<%= link_to 'grant', :action =>'grant', :id => participant.id %> 
-		</td>
+  	    <td align=center>denied</td>
 		<td>&nbsp;</td>
+		<td><%= link_to 'Grant', :action =>'grant', :id => participant.id %></td>
 		<% end %>
 		
 		<td width=30%>&nbsp;</td>

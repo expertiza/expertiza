@@ -277,8 +277,11 @@ class AssignmentController < ApplicationController
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])     
-      set_questionnaires
-      set_limits_and_weights
+      if params[:questionnaires] and params[:limits] and params[:weights]
+        set_questionnaires
+        set_limits_and_weights
+      end
+
       begin
         newpath = @assignment.get_path        
       rescue
@@ -354,10 +357,10 @@ class AssignmentController < ApplicationController
   
   def remove_assignment_from_course    
     assignment = Assignment.find(params[:id])
-    oldpath = assignment.get_path
+    oldpath = assignment.get_path rescue nil
     assignment.course_id = nil    
     assignment.save
-    newpath = assignment.get_path
+    newpath = assignment.get_path rescue nil
     FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
   end  

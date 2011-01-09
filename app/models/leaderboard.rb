@@ -78,14 +78,18 @@ class Leaderboard < ActiveRecord::Base
         @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",assgt.id])
         @revqids.each do |rqid|
             rtype = Questionnaire.find(rqid.questionnaire_id).type
-            if( rtype == ReviewQuestionnaire)
+            if( rtype == 'ReviewQuestionnaire')
+            
+                
                 differentQuestionnaires["Review"] = rqid.questionnaire_id
           
-            elsif( rtype == MetareviewQuestionnaire)
+            elsif( rtype == 'MetareviewQuestionnaire')
+              
                 differentQuestionnaires["Metareview"] = rqid.questionnaire_id
-            elsif( rtype == AuthorFeedbackQuestionnaire)
+            elsif( rtype == 'AuthorFeedbackQuestionnaire')
                 differentQuestionnaires["AuthorFeedback"] = rqid.questionnaire_id
-            elsif( rtype == TeammateReviewQuestionnaire)
+               
+            elsif( rtype == 'TeammateReviewQuestionnaire')
                 differentQuestionnaires["Teamreview"] = rqid.questionnaire_id
             end # end of elsif block
         end # end of each.do block
@@ -137,11 +141,11 @@ class Leaderboard < ActiveRecord::Base
 	    for fMTEntry in fMTEntries
 	        csEntry = CsEntriesAdaptor.new
 	        csEntry.participant_id = fMTEntry.reviewee_id
-	        if (fMTEntry.object_type.to_s == 'FeedbackResponseMap')
+	        if (fMTEntry.object_type == 'FeedbackResponseMap')
 	              csEntry.questionnaire_id = assQuestionnaires[assgt.id]["AuthorFeedback"]
-	        elsif (fMTEntry.object_type.to_s == 'MetareviewResponseMap')
+	        elsif (fMTEntry.object_type == 'MetareviewResponseMap')
 	              csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Metareview"]
-	        elsif (fMTEntry.object_type.to_s == 'TeammateReviewResponseMap')
+	        elsif (fMTEntry.object_type == 'TeammateReviewResponseMap')
                       csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Teamreview"]
                 end
                 csEntry.total_score = fMTEntry.score

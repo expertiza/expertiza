@@ -2,7 +2,7 @@
 <h1>Edit <%= @questionnaire.display_type %></h1>
 
 
-<% form_tag({:action=>'edit', :id=>@questionnaire.id}, :multipart => true)do %>
+<% form_tag({:action=>'edit', :id=>@questionnaire.id}, :multipart => true) do %>
 	<%= render :partial => 'questionnaire' %>
 	
 	<%= submit_tag "Save #{@questionnaire.display_type.downcase}", :name=>"save" %>
@@ -15,7 +15,7 @@
 
   	<%= submit_tag "Export questions to CSV", :name=>"export" %>
   	<br />
-</form>
+<% end %>
 <br />
 
 <%= render :partial => '/shared_scripts/back' %>

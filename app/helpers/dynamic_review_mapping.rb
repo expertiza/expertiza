@@ -54,7 +54,7 @@ module DynamicReviewMapping
         successful_mapping_col_wise = false;
         failed_mapping_row_wise = false;
         successful_mapping_row_wise = false;
-        if (team_review[i][j] == -1)
+        if (@team_review[i][j] == -1)
           @team_review[i][j] = 1
           @rows_ones[i] += 1
           @columns_ones[j] += 1

@@ -7,6 +7,8 @@ class InvitationController < ApplicationController
     user = User.find_by_name(params[:user][:name].strip)
     team = AssignmentTeam.find_by_id(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
+    return unless current_user_id?(student.user_id)
+    
     #check if the invited user is valid
     if !user
       flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct." 

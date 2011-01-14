@@ -41,4 +41,17 @@ protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
     @display_option.name = 'list_mine'
     @display_option.name = params[:display_option][:name] if params[:display_option]
   end
+  
+  # Use this method to validate the current user in order to avoid allowing users
+  # to see unauthorized data.
+  # Ex: return unless current_user_id?(params[:user_id])
+  def current_user_id?(user_id)
+    if user_id != session[:user].id
+      redirect_to '/denied'
+      return false
+    else
+      return true
+    end
+  end
+
 end

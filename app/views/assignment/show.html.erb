@@ -1,3 +1,6 @@
+<p>
+  <b>Course:</b> <%= (@assignment.course ? h(@assignment.course.name) : 'none') %>
+</p>
 <% for column in Assignment.content_columns %>
 <p>
   <b><%= column.human_name %>:</b> <%=h @assignment.send(column.name) %>

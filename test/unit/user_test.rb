@@ -33,7 +33,9 @@ class UserTest < Test::Unit::TestCase
     user.fullname = "student1_fullname",
     user.role_id = "3"
     assert !user.save
-    assert_equal ActiveRecord::Errors.default_error_messages[:taken], user.errors.on(:name)
+
+    error_messages = I18n.translate('activerecord.errors.messages')
+    assert_equal error_messages[:taken], user.errors.on(:name)
   end
   
   # 103 Check valid user name and password   

@@ -6,16 +6,22 @@ class SubmittedContentController < ApplicationController
   
   def edit
     @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
+    
     @assignment = @participant.assignment
   end
   
   def view
     @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
+    
     @assignment = @participant.assignment
   end  
   
   def submit_hyperlink
-    participant = AssignmentParticipant.find(params[:id]) 
+    participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(participant.user_id)
+
     url = URI.parse(params['submission'].strip)
     begin
       Net::HTTP.start(url.host, url.port)
@@ -29,12 +35,10 @@ class SubmittedContentController < ApplicationController
   
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(participant.user_id)
+
     file = params[:uploaded_file]
     participant.set_student_directory_num
-
-    #send message to reviewers(s) when submission has been updated
-    #ajbudlon, sept 07, 2007
-    participant.assignment.email(participant.id)
 
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
@@ -57,17 +61,23 @@ class SubmittedContentController < ApplicationController
       SubmittedContentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
     participant.update_resubmit_times       
+
+    #send message to reviewers when submission has been updated
+    participant.assignment.email(participant.id)
+
     redirect_to :action => 'edit', :id => participant.id
   end
   
   
   def folder_action
-    @participant = AssignmentParticipant.find(params[:id])       
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
+
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
       @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
-    end            
+    end
     if params[:faction][:delete]
       delete_selected_files
     elsif params[:faction][:rename]
@@ -79,7 +89,7 @@ class SubmittedContentController < ApplicationController
     elsif params[:faction][:create]
       create_new_folder
     end
-       
+
     redirect_to :action => 'edit', :id => @participant.id    
   end  
   

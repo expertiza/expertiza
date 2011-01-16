@@ -30,9 +30,9 @@ class InstitutionsControllerTest < Test::Unit::TestCase
   def test_add_institution_with_invalid_name
     number_of_institution = Institution.count
     post :create, :institution => { :name => ''}
-   # assert_template 'institution/new'
+    assert_template 'institution/new'
     assert_equal number_of_institution, Institution.count
-    assert !Institution.find(:all, :conditions => "name = ''");
+    assert Institution.find(:all, :conditions => "name = ''").count == 0;
   end
   
   # 403 Add a new institution with a name that already exists.
@@ -40,8 +40,8 @@ class InstitutionsControllerTest < Test::Unit::TestCase
     number_of_institution = Institution.count
     assert_equal 1, Institution.count(:all, :conditions => "name = 'Test state university'");
     post :create, :institution => { :name => 'Test state university'}
-    #assert_template 'institution/new'
-    #assert_equal Institution.count, number_of_institution
+    assert_template 'institution/new'
+    assert_equal Institution.count, number_of_institution
     assert_equal 1, Institution.count(:all, :conditions => "name = 'Test state university'");
   end
   
@@ -53,7 +53,7 @@ class InstitutionsControllerTest < Test::Unit::TestCase
     assert_redirected_to :action => 'show', :id => institutions(:institution1).id
     assert_equal Institution.count, number_of_institution
     assert_equal 1, Institution.count(:all, :conditions => "name = 'Biomedical Engineer'");
-    #assert !Institution.find(:all, :conditions => "name = 'Computer Science'");
+    assert Institution.find(:all, :conditions => "name = 'Computer Science'").count == 0;
   end
 
   # 405 Change the name of a institution to an invalid institution name (name='')
@@ -61,8 +61,7 @@ class InstitutionsControllerTest < Test::Unit::TestCase
     number_of_institution = Institution.count
     post :update,:id => institutions(:institution0).id, :institution => { :name => ''}
     assert_equal Institution.count, number_of_institution
-    assert_equal 1, Institution.count(:all, :conditions => "name = 'North Caroline State University'");
-    assert !Institution.find(:all, :conditions => "name = ''");
+    assert Institution.find(:all, :conditions => "name = ''").count == 0;
   end
   
   # 406 Change the name of a institution to an existing institution name
@@ -71,10 +70,8 @@ class InstitutionsControllerTest < Test::Unit::TestCase
     post :update,:id => institutions(:institution0).id, :institution => { :name => institutions(:institution1).name}
     assert_equal Institution.count, number_of_institution
     assert_equal 1, Institution.count(:all, :conditions => "name = 'Test state university'");
-    #assert !Institution.find(:all, :conditions => "name = 'Computer Science'");
+    assert Institution.find(:all, :conditions => "name = 'Computer Science'").count == 0;
   end
-  
-
   
   # 501 Delete a institution
   def test_delete_institution

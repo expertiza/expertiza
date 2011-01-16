@@ -144,7 +144,6 @@ class QuestionnaireController < ApplicationController
   def save_advice
     begin
       for advice_key in params[:advice].keys
-        p params[:advice][advice_key]
         QuestionAdvice.update(advice_key, params[:advice][advice_key])
       end
       flash[:notice] = "The questionnaire's question advice was successfully saved"

@@ -65,8 +65,8 @@ class CourseControllerTest < Test::Unit::TestCase
     assert_equal 'Blah', Course.find_by_name('Built Course').info
     post :update, :id => Course.find_by_name('Built Course').id, :course => {:info => 'Blah Blah'}    
     assert_equal 'Blah Blah', Course.find_by_name('Built Course').info
-#    What we really want to test is to see if we got where get_home_controller says we should've gotten, but we are cheating for now
-#    assert_redirected_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])      
+    # What we really want to test is to see if we got where get_home_controller says we should've gotten, but we are cheating for now
+    #assert_redirected_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])      
     assert_redirected_to :controller => 'tree_display', :action => 'list'
   end
 

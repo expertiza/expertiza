@@ -34,21 +34,6 @@ class QuestionnaireControllerTest < Test::Unit::TestCase
     assert_response(:success)
     assert_not_nil(Questionnaire.find(:first, :conditions => ["name = ?", "test edit name"]))
   end
-  #802 Add an questionnaire with existing name  
-  def test_create_questionnaire_with_existing_name
-   # It will raise an error while execute render method in controller
-   # Because the goldberg variables didn't been initialized  in the test framework
-    assert_raise (ActionView::TemplateError){
-      post :create_questionnaire, :save => true, 
-                           :questionnaire => {:name => questionnaires(:questionnaire2).name,
-                                       :instructor_id => users(:instructor2).id,
-                                       :type => "ReviewQuestionnaire",
-                                       :min_question_score => 1,
-                                       :max_question_score => 3, 
-                                       :id => @Questionnaire }
-    }                               
-    assert_template 'questionnaire/new_questionnaire'
-  end
   
   # 901
   def test_edit_Questionnaire_with_existing_name

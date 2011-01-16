@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 require 'assignment_participant'
 
 class AssignmentParticipantTest < Test::Unit::TestCase
-  fixtures :assignments, :users, :roles
+  fixtures :assignments, :users, :roles, :participants
   
   def test_import
     row = Array.new
@@ -29,4 +29,54 @@ class AssignmentParticipantTest < Test::Unit::TestCase
     # verify that correct user was added
     assert AssignmentParticipant.find_by_user_id(user.id)
   end
-end 
+  
+  def test_publishing_rights
+    participants = [ participants(:par0), participants(:par1) ]
+    private_key = users(:student1).generate_keys
+    
+    AssignmentParticipant.grant_publishing_rights(private_key, participants)
+    for participant in participants
+      assert_not_nil participant.digital_signature
+      assert_not_nil participant.time_stamp
+      assert participant.permission_granted
+      assert participant.verify_digital_signature(participant.digital_signature)
+    end
+  end
+
+  def test_publishing_rights_regenerate_keys
+    participants = [ participants(:par0), participants(:par1) ]
+    private_key = users(:student1).generate_keys
+    
+    AssignmentParticipant.grant_publishing_rights(private_key, participants)
+
+    # generate keys again, everything should be resigned automatically
+    private_key = users(:student1).generate_keys
+    
+    for participant in participants
+      assert_not_nil participant.digital_signature
+      assert_not_nil participant.time_stamp
+      assert participant.permission_granted
+      assert participant.verify_digital_signature(participant.digital_signature)
+    end
+  end
+
+  def test_publishing_rights_negative_tests
+    participants = [ participants(:par0), participants(:par1) ]
+    private_key = users(:student1).generate_keys
+    
+    AssignmentParticipant.grant_publishing_rights(private_key, participants)
+    for participant in participants
+      # try changing the time stamp and verify the digital signature is no longer valid
+      saved_time_stamp = participant.time_stamp
+      participant.time_stamp = (Time.now + 1).utc.strftime("%Y-%m-%d %H:%M:%S")
+      assert !participant.verify_digital_signature(participant.digital_signature)
+      
+      # try changing the assignment name and verify the digital signature is no longer valid
+      participant.time_stamp = saved_time_stamp
+      saved_assignment_name = participant.assignment.name
+      participant.assignment.name = "XXXX"
+      assert !participant.verify_digital_signature(participant.digital_signature)
+      participant.assignment.name = saved_assignment_name
+    end
+  end
+end

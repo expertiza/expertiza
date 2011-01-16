@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class UserTest < Test::Unit::TestCase
+  fixtures :users
   
   # Test user retrieval by email
   def test_find_by_login_email
@@ -57,4 +58,37 @@ class UserTest < Test::Unit::TestCase
     user.name = "student2"
     assert !user.valid?
   end  
+  
+  def test_generate_keys
+    user = users(:student1)
+    private_key = user.generate_keys
+    assert_not_nil private_key
+    assert_not_nil user.digital_certificate
+
+    # verify that we can sign something using the private key and then decrypt it using the public key
+    hash_data = Digest::SHA1.digest(Time.now.utc.strftime("%Y-%m-%d %H:%M:%S"))
+    clear_text = decrypt(hash_data, private_key, user.digital_certificate)
+    assert_equal hash_data, clear_text
+    
+    # try decrypting a signature made using an old private key
+    user.generate_keys
+    clear_text = decrypt(hash_data, private_key, user.digital_certificate)
+    assert_not_equal hash_data, clear_text    
+  end
+  
+  def decrypt(hash_data, private_key, digital_certificate)
+    private_key2 = OpenSSL::PKey::RSA.new(private_key)
+    cipher_text = Base64.encode64(private_key2.private_encrypt(hash_data))
+    cert = OpenSSL::X509::Certificate.new(digital_certificate)
+    public_key1 = cert.public_key 
+    public_key = OpenSSL::PKey::RSA.new(public_key1)    
+    begin
+      clear_text = public_key.public_decrypt(Base64.decode64(cipher_text))
+    rescue
+      clear_text = ''
+    end
+
+    clear_text
+  end
+
 end

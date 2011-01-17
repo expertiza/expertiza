@@ -1,0 +1,109 @@
+<%= form_tag :action=>'reportgen'%>
+User name:
+<br>
+<br>
+<%=text_field("userform", "name", :size=>"20")%>
+<br>
+<br>
+<input type="submit" value="Generate Report" />
+<% if @user.name!="" && @res==nil%>
+no user exist
+<% elsif @user.name!="" %>
+<br>
+<br>
+Report for :
+<%= @res.name%>
+<br>
+<br>
+<% i=0 %>
+<b>Teammate Reviews :</b>
+<br/>
+<br/>
+<table border="1" cellpadding="10">
+	<tr>
+		<th> Assignment </th>
+		<th> Score </th>
+		<th> Range </th>
+	</tr>
+	<% for i in 0..@type.size-1 do%>
+	<% if @type[i]=="TeammateReviewResponseMap"%>
+	<tr>
+		<td><%=@assgn[i]%></td>
+		<td><%=@scores[i]%></td>
+		<td><%=@ranges[i]%></td>
+		<td><%= link_to "see review", :action => "viewreviews", :assgn => @assgn[i], :id=> "TeammateReviewResponseMap", :user=> @res.id %></td>
+	</tr>
+<% end %>
+<% end %>
+</table>
+<br/>
+<br/>
+<% i=0 %>
+<b>Team Reviews :</b>
+<br/>
+<br/>
+<table border="1" cellpadding="10">
+	<tr>
+		<th> Assignment </th>
+		<th> Score </th>
+		<th> Range </th>
+	</tr>
+	<% for i in 0..@type.size-1 do%>
+	<% if @type[i]=="TeamReviewResponseMap"%>
+	<tr>
+		<td><%=@assgn[i]%></td>
+		<td><%=@scores[i]%></td>
+		<td><%=@ranges[i]%></td>
+		<td><%= link_to "see review", :action => "viewreviews", :assgn => @assgn[i], :id=> "TeamReviewResponseMap", :user=>@res.id %></td>
+	</tr>
+<% end %>
+<% end %>
+</table>
+<br/>
+<br/>
+<% i=0 %>
+<b>Participant Reviews :</b>
+<br/>
+<br/>
+<table border="1" cellpadding="10">
+	<tr>
+		<th> Assignment </th>
+		<th> Score </th>
+		<th> Range </th>
+	</tr>
+	<% for i in 0..@type.size-1 do%>
+	<% if @type[i]=="ParticipantReviewResponseMap"%>
+	<tr>
+		<td><%=@assgn[i]%></td>
+		<td><%=@scores[i]%></td>
+		<td><%=@ranges[i]%></td>
+		<td><%= link_to "see review", :action => "viewreviews", :assgn => @assgn[i], :id=> "ParticipantReviewResponseMap", :user=>@res.id %></td>
+	</tr>
+<% end %>
+<% end %>
+</table>
+<br/>
+<br/>
+<% i=0 %>
+<b>Author Feedback :</b>
+<br/>
+<br/>
+<table border="1" cellpadding="10">
+	<tr>
+		<th> Assignment </th>
+		<th> Score </th>
+		<th> Range </th>
+	</tr>
+	<% for i in 0..@type.size-1 do%>
+	<% if @type[i]=="FeedbackResponseMap"%>
+	<tr>
+		<td><%=@assgn[i]%></td>
+		<td><%=@scores[i]%></td>
+		<td><%=@ranges[i]%></td>
+		<td><%= link_to "see review", :action => "viewreviews", :assgn => @assgn[i], :id=> "FeedbackResponseMap", :user=>@res.id %></td>
+	</tr>
+<% end %>
+<% end %>
+</table>
+
+<% end %>

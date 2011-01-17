@@ -32,7 +32,7 @@ class UsersControllerTest < Test::Unit::TestCase
     @testUser = users(:student1).id    
   end
   
-  # 201 edit a user’s profile
+  # 201 edit a userï¿½s profile
   def test_update
     post :update, :id => @testUser, :user => { :clear_password => "",
       :name => "student1",
@@ -81,5 +81,14 @@ class UsersControllerTest < Test::Unit::TestCase
     assert_response :redirect
     assert_redirected_to :action => 'list'
     assert_equal numUsers-1, User.count
+  end
+  
+  def test_keys
+    user = User.find(users(:student1).id)
+    assert_nil user.digital_certificate
+    post :keys, :id => user.id
+    assert_template 'users/keys'
+    user = User.find(users(:student1).id)
+    assert_not_nil user.digital_certificate
   end
 end

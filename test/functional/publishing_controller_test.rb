@@ -5,14 +5,20 @@ require 'publishing_controller'
 class PublishingController; def rescue_action(e) raise e end; end
 
 class PublishingControllerTest < Test::Unit::TestCase
+  fixtures :users, :roles, :participants
+
   def setup
-    @controller = PublishingController.new
+    @controller = PublishingController.new  
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
-  end
 
-  # Replace this with your real tests.
-  def test_truth
-    assert true
+    @request.session[:user] = User.find(users(:student1).id)
+    Role.rebuild_cache
+    AuthController.set_current_role(User.find(users(:student1).id).role_id,@request.session)
+  end
+  
+  def test_grant
+    get :grant, :id => users(:student1).id
+    assert_response :success     
   end
 end

@@ -1,0 +1,69 @@
+
+	<% form_tag :action => 'percentage' do%>
+
+	<div>
+		<label for="name">Enter Student Name:</label>
+		<%= text_field_tag :name, params[:name] %>
+		<%= submit_tag "SUBMIT" %>
+	</div>
+
+	<% end %>
+         <!--<h2>OR</h2>
+    	<% form_tag :action => 'stud' do%>
+
+	<div>
+		<label for="name">Enter Team Name:</label>
+		<%= text_field_tag :name, params[:team] %>
+		<%= submit_tag "SUBMIT" %>
+	</div>
+
+	<% end %>-->
+
+      <% if !params[:name].nil? %>
+        <% if @user.nil? %>
+           <%= @msg%>
+            <% else %>  <br>
+            Student Name : <%= @user.name %>   <br>
+            Number of Courses enrolled : <%=@course %>   <br>
+            Number of Assignments Involved in : <%=@assignment %>   <br>
+            Teams involved in :
+            <% if @teamid.empty? || @teamid.nil? %>
+                USER NOT IN ANY TEAM
+            <%else%>
+            <% @teamid.each do |tam|%>
+                <% @teamname = Team.find_by_id(tam.team_id)%>
+                <%= @teamname[:name]+" , "%>
+                <%end%>
+             <%end%>    <br>    <br>
+
+            <table>
+              <tr>
+                <th> Review Type </th>
+                <th> Number of Reviews</th>
+              </tr>
+              <tr>
+                <td>Meta Review</td>
+                <td><%=@countmeta%></td>
+              </tr>
+              <tr>
+                <td>Feedback Review</td>
+                <td><%=@countfeed%></td>
+              </tr>
+              <tr>
+                <td>Teammate Review</td>
+                <td><%=@countteammate%></td>
+              </tr>
+              <tr>
+                <td>Participant Review</td>
+                <td><%=@countpart%></td>
+              </tr>
+              <tr>
+                <td>Team Review</td>
+                <td><%=@countteamreview%></td>
+              </tr>
+              </table>
+      <% end %>
+        <% end %>
+    <br>
+    <%= link_to 'Back', :action => 'assessment'%><br />
+

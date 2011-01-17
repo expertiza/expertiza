@@ -9,8 +9,12 @@ class PublishingController < ApplicationController
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
     
-    participant.update_attribute('permission_granted',params[:allow])  
-    redirect_to :action => 'view'
+    if (params[:allow] == '1')
+      redirect_to :action => 'grant'
+    else
+      participant.update_attribute('permission_granted',params[:allow])  
+      redirect_to :action => 'view'
+    end
   end  
   
   def update_publish_permissions

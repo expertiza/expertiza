@@ -5,16 +5,16 @@ class RubricTest < Test::Unit::TestCase
 
   def setup
     # Database was initialized with (at least) 3 questionnaires.
-    @questionnaire1 = Questionnaire.find(1)
-    @questionnaire2 = Questionnaire.find(2)
-    @questionnaire3 = Questionnaire.find(3)
+     @questionnaire1 = questionnaires(:questionnaire1)
+     @questionnaire2 = questionnaires(:questionnaire2)
+     @questionnaire3 = questionnaires(:questionnaire3)
   end
   
   def test_create
     assert_kind_of Questionnaire, @questionnaire1
     assert_equal "questionnaire1", @questionnaire1.name
     
-    assert_equal 1, @questionnaire1.min_question_score
+    assert_equal 0, @questionnaire1.min_question_score
     assert_equal 5, @questionnaire1.max_question_score
     assert_equal false, @questionnaire1.private
   end
@@ -63,18 +63,18 @@ class RubricTest < Test::Unit::TestCase
   end
   
   def test_true_false_question
-    assert !@questionnaire1.true_false_questions?
+    assert !@questionnaire2.true_false_questions?
     q = Question.new
-    q.questionnaire_id = @questionnaire1.id
+    q.questionnaire_id = @questionnaire2.id
     q.true_false = false
     q.txt = "1"
     q2 = Question.new
-    q2.questionnaire_id = @questionnaire1.id
+    q2.questionnaire_id = @questionnaire2.id
     q2.true_false = true
     q2.txt = "2"
-    @questionnaire1.questions << q
-    assert !@questionnaire1.true_false_questions?
-    @questionnaire1.questions << q2
-    assert @questionnaire1.true_false_questions?
+    @questionnaire2.questions << q
+    assert !@questionnaire2.true_false_questions?
+    @questionnaire2.questions << q2
+    assert @questionnaire2.true_false_questions?
   end
 end

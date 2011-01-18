@@ -6,57 +6,57 @@
 class CourseController < ApplicationController
   auto_complete_for :user, :name
   require 'fileutils'
-  
+
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
     @users = User.find_by_sql("select * from users where role_id=6") unless search.blank?
-    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false 
-  end 
+    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
+  end
   # Creates a new course
   # if private is set to 1, then the course will
   # only be available to the instructor who created it.
-  def new 
+  def new
     @private = params[:private]
   end
 
-  # Modify an existing course  
+  # Modify an existing course
   def edit
     @course = Course.find(params[:id])
   end
-  
+
   def update
     course = Course.find(params[:id])
-    if course.directory_path != params[:course][:directory_path]
+    if params[:course][:directory_path] and course.directory_path != params[:course][:directory_path]
       begin
         FileHelper.delete_directory(course)
       rescue
         flash[:error] = $!
       end
-      
+
       begin
         FileHelper.create_directory_from_path(params[:course][:directory_path])
       rescue
         flash[:error] = $!
       end
-    end      
-    course.update_attributes(params[:course])   
+    end
+    course.update_attributes(params[:course])
     redirect_to :controller => 'tree_display', :action => 'list'
   end
-  
-  def copy    
+
+  def copy
     orig_course = Course.find(params[:id])
     new_course = orig_course.clone
     new_course.instructor_id = session[:user].id
     new_course.name = 'Copy of '+orig_course.name
     begin
-     new_course.save!
-     new_course.create_node
-     flash[:note] = 'The course is currently associated with an existing location. This could cause errors for furture submissions.'      
-     redirect_to :controller => 'course', :action => 'edit', :id => new_course.id
+      new_course.save!
+      new_course.create_node
+      flash[:note] = 'The course is currently associated with an existing location. This could cause errors for furture submissions.'
+      redirect_to :controller => 'course', :action => 'edit', :id => new_course.id
     rescue
-     flash[:error] = 'The course was not able to be copied: '+$!
-     redirect_to :controller => 'tree_display', :action => 'list' 
-    end      
+      flash[:error] = 'The course was not able to be copied: '+$!
+      redirect_to :controller => 'tree_display', :action => 'list'
+    end
   end
 
   # create a course
@@ -66,14 +66,14 @@ class CourseController < ApplicationController
     begin
       course.save!
       course.create_node
-      FileHelper.create_directory(course) 
+      FileHelper.create_directory(course)
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = "The following error occurred while saving the course: "+$!
       redirect_to :action => 'new'
-    end        
+    end
   end
-  
+
   # delete the course
   def delete
     course = Course.find(params[:id])
@@ -87,10 +87,10 @@ class CourseController < ApplicationController
       | map |
       map.destroy
     }
-    course.destroy    
-    redirect_to :controller => 'tree_display', :action => 'list'   
+    course.destroy
+    redirect_to :controller => 'tree_display', :action => 'list'
   end
-  
+
   def toggle_access
     course = Course.find(params[:id])
     course.private = !course.private
@@ -101,7 +101,7 @@ class CourseController < ApplicationController
     end
     redirect_to :controller => 'tree_display', :action => 'list'
   end
-  
+
   def view_teaching_assistants
     @course = Course.find(params[:id])
     @ta_mappings = @course.ta_mappings
@@ -109,22 +109,22 @@ class CourseController < ApplicationController
       mapping[:name] = mapping.ta.name
     end
   end
-  
+
   def add_ta
     @course = Course.find(params[:course_id])
     @user = User.find_by_name(params[:user][:name])
     if(@user==nil)
-      redirect_to :action => 'view_teaching_assistants', :id => @course.id 
+      redirect_to :action => 'view_teaching_assistants', :id => @course.id
     else
       @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
       redirect_to :action => 'view_teaching_assistants', :id => @course.id
     end
-  end 
-  
+  end
+
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
     @ta_mapping.destroy
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end
-  
+
 end

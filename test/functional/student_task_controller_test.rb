@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../test_helper'
-require 'student_tasks_controller'
+require 'student_task_controller'
 
 # Re-raise errors caught by the controller.
 class StudentTasksController; def rescue_action(e) raise e end; end

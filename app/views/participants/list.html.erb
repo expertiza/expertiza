@@ -23,7 +23,7 @@
             :action=>'start', 
             :model => @model+'Participant', 
             :title => @model+' Participants',
-            :expected_fields => 'Username, "Full name (last, first[ middle])", E-mail address, Password',
+            :expected_fields => 'username, full name (first[ middle] last), e-mail address, password',
             :id => @parent.id %> | 
 <%= link_to 'Export '+@model+' Participants',
             :controller=>'export_file',

@@ -40,6 +40,6 @@ Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} 
 %>
 
 <%= link_to 'New User', :action => 'new' %> |
-<%= link_to 'Import Users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'Name, Full name (first[ middle] last), E-mail address, Password' %>
+<%= link_to 'Import Users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username, full name (first[ middle] last), e-mail address, password' %>
 </p>
 

@@ -21,6 +21,6 @@
             :action=>'start', 
             :model => 'CoursesUsers', 
             :title => 'Course Participants',
-            :expected_fields => 'Username, "Full name (last, first[ middle])", E-mail address, Password',
+            :expected_fields => 'username, full name (first[ middle] last), e-mail address, password',
             :id => @course.id %>
 | <%= render :partial => '/shared_scripts/back' %>

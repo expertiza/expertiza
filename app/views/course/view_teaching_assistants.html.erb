@@ -24,7 +24,7 @@
 %>
 <% 
   session[:return_to] = request.request_uri  
-  session[:expected_fields] = 'Name, Full name (first[ middle] last), E-mail address, Password'
+  session[:expected_fields] = 'username, full name (first[ middle] last), e-mail address, password'
   session[:course_id] = @course.id 
 %>
 

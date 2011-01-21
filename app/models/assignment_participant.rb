@@ -231,15 +231,15 @@ class AssignmentParticipant < Participant
       participant.digital_signature = cipher_text
       participant.time_stamp = time_now
       
-     #now, check to make sure the digital signature is valid, if not raise error
-     if(participant.verify_digital_signature(cipher_text))
+      #now, check to make sure the digital signature is valid, if not raise error
+      if (participant.verify_digital_signature(cipher_text))
         participant.update_attribute('permission_granted', 1)
         participant.save
       else
-      	participant.update_attribute('permission_granted', 0)
-      	participant.digital_signature-nil
-      	participant.time_stamp=nil
-      	raise "invalid key"
+        participant.update_attribute('permission_granted', 0)
+        participant.digital_signature-nil
+        participant.time_stamp=nil
+        raise "invalid key"
       end
       
     end
@@ -266,9 +266,9 @@ class AssignmentParticipant < Participant
         false;
       end
       
-      rescue Exception => msg  
-        false
-      end
+    rescue Exception => msg  
+      false
+    end
   end
   
   #define a handle for a new participant

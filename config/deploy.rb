@@ -14,22 +14,41 @@ role :app, "expertiza.ncsu.edu"
 role :db,  "expertiza.ncsu.edu", :primary => true # This is where Rails migrations will run
 
 namespace :deploy do
-  desc "Stop Application (do nothing)"
   task :stop do; end
-
-  desc "Start Application (do nothing)"
   task :start do; end
 
-  desc "Restart Application"
+  desc "Restart the application."
   task :restart do
     run "touch #{current_path}/tmp/restart.txt"
   end
 
-  desc "Symlink shared static files"
-  task :symlink_static do
+  desc "Symlink shared files into the current deploy directory."
+  task :symlink_shared do
     run "ln -s #{shared_path}/pg_data #{current_path}"
     run "ln -sf #{shared_path}/database.yml #{current_path}/config/database.yml"
   end
 end
 
-after "deploy:symlink", "deploy:symlink_static"
+after "deploy:symlink", "deploy:symlink_shared"
+
+desc "Load production data into the local development database."
+task :load_production_data, :roles => :db, :only => { :primary => true } do
+  require 'yaml'
+ 
+  database = YAML::load_file('config/database.yml')
+  filename = "dump.#{Time.now.strftime '%Y-%m-%d_%H:%M:%S'}.sql.gz"
+ 
+  on_rollback { delete "/tmp/#{filename}" }
+  run "mysqldump -u #{database['production']['username']} --password=#{database['production']['password']} #{database['production']['database']} --add-drop-table | gzip > /tmp/#{filename}" do |channel, stream, data|
+    puts data
+  end
+
+  on_rollback { system " rm -f #{filename}" }
+  get "/tmp/#{filename}", filename
+
+  logger.info 'Dropping and recreating database'
+  system 'rake db:drop && rake db:create'
+
+  logger.info 'Importing production database into local development database'
+  system "zcat #{filename} | mysql -u #{database['development']['username']} --password=#{database['development']['password']} #{database['development']['database']} && rm -f #{filename}"
+end

@@ -29,7 +29,7 @@ test:
 
 production:
   adapter: mysql
-  database: pg_production
+  database: pg_development
   username: root
   password: 
   host: localhost

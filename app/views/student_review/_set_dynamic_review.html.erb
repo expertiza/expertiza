@@ -1,6 +1,7 @@
-<% currentUser = session[:user] %>
-
-<% form_tag :controller => 'review_mapping', :action => 'add_dynamic_reviewer', :assignment_id => assignment.id, :reviewer_id => session[:user].id do %>
+<% form_tag :controller => 'review_mapping',
+            :action => 'add_dynamic_reviewer',
+            :assignment_id => assignment.id,
+            :reviewer_id => session[:user].id do %>
 
   <% if assignment.sign_up_topics.count > 0 %>
     <p> Select a topic below to begin a new review. </p>

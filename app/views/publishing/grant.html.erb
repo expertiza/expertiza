@@ -23,7 +23,7 @@
 		<% form_tag :action => 'grant_with_private_key' do %>
 		<% if (!@participant.nil?) %>
 		  <%= hidden_field_tag :id, @participant.id %> 
-        <% end %>
+		<% end %>
 		<%= text_area_tag :private_key, '', :rows => 20, :cols => 65, :style =>'scrollHeight:40' %><br />
 		<%= submit_tag 'Grant' %>
 		<% end %>

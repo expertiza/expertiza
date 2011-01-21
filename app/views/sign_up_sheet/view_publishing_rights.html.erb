@@ -55,14 +55,12 @@
 	      %>
 			      <td><%=(permissionGranted ? "granted" : "denied") %></td>
 			      <td>
-			      	<% if (permissionGranted && hasSignature)
-					     if (signatureValid) %>
-			      	       <img src="/images/Check-icon.png"/>
-				         <% else %>
-			      	       <img src="/images/delete_icon.png"/>
-				         <% end
-                       end %>
-				    &nbsp;
+			        <% if (permissionGranted && hasSignature && signatureValid) %>
+			          <img src="/images/Check-icon.png"/>
+			        <% else %>
+			          <img src="/images/delete_icon.png"/>
+			        <% end %>
+			        &nbsp;
 			      </td>
 			   </tr>
 		  <% 

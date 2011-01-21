@@ -22,13 +22,12 @@ class PublishingController < ApplicationController
       redirect_to :action => 'grant'
     else
       participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)
-      participants.each{
-        | participant |
+      participants.each do |participant|
         participant.update_attribute('permission_granted',params[:allow])  
         participant.digital_signature = nil
         participant.time_stamp = nil
         participant.save
-      }
+      end
       redirect_to :action => 'view'
     end
   end

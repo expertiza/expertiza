@@ -1,4 +1,3 @@
-<% @assignment = Assignment.find(params[:id]) %>
 <h1>Publishing rights for <%= @assignment.name %> assignment</h1>
 
 <% if flash[:notice] %>
@@ -32,12 +31,10 @@
             <th>&nbsp;</th>
           </tr>
 
-          <% 
-			participants = AssignmentParticipant.find_all_by_parent_id(@assignment.id)
-			if (participants.length > 0)
+          <% if (@assignment.participants.size > 0)
 
 			  for signed_up_user in topic.signed_up_users
-				user = User.find(signed_up_user.creator_id)
+				user = signed_up_user.creator
 		  %>
 		  	    <tr>
 	 	  		  <th>&nbsp;</th>
@@ -46,7 +43,7 @@
 				  <td><%=user.fullname%></td>
 	      <%
 				  permissionGranted = false
-				  for participant in participants
+				  for participant in @assignment.participants
 					if (user.id == participant.user.id)
 					  permissionGranted = participant.permission_granted?
 					  hasSignature = !participant.digital_signature.nil?

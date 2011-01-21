@@ -81,8 +81,8 @@ class SignUpSheetController < ApplicationController
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 
-    assignment = Assignment.find(assignment_id)
-    if !assignment.team_assignment
+    @assignment = Assignment.find(assignment_id)
+    if !@assignment.team_assignment
       @participants = SignedUpUser.find_participants(assignment_id)
     else
       @participants = SignedUpUser.find_team_participants(assignment_id)

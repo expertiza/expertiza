@@ -1,5 +1,6 @@
 class SignedUpUser < ActiveRecord::Base
   belongs_to :topic, :class_name => 'SignUpTopic'
+  belongs_to :creator, :class_name => 'User'
 
   def cancel_waitlists_of_users(creator_id, assignment_id)
     waitlisted_topics = SignedUpUser.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.creator_id = " + creator_id.to_s)

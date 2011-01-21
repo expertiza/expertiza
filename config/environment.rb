@@ -21,7 +21,9 @@ Rails::Initializer.run do |config|
   config.gem 'RedCloth'
   config.gem 'rgl', :lib => 'rgl/adjacency'
   config.gem 'rubyzip', :lib => "zip/zip"
-  raise 'graphviz dependency is not installed - missing dot executable' unless RUBY_PLATFORM =~ /mswin/ or %x(which dot).to_s.any?
+  if RAILS_ENV == 'production' and RUBY_PLATFORM !~ /mswin|mingw/ # Don't check on Windows, because there's no "which" command to check
+    raise 'dot executable missing - install graphviz' unless %x(which dot).to_s.any?
+  end
 
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named

@@ -24,13 +24,12 @@ class ImportFileController < ApplicationController
   protected  
   def importFile(session,params)    
     delimiter = get_delimiter(params)
-    
     file = params['file']
-    errors = Array.new  
-    while (line = file.gets(sep_string="\r"))      
+    errors = Array.new
+    file.each_line do |line|
       line = line.gsub("\n","")           
       if line and line.length > 0
-        row = parse_line(line,delimiter)        
+        row = parse_line(line,delimiter)
         begin
         if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
           Object.const_get(params[:model]).import(row,session,params[:id],params[:options])

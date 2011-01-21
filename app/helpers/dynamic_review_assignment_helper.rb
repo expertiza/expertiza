@@ -11,11 +11,6 @@ module DynamicReviewAssignmentHelper
      @current_assignment = Assignment.find(assignment_id)
      @reviewer_id = reviewer_id
      @topic_id = topic_id
-
-     puts "Assignment ID      " + @assignment_id.to_s
-     puts "Current Assignment " + @current_assignment.to_s
-     puts "Reviewer ID        " + @reviewer_id.to_s
-     puts "Topic ID           " + @topic_id.to_s
  
      if( review_type == Assignment::RS_AUTO_SELECTED)
        return auto_selected_review_assignment( )
@@ -30,6 +25,8 @@ module DynamicReviewAssignmentHelper
      
      # Get all the submissions available
      candidates_for_review = find_submissions_in_current_cycle()
+     candidates_for_review.each do |cr|
+     end
 
      # Find the most suited submission which is ready for review based on round robin
      return find_submission_to_review( candidates_for_review )
@@ -39,7 +36,6 @@ module DynamicReviewAssignmentHelper
          
      # Get all the submissions available
      @submissions_in_current_cycle = find_submissions_in_current_cycle()
-     puts @submissions_in_current_cycle
      # Based on round robin , build a Map ( paricipant_id , {0/1/-1} )
      # The submissions in current cycle is already a sorted Map ( paricipant_id , review_count)
      # Once a submission is picked , it has a higher review count and thus until all the
@@ -87,7 +83,6 @@ module DynamicReviewAssignmentHelper
 
   # Find all the submissions for this cycle
   # Build a Map from  (participant_id  => review_count)
-  # TODO On Max no of Reviews ,  no longer can be reviewed
   def self.find_submissions_in_current_cycle()
 
     #
@@ -95,10 +90,18 @@ module DynamicReviewAssignmentHelper
     #  submissions that have been made for this particular assignment. The 'AssignmentParticipant'
     #  model represents a submission for an assignment (among other things).
     #
+
+    #  Make sure to filter out any submissions that do not have any related material. This avoids
+    #  wasting time on submissions that have no content as well as avoiding duplicate reviews
+    #  of team submissions.
+    conditions_str = "submitted_hyperlink IS NOT NULL OR submitted_at IS NOT NULL"
     if @topic_id.blank?
-      submissions_in_current_cycle = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
+      submissions_in_current_cycle = AssignmentParticipant.find_all_by_parent_id(@assignment_id,
+                                                                                 :conditions => conditions_str)
     else
-      submissions_in_current_cycle = AssignmentParticipant.find_all_by_topic_id_and_parent_id(@topic_id , @assignment_id)
+      submissions_in_current_cycle = AssignmentParticipant.find_all_by_topic_id_and_parent_id(@topic_id ,
+                                                                                              @assignment_id,
+                                                                                              :conditions => conditions_str)
     end
 
     #  Create a new Hash to store the number of reviews that have already been done (or are in progress) for
@@ -119,13 +122,12 @@ module DynamicReviewAssignmentHelper
     return sorted_review_count
   end
 
+  #
   #  Sort the {submission => review_count} pair
   #  return the first submission that does not violate the conditions
   #  After sorting, we have submissions with least review count at the top.
   #  we can return the submission that does not violate the condition.
-  #TODO
-  # You cannot review your own submission
-  # The submission is currently on hold for review
+  #
   def self.find_submission_to_review( candidates_for_review )
 
     #  If there are no submissions ready for review, then return nil.
@@ -161,7 +163,9 @@ module DynamicReviewAssignmentHelper
     end
 
     #  If the submission was already reviewed by the reviewer, then do not continue.
-    if !ResponseMap.find_by_reviewed_object_id_and_reviewer_id( submission.parent_id, reviewer_id ).nil?
+    if !ResponseMap.find_by_reviewed_object_id_and_reviewer_id_and_reviewee_id( submission.parent_id,
+                                                                                reviewer_id,
+                                                                                submission.id ).nil?
       return nil
     end
 

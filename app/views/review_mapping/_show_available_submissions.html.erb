@@ -1,4 +1,3 @@
-<% currentUser = session[:user] %>
 <% form_tag :controller => 'review_mapping',
             :action => 'add_self_reviewer',
             :assignment_id => params[:assignment_id],
@@ -6,17 +5,6 @@
             :reviewer_id => session[:user].id do %>
     
   <h2>Select a submission below to begin a new review</h2>
-
-  <img src="/images/green-available.jpg" />
-  <em> Available </em>&nbsp;
-
-  <img src="/images/orange-available-later.jpg" />
-  <em>Currently Not Available </em>&nbsp;
-
-  <img src="/images/red-not-available.jpg" />
-  <em>Not Available </em>
-
-  <br>
 
   <!-- Based on the topic and assignment , get the submissions , list all the submissions with [hyperlinks/files]
        submitted by the participant. Allow the reviewer to choose one. The listed submissions should be based
@@ -27,38 +15,38 @@
   <% @assignment = Assignment.find_by_id(params[:assignment_id])%>
   <% @stage = @assignment.get_current_stage(@assignment.id)%>
 
-  <% if @available_submissions!= nil && @available_submissions.size > 0 %>
+  <% if !@available_submissions.nil? && @available_submissions.size > 0 %>
     <%@i=0%><!-- counter/instead of showing participant.id -->
     <% @available_submissions.each do |map| %>
-      <%@i = @i + 1%>
-      <br>
+      <%@i += 1%>
       <tr>
-        <% participant =  Participant.find_by_id_and_parent_id(map[0],params[:assignment_id]) %>
-
-        <% if participant!= nil && participant.submit_allowed%>
-	      <% if (map[1]== 0) %>
-            <img src="/images/green-available.jpg" />
-	        <% is_disabled = false %>
-          <% elsif (map[1] == 1) %>
-            <img src="/images/orange-available-later.jpg" />
-	        <% is_disabled = true %>
-          <% elsif (map[1] == -1) %>
-            <img src="/images/red-not-available.jpg" />
-	        <% is_disabled = true %>
-          <% end %>
+        <td>
+          <% participant =  Participant.find_by_id_and_parent_id(map[0],params[:assignment_id]) %>
+          <% is_disabled = false %>
+          <% if participant!= nil && participant.submit_allowed%>
+	        <% if (map[1] == 0) %>
+              <% is_disabled = false %>
+            <% elsif (map[1] == 1) %>
+              <% is_disabled = true %>
+            <% elsif (map[1] == -1) %>
+              <% is_disabled = true %>
+            <% end %>
+          </td>
           <td>
-            <%= radio_button_tag 'submission_id', participant.id ,false,:disabled => is_disabled %><%=h "Submission" + @i.to_s %>
+            <%= radio_button_tag 'submission_id', participant.id ,false,:disabled => is_disabled %><%=h "Submission " + @i.to_s %>
+	      </td>
+	      <td>
+		    <%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage =>  @stage} %>
 	      </td>
 	    </tr>
-	    <tr>
-		  <%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage =>  @stage} %>
-	    </tr>
+
       <% end %>
     <% end %>
-<br>
-<br>
-<input type='submit' value='Request'/><% else %>
-<%= "No submissions available for review" %>
+  <br>
+        
+  <input type='submit' value='Review Selected Submission'/>
+<% else %>
+  <%= "No submissions currently available for review." %>
 <% end %>
 <% end %>
 <br>

@@ -3,7 +3,7 @@
 <% else %>
 <h1>Grant Publishing Rights to all Past Assignments</h1>
 <% end %>
-<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+<% unless flash[:notice].blank? %>
 <div class="flash_error">
 	<%= flash[:notice] %>
 </div>
@@ -11,10 +11,12 @@
 
 <table class="listing" cellpadding=2>
 	<tr>
-	  <td colspan="2">Please supply your Private key to so a digital signature can be generated
-	  (private key will not be saved in the database). If you have lost your private 
-	  key, click <%= link_to 'here',{:controller=>:users, :action=>:keys, :id=>@user.id} %>
-	  to generate new keys.</td>
+	  <td colspan="2">
+	    Please supply your private key, so a digital signature can be generated
+	    (private key will not be saved).
+	    If you lost your private key,
+	    <%= link_to 'generate a new key', {:controller => :users, :action => :keys, :id => @user.id} %>.
+	  </td>
 	</tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr>
@@ -24,7 +26,8 @@
 		<% if (!@participant.nil?) %>
 		  <%= hidden_field_tag :id, @participant.id %> 
 		<% end %>
-		<%= text_area_tag :private_key, '', :rows => 20, :cols => 65, :style =>'scrollHeight:40' %><br />
+		<%= text_area_tag :private_key, '', :rows => 20, :cols => 65, :style => 'scrollHeight:40' %>
+		<br />
 		<%= submit_tag 'Grant' %>
 		<% end %>
 	  </td>

@@ -237,7 +237,7 @@ class AssignmentParticipant < Participant
         participant.save
       else
         participant.update_attribute('permission_granted', 0)
-        participant.digital_signature-nil
+        participant.digital_signature=nil
         participant.time_stamp=nil
         raise "invalid key"
       end

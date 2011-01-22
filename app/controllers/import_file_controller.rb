@@ -27,8 +27,8 @@ class ImportFileController < ApplicationController
     file = params['file']
     errors = Array.new
     file.each_line do |line|
-      line = line.gsub("\n","")           
-      if line and line.length > 0
+      line.chomp!
+      unless line.empty?
         row = parse_line(line,delimiter)
         begin
         if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'

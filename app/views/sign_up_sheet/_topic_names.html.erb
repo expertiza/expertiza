@@ -1,4 +1,4 @@
-<a href="#<%= i %>" onClick="toggleVis('<%=i%>');">
+<a href="#<%= i %>" onClick="toggleVis('<%=i%>'); return false;">
   <span class="inline" id="<%= i %>_show"><%= topic.topic_name %></span>
   <span class="inline" id="<%= i %>_hide" style="display: none"><%= topic.topic_name %></span>
 </a>

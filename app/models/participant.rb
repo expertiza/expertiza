@@ -1,7 +1,7 @@
 class Participant < ActiveRecord::Base
   belongs_to :user
-  has_many :comments
-  has_many :resubmission_times 
+  has_many :comments, :dependent => :destroy
+  has_many :resubmission_times, :dependent => :destroy
   
   validates_numericality_of :grade, :allow_nil => true
 

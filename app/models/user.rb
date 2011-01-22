@@ -1,12 +1,14 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
-  has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id'
+  has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id', :dependent => :destroy
+  # FIXME:          :class_name should be AssignmentParticipant, probably. In most cases it's used that way. But all?
   has_many :assignments, :through => :participants
+  has_many :signed_up_users, :foreign_key => 'creator_id', :dependent => :destroy
   
   belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
   
-  has_many :teams_users
+  has_many :teams_users, :dependent => :destroy
   has_many :teams, :through => :teams_users
   
   validates_presence_of :name

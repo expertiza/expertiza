@@ -9,12 +9,12 @@ and have to follow a link to generate their private keys -->
 		In order for your work to be published on our website, you need to grant us 
 		publishing rights for your work.  Before doing so you must generate a set of public and private keys so
 		you can digitally sign your granting action.
-    Please <%= link_to 'generate a key pair', {:controller => :users, :action => :keys, :id => @user.id} %>
-    now.
+    
+    <h3><%= link_to 'generate a key pair', {:controller => :users, :action => :keys, :id => @user.id} %></h3>
 
 
 	</div></td></tr>
-		<% else %>
+<% else %>
 	<tr>
 					
 		<td colspan=5>

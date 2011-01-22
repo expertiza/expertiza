@@ -11,6 +11,9 @@ config.cache_classes = true
 config.action_controller.consider_all_requests_local = false
 config.action_controller.perform_caching             = true
 
+# Because we have lots of bugs and want error reports displayed
+config.action_controller.consider_all_requests_local = true
+
 # Enable serving of images, stylesheets, and javascripts from an asset server
 # config.action_controller.asset_host                  = "http://assets.example.com"
 

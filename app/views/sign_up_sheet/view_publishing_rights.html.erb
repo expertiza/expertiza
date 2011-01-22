@@ -29,7 +29,8 @@
       </tr>
 
       <% if (@assignment.participants.size > 0) %>
-        <% topic.signed_up_users.map(&:creator).each do |user| %>
+        <% for signed_up_user in topic.signed_up_users %>
+          <% user = User.find(signed_up_user.creator_id) %>
           <tr>
             <th>&nbsp;</th>
             <th>&nbsp;</th>

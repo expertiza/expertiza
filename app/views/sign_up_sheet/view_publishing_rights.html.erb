@@ -8,7 +8,10 @@
   <table class="general">
     <tr>
       <th width="5%" rowspan="2">Topic #</th>
-      <th width="60%" rowspan="2">Topic name(s)</th>
+      <th width=<%= (@assignment.team_assignment ? "40" : "60") %> rowspan="2">Topic name(s)</th>
+	  <% if @assignment.team_assignment %>
+      <th width="20%" rowspan="2">Team name</th>
+	  <% end %>
       <th width="35%" colspan="4">Participant</th>
     </tr>
     <tr>
@@ -22,22 +25,37 @@
       <tr>
         <td><%= topic.topic_identifier %></td>
         <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic => topic} %></td>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
+        <th colspan=<%= (@assignment.team_assignment ? "5" : "4") %>>&nbsp;</th>
       </tr>
 
-      <% if (@assignment.participants.size > 0) %>
-        <% for signed_up_user in topic.signed_up_users %>
-          <% user = User.find(signed_up_user.creator_id) %>
+      <% if (@assignment.participants.size > 0)
+           for signed_up_user in topic.signed_up_users
+             if @assignment.team_assignment
+               team = Team.find(signed_up_user.creator_id)
+               users = team.users
+             else
+               users = [ User.find(signed_up_user.creator_id) ]
+	         end
+            
+             showed_team = false
+             for user in users
+      %>
           <tr>
             <th>&nbsp;</th>
             <th>&nbsp;</th>
+			<% if @assignment.team_assignment
+			     if !showed_team 
+            %>
+			<td align="center" rowspan="<%= team.users.size %>"><b><%= team.name %></b></td>
+			  <% end %>
+			  <% showed_team = true %>
+			<% end %>
             <td><%=user.name%></td>
             <td><%=user.fullname%></td>
             <%
               permissionGranted = false
+              hasSignature = false
+              signatureValid = false
               @assignment.participants.each do |participant|
                 if (user.id == participant.user.id)
                   permissionGranted = participant.permission_granted?
@@ -58,6 +76,7 @@
               &nbsp;
             </td>
           </tr>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>

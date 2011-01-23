@@ -72,7 +72,6 @@
             }%>
         <% end %>
 
-        <% if !assignment.dynamic_reviewer_assignments_enabled %>
           <div style="text-align:right">
           <% if !assignment.team_assignment %>
             <%= link_to 'delete', :action => 'delete_participant', :id => contributor.id %><br/>
@@ -80,7 +79,6 @@
           <%= link_to 'add reviewer', :action => 'select_reviewer', :id => assignment.id, :contributor_id => contributor.id %><br/>
           <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id %>
           </div>
-        <% end %>
 
        </td>
     <td colspan="2">
@@ -102,13 +100,11 @@
            %>           
            <tr style="background-color:<%=bgcolor2%>">            
              <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
-             <% if !assignment.dynamic_reviewer_assignments_enabled %>
                <div style="text-align:right">
                  <%= link_to 'delete', :action => 'delete_reviewer', :id => map.id %><br/>
                  <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.id %><br/>               
                  <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.id %>
                </div>
-             <% end %>             
              </td>
 
              <td width="50%">
@@ -127,11 +123,9 @@
               
                    <tr style="background-color:<%=bgcolor3%>">
                      <td><%= rmap.reviewer.name %> (<%= rmap.reviewer.fullname %>)
-                     <% if !assignment.dynamic_reviewer_assignments_enabled %>
                        <div style="text-align:right">
                          <%= link_to 'delete', :action => 'delete_metareviewer', :id => rmap.id %><br/>
                        </div>
-                     <% end %>      
                      </td>
                    </tr>
                <% end
@@ -152,7 +146,7 @@
   session[:return_to] = request.request_uri    
 %>
 
-<% if !assignment.dynamic_reviewer_assignments_enabled %>
+<% if !assignment.is_using_dynamic_reviewer_assignment? %>
 
 <%= link_to 'Assign reviewers automatically', :action => 'select_mapping', :id => assignment.id %>
 | <%= link_to 'Import reviewer mappings', 
@@ -169,7 +163,10 @@
             :title => 'Metareviewer Mappings',
             :expected_fields => 'Contributor, Reviewer, Metareviewer1, Metareviewer2, ... MetareviewerN',
             :id => assignment.id %>
-<BR/><%= link_to 'Export review mappings',
+<BR/>
+<% end %>
+
+<%= link_to 'Export review mappings',
             :controller=>'export_file',
             :action=>'start',
             :model=> 'ReviewResponseMap',
@@ -179,8 +176,5 @@
             :action=>'start',
             :model=> 'MetareviewResponseMap',
             :id=>assignment.id %>            
-| <%= link_to 'Delete all reviewers and metareviewers', :action => 'delete_all_reviewers_and_metareviewers', :id => assignment.id %>
-
-<% else %>
-  <p> NOTE: No manual changes can be made to review assignments as they are automatically generated.</p>
-<% end %>
+| <%= link_to 'Delete all reviewers and metareviewers', :action => 'delete_all_reviewers_and_metareviewers',
+                                                        :id => assignment.id %> | 

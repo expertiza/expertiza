@@ -30,6 +30,10 @@ class ImportFileController < ApplicationController
       line.chomp!
       unless line.empty?
         row = parse_line(line,delimiter)
+        logger.info "line #{line}"
+        logger.info "row #{row}"
+        logger.info "params[:model] #{params[:model]}"
+        logger.info "params[:id] #{params[:id]}"
         begin
         if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
           Object.const_get(params[:model]).import(row,session,params[:id],params[:options])

@@ -204,11 +204,17 @@ class AssignmentController < ApplicationController
     end
     
     default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)   
-    
-    @limits[:review] = default.notification_limit
-    @limits[:metareview] = default.notification_limit
-    @limits[:feedback] = default.notification_limit
-    @limits[:teammate] = default.notification_limit
+
+    if default.nil?
+      default_limit_value = 15
+    else
+      default_limit_value = default.notification_limit
+    end
+
+    @limits[:review]     = default_limit_value
+    @limits[:metareview] = default_limit_value
+    @limits[:feedback]   = default_limit_value
+    @limits[:teammate]   = default_limit_value
    
     @weights[:review] = 100
     @weights[:metareview] = 0
@@ -328,7 +334,7 @@ class AssignmentController < ApplicationController
         flash[:notice] = "The assignment is deleted"
       rescue
         url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
-        url_no  = url_for :action => 'delete', :id => params[:id]        
+        url_no  = url_for :action => 'delete', :id => params[:id]
         error = $!
         flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
       end
@@ -348,11 +354,6 @@ class AssignmentController < ApplicationController
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @courses = @user.set_courses_to_assignment
-#    if session[:user].role_id != 6 # for other that TA
-#      @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
-#    else
-#      @courses = TaMapping.get_courses(session[:user].id)
-#    end   
   end
   
   def remove_assignment_from_course    

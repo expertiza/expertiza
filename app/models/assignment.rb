@@ -4,7 +4,7 @@ class Assignment < ActiveRecord::Base
   
   belongs_to :course, :class_name => 'Course', :foreign_key => 'course_id'
   belongs_to :wiki_type
-   # wiki_type needs to be removed. When an assignment is created, it needs to
+  # wiki_type needs to be removed. When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically" set the type field to the value that
   # designates an assignment of the appropriate type.
@@ -22,7 +22,24 @@ class Assignment < ActiveRecord::Base
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
     
   COMPLETE = "Complete"
-  
+
+  #  Review Strategy information.
+  RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
+  RS_STUDENT_SELECTED    = 'Student-Selected'
+  RS_AUTO_SELECTED       = 'Auto-Selected'
+  REVIEW_STRATEGIES = [RS_INSTRUCTOR_SELECTED, RS_STUDENT_SELECTED, RS_AUTO_SELECTED]
+
+  DEFAULT_MAX_REVIEWERS = 3
+
+  def is_using_dynamic_reviewer_assignment?
+    if self.review_assignment_strategy == RS_AUTO_SELECTED or
+       self.review_assignment_strategy == RS_STUDENT_SELECTED
+      return true
+    else
+      return false
+    end
+  end
+ 
   def review_mappings
     if team_assignment
       TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
@@ -189,6 +206,7 @@ class Assignment < ActiveRecord::Base
     rescue
       raise "At least one teammate review response exists for #{self.name}."
     end
+    
     self.invitations.each{|invite| invite.destroy}
     self.teams.each{| team | team.delete}
     self.participants.each {|participant| participant.delete}
@@ -202,7 +220,7 @@ class Assignment < ActiveRecord::Base
       # directory is empty
     end
         
-    if !(self.wiki_type_id == 2 or self.wiki_type_id == 3) and directory != nil and directory.size == 2 
+    if !(self.wiki_type_id == 2 or self.wiki_type_id == 3) and directory != nil and directory.size == 2
         Dir.delete(RAILS_ROOT + "/pg_data/" + self.directory_path)          
     elsif !(self.wiki_type_id == 2 or self.wiki_type_id == 3) and directory != nil and directory.size != 2
         raise "Assignment directory is not empty."

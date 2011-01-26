@@ -50,5 +50,5 @@ task :load_production_data, :roles => :db, :only => { :primary => true } do
   system 'rake db:drop && rake db:create'
 
   logger.info 'Importing production database into local development database'
-  system "zcat #{filename} | mysql -u #{database['development']['username']} --password=#{database['development']['password']} #{database['development']['database']} && rm -f #{filename}"
+  system "gunzip -c #{filename} | mysql -u #{database['development']['username']} --password=#{database['development']['password']} #{database['development']['database']} && rm -f #{filename}"
 end

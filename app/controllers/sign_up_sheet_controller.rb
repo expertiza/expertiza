@@ -71,14 +71,18 @@ class SignUpSheetController < ApplicationController
     load_add_signup_topics(params[:id])
   end
 
+  def view_publishing_rights
+    load_add_signup_topics(params[:id])
+  end
+
   def load_add_signup_topics(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', assignment_id])
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 
-    assignment = Assignment.find(assignment_id)
-    if !assignment.team_assignment
+    @assignment = Assignment.find(assignment_id)
+    if !@assignment.team_assignment
       @participants = SignedUpUser.find_participants(assignment_id)
     else
       @participants = SignedUpUser.find_team_participants(assignment_id)

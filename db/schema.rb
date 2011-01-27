@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101116184602) do
+ActiveRecord::Schema.define(:version => 20101222143748) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -42,7 +42,7 @@ ActiveRecord::Schema.define(:version => 20101116184602) do
     t.integer  "teammate_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
     t.boolean  "team_assignment"
-    t.integer  "wiki_type_id",                               :default => 0,     :null => false
+    t.integer  "wiki_type_id",                         :default => 0,     :null => false
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                        :default => 0,     :null => false
     t.text     "spec_location"
@@ -52,7 +52,6 @@ ActiveRecord::Schema.define(:version => 20101116184602) do
     t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions"
     t.boolean  "dynamic_reviewer_assignments_enabled", :default => false
-    t.boolean  "allow_hosted_docs"
     t.string   "review_assignment_strategy"
     t.integer  "max_reviews_per_submission"
   end
@@ -334,6 +333,8 @@ ActiveRecord::Schema.define(:version => 20101116184602) do
     t.string   "type"
     t.string   "handle"
     t.integer  "topic_id"
+    t.datetime "time_stamp"
+    t.text     "digital_signature"
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
@@ -378,11 +379,11 @@ ActiveRecord::Schema.define(:version => 20101116184602) do
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
   create_table "response_maps", :force => true do |t|
-    t.integer "reviewed_object_id",                      :null => false
-    t.integer "reviewer_id",                             :null => false
-    t.integer "reviewee_id",                             :null => false
-    t.string  "type",                                    :null => false
-    t.boolean "notification_not_sent", :default => true
+    t.integer "reviewed_object_id",    :default => 0,     :null => false
+    t.integer "reviewer_id",           :default => 0,     :null => false
+    t.integer "reviewee_id",           :default => 0,     :null => false
+    t.string  "type",                  :default => "",    :null => false
+    t.boolean "notification_accepted", :default => false
   end
 
   add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"
@@ -615,6 +616,7 @@ ActiveRecord::Schema.define(:version => 20101116184602) do
     t.integer "master_permission_granted", :limit => 1,   :default => 0
     t.string  "handle"
     t.boolean "leaderboard_privacy",                      :default => false
+    t.text    "digital_certificate"
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

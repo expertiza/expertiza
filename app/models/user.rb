@@ -137,4 +137,47 @@ class User < ActiveRecord::Base
   def set_courses_to_assignment 
     @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')    
   end
+
+  # generate a new RSA public/private key pair and create our own X509 digital certificate which we 
+  # save in the database. The private key is returned by the method but not saved.
+  def generate_keys
+    # check if we are replacing a digital certificate already generated
+    replacing_key = true if (!self.digital_certificate.nil?)
+
+    # generate the new key pair
+    new_key = OpenSSL::PKey::RSA.generate( 1024 )
+    new_public = new_key.public_key
+    new_private = new_key.to_pem
+
+    # create the X509 certificate on behalf of the user
+    cert = OpenSSL::X509::Certificate.new
+    cert.version = 1
+    cert.subject = cert.issuer = OpenSSL::X509::Name.parse("/C="+self.id.to_s)
+    cert.public_key = new_public
+    
+    # certificate will be valid for 1 year
+    cert.not_before = Time.now
+    cert.not_after = Time.now+3600*24*365
+    
+    # self-sign (we trust our own certificates) it using the private key
+    cert.sign(new_key, OpenSSL::Digest::SHA1.new)
+    
+    # convert to a textual form and save it in the database
+    self.digital_certificate = cert.to_pem
+    self.save
+    
+    # when replacing an existing key, update any digital signatures made previously with the new key
+    if (replacing_key)
+      participants = AssignmentParticipant.find_all_by_user_id(self.id)
+      for participant in participants
+        if (participant.permission_granted && !participant.digital_signature.nil?)
+          AssignmentParticipant.grant_publishing_rights(new_private, [ participant ]) 
+        end
+      end
+    end
+    
+    # return the new private key
+    new_private
+  end 
+
 end

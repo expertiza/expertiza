@@ -31,8 +31,10 @@
       <% if (@assignment.participants.size > 0)
            for signed_up_user in topic.signed_up_users
              if @assignment.team_assignment
-               team = Team.find(signed_up_user.creator_id)
-               users = team.users
+               # An unknown bug causes teams to disappear. Don't crash if this happens
+               team = Team.find_by_id(signed_up_user.creator_id)
+               users = []
+               users = team.users if team
              else
                users = [ User.find(signed_up_user.creator_id) ]
 	         end
@@ -69,9 +71,9 @@
             <td><%= (permissionGranted ? "granted" : "denied") %></td>
             <td>
               <% if (permissionGranted && hasSignature && signatureValid) %>
-                <img src="/images/Check-icon.png"/>
+                <img src="/images/Check-icon.png" title="verified with digitigal signature" alt="verified"/>
               <% else %>
-                <img src="/images/delete_icon.png"/>
+                <img src="/images/delete_icon.png" title="no digitigal signature" alt="unverified"/>
               <% end %>
               &nbsp;
             </td>

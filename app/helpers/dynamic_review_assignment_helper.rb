@@ -25,8 +25,6 @@ module DynamicReviewAssignmentHelper
      
      # Get all the submissions available
      candidates_for_review = find_submissions_in_current_cycle()
-     candidates_for_review.each do |cr|
-     end
 
      # Find the most suited submission which is ready for review based on round robin
      return find_submission_to_review( candidates_for_review )
@@ -53,13 +51,13 @@ module DynamicReviewAssignmentHelper
      least_review_count = -1;
      max_no_reviews = 5
      @submissions_availability = Hash.new
-     if(@submissions_in_current_cycle.nil? == false &&  @submissions_in_current_cycle.size > 0)
+     unless @submissions_in_current_cycle.nil?
        @submissions_in_current_cycle.each { |submission|
  
          if( least_review_count == -1)
            least_review_count = submission[1]
          end
-         if submission[0] != @reviewer_id # Check for more conditions here
+         if submission[0] != @reviewer_id
            @submissions_availability[submission[0]] = get_state(least_review_count,submission[1],max_no_reviews)
          end
        }

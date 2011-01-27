@@ -158,11 +158,16 @@ class UsersController < ApplicationController
     redirect_to :action => 'list'
   end
 
+  def keys
+    @user = User.find(params[:id])
+    @private_key = @user.generate_keys
+  end
+  
   protected
 
   def foreign
     role = Role.find((session[:user]).role_id)  
     @all_roles = Role.find(:all, :conditions => ['id in (?) or id = ?',role.get_available_roles,role.id])
   end
-  
+ 
 end

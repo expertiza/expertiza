@@ -1,0 +1,35 @@
+<% if (!@participant.nil?) %>
+<h1>Grant Publishing Rights to <%= @participant.assignment.name %></h1>
+<% else %>
+<h1>Grant Publishing Rights to all Past Assignments</h1>
+<% end %>
+<% unless flash[:notice].blank? %>
+<div class="flash_error">
+	<%= flash[:notice] %>
+</div>
+<% end %>
+
+<table class="listing" cellpadding=2>
+	<tr>
+	  <td colspan="2">
+	    Please supply your private key, so a digital signature can be generated
+	    (private key will not be saved).
+	    If you lost your private key,
+	    <%= link_to 'generate a new key', {:controller => :users, :action => :keys, :id => @user.id} %>.
+	  </td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+	  <td valign="top"><b>Private Key:</b></td>
+	  <td>
+		<% form_tag :action => 'grant_with_private_key' do %>
+		<% if (!@participant.nil?) %>
+		  <%= hidden_field_tag :id, @participant.id %> 
+		<% end %>
+		<%= text_area_tag :private_key, '', :rows => 20, :cols => 65, :style => 'scrollHeight:40' %>
+		<br />
+		<%= submit_tag 'Grant' %>
+		<% end %>
+	  </td>
+	</tr>
+</table>

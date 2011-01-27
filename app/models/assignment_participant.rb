@@ -200,6 +200,77 @@ class AssignmentParticipant < Participant
     return fields            
   end
   
+  # generate a hash string that we can digitally sign, consisting of the 
+  # assignment name, user name, and time stamp passed in.
+  def get_hash(time_stamp)
+    # first generate a hash from the assignment name itself
+    hash_data = Digest::SHA1.digest(self.assignment.name.to_s)
+    
+    # second generate a hash from the first hash plus the user name and time stamp
+    sign = hash_data + self.user.name.to_s + time_stamp.strftime("%Y-%m-%d %H:%M:%S")
+    Digest::SHA1.digest(sign)
+  end
+  
+  # grant publishing rights to one or more assignments. Using the supplied private key, 
+  # digital signatures are generated.
+  # reference: http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
+  def self.grant_publishing_rights(privateKey, participants)
+    for participant in participants
+      # get the current time in UTC
+      time_now = Time.now.utc
+      
+      # generate a hash to digitally sign
+      hash_data = participant.get_hash(time_now)
+            
+      # generate a digital signature of the hash
+      private_key2 = OpenSSL::PKey::RSA.new(privateKey)
+      cipher_text = Base64.encode64(private_key2.private_encrypt(hash_data))
+      
+      # save the digital signature and the time stamp in the database.  Time stamp needs to be 
+      # saved so we can generate the hash again later and compare it to the one digitally signed.
+      participant.digital_signature = cipher_text
+      participant.time_stamp = time_now
+      
+      #now, check to make sure the digital signature is valid, if not raise error
+      if (participant.verify_digital_signature(cipher_text))
+        participant.update_attribute('permission_granted', 1)
+        participant.save
+      else
+        participant.update_attribute('permission_granted', 0)
+        participant.digital_signature=nil
+        participant.time_stamp=nil
+        raise "invalid key"
+      end
+      
+    end
+  end
+  
+  # verify the digital signature is valid
+  def verify_digital_signature(cipher_text)
+    # get a hash based on the time stamp saved in the database
+    hash_data = get_hash(self.time_stamp)
+
+    # get the public key from the digital certificate saved in the database
+    certificate1 = self.user.digital_certificate 
+    cert = OpenSSL::X509::Certificate.new(certificate1)
+    begin
+      public_key1 = cert.public_key 
+      public_key = OpenSSL::PKey::RSA.new(public_key1)
+      
+      # decrypt the hash from the passed in digital signature and compare to the one
+      # we just generated to see if it is valid
+      clear_text = public_key.public_decrypt(Base64.decode64(cipher_text))
+      if (hash_data == clear_text)
+        true
+      else
+        false;
+      end
+      
+    rescue Exception => msg  
+      false
+    end
+  end
+  
   #define a handle for a new participant
   def set_handle()
     if self.user.handle == nil or self.user.handle == ""

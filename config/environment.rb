@@ -17,11 +17,12 @@ Rails::Initializer.run do |config|
   # Specify gems that this application depends on and have them installed with rake gems:install
   # config.gem "hpricot", :lib, :version => '0.6', :source => "http://code.whytheluckystiff.net"
   config.gem 'fastercsv'
+  config.gem 'gdata'
+  config.gem 'hoptoad_notifier'
   config.gem 'mysql'
   config.gem 'RedCloth'
   config.gem 'rgl', :lib => 'rgl/adjacency'
   config.gem 'rubyzip', :lib => "zip/zip"
-  config.gem 'gdata'
 
   if RAILS_ENV == 'production' and RUBY_PLATFORM !~ /mswin|mingw/ # Don't check on Windows, because there's no "which" command to check
     raise 'dot executable missing - install graphviz' unless %x(which dot).to_s.any?

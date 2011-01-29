@@ -2,7 +2,7 @@
 
 <% if session[:user].master_permission_granted.nil? and !@participant.permission_granted %>
    <div class="flash_note">Your work cannot be published because you haven't granted us permission to publish your work. 
-     Set <%= link_to 'publishing rights', :controller => 'publishing', :action => 'view' %> for your work. 
+     Set <strong><%= link_to 'publishing rights', :controller => 'publishing', :action => 'view' %></strong> for your work. 
    </div>
 <%end%>
 

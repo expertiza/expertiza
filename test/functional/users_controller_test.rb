@@ -65,10 +65,9 @@ class UsersControllerTest < Test::Unit::TestCase
     # Because the goldberg variables didn't been initialized  in the test framework
 #   assert_raise (ActionView::TemplateError){
     post :update, :id => @testUser, :user => { :clear_password => "test",
-      :confirm_password => "nottest"}
+      :clear_password_confirmation => "nottest"}
 #   }
-    assert assigns(:user).valid?                                    
-    assert_equal "The passwords you entered don't match", flash[:error]
+    assert !assigns(:user).valid?                                    
     assert_template 'users/edit'
   end
   # test removing a user

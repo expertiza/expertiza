@@ -53,9 +53,9 @@ task :load_production_data, :roles => :db, :only => { :primary => true } do
   system "gunzip -c #{filename} | mysql -u #{database['development']['username']} --password=#{database['development']['password']} #{database['development']['database']} && rm -f #{filename}"
 end
 
-
-Dir[File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'hoptoad_notifier-*')].each do |vendored_notifier|
-  $: << File.join(vendored_notifier, 'lib')
-end
-
-require 'hoptoad_notifier/capistrano'
+# Hoptoad deploy tracking only works with paid hoptoad accounts
+#Dir[File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'hoptoad_notifier-*')].each do |vendored_notifier|
+#  $: << File.join(vendored_notifier, 'lib')
+#end
+#
+#require 'hoptoad_notifier/capistrano'

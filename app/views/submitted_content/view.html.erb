@@ -1,11 +1,5 @@
 <h1>Submit work for <%= @assignment.name %></h1>
 
-<% if !@participant.permission_granted %>
-   <div class="flash_note">Your work cannot be published because you haven't granted us permission to publish your work. 
-     Set <strong><%= link_to 'publishing rights', :controller => 'publishing', :action => 'view' %></strong> for your work. 
-   </div>
-<%end%>
-
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
 
 <a href="javascript:window.history.back()">Back</a>

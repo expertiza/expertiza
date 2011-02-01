@@ -24,8 +24,7 @@
 	    <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
 	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
     <% else %>
-	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" >
-		</textarea>	
+	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>	
     <% end %>
     <% if question.true_false? %>
       <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">

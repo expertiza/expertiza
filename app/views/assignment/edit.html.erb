@@ -16,7 +16,7 @@
         <th style="padding:10px">Review allowed</th>
         <th style="padding:10px">Resubmission allowed</th>
         <th style="padding:10px">Re-review allowed</th>
-        <th style="padding:10px">Review of review allowed</th>
+        <th style="padding:10px">Metareview allowed</th>
 		<th style="padding:10px">Reminder (hrs)</th>
     </tr>
   <% 	i = 0;
@@ -38,7 +38,7 @@
 		         heading = "Re-review deadline"
 		      end
 		      if  @due_date.deadline_type_id == 5
-		         heading = "Review of review deadline"
+		         heading = "Metareview deadline"
 		      end
 		      
 		 %>

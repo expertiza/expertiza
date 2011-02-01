@@ -1,11 +1,5 @@
 <h1>Submit work for <%= @assignment.name %></h1>
     
-<% if(session[:user].master_permission_granted == nil && !@participant.permission_granted)%>
-     <div class="flash_note">Your work cannot be published because you haven't granted us permission to publish your work. 
-     <br/>Click <%= link_to 'yes', :action =>'set_publish_permission_yes', :id => @participant.id%> to grant permission for this work. 
-     <br/>Click <%= link_to 'always', :action =>'set_publish_master_permission_yes', :id => @participant.id%> to grant permission for <b>all</b> your work. 
-     <br/>Click <%= link_to 'never', :action =>'set_publish_master_permission_no', :id => @participant.id%> to deny permission for <b>all</b> your work. </div>
-<% end %>
 <%@stage = @assignment.get_current_stage(@participant.topic_id)%>
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => @stage} %>
 <BR/>

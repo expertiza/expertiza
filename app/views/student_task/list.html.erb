@@ -46,7 +46,7 @@
     %>
 
      <span>&nbsp; &raquo; <%= link_to participant.assignment.name + " " +
-             stage, :controller => controller, :action => action, :id => participant.id %>(<%=
+             stage, :controller => controller, :action => action, :id => participant.id %> (<%=
          time_ago_in_words(duedate) %> left) </span><br/>
 
     <% end %>

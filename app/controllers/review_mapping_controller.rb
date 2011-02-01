@@ -363,7 +363,7 @@ class ReviewMappingController < ApplicationController
     revmapid = mapping.review_mapping.id
     mapping.delete
     
-    flash[:note] = "The review of reviewer has been deleted."
+    flash[:note] = "The metareviewer has been deleted."
     redirect_to :action => 'list_rofreviewers', :id => revmapid  
   end     
     

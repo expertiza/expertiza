@@ -26,9 +26,8 @@ class StudentTaskController < ApplicationController
           current_folder = DisplayOption.new
           current_folder.name = ""
 
-          files = participant.get_files(participant.get_path + current_folder.name)
           url = participant.submitted_hyperlink
-          if  (participant.resubmission_times.size >0 and files.length > 0) or (!url.nil? and url!= '')
+          if  (participant.resubmission_times.size >0) or (!url.nil? and url!= '')
             @taskrevisions << participant
           else
             @tasknotstarted << participant

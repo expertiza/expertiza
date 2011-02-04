@@ -26,14 +26,14 @@ module Mime
     # Register mime types in file and return the newly registered types
     # Returns newly loaded extensions [['ext1'], ['ext2a', 'ext2b']]
     def self.import_apache_mime_types(file='/etc/mime.types')
-      self.load_mime_types(file).map do |type, extensions|
+      types = self.load_mime_types(file).map do |type, extensions|
         primary_ext = extensions.shift
         #if Mime::Type.lookup_by_extension(primary_ext) == primary_ext # Don't overwrite extensions that are already registered
         unless Mime.constants.include?(primary_ext.to_s.upcase)
           Mime::Type.register(type, primary_ext.to_sym, [], extensions) rescue nil # some extensions aren't constantizable
         end
       end
-      _.compact
+      types.compact
     end
   end
 end

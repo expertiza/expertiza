@@ -21,6 +21,8 @@ module Mime
         }
         hash
       }
+    rescue
+      {}
     end
 
     # Register mime types in file and return the newly registered types

@@ -104,7 +104,10 @@ class SubmittedContentController < ApplicationController
         send_file(folder_name+ "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline')
       else
         if !File.directory?(folder_name + "/" + file_name)
-          send_file( folder_name + "/" + file_name, :disposition => 'inline')
+          file_ext = File.extname(file_name)[1..-1]
+          send_file folder_name + "/" + file_name,
+                    :disposition => 'inline',
+                    :type => Mime::Type.lookup_by_extension(file_ext)
         else
            Net::SFTP.start("http://pg-server.csc.ncsu.edu", "*****", "****") do |sftp|
               sftp.download!(folder_name + "/" + file_name, "C:/expertiza", :recursive => true)

@@ -28,9 +28,10 @@ module Mime
     def self.import_apache_mime_types(file='/etc/mime.types')
       types = self.load_mime_types(file).map do |type, extensions|
         primary_ext = extensions.shift
-        #if Mime::Type.lookup_by_extension(primary_ext) == primary_ext # Don't overwrite extensions that are already registered
-        unless Mime.constants.include?(primary_ext.to_s.upcase)
-          Mime::Type.register(type, primary_ext.to_sym, [], extensions) rescue nil # some extensions aren't constantizable
+        # Don't overwrite extensions that are already registered.
+        # Also html stuff is already defined, and loading some of apache's makes xhtml go strict
+        unless Mime.constants.include?(primary_ext.to_s.upcase) || type =~ /html/
+          Mime::Type.register(type, primary_ext.to_sym, [], extensions) rescue nil # some extensions aren't constantizable. Ingore these
         end
       end
       types.compact

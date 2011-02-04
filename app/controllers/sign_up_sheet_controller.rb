@@ -271,20 +271,44 @@ class SignUpSheetController < ApplicationController
       first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
 
       if !first_waitlisted_user.nil?
-        #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-        first_waitlisted_user.is_waitlisted = false
-        first_waitlisted_user.save
+        confby = first_waitlisted_user.confirm_by.days.from_now.to_date
+      
+      
+      tnow = Time.now.to_date
+      
+      if assignment.staggered_deadline ==1
+        topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic_id, 1)
+      else
+        topic_deadline_subm = DueDate.find_by_assignment_id_and_deadline_type_id(assignment.id,1)
+      end
+    
+      if topic_deadline_subm.due_at < confby
+        check = 0
+      else
+        check = 1
+      end
+      end
+    
+      if !first_waitlisted_user.nil?
+        if check == 1
+          #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+          first_waitlisted_user.is_waitlisted = false
+          first_waitlisted_user.save
 
-        #update the participants details
-        if assignment.team_assignment?
-          user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-          participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
+          #update the participants details
+          if assignment.team_assignment?
+            user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+            participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
+          else
+            participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
+          end
+            participant.update_topic_id(topic_id)   
+          SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
         else
-          participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
+          
+          first_waitlisted_user.destroy
+          SignUpTopic.cancel_one_waitlist(first_waitlisted_user.creator_id,assignment_id,topic_id)
         end
-        participant.update_topic_id(topic_id)
-
-        SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
       end
     end
 
@@ -299,6 +323,7 @@ class SignUpSheetController < ApplicationController
   def signup
     #find the assignment to which user is signing up
     assignment = Assignment.find(params[:assignment_id])
+    val = params[:confirm_by]
 
     #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
     if assignment.team_assignment == true
@@ -311,12 +336,13 @@ class SignUpSheetController < ApplicationController
         team = create_team(params[:assignment_id])
         user = User.find(session[:user].id)
         teamuser = create_team_users(user, team.id)
-        confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id])
+       
+        confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id],val)
       else
-        confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id])
+        confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id],val)
       end
     else
-      confirmationStatus = confirmTopic(session[:user].id, params[:id], params[:assignment_id])
+      confirmationStatus = confirmTopic(session[:user].id, params[:id], params[:assignment_id],val)
     end
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
@@ -330,14 +356,15 @@ class SignUpSheetController < ApplicationController
     user_signup
   end
 
-  def confirmTopic(creator_id, topic_id, assignment_id)
+  def confirmTopic(creator_id, topic_id, assignment_id,val)
     #check whether user has signed up already
     user_signup = otherConfirmedTopicforUser(assignment_id, creator_id)
-
+    asgnmt = Assignment.find(assignment_id)
     sign_up = SignedUpUser.new
     sign_up.topic_id = params[:id]
     sign_up.creator_id = creator_id
-    if user_signup.size == 0
+    sign_up.confirm_by = val
+    if user_signup.size < asgnmt.max_topic_count
       #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
       if slotExist?(topic_id)
         sign_up.is_waitlisted = false
@@ -365,6 +392,7 @@ class SignUpSheetController < ApplicationController
       #check whether user is clicking on a topic which is not going to place him in the waitlist
       if !slotExist?(topic_id)
         sign_up.is_waitlisted = true
+        
         if sign_up.save
           return true
         else
@@ -600,9 +628,10 @@ class SignUpSheetController < ApplicationController
     }
 
   end
-
-
 end
+
+
+
 
 
 

@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/../test_helper'
+require 'yaml'
 require 'assignment_participant'
 
 class AssignmentParticipantTest < Test::Unit::TestCase
@@ -79,4 +80,73 @@ class AssignmentParticipantTest < Test::Unit::TestCase
       participant.assignment.name = saved_assignment_name
     end
   end
+
+  def test_submmit_first_hyperlink
+    participant = participants(:par0)
+    assert_nil participant.submitted_hyperlinks
+
+    url = "http://www.ncsu.edu"
+    participant.submmit_hyperlink(url)
+    assert_not_nil participant.submitted_hyperlinks
+    assert_equal YAML::dump([url]), participant.submitted_hyperlinks
+  end
+
+  def test_submit_third_hyperlink
+    participant = participants(:par1)
+    assert_not_nil participant.submitted_hyperlinks
+
+    urls = YAML::load participant.submitted_hyperlinks
+    assert_equal urls.size, 2
+    
+    url = "http://www.csc.ncsu.edu/"
+    participant.submmit_hyperlink(url)
+
+    urls = YAML::load participant.submitted_hyperlinks
+    assert_equal urls.size, 3
+    assert_equal url, urls[2]
+  end
+
+  def test_remove_second_hyperlink_of_three
+    participant = participants(:par2)
+    before_urls = YAML::load participant.submitted_hyperlinks
+    assert_equal before_urls.size, 3
+    
+    participant.remove_hyperlink(1)
+    after_urls = YAML::load participant.submitted_hyperlinks
+    
+    assert_equal after_urls.size, 2
+    assert_equal before_urls[0], after_urls[0]
+    assert_equal before_urls[2], after_urls[1]
+  end
+
+  def test_remove_one_hyperlink_of_one
+    participant = participants(:par3)
+    before_urls = YAML::load participant.submitted_hyperlinks
+    assert_equal before_urls.size, 1
+    
+    participant.remove_hyperlink(0)
+    assert_nil participant.submitted_hyperlinks
+  end
+
+  def test_reject_remove_nonexistent_index
+    participant = participants(:par0)
+    assert_raise RuntimeError do
+      participant.remove_hyperlink(0)
+    end
+  end
+
+  def test_reject_hyperlink_duplicates
+    participant = participants(:par1)
+    assert_raise RuntimeError do
+      participant.submmit_hyperlink "http://www.ncsu.edu/"
+    end
+  end
+
+  def test_reject_empty_hyperlink
+    participant = participants(:par1)
+    assert_raise RuntimeError do
+      participant.submmit_hyperlink ""
+    end
+  end
+
 end

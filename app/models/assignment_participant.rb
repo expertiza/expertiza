@@ -1,3 +1,6 @@
+require 'uri'
+require 'yaml'
+
 class AssignmentParticipant < Participant  
   require 'wiki_helper'
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
@@ -26,17 +29,53 @@ class AssignmentParticipant < Participant
     return scores
   end
 
-  def get_hyperlinks             
+  # Appends the hyperlink to a list that is stored in YAML format in the DB
+  # @exception  If is hyperlink was already there
+  #             If it is an invalid URL
+  def submmit_hyperlink(hyperlink)
+    hyperlink.strip!
+    raise "The hyperlink cannot be empty" if hyperlink.empty?
+
+    url = URI.parse(hyperlink)
+    
+    # If not a valid URL, it will throw an exception
+    Net::HTTP.start(url.host, url.port)
+
+    hyperlinks = get_hyperlinks
+    raise "The hyperlink has already been stored" if hyperlinks.include? hyperlink
+
+    hyperlinks << hyperlink
+    self.submitted_hyperlinks = YAML::dump(hyperlinks)
+
+    self.save
+  end
+
+  # Note: This method is not used yet. It is here in the case it will be needed.
+  # @exception  If the index does not exist in the array
+  def remove_hyperlink(index)
+    hyperlinks = get_hyperlinks
+    raise "The link does not exist" unless index < hyperlinks.size
+
+    hyperlinks.delete_at(index)
+    self.submitted_hyperlinks = hyperlinks.empty? ? nil : YAML::dump(hyperlinks)
+
+    self.save
+  end
+
+  # TODO:REFACTOR: This shouldn't be handled using an if statement, but using 
+  # polymorphism for individual and team participants
+  def get_hyperlinks         
     if self.team     
       links = self.team.get_hyperlinks     
     else        
-      links = Array.new  
-      if self.submitted_hyperlink and self.submitted_hyperlink.strip.length > 0
-        links << self.submitted_hyperlink
-      end
+      links = get_hyperlinks_array
     end
-    
+
     return links
+  end
+
+  def get_hyperlinks_array
+    self.submitted_hyperlinks.nil? ? [] : YAML::load(self.submitted_hyperlinks)
   end
 
   #Copy this participant to a course
@@ -81,16 +120,11 @@ class AssignmentParticipant < Participant
   end
   
   def has_submissions    
-    if (self.submitted_hyperlink and self.submitted_hyperlink.strip.length > 0)
-      hplink = true
-    else
-      hplink = false
-    end
     return ((get_submitted_files.length > 0) or 
             (get_wiki_submissions.length > 0) or 
-            (hplink)) 
+            (get_hyperlinks_array.length > 0)) 
   end
- 
+
   def get_submitted_files()
     files = Array.new
     if(self.directory_num)      
@@ -315,4 +349,11 @@ class AssignmentParticipant < Participant
       end
     end
   end   
+
+private
+
+  # Use submmit_hyperlink(), remove_hyperlink() instead
+  def submitted_hyperlinks=(val)
+    write_attribute :submitted_hyperlinks, val
+  end
 end

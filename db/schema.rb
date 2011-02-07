@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101222143748) do
+ActiveRecord::Schema.define(:version => 20110205220301) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -319,16 +319,16 @@ ActiveRecord::Schema.define(:version => 20101222143748) do
   end
 
   create_table "participants", :force => true do |t|
-    t.boolean  "submit_allowed",      :default => true
-    t.boolean  "review_allowed",      :default => true
+    t.boolean  "submit_allowed",       :default => true
+    t.boolean  "review_allowed",       :default => true
     t.integer  "user_id"
     t.integer  "parent_id"
     t.integer  "directory_num"
     t.datetime "submitted_at"
     t.string   "topic"
     t.boolean  "permission_granted"
-    t.integer  "penalty_accumulated", :default => 0,    :null => false
-    t.text     "submitted_hyperlink"
+    t.integer  "penalty_accumulated",  :default => 0,    :null => false
+    t.text     "submitted_hyperlinks"
     t.float    "grade"
     t.string   "type"
     t.string   "handle"

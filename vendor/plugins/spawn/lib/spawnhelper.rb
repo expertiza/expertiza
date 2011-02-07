@@ -8,7 +8,7 @@ module SpawnHelper
     # thread for deadline emails
     spawn do        
       while true do        
-        puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
+        #puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
         Rails.logger.info "Thread running, time #{Time.now}.\n"
         # find all assignments in database                
         #allAssign = Assignment.find(:all)
@@ -54,7 +54,7 @@ module SpawnHelper
           if(due_dates.size > 0)#making sure that the assignmefnt does have due dates
             #the above query picks all deadlines for an asisgnment and we check for each and based on the assignment type we perform specific checks and then send email reminders
             for date in due_dates 
-              puts "~~~~~~~~~~Date is: #{date.due_at} and date.due_at - Time.now is: #{date.due_at - Time.now} and flag is #{date.flag}\n"
+              #puts "~~~~~~~~~~Date is: #{date.due_at} and date.due_at - Time.now is: #{date.due_at - Time.now} and flag is #{date.flag}\n"
               if((date.due_at - Time.now) <= date.threshold * 3600 && (date.due_at - Time.now) > 0 && date.flag == false)#send reminder
                 #puts "~~~~~~~~~~Deadline type is: #{date.deadline_type_id} threshold is: #{date.threshold}\n"
                 deadlinetype = date.deadline_type_id
@@ -94,7 +94,7 @@ module SpawnHelper
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
       #puts "~~~~~~~~~~Sending submission_reminder if no submissions found ... submitted at nil #{(participant.submitted_at == nil)} .. hyperlink nil #{participant.submitted_hyperlink == nil} hyperlink empty #{participant.submitted_hyperlink != ""}\n"
-      if(participant.submitted_at == nil && (participant.submitted_hyperlink == nil || participant.submitted_hyperlink == ""))#if(participant.has_submissions == false)
+      if (participant.submitted_at.nil? && participant.get_hyperlinks.empty?)#if(participant.has_submissions == false)
         emails << email
       end
     end#end of for loop
@@ -132,7 +132,7 @@ module SpawnHelper
               else #if the reviewee has made some sort of submission
                 reviewee = eachresponsemap.reviewee
                 #puts "~~~~~~~~~~Sending review_reminder if no responses found ... submitted at nil #{(reviewee[0].submitted_at == nil)} .. hyperlink nil #{reviewee[0].submitted_hyperlink == nil} hyperlink empty #{reviewee[0].submitted_hyperlink == ""}\n"
-                if(reviewee[0].submitted_at != nil || (reviewee[0].submitted_hyperlink != nil && reviewee[0].submitted_hyperlink != ""))
+                unless (reviewee[0].submitted_at.nil? && reviewee[0].get_hyperlinks.empty?)
                   #puts "~~~~~~~~~~Email: #{email}\n"   
                   emails << email
                 end

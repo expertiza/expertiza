@@ -28,9 +28,7 @@ class AssignmentTeam < Team
   def get_hyperlinks
     links = Array.new
     for team_member in self.get_participants 
-     if team_member.submitted_hyperlink != nil and team_member.submitted_hyperlink.strip.length > 0      
-      links << team_member.submitted_hyperlink      
-     end
+      links.concat(team_member.get_hyperlinks_array)
     end
     return links
   end

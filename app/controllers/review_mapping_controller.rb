@@ -95,7 +95,7 @@ class ReviewMappingController < ApplicationController
                                                 :reviewer_id => reviewer.id,
                                                 :reviewed_object_id => assignment.id)
           else
-            flash[:error] = "Could not find a submission to review."
+            flash[:error] = "There are no more submissions for you to review at this time."
             raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
           end
         end
@@ -141,7 +141,7 @@ class ReviewMappingController < ApplicationController
       if !requested_topic_id.nil?
         flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
       else
-        flash[:error] = "Could not find a submission to review."
+        flash[:error] = "There are no more submissions for you to review at this time."
       end
       redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
     else

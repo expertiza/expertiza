@@ -63,7 +63,7 @@ class SubmittedContentController < ApplicationController
     participant.update_resubmit_times       
 
     #send message to reviewers when submission has been updated
-    participant.assignment.email(participant.id)
+    participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
 
     redirect_to :action => 'edit', :id => participant.id
   end

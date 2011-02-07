@@ -92,7 +92,7 @@ module DynamicReviewAssignmentHelper
     #  Make sure to filter out any submissions that do not have any related material. This avoids
     #  wasting time on submissions that have no content as well as avoiding duplicate reviews
     #  of team submissions.
-    conditions_str = "submitted_hyperlink IS NOT NULL OR submitted_at IS NOT NULL"
+    conditions_str = "submitted_hyperlinks IS NOT NULL OR submitted_at IS NOT NULL"
     if @topic_id.blank?
       submissions_in_current_cycle = AssignmentParticipant.find_all_by_parent_id(@assignment_id,
                                                                                  :conditions => conditions_str)

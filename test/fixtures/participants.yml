@@ -18,7 +18,8 @@ par1:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par1"
-  
+  submitted_hyperlinks: "--- \n- http://www.ncsu.edu/\n- http://www.google.com/\n"
+
 par2:
   submit_allowed: 1
   review_allowed: 0
@@ -27,6 +28,7 @@ par2:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par2"
+  submitted_hyperlinks: "--- \n- http://www.ncsu.edu/\n- http://www.google.com/\n- http://www.csc.ncsu.edu/\n"
   
 par3:
   submit_allowed: 1
@@ -36,6 +38,7 @@ par3:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par3"
+  submitted_hyperlinks: "--- \n- http://www.ncsu.edu/\n"
   
 par4:
   submit_allowed: 1

@@ -37,12 +37,11 @@ class AssignmentParticipant < Participant
     raise "The hyperlink cannot be empty" if hyperlink.empty?
 
     url = URI.parse(hyperlink)
-    
+
     # If not a valid URL, it will throw an exception
     Net::HTTP.start(url.host, url.port)
 
-    hyperlinks = get_hyperlinks
-    raise "The hyperlink has already been stored" if hyperlinks.include? hyperlink
+    hyperlinks = get_hyperlinks_array
 
     hyperlinks << hyperlink
     self.submitted_hyperlinks = YAML::dump(hyperlinks)

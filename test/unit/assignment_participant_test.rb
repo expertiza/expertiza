@@ -135,13 +135,6 @@ class AssignmentParticipantTest < Test::Unit::TestCase
     end
   end
 
-  def test_reject_hyperlink_duplicates
-    participant = participants(:par1)
-    assert_raise RuntimeError do
-      participant.submmit_hyperlink "http://www.ncsu.edu/"
-    end
-  end
-
   def test_reject_empty_hyperlink
     participant = participants(:par1)
     assert_raise RuntimeError do

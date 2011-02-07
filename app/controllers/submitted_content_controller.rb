@@ -1,5 +1,4 @@
 require 'zip/zip'
-require 'uri'  
 
 class SubmittedContentController < ApplicationController
   helper :wiki
@@ -22,16 +21,25 @@ class SubmittedContentController < ApplicationController
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
 
-    url = URI.parse(params['submission'].strip)
     begin
-      Net::HTTP.start(url.host, url.port)
-      participant.update_attribute('submitted_hyperlink',params['submission'].strip)
+      participant.submmit_hyperlink(params['submission'])
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end    
     redirect_to :action => 'edit', :id => participant.id
   end    
   
+  def remove_hyperlink
+    participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(participant.user_id)
+
+    begin
+      participant.remove_hyperlink(params['index'].to_i)
+    rescue 
+      flash[:error] = $!
+    end    
+    redirect_to :action => 'edit', :id => participant.id
+  end
   
   def submit_file
     participant = AssignmentParticipant.find(params[:id])

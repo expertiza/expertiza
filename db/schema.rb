@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110205220301) do
+ActiveRecord::Schema.define(:version => 20110210160753) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -28,30 +28,29 @@ ActiveRecord::Schema.define(:version => 20110205220301) do
     t.datetime "updated_at"
     t.string   "name"
     t.string   "directory_path"
-    t.integer  "submitter_count",                      :default => 0,     :null => false
-    t.integer  "course_id",                            :default => 0
-    t.integer  "instructor_id",                        :default => 0
-    t.boolean  "private",                              :default => false, :null => false
-    t.integer  "num_reviews",                          :default => 0,     :null => false
-    t.integer  "num_review_of_reviews",                :default => 0,     :null => false
-    t.integer  "num_review_of_reviewers",              :default => 0,     :null => false
-    t.integer  "review_strategy_id",                   :default => 0
-    t.integer  "mapping_strategy_id",                  :default => 0
+    t.integer  "submitter_count",                   :default => 0,     :null => false
+    t.integer  "course_id",                         :default => 0
+    t.integer  "instructor_id",                     :default => 0
+    t.boolean  "private",                           :default => false, :null => false
+    t.integer  "num_reviews",                       :default => 0,     :null => false
+    t.integer  "num_review_of_reviews",             :default => 0,     :null => false
+    t.integer  "num_review_of_reviewers",           :default => 0,     :null => false
+    t.integer  "review_strategy_id",                :default => 0
+    t.integer  "mapping_strategy_id",               :default => 0
     t.integer  "review_questionnaire_id"
     t.integer  "review_of_review_questionnaire_id"
     t.integer  "teammate_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
     t.boolean  "team_assignment"
-    t.integer  "wiki_type_id",                         :default => 0,     :null => false
+    t.integer  "wiki_type_id",                      :default => 0,     :null => false
     t.boolean  "require_signup"
-    t.integer  "num_reviewers",                        :default => 0,     :null => false
+    t.integer  "num_reviewers",                     :default => 0,     :null => false
     t.text     "spec_location"
     t.integer  "author_feedback_questionnaire_id"
-    t.integer  "team_count",                           :default => 0,     :null => false
+    t.integer  "team_count",                        :default => 0,     :null => false
     t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions"
-    t.boolean  "dynamic_reviewer_assignments_enabled", :default => false
     t.string   "review_assignment_strategy"
     t.integer  "max_reviews_per_submission"
   end

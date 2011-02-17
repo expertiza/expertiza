@@ -7,7 +7,7 @@
     <p> Select a topic below to begin a new review. </p>
 
     <% assignment.sign_up_topics.each do |topic| %>
-      <%= radio_button_tag :topic_id, topic.id %> <%=h topic.topic_name %><br>
+      <%= radio_button_tag :topic_id, topic.id %> <%= topic.topic_identifier %>, <%=h topic.topic_name %><br>
     <% end %>
     <br />
   <% end %>

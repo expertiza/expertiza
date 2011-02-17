@@ -2,7 +2,6 @@
 <% review_no = 1%>
 <% mappings.each do | map | %> 
   <tr>
-    <td><%= title %> <%= review_no %></td>
      <%if @assignment.team_assignment?%>
        <%if map.type.to_s == "MetareviewResponseMap"%>
           <%review_mapping = ResponseMap.find(map.reviewed_object_id)%>

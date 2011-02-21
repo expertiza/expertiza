@@ -92,16 +92,14 @@ module DynamicReviewAssignmentHelper
     #  Make sure to filter out any submissions that do not have any related material. This avoids
     #  wasting time on submissions that have no content as well as avoiding duplicate reviews
     #  of team submissions.
-    conditions_str = "submitted_hyperlinks IS NOT NULL OR submitted_at IS NOT NULL"
     if @topic_id.blank?
-      submissions_in_current_cycle = AssignmentParticipant.find_all_by_parent_id(@assignment_id,
-                                                                                 :conditions => conditions_str)
+      submissions_in_current_cycle = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
     else
       submissions_in_current_cycle = AssignmentParticipant.find_all_by_topic_id_and_parent_id(@topic_id ,
-                                                                                              @assignment_id,
-                                                                                              :conditions => conditions_str)
+                                                                                              @assignment_id)
     end
-
+    submissions_in_current_cycle.reject! { |submission| !submission.has_submissions }
+    
     #  Create a new Hash to store the number of reviews that have already been done (or are in progress) for
     #  each submission.
     @submission_review_count = Hash.new

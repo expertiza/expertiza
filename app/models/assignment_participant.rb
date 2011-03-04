@@ -8,6 +8,10 @@ class AssignmentParticipant < Participant
   belongs_to :user
   validates_presence_of :handle
   
+  def includes?(participant)
+    return participant == self
+  end
+  
   def fullname
     self.user.fullname
   end

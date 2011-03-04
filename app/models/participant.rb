@@ -1,7 +1,9 @@
 class Participant < ActiveRecord::Base
   belongs_to :user
-  has_many :comments, :dependent => :destroy
-  has_many :resubmission_times, :dependent => :destroy
+  belongs_to :topic, :class_name => 'SignUpTopic'
+  
+  has_many   :comments, :dependent => :destroy
+  has_many   :resubmission_times, :dependent => :destroy
   
   validates_numericality_of :grade, :allow_nil => true
 
@@ -50,10 +52,10 @@ class Participant < ActiveRecord::Base
   end
 
   def get_topic_string
-    if topic == nil or topic.strip == ""
+    if topic == nil or topic.topic_name.empty?
       return "<center>&#8212;</center>"
     end
-    return topic
+    return topic.topic_name
   end
  
   

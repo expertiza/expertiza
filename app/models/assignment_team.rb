@@ -10,6 +10,28 @@ class AssignmentTeam < Team
 
     super
   end
+   
+  # Keep this method name to allow polymorphism with assigment_participant
+  # However, this looks ugly, when it is a team a assignment, the team should
+  # have the information of the topic to avoid redundancy
+  def topic
+    team_topic = nil
+
+    participants.each do |participant|
+      team_topic = participant.topic
+      break unless team_topic.nil?
+    end
+
+    team_topic
+  end
+  
+  def participants
+    AssignmentParticipant.find(:all, :conditions => ['parent_id = ? and user_id IN (?)', parent_id, users])
+  end
+  
+  def includes?(participant)
+    return participants.include?(participant)
+  end
   
   def self.get_first_member(team_id)
     participant = nil
@@ -129,7 +151,6 @@ class AssignmentTeam < Team
     return participants    
   end
 
-   
   def copy(course_id)
    new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})    
    copy_members(new_team)
@@ -141,7 +162,6 @@ class AssignmentTeam < Team
    end    
   end
  
-   
   def assignment
     Assignment.find(self.parent_id)
   end

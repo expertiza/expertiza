@@ -125,6 +125,20 @@ class ReviewMappingController < ApplicationController
     return nil
   end
 
+  def assign_reviewer_dynamically
+    begin
+      assignment = Assignment.find(params[:assignment_id])
+      reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+      topic      = SignUpTopic.find(params[:topic_id])
+    
+      assignment.assign_reviewer_dynamically(reviewer, topic)
+      
+    rescue Exception => e
+      flash[:error] = (e.nil?) ? $! : e
+    end
+    
+    redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
+  end
 
   def add_dynamic_reviewer
     assignment = Assignment.find(params[:assignment_id])
@@ -149,24 +163,24 @@ class ReviewMappingController < ApplicationController
         if assignment.team_assignment
           contributor = get_team_from_submission(submission)
 
-          if TeamReviewResponseMap.find(:first,
-                                        :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
+          # if TeamReviewResponseMap.find(:first,
+                                        # :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
             TeamReviewResponseMap.create(:reviewee_id => contributor.id, 
                                          :reviewer_id => reviewer.id,
                                          :reviewed_object_id => assignment.id)
-          else
-            raise "The reviewer is already assigned to this contributor!"
-          end
+          # else
+            # raise "The reviewer is already assigned to this contributor!"
+          # end
         else
           contributor = AssignmentParticipant.find_by_id_and_parent_id(submission.id, assignment.id)
-          if ParticipantReviewResponseMap.find(:first,
-                                               :conditions => ['reviewee_id = ? and reviewer_id = ?',contributor.id,reviewer.id]).nil?
+          # if ParticipantReviewResponseMap.find(:first,
+                                               # :conditions => ['reviewee_id = ? and reviewer_id = ?',contributor.id,reviewer.id]).nil?
             ParticipantReviewResponseMap.create(:reviewee_id => contributor.id, 
                                                 :reviewer_id => reviewer.id,
                                                 :reviewed_object_id => assignment.id)
-          else
-            raise "The reviewer is already assigned to this contributor!"
-          end
+          # else
+            # raise "The reviewer is already assigned to this contributor!"
+          # end
         end
       rescue
         flash[:error] = $!

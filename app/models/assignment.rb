@@ -1,7 +1,7 @@
 class Assignment < ActiveRecord::Base
   require 'ftools'
   include DynamicReviewMapping
-  
+
   belongs_to :course, :class_name => 'Course', :foreign_key => 'course_id'
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to
@@ -17,10 +17,10 @@ class Assignment < ActiveRecord::Base
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy  
-    
+
   validates_presence_of :name
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
-    
+
   COMPLETE = "Complete"
 
   #  Review Strategy information.
@@ -31,6 +31,33 @@ class Assignment < ActiveRecord::Base
 
   DEFAULT_MAX_REVIEWERS = 3
 
+  # Here we set up the @contributors to use participants/teams polymorphically
+  def after_initialize
+    self.review_strategy_id = nil 
+    self.mapping_strategy_id = nil
+    @contributors = (team_assignment) ? teams : participants
+  end
+  
+  def assign_reviewer_dynamically(reviewer, topic)
+    candidate_contributors = find_candidate_contributors_to_review(reviewer, topic)
+    raise 'There are no more available reviews at this time' if candidate_contributors.empty?
+    
+    
+  end
+  
+  # Returns the array of candidate contributors to be reviewed by this reviewer
+  # on this topic
+  def find_candidate_contributors_to_review(reviewer, topic)
+    candidate_contributors = Array.new(@contributors)
+    candidate_contributors.reject! { |contributor| contributor.topic != topic }
+    candidate_contributors.reject! { |contributor| contributor.includes?(reviewer) }
+    return candidate_contributors
+  end
+
+  def contributors
+    @contributors
+  end
+
   def is_using_dynamic_reviewer_assignment?
     if self.review_assignment_strategy == RS_AUTO_SELECTED or
        self.review_assignment_strategy == RS_STUDENT_SELECTED
@@ -39,7 +66,7 @@ class Assignment < ActiveRecord::Base
       return false
     end
   end
- 
+
   def review_mappings
     if team_assignment
       TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
@@ -91,11 +118,6 @@ class Assignment < ActiveRecord::Base
     end
     return scores
   end
-   
-  def after_initialize
-    self.review_strategy_id = nil 
-    self.mapping_strategy_id = nil
-  end
   
   def compute_scores
     scores = Hash.new
@@ -110,7 +132,6 @@ class Assignment < ActiveRecord::Base
       scores << pScore
     }
   end
-  
   
   def get_contributor(contrib_id)
     if team_assignment
@@ -343,7 +364,6 @@ def add_participant(user_name)
       end
       node.save   
  end
-
 
 
   def get_current_stage(topic_id=nil)

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110210160753) do
+ActiveRecord::Schema.define(:version => 20110304054311) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -324,7 +324,6 @@ ActiveRecord::Schema.define(:version => 20110210160753) do
     t.integer  "parent_id"
     t.integer  "directory_num"
     t.datetime "submitted_at"
-    t.string   "topic"
     t.boolean  "permission_granted"
     t.integer  "penalty_accumulated",  :default => 0,    :null => false
     t.text     "submitted_hyperlinks"

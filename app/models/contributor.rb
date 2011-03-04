@@ -1,0 +1,4 @@
+class Contributor
+
+end
+

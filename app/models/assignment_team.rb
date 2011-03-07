@@ -1,19 +1,27 @@
 class AssignmentTeam < Team
-  belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
-  has_many :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
+  
+  belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
+  has_many    :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
 
-  def delete
-    if read_attribute(:type) == 'AssignmentTeam'
-      signup = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
-      signup.each &:destroy
-    end
+# START of contributor methods, shared with AssignmentParticipant
 
-    super
+  # Whether this team includes a given participant or not
+  def includes?(participant)
+    return participants.include?(participant)
   end
-   
-  # Keep this method name to allow polymorphism with assigment_participant
-  # However, this looks ugly, when it is a team a assignment, the team should
-  # have the information of the topic to avoid redundancy
+
+  def assign_reviewer(reviewer)
+    TeamReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+      :reviewed_object_id => assignment.id)
+  end
+
+  def reviewed_by?(reviewer)
+    return TeamReviewResponseMap.find(:all, 
+      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+      self.id, reviewer.id, assignment.id]).empty? == false
+  end
+
+  # Topic picked by the team
   def topic
     team_topic = nil
 
@@ -24,13 +32,34 @@ class AssignmentTeam < Team
 
     team_topic
   end
-  
+
+  # Whether the team has submitted work or not
+  def has_submissions?
+    participants.each do |participant|
+      return true if participant.has_submissions?
+    end
+    return false
+  end
+
+  def reviewed_contributor?(contributor)
+    return TeamReviewResponseMap.find(:all, 
+      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+      contributor.id, self.id, assignment.id]).empty? == false
+  end
+
+# END of contributor methods
+
   def participants
     AssignmentParticipant.find(:all, :conditions => ['parent_id = ? and user_id IN (?)', parent_id, users])
   end
-  
-  def includes?(participant)
-    return participants.include?(participant)
+
+  def delete
+    if read_attribute(:type) == 'AssignmentTeam'
+      signup = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
+      signup.each &:destroy
+    end
+
+    super
   end
   
   def self.get_first_member(team_id)

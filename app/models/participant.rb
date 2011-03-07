@@ -4,6 +4,7 @@ class Participant < ActiveRecord::Base
   
   has_many   :comments, :dependent => :destroy
   has_many   :resubmission_times, :dependent => :destroy
+  has_many   :reviews, :class_name => 'ResponseMap', :foreign_key => 'reviewer_id'
   
   validates_numericality_of :grade, :allow_nil => true
 
@@ -52,13 +53,12 @@ class Participant < ActiveRecord::Base
   end
 
   def get_topic_string
-    if topic == nil or topic.topic_name.empty?
+    if topic.nil? or topic.topic_name.empty?
       return "<center>&#8212;</center>"
     end
     return topic.topic_name
   end
- 
-  
+
   def able_to_submit
     if submit_allowed
       return true

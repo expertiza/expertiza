@@ -3,14 +3,37 @@ require 'yaml'
 
 class AssignmentParticipant < Participant  
   require 'wiki_helper'
-  belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
-  has_many :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
-  belongs_to :user
+  
+  belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
+  has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
+  belongs_to  :user
+
   validates_presence_of :handle
   
+# START of contributor methods, shared with AssignmentTeam
+
   def includes?(participant)
     return participant == self
   end
+
+  def assign_reviewer(reviewer)
+    ParticipantReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+      :reviewed_object_id => assignment.id)
+  end
+
+  def reviewed_by?(reviewer)
+    return ParticipantReviewResponseMap.find(:all, 
+      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+      self.id, reviewer.id, assignment.id]).empty? == false
+  end
+
+  def has_submissions?
+    return ((get_submitted_files.length > 0) or 
+            (get_wiki_submissions.length > 0) or 
+            (get_hyperlinks_array.length > 0)) 
+  end
+
+# END of contributor methods
   
   def fullname
     self.user.fullname
@@ -120,12 +143,6 @@ class AssignmentParticipant < Participant
   
   def get_teammate_reviews
     TeammateReviewResponseMap.get_assessments_for(self)
-  end
-  
-  def has_submissions    
-    return ((get_submitted_files.length > 0) or 
-            (get_wiki_submissions.length > 0) or 
-            (get_hyperlinks_array.length > 0)) 
   end
 
   def get_submitted_files()

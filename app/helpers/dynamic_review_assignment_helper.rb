@@ -1,3 +1,5 @@
+# TODO: Remove this helper, this code is not well-designed.
+# Look at Assignment.contributor_to_review() as an example of a better approach
 module DynamicReviewAssignmentHelper
 
   #  * The article was not written by the potential reviewer.
@@ -12,23 +14,12 @@ module DynamicReviewAssignmentHelper
      @reviewer_id = reviewer_id
      @topic_id = topic_id
  
-     if( review_type == Assignment::RS_AUTO_SELECTED)
-       return auto_selected_review_assignment( )
-     elsif (review_type == Assignment::RS_STUDENT_SELECTED)
+     if (review_type == Assignment::RS_STUDENT_SELECTED)
        return student_selected_review_assignment( )
      else
        return nil
      end
    end 
-   
-   def self.auto_selected_review_assignment( )
-     
-     # Get all the submissions available
-     candidates_for_review = find_submissions_in_current_cycle()
-
-     # Find the most suited submission which is ready for review based on round robin
-     return find_submission_to_review( candidates_for_review )
-   end
    
    def self.student_selected_review_assignment( )
          
@@ -98,7 +89,7 @@ module DynamicReviewAssignmentHelper
       submissions_in_current_cycle = AssignmentParticipant.find_all_by_topic_id_and_parent_id(@topic_id ,
                                                                                               @assignment_id)
     end
-    submissions_in_current_cycle.reject! { |submission| !submission.has_submissions }
+    submissions_in_current_cycle.reject! { |submission| !submission.has_submissions? }
     
     #  Create a new Hash to store the number of reviews that have already been done (or are in progress) for
     #  each submission.
@@ -116,57 +107,6 @@ module DynamicReviewAssignmentHelper
     # Sort and return the list of submissions by the number of reviews that they have.
     sorted_review_count =  @submission_review_count.sort {|a, b| a[1]<=>b[1]}
     return sorted_review_count
-  end
-
-  #
-  #  Sort the {submission => review_count} pair
-  #  return the first submission that does not violate the conditions
-  #  After sorting, we have submissions with least review count at the top.
-  #  we can return the submission that does not violate the condition.
-  #
-  def self.find_submission_to_review( candidates_for_review )
-
-    #  If there are no submissions ready for review, then return nil.
-    if candidates_for_review.size == 0
-      return nil
-    end
-
-    #  Go through the list of submissions that are candidates for review and return the
-    #  first one that meets all of the specified criteria.
-    candidates_for_review.each do |candidate_submission|
-      submission_to_review = is_candidate_submission_valid_for_review(candidate_submission[0],
-                                                                      @assignment_id,
-                                                                      @reviewer_id)
-      #  If this candidate passed all of the checks, then it should
-      #  be reviewed.
-      if !submission_to_review.nil?
-        return submission_to_review
-      end
-    end
-
-    #  No candidates were found to review.
-    return nil
-  end
-
-  #  Determine if the given submission can be reviewed by the current
-  #  reviewer.
-  def self.is_candidate_submission_valid_for_review(submission_id, assignment_id, reviewer_id)
-    submission = AssignmentParticipant.find_by_id_and_parent_id(submission_id, assignment_id)
-
-    #  If the submission was done by the reviewer, then do not continue.
-    if submission.id == reviewer_id
-      return nil
-    end
-
-    #  If the submission was already reviewed by the reviewer, then do not continue.
-    if !ResponseMap.find_by_reviewed_object_id_and_reviewer_id_and_reviewee_id( submission.parent_id,
-                                                                                reviewer_id,
-                                                                                submission.id ).nil?
-      return nil
-    end
-
-    #  Found a valid submission, return it.
-    return submission
   end
 
 end

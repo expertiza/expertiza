@@ -31,7 +31,7 @@ class Assignment < ActiveRecord::Base
 
   DEFAULT_MAX_REVIEWERS = 3
 
-  # Here we set up the @contributors to use participants/teams polymorphically
+  # Here we set up the @contributors attribute to use participants/teams polymorphically
   def after_initialize
     self.review_strategy_id = nil 
     self.mapping_strategy_id = nil
@@ -39,19 +39,42 @@ class Assignment < ActiveRecord::Base
   end
   
   def assign_reviewer_dynamically(reviewer, topic)
-    candidate_contributors = find_candidate_contributors_to_review(reviewer, topic)
-    raise 'There are no more available reviews at this time' if candidate_contributors.empty?
+    # The following method raises an exception if not successful which 
+    # has to be captured by the caller (in review_mapping_controller)
+    contributor = contributor_to_review(reviewer, topic)
     
-    
+    contributor.assign_reviewer(reviewer)
   end
   
-  # Returns the array of candidate contributors to be reviewed by this reviewer
-  # on this topic
-  def find_candidate_contributors_to_review(reviewer, topic)
-    candidate_contributors = Array.new(@contributors)
-    candidate_contributors.reject! { |contributor| contributor.topic != topic }
-    candidate_contributors.reject! { |contributor| contributor.includes?(reviewer) }
-    return candidate_contributors
+  # Returns a contributor to review if available, otherwise will raise an error
+  def contributor_to_review(reviewer, topic)
+    contributors = Array.new(@contributors)
+    work = (topic.nil?) ? 'assignment' : 'topic'
+    
+    # 1) Filter by topic; 2) remove reviewer as contributor
+    # 3) remove contributors that have not submitted work yet
+    contributors.reject! do |contributor| 
+      contributor.topic != topic or contributor.includes?(reviewer) or !contributor.has_submissions?
+    end
+    raise "No work has been submitted for this #{work}" if contributors.empty?
+    
+    # Reviewer can review only once each contributor
+    contributors.reject! { |contributor| contributor.reviewed_by?(reviewer) }
+    raise "You have already reviewed all sumbmissions for this #{work}" if contributors.empty?
+
+    # Reduce to the contributors with the least amount of reviews
+    contributors.sort! { |a, b| a.review_mappings.count <=> b.review_mappings.count }
+    min_reviews = contributors.first.review_mappings.count
+    contributors.reject! { |contributor| contributor.review_mappings.count > min_reviews }
+    
+    # Pick the contributor whose most recent reviewer was assigned longest ago
+    if min_reviews > 0
+      # Sort by last review mapping id, since it reflects the order in which reviews were assigned
+      contributors.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id }
+    end
+    
+    # The first contributor is the best candidate to review
+    return contributors.first
   end
 
   def contributors

@@ -130,12 +130,12 @@ class ReviewMappingController < ApplicationController
     begin
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
-      topic      = SignUpTopic.find(params[:topic_id])
+      topic      = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
     
       assignment.assign_reviewer_dynamically(reviewer, topic)
       
     rescue Exception => e
-      flash[:error] = (e.nil?) ? $! : e
+      flash[:alert] = (e.nil?) ? $! : e
     end
     
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id

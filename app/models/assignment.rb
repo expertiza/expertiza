@@ -48,33 +48,33 @@ class Assignment < ActiveRecord::Base
   
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
-    contributors = Array.new(@contributors)
+    contributor_set = Array.new(@contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
-    
+
     # 1) Filter by topic; 2) remove reviewer as contributor
     # 3) remove contributors that have not submitted work yet
-    contributors.reject! do |contributor| 
+    contributor_set.reject! do |contributor| 
       contributor.topic != topic or contributor.includes?(reviewer) or !contributor.has_submissions?
     end
-    raise "No work has been submitted for this #{work}" if contributors.empty?
-    
-    # Reviewer can review only once each contributor
-    contributors.reject! { |contributor| contributor.reviewed_by?(reviewer) }
-    raise "You have already reviewed all sumbmissions for this #{work}" if contributors.empty?
+    raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
-    # Reduce to the contributors with the least amount of reviews
-    contributors.sort! { |a, b| a.review_mappings.count <=> b.review_mappings.count }
-    min_reviews = contributors.first.review_mappings.count
-    contributors.reject! { |contributor| contributor.review_mappings.count > min_reviews }
-    
+    # Reviewer can review only once each contributor
+    contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
+    raise "You have already reviewed all sumbmissions for this #{work}." if contributor_set.empty?
+
+    # Reduce to the contributors with the least number of received responses
+    contributor_set.sort! { |a, b| a.responses.count <=> b.responses.count }
+    min_reviews = contributor_set.first.responses.count
+    contributor_set.reject! { |contributor| contributor.responses.count > min_reviews }
+
     # Pick the contributor whose most recent reviewer was assigned longest ago
     if min_reviews > 0
       # Sort by last review mapping id, since it reflects the order in which reviews were assigned
-      contributors.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id }
+      contributor_set.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id }
     end
-    
+
     # The first contributor is the best candidate to review
-    return contributors.first
+    return contributor_set.first
   end
 
   def contributors

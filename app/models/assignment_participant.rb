@@ -6,6 +6,7 @@ class AssignmentParticipant < Participant
   
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
   has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
+  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   belongs_to  :user
 
   validates_presence_of :handle

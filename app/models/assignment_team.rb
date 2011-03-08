@@ -2,6 +2,7 @@ class AssignmentTeam < Team
   
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many    :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
+  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, teams t WHERE r.map_id = m.id AND m.type = \'TeamReviewResponseMap\' AND m.reviewee_id = t.id AND t.id = #{id}'
 
 # START of contributor methods, shared with AssignmentParticipant
 

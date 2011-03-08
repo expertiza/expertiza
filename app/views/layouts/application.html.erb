@@ -88,6 +88,8 @@
 <div class="flash_note"><%= flash[:note] %></div>
 <% elsif flash[:error] -%>
 <div class="flash_error"><h1>Error!</h1><%= flash[:error] %></div>
+<% elsif flash[:alert] -%>
+<div class="flash_error"><%= flash[:alert] %></div>
 <% end -%>
 <%= yield %>
     </div>  <!-- class="content" -->

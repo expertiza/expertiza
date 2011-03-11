@@ -19,7 +19,7 @@
      <%end%>
 
    <% if participant %>
-     <tr><td><%= @assignment.name %> <%= title %> <%= review_no %></td>
+     <tr><td><%= participant.topic.nil? ? "#{title} #{review_no}" : "#{participant.topic.topic_identifier}, #{participant.topic.topic_name}"%></td>
 
      <% if map.response %>            
        <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>

@@ -51,18 +51,18 @@ class Assignment < ActiveRecord::Base
     contributor_set = Array.new(@contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
-    # 1) Filter by topic; 2) remove reviewer as contributor
+    # 1) Only consider contributors that worked on this topic; 2) remove reviewer as contributor
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor| 
       contributor.topic != topic or contributor.includes?(reviewer) or !contributor.has_submissions?
     end
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
-    # Reviewer can review only once each contributor
+    # Reviewer can only review each contributor once
     contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
-    raise "You have already reviewed all sumbmissions for this #{work}." if contributor_set.empty?
+    raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
 
-    # Reduce to the contributors with the least number of received responses
+    # Reduce to the contributors with the least number of reviews ("responses") received
     contributor_set.sort! { |a, b| a.responses.count <=> b.responses.count }
     min_reviews = contributor_set.first.responses.count
     contributor_set.reject! { |contributor| contributor.responses.count > min_reviews }

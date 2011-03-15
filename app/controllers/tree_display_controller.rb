@@ -99,10 +99,10 @@ class TreeDisplayController < ApplicationController
     end
     
     if @sortvar == nil
-      @sortvar = 'name'
+      @sortvar = 'created_at'
     end
     if @sortorder == nil
-      @sortorder = 'asc'
+      @sortorder = 'desc'
     end
         
     if session[:root]

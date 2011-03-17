@@ -196,8 +196,18 @@ class AssignmentTeam < Team
     Assignment.find(self.parent_id)
   end
  
-  def get_reviews
-    Review.get_assessments_for(self)
+  # return a hash of scores that the team has received for the questions
+  def get_scores(questions)
+    scores = Hash.new
+    scores[:team] = self # This doesn't appear to be used anywhere
+    assignment.questionnaires.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = Response.all(:joins => :map,
+        :conditions => {:response_maps => {:reviewee_id => self.id, :type => 'TeamReviewResponseMap'}})
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+    end
+    scores[:total_score] = assignment.compute_total_score(scores)
+    return scores
   end
   
   def self.get_team(participant)

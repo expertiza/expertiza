@@ -124,7 +124,7 @@ class Assignment < ActiveRecord::Base
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
       } 
-      scores[:participants][participant.id.to_s.to_sym][:total_score] = participant.compute_total_score(scores[:participants][participant.id.to_s.to_sym])
+      scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
     }        
     
     if self.team_assignment
@@ -523,6 +523,17 @@ end
         return nil
       end
     end
+  end
+
+  # Compute total score for this assignment by summing the scores given on all questionnaires.
+  # Only scores passed in are included in this sum.
+  def compute_total_score(scores)
+    total = 0
+    self.questionnaires.each do |questionnaire|
+      total += questionnaire.get_weighted_score(self, scores)
     end
+    return total
+  end
+  
 end
   

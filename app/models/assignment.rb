@@ -54,7 +54,9 @@ class Assignment < ActiveRecord::Base
     # 1) Filter by topic; 2) remove reviewer as contributor
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor| 
-      contributor.topic != topic or contributor.includes?(reviewer) or !contributor.has_submissions?
+      contributor.topic != topic or # both will be nil for assignments with no signup sheet
+        contributor.includes?(reviewer) or
+        !contributor.has_submissions?
     end
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 

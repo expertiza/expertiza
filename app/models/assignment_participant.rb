@@ -23,9 +23,8 @@ class AssignmentParticipant < Participant
   end
 
   def reviewed_by?(reviewer)
-    return ParticipantReviewResponseMap.find(:all, 
-      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
-      self.id, reviewer.id, assignment.id]).empty? == false
+    return ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+                                              self.id, reviewer.id, assignment.id]) > 0
   end
 
   def has_submissions?

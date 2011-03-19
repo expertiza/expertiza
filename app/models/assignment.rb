@@ -35,7 +35,6 @@ class Assignment < ActiveRecord::Base
   def after_initialize
     self.review_strategy_id = nil 
     self.mapping_strategy_id = nil
-    @contributors = (team_assignment) ? teams : participants
   end
   
   def assign_reviewer_dynamically(reviewer, topic)
@@ -83,7 +82,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def contributors
-    @contributors
+    @contributors ||= team_assignment ? teams : participants
   end
 
   def is_using_dynamic_reviewer_assignment?

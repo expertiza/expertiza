@@ -131,16 +131,30 @@ class ReviewMappingController < ApplicationController
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
       topic      = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
-    
+
       assignment.assign_reviewer_dynamically(reviewer, topic)
-      
+
     rescue Exception => e
       flash[:alert] = (e.nil?) ? $! : e
     end
-    
+
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
   end
- 
+
+  def assign_metareviewer_dynamically
+    begin
+      assignment   = Assignment.find(params[:assignment_id])
+      metareviewer = AssignmentParticipant.find_by_user_id_and_parent_id(params[:metareviewer_id], assignment.id)
+
+      assignment.assign_metareviewer_dynamically(metareviewer)
+
+    rescue Exception => e
+      flash[:alert] = (e.nil?) ? $! : e
+    end
+
+    redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
+  end
+
   def add_metareviewer    
     mapping = ResponseMap.find(params[:id])  
     msg = String.new
@@ -152,7 +166,12 @@ class ReviewMappingController < ApplicationController
       if MetareviewResponseMap.find(:first, :conditions => ['reviewed_object_id = ? and reviewer_id = ?',mapping.id,reviewer.id]) != nil
          raise "The metareviewer \""+reviewer.user.name+"\" is already assigned to this reviewer."
       end
-      MetareviewResponseMap.create(:reviewed_object_id => mapping.id,                        
+      # Code Review: Semantically it doesn't make sense to review the 'response map'
+      #              the object to be reviewed should be the 'response' itself.
+      #              Another reason is that a response map doesn't necessarily have a
+      #              response (i.e. a review hasn't been submitted yet)
+      #              Consider refactoring this.
+      MetareviewResponseMap.create(:reviewed_object_id => mapping.id,
                                    :reviewer_id => reviewer.id,
                                    :reviewee_id => mapping.reviewer.id)                         
     rescue  

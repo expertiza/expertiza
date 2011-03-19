@@ -21,6 +21,7 @@
 <h2>Metareviews for "<%= @assignment.name %>"</h2>
   <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
   <br/>
+  <%= render :partial => 'set_dynamic_metareview', :locals => {:assignment => @assignment} %>
 <% end %>
 
 <br><br>

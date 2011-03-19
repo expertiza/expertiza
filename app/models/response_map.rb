@@ -1,7 +1,9 @@
 class ResponseMap < ActiveRecord::Base
   belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id'
   has_one :response, :class_name => 'Response', :foreign_key => 'map_id'
-  
+  has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id'
+  has_many :metareview_responses, :source => :responses, :finder_sql => 'SELECT meta.* FROM responses r, response_maps meta, response_maps rev WHERE r.map_id = m.id AND m.type = \'MetaeviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
+
   def self.get_assessments_for(participant)
     responses = Array.new   
     
@@ -33,5 +35,20 @@ class ResponseMap < ActiveRecord::Base
   
   def show_feedback()
     return nil
+  end
+  
+  # Evaluates whether this response_map was metareviewed by metareviewer
+  # @param[in] metareviewer AssignmentParticipant object
+  def metareviewed_by?(metareviewer)
+    return MetareviewResponseMap.find(:all, 
+      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+      reviewer.id, metareviewer.id, self.id]).empty? == false
+  end
+  
+  # Assigns a metareviewer to this review (response)
+  # @param[in] metareviewer AssignmentParticipant object 
+  def assign_metareviewer(metareviewer)
+    MetareviewResponseMap.create(:reviewed_object_id => self.id,
+      :reviewer_id => metareviewer.id, :reviewee_id => reviewer.id)
   end
 end

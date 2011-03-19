@@ -72,7 +72,10 @@ class Assignment < ActiveRecord::Base
     # Pick the contributor whose most recent reviewer was assigned longest ago
     if min_reviews > 0
       # Sort by last review mapping id, since it reflects the order in which reviews were assigned
-      contributor_set.sort! { |a, b| a.review_mappings.last.created_at <=> b.review_mappings.last.created_at }
+                                                    # Sorting on id assumes that ids are assigned sequentially in the db.
+                                                    # .last assumes the database returns rows in the order they were created.
+                                                    # Added unit tests to ensure these conditions are both true with the current database.
+      contributor_set.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id }
     end
 
     # The first contributor is the best candidate to review

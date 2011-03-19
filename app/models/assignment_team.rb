@@ -17,9 +17,8 @@ class AssignmentTeam < Team
   end
 
   def reviewed_by?(reviewer)
-    return TeamReviewResponseMap.find(:all, 
-      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
-      self.id, reviewer.id, assignment.id]).empty? == false
+    return TeamReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+                                       self.id, reviewer.id, assignment.id]) > 0
   end
 
   # Topic picked by the team

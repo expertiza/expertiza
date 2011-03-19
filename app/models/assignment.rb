@@ -47,7 +47,7 @@ class Assignment < ActiveRecord::Base
   
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
-    contributor_set = Array.new(@contributors)
+    contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
     # 1) Filter by topic; 2) remove reviewer as contributor
@@ -59,9 +59,9 @@ class Assignment < ActiveRecord::Base
     end
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
-    # Reviewer can review only once each contributor
+    # Reviewer can review each contributor only once 
     contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
-    raise "You have already reviewed all sumbmissions for this #{work}." if contributor_set.empty?
+    raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
 
     # Reduce to the contributors with the least number of received responses
     contributor_set.sort! { |a, b| a.responses.count <=> b.responses.count }

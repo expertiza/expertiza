@@ -27,7 +27,7 @@ class AssignmentTeam < Team
 
     participants.each do |participant|
       team_topic = participant.topic
-      break unless team_topic.nil?
+      break if team_topic
     end
 
     team_topic

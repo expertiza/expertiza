@@ -91,4 +91,11 @@ class UserTest < Test::Unit::TestCase
     clear_text
   end
 
+  def test_get_available_users
+    # student1 should be available to instructor1 based on their roles
+    avail_users_like_student1 = users(:instructor1).get_available_users('student1')
+    assert_equal 1, avail_users_like_student1.size
+    assert_equal "student1", avail_users_like_student1.first.name
+  end
+
 end

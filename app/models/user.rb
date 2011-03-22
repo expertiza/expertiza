@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   has_many :assignments, :through => :participants
   
   belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
+  belongs_to :role
   
   has_many :teams_users, :dependent => :destroy
   has_many :teams, :through => :teams_users
@@ -28,18 +29,11 @@ class User < ActiveRecord::Base
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end
   
-  def getAvailableUsers(name)    
-    parents = Role.find(self.role_id).get_parents
-    
-    allUsers = User.find(:all, :conditions => ['name LIKE ?',"#{name}%"],:limit => 10)
-    users = Array.new
-    allUsers.each { | user | 
-      role = Role.find(user.role_id)
-      if parents.index(role) 
-        users << user
-      end
-    }    
-    return users 
+  def get_available_users(name)    
+    lesser_roles = role.get_parents
+    all_users = User.find(:all, :conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
+    visible_users = all_users.select{|user| lesser_roles.include? user.role}
+    return visible_users[0,10] # the first 10
   end
 
   def role

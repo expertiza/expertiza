@@ -2,7 +2,7 @@ class ImpersonateController < ApplicationController
   #auto_complete_for :user, :name
   
   def auto_complete_for_user_name     
-     @users = session[:user].getAvailableUsers(params[:user][:name])        
+     @users = session[:user].get_available_users(params[:user][:name])        
      render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
 

@@ -49,6 +49,12 @@ class User < ActiveRecord::Base
     return @role
   end
 
+  def can_impersonate?(other_user)
+    return true if other_user == self # can impersonate self
+    return false if other_user == other_user.parent # no one can impersonate a top-level parent (usually superadmin)
+    return other_user.parent == self || can_impersonate?(other_user.parent) # recursive
+  end
+
   def encrypt_password
     if self.clear_password  # Only update the password if it has been changed
       self.password_salt = self.object_id.to_s + rand.to_s

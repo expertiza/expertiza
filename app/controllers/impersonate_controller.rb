@@ -17,10 +17,16 @@ class ImpersonateController < ApplicationController
     end    
     
     begin
-       # Initial impersonation
+       original_user = session[:super_user] || session[:user]
+
+       # Impersonate using form on /impersonate/start
        if params[:impersonate].nil?
           user = User.find_by_name(params[:user][:name])
           if user
+             unless original_user.can_impersonate? user
+                raise flash[:error] = "You cannot impersonate #{params[:user][:name]}"
+             end
+
              if session[:super_user] == nil
                 session[:super_user] = session[:user]
              end          
@@ -35,6 +41,10 @@ class ImpersonateController < ApplicationController
           if params[:impersonate][:name].length > 0
              user = User.find_by_name(params[:impersonate][:name])
              if user
+               unless original_user.can_impersonate? user
+                 raise flash[:error] = "You cannot impersonate #{params[:user][:name]}"
+               end
+
                AuthController.clear_user_info(session, nil)
                session[:user] = user          
              else    

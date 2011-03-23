@@ -4,6 +4,11 @@ class DueDate < ActiveRecord::Base
   OK = 3
   
   belongs_to :assignment
+  validate :due_at_is_valid_datetime
+
+  def due_at_is_valid_datetime
+    errors.add(:due_at, 'must be a valid datetime') if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
+  end
 
   def self.copy(old_assignment_id, new_assignment_id)    
     duedates = find(:all, :conditions => ['assignment_id = ?',old_assignment_id])

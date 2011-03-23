@@ -485,14 +485,17 @@ class SignUpSheetController < ApplicationController
         end
 
         topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_subm,i)
+        topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + i.to_s]})
+        flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
+        
         topic_deadline_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_rev,i)
-
-        topic_deadline_subm.update_attribute('due_at', due_date['submission_' + i.to_s])
-        topic_deadline_rev.update_attribute('due_at', due_date['review_' + i.to_s])
+        topic_deadline_rev.update_attributes({'due_at' => due_date['review_' + i.to_s]})
+        flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
       end
 
       topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(due_date['t_id'], DeadlineType.find_by_name('metareview').id)
-      topic_deadline_subm.update_attribute('due_at', due_date['submission_' + (review_rounds+1).to_s])
+      topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + (review_rounds+1).to_s]})
+      flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
     }
 
     redirect_to_sign_up(params[:assignment_id])    

@@ -32,6 +32,16 @@ function get_assignment_startdate() {
         days_between_chapters.style.display = "none";
 	}
 }
+
+function onChangeWikiType(){
+	submission_directory = document.getElementById("assgt_directory");
+	var dropdownIndex = document.getElementById('wikiselect').selectedIndex;
+	if(dropdownIndex == 0){
+		submission_directory.innerHTML = "Submission directory:"
+	}else{
+		submission_directory.innerHTML = "Base URL for Wiki:"
+	}
+}
 </script>
 
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
@@ -72,7 +82,7 @@ function get_assignment_startdate() {
       <br/>
       <br/>
     <% else %>
-      <select name="assignment[wiki_type_id]" width="15%">
+      <select id="wikiselect" name="assignment[wiki_type_id]" width="15%" onchange="onChangeWikiType();">
       <% @wiki_types.each do |wiki_type| %>
         <option style="width:75px" value="<%= wiki_type.id %>"
         <%= ' selected' if wiki_type.id == @assignment.wiki_type_id %> >
@@ -119,6 +129,8 @@ function get_assignment_startdate() {
 
 <p>
 </p>
+<script type="text/javascript">onChangeWikiType();</script>
+
 <!--[eoform:assignment]-->
 
 

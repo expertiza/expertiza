@@ -37,7 +37,6 @@ class Assignment < ActiveRecord::Base
   def after_initialize
     self.review_strategy_id = nil 
     self.mapping_strategy_id = nil
-    @contributors = (team_assignment) ? teams : participants
     @review_mappings = (team_assignment) ? team_review_mappings : participant_review_mappings
   end
   
@@ -51,17 +50,19 @@ class Assignment < ActiveRecord::Base
   
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
-    contributor_set = Array.new(@contributors)
+    contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
     # 1) Only consider contributors that worked on this topic; 2) remove reviewer as contributor
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor| 
-      contributor.topic != topic or contributor.includes?(reviewer) or !contributor.has_submissions?
+      contributor.topic != topic or # both will be nil for assignments with no signup sheet
+        contributor.includes?(reviewer) or
+        !contributor.has_submissions?
     end
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
-    # Reviewer can only review each contributor once
+    # Reviewer can review each contributor only once 
     contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
     raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
 
@@ -74,6 +75,9 @@ class Assignment < ActiveRecord::Base
     if min_reviews > 0
       # Sort by last review mapping id, since it reflects the order in which reviews were assigned
       # This has a round-robin effect
+      # Sorting on id assumes that ids are assigned sequentially in the db.
+      # .last assumes the database returns rows in the order they were created.
+      # Added unit tests to ensure these conditions are both true with the current database.
       contributor_set.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id }
     end
 
@@ -82,7 +86,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def contributors
-    @contributors
+    @contributors ||= team_assignment ? teams : participants
   end
 
   def review_mappings
@@ -183,7 +187,7 @@ class Assignment < ActiveRecord::Base
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
       } 
-      scores[:participants][participant.id.to_s.to_sym][:total_score] = participant.compute_total_score(scores[:participants][participant.id.to_s.to_sym])
+      scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
     }        
     
     if self.team_assignment
@@ -582,6 +586,17 @@ end
         return nil
       end
     end
+  end
+
+  # Compute total score for this assignment by summing the scores given on all questionnaires.
+  # Only scores passed in are included in this sum.
+  def compute_total_score(scores)
+    total = 0
+    self.questionnaires.each do |questionnaire|
+      total += questionnaire.get_weighted_score(self, scores)
     end
+    return total
+  end
+  
 end
   

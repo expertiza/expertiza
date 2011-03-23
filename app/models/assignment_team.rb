@@ -19,9 +19,8 @@ class AssignmentTeam < Team
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object 
   def reviewed_by?(reviewer)
-    return TeamReviewResponseMap.find(:all, 
-      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
-      self.id, reviewer.id, assignment.id]).empty? == false
+    return TeamReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+                                       self.id, reviewer.id, assignment.id]) > 0
   end
 
   # Topic picked by the team
@@ -30,7 +29,7 @@ class AssignmentTeam < Team
 
     participants.each do |participant|
       team_topic = participant.topic
-      break unless team_topic.nil?
+      break if team_topic
     end
 
     team_topic
@@ -198,8 +197,18 @@ class AssignmentTeam < Team
     Assignment.find(self.parent_id)
   end
  
-  def get_reviews
-    Review.get_assessments_for(self)
+  # return a hash of scores that the team has received for the questions
+  def get_scores(questions)
+    scores = Hash.new
+    scores[:team] = self # This doesn't appear to be used anywhere
+    assignment.questionnaires.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = Response.all(:joins => :map,
+        :conditions => {:response_maps => {:reviewee_id => self.id, :type => 'TeamReviewResponseMap'}})
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+    end
+    scores[:total_score] = assignment.compute_total_score(scores)
+    return scores
   end
   
   def self.get_team(participant)

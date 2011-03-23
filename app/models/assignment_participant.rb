@@ -28,9 +28,8 @@ class AssignmentParticipant < Participant
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object 
   def reviewed_by?(reviewer)
-    return ParticipantReviewResponseMap.find(:all, 
-      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
-      self.id, reviewer.id, assignment.id]).empty? == false
+    return ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+                                              self.id, reviewer.id, assignment.id]) > 0
   end
 
   def has_submissions?
@@ -49,16 +48,16 @@ class AssignmentParticipant < Participant
     self.user.name
   end
 
+  # Return scores that this participant has given
   def get_scores(questions)
-      scores = Hash.new
-      scores[:participant] = self
-      assignment.questionnaires.each{
-        | questionnaire |
-        scores[questionnaire.symbol] = Hash.new
-        scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-        scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
-      }  
-      scores[:total_score] = compute_total_score(scores)
+    scores = Hash.new
+    scores[:participant] = self # This doesn't appear to be used anywhere
+    assignment.questionnaires.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+    end
+    scores[:total_score] = assignment.compute_total_score(scores)
     return scores
   end
 
@@ -203,15 +202,6 @@ class AssignmentParticipant < Participant
   def team
     AssignmentTeam.get_team(self)
   end
-  
-  def compute_total_score(scores)     
-    total = 0
-    self.assignment.questionnaires.each{
-      | questionnaire |      
-      total += questionnaire.get_weighted_score(self.assignment, scores)
-    }
-    return total
-  end  
   
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment

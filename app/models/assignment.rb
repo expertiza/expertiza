@@ -31,12 +31,6 @@ class Assignment < ActiveRecord::Base
 
   DEFAULT_MAX_REVIEWERS = 3
 
-  # Here we set up the @contributors attribute to use participants/teams polymorphically
-  def after_initialize
-    self.review_strategy_id = nil 
-    self.mapping_strategy_id = nil
-  end
-  
   def assign_reviewer_dynamically(reviewer, topic)
     # The following method raises an exception if not successful which 
     # has to be captured by the caller (in review_mapping_controller)

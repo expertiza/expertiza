@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110324001445) do
+ActiveRecord::Schema.define(:version => 20110323134426) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -35,8 +35,6 @@ ActiveRecord::Schema.define(:version => 20110324001445) do
     t.integer  "num_reviews",                       :default => 0,     :null => false
     t.integer  "num_review_of_reviews",             :default => 0,     :null => false
     t.integer  "num_review_of_reviewers",           :default => 0,     :null => false
-    t.integer  "review_strategy_id",                :default => 0
-    t.integer  "mapping_strategy_id",               :default => 0
     t.integer  "review_questionnaire_id"
     t.integer  "review_of_review_questionnaire_id"
     t.integer  "teammate_review_questionnaire_id"
@@ -57,11 +55,18 @@ ActiveRecord::Schema.define(:version => 20110324001445) do
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
   add_index "assignments", ["instructor_id"], :name => "fk_assignments_instructors"
-  add_index "assignments", ["mapping_strategy_id"], :name => "fk_assignments_mapping_strategies"
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
-  add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
+
+  create_table "cheers", :force => true do |t|
+    t.integer  "post_id"
+    t.integer  "cheercount"
+    t.integer  "uncheercount"
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -136,6 +141,13 @@ ActiveRecord::Schema.define(:version => 20110324001445) do
   add_index "due_dates", ["review_allowed_id"], :name => "fk_due_date_review_allowed"
   add_index "due_dates", ["review_of_review_allowed_id"], :name => "fk_due_date_review_of_review_allowed"
   add_index "due_dates", ["submission_allowed_id"], :name => "fk_due_date_submission_allowed"
+
+  create_table "followers", :force => true do |t|
+    t.string   "name"
+    t.integer  "followeruserid"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "goldberg_content_pages", :force => true do |t|
     t.string   "title"
@@ -290,10 +302,6 @@ ActiveRecord::Schema.define(:version => 20110324001445) do
     t.string  "qtype"
   end
 
-  create_table "mapping_strategies", :force => true do |t|
-    t.string "name"
-  end
-
   create_table "markup_styles", :force => true do |t|
     t.string "name", :default => "", :null => false
   end
@@ -344,6 +352,22 @@ ActiveRecord::Schema.define(:version => 20110324001445) do
   create_table "plugin_schema_info", :id => false, :force => true do |t|
     t.string  "plugin_name"
     t.integer "version"
+  end
+
+  create_table "post_topics", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "topicname"
+  end
+
+  create_table "posts", :force => true do |t|
+    t.string   "name"
+    t.text     "posttext"
+    t.integer  "parentpost"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "topic_id"
+    t.integer  "best_post",  :default => 0
   end
 
   create_table "question_advices", :force => true do |t|
@@ -401,10 +425,6 @@ ActiveRecord::Schema.define(:version => 20110324001445) do
   end
 
   add_index "resubmission_times", ["participant_id"], :name => "fk_resubmission_times_participants"
-
-  create_table "review_strategies", :force => true do |t|
-    t.string "name"
-  end
 
   create_table "roles", :force => true do |t|
     t.string   "name",            :default => "", :null => false

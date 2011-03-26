@@ -258,26 +258,37 @@ class Assignment < ActiveRecord::Base
     return path + FileHelper.clean_path(self.directory_path)      
   end 
     
+  # Check whether review, metareview, etc.. is allowed
+  # If topic_id is set, check for that topic only. Otherwise, check to see if there is any topic which can be reviewed(etc) now
   def check_condition(column,topic_id=nil)
-    if !self.staggered_deadline?
-      next_due_date = DueDate.find(:first, :conditions => ['assignment_id = ? and due_at >= ?',self.id,Time.now], :order => 'due_at')
+    if self.staggered_deadline?
+      # next_due_date - the nearest due date that hasn't passed
+      if topic_id
+        # next for topic
+        next_due_date = TopicDeadline.find(:first,
+          :conditions => ['topic_id = ? and due_at >= ?', topic_id, Time.now],
+          :order => 'due_at')
+      else
+        # next for assignment
+        next_due_date = TopicDeadline.find(:first,
+          :conditions => ['assignment_id = ? and due_at >= ?', self.id, Time.now],
+          :joins => {:topic => :assignment},
+          :order => 'due_at')
+      end
     else
-      next_due_date = TopicDeadline.find(:first, :conditions => ['topic_id = ? and due_at >= ?',topic_id,Time.now], :order => 'due_at')
+      next_due_date = DueDate.find(:first, :conditions => ['assignment_id = ? and due_at >= ?', self.id, Time.now], :order => 'due_at')
     end
 
     if next_due_date.nil?
       return false
     end
-    condition = 0
-    next_due_date.attributes.each{
-      | key, value |
-      if key == column
-        condition = value
-      end
-    }   
-    
-    right = DeadlineRight.find(condition)
-    return (right!= nil and (right.name == "OK" or right.name == "Late"))    
+
+    # command pattern - get the attribute with the name in column
+    # Here, column is usually something like 'review_allowed_id'
+    right_id = next_due_date.send column
+
+    right = DeadlineRight.find(right_id)
+    return (right and (right.name == "OK" or right.name == "Late"))    
   end
     
   # Determine if the next due date from now allows for submissions

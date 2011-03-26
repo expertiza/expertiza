@@ -55,7 +55,7 @@ class ReviewMappingController < ApplicationController
   end
 
   # Get all the available submissions
-  def _show_available_submissions
+  def show_available_submissions
     assignment = Assignment.find(params[:assignment_id])
     reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
     requested_topic_id = params[:topic_id]

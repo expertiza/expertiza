@@ -118,21 +118,21 @@ class StudentTaskController < ApplicationController
         review_mappings = ParticipantReviewResponseMap.find_all_by_reviewer_id(@participant.id)
       end
 
-      review_mappings.each { |review_mapping|
-          if @assignment.team_assignment
-            participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
-          else
-            participant = review_mapping.reviewee
-          end
+      review_mappings.each do |review_mapping|
+        if @assignment.team_assignment
+          participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
+        else
+          participant = review_mapping.reviewee
+        end
 
-          if !participant.nil? and !participant.topic_id.nil?
-            review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id,1)
+        if !participant.nil? and !participant.topic_id.nil?
+          review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id, 1)
 
           if review_due_date.due_at < Time.now && @assignment.get_current_stage(participant.topic_id) != 'Complete'
             @reviewee_topic_id = participant.topic_id
           end
         end
-      }
+      end
     end
   end
 

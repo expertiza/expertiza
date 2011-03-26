@@ -40,9 +40,8 @@ class ResponseMap < ActiveRecord::Base
   # Evaluates whether this response_map was metareviewed by metareviewer
   # @param[in] metareviewer AssignmentParticipant object
   def metareviewed_by?(metareviewer)
-    return MetareviewResponseMap.find(:all, 
-      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
-      reviewer.id, metareviewer.id, self.id]).empty? == false
+    return MetareviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+      reviewer.id, metareviewer.id, self.id]) > 0
   end
   
   # Assigns a metareviewer to this review (response)

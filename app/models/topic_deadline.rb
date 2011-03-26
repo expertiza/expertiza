@@ -1,4 +1,6 @@
 class TopicDeadline < ActiveRecord::Base
+  belongs_to :topic, :class_name => 'SignUpTopic'
+
   validate :due_at_is_valid_datetime
 
   def due_at_is_valid_datetime

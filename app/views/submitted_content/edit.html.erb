@@ -1,5 +1,5 @@
-<h1>Submit work for <%= @assignment.name %></h1>
-    
+<%= render :partial => 'submitted_content/title' %>    
+
 <%@stage = @assignment.get_current_stage(@participant.topic_id)%>
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => @stage} %>
 <BR/>

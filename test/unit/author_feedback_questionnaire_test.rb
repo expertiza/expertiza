@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 class AuthorFeedbackQuestionnaireTest < Test::Unit::TestCase
   #fixtures :author_feedback_questionnaires
    #TODO verify fixture
-  fixtures :questionnaires, :assignments, :scores, :participants
+  fixtures :questionnaires, :assignments, :participants
 
   # Replace this with your real tests.
   #def test_truth

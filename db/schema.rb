@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110323134426) do
+ActiveRecord::Schema.define(:version => 20110324001445) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -58,15 +58,6 @@ ActiveRecord::Schema.define(:version => 20110323134426) do
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
-
-  create_table "cheers", :force => true do |t|
-    t.integer  "post_id"
-    t.integer  "cheercount"
-    t.integer  "uncheercount"
-    t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -141,13 +132,6 @@ ActiveRecord::Schema.define(:version => 20110323134426) do
   add_index "due_dates", ["review_allowed_id"], :name => "fk_due_date_review_allowed"
   add_index "due_dates", ["review_of_review_allowed_id"], :name => "fk_due_date_review_of_review_allowed"
   add_index "due_dates", ["submission_allowed_id"], :name => "fk_due_date_submission_allowed"
-
-  create_table "followers", :force => true do |t|
-    t.string   "name"
-    t.integer  "followeruserid"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "goldberg_content_pages", :force => true do |t|
     t.string   "title"
@@ -354,22 +338,6 @@ ActiveRecord::Schema.define(:version => 20110323134426) do
     t.integer "version"
   end
 
-  create_table "post_topics", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "topicname"
-  end
-
-  create_table "posts", :force => true do |t|
-    t.string   "name"
-    t.text     "posttext"
-    t.integer  "parentpost"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "topic_id"
-    t.integer  "best_post",  :default => 0
-  end
-
   create_table "question_advices", :force => true do |t|
     t.integer "question_id"
     t.integer "score"
@@ -425,6 +393,24 @@ ActiveRecord::Schema.define(:version => 20110323134426) do
   end
 
   add_index "resubmission_times", ["participant_id"], :name => "fk_resubmission_times_participants"
+
+  create_table "reviewsmetareviews", :id => false, :force => true do |t|
+    t.integer "assign_id",              :default => 0, :null => false
+    t.integer "reviewed_object_id",     :default => 0, :null => false
+    t.integer "reviewer_id",            :default => 0, :null => false
+    t.integer "reviewee_id",            :default => 0, :null => false
+    t.integer "question_id",            :default => 0, :null => false
+    t.integer "score"
+    t.text    "comments"
+    t.integer "response_id"
+    t.integer "metareviewed_object",    :default => 0, :null => false
+    t.integer "metareviewer",           :default => 0, :null => false
+    t.integer "metareviewee",           :default => 0, :null => false
+    t.integer "metareview_question_id", :default => 0, :null => false
+    t.integer "metareview_score"
+    t.text    "metareview_comments"
+    t.integer "metareview_response_id"
+  end
 
   create_table "roles", :force => true do |t|
     t.string   "name",            :default => "", :null => false
@@ -561,6 +547,50 @@ ActiveRecord::Schema.define(:version => 20110323134426) do
   add_index "system_settings", ["public_role_id"], :name => "fk_system_settings_public_role_id"
   add_index "system_settings", ["session_expired_page_id"], :name => "fk_system_settings_session_expired_page_id"
   add_index "system_settings", ["site_default_page_id"], :name => "fk_system_settings_site_default_page_id"
+
+  create_table "t1", :force => true do |t|
+    t.integer "assign_id",             :default => 0,     :null => false
+    t.integer "reviewed_object_id",    :default => 0,     :null => false
+    t.integer "reviewer_id",           :default => 0,     :null => false
+    t.integer "reviewee_id",           :default => 0,     :null => false
+    t.string  "type",                  :default => "",    :null => false
+    t.boolean "notification_accepted", :default => false
+  end
+
+  create_table "t2", :force => true do |t|
+    t.integer "assign_id",             :default => 0,     :null => false
+    t.integer "reviewed_object_id",    :default => 0,     :null => false
+    t.integer "reviewer_id",           :default => 0,     :null => false
+    t.integer "reviewee_id",           :default => 0,     :null => false
+    t.string  "type",                  :default => "",    :null => false
+    t.boolean "notification_accepted", :default => false
+    t.integer "question_id",           :default => 0,     :null => false
+    t.integer "score"
+    t.text    "comments"
+    t.integer "response_id"
+  end
+
+  create_table "t3", :force => true do |t|
+    t.integer "assign_id",             :default => 0,     :null => false
+    t.integer "reviewed_object_id",    :default => 0,     :null => false
+    t.integer "reviewer_id",           :default => 0,     :null => false
+    t.integer "reviewee_id",           :default => 0,     :null => false
+    t.string  "type",                  :default => "",    :null => false
+    t.boolean "notification_accepted", :default => false
+  end
+
+  create_table "t4", :force => true do |t|
+    t.integer "assign_id",             :default => 0,     :null => false
+    t.integer "reviewed_object_id",    :default => 0,     :null => false
+    t.integer "reviewer_id",           :default => 0,     :null => false
+    t.integer "reviewee_id",           :default => 0,     :null => false
+    t.string  "type",                  :default => "",    :null => false
+    t.boolean "notification_accepted", :default => false
+    t.integer "question_id",           :default => 0,     :null => false
+    t.text    "comments"
+    t.integer "score"
+    t.integer "response_id"
+  end
 
   create_table "ta_mappings", :force => true do |t|
     t.integer "ta_id"

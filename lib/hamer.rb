@@ -116,10 +116,11 @@ module Hamer
       return @reviewers if @reviewers
 
       @reviewers = []
-      @reviewers << Reviewer.new('A')
-      @reviewers << Reviewer.new('B')
-      @reviewers << Reviewer.new('C')
-      @reviewers << Reviewer.new('D')
+      ('A'..'D').each do |letter| # A-D: 4 reviewers
+        @reviewers << Reviewer.new(letter)
+      end
+
+      return @reviwers
     end
 
     def submissions(rogue_score=5)

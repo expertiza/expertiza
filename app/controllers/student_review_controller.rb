@@ -25,6 +25,16 @@ class StudentReviewController < ApplicationController
 
     @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
 
+    # Calculate the number of metareviews that the user has completed so far.
+    @num_metareviews_total       = @metareview_mappings.size
+
+    @num_metareviews_completed   = 0
+    @metareview_mappings.each do |map|
+      @num_metareviews_completed += 1 if map.response
+    end
+
+    @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
+
     if @assignment.staggered_deadline?
       @review_mappings.each { |review_mapping|
           if @assignment.team_assignment?

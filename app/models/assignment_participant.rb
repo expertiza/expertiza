@@ -1,6 +1,9 @@
 require 'uri'
 require 'yaml'
 
+# Code Review: Notice that Participant overloads two different concepts: 
+#              contribution and participant (see fields of the participant table).
+#              Consider creating a new table called contributions.
 class AssignmentParticipant < Participant  
   require 'wiki_helper'
   
@@ -22,6 +25,8 @@ class AssignmentParticipant < Participant
       :reviewed_object_id => assignment.id)
   end
 
+  # Evaluates whether this participant contribution was reviewed by reviewer
+  # @param[in] reviewer AssignmentParticipant object 
   def reviewed_by?(reviewer)
     return ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
                                               self.id, reviewer.id, assignment.id]) > 0

@@ -21,6 +21,11 @@
 <h2>Metareviews for "<%= @assignment.name %>"</h2>
   <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
   <br/>
+  <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
+    <% if @num_metareviews_in_progress == 0 %>
+  	  <%= render :partial => 'set_dynamic_metareview', :locals => {:assignment => @assignment} %>
+    <% end %>
+  <% end %>
 <% end %>
 
 <br><br>

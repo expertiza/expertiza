@@ -9,9 +9,11 @@ class Assignment < ActiveRecord::Base
   # then Rails will "automatically" set the type field to the value that
   # designates an assignment of the appropriate type.
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
+  has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
   has_many :due_dates
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
+  has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
   has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaires', :foreign_key => 'assignment_id'
   has_many :questionnaires, :through => :assignment_questionnaires
@@ -44,7 +46,7 @@ class Assignment < ActiveRecord::Base
     contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
-    # 1) Filter by topic; 2) remove reviewer as contributor
+    # 1) Only consider contributors that worked on this topic; 2) remove reviewer as contributor
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor| 
       contributor.topic != topic or # both will be nil for assignments with no signup sheet
@@ -57,7 +59,7 @@ class Assignment < ActiveRecord::Base
     contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
     raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
 
-    # Reduce to the contributors with the least number of received responses
+    # Reduce to the contributors with the least number of reviews ("responses") received
     contributor_set.sort! { |a, b| a.responses.count <=> b.responses.count }
     min_reviews = contributor_set.first.responses.count
     contributor_set.reject! { |contributor| contributor.responses.count > min_reviews }
@@ -65,9 +67,10 @@ class Assignment < ActiveRecord::Base
     # Pick the contributor whose most recent reviewer was assigned longest ago
     if min_reviews > 0
       # Sort by last review mapping id, since it reflects the order in which reviews were assigned
-                                                    # Sorting on id assumes that ids are assigned sequentially in the db.
-                                                    # .last assumes the database returns rows in the order they were created.
-                                                    # Added unit tests to ensure these conditions are both true with the current database.
+      # This has a round-robin effect
+      # Sorting on id assumes that ids are assigned sequentially in the db.
+      # .last assumes the database returns rows in the order they were created.
+      # Added unit tests to ensure these conditions are both true with the current database.
       contributor_set.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id }
     end
 
@@ -77,6 +80,65 @@ class Assignment < ActiveRecord::Base
 
   def contributors
     @contributors ||= team_assignment ? teams : participants
+  end
+
+  def review_mappings
+    @review_mappings ||= team_assignment ? team_review_mappings : participant_review_mappings
+  end
+
+  def assign_metareviewer_dynamically(metareviewer)
+    # The following method raises an exception if not successful which 
+    # has to be captured by the caller (in review_mapping_controller)
+    response_map = response_map_to_metareview(metareviewer)
+    
+    response_map.assign_metareviewer(metareviewer)
+  end
+
+  # Returns a review (response) to metareview if available, otherwise will raise an error
+  def response_map_to_metareview(metareviewer)
+    response_map_set = Array.new(review_mappings)
+
+    # Reject response maps without responses
+    response_map_set.reject! { |response_map| !response_map.response }
+    raise "There are no reviews to metareview at this time for this assignment." if response_map_set.empty?
+
+    # Reject reviews where the metareviewer was the reviewer or the contributor
+    response_map_set.reject! do |response_map| 
+      (response_map.reviewee == metareviewer) or (response_map.reviewer.includes?(metareviewer))
+    end
+    raise "There are no more reviews to metareview for this assignment." if response_map_set.empty?
+
+    # Metareviewer can only metareview each review once
+    response_map_set.reject! { |response_map| response_map.metareviewed_by?(metareviewer) }
+    raise "You have already metareviewed all reviews for this assignment." if response_map_set.empty?
+
+    # Reduce to the response maps with the least number of metareviews received
+    response_map_set.sort! { |a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    min_metareviews = response_map_set.first.metareview_response_maps.count
+    response_map_set.reject! { |response_map| response_map.metareview_response_maps.count > min_metareviews }
+
+    # Reduce the response maps to the reviewers with the least number of metareviews received
+    reviewers = Hash.new    # <reviewer, number of metareviews>
+    response_map_set.each do |response_map|
+      reviewer = response_map.reviewer
+      reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
+    end
+    reviewers = reviewers.sort { |a, b| a[1] <=> b[1] }
+    min_metareviews = reviewers.first[1]
+    reviewers.reject! { |reviewer| reviewer[1] == min_metareviews }
+    response_map_set.reject! { |response_map| reviewers.member?(response_map.reviewer) }
+
+    # Pick the response map whose most recent metareviewer was assigned longest ago
+    response_map_set.sort! { |a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    min_metareviews = response_map_set.first.metareview_response_maps.count
+    if min_metareviews > 0
+      # Sort by last metareview mapping id, since it reflects the order in which reviews were assigned
+      # This has a round-robin effect
+      response_map_set.sort! { |a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id }
+    end
+
+    # The first review_map is the best candidate to metareview
+    return response_map_set.first
   end
 
   def is_using_dynamic_reviewer_assignment?

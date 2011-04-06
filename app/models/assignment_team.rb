@@ -16,6 +16,8 @@ class AssignmentTeam < Team
       :reviewed_object_id => assignment.id)
   end
 
+  # Evaluates whether any contribution by this team was reviewed by reviewer
+  # @param[in] reviewer AssignmentParticipant object 
   def reviewed_by?(reviewer)
     return TeamReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
                                        self.id, reviewer.id, assignment.id]) > 0

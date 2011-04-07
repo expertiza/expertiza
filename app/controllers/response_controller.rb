@@ -97,6 +97,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @res = 0
     msg = ""
+    error_msg = ""
     begin      
       @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
       @res = @response.id
@@ -106,30 +107,34 @@ class ResponseController < ApplicationController
         score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
       end  
     rescue
-      msg = "Your response was not saved. Cause: "+$!
+      error_msg = "Your response was not saved. Cause: " + $!
     end
     
     begin
       ResponseHelper.compare_scores(@response, @questionnaire)
       ScoreCache.update_cache(@res)
-      msg = "Your response was successfully saved."
       @map.save
+      msg = "Your response was successfully saved."
     rescue
       @response.delete
-      msg = "Your response was not saved. Cause: "+$!
+      error_msg = "Your response was not saved. Cause: " + $!
     end
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg
   end      
   
-  def saving
+  def saving   
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
-    @msg = params[:msg]
     @map.notification_accepted = false;
     @map.save
+    
+    redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
   end
   
   def redirection
+    flash[:error] = params[:error_msg] unless params[:error_msg].empty?
+    flash[:note]  = params[:msg] unless params[:msg].empty?
+    
     @map = ResponseMap.find(params[:id])
     if params[:return] == "feedback"
       redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id

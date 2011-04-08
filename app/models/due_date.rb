@@ -4,6 +4,7 @@ class DueDate < ActiveRecord::Base
   OK = 3
   
   belongs_to :assignment
+  belongs_to :deadline_type
   validate :due_at_is_valid_datetime
 
   def due_at_is_valid_datetime

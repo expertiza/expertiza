@@ -89,8 +89,8 @@ class Assignment < ActiveRecord::Base
     raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
 
     # Reduce to the contributors with the least number of reviews ("responses") received
-    contributor_set.sort! { |a, b| a.responses.count <=> b.responses.count }
-    min_reviews = contributor_set.first.responses.count
+    min_contributor = contributor_set.min_by { |a| a.responses.count }
+    min_reviews = min_contributor.responses.count
     contributor_set.reject! { |contributor| contributor.responses.count > min_reviews }
 
     # Pick the contributor whose most recent reviewer was assigned longest ago

@@ -33,6 +33,28 @@ class Assignment < ActiveRecord::Base
 
   DEFAULT_MAX_REVIEWERS = 3
 
+  # Returns a set of topics that can be reviewed.
+  # We choose the topics if one of its submissions has received the fewest reviews so far
+  def candidate_topics_to_review
+    return nil if sign_up_topics.empty?   # This is not a topic assignment
+    
+    contributor_set = Array.new(contributors)
+    
+    # Reject contributors that have not selected a topic, or have no submissions
+    contributor_set.reject! { |contributor| contributor.topic.nil? or !contributor.has_submissions? }
+    
+    # Filter the contributors with the least number of reviews
+    # (using the fact that each contributor is associated with a topic)
+    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
+    min_reviews = contributor.review_mappings.count
+    contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews }
+    
+    candidate_topics = Set.new
+    contributor_set.each { |contributor| candidate_topics.add(contributor.topic) }
+    
+    candidate_topics
+  end
+
   def assign_reviewer_dynamically(reviewer, topic)
     # The following method raises an exception if not successful which 
     # has to be captured by the caller (in review_mapping_controller)
@@ -43,6 +65,13 @@ class Assignment < ActiveRecord::Base
   
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
+    # This condition might happen if the reviewer waited too much time in the
+    # select topic page and other students have already selected this topic.
+    # Another scenario is someone that deliberately modifies the view.
+    if topic
+      raise "This topic has too many reviews, please select another one." unless candidate_topics_to_review.include?(topic)
+    end
+    
     contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 

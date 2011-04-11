@@ -1,6 +1,6 @@
 class TopicReviewThreshold < ActiveRecord::Migration
   def self.up
-    add_column :assignments, :review_topic_threshold, :integer
+    add_column :assignments, :review_topic_threshold, :integer, :default => 0
   end
 
   def self.down

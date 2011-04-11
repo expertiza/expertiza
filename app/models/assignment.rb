@@ -47,12 +47,16 @@ class Assignment < ActiveRecord::Base
     # (using the fact that each contributor is associated with a topic)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
     min_reviews = contributor.review_mappings.count
-    contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews }
+    contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
     
     candidate_topics = Set.new
     contributor_set.each { |contributor| candidate_topics.add(contributor.topic) }
     
     candidate_topics
+  end
+
+  def has_topics?
+    @has_topics ||= !sign_up_topics.empty?
   end
 
   def assign_reviewer_dynamically(reviewer, topic)
@@ -65,6 +69,9 @@ class Assignment < ActiveRecord::Base
   
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
+    raise "Please select a topic" if has_topics? and topic.nil?
+    raise "This assignment does not have topics" if !has_topics? and topic
+    
     # This condition might happen if the reviewer waited too much time in the
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.

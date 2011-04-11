@@ -2,7 +2,7 @@ class Assignment < ActiveRecord::Base
   require 'ftools'
   include DynamicReviewMapping
 
-  belongs_to :course, :class_name => 'Course', :foreign_key => 'course_id'
+  belongs_to :course
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;

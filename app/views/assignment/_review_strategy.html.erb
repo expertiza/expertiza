@@ -1,13 +1,13 @@
 <script type="text/javascript">
 function onReviewTypeChange(){
-	document.poppedLayer5 = eval('document.getElementById("max_reviews_table_row")');
+	document.poppedLayer5 = eval('document.getElementById("review_topic_threshold_row")');
 	var dropdownIndex = document.getElementById('assignment_review_assignment_strategy').selectedIndex;
 	var dropdownValue = document.getElementById('assignment_review_assignment_strategy')[dropdownIndex].value;
 
-	if(dropdownValue == "<%= Assignment::RS_INSTRUCTOR_SELECTED %>"){
-		document.poppedLayer5.style.display = "none";
-	}else{
+	if(dropdownValue == "<%= Assignment::RS_AUTO_SELECTED %>"){
 		document.poppedLayer5.style.display = "";
+	}else{
+		document.poppedLayer5.style.display = "none";
 	}
 }
 </script>
@@ -29,8 +29,13 @@ function onReviewTypeChange(){
     </select>
     <img src="/images/info.png" title="- Instructor-Selected: Instructor decides who reviews whom
 - Student-Selected: Students choose from a list of assignments or topics to review.
-- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review."
+- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.">
   </td>
+ </tr>
+ <tr id="review_topic_threshold_row">
+   <td style="width:250px"><label for="review_topic_threshold">Review topic threshold:</label></td>
+   <td><%= text_field 'assignment', 'review_topic_threshold', :size => 5 %> <img src="/images/info.png" title="A topic is reviewable if the minimum number of reviews already done for the submissions on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic." >
+   </td>
  </tr>
   
 </table>

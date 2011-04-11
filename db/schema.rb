@@ -51,7 +51,7 @@ ActiveRecord::Schema.define(:version => 20110410232719) do
     t.integer  "days_between_submissions"
     t.string   "review_assignment_strategy"
     t.integer  "max_reviews_per_submission"
-    t.integer  "review_topic_threshold"
+    t.integer  "review_topic_threshold",            :default => 0
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"

@@ -7,9 +7,9 @@
     <p><b>Select a topic below to begin a new review:</b></p>
     <table cellpadding="0">
       <% candidate_topics_to_review = assignment.candidate_topics_to_review.to_a %>
-	  <% candidate_topics_to_review.sort! { |a, b| a.topic_identifier <=> b.topic_identifier } %>
+	  <% candidate_topics_to_review.sort! { |a, b| a.id <=> b.id } %>
       <% not_reviewable_topics = assignment.sign_up_topics - candidate_topics_to_review %>
-	  <% not_reviewable_topics.sort! { |a, b| a.topic_identifier <=> b.topic_identifier } %>
+	  <% not_reviewable_topics.sort! { |a, b| a.id <=> b.id } %>
       <% candidate_topics_to_review.each do |topic| %>
       <tr>
         <td><%= radio_button_tag 'topic_id', topic.id %></td>

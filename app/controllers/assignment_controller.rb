@@ -204,8 +204,8 @@ class AssignmentController < ApplicationController
     @assignment.assignment_questionnaires.clear
     params[:questionnaires].each{
       | key, value |       
-      if value.to_i > 0 and Questionnaire.find(value)
-        @assignment.questionnaires << Questionnaire.find(value)
+      if value.to_i > 0 and (q = Questionnaire.find(value))
+        @assignment.questionnaires << q
       end
     }     
   end   

@@ -4,8 +4,9 @@
 <ul id="actionmenu"><li class="daddy">&nbsp;
 <ul>
 <%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Questionnaire', :controller => 'questionnaire', :node => node, :owner_id => owner_id} %>
-<li><%= link_to 'View questionnaire',:controller=>'questionnaire', :action=>'view', :id => node.node_object_id %></li>
-                                                                                                               
+<div>
+  <%= link_to image_tag('/images/tree_view/view-survey-24.png', :title => 'View questionnaire'),:controller=>'questionnaire', :action=>'view', :id => node.node_object_id %>
+</div>
 </ul>
 </li></ul>       
 </TD>

@@ -12,6 +12,12 @@ a {
   padding: 0 1px 2px 1px ;
 }
 
+img 
+{ 
+  border-style: none; 
+  text-decoration: none; 
+} 
+
 a:hover {
   color: #6D7A73 ;
   text-decoration: underline ;
@@ -131,7 +137,7 @@ a:hover {
 
 #actionmenu, #actionmenu ul {
   padding: 0 ;
-  margin: 0 ;
+  margin: 0.5em ;
   width: 80% ;
   list-style: none ;
   z-index: 999 ;
@@ -139,7 +145,13 @@ a:hover {
 
 #actionmenu a {
   color: white ;
+  margin: 0.3em ;
+  border: 0;
+}
+
+#actionmenu div {
   display: block ;
+  margin: 0.4em ;
 }
 
 #actionmenu a:hover {    
@@ -147,16 +159,21 @@ a:hover {
   text-decoration: none ;
 }
 
+#actionmenu a:link {    
+  border: 0px ;
+}
+
 #actionmenu li {
   float: left ;
 }
 
 #actionmenu li ul li a {  
+  width: 17em ;
   text-align: left ;
   line-height: 2em ;
   width: 17em ;
   border-bottom: .075em solid white ;
-  border-right: .075em solid white ;   
+  border-right: .075em solid white ;
 }
 #actionmenu li.daddy {  
   width: 9em;

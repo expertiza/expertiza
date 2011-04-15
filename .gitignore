@@ -5,3 +5,4 @@ pg_data
 pg_development.png
 .tmp*
 .project
+.loadpath

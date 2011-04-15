@@ -23,6 +23,7 @@ class SignUpSheetController < ApplicationController
       @topics.each {|topic|
 
         @duedates[i]['t_id'] = topic.id
+        @duedates[i]['topic_identifier'] = topic.topic_identifier
         @duedates[i]['topic_name'] = topic.topic_name
 
         for j in 1..@review_rounds
@@ -59,12 +60,6 @@ class SignUpSheetController < ApplicationController
         i = i + 1
       }
     end
-
-    if !@duedates.nil?
-      @duedates.sort! {|a,b| a['submission_1'] <=> b['submission_1']}
-    end
-
-
   end
 
   def add_signup_topics

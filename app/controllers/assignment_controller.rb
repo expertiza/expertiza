@@ -210,17 +210,11 @@ class AssignmentController < ApplicationController
   end  
   
   def set_questionnaires
-    #@assignment.assignment_questionnaires.clear
-    #puts "************params " +params[:questionnaires].inspect
     @assignment.questionnaires = Array.new
     params[:questionnaires].each{
       | key, value |       
-       puts "*************** value "+ value
-     if value.to_i > 0 && !Questionnaire.find(value).nil?
-       puts "*********questionnaire: " + Questionnaire.find(value).inspect
-        puts "***inspecting"+@assignment.questionnaires.inspect
-        @assignment.questionnaires << Questionnaire.find(value)
-        puts "************** @assignment.questionnaires: " + @assignment.questionnaires.inspect
+      if value.to_i > 0 and (q = Questionnaire.find(value))
+        @assignment.questionnaires << q
      end
     }     
   end   

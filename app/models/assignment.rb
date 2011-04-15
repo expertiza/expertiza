@@ -2,7 +2,7 @@ class Assignment < ActiveRecord::Base
   require 'ftools'
   include DynamicReviewMapping
 
-  belongs_to :course, :class_name => 'Course', :foreign_key => 'course_id'
+  belongs_to :course
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
@@ -33,6 +33,32 @@ class Assignment < ActiveRecord::Base
 
   DEFAULT_MAX_REVIEWERS = 3
 
+  # Returns a set of topics that can be reviewed.
+  # We choose the topics if one of its submissions has received the fewest reviews so far
+  def candidate_topics_to_review
+    return nil if sign_up_topics.empty?   # This is not a topic assignment
+    
+    contributor_set = Array.new(contributors)
+    
+    # Reject contributors that have not selected a topic, or have no submissions
+    contributor_set.reject! { |contributor| contributor.topic.nil? or !contributor.has_submissions? }
+    
+    # Filter the contributors with the least number of reviews
+    # (using the fact that each contributor is associated with a topic)
+    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
+    min_reviews = contributor.review_mappings.count
+    contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
+    
+    candidate_topics = Set.new
+    contributor_set.each { |contributor| candidate_topics.add(contributor.topic) }
+    
+    candidate_topics
+  end
+
+  def has_topics?
+    @has_topics ||= !sign_up_topics.empty?
+  end
+
   def assign_reviewer_dynamically(reviewer, topic)
     # The following method raises an exception if not successful which 
     # has to be captured by the caller (in review_mapping_controller)
@@ -43,6 +69,16 @@ class Assignment < ActiveRecord::Base
   
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
+    raise "Please select a topic" if has_topics? and topic.nil?
+    raise "This assignment does not have topics" if !has_topics? and topic
+    
+    # This condition might happen if the reviewer waited too much time in the
+    # select topic page and other students have already selected this topic.
+    # Another scenario is someone that deliberately modifies the view.
+    if topic
+      raise "This topic has too many reviews, please select another one." unless candidate_topics_to_review.include?(topic)
+    end
+    
     contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
@@ -60,8 +96,8 @@ class Assignment < ActiveRecord::Base
     raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
 
     # Reduce to the contributors with the least number of reviews ("responses") received
-    contributor_set.sort! { |a, b| a.responses.count <=> b.responses.count }
-    min_reviews = contributor_set.first.responses.count
+    min_contributor = contributor_set.min_by { |a| a.responses.count }
+    min_reviews = min_contributor.responses.count
     contributor_set.reject! { |contributor| contributor.responses.count > min_reviews }
 
     # Pick the contributor whose most recent reviewer was assigned longest ago

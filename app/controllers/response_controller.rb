@@ -132,8 +132,8 @@ class ResponseController < ApplicationController
   end
   
   def redirection
-    flash[:error] = params[:error_msg] unless params[:error_msg].empty?
-    flash[:note]  = params[:msg] unless params[:msg].empty?
+    flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
+    flash[:note]  = params[:msg] unless params[:msg] and params[:msg].empty?
     
     @map = ResponseMap.find(params[:id])
     if params[:return] == "feedback"

@@ -49,7 +49,7 @@
                   <% if !select.nil?
                       selected = select[:dependent_on].to_a 
                   end%>
-                  <%= select_tag 'topic_dependencies_' + topic.id.to_s + '[dependent_on][]', options_for_select( topic_identifier, selected), :multiple => true %>
+                  <%= select_tag 'topic_dependencies_' + topic.id.to_s + '[dependent_on][]', options_for_select( topic_identifier, selected), :multiple => true, :size => 2 %>
               </td>
 
               <td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>

@@ -3,12 +3,28 @@
             :assignment_id => assignment.id,
             :reviewer_id => session[:user].id do %>
 
-  <% if assignment.sign_up_topics.count > 0 %>
+  <% if assignment.has_topics? %>
     <p><b>Select a topic below to begin a new review:</b></p>
-  
-    <% assignment.sign_up_topics.each do |topic| %>
-      <%= radio_button_tag 'topic_id', topic.id %> <%= topic.topic_identifier %>: <%= topic.topic_name %><br>
-    <% end %>
+    <table cellpadding="0">
+      <% candidate_topics_to_review = assignment.candidate_topics_to_review.to_a %>
+	  <% candidate_topics_to_review.sort! { |a, b| a.id <=> b.id } %>
+      <% not_reviewable_topics = assignment.sign_up_topics - candidate_topics_to_review %>
+	  <% not_reviewable_topics.sort! { |a, b| a.id <=> b.id } %>
+      <% candidate_topics_to_review.each do |topic| %>
+      <tr>
+        <td><%= radio_button_tag 'topic_id', topic.id %></td>
+		<td><%= topic.topic_identifier %>:</td>
+		<td><%= topic.topic_name %></td>
+	  </tr>
+	  <% end %>
+      <% not_reviewable_topics.each do |topic| %>
+      <tr>
+	    <td></td>
+		<td><font color="gray"><%= topic.topic_identifier %>:</font></td>
+		<td><font color="gray"><%= topic.topic_name %></font></td>
+      </tr>
+	  <% end %>
+    </table>
   <% end %>
   <br>
   <input type='submit' value='Request a new submission to review'/>

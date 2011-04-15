@@ -52,7 +52,7 @@ class AssignmentTeam < Team
 # END of contributor methods
 
   def participants
-    AssignmentParticipant.find(:all, :conditions => ['parent_id = ? and user_id IN (?)', parent_id, users])
+    @participants ||= AssignmentParticipant.find(:all, :conditions => ['parent_id = ? and user_id IN (?)', parent_id, users])
   end
 
   def delete

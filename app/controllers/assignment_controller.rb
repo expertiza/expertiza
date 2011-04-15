@@ -104,6 +104,11 @@ class AssignmentController < ApplicationController
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
     
+    #for drop topic
+    deadline = DeadlineType.find_by_name("drop topic")
+    @drop_topic_deadline = deadline.id
+    #end of addition
+    
     if @assignment.save 
       set_questionnaires   
       set_limits_and_weights
@@ -119,6 +124,10 @@ class AssignmentController < ApplicationController
       raise "Please enter a valid Review deadline" if !due_date
       max_round = 2;
       
+      #for drop topic
+      due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
+      raise "Please enter a valid drop toipic deadline" if !due_date
+      #end of addition
      
       if params[:assignment_helper][:no_of_reviews].to_i >= 2
         for resubmit_duedate_key in params[:additional_submit_deadline].keys
@@ -201,12 +210,18 @@ class AssignmentController < ApplicationController
   end  
   
   def set_questionnaires
-    @assignment.assignment_questionnaires.clear
+    #@assignment.assignment_questionnaires.clear
+    #puts "************params " +params[:questionnaires].inspect
+    @assignment.questionnaires = Array.new
     params[:questionnaires].each{
       | key, value |       
-      if value.to_i > 0 and Questionnaire.find(value)
+       puts "*************** value "+ value
+     if value.to_i > 0 && !Questionnaire.find(value).nil?
+       puts "*********questionnaire: " + Questionnaire.find(value).inspect
+        puts "***inspecting"+@assignment.questionnaires.inspect
         @assignment.questionnaires << Questionnaire.find(value)
-      end
+        puts "************** @assignment.questionnaires: " + @assignment.questionnaires.inspect
+     end
     }     
   end   
   

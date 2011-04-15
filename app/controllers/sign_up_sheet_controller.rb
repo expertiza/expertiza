@@ -256,44 +256,50 @@ class SignUpSheetController < ApplicationController
     #find whether assignment is team assignment
     assignment = Assignment.find(assignment_id)
 
-    #if team assignment find the creator id from teamusers table and teams
-    if assignment.team_assignment == true
-      #users_team will contain the team id of the team to which the user belongs
-      users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
-      signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
+    #making sure that the drop date deadline hasn't passed
+    dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})
+    if(!dropDate.nil? && dropDate.due_at < Time.now)
+      flash[:error] = "You cannot drop this topic because you are past the drop deadline."
     else
-      signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, session[:user].id)
-    end
-
-    #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
-    if signup_record.is_waitlisted == false
-      #find the first wait listed user if exists
-      first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
-
-      if !first_waitlisted_user.nil?
-        #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-        first_waitlisted_user.is_waitlisted = false
-        first_waitlisted_user.save
-
-        #update the participants details
-        if assignment.team_assignment?
-          user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-          participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
-        else
-          participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
-        end
-        participant.update_topic_id(topic_id)
-
-        SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
+      #if team assignment find the creator id from teamusers table and teams
+      if assignment.team_assignment == true
+        #users_team will contain the team id of the team to which the user belongs
+        users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
+        signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
+      else
+        signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, session[:user].id)
       end
-    end
 
-    if !signup_record.nil?
-      participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-      #update participant's topic id to nil
-      participant.update_topic_id(nil)
-      signup_record.destroy
-    end
+      #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
+      if signup_record.is_waitlisted == false
+        #find the first wait listed user if exists
+        first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
+  
+        if !first_waitlisted_user.nil?
+          #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+          first_waitlisted_user.is_waitlisted = false
+          first_waitlisted_user.save
+  
+          #update the participants details
+          if assignment.team_assignment?
+            user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+            participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
+          else
+            participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
+          end
+          participant.update_topic_id(topic_id)
+  
+          SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
+        end
+      end
+  
+      if !signup_record.nil?
+        participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+        #update participant's topic id to nil
+        participant.update_topic_id(nil)
+        signup_record.destroy
+      end
+    end #end condition for 'drop deadline' check
   end
 
   def signup

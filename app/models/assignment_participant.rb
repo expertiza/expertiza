@@ -373,3 +373,10 @@ private
     write_attribute :submitted_hyperlinks, val
   end
 end
+
+def get_topic_string
+    if topic.nil? or topic.topic_name.empty?
+      return "<center>&#8212;</center>"
+    end
+    return topic.topic_name
+  end

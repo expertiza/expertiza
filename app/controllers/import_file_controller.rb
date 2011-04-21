@@ -31,16 +31,16 @@ class ImportFileController < ApplicationController
       unless line.empty?
         row = parse_line(line,delimiter)
         begin
-        if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
-          Object.const_get(params[:model]).import(row,session,params[:id],params[:options])
-        elsif params[:model] == 'SignUpTopic'
-          session[:assignment_id] = params[:id]
-          Object.const_get(params[:model]).import(row,session,params[:id])          
-        else
-          Object.const_get(params[:model]).import(row,session,params[:id])
-        end
-        rescue ImportError
-        errors << $!             
+          if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
+            Object.const_get(params[:model]).import(row,session,params[:id],params[:options])
+          elsif params[:model] == 'SignUpTopic'
+            session[:assignment_id] = params[:id]
+            Object.const_get(params[:model]).import(row,session,params[:id])          
+          else
+            Object.const_get(params[:model]).import(row,session,params[:id])
+          end
+        rescue
+          errors << $!             
         end  
       end
     end 
@@ -67,5 +67,5 @@ class ImportFileController < ApplicationController
       row = Array.new
       items.each { | value | row << value.sub("\"","").sub("\"","").strip }
       return row
-  end   
+  end
 end

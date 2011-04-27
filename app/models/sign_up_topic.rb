@@ -37,7 +37,7 @@ class SignUpTopic < ActiveRecord::Base
     SignedUpUser.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.creator_id = " + creator_id.to_s)
   end
 
-  def self.slotExist?(topic_id)
+  def self.slotAvailable?(topic_id)
     topic = SignUpTopic.find(topic_id)
     no_of_students_who_selected_the_topic = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic_id, false)
 

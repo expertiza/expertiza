@@ -2,14 +2,14 @@
    current_folder.name = "" %>
 <% files = participant.get_files(participant.get_path + current_folder.name) %>
 or<br/><br/>
-<b>Submit a file:</b><BR/><BR/>
+<b>Submit a file:</b><BR/>
 <% if files.length > 0 or stage != "Complete"  %>
   <% if stage != "Complete" %>
     <% form_tag({:action=>'submit_file',:id => participant.id},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
     	<br/><input type="checkbox" name="unzip" value=""/> Unzip submission
     	<br/><input type="file" id="uploaded_file" name="uploaded_file" size=40 />
     	<%= submit_tag 'Upload file' %>
-    	<br><br>
+    	<br>
     <% end %>
   <% end %>
   <% form_tag({:action=>'folder_action', :id => participant.id},{:multipart => true})do %>
@@ -23,7 +23,6 @@ or<br/><br/>
 		<input type="button" onclick="deleteSelectedFile();" value="Delete selected file" />
 		<input type="reset" value="Reset"></div><br>
 	<% end %>
-	<BR/>
     <table>
 	  <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, false) %> </div></td></tr>
     </table>
@@ -32,4 +31,3 @@ or<br/><br/>
 <% else %>
 No files have been submitted.
 <% end %>
-<BR/><BR/>

@@ -11,7 +11,7 @@
     <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
   <%end%>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
-  <br/><hr/><br/>
+  <hr/>
 <% end %>
 <%= @map.show_review() %>
 

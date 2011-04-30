@@ -43,14 +43,14 @@ class Assignment < ActiveRecord::Base
     # Reject contributors that have not selected a topic, or have no submissions
     contributor_set.reject! { |contributor| contributor.topic.nil? or !contributor.has_submissions? }
     
-    # Reject contributions of topics whose deadline is passed
+    # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(contributor.topic.id) == "Complete" or
                                             contributor.assignment.get_current_stage(contributor.topic.id) == "submission" }
     
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
-    min_reviews = contributor.review_mappings.count
+    min_reviews = contributor.review_mappings.count rescue 0
     contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
     
     candidate_topics = Set.new

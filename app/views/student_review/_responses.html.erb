@@ -20,11 +20,11 @@
    <% if participant %>
      <tr><td><b><%= "#{title} #{review_no}." %></b>
 	 <%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %></td>
-
+		 <td>&nbsp;</td>
      <% if map.response %>            
-       <td>&nbsp;&nbsp;<%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
+       <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
        <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
-        <td>&nbsp;&nbsp;<%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
+        <td><%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
 			<% end %>
            
      <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>

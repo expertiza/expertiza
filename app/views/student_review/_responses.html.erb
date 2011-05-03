@@ -1,7 +1,6 @@
-<table cellspacing="5">
+<table>
 <% review_no = 1%>
 <% mappings.each do | map | %> 
-  <tr>
      <%if @assignment.team_assignment?%>
        <%if map.type.to_s == "MetareviewResponseMap"%>
           <%review_mapping = ResponseMap.find(map.reviewed_object_id)%>
@@ -23,9 +22,9 @@
 	 <%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %></td>
 
      <% if map.response %>            
-       <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
+       <td>&nbsp;&nbsp;<%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
        <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
-        <td><%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
+        <td>&nbsp;&nbsp;<%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
 			<% end %>
            
      <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>

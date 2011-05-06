@@ -95,7 +95,7 @@ class AssignmentParticipant < Participant
 
   # TODO:REFACTOR: This shouldn't be handled using an if statement, but using 
   # polymorphism for individual and team participants
-  def get_hyperlinks         
+  def get_hyperlinks
     if self.team     
       links = self.team.get_hyperlinks     
     else        

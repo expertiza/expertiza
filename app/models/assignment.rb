@@ -221,6 +221,7 @@ class Assignment < ActiveRecord::Base
       questionnaires.each{
         | questionnaire |
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
+        # TODO: REFACTOR: The line below performs a query for each questionnaire on each participant
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
       } 
@@ -240,20 +241,6 @@ class Assignment < ActiveRecord::Base
       }
     end
     return scores
-  end
-  
-  def compute_scores
-    scores = Hash.new
-    questionnaires = self.questionnaires
-    
-    self.participants.each{
-      | participant |
-      pScore = Hash.new
-      pScore[:id] = participant.id
-      
-      
-      scores << pScore
-    }
   end
   
   def get_contributor(contrib_id)

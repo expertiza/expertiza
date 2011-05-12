@@ -374,12 +374,14 @@ class Assignment < ActiveRecord::Base
     rescue
       # directory is empty
     end
-        
-    if !(self.wiki_type_id == 2 or self.wiki_type_id == 3) and directory != nil and directory.size == 2
-        Dir.delete(RAILS_ROOT + "/pg_data/" + self.directory_path)          
-    elsif !(self.wiki_type_id == 2 or self.wiki_type_id == 3) and directory != nil and directory.size != 2
-        raise "Assignment directory is not empty."
-    end 
+       
+    if !is_wiki_assignment and !self.directory_path.empty? and !directory.nil?
+      if directory.size == 2
+        Dir.delete(RAILS_ROOT + "/pg_data/" + self.directory_path)
+      else
+        raise "Assignment directory is not empty"
+      end
+    end
     
     self.assignment_questionnaires.each{|aq| aq.destroy}
     
@@ -440,11 +442,7 @@ class Assignment < ActiveRecord::Base
  
  # It appears that this method is not used at present!
  def is_wiki_assignment
-   if self.wiki_type_id > 1 
-     return true
-   else
-     return false
-   end
+   return (self.wiki_type_id > 1)
  end
  
  #

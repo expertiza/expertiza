@@ -104,8 +104,8 @@ class AssignmentController < ApplicationController
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
     
-    #for drop topic
-    deadline = DeadlineType.find_by_name("drop topic")
+    #for drop_topic
+    deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
     #end of addition
     

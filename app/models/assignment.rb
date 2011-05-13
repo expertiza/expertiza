@@ -644,5 +644,18 @@ end
     return total
   end
   
+  # Checks whether there are duplicate assignments of the same name by the same instructor.
+  # If the assignments are assigned to courses, it's OK to have duplicate names in different
+  # courses.
+  def duplicate_name?
+    if course
+      Assignment.find(:all, :conditions => ['course_id = ? and instructor_id = ? and name = ?', 
+        course_id, instructor_id, name]).count > 1
+    else
+      Assignment.find(:all, :conditions => ['instructor_id = ? and name = ?', 
+        instructor_id, name]).count > 1
+    end
+  end
+  
 end
   

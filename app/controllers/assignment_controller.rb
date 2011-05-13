@@ -88,8 +88,8 @@ class AssignmentController < ApplicationController
       @days = params[:days].to_i
       @weeks = params[:weeks].to_i      
     end
-
-
+    
+    
     @assignment.days_between_submissions = @days + (@weeks*7)
     
     # Deadline types used in the deadline_types DB table
@@ -115,61 +115,61 @@ class AssignmentController < ApplicationController
       
       max_round = 1
       
-     begin
-      #setting the Due Dates with a helper function written in DueDate.rb
-      due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
-      raise "Please enter a valid Submission deadline" if !due_date
-
-      due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
-      raise "Please enter a valid Review deadline" if !due_date
-      max_round = 2;
-      
-      #for drop topic
-      due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
-      raise "Please enter a valid drop toipic deadline" if !due_date
-      #end of addition
-     
-      if params[:assignment_helper][:no_of_reviews].to_i >= 2
-        for resubmit_duedate_key in params[:additional_submit_deadline].keys
-          #setting the Due Dates with a helper function written in DueDate.rb
-          due_date = DueDate::set_duedate(params[:additional_submit_deadline][resubmit_duedate_key],@Resubmission_deadline, @assignment.id, max_round )
-          raise "Please enter a valid Resubmission deadline" if !due_date
-          max_round = max_round + 1
+      begin
+        #setting the Due Dates with a helper function written in DueDate.rb
+        due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
+        raise "Please enter a valid Submission deadline" if !due_date
+        
+        due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
+        raise "Please enter a valid Review deadline" if !due_date
+        max_round = 2;
+        
+        #for drop topic
+        due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
+        raise "Please enter a valid drop toipic deadline" if !due_date
+        #end of addition
+        
+        if params[:assignment_helper][:no_of_reviews].to_i >= 2
+          for resubmit_duedate_key in params[:additional_submit_deadline].keys
+            #setting the Due Dates with a helper function written in DueDate.rb
+            due_date = DueDate::set_duedate(params[:additional_submit_deadline][resubmit_duedate_key],@Resubmission_deadline, @assignment.id, max_round )
+            raise "Please enter a valid Resubmission deadline" if !due_date
+            max_round = max_round + 1
+          end
+          max_round = 2
+          for rereview_duedate_key in params[:additional_review_deadline].keys
+            #setting the Due Dates with a helper function written in DueDate.rb
+            due_date = DueDate::set_duedate(params[:additional_review_deadline][rereview_duedate_key],@Rereview_deadline, @assignment.id, max_round )
+            raise "Please enter a valid Rereview deadline" if !due_date
+            max_round = max_round + 1
+          end
         end
-        max_round = 2
-        for rereview_duedate_key in params[:additional_review_deadline].keys
-          #setting the Due Dates with a helper function written in DueDate.rb
-          due_date = DueDate::set_duedate(params[:additional_review_deadline][rereview_duedate_key],@Rereview_deadline, @assignment.id, max_round )
-          raise "Please enter a valid Rereview deadline" if !due_date
-          max_round = max_round + 1
-        end
-      end
-      #setting the Due Dates with a helper function written in DueDate.rb
-      @assignment.questionnaires.each{
-         |questionnaire|
-         if questionnaire.instance_of? MetareviewQuestionnaire
-           due_date = DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
-           raise "Please enter a valid Metareview deadline" if !due_date
-         end
-      }
-      
-      
-      # Create submission directory for this assignment
-      # If assignment is a Wiki Assignment (or has no directory)
-      # the helper will not create a path
-      FileHelper.create_directory(@assignment)      
-      
-      # Creating node information for assignment display
-      @assignment.create_node()
-      
-      flash[:notice] = 'Assignment was successfully created.'
-      redirect_to :action => 'list', :controller => 'tree_display'
-     rescue
+        #setting the Due Dates with a helper function written in DueDate.rb
+        @assignment.questionnaires.each{
+          |questionnaire|
+          if questionnaire.instance_of? MetareviewQuestionnaire
+            due_date = DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
+            raise "Please enter a valid Metareview deadline" if !due_date
+          end
+        }
+               
+        # Create submission directory for this assignment
+        # If assignment is a Wiki Assignment (or has no directory)
+        # the helper will not create a path
+        FileHelper.create_directory(@assignment)      
+        
+        # Creating node information for assignment display
+        @assignment.create_node()
+        
+        flash[:alert] = "There is already an assignment named \"#{@assignment.name}\". &nbsp;<a style='color: blue;' href='../../assignment/edit/#{@assignment.id}'>Edit assignment</a>" if @assignment.duplicate_name?
+        flash[:note] = 'Assignment was successfully created.'
+        redirect_to :action => 'list', :controller => 'tree_display'
+      rescue
         flash[:error] = $!
         prepare_to_edit
-      @wiki_types = WikiType.find(:all)
-      render :action => 'new'
-    end
+        @wiki_types = WikiType.find(:all)
+        render :action => 'new'
+      end
       
     else
       @wiki_types = WikiType.find(:all)

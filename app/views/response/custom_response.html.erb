@@ -1,0 +1,1098 @@
+ <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+ <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+ 
+  <script>
+  $(document).ready(function() {
+    $("#accordion").accordion({ autoHeight: false });
+  });
+  </script>
+ <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
+
+<% if !@map.contributor.nil?%>
+  <%if @map.assignment.team_assignment?
+        team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
+        topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
+  else%>
+        <% topic_id = Participant.find(@map.contributor).topic_id%>
+  <%end%>
+
+  <%if !topic_id.nil?%>
+    <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
+  <%end%>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
+  <br/><hr/><br/>
+<% end %>
+<%= @map.show_review() %>
+
+ <%
+ #TODO: Put this in some other place    
+ def label(object_name, method, label)
+    content_tag(:label, h(label), :for => "#{object_name}_#{method}")
+  end
+ %>
+
+
+
+
+
+ <br/>   <br/>
+ <%= form_tag :action => @next_action, :id => @modified_object %>
+
+ <div id="accordion">
+   <h3><a href="#"><b>Learning Targets</b></a></h3>
+   <div>
+     <p>
+        Check the descriptions that are true of the article's learning targets:
+        <p> <% if controller.action_name != 'new' %>
+                <%=check_box("custom_response", "0", {:checked => @review_scores[0].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+            <%else%>
+                <%=check_box("custom_response", "0")%>
+          <%end%>
+          <%=label("custom_response", "0", "They state what the reader should know or be able to do after reading the article")%></p>
+        <p><% if controller.action_name != 'new' %>
+                <%=check_box("custom_response", "1", {:checked => @review_scores[1].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+            <%else%>
+                <%=check_box("custom_response", "1")%>
+            <%end%>
+          <%=label("custom_response", "1", "They are specific ")%></p>
+        <p><% if controller.action_name != 'new' %>
+                <%=check_box("custom_response", "2", {:checked => @review_scores[2].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+            <%else%>
+                <%=check_box("custom_response", "2")%>
+            <%end%>
+          <%=label("custom_response", "2", "They are appropriate and reasonable i.e. not too easy or too difficult for ECI 301 students")%> </p>
+        <p><% if controller.action_name != 'new' %>
+                <%=check_box("custom_response", "3", {:checked => @review_scores[3].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+            <%else%>
+                <%=check_box("custom_response", "3")%>
+            <%end%>
+          <%=label("custom_response", "3", "They are observable i.e. you wouldn't have to look inside the readers' head to know if they met this target")%> </p>
+
+        <p><%=label("custom_response", "4", "Number of learning targets:")%>
+          <% if controller.action_name != 'new' %>
+            <%=text_field "custom_response", "4" , :label => "Number of learning targets:", :size => 3, :value => @review_scores[4].comments.gsub(/\"/,'&quot;')%>
+          <% else %>
+            <%=text_field "custom_response", "4" , :label => "Number of learning targets:", :size => 3%>
+          <% end %>
+        </p>
+        <%  grades = Array.new
+            for i in 0..5
+                grades << i
+            end
+        %>
+        <p><%=label("custom_response", "5", "Assign a grade for the learning targets: ")%>
+          <% if controller.action_name != 'new' %>
+            <%= select_tag "custom_response[5]", options_for_select(grades,@review_scores[5].comments.gsub(/\"/,'&quot;').to_i)%>
+          <% else %>
+            <%= select_tag "custom_response[5]", options_for_select(grades,nil)%>
+          <% end %>
+        </p>
+        <p><%=label("custom_response", "6", "Please make a comment about your rating. Provide suggestions for how the author can improve their learning targets:")%></p>
+         <% if controller.action_name != 'new' %>
+            <%=text_area("custom_response", "6", :size => "40x5", :value => @review_scores[6].comments.gsub(/\"/,'&quot;'))%>
+         <% else %>
+            <%=text_area("custom_response", "6", :size => "40x5")%>
+         <% end %>
+     </p>
+   </div>
+   <h3><a href="#"><b>Content</b></a></h3>
+   <div>
+     <p>Copy (Ctrl + C) and paste (Ctrl + V) the text of the article into a Word document (you can also use <a href="http://www.openoffice.org">Open Office</a>, a free alternative to Microsoft Word). Use track changes and/or comments (<font color="blue"><a href="http://www.ehow.com/how_2136058_use-track-changes-word.html">Learn How</a></font>) to suggest changes or additions. Save your file in MS Word 97-2003 compatible format (as a .doc) and upload it below.</p>
+     <p>In addition to correcting grammar etc, suggest places where clarification, examples and explanations can be added. Point out where visual or interactive elements can be introduced. Discuss whether the information included was important, interesting, engaging. Suggest what could be omitted or added.</p>
+     <p><b><font color='red' size ="4">WARNING!!</font> You must save your review 
+		       <font size="3"><u>BEFORE</u></font> you upload a file. Any text that has not been saved 
+					 <font size="3"><u>WILL BE LOST</u></font> when you click on the Upload File link. 
+					 </b>To save your review, click Save Review at the bottom of this page.  
+					 <font size="2"><i>(If you forget to save before uploading a file, you should be able to recover your text by hitting the back button twice.)</i></font></p>
+        <b><%=label("custom_response", "7", "File:")%></b>
+        <%  @current_folder = DisplayOption.new
+            @current_folder.name = "" %>
+            <% files_list = Dir[@participant.assignment.get_path.to_s+ "/" +@map.id.to_s + @current_folder.name + "/*"]
+            files = Array.new
+            for file in files_list
+                if File.directory?(file) then
+                    dir_files = get_files(file)
+                    dir_files.each{|f| files << f}
+                end
+                files << file
+            end
+            file = files[0]
+            if !file.nil?
+                parentFolder = File.dirname(file)
+                location = parentFolder + File.basename(file)
+                %><u><i><%=link_to File.basename(file), :controller => 'submitted_content', :action => 'download', :download => File.basename(file), "current_folder[name]" =>  File.dirname(file)%></i></u>
+            <% end %>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp
+            <%if @map.response.nil?
+                return_to = "new"
+             else
+                return_to ="edit"
+             end
+            %>
+            <%=link_to('Upload File', :action=>'upload', :participant_id => @participant.id, :map => @map.id, :id=>params[:id], :return_to => return_to)%>
+     <br>
+     <table>
+          <% if controller.action_name != 'new' %>
+              <tr>
+                <td>
+                  <%=label("custom_response", "8", "Write one compliment for the article:")%>
+                  <%=text_area("custom_response", "8", :size => "50x5", :value => @review_scores[8].comments.gsub(/\"/,'&quot;'))%>
+                </td>
+                <td>
+                  <%=label("custom_response", "9", "Write another compliment for the article:")%>
+                  <%=text_area("custom_response", "9", :size => "50x5", :value => @review_scores[9].comments.gsub(/\"/,'&quot;'))%>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <%=label("custom_response", "10", "Write one suggestion for the article:")%>
+                  <%=text_area("custom_response", "10", :size => "50x5", :value => @review_scores[10].comments.gsub(/\"/,'&quot;'))%>
+                </td>
+                <td>
+                  <%=label("custom_response", "11", "Write another suggestion for the article:")%>
+                  <%=text_area("custom_response", "11", :size => "50x5", :value => @review_scores[11].comments.gsub(/\"/,'&quot;'))%>
+                </td>
+              </tr>
+          <% else %>
+            <tr>
+                <td>
+                  <%=label("custom_response", "8", "Write one compliment for the article:")%>
+                  <%=text_area("custom_response", "8", :size => "50x5")%>
+                </td>
+                <td>
+                  <%=label("custom_response", "9", "Write another compliment for the article:")%>
+                  <%=text_area("custom_response", "9", :size => "50x5")%>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <%=label("custom_response", "10", "Write one suggestion for the article:")%>
+                  <%=text_area("custom_response", "10", :size => "50x5")%>
+                </td>
+                <td>
+                  <%=label("custom_response", "11", "Write another suggestion for the article:")%>
+                  <%=text_area("custom_response", "11", :size => "50x5")%>
+                </td>
+              </tr>
+          <% end %>
+        </table>
+   </div>
+
+   <%#**************************SOURCES**************************%>
+   <h3><a href="#"><b>Sources</b></a></h3>
+   <div>
+     <% if controller.action_name != 'new' %>
+        <p><%=label("custom_response", "12", "How many sources are in the references list?")%>
+          <%=text_field "custom_response", "12" , :label => "How many sources are in the references list?", :size => 3, :value => @review_scores[12].comments.gsub(/\"/,'&quot;')%></p>
+
+        <p><%=label("custom_response", "13", "List the range of publication years for all sources, e.g. 1998-2006:")%>
+          <%=text_field "custom_response", "13" , :label => "List the range of publication years for all sources, e.g. 1998-2006:a", :size => 3, :value => @review_scores[13].comments.gsub(/\"/,'&quot;')%>
+          -<%=text_field "custom_response", "14" , :label => "List the range of publication years for all sources, e.g. 1998-2006:b", :size => 3, :value => @review_scores[14].comments.gsub(/\"/,'&quot;')%></p>
+
+         Check the descriptions that are true of the article:
+         <p><%=check_box("custom_response", "15", {:checked => @review_scores[15].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "15", "It lists all the sources in a section labeled \"References\"")%></p>
+
+         <p><%=check_box("custom_response", "16", {:checked => @review_scores[16].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "16", "The author cites each of these sources in the article")%></p>
+
+         <p><%=check_box("custom_response", "17", {:checked => @review_scores[17].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "17", "The citations are in APA format")%></p>
+
+         <p><%=check_box("custom_response", "18", {:checked => @review_scores[18].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "18", "The author cites at least 2 scholarly sources")%></p>
+
+         <p><%=check_box("custom_response", "19", {:checked => @review_scores[19].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "19", "Most of the sources are current (less than 5 years old)")%></p>
+
+         <p><%=check_box("custom_response", "20", {:checked => @review_scores[20].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "20", "Taken together the sources represent a good balance of potential references for this topic")%></p>
+
+         <p><%=check_box("custom_response", "21", {:checked => @review_scores[21].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "21", "The sources represent different viewpoints")%></p>
+
+         <p><%=label("custom_response", "22", "What other sources or perspectives might the author want to consider?")%></p>
+            <%=text_area("custom_response", "22", :size => "40x5", :value => @review_scores[22].comments.gsub(/\"/,'&quot;'))%>
+
+         <p><%=check_box("custom_response", "23", {:checked => @review_scores[23].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "23", "All materials (such as tables, graphs, images or videos created by other people or organizations) posted in the article are in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible")%></p>
+
+         <p><%=label("custom_response", "24", "If not, which one(s) may infringe copyrights?")%></p>
+            <%=text_area("custom_response", "24", :size => "40x5", :value => @review_scores[24].comments.gsub(/\"/,'&quot;'))%>
+
+         <p><%=label("custom_response", "25", "Please make a comment about the sources. Explain how the author can improve the use of sources in the article:")%></p>
+            <%=text_area("custom_response", "25", :size => "60x5", :value => @review_scores[25].comments.gsub(/\"/,'&quot;'))%>
+
+
+
+         
+     <% else %>
+        <p><%=label("custom_response", "12", "How many sources are in the references list?")%>
+          <%=text_field "custom_response", "12" , :label => "How many sources are in the references list?", :size => 3%></p>
+
+
+        <p><%=label("custom_response", "13", "List the range of publication years for all sources, e.g. 1998-2006:")%>
+          <%=text_field "custom_response", "13" , :label => "List the range of publication years for all sources, e.g. 1998-2006:", :size => 3%>
+          -<%=text_field "custom_response", "14" , :label => "List the range of publication years for all sources, e.g. 1998-2006:", :size => 3%></p>
+
+         Check the descriptions that are true of the article:
+         <p><%=check_box("custom_response", "15")%>
+            <%=label("custom_response", "15", "It lists all the sources in a section labeled \"References\"")%></p>
+
+         <p><%=check_box("custom_response", "16")%>
+            <%=label("custom_response", "16", "The author cites each of these sources in the article")%></p>
+
+         <p><%=check_box("custom_response", "17")%>
+            <%=label("custom_response", "17", "The citations are in APA format")%></p>
+
+         <p><%=check_box("custom_response", "18")%>
+            <%=label("custom_response", "18", "The author cites at least 2 scholarly sources")%></p>
+
+         <p><%=check_box("custom_response", "19")%>
+            <%=label("custom_response", "19", "Most of the sources are current (less than 5 years old)")%></p>
+
+         <p><%=check_box("custom_response", "20")%>
+            <%=label("custom_response", "20", "Taken together the sources represent a good balance of potential references for this topic")%></p>
+
+         <p><%=check_box("custom_response", "21")%>
+            <%=label("custom_response", "21", "The sources represent different viewpoints")%></p>
+
+         <p><%=label("custom_response", "22", "What other sources or perspectives might the author want to consider?")%></p>
+            <%=text_area("custom_response", "22", :size => "40x5")%>
+
+         <p><%=check_box("custom_response", "23")%>
+            <%=label("custom_response", "23", "All materials (such as tables, graphs, images or videos created by other people or organizations) posted in the article are in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible")%></p>
+
+         <p><%=label("custom_response", "24", "If not, which one(s) may infringe copyrights?")%></p>
+            <%=text_area("custom_response", "24", :size => "40x5")%>
+
+         <p><%=label("custom_response", "25", "Please make a comment about the sources. Explain how the author can improve the use of sources in the article:")%></p>
+            <%=text_area("custom_response", "25", :size => "60x5")%>
+
+
+
+     <% end %>
+   </div>
+
+   <h3><a href="#"><b>Multiple Choice Questions</b></a></h3>
+
+   <div>
+     <% if controller.action_name != 'new' %>
+     
+        Check the descriptions that are true of the multiple-choice questions:
+         <p><%=check_box("custom_response", "26", {:checked => @review_scores[26].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "26", "There are 4 multiple-choice questions")%></p>
+
+         <p><%=check_box("custom_response", "27", {:checked => @review_scores[27].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "27", "They each have four answer choices (A-D)")%></p>
+
+         <p><%=check_box("custom_response", "28", {:checked => @review_scores[28].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "28", "There is a single correct (aka: not opinion-based) answer for each question")%></p>
+
+         <p><%=check_box("custom_response", "29", {:checked => @review_scores[29].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "29", "The questions assess the learning target(s)")%></p>
+
+         <p><%=check_box("custom_response", "30", {:checked => @review_scores[30].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "30", "The questions are appropriate and reasonable (not too easy and not too difficult)")%></p>
+
+         <p><%=check_box("custom_response", "31", {:checked => @review_scores[31].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "31", "The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers")%></p>
+
+         <p><%=check_box("custom_response", "32", {:checked => @review_scores[32].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "32", "The response options are listed in alphabetical order")%></p>
+
+         <p><%=check_box("custom_response", "33", {:checked => @review_scores[33].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+             <%=label("custom_response", "33", "The correct answers are provided and listed BELOW all the questions")%></p>
+
+
+        <% else %>
+     Check the descriptions that are true of the multiple-choice questions:
+             <p><%=check_box("custom_response", "26")%>
+                <%=label("custom_response", "26", "There are 4 multiple-choice questions")%></p>
+
+             <p><%=check_box("custom_response", "27")%>
+                <%=label("custom_response", "27", "They each have four answer choices (A-D)")%></p>
+
+             <p><%=check_box("custom_response", "28")%>
+                <%=label("custom_response", "28", "There is a single correct (aka: not opinion-based) answer for each question")%></p>
+
+             <p><%=check_box("custom_response", "29")%>
+                <%=label("custom_response", "29", "The questions assess the learning target(s)")%></p>
+
+             <p><%=check_box("custom_response", "30")%>
+                <%=label("custom_response", "30", "The questions are appropriate and reasonable (not too easy and not too difficult)")%></p>
+
+             <p><%=check_box("custom_response", "31")%>
+                <%=label("custom_response", "31", "The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers")%></p>
+
+             <p><%=check_box("custom_response", "32")%>
+                <%=label("custom_response", "32", "The response options are listed in alphabetical order")%></p>
+
+             <p><%=check_box("custom_response", "33")%>
+                <%=label("custom_response", "33", "The correct answers are provided and listed BELOW all the questions")%></p>
+     <%end%>
+             <%  types = Array.new
+                 types[0] = "Knowledge"
+                 types[1] = "Application"
+             %>
+             <p>
+                <br/>Rate each of the four questions.
+                <table bgcolor='lightgray'>
+                  <tr>
+                    <td>
+                    <% if controller.action_name != 'new' %>
+                        <p><%=label("custom_response", "34", "Type:")%>
+                        <%= select_tag "custom_response[34]", options_for_select(types,@review_scores[34].comments.gsub(/\"/,'&quot;'))%></p>
+                        <p><%=label("custom_response", "35", "Grade:")%>
+                        <%= select_tag "custom_response[35]", options_for_select(grades,@review_scores[35].comments.gsub(/\"/,'&quot;').to_i)%></p>
+                        <p><%=label("custom_response", "36", "Comment:")%></p>
+                          <%=text_area("custom_response", "36", :size => "60x5", :value => @review_scores[36].comments.gsub(/\"/,'&quot;'))%>
+                    <% else %>
+                        <p><%=label("custom_response", "34", "Type:")%>
+                        <%= select_tag "custom_response[34]", options_for_select(types,nil)%></p>
+                        <p><%=label("custom_response", "35", "Grade:")%>
+                        <%= select_tag "custom_response[35]", options_for_select(grades,nil)%></p>
+                        <p><%=label("custom_response", "36", "Comment:")%></p>
+                          <%=text_area("custom_response", "36", :size => "60x5")%>
+                    <% end %>
+                    </td>
+                   </tr>
+                </table>
+               <br/>
+                <table bgcolor='lightgray'>
+                  <tr>
+                    <td>
+                    <% if controller.action_name != 'new' %>
+                        <p><%=label("custom_response", "37", "Type:")%>
+                        <%= select_tag "custom_response[37]", options_for_select(types,@review_scores[37].comments.gsub(/\"/,'&quot;'))%></p>
+                        <p><%=label("custom_response", "38", "Grade:")%>
+                        <%= select_tag "custom_response[38]", options_for_select(grades,@review_scores[38].comments.gsub(/\"/,'&quot;').to_i)%></p>
+                        <p><%=label("custom_response", "39", "Comment:")%></p>
+                          <%=text_area("custom_response", "39", :size => "60x5", :value => @review_scores[39].comments.gsub(/\"/,'&quot;'))%>
+                    <% else %>
+                        <p><%=label("custom_response", "37", "Type:")%>
+                        <%= select_tag "custom_response[37]", options_for_select(types,nil)%></p>
+                        <p><%=label("custom_response", "38", "Grade:")%>
+                        <%= select_tag "custom_response[38]", options_for_select(grades,nil)%></p>
+                        <p><%=label("custom_response", "39", "Comment:")%></p>
+                          <%=text_area("custom_response", "39", :size => "60x5")%>
+                    <% end %>
+                    </td>
+                   </tr>
+                </table>
+                <br/>
+                <table bgcolor='lightgray'>
+                  <tr>
+                    <td>
+                    <% if controller.action_name != 'new' %>
+                        <p><%=label("custom_response", "40", "Type:")%>
+                        <%= select_tag "custom_response[40]", options_for_select(types,@review_scores[40].comments.gsub(/\"/,'&quot;'))%></p>
+                        <p><%=label("custom_response", "41", "Grade:")%>
+                        <%= select_tag "custom_response[41]", options_for_select(grades,@review_scores[41].comments.gsub(/\"/,'&quot;').to_i)%></p>
+                        <p><%=label("custom_response", "42", "Comment:")%></p>
+                          <%=text_area("custom_response", "42", :size => "60x5", :value => @review_scores[42].comments.gsub(/\"/,'&quot;'))%>
+                    <% else %>
+                        <p><%=label("custom_response", "40", "Type:")%>
+                        <%= select_tag "custom_response[40]", options_for_select(types,nil)%></p>
+                        <p><%=label("custom_response", "41", "Grade:")%>
+                        <%= select_tag "custom_response[41]", options_for_select(grades,nil)%></p>
+                        <p><%=label("custom_response", "42", "Comment:")%></p>
+                          <%=text_area("custom_response", "42", :size => "60x5")%>
+                    <% end %>
+                    </td>
+                   </tr>
+                </table>
+                <br/>
+                <table bgcolor='lightgray'>
+                  <tr>
+                    <td>
+                    <% if controller.action_name != 'new' %>
+                        <p><%=label("custom_response", "43", "Type:")%>
+                        <%= select_tag "custom_response[43]", options_for_select(types,@review_scores[43].comments.gsub(/\"/,'&quot;'))%></p>
+                        <p><%=label("custom_response", "44", "Grade:")%>
+                        <%= select_tag "custom_response[44]", options_for_select(grades,@review_scores[44].comments.gsub(/\"/,'&quot;').to_i)%></p>
+                        <p><%=label("custom_response", "45", "Comment:")%></p>
+                          <%=text_area("custom_response", "45", :size => "60x5", :value => @review_scores[45].comments.gsub(/\"/,'&quot;'))%>
+                    <% else %>
+                        <p><%=label("custom_response", "43", "Type:")%>
+                        <%= select_tag "custom_response[43]", options_for_select(types,nil)%></p>
+                        <p><%=label("custom_response", "44", "Grade:")%>
+                        <%= select_tag "custom_response[44]", options_for_select(grades,nil)%></p>
+                        <p><%=label("custom_response", "45", "Comment:")%></p>
+                          <%=text_area("custom_response", "45", :size => "60x5")%>
+                    <% end %>
+                    </td>
+                   </tr>
+                </table>
+             </p>
+
+
+
+
+         
+   </div>
+
+   <h3><a href="#"><b>Rubric</b></a></h3>
+   <div>
+     Please check sections that apply to the article.
+     <% if controller.action_name != 'new' %>
+         <p><b>Importance</b></p>
+         <hr>
+         <div align="center">The information selected by the author:</div>
+         <table class='general'>
+            <tr>
+              <th cellspacing="20%">5 - Very Important   </th>
+              <th cellspacing="20%">4 - Quite Important  </th>
+              <th cellspacing="20%">3 - Some Importance  </th>
+              <th cellspacing="20%">2 - Little Importance</th>
+              <th cellspacing="20%">1 - No Importance    </th>
+            </tr>
+            <tr>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "46", {:checked => @review_scores[46].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "46", "Is very important for future teachers to know")%></p></li>
+                  <li><p><%=check_box("custom_response", "47", {:checked => @review_scores[47].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "47", "Is based on researched information")%></p></li>
+                  <li><p><%=check_box("custom_response", "48", {:checked => @review_scores[48].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "48", "Is highly relevant to current educational practice")%></p></li>
+                  <li><p><%=check_box("custom_response", "49", {:checked => @review_scores[49].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "49", "Provides an excellent overview and in-depth discussion of key issues")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "50", {:checked => @review_scores[50].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "50", "Is relevant to future teachers")%></p></li>
+                  <li><p><%=check_box("custom_response", "51", {:checked => @review_scores[51].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "51", "Is mostly based on researched information")%></p></li>
+                  <li><p><%=check_box("custom_response", "52", {:checked => @review_scores[52].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "52", "Is applicable to today's schools")%></p></li>
+                  <li><p><%=check_box("custom_response", "53", {:checked => @review_scores[53].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "53", "Provides a good overview and explores a few key ideas")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "54", {:checked => @review_scores[54].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "54", "Has useful points but some irrelevant information")%></p></li>
+                  <li><p><%=check_box("custom_response", "55", {:checked => @review_scores[55].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "55", "Is half research; half the author's opinion")%></p></li>
+                  <li><p><%=check_box("custom_response", "56", {:checked => @review_scores[56].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "56", "Is partially out-dated or may not reflect current practice")%></p></li>
+                  <li><p><%=check_box("custom_response", "57", {:checked => @review_scores[57].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "57", "Contains good information but yields an incomplete understanding")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "58", {:checked => @review_scores[58].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "58", "Has one useful point")%></p></li>
+                  <li><p><%=check_box("custom_response", "59", {:checked => @review_scores[59].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "59", "Is mostly the author's opinion.")%></p></li>
+                  <li><p><%=check_box("custom_response", "60", {:checked => @review_scores[60].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "60", "Is mostly irrelevant in today's schools")%></p></li>
+                  <li><p><%=check_box("custom_response", "61", {:checked => @review_scores[61].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "61", "Focused on unimportant subtopics OR is overly general")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "62", {:checked => @review_scores[62].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "62", "Is not relevant to future teachers")%></p></li>
+                  <li><p><%=check_box("custom_response", "63", {:checked => @review_scores[63].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "63", "Is entirely the author's opinion")%></p></li>
+                  <li><p><%=check_box("custom_response", "64", {:checked => @review_scores[64].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "64", "Is obsolete")%></p></li>
+                  <li><p><%=check_box("custom_response", "65", {:checked => @review_scores[65].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "65", "Lacks any substantive information")%></p></li>
+                </ul>
+              </td>
+            </tr>
+
+         </table>
+     <% else %>
+         <p><b>Importance</b></p>
+         <hr>
+         <div align="center">The information selected by the author:</div>
+         <table class='general'>
+            <tr>
+              <th cellspacing="20%">5 - Very Important   </th>
+              <th cellspacing="20%">4 - Quite Important  </th>
+              <th cellspacing="20%">3 - Some Importance  </th>
+              <th cellspacing="20%">2 - Little Importance</th>
+              <th cellspacing="20%">1 - No Importance    </th>
+            </tr>
+            <tr>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "46")%><%=label("custom_response", "46", "Is very important for future teachers to know")%></p></li>
+                  <li><p><%=check_box("custom_response", "47")%><%=label("custom_response", "47", "Is based on researched information")%></p></li>
+                  <li><p><%=check_box("custom_response", "48")%><%=label("custom_response", "48", "Is highly relevant to current educational practice")%></p></li>
+                  <li><p><%=check_box("custom_response", "49")%><%=label("custom_response", "49", "Provides an excellent overview and in-depth discussion of key issues")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "50")%><%=label("custom_response", "50", "Is relevant to future teachers")%></p></li>
+                  <li><p><%=check_box("custom_response", "51")%><%=label("custom_response", "51", "Is mostly based on researched information")%></p></li>
+                  <li><p><%=check_box("custom_response", "52")%><%=label("custom_response", "52", "Is applicable to today's schools")%></p></li>
+                  <li><p><%=check_box("custom_response", "53")%><%=label("custom_response", "53", "Provides a good overview and explores a few key ideas")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "54")%><%=label("custom_response", "54", "Has useful points but some irrelevant information")%></p></li>
+                  <li><p><%=check_box("custom_response", "55")%><%=label("custom_response", "55", "Is half research; half the author's opinion")%></p></li>
+                  <li><p><%=check_box("custom_response", "56")%><%=label("custom_response", "56", "Is partially out-dated or may not reflect current practice")%></p></li>
+                  <li><p><%=check_box("custom_response", "57")%><%=label("custom_response", "57", "Contains good information but yields an incomplete understanding")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "58")%><%=label("custom_response", "58", "Has one useful point")%></p></li>
+                  <li><p><%=check_box("custom_response", "59")%><%=label("custom_response", "59", "Is mostly the author's opinion.")%></p></li>
+                  <li><p><%=check_box("custom_response", "60")%><%=label("custom_response", "60", "Is mostly irrelevant in today's schools")%></p></li>
+                  <li><p><%=check_box("custom_response", "61")%><%=label("custom_response", "61", "Focused on unimportant subtopics OR is overly general")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "62")%><%=label("custom_response", "62", "Is not relevant to future teachers")%></p></li>
+                  <li><p><%=check_box("custom_response", "63")%><%=label("custom_response", "63", "Is entirely the author's opinion")%></p></li>
+                  <li><p><%=check_box("custom_response", "64")%><%=label("custom_response", "64", "Is obsolete")%></p></li>
+                  <li><p><%=check_box("custom_response", "65")%><%=label("custom_response", "65", "Lacks any substantive information")%></p></li>
+                </ul>
+              </td>
+            </tr>
+
+         </table>
+
+     <% end %>
+
+
+
+
+     <% if controller.action_name != 'new' %>
+         <p><b>Interest</b></p>
+         <hr>
+         <div align="center">To attract and maintain attention, the article has:</div>
+         <table class='general'>
+            <tr>
+              <th cellspacing="20%">5 - Extremely Interesting   </th>
+              <th cellspacing="20%">4 - Quite Interesting  </th>
+              <th cellspacing="20%">3 - Reasonably Interesting  </th>
+              <th cellspacing="20%">2 - Little Interest</th>
+              <th cellspacing="20%">1 - No Interest    </th>
+            </tr>
+            <tr>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "66", {:checked => @review_scores[66].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "66", "A sidebar with new information that was motivating to read/view")%></p></li>
+                  <li><p><%=check_box("custom_response", "67", {:checked => @review_scores[67].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "67", "Many creative, attractive visuals and engaging, interactive elements")%></p></li>
+                  <li><p><%=check_box("custom_response", "68", {:checked => @review_scores[68].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "68", "Multiple perspectives")%></p></li>
+                  <li><p><%=check_box("custom_response", "69", {:checked => @review_scores[69].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "69", "Insightful interpretation & analysis throughout")%></p></li>
+                  <li><p><%=check_box("custom_response", "70", {:checked => @review_scores[70].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "70", "Many compelling examples that support the main points (it \"shows\" not just \"tells\")")%></p></li>
+
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "71", {:checked => @review_scores[71].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "71", "A sidebar that adds something new to the article")%></p></li>
+                  <li><p><%=check_box("custom_response", "72", {:checked => @review_scores[72].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "72", "A few effective visuals or interactive elements")%></p></li>
+                  <li><p><%=check_box("custom_response", "73", {:checked => @review_scores[73].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "73", "At least one interesting, fresh perspective")%></p></li>
+                  <li><p><%=check_box("custom_response", "74", {:checked => @review_scores[74].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "74", "Frequent interpretation and analysis")%></p></li>
+                  <li><p><%=check_box("custom_response", "75", {:checked => @review_scores[75].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "75", "Clearly explained and well supported points")%></p></li>
+
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "76", {:checked => @review_scores[76].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "76", "A sidebar that repeats what is in the article")%></p></li>
+                  <li><p><%=check_box("custom_response", "77", {:checked => @review_scores[77].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "77", "An effective visual or interactive element")%></p></li>
+                  <li><p><%=check_box("custom_response", "78", {:checked => @review_scores[78].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "78", "One reasonable (possibly typical) perspective")%></p></li>
+                  <li><p><%=check_box("custom_response", "79", {:checked => @review_scores[79].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "79", "Some interpretation and analysis")%></p></li>
+                  <li><p><%=check_box("custom_response", "80", {:checked => @review_scores[80].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "80", "Supported points")%></p></li>
+
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "81", {:checked => @review_scores[81].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "81", "A quote, link, etc. included as a sidebar, but that is not in a textbox")%></p></li>
+                  <li><p><%=check_box("custom_response", "82", {:checked => @review_scores[82].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "82", "Visuals or interactive elements that are distracting")%></p></li>
+                  <li><p><%=check_box("custom_response", "83", {:checked => @review_scores[83].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "83", "Only a biased perspective")%></p></li>
+                  <li><p><%=check_box("custom_response", "84", {:checked => @review_scores[84].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "84", "Minimal analysis or interpretation")%></p></li>
+                  <li><p><%=check_box("custom_response", "85", {:checked => @review_scores[85].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "85", "At least one clear and supported point")%></p></li>
+
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "86", {:checked => @review_scores[86].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "86", "No side bar included")%></p></li>
+                  <li><p><%=check_box("custom_response", "87", {:checked => @review_scores[87].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "87", "No visuals or interactive elements")%></p></li>
+                  <li><p><%=check_box("custom_response", "88", {:checked => @review_scores[88].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "88", "No perspective is acknowledged")%></p></li>
+                  <li><p><%=check_box("custom_response", "89", {:checked => @review_scores[89].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "89", "No analysis or interpretation")%></p></li>
+                  <li><p><%=check_box("custom_response", "90", {:checked => @review_scores[90].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "90", "No well-supported points")%></p></li>
+
+                </ul>
+              </td>
+            </tr>
+
+         </table>
+     <% else %>
+         <p><b>Interest</b></p>
+         <hr>
+         <div align="center">To attract and maintain attention, the article has:</div>
+         <table class='general'>
+            <tr>
+              <th cellspacing="20%">5 - Extremely Interesting   </th>
+              <th cellspacing="20%">4 - Quite Interesting  </th>
+              <th cellspacing="20%">3 - Reasonably Interesting  </th>
+              <th cellspacing="20%">2 - Little Interest</th>
+              <th cellspacing="20%">1 - No Interest    </th>
+            </tr>
+            <tr>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "66")%><%=label("custom_response", "66", "A sidebar with new information that was motivating to read/view")%></p></li>
+                  <li><p><%=check_box("custom_response", "67")%><%=label("custom_response", "67", "Many creative, attractive visuals and engaging, interactive elements")%></p></li>
+                  <li><p><%=check_box("custom_response", "68")%><%=label("custom_response", "68", "Multiple perspectives")%></p></li>
+                  <li><p><%=check_box("custom_response", "69")%><%=label("custom_response", "69", "Insightful interpretation & analysis throughout")%></p></li>
+                  <li><p><%=check_box("custom_response", "70")%><%=label("custom_response", "70", "Many compelling examples that support the main points (it \"shows\" not just \"tells\")")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "71")%><%=label("custom_response", "71", "A sidebar that adds something new to the article")%></p></li>
+                  <li><p><%=check_box("custom_response", "72")%><%=label("custom_response", "72", "A few effective visuals or interactive elements")%></p></li>
+                  <li><p><%=check_box("custom_response", "73")%><%=label("custom_response", "73", "At least one interesting, fresh perspective")%></p></li>
+                  <li><p><%=check_box("custom_response", "74")%><%=label("custom_response", "74", "Frequent interpretation and analysis")%></p></li>
+                  <li><p><%=check_box("custom_response", "75")%><%=label("custom_response", "75", "Clearly explained and well supported points")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "76")%><%=label("custom_response", "76", "A sidebar that repeats what is in the article")%></p></li>
+                  <li><p><%=check_box("custom_response", "77")%><%=label("custom_response", "77", "An effective visual or interactive element")%></p></li>
+                  <li><p><%=check_box("custom_response", "78")%><%=label("custom_response", "78", "One reasonable (possibly typical) perspective")%></p></li>
+                  <li><p><%=check_box("custom_response", "79")%><%=label("custom_response", "79", "Some interpretation and analysis")%></p></li>
+                  <li><p><%=check_box("custom_response", "80")%><%=label("custom_response", "80", "Supported points")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "81")%><%=label("custom_response", "81", "A quote, link, etc. included as a sidebar, but that is not in a textbox")%></p></li>
+                  <li><p><%=check_box("custom_response", "82")%><%=label("custom_response", "82", "Visuals or interactive elements that are distracting")%></p></li>
+                  <li><p><%=check_box("custom_response", "83")%><%=label("custom_response", "83", "Only a biased perspective")%></p></li>
+                  <li><p><%=check_box("custom_response", "84")%><%=label("custom_response", "84", "Minimal analysis or interpretation")%></p></li>
+                  <li><p><%=check_box("custom_response", "85")%><%=label("custom_response", "85", "At least one clear and supported point")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "86")%><%=label("custom_response", "86", "No side bar included")%></p></li>
+                  <li><p><%=check_box("custom_response", "87")%><%=label("custom_response", "87", "No visuals or interactive elements")%></p></li>
+                  <li><p><%=check_box("custom_response", "88")%><%=label("custom_response", "88", "No perspective is acknowledged")%></p></li>
+                  <li><p><%=check_box("custom_response", "89")%><%=label("custom_response", "89", "No analysis or interpretation")%></p></li>
+                  <li><p><%=check_box("custom_response", "90")%><%=label("custom_response", "90", "No well-supported points")%></p></li>
+                </ul>
+              </td>
+            </tr>
+
+         </table>
+
+     <% end %>
+
+
+
+
+
+
+     <% if controller.action_name != 'new' %>
+         <p><b>Credibility</b></p>
+         <hr>
+         <div align="center">To demonstrate its credibility the article:</div>
+         <table class='general'>
+            <tr>
+              <th cellspacing="20%">5 - Completely Credible   </th>
+              <th cellspacing="20%">4 - Substantial Credibility  </th>
+              <th cellspacing="20%">3 - Reasonable Credibility </th>
+              <th cellspacing="20%">2 - Limited Credibility</th>
+              <th cellspacing="20%">1 - Not Credible   </th>
+            </tr>
+            <tr>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "91", {:checked => @review_scores[91].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "91", "Cites 5 or more diverse, reputable sources in proper APA format")%></p></li>
+                  <li><p><%=check_box("custom_response", "92", {:checked => @review_scores[92].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "92", "Provides citations for all presented information")%></p></li>
+                  <li><p><%=check_box("custom_response", "93", {:checked => @review_scores[93].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "93", "Readily identifies bias: both the author's own and others")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "94", {:checked => @review_scores[94].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "94", "Cites 5 or more diverse, reputable sources with few APA errors")%></p></li>
+                  <li><p><%=check_box("custom_response", "95", {:checked => @review_scores[95].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "95", "Provides citations for most information")%></p></li>
+                  <li><p><%=check_box("custom_response", "96", {:checked => @review_scores[96].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "96", "Clearly differentiates between opinion and fact")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "97", {:checked => @review_scores[97].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "97", "Cites 5 or more reputable sources")%></p></li>
+                  <li><p><%=check_box("custom_response", "98", {:checked => @review_scores[98].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "98", "Supports some claims with citation")%></p></li>
+                  <li><p><%=check_box("custom_response", "99", {:checked => @review_scores[99].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "99", "Occasionally states opinion as fact")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "100", {:checked => @review_scores[100].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "100", "Cites 4 or more reputable sources")%></p></li>
+                  <li><p><%=check_box("custom_response", "101", {:checked => @review_scores[101].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "101", "Has several unsupported claims")%></p></li>
+                  <li><p><%=check_box("custom_response", "102", {:checked => @review_scores[102].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "102", "Routinely states opinion as fact and fails to acknowledge bias")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "103", {:checked => @review_scores[103].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "103", "Cites 3 or fewer reputable sources")%></p></li>
+                  <li><p><%=check_box("custom_response", "104", {:checked => @review_scores[104].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "104", "Has mostly unsupported claims")%></p></li>
+                  <li><p><%=check_box("custom_response", "105", {:checked => @review_scores[105].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "105", "Is very biased and contains almost entirely opinions")%></p></li>
+                </ul>
+              </td>
+            </tr>
+
+         </table>
+     <% else %>
+         <p><b>Credibility</b></p>
+         <hr>
+         <div align="center">To demonstrate its credibility the article:</div>
+         <table class='general'>
+            <tr>
+              <th cellspacing="20%">5 - Completely Credible   </th>
+              <th cellspacing="20%">4 - Substantial Credibility  </th>
+              <th cellspacing="20%">3 - Reasonable Credibility </th>
+              <th cellspacing="20%">2 - Limited Credibility</th>
+              <th cellspacing="20%">1 - Not Credible   </th>
+            </tr>
+            <tr>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "91")%><%=label("custom_response", "91", "Cites 5 or more diverse, reputable sources in proper APA format")%></p></li>
+                  <li><p><%=check_box("custom_response", "92")%><%=label("custom_response", "92", "Provides citations for all presented information")%></p></li>
+                  <li><p><%=check_box("custom_response", "93")%><%=label("custom_response", "93", "Readily identifies bias: both the author's own and others")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "94")%><%=label("custom_response", "94", "Cites 5 or more diverse, reputable sources with few APA errors")%></p></li>
+                  <li><p><%=check_box("custom_response", "95")%><%=label("custom_response", "95", "Provides citations for most information")%></p></li>
+                  <li><p><%=check_box("custom_response", "96")%><%=label("custom_response", "96", "Clearly differentiates between opinion and fact")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "97")%><%=label("custom_response", "97", "Cites 5 or more reputable sources")%></p></li>
+                  <li><p><%=check_box("custom_response", "98")%><%=label("custom_response", "98", "Supports some claims with citation")%></p></li>
+                  <li><p><%=check_box("custom_response", "99")%><%=label("custom_response", "99", "Occasionally states opinion as fact")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "100")%><%=label("custom_response", "100", "Cites 4 or more reputable sources")%></p></li>
+                  <li><p><%=check_box("custom_response", "101")%><%=label("custom_response", "101", "Has several unsupported claims")%></p></li>
+                  <li><p><%=check_box("custom_response", "102")%><%=label("custom_response", "102", "Routinely states opinion as fact and fails to acknowledge bias")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "103")%><%=label("custom_response", "103", "Cites 3 or fewer reputable sources")%></p></li>
+                  <li><p><%=check_box("custom_response", "104")%><%=label("custom_response", "104", "Has mostly unsupported claims")%></p></li>
+                  <li><p><%=check_box("custom_response", "105")%><%=label("custom_response", "105", "Is very biased and contains almost entirely opinions")%></p></li>
+                </ul>
+              </td>
+            </tr>
+
+         </table>
+
+     <% end %>
+
+
+
+
+
+
+
+     <% if controller.action_name != 'new' %>
+         <p><b>Pedagogy</b></p>
+         <hr>
+         <div align="center">To help guide the reader:</div>
+         <table class='general'>
+            <tr>
+              <th cellspacing="20%">5 - Superior   </th>
+              <th cellspacing="20%">4 - Effective  </th>
+              <th cellspacing="20%">3 - Acceptable </th>
+              <th cellspacing="20%">2 - Deficient</th>
+              <th cellspacing="20%">1 - Absent   </th>
+            </tr>
+            <tr>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "106", {:checked => @review_scores[106].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "106", "Specific, appropriate, observable learning targets establish the purpose of the article")%></p></li>
+                  <li><p><%=check_box("custom_response", "107", {:checked => @review_scores[107].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "107", "The article accomplishes its established goals")%></p></li>
+                  <li><p><%=check_box("custom_response", "108", {:checked => @review_scores[108].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "108", "Excellent knowledge and application MC questions align with learning targets and assess important content")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "109", {:checked => @review_scores[109].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "109", "Specific and reasonable learning targets are stated")%></p></li>
+                  <li><p><%=check_box("custom_response", "110", {:checked => @review_scores[110].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "110", "The article partially meets its established goals")%></p></li>
+                  <li><p><%=check_box("custom_response", "111", {:checked => @review_scores[111].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "111", "Well constructed MC questions assess important content")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "112", {:checked => @review_scores[112].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "112", "Reasonable learning targets are stated")%></p></li>
+                  <li><p><%=check_box("custom_response", "113", {:checked => @review_scores[113].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "113", "The content relates to its goals")%></p></li>
+                  <li><p><%=check_box("custom_response", "114", {:checked => @review_scores[114].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "114", "MC questions assess important content")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "115", {:checked => @review_scores[115].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "115", "A learning target is included")%></p></li>
+                  <li><p><%=check_box("custom_response", "116", {:checked => @review_scores[116].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "116", "Content does not achieve its goal, or goal is unclear")%></p></li>
+                  <li><p><%=check_box("custom_response", "117", {:checked => @review_scores[117].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "117", "4 questions are included")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "118", {:checked => @review_scores[118].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "118", "Learning target is missing/ not actually a learning target")%></p></li>
+                  <li><p><%=check_box("custom_response", "119", {:checked => @review_scores[119].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "119", "Article has no goal/ content is unfocused")%></p></li>
+                  <li><p><%=check_box("custom_response", "120", {:checked => @review_scores[120].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "120", "Questions are missing")%></p></li>
+                </ul>
+              </td>
+            </tr>
+
+         </table>
+     <% else %>
+         <p><b>Pedagogy</b></p>
+         <hr>
+         <div align="center">To help guide the reader:</div>
+         <table class='general'>
+            <tr>
+              <th cellspacing="20%">5 - Superior   </th>
+              <th cellspacing="20%">4 - Effective  </th>
+              <th cellspacing="20%">3 - Acceptable </th>
+              <th cellspacing="20%">2 - Deficient</th>
+              <th cellspacing="20%">1 - Absent   </th>
+            </tr>
+            <tr>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "106")%><%=label("custom_response", "106", "Specific, appropriate, observable learning targets establish the purpose of the article")%></p></li>
+                  <li><p><%=check_box("custom_response", "107")%><%=label("custom_response", "107", "The article accomplishes its established goals")%></p></li>
+                  <li><p><%=check_box("custom_response", "108")%><%=label("custom_response", "108", "Excellent knowledge and application MC questions align with learning targets and assess important content")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "109")%><%=label("custom_response", "109", "Specific and reasonable learning targets are stated")%></p></li>
+                  <li><p><%=check_box("custom_response", "110")%><%=label("custom_response", "110", "The article partially meets its established goals")%></p></li>
+                  <li><p><%=check_box("custom_response", "111")%><%=label("custom_response", "111", "Well constructed MC questions assess important content")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "112")%><%=label("custom_response", "112", "Reasonable learning targets are stated")%></p></li>
+                  <li><p><%=check_box("custom_response", "113")%><%=label("custom_response", "113", "The content relates to its goals")%></p></li>
+                  <li><p><%=check_box("custom_response", "114")%><%=label("custom_response", "114", "MC questions assess important content")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "115")%><%=label("custom_response", "115", "A learning target is included")%></p></li>
+                  <li><p><%=check_box("custom_response", "116")%><%=label("custom_response", "116", "Content does not achieve its goal, or goal is unclear")%></p></li>
+                  <li><p><%=check_box("custom_response", "117")%><%=label("custom_response", "117", "4 questions are included")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "118")%><%=label("custom_response", "118", "Learning target is missing/ not actually a learning target")%></p></li>
+                  <li><p><%=check_box("custom_response", "119")%><%=label("custom_response", "119", "Article has no goal/ content is unfocused")%></p></li>
+                  <li><p><%=check_box("custom_response", "120")%><%=label("custom_response", "120", "Questions are missing")%></p></li>
+                </ul>
+              </td>
+            </tr>
+
+         </table>
+
+     <% end %>
+
+
+
+
+
+    <% if controller.action_name != 'new' %>
+         <p><b>Writing Quality</b></p>
+         <hr>
+         <div align="center">The writing:</div>
+         <table class='general'>
+            <tr>
+              <th cellspacing="20%">5 - Excellently Written   </th>
+              <th cellspacing="20%">4 - Well Written  </th>
+              <th cellspacing="20%">3 - Reasonably Written  </th>
+              <th cellspacing="20%">2 - Fairly Written</th>
+              <th cellspacing="20%">1 - Poorly Written    </th>
+            </tr>
+            <tr>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "121", {:checked => @review_scores[121].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "121", "Is focused, organized, and easy to read throughout")%></p></li>
+                  <li><p><%=check_box("custom_response", "122", {:checked => @review_scores[122].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "122", "Uses rich, descriptive vocabulary and a variety of effective sentence structures")%></p></li>
+                  <li><p><%=check_box("custom_response", "123", {:checked => @review_scores[123].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "123", "Contains few to no mechanical errors")%></p></li>
+                  <li><p><%=check_box("custom_response", "124", {:checked => @review_scores[124].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "124", "Has an effective introduction and a conclusion that synthesizes all of the material presented")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "125", {:checked => @review_scores[125].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "125", "Is organized and flows well")%></p></li>
+                  <li><p><%=check_box("custom_response", "126", {:checked => @review_scores[126].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "126", "Uses effective vocabulary and sentence structures")%></p></li>
+                  <li><p><%=check_box("custom_response", "127", {:checked => @review_scores[127].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "127", "Contains a few minor mechanical errors")%></p></li>
+                  <li><p><%=check_box("custom_response", "128", {:checked => @review_scores[128].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "128", "Has an effective introduction and conclusion based on included information")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "129", {:checked => @review_scores[129].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "129", "Is mostly organized")%></p></li>
+                  <li><p><%=check_box("custom_response", "130", {:checked => @review_scores[130].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "130", "Uses properly constructed sentences")%></p></li>
+                  <li><p><%=check_box("custom_response", "131", {:checked => @review_scores[131].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "131", "Has a few distracting errors")%></p></li>
+                  <li><p><%=check_box("custom_response", "132", {:checked => @review_scores[132].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "132", "Includes an introduction and a conclusion")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "133", {:checked => @review_scores[133].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "133", "Can be difficult to follow")%></p></li>
+                  <li><p><%=check_box("custom_response", "134", {:checked => @review_scores[134].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "134", "Contains several awkward sentences")%></p></li>
+                  <li><p><%=check_box("custom_response", "135", {:checked => @review_scores[135].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "135", "Has several distracting errors")%></p></li>
+                  <li><p><%=check_box("custom_response", "136", {:checked => @review_scores[136].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "136", "Lacks either an introduction or a conclusion")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "137", {:checked => @review_scores[137].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "137", "Has minimal organization")%></p></li>
+                  <li><p><%=check_box("custom_response", "138", {:checked => @review_scores[138].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "138", "Has many poorly constructed sentences")%></p></li>
+                  <li><p><%=check_box("custom_response", "139", {:checked => @review_scores[139].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "139", "Has many mechanical errors that inhibit comprehension")%></p></li>
+                  <li><p><%=check_box("custom_response", "140", {:checked => @review_scores[140].comments.gsub(/\"/,'&quot;').to_i == 1})%><%=label("custom_response", "140", "Has neither a clear introduction nor a conclusion")%></p></li>
+                </ul>
+              </td>
+            </tr>
+
+         </table>
+     <% else %>
+         <p><b>Writing Quality</b></p>
+         <hr>
+         <div align="center">The writing:</div>
+         <table class='general'>
+            <tr>
+              <th cellspacing="20%">5 - Excellently Written   </th>
+              <th cellspacing="20%">4 - Well Written  </th>
+              <th cellspacing="20%">3 - Reasonably Written  </th>
+              <th cellspacing="20%">2 - Fairly Written</th>
+              <th cellspacing="20%">1 - Poorly Written    </th>
+            </tr>
+            <tr>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "121")%><%=label("custom_response", "121", "Is focused, organized, and easy to read throughout")%></p></li>
+                  <li><p><%=check_box("custom_response", "122")%><%=label("custom_response", "122", "Uses rich, descriptive vocabulary and a variety of effective sentence structures")%></p></li>
+                  <li><p><%=check_box("custom_response", "123")%><%=label("custom_response", "123", "Contains few to no mechanical errors")%></p></li>
+                  <li><p><%=check_box("custom_response", "124")%><%=label("custom_response", "124", "Has an effective introduction and a conclusion that synthesizes all of the material presented")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "125")%><%=label("custom_response", "125", "Is organized and flows well")%></p></li>
+                  <li><p><%=check_box("custom_response", "126")%><%=label("custom_response", "126", "Uses effective vocabulary and sentence structures")%></p></li>
+                  <li><p><%=check_box("custom_response", "127")%><%=label("custom_response", "127", "Contains a few minor mechanical errors")%></p></li>
+                  <li><p><%=check_box("custom_response", "128")%><%=label("custom_response", "128", "Has an effective introduction and conclusion based on included information")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "129")%><%=label("custom_response", "129", "Is mostly organized")%></p></li>
+                  <li><p><%=check_box("custom_response", "130")%><%=label("custom_response", "130", "Uses properly constructed sentences")%></p></li>
+                  <li><p><%=check_box("custom_response", "131")%><%=label("custom_response", "131", "Has a few distracting errors")%></p></li>
+                  <li><p><%=check_box("custom_response", "132")%><%=label("custom_response", "132", "Includes an introduction and a conclusion")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "133")%><%=label("custom_response", "133", "Can be difficult to follow")%></p></li>
+                  <li><p><%=check_box("custom_response", "134")%><%=label("custom_response", "134", "Contains several awkward sentences")%></p></li>
+                  <li><p><%=check_box("custom_response", "135")%><%=label("custom_response", "135", "Has several distracting errors")%></p></li>
+                  <li><p><%=check_box("custom_response", "136")%><%=label("custom_response", "136", "Lacks either an introduction or a conclusion")%></p></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><p><%=check_box("custom_response", "137")%><%=label("custom_response", "137", "Has minimal organization")%></p></li>
+                  <li><p><%=check_box("custom_response", "138")%><%=label("custom_response", "138", "Has many poorly constructed sentences")%></p></li>
+                  <li><p><%=check_box("custom_response", "139")%><%=label("custom_response", "139", "Has many mechanical errors that inhibit comprehension")%></p></li>
+                  <li><p><%=check_box("custom_response", "140")%><%=label("custom_response", "140", "Has neither a clear introduction nor a conclusion")%></p></li>
+                </ul>
+              </td>
+            </tr>
+
+         </table>
+
+     <% end %>
+
+   </div>
+
+<h3><a href="#"><b>Ratings</b></a></h3>
+   <div>
+     Provide a rating and justification for each criterion:     
+     <table cellpadding="30">
+       <tr>
+            <td><b>Importance:</b>
+                 <p><% if controller.action_name != 'new' %>
+                    <p>Rating:<%= select_tag "custom_response[141]", options_for_select(grades,@review_scores[141].comments.gsub(/\"/,'&quot;').to_i)%></p>
+                    <p>Comment:<%=text_area("custom_response", "142", :size => "40x5", :value => @review_scores[142].comments.gsub(/\"/,'&quot;'))%></p>
+
+                  <% else %>
+                    <p>Rating:<%= select_tag "custom_response[141]", options_for_select(grades,nil)%></p>
+                    Comment:<p><%=text_area("custom_response", "142", :size => "40x5")%></p>                       
+                  <% end %> </p>
+            </td>
+            <td><b>Interest:</b>
+                 <p><% if controller.action_name != 'new' %>
+                    <p>Rating:<%= select_tag "custom_response[143]", options_for_select(grades,@review_scores[143].comments.gsub(/\"/,'&quot;').to_i)%></p>
+                    <p>Comment:<%=text_area("custom_response", "144", :size => "40x5", :value => @review_scores[144].comments.gsub(/\"/,'&quot;'))%></p>
+
+                  <% else %>
+                    <p>Rating:<%= select_tag "custom_response[143]", options_for_select(grades,nil)%></p>
+                    Comment:<p><%=text_area("custom_response", "144", :size => "40x5")%></p>
+                  <% end %> </p>
+            </td>
+       <tr>
+
+       <tr>
+            <td><b>Credibility:</b>
+                 <p><% if controller.action_name != 'new' %>
+                    <p>Rating:<%= select_tag "custom_response[145]", options_for_select(grades,@review_scores[145].comments.gsub(/\"/,'&quot;').to_i)%></p>
+                    <p>Comment:<%=text_area("custom_response", "146", :size => "40x5", :value => @review_scores[146].comments.gsub(/\"/,'&quot;'))%></p>
+
+                  <% else %>
+                    <p>Rating:<%= select_tag "custom_response[145]", options_for_select(grades,nil)%></p>
+                    Comment:<p><%=text_area("custom_response", "146", :size => "40x5")%></p>
+                  <% end %> </p>
+            </td>
+            <td><b>Pedagogy:</b>
+                 <p><% if controller.action_name != 'new' %>
+                    <p>Rating:<%= select_tag "custom_response[147]", options_for_select(grades,@review_scores[147].comments.gsub(/\"/,'&quot;').to_i)%></p>
+                    <p>Comment:<%=text_area("custom_response", "148", :size => "40x5", :value => @review_scores[148].comments.gsub(/\"/,'&quot;'))%></p>
+
+                  <% else %>
+                    <p>Rating:<%= select_tag "custom_response[147]", options_for_select(grades,nil)%></p>
+                    Comment:<p><%=text_area("custom_response", "148", :size => "40x5")%></p>
+                  <% end %> </p>
+            </td>
+       <tr>
+     
+        <tr >
+            <td><b>Writing:</b>
+                 <p><% if controller.action_name != 'new' %>
+                    <p>Rating:<%= select_tag "custom_response[149]", options_for_select(grades,@review_scores[149].comments.gsub(/\"/,'&quot;').to_i)%></p>
+                    <p>Comment:<%=text_area("custom_response", "150", :size => "40x5", :value => @review_scores[150].comments.gsub(/\"/,'&quot;'))%></p>
+
+                  <% else %>
+                    <p>Rating:<%= select_tag "custom_response[149]", options_for_select(grades,nil)%></p>
+                    Comment:<p><%=text_area("custom_response", "150", :size => "40x5")%></p>
+                  <% end %> </p>
+            </td>
+       </tr>
+     </table>
+   </div>  
+
+ </div>
+ <br/>
+ <%= submit_tag "Save "+@title, :name=>"save" %>
+
+</form>

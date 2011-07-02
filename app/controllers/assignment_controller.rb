@@ -94,37 +94,48 @@ class AssignmentController < ApplicationController
     
     # Deadline types used in the deadline_types DB table
     deadline = DeadlineType.find_by_name("submission")
-    @Submission_deadline= deadline.id
+    @Submission_deadline = deadline.id
     deadline = DeadlineType.find_by_name("review")
     @Review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("resubmission")
-    @Resubmission_deadline= deadline.id
+    @Resubmission_deadline = deadline.id
     deadline = DeadlineType.find_by_name("rereview")
     @Rereview_deadline = deadline.id
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
+    deadline = DeadlineType.find_by_name("drop_topic")
+    @drop_topic_deadline = deadline.id
     
     if @assignment.save 
       set_questionnaires   
       set_limits_and_weights
       
       max_round = 1
+      
+     begin
       #setting the Due Dates with a helper function written in DueDate.rb
-      DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
-      DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
+      due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
+      raise "Please enter a valid Submission deadline" if !due_date
+
+      due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
+      raise "Please enter a valid Review deadline" if !due_date
       max_round = 2;
       
+      due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
+      raise "Please enter a valid drop toipic deadline" if !due_date
      
       if params[:assignment_helper][:no_of_reviews].to_i >= 2
         for resubmit_duedate_key in params[:additional_submit_deadline].keys
           #setting the Due Dates with a helper function written in DueDate.rb
-          DueDate::set_duedate(params[:additional_submit_deadline][resubmit_duedate_key],@Resubmission_deadline, @assignment.id, max_round )
+          due_date = DueDate::set_duedate(params[:additional_submit_deadline][resubmit_duedate_key],@Resubmission_deadline, @assignment.id, max_round )
+          raise "Please enter a valid Resubmission deadline" if !due_date
           max_round = max_round + 1
         end
         max_round = 2
         for rereview_duedate_key in params[:additional_review_deadline].keys
           #setting the Due Dates with a helper function written in DueDate.rb
-          DueDate::set_duedate(params[:additional_review_deadline][rereview_duedate_key],@Rereview_deadline, @assignment.id, max_round )
+          due_date = DueDate::set_duedate(params[:additional_review_deadline][rereview_duedate_key],@Rereview_deadline, @assignment.id, max_round )
+          raise "Please enter a valid Rereview deadline" if !due_date
           max_round = max_round + 1
         end
       end
@@ -132,7 +143,8 @@ class AssignmentController < ApplicationController
       @assignment.questionnaires.each{
          |questionnaire|
          if questionnaire.instance_of? MetareviewQuestionnaire
-           DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
+           due_date = DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
+           raise "Please enter a valid Metareview deadline" if !due_date
          end
       }
       
@@ -147,6 +159,12 @@ class AssignmentController < ApplicationController
       
       flash[:notice] = 'Assignment was successfully created.'
       redirect_to :action => 'list', :controller => 'tree_display'
+     rescue
+        flash[:error] = $!
+        prepare_to_edit
+      @wiki_types = WikiType.find(:all)
+      render :action => 'new'
+    end
       
     else
       @wiki_types = WikiType.find(:all)
@@ -157,7 +175,10 @@ class AssignmentController < ApplicationController
   
   def edit
     @assignment = Assignment.find(params[:id])
-
+    prepare_to_edit
+  end
+  
+  def prepare_to_edit
     if !@assignment.days_between_submissions.nil?
       @weeks = @assignment.days_between_submissions/7
       @days = @assignment.days_between_submissions - @weeks*7
@@ -184,12 +205,12 @@ class AssignmentController < ApplicationController
   end  
   
   def set_questionnaires
-    @assignment.assignment_questionnaires.clear
+    @assignment.questionnaires = Array.new
     params[:questionnaires].each{
       | key, value |       
-      if value.to_i > 0 and Questionnaire.find(value)
-        @assignment.questionnaires << Questionnaire.find(value)
-      end
+      if value.to_i > 0 and (q = Questionnaire.find(value))
+        @assignment.questionnaires << q
+     end
     }     
   end   
   
@@ -204,11 +225,17 @@ class AssignmentController < ApplicationController
     end
     
     default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)   
-    
-    @limits[:review] = default.notification_limit
-    @limits[:metareview] = default.notification_limit
-    @limits[:feedback] = default.notification_limit
-    @limits[:teammate] = default.notification_limit
+
+    if default.nil?
+      default_limit_value = 15
+    else
+      default_limit_value = default.notification_limit
+    end
+
+    @limits[:review]     = default_limit_value
+    @limits[:metareview] = default_limit_value
+    @limits[:feedback]   = default_limit_value
+    @limits[:teammate]   = default_limit_value
    
     @weights[:review] = 100
     @weights[:metareview] = 0
@@ -290,15 +317,25 @@ class AssignmentController < ApplicationController
       if oldpath != nil and newpath != nil
         FileHelper.update_file_location(oldpath,newpath)
       end
-      # Iterate over due_dates, from due_date[0] to the maximum due_date
-      if params[:due_date]
-        for due_date_key in params[:due_date].keys
-          due_date_temp = DueDate.find(due_date_key)
-          due_date_temp.update_attributes(params[:due_date][due_date_key])
+      
+      begin
+        # Iterate over due_dates, from due_date[0] to the maximum due_date
+        if params[:due_date]
+          for due_date_key in params[:due_date].keys
+            due_date_temp = DueDate.find(due_date_key)
+            due_date_temp.update_attributes(params[:due_date][due_date_key])     
+            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+          end
         end
+     
+        flash[:notice] = 'Assignment was successfully updated.'
+        redirect_to :action => 'show', :id => @assignment                  
+     
+      rescue
+        flash[:error] = $!
+        prepare_to_edit
+        render :action => 'edit', :id => @assignment
       end
-      flash[:notice] = 'Assignment was successfully updated.'
-      redirect_to :action => 'show', :id => @assignment                  
     else # Simply refresh the page
       @wiki_types = WikiType.find(:all)
       render :action => 'edit'
@@ -328,7 +365,7 @@ class AssignmentController < ApplicationController
         flash[:notice] = "The assignment is deleted"
       rescue
         url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
-        url_no  = url_for :action => 'delete', :id => params[:id]        
+        url_no  = url_for :action => 'delete', :id => params[:id]
         error = $!
         flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
       end
@@ -348,11 +385,6 @@ class AssignmentController < ApplicationController
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @courses = @user.set_courses_to_assignment
-#    if session[:user].role_id != 6 # for other that TA
-#      @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
-#    else
-#      @courses = TaMapping.get_courses(session[:user].id)
-#    end   
   end
   
   def remove_assignment_from_course    

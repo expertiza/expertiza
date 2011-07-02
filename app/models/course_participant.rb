@@ -14,7 +14,7 @@ class CourseParticipant < Participant
   # if user does not exist, it will be created and added to this assignment
   def self.import(row,session,id)
     if row.length != 4
-       raise ArgumentError, "Not enough items" 
+       raise ArgumentError, "The record containing #{row[0]} should have 4 items, it has #{row.length}."
     end
     user = User.find_by_name(row[0])        
     if (user == nil)

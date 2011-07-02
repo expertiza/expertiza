@@ -43,23 +43,17 @@ class AdminController < ApplicationController
       redirect_to :action => 'list_instructors'
     else
     
-    @user = User.new(params[:user])
-    @user.parent_id = (session[:user]).id
-    @user.role_id = Role::INSTRUCTOR
-    #@user.mru_directory_path = "/"
+      @user = User.new(params[:user])
+      @user.parent_id = (session[:user]).id
+      @user.role_id = Role::INSTRUCTOR
+      #@user.mru_directory_path = "/"
     
-    if params[:user][:clear_password].length == 0 or
-        params[:user][:confirm_password] != params[:user][:clear_password]
-      flash[:error] = 'Password invalid!'
-      render :action => 'new_instructor'
-    else
       if @user.save
         flash[:notice] = 'Instructor was successfully created.'
         redirect_to :action => 'list_instructors'
       else
         render :action => 'new_instructor'
       end
-    end
     end
   end
   

@@ -53,9 +53,25 @@ peer_review_questionnaire:
  type: "AuthorFeedbackQuestionnaire"
  display_type: "AuthorFeedback"
 
+teammate_review_questionnaire:
+ name: questionnaire5
+ instructor_id: <%= Fixtures.identify(:instructor3) %>
+ private: 0
+ min_question_score: 0
+ max_question_score: 5
+ type: "TeammateReviewQuestionnaire"
+ display_type: "TeammateReview"
+
+global_survey_questionnaire:
+ name: questionnaire6
+ instructor_id: <%= Fixtures.identify(:instructor3) %>
+ private: 0
+ min_question_score: 0
+ max_question_score: 5
+ type: "GlobalSurveyQuestionnaire"
+ display_type: "GlobalSurvey"
 
 
-  
 
  
  

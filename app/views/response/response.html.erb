@@ -11,7 +11,7 @@
     <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
   <%end%>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
-  <br/><hr/><br/>
+  <hr/>
 <% end %>
 <%= @map.show_review() %>
 
@@ -24,8 +24,7 @@
 	    <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
 	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
     <% else %>
-	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" >
-		</textarea>	
+	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>	
     <% end %>
     <% if question.true_false? %>
       <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">

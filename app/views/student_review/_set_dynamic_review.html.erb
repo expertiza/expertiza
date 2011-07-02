@@ -1,0 +1,45 @@
+<SCRIPT LANGUAGE="JavaScript">
+function toggleVis(value, id) {
+	var elem = document.getElementById(id);
+	if (value) {
+		elem.style.display = 'none';
+	} else {
+		elem.style.display = '';
+	}
+}
+</SCRIPT>
+<% form_tag :controller => 'review_mapping',
+            :action => 'assign_reviewer_dynamically',
+            :assignment_id => assignment.id,
+            :reviewer_id => session[:user].id do %>
+
+  <% if assignment.has_topics? %>
+    <p><b>Select a topic below to begin a new review:</b></p>
+		
+		<input id="i_dont_care" name="i_dont_care" type="checkbox" onchange="toggleVis(this.checked, 'topic_list');" /> 
+		I don't care which topic I review.
+		
+    <table cellpadding="0" id="topic_list">
+    <% candidate_topics_to_review = assignment.candidate_topics_to_review.to_a %>
+	  <% candidate_topics_to_review.sort! { |a, b| a.id <=> b.id } %>
+    <% non_reviewable_topics = assignment.sign_up_topics - candidate_topics_to_review %>
+	  <% non_reviewable_topics.sort! { |a, b| a.id <=> b.id } %>
+    <% candidate_topics_to_review.each do |topic| %>
+    <tr>
+      <td><%= radio_button_tag 'topic_id', topic.id %></td>
+		  <td><%= topic.topic_identifier %>:</td>
+			<td><%= topic.topic_name %></td>
+	  </tr>
+	  <% end %>
+      <% non_reviewable_topics.each do |topic| %>
+      <tr>
+	    <td></td>
+		<td><font color="gray"><%= topic.topic_identifier %>:</font></td>
+		<td><font color="gray"><%= topic.topic_name %></font></td>
+      </tr>
+	  <% end %>
+    </table>
+  <% end %>
+  <p><input type='submit' value='Request a new submission to review'/></p>
+<% end %>
+

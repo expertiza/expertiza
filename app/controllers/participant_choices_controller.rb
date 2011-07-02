@@ -1,9 +1,5 @@
 
 class ParticipantChoicesController < ApplicationController
-  scaffold :signup_choices 
-  scaffold :waitlists
-  scaffold :participants
-  scaffold :assignment_signups
   
   def index
     list

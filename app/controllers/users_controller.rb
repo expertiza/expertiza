@@ -90,7 +90,7 @@ class UsersController < ApplicationController
     @user = User.new(params[:user])
     # record the person who created this new user
     @user.parent_id = (session[:user]).id
-
+    
     if @user.save
       #Instructor and Administrator users need to have a default set for their notifications
       # the creation of an AssignmentQuestionnaires object with only the User ID field populated
@@ -142,11 +142,16 @@ class UsersController < ApplicationController
     redirect_to :action => 'list'
   end
 
+  def keys
+    @user = User.find(params[:id])
+    @private_key = @user.generate_keys
+  end
+  
   protected
 
   def foreign
     role = Role.find((session[:user]).role_id)  
     @all_roles = Role.find(:all, :conditions => ['id in (?) or id = ?',role.get_available_roles,role.id])
   end
-  
+ 
 end

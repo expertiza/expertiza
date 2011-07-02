@@ -3,17 +3,16 @@ class StudentTeamController < ApplicationController
    
   def view
     @student = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@student.user_id)
+    
     @send_invs = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', @student.user.id, @student.assignment.id])
     @received_invs = Invitation.find(:all, :conditions => ['to_id = ? and assignment_id = ? and reply_status = "W"', @student.user.id, @student.assignment.id])
   end
-  
-  def new
-    @student = AssignmentParticipant.find(params[:id])
-    @team = Team.new 
-  end
-  
+   
   def create
     @student = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@student.user_id)
+
     check = AssignmentTeam.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @student.parent_id])        
     @team = AssignmentTeam.new(params[:team])
     @team.parent_id = @student.parent_id    
@@ -34,6 +33,7 @@ class StudentTeamController < ApplicationController
   def edit 
     @team = AssignmentTeam.find_by_id(params[:team_id])
     @student = AssignmentParticipant.find(params[:student_id])
+    return unless current_user_id?(@student.user_id)
   end
   
   def update
@@ -53,6 +53,8 @@ class StudentTeamController < ApplicationController
   
   def leave
     @student = AssignmentParticipant.find(params[:student_id])
+    return unless current_user_id?(@student.user_id)
+    
     #remove the entry from teams_users
     user = TeamsUser.find(:first, :conditions =>["team_id =? and user_id =?", params[:team_id], @student.user_id])
     if user

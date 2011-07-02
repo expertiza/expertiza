@@ -5,14 +5,14 @@
    end %>
 
 <table>
- <tr><th width="20%">&nbsp;</th><th>Selected questionnaire</th><th>Weight</th><th>Notification percent</th></tr>
+ <tr><th width="20%">&nbsp;</th><th>Selected questionnaire</th><th>Weight</th><th>Notify when scores differ by more than <img src="/images/info.png" title="If two reviews differ by more than this amount, the instructor will be notified by e-mail."></th></tr>
  <tr>
    <td>Review:</td>
    <td style="padding: 15px;">
       <% selected = @assignment.questionnaires.find_by_type('ReviewQuestionnaire') %>
       <select style="width:250px" name="questionnaires[review]">
         <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
-        <% ReviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id]).each{
+        <% ReviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
              | questionnaire | %>
              <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
         <% } %>
@@ -32,7 +32,7 @@
       <% selected = @assignment.questionnaires.find_by_type('MetareviewQuestionnaire') %>
       <select style="width:250px" name="questionnaires[metareview]">
         <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>        
-        <% MetareviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id]).each{
+        <% MetareviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
              | questionnaire | %>
              <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
         <% } %>
@@ -50,7 +50,7 @@
       <% selected = @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire') %>
       <select style="width:250px" name="questionnaires[feedback]">
         <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>       
-        <% AuthorFeedbackQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id]).each{
+        <% AuthorFeedbackQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
              | questionnaire | %>
              <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
         <% } %>
@@ -68,7 +68,7 @@
       <% selected = @assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') %>       
       <select style="width:250px" name="questionnaires[teammate]">
         <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>              
-        <% TeammateReviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id]).each{
+        <% TeammateReviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
              | questionnaire | %>
              <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
         <% } %>
@@ -93,5 +93,6 @@
  <tr>
   <td><label for="allow_suggestions">Students can suggest topics for this assignment</label></td>
   <td><%= check_box 'assignment', 'allow_suggestions', {}, true, false %></td>
- </tr> 	
+ </tr>
+
 </table>

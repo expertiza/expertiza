@@ -1,4 +1,4 @@
-<% @q_type = @questionnaire.type.name %>
+<% @q_type = @questionnaire.class.name %>
 
 <h1>Edit an existing <%= @q_type.downcase %></h1>
 
@@ -11,7 +11,7 @@
 
   	<h4>Import/Export (from/to CSV format)</h4>
   	<input type="submit" name="import" value="Import questions"/>
-  	<input type="file" name="csv" />
+  	<input type="file" name="csv" /> <font size="-1">&nbsp;&nbsp; Format: {question}, {'Numeric' | 'True/False'}, {1-5} </font>
   	<br />
 
   	<%= submit_tag "Export questions to CSV", :name=>"export" %>

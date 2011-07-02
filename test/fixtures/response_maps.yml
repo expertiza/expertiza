@@ -31,7 +31,7 @@ response_maps4:
  reviewed_object_id: <%= Fixtures.identify(:assignment7) %>
  type: "ParticipantReviewResponseMap"
 
- response_maps5:
+response_maps5:
  reviewee_id: <%= Fixtures.identify(:par13) %>
  reviewer_id: <%= Fixtures.identify(:par14) %>
  reviewed_object_id: <%= Fixtures.identify(:assignment7) %>
@@ -48,7 +48,7 @@ response_map7:
  reviewee_id: <%= Fixtures.identify(:par14) %>
  reviewer_id: <%= Fixtures.identify(:par13) %>
  reviewed_object_id: <%= Fixtures.identify(:response_maps5) %>
- type:"FeedbackResponseMap"
+ type: "FeedbackResponseMap"
  
 
 response_map8:

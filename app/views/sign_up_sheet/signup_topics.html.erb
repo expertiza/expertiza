@@ -1,16 +1,15 @@
 <h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
-
-<table class="general">
-  <tr>
-    <th width="5%">Topic #</th>
-    <th width="75%">Topic name(s)</th>
-    <th width="5%">Max choosers</th>
-    <th width="5%">Available slots</th>
-    <th width="5%">Waitlist</th>
-    <%if @show_actions%>
-    <th width="5%">Action</th>
-    <%end%>
-  </tr>
+	<table class="general">
+	  <tr>
+	    <th width="5%">Topic #</th>
+	    <th width="75%">Topic name(s)</th>
+	    <th width="5%">Max choosers</th>
+	    <th width="5%">Available slots</th>
+	    <th width="5%">Waitlist</th>
+	    <%if @show_actions%>
+	    <th width="5%">Action</th>
+	    <%end%>
+	  </tr>
 
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
       <b>Your topic(s):</b>
@@ -25,7 +24,17 @@
 
   <% i=1 %>
   <% for topic in @sign_up_topics %>
-      <tr>
+  	<% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+     <% for selected_topic in @selected_topics %>
+       <% if selected_topic.topic_id == topic.id %>
+        <tr bgcolor="yellow">
+       <% else %>
+	     <tr>
+	   <% end%>
+	 <%end %>
+	 <%else%>
+	 	<tr>
+	<%end%>
         <td><%=topic.topic_identifier%></td>
         <td><%= topic.topic_name %></td>
         <td align="center"><%= topic.max_choosers %></td>
@@ -48,7 +57,7 @@
             <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
                 <% for selected_topic in @selected_topics %>
                     <% if selected_topic.topic_id == topic.id %>
-                        <td align="center"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+                        <td align="center" bgcolor="yellow"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
                         <%action_symbol_added = true%>
                     <% end %>
                 <% end %>

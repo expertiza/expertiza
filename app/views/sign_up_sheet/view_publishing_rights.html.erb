@@ -1,0 +1,86 @@
+<h1>Publishing rights for <%= @assignment.name %> assignment</h1>
+
+<% if flash[:notice] %>
+  <div class="flash_note"><%= flash[:notice] %></div>
+<% end %>
+
+<% if @sign_up_topics.any? %>
+  <table class="general">
+    <tr>
+      <th width="5%" rowspan="2">Topic #</th>
+      <th width=<%= (@assignment.team_assignment ? "40" : "60") %> rowspan="2">Topic name(s)</th>
+	  <% if @assignment.team_assignment %>
+      <th width="20%" rowspan="2">Team name</th>
+	  <% end %>
+      <th width="35%" colspan="4">Participant</th>
+    </tr>
+    <tr>
+      <th>Name</th>
+      <th>Fullname</th>
+      <th>Publish Rights</th>
+      <th>Verified</th>
+    </tr>
+
+    <% @sign_up_topics.each_with_index do |topic, i| %>
+      <tr>
+        <td><%= topic.topic_identifier %></td>
+        <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic => topic} %></td>
+        <th colspan=<%= (@assignment.team_assignment ? "5" : "4") %>>&nbsp;</th>
+      </tr>
+
+      <% if (@assignment.participants.size > 0)
+           for signed_up_user in topic.signed_up_users
+             if @assignment.team_assignment
+               # An unknown bug causes teams to disappear. Don't crash if this happens
+               team = Team.find_by_id(signed_up_user.creator_id)
+               users = []
+               users = team.users if team
+             else
+               users = [ User.find(signed_up_user.creator_id) ]
+	         end
+            
+             showed_team = false
+             for user in users
+      %>
+          <tr>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+			<% if @assignment.team_assignment
+			     if !showed_team 
+            %>
+			<td align="center" rowspan="<%= team.users.size %>"><b><%= team.name %></b></td>
+			  <% end %>
+			  <% showed_team = true %>
+			<% end %>
+            <td><%=user.name%></td>
+            <td><%=user.fullname%></td>
+            <%
+              permissionGranted = false
+              hasSignature = false
+              signatureValid = false
+              @assignment.participants.each do |participant|
+                if (user.id == participant.user.id)
+                  permissionGranted = participant.permission_granted?
+                  hasSignature = !participant.digital_signature.nil?
+                  if (permissionGranted && hasSignature)
+                      signatureValid = participant.verify_digital_signature(participant.digital_signature)
+                  end
+                end
+              end
+            %>
+            <td><%= (permissionGranted ? "granted" : "denied") %></td>
+            <td>
+              <% if (permissionGranted && hasSignature && signatureValid) %>
+                <img src="/images/Check-icon.png" title="verified with digitigal signature" alt="verified"/>
+              <% else %>
+                <img src="/images/delete_icon.png" title="no digitigal signature" alt="unverified"/>
+              <% end %>
+              &nbsp;
+            </td>
+          </tr>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </table>
+<% end %>

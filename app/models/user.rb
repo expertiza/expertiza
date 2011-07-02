@@ -4,33 +4,38 @@ class User < ActiveRecord::Base
     c.crypto_provider = Authlogic::CryptoProviders::Sha1
   end
 
-  has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id'
+  has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id', :dependent => :destroy
+  # FIXME:          :class_name should be AssignmentParticipant, probably. In most cases it's used that way. But all?
   has_many :assignments, :through => :participants
   
   belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
+  belongs_to :role
   
-  has_many :teams_users
+  has_many :teams_users, :dependent => :destroy
   has_many :teams, :through => :teams_users
   
+  validates_presence_of :name
+  validates_presence_of :email, :message => "can't be blank; use anything@mailinator.com for test users"
+  validates_format_of :email, :with => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, :allow_blank => true
+  validates_uniqueness_of :name
+
+  # happens in this order. see http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html
+  before_save :encrypt_password
+  before_create :assign_random_password
+  after_create :email_welcome
+  after_save :erase_clear_password
+
   attr_accessor :clear_password
-  attr_accessor :confirm_password
 
   def list_mine(object_type, user_id)
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end
   
-  def getAvailableUsers(name)    
-    parents = Role.find(self.role_id).get_parents
-    
-    allUsers = User.find(:all, :conditions => ['name LIKE ?',"#{name}%"],:limit => 10)
-    users = Array.new
-    allUsers.each { | user | 
-      role = Role.find(user.role_id)
-      if parents.index(role) 
-        users << user
-      end
-    }    
-    return users 
+  def get_available_users(name)    
+    lesser_roles = role.get_parents
+    all_users = User.find(:all, :conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
+    visible_users = all_users.select{|user| lesser_roles.include? user.role}
+    return visible_users[0,10] # the first 10
   end
 
   def role
@@ -40,16 +45,53 @@ class User < ActiveRecord::Base
     return @role
   end
 
+  def can_impersonate?(other_user)
+    return true if other_user == self # can impersonate self
+    return false if other_user == other_user.parent # no one can impersonate a top-level parent (usually superadmin)
+    return other_user.parent == self || can_impersonate?(other_user.parent) # recursive
+  end
+
+  def encrypt_password
+    if self.clear_password  # Only update the password if it has been changed
+      Authlogic::CryptoProviders::Sha1.stretches = 1
+      self.password = Authlogic::CryptoProviders::Sha1.encrypt(self.password_salt.to_s + clear_password)
+    end
+  end
+
+  def erase_clear_password
+    self.clear_password = nil
+  end
+
+  def assign_random_password #FIXME
+    if self.clear_password.blank?
+      self.clear_password = random_pronouncable_password
+      self.encrypt_password # There's a before_save filter for this, but it has already run before the before_create filter that calls this
+    end
+  end
+
+  def email_welcome
+    Mailer.deliver_message(
+        {:recipients => self.email,
+         :subject => "Your Expertiza account has been created",
+         :body => {
+           :user => self,
+           :password => clear_password, #FIXME
+           :first_name => ApplicationHelper::get_user_first_name(self),
+           :partial_name => "user_welcome"
+         }
+        }
+    )
+  end
+
   def check_password(clear_password)
     Authlogic::CryptoProviders::Sha1.stretches = 1
     Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + clear_password])
   end
-  
+
   # Generate email to user with new password
-  #ajbudlon, sept 07, 2007   
   def send_password(clear_password) 
-    Authlogic::CryptoProviders::Sha1.stretches = 1
-    self.password = Authlogic::CryptoProviders::Sha1.encrypt(self.password_salt.to_s + clear_password)
+    self.clear_password = clear_password
+    self.encrypt_password
     self.save
     
     Mailer.deliver_message(
@@ -59,13 +101,24 @@ class User < ActiveRecord::Base
            :user => self,
            :password => clear_password,
            :first_name => ApplicationHelper::get_user_first_name(self),
-           :partial_name => "send_password"           
+           :partial_name => "send_password"
          }
         }
     )
-    
-  end   
- 
+  end
+
+  # credit: http://snippets.dzone.com/posts/show/2137
+  def random_pronouncable_password(size=4)
+    c = %w(b c d f g h j k l m n p qu r s t v w x z ch cr fr nd ng nk nt ph pr rd sh sl sp st th tr)
+    v = %w(a e i o u y)
+    f, r = true, ''
+    (size * 2).times do
+      r << (f ? c[rand * c.size] : v[rand * v.size])
+      f = !f
+    end
+    r
+  end
+
   def self.import(row,session,id = nil)
       if row.length != 4
        raise ArgumentError, "Not enough items" 
@@ -126,6 +179,48 @@ class User < ActiveRecord::Base
     @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')    
   end
 
+  # generate a new RSA public/private key pair and create our own X509 digital certificate which we 
+  # save in the database. The private key is returned by the method but not saved.
+  def generate_keys
+    # check if we are replacing a digital certificate already generated
+    replacing_key = true if (!self.digital_certificate.nil?)
+
+    # generate the new key pair
+    new_key = OpenSSL::PKey::RSA.generate( 1024 )
+    new_public = new_key.public_key
+    new_private = new_key.to_pem
+
+    # create the X509 certificate on behalf of the user
+    cert = OpenSSL::X509::Certificate.new
+    cert.version = 1
+    cert.subject = cert.issuer = OpenSSL::X509::Name.parse("/C="+self.id.to_s)
+    cert.public_key = new_public
+    
+    # certificate will be valid for 1 year
+    cert.not_before = Time.now
+    cert.not_after = Time.now+3600*24*365
+    
+    # self-sign (we trust our own certificates) it using the private key
+    cert.sign(new_key, OpenSSL::Digest::SHA1.new)
+    
+    # convert to a textual form and save it in the database
+    self.digital_certificate = cert.to_pem
+    self.save
+    
+    # when replacing an existing key, update any digital signatures made previously with the new key
+    if (replacing_key)
+      participants = AssignmentParticipant.find_all_by_user_id(self.id)
+      for participant in participants
+        if (participant.permission_granted && !participant.digital_signature.nil?)
+          AssignmentParticipant.grant_publishing_rights(new_private, [ participant ]) 
+        end
+      end
+    end
+    
+    # return the new private key
+    new_private
+  end
+
   def initialize(attributes = nil)
     super(attributes)
     Authlogic::CryptoProviders::Sha1.stretches = 1
@@ -133,4 +228,5 @@ class User < ActiveRecord::Base
     @email_on_submission = true
     @email_on_review_of_review = true
   end
+
 end

@@ -1,0 +1,20 @@
+<% form_tag :controller => 'review_mapping',
+            :action => 'show_available_submissions',
+            :assignment_id => assignment.id,
+            :reviewer_id => session[:user].id do %>
+
+  <% if assignment.sign_up_topics.count > 0 %>
+    <p><b>Select a topic below to begin a new review:</b></p>
+
+    <% assignment.sign_up_topics.each do |topic| %>
+      <%= radio_button_tag :topic_id, topic.id %> <%= topic.topic_identifier %>: <%=h topic.topic_name %><br>
+    <% end %>
+    <br />
+  <% end %>
+
+  <% if assignment.sign_up_topics.count > 0 %>
+     <input type='submit' value='Select a Topic to Review'/>
+  <% else %>
+     <input type='submit' value='Go to Selection Page'/>
+  <% end %>
+<% end %>

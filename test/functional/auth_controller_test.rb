@@ -27,7 +27,7 @@ class AuthControllerTest < Test::Unit::TestCase
   
   # Verify that student accounts are sent to student_assignment.
   def test_valid_instr_login
-    post :login, :login => {:name => users(:student).name, :password => users(:student).name}
+    post :login, :login => {:name => users(:student1).name, :password => users(:student1).name}
     assert_redirected_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])
   end    
   
@@ -59,7 +59,7 @@ class AuthControllerTest < Test::Unit::TestCase
 
   # Test for accessing an unauthorized page
   def test_unauthorized
-    post :login, :login => {:name => users(:student).name, :password => users(:student).name}
+    post :login, :login => {:name => users(:student1).name, :password => users(:student1).name}
     params = {:controller => 'impersonate', :action => 'start'}
     assert_equal AuthController.authorised?(@response.session, params), false    
   end

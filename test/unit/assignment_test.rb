@@ -1,6 +1,6 @@
 require './' + File.dirname(__FILE__) + '/../test_helper'
 
-class AssignmentTest < Test::Unit::TestCase
+class AssignmentTest < ActiveSupport::TestCase
   fixtures :assignments
 
   def test_invalid_with_empty_attributes

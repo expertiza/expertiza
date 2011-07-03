@@ -4,7 +4,7 @@ require 'export_file_controller'
 # Re-raise errors caught by the controller.
 class ExportFileController; def rescue_action(e) raise e end; end
 
-class ExportFileControllerTest < Test::Unit::TestCase
+class ExportFileControllerTest < ActiveSupport::TestCase
   def setup
     @controller = ExportFileController.new
     @request    = ActionController::TestRequest.new

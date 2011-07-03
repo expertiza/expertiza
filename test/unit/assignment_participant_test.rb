@@ -2,7 +2,7 @@ require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'yaml'
 require 'assignment_participant'
 
-class AssignmentParticipantTest < Test::Unit::TestCase
+class AssignmentParticipantTest < ActiveSupport::TestCase
   fixtures :assignments, :users, :roles, :participants
   
   def test_import

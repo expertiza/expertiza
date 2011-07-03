@@ -1,6 +1,6 @@
 require './' + File.dirname(__FILE__) + '/../test_helper'
 
-class RubricTest < Test::Unit::TestCase
+class RubricTest < ActiveSupport::TestCase
   fixtures :questionnaires, :assignments
 
   def setup

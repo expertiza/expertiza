@@ -352,7 +352,6 @@ class AssignmentController < ApplicationController
     # If the assignment is already deleted, go back to the list of assignments
     if assignment 
       begin
-        @user =  ApplicationHelper::get_user_role(session[:user])
         @user = session[:user]
         id = @user.get_instructor
         if(id != assignment.instructor_id)

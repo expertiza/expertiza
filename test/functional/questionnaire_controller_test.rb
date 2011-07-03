@@ -6,7 +6,7 @@ class QuestionnaireController;
   def rescue_action(e) raise e end;
 end
 
-class QuestionnaireControllerTest < Test::Unit::TestCase
+class QuestionnaireControllerTest < ActiveSupport::TestCase
   fixtures :questionnaires
   fixtures :users
   fixtures :question_advices

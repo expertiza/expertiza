@@ -4,7 +4,7 @@ require 'student_task_controller'
 # Re-raise errors caught by the controller.
 class StudentTasksController; def rescue_action(e) raise e end; end
 
-class StudentTasksControllerTest < Test::Unit::TestCase
+class StudentTasksControllerTest < ActiveSupport::TestCase
   def setup
     @controller = StudentTasksController.new
     @request    = ActionController::TestRequest.new

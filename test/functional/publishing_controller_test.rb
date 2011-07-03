@@ -4,7 +4,7 @@ require 'publishing_controller'
 # Re-raise errors caught by the controller.
 class PublishingController; def rescue_action(e) raise e end; end
 
-class PublishingControllerTest < Test::Unit::TestCase
+class PublishingControllerTest < ActiveSupport::TestCase
   fixtures :users, :roles, :participants
 
   def setup

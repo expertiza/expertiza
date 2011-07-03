@@ -1,6 +1,6 @@
 require './' + File.dirname(__FILE__) + '/../test_helper'
 
-class ResubmissionTimeTest < Test::Unit::TestCase
+class ResubmissionTimeTest < ActiveSupport::TestCase
   fixtures :resubmission_times
 
   # Replace this with your real tests.

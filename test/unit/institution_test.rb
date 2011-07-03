@@ -1,6 +1,6 @@
 require './' + File.dirname(__FILE__) + '/../test_helper'
 
-class InstitutionTest < Test::Unit::TestCase
+class InstitutionTest < ActiveSupport::TestCase
   fixtures :institutions
   
   def setup

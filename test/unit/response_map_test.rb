@@ -1,6 +1,6 @@
 require './' + File.dirname(__FILE__) + '/../test_helper'
 
-class ResponseMapTest < Test::Unit::TestCase
+class ResponseMapTest < ActiveSupport::TestCase
   fixtures :response_maps, :participants
 
   # Replace this with your real tests.

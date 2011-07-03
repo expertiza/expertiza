@@ -4,7 +4,7 @@ require 'response_controller'
 # Re-raise errors caught by the controller.
 class ResponseController; def rescue_action(e) raise e end; end
 
-class ResponseControllerTest < Test::Unit::TestCase
+class ResponseControllerTest < ActiveSupport::TestCase
   def setup
     @controller = ResponseController.new
     @request    = ActionController::TestRequest.new

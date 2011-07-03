@@ -8,7 +8,7 @@ require 'course_controller'
 # Re-raise errors caught by the controller.
 class CourseController; def rescue_action(e) raise e end; end
 
-class CourseControllerTest < Test::Unit::TestCase
+class CourseControllerTest < ActiveSupport::TestCase
   fixtures :users
   fixtures :courses, :roles, :tree_folders
   fixtures :system_settings, :permissions, :roles_permissions

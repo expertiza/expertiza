@@ -16,7 +16,7 @@ Rails::Initializer.run do |config|
 
   # Specify gems that this application depends on and have them installed with rake gems:install
   # config.gem "hpricot", :lib, :version => '0.6', :source => "http://code.whytheluckystiff.net"
-  ########config.gem 'fastercsv'
+  config.gem 'fastercsv'
   config.gem 'gdata', :lib => false
   config.gem 'hoptoad_notifier'
   config.gem 'mysql'

@@ -79,25 +79,21 @@ class RubricTest < Test::Unit::TestCase
   end
 
   def test_get_assessment_for
-     questionnaire1 = Array.new
-     questionnaire1<<questionnaires(:questionnaire0)
-     questionnaire1<<questionnaires(:questionnaire1)
-     questionnaire1<<questionnaires(:questionnaire2)
-     #questionnaire1<<questionnaires(:questionnaire3)
-     #questionnaire1<<questionnaires(:questionnaire4)
-     questionnaire1<<questionnaires(:peer_review_questionnaire)
+    questionnaire1 = Array.new
+    questionnaire1<<questionnaires(:questionnaire0)
+    questionnaire1<<questionnaires(:questionnaire1)
+    questionnaire1<<questionnaires(:questionnaire2)
+    #questionnaire1<<questionnaires(:questionnaire3)
+    #questionnaire1<<questionnaires(:questionnaire4)
+    questionnaire1<<questionnaires(:peer_review_questionnaire)
 
-      
-      puts questionnaire1.size
+    scores = Hash.new
+    scores[:participant] = AssignmentParticipant.find_by_parent_id(assignments(:assignment0))
+    questionnaire1.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(AssignmentParticipant.find_by_parent_id(assignments(:assignment0)))
 
-      scores = Hash.new
-      scores[:participant] = AssignmentParticipant.find_by_parent_id(assignments(:assignment0))
-      questionnaire1.each{
-        | questionnaire |
-        scores[questionnaire.symbol] = Hash.new
-        scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(AssignmentParticipant.find_by_parent_id(assignments(:assignment0)))
-
-        assert_not_equal(scores[questionnaire.symbol][:assessments],0)
-        }
+      assert_not_equal(scores[questionnaire.symbol][:assessments],0)
+    end
   end
 end

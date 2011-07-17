@@ -16,6 +16,7 @@ end
 
 role :web, "expertiza.ncsu.edu"
 role :app, "expertiza.ncsu.edu"
+role :cron, "expertiza.ncsu.edu"
 role :db,  "expertiza.ncsu.edu", :primary => true # This is where Rails migrations will run
 
 namespace :deploy do

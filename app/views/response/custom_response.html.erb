@@ -45,30 +45,10 @@
    <div>
      <p>
         Check the descriptions that are true of the article's learning targets:
-        <p> <% if controller.action_name != 'new' %>
-                <%=check_box("custom_response", "0", {:checked => @review_scores[0].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-            <%else%>
-                <%=check_box("custom_response", "0")%>
-          <%end%>
-          <%=label("custom_response", "0", "They state what the reader should know or be able to do after reading the article")%></p>
-        <p><% if controller.action_name != 'new' %>
-                <%=check_box("custom_response", "1", {:checked => @review_scores[1].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-            <%else%>
-                <%=check_box("custom_response", "1")%>
-            <%end%>
-          <%=label("custom_response", "1", "They are specific ")%></p>
-        <p><% if controller.action_name != 'new' %>
-                <%=check_box("custom_response", "2", {:checked => @review_scores[2].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-            <%else%>
-                <%=check_box("custom_response", "2")%>
-            <%end%>
-          <%=label("custom_response", "2", "They are appropriate and reasonable i.e. not too easy or too difficult for ECI 301 students")%> </p>
-        <p><% if controller.action_name != 'new' %>
-                <%=check_box("custom_response", "3", {:checked => @review_scores[3].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-            <%else%>
-                <%=check_box("custom_response", "3")%>
-            <%end%>
-          <%=label("custom_response", "3", "They are observable i.e. you wouldn't have to look inside the readers' head to know if they met this target")%> </p>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 0, :ques_text => "They state what the reader should know or be able to do after reading the article."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 1, :ques_text => "They are specific."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 2, :ques_text => "They are appropriate and reasonable i.e. not too easy or too difficult for ECI 301 students."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 3, :ques_text => "They are observable, i.e. you wouldn't have to look inside the readers' head to know if they met this target."} %>
 
         <p><%=label("custom_response", "4", "Number of learning targets:")%>
           <% if controller.action_name != 'new' %>
@@ -191,41 +171,24 @@
           -<%=text_field "custom_response", "14" , :label => "List the range of publication years for all sources, e.g. 1998-2006:b", :size => 3, :value => @review_scores[14].comments.gsub(/\"/,'&quot;')%></p>
 
          Check the descriptions that are true of the article:
-         <p><%=check_box("custom_response", "15", {:checked => @review_scores[15].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "15", "It lists all the sources in a section labeled \"References\"")%></p>
-
-         <p><%=check_box("custom_response", "16", {:checked => @review_scores[16].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "16", "The author cites each of these sources in the article")%></p>
-
-         <p><%=check_box("custom_response", "17", {:checked => @review_scores[17].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "17", "The citations are in APA format")%></p>
-
-         <p><%=check_box("custom_response", "18", {:checked => @review_scores[18].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "18", "The author cites at least 2 scholarly sources")%></p>
-
-         <p><%=check_box("custom_response", "19", {:checked => @review_scores[19].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "19", "Most of the sources are current (less than 5 years old)")%></p>
-
-         <p><%=check_box("custom_response", "20", {:checked => @review_scores[20].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "20", "Taken together the sources represent a good balance of potential references for this topic")%></p>
-
-         <p><%=check_box("custom_response", "21", {:checked => @review_scores[21].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "21", "The sources represent different viewpoints")%></p>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 15, :ques_text => "It lists all the sources in a section labeled \"References\"."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 16, :ques_text => "The author cites each of these sources in the article."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 17, :ques_text => "The citations are in APA format."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 18, :ques_text => "The author cites at least 2 scholarly sources."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 19, :ques_text => "Most of the sources are current (less than 5 years old)."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 20, :ques_text => "Taken together the sources represent a good balance of potential references for this topic."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 21, :ques_text => "The sources represent different viewpoints."} %>
 
          <p><%=label("custom_response", "22", "What other sources or perspectives might the author want to consider?")%></p>
             <%=text_area("custom_response", "22", :size => "40x5", :value => @review_scores[22].comments.gsub(/\"/,'&quot;'))%>
 
-         <p><%=check_box("custom_response", "23", {:checked => @review_scores[23].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "23", "All materials (such as tables, graphs, images or videos created by other people or organizations) posted in the article are in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible")%></p>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 23, :ques_text => "All materials (such as tables, graphs, images or videos created by other people or organizations) posted in the article are in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible."} %>
 
          <p><%=label("custom_response", "24", "If not, which one(s) may infringe copyrights?")%></p>
             <%=text_area("custom_response", "24", :size => "40x5", :value => @review_scores[24].comments.gsub(/\"/,'&quot;'))%>
 
          <p><%=label("custom_response", "25", "Please make a comment about the sources. Explain how the author can improve the use of sources in the article:")%></p>
             <%=text_area("custom_response", "25", :size => "60x5", :value => @review_scores[25].comments.gsub(/\"/,'&quot;'))%>
-
-
-
          
      <% else %>
         <p><%=label("custom_response", "12", "How many sources are in the references list?")%>
@@ -237,41 +200,24 @@
           -<%=text_field "custom_response", "14" , :label => "List the range of publication years for all sources, e.g. 1998-2006:", :size => 3%></p>
 
          Check the descriptions that are true of the article:
-         <p><%=check_box("custom_response", "15")%>
-            <%=label("custom_response", "15", "It lists all the sources in a section labeled \"References\"")%></p>
-
-         <p><%=check_box("custom_response", "16")%>
-            <%=label("custom_response", "16", "The author cites each of these sources in the article")%></p>
-
-         <p><%=check_box("custom_response", "17")%>
-            <%=label("custom_response", "17", "The citations are in APA format")%></p>
-
-         <p><%=check_box("custom_response", "18")%>
-            <%=label("custom_response", "18", "The author cites at least 2 scholarly sources")%></p>
-
-         <p><%=check_box("custom_response", "19")%>
-            <%=label("custom_response", "19", "Most of the sources are current (less than 5 years old)")%></p>
-
-         <p><%=check_box("custom_response", "20")%>
-            <%=label("custom_response", "20", "Taken together the sources represent a good balance of potential references for this topic")%></p>
-
-         <p><%=check_box("custom_response", "21")%>
-            <%=label("custom_response", "21", "The sources represent different viewpoints")%></p>
+				 <%= render :partial => "checkbox", :locals => {:ques_num => 15, :ques_text => "It lists all the sources in a section labeled \"References\"."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 16, :ques_text => "The author cites each of these sources in the article."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 17, :ques_text => "The citations are in APA format."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 18, :ques_text => "The author cites at least 2 scholarly sources."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 19, :ques_text => "Most of the sources are current (less than 5 years old)."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 20, :ques_text => "Taken together the sources represent a good balance of potential references for this topic."} %>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 21, :ques_text => "The sources represent different viewpoints."} %>
 
          <p><%=label("custom_response", "22", "What other sources or perspectives might the author want to consider?")%></p>
             <%=text_area("custom_response", "22", :size => "40x5")%>
 
-         <p><%=check_box("custom_response", "23")%>
-            <%=label("custom_response", "23", "All materials (such as tables, graphs, images or videos created by other people or organizations) posted in the article are in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible")%></p>
+         <%= render :partial => "checkbox", :locals => {:ques_num => 23, :ques_text => "All materials (such as tables, graphs, images or videos created by other people or organizations) posted in the article are in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible."} %>
 
          <p><%=label("custom_response", "24", "If not, which one(s) may infringe copyrights?")%></p>
             <%=text_area("custom_response", "24", :size => "40x5")%>
 
          <p><%=label("custom_response", "25", "Please make a comment about the sources. Explain how the author can improve the use of sources in the article:")%></p>
             <%=text_area("custom_response", "25", :size => "60x5")%>
-
-
-
      <% end %>
    </div>
 
@@ -281,56 +227,25 @@
      <% if controller.action_name != 'new' %>
      
         Check the descriptions that are true of the multiple-choice questions:
-         <p><%=check_box("custom_response", "26", {:checked => @review_scores[26].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "26", "There are 4 multiple-choice questions")%></p>
-
-         <p><%=check_box("custom_response", "27", {:checked => @review_scores[27].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "27", "They each have four answer choices (A-D)")%></p>
-
-         <p><%=check_box("custom_response", "28", {:checked => @review_scores[28].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "28", "There is a single correct (aka: not opinion-based) answer for each question")%></p>
-
-         <p><%=check_box("custom_response", "29", {:checked => @review_scores[29].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "29", "The questions assess the learning target(s)")%></p>
-
-         <p><%=check_box("custom_response", "30", {:checked => @review_scores[30].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "30", "The questions are appropriate and reasonable (not too easy and not too difficult)")%></p>
-
-         <p><%=check_box("custom_response", "31", {:checked => @review_scores[31].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "31", "The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers")%></p>
-
-         <p><%=check_box("custom_response", "32", {:checked => @review_scores[32].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "32", "The response options are listed in alphabetical order")%></p>
-
-         <p><%=check_box("custom_response", "33", {:checked => @review_scores[33].comments.gsub(/\"/,'&quot;').to_i == 1})%>
-             <%=label("custom_response", "33", "The correct answers are provided and listed BELOW all the questions")%></p>
-
+        <%= render :partial => "checkbox", :locals => {:ques_num => 26, :ques_text => "There are 4 multiple-choice questions."} %>
+        <%= render :partial => "checkbox", :locals => {:ques_num => 27, :ques_text => "They each have four answer choices (A-D)."} %>
+        <%= render :partial => "checkbox", :locals => {:ques_num => 28, :ques_text => "There is a single correct (aka: not opinion-based) answer for each question."} %>
+        <%= render :partial => "checkbox", :locals => {:ques_num => 29, :ques_text => "The questions assess the learning target(s)."} %>
+        <%= render :partial => "checkbox", :locals => {:ques_num => 30, :ques_text => "The questions are appropriate and reasonable (not too easy and not too difficult)."} %>
+        <%= render :partial => "checkbox", :locals => {:ques_num => 31, :ques_text => "The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers."} %>
+        <%= render :partial => "checkbox", :locals => {:ques_num => 32, :ques_text => "The response options are listed in alphabetical order."} %>
+        <%= render :partial => "checkbox", :locals => {:ques_num => 33, :ques_text => "The correct answers are provided and listed BELOW all the questions."} %>
 
         <% else %>
      Check the descriptions that are true of the multiple-choice questions:
-             <p><%=check_box("custom_response", "26")%>
-                <%=label("custom_response", "26", "There are 4 multiple-choice questions")%></p>
-
-             <p><%=check_box("custom_response", "27")%>
-                <%=label("custom_response", "27", "They each have four answer choices (A-D)")%></p>
-
-             <p><%=check_box("custom_response", "28")%>
-                <%=label("custom_response", "28", "There is a single correct (aka: not opinion-based) answer for each question")%></p>
-
-             <p><%=check_box("custom_response", "29")%>
-                <%=label("custom_response", "29", "The questions assess the learning target(s)")%></p>
-
-             <p><%=check_box("custom_response", "30")%>
-                <%=label("custom_response", "30", "The questions are appropriate and reasonable (not too easy and not too difficult)")%></p>
-
-             <p><%=check_box("custom_response", "31")%>
-                <%=label("custom_response", "31", "The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers")%></p>
-
-             <p><%=check_box("custom_response", "32")%>
-                <%=label("custom_response", "32", "The response options are listed in alphabetical order")%></p>
-
-             <p><%=check_box("custom_response", "33")%>
-                <%=label("custom_response", "33", "The correct answers are provided and listed BELOW all the questions")%></p>
+             <%= render :partial => "checkbox", locals => {:ques_num => 26, :ques_text => "There are 4 multiple-choice questions."}%>
+             <%= render :partial => "checkbox", locals => {:ques_num => 27, :ques_text => "They each have four answer choices (A-D)."}%>
+             <%= render :partial => "checkbox", locals => {:ques_num => 28, :ques_text => "There is a single correct (aka: not opinion-based) answer for each question."}%>
+             <%= render :partial => "checkbox", locals => {:ques_num => 29, :ques_text => "The questions assess the learning target(s)."}%>
+             <%= render :partial => "checkbox", locals => {:ques_num => 30, :ques_text => "The questions are appropriate and reasonable (not too easy and not too difficult)."}%>
+             <%= render :partial => "checkbox", locals => {:ques_num => 31, :ques_text => "The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers."}%>
+             <%= render :partial => "checkbox", locals => {:ques_num => 32, :ques_text => "The response options are listed in alphabetical order."}%>
+             <%= render :partial => "checkbox", locals => {:ques_num => 33, :ques_text => "The correct answers are provided and listed BELOW all the questions."}%>
      <%end%>
              <%  types = Array.new
                  types[0] = "Knowledge"
@@ -684,11 +599,6 @@
 
      <% end %>
 
-
-
-
-
-
      <% if controller.action_name != 'new' %>
          <p><b>Credibility</b></p>
          <hr>
@@ -794,12 +704,6 @@
 
      <% end %>
 
-
-
-
-
-
-
      <% if controller.action_name != 'new' %>
          <p><b>Pedagogy</b></p>
          <hr>
@@ -904,10 +808,6 @@
          </table>
 
      <% end %>
-
-
-
-
 
     <% if controller.action_name != 'new' %>
          <p><b>Writing Quality</b></p>

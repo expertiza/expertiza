@@ -5,7 +5,8 @@ class UsersController < ApplicationController
          :redirect_to => { :action => :list }
 
   def index
-    redirect_to :action => 'list'
+    list
+    render :action => 'list'
   end
   
   def self.participants_in(assignment_id)
@@ -49,7 +50,7 @@ class UsersController < ApplicationController
   def show_selection
     @user = User.find_by_name(params[:user][:name])
     if @user != nil
-       getRole
+       get_role
        if @role.parent_id == nil || @role.parent_id < (session[:user]).role_id || @user.id == (session[:user]).id
           render :action => 'show'
       else
@@ -64,17 +65,9 @@ class UsersController < ApplicationController
   
   def show
     @user = User.find(params[:id])
-    getRole
+    get_role
   end
   
-  def getRole
-     if @user && @user.role_id
-      @role = Role.find(@user.role_id)
-    elsif @user
-      @role = Role.new(:id => nil, :name => '(none)')
-    end
-  end
-
   def new
     @user = User.new
     foreign
@@ -111,7 +104,7 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
-    getRole
+    get_role
     foreign
   end
 
@@ -141,7 +134,7 @@ class UsersController < ApplicationController
     
     redirect_to :action => 'list'
   end
-
+  
   def keys
     @user = User.find(params[:id])
     @private_key = @user.generate_keys
@@ -154,4 +147,14 @@ class UsersController < ApplicationController
     @all_roles = Role.find(:all, :conditions => ['id in (?) or id = ?',role.get_available_roles,role.id])
   end
  
+  private
+
+  def get_role
+     if @user && @user.role_id
+      @role = Role.find(@user.role_id)
+    elsif @user
+      @role = Role.new(:id => nil, :name => '(none)')
+    end
+  end
+
 end

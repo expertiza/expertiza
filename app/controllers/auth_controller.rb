@@ -106,7 +106,6 @@ class AuthController < ApplicationController
   protected
 
   def self.logout(session)
-    #session.delete()
     self.clear_session(session)
   end
   

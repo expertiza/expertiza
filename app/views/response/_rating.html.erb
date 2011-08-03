@@ -1,0 +1,22 @@
+<table bgcolor='lightgray'>
+  <tr>
+    <td>
+      <% if controller.action_name == 'new' %>
+	  <p><%=label("custom_response", "ques_num", "Type:")%>
+	    <%= select_tag "custom_response[ques_num]", options_for_select(selections,nil)%></p>
+	  <p><%=label("custom_response", "ques_num+1", "Grade:")%>
+	     <%= select_tag "custom_response[ques_num+1]", options_for_select(grades,nil)%></p>
+	  <p><%=label("custom_response", "ques_num+2", "Comment:")%></p>
+	     <%=text_area("custom_response", "ques_num+2", :size => "60x5")%>
+      <% else %>
+	  <p><%=label("custom_response", "ques_num", "Type:")%>
+	     <%= select_tag "custom_response[ques_num]", options_for_select(selections,@review_scores[ques_num].comments.gsub(/\"/,'&quot;'))%></p>
+	  <p><%=label("custom_response", "ques_num+1", "Grade:")%>
+	     <%= select_tag "custom_response[ques_num+1]", options_for_select(grades,@review_scores[ques_num+1].comments.gsub(/\"/,'&quot;').to_i)%></p>
+	  <p><%=label("custom_response", "ques_num+2", "Comment:")%></p>
+	     <%=text_area("custom_response", "ques_num+2", :size => "60x5", :value => @review_scores[ques_num+2].comments.gsub(/\"/,'&quot;'))%>
+      <% end %>
+     </td>
+    </tr>
+ </table>
+<br/>

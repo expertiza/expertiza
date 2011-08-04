@@ -21,7 +21,7 @@
     <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
   <%end%>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
-  <br/><hr/><br/>
+  <hr/>
 <% end %>
 <%= @map.show_review() %>
 
@@ -33,8 +33,6 @@
   end
  %>
 
-
- <br/>   <br/>
  <%= form_tag :action => @next_action, :id => @modified_object %>
 
  <div id="accordion">
@@ -152,7 +150,7 @@
      %>
      <p>
     	  <% for i in [34, 37, 40, 43] %>
-    	    <%= render :partial => "rating", :locals => {:ques_num => i, :selections => types, :grades => grades} %>
+    	    <%= render :partial => "rating", :locals => {:ques_num => i, :size => "60x5", :dropdown1_title => "Type:", :selections => types, :dropdown2_title => "Grade:", :grades => grades} %>
     	  <% end %>
      </p>
    </div>
@@ -438,63 +436,28 @@
 <h3><a href="#"><b>Ratings</b></a></h3>
    <div>
      Provide a rating and justification for each criterion:     
-     <table cellpadding="30">
+     <table cellpadding="5">
        <tr>
             <td><b>Importance:</b>
-                 <p><% if controller.action_name != 'new' %>
-                    <p>Rating:<%= select_tag "custom_response[141]", options_for_select(grades,@review_scores[141].comments.gsub(/\"/,'&quot;').to_i)%></p>
-                    <p>Comment:<%=text_area("custom_response", "142", :size => "40x5", :value => @review_scores[142].comments.gsub(/\"/,'&quot;'))%></p>
-
-                  <% else %>
-                    <p>Rating:<%= select_tag "custom_response[141]", options_for_select(grades,nil)%></p>
-                    Comment:<p><%=text_area("custom_response", "142", :size => "40x5")%></p>                       
-                  <% end %> </p>
+						     <%= render :partial => "rating", :locals => {:ques_num => 141, :size => "40x5", :dropdown1_title => nil, :dropdown2_title => "Rating:", :grades => grades} %>
             </td>
             <td><b>Interest:</b>
-                 <p><% if controller.action_name != 'new' %>
-                    <p>Rating:<%= select_tag "custom_response[143]", options_for_select(grades,@review_scores[143].comments.gsub(/\"/,'&quot;').to_i)%></p>
-                    <p>Comment:<%=text_area("custom_response", "144", :size => "40x5", :value => @review_scores[144].comments.gsub(/\"/,'&quot;'))%></p>
-
-                  <% else %>
-                    <p>Rating:<%= select_tag "custom_response[143]", options_for_select(grades,nil)%></p>
-                    Comment:<p><%=text_area("custom_response", "144", :size => "40x5")%></p>
-                  <% end %> </p>
+                 <%= render :partial => "rating", :locals => {:ques_num => 143, :size => "40x5", :dropdown1_title => nil, :dropdown2_title => "Rating:", :grades => grades} %>
             </td>
        <tr>
 
        <tr>
             <td><b>Credibility:</b>
-                 <p><% if controller.action_name != 'new' %>
-                    <p>Rating:<%= select_tag "custom_response[145]", options_for_select(grades,@review_scores[145].comments.gsub(/\"/,'&quot;').to_i)%></p>
-                    <p>Comment:<%=text_area("custom_response", "146", :size => "40x5", :value => @review_scores[146].comments.gsub(/\"/,'&quot;'))%></p>
-
-                  <% else %>
-                    <p>Rating:<%= select_tag "custom_response[145]", options_for_select(grades,nil)%></p>
-                    Comment:<p><%=text_area("custom_response", "146", :size => "40x5")%></p>
-                  <% end %> </p>
+                 <%= render :partial => "rating", :locals => {:ques_num => 145, :size => "40x5", :dropdown1_title => nil, :dropdown2_title => "Rating:", :grades => grades} %>
             </td>
             <td><b>Pedagogy:</b>
-                 <p><% if controller.action_name != 'new' %>
-                    <p>Rating:<%= select_tag "custom_response[147]", options_for_select(grades,@review_scores[147].comments.gsub(/\"/,'&quot;').to_i)%></p>
-                    <p>Comment:<%=text_area("custom_response", "148", :size => "40x5", :value => @review_scores[148].comments.gsub(/\"/,'&quot;'))%></p>
-
-                  <% else %>
-                    <p>Rating:<%= select_tag "custom_response[147]", options_for_select(grades,nil)%></p>
-                    Comment:<p><%=text_area("custom_response", "148", :size => "40x5")%></p>
-                  <% end %> </p>
+                 <%= render :partial => "rating", :locals => {:ques_num => 147, :size => "40x5", :dropdown1_title => nil, :dropdown2_title => "Rating:", :grades => grades} %>
             </td>
        <tr>
      
-        <tr >
+        <tr>
             <td><b>Writing:</b>
-                 <p><% if controller.action_name != 'new' %>
-                    <p>Rating:<%= select_tag "custom_response[149]", options_for_select(grades,@review_scores[149].comments.gsub(/\"/,'&quot;').to_i)%></p>
-                    <p>Comment:<%=text_area("custom_response", "150", :size => "40x5", :value => @review_scores[150].comments.gsub(/\"/,'&quot;'))%></p>
-
-                  <% else %>
-                    <p>Rating:<%= select_tag "custom_response[149]", options_for_select(grades,nil)%></p>
-                    Comment:<p><%=text_area("custom_response", "150", :size => "40x5")%></p>
-                  <% end %> </p>
+                 <%= render :partial => "rating", :locals => {:ques_num => 149, :size => "40x5", :dropdown1_title => nil, :dropdown2_title => "Rating:", :grades => grades} %>
             </td>
        </tr>
      </table>

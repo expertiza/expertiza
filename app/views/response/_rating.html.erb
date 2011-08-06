@@ -21,7 +21,7 @@
 	  <p><%=label("custom_response", "ques_num", dropdown2_title)%>
 	     <%= select_tag "custom_response[ques_num]", options_for_select(grades,@review_scores[ques_num].comments.gsub(/\"/,'&quot;').to_i)%></p>
 			 <% ques_num += 1 %><p>
-	  <p><%=label("custom_response", "ques_num", "Comment:")%></p><br>
+	  <%=label("custom_response", "ques_num", "Comment:")%><br>
 	     <%=text_area("custom_response", "ques_num", :size => size, :value => @review_scores[ques_num].comments.gsub(/\"/,'&quot;'))%>
       <% end %>
      </td>

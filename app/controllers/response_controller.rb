@@ -5,7 +5,7 @@ class ResponseController < ApplicationController
   
   def view
     @response = Response.find(params[:id])
-    # return unless current_user_id?(@response.map.reviewer.user_id)
+    return if redirect_when_disallowed(@response)
 
     @map = @response.map
     get_content
@@ -13,6 +13,8 @@ class ResponseController < ApplicationController
   
   def delete
     @response = Response.find(params[:id])
+    return if redirect_when_disallowed(@response)
+
     map_id = @response.map.id
     @response.delete
     redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
@@ -24,6 +26,8 @@ class ResponseController < ApplicationController
     
     @return = params[:return]
     @response = Response.find(params[:id]) 
+    return if redirect_when_disallowed(@response)
+
     @modified_object = @response.id
     @map = @response.map           
     get_content    
@@ -46,6 +50,8 @@ class ResponseController < ApplicationController
   
   def update
     @response = Response.find(params[:id])
+    return if redirect_when_disallowed(@response)
+
     @myid = @response.id
     msg = ""
     begin 
@@ -219,5 +225,19 @@ class ResponseController < ApplicationController
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score     
-  end      
+  end
+  
+  def redirect_when_disallowed(response)
+    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment
+      team = response.map.reviewer.team
+      unless team.has_user session[:user]
+        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+        return true
+      end
+    else
+      return true unless current_user_id?(response.map.reviewer.user_id)
+    end
+    
+    return false
+  end
 end

@@ -20,7 +20,13 @@ class GradesController < ApplicationController
 
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
-    # return unless current_user_id?(@participant.user_id)
+    print 'DEBUG: The check for user ID is commented out here'
+    print 'DEBUG: Session[:user].id = ' + session[:user].id.to_s  # Laura
+    print 'DEBUG: Participant.user_id = ' + @participant.user_id.to_s  # Tiffany
+
+    #return unless current_user_id?(@participant.user_id)
+    # What we really need to check is whether the team of the
+    # current user (if any) contains the participant (?)
 
     @assignment = @participant.assignment
 
@@ -193,6 +199,7 @@ class GradesController < ApplicationController
   end
 
   private
+  
   def process_response(collabel, rowlabel, responses, questionnaire_type)
     @collabel = collabel
     @rowlabel = rowlabel
@@ -207,7 +214,23 @@ class GradesController < ApplicationController
     @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
   end
 
-  def get_body_text(submission)
+  def redirect_when_disallowed(response)
+    # For author feedback, participants need to be able to read feedback submitted by other teammates.
+    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+    ## This code was cloned from response_controller.  The first term in the conjunction below needs to be removed or modified.
+    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && @participant.parent_id.team_assignment
+      team = @participant.team
+      unless team.has_user session[:user]
+        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+        return true
+      end
+    else
+      return true unless current_user_id?(response.map.reviewer.user_id)
+    end
+    return false
+  end
+
+def get_body_text(submission)
     if submission
       role = "reviewer"
       item = "submission"

@@ -139,10 +139,8 @@ def custom_display_as_html(code, file_url)
   code = code + "<h2>Content</h2><hr>"
   code = code + "<i>File:</i>"
   if file_url.nil?
-    print "File URL is apparently nil\n"
     code = code + "File has not been uploaded<br/>"
   else
-    print "File URL is " + file_url.to_s + "\n"
     code = code + file_url.to_s + "<br/>"
   end
   

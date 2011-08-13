@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 
-class LatePolicyTest < Test::Unit::TestCase
+class LatePolicyTest < ActiveSupport::TestCase
   fixtures :late_policies
 
   # Replace this with your real tests.

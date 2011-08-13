@@ -23,7 +23,7 @@ Rails::Initializer.run do |config|
   config.gem 'RedCloth'
   config.gem 'rgl', :lib => 'rgl/adjacency'
   config.gem 'rubyzip', :lib => "zip/zip"
-  config.gem 'authlogic', :version => '~> 2.1.6'
+  config.gem 'expertiza-authlogic', :lib => 'authlogic', :version => '~> 2.1.6.1'
 
   if RAILS_ENV == 'production' and RUBY_PLATFORM !~ /mswin|mingw/ # Don't check on Windows, because there's no "which" command to check
     raise 'dot executable missing - install graphviz' if %x(which dot).to_s.empty?

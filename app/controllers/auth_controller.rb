@@ -31,7 +31,8 @@ class AuthController < ApplicationController
         logger.warn "Failed login attempt"
         respond_to do |wants|
           wants.html do
-            redirect_to :action => 'login_failed'
+            flash.now[:error] = "Incorrect Name/Password"
+            render :action => '../password_retrieval/forgotten'
           end
           wants.xml do
             render :nothing => true, :status => 404

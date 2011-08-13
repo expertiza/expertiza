@@ -2,7 +2,8 @@
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
 
-protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
+  protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
+  filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
 
   def authorize 
     unless session[:user]

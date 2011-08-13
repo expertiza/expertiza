@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'student_review_controller'
 
 # Re-raise errors caught by the controller.
 class StudentReviewController; def rescue_action(e) raise e end; end
 
-class StudentReviewControllerTest < Test::Unit::TestCase
+class StudentReviewControllerTest < ActiveSupport::TestCase
   def setup
     @controller = StudentReviewController.new
     @request    = ActionController::TestRequest.new

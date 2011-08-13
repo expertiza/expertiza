@@ -50,7 +50,7 @@ class UsersController < ApplicationController
   def show_selection
     @user = User.find_by_name(params[:user][:name])
     if @user != nil
-       getRole
+       get_role
        if @role.parent_id == nil || @role.parent_id < (session[:user]).role_id || @user.id == (session[:user]).id
           render :action => 'show'
       else
@@ -65,28 +65,23 @@ class UsersController < ApplicationController
   
   def show
     @user = User.find(params[:id])
-    getRole
+    get_role
   end
   
-  def getRole
-     if @user && @user.role_id
-      @role = Role.find(@user.role_id)
-    elsif @user
-      @role = Role.new(:id => nil, :name => '(none)')
-    end
-  end
-
   def new
     @user = User.new
     foreign
   end
 
   def create
+    # if the user name already exists, register the user by email address
     check = User.find_by_name(params[:user][:name])
     if check != nil
       params[:user][:name] = params[:user][:email]
     end
+    
     @user = User.new(params[:user])
+    # record the person who created this new user
     @user.parent_id = (session[:user]).id
     
     if @user.save
@@ -106,19 +101,15 @@ class UsersController < ApplicationController
     end
   end
 
+
   def edit
     @user = User.find(params[:id])
-    if @user.role_id
-      @role = Role.find(@user.role_id)
-    end
+    get_role
     foreign
   end
 
   def update
     @user = User.find(params[:id])   
-    if params[:user]['clear_password'] == ''
-      params[:user].delete('clear_password')
-    end
 
     if @user.update_attributes(params[:user])
       flash[:notice] = 'User was successfully updated.'
@@ -128,6 +119,7 @@ class UsersController < ApplicationController
       render :action => 'edit'
     end
   end
+
 
   def destroy
     begin
@@ -142,7 +134,7 @@ class UsersController < ApplicationController
     
     redirect_to :action => 'list'
   end
-
+  
   def keys
     @user = User.find(params[:id])
     @private_key = @user.generate_keys
@@ -155,4 +147,14 @@ class UsersController < ApplicationController
     @all_roles = Role.find(:all, :conditions => ['id in (?) or id = ?',role.get_available_roles,role.id])
   end
  
+  private
+
+  def get_role
+     if @user && @user.role_id
+      @role = Role.find(@user.role_id)
+    elsif @user
+      @role = Role.new(:id => nil, :name => '(none)')
+    end
+  end
+
 end

@@ -5,7 +5,7 @@ require 'test_helper'
 # Re-raise errors caught by the controller.
 class AdminController; def rescue_action(e) raise e end; end
 
-class AdminControllerTest < Test::Unit::TestCase
+class AdminControllerTest < ActiveSupport::TestCase
   fixtures :users, :roles, :system_settings, :content_pages, :permissions, :roles_permissions, :controller_actions, :site_controllers, :menu_items
   set_fixture_class :system_settings => 'SystemSettings' 
   set_fixture_class :roles_permissions => 'RolesPermission'

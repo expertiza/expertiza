@@ -24,9 +24,7 @@ class GradesController < ApplicationController
     print 'DEBUG: Session[:user].id = ' + session[:user].id.to_s  # Laura
     print 'DEBUG: Participant.user_id = ' + @participant.user_id.to_s  # Tiffany
 
-    #return unless current_user_id?(@participant.user_id)
-    # What we really need to check is whether the team of the
-    # current user (if any) contains the participant (?)
+    return if redirect_when_disallowed
 
     @assignment = @participant.assignment
 
@@ -214,11 +212,11 @@ class GradesController < ApplicationController
     @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
   end
 
-  def redirect_when_disallowed(response)
+  def redirect_when_disallowed
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
     # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-    ## This code was cloned from response_controller.  The first term in the conjunction below needs to be removed or modified.
-    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && @participant.parent_id.team_assignment
+    ## This following code was cloned from response_controller.
+    if @participant.assignment.team_assignment
       team = @participant.team
       unless team.has_user session[:user]
         redirect_to '/denied?reason=You are not on the team that wrote this feedback'

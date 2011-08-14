@@ -4,25 +4,25 @@
     	<% if dropdown1_title != nil %>
 				<p><%=label("custom_response", "ques_num", dropdown1_title)%>
 			  <% if controller.action_name == 'new' %>
-	        <%= select_tag "custom_response[ques_num]", options_for_select(selections,nil)%></p>
+	        <%= select_tag "custom_response[#{ques_num}]", options_for_select(selections, nil)%></p>
 			  <% else %>
-	        <%= select_tag "custom_response[ques_num]", options_for_select(selections,@review_scores[ques_num].comments.gsub(/\"/,'&quot;'))%></p>
+	        <%= select_tag "custom_response[#{ques_num}]", options_for_select(selections, @review_scores[ques_num].comments.gsub(/\"/,'&quot;'))%></p>
         <% end %>
 				<% ques_num += 1 %><p>
 		  <% end %>
 			
       <% if controller.action_name == 'new' %>
-	  <p><%=label("custom_response", "ques_num", dropdown2_title)%>
-	     <%= select_tag "custom_response[ques_num]", options_for_select(grades,nil)%></p>
+	  <p><%=label("custom_response", ques_num, dropdown2_title)%>
+	     <%= select_tag "custom_response[#{ques_num}]", options_for_select(grades,nil)%></p>
 			 <% ques_num += 1 %><p>
-	  <p><%=label("custom_response", "ques_num", "Comment:")%></p><br>
-	     <%=text_area("custom_response", "ques_num", :size => size)%>
+	  <p><%=label("custom_response", ques_num, "Comment:")%></p><br>
+	     <%=text_area("custom_response", ques_num, :size => size)%>
       <% else %>
-	  <p><%=label("custom_response", "ques_num", dropdown2_title)%>
-	     <%= select_tag "custom_response[ques_num]", options_for_select(grades,@review_scores[ques_num].comments.gsub(/\"/,'&quot;').to_i)%></p>
+	  <p><%=label("custom_response", ques_num, dropdown2_title)%>
+	     <%= select_tag "custom_response[#{ques_num}]", options_for_select(grades, @review_scores[ques_num].comments.gsub(/\"/,'&quot;').to_i)%></p>
 			 <% ques_num += 1 %><p>
-	  <%=label("custom_response", "ques_num", "Comment:")%><br>
-	     <%=text_area("custom_response", "ques_num", :size => size, :value => @review_scores[ques_num].comments.gsub(/\"/,'&quot;'))%>
+	  <%=label("custom_response", ques_num, "Comment:")%><br>
+	     <%=text_area("custom_response", ques_num, :size => size, :value => @review_scores[ques_num].comments.gsub(/\"/,'&quot;'))%>
       <% end %>
      </td>
     </tr>

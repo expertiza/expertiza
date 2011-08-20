@@ -7,7 +7,12 @@ set :scm, :git
 
 set :deploy_to, "/local/rails/expertiza"
 set :runner, "www-data"
-set :branch, "master"
+set :branch do
+  default_branch = 'master'
+  branch = Capistrano::CLI.ui.ask "Branch to deploy (make sure to push first) [#{default_branch}]: "
+  branch = default_branch if branch.empty?
+  branch
+end
 
 role :web, "expertiza.ncsu.edu"
 role :app, "expertiza.ncsu.edu"

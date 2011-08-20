@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'auth_controller'
 
 # Re-raise errors caught by the controller.
 class AuthController; def rescue_action(e) raise e end; end
 
-class AuthControllerTest < Test::Unit::TestCase
+class AuthControllerTest < ActiveSupport::TestCase
   fixtures :users
   
   def setup

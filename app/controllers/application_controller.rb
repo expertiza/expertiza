@@ -2,15 +2,50 @@
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
 
-protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
+  helper_method :current_user_session, :current_user
+  protect_from_forgery
+  filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
 
   def authorize 
     unless session[:user]
       flash[:notice] = "Please log in."
-      redirect_to(:controller => 'auth', :action => 'login')
+      redirect_to(:controller => 'user_sessions', :action => 'new')
     end
   end
-  
+
+  private
+  def current_user_session
+    return @current_user_session if defined?(@current_user_session)
+    @current_user_session = UserSession.find
+  end
+
+  def current_user
+    return @current_user if defined?(@current_user)
+    @current_user = current_user_session && current_user_session.record
+  end
+
+  def require_user
+    unless current_user
+      store_location
+      flash[:notice] = "You must be logged in to access this page"
+      redirect_to session[:return_to]
+      return false
+    end
+  end
+
+  def require_no_user
+    if current_user
+      store_location
+      flash[:notice] = "You must be logged out to access this page"
+      redirect_to session[:return_to]
+      return false
+    end
+  end
+
+  def store_location
+    session[:return_to] = request.request_uri
+  end
+
   protected
   def list(object_type)
     # Calls the correct listing method based on the role of the

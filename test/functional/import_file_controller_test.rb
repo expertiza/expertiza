@@ -2,13 +2,13 @@
 # Author: ajbudlon
 # Date: 7/18/2008
 
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'import_file_controller'
 
 # Re-raise errors caught by the controller.
 class ImportFileController; def rescue_action(e) raise e end; end
 
-class ImportFileControllerTest < Test::Unit::TestCase
+class ImportFileControllerTest < ActiveSupport::TestCase
   fixtures :users, :assignments, :roles
   set_fixture_class:system_settings => 'SystemSettings'    
   fixtures :system_settings

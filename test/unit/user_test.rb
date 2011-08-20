@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 
-class UserTest < Test::Unit::TestCase
+class UserTest < ActiveSupport::TestCase
   fixtures :users
   
   # Test user retrieval by email
@@ -34,9 +34,7 @@ class UserTest < Test::Unit::TestCase
     user.fullname = "student1_fullname",
     user.role_id = "3"
     assert !user.save
-
-    error_messages = I18n.translate('activerecord.errors.messages')
-    assert_equal error_messages[:taken], user.errors.on(:name)
+    assert_equal I18n.translate('activerecord.errors.messages')[:taken], user.errors.on(:name)
   end
   
   # 103 Check valid user name and password   

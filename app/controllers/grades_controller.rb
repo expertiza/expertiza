@@ -20,9 +20,6 @@ class GradesController < ApplicationController
 
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
-    print 'DEBUG: The check for user ID is commented out here'
-    print 'DEBUG: Session[:user].id = ' + session[:user].id.to_s  # Laura
-    print 'DEBUG: Participant.user_id = ' + @participant.user_id.to_s  # Tiffany
 
     return if redirect_when_disallowed
 

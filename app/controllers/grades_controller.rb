@@ -20,9 +20,6 @@ class GradesController < ApplicationController
 
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
-    print 'DEBUG: The check for user ID is commented out here'
-    print 'DEBUG: Session[:user].id = ' + session[:user].id.to_s  # Laura
-    print 'DEBUG: Participant.user_id = ' + @participant.user_id.to_s  # Tiffany
 
     return if redirect_when_disallowed
 
@@ -137,7 +134,7 @@ class GradesController < ApplicationController
                 :author => email_form[:author]
   end
 
-  # ther grading conflict email form provides the instructor a way of emailing
+  # the grading conflict email form provides the instructor a way of emailing
   # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.  
   def conflict_notification
     if session[:user].role_id !=6

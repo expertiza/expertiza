@@ -20,7 +20,8 @@ class GradesController < ApplicationController
 
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
+
+    return if redirect_when_disallowed
 
     @assignment = @participant.assignment
 
@@ -133,7 +134,7 @@ class GradesController < ApplicationController
                 :author => email_form[:author]
   end
 
-  # ther grading conflict email form provides the instructor a way of emailing
+  # the grading conflict email form provides the instructor a way of emailing
   # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.  
   def conflict_notification
     if session[:user].role_id !=6
@@ -193,6 +194,7 @@ class GradesController < ApplicationController
   end
 
   private
+  
   def process_response(collabel, rowlabel, responses, questionnaire_type)
     @collabel = collabel
     @rowlabel = rowlabel
@@ -207,7 +209,23 @@ class GradesController < ApplicationController
     @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
   end
 
-  def get_body_text(submission)
+  def redirect_when_disallowed
+    # For author feedback, participants need to be able to read feedback submitted by other teammates.
+    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+    ## This following code was cloned from response_controller.
+    if @participant.assignment.team_assignment
+      team = @participant.team
+      unless team.has_user session[:user]
+        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+        return true
+      end
+    else
+      return true unless current_user_id?(response.map.reviewer.user_id)
+    end
+    return false
+  end
+
+def get_body_text(submission)
     if submission
       role = "reviewer"
       item = "submission"

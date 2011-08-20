@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 
-class DeadlineRightTest < Test::Unit::TestCase
+class DeadlineRightTest < ActiveSupport::TestCase
   fixtures :deadline_rights
 
   # Replace this with your real tests.

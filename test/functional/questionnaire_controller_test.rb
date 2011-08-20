@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'questionnaire_controller'
 
 # Re-raise errors caught by the controller.
@@ -6,7 +6,7 @@ class QuestionnaireController;
   def rescue_action(e) raise e end;
 end
 
-class QuestionnaireControllerTest < Test::Unit::TestCase
+class QuestionnaireControllerTest < ActiveSupport::TestCase
   fixtures :questionnaires
   fixtures :users
   fixtures :question_advices

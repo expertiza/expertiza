@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'pg_users_controller'
 
 # Re-raise errors caught by the controller.
 class PgUsersController; def rescue_action(e) raise e end; end
 
-class PgUsersControllerTest < Test::Unit::TestCase
+class PgUsersControllerTest < ActiveSupport::TestCase
   fixtures :users
   
   def setup

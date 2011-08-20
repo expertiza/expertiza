@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'assignment_controller'
 
 # Re-raise errors caught by the controller.
 class AssignmentController; def rescue_action(e) raise e end; end
 
-class AssignmentControllerTest < Test::Unit::TestCase
+class AssignmentControllerTest < ActiveSupport::TestCase
   # use dynamic fixtures to populate users table
   # for the use of testing
   fixtures :users
@@ -119,3 +119,9 @@ class AssignmentControllerTest < Test::Unit::TestCase
   end
 
 end
+
+
+
+
+
+

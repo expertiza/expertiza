@@ -1,15 +1,6 @@
-include ActionController
-include ActiveRecord
-
-module SpawnHelper
-  COMPLETE = "Complete"
-  
-  def background()               
-    # thread for deadline emails
-    spawn do        
-      while true do        
+desc "Send email reminders to all students with upcoming assignment deadlines"
+task :send_email_reminders => :environment do
         #puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
-        Rails.logger.info "Thread running, time #{Time.now}.\n"
         # find all assignments in database                
         #allAssign = Assignment.find(:all)
         #query to pick only those assignments that were created in the last 2 weeks - to avoid picking all assignments
@@ -76,11 +67,7 @@ module SpawnHelper
           #MUST SET A FLAG TO INDICATE THAT REMINDERS HAVE BEEN SENT TO A PARTICIPANT OF AN ASSIGNMENT FOR A SPECIFIC ASSIGNMENT TYPE
           #ELSE THEY WILL GET SPAMMED WITH MESSAGES EVERY HOUR
         end #end 'for' loop for all assignmnets
-        Rails.logger.info "Thread going to sleep, time #{Time.now}.\n"
-        sleep 3600 #sleeps for 1 hour after all reminders have been sent
-      end #end of 'while' loop
-    end #end of spawn do loop
-  end #end of 'def'
+end
 
   def submission_reminder(assign, due_date)
     allParticipants = assign.participants
@@ -206,4 +193,3 @@ module SpawnHelper
          :body => body
         })
   end
-end #end of class

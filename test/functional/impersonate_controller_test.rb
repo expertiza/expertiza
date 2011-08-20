@@ -8,7 +8,7 @@ require 'impersonate_controller'
 # Re-raise errors caught by the controller.
 class ImpersonateController; def rescue_action(e) raise e end; end
 
-class ImpersonateControllerTest < ActiveSupport::TestCase
+class ImpersonateControllerTest < ActionController::TestCase
   fixtures :users, :roles, :goldberg_system_settings
 
   # puts "Now entering ImpersonateController Test...."

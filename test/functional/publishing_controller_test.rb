@@ -4,7 +4,7 @@ require 'publishing_controller'
 # Re-raise errors caught by the controller.
 class PublishingController; def rescue_action(e) raise e end; end
 
-class PublishingControllerTest < ActiveSupport::TestCase
+class PublishingControllerTest < ActionController::TestCase
   fixtures :users, :roles, :participants
 
   def setup
@@ -56,7 +56,7 @@ class PublishingControllerTest < ActiveSupport::TestCase
     user.generate_keys
     post :grant_with_private_key, :id => participants(:par0).id, :private_key => private_key
     assert_response :redirect
-    assert_redirected_to :action => 'grant'
+    assert_redirected_to :controller => 'publishing', :action => 'grant', :id => participants(:par0).id
   end
 
   def test_set_publish_permission

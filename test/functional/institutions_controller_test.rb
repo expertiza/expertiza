@@ -4,7 +4,7 @@ require 'institution_controller'
 # Re-raise errors caught by the controller.
 class InstitutionController; def rescue_action(e) raise e end; end
 
-class InstitutionsControllerTest < ActiveSupport::TestCase
+class InstitutionsControllerTest < ActionController::TestCase
   fixtures :institutions
   fixtures :users, :roles
   def setup

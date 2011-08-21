@@ -8,7 +8,7 @@ require 'import_file_controller'
 # Re-raise errors caught by the controller.
 class ImportFileController; def rescue_action(e) raise e end; end
 
-class ImportFileControllerTest < ActiveSupport::TestCase
+class ImportFileControllerTest < ActionController::TestCase
   fixtures :users, :assignments, :roles
   set_fixture_class:system_settings => 'SystemSettings'    
   fixtures :system_settings

@@ -20,7 +20,8 @@ class UserTest < ActiveSupport::TestCase
     user = User.new
     user.name = "testStudent1"
     user.fullname = "test_Student_1"
-    user.password = Digest::SHA1.hexdigest("testStudent1")
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
     user.email = "testStudent1@foo.edu"
     user.role_id = "1"
     assert user.save
@@ -30,7 +31,8 @@ class UserTest < ActiveSupport::TestCase
   def test_add_user_with_exist_name
     user = User.new
     user.name = 'student1'
-    user.password = Digest::SHA1.hexdigest("student1")
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
     user.fullname = "student1_fullname",
     user.role_id = "3"
     assert !user.save

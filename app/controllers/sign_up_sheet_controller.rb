@@ -224,8 +224,8 @@ class SignUpSheetController < ApplicationController
       @show_actions = false
     end
     
-    #Find whether the user has signed up for any topics, if so the user won't be able to
-    #signup again unless the former was a waitlisted topic
+    #Find whether the user has signed up for any topics; if so the user won't be able to
+    #sign up again unless the former was a waitlisted topic
     #if team assignment, then team id needs to be passed as parameter else the user's id
     if assignment.team_assignment == true
       users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
@@ -254,7 +254,7 @@ class SignUpSheetController < ApplicationController
     #making sure that the drop date deadline hasn't passed
     dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})
     if(!dropDate.nil? && dropDate.due_at < Time.now)
-      flash[:error] = "You cannot drop this topic because you are past the drop deadline."
+      flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
       #if team assignment find the creator id from teamusers table and teams
       if assignment.team_assignment == true
@@ -271,7 +271,8 @@ class SignUpSheetController < ApplicationController
         first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
   
         if !first_waitlisted_user.nil?
-          #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+          # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+          ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
           first_waitlisted_user.is_waitlisted = false
           first_waitlisted_user.save
   
@@ -614,9 +615,4 @@ class SignUpSheetController < ApplicationController
 
   end
 
-
 end
-
-
-
-

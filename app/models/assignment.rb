@@ -529,9 +529,12 @@ def add_participant(user_name)
 
    def get_review_rounds
     due_dates = DueDate.find_all_by_assignment_id(self.id)
-    rounds = (due_dates.size - 2)/2 + 1
-    if rounds < 0
-       return 0
+    rounds = 0
+    for i in (0 .. due_dates.length-1)
+      deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
+      if deadline_type.name == "review" || deadline_type.name == "rereview"
+        rounds = rounds + 1
+      end
     end
     rounds
   end

@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'assignment_controller'
 
 # Re-raise errors caught by the controller.
 class AssignmentController; def rescue_action(e) raise e end; end
 
-class AssignmentControllerTest < Test::Unit::TestCase
+class AssignmentControllerTest < ActionController::TestCase
   # use dynamic fixtures to populate users table
   # for the use of testing
   fixtures :users
@@ -82,6 +82,7 @@ class AssignmentControllerTest < Test::Unit::TestCase
 
     id = Assignment.first.id
     @assignment = Assignment.first
+    original_assignment_name = @assignment.name
     number_of_assignment = Assignment.count
     # It will raise an error while execute render method in controller
     # Because the goldberg variables didn't been initialized  in the test framework
@@ -101,7 +102,7 @@ class AssignmentControllerTest < Test::Unit::TestCase
       }
     }
     assert_template 'assignment/edit'
-    assert_equal "Assignment 9", Assignment.first.name
+    assert_equal original_assignment_name, Assignment.first.name
   end
 
   # 1201 Delete a assignment
@@ -109,12 +110,18 @@ class AssignmentControllerTest < Test::Unit::TestCase
 
     number_of_assignment = Assignment.count
     number_of_duedate = DueDate.count
-    id = Assignment.first.id
+    id = Assignment.first(:conditions => {:instructor_id => users(:instructor3).id}).id
     post :delete, :id => id
-    assert_redirected_to :action => 'list'
+    assert_redirected_to :controller => 'tree_display', :action => 'list'
     assert_equal number_of_assignment-1, Assignment.count
     assert_raise(ActiveRecord::RecordNotFound){ Assignment.find(id) }
 
   end
 
 end
+
+
+
+
+
+

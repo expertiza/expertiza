@@ -604,6 +604,7 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.string  "handle"
     t.boolean "leaderboard_privacy",                      :default => false
     t.text    "digital_certificate"
+    t.string  "persistence_token"
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

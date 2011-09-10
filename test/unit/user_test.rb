@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 
-class UserTest < Test::Unit::TestCase
+class UserTest < ActiveSupport::TestCase
   fixtures :users
   
   # Test user retrieval by email
@@ -20,7 +20,8 @@ class UserTest < Test::Unit::TestCase
     user = User.new
     user.name = "testStudent1"
     user.fullname = "test_Student_1"
-    user.password = Digest::SHA1.hexdigest("testStudent1")
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
     user.email = "testStudent1@foo.edu"
     user.role_id = "1"
     assert user.save
@@ -30,13 +31,12 @@ class UserTest < Test::Unit::TestCase
   def test_add_user_with_exist_name
     user = User.new
     user.name = 'student1'
-    user.password = Digest::SHA1.hexdigest("student1")
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
     user.fullname = "student1_fullname",
     user.role_id = "3"
     assert !user.save
-
-    error_messages = I18n.translate('activerecord.errors.messages')
-    assert_equal error_messages[:taken], user.errors.on(:name)
+    assert_equal I18n.translate('activerecord.errors.messages')[:taken], user.errors.on(:name)
   end
   
   # 103 Check valid user name and password   

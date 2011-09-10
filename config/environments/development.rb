@@ -17,4 +17,3 @@ config.action_view.debug_rjs                         = true
 config.action_mailer.raise_delivery_errors = false
 
 config.log_level = :info
-config.after_initialize do background() end

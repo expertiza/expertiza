@@ -1,5 +1,4 @@
 class AssignmentController < ApplicationController
-  require 'ftools'
   auto_complete_for :user, :name
   before_filter :authorize
   
@@ -94,20 +93,17 @@ class AssignmentController < ApplicationController
     
     # Deadline types used in the deadline_types DB table
     deadline = DeadlineType.find_by_name("submission")
-    @Submission_deadline= deadline.id
+    @Submission_deadline = deadline.id
     deadline = DeadlineType.find_by_name("review")
     @Review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("resubmission")
-    @Resubmission_deadline= deadline.id
+    @Resubmission_deadline = deadline.id
     deadline = DeadlineType.find_by_name("rereview")
     @Rereview_deadline = deadline.id
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
-    
-    #for drop_topic
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
-    #end of addition
     
     if @assignment.save 
       set_questionnaires   
@@ -124,10 +120,8 @@ class AssignmentController < ApplicationController
         raise "Please enter a valid Review deadline" if !due_date
         max_round = 2;
         
-        #for drop topic
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
         raise "Please enter a valid drop toipic deadline" if !due_date
-        #end of addition
         
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys
@@ -357,7 +351,6 @@ class AssignmentController < ApplicationController
     # If the assignment is already deleted, go back to the list of assignments
     if assignment 
       begin
-        @user =  ApplicationHelper::get_user_role(session[:user])
         @user = session[:user]
         id = @user.get_instructor
         if(id != assignment.instructor_id)

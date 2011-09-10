@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'institution_controller'
 
 # Re-raise errors caught by the controller.
 class InstitutionController; def rescue_action(e) raise e end; end
 
-class InstitutionsControllerTest < Test::Unit::TestCase
+class InstitutionsControllerTest < ActionController::TestCase
   fixtures :institutions
   fixtures :users, :roles
   def setup
@@ -81,4 +81,26 @@ class InstitutionsControllerTest < Test::Unit::TestCase
     assert_equal number_of_institution-1, Institution.count
     assert_raise(ActiveRecord::RecordNotFound){ Institution.find(1) }
   end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 end

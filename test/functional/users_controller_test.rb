@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require './' + File.dirname(__FILE__) + '/../test_helper'
 require 'users_controller'
 
 # Re-raise errors caught by the controller.
 class UsersController; def rescue_action(e) raise e end; end
 
-class UsersControllerTest < Test::Unit::TestCase
+class UsersControllerTest < ActionController::TestCase
   fixtures :users, :participants, :assignments, :wiki_types, :response_maps
   fixtures :roles
 # --------------------------------------------------------------

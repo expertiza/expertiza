@@ -20,7 +20,8 @@ class Role < ActiveRecord::Base
     roles = Role.find(:all)
     
     for role in roles do
-      role.cache = nil ; role.save # we have to do this to clear it
+      role.cache = nil
+      role.save # we have to do this to clear it
 
       role.cache = Hash.new
       role.rebuild_credentials

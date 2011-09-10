@@ -130,6 +130,42 @@ class SubmittedContentController < ApplicationController
       end 
   end  
   
+  # This was written for a custom rubric used by Dr. Jennifer Kidd (ODU)
+  # Note that the file that is being uploaded here is a REVIEW, not submitted work. 
+  def custom_submit_file 
+
+    begin
+      file = params[:uploaded_file]
+      participant = Participant.find(params[:participant_id])
+
+      @current_folder = DisplayOption.new
+      @current_folder.name = "/"
+      if params[:current_folder]
+        @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
+      end
+
+      curr_directory = participant.assignment.get_path.to_s+ "/" +params[:map].to_s + @current_folder.name
+      if !File.exists? curr_directory
+         FileUtils.mkdir_p(curr_directory)
+      else
+         FileUtils.rm_rf(curr_directory)
+         FileUtils.mkdir_p(curr_directory)
+      end
+
+      safe_filename = file.original_filename.gsub(/\\/,"/")
+      safe_filename = FileHelper::sanitize_filename(safe_filename) # new code to sanitize file path before upload*
+      full_filename =  curr_directory + File.split(safe_filename).last.gsub(" ",'_') #safe_filename #curr_directory +
+      File.open(full_filename, "wb") { |f| f.write(file.read) }
+    rescue
+    end
+
+    if params[:return_to] == "edit"
+      redirect_to :controller=>'response', :action => params[:return_to], :id => params[:id]
+    else
+      redirect_to :controller=>'response', :action => params[:return_to], :id => params[:map]      
+    end
+  end
+
 private  
   
   def get_file_type file_name

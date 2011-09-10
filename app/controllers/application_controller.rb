@@ -3,7 +3,8 @@
 class ApplicationController < ActionController::Base
 
   helper_method :current_user_session, :current_user
-  protect_from_forgery
+  protect_from_forgery unless Rails.env.test?
+  filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
 
   def authorize 
     unless session[:user]

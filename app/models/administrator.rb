@@ -3,15 +3,15 @@
 # Author: unknown
 class Administrator < User
   
-  QUESTIONNAIRE = [["My instructor's questionnaires",'list_instructors'],
+  QUESTIONNAIRE = [["My instructors' questionnaires",'list_instructors'],
             ['My questionnaires','list_mine'],
             ['All public questionnaires','list_all']]
             
-  SIGNUPSHEET = [["My instructor's signups",'list_instructors'],
+  SIGNUPSHEET = [["My instructors' signups",'list_instructors'],
             ['My signups','list_mine'],
             ['All public signups','list_all']]          
             
-  ASSIGNMENT = [["My instructor's assignments",'list_instructors'],
+  ASSIGNMENT = [["My instructors' assignments",'list_instructors'],
                 ['My assignments','list_mine'],
                 ['All public assignments','list_all']]
     

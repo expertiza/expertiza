@@ -3,7 +3,7 @@ class SurveyDeploymentController < ApplicationController
 
 
   def new 
-    @surveys=Questionnaire.find_all_by_type_id(4).map{|u| [u.name, u.id] }
+    @surveys=Questionnaire.find_all_by_type(4).map{|u| [u.name, u.id] }
     @course = Course.find_all_by_instructor_id(session[:user].id).map{|u| [u.name, u.id] }
     @total_students = CourseParticipant.find_all_by_parent_id(@course[0].id).count
   end

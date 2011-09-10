@@ -224,8 +224,8 @@ class SignUpSheetController < ApplicationController
       @show_actions = false
     end
     
-    #Find whether the user has signed up for any topics, if so the user won't be able to
-    #signup again unless the former was a waitlisted topic
+    #Find whether the user has signed up for any topics; if so the user won't be able to
+    #sign up again unless the former was a waitlisted topic
     #if team assignment, then team id needs to be passed as parameter else the user's id
     if assignment.team_assignment == true
       users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
@@ -254,7 +254,7 @@ class SignUpSheetController < ApplicationController
     #making sure that the drop date deadline hasn't passed
     dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})
     if(!dropDate.nil? && dropDate.due_at < Time.now)
-      flash[:error] = "You cannot drop this topic because you are past the drop deadline."
+      flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
       #if team assignment find the creator id from teamusers table and teams
       if assignment.team_assignment == true
@@ -271,7 +271,8 @@ class SignUpSheetController < ApplicationController
         first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
   
         if !first_waitlisted_user.nil?
-          #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+          # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+          ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
           first_waitlisted_user.is_waitlisted = false
           first_waitlisted_user.save
   
@@ -591,18 +592,26 @@ class SignUpSheetController < ApplicationController
 
         set_of_due_dates.sort! {|a,b| a.due_at <=> b.due_at}
 
-        offset = (DateTime.parse(set_of_due_dates.last['due_at'].to_s) - DateTime.parse(set_of_due_dates.first['due_at'].to_s)).abs + days_between_submissions + 1
-
+        offset = days_between_submissions 
       end
 
       set_of_topic.each { |topic_id|
         #if the due dates have already been created and the save dependency is being clicked,
         #then delete existing n create again
         prev_saved_due_dates = TopicDeadline.find_all_by_topic_id(topic_id)
-        if !prev_saved_due_dates.nil?
-          prev_saved_due_dates.each {|date|
-            date.destroy
-          }
+        
+        #Only if there is a dependency for the topic
+        if !prev_saved_due_dates.nil?    
+          num_due_dates = prev_saved_due_dates.length
+          #for each due date in the current topic he want to compare it to the previous due date
+          for x in 0..num_due_dates - 1
+            #we don't want the old date to move earlier in time so we save it as the new due date and destroy the old one  
+            if DateTime.parse(set_of_due_dates[x].due_at.to_s) + offset.to_i < DateTime.parse(prev_saved_due_dates[x].due_at.to_s)
+              set_of_due_dates[x] = prev_saved_due_dates[x]
+              offset = 0
+            end
+            prev_saved_due_dates[x].destroy
+          end
         end
 
         set_of_due_dates.each {|due_date|
@@ -614,9 +623,4 @@ class SignUpSheetController < ApplicationController
 
   end
 
-
 end
-
-
-
-

@@ -8,7 +8,7 @@ require 'course_controller'
 # Re-raise errors caught by the controller.
 class CourseController; def rescue_action(e) raise e end; end
 
-class CourseControllerTest < ActiveSupport::TestCase
+class CourseControllerTest < ActionController::TestCase
   fixtures :users
   fixtures :courses, :roles, :tree_folders
   fixtures :system_settings, :permissions, :roles_permissions
@@ -77,7 +77,7 @@ class CourseControllerTest < ActiveSupport::TestCase
     assert_equal 32, Course.find(:all).length
     new_course = Course.find(:all).last
     assert_not_equal courses(:course1).id, new_course.id
-    assert_redirected_to :action => 'edit'
+    assert_redirected_to :controller => 'course', :action => 'edit', :id => new_course.id
   end
  
   # Verify successful delete of course

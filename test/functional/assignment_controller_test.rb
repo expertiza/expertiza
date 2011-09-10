@@ -4,7 +4,7 @@ require 'assignment_controller'
 # Re-raise errors caught by the controller.
 class AssignmentController; def rescue_action(e) raise e end; end
 
-class AssignmentControllerTest < ActiveSupport::TestCase
+class AssignmentControllerTest < ActionController::TestCase
   # use dynamic fixtures to populate users table
   # for the use of testing
   fixtures :users
@@ -112,7 +112,7 @@ class AssignmentControllerTest < ActiveSupport::TestCase
     number_of_duedate = DueDate.count
     id = Assignment.first(:conditions => {:instructor_id => users(:instructor3).id}).id
     post :delete, :id => id
-    assert_redirected_to :action => 'list'
+    assert_redirected_to :controller => 'tree_display', :action => 'list'
     assert_equal number_of_assignment-1, Assignment.count
     assert_raise(ActiveRecord::RecordNotFound){ Assignment.find(id) }
 

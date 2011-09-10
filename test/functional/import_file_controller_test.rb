@@ -9,8 +9,8 @@ require 'import_file_controller'
 class ImportFileController; def rescue_action(e) raise e end; end
 
 class ImportFileControllerTest < ActionController::TestCase
-  fixtures :users, :assignments, :roles
-  set_fixture_class:system_settings => 'SystemSettings'
+  fixtures :users, :roles, :system_settings, :content_pages, :permissions, :roles_permissions, :controller_actions, :site_controllers, :menu_items, :assignments, :participants
+  set_fixture_class :system_settings => 'SystemSettings'
   fixtures :system_settings
   fixtures :content_pages
   @settings = SystemSettings.find(:first)
@@ -39,15 +39,32 @@ class ImportFileControllerTest < ActionController::TestCase
     assert_response :success
   end 
   
-  def test_import
-    partcount = AssignmentParticipant.count  
+  def test_import_participants
+    assignment = assignments(:assignment1)
+    
     @request.session[:return_to] = 'http://test:host'
     post :import, :model      => 'AssignmentParticipant',
                   :file       => File.new(RAILS_ROOT+'/test/roster.txt'),
-                  :id         => assignments(:assignment1).id,
+                  :id         => assignment.id,
                   :delim_type => 'other',
                   :other_char => '*'
-    assert partcount + 1, AssignmentParticipant.count
+    
+    participant_usernames = assignment.participants.map { |participant| participant.user.name }
+    %w(student1 student2 student3).each do |username|
+      assert participant_usernames.include? username
+    end
+    
+    assert_redirected_to 'http://test:host'
+  end
+  
+  def test_import_users
+    user_count = User.count  
+    @request.session[:return_to] = 'http://test:host'
+    post :import, :model      => 'User',
+                  :file       => File.new(RAILS_ROOT+'/test/user_import.csv'),
+                  :delim_type => 'comma'
+    assert_equal user_count + 1, User.count
+    assert_equal User.last.name, 'edwards34'
     assert_redirected_to 'http://test:host'
   end
 end

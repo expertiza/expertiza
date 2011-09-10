@@ -22,24 +22,13 @@
 
 <link rel="stylesheet" href="/stylesheets/redbox.css" type="text/css" />
 
-<%= javascript_include_tag :defaults %>
+<%= javascript_include_tag :defaults, 'jquery', 'redbox', 'suckerfish', 'actionmenu', 'tableactions', 'datetimepicker',
+      'CalendarPopup', 'ajaxtabs', 'sorttable', 'shared', 'textareasizer' %>
 
-<script type="text/javascript" src="/javascripts/jquery.js"></script>
 <%= javascript_tag 'jQuery.noConflict(); // Let Prototype own the $ variable' %>
 
-<script type="text/javascript" src="/javascripts/redbox.js"></script>
-<script type="text/javascript" src="/javascripts/suckerfish.js"></script>
-<script type="text/javascript" src="/javascripts/actionmenu.js"></script>
-<script type="text/javascript" src="/javascripts/tableactions.js"></script>
-<script type="text/javascript" src="/javascripts/application.js"></script>
-<script type="text/javascript" src="/javascripts/datetimepicker.js"></script>
-<script type="text/javascript" src="/javascripts/CalendarPopup.js"></script>
-<script type="text/javascript" src="/javascripts/ajaxtabs.js"></script>
-<script type="text/javascript" src="/javascripts/sorttable.js"></script>
-<script type="text/javascript" src="/javascripts/shared.js"></script>
-<script type="text/javascript" src="/javascripts/textareasizer.js"></script>
-<% if controller.controller_name == "submitted_content" %><script type="text/javascript" src="/javascripts/submissions.js"></script><% end %>
-<% if controller.controller_name == "grades" %><script type="text/javascript" src="/javascripts/grading.js"></script><% end %>
+<% if controller.controller_name == "submitted_content" %><%= javascript_include_tag 'submissions' %><% end %>
+<% if controller.controller_name == "grades" %><%= javascript_include_tag 'grading' %><% end %>
 
 <SCRIPT LANGUAGE="JavaScript">
 	var cal = new CalendarPopup();

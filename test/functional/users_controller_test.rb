@@ -8,7 +8,7 @@ class UsersControllerTest < ActionController::TestCase
   fixtures :users, :participants, :assignments, :wiki_types, :response_maps
   fixtures :roles
 # --------------------------------------------------------------
-  set_fixture_class:system_settings => 'SystemSettings'    
+  set_fixture_class :system_settings => 'SystemSettings'    
   fixtures :system_settings
   fixtures :content_pages  
   @settings = SystemSettings.find(:first)

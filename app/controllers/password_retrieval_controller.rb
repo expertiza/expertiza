@@ -9,7 +9,7 @@ class PasswordRetrievalController < ApplicationController
     else
       user = User.find_by_email(params[:user][:email])
       if user
-        user.reset_password!
+        user.reset_and_mail_password
         flash[:pwnote] = "A new password has been sent to your e-mail address."
       else
         flash[:pwerr] = "No account is associated with the address, \""+params[:user][:email]+"\". Please try again."

@@ -78,7 +78,7 @@ class User < ActiveRecord::Base
   end
 
   # Generate email to user with new password
-  def send_password(clear_password) 
+  def reset_and_mail_password
     self.reset_password!
     
     Mailer.deliver_message(

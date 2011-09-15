@@ -3,18 +3,6 @@ require './' + File.dirname(__FILE__) + '/../test_helper'
 class UserTest < ActiveSupport::TestCase
   fixtures :users
   
-  # Test user retrieval by email
-  def test_find_by_login_email
-    user = User.find_by_login('student1@foo.edu')    
-    assert_equal 'student1', user.name
-  end
-  
-  # Test user retrieval by name
-  def test_find_by_login_name
-    user = User.find_by_login('student1')    
-    assert_equal 'student1', user.name
-  end
-
   # 101 add a new user 
   def test_add_user
     user = User.new

@@ -25,7 +25,7 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :name
 
   # happens in this order. see http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html
-  before_create :randomize_password # AuthLogic
+  before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.clear_password.blank? } # AuthLogic
   after_create :email_welcome
 
   def list_mine(object_type, user_id)

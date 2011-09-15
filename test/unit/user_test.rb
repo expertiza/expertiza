@@ -3,6 +3,18 @@ require './' + File.dirname(__FILE__) + '/../test_helper'
 class UserTest < ActiveSupport::TestCase
   fixtures :users
   
+  def test_random_password_generation_for_new_users
+    u = User.new(:email => "new@guy.co", :name => 'newguy')
+    u.save!
+    assert u.clear_password.present?
+  end
+  
+  def test_no_random_password_generation_for_new_users_with_specified_password
+    u = User.new(:email => "new@guy.co", :name => 'newguy', :clear_password => 'mypass', :clear_password_confirmation => 'mypass')
+    u.save!
+    assert_equal "mypass", u.clear_password
+  end
+  
   # 101 add a new user 
   def test_add_user
     user = User.new
@@ -12,7 +24,7 @@ class UserTest < ActiveSupport::TestCase
     user.clear_password_confirmation = "testStudent1"
     user.email = "testStudent1@foo.edu"
     user.role_id = "1"
-    assert user.save
+    user.save! # an exception is thrown if the user is invalid
   end 
   
   # 102 Add a user with existing name 

@@ -114,4 +114,8 @@ class Participant < ActiveRecord::Base
       self.update_attribute(:topic_id, topic_id)
     end
   end
+  
+  def signed_up_topic
+    # To be written later
+  end
 end

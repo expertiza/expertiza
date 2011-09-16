@@ -40,11 +40,11 @@ class Assignment < ActiveRecord::Base
     contributor_set = Array.new(contributors)
     
     # Reject contributors that have not selected a topic, or have no submissions
-    contributor_set.reject! { |contributor| contributor.topic.nil? or !contributor.has_submissions? }
+    contributor_set.reject! { |contributor| contributor.signed_up_topic.nil? or !contributor.has_submissions? }
     
     # Reject contributions of topics whose deadline has passed
-    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(contributor.topic.id) == "Complete" or
-                                            contributor.assignment.get_current_stage(contributor.topic.id) == "submission" }
+    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(contributor.signed_up_topic.id) == "Complete" or
+                                            contributor.assignment.get_current_stage(contributor.signed_up_topic.id) == "submission" }
     
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
@@ -53,7 +53,7 @@ class Assignment < ActiveRecord::Base
     contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
     
     candidate_topics = Set.new
-    contributor_set.each { |contributor| candidate_topics.add(contributor.topic) }
+    contributor_set.each { |contributor| candidate_topics.add(contributor.signed_up_topic) }
     
     candidate_topics
   end
@@ -79,7 +79,7 @@ class Assignment < ActiveRecord::Base
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.
     if topic
-      raise "This topic has too many reviews, please select another one." unless candidate_topics_to_review.include?(topic)
+      raise "This topic has too many reviews; please select another one." unless candidate_topics_to_review.include?(topic)
     end
     
     contributor_set = Array.new(contributors)
@@ -88,7 +88,7 @@ class Assignment < ActiveRecord::Base
     # 1) Only consider contributors that worked on this topic; 2) remove reviewer as contributor
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor| 
-      contributor.topic != topic or # both will be nil for assignments with no signup sheet
+      contributor.signed_up_topic != topic or # both will be nil for assignments with no signup sheet
         contributor.includes?(reviewer) or
         !contributor.has_submissions?
     end
@@ -111,10 +111,14 @@ class Assignment < ActiveRecord::Base
       # .last assumes the database returns rows in the order they were created.
       # Added unit tests to ensure these conditions are both true with the current database.
       contributor_set.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id }
-    end
+  end
 
-    # The first contributor is the best candidate to review
-    return contributor_set.first
+    # Choose a contributor at random (.sample) from the remaining contributors.
+    # Actually, we SHOULD pick the contributor who was least recently picked.  But sample
+    # is much simpler, and probably almost as good, given that even if the contributors are
+    # picked in round-robin fashion, the reviews will not be submitted in the same order that
+    # they were picked.
+    return contributor_set.sample
   end
 
   def contributors

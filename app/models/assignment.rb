@@ -40,21 +40,20 @@ class Assignment < ActiveRecord::Base
     contributor_set = Array.new(contributors)
     
     # Reject contributors that have not selected a topic, or have no submissions
-    contributor_set.reject! { |contributor| contributor.signed_up_topic.nil? or !contributor.has_submissions? }
+    contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
     
     # Reject contributions of topics whose deadline has passed
-    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(contributor.signed_up_topic.id) == "Complete" or
-                                            contributor.assignment.get_current_stage(contributor.signed_up_topic.id) == "submission" }
-    
+    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
+                                            contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
+
     min_reviews = contributor.review_mappings.count rescue 0
     contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
     
     candidate_topics = Set.new
-    contributor_set.each { |contributor| candidate_topics.add(contributor.signed_up_topic) }
-    
+    contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
     candidate_topics
   end
 
@@ -88,7 +87,7 @@ class Assignment < ActiveRecord::Base
     # 1) Only consider contributors that worked on this topic; 2) remove reviewer as contributor
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor| 
-      contributor.signed_up_topic != topic or # both will be nil for assignments with no signup sheet
+      signed_up_topic(contributor) != topic or # both will be nil for assignments with no signup sheet
         contributor.includes?(reviewer) or
         !contributor.has_submissions?
     end
@@ -663,5 +662,16 @@ end
     end
   end
   
+    def signed_up_topic(contributor)
+      # The purpose is to return the topic that the contributor has signed up to do for this assignment.
+      # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
+      # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
+      contributors_topic = SignedUpUser.find_by_creator_id(contributor.id)
+      if !contributors_topic.nil?
+        contributors_signup_topic = SignUpTopic.find_by_id(contributors_topic.topic_id)
+        #returns the topic
+        return contributors_signup_topic
+      end
+  end
 end
   

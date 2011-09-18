@@ -115,7 +115,4 @@ class Participant < ActiveRecord::Base
     end
   end
   
-  def signed_up_topic
-    # To be written later
-  end
 end

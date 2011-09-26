@@ -38,8 +38,13 @@ class ResponseController < ApplicationController
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
     if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
-      @next_action = "custom_update"
-      render :action => 'custom_response'
+      if @assignment.id < 447
+         @next_action = "custom_update"
+         render :action => 'custom_response'
+     else
+         @next_action = "custom_update"
+         render :action => 'custom_response_2011'
+     end
     else
       # end of special code (except for the end below, to match the if above)
       #**********************

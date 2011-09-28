@@ -87,7 +87,6 @@ class ResponseController < ApplicationController
   end  
   
   def custom_update
-    p '##### response ID: ' + params[:id].to_s
     @response = Response.find(params[:id])
     @myid = @response.id
     msg = ""
@@ -101,7 +100,6 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions
 
-      p '##### questions.size: ' + questions.size.to_s
       for i in 0..questions.size-1
         score = Score.find_by_response_id_and_question_id(@response.id, questions[i.to_i].id)
         score.update_attribute('comments',params[:custom_response][i.to_s])
@@ -135,15 +133,15 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @modified_object = @map.id
-    get_content    
+    get_content  
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
     if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
       if @assignment.id < 447
-         @next_action = "custom_update"
+         @next_action = "custom_create"
          render :action => 'custom_response'
      else
-         @next_action = "custom_update"
+         @next_action = "custom_create"
          render :action => 'custom_response_2011'
      end
     else

@@ -111,9 +111,9 @@ def custom_display_as_html(code, file_url)
   #********************Learning Targets******************
   code = code + "<h2>Learning Targets</h2><hr>"
   if review_scores[0].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They state what the reader should know or be able to do after reading the article<br/>"
+    code = code + "<img src=\"/images/Check-icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>"
   else
-    code = code + "<img src=\"/images/delete_icon.png\"> They state what the reader should know or be able to do after reading the article<br/>"   
+    code = code + "<img src=\"/images/delete_icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>"   
   end
 
   if review_scores[1].comments == "1"
@@ -123,9 +123,9 @@ def custom_display_as_html(code, file_url)
   end
 
   if review_scores[2].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for ECI 301 students<br/>"
+    code = code + "<img src=\"/images/Check-icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
   else
-    code = code + "<img src=\"/images/delete_icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for ECI 301 students<br/>"
+    code = code + "<img src=\"/images/delete_icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
   end
 
   if review_scores[3].comments == "1"
@@ -152,8 +152,8 @@ def custom_display_as_html(code, file_url)
   code = code + "<i>Suggestion:</i>"
     code = code + "<ul><li>#{review_scores[10].comments.gsub(/\"/,'&quot;').to_s}</li><li>#{review_scores[11].comments.gsub(/\"/,'&quot;').to_s}</li></ul>"
 
-  #*******************Sources************************
-  code = code + "<h2>Sources</h2><hr>"
+  #*******************Sources and Use of Source Material************************
+  code = code + "<h2>Sources and Use of Source Material</h2><hr>"
     code = code + "<br/>How many sources are in the references list?: #{review_scores[12].comments.gsub(/\"/,'&quot;').to_s}<br/>"
     code = code + "<br/>List the range of publication years for all sources, e.g. 1998-2006: <b>#{review_scores[13].comments.gsub(/\"/,'&quot;').to_s} - #{review_scores[14].comments.gsub(/\"/,'&quot;').to_s}</b><br/><br/>"
 
@@ -164,9 +164,9 @@ def custom_display_as_html(code, file_url)
   end
 
   if review_scores[16].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The author cites each of these sources in the article<br/>"
+    code = code + "<img src=\"/images/Check-icon.png\"> The author cites each of these sources in the lesson<br/>"
   else
-    code = code + "<img src=\"/images/delete_icon.png\"> The author cites each of these sources in the article<br/>"
+    code = code + "<img src=\"/images/delete_icon.png\"> The author cites each of these sources in the lesson<br/>"
   end
 
   if review_scores[17].comments == "1"
@@ -203,15 +203,15 @@ def custom_display_as_html(code, file_url)
     code = code + "<dl><dd>#{review_scores[22].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
   
   if review_scores[23].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the article in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible<br/>"
+    code = code + "<img src=\"/images/Check-icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the lesson in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible. <br/>"
   else
-    code = code + "<img src=\"/images/delete_icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the article in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible<br/>"
+    code = code + "<img src=\"/images/delete_icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the lesson in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible<br/>"
   end
 
-  code = code + "<br/><b>If not, which one(s) may infringe copyrights?</b><br/>"
+  code = code + "<br/><b>If not, which one(s) may infringe copyrights, or what areas of text may need citations, revisions or elaboration?</b><br/>"
     code = code + "<dl><dd>#{review_scores[24].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
 
-  code = code + "<br/>Please make a comment about the sources. Explain how the author can improve the use of sources in the article.<br/>"
+  code = code + "<br/>Please make a comment about the sources. Explain how the author can improve the use of sources in the lesson.<br/>"
     code = code + "<dl><dd>#{review_scores[25].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
 
   #*******************Multiple Choice Questions************************
@@ -377,7 +377,7 @@ def custom_display_as_html(code, file_url)
 
   code = code + "<h3>Interest</h3>"
   code = code +
-           "<div align=\"center\">To attract and maintain attention, the article has:</div><table class='general'>
+           "<div align=\"center\">To attract and maintain attention, the lesson has:</div><table class='general'>
             <tr>
               <th>5 - Extremely Interesting   </th>
               <th>4 - Quite Interesting  </th>
@@ -407,7 +407,7 @@ def custom_display_as_html(code, file_url)
 
   code = code + "<td><ul>"
   if review_scores[71].comments == "1"
-    code = code + "<li>A sidebar that adds something new to the article</li>"
+    code = code + "<li>A sidebar that adds something new to the lesson</li>"
   end
   if review_scores[72].comments == "1"
     code = code + "<li>A few effective visuals or interactive elements</li>"
@@ -425,7 +425,7 @@ def custom_display_as_html(code, file_url)
 
   code = code + "<td><ul>"
   if review_scores[76].comments == "1"
-    code = code + "<li>A sidebar that repeats what is in the article</li>"
+    code = code + "<li>A sidebar that repeats what is in the lesson</li>"
   end
   if review_scores[77].comments == "1"
     code = code + "<li>An effective visual or interactive element</li>"
@@ -482,7 +482,7 @@ def custom_display_as_html(code, file_url)
   code = code + "<h3>Credibility</h3>"
 
   code = code +
-           "<div align=\"center\">To demonstrate its credibility the article:</div><table class='general'>
+           "<div align=\"center\">To demonstrate its credibility the lesson:</div><table class='general'>
             <tr>
               <th>5 - Completely Credible   </th>
               <th>4 - Substantial Credibility  </th>
@@ -575,10 +575,10 @@ def custom_display_as_html(code, file_url)
 
   code = code + "<td><ul>"
   if review_scores[106].comments == "1"
-    code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the article</li>"
+    code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the lesson</li>"
   end
   if review_scores[107].comments == "1"
-    code = code + "<li>The article accomplishes its established goals</li>"
+    code = code + "<li>The lesson accomplishes its established goals</li>"
   end
   if review_scores[108].comments == "1"
     code = code + "<li>Excellent knowledge and application MC questions align with learning targets and assess important content</li>"
@@ -591,7 +591,7 @@ def custom_display_as_html(code, file_url)
     code = code + "<li>Specific and reasonable learning targets are stated</li>"
   end
   if review_scores[110].comments == "1"
-    code = code + "<li>The article partially meets its established goals</li>"
+    code = code + "<li>The lesson partially meets its established goals</li>"
   end
   if review_scores[111].comments == "1"
     code = code + "<li>Well constructed MC questions assess important content</li>"
@@ -630,7 +630,7 @@ def custom_display_as_html(code, file_url)
     code = code + "<li>Learning target is missing/ not actually a learning target</li>"
   end
   if review_scores[119].comments == "1"
-    code = code + "<li>Article has no goal/ content is unfocused</li>"
+    code = code + "<li>Lesson has no goal/ content is unfocused</li>"
   end
   if review_scores[120].comments == "1"
     code = code + "<li>Questions are missing</li>"
@@ -764,9 +764,9 @@ def custom_display_as_html_2011(code, file_url)
   #********************Learning Targets******************
   code = code + "<h2>Learning Targets</h2><hr>"
   if review_scores[0].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They state what the reader should know or be able to do after reading the article<br/>"
+    code = code + "<img src=\"/images/Check-icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>"
   else
-    code = code + "<img src=\"/images/delete_icon.png\"> They state what the reader should know or be able to do after reading the article<br/>"
+    code = code + "<img src=\"/images/delete_icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>"
   end
 
   if review_scores[1].comments == "1"
@@ -776,9 +776,9 @@ def custom_display_as_html_2011(code, file_url)
   end
 
   if review_scores[2].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for ECI 301 students<br/>"
+    code = code + "<img src=\"/images/Check-icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
   else
-    code = code + "<img src=\"/images/delete_icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for ECI 301 students<br/>"
+    code = code + "<img src=\"/images/delete_icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
   end
 
   if review_scores[3].comments == "1"
@@ -805,8 +805,8 @@ def custom_display_as_html_2011(code, file_url)
   code = code + "<i>Suggestion:</i>"
     code = code + "<ul><li>#{review_scores[10].comments.gsub(/\"/,'&quot;').to_s}</li><li>#{review_scores[11].comments.gsub(/\"/,'&quot;').to_s}</li></ul>"
 
-  #*******************Sources************************
-  code = code + "<h2>Sources</h2><hr>"
+  #*******************Sources and Use of Source Material************************
+  code = code + "<h2>Sources and Use of Source Material</h2><hr>"
     code = code + "<br/>How many sources are in the references list?: #{review_scores[12].comments.gsub(/\"/,'&quot;').to_s}<br/>"
     code = code + "<br/>List the range of publication years for all sources, e.g. 1998-2006: <b>#{review_scores[13].comments.gsub(/\"/,'&quot;').to_s} - #{review_scores[14].comments.gsub(/\"/,'&quot;').to_s}</b><br/><br/>"
 
@@ -817,9 +817,9 @@ def custom_display_as_html_2011(code, file_url)
   end
 
   if review_scores[16].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The author cites each of these sources in the article<br/>"
+    code = code + "<img src=\"/images/Check-icon.png\"> The author cites each of these sources in the lesson<br/>"
   else
-    code = code + "<img src=\"/images/delete_icon.png\"> The author cites each of these sources in the article<br/>"
+    code = code + "<img src=\"/images/delete_icon.png\"> The author cites each of these sources in the lesson<br/>"
   end
 
   if review_scores[17].comments == "1"
@@ -856,15 +856,15 @@ def custom_display_as_html_2011(code, file_url)
     code = code + "<dl><dd>#{review_scores[22].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
 
   if review_scores[23].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the article in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible<br/>"
+    code = code + "<img src=\"/images/Check-icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the lesson in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible <b>and</b> all information quoted or paraphrased from other sources is properly cited and commented on so there is no evidence of plagiarism. There are no large sections of text copied from (or closely resembling) other sources.<br/>"
   else
-    code = code + "<img src=\"/images/delete_icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the article in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible<br/>"
+    code = code + "<img src=\"/images/delete_icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the lesson in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible<b>and</b> all information quoted or paraphrased from other sources is properly cited and commented on so there is no evidence of plagiarism. There are no large sections of text copied from (or closely resembling) other sources.<br/>"
   end
 
-  code = code + "<br/><b>If not, which one(s) may infringe copyrights?</b><br/>"
+  code = code + "<br/><b>If not, which one(s) may infringe copyrights, or what areas of text may need citations, revisions or elaboration?</b><br/>"
     code = code + "<dl><dd>#{review_scores[24].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
 
-  code = code + "<br/>Please make a comment about the sources. Explain how the author can improve the use of sources in the article.<br/>"
+  code = code + "<br/>Please make a comment about the sources. Explain how the author can improve the use of sources in the lesson.<br/>"
     code = code + "<dl><dd>#{review_scores[25].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
 
   #*******************Multiple Choice Questions************************
@@ -1000,7 +1000,7 @@ def custom_display_as_html_2011(code, file_url)
 
   code = code + "<h3>Interest</h3>"
   code = code +
-           "<div align=\"center\">To attract and maintain attention, the article has:</div><table class='general'>
+           "<div align=\"center\">To attract and maintain attention, the lesson has:</div><table class='general'>
             <tr>
               <th>5 - Extremely Interesting   </th>
               <th>4 - Quite Interesting  </th>
@@ -1066,7 +1066,7 @@ def custom_display_as_html_2011(code, file_url)
   code = code + "<h3>Credibility</h3>"
 
   code = code +
-           "<div align=\"center\">To demonstrate its credibility the article:</div><table class='general'>
+           "<div align=\"center\">To demonstrate its credibility the lesson:</div><table class='general'>
             <tr>
               <th>5 - Completely Credible   </th>
               <th>4 - Substantial Credibility  </th>
@@ -1159,10 +1159,10 @@ def custom_display_as_html_2011(code, file_url)
 
   code = code + "<td><ul>"
   if review_scores[83].comments == "1"
-    code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the article.</li>"
+    code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the lesson.</li>"
   end
   if review_scores[84].comments == "1"
-    code = code + "<li>The article accomplishes its established goals.</li>"
+    code = code + "<li>The lesson accomplishes its established goals.</li>"
   end
   if review_scores[85].comments == "1"
     code = code + "<li>Well constructed MC questions (1&2 knowledge; 3&4 application) align with learning targets and assess important content.</li>"
@@ -1177,7 +1177,7 @@ def custom_display_as_html_2011(code, file_url)
     code = code + "<li>Specific and reasonable learning targets are stated.</li>"
   end
   if review_scores[88].comments == "1"
-    code = code + "<li>The article partially meets its established goals</li>"
+    code = code + "<li>The lesson partially meets its established goals</li>"
   end
   if review_scores[89].comments == "1"
     code = code + "<li>Well constructed MC questions (4) assess important content.</li>"
@@ -1222,7 +1222,7 @@ def custom_display_as_html_2011(code, file_url)
     code = code + "<li>Learning target is missing/ not actually a learning target</li>"
   end
   if review_scores[100].comments == "1"
-    code = code + "<li>Article has no goal/ content is unfocused.</li>"
+    code = code + "<li>Lesson has no goal/ content is unfocused.</li>"
   end
   if review_scores[101].comments == "1"
     code = code + "<li>Questions are missing.</li>"

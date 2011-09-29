@@ -39,10 +39,10 @@
    <h3><a href="#"><b>Learning Targets</b></a></h3>
    <div>
      <p>
-        Check the descriptions that are true of the article's learning targets:
-        <%= render :partial => "checkbox", :locals => {:ques_num => 0, :ques_text => "They state what the reader should know or be able to do after reading the article."} %>
+        Check the descriptions that are true of the lesson's learning targets:
+        <%= render :partial => "checkbox", :locals => {:ques_num => 0, :ques_text => "They state what the reader should know or be able to do after reading the lesson."} %>
         <%= render :partial => "checkbox", :locals => {:ques_num => 1, :ques_text => "They are specific."} %>
-        <%= render :partial => "checkbox", :locals => {:ques_num => 2, :ques_text => "They are appropriate and reasonable i.e. not too easy or too difficult for ECI 301 students."} %>
+        <%= render :partial => "checkbox", :locals => {:ques_num => 2, :ques_text => "They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students."} %>
         <%= render :partial => "checkbox", :locals => {:ques_num => 3, :ques_text => "They are observable, i.e. you wouldn't have to look inside the readers' head to know if they met this target."} %>
 
         <%= render :partial => "textfield", :locals => {:ques_num => 4, :field_size => 3, :ques_text => "Number of learning targets:"} %>
@@ -61,8 +61,22 @@
    </div>
    <h3><a href="#"><b>Content</b></a></h3>
    <div>
-     <p>Copy (Ctrl + C) and paste (Ctrl + V) the text of the article into a Word document (you can also use <a href="http://www.openoffice.org">Open Office</a>, a free alternative to Microsoft Word). Use track changes and/or comments (<font color="blue"><a href="http://www.ehow.com/how_2136058_use-track-changes-word.html">Learn How</a></font>) to suggest changes or additions. Save your file in MS Word 97-2003 compatible format (as a .doc) and upload it below.</p>
+     <p>Copy (Ctrl + C) and paste (Ctrl + V) the text of the lesson into a Word document (you can also use <a href="http://www.openoffice.org">Open Office</a>, a free alternative to Microsoft Word). Use track changes and/or comments (<font color="blue"><a href="http://www.ehow.com/how_2136058_use-track-changes-word.html">Learn How</a></font>) to suggest changes or additions. Save your file in MS Word 97-2003 compatible format (as a .doc) and upload it below.</p>
      <p>In addition to correcting grammar etc, suggest places where clarification, examples and explanations can be added. Point out where visual or interactive elements can be introduced. Discuss whether the information included was important, interesting, engaging. Suggest what could be omitted or added.</p>
+     <p>The lesson should include an anticipatory set that:
+		 <ul><li>Gets the reader’s attention</li>
+		      <li>Helps the reader relate to the content</li>
+		      <li>Helps the reader consider what he/she already knows about the topic</li>
+          <li>Prepares the reader for the content/introduces the topic</li>
+     </ul>
+     Please make a comment about the anticipatory set in your uploaded file or in the compliments and suggestions. If appropriate, provide suggestions for how the author can improve their anticipatory set.</p>
+     <p>The author can create lesson closure by:
+     <ul>
+        <li>Synthesizing the information presented in the lesson</li>
+        <li>Offering his/her own ideas on the topic</li>
+        <li>Providing ideas for further thinking on this topic</li>
+     </ul>
+     Please make a comment about the anticipatory set in your uploaded file or in the compliments and suggestions. If appropriate, provide suggestions for how the author can improve their lesson closure.</p>
      <p><b><font color='red' size ="4">WARNING!!</font> You must save your review 
 		       <font size="3"><u>BEFORE</u></font> you upload a file. Any text that has not been saved 
 					 <font size="3"><u>WILL BE LOST</u></font> when you click on the Upload File link. 
@@ -96,18 +110,18 @@
     <br>
     <table>
       <tr>
-        <td><%= render :partial => "textarea", :locals => {:ques_num => 8, :area_size => "50x5", :ques_text => "Write one compliment for the article:"} %></td>
-        <td><%= render :partial => "textarea", :locals => {:ques_num => 9, :area_size => "50x5", :ques_text => "Write another compliment for the article:"} %></td>
+        <td><%= render :partial => "textarea", :locals => {:ques_num => 8, :area_size => "50x5", :ques_text => "Write one compliment for the lesson:"} %></td>
+        <td><%= render :partial => "textarea", :locals => {:ques_num => 9, :area_size => "50x5", :ques_text => "Write another compliment for the lesson:"} %></td>
       </tr>
       <tr>
-        <td><%= render :partial => "textarea", :locals => {:ques_num => 10, :area_size => "50x5", :ques_text => "Write one suggestion for the article:"} %></td>
-        <td><%= render :partial => "textarea", :locals => {:ques_num => 11, :area_size => "50x5", :ques_text => "Write another suggestion for the article:"} %></td>
+        <td><%= render :partial => "textarea", :locals => {:ques_num => 10, :area_size => "50x5", :ques_text => "Write one suggestion for the lesson:"} %></td>
+        <td><%= render :partial => "textarea", :locals => {:ques_num => 11, :area_size => "50x5", :ques_text => "Write another suggestion for the lesson:"} %></td>
       </tr>
     </table>
   </div>
 
    <%#**************************SOURCES**************************%>
-   <h3><a href="#"><b>Sources</b></a></h3>
+   <h3><a href="#"><b>Sources and Use of Source Material</b></a></h3>
    <div>
      <%= render :partial => "textfield", :locals => {:ques_num => 12, :field_size => 3, :ques_text => "How many sources are in the references list?"} %>
 
@@ -116,18 +130,18 @@
       - <%= render :partial => "textfield_inline", :locals => {:ques_num => 14, :field_size => 3} %>
      </p>
 
-     Check the descriptions that are true of the article:
+     Check the descriptions that are true of the lesson:
      <%= render :partial => "checkbox", :locals => {:ques_num => 15, :ques_text => "It lists all the sources in a section labeled \"References\"."} %>
-     <%= render :partial => "checkbox", :locals => {:ques_num => 16, :ques_text => "The author cites each of these sources in the article."} %>
+     <%= render :partial => "checkbox", :locals => {:ques_num => 16, :ques_text => "The author cites each of these sources in the lesson."} %>
      <%= render :partial => "checkbox", :locals => {:ques_num => 17, :ques_text => "The citations are in APA format."} %>
      <%= render :partial => "checkbox", :locals => {:ques_num => 18, :ques_text => "The author cites at least 2 scholarly sources."} %>
      <%= render :partial => "checkbox", :locals => {:ques_num => 19, :ques_text => "Most of the sources are current (less than 5 years old)."} %>
      <%= render :partial => "checkbox", :locals => {:ques_num => 20, :ques_text => "Taken together the sources represent a good balance of potential references for this topic."} %>
      <%= render :partial => "checkbox", :locals => {:ques_num => 21, :ques_text => "The sources represent different viewpoints."} %>
      <%= render :partial => "textarea", :locals => {:ques_num => 22, :area_size => "40x5", :ques_text => "What other sources or perspectives might the author want to consider?"} %>
-     <%= render :partial => "checkbox", :locals => {:ques_num => 23, :ques_text => "All materials (such as tables, graphs, images or videos created by other people or organizations) posted in the article are in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible."} %>
-     <%= render :partial => "textarea", :locals => {:ques_num => 24, :area_size => "40x5", :ques_text => "If not, which one(s) may infringe copyrights?"} %>
-     <%= render :partial => "textarea", :locals => {:ques_num => 25, :area_size => "60x5", :ques_text => "Please make a comment about the sources. Explain how the author can improve the use of sources in the article:"} %>
+     <%= render :partial => "checkbox", :locals => {:ques_num => 23, :ques_text => "All materials (such as tables, graphs, images or videos created by other people or organizations) posted in the lesson are in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible AND all information quoted or paraphrased from other sources is properly cited and commented on so there is no evidence of plagiarism. There are no large sections of text copied from (or closely resembling) other sources."} %>
+     <%= render :partial => "textarea", :locals => {:ques_num => 24, :area_size => "40x5", :ques_text => "If not, which one(s) may infringe copyrights, or what areas of text may need citations, revisions or elaboration?"} %>
+     <%= render :partial => "textarea", :locals => {:ques_num => 25, :area_size => "60x5", :ques_text => "Please make a comment about the sources. Explain how the author can improve the use of sources in the lesson:"} %>
    </div>
 
    <%#**************************MULTIPLE-CHOICE**************************%>
@@ -157,7 +171,7 @@
 
    <h3><a href="#"><b>Rubric</b></a></h3>
    <div>
-     Please check selections that apply to the article.
+     Please check selections that apply to the lesson.
      <p><b>Importance</b></p>
      <hr>
      <div align="center">The information selected by the author:</div>
@@ -206,7 +220,7 @@
 
      <p><b>Interest</b></p>
      <hr>
-     <div align="center">To attract and maintain attention, the article has:</div>
+     <div align="center">To attract and maintain attention, the lesson has:</div>
      <table class='general'>
         <tr>
           <th cellspacing="20%">5 - Extremely Interesting   </th>
@@ -253,7 +267,7 @@
 
      <p><b>Credibility</b></p>
      <hr>
-     <div align="center">To demonstrate its credibility the article:</div>
+     <div align="center">To demonstrate its credibility the lesson:</div>
      <table class='general'>
         <tr>
           <th cellspacing="20%">5 - Completely Credible   </th>
@@ -315,8 +329,8 @@
         <tr>
           <td>
             <ul>
-              <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 83, :ques_text => "Specific, appropriate, observable learning targets establish the purpose of the article."}%></p></li>
-              <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 84, :ques_text => "The article accomplishes its established goals."}%></p></li>
+              <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 83, :ques_text => "Specific, appropriate, observable learning targets establish the purpose of the lesson."}%></p></li>
+              <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 84, :ques_text => "The lesson accomplishes its established goals."}%></p></li>
               <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 85, :ques_text => "Well constructed MC questions (1&2 knowledge; 3&4 application) align with learning targets and assess important content."}%></p></li>
               <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 86, :ques_text => "An anticipatory set engages the reader, introduces the topic and its importance to future teachers, and helps readers connect to the content; the lesson closure synthesizes the material presented and stimulates further thinking on the issue."}%></p></li>
             </ul>
@@ -324,7 +338,7 @@
           <td>
             <ul>
               <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 87, :ques_text => "Specific and reasonable learning targets are stated."}%></p></li>
-              <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 88, :ques_text => "The article partially meets its established goals."}%></p></li>
+              <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 88, :ques_text => "The lesson partially meets its established goals."}%></p></li>
               <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 89, :ques_text => "Well constructed MC questions (4) assess important content."}%></p></li>
               <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 90, :ques_text => "An anticipatory set engages the reader and introduces the topic; the lesson ends with a conclusion that summarizes the content."}%></p></li>
             </ul>
@@ -348,7 +362,7 @@
           <td>
             <ul>
               <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 99, :ques_text => "Learning target is missing/ not actually a learning target."}%></p></li>
-              <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 100, :ques_text => "Article has no goal/ content is unfocused."}%></p></li>
+              <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 100, :ques_text => "Lesson has no goal/ content is unfocused."}%></p></li>
               <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 101, :ques_text => "Questions are missing."}%></p></li>
               <li><p><%= render :partial => "checkbox", :locals => {:ques_num => 102, :ques_text => "Neither an introduction nor a conclusion are included."}%></p></li>
             </ul>

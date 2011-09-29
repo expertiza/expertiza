@@ -31,7 +31,7 @@ class Response < ActiveRecord::Base
     
     # Test for whether Jen's custom rubric needs to be used
     if ((self.map.assignment.instructor_id == User.find_by_name("jkidd").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
-      if self.map.assignment.id < 447
+      if self.map.assignment.id < 469
         return custom_display_as_html(code, file_url) + "</div>"
       else
         return custom_display_as_html_2011(code, file_url) + "</div>"

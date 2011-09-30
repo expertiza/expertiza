@@ -35,7 +35,9 @@ class Response < ActiveRecord::Base
         return custom_display_as_html(code, file_url) + "</div>"
       else
         return custom_display_as_html_2011(code, file_url) + "</div>"
+      end
     end
+    
     # End of custom code
 
     count = 0
@@ -1319,5 +1321,4 @@ def custom_display_as_html_2011(code, file_url)
     code += "Error " + $!
   end
   code
-end
 end

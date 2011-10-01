@@ -14,17 +14,6 @@ Rails::Initializer.run do |config|
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
-  # Specify gems that this application depends on and have them installed with rake gems:install
-  # config.gem "hpricot", :lib, :version => '0.6', :source => "http://code.whytheluckystiff.net"
-  config.gem 'fastercsv'
-  config.gem 'gdata', :lib => false
-  config.gem 'hoptoad_notifier'
-  config.gem 'mysql'
-  config.gem 'RedCloth'
-  config.gem 'rgl', :lib => 'rgl/adjacency'
-  config.gem 'rubyzip', :lib => "zip/zip"
-  config.gem 'expertiza-authlogic', :lib => 'authlogic', :version => '~> 2.1.6.1'
-
   if RAILS_ENV == 'production' and RUBY_PLATFORM !~ /mswin|mingw/ # Don't check on Windows, because there's no "which" command to check
     raise 'dot executable missing - install graphviz' if %x(which dot).to_s.empty?
   end

@@ -47,6 +47,11 @@ ActionController::Base.allow_rescue = false
 # block that will explicitly put your database in a known state.
 Cucumber::Rails::World.use_transactional_fixtures = true
 
+Fixtures.reset_cache  
+fixtures_folder = File.join(RAILS_ROOT, 'spec', 'fixtures')
+fixtures = Dir[File.join(fixtures_folder, '*.yml')].map {|f| File.basename(f, '.yml') }
+Fixtures.create_fixtures(fixtures_folder, fixtures)
+
 class ActiveRecord::Base
   mattr_accessor :shared_connection
   @@shared_connection = nil

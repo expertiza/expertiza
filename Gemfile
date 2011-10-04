@@ -12,6 +12,7 @@ gem 'rubyzip', :require => 'zip/zip'
 
 group :development do
   gem 'mongrel'
+  gem 'ruby-debug'
 end
 
 group :test do

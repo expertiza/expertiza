@@ -33,9 +33,15 @@ namespace :deploy do
     run "ln -s #{shared_path}/pg_data #{current_path}"
     run "ln -sf #{shared_path}/database.yml #{current_path}/config/database.yml"
   end
+
+  desc "Install gems with bundler"
+  task :bundle_install do
+    run 'bundle install'
+  end
 end
 
 after "deploy:symlink", "deploy:symlink_shared"
+after "deploy:update", "deploy:bundle_install"
 
 desc "Load production data into the local development database."
 task :load_production_data, :roles => :db, :only => { :primary => true } do
@@ -58,10 +64,3 @@ task :load_production_data, :roles => :db, :only => { :primary => true } do
   logger.info 'Importing production database into local development database'
   system "gunzip -c #{filename} | mysql -u #{database['development']['username']} --password=#{database['development']['password']} #{database['development']['database']} && rm -f #{filename}"
 end
-
-# Hoptoad deploy tracking only works with paid hoptoad accounts
-#Dir[File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'hoptoad_notifier-*')].each do |vendored_notifier|
-#  $: << File.join(vendored_notifier, 'lib')
-#end
-#
-#require 'hoptoad_notifier/capistrano'

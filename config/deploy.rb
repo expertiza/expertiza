@@ -1,6 +1,7 @@
 set :application, "expertiza"
 set :repository,  "git://github.com/expertiza/expertiza.git"
 set :user, "rails"
+set :use_sudo, false
 
 set :scm, :git
 #set :git_enable_submodules, 1
@@ -36,7 +37,7 @@ namespace :deploy do
 
   desc "Install gems with bundler"
   task :bundle_install do
-    run 'bundle install'
+    run "cd #{release_path} && bundle install --deployment --without test development"
   end
 end
 

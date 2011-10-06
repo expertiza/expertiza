@@ -2,7 +2,7 @@
 <html>
 <head>
 <%#= hoptoad_javascript_notifier %>
-<link rel="stylesheet" type="text/css" href="/stylesheets/dddropdownpanel.css" />
+<link rel="stylesheet" type="text/css" href="/stylesheets/dddropdownpanel.css">
 
 
 <title><% if params[:controller] == 'content_pages' and
@@ -13,14 +13,14 @@
 <%= params[:controller] %> | <%= params[:action] %> 
 <% end -%></title>
 
-<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
 
 <link rel="stylesheet" href="/stylesheets/goldberg.css" 
-  type="text/css" media="screen" />
+  type="text/css" media="screen">
 <link rel="stylesheet" href="/stylesheets/layout.css" 
-  type="text/css" media="screen" />
+  type="text/css" media="screen">
 
-<link rel="stylesheet" href="/stylesheets/redbox.css" type="text/css" />
+<link rel="stylesheet" href="/stylesheets/redbox.css" type="text/css">
 
 <%= javascript_include_tag :defaults, 'jquery', 'redbox', 'suckerfish', 'actionmenu', 'tableactions', 'application', 'datetimepicker',
       'CalendarPopup', 'ajaxtabs', 'sorttable', 'shared', 'textareasizer' %>
@@ -32,7 +32,7 @@
 
 <SCRIPT LANGUAGE="JavaScript">
 	var cal = new CalendarPopup();
-	</SCRIPT>
+</SCRIPT>
 
 <% if defined?(RAILS_ROOT)
      if File.exists?("#{RAILS_ROOT}/public/stylesheets/ajax_scaffold.css") -%>
@@ -46,7 +46,7 @@
 
 <body>
 <div class="header">
-<img src="/images/logo.jpg"/>
+<img src="/images/logo.jpg">
 <h1><%= @settings.site_name %></h1>
 <h2><%= @settings.site_subtitle %></h2>
 </div>

@@ -1,3 +1,5 @@
+require 'bundler/capistrano'
+
 set :application, "expertiza"
 set :repository,  "git://github.com/expertiza/expertiza.git"
 set :user, "rails"
@@ -5,6 +7,8 @@ set :use_sudo, false
 
 set :scm, :git
 #set :git_enable_submodules, 1
+
+set :bundle_without,  [:development, :test]
 
 set :deploy_to, "/local/rails/expertiza"
 set :runner, "www-data"
@@ -34,15 +38,9 @@ namespace :deploy do
     run "ln -s #{shared_path}/pg_data #{current_path}"
     run "ln -sf #{shared_path}/database.yml #{current_path}/config/database.yml"
   end
-
-  desc "Install gems with bundler"
-  task :bundle_install do
-    run "cd #{release_path} && bundle install --deployment --without test development"
-  end
 end
 
 after "deploy:symlink", "deploy:symlink_shared"
-after "deploy:update", "deploy:bundle_install"
 
 desc "Load production data into the local development database."
 task :load_production_data, :roles => :db, :only => { :primary => true } do

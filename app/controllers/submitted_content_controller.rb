@@ -119,13 +119,12 @@ class SubmittedContentController < ApplicationController
       else
         if !File.directory?(folder_name + "/" + file_name)
           file_ext = File.extname(file_name)[1..-1]
+          file_ext = 'bin' if file_ext.blank? # default to application/octet-stream
           send_file folder_name + "/" + file_name,
                     :disposition => 'inline',
                     :type => Mime::Type.lookup_by_extension(file_ext)
         else
-           Net::SFTP.start("http://pg-server.csc.ncsu.edu", "*****", "****") do |sftp|
-              sftp.download!(folder_name + "/" + file_name, "C:/expertiza", :recursive => true)
-           end
+          raise "Directory downloads are not supported"
         end
       end 
   end  

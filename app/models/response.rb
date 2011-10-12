@@ -68,7 +68,9 @@ class Response < ActiveRecord::Base
     self.map.questionnaire.questions.each{
       | question |
       item = Score.find_by_response_id_and_question_id(self.id, question.id)
-      total_score += item.score      
+      if(item != nil)
+        total_score += item.score
+      end
     }    
     return total_score        
   end  

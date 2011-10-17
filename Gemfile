@@ -10,7 +10,7 @@ gem 'rails', '~> 2.3.14'
 gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rubyzip', :require => 'zip/zip'
-
+gem 'rdoc'
 group :development do
   gem 'mongrel'
   gem 'ruby-debug'

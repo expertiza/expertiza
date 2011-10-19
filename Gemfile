@@ -7,9 +7,10 @@ gem 'gdata', :require => false
 gem 'hoptoad_notifier'
 gem 'mysql'
 gem 'rails', '~> 2.3.14'
-gem 'RedCloth'
+gem 'RedCloth', '~> 4.2.7'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rubyzip', :require => 'zip/zip'
+gem 'rdoc'
 
 group :development do
   gem 'mongrel'

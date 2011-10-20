@@ -14,11 +14,7 @@ development:
   adapter: mysql
   database: pg_development
   username: root
-<<<<<<< HEAD
   password: root
-=======
-  password: password
->>>>>>> d6d7b8ec514c499c2440883e122082a395e319d3
   host: localhost
 
 # Warning: The database defined as 'test' will be erased and
@@ -28,18 +24,14 @@ test: &test
   adapter: mysql
   database: pg_test
   username: root
-<<<<<<< HEAD
   password: root
-=======
-  password: password
->>>>>>> d6d7b8ec514c499c2440883e122082a395e319d3
   host: localhost
 
 production:
   adapter: mysql
   database: pg_development
   username: root
-  password: password
+  password:
   host: localhost
 
 cucumber:

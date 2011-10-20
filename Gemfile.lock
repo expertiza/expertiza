@@ -110,7 +110,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  RedCloth
+  RedCloth (~> 4.2.7)
   capistrano
   capybara (= 0.3.9)
   cucumber (= 0.9.4)

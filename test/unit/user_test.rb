@@ -97,5 +97,19 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1, avail_users_like_student1.size
     assert_equal "student1", avail_users_like_student1.first.name
   end
+  
+  def test_emails_must_be_valid
+    u = User.new(:email => "new@guy.co", :name => 'newguy')
+    assert u.valid?, "Should be valid with a valid email"
+    
+    u.email = "not@valid"
+    assert !u.valid?, "Should not be valid with an invalid email"
+  end
+  
+  def test_emails_need_not_be_unique
+    used_email = users(:admin).email
+    u = User.new(:email => used_email, :name => 'newguy')
+    assert u.valid?, "User should be valid with a duplicate email"
+  end
 
 end

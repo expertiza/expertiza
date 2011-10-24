@@ -136,7 +136,7 @@ class ResponseController < ApplicationController
     get_content  
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
+    if (!User.find_by_name("jkidd").nil?) && (@assignment.instructor_id == User.find_by_name("jkidd").id) && (@title == "Review")
       if @assignment.id < 469
          @next_action = "custom_create"
          render :action => 'custom_response'

@@ -135,6 +135,7 @@ class ResponseController < ApplicationController
     @modified_object = @map.id
     get_content  
     #**********************
+    # ResponseController#new had error in the first condition of if statement. Was not checking for nil but retrieving id. Fixed now.
     # Check whether this is Jen's assgt. & if so, use her rubric
     if (!User.find_by_name("jkidd").nil?) && (@assignment.instructor_id == User.find_by_name("jkidd").id) && (@title == "Review")
       if @assignment.id < 469
@@ -150,6 +151,7 @@ class ResponseController < ApplicationController
     render :action => 'response'
     end
   end
+  
   
   def create     
     @map = ResponseMap.find(params[:id])

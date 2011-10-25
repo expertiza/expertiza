@@ -66,7 +66,7 @@ class User < ActiveRecord::Base
            :user => self,
            :password => clear_password, #FIXME
            :first_name => ApplicationHelper::get_user_first_name(self),
-           :partial_name => "user_welcome"
+           :partial_name => "user_welcome_html"
          }
         }
     )

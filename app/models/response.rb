@@ -2,6 +2,24 @@ class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
   
+  # Callbacks
+  after_save(:email_response) 
+  
+  
+  def email_response
+    user = User.find(self.map.reviewee_id)
+    Mailer.deliver_message(
+        {:recipients => user.email,
+         :subject => "Your work has been reviewed",
+         :body => {
+           :questionnaire => self.map.questionnaire,
+           :first_name => ApplicationHelper::get_user_first_name(user),
+           :partial_name => "reviewer_response"
+         }
+        }
+    )
+  end
+  
   def display_as_html(prefix = nil, count = nil, file_url = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying

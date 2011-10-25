@@ -37,7 +37,7 @@ class ResponseController < ApplicationController
     }
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
+    if (!User.find_by_name("jkidd").nil?) && (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
       if @assignment.id < 469
          @next_action = "custom_update"
          render :action => 'custom_response'
@@ -62,7 +62,10 @@ class ResponseController < ApplicationController
       @myid = @response.id
       @map = @response.map
       @response.update_attribute('additional_comment',params[:review][:comments])
-      
+      # This is a hack to allow the before save callback which sends notification
+      # This is done since, update_attribute method skips callbacks 
+      @response.updated_at = DateTime.now
+      @response.save
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions
 
@@ -78,7 +81,6 @@ class ResponseController < ApplicationController
     begin
        ResponseHelper.compare_scores(@response, @questionnaire)
        ScoreCache.update_cache(@response.id)
-    
       msg = "Your response was successfully saved."
     rescue
       msg = "An error occurred while saving the response: "+$!

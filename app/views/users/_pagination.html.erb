@@ -1,0 +1,15 @@
+<div style="float: left;">
+
+  <% form_tag :controller => 'users', :action => 'list', :letter => session[:letter], :paginate_show => '1' do %>
+
+    Users per page:
+    <%= select_tag :num_users, options_for_select([['25', 1], ['50', 2], ['100', 3], ['all', 4]], Integer(@per_page)) %>
+    <%= submit_tag"Show" %>
+
+  <% end %>
+</div>
+<div style="float: left; display: inline-block;">
+  <%= will_paginate @users, :inner_window => 1, :outer_window => 1, :params => {:letter => session[:letter], :num_users => @per_page}%>
+</div>
+
+<div style="clear: both;"></div>

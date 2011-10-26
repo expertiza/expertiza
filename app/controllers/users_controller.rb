@@ -37,7 +37,24 @@ class UsersController < ApplicationController
     end 
     logger.info "#{letter}"
     @letters = Array.new
-    @users = User.paginate(:page => params[:page], :order => 'name', :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter])
+
+    # Check if the "Show" button for pagination is clicked
+    # If yes, set @per_page to the value of the selection dropdown
+    # Else, if the request is from one of the letter links on the top
+    # set @per_page to 1 (25 names per page).
+    # Else, set @per_page to the :num_users param passed in from
+    # the will_paginate method from the 'pagination' partial.
+    if params[:paginate_show]
+      @per_page = params[:num_users]
+    elsif params[:from_letter]
+      @per_page = 1
+    else
+      @per_page = params[:num_users]
+    end
+
+    # Get the users list to show on current page
+    @users = paginate_list(role, user.id, letter)
+
     all_users.each {
        | userObj |
        first = userObj.name[0,1].downcase
@@ -46,7 +63,7 @@ class UsersController < ApplicationController
        end
     }
   end
-  
+
   def show_selection
     @user = User.find_by_name(params[:user][:name])
     if @user != nil
@@ -157,4 +174,19 @@ class UsersController < ApplicationController
     end
   end
 
+  def paginate_list(role, user_id, letter)
+    paginate_options = {"1" => 25, "2" => 50, "3" => 100}
+
+    # If the above hash does not have a value for the key,
+    # it means that we need to show all the users on the page
+    #
+    # Just a point to remember, when we use pagination, the
+    # 'users' variable should be an object, not an array
+    if (paginate_options["#{@per_page}"].nil?)
+      users = User.paginate(:page => params[:page], :order => 'name', :per_page => User.count(:all), :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user_id, letter])
+    else
+      users = User.paginate(:page => params[:page], :order => 'name', :per_page => paginate_options["#{@per_page}"], :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user_id, letter])
+    end
+    users
+  end
 end

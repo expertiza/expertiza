@@ -74,5 +74,41 @@ class Team < ActiveRecord::Base
    create(:name => name, :parent_id => parent_id)
    parent = Object.const_get(self.get_parent_model).find(parent_id)
    Object.const_get(self.get_node_type).create(:parent_id => parent.id, :node_object_id => self.id)
- end 
+ end
+
+ def self.check_for_existing(parent, name)
+   list = Object.const_get(session[:team_type]+'Team').find(:all, :conditions => ['parent_id = ? and name = ?', parent.id, name])
+   if list.length > 0
+     raise TeamExistsError, 'Team name, "' + name + '", is already in use.'
+   end
+ end
+
+  def self.randomize_all_by_parent(parent)
+    participants = Participant.find(:all, :conditions => ["parent_id = ?", parent.id])
+    participants = participants.sort{rand(3) - 1}
+
+    no_of_teams = participants.length.fdiv(parent.team_count).ceil
+    nextTeamMemberIndex = 0
+
+    for i in 1..no_of_teams
+      begin
+        Team.check_for_existing(parent, "Team #{i}")
+      rescue TeamExistsError
+        team = Team.find_by_name("Team #{i}")
+        team.delete
+      end
+
+      team = Object.const_get(session[:team_type] + 'Team').create(:name => "Team #{i}", :parent_id => parent.id)
+      TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
+
+      parent.team_count.times do
+        break if nextTeamMemberIndex >= participants.length
+
+        user = User.find_by_id(participants[nextTeamMemberIndex].user_id)
+        team.add_member(user)
+
+        nextTeamMemberIndex += 1
+      end
+    end
+  end
 end

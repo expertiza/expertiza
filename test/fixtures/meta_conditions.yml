@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  data_name: MyString
+  condition: MyString
+  comparison_value: MyString
+
+two:
+  data_name: MyString
+  condition: MyString
+  comparison_value: MyString

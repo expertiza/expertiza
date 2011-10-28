@@ -34,7 +34,7 @@ class UsersController < ApplicationController
     session[:letter] = letter
     if letter == nil
       letter = all_users.first.name[0,1].downcase
-    end 
+    end
     logger.info "#{letter}"
     @letters = Array.new
 
@@ -182,10 +182,23 @@ class UsersController < ApplicationController
     #
     # Just a point to remember, when we use pagination, the
     # 'users' variable should be an object, not an array
+    condition = "(role_id in (?) or id = ?) and name like ?"
+    search_filter = letter + '%'
+    if params[:search_by] == '1'  #search by user name
+      condition = "(role_id in (?) or id = ?) and name like ?"
+      search_filter = '%' + letter + '%'
+    elsif params[:search_by] == '2' # search by full name
+      condition = "(role_id in (?) or id = ?) and fullname like ?"
+      search_filter = '%' + letter + '%'
+    elsif params[:search_by] == '3' # search by email
+      condition = "(role_id in (?) or id = ?) and email like ?"
+      search_filter = '%' + letter + '%'
+    end
+
     if (paginate_options["#{@per_page}"].nil?)
-      users = User.paginate(:page => params[:page], :order => 'name', :per_page => User.count(:all), :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user_id, letter])
+      users = User.paginate(:page => params[:page], :order => 'name', :per_page => User.count(:all), :conditions => [condition, role.get_available_roles, user_id, search_filter])
     else
-      users = User.paginate(:page => params[:page], :order => 'name', :per_page => paginate_options["#{@per_page}"], :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user_id, letter])
+      users = User.paginate(:page => params[:page], :order => 'name', :per_page => paginate_options["#{@per_page}"], :conditions => [condition, role.get_available_roles, user_id, search_filter])
     end
     users
   end

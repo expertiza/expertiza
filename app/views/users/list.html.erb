@@ -2,14 +2,19 @@
 
 <br/>
 <% form_tag :action => 'show_selection' do %>
-Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
 <input type='submit' value='Edit'/>
+<% end %>
+
+<% form_tag :action => 'list', :paginate_show => '1',:num_users => @per_page do %>
+    Search users: <%= text_field_tag(:letter,params[:letter]) %>
+    <%= select_tag(:search_by, options_for_select([['Username', 1], ['Full name', 2],['Email',3]])) %>
+    <%= submit_tag("Search") %>
 <% end %>
   
 <div>
   <%= render :partial => 'shared_scripts/letters' %>
 </div>
-
 
 <%= render :partial => 'users/pagination' %>
 
@@ -21,16 +26,16 @@ Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} 
 <% for user in @users %>
   <tr class= "exp">
     <td ><%= link_to user.name, :action => 'show',
-	    :id => user.id %></td>
+:id => user.id %></td>
     <td ><%= user.fullname %></td>
     <td ><%= user.email %></td>
     <td ><%= link_to user.role.name, :controller => 'roles',
             :action => 'show', :id => user.role.id %></td>
-    <td  align="center"><%= (User.find_by_id(user.parent_id)).name %></td>
+    <td align="center"><%= (User.find_by_id(user.parent_id)).name %></td>
     <td ><%= User.yesorno(user.email_on_review) %></td>
     <td ><%= User.yesorno(user.email_on_submission) %></td>
     <td ><%= User.yesorno(user.email_on_review_of_review) %></td>
-	<td ><%= User.yesorno(user.leaderboard_privacy) %></td>
+<td ><%= User.yesorno(user.leaderboard_privacy) %></td>
   </tr>
 <% end -%>
 </table>
@@ -43,11 +48,10 @@ Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} 
 <%= render :partial => 'shared_scripts/letters' %>
 
 <p>
-<% 
-  session[:return_to] = request.request_uri  
+<%
+  session[:return_to] = request.request_uri
 %>
 
 <%= link_to 'New User', :action => 'new' %> |
 <%= link_to 'Import Users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username, full name (first[ middle] last), e-mail address, password' %>
 </p>
-

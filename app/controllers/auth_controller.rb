@@ -1,6 +1,6 @@
 class AuthController < ApplicationController
   helper :auth
-  before_filter :authorize, :except => :login
+  before_filter :authorize, :except =>[:login,:review_redirect]
   
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :login, :logout ],
@@ -16,7 +16,9 @@ class AuthController < ApplicationController
         logger.info "User #{params[:login][:name]} successfully logged in"
         session[:user] = user
         AuthController.set_current_role(user.role_id,session)
-        
+        if session[:redirect_link]!=nil
+           redirect_to session[:redirect_link]
+          end
         respond_to do |wants|          
           wants.html do
             ## This line must be modified to read as shown at left when a new version of Goldberg is installed!
@@ -41,6 +43,19 @@ class AuthController < ApplicationController
       end
     end
   end  # def login
+
+  def review_redirect
+
+    link='http://localhost:3000/tree_display/list'
+    session[:redirect_link]=link #'http://localhost:3000/tree_display/list'#params[:redirect_link]
+    if !session[:user]
+      redirect '/'
+    else
+      session[:redirect_link]=nil;
+      redirect_to link #'http://localhost:3000/tree_display/list'#params[:redirect_link]
+    end
+  end
+
  
   def login_failed
     flash.now[:error] = "Incorrect Name/Password"

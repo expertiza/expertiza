@@ -38,6 +38,8 @@ class UsersController < ApplicationController
     logger.info "#{letter}"
     @letters = Array.new
 
+    @per_page = 1
+
     # Check if the "Show" button for pagination is clicked
     # If yes, set @per_page to the value of the selection dropdown
     # Else, if the request is from one of the letter links on the top

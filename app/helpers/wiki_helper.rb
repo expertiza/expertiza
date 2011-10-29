@@ -193,6 +193,7 @@ module WikiHelper
     response = '' #the response from the URL
 
     #Check to make sure we were passed a valid URL
+    puts _assignment_url
     matches = /http:/.match( _assignment_url )
     if not matches
       return response
@@ -206,10 +207,8 @@ module WikiHelper
     _wiki_user.gsub!(" ","+")
 
     #Media Wiki Specific
-    review = "index.php?title=Special:Contributions&target=" + _wiki_user+"&offset=0&limit=1000"
-
+    review = "index.php?limit=1000&tagFilter=&title=Special%3AContributions&contribs=user&target=" + _wiki_user+"&namespace=&year=&month=-1"
     #Grab this user's contributions
-    
     url = wiki_url[0].to_s + review
     @urlin = url
     open(url, 
@@ -231,16 +230,22 @@ module WikiHelper
     # <!-- end content -->
     # 
     #Get everything between the words "wikipage"
-    changes = response.split(/<!-- start content -->/) 
-    changes2 = changes[1].split(/<!-- end content -->/)
-    response = changes2[0]
 
+    #changes = response.split(/<!-- start content -->/)
+    #changes2 = changes[1].split(/<!-- end content -->/)
+    #response = changes2[0]
+    is_link_present = response.scan(/No changes were found matching these criteria/)
+    if(is_link_present[0].nil? == false)
+      return ""
+    end
     #Extract each line item
-    line_items = response.scan(/<li>.*<\/li>/)
-
+    line_items = response.scan(/<li class=""><a href=".*?>/)
+    latest_title = line_items[0].scan(/".*?"/)
+    latest_title[2] = latest_title[2].gsub(/"/,'')
+    latest_url = line_items[0].gsub(/&amp.*?"/,'"') + latest_title[2] +'</a></li>'
     #Extract the dates only
-    dates = response.scan(/\d\d:\d\d, \d+ \w+ \d\d\d\d/)
-
+    dates = line_items[0].scan(/\d\d:\d\d, \d+ \w+ \d\d\d\d/)
+    return latest_url
     #if start date provided we only want date line items since start date
     if _start_date
         

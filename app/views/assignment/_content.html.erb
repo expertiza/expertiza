@@ -92,6 +92,7 @@ function onChangeWikiType(){
       </select>
     <% end %>
   </td>
+
 </tr>
 <tr>
   <td><label for="team_assignment">Team assignment:</label></td>
@@ -126,6 +127,11 @@ function onChangeWikiType(){
 </table></td>
 </tr>
 </table>
+<tr id="max_topic_count" style="display:none">  
+  <td valign="top" width="250" height="50"><label for="max_topic_count">Maximum number of topics user can choose:</label></td>   
+  <td valign="top"><%= text_field 'assignment','max_topic_count', :size => 5%></td>  
+  </td> 
+</tr>
 
 <p>
 </p>

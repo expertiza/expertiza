@@ -304,10 +304,36 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "menu_items", ["controller_action_id"], :name => "fk_menu_item_controller_action_id"
   add_index "menu_items", ["parent_id"], :name => "fk_menu_item_parent_id"
 
+  create_table "meta_conditions", :force => true do |t|
+    t.integer  "notification_id"
+    t.string   "data_name"
+    t.string   "condition"
+    t.string   "comparison_value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "nodes", :force => true do |t|
     t.integer "parent_id"
     t.integer "node_object_id"
     t.string  "type"
+  end
+
+  create_table "notification_messages", :force => true do |t|
+    t.string   "subject"
+    t.string   "body"
+    t.string   "variables"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "notifications", :force => true do |t|
+    t.string   "description"
+    t.string   "base_data_type"
+    t.string   "relationship"
+    t.integer  "notification_message_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "participants", :force => true do |t|
@@ -326,6 +352,8 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.integer  "topic_id"
     t.datetime "time_stamp"
     t.text     "digital_signature"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
@@ -370,11 +398,13 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
   create_table "response_maps", :force => true do |t|
-    t.integer "reviewed_object_id",    :default => 0,     :null => false
-    t.integer "reviewer_id",           :default => 0,     :null => false
-    t.integer "reviewee_id",           :default => 0,     :null => false
-    t.string  "type",                  :default => "",    :null => false
-    t.boolean "notification_accepted", :default => false
+    t.integer  "reviewed_object_id",    :default => 0,     :null => false
+    t.integer  "reviewer_id",           :default => 0,     :null => false
+    t.integer  "reviewee_id",           :default => 0,     :null => false
+    t.string   "type",                  :default => "",    :null => false
+    t.boolean  "notification_accepted", :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"
@@ -454,10 +484,12 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"
 
   create_table "signed_up_users", :force => true do |t|
-    t.integer "topic_id",                   :default => 0,     :null => false
-    t.integer "creator_id",                 :default => 0,     :null => false
-    t.boolean "is_waitlisted",              :default => false, :null => false
-    t.integer "preference_priority_number"
+    t.integer  "topic_id",                   :default => 0,     :null => false
+    t.integer  "creator_id",                 :default => 0,     :null => false
+    t.boolean  "is_waitlisted",              :default => false, :null => false
+    t.integer  "preference_priority_number"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "signed_up_users", ["topic_id"], :name => "fk_signed_up_users_sign_up_topics"

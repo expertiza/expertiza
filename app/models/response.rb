@@ -8,7 +8,7 @@ class Response < ActiveRecord::Base
   
   def email_response
     user = User.find(self.map.reviewee_id)
-    Mailer.deliver_message(
+    Mailer.deliver_message (
         {:recipients => user.email,
          :subject => "Your work has been reviewed",
          :body => {

@@ -19,7 +19,7 @@ class ReviewMappingController < ApplicationController
     @contributor = assignment.get_contributor(params[:contributor_id])
     session[:contributor] = @contributor
   end
-  
+    
   def select_metareviewer
     @mapping = ResponseMap.find(params[:id])    
   end  

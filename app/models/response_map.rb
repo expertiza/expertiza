@@ -4,6 +4,24 @@ class ResponseMap < ActiveRecord::Base
   has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id'
   has_many :metareview_responses, :source => :responses, :finder_sql => 'SELECT meta.* FROM responses r, response_maps meta, response_maps rev WHERE r.map_id = m.id AND m.type = \'MetaeviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
 
+  # Callbacks
+  after_create(:email_reviewer)   
+  
+  
+  def email_reviewer
+    assignment = Assignment.find(:first, [:conditions => "id = #{self.reviewed_object_id}"])
+    Mailer.deliver_message (
+        {:recipients => self.reviewer.user.email,
+         :subject => "You have been added as a reviewer.",
+         :body => {
+           :first_name => ApplicationHelper::get_user_first_name(self.reviewer.user),
+           :assignment => assignment,
+           :partial_name => "reviewer_added"
+         }
+        }
+    )
+  end
+  
   def self.get_assessments_for(participant)
     responses = Array.new   
     

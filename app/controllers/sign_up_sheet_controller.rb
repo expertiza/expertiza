@@ -275,7 +275,6 @@ class SignUpSheetController < ApplicationController
           ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
           first_waitlisted_user.is_waitlisted = false
           first_waitlisted_user.save
-  
           #update the participants details
           if assignment.team_assignment?
             user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
@@ -284,7 +283,17 @@ class SignUpSheetController < ApplicationController
             participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
           end
           participant.update_topic_id(topic_id)
-  
+          # Send email to the user, informing she's been removed from the waitlist
+          Mailer.deliver_message (
+              {:recipients => participant.user.email,
+               :subject => "You have been removed from the waitlist and assigned a topic",
+               :body => {
+                 :first_name => ApplicationHelper::get_user_first_name(participant.user),
+                 :assignment => assignment,
+                 :partial_name => "assignment_slot_alloted"
+               }
+              }
+          )
           SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
         end
       end

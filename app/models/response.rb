@@ -3,11 +3,10 @@ class Response < ActiveRecord::Base
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
   
   # Callbacks
-  #after_save(:email_response) 
-  
+  after_save(:email_response) 
   
   def email_response
-    user = User.find(self.map.reviewee_id)
+    user = self.map.reviewee.user
     Mailer.deliver_message (
         {:recipients => user.email,
          :subject => "Your work has been reviewed",

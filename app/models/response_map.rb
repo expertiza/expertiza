@@ -1,12 +1,12 @@
 class ResponseMap < ActiveRecord::Base
   belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id'
+  belongs_to :reviewee, :class_name => 'Participant', :foreign_key => 'reviewee_id'
   has_one :response, :class_name => 'Response', :foreign_key => 'map_id'
   has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id'
   has_many :metareview_responses, :source => :responses, :finder_sql => 'SELECT meta.* FROM responses r, response_maps meta, response_maps rev WHERE r.map_id = m.id AND m.type = \'MetaeviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
 
   # Callbacks
   after_create(:email_reviewer)   
-  
   
   def email_reviewer
     assignment = Assignment.find(:first, [:conditions => "id = #{self.reviewed_object_id}"])

@@ -393,7 +393,6 @@ class Assignment < ActiveRecord::Base
   # Generate emails for reviewers when new content is available for review
   #ajbudlon, sept 07, 2007   
   def email(author_id) 
-  
     # Get all review mappings for this assignment & author
     participant = AssignmentParticipant.find(author_id)
     if team_assignment
@@ -401,9 +400,7 @@ class Assignment < ActiveRecord::Base
     else
       author = participant
     end
-    
     for mapping in author.review_mappings
-
        # If the reviewer has requested an e-mail deliver a notification
        # that includes the assignment, and which item has been updated.
        if mapping.reviewer.user.email_on_submission

@@ -25,12 +25,16 @@ class SubmittedContentController < ApplicationController
   def submit_hyperlink
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
-
     begin
       participant.submmit_hyperlink(params['submission'])
+      # send message to reviewers when submission has been updated
+      # If the user has no team: 
+      # 1) there are no reviewers to notify; 
+      # 2) calling email will throw an exception. So rescue and ignore it.
+      participant.assignment.email(participant.id) rescue nil
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
-    end    
+    end
     redirect_to :action => 'edit', :id => participant.id
   end    
 
@@ -50,23 +54,17 @@ class SubmittedContentController < ApplicationController
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
-
     file = params[:uploaded_file]
     participant.set_student_directory_num
-
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     if params[:current_folder]
       @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end           
-           
     curr_directory = participant.get_path.to_s+@current_folder.name
-    
-
     if !File.exists? curr_directory
        FileUtils.mkdir_p(curr_directory)
     end
-   
     safe_filename = file.original_filename.gsub(/\\/,"/")
     safe_filename = FileHelper::sanitize_filename(safe_filename) # new code to sanitize file path before upload*
     full_filename =  curr_directory + File.split(safe_filename).last.gsub(" ",'_') #safe_filename #curr_directory +
@@ -75,13 +73,13 @@ class SubmittedContentController < ApplicationController
       SubmittedContentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
     participant.update_resubmit_times       
-
     #send message to reviewers when submission has been updated
-    participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
-
+    # If the user has no team: 
+    # 1) there are no reviewers to notify; 
+    # 2) calling email will throw an exception. So rescue and ignore it.
+    participant.assignment.email(participant.id) rescue nil 
     redirect_to :action => 'edit', :id => participant.id
   end
-  
   
   def folder_action
     @participant = AssignmentParticipant.find(params[:id])

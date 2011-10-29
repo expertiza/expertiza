@@ -6,7 +6,6 @@ class ResponseController < ApplicationController
   def view
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
-
     @map = @response.map
     get_content
   end

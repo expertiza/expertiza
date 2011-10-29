@@ -71,7 +71,7 @@ class AssignmentParticipant < Participant
     url = URI.parse(hyperlink)
 
     # If not a valid URL, it will throw an exception
-    Net::HTTP.start(url.host, url.port)
+    # Net::HTTP.start(url.host, url.port)
 
     hyperlinks = get_hyperlinks_array
 
@@ -79,7 +79,9 @@ class AssignmentParticipant < Participant
     self.submitted_hyperlinks = YAML::dump(hyperlinks)
 
     self.save
+    
   end
+  
 
   # Note: This method is not used yet. It is here in the case it will be needed.
   # @exception  If the index does not exist in the array
@@ -359,7 +361,7 @@ class AssignmentParticipant < Participant
             | member |
             if member.directory_num == nil or member.directory_num < 0
               member.directory_num = self.directory_num
-              member.save
+              member.save 
             end
         }
       end

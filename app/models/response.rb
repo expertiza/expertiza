@@ -227,63 +227,55 @@ end
   code = code + "</ul></td>"
 
   code = code + "<td><ul>"
-  if review_scores[50].comments == "1"
-    code = code + "<li>Is relevant to future teachers</li>"
-  end
-  if review_scores[51].comments == "1"
-    code = code + "<li>Is mostly based on researched information</li>"
-  end
-  if review_scores[52].comments == "1"
-    code = code + "<li>Is applicable to today's schools</li>"
-  end
-  if review_scores[53].comments == "1"
-    code = code + "<li>Provides a good overview and explores a few key ideas</li>"
-  end
+
+for i in 50..53
+if review_scores[i].comments == "1"
+ code = code + "<img src=\"/images/Check-icon.png\">"
+else 
+ code = code + "<img src=\"/images/delete_icon.png\">"
+ end
+end
+
+
+
+
   code = code + "</ul></td>"
 
   code = code + "<td><ul>"
-  if review_scores[54].comments == "1"
-    code = code + "<li>Has useful points but some irrelevant information</li>"
-  end
-  if review_scores[55].comments == "1"
-    code = code + "<li>Is half research; half the author's opinion</li>"
-  end
-  if review_scores[56].comments == "1"
-    code = code + "<li>Is partially out-dated or may not reflect current practice</li>"
-  end
-  if review_scores[57].comments == "1"
-    code = code + "<li>Contains good information but yields an incomplete understanding</li>"
-  end
+
+for i in 54..57
+if review_scores[i].comments == "1"
+ code = code + "<img src=\"/images/Check-icon.png\">"
+else 
+ code = code + "<img src=\"/images/delete_icon.png\">"
+ end
+end
+
   code = code + "</ul></td>"
 
   code = code + "<td><ul>"
-  if review_scores[58].comments == "1"
-    code = code + "<li>Has one useful point</li>"
-  end
-  if review_scores[59].comments == "1"
-    code = code + "<li>Is mostly the author's opinion.</li>"
-  end
-  if review_scores[60].comments == "1"
-    code = code + "<li>Is mostly irrelevant in today's schools</li>"
-  end
-  if review_scores[61].comments == "1"
-    code = code + "<li>Focused on unimportant subtopics OR is overly general</li>"
-  end
+
+for i in 58..61
+if review_scores[i].comments == "1"
+ code = code + "<img src=\"/images/Check-icon.png\">"
+else 
+ code = code + "<img src=\"/images/delete_icon.png\">"
+ end
+end
+
   code = code + "</ul></td>"
 
-  code = code + "<td><ul>"  
-  if review_scores[62].comments == "1"
-    code = code + "<li>Is not relevant to future teachers</li>"
-  end
-  if review_scores[63].comments == "1"
-    code = code + "<li>Is entirely the author's opinion</li>"
-  end
-  if review_scores[64].comments == "1"
-    code = code + "<li>Is obsolete</li>"
-  end
-  if review_scores[65].comments == "1"
-    code = code + "<li>Lacks any substantive information</li>"
-  end
+  code = code + "<td><ul>" 
+
+
+for i in 62..65
+if review_scores[i].comments == "1"
+ code = code + "<img src=\"/images/Check-icon.png\">"
+else 
+ code = code + "<img src=\"/images/delete_icon.png\">"
+ end
+end
+
   code = code + "</ul></td></tr>"
 
   code = code + "</table>"

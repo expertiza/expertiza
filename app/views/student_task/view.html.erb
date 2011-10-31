@@ -34,28 +34,27 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 	<li><%= link_to "Your scores",{:controller => 'grades', :action => 'view_my_scores', :id => @participant.id} %> (View feedback on your work)</li>
     <%if @can_provide_suggestions == true %>
 	<li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
-	<!-- begin E3-B-->
-	<% if false %>
-	<%  
-		@temp= Suggestion.find_all_by_unityID(session[:user].name) 
-	%>
-	<% 
-		if @temp.size != 0
-	%>
+<!-- begin E3-B-->
+	
+	<%  @temp= Suggestion.find_all_by_unityID(session[:user].name) %>
+	<% if @temp.size != 0 %>
 	<li>
-	<%= 
-		link_to "View your suggestions",{:controller => 'suggestion', :action => 'view_suggestion',:id => @assignment.id} 
-	%>
+	<%=link_to "View your suggestions",{:controller => 'suggestion', :action => 'view_suggestion',:id => @assignment.id} %>
 	</li>
 	<%end%>
-	<% end %>
+	
 <!-- end E3-B-->
+
+
+
 <!-- begin A -->
+<% if false %>
 		<% @user = User.find(session[:user]) 
 			@suggestions = Suggestion.find(:all, :conditions => "assignment_id = #{@assignment.id} and unityid = '#{@user.name}'")
 		   if not @suggestions.nil? %>
 			  <li><%= link_to "View your suggestions",{:controller => 'suggestion', :action => 'view_comments', :id => @assignment.id} %></li>
 		<% end %>
+<% end %>
 <!-- end A -->
 	<% end %>
 

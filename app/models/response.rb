@@ -387,12 +387,10 @@ end
   if review_scores[90].comments == "1"
     code = code + "<li>No well-supported points</li>"
   end
+  
   code = code + "</ul></td></tr>"
-
   code = code + "</table>"
-
   code = code + "<h3>Credibility</h3>"
-
   code = code +
            "<div align=\"center\">To demonstrate its credibility the lesson:</div><table class='general'>
             <tr>
@@ -416,7 +414,6 @@ end
   end
 
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
   if review_scores[94].comments == "1"
     code = code + "<li>Cites 5 or more diverse, reputable sources with few APA errors</li>"
@@ -429,7 +426,6 @@ end
   end
 
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
   if review_scores[97].comments == "1"
     code = code + "<li>Cites 5 or more reputable sources</li>"
@@ -442,7 +438,6 @@ end
   end
 
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
   if review_scores[100].comments == "1"
     code = code + "<li>Cites 4 or more reputable sources</li>"
@@ -455,7 +450,6 @@ end
   end
 
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
   if review_scores[103].comments == "1"
     code = code + "<li>Cites 3 or fewer reputable sources</li>"
@@ -468,11 +462,8 @@ end
   end
 
   code = code + "</ul></td></tr>"
-
   code = code + "</table>"
-
   code = code + "<h3>Pedagogy</h3>"
-
   code = code +
            "<div align=\"center\">To help guide the reader:</div><table class='general'>
             <tr>
@@ -496,7 +487,6 @@ end
   end
 
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
   if review_scores[109].comments == "1"
     code = code + "<li>Specific and reasonable learning targets are stated</li>"
@@ -509,9 +499,9 @@ end
   end
 
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
-  if review_scores[112].comments == "1"
+  
+ if review_scores[112].comments == "1"
     code = code + "<li>Reasonable learning targets are stated</li>"
   end
   if review_scores[113].comments == "1"
@@ -522,9 +512,9 @@ end
   end
 
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
-  if review_scores[115].comments == "1"
+  
+if review_scores[115].comments == "1"
     code = code + "<li>A learning target is included</li>"
   end
   if review_scores[116].comments == "1"
@@ -535,7 +525,6 @@ end
   end
 
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
   if review_scores[118].comments == "1"
     code = code + "<li>Learning target is missing/ not actually a learning target</li>"
@@ -548,7 +537,6 @@ end
   end
 
   code = code + "</ul></td></tr>"
-
   code = code + "</table>"
   code = code + "<h3>Writing Quality</h3>"
 

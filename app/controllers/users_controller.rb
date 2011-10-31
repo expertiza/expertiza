@@ -186,13 +186,14 @@ class UsersController < ApplicationController
     # 'users' variable should be an object, not an array
     condition = "(role_id in (?) or id = ?) and name like ?"
     search_filter = letter + '%'
-    if params[:search_by] == '1'  #search by user name
+    @search_by = params[:search_by]
+    if @search_by == '1'  #search by user name
       condition = "(role_id in (?) or id = ?) and name like ?"
       search_filter = '%' + letter + '%'
-    elsif params[:search_by] == '2' # search by full name
+    elsif @search_by == '2' # search by full name
       condition = "(role_id in (?) or id = ?) and fullname like ?"
       search_filter = '%' + letter + '%'
-    elsif params[:search_by] == '3' # search by email
+    elsif @search_by == '3' # search by email
       condition = "(role_id in (?) or id = ?) and email like ?"
       search_filter = '%' + letter + '%'
     end

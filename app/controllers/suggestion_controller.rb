@@ -320,18 +320,12 @@ end
       approve_suggestion
     elsif !params[:reject_suggestion].nil?
       reject_suggestion
-      # begin E3-B
-      # HEAD
-      # elsif !params[:defer_suggestion].nil? # added this to support new status defered
-      # defer_suggestion
-      # elsif !params[:initiate_suggestion].nil?
-      # initiate_suggestion
-      # end E3-B
+    elsif !params[:defer_suggestion].nil? # added this to support new status defered
+      defer_suggestion
+    elsif !params[:initiate_suggestion].nil?
+      initiate_suggestion
     elsif !params[:edit_suggestion].nil?
       edit_suggestion
-      # begin A
-      # c01f33e... E3: Team: OSS project_Team1
-      # end A
     end
   end
   
@@ -387,10 +381,7 @@ end
     redirect_to :action => 'show', :id => @suggestion
   end
   
-=begin
-# begin E3-B
-# HEAD
-   # this method gets called when the instructor clicks on Defer Suggestion button
+  # this method gets called when the instructor clicks on Defer Suggestion button
   def defer_suggestion
     @suggestion = Suggestion.find(params[:id])
     
@@ -522,5 +513,4 @@ end
               "unityID = '#{session[:user].name}' and status not in ('Approved', 'Rejected') and assignment_id = #{params[:id]}")
   end
   
-# end A c01f33e... E3: Team: OSS project_Team1
 end

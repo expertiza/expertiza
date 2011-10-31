@@ -90,4 +90,20 @@ class UsersControllerTest < ActionController::TestCase
     user = User.find(users(:student1).id)
     assert_not_nil user.digital_certificate
   end
+
+  def test_should_get_data_and_index
+    get :list, :letter => 's', :page => 2, :num_users => 1
+
+    assert_response :success
+    assert assigns(:users)
+    assert_select 'div.pagination', true
+  end
+
+  def test_should_not_show_pagination_links_if_all_users_are_shown
+    get :list, :letter => 's', :num_users => 4
+
+    assert_response :success
+    assert assigns(:users)
+    assert_select 'div.pagination', false
+  end
 end

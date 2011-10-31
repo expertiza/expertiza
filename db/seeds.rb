@@ -58,7 +58,7 @@ SiteController.create(:name => 'eula', :builtin => false, :permission_id => Perm
 SiteController.create(:name => 'student_review', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
 SiteController.create(:name => 'publishing', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
 SiteController.create(:name => 'export_file', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
-SiteController.create(:name => 'resonse', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
+SiteController.create(:name => 'response', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
 SiteController.create(:name => 'sign_up_sheet', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'suggestion', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'leaderboard', :builtin => false, :permission_id => Permission.find_by_name('public actions - execute').id)
@@ -266,7 +266,7 @@ SystemSettings.create(:site_name => 'Expertiza',
 
 ###### users
 # Default administrator
-User.create!(:name => 'admin', 
+User.create!(:name => 'admin',
              :email => 'anything@mailinator.com',
              :clear_password => 'admin',
              :clear_password_confirmation => 'admin',
@@ -279,6 +279,7 @@ User.create!(:name => 'admin',
 tu = User.find_by_name('admin')
 tu.parent_id = tu.id
 tu.save!
+
 
 ###########################################################################
 # Display tables
@@ -328,3 +329,135 @@ end
 ###### extra stuff
 # Rebuild the role cache.
 Role.rebuild_cache
+
+###########################################################################
+# Creating Class Environment
+###########################################################################
+
+# Instructor
+User.create!(:name => 'instructor1',
+             :email => 'instructor1@mailinator.com',
+             :clear_password => 'password',
+             :clear_password_confirmation => 'password',
+             :role_id => Role.find_by_name('Instructor').id,
+             :email_on_review => true,
+             :email_on_submission => true,
+             :email_on_review_of_review => true,
+             :is_new_user => false,
+             :master_permission_granted => false)
+tu = User.find_by_name('instructor1')
+tu.parent_id = User.find_by_name('admin').id
+tu.save!
+
+# TA1
+User.create!(:name => 'ta1',
+             :email => 'ta1@mailinator.com',
+             :clear_password => 'password',
+             :clear_password_confirmation => 'password',
+             :role_id => Role.find_by_name('Teaching Assistant').id,
+             :email_on_review => true,
+             :email_on_submission => true,
+             :email_on_review_of_review => true,
+             :is_new_user => false,
+             :master_permission_granted => false)
+tu = User.find_by_name('ta1')
+tu.parent_id = User.find_by_name('instructor1').id
+tu.save!
+
+# Student1
+User.create!(:name => 'student1',
+             :email => 'student1@mailinator.com',
+             :clear_password => 'password',
+             :clear_password_confirmation => 'password',
+             :role_id => Role.find_by_name('Student').id,
+             :email_on_review => true,
+             :email_on_submission => true,
+             :email_on_review_of_review => true,
+             :is_new_user => false,
+             :master_permission_granted => false)
+tu = User.find_by_name('student1')
+tu.parent_id = User.find_by_name('ta1').id
+tu.save!
+
+# Student2
+User.create!(:name => 'student2',
+             :email => 'student2@mailinator.com',
+             :clear_password => 'password',
+             :clear_password_confirmation => 'password',
+             :role_id => Role.find_by_name('Student').id,
+             :email_on_review => true,
+             :email_on_submission => true,
+             :email_on_review_of_review => true,
+             :is_new_user => false,
+             :master_permission_granted => false)
+tu = User.find_by_name('student2')
+tu.parent_id = User.find_by_name('ta1').id
+tu.save!
+
+# Student3
+User.create!(:name => 'student3',
+             :email => 'student3@mailinator.com',
+             :clear_password => 'password',
+             :clear_password_confirmation => 'password',
+             :role_id => Role.find_by_name('Student').id,
+             :email_on_review => true,
+             :email_on_submission => true,
+             :email_on_review_of_review => true,
+             :is_new_user => false,
+             :master_permission_granted => false)
+tu = User.find_by_name('student3')
+tu.parent_id = User.find_by_name('ta1').id
+tu.save!
+
+#Create CSC517 test course with ./CSC517_instructor1 directory path
+Course.create(:name => 'CSC517', :instructor_id => User.find_by_name('instructor1').id,
+             :directory_path => 'CSC517_instructor1', :info => 'Test CSC517 class Object Oriented Programming')
+tu = Course.find_by_name('CSC517')
+tu.create_node()
+tu.save!
+
+#TA_mapping
+TaMapping.create(:ta_id => User.find_by_name('ta1').id, :course_id => Course.find_by_name('CSC517').id)
+
+#3 Assignment with different deadlines
+Assignment.create(:name => 'Assignment1',:directory_path => 'CSC517_instructor1/Assignment1',:submitter_count => 0,
+                  :course_id => Course.find_by_name('CSC517').id, :instructor_id => User.find_by_name('instructor1').id,
+                  :require_signup => 1, :team_count => 2)
+
+Assignment.create(:name => 'Assignment2',:directory_path => 'CSC517_instructor1/Assignment2',:submitter_count => 0,
+                  :course_id => Course.find_by_name('CSC517').id, :instructor_id => User.find_by_name('instructor1').id,
+                  :require_signup => 1, :team_count => 2)
+
+Assignment.create(:name => 'Assignment3',:directory_path => 'CSC517_instructor1/Assignment3',:submitter_count => 0,
+                  :course_id => Course.find_by_name('CSC517').id, :instructor_id => User.find_by_name('instructor1').id,
+                  :require_signup => 1, :team_count => 1)
+
+#Create Invitation and accept them)
+Invitation.create(:assignment_id => Assignment.find_by_name('Assignment1').id,
+                  :from_id => User.find_by_name('student1'), :to_id => User.find_by_name('student2').id,
+                  :reply_status => 'A')
+
+Invitation.create(:assignment_id => Assignment.find_by_name('Assignment2').id,
+                  :from_id => User.find_by_name('student3'), :to_id => User.find_by_name('student1').id,
+                  :reply_status => 'A')
+
+#Create Teams
+Team.create(:name => 'Assignment1Team1', :parent_id => Assignment.find_by_name('Assignment1').id, :type => 'AssignmentTeam')
+Team.create(:name => 'Assignment1Team2', :parent_id => Assignment.find_by_name('Assignment1').id, :type => 'AssignmentTeam')
+Team.create(:name => 'Assignment2Team1', :parent_id => Assignment.find_by_name('Assignment2').id, :type => 'AssignmentTeam')
+Team.create(:name => 'Assignment2Team2', :parent_id => Assignment.find_by_name('Assignment2').id, :type => 'AssignmentTeam')
+Team.create(:name => 'Assignment3Team1', :parent_id => Assignment.find_by_name('Assignment3').id, :type => 'AssignmentTeam')
+Team.create(:name => 'Assignment3Team2', :parent_id => Assignment.find_by_name('Assignment3').id, :type => 'AssignmentTeam')
+Team.create(:name => 'Assignment3Team3', :parent_id => Assignment.find_by_name('Assignment3').id, :type => 'AssignmentTeam')
+
+#Assign Users to Team
+TeamsUser.create(:team_id => Team.find_by_name('Assignment1Team1').id, :user_id => User.find_by_name('student1').id)
+TeamsUser.create(:team_id => Team.find_by_name('Assignment1Team1').id, :user_id => User.find_by_name('student2').id)
+TeamsUser.create(:team_id => Team.find_by_name('Assignment1Team2').id, :user_id => User.find_by_name('student3').id)
+TeamsUser.create(:team_id => Team.find_by_name('Assignment2Team1').id, :user_id => User.find_by_name('student1').id)
+TeamsUser.create(:team_id => Team.find_by_name('Assignment2Team1').id, :user_id => User.find_by_name('student3').id)
+TeamsUser.create(:team_id => Team.find_by_name('Assignment2Team2').id, :user_id => User.find_by_name('student2').id)
+TeamsUser.create(:team_id => Team.find_by_name('Assignment3Team1').id, :user_id => User.find_by_name('student1').id)
+TeamsUser.create(:team_id => Team.find_by_name('Assignment3Team2').id, :user_id => User.find_by_name('student2').id)
+TeamsUser.create(:team_id => Team.find_by_name('Assignment3Team3').id, :user_id => User.find_by_name('student3').id)
+

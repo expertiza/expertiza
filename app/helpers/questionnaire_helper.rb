@@ -1,8 +1,10 @@
+require 'fastercsv'
+
 module QuestionnaireHelper
-  
+
+
   questionnaireS_FOLDER = "Public/" # CSV files are stored in a temporary public directory
   CSV_ALLOWED_AGE = 60 * 5 # CSV files may be deleted if they are 5 minutes old
-
   CSV_QUESTION = 0
   CSV_TYPE = 1
   CSV_WEIGHT = 2
@@ -11,11 +13,12 @@ module QuestionnaireHelper
     strategy.call @questionnaire, user_name
   end
 
+
   #method to export the quiz in text file format
-  def self.create_questionnaire_GIFT(questionnaire, user_name)    
-    questionnaireS_FOLDER = "./"        
-    filename = questionnaireS_FOLDER + user_name + "-" + questionnaire.name + "."+"GIFT"   
-    buf = File.new(filename, 'w')      
+  def self.create_questionnaire_GIFT(questionnaire, user_name)
+    questionnaireS_FOLDER = "./"
+    filename = questionnaireS_FOLDER + user_name + "-" + questionnaire.name + "."+"GIFT"
+    buf = File.new(filename, 'w')
     for question in questionnaire.questions
       # Each row is formatted as follows
       # Question, answer choices correct answer marked by = in front followed by question weight and followed by advices
@@ -28,12 +31,12 @@ module QuestionnaireHelper
       row << advice.advice
       end
       row << "\n\n"
-      buf.write (row)    
+      buf.write (row)
     end
-    buf.close    
+    buf.close
     return filename
-  end
-  
+   end
+
   #method to export the quiz in text file format from the GIFT format entered by the user
    def self.create_questionnaire_TXT(questionnaire, user_name)
     questionnaireS_FOLDER = "./"
@@ -120,16 +123,6 @@ module QuestionnaireHelper
     return questions
   end
 
-  def self.delete_expired_csv_files
-    # Deletes any old CSV files that reside in the temp directory
-    files = Dir[questionnaireS_FOLDER + "*"]
-    for file in files
-      if Time.now > File.ctime(file) + CSV_ALLOWED_AGE and file.include? ".csv"
-        File.delete(file)
-      end 
-    end
-  end  
-  
   def self.adjust_advice_size(questionnaire, question)
     if question.true_false and question.question_advices.length != 2
         question.question_advices << QuestionAdvice.new(:score=>0)

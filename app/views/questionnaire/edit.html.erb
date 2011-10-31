@@ -2,17 +2,18 @@
 <h1>Edit <%= @questionnaire.display_type %></h1>
 
 
-<% form_tag({:action=>'edit', :id=>@questionnaire.id}, :multipart => true)do %>
+<% form_tag({:action=>'edit', :id=>@questionnaire.id}, :multipart => true) do %>
 	<%= render :partial => 'questionnaire' %>
 	
 	<%= submit_tag "Save #{@questionnaire.display_type.downcase}", :name=>"save" %>
     <input style="margin-left:36em" type="submit" name="view_advice" value="View advice"/>	
 
+
   	
 	<%if @questionnaire.type == "QuizQuestionnaire" %>
 	<h4>Export quiz in specific formats </h4>
 	<select id="QuizFormat" name="Format" >
-		<option value="GIFT", selected="selected">MOODLE GIFT</option>
+		<option value="GIFT" selected="selected" >MOODLE GIFT</option>
 		<option value="txt" >BLACKBOARD TXT</option>
 	</select>
 	<%= submit_tag "Export Quiz ", :name=>"export", :controller =>"questionnaire", :action => "edit", :id=>"export"%>
@@ -23,10 +24,10 @@
 	<%= submit_tag "Export questions", :name=>"export" %>
 	<%end%>
   	<br />
-
-  	
   	<br />
+
 	<%end%>
+
 
 
 <% if @questionnaire.type == "QuizQuestionnaire" %>

@@ -12,7 +12,7 @@ first:
  menu_depth: 3
  start_path: "http://localhost:3000/"
  site_url_prefix: 0
- self_reg_enabled: "null"
+ self_reg_enabled: null
  self_reg_role_id: 0
  self_reg_confirmation_required: 11
  self_reg_confirmation_error_page_id: 0

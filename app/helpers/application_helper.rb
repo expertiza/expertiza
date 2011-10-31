@@ -32,13 +32,14 @@ module ApplicationHelper
   end
   
   def self.get_user_first_name(recipient)
-      if recipient.fullname.index(",")
-        start_ss = recipient.fullname.index(",")+2
-     else
-        start_ss = 0
-     end   
-     name = recipient.fullname[start_ss, recipient.fullname.length]
-     return name.strip
+    return '' if recipient.fullname.blank?
+    if recipient.fullname.index(",")
+      start_ss = recipient.fullname.index(",")+2
+    else
+      start_ss = 0
+    end   
+    name = recipient.fullname[start_ss, recipient.fullname.length]
+    return name.strip
  end
  
   def self.get_field(element,field,model,column)   

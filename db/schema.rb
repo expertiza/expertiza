@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101001183244) do
+ActiveRecord::Schema.define(:version => 20110512155258) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -35,36 +35,35 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
     t.integer  "num_reviews",                       :default => 0,     :null => false
     t.integer  "num_review_of_reviews",             :default => 0,     :null => false
     t.integer  "num_review_of_reviewers",           :default => 0,     :null => false
-    t.integer  "review_strategy_id",                :default => 0
-    t.integer  "mapping_strategy_id",               :default => 0
     t.integer  "review_questionnaire_id"
     t.integer  "review_of_review_questionnaire_id"
+    t.integer  "teammate_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
     t.boolean  "team_assignment"
-    t.integer  "wiki_type_id"
+    t.integer  "wiki_type_id",                      :default => 0,     :null => false
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false
     t.text     "spec_location"
     t.integer  "author_feedback_questionnaire_id"
-    t.integer  "teammate_review_questionnaire_id"
     t.integer  "team_count",                        :default => 0,     :null => false
     t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions"
+    t.string   "review_assignment_strategy"
+    t.integer  "max_reviews_per_submission"
+    t.integer  "review_topic_threshold",            :default => 0
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
   add_index "assignments", ["instructor_id"], :name => "fk_assignments_instructors"
-  add_index "assignments", ["mapping_strategy_id"], :name => "fk_assignments_mapping_strategies"
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
-  add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
 
   create_table "comments", :force => true do |t|
-    t.integer "participant_id", :null => false
-    t.boolean "private",        :null => false
-    t.text    "comment",        :null => false
+    t.integer "participant_id", :default => 0,     :null => false
+    t.boolean "private",        :default => false, :null => false
+    t.text    "comment",                           :null => false
   end
 
   create_table "content_pages", :force => true do |t|
@@ -129,11 +128,11 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "due_dates", ["assignment_id"], :name => "fk_due_dates_assignments"
   add_index "due_dates", ["deadline_type_id"], :name => "fk_deadline_type_due_date"
   add_index "due_dates", ["late_policy_id"], :name => "fk_due_date_late_policies"
-  add_index "due_dates", ["rereview_allowed_id"], :name => "idx_rereview_allowed"
-  add_index "due_dates", ["resubmission_allowed_id"], :name => "idx_resubmission_allowed"
-  add_index "due_dates", ["review_allowed_id"], :name => "idx_review_allowed"
-  add_index "due_dates", ["review_of_review_allowed_id"], :name => "idx_review_of_review_allowed"
-  add_index "due_dates", ["submission_allowed_id"], :name => "idx_submission_allowed"
+  add_index "due_dates", ["rereview_allowed_id"], :name => "fk_due_date_rereview_allowed"
+  add_index "due_dates", ["resubmission_allowed_id"], :name => "fk_due_date_resubmission_allowed"
+  add_index "due_dates", ["review_allowed_id"], :name => "fk_due_date_review_allowed"
+  add_index "due_dates", ["review_of_review_allowed_id"], :name => "fk_due_date_review_of_review_allowed"
+  add_index "due_dates", ["submission_allowed_id"], :name => "fk_due_date_submission_allowed"
 
   create_table "goldberg_content_pages", :force => true do |t|
     t.string   "title"
@@ -288,10 +287,6 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
     t.string  "qtype"
   end
 
-  create_table "mapping_strategies", :force => true do |t|
-    t.string "name"
-  end
-
   create_table "markup_styles", :force => true do |t|
     t.string "name", :default => "", :null => false
   end
@@ -316,20 +311,21 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   end
 
   create_table "participants", :force => true do |t|
-    t.boolean  "submit_allowed",                     :default => true
-    t.boolean  "review_allowed",                     :default => true
+    t.boolean  "submit_allowed",       :default => true
+    t.boolean  "review_allowed",       :default => true
     t.integer  "user_id"
     t.integer  "parent_id"
     t.integer  "directory_num"
     t.datetime "submitted_at"
-    t.string   "topic"
     t.boolean  "permission_granted"
-    t.integer  "penalty_accumulated",                :default => 0,    :null => false
-    t.string   "submitted_hyperlink", :limit => 500
+    t.integer  "penalty_accumulated",  :default => 0,    :null => false
+    t.text     "submitted_hyperlinks"
     t.float    "grade"
     t.string   "type"
     t.string   "handle"
     t.integer  "topic_id"
+    t.datetime "time_stamp"
+    t.text     "digital_signature"
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
@@ -374,17 +370,18 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
   create_table "response_maps", :force => true do |t|
-    t.integer "reviewed_object_id",                 :null => false
-    t.integer "reviewer_id",                        :null => false
-    t.integer "reviewee_id",                        :null => false
-    t.string  "type",               :default => "", :null => false
+    t.integer "reviewed_object_id",    :default => 0,     :null => false
+    t.integer "reviewer_id",           :default => 0,     :null => false
+    t.integer "reviewee_id",           :default => 0,     :null => false
+    t.string  "type",                  :default => "",    :null => false
+    t.boolean "notification_accepted", :default => false
   end
 
   add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"
 
   create_table "responses", :force => true do |t|
-    t.integer  "map_id",             :null => false
-    t.string   "additional_comment"
+    t.integer  "map_id",             :default => 0, :null => false
+    t.text     "additional_comment"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -397,10 +394,6 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   end
 
   add_index "resubmission_times", ["participant_id"], :name => "fk_resubmission_times_participants"
-
-  create_table "review_strategies", :force => true do |t|
-    t.string "name"
-  end
 
   create_table "roles", :force => true do |t|
     t.string   "name",            :default => "", :null => false
@@ -424,14 +417,14 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
 
   create_table "score_caches", :force => true do |t|
-    t.integer "reviewee_id", :default => 0,   :null => false
+    t.integer "reviewee_id"
     t.float   "score",       :default => 0.0, :null => false
     t.string  "range",       :default => ""
     t.string  "object_type", :default => "",  :null => false
   end
 
   create_table "scores", :force => true do |t|
-    t.integer "question_id", :null => false
+    t.integer "question_id", :default => 0, :null => false
     t.integer "score"
     t.text    "comments"
     t.integer "response_id"
@@ -451,9 +444,9 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "sign_up_topics", :force => true do |t|
-    t.text    "topic_name",                     :null => false
-    t.integer "assignment_id",                  :null => false
-    t.integer "max_choosers",                   :null => false
+    t.text    "topic_name",                                    :null => false
+    t.integer "assignment_id",                  :default => 0, :null => false
+    t.integer "max_choosers",                   :default => 0, :null => false
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
   end
@@ -461,9 +454,9 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"
 
   create_table "signed_up_users", :force => true do |t|
-    t.integer "topic_id",                   :null => false
-    t.integer "creator_id",                 :null => false
-    t.boolean "is_waitlisted",              :null => false
+    t.integer "topic_id",                   :default => 0,     :null => false
+    t.integer "creator_id",                 :default => 0,     :null => false
+    t.boolean "is_waitlisted",              :default => false, :null => false
     t.integer "preference_priority_number"
   end
 
@@ -488,7 +481,7 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   create_table "suggestions", :force => true do |t|
     t.integer "assignment_id"
     t.string  "title"
-    t.string  "description",       :limit => 750
+    t.text    "description"
     t.string  "status"
     t.string  "unityID"
     t.string  "signup_preference"
@@ -500,6 +493,7 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
     t.datetime "end_date"
     t.integer  "num_of_students"
     t.datetime "last_reminder"
+    t.integer  "course_id",            :default => 0, :null => false
   end
 
   create_table "survey_participants", :force => true do |t|
@@ -516,10 +510,6 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
     t.string  "email"
     t.integer "survey_deployment_id"
   end
-
-  add_index "survey_responses", ["assignment_id"], :name => "fk_survey_assignments"
-  add_index "survey_responses", ["question_id"], :name => "fk_survey_questions"
-  add_index "survey_responses", ["survey_id"], :name => "fk_survey_questionnaires"
 
   create_table "system_settings", :force => true do |t|
     t.string  "site_name",                 :default => "", :null => false
@@ -551,7 +541,7 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
 
   create_table "teams", :force => true do |t|
     t.string  "name"
-    t.integer "parent_id", :default => 0, :null => false
+    t.integer "parent_id"
     t.string  "type"
   end
 
@@ -576,6 +566,8 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
     t.integer  "round"
   end
 
+  add_index "topic_deadlines", ["deadline_type_id"], :name => "fk_deadline_type_topic_deadlines"
+  add_index "topic_deadlines", ["late_policy_id"], :name => "fk_topic_deadlines_late_policies"
   add_index "topic_deadlines", ["rereview_allowed_id"], :name => "idx_rereview_allowed"
   add_index "topic_deadlines", ["resubmission_allowed_id"], :name => "idx_resubmission_allowed"
   add_index "topic_deadlines", ["review_allowed_id"], :name => "idx_review_allowed"
@@ -584,7 +576,7 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "topic_deadlines", ["topic_id"], :name => "fk_topic_deadlines_topics"
 
   create_table "topic_dependencies", :force => true do |t|
-    t.integer "topic_id",                     :null => false
+    t.integer "topic_id",     :default => 0,  :null => false
     t.string  "dependent_on", :default => "", :null => false
   end
 
@@ -607,10 +599,12 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                              :default => true
-    t.boolean "master_permission_granted"
+    t.boolean "is_new_user",                              :default => true,  :null => false
+    t.integer "master_permission_granted", :limit => 1,   :default => 0
     t.string  "handle"
     t.boolean "leaderboard_privacy",                      :default => false
+    t.text    "digital_certificate"
+    t.string  "persistence_token"
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

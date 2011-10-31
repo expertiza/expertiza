@@ -89,6 +89,7 @@ class QuestionnaireController < ApplicationController
   
   # Edit a questionnaire
   def edit
+    begin
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to :action => 'list' if @questionnaire == nil
     
@@ -98,7 +99,13 @@ class QuestionnaireController < ApplicationController
     end
     
     if params['export']
-      #filename = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name 
+      csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
+
+      send_data csv_data, 
+        :type => 'text/csv; charset=iso-8859-1; header=present',
+        :disposition => "attachment; filename=questionnaires.csv"
+
+    #filename = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
      #filename = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name , params['Format']
      if(params['Format']=='txt')
          strategy=QuestionnaireHelper.method(:create_questionnaire_TXT) # assigns the TXT method in questionnaire_helper module
@@ -106,10 +113,10 @@ class QuestionnaireController < ApplicationController
      if(params['Format']=='GIFT')
          strategy=QuestionnaireHelper.method(:create_questionnaire_GIFT) #assigns the GIFT method in questionnaire_helper module
    end
-   
+
    filename=strategy.call @questionnaire, session[:user].name  #calls the apprpriate assigned method
    #filename=strategy.call @questionnaire, session[:user].name
-     send_file(filename) 
+     send_file(filename)
     end
     
     if params['import']
@@ -117,13 +124,23 @@ class QuestionnaireController < ApplicationController
       questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
       
       if questions != nil and questions.length > 0
-        @questionnaire.delete_questions
+
+        # delete the existing questions if no scores have been recorded yet
+        @questionnaire.questions.each {
+          | question |
+            raise "Cannot import new questions, scores exist" if Score.find_by_question_id(question.id)
+            question.delete        
+        }
+        
         @questionnaire.questions = questions
       end
     end
     
     if params['view_advice']
         redirect_to :action => 'edit_advice', :id => params[:questionnaire][:id]
+    end
+    rescue
+      flash[:error] = $!
     end
   end
     
@@ -196,7 +213,6 @@ class QuestionnaireController < ApplicationController
   def save_advice
     begin
       for advice_key in params[:advice].keys
-        p params[:advice][advice_key]
         QuestionAdvice.update(advice_key, params[:advice][advice_key])
       end
       flash[:notice] = "The questionnaire's question advice was successfully saved"

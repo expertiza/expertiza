@@ -1,0 +1,19 @@
+Feature: Delete a Course as an Admin
+  In order to delete a course
+  As an expertiza admin
+  I want to delete a course form in expertiza
+
+Scenario: Delete course
+  Given the following courses:
+    |Course name|Course directory path|Course info|
+    |course_name 1|course_directory_path 1|course_info 1|
+    |course_name 2|course_directory_path 2|course_info 2|
+    |course_name 3|course_directory_path 3|course_info 3|
+    |course_name 4|course_directory_path 4|course_info 4|
+  When I delete the 3rd course
+  Then I should see the following courses:
+    |Course name|Course directory path|Course info|
+    |course_name 1|course_directory_path 1|course_info 1|
+    |course_name 2|course_directory_path 2|course_info 2|
+    |course_name 4|course_directory_path 4|course_info 4|
+

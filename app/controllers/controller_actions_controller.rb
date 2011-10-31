@@ -111,9 +111,9 @@ class ControllerActionsController < ApplicationController
     actions = Hash.new()
     
     if classes.has_key? classname
-      controller = classes[controller_name]
+      controller = classes[classname]
 
-      for method in controller.public_instance_methods do
+      for method in controller.public_instance_methods(false) do
         actions[method] = true
       end
 

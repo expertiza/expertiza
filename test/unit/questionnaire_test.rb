@@ -1,21 +1,21 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class RubricTest < Test::Unit::TestCase
-  fixtures :questionnaires
+class RubricTest < ActiveSupport::TestCase
+  fixtures :questionnaires, :assignments
 
   def setup
     # Database was initialized with (at least) 3 questionnaires.
-    @questionnaire1 = Questionnaire.find(1)
-    @questionnaire2 = Questionnaire.find(2)
-    @questionnaire3 = Questionnaire.find(3)
+    @questionnaire1 = Questionnaire.find(questionnaires(:questionnaire1).id)
+    @questionnaire2 = Questionnaire.find(questionnaires(:questionnaire2).id)
+    @questionnaire3 = Questionnaire.find(questionnaires(:questionnaire3).id)
   end
   
   def test_create
     assert_kind_of Questionnaire, @questionnaire1
-    assert_equal "questionnaire1", @questionnaire1.name
+    assert_equal questionnaires(:questionnaire1).name, @questionnaire1.name
     
-    assert_equal 1, @questionnaire1.min_question_score
-    assert_equal 5, @questionnaire1.max_question_score
+    assert_equal questionnaires(:questionnaire1).min_question_score, @questionnaire1.min_question_score
+    assert_equal questionnaires(:questionnaire1).max_question_score, @questionnaire1.max_question_score
     assert_equal false, @questionnaire1.private
   end
   
@@ -63,18 +63,37 @@ class RubricTest < Test::Unit::TestCase
   end
   
   def test_true_false_question
-    assert !@questionnaire1.true_false_questions?
-    q = Question.new
-    q.questionnaire_id = @questionnaire1.id
-    q.true_false = false
-    q.txt = "1"
+    #assert !@questionnaire1.true_false_questions?
+    #q = Question.new
+    #q.questionnaire_id = @questionnaire1.id
+    #q.true_false = false
+    #q.txt = "1"
     q2 = Question.new
     q2.questionnaire_id = @questionnaire1.id
     q2.true_false = true
     q2.txt = "2"
-    @questionnaire1.questions << q
-    assert !@questionnaire1.true_false_questions?
+    #@questionnaire1.questions << q
+    #assert !@questionnaire1.true_false_questions?
     @questionnaire1.questions << q2
     assert @questionnaire1.true_false_questions?
+  end
+
+  def test_get_assessment_for
+    questionnaire1 = Array.new
+    questionnaire1<<questionnaires(:questionnaire0)
+    questionnaire1<<questionnaires(:questionnaire1)
+    questionnaire1<<questionnaires(:questionnaire2)
+    #questionnaire1<<questionnaires(:questionnaire3)
+    #questionnaire1<<questionnaires(:questionnaire4)
+    questionnaire1<<questionnaires(:peer_review_questionnaire)
+
+    scores = Hash.new
+    scores[:participant] = AssignmentParticipant.find_by_parent_id(assignments(:assignment0))
+    questionnaire1.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(AssignmentParticipant.find_by_parent_id(assignments(:assignment0)))
+
+      assert_not_equal(scores[questionnaire.symbol][:assessments],0)
+    end
   end
 end

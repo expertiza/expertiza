@@ -11,7 +11,7 @@
     <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
   <%end%>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
-  <br/><hr/><br/>
+  <hr/>
 <% end %>
 <%= @map.show_review() %>
 
@@ -19,35 +19,37 @@
 <% i = 0
    @questions.each{
     | question | %>
-    <% if controller.action_name == 'new_quiz'  %>
-        <%= question.txt.split("{")[0] %><BR/>
-        <% answerCounter=0 %>
-        <% question.txt.split("{")[1].split(//,2)[1].chop.split(%r{~|=}).each{ | answer | %>
-            <input type="checkbox" name=<%= "responses["+question.id.to_s+"]["+answerCounter.to_s+"]" %> value=<%= answer %>><%= answer %><br>
-            <% answerCounter+=1 %>
-        <% } %>
+
+    <%= question.txt %><BR/>
+    <% if controller.action_name != 'new' and @review_scores[i] != nil and @review_scores[i].comments != nil %>  	    
+	    <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
+	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
     <% else %>
 
-        <%= question.txt %><BR/>
-        <% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
-            <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
-            <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
-        <% else %>
-            <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>
-
-        <% end %>
-
-       <% if question.true_false? %>
-          <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
-             <%if controller.action_name != 'new' %>
-               <option value="<%=@min%>" <%if @min==@review_scores[i].score%>selected="selected"<%end%> ><%=@min%></option>
-               <option value="<%=@max%>" <%if @max==@review_scores[i].score%>selected="selected"<%end%> ><%=@max%></option>
+	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" >
+		</textarea>	
+    <% end %>
+    <% if question.true_false? %>
+      <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+         <%if controller.action_name != 'new' %>
+           <option value="<%=@min%>" <%if @min==@review_scores[i].score%>selected="selected"<%end%> ><%=@min%></option>
+           <option value="<%=@max%>" <%if @max==@review_scores[i].score%>selected="selected"<%end%> ><%=@max%></option>    
+         <%else%>
+           <option value="<%=@min%>"><%=@min%></option>
+           <option value="<%=@max%>"><%=@max%></option> 
+         <%end%> 
+      </select>  
+  <% else %>
+      <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+          <% for j in @min..@max %>
+	         <%if controller.action_name != 'new' %>
+            	<option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
              <%else%>
                <option value="<%=@min%>"><%=@min%></option>
                <option value="<%=@max%>"><%=@max%></option>
              <%end%>
           </select>
-      <% else %>
+
           <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
               <% for j in @min..@max %>
                  <%if controller.action_name != 'new' %>

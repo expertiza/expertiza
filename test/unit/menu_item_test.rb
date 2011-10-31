@@ -29,6 +29,6 @@ class MenuItemTest < ActiveSupport::TestCase
   end
   
   def test_next_seq
-    assert_equal 1, MenuItem.next_seq(nil)
+    assert_equal 11, MenuItem.next_seq(nil)
   end
 end

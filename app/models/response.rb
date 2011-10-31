@@ -106,8 +106,7 @@ class Response < ActiveRecord::Base
   end  
 end
 
-#This is an example of how to *not* write code. 
-#I hope our grandchildren will forgive us for our actions.
+ 
 def custom_display_as_html(code, file_url)
   begin
   review_scores = self.scores

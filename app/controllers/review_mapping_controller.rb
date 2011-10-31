@@ -306,15 +306,6 @@ class ReviewMappingController < ApplicationController
     mapping.delete
     redirect_to :action => 'list_mappings', :id => mapping.review_mapping.assignment_id
   end
-  
-  def delete_rofreviewer
-    mapping = ResponseMapping.find(params[:id])
-    revmapid = mapping.review_mapping.id
-    mapping.delete
-    
-    flash[:note] = "The metareviewer has been deleted."
-    redirect_to :action => 'list_rofreviewers', :id => revmapid  
-  end     
     
   def list       
     all_assignments = Assignment.find(:all, :order => 'name', :conditions => ["instructor_id = ?",session[:user].id])
@@ -436,7 +427,7 @@ class ReviewMappingController < ApplicationController
   def automatic_reviewer_mapping
     assignment = Assignment.find(params[:id])
 
-    message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_review_of_reviews])
+    message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_metareviews])
     flash[:note] = message
     redirect_to :action => 'list_mappings', :id => assignment.id
   end
@@ -474,7 +465,7 @@ class ReviewMappingController < ApplicationController
     @userid = session[:user].id
   end
   
-  def search
+  def search_by_reviewer
     @assignment = Assignment.find(params[:id])
     @id = params[:id]
     

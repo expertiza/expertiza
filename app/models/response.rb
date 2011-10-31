@@ -471,7 +471,6 @@ end
 
   code = code + "</table>"
 
-
   code = code + "<h3>Pedagogy</h3>"
 
   code = code +
@@ -1054,7 +1053,6 @@ def custom_display_as_html_2011(code, file_url)
   code = code + "</ul></td></tr>"
 
   code = code + "</table>"
-
 
   code = code + "<h3>Pedagogy</h3>"
 

@@ -170,55 +170,16 @@ end
 
   #*******************Multiple Choice Questions************************
   code = code + "<h2>Multiple Choice Questions</h2><hr>"
-  if review_scores[26].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> There are 4 multiple-choice questions<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> There are 4 multiple-choice questions<br/>"
-  end
 
-  if review_scores[27].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They each have four answer choices (A-D)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They each have four answer choices (A-D)<br/>"
-  end
+for i in 26..33
+if review_scores[i].comments == "1"
+ code = code + "<img src=\"/images/Check-icon.png\">"
+else 
+ code = code + "<img src=\"/images/delete_icon.png\">"
+ end
+end
 
-  if review_scores[28].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> There is a single correct (aka: not opinion-based) answer for each question<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> There is a single correct (aka: not opinion-based) answer for each question<br/>"
-  end
-
-  if review_scores[29].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The questions assess the learning target(s)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The questions assess the learning target(s)<br/>"
-  end
-
-  if review_scores[30].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The questions are appropriate and reasonable (not too easy and not too difficult)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The questions are appropriate and reasonable (not too easy and not too difficult)<br/>"
-  end
-
-  if review_scores[31].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers<br/>"
-  end
-
-  if review_scores[32].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The response options are listed in alphabetical order<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The response options are listed in alphabetical order<br/>"
-  end
-
-  if review_scores[33].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
-  end
-
-  code = code + "<br/><h3>Questions</h3>"
+     code = code + "<br/><h3>Questions</h3>"
 
     code = code + "<i>Type: </i><b>#{review_scores[34].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Grade: </i><b>#{review_scores[35].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
@@ -253,18 +214,16 @@ end
             <tr>"
 
   code = code + "<td><ul>"
-  if review_scores[46].comments == "1"
-    code = code + "<li>Is very important for future teachers to know</li>"
-  end
-  if review_scores[47].comments == "1"
-    code = code + "<li>Is based on researched information</li>"
-  end
-  if review_scores[48].comments == "1"
-    code = code + "<li>Is highly relevant to current educational practice</li>"
-  end
-  if review_scores[49].comments == "1"
-    code = code + "<li>Provides an excellent overview and in-depth discussion of key issues</li>"
-  end
+
+for i in 46..49
+if review_scores[i].comments == "1"
+ code = code + "<img src=\"/images/Check-icon.png\">"
+else 
+ code = code + "<img src=\"/images/delete_icon.png\">"
+ end
+end
+
+
   code = code + "</ul></td>"
 
   code = code + "<td><ul>"

@@ -28,7 +28,7 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:id])  
     msg = String.new
     begin
-      user = get_user(params)      
+      user = User.get_user(params)
       regurl = url_for :action => 'add_user_to_assignment', 
           :id => assignment.id, 
           :user_id => user.id, 
@@ -164,7 +164,7 @@ class ReviewMappingController < ApplicationController
     mapping = ResponseMap.find(params[:id])  
     msg = String.new
     begin
-      user = get_user(params)   
+      user = User.get_user(params)
       regurl = url_for :action => 'add_user_to_assignment', :id => mapping.id, :user_id => user.id               
       reviewer = get_reviewer(user,mapping.assignment,regurl)
       
@@ -185,23 +185,10 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => mapping.assignment.id, :msg => msg                                  
   end 
   
-  def get_user(params)      
-      if params[:user_id]
-        user = User.find(params[:user_id])
-      else
-        user = User.find_by_name(params[:user][:name])
-      end    
-      if user.nil?
-         newuser = url_for :controller => 'users', :action => 'new' 
-         raise "Please <a href='#{newuser}'>create an account</a> for this user to continue."
-      end 
-      return user
-  end
-  
-  def get_reviewer(user,assignment,regurl)      
+  def get_reviewer(user,assignment,reg_url)
       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,assignment.id)
       if reviewer.nil?
-         raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{regurl}'>register</a> this user to continue."
+         raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
      end
      return reviewer
   end  

@@ -287,6 +287,14 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.string  "qtype"
   end
 
+  create_table "log_entries", :force => true do |t|
+    t.integer  "user"
+    t.string   "location"
+    t.string   "entry"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "markup_styles", :force => true do |t|
     t.string "name", :default => "", :null => false
   end

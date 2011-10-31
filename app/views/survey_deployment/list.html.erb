@@ -41,7 +41,7 @@ Survey Deployment
 
 <%= link_to "Add New Deployment", :action=>"new" %><p>
 
-<% if session[:user].role_id==4 # only super admin can start/restart thread for now %>
+<% if session[:user].role_id==4 %><% # only super admin can start/restart thread for now %>
 <%= link_to "Reminder thread status", :action=>"reminder_thread" %>
 <% end %>
 </body>

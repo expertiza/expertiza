@@ -2,9 +2,12 @@ require "credentials"
 require "menu"
 
 class Role < ActiveRecord::Base
+  belongs_to :parent, :class_name => 'Role'
+
   serialize :cache
   validates_presence_of :name
   validates_uniqueness_of :name
+
   attr_reader :student,:ta,:instructor,:administrator,:superadministrator
 
   STUDENT = 1
@@ -17,7 +20,8 @@ class Role < ActiveRecord::Base
     roles = Role.find(:all)
     
     for role in roles do
-      role.cache = nil ; role.save # we have to do this to clear it
+      role.cache = nil
+      role.save # we have to do this to clear it
 
       role.cache = Hash.new
       role.rebuild_credentials
@@ -36,6 +40,7 @@ class Role < ActiveRecord::Base
     self.cache[:menu] = menu
   end
 
+  # return ids of roles that are below this role
   def get_available_roles  
     ids = Array.new
     
@@ -52,6 +57,7 @@ class Role < ActiveRecord::Base
     return ids
   end
 
+  # "parents" are lesser roles. This returns a list including this role and all lesser roels.
   def get_parents
     parents = Array.new
     seen = Hash.new

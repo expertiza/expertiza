@@ -105,6 +105,8 @@ end
   # and redirect to the view_actions page
   def change_handle
     @participant = AssignmentParticipant.find(params[:id])  
+    return unless current_user_id?(@participant.user_id)
+
     if params[:participant] != nil
       if AssignmentParticipant.find_all_by_parent_id_and_handle(@participant.parent_id, params[:participant][:handle]).length > 0
         flash[:error] = "<b>#{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different handle."

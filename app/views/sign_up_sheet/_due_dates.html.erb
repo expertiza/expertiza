@@ -1,21 +1,23 @@
 <table class="general">
     <tr>
-    <th>topic#</th>    
+    <th>#</th>
+	<th>Topic name</th>
     <th>Submission deadline</th>
     <th>Review deadline</th>
     
     <%for i in 2..@assignment.get_review_rounds%>
-        <th>Resubmission deadline <%=i-1%></th>
-        <th>Review deadline <%=i-1%></th>
+        <th>Resubmission deadline <%=i%></th>
+        <th>Review deadline <%=i%></th>
     <%end%>
-    <th>Meta review deadline</th>
+    <th>Metareview deadline</th>
     </tr>
     <% i=0 %>
     <%@resubmission_rounds = @assignment.get_review_rounds%>
   
     <% for @due_date in @duedates %>      
       <tr>
-        <td><%= @due_date['topic_name'] %></td>
+        <td><%= @due_date['topic_identifier'] %></td>
+		<td><%= @due_date['topic_name'] %></td>
         <%= hidden_field('due_date[]', 't_id', :id => 'due_date_' + @due_date['t_id'].to_s) %>
         <%for j in 1..@resubmission_rounds%>
         <td>

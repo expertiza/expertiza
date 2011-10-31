@@ -1,5 +1,5 @@
 advice0:
- question_id: <%= Fixtures.identify(:questionnaire1)%>
+ question_id: <%= Fixtures.identify(:question5)%>
  score: 2
  advice: Good
  

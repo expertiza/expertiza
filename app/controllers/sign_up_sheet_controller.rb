@@ -265,6 +265,7 @@ class SignUpSheetController < ApplicationController
       else
         signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, session[:user].id)
       end
+    end
 
     #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
     if signup_record.is_waitlisted == false
@@ -371,7 +372,7 @@ class SignUpSheetController < ApplicationController
     sign_up.confirm_by = val
     if user_signup.size < asgnmt.max_topic_count
       #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-      if slotExist?(topic_id)
+      if slotAvailable?(topic_id)
         sign_up.is_waitlisted = false
 
         # Using a DB transaction to ensure atomic inserts
@@ -402,7 +403,7 @@ class SignUpSheetController < ApplicationController
       end
 	  
       #check whether user is clicking on a topic which is not going to place him in the waitlist
-      if !slotExist?(topic_id)
+      if !slotAvailable?(topic_id)
         sign_up.is_waitlisted = true
         
         if sign_up.save
@@ -652,4 +653,5 @@ class SignUpSheetController < ApplicationController
 
   end
 end
+
 

@@ -106,7 +106,6 @@ class Response < ActiveRecord::Base
   end  
 end
 
- 
 def custom_display_as_html(code, file_url)
   begin
   review_scores = self.scores

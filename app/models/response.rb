@@ -117,7 +117,7 @@ for i in 0..3
  if review_scores[i].comments == "1"
 code = code + "<img src=\"/images/Check-icon.png\">
 else 
-code = code + "<img src=\"/images/delete-icon.png\">
+code = code + "<img src=\"/images/delete_icon.png\">
  end
 end
 

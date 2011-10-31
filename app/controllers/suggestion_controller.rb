@@ -320,10 +320,18 @@ end
       approve_suggestion
     elsif !params[:reject_suggestion].nil?
       reject_suggestion
-      elsif !params[:defer_suggestion].nil? # added this to support new status defered
-      defer_suggestion
-      elsif !params[:initiate_suggestion].nil?
-      initiate_suggestion
+      # begin E3-B
+      # HEAD
+      # elsif !params[:defer_suggestion].nil? # added this to support new status defered
+      # defer_suggestion
+      # elsif !params[:initiate_suggestion].nil?
+      # initiate_suggestion
+      # end E3-B
+    elsif !params[:edit_suggestion].nil?
+      edit_suggestion
+      # begin A
+      # c01f33e... E3: Team: OSS project_Team1
+      # end A
     end
   end
   
@@ -379,6 +387,9 @@ end
     redirect_to :action => 'show', :id => @suggestion
   end
   
+=begin
+# begin E3-B
+# HEAD
    # this method gets called when the instructor clicks on Defer Suggestion button
   def defer_suggestion
     @suggestion = Suggestion.find(params[:id])
@@ -468,4 +479,52 @@ def activity
 @assignment_id = params[:assignment_id]
 end
 
+# end E3-B
+
+# begin A
+=end
+
+  def edit_suggestion
+    @suggestion = Suggestion.find(params[:id])
+    if @suggestion.unityID != session[:user].name
+      if not @suggestion.unityID.nil? and not @suggestion.unityID.empty?
+        user = User.find_by_name(@suggestion.unityID)
+        @toemail = user.id
+      else
+        @toemail = nil
+      end
+      @editor = "instructor"
+      @suggestion.status = 'Reviewed'
+    else
+      assnt = Assignment.find(@suggestion.assignment_id)
+      course = Course.find(assnt.course_id)
+      instructor = User.find(course.instructor_id)
+      @toemail = instructor.id
+      @editor = session[:user].name
+      @suggestion.status = 'Resubmitted'
+    end
+    
+    if @suggestion.update_attributes(params[:suggestion_edit])
+      flash[:notice] = 'Successfully updated the suggestion'
+      if not @toemail.nil?
+        @suggestion.email(@toemail, @editor)
+      end
+      #call log function here
+    else
+      flash[:error] = 'Error when updating the suggestion'
+    end
+    if @editor == "instructor"
+      redirect_to :action => "show", :id => params[:id]
+    else
+      redirect_to :action => "view_comments", :id => @suggestion.assignment_id
+    end
+  end
+  
+  def view_comments
+    assignment = Assignment.find(params[:id])
+    @suggestions = Suggestion.find(:all, :conditions =>
+              "unityID = '#{session[:user].name}' and status not in ('Approved', 'Rejected') and assignment_id = #{params[:id]}")
+  end
+  
+# end A c01f33e... E3: Team: OSS project_Team1
 end

@@ -1,0 +1,39 @@
+<h3>Suggestion Comments</h3>
+<% for @suggestion in @suggestions %>
+<table border=0 cellspacing=10>
+	<colgroup>
+		<col width=25%/>
+		<col width=60%/>
+	</colgroup>
+	<tr>
+		<td><b>Title:</b></td>
+		<td><%=h @suggestion.title %></td>
+	</tr>
+	<tr>
+		<td><b>Description:</b></td>
+		<td><%=h @suggestion.description %></td>
+	</tr>
+	<tr>
+		<td><b>Suggestion's status:</b></td>
+		<td><%=h @suggestion.status %></td>
+	</tr>
+	<%if @suggestion.suggestion_comments.size > 0 %>
+	<tr>
+		<td rowspan="<%= @suggestion.suggestion_comments.size %>"><b>Comments</b></td>
+		<% for suggestion_comment in @suggestion.suggestion_comments %>
+		<td><%= suggestion_comment.comments %></td>
+		<% end %>
+	</tr>
+	<% end %>
+</table>
+
+  <br />
+  <% form_tag :action => 'edit_suggestion', :id => @suggestion.id do %>
+  	 <%= render :partial => 'edit' %>
+	 <%= submit_tag "Submit", :name => 'edit_suggestion' %>
+  <% end %>
+  <hr>
+<% end %>
+<p>
+	<%= link_to 'Back', :action => 'list', :controller => 'student_task' %>
+</p>

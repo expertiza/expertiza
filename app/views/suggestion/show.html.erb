@@ -1,5 +1,7 @@
 <h3>Suggestion</h3>
 <table border=0 cellspacing=10>
+<!-- begin E3-B -->
+<% if false %>
     <colgroup>
         <col width=25%><col width=60%>
     </colgroup>
@@ -49,6 +51,48 @@
             <%=h @suggestion.status %>
         </td>
     </tr>
+<% end %>
+<!-- end E3-B -->
+<!-- begin A -->
+	<colgroup>
+		<col width=25%/>
+		<col width=60%/>
+	</colgroup>
+	<tr>
+		<td><b>Title:</b></td>
+		<td><%=h @suggestion.title %></td>
+	</tr>
+	<tr>
+		<td><b>Description:</b></td>
+		<td><%=h @suggestion.description %></td>
+	</tr>
+	<tr>
+		<td><b>Submitter's unity ID:</b></td>
+		<td>
+			<%if @suggestion.unityID != "" %>
+				<%=h @suggestion.unityID %>
+			<%else%>
+				--
+			<%end%>
+		</td>
+	</tr>
+	<tr>
+		<td><b>Submitter's sign-up preference:</b></td>
+		<td>
+			<%if @suggestion.signup_preference == 'Y' %>
+				Yes
+			<%elsif @suggestion.signup_preference == 'N' %>
+				No
+			<%else%>
+				No preference
+			<%end%>
+		</td>
+	</tr>
+	<tr>
+		<td><b>Suggestion's status:</b></td>
+		<td><%=h @suggestion.status %></td>
+	</tr>	
+<!-- end A -->
 </table>
 <p>
     <% if (@suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && @suggestion.status != 'Deferred') %>
@@ -170,6 +214,8 @@
 <%end %>
 <br>
 <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' %>
+<!-- begin E3-B -->
+<% if false %>
 <b>Add new comment and vote</b>
 <br>
 <% form_tag :action => 'submit', :id => @suggestion do %>
@@ -180,6 +226,25 @@
 </p>
 <%= submit_tag "Submit vote", :name => 'add_comment' %>
 <% end %>
+<% end %>
+<!-- end E3-B -->
+<!-- begin A -->
+  <b>Add new comment and vote</b> <br>
+  <% form_tag :action => 'submit', :id => @suggestion do %>
+     <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %> 
+     <p>
+       <%= "Vote"%>
+       <%= select ("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
+     </p>
+     
+     <%= submit_tag "Submit vote", :name => 'add_comment' %>
+  <% end %>
+  <br />
+  <% form_tag :action => 'submit', :id => @suggestion do %>
+  	 <%= render :partial => 'edit', :suggestion => @suggestion %>
+	 <%= submit_tag "Submit edits", :name => 'edit_suggestion' %>
+  <% end %>
+<!-- end A -->
 <% end %>
 <%end %>
 <%if !( session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4)) %>

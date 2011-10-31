@@ -307,26 +307,29 @@ module WikiHelper
 
   end
 
-  def self.compareDate (date1,date2)
-    if(date1.year > date2.year)
-      return 1
-    elsif(date1.year < date2.year)
-      return -1
-    else
-      if(date1.month > date2.month)
-        return 1
-      elsif(date1.month < date2.month)
-        return -1
-      else
-        if(date1.day > date2.day)
-          return 1
-        elsif(date1.day < date2.day)
-          return -1
-        else
-          return 0
+  def self.compareDates(condition,dates,line_items)
+      #Remove dates before deadline
+      dates.each_with_index do |date, index|
+        #The date is before start of review
+        if (condition.call(date))
+          line_items[index] = nil
         end
       end
-    end
+  end
+  def self.getwikipage(url)
+    response = ''
+    open(url,
+         "User-Agent" => "Ruby/#{RUBY_VERSION}",
+         "From" => "email@addr.com", #Put pg admin email address here
+         "Referer" => "http://") { |f| #Put pg URL here
+         # Save the response body
+         response = f.read
+         @resp = response
+        }
+    return response
+  end
+  def self.cleanURLS(response , wiki_url)
+    return response.gsub(/href=\"(.*?)index.php/,'href="' + wiki_url[0].to_s + 'index.php')
   end
  ##
   # review_mediawiki
@@ -341,18 +344,15 @@ module WikiHelper
   # @args: _start_date (all review items older will be filtered out)
   # @args: _wiki_user (wiki user id to crawl)
   ##
+  # @param _assignment_url [Object]
+  # @param _assignment_id [Object]
+  # @param _wiki_user [Object]
   def self.review_mediawiki_new(_assignment_url, _assignment_id, _wiki_user = nil)
 
     response = '' #the response from the URL
-
     #Check to make sure we were passed a valid URL
-    puts _assignment_url
     matches = /http:/.match( _assignment_url )
-    if not matches
-      return response
-    end
-
-    if _assignment_id.nil?
+    if not matches or _assignment_id.nil?
       return response
     end
 
@@ -373,25 +373,22 @@ module WikiHelper
     #Grab this user's contributions
     url = wiki_url[0].to_s + review
     @urlin = url
-    open(url,
-         "User-Agent" => "Ruby/#{RUBY_VERSION}",
-         "From" => "email@addr.com", #Put pg admin email address here
-         "Referer" => "http://") { |f| #Put pg URL here
 
-      # Save the response body
-      response = f.read
-      @resp = response
-    }
+
+    response = getwikipage(url)
 
     #Clean URLs
-    response = response.gsub(/href=\"(.*?)index.php/,'href="' + wiki_url[0].to_s + 'index.php')
+    response = cleanURLS(response,wiki_url)
+    contribution_list = response.scan(/<li class=""><a href=".*?<\/li>/)
+    line_items = response.scan(/<li class=""><a href=".*?>/)
+
     @res = response
     # if the user has no assignments submitted
     is_link_present = response.scan(/No changes were found matching these criteria/)
     if(is_link_present[0].nil? == false)
-      return ""
+      return ''
     end
-    contribution_list = response.scan(/<li class=""><a href=".*?<\/li>/)
+
     #Extract the dates only
     dates = Array.new
     contribution_list.each do |contribution|
@@ -399,29 +396,12 @@ module WikiHelper
       dates << Time.parse(scanned_date[0])
     end
 
-    #Extract each line item
-    line_items = response.scan(/<li class=""><a href=".*?>/)
+    # for each of the dates check if the date is within the assigment deadlines.
+    condition = lambda{|date| start_date > date}
+    compareDates(condition,dates,line_items)
+    condition = lambda{|date| end_date.due_at < date}
+    compareDates(condition,dates,line_items)
 
-    #if start date provided we only want date line items since start date
-    if start_date
-      #Remove dates before deadline
-      dates.each_with_index do |date, index|
-        #The date is before start of review
-        if (compareDate(start_date,date) == 1)
-          line_items[index] = nil
-        end
-      end
-    end
-    #if start date provided we only want date line items since start date
-    if end_date
-      #Remove dates before deadline
-      dates.each_with_index do |date, index|
-        #The date is before start of review
-        if (compareDate(date,end_date.due_at) == 1)
-          line_items[index] = nil
-        end
-      end
-    end
     line_items.compact!
     # check for the line_items being empty
     if !(line_items.empty?)
@@ -429,8 +409,7 @@ module WikiHelper
       latest_title[2] = latest_title[2].gsub(/"/,'')
       latest_url = line_items[0].gsub(/&amp.*?"/,'"') + latest_title[2] +'</a></li>'
       return latest_url
-
     end
-
+    return ''
   end
 end

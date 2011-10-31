@@ -12,9 +12,11 @@
       end %>
     <%if @assignment.team_assignment and team != nil # The lookup of all team members should be put in a wiki helper
         for team_member in team.get_participants %>
-	    <%= puts participant.assignment.directory_path %>
-        <%= WikiHelper::review_mediawiki_new participant.assignment.directory_path, @assignment.id, team_member.handle  %>
-	   <%end%>
+            <%= test = WikiHelper::review_mediawiki_new participant.assignment.directory_path, @assignment.id, team_member.handle  %>
+	        <% if test != ''
+                break
+                end %>
+        <%end%>
     <%else%>
-	    <%= WikiHelper::review_mediawiki_new participant.assignment.directory_path, @assignment.id, participant.handle  %>
+	    <%= test = WikiHelper::review_mediawiki_new participant.assignment.directory_path, @assignment.id, participant.handle  %>
     <%end%>

@@ -218,7 +218,7 @@ class ReviewMappingController < ApplicationController
  
   def delete_all_reviewers_and_metareviewers
     assignment = Assignment.find(params[:id])
-    failedCount = delete_mappings(assignment.review_mappings,params[:force])   
+    failedCount = ResponseMap.delete_mappings(assignment.review_mappings,params[:force])
     if failedCount > 0
       url_yes = url_for :action => 'delete_all_reviewers_and_metareviewers', :id => params[:id], :force => 1
       url_no  = url_for :action => 'delete_all_reviewers_and_metareviewers', :id => params[:id]
@@ -234,7 +234,7 @@ class ReviewMappingController < ApplicationController
     contributor = assignment.get_contributor(params[:contributor_id])
     mappings = contributor.review_mappings
     
-    failedCount = delete_mappings(mappings, params[:force])
+    failedCount = ResponseMap.delete_mappings(mappings, params[:force])
     if failedCount > 0
       url_yes = url_for :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id, :force => 1
       url_no  = url_for :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id
@@ -249,7 +249,7 @@ class ReviewMappingController < ApplicationController
     mapping = ResponseMap.find(params[:id])    
     
     mmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(mapping.id)
-    failedCount = delete_mappings(mmappings, params[:force])
+    failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
     if failedCount > 0
       url_yes = url_for :action => 'delete_all_metareviewers', :id => mapping.id, :force => 1
       url_no  = url_for :action => 'delete_all_metareviewers', :id => mapping.id
@@ -260,19 +260,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => mapping.assignment.id
   end   
   
-  def delete_mappings(mappings, force=nil)
-    failedCount = 0
-    mappings.each{ 
-       |mapping|
-       assignment_id = mapping.assignment.id
-       begin         
-         mapping.delete(force)
-       rescue
-         failedCount += 1
-       end
-    } 
-    return failedCount
-  end
         
   def delete_participant
     contributor = AssignmentParticipant.find(params[:id])

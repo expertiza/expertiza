@@ -115,9 +115,9 @@ def custom_display_as_html(code, file_url)
   
 for i in 0..3
  if review_scores[i].comments == "1"
-code = code + "<img src=\"/images/Check-icon.png\">
+code = code + "<img src=\"/images/Check-icon.png\">"
 else 
-code = code + "<img src=\"/images/delete_icon.png\">
+code = code + "<img src=\"/images/delete_icon.png\">"
  end
 end
 

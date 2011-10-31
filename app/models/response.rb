@@ -114,11 +114,12 @@ def custom_display_as_html(code, file_url)
   code = code + "<h2>Learning Targets</h2><hr>"
   
 for i in 0..3
-if review_scores[i].comments == "1"
+ if review_scores[i].comments == "1"
 code = code + "<img src=\"/images/Check-icon.png\">
 else 
 code = code + "<img src=\"/images/delete-icon.png\">
-
+ end
+end
 
 
     code = code + "<br/><i>Number of Learning Targets: </i>#{review_scores[4].comments.gsub(/\"/,'&quot;').to_s}<br/>"

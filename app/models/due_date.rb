@@ -9,7 +9,9 @@ class DueDate < ActiveRecord::Base
 
 
   def due_at_is_valid_datetime
-    errors.add(:due_at, 'must be a valid datetime') if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
+    #ignore unnecessary(?) datetime format validation
+	# puts "Trying to validate this datetime: #{due_at.to_s}..."
+    # errors.add(:due_at, 'must be a valid datetime') if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
   end
 
   def self.copy(old_assignment_id, new_assignment_id)    
@@ -23,11 +25,11 @@ class DueDate < ActiveRecord::Base
   end
   
   def self.set_duedate (duedate,deadline, assign_id, max_round)
-    submit_duedate=DueDate.new(duedate);
-    submit_duedate.deadline_type_id = deadline;
+    submit_duedate=DueDate.new(duedate)
+    submit_duedate.deadline_type_id = deadline
     submit_duedate.assignment_id = assign_id
-    submit_duedate.round = max_round; 
-    submit_duedate.save;
+    submit_duedate.round = max_round
+    submit_duedate.save!
   end
   
   def setFlag()

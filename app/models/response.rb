@@ -112,29 +112,14 @@ def custom_display_as_html(code, file_url)
 
   #********************Learning Targets******************
   code = code + "<h2>Learning Targets</h2><hr>"
-  if review_scores[0].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>"   
-  end
+  
+for i in 0..3
+if review_scores[i].comments == "1"
+code = code + "<img src=\"/images/Check-icon.png\">
+else 
+code = code + "<img src=\"/images/delete-icon.png\">
 
-  if review_scores[1].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They are specific<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They are specific<br/>"
-  end
 
-  if review_scores[2].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
-  end
-
-  if review_scores[3].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They are observable i.e. you wouldn't have to look inside the readers' head to know if they met this target<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They are observable i.e. you wouldn't have to look inside the readers' head to know if they met this target<br/>"
-  end
 
     code = code + "<br/><i>Number of Learning Targets: </i>#{review_scores[4].comments.gsub(/\"/,'&quot;').to_s}<br/>"
     code = code + "<br/><i>Grade: </i>#{review_scores[5].comments.gsub(/\"/,'&quot;').to_s}<br/>"

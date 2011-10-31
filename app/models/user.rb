@@ -69,7 +69,9 @@ class User < ActiveRecord::Base
 
   # Generate email to user with new password
   def reset_password
-         self.reset_password!
+      randomize_password
+      save
+      clear_password
   end
 
   def self.random_password(size=8)

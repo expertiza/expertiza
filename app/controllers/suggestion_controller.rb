@@ -479,10 +479,6 @@ def activity
 @assignment_id = params[:assignment_id]
 end
 
-# end E3-B
-
-# begin A
-=end
 
   def edit_suggestion
     @suggestion = Suggestion.find(params[:id])

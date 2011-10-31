@@ -145,49 +145,15 @@ end
     code = code + "<br/>How many sources are in the references list?: #{review_scores[12].comments.gsub(/\"/,'&quot;').to_s}<br/>"
     code = code + "<br/>List the range of publication years for all sources, e.g. 1998-2006: <b>#{review_scores[13].comments.gsub(/\"/,'&quot;').to_s} - #{review_scores[14].comments.gsub(/\"/,'&quot;').to_s}</b><br/><br/>"
 
-  if review_scores[15].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> It lists all the sources in a section labeled \"References\"<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> It lists all the sources in a section labeled \"References\"<br/>"
-  end
+ for i in 15..21
+if review_scores[i].comments == "1"
+ code = code + "<img src=\"/images/Check-icon.png\">"
+else 
+ code = code + "<img src=\"/images/delete_icon.png\">"
+ end
+end
 
-  if review_scores[16].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The author cites each of these sources in the lesson<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The author cites each of these sources in the lesson<br/>"
-  end
-
-  if review_scores[17].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The citations are in APA format<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The citations are in APA format<br/>"
-  end
-
-  if review_scores[18].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The author cites at least 2 scholarly sources<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The author cites at least 2 scholarly sources<br/>"
-  end
-
-  if review_scores[19].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> Most of the sources are current (less than 5 years old)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> Most of the sources are current (less than 5 years old)<br/>"
-  end
-
-  if review_scores[20].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> Taken together the sources represent a good balance of potential references for this topic<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> Taken together the sources represent a good balance of potential references for this topic<br/>"
-  end
-
-  if review_scores[21].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The sources represent different viewpoints<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The sources represent different viewpoints<br/>"
-  end
-
-  code = code + "<br/><b>What other sources or perspectives might the author want to consider?</b><br/>"
+    code = code + "<br/><b>What other sources or perspectives might the author want to consider?</b><br/>"
     code = code + "<dl><dd>#{review_scores[22].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
   
   if review_scores[23].comments == "1"

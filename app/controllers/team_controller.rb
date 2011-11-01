@@ -51,7 +51,7 @@ def create_teams
    team = Team.find(params[:id])
    parent = Object.const_get(session[:team_type]).find(team.parent_id)
    begin
-    Team.check_for_existing(parent, params[:team][:name])
+    Team.check_for_existing(parent, params[:team][:name], session[:team_type])
     team.name = params[:team][:name]
     team.save
     redirect_to :action => 'list', :id => parent.id

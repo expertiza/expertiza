@@ -5,4 +5,10 @@ class LogEntryTest < ActiveSupport::TestCase
   test "the truth" do
     assert true
   end
+  test "create user login" do
+    user = User.new
+    user.name="moon light"
+    user.email="moonlight@hereko"
+    assert(log.nil?)
+  end
 end

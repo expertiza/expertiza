@@ -428,71 +428,63 @@ code = code +
             <tr>"
 
   code = code + "<td><ul>"
-  if review_scores[106].comments == "1"
-    code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the lesson</li>"
-  end
-  if review_scores[107].comments == "1"
-    code = code + "<li>The lesson accomplishes its established goals</li>"
-  end
-  if review_scores[108].comments == "1"
-    code = code + "<li>Excellent knowledge and application MC questions align with learning targets and assess important content</li>"
-  end
-
-  code = code + "</ul></td>"
-  code = code + "<td><ul>"
-  if review_scores[109].comments == "1"
-    code = code + "<li>Specific and reasonable learning targets are stated</li>"
-  end
-  if review_scores[110].comments == "1"
-    code = code + "<li>The lesson partially meets its established goals</li>"
-  end
-  if review_scores[111].comments == "1"
-    code = code + "<li>Well constructed MC questions assess important content</li>"
-  end
-
-  code = code + "</ul></td>"
-  code = code + "<td><ul>"
-  
- if review_scores[112].comments == "1"
-    code = code + "<li>Reasonable learning targets are stated</li>"
-  end
-  if review_scores[113].comments == "1"
-    code = code + "<li>The content relates to its goals</li>"
-  end
-  if review_scores[114].comments == "1"
-    code = code + "<li>MC questions assess important content</li>"
-  end
-
-  code = code + "</ul></td>"
-  code = code + "<td><ul>"
-  
-if review_scores[115].comments == "1"
-    code = code + "<li>A learning target is included</li>"
-  end
-  if review_scores[116].comments == "1"
-    code = code + "<li>Content does not achieve its goal, or goal is unclear</li>"
-  end
-  if review_scores[117].comments == "1"
-    code = code + "<li>4 questions are included</li>"
-  end
-
-  code = code + "</ul></td>"
-  code = code + "<td><ul>"
-  if review_scores[118].comments == "1"
-    code = code + "<li>Learning target is missing/ not actually a learning target</li>"
-  end
-  if review_scores[119].comments == "1"
-    code = code + "<li>Lesson has no goal/ content is unfocused</li>"
-  end
-  if review_scores[120].comments == "1"
-    code = code + "<li>Questions are missing</li>"
-  end
-
-  code = code + "</ul></td></tr>"
-  code = code + "</table>"
-  code = code + "<h3>Writing Quality</h3>"
-
-  code = code +
+for i in 106..108
+if review_scores[i].comments == "1"
+case i
+when 106 :code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the lesson</li>"
+when 107 :code = code + "<li>The lesson accomplishes its established goals</li>"
+when 108 :code = code + "<li>Excellent knowledge and application MC questions align with learning targets and assess important content</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 109..111
+if review_scores[i].comments == "1"
+case i
+when 109 :code = code + "<li>Specific and reasonable learning targets are stated</li>"
+when 110 :code = code + "<li>The lesson partially meets its established goals</li>"
+when 111 :code = code + "<li>Well constructed MC questions assess important content</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 112..114
+if review_scores[i].comments == "1"
+case i
+when 112 :code = code + "<li>Reasonable learning targets are stated</li>"
+when 113 :code = code + "<li>The content relates to its goals</li>"
+when 114 :code = code + "<li>MC questions assess important content</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 115..117
+if review_scores[i].comments == "1"
+case i
+when 115 :code = code + "<li>A learning target is included</li>"
+when 116 :code = code + "<li>Content does not achieve its goal, or goal is unclear</li>"
+when 117 :code = code + "<li>4 questions are included</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 118..120
+if review_scores[i].comments == "1"
+case i
+when 118 :code = code + "<li>Learning target is missing/ not actually a learning target</li>"
+when 119 :code = code + "<li>Lesson has no goal/ content is unfocused</li>"
+when 120 :code = code + "<li>Questions are missing</li>"
+end
+end
+end
+code = code + "</ul></td></tr>"
+code = code + "</table>"
+code = code + "<h3>Writing Quality</h3>"
+code = code +
            "<div align=\"center\">The writing:</div><table class='general'>
             <tr>
               <th>5 - Excellently Written   </th>
@@ -502,83 +494,67 @@ if review_scores[115].comments == "1"
               <th>1 - Poorly Written    </th>
             </tr>
             <tr>"
-
-  code = code + "<td><ul>"
-  if review_scores[121].comments == "1"
-    code = code + "<li>Is focused, organized, and easy to read throughout</li>"
-  end
-  if review_scores[122].comments == "1"
-    code = code + "<li>Uses rich, descriptive vocabulary and a variety of effective sentence structures</li>"
-  end
-  if review_scores[123].comments == "1"
-    code = code + "<li>Contains few to no mechanical errors</li>"
-  end
-  if review_scores[124].comments == "1"
-    code = code + "<li>Has an effective introduction and a conclusion that synthesizes all of the material presented</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[125].comments == "1"
-    code = code + "<li>Is organized and flows well</li>"
-  end
-  if review_scores[126].comments == "1"
-    code = code + "<li>Uses effective vocabulary and sentence structures</li>"
-  end
-  if review_scores[127].comments == "1"
-    code = code + "<li>Contains a few minor mechanical errors</li>"
-  end
-  if review_scores[128].comments == "1"
-    code = code + "<li>Has an effective introduction and conclusion based on included information</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[129].comments == "1"
-    code = code + "<li>Is mostly organized</li>"
-  end
-  if review_scores[130].comments == "1"
-    code = code + "<li>Uses properly constructed sentences</li>"
-  end
-  if review_scores[131].comments == "1"
-    code = code + "<li>Has a few distracting errors</li>"
-  end
-  if review_scores[132].comments == "1"
-    code = code + "<li>Includes an introduction and a conclusion</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[133].comments == "1"
-    code = code + "<li>Can be difficult to follow</li>"
-  end
-  if review_scores[134].comments == "1"
-    code = code + "<li>Contains several awkward sentences</li>"
-  end
-  if review_scores[135].comments == "1"
-    code = code + "<li>Has several distracting errors</li>"
-  end
-  if review_scores[136].comments == "1"
-    code = code + "<li>Lacks either an introduction or a conclusion</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[137].comments == "1"
-    code = code + "<li>Has minimal organization</li>"
-  end
-  if review_scores[138].comments == "1"
-    code = code + "<li>Has many poorly constructed sentences</li>"
-  end
-  if review_scores[139].comments == "1"
-    code = code + "<li>Has many mechanical errors that inhibit comprehension</li>"
-  end
-  if review_scores[140].comments == "1"
-    code = code + "<li>Has neither a clear introduction nor a conclusion</li>"
-  end
-  code = code + "</ul></td></tr>"
-
-  code = code + "</table>"
+code = code + "<td><ul>"
+for i in 121..124
+if review_scores[i].comments == "1"
+case i
+when 121 :code = code + "<li>Is focused, organized, and easy to read throughout</li>"
+when 122 :code = code + "<li>Uses rich, descriptive vocabulary and a variety of effective sentence structures</li>"
+when 123 :code = code + "<li>Contains few to no mechanical errors</li>"
+when 124 :code = code + "<li>Has an effective introduction and a conclusion that synthesizes all of the material presented</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 125..128
+if review_scores[i].comments == "1"
+case i
+when 125 :code = code + "<li>Is organized and flows well</li>"
+when 126 :code = code + "<li>Uses effective vocabulary and sentence structures</li>"
+when 127 :code = code + "<li>Contains a few minor mechanical errors</li>"
+when 128 :code = code + "<li>Has an effective introduction and conclusion based on included information</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 129..132
+if review_scores[i].comments == "1"
+case i
+when 129 :code = code + "<li>Is mostly organized</li>"
+when 130 :code = code + "<li>Uses properly constructed sentences</li>"
+when 131 :code = code + "<li>Has a few distracting errors</li>"
+when 132 :code = code + "<li>Includes an introduction and a conclusion</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 133..136
+if review_scores[i].comments == "1"
+case i
+when 133 :code = code + "<li>Can be difficult to follow</li>"
+when 134 :code = code + "<li>Contains several awkward sentences</li>"
+when 135 :code = code + "<li>Has several distracting errors</li>"
+when 136 :code = code + "<li>Lacks either an introduction or a conclusion</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 137..140
+if review_scores[i].comments == "1"
+case i
+when 137 :code = code + "<li>Has minimal organization</li>"
+when 138 :code = code + "<li>Has many poorly constructed sentences</li>"
+when 139 :code = code + "<li>Has many mechanical errors that inhibit comprehension</li>"
+when 140 :code = code + "<li>Has neither a clear introduction nor a conclusion</li>"
+end
+end
+end
+code = code + "</ul></td></tr>"
+code = code + "</table>"
 
   #*******************Ratings************************
   code = code + "<h2>Ratings</h2><hr>"

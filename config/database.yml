@@ -33,12 +33,6 @@ production:
   username: root
   password: 
   host: localhost
-<<<<<<< HEAD
-  
-  
-||||||| merged common ancestors
-=======
 
 cucumber:
   <<: *test
->>>>>>> master

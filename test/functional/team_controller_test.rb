@@ -8,6 +8,34 @@ class TeamControllerTest < ActionController::TestCase
   setup do
   end
 
+  test "create_teams_view should assign parent" do
+    sessionVars = session_for(users(:superadmin))
+    sessionVars[:team_type] = "Course"
+
+    get :create_teams_view, {'id' => nodes(:node23).node_object_id}, sessionVars
+    assert_response :success
+    assert_not_nil assigns(:parent)
+  end
+
+  test "delete_all should redirect to list" do
+    sessionVars = session_for(users(:superadmin))
+    sessionVars[:team_type] = "Course"
+    nodeId = nodes(:node23).node_object_id
+
+    get :delete_all, {'id' => nodeId}, sessionVars
+    assert_redirected_to "team/list/#{nodeId}"
+  end
+
+  test "delete_all should delete team" do
+    sessionVars = session_for(users(:superadmin))
+    sessionVars[:team_type] = "Course"
+    nodeId = nodes(:node23).node_object_id
+
+    assert_difference 'Team.count', -1 do
+      get :delete_all, {'id' => nodeId}, sessionVars
+    end
+  end
+
   test "list should accept course_node" do
     get :list, {'id' => nodes(:node23).node_object_id, 'type' => 'Course'}, session_for(users(:superadmin))
     assert_response :success

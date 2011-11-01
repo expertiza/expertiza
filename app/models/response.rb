@@ -256,9 +256,7 @@ when 46 :code = code + "<li>Is very important for future teachers to know</li>"
 when 47 :code = code + "<li>Is based on researched information</li>" 
 when 48 :code = code + "<li>Is highly relevant to current educational practice</li>"
 when 49 :code = code + "<li>Provides an excellent overview and in-depth discussion of key issues</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>" 
 code = code + "<td><ul>"  
 for i in 50..53
@@ -268,9 +266,7 @@ when 50 :code = code + "<li>Is relevant to future teachers</li>"
 when 51 :code = code + "<li>Is mostly based on researched information</li>"
 when 52 :code = code + "<li>Is applicable to today's schools</li>" 
 when 53 :code = code + "<li>Provides a good overview and explores a few key ideas</li>" 
-end
-end
-end
+end end end
 code = code + "</ul></td>" 
 code = code + "<td><ul>" 
 for i in 54..57
@@ -280,9 +276,7 @@ when 54 :code = code + "<li>Has useful points but some irrelevant information</l
 when 55 :code = code + "<li>Is half research; half the author's opinion</li>" 
 when 56 :code = code + "<li>Is partially out-dated or may not reflect current practice</li>"  
 when 57 :code = code + "<li>Contains good information but yields an incomplete understanding</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>" 
 code = code + "<td><ul>"
 for i in 58..61
@@ -292,9 +286,7 @@ when 58 :code = code + "<li>Has one useful point</li>"
 when 59 :code = code + "<li>Is mostly the author's opinion.</li>"
 when 60 :code = code + "<li>Is mostly irrelevant in today's schools</li>" 
 when 61 :code = code + "<li>Focused on unimportant subtopics OR is overly general</li>"  
-end
-end
-end
+end end end
 code = code + "</ul></td>"  code = code + "<td><ul>"  
 for i in 62..65
 if review_scores[i].comments == "1"
@@ -303,9 +295,7 @@ when 62 :code = code + "<li>Is not relevant to future teachers</li>"
 when 63 :code = code + "<li>Is entirely the author's opinion</li>" 
 when 64 :code = code + "<li>Is obsolete</li>" 
 when 65 :code = code + "<li>Lacks any substantive information</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td></tr>"
 code = code + "</table>"
 code = code + "<h3>Interest</h3>"
@@ -329,9 +319,7 @@ when 67 :code = code + "<li>Many creative, attractive visuals and engaging, inte
 when 68 :code = code + "<li>Multiple perspectives</li>"
 when 69 :code = code + "<li>Insightful interpretation & analysis throughout</li>"
 when 70 :code = code + "<li>Many compelling examples that support the main points (it \"shows\" not just \"tells\")</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 71..75
@@ -342,9 +330,7 @@ when 72 :code = code + "<li>A few effective visuals or interactive elements</li>
 when 73 :code = code + "<li>At least one interesting, fresh perspective</li>"
 when 74 :code = code + "<li>Frequent interpretation and analysis</li>"
 when 75 :code = code + "<li>Clearly explained and well supported points</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 76..80
@@ -355,9 +341,7 @@ when 77 :code = code + "<li>An effective visual or interactive element</li>"
 when 78 :code = code + "<li>One reasonable (possibly typical) perspective</li>"
 when 79 :code = code + "<li>Some interpretation and analysis</li>"
 when 80 :code = code + "<li>Supported points</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 81..85
@@ -368,9 +352,7 @@ when 82 :code = code + "<li>Visuals or interactive elements that are distracting
 when 83 :code = code + "<li>Only a biased perspective</li>"
 when 84 :code = code + "<li>Minimal analysis or interpretation</li>"
 when 85 :code = code + "<li>At least one clear and supported point</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 86..90
@@ -381,6 +363,7 @@ when 87 :code = code + "<li>No visuals or interactive elements</li>"
 when 88 :code = code + "<li>No perspective is acknowledged</li>"
 when 89 :code = code + "<li>No analysis or interpretation</li>"
 when 90 :code = code + "<li>No well-supported points</li>"
+end end end 
 code = code + "</ul></td></tr>"
 code = code + "</table>"
 code = code + "<h3>Credibility</h3>"
@@ -401,9 +384,7 @@ case i
 when 91 :code = code + "<li>Cites 5 or more diverse, reputable sources in proper APA format</li>"
 when 92 :code = code + "<li>Provides citations for all presented information</li>"
 when 93 :code = code + "<li>Readily identifies bias: both the author's own and others</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 94..96
@@ -412,9 +393,7 @@ case i
 when 94 :code = code + "<li>Cites 5 or more diverse, reputable sources with few APA errors</li>"
 when 95 :code = code + "<li>Provides citations for most information</li>"
 when 96 :code = code + "<li>Clearly differentiates between opinion and fact</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 97..99
@@ -423,9 +402,7 @@ case i
 when 97 :code = code + "<li>Cites 5 or more reputable sources</li>"
 when 98 :code = code + "<li>Supports some claims with citation</li>"
 when 99 :code = code + "<li>Occasionally states opinion as fact</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 100..102
@@ -434,9 +411,7 @@ case i
 when 100 :code = code + "<li>Cites 4 or more reputable sources</li>"
 when 101 :code = code + "<li>Has several unsupported claims</li>"
 when 102 :code = code + "<li>Routinely states opinion as fact and fails to acknowledge bias</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 103..105
@@ -445,9 +420,7 @@ case i
 when 103 :code = code + "<li>Cites 3 or fewer reputable sources</li>"
 when 104 :code = code + "<li>Has mostly unsupported claims</li>"
 when 105 :code = code + "<li>Is very biased and contains almost entirely opinions</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td></tr>"
 code = code + "</table>"
 code = code + "<h3>Pedagogy</h3>"
@@ -469,9 +442,7 @@ case i
 when 106 :code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the lesson</li>"
 when 107 :code = code + "<li>The lesson accomplishes its established goals</li>"
 when 108 :code = code + "<li>Excellent knowledge and application MC questions align with learning targets and assess important content</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 109..111
@@ -480,9 +451,7 @@ case i
 when 109 :code = code + "<li>Specific and reasonable learning targets are stated</li>"
 when 110 :code = code + "<li>The lesson partially meets its established goals</li>"
 when 111 :code = code + "<li>Well constructed MC questions assess important content</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 112..114
@@ -491,9 +460,7 @@ case i
 when 112 :code = code + "<li>Reasonable learning targets are stated</li>"
 when 113 :code = code + "<li>The content relates to its goals</li>"
 when 114 :code = code + "<li>MC questions assess important content</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 115..117
@@ -502,9 +469,7 @@ case i
 when 115 :code = code + "<li>A learning target is included</li>"
 when 116 :code = code + "<li>Content does not achieve its goal, or goal is unclear</li>"
 when 117 :code = code + "<li>4 questions are included</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 118..120
@@ -513,9 +478,7 @@ case i
 when 118 :code = code + "<li>Learning target is missing/ not actually a learning target</li>"
 when 119 :code = code + "<li>Lesson has no goal/ content is unfocused</li>"
 when 120 :code = code + "<li>Questions are missing</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td></tr>"
 code = code + "</table>"
 code = code + "<h3>Writing Quality</h3>"
@@ -537,9 +500,7 @@ when 121 :code = code + "<li>Is focused, organized, and easy to read throughout<
 when 122 :code = code + "<li>Uses rich, descriptive vocabulary and a variety of effective sentence structures</li>"
 when 123 :code = code + "<li>Contains few to no mechanical errors</li>"
 when 124 :code = code + "<li>Has an effective introduction and a conclusion that synthesizes all of the material presented</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 125..128
@@ -549,9 +510,7 @@ when 125 :code = code + "<li>Is organized and flows well</li>"
 when 126 :code = code + "<li>Uses effective vocabulary and sentence structures</li>"
 when 127 :code = code + "<li>Contains a few minor mechanical errors</li>"
 when 128 :code = code + "<li>Has an effective introduction and conclusion based on included information</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 129..132
@@ -561,9 +520,7 @@ when 129 :code = code + "<li>Is mostly organized</li>"
 when 130 :code = code + "<li>Uses properly constructed sentences</li>"
 when 131 :code = code + "<li>Has a few distracting errors</li>"
 when 132 :code = code + "<li>Includes an introduction and a conclusion</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 133..136
@@ -573,9 +530,7 @@ when 133 :code = code + "<li>Can be difficult to follow</li>"
 when 134 :code = code + "<li>Contains several awkward sentences</li>"
 when 135 :code = code + "<li>Has several distracting errors</li>"
 when 136 :code = code + "<li>Lacks either an introduction or a conclusion</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
 for i in 137..140
@@ -585,9 +540,7 @@ when 137 :code = code + "<li>Has minimal organization</li>"
 when 138 :code = code + "<li>Has many poorly constructed sentences</li>"
 when 139 :code = code + "<li>Has many mechanical errors that inhibit comprehension</li>"
 when 140 :code = code + "<li>Has neither a clear introduction nor a conclusion</li>"
-end
-end
-end
+end end end
 code = code + "</ul></td></tr>"
 code = code + "</table>"
 

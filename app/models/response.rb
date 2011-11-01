@@ -731,9 +731,7 @@ def custom_display_as_html_2011(code, file_url)
   else
     code = code + "<img src=\"/images/delete_icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
   end
-
   code = code + "<br/><h3>Questions</h3>"
-
     code = code + "<i>Type: </i><b>#{review_scores[34].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Grade: </i><b>#{review_scores[35].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Comment: </i><dl><dd>#{review_scores[36].comments.gsub(/\"/,'&quot;').to_s}</dl></dd><br/>"
@@ -753,7 +751,6 @@ def custom_display_as_html_2011(code, file_url)
 
   #*******************Rubric************************
   code = code + "<h2>Rubric</h2><hr>"
-
   code = code + "<h3>Importance</h3>"
   code = code +
            "<div align=\"center\">The information selected by the author:</div><table class='general'>
@@ -810,9 +807,7 @@ def custom_display_as_html_2011(code, file_url)
     code = code + "<li>Lacks any substantive information (entirely common knowledge or author’s opinion).</li>"
   end
   code = code + "</ul></td></tr>"
-
   code = code + "</table>"
-
   code = code + "<h3>Interest</h3>"
   code = code +
            "<div align=\"center\">To attract and maintain attention, the lesson has:</div><table class='general'>
@@ -875,11 +870,8 @@ def custom_display_as_html_2011(code, file_url)
     code = code + "<li>No interpretation or explanation of cited material.</li>"
   end
   code = code + "</ul></td></tr>"
-
   code = code + "</table>"
-
   code = code + "<h3>Credibility</h3>"
-
   code = code +
            "<div align=\"center\">To demonstrate its credibility the lesson:</div><table class='general'>
             <tr>
@@ -901,9 +893,7 @@ def custom_display_as_html_2011(code, file_url)
   if review_scores[70].comments == "1"
     code = code + "<li>Identifies bias in sources and clearly differentiates between opinion and fact.</li>"
   end
-
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
   if review_scores[71].comments == "1"
     code = code + "<li>Cites 5 diverse, reputable sources with few APA errors.</li>"
@@ -914,9 +904,7 @@ def custom_display_as_html_2011(code, file_url)
   if review_scores[73].comments == "1"
     code = code + "<li>Clearly differentiates between opinion and fact</li>"
   end
-
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
   if review_scores[74].comments == "1"
     code = code + "<li>Cites 5 reputable sources.</li>"
@@ -927,9 +915,7 @@ def custom_display_as_html_2011(code, file_url)
   if review_scores[76].comments == "1"
     code = code + "<li>Occasionally states opinion as fact.</li>"
   end
-
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
   if review_scores[77].comments == "1"
     code = code + "<li>Cites 4 reputable sources.</li>"
@@ -940,9 +926,7 @@ def custom_display_as_html_2011(code, file_url)
   if review_scores[79].comments == "1"
     code = code + "<li>Routinely states opinion as fact and fails to acknowledge bias.</li>"
   end
-
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
   if review_scores[80].comments == "1"
     code = code + "<li>Cites 3 or fewer reputable sources.</li>"
@@ -953,13 +937,9 @@ def custom_display_as_html_2011(code, file_url)
   if review_scores[82].comments == "1"
     code = code + "<li>Is very biased and contains almost entirely opinions.</li>"
   end
-
   code = code + "</ul></td></tr>"
-
   code = code + "</table>"
-
   code = code + "<h3>Pedagogy</h3>"
-
   code = code +
            "<div align=\"center\">To help guide the reader:</div><table class='general'>
             <tr>
@@ -1045,10 +1025,8 @@ def custom_display_as_html_2011(code, file_url)
     code = code + "<li>Neither an introduction nor a conclusion are included.</li>"
   end
   code = code + "</ul></td></tr>"
-
   code = code + "</table>"
   code = code + "<h3>Writing Quality</h3>"
-
   code = code +
            "<div align=\"center\">The writing:</div><table class='general'>
             <tr>
@@ -1104,7 +1082,6 @@ def custom_display_as_html_2011(code, file_url)
     code = code + "<li>Has many mechanical errors that inhibit comprehension.</li>"
   end
   code = code + "</ul></td></tr>"
-
   code = code + "</table>"
 
   #*******************Ratings************************

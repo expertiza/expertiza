@@ -106,4 +106,46 @@ class UsersControllerTest < ActionController::TestCase
     assert assigns(:users)
     assert_select 'div.pagination', false
   end
+
+  def test_search_by_username
+    #search for something that is there
+    get :list, :letter => 'tud10', :num_users => 4, :search_by => 1
+    assert_response :success
+    assert assigns(:users)
+    assert_not_equal assigns(:users).size, 0
+
+    #search for something that is not there
+    get :list, :letter => 'tgdfgdfsdafa0', :num_users => 4, :search_by => 1
+    assert_response :success
+    assert assigns(:users)
+    assert_equal assigns(:users).size, 0
+  end
+
+  def test_search_by_fullname
+    #search for something that is there
+    get :list, :letter => '9_ful', :num_users => 4, :search_by => 2
+    assert_response :success
+    assert assigns(:users)
+    assert_not_equal assigns(:users).size, 0
+
+    #search for something that is not there
+    get :list, :letter => 'sdgfbfvrs', :num_users => 4, :search_by => 2
+    assert_response :success
+    assert assigns(:users)
+    assert_equal assigns(:users).size, 0
+  end
+
+  def test_search_by_email
+    #search for something that is there
+    get :list, :letter => '9@foo.edu', :num_users => 4, :search_by => 3
+    assert_response :success
+    assert assigns(:users)
+    assert_not_equal assigns(:users).size, 0
+
+    #search for something that is not there
+    get :list, :letter => 'fsfgdfvxzcff', :num_users => 4, :search_by => 3
+    assert_response :success
+    assert assigns(:users)
+    assert_equal assigns(:users).size, 0
+  end
 end

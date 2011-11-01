@@ -226,33 +226,33 @@ end
 end
 
 code = code + "</ul></td>" 
- code = code + "<td><ul>"  
-if review_scores[50].comments == "1" 
-   code = code + "<li>Is relevant to future teachers</li>" 
- end 
- if review_scores[51].comments == "1" 
-   code = code + "<li>Is mostly based on researched information</li>" 
- end  
-if review_scores[52].comments == "1" 
-   code = code + "<li>Is applicable to today's schools</li>" 
- end 
- if review_scores[53].comments == "1" 
-   code = code + "<li>Provides a good overview and explores a few key ideas</li>" 
- end 
- code = code + "</ul></td>"  code = code + "<td><ul>" 
- if review_scores[54].comments == "1"   
- code = code + "<li>Has useful points but some irrelevant information</li>" 
- end 
- if review_scores[55].comments == "1"  
-  code = code + "<li>Is half research; half the author's opinion</li>"  
+code = code + "<td><ul>"  
+
+for i in 50..53
+if review_scores[i].comments == "1"
+case i
+when 50 :code = code + "<li>Is relevant to future teachers</li>" 
+when 51 :code = code + "<li>Is mostly based on researched information</li>"
+when 52 :code = code + "<li>Is applicable to today's schools</li>" 
+when 53 :code = code + "<li>Provides a good overview and explores a few key ideas</li>" 
 end
-  if review_scores[56].comments == "1"
-    code = code + "<li>Is partially out-dated or may not reflect current practice</li>"  
 end
-  if review_scores[57].comments == "1"   
- code = code + "<li>Contains good information but yields an incomplete understanding</li>" 
- end  
-code = code + "</ul></td>" 
+end
+
+ code = code + "</ul></td>" 
+ code = code + "<td><ul>" 
+for i in 54..57
+if review_scores[i].comments == "1"
+case i
+when 54 :code = code + "<li>Has useful points but some irrelevant information</li>" 
+when 55 :code = code + "<li>Is half research; half the author's opinion</li>" 
+when 56 :code = code + "<li>Is partially out-dated or may not reflect current practice</li>"  
+when 57 :code = code + "<li>Contains good information but yields an incomplete understanding</li>"
+end
+end
+end
+
+ code = code + "</ul></td>" 
  code = code + "<td><ul>"  
 if review_scores[58].comments == "1"   
  code = code + "<li>Has one useful point</li>" 

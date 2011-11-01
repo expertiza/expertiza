@@ -214,20 +214,16 @@ end
             <tr>"
 
   code = code + "<td><ul>"
-
-  if review_scores[46].comments == "1"  
-  code = code + "<li>Is very important for future teachers to know</li>"
-  end 
-
- if review_scores[47].comments == "1"  
-  code = code + "<li>Is based on researched information</li>" 
- end
-  if review_scores[48].comments == "1" 
-   code = code + "<li>Is highly relevant to current educational practice</li>"
-  end 
- if review_scores[49].comments == "1"
-    code = code + "<li>Provides an excellent overview and in-depth discussion of key issues</li>"
-  end  
+for i in 46..49
+if review_scores[i].comments == "1"
+case i
+when 46 :code = code + "<li>Is very important for future teachers to know</li>"
+when 47 :code = code + "<li>Is based on researched information</li>" 
+when 48 :code = code + "<li>Is highly relevant to current educational practice</li>"
+when 49 :code = code + "<li>Provides an excellent overview and in-depth discussion of key issues</li>"
+end
+end
+end
 
 code = code + "</ul></td>" 
  code = code + "<td><ul>"  

@@ -1,4 +1,3 @@
-<!-- REVIEWS --> 
 <% if rscore and rscore[:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
@@ -17,11 +16,39 @@
   <% count = 0 %>
   <% for review in rscore[:assessments] %>
     <% count = count + 1 %>
+		
+		<% file_url = nil
+       if (participant.assignment.instructor_id == User.find_by_name("jkidd").id)
+            @current_folder = DisplayOption.new
+            @current_folder.name = ""
+            @participant = Participant.find(review.map.reviewer_id)
+						files_list = Dir[@participant.assignment.get_path.to_s + "/" + review.map.id.to_s + @current_folder.name + "/*"]
+						files = Array.new
+						for file in files_list
+						if File.directory?(file) then
+							dir_files = get_files(file)
+							dir_files.each{|f| files << f}
+						end
+						files << file
+					end
+					file = files[0]
+					file_url = ""
+					if !file.nil?
+             # parentFolder = File.dirname(file)
+             # location = parentFolder + File.basename(file)
+					   file_url = ""
+						 file_url = "<u><i> "
+						 file_url += link_to File.basename(file), :controller=>'submitted_content', :action=>'download', :download=>File.basename(file), 'current_folder[name]'=>File.dirname(file)
+						 file_url += " </i></u><br/>"
+					end
+		end
+    %>
+
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
     <% else %>
       <% review_feedback = nil %>
-      <%= review.display_as_html(nil,count) %><BR/><BR/>
+      <%= review.display_as_html(nil,count, file_url) %><BR/><BR/>
       <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)         
          if map
                 review_feedback = map.response         
@@ -38,4 +65,3 @@
 <% else %>
   <i>No reviews have been completed for this user's submissions.</i>
 <% end %>
-<!-- END REVIEWS --> 

@@ -26,8 +26,6 @@ assignment<%= i %>:
   num_reviews: <%= i%2+1 %>
   num_review_of_reviews: <%= i%2+1 %>
   num_review_of_reviewers: <%= i%3 %>
-  review_strategy_id: <%= rev_list[i%2] %>
-  mapping_strategy_id: <%= map_list[i%2] %>
   review_questionnaire_id: <%= q_list[i%3] %>
   review_of_review_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
   author_feedback_questionnaire_id: <%= q_list[(i+1)%3] %>
@@ -36,9 +34,9 @@ assignment<%= i %>:
   require_signup: <%= i==5 %>
   num_reviewers: <%= i%5+1 %>
   spec_location:
-  team_assignment: <=% i > 5 %>
-  wiki_type_id: <%= Fixtures.identify(:MediaWiki) %>
-  team_count: <=% 2*i %>
+  team_assignment: <%= i > 5 %>
+  wiki_type_id: 1
+  team_count: <%= 2*i %>
   
 <% end %>
 
@@ -52,8 +50,6 @@ assignment_team_count:
   num_reviews: 1
   num_review_of_reviews: 1
   num_review_of_reviewers: 1
-  review_strategy_id: <%= rev_list[0] %>
-  mapping_strategy_id: <%= map_list[0] %>
   review_questionnaire_id: <%= q_list[0] %>
   review_of_review_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
   author_feedback_questionnaire_id:
@@ -62,7 +58,7 @@ assignment_team_count:
   require_signup: <%= 1 %>
   num_reviewers: <%= 2 %>
   spec_location:
-  team_assignment: <=% 1 %>
+  team_assignment: <%= 1 %>
   wiki_type_id: <%= Fixtures.identify(:MediaWiki) %>
   team_count: 2
  
@@ -76,8 +72,6 @@ assignment_review0:
   num_reviews: 1
   num_review_of_reviews: 1
   num_review_of_reviewers: 3
-  review_strategy_id: <%= rev_list[0] %>
-  mapping_strategy_id: <%= map_list[0] %>
   review_questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
   review_of_review_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
   author_feedback_questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
@@ -86,7 +80,7 @@ assignment_review0:
   require_signup: <%= 1 %>
   num_reviewers: <%= 3 %>
   spec_location:
-  team_assignment: <=% 1 %>
+  team_assignment: <%= 1 %>
   team_count: 2
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %> 
  

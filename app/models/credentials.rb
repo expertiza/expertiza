@@ -11,19 +11,12 @@ class Credentials
     role = Role.find(@role_id)
     @updated_at = role.updated_at
 
-    roles = role.get_parents
-    @role_ids = Array.new
-    for r in roles do
-      @role_ids << r.id
-    end
+    @role_ids = role.get_parents.map{|r|r.id}
 
     permissions = Permission.find_for_role(@role_ids)
-    @permission_ids = Array.new
-    for p in permissions do
-      @permission_ids << p.id
-    end
+    @permission_ids = permissions.map{|p|p.id}
 
-    if @permission_ids.length < 1
+    if @permission_ids.empty?
       @permission_ids << 0
     end
 

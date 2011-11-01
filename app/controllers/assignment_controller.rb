@@ -1,5 +1,4 @@
 class AssignmentController < ApplicationController
-  require 'ftools'
   auto_complete_for :user, :name
   before_filter :authorize
   
@@ -104,74 +103,94 @@ end
       @days = params[:days].to_i
       @weeks = params[:weeks].to_i      
     end
-
-
+    
+    
     @assignment.days_between_submissions = @days + (@weeks*7)
     
     # Deadline types used in the deadline_types DB table
     deadline = DeadlineType.find_by_name("submission")
-    @Submission_deadline= deadline.id
+    @Submission_deadline = deadline.id
     deadline = DeadlineType.find_by_name("review")
     @Review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("resubmission")
-    @Resubmission_deadline= deadline.id
+    @Resubmission_deadline = deadline.id
     deadline = DeadlineType.find_by_name("rereview")
     @Rereview_deadline = deadline.id
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
+
     #PART OF IMPROVEMENT TO SUGGEST AND APPROVE
     #This is the new deadline added as part of improving suggestion project. Switch topic deadline
     #refers to the final date after which a student will not be able to switch topics for an assignment
     deadline = DeadlineType.find_by_name("switch_topics")
     @switch_topics_deadline = deadline.id
     
+    deadline = DeadlineType.find_by_name("drop_topic")
+    @drop_topic_deadline = deadline.id
     
     if @assignment.save 
       set_questionnaires   
       set_limits_and_weights
       
       max_round = 1
-      #setting the Due Dates with a helper function written in DueDate.rb
-      DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
       
-      DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
-      #Setting the due date to switch topics,#PART OF IMPROVEMENT TO SUGGEST AND APPROVE
-      DueDate::set_duedate(params[:switch_deadline],@switch_topics_deadline, @assignment.id, max_round )
-      max_round = 2;
-      
-     
-      if params[:assignment_helper][:no_of_reviews].to_i >= 2
-        for resubmit_duedate_key in params[:additional_submit_deadline].keys
-          #setting the Due Dates with a helper function written in DueDate.rb
-          DueDate::set_duedate(params[:additional_submit_deadline][resubmit_duedate_key],@Resubmission_deadline, @assignment.id, max_round )
-          max_round = max_round + 1
+      begin
+        #setting the Due Dates with a helper function written in DueDate.rb
+        due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
+        raise "Please enter a valid Submission deadline" if !due_date
+        
+        due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
+        raise "Please enter a valid Review deadline" if !due_date
+       
+        #Setting the due date to switch topics,#PART OF IMPROVEMENT TO SUGGEST AND APPROVE
+        DueDate::set_duedate(params[:switch_deadline],@switch_topics_deadline, @assignment.id, max_round )
+       
+        max_round = 2;
+           
+        due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
+        raise "Please enter a valid drop toipic deadline" if !due_date
+        
+        if params[:assignment_helper][:no_of_reviews].to_i >= 2
+          for resubmit_duedate_key in params[:additional_submit_deadline].keys
+            #setting the Due Dates with a helper function written in DueDate.rb
+            due_date = DueDate::set_duedate(params[:additional_submit_deadline][resubmit_duedate_key],@Resubmission_deadline, @assignment.id, max_round )
+            raise "Please enter a valid Resubmission deadline" if !due_date
+            max_round = max_round + 1
+          end
+          max_round = 2
+          for rereview_duedate_key in params[:additional_review_deadline].keys
+            #setting the Due Dates with a helper function written in DueDate.rb
+            due_date = DueDate::set_duedate(params[:additional_review_deadline][rereview_duedate_key],@Rereview_deadline, @assignment.id, max_round )
+            raise "Please enter a valid Rereview deadline" if !due_date
+            max_round = max_round + 1
+          end
         end
-        max_round = 2
-        for rereview_duedate_key in params[:additional_review_deadline].keys
-          #setting the Due Dates with a helper function written in DueDate.rb
-          DueDate::set_duedate(params[:additional_review_deadline][rereview_duedate_key],@Rereview_deadline, @assignment.id, max_round )
-          max_round = max_round + 1
-        end
+        #setting the Due Dates with a helper function written in DueDate.rb
+        @assignment.questionnaires.each{
+          |questionnaire|
+          if questionnaire.instance_of? MetareviewQuestionnaire
+            due_date = DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
+            raise "Please enter a valid Metareview deadline" if !due_date
+          end
+        }
+               
+        # Create submission directory for this assignment
+        # If assignment is a Wiki Assignment (or has no directory)
+        # the helper will not create a path
+        FileHelper.create_directory(@assignment)      
+        
+        # Creating node information for assignment display
+        @assignment.create_node()
+        
+        flash[:alert] = "There is already an assignment named \"#{@assignment.name}\". &nbsp;<a style='color: blue;' href='../../assignment/edit/#{@assignment.id}'>Edit assignment</a>" if @assignment.duplicate_name?
+        flash[:note] = 'Assignment was successfully created.'
+        redirect_to :action => 'list', :controller => 'tree_display'
+      rescue
+        flash[:error] = $!
+        prepare_to_edit
+        @wiki_types = WikiType.find(:all)
+        render :action => 'new'
       end
-      #setting the Due Dates with a helper function written in DueDate.rb
-      @assignment.questionnaires.each{
-         |questionnaire|
-         if questionnaire.instance_of? MetareviewQuestionnaire
-           DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
-         end
-      }
-      
-      
-      # Create submission directory for this assignment
-      # If assignment is a Wiki Assignment (or has no directory)
-      # the helper will not create a path
-      FileHelper.create_directory(@assignment)      
-      
-      # Creating node information for assignment display
-      @assignment.create_node()
-      
-      flash[:notice] = 'Assignment was successfully created.'
-      redirect_to :action => 'list', :controller => 'tree_display'
       
     else
       @wiki_types = WikiType.find(:all)
@@ -182,7 +201,10 @@ end
   
   def edit
     @assignment = Assignment.find(params[:id])
-
+    prepare_to_edit
+  end
+  
+  def prepare_to_edit
     if !@assignment.days_between_submissions.nil?
       @weeks = @assignment.days_between_submissions/7
       @days = @assignment.days_between_submissions - @weeks*7
@@ -209,12 +231,12 @@ end
   end  
   
   def set_questionnaires
-    @assignment.assignment_questionnaires.clear
+    @assignment.questionnaires = Array.new
     params[:questionnaires].each{
       | key, value |       
-      if value.to_i > 0 and Questionnaire.find(value)
-        @assignment.questionnaires << Questionnaire.find(value)
-      end
+      if value.to_i > 0 and (q = Questionnaire.find(value))
+        @assignment.questionnaires << q
+     end
     }     
   end   
   
@@ -230,13 +252,17 @@ end
     
     default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)   
 
-    if default!= nil    
-    @limits[:review] = default.notification_limit
-    @limits[:metareview] = default.notification_limit
-    @limits[:feedback] = default.notification_limit
-    @limits[:teammate] = default.notification_limit
+    if default.nil?
+      default_limit_value = 15
+    else
+      default_limit_value = default.notification_limit
     end
 
+    @limits[:review]     = default_limit_value
+    @limits[:metareview] = default_limit_value
+    @limits[:feedback]   = default_limit_value
+    @limits[:teammate]   = default_limit_value
+   
     @weights[:review] = 100
     @weights[:metareview] = 0
     @weights[:feedback] = 0
@@ -303,10 +329,12 @@ end
     @assignment.days_between_submissions = @days + (@weeks*7)
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
-    if @assignment.update_attributes(params[:assignment])
-      
-      set_questionnaires
-      set_limits_and_weights
+    if @assignment.update_attributes(params[:assignment])     
+      if params[:questionnaires] and params[:limits] and params[:weights]
+        set_questionnaires
+        set_limits_and_weights
+      end
+
       begin
         newpath = @assignment.get_path        
       rescue
@@ -315,18 +343,25 @@ end
       if oldpath != nil and newpath != nil
         FileHelper.update_file_location(oldpath,newpath)
       end
-      # Iterate over due_dates, from due_date[0] to the maximum due_date
-      if params[:due_date]
-        for due_date_key in params[:due_date].keys
-          due_date_temp = DueDate.find(due_date_key)
-          puts due_date_temp
-          puts due_date_key
-          puts params[:due_date][due_date_key]
-          due_date_temp.update_attributes(params[:due_date][due_date_key])
+
+      begin
+        # Iterate over due_dates, from due_date[0] to the maximum due_date
+        if params[:due_date]
+          for due_date_key in params[:due_date].keys
+            due_date_temp = DueDate.find(due_date_key)
+            due_date_temp.update_attributes(params[:due_date][due_date_key])     
+            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+          end
         end
+     
+        flash[:notice] = 'Assignment was successfully updated.'
+        redirect_to :action => 'show', :id => @assignment                  
+     
+      rescue
+        flash[:error] = $!
+        prepare_to_edit
+        render :action => 'edit', :id => @assignment
       end
-      flash[:notice] = 'Assignment was successfully updated.'
-      redirect_to :action => 'show', :id => @assignment                  
     else # Simply refresh the page
       @wiki_types = WikiType.find(:all)
       render :action => 'edit'
@@ -343,7 +378,6 @@ end
     # If the assignment is already deleted, go back to the list of assignments
     if assignment 
       begin
-        @user =  ApplicationHelper::get_user_role(session[:user])
         @user = session[:user]
         id = @user.get_instructor
         if(id != assignment.instructor_id)
@@ -356,7 +390,7 @@ end
         flash[:notice] = "The assignment is deleted"
       rescue
         url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
-        url_no  = url_for :action => 'delete', :id => params[:id]        
+        url_no  = url_for :action => 'delete', :id => params[:id]
         error = $!
         flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
       end
@@ -376,19 +410,14 @@ end
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @courses = @user.set_courses_to_assignment
-#    if session[:user].role_id != 6 # for other that TA
-#      @courses = Course.find_all_by_instructor_id(session[:user].id, :order => 'name')
-#    else
-#      @courses = TaMapping.get_courses(session[:user].id)
-#    end   
   end
   
   def remove_assignment_from_course    
     assignment = Assignment.find(params[:id])
-    oldpath = assignment.get_path
+    oldpath = assignment.get_path rescue nil
     assignment.course_id = nil    
     assignment.save
-    newpath = assignment.get_path
+    newpath = assignment.get_path rescue nil
     FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
   end  

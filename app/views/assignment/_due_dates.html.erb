@@ -2,7 +2,7 @@
  <div style="font-size:large;"><b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b></div><br/>
     <div style="padding: 5px">Number of rounds of review:
         <input type="text" id="assignment_helper_no_of_reviews" name="assignment_helper[no_of_reviews]" maxlength="5" size="5" value="1" onchange="addElement();" />
-        <input type="button" name="selectButton" value="Edit" onclick="addElement();" />
+        <input type="button" name="selectButton" value="Set" onclick="addElement();" />
     </div>
         <br/>   
         <TABLE class="exp">
@@ -14,7 +14,7 @@
 
                <TH>Resubmission allowed</TH>
                <TH>Rereview allowed</TH>
-               <TH>Review of review allowed</TH>
+               <TH>Metareview allowed</TH>
 			   <TH>Reminder (hrs)</TH>
            </TR>
            <TR>
@@ -79,7 +79,7 @@
        <table class="exp">
            <TR>
                <TD ALIGN=LEFT WIDTH=20%>
-                   Review-of-review deadline
+                   Metareview deadline
                </TD>
                <TD ALIGN="CENTER">
                   <input type="text" id="reviewofreview_deadline_due_at" name ="reviewofreview_deadline[due_at]"/>
@@ -105,10 +105,9 @@
                </TD>
 			   
            </TR>
-		   
-      
 
-	    <TD ALIGN=LEFT WIDTH=20%>
+			<TR>
+     	    <TD ALIGN=LEFT WIDTH=20%>
                    Switch Topic deadline
 				   <FONT COLOR="blue">(Enter a date less than submission deadline)</FONT>
                </TD>
@@ -134,8 +133,15 @@
                    <%= select('switch_deadline', 'threshold', [ [8, 8] ],:selected =>1 )%>
                </TD>
 			   
+               <TD ALIGN=LEFT WIDTH=20%>
+                   Drop-topic deadline
+               </TD>
+               <TD ALIGN="CENTER">
+                  <input type="text" id="drop_topic_due_at" name ="drop_topic_deadline[due_at]"/>
+                  <img src="/images/cal.gif" onClick="NewCal('drop_topic_due_at','YYYYMMDD',true,24); return false;"/>
+               </TD>
            </TR>
-		  </table>
+       </table>
     </div>
 	 
 <br/>

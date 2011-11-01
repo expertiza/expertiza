@@ -1,12 +1,14 @@
 <TD WIDTH="15%">
   <ul id="actionmenu">
     <li class="daddy">&nbsp;
-      <ul>        
-        <% model = TreeFolder.find(node.node_object_id).name+"Questionnaire"
-           model.gsub!(/[^\w]/,'') %>
-        <li><%= link_to 'Create Public '+node.get_name, :controller=>'questionnaire', :action=>'new', :model => model, :private => 0 %></li>  
-        <li><%= link_to 'Create Private '+node.get_name, :controller=>'questionnaire', :action=>'new', :model => model, :private => 1 %></li>          
-      </ul>
+      <ul>
+        <div>
+          <% model = TreeFolder.find(node.node_object_id).name+"Questionnaire"
+            model.gsub!(/[^\w]/,'') %>
+          <li><%= link_to image_tag('/images/tree_view/add-public-24.png', :title => 'Create Public '+node.get_name), :controller=>'questionnaire', :action=>'new', :model => model, :private => 0 %></li>  
+          <li><%= link_to image_tag('/images/tree_view/add-private-24.png', :title => 'Create Private '+node.get_name), :controller=>'questionnaire', :action=>'new', :model => model, :private => 1 %></li>          
+        </div>
+	  </ul>
     </li>
   </ul>        
 </TD>

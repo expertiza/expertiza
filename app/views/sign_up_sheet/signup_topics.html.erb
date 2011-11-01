@@ -19,7 +19,6 @@
     <th width="10%">Bookmarks</th>
   </tr>
 
-
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
       <b>Your topic(s):</b>
       <% for selected_topic in @selected_topics %>
@@ -34,7 +33,17 @@
 
   <% i=1 %>
   <% for topic in @sign_up_topics %>
-      <tr>
+  	<% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+     <% for selected_topic in @selected_topics %>
+       <% if selected_topic.topic_id == topic.id %>
+        <tr bgcolor="yellow">
+       <% else %>
+	     <tr>
+	   <% end%>
+	 <%end %>
+	 <%else%>
+	 	<tr>
+	<%end%>
         <td><%=topic.topic_identifier%></td>
         <td><%= link_to topic.topic_name,:action => "show", :id => topic.id %></td>
         <td align="center"><%= topic.max_choosers %></td>
@@ -58,8 +67,10 @@
             <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
                 <% for selected_topic in @selected_topics %>
                     <% if selected_topic.topic_id == topic.id %>
-                        <td align="center"><%= link_to image_tag('delete_icon.png',  :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
-                        <%action_symbol_added = true%>
+
+                        <td align="center" bgcolor="yellow"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+
+                     <%action_symbol_added = true%>
                     <% end %>
                 <% end %>
             <% end %>

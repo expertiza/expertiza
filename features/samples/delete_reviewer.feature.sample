@@ -1,0 +1,12 @@
+Feature: Delete a Reviewer of an Assignment
+  In order to delete a reviewer of an assignment
+  As an admin of an assignment in Expertiza
+  I want to delete a user on the admin console
+
+Scenario: Delete a reviewer from an assignment
+  Given a browser is open to Expertiza with logging delete_reviewer-log.txt
+  And I am logged into Expertiza as an Admin
+  And I navigate to the ASSIGNMENT_LIST
+  When I find the popup for ASSIGN_REVIEWERS_COURSE I click on assign reviewers
+  And I click to delete the reviewer and verify they are gone
+  And I close the browser

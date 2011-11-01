@@ -2,7 +2,7 @@
 // This file is automatically included by javascript_include_tag :defaults
 function checkForm()
 {
-	return checkWeights() && checkDeadlines();
+	return checkWeights(); // && checkDeadlines();
 }
 
 function checkWeights()

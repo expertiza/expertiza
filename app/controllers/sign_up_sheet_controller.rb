@@ -30,6 +30,7 @@ class SignUpSheetController < ApplicationController
       @topics.each {|topic|
 
         @duedates[i]['t_id'] = topic.id
+        @duedates[i]['topic_identifier'] = topic.topic_identifier
         @duedates[i]['topic_name'] = topic.topic_name
 
         for j in 1..@review_rounds
@@ -66,15 +67,13 @@ class SignUpSheetController < ApplicationController
         i = i + 1
       }
     end
-
-    if !@duedates.nil?
-      @duedates.sort! {|a,b| a['submission_1'] <=> b['submission_1']}
-    end
-
-
   end
 
   def add_signup_topics
+    load_add_signup_topics(params[:id])
+  end
+
+  def view_publishing_rights
     load_add_signup_topics(params[:id])
   end
 
@@ -84,8 +83,8 @@ class SignUpSheetController < ApplicationController
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 
-    assignment = Assignment.find(assignment_id)
-    if !assignment.team_assignment
+    @assignment = Assignment.find(assignment_id)
+    if !@assignment.team_assignment
       @participants = SignedUpUser.find_participants(assignment_id)
     else
       @participants = SignedUpUser.find_team_participants(assignment_id)
@@ -239,9 +238,10 @@ class SignUpSheetController < ApplicationController
       @show_actions = false
     end
     
-    
-    #Find whether the user has signed up for any topics, if so the user won't be able to
-    #signup again unless the former was a waitlisted topic
+
+    #Find whether the user has signed up for any topics; if so the user won't be able to
+    #sign up again unless the former was a waitlisted topic
+
     #if team assignment, then team id needs to be passed as parameter else the user's id
     if assignment.team_assignment == true
       users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
@@ -266,71 +266,75 @@ class SignUpSheetController < ApplicationController
   def delete_signup_for_topic(assignment_id,topic_id)
     #find whether assignment is team assignment
     assignment = Assignment.find(assignment_id)
-    
-    
-    #if team assignment find the creator id from teamusers table and teams
-    if assignment.team_assignment == true
-      #users_team will contain the team id of the team to which the user belongs
-      users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
-      signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
-    
+
+    #making sure that the drop date deadline hasn't passed
+    dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})
+    if(!dropDate.nil? && dropDate.due_at < Time.now)
+      flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
-      signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, session[:user].id)
-    
-    end
-
-#############DO NOT MOVE THIS CODE . IT HAS TO BE AFTER THE AboVE IF ELSE STATEMENT BELOW
-# This block of code checks to see if the deadline to switch topics has passed. If it has passed
-#it ensures that the user can drop this topic but cannot signup for any other topic except this.
-#Basically, it binds the user to signup only for this topic or drop it after the swtich deadline.
-#see readme for clear description. Also adds an entry binding the user in the switch_topic table
-#PART OF IMPROVEMENT TO SUGGEST AND APPROVE 
- @switch_date = DueDate.find_by_assignment_id_and_deadline_type_id(assignment_id,6)
-  if @switch_date
-      if @switch_date.due_at < Time.now
-        if !(signup_record.is_waitlisted)
-        @bind = SwitchTopic.new
-        @bind.userid = session[:user].id
-        @bind.unityid = session[:user].name
-        @bind.assignment_id = assignment_id
-        @bind.topic_id = topic_id
-        @bind.save
-        flash[:error] = "Deadline to switch topics has passed. You can only signup for your original Topic if slots are available"
+      
+      #############DO NOT MOVE THIS CODE . IT HAS TO BE AFTER THE AboVE IF ELSE STATEMENT BELOW
+      # This block of code checks to see if the deadline to switch topics has passed. If it has passed
+      #it ensures that the user can drop this topic but cannot signup for any other topic except this.
+      #Basically, it binds the user to signup only for this topic or drop it after the swtich deadline.
+      #see readme for clear description. Also adds an entry binding the user in the switch_topic table
+      #PART OF IMPROVEMENT TO SUGGEST AND APPROVE 
+       @switch_date = DueDate.find_by_assignment_id_and_deadline_type_id(assignment_id,6)
+        if @switch_date
+            if @switch_date.due_at < Time.now
+              if !(signup_record.is_waitlisted)
+              @bind = SwitchTopic.new
+              @bind.userid = session[:user].id
+              @bind.unityid = session[:user].name
+              @bind.assignment_id = assignment_id
+              @bind.topic_id = topic_id
+              @bind.save
+              flash[:error] = "Deadline to switch topics has passed. You can only signup for your original Topic if slots are available"
+              end
+            end
+          end
+      ##################
+      
+      #if team assignment find the creator id from teamusers table and teams
+      if assignment.team_assignment == true
+        #users_team will contain the team id of the team to which the user belongs
+        users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
+        signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
+      else
+        signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, session[:user].id)
+      end
+      
+      #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
+      if signup_record.is_waitlisted == false
+        #find the first wait listed user if exists
+        first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
+  
+        if !first_waitlisted_user.nil?
+          # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+          ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
+          first_waitlisted_user.is_waitlisted = false
+          first_waitlisted_user.save
+  
+          #update the participants details
+          if assignment.team_assignment?
+            user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+            participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
+          else
+            participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
+          end
+          participant.update_topic_id(topic_id)
+  
+          SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
         end
       end
-    end
-##################
-
-
-    #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
-    if signup_record.is_waitlisted == false
-      #find the first wait listed user if exists
-      first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
-
-      if !first_waitlisted_user.nil?
-        #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-        first_waitlisted_user.is_waitlisted = false
-        first_waitlisted_user.save
-
-        #update the participants details
-        if assignment.team_assignment?
-          user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-          participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
-        else
-          participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
-        end
-        participant.update_topic_id(topic_id)
-
-        SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
+  
+      if !signup_record.nil?
+        participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+        #update participant's topic id to nil
+        participant.update_topic_id(nil)
+        signup_record.destroy
       end
-    end
-
-    if !signup_record.nil?
-      participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-      #update participant's topic id to nil
-      participant.update_topic_id(nil)
-      signup_record.destroy
-    end
+    end #end condition for 'drop deadline' check
   end
 
   def signup
@@ -379,8 +383,9 @@ class SignUpSheetController < ApplicationController
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
-  def slotExist?(topic_id)
-    SignUpTopic.slotExist?(topic_id)
+  # When using this method when creating fields, update race conditions by using db transactions
+  def slotAvailable?(topic_id)
+    SignUpTopic.slotAvailable?(topic_id)
   end
 
   def otherConfirmedTopicforUser(assignment_id, creator_id)
@@ -395,22 +400,26 @@ class SignUpSheetController < ApplicationController
     sign_up = SignedUpUser.new
     sign_up.topic_id = params[:id]
     sign_up.creator_id = creator_id
+    
+    result = false
     if user_signup.size == 0
-      #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-      if slotExist?(topic_id)
-        sign_up.is_waitlisted = false
 
-        #Update topic_id in participant table with the topic_id
-        participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-        
-        participant.update_topic_id(topic_id)
-      else
-        sign_up.is_waitlisted = true
-      end
-      if sign_up.save
-        return true
-      else
-        return false
+      # Using a DB transaction to ensure atomic inserts
+      ActiveRecord::Base.transaction do
+        #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
+        if slotAvailable?(topic_id)
+          sign_up.is_waitlisted = false
+  
+          #Update topic_id in participant table with the topic_id
+          participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+          
+          participant.update_topic_id(topic_id)
+        else
+          sign_up.is_waitlisted = true
+        end
+        if sign_up.save
+          result = true
+        end
       end
     else
       #If all the topics choosen by the user are waitlisted,
@@ -420,25 +429,29 @@ class SignUpSheetController < ApplicationController
           return false
         end
       end
-      #check whether user is clicking on a topic which is not going to place him in the waitlist
-      if !slotExist?(topic_id)
-        sign_up.is_waitlisted = true
-        if sign_up.save
-          return true
-        else
-          return false
-        end
-      else
-        #if slot exist, then confirm the topic for the user and delete all the waitlist for this user        
-        SignUpTopic.cancel_all_waitlists(creator_id, assignment_id)
-        sign_up.is_waitlisted = false
-        sign_up.save
 
-        participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-        participant.update_topic_id(topic_id)
-        return true
+      # Using a DB transaction to ensure atomic inserts
+      ActiveRecord::Base.transaction do
+        #check whether user is clicking on a topic which is not going to place him in the waitlist
+        if !slotAvailable?(topic_id)
+          sign_up.is_waitlisted = true
+          if sign_up.save
+            result = true
+          end
+        else
+          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user        
+          SignUpTopic.cancel_all_waitlists(creator_id, assignment_id)
+          sign_up.is_waitlisted = false
+          sign_up.save
+  
+          participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+          participant.update_topic_id(topic_id)
+          result = true
+        end
       end
     end
+    
+    result
   end
 
   def create_team(assignment_id)
@@ -543,14 +556,17 @@ class SignUpSheetController < ApplicationController
         end
 
         topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_subm,i)
+        topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + i.to_s]})
+        flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
+        
         topic_deadline_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_rev,i)
-
-        topic_deadline_subm.update_attribute('due_at', due_date['submission_' + i.to_s])
-        topic_deadline_rev.update_attribute('due_at', due_date['review_' + i.to_s])
+        topic_deadline_rev.update_attributes({'due_at' => due_date['review_' + i.to_s]})
+        flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
       end
 
       topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(due_date['t_id'], DeadlineType.find_by_name('metareview').id)
-      topic_deadline_subm.update_attribute('due_at', due_date['submission_' + (review_rounds+1).to_s])
+      topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + (review_rounds+1).to_s]})
+      flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
     }
 
     redirect_to_sign_up(params[:assignment_id])    
@@ -636,18 +652,26 @@ class SignUpSheetController < ApplicationController
 
         set_of_due_dates.sort! {|a,b| a.due_at <=> b.due_at}
 
-        offset = (DateTime.parse(set_of_due_dates.last['due_at'].to_s) - DateTime.parse(set_of_due_dates.first['due_at'].to_s)).abs + days_between_submissions + 1
-
+        offset = days_between_submissions 
       end
 
       set_of_topic.each { |topic_id|
         #if the due dates have already been created and the save dependency is being clicked,
         #then delete existing n create again
         prev_saved_due_dates = TopicDeadline.find_all_by_topic_id(topic_id)
-        if !prev_saved_due_dates.nil?
-          prev_saved_due_dates.each {|date|
-            date.destroy
-          }
+        
+        #Only if there is a dependency for the topic
+        if !prev_saved_due_dates.nil?    
+          num_due_dates = prev_saved_due_dates.length
+          #for each due date in the current topic he want to compare it to the previous due date
+          for x in 0..num_due_dates - 1
+            #we don't want the old date to move earlier in time so we save it as the new due date and destroy the old one  
+            if DateTime.parse(set_of_due_dates[x].due_at.to_s) + offset.to_i < DateTime.parse(prev_saved_due_dates[x].due_at.to_s)
+              set_of_due_dates[x] = prev_saved_due_dates[x]
+              offset = 0
+            end
+            prev_saved_due_dates[x].destroy
+          end
         end
 
         set_of_due_dates.each {|due_date|
@@ -659,9 +683,4 @@ class SignUpSheetController < ApplicationController
 
   end
 
-
 end
-
-
-
-

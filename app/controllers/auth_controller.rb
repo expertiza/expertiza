@@ -12,10 +12,9 @@ class AuthController < ApplicationController
     else
       user = User.find_by_login(params[:login][:name])
       
-      if user and user.check_password(params[:login][:password])
+      if user and user.valid_password?(params[:login][:password])
         logger.info "User #{params[:login][:name]} successfully logged in"
         session[:user] = user
-        
         AuthController.set_current_role(user.role_id,session)
         
         respond_to do |wants|          
@@ -32,12 +31,13 @@ class AuthController < ApplicationController
         logger.warn "Failed login attempt"
         respond_to do |wants|
           wants.html do
-            redirect_to :action => 'login_failed'
+            flash[:error] = "Incorrect Name/Password"
+            redirect_to :controller => 'password_retrieval', :action => 'forgotten'
           end
           wants.xml do
             render :nothing => true, :status => 404
           end
-          end
+        end
       end
     end
   end  # def login
@@ -107,7 +107,6 @@ class AuthController < ApplicationController
   protected
 
   def self.logout(session)
-    session.delete
     self.clear_session(session)
   end
   

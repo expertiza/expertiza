@@ -14,19 +14,16 @@ class User < ActiveRecord::Base
   has_many :assignments, :through => :participants
   
   belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
-<<<<<<< HEAD
-  has_many :bookmark_users
-  has_many :teams_users
-||||||| merged common ancestors
-  
-  has_many :teams_users
-=======
+
+  #Couldnt find the corresponding databse table, hence commenting it out
+  # has_many :bookmark_users
+
   belongs_to :role
   
   has_many :teams_users, :dependent => :destroy
->>>>>>> master
   has_many :teams, :through => :teams_users
-  has_many :bmappings
+  #Couldnt find the corresponding databse table, hence commenting it out
+  #has_many :bmappings
   validates_presence_of :name
   validates_presence_of :email, :message => "can't be blank; use anything@mailinator.com for test users"
   validates_format_of :email, :with => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, :allow_blank => true

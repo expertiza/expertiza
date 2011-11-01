@@ -5,34 +5,6 @@
 <ul>
 <%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Assignment', :controller => 'assignment', :node => node, :owner_id => owner_id} %>
 <% if is_available(session[:user],owner_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),owner_id))%>  
-<<<<<<< HEAD
-<li><%= link_to 'Add/remove participants',:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment'%></li>
-<li><%= link_to 'Show publishing rights',:controller=>'participants', :action=>'list_pub_rights', :id => node.node_object_id, :model => 'Assignment'%></li>
-<% if Assignment.find(node.node_object_id).team_assignment %><li><%= link_to 'Create teams',:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Assignment' %></li><% end %>
-<% if Assignment.find(node.node_object_id).course_id %>
-<li><%= link_to 'Remove from course', :controller => 'assignment', :action => 'remove_assignment_from_course', :id => node.node_object_id %>
-<% else %>
-<li><%= link_to 'Assign to course', :controller => 'assignment', :action => 'associate_assignment_to_course', :id => node.node_object_id %>
-<% end %> 
-<li><%= link_to 'Assign reviewers',:controller=>'review_mapping', :action=>'list_mappings', :id => node.node_object_id %></li>
-<li><%= link_to 'View scores',:controller=>'grades', :action=>'view', :id => node.node_object_id %></li>
-<li> <%= link_to 'View review report', :controller=>'review_mapping', :action=>'review_report', :id => node.node_object_id %></li>
-<%@assignment = Assignment.find(node.node_object_id)%>      
-<% if (SignUpTopic.find(:first, :conditions => ['assignment_id = ?',node.node_object_id])).nil? %>
-||||||| merged common ancestors
-<li><%= link_to 'Add participants',:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment'%></li>
-<% if Assignment.find(node.node_object_id).team_assignment %><li><%= link_to 'Create teams',:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Assignment' %></li><% end %>
-<% if Assignment.find(node.node_object_id).course_id %>
-<li><%= link_to 'Remove from course', :controller => 'assignment', :action => 'remove_assignment_from_course', :id => node.node_object_id %>
-<% else %>
-<li><%= link_to 'Assign to course', :controller => 'assignment', :action => 'associate_assignment_to_course', :id => node.node_object_id %>
-<% end %> 
-<li><%= link_to 'Assign reviewers',:controller=>'review_mapping', :action=>'list_mappings', :id => node.node_object_id %></li>
-<li><%= link_to 'View scores',:controller=>'grades', :action=>'view', :id => node.node_object_id %></li>
-<li> <%= link_to 'View review report', :controller=>'review_mapping', :action=>'review_report', :id => node.node_object_id %></li>
-<%@assignment = Assignment.find(node.node_object_id)%>      
-<% if (SignUpTopic.find(:first, :conditions => ['assignment_id = ?',node.node_object_id])).nil? %>
-=======
 <div>
   <%= link_to image_tag('/images/tree_view/add-participant-24.png', :title => 'Add participants'),:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment'%>
   <%@assignment = Assignment.find(node.node_object_id)%>
@@ -41,7 +13,6 @@
   <% end %>
   <% signup_topic = SignUpTopic.find(:first, :conditions => ['assignment_id = ?',node.node_object_id]) %>
   <% if signup_topic %>
->>>>>>> master
     <% if @assignment.staggered_deadline == true %>
       <%= link_to image_tag('/images/tree_view/edit-signup-sheet-24.png', :title => 'Edit signup sheet'), :controller=>'sign_up_sheet', :action=>'add_signup_topics_staggered', :id => node.node_object_id %>
     <% else %>

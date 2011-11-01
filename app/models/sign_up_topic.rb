@@ -1,18 +1,12 @@
 class SignUpTopic < ActiveRecord::Base
   has_many :signed_up_users, :foreign_key => 'topic_id', :dependent => :destroy
   has_many :topic_dependencies, :foreign_key => 'topic_id', :dependent => :destroy
-<<<<<<< HEAD
-  has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy  
-  has_and_belongs_to_many :bmappings
-||||||| merged common ancestors
-  has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy  
-
-=======
   has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy 
   has_many :assignment_participants, :foreign_key => 'topic_id'
+  #Couldnt find the corresponding databse table, hence commenting it out
+  #has_many :bmappings
 
   belongs_to :assignment
->>>>>>> master
 
   def self.import(row,session,id = nil)
 

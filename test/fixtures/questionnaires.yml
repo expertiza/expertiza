@@ -71,7 +71,14 @@ global_survey_questionnaire:
  type: "GlobalSurveyQuestionnaire"
  display_type: "GlobalSurvey"
 
-
+course_evaluation_questionnaire:
+  name: course_eval_questionnaire
+  instructur_id: <%= Fixtures.identify(:instructor1) %>
+  private: 0
+  min_question_score: 0
+  max_question_score: 0
+  type: "CourseEvaluationQuestionnaire"
+  display_type: "Course Evaluation"
 
  
  

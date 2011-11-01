@@ -1,0 +1,6 @@
+survey_deployment_1:
+  course_evaluation_id: <%= Fixtures.identify(:course_evaluation_questionnaire) %>
+  start_date: <%= DateTime.now.to_formatted_s(:db) %>
+  end_date: <%= (DateTime.now.to_time + 7.days).to_datetime.to_formatted_s(:db) %>
+  num_of_students: <%= User.find_all_by_role_id(Role.student.id).length %>
+  last_reminder: <% (DateTime.now.to_time + 6.days).to_datetime.to_formatted_s(:db) %>

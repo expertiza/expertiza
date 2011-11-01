@@ -4,7 +4,7 @@ module MailerHelper
 # @param partial_name [Object]
 def self.send_mail_to_user(user,subject,partial_name,password)
 
-  Mailer.deliver_message(
+ return  Mailer.deliver_message(
         {:recipients => user.email,
          :subject =>subject,
          :body => {

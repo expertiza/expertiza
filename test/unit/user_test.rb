@@ -98,4 +98,22 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "student1", avail_users_like_student1.first.name
   end
 
+  def test_check_email
+    user = User.new
+    user.name = "testStudent1"
+    user.fullname = "test_Student_1"
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
+    user.email = "testStudent1@foo.edu"
+    user.role_id = "1"
+    user.save! # an exception is thrown if the user is invalid
+
+    email = MailerHelper::send_mail_to_user(user,"Test Email","user_welcome",user.clear_password)
+    assert !ActionMailer::Base.deliveries.empty?
+
+    assert_equal [user.email], email.to
+    assert_equal "Test Email", email.subject
+
+  end
+
 end

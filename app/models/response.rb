@@ -224,10 +224,8 @@ when 49 :code = code + "<li>Provides an excellent overview and in-depth discussi
 end
 end
 end
-
 code = code + "</ul></td>" 
 code = code + "<td><ul>"  
-
 for i in 50..53
 if review_scores[i].comments == "1"
 case i
@@ -238,9 +236,8 @@ when 53 :code = code + "<li>Provides a good overview and explores a few key idea
 end
 end
 end
-
- code = code + "</ul></td>" 
- code = code + "<td><ul>" 
+code = code + "</ul></td>" 
+code = code + "<td><ul>" 
 for i in 54..57
 if review_scores[i].comments == "1"
 case i
@@ -251,40 +248,33 @@ when 57 :code = code + "<li>Contains good information but yields an incomplete u
 end
 end
 end
-
- code = code + "</ul></td>" 
- code = code + "<td><ul>"  
-if review_scores[58].comments == "1"   
- code = code + "<li>Has one useful point</li>" 
- end 
- if review_scores[59].comments == "1" 
-   code = code + "<li>Is mostly the author's opinion.</li>"
-  end 
- if review_scores[60].comments == "1"   
- code = code + "<li>Is mostly irrelevant in today's schools</li>" 
- end 
- if review_scores[61].comments == "1"   
- code = code + "<li>Focused on unimportant subtopics OR is overly general</li>"  
-end 
- code = code + "</ul></td>"  code = code + "<td><ul>"  
-  if review_scores[62].comments == "1"  
-  code = code + "<li>Is not relevant to future teachers</li>" 
- end 
- if review_scores[63].comments == "1"   
- code = code + "<li>Is entirely the author's opinion</li>" 
- end
-  if review_scores[64].comments == "1"   
- code = code + "<li>Is obsolete</li>" 
- end 
- if review_scores[65].comments == "1"  
-  code = code + "<li>Lacks any substantive information</li>"
-  end
-  code = code + "</ul></td></tr>"
-
-  code = code + "</table>"
-
-  code = code + "<h3>Interest</h3>"
-  code = code +
+code = code + "</ul></td>" 
+code = code + "<td><ul>"
+for i in 58..61
+if review_scores[i].comments == "1"
+case i  
+when 58 :code = code + "<li>Has one useful point</li>" 
+when 59 :code = code + "<li>Is mostly the author's opinion.</li>"
+when 60 :code = code + "<li>Is mostly irrelevant in today's schools</li>" 
+when 61 :code = code + "<li>Focused on unimportant subtopics OR is overly general</li>"  
+end
+end
+end
+code = code + "</ul></td>"  code = code + "<td><ul>"  
+for i in 62..65
+if review_scores[i].comments == "1"
+case i
+when 62 :code = code + "<li>Is not relevant to future teachers</li>" 
+when 63 :code = code + "<li>Is entirely the author's opinion</li>" 
+when 64 :code = code + "<li>Is obsolete</li>" 
+when 65 :code = code + "<li>Lacks any substantive information</li>"
+end
+end
+end
+code = code + "</ul></td></tr>"
+code = code + "</table>"
+code = code + "<h3>Interest</h3>"
+code = code +
            "<div align=\"center\">To attract and maintain attention, the lesson has:</div><table class='general'>
             <tr>
               <th>5 - Extremely Interesting   </th>

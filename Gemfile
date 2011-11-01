@@ -23,4 +23,5 @@ group :test do
   gem 'cucumber-rails', '0.3.2', :require => false
   gem 'capybara', '0.3.9'
   gem 'database_cleaner', '>=0.5.0', :require => false
+  gem 'test-unit'
 end

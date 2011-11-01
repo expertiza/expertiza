@@ -114,6 +114,7 @@ GEM
       rubyzip
     stream (0.5)
     term-ansicolor (1.0.7)
+    test-unit (2.4.0)
 
 PLATFORMS
   ruby
@@ -138,3 +139,4 @@ DEPENDENCIES
   rgl
   ruby-debug
   rubyzip
+  test-unit

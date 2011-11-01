@@ -1,11 +1,10 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  user: 
-  location: MyString
-  entry: MyString
-
+  user: 2
+  location: auth_controller/logout
+  entry: User logged out
 two:
-  user: 
-  location: MyString
-  entry: MyString
+  user: 2
+  location: auth_controller/login
+  entry: User logged in

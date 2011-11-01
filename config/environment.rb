@@ -52,8 +52,7 @@ Rails::Initializer.run do |config|
        :secret => '3d70fee70cddd63552e8dd6ae6c788060af8fb015da5fef83d368abf37aa10c112d842d7c038420845109147779552cdd687ec4e2034cec3046dc439d8a468e'
   }
 
-<<<<<<< HEAD
-  config.action_controller.session_store = :p_store
+ config.action_controller.session_store = :p_store
  #  config.action_mailer.raise_delivery_errors = false
  config.action_mailer.delivery_method = :smtp
  
@@ -77,28 +76,13 @@ Rails::Initializer.run do |config|
    :password       => "**********",
    :default_content_type => "text/html"
  }
-||||||| merged common ancestors
+
   config.action_controller.session_store = :p_store
-=======
-  config.action_controller.session_store = :active_record_store
->>>>>>> master
   
-<<<<<<< HEAD
-||||||| merged common ancestors
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     :address => "smtp.ncsu.edu",
     :port => 25,
     :domain => "localhost"
   }
-=======
-  if RAILS_ENV == 'production'
-    config.action_mailer.delivery_method = :smtp
-    config.action_mailer.smtp_settings = {
-      :address => "smtp.ncsu.edu",
-      :port => 25,
-      :domain => "localhost"
-    }
-  end
->>>>>>> master
 end

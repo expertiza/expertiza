@@ -285,79 +285,59 @@ code = code +
             </tr>
             <tr>"
 
-  code = code + "<td><ul>"
-  if review_scores[66].comments == "1"
-    code = code + "<li>A sidebar with new information that was motivating to read/view</li>"
-  end
-  if review_scores[67].comments == "1"
-    code = code + "<li>Many creative, attractive visuals and engaging, interactive elements</li>"
-  end
-  if review_scores[68].comments == "1"
-    code = code + "<li>Multiple perspectives</li>"
-  end
-  if review_scores[69].comments == "1"
-    code = code + "<li>Insightful interpretation & analysis throughout</li>"
-  end
-  if review_scores[70].comments == "1"
-    code = code + "<li>Many compelling examples that support the main points (it \"shows\" not just \"tells\")</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[71].comments == "1"
-    code = code + "<li>A sidebar that adds something new to the lesson</li>"
-  end
-  if review_scores[72].comments == "1"
-    code = code + "<li>A few effective visuals or interactive elements</li>"
-  end
-  if review_scores[73].comments == "1"
-    code = code + "<li>At least one interesting, fresh perspective</li>"
-  end
-  if review_scores[74].comments == "1"
-    code = code + "<li>Frequent interpretation and analysis</li>"
-  end
-  if review_scores[75].comments == "1"
-    code = code + "<li>Clearly explained and well supported points</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[76].comments == "1"
-    code = code + "<li>A sidebar that repeats what is in the lesson</li>"
-  end
-  if review_scores[77].comments == "1"
-    code = code + "<li>An effective visual or interactive element</li>"
-  end
-  if review_scores[78].comments == "1"
-    code = code + "<li>One reasonable (possibly typical) perspective</li>"
-  end
-  if review_scores[79].comments == "1"
-    code = code + "<li>Some interpretation and analysis</li>"
-  end
-  if review_scores[80].comments == "1"
-    code = code + "<li>Supported points</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[81].comments == "1"
-    code = code + "<li>A quote, link, etc. included as a sidebar, but that is not in a textbox</li>"
-  end
-  if review_scores[82].comments == "1"
-    code = code + "<li>Visuals or interactive elements that are distracting</li>"
-  end
-  if review_scores[83].comments == "1"
-    code = code + "<li>Only a biased perspective</li>"
-  end
-  if review_scores[84].comments == "1"
-    code = code + "<li>Minimal analysis or interpretation</li>"
-  end
-  if review_scores[85].comments == "1"
-    code = code + "<li>At least one clear and supported point</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
+code = code + "<td><ul>"
+for i in 66..70
+if review_scores[i].comments == "1"
+case i
+when 66 :code = code + "<li>A sidebar with new information that was motivating to read/view</li>"
+when 67 :code = code + "<li>Many creative, attractive visuals and engaging, interactive elements</li>"
+when 68 :code = code + "<li>Multiple perspectives</li>"
+when 69 :code = code + "<li>Insightful interpretation & analysis throughout</li>"
+when 70 :code = code + "<li>Many compelling examples that support the main points (it \"shows\" not just \"tells\")</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 71..75
+if review_scores[i].comments == "1"
+case i
+when 71 :code = code + "<li>A sidebar that adds something new to the lesson</li>"
+when 72 :code = code + "<li>A few effective visuals or interactive elements</li>"
+when 73 :code = code + "<li>At least one interesting, fresh perspective</li>"
+when 74 :code = code + "<li>Frequent interpretation and analysis</li>"
+when 75 :code = code + "<li>Clearly explained and well supported points</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 76..80
+if review_scores[i].comments == "1"
+case i
+when 76 :code = code + "<li>A sidebar that repeats what is in the lesson</li>"
+when 77 :code = code + "<li>An effective visual or interactive element</li>"
+when 78 :code = code + "<li>One reasonable (possibly typical) perspective</li>"
+when 79 :code = code + "<li>Some interpretation and analysis</li>"
+when 80 :code = code + "<li>Supported points</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 81..85
+if review_scores[i].comments == "1"
+case i
+when 81 :code = code + "<li>A quote, link, etc. included as a sidebar, but that is not in a textbox</li>"
+when 82 :code = code + "<li>Visuals or interactive elements that are distracting</li>"
+when 83 :code = code + "<li>Only a biased perspective</li>"
+when 84 :code = code + "<li>Minimal analysis or interpretation</li>"
+when 85 :code = code + "<li>At least one clear and supported point</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
   if review_scores[86].comments == "1"
     code = code + "<li>No side bar included</li>"
   end

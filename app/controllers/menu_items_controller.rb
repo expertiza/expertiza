@@ -161,7 +161,7 @@ class MenuItemsController < ApplicationController
     end
   end
 
-  def noview
+  def no_view
     @items = MenuItem.items_for_permissions(session[:credentials].permission_ids)
   end
 

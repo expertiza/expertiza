@@ -47,5 +47,11 @@ class AdminControllerTest < ActionController::TestCase
     @settings = SystemSettings.find(system_settings(:first).id)
     post :list_instructors, nil, session_for(users(:student1))
     assert_redirected_to '/denied' 
-  end     
+  end
+
+  def test_show_admin
+    post :show,{:id => users(:admin).id}, session_for(users(:admin))
+    assert_response  :success
+  end
+
 end

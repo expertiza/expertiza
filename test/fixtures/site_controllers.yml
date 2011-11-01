@@ -74,6 +74,10 @@ site_controller_participants:
   name: participants
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
   builtin: "0"
+site_controller_instructor:
+  name: instructor
+  permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+  builtin: "0"
 site_controller_admin:
   name: admin
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>

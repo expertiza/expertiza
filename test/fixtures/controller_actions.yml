@@ -3,26 +3,31 @@ controller_action_menu_items_list:
   url_to_use:
   permission_id:
   site_controller_id: <%= Fixtures.identify(:site_controller_menu_items) %>
+
 controller_action_menu_items_link:
   name: menu_items_link
   url_to_use:
   permission_id: <%= Fixtures.identify(:permission_public_actions_execute) %>
   site_controller_id: <%= Fixtures.identify(:site_controller_menu_items) %>
+
 controller_action_roles_list:
   name: roles_list
   url_to_use:
   permission_id:
   site_controller_id: <%= Fixtures.identify(:site_controller_roles) %>
+
 controller_action_tree_display_goto_author_feedbacks:
   name: tree_display_goto_author_feedbacks
   url_to_use:
   permission_id:
   site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+
 controller_action_tree_display_goto_questionnaires:
   name: tree_display_goto_questionnaires
   url_to_use:
   permission_id:
   site_controller_id: <%= Fixtures.identify(:site_controller_tree_display) %>
+
 controller_action_tree_display_list:
   name: tree_display_list
   url_to_use:
@@ -178,36 +183,61 @@ controller_action_participants_edit_team_members:
   url_to_use:
   permission_id:  <%= Fixtures.identify(:permission_administer_assignments) %>
   site_controller_id: <%= Fixtures.identify(:site_controller_participants) %>
+
 controller_action_participants_list_assignments:
   name: participants_list_assignments
   url_to_use:
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
   site_controller_id: <%= Fixtures.identify(:site_controller_participants) %>
+
 controller_action_participants_list_courses:
   name: participants_list_courses
   url_to_use:
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
   site_controller_id: <%= Fixtures.identify(:site_controller_participants) %>
+
 controller_action_participants_list_students:
   name: participants_list_students
   url_to_use:
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
   site_controller_id: <%= Fixtures.identify(:site_controller_participants) %>
-controller_action_admin_list_instructors:
-  name: admin_list_instructors
+
+controller_action_instructor_list:
+  name: instructor_list
   url_to_use:
   permission_id: <%= Fixtures.identify(:permission_administer_instructors) %>
-  site_controller_id: <%= Fixtures.identify(:site_controller_admin) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_instructor) %>
+
 controller_action_admin_list_super_administrators:
   name: admin_list_super_administrators
   url_to_use:
   permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
   site_controller_id: <%= Fixtures.identify(:site_controller_admin) %>
+
+controller_action_instructor_show:
+  name: instructor_show
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_instructors) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_instructor) %>
+
+controller_action_instructor_remove:
+  name: instructor_remove
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_instructors) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_instructor) %>
+
+controller_action_admin_show:
+  name: admin_show
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_admin) %>
+
 controller_action_admin_list_administrators:
   name: admin_list_administrators
   url_to_use:
   permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
   site_controller_id: <%= Fixtures.identify(:site_controller_admin) %>
+
 controller_action_student_assignment_list:
   name: student_assignment_list
   url_to_use:

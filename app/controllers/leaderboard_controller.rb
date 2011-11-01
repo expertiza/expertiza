@@ -1,3 +1,4 @@
+
 class LeaderboardController < ApplicationController
 
   # Our logic for the overall leaderboard. This method provides the data for

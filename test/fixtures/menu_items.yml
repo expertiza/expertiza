@@ -84,7 +84,7 @@ menu_item_credits:
   parent_id: <%= Fixtures.identify(:menu_item_contact_us) %>
 menu_item_show_instructors:
   name: show_instructors
-  controller_action_id: <%= Fixtures.identify(:controller_action_admin_list_instructors) %>
+  controller_action_id: <%= Fixtures.identify(:controller_action_instructor_list) %>
   content_page_id: 
   seq: "4"
   label: Instructors

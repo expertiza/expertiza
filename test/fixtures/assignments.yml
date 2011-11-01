@@ -84,4 +84,71 @@ assignment_review0:
   team_count: 2
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %> 
  
-  
+
+#Assignments for course_object_oriented for instructor 1
+assignment_project1:
+  name: Assignment_Project1
+  directory_path: CSC517_instructor1/Assignment1
+  submitter_count: 0
+  course:  <%= Fixtures.identify(:course_object_oriented:) %>
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
+  private: 0
+  num_reviews: 1
+  num_review_of_reviews: 1
+  num_review_of_reviewers: 3
+  review_questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+  review_of_review_questionnaire_id: <%= Fixtures.identify(:questionnaire2) %>
+  author_feedback_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
+  teammate_review_questionnaire_id: <%= Fixtures.identify(:teammate_review_questionnaire) %>
+  reviews_visible_to_all: <%= 0 %>
+  require_signup: <%= 0 %>
+  num_reviewers: <%= 3 %>
+  spec_location:
+  team_assignment: <%= 1 %>
+  team_count: 2
+  wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>
+
+
+assignment_project2:
+  name: Assignment_Project2
+  directory_path: CSC517_instructor1/Assignment2
+  submitter_count: 0
+  course:  <%= Fixtures.identify(:course_object_oriented:) %>
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
+  private: 0
+  num_reviews: 1
+  num_review_of_reviews: 1
+  num_review_of_reviewers: 3
+  review_questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+  review_of_review_questionnaire_id: <%= Fixtures.identify(:questionnaire2) %>
+  author_feedback_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
+  teammate_review_questionnaire_id: <%= Fixtures.identify(:teammate_review_questionnaire) %>
+  reviews_visible_to_all: <%= 0 %>
+  require_signup: <%= 0 %>
+  num_reviewers: <%= 3 %>
+  spec_location:
+  team_assignment: <%= 1 %>
+  team_count: 2
+  wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>
+
+assignment_project3:
+  name: Assignment_Project3
+  directory_path: CSC517_instructor1/Assignment3
+  submitter_count: 0
+  course:  <%= Fixtures.identify(:course_object_oriented:) %>
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
+  private: 0
+  num_reviews: 1
+  num_review_of_reviews: 1
+  num_review_of_reviewers: 3
+  review_questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+  review_of_review_questionnaire_id: <%= Fixtures.identify(:questionnaire2) %>
+  author_feedback_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
+  teammate_review_questionnaire_id: <%= Fixtures.identify(:teammate_review_questionnaire) %>
+  reviews_visible_to_all: <%= 0 %>
+  require_signup: <%= 0 %>
+  num_reviewers: <%= 3 %>
+  spec_location:
+  team_assignment: <%= 0 %>
+  team_count: 1
+  wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>

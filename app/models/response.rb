@@ -338,26 +338,18 @@ end
 end
 code = code + "</ul></td>"
 code = code + "<td><ul>"
-  if review_scores[86].comments == "1"
-    code = code + "<li>No side bar included</li>"
-  end
-  if review_scores[87].comments == "1"
-    code = code + "<li>No visuals or interactive elements</li>"
-  end
-  if review_scores[88].comments == "1"
-    code = code + "<li>No perspective is acknowledged</li>"
-  end
-  if review_scores[89].comments == "1"
-    code = code + "<li>No analysis or interpretation</li>"
-  end
-  if review_scores[90].comments == "1"
-    code = code + "<li>No well-supported points</li>"
-  end
-  
-  code = code + "</ul></td></tr>"
-  code = code + "</table>"
-  code = code + "<h3>Credibility</h3>"
-  code = code +
+for i in 86..90
+if review_scores[i].comments == "1"
+case i
+when 86 :code = code + "<li>No side bar included</li>"
+when 87 :code = code + "<li>No visuals or interactive elements</li>"
+when 88 :code = code + "<li>No perspective is acknowledged</li>"
+when 89 :code = code + "<li>No analysis or interpretation</li>"
+when 90 :code = code + "<li>No well-supported points</li>"
+code = code + "</ul></td></tr>"
+code = code + "</table>"
+code = code + "<h3>Credibility</h3>"
+code = code +
            "<div align=\"center\">To demonstrate its credibility the lesson:</div><table class='general'>
             <tr>
               <th>5 - Completely Credible   </th>
@@ -367,70 +359,64 @@ code = code + "<td><ul>"
               <th>1 - Not Credible   </th>
             </tr>
             <tr>"
-
-  code = code + "<td><ul>"
-  if review_scores[91].comments == "1"
-    code = code + "<li>Cites 5 or more diverse, reputable sources in proper APA format</li>"
-  end
-  if review_scores[92].comments == "1"
-    code = code + "<li>Provides citations for all presented information</li>"
-  end
-  if review_scores[93].comments == "1"
-    code = code + "<li>Readily identifies bias: both the author's own and others</li>"
-  end
-
-  code = code + "</ul></td>"
-  code = code + "<td><ul>"
-  if review_scores[94].comments == "1"
-    code = code + "<li>Cites 5 or more diverse, reputable sources with few APA errors</li>"
-  end
-  if review_scores[95].comments == "1"
-    code = code + "<li>Provides citations for most information</li>"
-  end
-  if review_scores[96].comments == "1"
-    code = code + "<li>Clearly differentiates between opinion and fact</li>"
-  end
-
-  code = code + "</ul></td>"
-  code = code + "<td><ul>"
-  if review_scores[97].comments == "1"
-    code = code + "<li>Cites 5 or more reputable sources</li>"
-  end
-  if review_scores[98].comments == "1"
-    code = code + "<li>Supports some claims with citation</li>"
-  end
-  if review_scores[99].comments == "1"
-    code = code + "<li>Occasionally states opinion as fact</li>"
-  end
-
-  code = code + "</ul></td>"
-  code = code + "<td><ul>"
-  if review_scores[100].comments == "1"
-    code = code + "<li>Cites 4 or more reputable sources</li>"
-  end
-  if review_scores[101].comments == "1"
-    code = code + "<li>Has several unsupported claims</li>"
-  end
-  if review_scores[102].comments == "1"
-    code = code + "<li>Routinely states opinion as fact and fails to acknowledge bias</li>"
-  end
-
-  code = code + "</ul></td>"
-  code = code + "<td><ul>"
-  if review_scores[103].comments == "1"
-    code = code + "<li>Cites 3 or fewer reputable sources</li>"
-  end
-  if review_scores[104].comments == "1"
-    code = code + "<li>Has mostly unsupported claims</li>"
-  end
-  if review_scores[105].comments == "1"
-    code = code + "<li>Is very biased and contains almost entirely opinions</li>"
-  end
-
-  code = code + "</ul></td></tr>"
-  code = code + "</table>"
-  code = code + "<h3>Pedagogy</h3>"
-  code = code +
+code = code + "<td><ul>"
+for i in 91..93
+if review_scores[i].comments == "1"
+case i
+when 91 :code = code + "<li>Cites 5 or more diverse, reputable sources in proper APA format</li>"
+when 92 :code = code + "<li>Provides citations for all presented information</li>"
+when 93 :code = code + "<li>Readily identifies bias: both the author's own and others</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 94..96
+if review_scores[i].comments == "1"
+case i
+when 94 :code = code + "<li>Cites 5 or more diverse, reputable sources with few APA errors</li>"
+when 95 :code = code + "<li>Provides citations for most information</li>"
+when 96 :code = code + "<li>Clearly differentiates between opinion and fact</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 97..99
+if review_scores[i].comments == "1"
+case i
+when 97 :code = code + "<li>Cites 5 or more reputable sources</li>"
+when 98 :code = code + "<li>Supports some claims with citation</li>"
+when 99 :code = code + "<li>Occasionally states opinion as fact</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 100..102
+if review_scores[i].comments == "1"
+case i
+when 100 :code = code + "<li>Cites 4 or more reputable sources</li>"
+when 101 :code = code + "<li>Has several unsupported claims</li>"
+when 102 :code = code + "<li>Routinely states opinion as fact and fails to acknowledge bias</li>"
+end
+end
+end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i in 103..105
+if review_scores[i].comments == "1"
+case i
+when 103 :code = code + "<li>Cites 3 or fewer reputable sources</li>"
+when 104 :code = code + "<li>Has mostly unsupported claims</li>"
+when 105 :code = code + "<li>Is very biased and contains almost entirely opinions</li>"
+end
+end
+end
+code = code + "</ul></td></tr>"
+code = code + "</table>"
+code = code + "<h3>Pedagogy</h3>"
+code = code +
            "<div align=\"center\">To help guide the reader:</div><table class='general'>
             <tr>
               <th>5 - Superior   </th>

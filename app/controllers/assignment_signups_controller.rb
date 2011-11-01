@@ -13,7 +13,7 @@ class AssignmentSignupsController < ApplicationController
     @assignment_signups = SignupSheet.find(:all)
   end
 
-  def listuser
+  def list_user
     @user_id = session[:user].id  
     if (session[:user].role_id == 1)
       @signups= SignupSheet.find_by_sql("select * from signup_sheets where assignment_id in (select assignment_id from participants where user_id = "+session[:user].id.to_s+")")

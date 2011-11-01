@@ -24,7 +24,7 @@ class QuestionsController < ApplicationController
   # List questions for this user
   # ?? Need clarification of what this task
   #    actually does. 
-  def listuser
+  def list_user
          @question = Array.new
          @i = 0
          @sign_qts = SignupQuestion.find(:all,

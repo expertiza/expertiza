@@ -102,7 +102,7 @@ class CourseController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
-  def view_teaching_assistants
+  def list_ta
     @course = Course.find(params[:id])
     @ta_mappings = @course.ta_mappings
     for mapping in @ta_mappings
@@ -114,17 +114,17 @@ class CourseController < ApplicationController
     @course = Course.find(params[:course_id])
     @user = User.find_by_name(params[:user][:name])
     if(@user==nil)
-      redirect_to :action => 'view_teaching_assistants', :id => @course.id
+      redirect_to :action => 'list_ta', :id => @course.id
     else
       @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
-      redirect_to :action => 'view_teaching_assistants', :id => @course.id
+      redirect_to :action => 'list_ta', :id => @course.id
     end
   end
 
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
     @ta_mapping.destroy
-    redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
+    redirect_to :action => 'list_ta', :id => @ta_mapping.course
   end
 
 end

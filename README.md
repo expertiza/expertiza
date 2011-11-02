@@ -1,5 +1,54 @@
+Team Members:
+
+Ashwini Bangalore NarasimhaMurthy, UnityID: abangal3
+
+Sindhoora Reddy Vellanki, UnityID: svellan
+
+Pratyush Karli, UnityID: pkarli
+
+Changes Made:
+
+1. We have moved the method add_participant from the assignment class to participant class
+2. We have moved the following methods to review_mapping_controller.rb
+    a.  assign_reviewer_dynamically
+    b.  assign_metareviewer_dynamically
+3. We have moved the following methods to a module ScoreHelper
+    a.  get_scores
+    b.  compute_scores
+    c.  get_max_score_possible
+    d.  compute_total_score
+4. We have moved the following methods to a module AssignmentStageHelper
+    a. get_current_stage
+    b. get_stage_deadline
+    c. find_current_stage
+    d. find_next_stage
+5. We have moved the following methods to a module ReviewingHelper
+    a.  candidate_topics_to_review
+    b.  contributor_to_review
+    c.  response_map_to_metareview
+    d.  review_mappings
+    e.  metareview_mappings
+    f.  get_review_number
+    g.  get_review_round
+    h.  email
+6. We have moved the following methods from Assignment class to DueDate class
+    a. get_current_due_date
+    b. get_next_due_date
+
+Functional test has been written for review_mapping_controller.rb, but has a few glitches which need to be fixed.
+
+
+
+
+
+
+
+
+
+
 Expertiza
 =========
+
 
 #### Peer review system
 
@@ -60,3 +109,8 @@ When editing existing files:
 
 Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
 Applying style guidelines to code you add and modify is good enough. :-)
+
+
+
+
+

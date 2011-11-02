@@ -31,7 +31,7 @@ We took the following approach to integrate previous work done on Expertiza:
 
 How to setup and start the application:  
    
-        --      Start the mysql server.
+    --  Start the mysql server.
 	--	Create a database named "pg_development" in mysql (Mysql 5.5 database server).
 	--	Download the sql dump file. Download  the dump from courses.ncsu.edu/csc517/common/homework/OSS/expertiza-scrubbed.sql.gz 
 	--	Import this dump into the database created. To import, use: mysql -u root pg_development < expertiza-scrubbed.sql
@@ -64,7 +64,7 @@ Steps:
 
 How to setup and start the application:
 
-        --      Start the mysql server.
+    --  Start the mysql server.
 	--	Create a database named "pg_development" in mysql (Mysql 5.5 database server).
 	--	Download the sql dump file from http://cl.ly/2C3e1u1P1E1j0V3g0z1e 
 	--	Import this dump into the database created. To import, use: mysql -u root pg_development < 517dump-scrubbed.sql

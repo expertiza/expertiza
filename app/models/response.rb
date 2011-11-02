@@ -1,8 +1,7 @@
 class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
-  
-  def display_as_html(prefix = nil, count = nil, file_url = nil)
+   def display_as_html(prefix = nil, count = nil, file_url = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -37,9 +36,8 @@ class Response < ActiveRecord::Base
         return custom_display_as_html_2011(code, file_url) + "</div>"
       end
     end
-    
+  
     # End of custom code
-
     count = 0
     self.scores.each{
       | reviewScore |
@@ -140,8 +138,7 @@ end end end
   else
     code = code + file_url.to_s + "<br/>"
   end
-  
-  code = code + "<i>Compliment:</i>"
+   code = code + "<i>Compliment:</i>"
     code = code + "<ul><li>#{review_scores[8].comments.gsub(/\"/,'&quot;').to_s}</li><li>#{review_scores[9].comments.gsub(/\"/,'&quot;').to_s}</li></ul>"
   code = code + "<i>Suggestion:</i>"
     code = code + "<ul><li>#{review_scores[10].comments.gsub(/\"/,'&quot;').to_s}</li><li>#{review_scores[11].comments.gsub(/\"/,'&quot;').to_s}</li></ul>"
@@ -180,7 +177,6 @@ if review_scores[23].comments == "1"
   else
     code = code + "<img src=\"/images/delete_icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the lesson in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible<br/>"
   end
-
   code = code + "<br/><b>If not, which one(s) may infringe copyrights, or what areas of text may need citations, revisions or elaboration?</b><br/>"
     code = code + "<dl><dd>#{review_scores[24].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
 
@@ -189,7 +185,6 @@ if review_scores[23].comments == "1"
 
   #*******************Multiple Choice Questions************************
   code = code + "<h2>Multiple Choice Questions</h2><hr>"
-
 for i in 26..33
 if review_scores[i].comments == "1"
 case i
@@ -215,7 +210,6 @@ when 32 :code = code + "<img src=\"/images/delete_icon.png\"> The response optio
 when 33 :code = code + "<img src=\"/images/delete_icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
 end end end 
 code = code + "<br/><h3>Questions</h3>"
-
     code = code + "<i>Type: </i><b>#{review_scores[34].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Grade: </i><b>#{review_scores[35].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Comment: </i><dl><dd>#{review_scores[36].comments.gsub(/\"/,'&quot;').to_s}</dl></dd><br/>"
@@ -231,7 +225,6 @@ code = code + "<br/><h3>Questions</h3>"
     code = code + "<i>Type: </i><b>#{review_scores[43].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Grade: </i><b>#{review_scores[44].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Comment: </i><dl><dd>#{review_scores[45].comments.gsub(/\"/,'&quot;').to_s}</dl></dd><br/>"
-
 
   #*******************Rubric************************
   code = code + "<h2>Rubric</h2><hr>"

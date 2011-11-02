@@ -897,21 +897,16 @@ end end end
             <tr>"
 
   code = code + "<td><ul>"
-  if review_scores[83].comments == "1"
-    code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the lesson.</li>"
-  end
-  if review_scores[84].comments == "1"
-    code = code + "<li>The lesson accomplishes its established goals.</li>"
-  end
-  if review_scores[85].comments == "1"
-    code = code + "<li>Well constructed MC questions (1&2 knowledge; 3&4 application) align with learning targets and assess important content.</li>"
-  end
-  if review_scores[88].comments == "1"
-    code = code + "<li>An anticipatory set engages the reader, introduces the topic and its importance to future teachers, and helps readers connect to the content; the lesson closure synthesizes the material presented and stimulates further thinking on the issue.</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
+for i = 83..86
+if review_scores[i] == "1"
+case i
+when 83 :code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the lesson.</li>"
+when 84 :code = code + "<li>The lesson accomplishes its established goals.</li>"
+when 85 :code = code + "<li>Well constructed MC questions (1&2 knowledge; 3&4 application) align with learning targets and assess important content.</li>"
+when 86 : code = code + "<li>An anticipatory set engages the reader, introduces the topic and its importance to future teachers, and helps readers connect to the content; the lesson closure synthesizes the material presented and stimulates further thinking on the issue.</li>"
+end end end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
 for i = 87..90
 if review_scores[i].comments == "1"
 case i

@@ -95,6 +95,12 @@ class TeamControllerTest < ActionController::TestCase
     assert_redirected_to "team/list/#{nodeId}"
   end
 
+  test "update should raise TeamExistsError" do
+    first_team = Team.first
+
+    assert_raise TeamExistsError { Team.check_for_existing(first_team.parent, first_team.name, first_team.team_type) }
+  end
+
   test "delete should decrease number of teams" do
     sessionVars = session_for(users(:superadmin))
     sessionVars[:team_type] = "Course"

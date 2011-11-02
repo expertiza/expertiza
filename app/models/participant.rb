@@ -53,10 +53,17 @@ class Participant < ActiveRecord::Base
   end
 
   def get_topic_string
-    if topic.nil? or topic.topic_name.empty?
-      return "<center>&#8212;</center>"
-    end
-    return topic.topic_name
+    # attempt to find the participant's topics
+    p_topics = SignedUpUser.find(:all, :conditions => ["creator_id = ?", user.id])
+    return "<center>&#8212;</center>" if p_topics.empty?
+	
+	# build the list of participant's topics
+	topic_string = ""
+	p_topics.each {|x|
+	  topic_string += SignUpTopic.find(x.topic_id).topic_name + "<br/>"
+	}
+	
+    return topic_string
   end
 
   def able_to_submit

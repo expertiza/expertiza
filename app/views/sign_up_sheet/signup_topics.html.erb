@@ -1,15 +1,17 @@
 <h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
-	<table class="general">
-	  <tr>
-	    <th width="5%">Topic #</th>
-	    <th width="75%">Topic name(s)</th>
-	    <th width="5%">Max choosers</th>
-	    <th width="5%">Available slots</th>
-	    <th width="5%">Waitlist</th>
-	    <%if @show_actions%>
-	    <th width="5%">Action</th>
-	    <%end%>
-	  </tr>
+
+<table class="general">
+  <tr>
+    <th width="5%">Topic #</th>
+    <th width="65%">Topic name(s)</th>
+    <th width="5%">Max choosers</th>
+    <th width="5%">Available slots</th>
+	<th width="10%">Due by</th>
+    <th width="5%">Waitlist</th>
+    <%if @show_actions%>
+    <th width="5%">Action</th>
+    <%end%>
+  </tr>
 
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
       <b>Your topic(s):</b>
@@ -51,21 +53,71 @@
             <td align="center"><%= topic.max_choosers %></td>
         <% end %>
 
+		<%asnmt = Assignment.find(params[:id])%>
+        <%if asnmt.staggered_deadline ==1%>
+        <%topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, 1)%>
+      	<%else%>
+        <%topic_deadline_subm = DueDate.find_by_assignment_id_and_deadline_type_id(asnmt.id,1)%>
+      	<%end%>
+		<td><%=topic_deadline_subm.due_at%></td>
+		
         <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
         <%if @show_actions%>
             <%action_symbol_added = false%>
             <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
                 <% for selected_topic in @selected_topics %>
                     <% if selected_topic.topic_id == topic.id %>
-                        <td align="center" bgcolor="yellow"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
-                        <%action_symbol_added = true%>
+                        <%tchk = 5.days.from_now.to_date%>
+						<%asnmt = Assignment.find(params[:id])%>
+                 		<%if asnmt.staggered_deadline ==1%>
+               				 <%topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, 1)%>
+      					<%else%>
+        					<%topic_deadline_subm = DueDate.find_by_assignment_id_and_deadline_type_id(asnmt.id,1)%>
+      					<%end%>
+						<%if tchk<topic_deadline_subm.due_at.to_date%>
+						<td align="center"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+                        <%else%>
+						<td align="center">You cannot leave this topic anymore</td>
+						<%end%>
+						<%action_symbol_added = true%>
                     <% end %>
                 <% end %>
             <% end %>
             <%if action_symbol_added == false %>
-                <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
-            <% end %>
+                <%confirm_by = 0%>
+				<%tclose = Time.now.to_date%>
+				<%tchk = 5.days.from_now.to_date%>
+      			<%asnmt = Assignment.find(params[:id])%>
+                 <%if asnmt.staggered_deadline ==1%>
+                <%topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, 1)%>
+      			<%else%>
+        		<%topic_deadline_subm = DueDate.find_by_assignment_id_and_deadline_type_id(asnmt.id,1)%>
+      			<%end%>
+				<%if tchk>topic_deadline_subm.due_at.to_date%>
+					<td>You cannot sign up for a topic anymore</td>
+				<%else%>
+					<% found_in_waiting = false%>
+					<% for slot in @slots_filled %>
+            			<% if slot.topic_id.to_s == topic.id.to_s %>
+                			<% available_slots = topic.max_choosers.to_int - slot.count.to_i %>
+                			<%if available_slots == 0%>
+			    				<td align="center" >Confirm 9 days before?<%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id], :confirm_by => 9 %></td>
+								<td align="center" >Confirm 7 days before?<%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id], :confirm_by => 7 %></td>
+								<td align="center" >Confirm 5 days before?<%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id], :confirm_by => 5 %></td>
+								<% found_in_waiting = true %>
+							<%end%>
+                		<% end %>
+        			<% end %>
+					<% if found_in_waiting == false %>
+						
+							<td align="center" ><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id], :confirm_by => nil %></td>
+					<%end%>
+				<%end%>
+            	
+				
+			<% end %>
         <% end %>
+		
       </tr>
       <% i=i+1 %>
   <% end %>

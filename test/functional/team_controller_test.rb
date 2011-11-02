@@ -90,23 +90,29 @@ class TeamControllerTest < ActionController::TestCase
     sessionVars = session_for(users(:superadmin))
     sessionVars[:team_type] = "Course"
     nodeId = nodes(:node23).node_object_id
+    teamId = teams(:team2).id
 
-    post :update, {'id' => nodeId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
+    post :update, {'id' => teamId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
     assert_redirected_to "team/list/#{nodeId}"
   end
 
-  test "update should raise TeamExistsError" do
-    first_team = Team.first
+  test "update should raise RecordNotFound" do
+    sessionVars = session_for(users(:superadmin))
+    sessionVars[:team_type] = "Course"
+    nodeId = nodes(:node23).node_object_id
+    teamId = teams(:team3).id
 
-    assert_raise TeamExistsError { Team.check_for_existing(first_team.parent, first_team.name, first_team.team_type) }
+    assert_raise(ActiveRecord::RecordNotFound) {
+      post :update, {'id' => teamId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
+    }
   end
 
   test "delete should decrease number of teams" do
     sessionVars = session_for(users(:superadmin))
     sessionVars[:team_type] = "Course"
 
-    assert_difference 'Team.count' do
-      post :delete, {'id' => nodes(:node23).node_object_id, 'team' => {'name' => "SomeTeamName"}}, sessionVars
+    assert_difference 'Team.count', -1 do
+      get :delete, {'id' => teams(:team2).id}, sessionVars
     end
   end
 
@@ -114,8 +120,8 @@ class TeamControllerTest < ActionController::TestCase
     sessionVars = session_for(users(:superadmin))
     sessionVars[:team_type] = "Course"
 
-    assert_difference('TeamNode.count', -1) do
-      post :delete, {'id' => nodes(:node23).node_object_id, 'team' => {'name' => "SomeTeamName"}}, sessionVars
+    assert_difference 'TeamNode.count', -1 do
+      get :delete, {'id' => teams(:team2).id}, sessionVars
     end
   end
 
@@ -123,8 +129,9 @@ class TeamControllerTest < ActionController::TestCase
     sessionVars = session_for(users(:superadmin))
     sessionVars[:team_type] = "Course"
     nodeId = nodes(:node23).node_object_id
+    teamId = teams(:team2).id
 
-    post :delete, {'id' => nodeId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
+    get :delete, {'id' => teamId}, sessionVars
     assert_redirected_to "team/list/#{nodeId}"
   end
 end

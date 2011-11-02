@@ -85,4 +85,40 @@ class TeamControllerTest < ActionController::TestCase
     post :create, {'id' => nodeId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
     assert_redirected_to "team/list/#{nodeId}"
   end
+
+  test "update should redirect to list" do
+    sessionVars = session_for(users(:superadmin))
+    sessionVars[:team_type] = "Course"
+    nodeId = nodes(:node23).node_object_id
+
+    post :update, {'id' => nodeId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
+    assert_redirected_to "team/list/#{nodeId}"
+  end
+
+  test "delete should decrease number of teams" do
+    sessionVars = session_for(users(:superadmin))
+    sessionVars[:team_type] = "Course"
+
+    assert_difference 'Team.count' do
+      post :delete, {'id' => nodes(:node23).node_object_id, 'team' => {'name' => "SomeTeamName"}}, sessionVars
+    end
+  end
+
+  test "delete should decrease number of team nodes" do
+    sessionVars = session_for(users(:superadmin))
+    sessionVars[:team_type] = "Course"
+
+    assert_difference('TeamNode.count', -1) do
+      post :delete, {'id' => nodes(:node23).node_object_id, 'team' => {'name' => "SomeTeamName"}}, sessionVars
+    end
+  end
+
+  test "delete should redirect to list" do
+    sessionVars = session_for(users(:superadmin))
+    sessionVars[:team_type] = "Course"
+    nodeId = nodes(:node23).node_object_id
+
+    post :delete, {'id' => nodeId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
+    assert_redirected_to "team/list/#{nodeId}"
+  end
 end

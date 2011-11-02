@@ -83,11 +83,11 @@ class Team < ActiveRecord::Base
    end
  end
 
-  def self.randomize_all_by_parent(parent, team_type)
+  def self.randomize_all_by_parent(parent, team_type, team_size)
     participants = Participant.find(:all, :conditions => ["parent_id = ?", parent.id])
     participants = participants.sort{rand(3) - 1}
 
-    no_of_teams = participants.length.fdiv(parent.team_count).ceil
+    no_of_teams = participants.length.fdiv(team_size).ceil
     nextTeamMemberIndex = 0
 
     for i in 1..no_of_teams
@@ -101,7 +101,7 @@ class Team < ActiveRecord::Base
       team = Object.const_get(team_type + 'Team').create(:name => "Team #{i}", :parent_id => parent.id)
       TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
 
-      parent.team_count.times do
+      team_size.times do
         break if nextTeamMemberIndex >= participants.length
 
         user = User.find_by_id(participants[nextTeamMemberIndex].user_id)

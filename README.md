@@ -1,60 +1,41 @@
-Expertiza
-=========
+OSS Project
 
-#### Peer review system
+Expertiza: Enhancements to Suggest and Improve
 
-Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.
+Chandan Apsangi (capsang) Vaibhav Gumashta(vgumash) Vartika Singh (vsingh3)
 
-Setup
------
+Features:
 
-### NCSU VCL image
+Notification should be sent for the following events:
 
-The expertiza environment is already set up in [NC State's VCL](https://vcl.ncsu.edu) image "Ruby on Rails".
-If you have access, this is quickest way to get a development environment running for Expertiza.
+1. When a new account is created, an email is sent to the id used to create the account
 
-If not:
+2. When a user is assigned to review a new assignment, he/she will be sent an email informing the same
 
-### Tools
+3. When a user is reassigned to review another assignment, he/she will be sent an email informing the same
 
- * [Set up git](http://help.github.com/set-up-git-redirect)
- * Install Ruby 1.8.7. (Ruby 1.9.2 may work but hasn't been tested)
-   Use [rvm](http://beginrescueend.com) on Linux/OSX, or [RailsInstaller](http://railsinstaller.org) on Windows
- * `gem install bundler` (see [issues on Windows](http://matt-hulse.com/articles/2010/01/30/from-zero-to-rails3-on-windows-in-600-seconds/))
+4. When a user adds himself on the waiting list for a particular assignment, and later is moved off the waiting list, then an email will be sent to notify him/her about the update
 
-### Dependencies
+5. When a user's work is reviewed
 
- * libxslt development libraries [OSX: (already installed?) Ubuntu: `sudo apt-get install libxslt-dev` Fedora: `yum install libxslt-devel` Windows: ?]
- * (optional) [graphviz](http://www.graphviz.org)
- * bundled gems: `bundle install`
- 
- If anything is missing here, please report it in an issue or fix it in a pull request. Thanks!
+6. When author updates his work after it has been reviewed, the reviewer will be notified about the same
 
-Contributing
-------------
+The commits for this project were present in two different branches on Github: E15-A and B. E15-A consists only of the commits related to E15 project. But we had to cherry-pick E15 related commits from branch B (which consists of other commits as well).
 
- * [Fork](http://help.github.com/fork-a-repo/) the expertiza project
- * [Create a new branch](http://progit.org/book) for your contribution with a descriptive name
- * [Commit and push](http://progit.org/book) until you are happy with your contribution - follow the style guidelines below
- * Make sure to add tests for it; the tests should fail before your contribution/fix and pass afterward
- * [Send a pull request](http://help.github.com/send-pull-requests) to have your code reviewed for merging back into Expertiza
+We took the following approach to integrate previous work done on Expertiza:
 
-Style Guidelines
-----------------
+1. Create a branch E15-Notification based on 517 tag.
 
-We've had many contributors in the past who have used a wide variety of ruby coding styles. It's a mess, and we're trying to unify it.
+2. Merge E15-A branch into E15-Notification as all of those commits are applicable
 
-All new files/contributions should:
+3. Cherry-pick E15 related commits from branch B into E15-Notification
 
- * Use unix line endings (Windows users: configure git to use [autocrlf](http://help.github.com/line-endings))
- * Indent with 2 spaces (no tabs; configure your editor) both in ruby and erb
- * Follow the [Ruby Style Guide](http://batsov.com/Programming/Ruby/2011/09/12/ruby-style-guide.html) style for syntax, formatting, and naming
+4. In case of conflicts test the feature with each of the commits separately and pick the best one
 
-When editing existing files:
+5. Test each of the features listed above through local server setup
 
- * Keep the existing tabbing (use tabs instead of spaces in files that already use tabs everywhere; otherwise use spaces)
- * Keep the existing line ending style (dos/unix)
- * Follow the Ruby style Guide on code you add or edit, as above
+6. Fix any failures/make changes to ensure that the features are working
 
-Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
-Applying style guidelines to code you add and modify is good enough. :-)
+7. Run integration tests to ensure final quality
+
+8. Merge our branch E15-Notification with the Master

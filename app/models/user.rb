@@ -80,7 +80,7 @@ class User < ActiveRecord::Base
   # Generate email to user with new password
   def reset_and_mail_password
     self.reset_password!
-    
+     puts self.email
     Mailer.deliver_message(
         {:recipients => self.email,
          :subject => "Your Expertiza password has been reset",

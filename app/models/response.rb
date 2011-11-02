@@ -1,4 +1,5 @@
 class Response < ActiveRecord::Base
+  include ActionController::UrlWriter
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
   
@@ -77,9 +78,12 @@ class Response < ActiveRecord::Base
   
  #Generate an email to the instructor when a new review exceeds the allowed difference
  #ajbudlon, nov 18, 2008
- def notify_on_difference(new_pct,avg_pct,limit)
+def notify_on_difference(new_pct,avg_pct,limit,host)
    mapping = self.map
-   instructor = mapping.assignment.instructor 
+   instructor = mapping.assignment.instructor
+   redirect_url = url_for(:host=>host, :controller => "response" , :action => "view" , :id => mapping.response.id)
+   redirect_url = CGI::escape(redirect_url)
+   puts url_for(:host=>host, :controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
    Mailer.deliver_message(
      {:recipients => instructor.email,
       :subject => "Expertiza Notification: A review score is outside the acceptable range",
@@ -94,7 +98,8 @@ class Response < ActiveRecord::Base
         :types => "reviews",
         :performer => "reviewer",
         :assignment => mapping.assignment,    
-        :partial_name => 'limit_notify'
+        :partial_name => 'limit_notify',
+        :link => url_for(:host=>host, :controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
       }
      }
    )         

@@ -69,6 +69,7 @@ class ReviewMappingController < ApplicationController
   # TODO: Refactor this method. Look at assign_reviewer_dynamically as an example
   # Add the entry into the Response Map
   def add_self_reviewer
+    puts 'in method'
     assignment = Assignment.find(params[:assignment_id])
     reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
     submission = AssignmentParticipant.find_by_id_and_parent_id(params[:submission_id],assignment.id)
@@ -90,6 +91,7 @@ class ReviewMappingController < ApplicationController
             raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
           end
         else
+          puts 'in else'
           contributor = AssignmentParticipant.find_by_id_and_parent_id(submission.id, assignment.id)
           if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',contributor.id ,reviewer.id]).nil?
             ParticipantReviewResponseMap.create(:reviewee_id => contributor.id,

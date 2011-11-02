@@ -44,7 +44,7 @@ Rails::Initializer.run do |config|
 
   config.action_controller.session_store = :active_record_store
   
-  if RAILS_ENV == 'production'
+  if RAILS_ENV == 'development'
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
       :address => "smtp.ncsu.edu",

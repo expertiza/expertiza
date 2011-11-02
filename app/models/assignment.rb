@@ -1,6 +1,6 @@
 class Assignment < ActiveRecord::Base
   include DynamicReviewMapping
-
+  include ActionController::UrlWriter
   belongs_to :course
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to
@@ -390,10 +390,10 @@ class Assignment < ActiveRecord::Base
     self.destroy
   end      
   
-  # Generate emails for reviewers when new content is available for review
-  #ajbudlon, sept 07, 2007   
-  def email(author_id) 
-  
+   # Generate emails for reviewers when new content is available for review
+  #ajbudlon, sept 07, 2007
+  def email(author_id,host)
+
     # Get all review mappings for this assignment & author
     participant = AssignmentParticipant.find(author_id)
     if team_assignment
@@ -401,13 +401,17 @@ class Assignment < ActiveRecord::Base
     else
       author = participant
     end
-    
+
     for mapping in author.review_mappings
 
        # If the reviewer has requested an e-mail deliver a notification
        # that includes the assignment, and which item has been updated.
        if mapping.reviewer.user.email_on_submission
           user = mapping.reviewer.user
+          puts 'in email'
+          puts mapping.response.id
+          redirect_url = url_for(:host=>host ,:controller => "response" , :action => "edit" , :id => mapping.response.id)
+          redirect_url = CGI::escape(redirect_url)
           Mailer.deliver_message(
             {:recipients => user.email,
              :subject => "A new submission is available for #{self.name}",
@@ -416,13 +420,14 @@ class Assignment < ActiveRecord::Base
               :type => "submission",
               :location => get_review_number(mapping).to_s,
               :first_name => ApplicationHelper::get_user_first_name(user),
-              :partial_name => "update"
+              :partial_name => "update",
+              :link => url_for(:host=>host , :controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
              }
             }
           )
        end
     end
-  end 
+  end
 
   # Get all review mappings for this assignment & reviewer
   # required to give reviewer location of new submission content

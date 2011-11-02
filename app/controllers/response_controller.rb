@@ -5,7 +5,7 @@ class ResponseController < ApplicationController
   
   def view
     @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
+    return if ( redirect_when_disallowed(@response) )
 
     @map = @response.map
     get_content
@@ -37,7 +37,7 @@ class ResponseController < ApplicationController
     }
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
+    if (@assignment.instructor_id == User.find_by_name("efg").id) && @title == "Review"
       if @assignment.id < 469
          @next_action = "custom_update"
          render :action => 'custom_response'
@@ -80,11 +80,12 @@ class ResponseController < ApplicationController
     end
 
     begin
-       ResponseHelper.compare_scores(@response, @questionnaire)
+       ResponseHelper.compare_scores(@response, @questionnaire,request.host_with_port)
        ScoreCache.update_cache(@response.id)
     
       msg = "Your response was successfully saved."
     rescue
+
       msg = "An error occurred while saving the response: "+$!
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
@@ -140,19 +141,19 @@ class ResponseController < ApplicationController
     get_content  
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
-      if @assignment.id < 469
-         @next_action = "custom_create"
-         render :action => 'custom_response'
-     else
-         @next_action = "custom_create"
-         render :action => 'custom_response_2011'
-     end
-    else
+    #if (@assignment.instructor_id == User.find_by_name("efg").id) && @title == "Review"
+     # if @assignment.id < 469
+     #    @next_action = "custom_create"
+      #   render :action => 'custom_response'
+     #else
+     #    @next_action = "custom_create"
+     #    render :action => 'custom_response_2011'
+     #end
+    #else
       # end of special code (except for the end below, to match the if above)
       #**********************
     render :action => 'response'
-    end
+    #end
   end
   
   def create     
@@ -160,7 +161,7 @@ class ResponseController < ApplicationController
     @res = 0
     msg = ""
     error_msg = ""
-    begin      
+    begin
       @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
       @res = @response.id
       @questionnaire = @map.questionnaire
@@ -173,12 +174,13 @@ class ResponseController < ApplicationController
     end
     
     begin
-      ResponseHelper.compare_scores(@response, @questionnaire)
+      ResponseHelper.compare_scores(@response, @questionnaire,request.host_with_port)
       ScoreCache.update_cache(@res)
       @map.save
       msg = "Your response was successfully saved."
     rescue
       @response.delete
+
       error_msg = "Your response was not saved. Cause: " + $!
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg
@@ -243,6 +245,11 @@ class ResponseController < ApplicationController
   def redirect_when_disallowed(response)
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
     # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+
+    #allow the instructor to view the feedback
+    if(response.map.assignment.instructor.id == session[:user].id)
+      return false
+    end
     if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment
       team = response.map.reviewer.team
       unless team.has_user session[:user]
@@ -255,4 +262,5 @@ class ResponseController < ApplicationController
     
     return false
   end
+
 end

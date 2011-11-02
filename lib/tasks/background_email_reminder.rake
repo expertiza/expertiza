@@ -1,5 +1,9 @@
+
 desc "Send email reminders to all students with upcoming assignment deadlines"
+HOST = 'localhost:3000'
+
 task :send_email_reminders => :environment do
+  include ActionController::UrlWriter
         #puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
         # find all assignments in database                
         #allAssign = Assignment.find(:all)
@@ -42,7 +46,7 @@ task :send_email_reminders => :environment do
                  :conditions => ["assignment_id = ?", assign.id])
           #puts "~~~~~~~~~~~~~~~~~~~~~due dates size #{due_dates.size} and due_at #{due_dates[0].due_at} and date.due_at - Time.now is #{due_dates[0].due_at - (Time.now-14400)}\n"
           
-          if(due_dates.size > 0)#making sure that the assignmefnt does have due dates
+          if(due_dates.size > 0)#making sure that the assignment does have due dates
             #the above query picks all deadlines for an asisgnment and we check for each and based on the assignment type we perform specific checks and then send email reminders
             for date in due_dates 
               #puts "~~~~~~~~~~Date is: #{date.due_at} and date.due_at - Time.now is: #{date.due_at - Time.now} and flag is #{date.flag}\n"
@@ -72,10 +76,14 @@ end
   def submission_reminder(assign, due_date)
     allParticipants = assign.participants
     emails = Array.new
+    urls = Array.new
     Rails.logger.info "Inside submission_reminder for assignment #{assign.name}"
     assign_type = DeadlineType.find(due_date.deadline_type_id).name
     for participant in allParticipants 
       email = participant.user.email
+      redirect_url = url_for(:host => HOST ,:controller => "submitted_content" , :action => "edit" , :id => participant.id)
+      redirect_url = CGI::escape(redirect_url)
+      url = url_for(:host => HOST ,:controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
       #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
@@ -83,26 +91,31 @@ end
       #puts "~~~~~~~~~~Sending submission_reminder if no submissions found ... submitted at nil #{(participant.submitted_at == nil)} .. hyperlink nil #{participant.submitted_hyperlink == nil} hyperlink empty #{participant.submitted_hyperlink != ""}\n"
       if (participant.submitted_at.nil? && participant.get_hyperlinks.empty?)#if(participant.has_submissions == false)
         emails << email
+        urls << url
       end
     end#end of for loop
     #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
-    email_remind(emails, assign_name, due_date, assign_type)
+    email_remind(emails, assign_name, due_date, assign_type,urls)
     Rails.logger.info "Sent submission reminders for assignment #{assign.name}"
   end
 
   def review_reminder(assign, due_date)
     allParticipants = assign.participants
     emails = Array.new
+    urls = Array.new
     Rails.logger.info "Inside review_reminder for assignment #{assign.name}"
     assign_type = DeadlineType.find(due_date.deadline_type_id).name
     #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
     for participant in allParticipants                
       email = participant.user.email
+      redirect_url = url_for(:host => HOST ,:controller => "student_review" , :action => "list" , :id => participant.id)
+      redirect_url = CGI::escape(redirect_url)
+      url = url_for(:host => HOST ,:controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
       #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       #check if the participant/reviewer has reviewed the latest version of the resubmitted file, else send him a reminder
-      allresponsemaps = participant.review_mappings
+      allresponsemaps = participant.reviewer_mappings
       #puts" ~~~~~number of response maps #{allresponsemaps.size}\n"
       if(allresponsemaps.size > 0)
         for eachresponsemap in allresponsemaps
@@ -112,16 +125,19 @@ end
             if(!response.nil? && resubmission_times.size > 0)#meaning the reviewer has submitted a response for that map_id  
               if(response.updated_at < resubmission_times[0].resubmitted_at) #participant/reviewer has reviewed an older version
                   emails << email
+                  urls << url
               end
             elsif(response.nil?) #where the reviewee has submitted and reviewer has provided no response
               if(resubmission_times.size > 0)
                 emails << email
+                urls << url
               else #if the reviewee has made some sort of submission
                 reviewee = eachresponsemap.reviewee
                 #puts "~~~~~~~~~~Sending review_reminder if no responses found ... submitted at nil #{(reviewee[0].submitted_at == nil)} .. hyperlink nil #{reviewee[0].submitted_hyperlink == nil} hyperlink empty #{reviewee[0].submitted_hyperlink == ""}\n"
                 unless (reviewee[0].submitted_at.nil? && reviewee[0].get_hyperlinks.empty?)
                   #puts "~~~~~~~~~~Email: #{email}\n"   
                   emails << email
+                  urls << url
                 end
               end
            end
@@ -129,18 +145,22 @@ end
       end
     end #end of the for loop for all participants of the assignment
     #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
-    email_remind(emails, assign_name, due_date, assign_type)
+    email_remind(emails, assign_name, due_date, assign_type,urls)
     Rails.logger.info "Sent review reminders for assignment #{assign.name}"
   end
 
   def metareview_reminder(assign, due_date)
     allParticipants = assign.participants
     emails = Array.new
+    urls = Array.new
     Rails.logger.info "Inside metareview_reminder for assignment #{assign.name}"
     assign_type = DeadlineType.find(due_date.deadline_type_id).name
     #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
     for participant in allParticipants               
       email = participant.user.email
+      redirect_url = url_for(:host => HOST ,:controller => "student_review" , :action => "list" , :id => participant.id)
+      redirect_url = CGI::escape(redirect_url)
+      url = url_for(:host => HOST ,:controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
       #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
@@ -154,34 +174,42 @@ end
             if(checkresponsemap.size > 0)
               if eachresponsemap.response.nil?
                 emails << email
+                urls << url
               end
             end
         end
       end
     end #end of the for loop
     #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
-    email_remind(emails, assign_name, due_date, assign_type)
+    email_remind(emails, assign_name, due_date, assign_type,url)
     Rails.logger.info "Sent metareview reminders for assignment #{assign.name}"
   end
 
-  def email_remind(emails, assign_name, due_date, assign_type)
+  def email_remind(emails, assign_name, due_date, assign_type, urls)
       #puts "~~~~~~~~~~~~~inside email reminder email #{emails}"
       due_date_string = due_date.due_at.to_s
       subject = "Message regarding #{assign_type} for #{assign_name}"
-      if assign_type == "submission"
+       if assign_type == "submission"
         body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}."
       end
       if assign_type == "review"
         body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}."
       end
       if assign_type == "metareview"
-        body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}." 
-      end  
-      Mailer.deliver_message(
-        {:bcc => emails,
+        body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}."
+      end
+      puts emails
+      (0..(emails.length-1)).each do|participant|
+         participantBody = body + "To complete this assignment please follow this <a href=\"#{urls[participant]}\">link</a>."
+         Mailer.deliver_message(
+        {:recipients => emails[participant],
          :subject => subject,
-         :body => body
-        })         
+         :body => participantBody
+        })
+
+      end
+
+
   end
   
   def email_start(emails, assign_name)      

@@ -1,7 +1,7 @@
 class AuthController < ApplicationController
   helper :auth
-  before_filter :authorize, :except =>[:login,:review_redirect]
-  
+  before_filter :authorize, :except =>[:login, :review_redirect]
+
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :login, :logout ],
          :redirect_to => { :action => :list }
@@ -11,24 +11,27 @@ class AuthController < ApplicationController
       AuthController.clear_session(session)
     else
       user = User.find_by_login(params[:login][:name])
-      
+
       if user and user.valid_password?(params[:login][:password])
         logger.info "User #{params[:login][:name]} successfully logged in"
         session[:user] = user
         AuthController.set_current_role(user.role_id,session)
+
         if session[:redirect_link]!=nil
-           redirect_to session[:redirect_link]
-          end
-        respond_to do |wants|          
+           url = session[:redirect_link]
+           session[:redirect_link]=nil
+           redirect_to url
+        else
+        respond_to do |wants|
           wants.html do
             ## This line must be modified to read as shown at left when a new version of Goldberg is installed!
-            redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user]) 
+            redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])
           end
           wants.xml do
             render :nothing => true, :status => 200
           end
         end
-        
+        end
       else
         logger.warn "Failed login attempt"
         respond_to do |wants|
@@ -46,21 +49,22 @@ class AuthController < ApplicationController
 
   def review_redirect
 
-    link='http://localhost:3000/tree_display/list'
-    session[:redirect_link]=link #'http://localhost:3000/tree_display/list'#params[:redirect_link]
     if !session[:user]
-      redirect '/'
+          session[:redirect_link] = CGI::unescape(params[:redirect_link])
+      redirect_to '/'
     else
-      session[:redirect_link]=nil;
-      redirect_to link #'http://localhost:3000/tree_display/list'#params[:redirect_link]
+
+      redirect_to CGI::unescape(params[:redirect_link])
     end
   end
 
- 
-  def login_failed
+
+
+ def login_failed
     flash.now[:error] = "Incorrect Name/Password"
     render :action => 'forgotten'
   end
+
 
   def logout
     AuthController.logout(session)
@@ -99,9 +103,11 @@ class AuthController < ApplicationController
       else
         check_controller = true
       end
-      
+
       # Check if there's a general permission for a controller
+     # puts'abcd'+params[:controller]
       if check_controller
+        #puts'abcd'+params[:controller]
         if session[:credentials].controllers.has_key?(params[:controller])
           if session[:credentials].controllers[params[:controller]]
             logger.info "Controller: authorised"
@@ -113,7 +119,7 @@ class AuthController < ApplicationController
           end
       end
     end  # Check permissions
-    
+
     logger.info "Authorised? #{authorised.to_s}"
     return authorised
   end
@@ -124,7 +130,7 @@ class AuthController < ApplicationController
   def self.logout(session)
     self.clear_session(session)
   end
-  
+
   def self.set_current_role(role_id, session)
     if role_id
        role = Role.find(role_id)

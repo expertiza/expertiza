@@ -2,7 +2,7 @@ Hi <%= @first_name %>,
 
 One of the <%=@type%>s you are reviewing for the "<%= @obj_name %>" assignment has
 just been entered or revised. You may log into Expertiza and review the work now.
-
+<a href="<%= @link%>">Follow this link to review the work</a>
 <% if @review_scores != nil %>
 Review Content:
 <% for @rs in @review_scores %>

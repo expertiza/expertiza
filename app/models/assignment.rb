@@ -1,4 +1,6 @@
 class Assignment < ActiveRecord::Base
+
+  #We have made chnages here
   include DynamicReviewMapping
 
   belongs_to :course

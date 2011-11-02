@@ -19,7 +19,7 @@ class AssignmentTest < ActiveSupport::TestCase
   def test_database_returns_review_mappings_in_order_of_creation_and_uses_sequential_ids
     p = AssignmentParticipant.create :handle => 'assignment'
     (1..5).each do |i|
-      map = ParticipantReviewResponseMap.create :reviewer_id => i # use reviewer_id to store the sequence
+      map = ParticipantReviewResponseMap.create :reviewer_id => i, :reviewee_id => 0, :reviewed_object_id => 0 # use reviewer_id to store the sequence
       p.review_mappings << map
     end
     

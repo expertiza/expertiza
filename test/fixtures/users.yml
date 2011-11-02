@@ -57,7 +57,7 @@ instructor3:
   email_on_review: 1
     
 student1:
-  name: student1
+  name: " "
   parent_id: <%= Fixtures.identify(:admin) %>
   fullname: student1_fullname
   password: <%= Digest::SHA1.hexdigest("student1") %>
@@ -76,7 +76,7 @@ student2:
   fullname: student2_fullname
   password: <%= Digest::SHA1.hexdigest("student2") %>
   password_salt:
-  email: student2@foo.edu
+  email: " "
   role_id: <%= Fixtures.identify(:Student_role) %>
   email_on_review: 0
   email_on_submission: 1
@@ -174,7 +174,6 @@ student9:
   email_on_submission: 1
   email_on_review_of_review: 1   
   master_permission_granted: 1
-  
 
 admin_test:
   name: admin_test

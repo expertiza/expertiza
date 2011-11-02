@@ -29,7 +29,7 @@ We took the following approach to integrate previous work done on Expertiza:
 	--	Run integration tests to ensure final quality 
 	--	Merge our branch E15-Notification with the Master
 
-How to setup and start the application:
+How to setup and start the application:  
    
         --      Start the mysql server.
 	--	Create a database named "pg_development" in mysql (Mysql 5.5 database server).
@@ -38,6 +38,7 @@ How to setup and start the application:
 	--	Do rake db:migrate
 	--	Run the server.
 
+---------------------------------------------------------------------------------------------------------------------------------------------
 E3: Enhancements to Suggest and Approve
 
 https://trello.com/card/board/e3-enhancements-to-suggest-and-approve/4e97910a88107fb718001fd1/4e979b7f88107fb718025fed
@@ -69,3 +70,6 @@ How to setup and start the application:
 	--	Import this dump into the database created. To import, use: mysql -u root pg_development < 517dump-scrubbed.sql
 	--	Do rake db:migrate
 	--	Run the server.
+
+
+

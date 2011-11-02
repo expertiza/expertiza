@@ -106,8 +106,8 @@ site_controller_team:
   name: team
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
   builtin: "0"
-site_controller_review_of_review:
-  name: review_of_review
+site_controller_metareview:
+  name: metareview
   permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
   builtin: "0"
 site_controller_survey:

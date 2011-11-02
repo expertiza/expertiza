@@ -161,7 +161,7 @@ class GradesController < ApplicationController
       @caction = "view_review"
       @symbol = "review"
       process_response("Review", "Reviewer", @participant.get_reviews, "ReviewQuestionnaire")
-    elsif @submission == "review_of_review"
+    elsif @submission == "metareview"
       @symbol = "metareview"
       process_response("Metareview", "Metareviewer", @participant.get_metareviews, "MetareviewQuestionnaire")
     elsif @submission == "review_feedback"

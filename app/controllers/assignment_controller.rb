@@ -101,7 +101,7 @@ class AssignmentController < ApplicationController
     deadline = DeadlineType.find_by_name("rereview")
     @Rereview_deadline = deadline.id
     deadline = DeadlineType.find_by_name("metareview")
-    @Review_of_review_deadline = deadline.id
+    @metareview_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
     
@@ -142,7 +142,7 @@ class AssignmentController < ApplicationController
         @assignment.questionnaires.each{
           |questionnaire|
           if questionnaire.instance_of? MetareviewQuestionnaire
-            due_date = DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
+            due_date = DueDate::set_duedate(params[:reviewofreview_deadline],@metareview_deadline, @assignment.id, max_round )
             raise "Please enter a valid Metareview deadline" if !due_date
           end
         }

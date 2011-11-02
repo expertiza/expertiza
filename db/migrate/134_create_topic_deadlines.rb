@@ -7,9 +7,11 @@ class CreateTopicDeadlines < ActiveRecord::Migration
       t.column "late_policy_id", :integer
       t.column "submission_allowed_id", :integer
       t.column "review_allowed_id", :integer
-      t.column "resubmission_allowed_id", :integer
-      t.column "rereview_allowed_id", :integer
-      t.column "review_of_review_allowed_id", :integer
+      t.column "metareview_allowed_id", :integer
+      t.column "signup_allowed_id", :integer
+      t.column "drop_allowed_id", :integer
+      t.column "teammate_review_allowed_id", :integer
+      t.column "survey_response_allowed_id", :integer
       t.column "round", :integer
     end
 
@@ -29,9 +31,11 @@ class CreateTopicDeadlines < ActiveRecord::Migration
 
     add_index "topic_deadlines", ["submission_allowed_id"], :name => "idx_submission_allowed"
     add_index "topic_deadlines", ["review_allowed_id"], :name => "idx_review_allowed"
-    add_index "topic_deadlines", ["resubmission_allowed_id"], :name => "idx_resubmission_allowed"
-    add_index "topic_deadlines", ["rereview_allowed_id"], :name => "idx_rereview_allowed"
-    add_index "topic_deadlines", ["review_of_review_allowed_id"], :name => "idx_review_of_review_allowed"
+    add_index "topic_deadlines", ["metareview_allowed_id"], :name => "idx_metareview_allowed"
+    add_index "topic_deadlines", ["signup_allowed_id"], :name => "idx_signup_allowed_id"
+    add_index "topic_deadlines", ["drop_allowed_id"], :name => "idx_drop_allowed_id"
+    add_index "topic_deadlines", ["teammate_review_allowed_id"], :name => "idx_teammate_review_allowed_id"
+    add_index "topic_deadlines", ["survey_response_allowed_id"], :name => "idx_survey_response_allowed_id"
   end
 
   def self.down

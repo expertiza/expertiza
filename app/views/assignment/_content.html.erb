@@ -3,16 +3,28 @@ function onChange(){
 	count = document.getElementById("team_count1");
 	hidden = document.getElementById("team_count2");
 	document.poppedLayer3 = eval('document.getElementById("teammate_review")');
+	document.poppedLayer4 = eval('document.getElementById("team_allowed")');
+	document.poppedLayer5 = eval('document.getElementById("team_allowed1")');
+	document.poppedLayer6 = eval('document.getElementById("team_allowed2")');
+	document.poppedLayer7 = eval('document.getElementById("team_allowed3")');
 	var dropdownIndex = document.getElementById('teamselect').selectedIndex;
 	var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
 	if(dropdownValue == "true"){
 		count.style.display = "";
 		hidden.style.display = "none";
 		document.poppedLayer3.style.display = "";
+		document.poppedLayer4.style.display = "";
+		document.poppedLayer5.style.display = "";
+		document.poppedLayer6.style.display = "";
+		document.poppedLayer7.style.display = "";
 	}else{
 		count.style.display = "none";
 		hidden.style.display  = "";
 		document.poppedLayer3.style.display = "none";
+		document.poppedLayer4.style.display = "none";
+		document.poppedLayer5.style.display = "none";
+		document.poppedLayer6.style.display = "none";
+		document.poppedLayer7.style.display = "none";
 	}
 }
 

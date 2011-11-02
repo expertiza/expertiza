@@ -1,7 +1,6 @@
 class User < ActiveRecord::Base
   
   acts_as_authentic do |config|
-    config.validates_uniqueness_of_email_field_options = {:if => lambda { false }} # Don't validate email uniqueness
     config.password_field = :clear_password
     config.crypted_password_field = :password
     config.crypto_provider = Authlogic::CryptoProviders::Sha1
@@ -206,7 +205,7 @@ class User < ActiveRecord::Base
     Authlogic::CryptoProviders::Sha1.stretches = 1
     @email_on_review = true
     @email_on_submission = true
-    @email_on_review_of_review = true
+    @email_on_metareview = true
   end
 
 end

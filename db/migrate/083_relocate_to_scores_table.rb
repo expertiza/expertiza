@@ -12,7 +12,7 @@ class RelocateToScoresTable < ActiveRecord::Migration
      end
      begin
     execute "insert into scores (instance_id, question_id, score, comments, questionnaire_type_id) 
-    select  review_of_review_id, question_id, score, comments,6 from review_of_review_scores"
+    select  metareview_id, question_id, score, comments,6 from metareview_scores"
     rescue
   end
     begin
@@ -25,7 +25,7 @@ class RelocateToScoresTable < ActiveRecord::Migration
     rescue
   end
     begin
-    drop_table :review_of_review_scores
+    drop_table :metareview_scores
     rescue
   end
     begin

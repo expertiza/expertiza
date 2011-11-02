@@ -154,14 +154,14 @@ class StudentTaskController < ApplicationController
     end
 
     @review_phase = next_due_date.deadline_type_id;
-    if next_due_date.review_of_review_allowed_id == DueDate::LATE or next_due_date.review_of_review_allowed_id == DueDate::OK
+    if next_due_date.metareview_allowed_id == DueDate::LATE or next_due_date.metareview_allowed_id == DueDate::OK
       if @review_phase == DeadlineType.find_by_name("metareview").id
         @can_view_metareview = true
       end
     end
 
     @review_mappings = ResponseMap.find_all_by_reviewer_id(@participant.id)
-    @review_of_review_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)
+    @metareview_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)
   end
 
   def your_work

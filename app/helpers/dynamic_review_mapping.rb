@@ -393,13 +393,13 @@ module DynamicReviewMapping
   #TODO: refactor later to merge with generic code. All the 3 functions have lot of code that is common
   #and all 3 functions work on more or less the same algo 
 
-  def assign_reviewers_automatically(num_reviews, num_review_of_reviews)
+  def assign_reviewers_automatically(num_reviews, num_metareviews)
     if self.team_assignment?
       review_message = assign_reviewers_team(num_reviews)
     else
       review_message = assign_reviewers_individual(num_reviews)
     end
-    metareview_message = assign_metareviewers(num_review_of_reviews, @assignment)
+    metareview_message = assign_metareviewers(num_metareviews, @assignment)
 
     return review_message.to_s + metareview_message.to_s
   end
@@ -870,12 +870,12 @@ module DynamicReviewMapping
 
   end
 
-  def assign_metareviewers(num_review_of_reviews, assignment)
+  def assign_metareviewers(num_metareviews, assignment)
 
     @show_message = false
 
     @assignment = assignment
-    number_of_reviews = num_review_of_reviews.to_i
+    number_of_reviews = num_metareviews.to_i
 
     if @assignment.team_assignment?
       contributors = TeamReviewResponseMap.find_all_by_reviewed_object_id(@assignment.id)

@@ -14,7 +14,7 @@
     <td  align="center"><%= (User.find_by_id(user.parent_id)).name %></td>
     <td ><%= User.yesorno(user.email_on_review) %></td>
     <td ><%= User.yesorno(user.email_on_submission) %></td>
-    <td ><%= User.yesorno(user.email_on_review_of_review) %></td>    
+    <td ><%= User.yesorno(user.email_on_metareview) %></td>
     <td ><%= participant.handle %></td>
            
     <td ><%= link_to 'Remove', :controller => controller, :action => 'delete', :method => :post, :id => participant.id %></td>

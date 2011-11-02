@@ -21,10 +21,10 @@ class CreateQuestionnaireWeights < ActiveRecord::Migration
         end     
         qweight.save
       end
-      if assignment.review_of_review_questionnaire_id != nil && assignment.review_of_review_questionnaire_id != 0
+      if assignment.metareview_questionnaire_id != nil && assignment.metareview_questionnaire_id != 0
         mweight = MetareviewWeight.create(
           :assignment_id => assignment.id,
-          :questionnaire_id => assignment.review_of_review_questionnaire_id         
+          :questionnaire_id => assignment.metareview_questionnaire_id
         );
         if assignment.review_weight != nil
           mweight.weight = 100 - assignment.review_weight          

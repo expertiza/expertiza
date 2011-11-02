@@ -10,12 +10,12 @@ class CreateAssignments < ActiveRecord::Migration
     t.column "instructor_id", :integer, :default => 0, :null => false
     t.column "private", :boolean, :default => false, :null => false
     t.column "num_reviews", :integer, :default => 0, :null => false
-    t.column "num_review_of_reviews", :integer, :default => 0, :null => false
-    t.column "num_review_of_reviewers", :integer, :default => 0, :null => false
+    t.column "num_metareviews", :integer, :default => 0, :null => false
+    t.column "num_metareviewers", :integer, :default => 0, :null => false
     t.column "review_strategy_id", :integer, :default => 0, :null => false
     t.column "mapping_strategy_id", :integer, :default => 0, :null => false
     t.column "review_questionnaire_id", :integer
-    t.column "review_of_review_questionnaire_id", :integer
+    t.column "metareview_questionnaire_id", :integer
     t.column "review_weight", :float
     t.column "reviews_visible_to_all", :boolean
     t.column "team_assignment", :boolean
@@ -31,11 +31,11 @@ class CreateAssignments < ActiveRecord::Migration
              add constraint fk_assignments_review_questionnaires
              foreign key (review_questionnaire_id) references questionnaires(id)"
              
-  add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
+  add_index "assignments", ["metareview_questionnaire_id"], :name => "fk_assignments_metareview_questionnaires"
 
   execute "alter table assignments 
-             add constraint fk_assignments_review_of_review_questionnaires
-             foreign key (review_of_review_questionnaire_id) references questionnaires(id)"
+             add constraint fk_assignments_metareview_questionnaires
+             foreign key (metareview_questionnaire_id) references questionnaires(id)"
              
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
 

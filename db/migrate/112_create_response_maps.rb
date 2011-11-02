@@ -31,11 +31,11 @@ class CreateResponseMaps < ActiveRecord::Migration
              ADD CONSTRAINT fk_score_response
              FOREIGN KEY (response_id) REFERENCES responses(id)'              
     
-    ActiveRecord::Base.connection.select_all("select * from review_of_review_mappings").each{
+    ActiveRecord::Base.connection.select_all("select * from metareview_mappings").each{
        | map | 
        rmap = ActiveRecord::Base.connection.select_all("select * from review_mappings where id = #{map['reviewed_object_id']}")       
        assignment = Assignment.find(rmap[0]['reviewed_object_id'].to_i) 
-       create_response_map(map,"review_of_reviews","MetareviewResponseMap", "MetareviewQuestionnaire",assignment)       
+       create_response_map(map,"metareviews","MetareviewResponseMap", "MetareviewQuestionnaire",assignment)
     }
     
     ActiveRecord::Base.connection.select_all("select * from feedback_mappings").each{
@@ -91,8 +91,8 @@ class CreateResponseMaps < ActiveRecord::Migration
      
     remove_column :scores, :instance_id
      
-    drop_table :review_of_reviews    
-    drop_table :review_of_review_mappings
+    drop_table :metareviews
+    drop_table :metareview_mappings
     drop_table :review_feedbacks
     drop_table :feedback_mappings
     drop_table :teammate_reviews

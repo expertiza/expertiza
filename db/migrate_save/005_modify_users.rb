@@ -14,7 +14,7 @@ class ModifyUsers < ActiveRecord::Migration
     # t.column :email_address, :string, :limit=>80  -- called "email" in Goldberg
     add_column :users, :email_on_review, :boolean
     add_column :users, :email_on_submission, :boolean
-    add_column :users, :email_on_review_of_review, :boolean
+    add_column :users, :email_on_metareview, :boolean
 
     execute "alter table users 
              add constraint fk_institutions_users
@@ -30,6 +30,6 @@ class ModifyUsers < ActiveRecord::Migration
     remove_column :users, :mru_directory_path
     remove_column :users, :email_on_review
     remove_column :users, :email_on_submission
-    remove_column :users, :email_on_review_of_review
+    remove_column :users, :email_on_metareview
   end
 end

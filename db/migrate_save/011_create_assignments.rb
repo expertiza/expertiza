@@ -8,9 +8,9 @@ class CreateAssignments < ActiveRecord::Migration
 	t.column :instructor_id, :integer # id of instructor who created the assignment
 	t.column :private, :boolean  # whether assignment is visible to other instructors
     t.column :num_reviewers, :integer # number of people who review each submission for this assgt.
-    t.column :num_review_of_reviewers, :integer # number of people who review each review for this assgt.
+    t.column :num_metareviewers, :integer # number of people who review each review for this assgt.
 	t.column :review_questionnaire_id, :integer
-	t.column :review_of_review_questionnaire_id, :integer
+	t.column :metareview_questionnaire_id, :integer
 	t.column :review_weight, :float # the percentage that reviews count for; the balance of grade depends on reviews of reviews
 	t.column :reviews_visible_to_all, :boolean # if false, other reviewers can't see this reviewer's review
 	t.column :team_assignment, :boolean
@@ -21,8 +21,8 @@ class CreateAssignments < ActiveRecord::Migration
              add constraint fk_assignments_review_questionnaires
              foreign key (review_questionnaire_id) references questionnaires(id)"
     execute "alter table assignments
-             add constraint fk_assignments_review_of_review_questionnaires
-             foreign key (review_of_review_questionnaire_id) references questionnaires(id)"
+             add constraint fk_assignments_metareview_questionnaires
+             foreign key (metareview_questionnaire_id) references questionnaires(id)"
     execute "alter table assignments
              add constraint fk_assignments_instructors
              foreign key (instructor_id) references users(id)"

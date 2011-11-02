@@ -44,7 +44,7 @@ class AssignmentControllerTest < ActionController::TestCase
       :course_id           => 1,
       :directory_path      => "2_valid_test",
       :review_questionnaire_id    => questionnaire_id,
-      :review_of_review_questionnaire_id => questionnaire_id,
+      :metareview_questionnaire_id => questionnaire_id,
       :author_feedback_questionnaire_id  => questionnaire_id,
       :instructor_id => instructorid,
       :course_id => courseid
@@ -63,7 +63,7 @@ class AssignmentControllerTest < ActionController::TestCase
     questionnaire_id = Questionnaire.first.id
     post :update, :id => id, :assignment=> { :name => 'updatedAssignment9',
       :review_questionnaire_id => questionnaire_id,
-      :review_of_review_questionnaire_id => questionnaire_id,
+      :metareview_questionnaire_id => questionnaire_id,
       :author_feedback_questionnaire_id  => questionnaire_id
     }
 
@@ -90,14 +90,17 @@ class AssignmentControllerTest < ActionController::TestCase
       post :update, :id => id, :assignment=> { :name => '',
           :directory_path => "admin/test1",
           :review_questionnaire_id => 1,
-          :review_of_review_questionnaire_id => 1,
+          :metareview_questionnaire_id => 1,
         },
         :due_date => {  "1" , { :resubmission_allowed_id =>1 ,
           :submission_allowed_id =>3,
-          :review_of_review_allowed_id =>1,
+          :metareview_allowed_id =>1,
           :review_allowed_id =>1,
           :due_at =>"2007-07-10 15:00:00",
-          :rereview_allowed_id =>1
+          :signup_allowed_id =>1,
+          :drop_allowed_id =>1,
+          :teammate_review_allowed_id =>1,
+          :survey_response_allowed_id =>1
         }
       }
     }

@@ -239,7 +239,7 @@ class AssignmentParticipant < Participant
             user.parent.name,
             user.email_on_submission,
             user.email_on_review,
-            user.email_on_review_of_review,
+            user.email_on_metareview,
             part.handle
           ]
       } 

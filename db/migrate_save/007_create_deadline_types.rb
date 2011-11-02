@@ -11,7 +11,7 @@ class CreateDeadlineTypes < ActiveRecord::Migration
     deadline_type.save
     deadline_type = DeadlineType.create(:name=>"rereview") # this means permission to review a version that has been submitted since the most recent review deadline
     deadline_type.save
-    deadline_type = DeadlineType.create(:name=>"review_of_review")
+    deadline_type = DeadlineType.create(:name=>"metareview")
     deadline_type.save
   end
 

@@ -12,7 +12,7 @@ module ImportFileHelper
     attributes["clear_password_confirmation"] = attributes["clear_password"]
     attributes["email_on_submission"] = 1
     attributes["email_on_review"] = 1
-    attributes["email_on_review_of_review"] = 1
+    attributes["email_on_metareview"] = 1
     attributes
   end
 

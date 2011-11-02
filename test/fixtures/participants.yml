@@ -155,3 +155,49 @@ par15:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par15"
+
+
+partestnoreview:
+  submit_allowed: 2
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student1) %>
+  parent_id: <%= Fixtures.identify(:assignment_submitted) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_test_review"
+  submitted_hyperlinks: "--- \n- http://www.ncsu.edu/\n- http://www.google.com/\n"
+
+
+partestreview:
+  submit_allowed: 2
+  review_allowed: 2
+  user_id: <%= Fixtures.identify(:student1) %>
+  parent_id: <%= Fixtures.identify(:assignment_submitted) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_test_review"
+  submitted_hyperlinks: "--- \n- http://www.ncsu.edu/\n- http://www.google.com/\n"
+
+partestsubmit:
+  submit_allowed: 2
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student1) %>
+  parent_id: <%= Fixtures.identify(:assignment_not_submitted) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_test_submit"
+  submitted_hyperlinks: ""
+
+partestnosubmit:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student1) %>
+  parent_id: <%= Fixtures.identify(:assignment_not_submitted) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_test_submit"
+  submitted_hyperlinks: ""

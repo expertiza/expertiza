@@ -43,8 +43,52 @@ due_date_review<%= j %>:
   late_policy_id: <%= Fixtures.identify("late_policy0") %>
   submission_allowed_id: 2
   review_allowed_id: 2
-  resubmission_allowed_id: 2
-  rereview_allowed_id: 2
-  review_of_review_allowed_id: 1
+  metareview_allowed_id: 1
+  signup_allowed_id: 1
+  drop_allowed_id: 1
+  teammate_review_allowed_id: 1
+  survey_response_allowed_id: 1
   round: 2
 <%end%>
+
+due_date_test:
+  due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: Fixtures.identify(:deadline_type_review)
+  assignment_id: <%= Fixtures.identify("assignment_submitted") %>
+  late_policy_id: <%= Fixtures.identify("late_policy0") %>
+  submission_allowed_id: 2
+  review_allowed_id: 1
+  metareview_allowed_id: 1
+  round: 1
+
+due_date_test4:
+  due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: Fixtures.identify(:deadline_type_review)
+  assignment_id: <%= Fixtures.identify("assignment_submitted") %>
+  late_policy_id: <%= Fixtures.identify("late_policy0") %>
+  submission_allowed_id: 2
+  review_allowed_id: 2
+  metareview_allowed_id: 1
+  round: 1
+
+due_date_test1:
+  due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: Fixtures.identify(:deadline_type_submission)
+  assignment_id: <%= Fixtures.identify("assignment_not_submitted") %>
+  late_policy_id: <%= Fixtures.identify("late_policy0") %>
+  submission_allowed_id: 1
+  review_allowed_id: 1
+  metareview_allowed_id: 1
+  round: 1
+
+
+due_date_test2:
+  due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: Fixtures.identify(:deadline_type_submission)
+  assignment_id: <%= Fixtures.identify("assignment_not_submitted") %>
+  late_policy_id: <%= Fixtures.identify("late_policy0") %>
+  submission_allowed_id: 2
+  review_allowed_id: 1
+  metareview_allowed_id: 1
+  round: 1
+

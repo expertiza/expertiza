@@ -1,5 +1,5 @@
 class CreateReviews < ActiveRecord::Migration
-  # This table should have essentially the same format as review_of_reviews
+  # This table should have essentially the same format as metareviews
   def self.up
     create_table :reviews do |t|
       t.column :reviewed_at, :datetime  # time that the review was saved

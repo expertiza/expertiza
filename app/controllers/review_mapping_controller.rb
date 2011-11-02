@@ -476,7 +476,7 @@ class ReviewMappingController < ApplicationController
   def automatic_reviewer_mapping
     assignment = Assignment.find(params[:id])
 
-    message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_review_of_reviews])
+    message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_metareviews])
     flash[:note] = message
     redirect_to :action => 'list_mappings', :id => assignment.id
   end

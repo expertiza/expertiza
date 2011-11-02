@@ -11,7 +11,7 @@ class CreateUsers < ActiveRecord::Migration
     # t.column :email_address, :string, :limit=>80  -- called "email" in Goldberg
     add_column :email_on_review, :boolean
     add_column :email_on_submission, :boolean
-    add_column :email_on_review_of_review, :boolean
+    add_column :email_on_metareview, :boolean
 
     user = User.create(:username => "testuser1", :password=> User.hash_password("1wolfpack"), :role_id => "3")
     user.save

@@ -26,7 +26,7 @@ class UpdateControllersForResponse < ActiveRecord::Migration
       controller.destroy
     end
     
-    controller = SiteController.find_by_name("review_of_review")
+    controller = SiteController.find_by_name("metareview")
     if controller
       ControllerAction.find_all_by_site_controller_id(controller.id).each{|action| action.destroy}
       controller.destroy    

@@ -33,23 +33,23 @@
    end 
   end %></ul>
  </tr>
- <% if @can_view_metareview == true && @review_of_review_mappings.size > 0 %>
+ <% if @can_view_metareview == true && @metareview_mappings.size > 0 %>
    <h3>Metareviews for <%= @assignment.name %></h3>
    <tr><ul>
      <%ror_no = 1%>
-     <%for ror_map in @review_of_review_mappings %>
-        <%@ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id)%>
+     <%for ror_map in @metareview_mappings %>
+        <%@ror = ReviewOfReview.find_by_metareview_mapping_id(ror_map.id)%>
         <% if (@ror)%>
           <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Metareview
-              <%= ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view', :id => @ror.id} %> &nbsp;
+              <%= ror_no%> &nbsp;<%= link_to "View",{:controller => 'metareview', :action => 'view', :id => @ror.id} %> &nbsp;
           <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
-              <%= link_to "Edit",{:controller => 'review_of_review', :action => 'edit', :id => @ror.id} %></li>
+              <%= link_to "Edit",{:controller => 'metareview', :action => 'edit', :id => @ror.id} %></li>
           <% end %>
           </li>
         <% elsif Review.find_by_review_mapping_id(ror_map.review_mapping_id) != nil %>
               <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
                  <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Metareview
-                     <%= ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new',
+                     <%= ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'metareview', :action => 'new',
                                          :id => ror_map.id, :assignment => @assignment.id} %>
                 </li>
               <%else%>

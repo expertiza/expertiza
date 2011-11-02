@@ -5,6 +5,7 @@ class ParticipantTest < ActiveSupport::TestCase
 	fixtures :participants
 	fixtures :courses
 	fixtures :assignments
+
 	
 	def test_add_participant()
 		participant = Participant.new
@@ -38,5 +39,23 @@ class ParticipantTest < ActiveSupport::TestCase
 		participant = participants(:par1)
 		participant.delete
 		assert participant.valid?
-	end
+  end
+
+  def test_valid_submission
+    par1 = Participant.new
+    par1.submit_allowed= TRUE
+    par1.review_allowed= FALSE
+    par1.parent_id= assignments(:assignment_not_submitted).id
+    assert par1.valid?
+  end
+
+  def test_valid_review
+    par2 = Participant.new
+    par2.submit_allowed= FALSE
+    par2.review_allowed= TRUE
+    par2.parent_id= assignments(:assignment_submitted).id
+    assert par2.valid?
+  end
+
+
 end

@@ -1,20 +1,20 @@
 class CreateReviewOfReviewScores < ActiveRecord::Migration
   def self.up
-    create_table :review_of_review_scores do |t|
-      t.column :review_of_review_id, :integer
+    create_table :metareview_scores do |t|
+      t.column :metareview_id, :integer
       t.column :question_id, :integer
       t.column :score, :integer
       t.column :comments, :text
     end
-    execute "alter table review_of_review_scores
-             add constraint fk_review_of_review_score_reviews
-             foreign key (review_of_review_id) references review_of_reviews(id)"
-    execute "alter table review_of_review_scores
-             add constraint fk_review_of_review_score_questions
+    execute "alter table metareview_scores
+             add constraint fk_metareview_score_reviews
+             foreign key (metareview_id) references metareviews(id)"
+    execute "alter table metareview_scores
+             add constraint fk_metareview_score_questions
              foreign key (question_id) references questions(id)"
   end
 
   def self.down
-    drop_table :review_of_review_scores
+    drop_table :metareview_scores
   end
 end

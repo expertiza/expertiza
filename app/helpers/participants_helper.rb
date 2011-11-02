@@ -22,7 +22,7 @@ module ParticipantsHelper
     attributes["clear_password"] = assign_password(8)
     attributes["email_on_submission"] = 1
     attributes["email_on_review"] = 1
-    attributes["email_on_review_of_review"] = 1
+    attributes["email_on_metareview"] = 1
     attributes
   end
   

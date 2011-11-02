@@ -12,7 +12,7 @@ class CreateUsers < ActiveRecord::Migration
       t.column "mru_directory_path", :string, :limit => 128
       t.column "email_on_review", :boolean
       t.column "email_on_submission", :boolean
-      t.column "email_on_review_of_review", :boolean
+      t.column "email_on_metareview", :boolean
       t.column "is_new_user", :boolean, :default => 1
       t.column "master_permission_granted", :boolean
 

@@ -27,7 +27,7 @@ class AdminController < ApplicationController
       # these values need to be true by default so new users receive e-mail on these events unless they opt not to
       @user.email_on_review = true
       @user.email_on_submission = true
-      @user.email_on_review_of_review = true  
+      @user.email_on_metareview = true
     else
       @found = true
     end

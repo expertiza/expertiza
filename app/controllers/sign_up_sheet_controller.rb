@@ -132,6 +132,7 @@ class SignUpSheetController < ApplicationController
       if @assignment.staggered_deadline?
         topic_set = Array.new
         topic = @sign_up_topic.id
+        topic = @sign_up_topic.id
 
       end
 
@@ -566,9 +567,11 @@ class SignUpSheetController < ApplicationController
     topic_deadline.late_policy_id = due_date.late_policy_id
     topic_deadline.submission_allowed_id = due_date.submission_allowed_id
     topic_deadline.review_allowed_id = due_date.review_allowed_id
-    topic_deadline.resubmission_allowed_id = due_date.resubmission_allowed_id
-    topic_deadline.rereview_allowed_id = due_date.rereview_allowed_id
-    topic_deadline.review_of_review_allowed_id = due_date.review_of_review_allowed_id
+    topic_deadline.metareview_allowed_id = due_date.metareview_allowed_id
+    topic_deadline.signup_allowed_id = due_date.signup_allowed_id
+    topic_deadline.drop_allowed_id = due_date.drop_allowed_id
+    topic_deadline.teammate_review_allowed_id = due_date.teammate_review_allowed_id
+    topic_deadline.survey_response_allowed_id = due_date.survey_response_allowed_id
     topic_deadline.round = due_date.round
     topic_deadline.save
   end

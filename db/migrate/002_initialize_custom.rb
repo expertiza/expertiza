@@ -71,7 +71,7 @@ class InitializeCustom < ActiveRecord::Migration
   execute "INSERT INTO `site_controllers` VALUES (21,'reports',8,0)"
   execute "INSERT INTO `site_controllers` VALUES (22,'institution',6,0)"
   execute "INSERT INTO `site_controllers` VALUES (23,'student_assignment',8,0)"
-  execute "INSERT INTO `site_controllers` VALUES (24,'review_of_review',8,0)"
+  execute "INSERT INTO `site_controllers` VALUES (24,'metareview',8,0)"
   execute "INSERT INTO `site_controllers` VALUES (25,'review_feedback',8,0)"
   execute "INSERT INTO `site_controllers` VALUES (26,'profile',8,0)"
   execute "INSERT INTO `site_controllers` VALUES (27,'survey_response',4,0)"

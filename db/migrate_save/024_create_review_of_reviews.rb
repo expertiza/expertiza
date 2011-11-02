@@ -1,9 +1,9 @@
 class CreateReviewOfReviews < ActiveRecord::Migration
   # This table should have essentially the same format as (the table) reviews
   def self.up
-    create_table :review_of_reviews do |t|
+    create_table :metareviews do |t|
       t.column :reviewed_at, :datetime  # time that the review of review was saved
-      t.column :review_of_review_mapping_id, :integer  # the entry in the review_of_review_mappings table that identifies reviewer and review
+      t.column :metareview_mapping_id, :integer  # the entry in the metareview_mappings table that identifies reviewer and review
       t.column :review_num_for_author, :integer  # on reviewee's review page, the review is listed as having this number
       t.column :review_num_for_reviewer, :integer  # on reviewer's review page, the review is listed as having this number
 	# Understand that, in dynamically mapped reviews, reviewer A may review reviewees B and C, and may be the first
@@ -13,12 +13,12 @@ class CreateReviewOfReviews < ActiveRecord::Migration
 	# doing reviews (e.g., teams are doing the reviews (of other teams), whereas individuals are doing the reviews
 	# of the reviews (that were done by teams)).
     end
-    execute "alter table review_of_reviews 
-             add constraint fk_review_of_review_review_of_review_mappings
-             foreign key (review_of_review_mapping_id) references review_of_review_mappings(id)"
+    execute "alter table metareviews
+             add constraint fk_metareview_metareview_mappings
+             foreign key (metareview_mapping_id) references metareview_mappings(id)"
   end
 
   def self.down
-    drop_table :review_of_reviews
+    drop_table :metareviews
   end
 end

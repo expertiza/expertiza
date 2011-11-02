@@ -30,7 +30,7 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
       | assignment |
       
       make_association('ReviewQuestionnaire',         assignment, assignment.review_questionnaire_id)
-      make_association('MetareviewQuestionnaire',     assignment, assignment.review_of_review_questionnaire_id)
+      make_association('MetareviewQuestionnaire',     assignment, assignment.metareview_questionnaire_id)
       make_association('AuthorFeedbackQuestionnaire', assignment, assignment.author_feedback_questionnaire_id)
       make_association('TeammateReviewQuestionnaire', assignment, assignment.teammate_review_questionnaire_id)        
     }

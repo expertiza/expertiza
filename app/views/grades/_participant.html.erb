@@ -50,7 +50,7 @@
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
     <% if controller.action_name != "view_my_scores" %>
-      <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review_of_review' %></FONT>
+      <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'metareview' %></FONT>
     <% end %>  	    
     </TD>
     <% else %>

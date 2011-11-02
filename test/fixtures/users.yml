@@ -121,7 +121,7 @@ student5:
   role_id: <%= Fixtures.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 0
-  email_on_review_of_review: 1
+  email_on_metareview: 1
 
 student6:
   name: student6
@@ -146,7 +146,7 @@ student7:
   email: student7@foo.edu
   email_on_review: 1
   email_on_submission: 1
-  email_on_review_of_review: 1   
+  email_on_metareview: 1
   is_new_user: 1
 
 student8:
@@ -159,7 +159,7 @@ student8:
   role_id: <%= Fixtures.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 1
-  email_on_review_of_review: 1   
+  email_on_metareview: 1
   master_permission_granted: 0
 
 student9:
@@ -172,7 +172,7 @@ student9:
   role_id: <%= Fixtures.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 1
-  email_on_review_of_review: 1   
+  email_on_metareview: 1
   master_permission_granted: 1
   
 

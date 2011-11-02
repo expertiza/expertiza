@@ -15,7 +15,7 @@ class UpdateRubricTypes < ActiveRecord::Migration
          scores = Score.find(:all, :conditions => ['question_id = ?',question.id])
          scores.each{
             | score | 
-            metareview = ActiveRecord::Base.connection.select_one("select * from `review_of_reviews where id = #{score.instance_id}")
+            metareview = ActiveRecord::Base.connection.select_one("select * from `metareviews where id = #{score.instance_id}")
             if metareview != nil
               score.update_attribute('questionnaire_type_id',metareview_type["id"])              
             end

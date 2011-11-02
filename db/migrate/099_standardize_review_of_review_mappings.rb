@@ -2,23 +2,23 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
   def self.up
 
     begin
-       execute "ALTER TABLE `review_of_review_mappings` 
-                DROP FOREIGN KEY `fk_review_of_review_mapping_review_mappings`"
+       execute "ALTER TABLE `metareview_mappings`
+                DROP FOREIGN KEY `fk_metareview_mapping_review_mappings`"
     rescue
     end
   
     begin
-      execute "ALTER TABLE `review_of_review_mappings` 
-               DROP INDEX `fk_review_of_review_mapping_review_mappings`"
+      execute "ALTER TABLE `metareview_mappings`
+               DROP INDEX `fk_metareview_mapping_review_mappings`"
     rescue
     end
                          
     
-    add_column :review_of_review_mappings, :reviewee_id, :integer, :null => false
-    rename_column :review_of_review_mappings, :review_mapping_id, :reviewed_object_id
+    add_column :metareview_mappings, :reviewee_id, :integer, :null => false
+    rename_column :metareview_mappings, :review_mapping_id, :reviewed_object_id
 
     
-    records = ActiveRecord::Base.connection.select_all("select * from `review_of_review_mappings`")
+    records = ActiveRecord::Base.connection.select_all("select * from `metareview_mappings`")
 
     records.each{
       | mapping |
@@ -29,20 +29,20 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
       end
     }
     
-    remove_column :review_of_review_mappings, :review_reviewer_id           
-    change_column :review_of_review_mappings, :reviewer_id, :integer, :null => false      
-    change_column :review_of_review_mappings, :reviewed_object_id, :integer, :null => false
+    remove_column :metareview_mappings, :review_reviewer_id
+    change_column :metareview_mappings, :reviewer_id, :integer, :null => false
+    change_column :metareview_mappings, :reviewed_object_id, :integer, :null => false
     
-    execute "ALTER TABLE `review_of_review_mappings` 
-             ADD CONSTRAINT `fk_review_of_review_mappings_participant_reviewers`
+    execute "ALTER TABLE `metareview_mappings`
+             ADD CONSTRAINT `fk_metareview_mappings_participant_reviewers`
              FOREIGN KEY (reviewer_id) references participants(id)"
              
-    execute "ALTER TABLE `review_of_review_mappings` 
-             ADD CONSTRAINT `fk_review_of_review_mappings_participant_reviewees`
+    execute "ALTER TABLE `metareview_mappings`
+             ADD CONSTRAINT `fk_metareview_mappings_participant_reviewees`
              FOREIGN KEY (reviewee_id) references participants(id)"             
              
-    execute "ALTER TABLE `review_of_review_mappings` 
-             ADD CONSTRAINT `fk_review_of_review_mappings_review_mappings`
+    execute "ALTER TABLE `metareview_mappings`
+             ADD CONSTRAINT `fk_metareview_mappings_review_mappings`
              FOREIGN KEY (reviewed_object_id) references review_mappings(id)"           
   end
   
@@ -50,7 +50,7 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
       today = Time.now             
       oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0)     
 
-      review = ActiveRecord::Base.connection.select_one("select * from `review_of_reviews` where mapping_id = #{mapping["id"]}")
+      review = ActiveRecord::Base.connection.select_one("select * from `metareviews` where mapping_id = #{mapping["id"]}")
       review_mapping = ActiveRecord::Base.connection.select_one("select * from `review_mappings` where id = #{mapping["reviewed_object_id"]}")
 
       assignment = Assignment.find(review_mapping.assignment_id)
@@ -102,7 +102,7 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
   def self.delete(mapping, reason)
     puts reason
     begin
-      execute "delete from `review_of_review_mappings` where id = #{mapping["id"]}"
+      execute "delete from `metareview_mappings` where id = #{mapping["id"]}"
       mapping.delete(true)
     rescue
       puts $!

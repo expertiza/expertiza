@@ -10,6 +10,7 @@ E15: Notification of more kinds of events
 https://trello.com/card/board/e15-notification-of-more-kinds-of-events/4e97910a88107fb718001fd1/4e979b5888107fb7180255b3
 
 Notification should be sent for the following events:
+
 	--	When a new account is created, an email is sent to the id used to create the account  
 	--	When a user is assigned to review a new assignment, he/she will be sent an email informing the same
 	--	When a user is reassigned to review another assignment, he/she will be sent an email informing the same

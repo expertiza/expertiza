@@ -1,5 +1,6 @@
 class Assignment < ActiveRecord::Base
 
+  #changes
   include DynamicReviewMapping
   include ReviewingHelper
   include ScoresHelper

@@ -1,9 +1,10 @@
 We have made the following Changes to the Expertiza custom response system
 
-1. moved some of the controller related code to the response_controller under the new method
-2. Created a method in response_helper.rb that currently stores the customs questions and returns the questions based on the index parameter
-3. Decreased the amount of code in the view file by using for loops to render similar objects (from 469 lines of code to 300 lines).
-4. Developed some functional tests but there is a glitch and we are working on fixing it.
+ 1. moved some of the controller related code to the response_controller under the new method
+ 2. Created a method in response_helper.rb that currently stores the customs questions and returns the questions based on the index parameter
+ 3. Decreased the amount of code in the view file by using for loops to render similar objects (from 469 lines of code to 300 lines).
+ 4. Developed some functional tests but there is a glitch and we are working on fixing it.
+ 5. The previous version contains 2 methods namely custom_response_as_html and custom_response_as_html_2011 in the response.rb file. This contained almost 1400 lines of code. I have reduced atleast 350 lines of code by using for loops, case switches and now the code is more readable and understandable and also the redundant code eliminated.
 
 Expertiza
 =========

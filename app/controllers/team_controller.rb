@@ -76,7 +76,7 @@ def create_teams
  # The team and team members are all copied.  
  def inherit
    assignment = Assignment.find(params[:id])
-   if assignment.course_id > 0
+   if assignment.course_id >= 0
     course = Course.find(assignment.course_id)
     teams = course.get_teams
     if teams.length > 0 
@@ -98,7 +98,7 @@ def create_teams
  def bequeath
    team = AssignmentTeam.find(params[:id])
    assignment = Assignment.find(team.parent_id)
-   if assignment.course_id
+   if assignment.course_id >= 0
       course = Course.find(assignment.course_id)
       team.copy(course.id)
       flash[:note] = "\""+team.name+"\" was successfully copied to \""+course.name+"\""

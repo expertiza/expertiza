@@ -29,6 +29,7 @@ Steps:
 	--	Merge our branch E15-Notification with the Master.
 
 How to setup and start the application:
+
 	-- 	Start the mysql server.  		
 	--	Create a database named "pg_development" in mysql (Mysql 5.5 database server).
 	--	Download the sql dump file from http://cl.ly/2C3e1u1P1E1j0V3g0z1e 

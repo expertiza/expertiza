@@ -122,7 +122,7 @@ class SuggestionController < ApplicationController
     if( params[:sortsuggestor].nil? && params[:sortstatus].nil?) #If no sorting specified either by suggestor or status
 
       if (params[:sortorder].nil? || params[:sortvar].nil?)#if there is no order given, display in the usual way
-        @suggestions = Suggestion.find_all_by_assignment_id(params[:id]
+        @suggestions = Suggestion.find_all_by_assignment_id(params[:id])
         @assignment = Assignment.find(params[:id])
         @user_suggestion = Suggestion.all
         puts "@user_suggestion #{@user_suggestion}"
@@ -148,7 +148,7 @@ class SuggestionController < ApplicationController
         @user_unityID.uniq!
         @user_unityID = handle_list_anonymous(@user_unityID)
       end
-      
+
     else #either one of the second sort option selected
       if (params[:sortsuggestor] == '' ) #sort only by status
 

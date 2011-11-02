@@ -39,7 +39,7 @@
   <%= link_to image_tag('/images/tree_view/view-scores-24.png', :title => 'View scores'),:controller=>'grades', :action=>'view', :id => node.node_object_id %>
   <%= link_to image_tag('/images/tree_view/view-review-report-24.png', :title => 'View review report'), :controller=>'review_mapping', :action=>'review_report', :id => node.node_object_id %>
   <%= link_to image_tag('/images/tree_view/view-survey-24.png', :title => 'View survey responses'),:controller=>'survey_response', :action=>'view_responses', :id => node.node_object_id %>
-  <%= link_to image_tag('/images/tree_view/view-suggestion-24.png', :title => 'View suggestions',:controller=>'suggestion', :action=>'list'), :id => node.node_object_id %>
+  <%= link_to image_tag('/images/tree_view/view-suggestion-24.png', :title => 'View suggestions'),:controller=>'suggestion', :action=>'list', :id => node.node_object_id %>
   <% if signup_topic %>
     <%= link_to image_tag('/images/tree_view/view-publish-rights-24.png', :title => 'View publishing rights'),:controller=>'sign_up_sheet', :action=>'view_publishing_rights', :id => node.node_object_id %>
   <% end %>

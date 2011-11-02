@@ -48,8 +48,10 @@ module ResponseHelper
      end    
   end  
   
-  
-      def load_questions (ques_num)
+      #stores and loads the custom response content based on the question id.
+      #It would be better to have these in a database
+      def load_questions (ques_num)      
+      
       @custom_questions = [
       "They state what the reader should know or be able to do after reading the article.",   #0
       "They are specific. ",  #1

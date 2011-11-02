@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class TeamControllerTest < ActionController::TestCase
-  fixtures :users, :roles, :teams, :nodes, :system_settings, :content_pages, :permissions, :roles_permissions, :controller_actions, :site_controllers, :menu_items
+  fixtures :users, :roles, :teams, :assignments, :nodes, :system_settings, :content_pages, :permissions, :roles_permissions, :controller_actions, :site_controllers, :menu_items
   set_fixture_class :system_settings => 'SystemSettings'
   set_fixture_class :roles_permissions => 'RolesPermission'
 
@@ -137,15 +137,18 @@ class TeamControllerTest < ActionController::TestCase
 
   test "inherit should redirect to list" do
     sessionVars = session_for(users(:superadmin))
-    assignment = assignment(:assignment4)
-    post :inherit, {'id' => assignment.id}, sessionVars
-    assert_redirected_to "team/list/#{assignment.id}"
+    assignmentId = assignments(:assignment2).id
+
+    post :inherit, {'id' => assignmentId}, sessionVars
+    assert_redirected_to "team/list/#{assignmentId}"
   end
 
   test "bequeath should redirect to list" do
     sessionVars = session_for(users(:superadmin))
-    assignment_team = teams(:team4)
-    post :bequeath, {'id' => assignment_team.id}, sessionVars
-    assert_redirected_to "team/list/#{assignment_team.id}"
+    teamId = teams(:team4).id
+    assignmentId = assignments(:assignment2).id
+
+    post :bequeath, {'id' => teamId}, sessionVars
+    assert_redirected_to "team/list/#{assignmentId}"
   end
 end

@@ -47,13 +47,13 @@ response_maps6:
 response_map7:
  reviewee_id: <%= Fixtures.identify(:par14) %>
  reviewer_id: <%= Fixtures.identify(:par13) %>
- reviewed_object_id: <%= Fixtures.identify(:response_maps5) %>
+ reviewed_object_id: <%= Fixtures.identify(:response_maps3) %>
  type: "FeedbackResponseMap"
  
 
 response_map8:
   reviewee_id: <%= Fixtures.identify(:par14) %>
   reviewer_id: <%= Fixtures.identify(:par15) %>
-  reviewed_object_id: <%= Fixtures.identify(:response_maps5) %>
+  reviewed_object_id: <%= Fixtures.identify(:response_maps3) %>
   type: "MetareviewResponseMap"
   

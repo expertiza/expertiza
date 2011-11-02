@@ -129,7 +129,27 @@ class ResponseController < ApplicationController
       redirect_to :back
     end
   end
-  
+
+  def new_quiz
+    @header = "Take"
+    @next_action = "create"
+    @feedback = params[:feedback]
+    @map = ResponseMap.find(params[:id])
+    @map = QuizResponseMap.create(:reviewer_id => @map.reviewer_id, :reviewee_id => @map.reviewee_id, :reviewed_object_id => @map.reviewed_object_id)
+    @modified_object = @map.id
+    @return = params[:return]
+    
+    @title = @map.get_title
+    @assignment = @map.assignment
+    @participant = @map.reviewer
+    @questionnaire = Questionnaire.find(@map.reviewee.quiz_id)
+    @questions = @questionnaire.questions
+    @min = @questionnaire.min_question_score
+    @max = @questionnaire.max_question_score
+
+    render :action => 'response'
+  end
+
   def new
     @header = "New"
     @next_action = "create"    
@@ -155,26 +175,52 @@ class ResponseController < ApplicationController
     end
   end
   
-  def create     
+  def create
+    
     @map = ResponseMap.find(params[:id])
+    
     @res = 0
     msg = ""
     error_msg = ""
     begin      
-      @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
-      @res = @response.id
-      @questionnaire = @map.questionnaire
-      questions = @questionnaire.questions     
-      params[:responses].each_pair do |k,v|
-        score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
-      end  
+      if params[:save]=="Save Quiz"
+            @response = Response.create(:map_id => @map.id)
+            @questionnaire = @map.questionnaire
+
+            questions = @questionnaire.questions
+            totalscore = 0
+            pointsperquestion = 100/questions.length
+            #evaluate each question
+            questions.each{ |question|
+              #calculate the score for the question
+              points = pointsperquestion
+              params[:responses].fetch(question.id.to_s).each_value{ |answer|
+                if question.txt.split("{")[1].include?("="+answer)==false
+                  points = 0
+                end
+              }
+              score = Score.create(:response_id => @response.id, :question_id => question.id, :score => points, :comments => "")
+              totalscore += points
+            }
+            @response.additional_comment = totalscore.to_s + '/100'
+            @response.save
+          else
+            @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
+            @questionnaire = @map.questionnaire
+
+            questions = @questionnaire.questions
+            params[:responses].each_pair{ |k,v|
+              score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+            }
+      end
     rescue
       error_msg = "Your response was not saved. Cause: " + $!
     end
     
     begin
-      ResponseHelper.compare_scores(@response, @questionnaire)
-      ScoreCache.update_cache(@res)
+    if params[:save]!="Save Quiz" then ResponseHelper.compare_scores(@response, @questionnaire) end
+    ScoreCache.update_cache(@response.id)
+   ScoreCache.update_cache(@res)
       @map.save
       msg = "Your response was successfully saved."
     rescue
@@ -183,7 +229,7 @@ class ResponseController < ApplicationController
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg
   end      
-  
+
   def custom_create
     @map = ResponseMap.find(params[:id])
     @response = Response.create(:map_id => @map.id, :additional_comment => "")
@@ -202,7 +248,9 @@ class ResponseController < ApplicationController
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end
 
-  def saving   
+
+  def saving
+
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.notification_accepted = false;

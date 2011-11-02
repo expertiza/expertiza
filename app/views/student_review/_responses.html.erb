@@ -1,57 +1,68 @@
-<table>
+<table cellspacing="5">
 <% review_no = 1%>
-<% mappings.each do | map | %> 
+<% mappings.each{
+     | map | %> 
+     <tr><td><%= @assignment.name %> <%= title %> <%= review_no %></td>
      <%if @assignment.team_assignment?%>
        <%if map.type.to_s == "MetareviewResponseMap"%>
           <%review_mapping = ResponseMap.find(map.reviewed_object_id)%>
-       <% participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id) %>
+          <%team = TeamsUser.find_all_by_team_id(review_mapping.reviewee_id)%>
+          <%@participant = Participant.find_by_user_id_and_parent_id(team.first.user_id,@assignment.id)%>
        <%else%>
-       <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
+          <%user_id = TeamsUser.find_all_by_team_id(map.reviewee_id).first.user_id %>
+          <%@participant = Participant.find_by_user_id_and_parent_id(user_id,@assignment.id)%>
        <%end%>
      <%else%>
        <%if map.type.to_s == "MetareviewResponseMap"%>
           <%review_mapping = ResponseMap.find(map.reviewed_object_id)%>
-       <% participant = review_mapping.reviewee %>
+          <%@participant = AssignmentParticipant.find(review_mapping.reviewee_id)%>    
        <%else%>
-       <% participant = map.reviewee %>
+          <%@participant = AssignmentParticipant.find(map.reviewee_id)%>
        <%end%>
      <%end%>
-
-   <% if participant %>
-     <tr><td><b><%= "#{title} #{review_no}." %></b>
-	 <%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %></td>
-		 <td>&nbsp;</td>
      <% if map.response %>            
        <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
-       <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
+       <% if @assignment.get_current_stage(@participant.topic_id) != "Complete" %>
         <td><%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
+        <% if @participant.quiz_id %>
+			<% quizResponseMap = QuizResponseMap.find(:first, :conditions => ["reviewed_object_id=? AND reviewer_id=?", map.assignment.id, map.reviewer_id]) %>
+			<% quizResponse = nil %>
+			<% if not quizResponseMap.nil? %>
+            	<% quizResponse = Response.find_by_map_id(quizResponseMap.id) %>
 			<% end %>
+			<%= quizResponse %>
+            <% if quizResponse != nil %>
+                <td><%= quizResponse.additional_comment  %></td>
+            <% else %>
+                <td><%= link_to 'Take Quiz', :controller => 'response', :action => 'new_quiz', :id => map.id %></td>
+            <% end %>
+        <% end %>
+       <% end %>
            
-     <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
+     <% elsif @assignment.get_current_stage(@participant.topic_id) != "Complete" %>
        <%if @assignment.staggered_deadline?%>
            <%if map.type.to_s == "MetareviewResponseMap"%>
-               <%if @assignment.get_current_stage(participant.topic_id) == 'metareview'%>
+               <%if @assignment.get_current_stage(@participant.topic_id) == 'metareview'%>
                    <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
                <%else%>
                    <td>Begin</td><td> (Work has not yet been submitted)</td>
                <%end%>
            <%else%>
-                <%if @assignment.get_current_stage(participant.topic_id) != 'submission'%>
+                <%if @assignment.get_current_stage(@participant.topic_id) != 'submission'%>
                    <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
                 <%else%>
                    <td>Begin</td><td> (Work has not yet been submitted)</td>
                 <%end%>
            <%end%>
-       <% else %>
-         <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
-       <% end %>
-
-     <% else %><% # Deadline has passed, and the work was not submitted %>
+       <%else%>
+           <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
+       <%end%>
+  	 <% else %>
   	   <td>Begin</td><td> (Work has not yet been submitted)</td>
      <% end %>       
-
      </tr>  
      <% review_no += 1 %>
-<% end %>
-<% end %>
+<% } %>
 </table>
+
+

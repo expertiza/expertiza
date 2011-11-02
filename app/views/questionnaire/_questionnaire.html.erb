@@ -5,7 +5,12 @@
 	<tr>
 		<td valign="top"><label for="questionnaire_name">Name:</label>	</td>
 		<td>
-			<%= text_field 'questionnaire', 'name'  %>
+			<% if @questionnaire.type == "QuizQuestionnaire" and @questionnaire.name.nil? %>
+				<%= text_field 'questionnaire', 'name', :value=>"#{session[:user].name}'s quiz"  %>
+				<%= hidden_field 'questionnaire', 'max_question_score', :value=>4 %>
+			<% else %>
+				<%= text_field 'questionnaire', 'name' %>
+			<% end %>
 			<%= hidden_field 'questionnaire', 'id' %>
 			<%= hidden_field 'questionnaire', 'type' %>
 		</td>		
@@ -13,10 +18,12 @@
 </table>
 <table>
 	<tr>
+		<% if @questionnaire.type != "QuizQuestionnaire" %>
 		<td>Min question score:</td>
 		<td><%= text_field 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
 		<td>Max question score:</td>
 		<td><%= text_field 'questionnaire', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
+		<% end %>
 		<td>Is this <%= @questionnaire.display_type %> private:</td> 
 		<td><%= select(:questionnaire, :private, [ ['no', false], 
 									 		['yes',  true]])%>
@@ -33,23 +40,57 @@
 		  more question(s)</td>
 		<td colspan=2><input type="button" value="Delete selected questions" onclick="deleteQuestions()"></td>
 	</tr>
+	
+	<% if @questionnaire.type == "QuizQuestionnaire" %>
+	<tr>
+		<td></td>
+		<td>
+					Quiz questions are specified in the following format:
+					<ul>
+						<li>Who's buried in Grant's tomb? {~Churchill =Grant ~Napoleon ~No one}</li>
+					</ul>
+					This follows the pattern of the simple multiple choice questions specified by the
+					<a href="http://docs.moodle.org/en/GIFT#Multiple_choice">Moodle GIFT format</a>.
+					Answers are enclosed in {}.  A ~ precedes incorrect answers, while an = precedes
+					the correct answer.
+		</td>
+	</tr>
+	<% end %>
+	
 	<tr>
 		<td align=left width=30>Delete</td>
 		<td align=center width=300>Question</td>
+		<% if @questionnaire.type != "QuizQuestionnaire" %>
 		<td align=center width=100>Scoring</td>
 		<td align=left>Weight</td>
+		<% end %>
 	</tr>
-	
+		
 	<% 	i = 1;
 		for @question in @questionnaire.questions %>
 	<tr>
 		<td align=center><input type=checkbox id="question_chk<%= i %>"></td>
 		<td><%= text_field "question[]", 'txt', :size=>70 %></td>
-		<td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
-		<td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
+		<% if @questionnaire.type != "QuizQuestionnaire" %>
+			<td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
+			<td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
+		<% end %>
 	</tr>
+	<% if @questionnaire.type == "QuizQuestionnaire" %>
+	<% p = @question.parse %>
+	<tr>
+		<td></td>
+		<td>
+			<% if p.nil? %>
+			WARNING: Improperly formatted question! <br />
+			<% elsif p[:correct].length == 0 %>
+			WARNING: Question has no correct answer! <br /> 
+			<% end %>
+		</td>
+	</tr>
+	<% end %>
 	<% 	i += 1;
-		end %>
+		 end %>
 </table>
 <BR/>
 <!--[eoform:course]-->

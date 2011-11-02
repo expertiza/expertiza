@@ -19,12 +19,15 @@
 <% i = 0
    @questions.each{
     | question | %>
+
     <%= question.txt %><BR/>
     <% if controller.action_name != 'new' and @review_scores[i] != nil and @review_scores[i].comments != nil %>  	    
 	    <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
 	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
     <% else %>
-	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>	
+
+	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" >
+		</textarea>	
     <% end %>
     <% if question.true_false? %>
       <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
@@ -39,33 +42,52 @@
   <% else %>
       <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
           <% for j in @min..@max %>
-	         <%if controller.action_name != 'new'and @review_scores[i] != nil %>
+	         <%if controller.action_name != 'new' %>
             	<option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
              <%else%>
-		        <option value="<%=j%>" ><%=j%></option>
-	        <% end %>
-          <% end %>
-      </select>     
-  <% end %> 
+               <option value="<%=@min%>"><%=@min%></option>
+               <option value="<%=@max%>"><%=@max%></option>
+             <%end%>
+          </select>
+
+          <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+              <% for j in @min..@max %>
+                 <%if controller.action_name != 'new' %>
+                    <option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
+                 <%else%>
+                    <option value="<%=j%>" ><%=j%></option>
+                <% end %>
+              <% end %>
+          </select>
+      <% end %>
+
   <%if question.question_advices.size > 0%>
       <%= render :partial => 'advice', :locals => {:i => i, :advice_list => question.question_advices} %>
   <% else %>
       <br/>
-  <% end %>      
-  <BR/><BR/>
+  <% end %>
+  <% end %>
+  <BR/>
   <% i+=1 
    } %>
 
-       
-<p>
-	<label for="review_comments">Additional Comments</label><BR/>
-	<textarea cols="70" rows="1" id="review_comments" name="review[comments]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><% if controller.action_name != 'new' and @response.additional_comment != nil %><%=@response.additional_comment.strip%><% end %></textarea>
-</p>
+<% if controller.action_name != 'new_quiz' %>
+    <BR/>
+    <p>
+        <label for="review_comments">Additional Comments</label><BR/>
+        <textarea cols="70" rows="1" id="review_comments" name="review[comments]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><% if controller.action_name != 'new' and @response.additional_comment != nil %><%=@response.additional_comment.strip%><% end %></textarea>
+    </p>
+<% end %>
 
 <br/>
-<%= submit_tag "Save "+@title, :name=>"save" %>
+<% if controller.action_name == 'new_quiz'  %>
+    <%= submit_tag "Save Quiz", :name=>"save" %>
+<% else %>
+    <%= submit_tag "Save "+@title, :name=>"save" %>
+<% end %>
 <%= hidden_field_tag('return', @return) %>
 <% end %>
 
 <%= @map.show_feedback() %>
+<br/>
 <a href="javascript:window.history.back()">Back</a>

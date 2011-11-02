@@ -1,35 +1,87 @@
 require 'fastercsv'
 
 module QuestionnaireHelper
-  
+
+
+  questionnaireS_FOLDER = "Public/" # CSV files are stored in a temporary public directory
+  CSV_ALLOWED_AGE = 60 * 5 # CSV files may be deleted if they are 5 minutes old
   CSV_QUESTION = 0
   CSV_TYPE = 1
   CSV_WEIGHT = 2
+  attr_accessor :strategy
+  def self.export questionnaire, user_name ,strategy
+    strategy.call @questionnaire, user_name
+  end
 
-  def self.create_questionnaire_csv(questionnaire, user_name)
-   csv_data = FasterCSV.generate do |csv|
+
+  #method to export the quiz in text file format
+  def self.create_questionnaire_GIFT(questionnaire, user_name)
+    questionnaireS_FOLDER = "./"
+    filename = questionnaireS_FOLDER + user_name + "-" + questionnaire.name + "."+"GIFT"
+    buf = File.new(filename, 'w')
     for question in questionnaire.questions
       # Each row is formatted as follows
-      # Question, question advice (from high score to low), type, weight
+      # Question, answer choices correct answer marked by = in front followed by question weight and followed by advices
       row = Array.new
-      row << question.txt
-      row << "True/False" if question.true_false
-      row << "Numeric" if !question.true_false
-      row << question.weight
-      
+      row << question.txt                 
+      row << question.weight      
       # loop through all the question advice from highest score to lowest score
       adjust_advice_size(questionnaire, question)
       for advice in question.question_advices.sort {|x,y| y.score <=> x.score }
-        row << advice.advice
+      row << advice.advice
       end
-      
-      csv << row
+      row << "\n\n"
+      buf.write (row)
     end
+    buf.close
+    return filename
    end
-  
-   return csv_data
+
+  #method to export the quiz in text file format from the GIFT format entered by the user
+   def self.create_questionnaire_TXT(questionnaire, user_name)
+    questionnaireS_FOLDER = "./"
+    filename = questionnaireS_FOLDER + user_name + "-" + questionnaire.name + "."+"TXT"
+    buf = File.new(filename, 'w')
+    for question in questionnaire.questions
+    # Each row is formatted as follows
+    # Question, answer choices correct answer marked by correct at end followed by question weight and followed by advices
+    row = Array.new
+    row << "MC"+"\t"
+    row << question.txt.split("?")[0]+"?\t"
+    answers=question.txt.split("?")[1]
+    answers= answers.split("{")[1]
+    answers=answers.split("}")[0]
+    answers=answers.split("~")
+    for ans in answers
+       if(!ans.empty?)
+         if(ans.index("="))
+            ans=ans.split("=")
+             if(!ans[0].empty?)
+              row<< ans[0].strip+"\t"
+              row<<"Incorrect"+"\t"
+             end
+              row<< ans[1].strip+"\t"
+              row<<"Correct"+"\t"
+          else  
+              row<< ans.strip+"\t"
+              row<<"Incorrect"+"\t"
+          end 
+       end                
+    end #end of for
+    row << question.weight      
+    # loop through all the question advice from highest score to lowest score
+    adjust_advice_size(questionnaire, question)
+    for advice in question.question_advices.sort {|x,y| y.score <=> x.score }
+    row << advice.advice
+    end
+    row << "\n\n"
+    buf.write (row)      
+    end  
+    buf.close    
+    return filename    
   end
   
+          
   def self.get_questions_from_csv(questionnaire, file)
     questions = Array.new
     
@@ -98,3 +150,5 @@ module QuestionnaireHelper
     return false
   end
 end
+
+

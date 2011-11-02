@@ -100,7 +100,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
   end
 
   def test_search_by_reviewer
-    assign_id = Fixtures.identify(:assignment7)
+    assign_id = Fixtures.identify(:assignment1)
     user = Participant.first(:conditions => {:parent_id => assign_id})
 
     post :search_by_reviewer, {:id => assign_id, :user => {:fullname => user.fullname}}, session_for(users(:admin))
@@ -109,11 +109,9 @@ class ReviewMappingControllerTest < ActionController::TestCase
   end
 
   def test_get_questionnaire_id
-    @assignment = Fixtures.identify(:assignment7)
-
+    @assignment = Assignment.find(Fixtures.identify(:assignment1))
     id = @assignment.get_review_questionnaire_id()
-
-    assert(id.to_int > 0)
+    assert (id > 0)
   end
 
 end

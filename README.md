@@ -1,9 +1,9 @@
 We have made the following Changes to the Expertiza custom response system
 
 1. moved some of the controller related code to the response_controller under the new method
-2. Created a method in response_helper.rb that currently stores the customs questions and returns the questions based on the index parameter. We may have to find a way to store these questions in the database tables once Adam modfies/creates a table to store these questions.
-3. Decreased the amount of code in the view file by using for loops to render similar objects (from 469 lines of code to 300 lines). I haven't modified anything on custom_response_2011.html.erb but if we are good with custom_response.html.erb then modifying the 2011 version is just a matter of copy and paste.
-
+2. Created a method in response_helper.rb that currently stores the customs questions and returns the questions based on the index parameter
+3. Decreased the amount of code in the view file by using for loops to render similar objects (from 469 lines of code to 300 lines).
+4. Developed some functional tests but there is a glitch and we are working on fixing it.
 
 Expertiza
 =========

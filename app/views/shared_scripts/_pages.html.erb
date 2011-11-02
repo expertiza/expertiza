@@ -1,1 +1,6 @@
-<br/><br/>
+<br/>
+<% (1..@noPages).each do |page| %>
+
+        <%= link_to page,:controller =>'users', :action => 'list', :page => page ,:letter => session[:letter]%>
+
+<% end %>

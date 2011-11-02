@@ -25,28 +25,382 @@ class UsersController < ApplicationController
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
     
-  def list
+ def list
+    @noPages=1
     user = session[:user]
     role = Role.find(user.role_id)
+
+
+    if(session[:opt].nil? && params[:opt].nil?)
+    session[:opt]="name"
+    end
+    if(!session[:opt].nil? && !params[:opt].nil?)
+    session[:opt]=params[:opt]
+    end
+
+
+    if(session[:opt].nil? || session[:opt].to_s=='name')
+      session[:letter]=nil
     all_users = User.find(:all, :order => 'name', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
-    
+
     letter = params[:letter]
     session[:letter] = letter
     if letter == nil
       letter = all_users.first.name[0,1].downcase
-    end 
+    end
     logger.info "#{letter}"
     @letters = Array.new
-    @users = User.paginate(:page => params[:page], :order => 'name', :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter])
+
+
+    @users = User.paginate(:page => params[:page], :order => 'name',:per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter])
+    @userCount=User.count(:order => 'name',:conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter])
+    @noPages=@userCount/20
     all_users.each {
        | userObj |
        first = userObj.name[0,1].downcase
        if not @letters.include?(first)
-          @letters << first  
+          @letters << first
        end
     }
+    end
+
+    if(session[:opt].to_s=='fullname')
+      session[:letter]=nil
+      fullname="fullname"
+    all_users = User.find(:all, :order => "#{session[:opt]}", :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+
+    letter = params[:letter]
+    session[:letter] = letter
+    if letter == nil
+      letter = all_users.first.fullname[0,1].downcase
+    end
+    logger.info "#{letter}"
+    @letters = Array.new
+    @users = User.paginate(:page => params[:page], :order => "#{session[:opt]}", :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(fullname,1,1) = ?", role.get_available_roles, user.id, letter])
+    @userCount= User.count(:order => "#{session[:opt]}",:conditions => ["(role_id in (?) or id = ?) and substring(fullname,1,1) = ?", role.get_available_roles, user.id, letter])
+
+
+     @noPages=@userCount/20
+      all_users.each {
+       | userObj |
+       first = userObj.fullname[0,1].downcase
+       if not @letters.include?(first)
+          @letters << first
+       end
+    }
+   end
+
+  if(session[:opt].nil? || session[:opt].to_s=='email')
+    session[:letter]=nil
+    all_users = User.find(:all, :order => 'email', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+
+    letter = params[:letter]
+    session[:letter] = letter
+    if letter == nil
+      letter = all_users.first.email[0,1].downcase
+    end
+    logger.info "#{letter}"
+    @letters = Array.new
+    @users = User.paginate(:page => params[:page], :order => 'email', :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(email,1,1) = ?", role.get_available_roles, user.id, letter])
+    @userCount=User.count(:order => 'email',:conditions => ["(role_id in (?) or id = ?) and substring(email,1,1) = ?", role.get_available_roles, user.id, letter])
+    @noPages=@userCount/20
+    all_users.each {
+       | userObj |
+       first = userObj.email[0,1].downcase
+       if not @letters.include?(first)
+          @letters << first
+       end
+    }
+    end
+
+    if(session[:opt].nil? || session[:opt].to_s=='role_id')
+        session[:letter]=nil
+        @allRoles = Role.find(:all,:order => "name")
+        @rolesAsc= Array.new
+        @allRoles.each do |roleRec|
+         @rolesAsc<<roleRec.id
+        end
+        all_users=Array.new
+        @rolesAsc.each do |roleno|
+        recs= User.find(:all, :conditions => ['role_id = ?', roleno])
+        recs.each do |rec|
+          all_users<<rec
+        end
+        end
+
+        #all_users = User.find(:all, :order => 'role_id', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+
+        if !params[:letter].nil?
+          session[:letter] = params[:letter]
+
+
+        record=Role.find_by_name(params[:letter])
+        letter=record.id
+
+
+        end
+        #session[:letter] = letter
+        if letter == nil
+          letter = all_users[0].role_id
+        end
+        logger.info "#{letter}"
+        @letters = Array.new
+        @users = User.paginate(:page => params[:page], :order => 'role_id', :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(role_id,1,1) = ?", role.get_available_roles, user.id, letter])
+        @userCount=User.count(:order => 'role_id', :conditions => ['(role_id = ?)', letter])
+        @noPages=@userCount/20
+        all_users.each {
+           | userObj |
+           first = userObj.role.name
+           if not @letters.include?(first)
+              @letters << first
+           end
+          }
+         @letters= @letters.sort
+    end
+
+
+
+    if(session[:opt].nil? || session[:opt].to_s=='parent_id')
+        session[:letter]=nil
+
+        @parentIDs=User.find_by_sql("select DISTINCT(parent_id) from Users")
+        @parentNames=Array.new
+        @parentIDs.each do |pid|
+         @parentNames<<(User.find_by_id(pid.parent_id)).name
+        end
+
+
+        @parentNames=@parentNames.sort
+
+        @spids = Array.new
+        @parentNames.each do |n|
+         @spids<< (User.find_by_name(n)).id
+        end
+
+        all_users= Array.new
+        @spids.each do |spid|
+        recs= User.find(:all, :conditions => ['id = ?', spid])
+        recs.each do |rec|
+          all_users<<rec
+        end
+        end
+
+        #all_users = User.find(:all, :order => 'role_id', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+
+        if !params[:letter].nil?
+          session[:letter] = params[:letter]
+
+        record=User.find_by_name(params[:letter])
+        letter=record.id
+
+        end
+        #session[:letter] = letter
+        if letter == nil
+          letter = @spids[0]
+        end
+        logger.info "#{letter}"
+        @letters = Array.new
+        @users = User.paginate(:page => params[:page], :order => 'parent_id', :per_page => 20, :conditions => ["parent_id = ?",letter])
+        @userCount=User.count(:order => 'parent_id',:conditions => ["parent_id = ?",letter])
+        @noPages=@userCount/20
+        all_users.each {
+           | userObj |
+           first = User.find(userObj.parent_id).name
+           if not @letters.include?(first)
+              @letters << first
+           end
+          }
+         @letters= @letters.sort
+    end
+
+
+    if(session[:opt].nil? || session[:opt].to_s=='review')
+      if(session[:letter] != 1 || session[:letter]!=0 || session[:letter].nil?)
+        session[:letter]=0
+      end
+    all_users = User.find(:all, :order => 'email_on_review')
+
+      if params[:letter].nil?
+        letter=session[:letter]
+      end
+      if (params[:letter]=="yes" || params[:letter]=="1")
+
+        letter=1
+      end
+      if (params[:letter]=="no" || params[:letter]=="0")
+
+        letter=0
+      end
+      #if params[:letter]=="blank"
+      #  letter=""
+      #end
+
+    session[:letter] = letter
+
+      p session[:letter]
+
+    logger.info "#{letter}"
+    @letters = Array.new
+
+    @users = User.paginate(:page => params[:page], :order => 'email_on_review',:per_page => 20, :conditions => ["email_on_review = ?",letter])
+    @userCount=User.count(:order => 'email_on_review',:conditions => ["email_on_review = ?",letter])
+    @noPages=@userCount/20
+    all_users.each {
+       | userObj |
+       first = User.yesorno(userObj.email_on_review)
+       if(first=="")
+
+           first="no"
+       end
+       if not @letters.include?(first)
+          @letters << first
+
+       end
+    }
+
   end
-  
+
+
+  if(session[:opt].nil? || session[:opt].to_s=='submission')
+      if(session[:letter] != 1 || session[:letter]!=0 || session[:letter].nil?)
+        session[:letter]=0
+      end
+    all_users = User.find(:all, :order => 'email_on_submission')
+
+      if params[:letter].nil?
+        letter=session[:letter]
+      end
+      if (params[:letter]=="yes" || params[:letter]=="1")
+       letter=1
+      end
+      if (params[:letter]=="no" || params[:letter]=="0")
+
+        letter=0
+      end
+      #if params[:letter]=="blank"
+      #  letter=""
+      #end
+
+    session[:letter] = letter
+
+      p session[:letter]
+
+    logger.info "#{letter}"
+    @letters = Array.new
+
+    @users = User.paginate(:page => params[:page], :order => 'email_on_submission',:per_page => 20, :conditions => ["email_on_submission = ?",letter])
+    @userCount=User.count(:order => 'email_on_submission',:conditions => ["email_on_submission = ?",letter])
+    @noPages=@userCount/20
+    all_users.each {
+       | userObj |
+       first = User.yesorno(userObj.email_on_submission)
+       if(first=="")
+
+           first="no"
+       end
+       if not @letters.include?(first)
+          @letters << first
+
+
+       end
+    }
+
+    end
+
+
+
+  if(session[:opt].nil? || session[:opt].to_s=='metareview')
+      if(session[:letter] != 1 || session[:letter]!=0 || session[:letter].nil?)
+        session[:letter]=0
+      end
+    all_users = User.find(:all, :order => 'email_on_review_of_review')
+
+      if params[:letter].nil?
+        letter=session[:letter]
+      end
+      if (params[:letter]=="yes" || params[:letter]=="1")
+
+        letter=1
+      end
+      if (params[:letter]=="no" || params[:letter]=="0")
+
+        letter=0
+      end
+      #if params[:letter]=="blank"
+      #  letter=""
+      #end
+
+    session[:letter] = letter
+
+      p session[:letter]
+
+    logger.info "#{letter}"
+    @letters = Array.new
+
+    @users = User.paginate(:page => params[:page], :order => 'email_on_review_of_review',:per_page => 20, :conditions => ["email_on_review_of_review = ?",letter])
+    @userCount=User.count(:order => 'email_on_review_of_review',:conditions => ["email_on_review_of_review = ?",letter])
+    @noPages=@userCount/20
+    all_users.each {
+       | userObj |
+       first = User.yesorno(userObj.email_on_review_of_review)
+       if(first=="")
+
+           first="no"
+       end
+       if not @letters.include?(first)
+          @letters << first
+
+       end
+    }
+
+    end
+
+
+
+   if(session[:opt].nil? || session[:opt].to_s=='privacy')
+      if(session[:letter] != 1 || session[:letter]!=0 || session[:letter].nil?)
+        session[:letter]=0
+      end
+    all_users = User.find(:all, :order => 'leaderboard_privacy')
+
+      if params[:letter].nil?
+        letter=session[:letter]
+      end
+      if (params[:letter]=="yes" || params[:letter]=="1")
+
+        letter=1
+      end
+      if (params[:letter]=="no" || params[:letter]=="0")
+
+        letter=0
+      end
+
+    session[:letter] = letter
+
+      p session[:letter]
+
+    logger.info "#{letter}"
+    @letters = Array.new
+
+    @users = User.paginate(:page => params[:page], :order => 'leaderboard_privacy',:per_page => 20, :conditions => ["leaderboard_privacy = ?",letter])
+    @userCount=User.count(:order => 'leaderboard_privacy',:conditions => ["leaderboard_privacy = ?",letter])
+    @noPages=@userCount/20
+    all_users.each {
+       | userObj |
+       first = User.yesorno(userObj.leaderboard_privacy)
+       if(first=="")
+
+           first="no"
+       end
+       if not @letters.include?(first)
+          @letters << first
+
+       end
+    }
+
+    end
+  end
+
   def show_selection
     @user = User.find_by_name(params[:user][:name])
     if @user != nil

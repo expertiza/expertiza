@@ -13,6 +13,47 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def check
+    original_array = Array.new
+    sorted_array=Array.new
+    if params[:new_question]!=nil
+      for question_key1 in params[:new_question].keys
+        if !params[:new_question][question_key1][:txt].strip.empty?
+          original_array << [params[:new_question][question_key1][:position_num].to_i,params[:new_question][question_key1][:txt]]
+        end
+      end
+    end
+    if params[:question]!=nil
+      for question_key in params[:question].keys
+              original_array << [params[:question][question_key][:position_num].to_i,params[:question][question_key][:txt]]
+          end
+    end
+    if params[:new_question]!=nil || params[:question]!=nil
+    sorted_array=original_array.sort
+    i=1
+    for iter in sorted_array
+       iter[0]=i
+      i=i+1
+    end
+    for iter in sorted_array
+      if params[:new_question]!=nil
+            for question_key1 in params[:new_question].keys
+              if params[:new_question][question_key1][:txt]==iter[1]
+                           params[:new_question][question_key1][:position_num]=iter[0]
+                      end
+            end
+      end
+      if params[:question]!=nil
+            for question_key in params[:question].keys
+                                  if params[:question][question_key][:txt]==iter[1]
+                                       params[:question][question_key][:position_num]=iter[0]
+                                  end
+            end
+      end
+    end
+    end
+  end
+
   private
   def current_user_session
     return @current_user_session if defined?(@current_user_session)

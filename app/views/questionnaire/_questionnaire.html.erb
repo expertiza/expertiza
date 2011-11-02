@@ -25,30 +25,57 @@
 </table>
 
 <br/>
-<table id="questions_table">
+<table id="questions_table" cellpadding="0" cellspacing="0">
 	<tr>
-        <td colspan=2 style="padding-bottom: 5pt"><strong>Questions</strong>
-		  <input style="margin-left: 50pt" type="button" value="Add" onclick="addQuestions()">
-		  <input id="numQuestionsToAdd" type="text" value="1" size=1>
-		  more question(s)</td>
-		<td colspan=2><input type="button" value="Delete selected questions" onclick="deleteQuestions()"></td>
+        <td colspan=4 style="padding-bottom: 5pt"><strong>Insert</strong>
+
+            <form name="choice">
+            <input type="radio" name='position' value='before' checked> Before</input>
+            <input type="radio" name='position' value='after'> After</input>
+            </form>
+            <select id="previous_questions">
+                      <%=@questions=Question.find_all_by_questionnaire_id(@questionnaire.id) %>
+                      <%for que in @questions%>
+                          <option value="<%=que.position_num%>"><%=que.txt%></option>
+                       <% end %>
+            </select>
+
+
+		    <input id="numQuestionsToAdd" type="text" value="1" size=1>
+		    more question(s)
+            <input style="margin-left: 50pt" type="button" value="Add" onclick="addQuestions()">
+        </td>
+  	    <td colspan=2><input type="button" value="Delete selected questions" onclick="deleteQuestions()"></td>
 	</tr>
-	<tr>
+    <tr>
 		<td align=left width=30>Delete</td>
 		<td align=center width=300>Question</td>
 		<td align=center width=100>Scoring</td>
 		<td align=left>Weight</td>
+      <td align=center></td>
+      <td align=center></td>
 	</tr>
-	
-	<% 	i = 1;
-		for @question in @questionnaire.questions %>
-	<tr>
-		<td align=center><input type=checkbox id="question_chk<%= i %>"></td>
+
+  <% members=@questionnaire.questions %>
+  <% sorted=members.sort { |m1,m2|(m1.position_num and m2.position_num) ? m1.position_num <=> m2.position_num : (m1.position_num ? -1 : 1)} %>
+  <% sorted.each do |a| %>
+    <%= a.position_num %>
+  <% end %>
+
+     <% i = 1;
+       for @question in sorted %>
+	    <tr>
+		<td><input type=checkbox id="question_chk<%= i %>"></td>
 		<td><%= text_field "question[]", 'txt', :size=>70 %></td>
 		<td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
 		<td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
-	</tr>
-	<% 	i += 1;
+
+
+        <td align="left" width="10"><input type="button" value="Move Up" id="<%=i-1%>" onClick="reorder('questions_table',this.id)"></td>
+        <td align="left"><input type="button" value="Move Down" id="<%=i-1%>" onClick="reorderdown('questions_table',this.id)" ></td>
+        <td width="0"><%= hidden_field "question[]", 'position_num' %></td>
+        </tr>
+	 <% 	i += 1;
 		end %>
 </table>
 <BR/>

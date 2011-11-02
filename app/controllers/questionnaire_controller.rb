@@ -3,7 +3,7 @@ class QuestionnaireController < ApplicationController
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
   # Generally a questionnaire is associated with an assignment (Assignment)  
-  before_filter :authorize
+  before_filter :authorize, :check
   
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
@@ -72,8 +72,9 @@ class QuestionnaireController < ApplicationController
     begin
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to :action => 'list' if @questionnaire == nil
-    
+
     if params['save']
+
       @questionnaire.update_attributes(params[:questionnaire])
       save_questionnaire  
     end
@@ -205,12 +206,13 @@ class QuestionnaireController < ApplicationController
     questions = Question.find(:all, :conditions => "questionnaire_id = " + questionnaire_id.to_s)
     for question in questions
       should_delete = true
+      if params[:question]
       for question_key in params[:question].keys
         if question_key.to_s === question.id.to_s
           should_delete = false
         end
       end
-      
+      end
       if should_delete == true
         for advice in question.question_advices
           advice.destroy
@@ -219,7 +221,8 @@ class QuestionnaireController < ApplicationController
       end
     end
   end
-  
+
+
   # Handles questions whose wording changed as a result of the edit    
   def save_questions(questionnaire_id)
     delete_questions questionnaire_id
@@ -240,4 +243,6 @@ class QuestionnaireController < ApplicationController
       end
     end
   end
+
+
 end

@@ -134,4 +134,18 @@ class TeamControllerTest < ActionController::TestCase
     get :delete, {'id' => teamId}, sessionVars
     assert_redirected_to "team/list/#{nodeId}"
   end
+
+  test "inherit should redirect to list" do
+    sessionVars = session_for(users(:superadmin))
+    assignment = assignment(:assignment4)
+    post :inherit, {'id' => assignment.id}, sessionVars
+    assert_redirected_to "team/list/#{assignment.id}"
+  end
+
+  test "bequeath should redirect to list" do
+    sessionVars = session_for(users(:superadmin))
+    assignment_team = teams(:team4)
+    post :bequeath, {'id' => assignment_team.id}, sessionVars
+    assert_redirected_to "team/list/#{assignment_team.id}"
+  end
 end

@@ -912,63 +912,44 @@ end end end
   code = code + "</ul></td>"
 
   code = code + "<td><ul>"
-  if review_scores[87].comments == "1"
-    code = code + "<li>Specific and reasonable learning targets are stated.</li>"
-  end
-  if review_scores[88].comments == "1"
-    code = code + "<li>The lesson partially meets its established goals</li>"
-  end
-  if review_scores[89].comments == "1"
-    code = code + "<li>Well constructed MC questions (4) assess important content.</li>"
-  end
-  if review_scores[90].comments == "1"
-    code = code + "<li>An anticipatory set engages the reader and introduces the topic; the lesson ends with a conclusion that summarizes the content.</li>"
-  end
+for i = 87..90
+if review_scores[i].comments == "1"
+case i
+when 87 :code = code + "<li>Specific and reasonable learning targets are stated.</li>"
+when 88 :code = code + "<li>The lesson partially meets its established goals</li>"
+when 89 :code = code + "<li>Well constructed MC questions (4) assess important content.</li>"
+when 90 :code = code + "<li>An anticipatory set engages the reader and introduces the topic; the lesson ends with a conclusion that summarizes the content.</li>"
+end end end
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
-  if review_scores[91].comments == "1"
-    code = code + "<li>Reasonable learning targets are stated.</li>"
-  end
-  if review_scores[92].comments == "1"
-    code = code + "<li>The content relates to its goals.</li>"
-  end
-  if review_scores[93].comments == "1"
-    code = code + "<li>MC questions (4) assess important content.</li>"
-  end
-  if review_scores[94].comments == "1"
-    code = code + "<li>An introduction and conclusion are included.</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[95].comments == "1"
-    code = code + "<li>A learning target is included.</li>"
-  end
-  if review_scores[96].comments == "1"
-    code = code + "<li>Content does not achieve its goal, or goal is unclear.</li>"
-  end
-  if review_scores[97].comments == "1"
-    code = code + "<li>4 questions are included.</li>"
-  end
-  if review_scores[98].comments == "1"
-    code = code + "<li>An introduction or a conclusion is included.</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[99].comments == "1"
-    code = code + "<li>Learning target is missing/ not actually a learning target</li>"
-  end
-  if review_scores[100].comments == "1"
-    code = code + "<li>Lesson has no goal/ content is unfocused.</li>"
-  end
-  if review_scores[101].comments == "1"
-    code = code + "<li>Questions are missing.</li>"
-  end
-  if review_scores[102].comments == "1"
-    code = code + "<li>Neither an introduction nor a conclusion are included.</li>"
-  end
+for i = 91..94
+if review_scores[i].comments == "1"
+case i
+when 91 :code = code + "<li>Reasonable learning targets are stated.</li>"
+when 92 :code = code + "<li>The content relates to its goals.</li>"
+when 93 :code = code + "<li>MC questions (4) assess important content.</li>"
+when 94 :code = code + "<li>An introduction and conclusion are included.</li>" 
+end end end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i = 95..98
+if review_scores[i].comments == "1"
+case i
+when 95 :code = code + "<li>A learning target is included.</li>"
+when 96 :code = code + "<li>Content does not achieve its goal, or goal is unclear.</li>"
+when 97 :code = code + "<li>4 questions are included.</li>"
+when 98 :code = code + "<li>An introduction or a conclusion is included.</li>"
+end end end
+ code = code + "</ul></td>"
+ code = code + "<td><ul>"
+for i = 99..102
+if review_scores[i].comments == "1"
+case i
+when 99 :code = code + "<li>Learning target is missing/ not actually a learning target</li>"
+when 100 :code = code + "<li>Lesson has no goal/ content is unfocused.</li>"
+when 101 :code = code + "<li>Questions are missing.</li>"
+when 102 :code = code + "<li>Neither an introduction nor a conclusion are included.</li>"
+end end end 
   code = code + "</ul></td></tr>"
   code = code + "</table>"
   code = code + "<h3>Writing Quality</h3>"

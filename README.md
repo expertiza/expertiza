@@ -1,9 +1,7 @@
 OSS Project 
 Project E217: Integrate a few of last year’s projects
 
-Chandan Apsangi (capsang) 
-Vaibhav Gumashta(vgumash)
-Vartika Singh (vsingh3)
+Chandan Apsangi (capsang), Vaibhav Gumashta(vgumash), Vartika Singh (vsingh3)
 
 E15: Notification of more kinds of events
 

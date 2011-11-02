@@ -31,9 +31,9 @@ class Response < ActiveRecord::Base
     # Test for whether Jen's custom rubric needs to be used
     if ((self.map.assignment.instructor_id == User.find_by_name("jkidd").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
       if self.map.assignment.id < 469
-        return custom_display_as_html(code, file_url) + "</div>"
+        return custom_response_code(code, file_url) + "</div>"
       else
-        return custom_display_as_html_2011(code, file_url) + "</div>"
+        return custom_response_code_2011(code, file_url) + "</div>"
       end
     end
   
@@ -59,7 +59,7 @@ class Response < ActiveRecord::Base
     return code
   end  
   
-  # Computes the total score awarded for a review
+ # Computes the total score awarded for a review
   def get_total_score
     total_score = 0
     
@@ -104,7 +104,7 @@ class Response < ActiveRecord::Base
   end  
 end
 
-def custom_display_as_html(code, file_url)
+def custom_response_code(code, file_url)
   begin
   review_scores = self.scores
 
@@ -565,35 +565,28 @@ code = code + "</table>"
   code
 end
 
-def custom_display_as_html_2011(code, file_url)
+def custom_response_code_2011(code, file_url)
   begin
   review_scores = self.scores
-
   #********************Learning Targets******************
   code = code + "<h2>Learning Targets</h2><hr>"
-  if review_scores[0].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>"
-  end
 
-  if review_scores[1].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They are specific<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They are specific<br/>"
-  end
-
-  if review_scores[2].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
-  end
-
-  if review_scores[3].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They are observable i.e. you wouldn't have to look inside the readers' head to know if they met this target<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They are observable i.e. you wouldn't have to look inside the readers' head to know if they met this target<br/>"
-  end
+for i in 0..3
+if review_scores[i].comments == "1"
+case i
+when 0 :code = code + "<img src=\"/images/Check-icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>"
+when 1 :code = code + "<img src=\"/images/Check-icon.png\"> They are specific<br/>"
+when 2 :code = code + "<img src=\"/images/Check-icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
+when 3 :code = code + "<img src=\"/images/Check-icon.png\"> They are observable i.e. you wouldn't have to look inside the readers' head to know if they met this target<br/>"
+end end end 
+for i in 0..3
+if review_scores[i].comments != "1"
+case i
+when 0 :code = code + "<img src=\"/images/delete_icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>" 
+when 1 :code = code + "<img src=\"/images/delete_icon.png\"> They are specific<br/>"
+when 2 :code = code + "<img src=\"/images/delete_icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
+when 3 :code = code + "<img src=\"/images/delete_icon.png\"> They are observable i.e. you wouldn't have to look inside the readers' head to know if they met this target<br/>"
+end end end
 
     code = code + "<br/><i>Number of Learning Targets: </i>#{review_scores[4].comments.gsub(/\"/,'&quot;').to_s}<br/>"
     code = code + "<br/><i>Grade: </i>#{review_scores[5].comments.gsub(/\"/,'&quot;').to_s}<br/>"
@@ -618,50 +611,32 @@ def custom_display_as_html_2011(code, file_url)
     code = code + "<br/>How many sources are in the references list?: #{review_scores[12].comments.gsub(/\"/,'&quot;').to_s}<br/>"
     code = code + "<br/>List the range of publication years for all sources, e.g. 1998-2006: <b>#{review_scores[13].comments.gsub(/\"/,'&quot;').to_s} - #{review_scores[14].comments.gsub(/\"/,'&quot;').to_s}</b><br/><br/>"
 
-  if review_scores[15].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> It lists all the sources in a section labeled \"References\"<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> It lists all the sources in a section labeled \"References\"<br/>"
-  end
 
-  if review_scores[16].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The author cites each of these sources in the lesson<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The author cites each of these sources in the lesson<br/>"
-  end
+for i in 15..21
+if review_scores[i].comments == "1"
+case i
+when 15 :code = code + "<img src=\"/images/Check-icon.png\"> It lists all the sources in a section labeled \"References\"<br/>"
+when 16 :code = code + "<img src=\"/images/Check-icon.png\"> The author cites each of these sources in the lesson<br/>"  
+when 17 :code = code + "<img src=\"/images/Check-icon.png\"> The citations are in APA format<br/>"
+when 18 :code = code + "<img src=\"/images/Check-icon.png\"> The author cites at least 2 scholarly sources<br/>"
+when 19 :code = code + "<img src=\"/images/Check-icon.png\"> Most of the sources are current (less than 5 years old)<br/>"
+when 20 :code = code + "<img src=\"/images/Check-icon.png\"> Taken together the sources represent a good balance of potential references for this topic<br/>"
+when 21 :code = code + "<img src=\"/images/Check-icon.png\"> The sources represent different viewpoints<br/>"
+end end end
+for i in 15..21
+if review_scores[i].comments != "1"
+case i
+when 15 :code = code + "<img src=\"/images/delete_icon.png\"> It lists all the sources in a section labeled \"References\"<br/>"
+when 16 :code = code + "<img src=\"/images/delete_icon.png\"> The author cites each of these sources in the lesson<br/>"
+when 17 :code = code + "<img src=\"/images/delete_icon.png\"> The citations are in APA format<br/>"
+when 18 :code = code + "<img src=\"/images/delete_icon.png\"> The author cites at least 2 scholarly sources<br/>"
+when 19 :code = code + "<img src=\"/images/delete_icon.png\"> Most of the sources are current (less than 5 years old)<br/>"
+when 20 :code = code + "<img src=\"/images/delete_icon.png\"> Taken together the sources represent a good balance of potential references for this topic<br/>"
+when 21 :code = code + "<img src=\"/images/delete_icon.png\"> The sources represent different viewpoints<br/>"
+end end end
 
-  if review_scores[17].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The citations are in APA format<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The citations are in APA format<br/>"
-  end
-
-  if review_scores[18].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The author cites at least 2 scholarly sources<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The author cites at least 2 scholarly sources<br/>"
-  end
-
-  if review_scores[19].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> Most of the sources are current (less than 5 years old)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> Most of the sources are current (less than 5 years old)<br/>"
-  end
-
-  if review_scores[20].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> Taken together the sources represent a good balance of potential references for this topic<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> Taken together the sources represent a good balance of potential references for this topic<br/>"
-  end
-
-  if review_scores[21].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The sources represent different viewpoints<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The sources represent different viewpoints<br/>"
-  end
-
-  code = code + "<br/><b>What other sources or perspectives might the author want to consider?</b><br/>"
-    code = code + "<dl><dd>#{review_scores[22].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
+ code = code + "<br/><b>What other sources or perspectives might the author want to consider?</b><br/>"
+ code = code + "<dl><dd>#{review_scores[22].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
 
   if review_scores[23].comments == "1"
     code = code + "<img src=\"/images/Check-icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the lesson in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible <b>and</b> all information quoted or paraphrased from other sources is properly cited and commented on so there is no evidence of plagiarism. There are no large sections of text copied from (or closely resembling) other sources.<br/>"
@@ -677,54 +652,31 @@ def custom_display_as_html_2011(code, file_url)
 
   #*******************Multiple Choice Questions************************
   code = code + "<h2>Multiple Choice Questions</h2><hr>"
-  if review_scores[26].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> There are 4 multiple-choice questions<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> There are 4 multiple-choice questions<br/>"
-  end
-
-  if review_scores[27].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They each have four answer choices (A-D)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They each have four answer choices (A-D)<br/>"
-  end
-
-  if review_scores[28].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> There is a single correct (aka: not opinion-based) answer for each question<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> There is a single correct (aka: not opinion-based) answer for each question<br/>"
-  end
-
-  if review_scores[29].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The questions assess the learning target(s)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The questions assess the learning target(s)<br/>"
-  end
-
-  if review_scores[30].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The questions are appropriate and reasonable (not too easy and not too difficult)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The questions are appropriate and reasonable (not too easy and not too difficult)<br/>"
-  end
-
-  if review_scores[31].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers<br/>"
-  end
-
-  if review_scores[32].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The response options are listed in alphabetical order<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The response options are listed in alphabetical order<br/>"
-  end
-
-  if review_scores[33].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
-  end
-  code = code + "<br/><h3>Questions</h3>"
+for i in 26..33
+if review_scores[i].comments == "1"
+case i
+when 26 :code = code + "<img src=\"/images/Check-icon.png\"> There are 4 multiple-choice questions<br/>"
+when 27 :code = code + "<img src=\"/images/Check-icon.png\"> They each have four answer choices (A-D)<br/>"
+when 28 :code = code + "<img src=\"/images/Check-icon.png\"> There is a single correct (aka: not opinion-based) answer for each question<br/>"
+when 29 :code = code + "<img src=\"/images/Check-icon.png\"> The questions assess the learning target(s)<br/>"
+when 30 :code = code + "<img src=\"/images/Check-icon.png\"> The questions are appropriate and reasonable (not too easy and not too difficult)<br/>"
+when 31 :code = code + "<img src=\"/images/Check-icon.png\"> The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers<br/>"
+when 32 :code = code + "<img src=\"/images/Check-icon.png\"> The response options are listed in alphabetical order<br/>"
+when 33 :code = code + "<img src=\"/images/Check-icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
+end end end 
+for i in 26..33
+if review_scores[i].comments != "1"
+case i
+when 26 :code = code + "<img src=\"/images/delete_icon.png\"> There are 4 multiple-choice questions<br/>"
+when 27 :code = code + "<img src=\"/images/delete_icon.png\"> They each have four answer choices (A-D)<br/>"
+when 28 :code = code + "<img src=\"/images/delete_icon.png\"> There is a single correct (aka: not opinion-based) answer for each question<br/>"
+when 29 :code = code + "<img src=\"/images/delete_icon.png\"> The questions assess the learning target(s)<br/>"
+when 30 :code = code + "<img src=\"/images/delete_icon.png\"> The questions are appropriate and reasonable (not too easy and not too difficult)<br/>"
+when 31 :code = code + "<img src=\"/images/delete_icon.png\"> The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers<br/>"
+when 32 :code = code + "<img src=\"/images/delete_icon.png\"> The response options are listed in alphabetical order<br/>"  
+when 33 :code = code + "<img src=\"/images/delete_icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
+end end end 
+    code = code + "<br/><h3>Questions</h3>"
     code = code + "<i>Type: </i><b>#{review_scores[34].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Grade: </i><b>#{review_scores[35].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Comment: </i><dl><dd>#{review_scores[36].comments.gsub(/\"/,'&quot;').to_s}</dl></dd><br/>"

@@ -98,7 +98,7 @@ class TeamControllerTest < ActionController::TestCase
   test "update should raise TeamExistsError" do
     first_team = Team.first
 
-    assert_raise TeamExistsError { Team.check_for_existing(first_team.parent, first_team.name, first_team.team_type) }
+    assert_raise( TeamExistsError ){ Team.check_for_existing(first_team.parent, first_team.name, first_team.team_type) }
   end
 
   test "delete should decrease number of teams" do
@@ -124,7 +124,21 @@ class TeamControllerTest < ActionController::TestCase
     sessionVars[:team_type] = "Course"
     nodeId = nodes(:node23).node_object_id
 
-    post :delete, {'id' => nodeId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
+    post :delete, {'id' => nodeId}, sessionVars
     assert_redirected_to "team/list/#{nodeId}"
+  end
+
+  test "inherit should redirect to list" do
+    sessionVars = session_for(users(:superadmin))
+    assignment = assignment(:assignment4)
+    post :inherit, {'id' => assignment.id}, sessionVars
+    assert_redirected_to "team/list/#{assignment.id}"
+  end
+
+  test "bequeath should redirect to list" do
+    sessionVars = session_for(users(:superadmin))
+    assignment_team = teams(:team4)
+    post :bequeath, {'id' => assignment_team.id}, sessionVars
+    assert_redirected_to "team/list/#{assignment_team.id}"
   end
 end

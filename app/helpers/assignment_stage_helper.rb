@@ -90,6 +90,4 @@ def find_current_stage(topic_id=nil)
   end
 
 
-
-
 end

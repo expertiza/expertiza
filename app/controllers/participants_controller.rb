@@ -15,7 +15,7 @@ class ParticipantsController < ApplicationController
     rescue
       flash[:error] = $!
     end
-    redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
+    redirect_to :action => 'list', :id => curr_object.id, :model => "Assignment"
   end
      
   def delete

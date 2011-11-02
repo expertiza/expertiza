@@ -1,0 +1,22 @@
+Topic1:
+  id: 1
+  topic_name: Topic1
+  assignment_id: <%= Fixtures.identify(:assignment_project1) %>
+  max_choosers: 2
+  topic_identifier: A101
+
+Topic2:
+  id: 1
+  topic_name: Topic1
+  assignment_id: <%= Fixtures.identify(:assignment_project2) %>
+  max_choosers: 2
+  topic_identifier: A102
+
+Topic3:
+  id: 1
+  topic_name: Topic1
+  assignment_id: <%= Fixtures.identify(:assignment_project3) %>
+  max_choosers: 3
+  topic_identifier: A103
+
+

@@ -83,21 +83,24 @@ class Team < ActiveRecord::Base
    end
  end
 
+  def self.delete_all_by_parent(parent)
+    teams = Team.find(:all, :conditions => ["parent_id=?", parent.id])
+
+    for team in teams
+      team.delete
+    end
+  end
+
   def self.randomize_all_by_parent(parent, team_type, team_size)
     participants = Participant.find(:all, :conditions => ["parent_id = ?", parent.id])
     participants = participants.sort{rand(3) - 1}
+
+    Team.delete_all_by_parent(parent)
 
     no_of_teams = participants.length.fdiv(team_size).ceil
     nextTeamMemberIndex = 0
 
     for i in 1..no_of_teams
-      begin
-        Team.check_for_existing(parent, "Team #{i}", team_type)
-      rescue TeamExistsError
-        team = Team.find_by_name("Team #{i}")
-        team.delete
-      end
-
       team = Object.const_get(team_type + 'Team').create(:name => "Team #{i}", :parent_id => parent.id)
       TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
 

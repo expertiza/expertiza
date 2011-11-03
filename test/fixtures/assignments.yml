@@ -1,4 +1,9 @@
 # Read about fixtures at http//ar.rubyonrails.org/classes/Fixtures.html
+######################################################
+#The below listed assignments are used for unit testing
+#There are 9 assignments without a team
+# 6 Assignments with a team
+#######################################################
 <% wiki_list = [nil, Fixtures.identify(:MediaWiki), Fixtures.identify(:DokuWiki)] %>
 <% prof_list = [] %>
 <% prof_list << Fixtures.identify(:instructor3) %>
@@ -85,6 +90,11 @@ assignment_review0:
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %> 
  
 
+################################################################
+#The 3 assignment inserted below are linked to course_object_oriented
+# course to form a class environment for testing with instructor1 as
+# the instructor
+################################################################
 #Assignments for course_object_oriented for instructor 1
 assignment_project1:
   name: Assignment_Project1

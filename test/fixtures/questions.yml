@@ -1,4 +1,5 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+# 7 questions one each for different kinds of questionnaires like review, metareview etc.
 question1:
  txt: Was assignment guidelines followed?
  true_false: false

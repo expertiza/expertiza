@@ -314,18 +314,6 @@ Node.all.each do |n|
   n.save
 end
 
-###########################################################################
-# Survey tables
-###########################################################################
-###### survey_deployments
-
-###### survey_participants
-
-###### survey_responses
-
-
-
-
 ###### extra stuff
 # Rebuild the role cache.
 Role.rebuild_cache

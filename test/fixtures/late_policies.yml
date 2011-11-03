@@ -1,4 +1,8 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+############################################################################
+# Six different late policies will be implemented to deduct points off for the
+# late submissions.
+############################################################################
 late_policy0:
   penalty_period_in_minutes: 0
   penalty_per_unit: 0

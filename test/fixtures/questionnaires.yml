@@ -1,3 +1,4 @@
+#7 Different questionnaires for different types like review, course survey etc.
 questionnaire0:
  name: questionnaire0
  instructor_id: <%= Fixtures.identify(:instructor1) %>

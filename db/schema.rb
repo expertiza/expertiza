@@ -60,6 +60,19 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
 
+  create_table "audit_trials", :force => true do |t|
+    t.integer  "suggestion_id"
+    t.string   "unityID"
+    t.text     "title"
+    t.text     "description"
+    t.string   "status"
+    t.boolean  "is_comment",    :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "audit_trials", ["suggestion_id"], :name => "fk_audit_trials_suggestions"
+
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
     t.boolean "private",        :default => false, :null => false
@@ -446,6 +459,10 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
 
+  create_table "schema_info", :id => false, :force => true do |t|
+    t.integer "version"
+  end
+
   create_table "score_caches", :force => true do |t|
     t.integer "reviewee_id"
     t.float   "score",       :default => 0.0, :null => false
@@ -479,6 +496,7 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.integer "max_choosers",                   :default => 0, :null => false
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
+    t.text    "description",                                   :null => false
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"
@@ -511,12 +529,15 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   end
 
   create_table "suggestions", :force => true do |t|
-    t.integer "assignment_id"
-    t.string  "title"
-    t.text    "description"
-    t.string  "status"
-    t.string  "unityID"
-    t.string  "signup_preference"
+    t.integer  "assignment_id"
+    t.text     "title"
+    t.text     "description"
+    t.string   "status"
+    t.string   "unityID"
+    t.string   "signup_preference"
+    t.integer  "control",           :default => 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "survey_deployments", :force => true do |t|
@@ -542,6 +563,18 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.string  "email"
     t.integer "survey_deployment_id"
   end
+
+  create_table "switch_topics", :force => true do |t|
+    t.string   "userid"
+    t.string   "unityid"
+    t.integer  "assignment_id"
+    t.integer  "topic_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "switch_topics", ["assignment_id"], :name => "fk_switch_topics_assignments"
+  add_index "switch_topics", ["topic_id"], :name => "fk_switch_topics_topics"
 
   create_table "system_settings", :force => true do |t|
     t.string  "site_name",                 :default => "", :null => false

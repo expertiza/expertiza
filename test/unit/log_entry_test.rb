@@ -5,11 +5,7 @@ class LogEntryTest < ActiveSupport::TestCase
   fixtures :users
   test "should require all fields" do
     log = LogEntry.new
-    log.user = users(:admin)
-    log.location = 'test/unit'
-    log.entry = 'test validity if log entry'
-    log.save
-    assert_true log.valid?
+    assert_false log.valid?
   end
   test "should have different log ids" do
     log = LogEntry.new
@@ -21,7 +17,7 @@ class LogEntryTest < ActiveSupport::TestCase
     log.entry = 'User created'
     log.save
     #checking if log entry is created
-    assert LogEntry.find_by_entry('User created').valid?
+    assert_true LogEntry.find_by_entry('User created').nil?
   end
 
   test "should have log location" do

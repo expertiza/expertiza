@@ -39,7 +39,10 @@ class LogEntriesController < ApplicationController
   # POST /log_entries.xml
   def create
     @log_entry = LogEntry.new(params[:log_entry])
-
+    @log_entry.user = params[:user]
+    @log_entry.location = params[:location]
+    @log_entry.entry = params[:entry]
+    @log_entry.save
     respond_to do |format|
       if @log_entry.save
         flash[:notice] = 'LogEntry was successfully created.'

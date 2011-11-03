@@ -15,7 +15,10 @@ class ParticipantsController < ApplicationController
     rescue
       flash[:error] = $!
     end
-    log_an_event(session[:user], "participants_controller/add", "added participants to assignment")
+    user = session[:user]
+    location = "participants_controller/add"
+    info = "participants_controller/add"
+    LogEntry.create({:user => user, :location => location, :entry => info})
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
   end
      

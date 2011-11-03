@@ -89,12 +89,4 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def log_an_event(user, location, info)
-    new_log_entry = LogEntry.new
-    new_log_entry.user = user
-    new_log_entry.location = location
-    new_log_entry.entry = info
-    new_log_entry.save
-  end
-
 end

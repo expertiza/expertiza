@@ -51,7 +51,11 @@ class ReviewMappingController < ApplicationController
     rescue
        msg = $!
     end
-    log_an_event(session[:user], "review_mapping_controller/add", "reviewer added to an assignment")
+    user = session[:user]
+    location = "review_mapping_controller/add"
+    info = "reviewer added to an assignment"
+    LogEntry.create({:user => user, :location => location, :entry => info})
+    #log_an_event(session[:user], "review_mapping_controller/add", "reviewer added to an assignment")
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg    
   end
 

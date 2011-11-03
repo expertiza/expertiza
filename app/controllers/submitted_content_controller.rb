@@ -27,7 +27,10 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(participant.user_id)
     begin
       participant.submmit_hyperlink(params['submission'])
-      log_an_event(session[:user], "submitted_content_controller/submit_hyperlink", "hyperlink submitted")
+      user = session[:user]
+      location = "submitted_content_controller/submit_hyperlink"
+      info = "hyperlink submitted"
+      LogEntry.create({:user => user, :location => location, :entry => info})
     rescue
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end    
@@ -76,7 +79,10 @@ class SubmittedContentController < ApplicationController
     end
 
     participant.update_resubmit_times
-    log_an_event(session[:user], "submitted_content_controller/submit_file", "file submitted")
+    user = session[:user]
+    location = "submitted_content_controller/submit_file"
+    info = "submitted_content_controller/submit_file"
+    LogEntry.create({:user => user, :location => location, :entry => info})
 
     #send message to reviewers when submission has been updated
     participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
@@ -116,7 +122,10 @@ class SubmittedContentController < ApplicationController
         rescue
         end
     end
-    log_an_event(session[:user], "submitted_content_controller/submit_hosted_document", "hosted document submitted")
+    user = session[:user]
+    location = "submitted_content_controller/submit_hosted_document"
+    info = "hosted document submitted"
+    LogEntry.create({:user => user, :location => location, :entry => info})
     redirect_to :action => 'edit', :id => participant.id
   end
 

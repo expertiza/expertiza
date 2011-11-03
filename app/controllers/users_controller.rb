@@ -94,7 +94,10 @@ class UsersController < ApplicationController
         AssignmentQuestionnaires.create(:user_id => @user.id)
       end
       flash[:notice] = 'User was successfully created.'
-      log_an_event(@user, "users_controller/create", "New user created")
+      user = session[:user]
+      location = "users_controller/create"
+      info = "New user created"
+      LogEntry.create({:user => user, :location => location, :entry => info})
       redirect_to :action => 'list'
     else
       foreign
@@ -114,7 +117,10 @@ class UsersController < ApplicationController
 
     if @user.update_attributes(params[:user])
       flash[:notice] = 'User was successfully updated.'
-      log_an_event(params[:user], "users_controller/update", "user info was updated")
+      user = session[:user]
+      location = "users_controller/update"
+      info = "user info was updated"
+      LogEntry.create({:user => user, :location => location, :entry => info})
       redirect_to :action => 'show', :id => @user
     else
       foreign

@@ -1,3 +1,4 @@
+#Inserts the survey into the tables.
 survey_deployment_1:
   course_evaluation_id: <%= Fixtures.identify(:course_evaluation_questionnaire) %>
   start_date: <%= DateTime.now.to_formatted_s(:db) %>

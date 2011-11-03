@@ -1,3 +1,4 @@
+#Creating different users for expertiza system.
 superadmin:
   name: suadmin
   parent_id: <%= Fixtures.identify(:superadmin) %>

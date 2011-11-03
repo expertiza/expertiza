@@ -1,7 +1,8 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
  ############################################################
-#Topic deadlines for course_object_oriented and instructor1
+#Topic deadline for 3 different topics. Deadline for each
+#phase of activity from review to metareview will be inserted
 ############################################################
 
 <% topic_list = [] %>

@@ -1,4 +1,5 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+# 5 differnt teams for unit testing purposes.
 team0:
   name: team1
   parent_id: <%= Fixtures.identify(:assignment0) %>
@@ -29,6 +30,7 @@ team5:
   type: AssignmentTeam
 
 
+#4 Teams for class environment example
 #Teams for course_object_oriented and instructor 1
 Assignment_Project1_Team1:
   name: Assignment1Team1

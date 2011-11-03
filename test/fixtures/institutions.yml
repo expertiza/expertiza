@@ -1,4 +1,8 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+############################################################################
+#Two University or institution NCSU and Test will be inserted into the table
+#for testing purposes.
+############################################################################
 institution0:
   name: North Carolina State University
 institution1:

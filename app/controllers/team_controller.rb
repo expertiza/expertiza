@@ -7,12 +7,7 @@ end
 
 def delete_all
   parent = Object.const_get(session[:team_type]).find(params[:id])  
-  teams = Team.find(:all, :conditions => ["parent_id=?", parent.id])
-  
-  for team in teams
-    team.delete
-  end
-
+  Team.delete_all_by_parent(parent)
   redirect_to :action => 'list', :id => parent.id
 end
 

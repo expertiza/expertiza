@@ -23,7 +23,7 @@ class TeamControllerTest < ActionController::TestCase
     nodeId = nodes(:node23).node_object_id
 
     get :delete_all, {'id' => nodeId}, sessionVars
-    assert_redirected_to "team/list/#{nodeId}"
+    assert_redirected_to "/team/list/#{nodeId}"
   end
 
   test "delete_all should delete team" do
@@ -83,7 +83,7 @@ class TeamControllerTest < ActionController::TestCase
     nodeId = nodes(:node23).node_object_id
 
     post :create, {'id' => nodeId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
-    assert_redirected_to "team/list/#{nodeId}"
+    assert_redirected_to "/team/list/#{nodeId}"
   end
 
   test "update should redirect to list" do
@@ -93,7 +93,7 @@ class TeamControllerTest < ActionController::TestCase
     teamId = teams(:team2).id
 
     post :update, {'id' => teamId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
-    assert_redirected_to "team/list/#{nodeId}"
+    assert_redirected_to "/team/list/#{nodeId}"
   end
 
   test "update should raise RecordNotFound" do
@@ -132,7 +132,7 @@ class TeamControllerTest < ActionController::TestCase
     teamId = teams(:team2).id
 
     get :delete, {'id' => teamId}, sessionVars
-    assert_redirected_to "team/list/#{nodeId}"
+    assert_redirected_to "/team/list/#{nodeId}"
   end
 
   test "inherit should redirect to list" do
@@ -140,7 +140,7 @@ class TeamControllerTest < ActionController::TestCase
     assignmentId = assignments(:assignment2).id
 
     post :inherit, {'id' => assignmentId}, sessionVars
-    assert_redirected_to "team/list/#{assignmentId}"
+    assert_redirected_to "/team/list/#{assignmentId}"
   end
 
   test "bequeath should redirect to list" do
@@ -149,6 +149,6 @@ class TeamControllerTest < ActionController::TestCase
     assignmentId = assignments(:assignment2).id
 
     post :bequeath, {'id' => teamId}, sessionVars
-    assert_redirected_to "team/list/#{assignmentId}"
+    assert_redirected_to "/team/list/#{assignmentId}"
   end
 end

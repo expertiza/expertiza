@@ -1,48 +1,29 @@
 require 'test_helper'
 
-# #class NotificationTest < ActiveSupport::TestCase
-# class UserMailerTest < ActionMailer::TestCase
-#   # Replace this with your real tests.
-#   
-#   fixtures :users
-#   
-#   test "the truth" do
-#     assert true
-#   end
-#   
-#   test "invite" do
-#         @expected.from    = 'me@example.com'
-#         @expected.to      = 'friend@example.com'
-#         @expected.subject = "You have been invited by #{@expected.from}"
-#         @expected.body    = read_fixture('invite')
-#         @expected.date    = Time.now
-#         assert_equal @expected.encoded, UserMailer.create_invite('me@example.com', 'friend@example.com', @expected.date).encoded
-#   end
-#   
-#    # assert_select_email do
-#    #       assert_select "h1", "Email alert"
-#    #   end
-#   
-#   test "required fields" do                 
-#       user1 = users(:student1)
-#       assert(!user1.valid?)
-#       user2 =users(:student2)
-#       assert(!user2.valid?)
-#   end
-#   
-# end
-   
-   class MailerTest < ActionMailer::TestCase
-     tests Mailer
-       def test_invite 
-         @expected.from    = 'me@example.com'
-         @expected.to      = 'friend@example.com'
-         @expected.subject = "You have been invited by #{@expected.from}"
-         @expected.body    = read_fixture('invite')
-         @expected.date    = Time.now
-         
-         assert_equal @expected.encoded, Mailer.message('me@example.com', 'friend@example.com', @expected.date).encoded
-       end
+
+class NotificationTest < ActionMailer::TestCase
+  tests Mailer
+  test "test_invite" do
+    #@expected.from    = 'customercare.quickfix@example.com'
+    @expected.to      = 'vsing3@ncsu.edu'
+    @expected.subject = "subject1"
+    @expected.content_type = 'text/html'
+    @expected.charset = 'utf-8'
+    @expected.body    = read_fixture('invite.html')
+    @expected.date = Time.now 
     
-     end
-  
+    assert_not_nil(Mailer, "Mailer is nil")
+    
+    mail_message = {:recipients => "vsing3@ncsu.edu",
+     :subject => "subject1",
+     :body => {
+      :obj_name => self.name,
+      :type => "submission",
+      :location => "location",
+      :first_name => "FNU",
+      :partial_name => "testing"
+      }
+    }
+    assert_equal @expected.encoded, Mailer.deliver_message(mail_message).encoded
+  end
+end

@@ -99,18 +99,27 @@ class ReviewMappingControllerTest < ActionController::TestCase
     assert_equal "All review mappings for this assignment have been deleted.", flash[:note]
   end
 
+  def test_review_report
+    assign_id = Fixtures.identify(:assignment1)
+    user = Participant.first(:conditions => {:parent_id => assign_id})
+
+    post :review_report, {:id => assign_id}, session_for(users(:admin))
+
+    assert_template :review_report
+  end
+
   def test_search_by_reviewer
     assign_id = Fixtures.identify(:assignment1)
     user = Participant.first(:conditions => {:parent_id => assign_id})
 
-    post :search_by_reviewer, {:id => assign_id, :user => {:fullname => user.fullname}}, session_for(users(:admin))
+    post :review_report, {:id => assign_id, :user => {:fullname => user.fullname}}, session_for(users(:admin))
 
     assert_template :review_report
   end
 
   def test_get_questionnaire_id
-    @assignment = Assignment.find(Fixtures.identify(:assignment1))
-    id = @assignment.get_review_questionnaire_id()
+    assignment = Assignment.find(Fixtures.identify(:assignment1))
+    id = assignment.get_review_questionnaire_id()
     assert (id > 0)
   end
 

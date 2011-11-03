@@ -19,7 +19,7 @@
       <td align = "center"><b><%=link_to_function("X", "Element.hide('searchform');Element.show('searchlink')") %></b></td>
   </div>
 
-  <% form_for :user, @user, :url => {:action => 'search_by_reviewer', :id => @id} do |n| %>
+  <% form_for :user, @user, :url => {:action => 'review_report', :id => @id} do |n| %>
   <table>
   <tr>
       <th>Reviewer's Name</th>

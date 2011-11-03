@@ -29,7 +29,7 @@ class UserTest < ActiveSupport::TestCase
   end
   
   def test_add_suggestion
-    params = {:title => "title1",:description => "description1", :signup_preference => "kuch bhi"}
+    params = {:title => "title1",:description => "description1", :signup_preference => "pref"}
     suggestion = Suggestion.new(params)
     suggestion.assignment_id = 2
     suggestion.status = 'Initiated'
@@ -40,7 +40,7 @@ class UserTest < ActiveSupport::TestCase
   end
   
   def test_add_suggestion_no_title
-    params = {:description => "description1", :signup_preference => "kuch bhi"}
+    params = {:description => "description1", :signup_preference => "pref"}
     suggestion = Suggestion.new(params)
     suggestion.assignment_id = 2
     suggestion.status = 'Initiated'
@@ -51,7 +51,7 @@ class UserTest < ActiveSupport::TestCase
   end
   
   def test_add_suggestion_no_description
-    params = {:title => "title1", :signup_preference => "kuch bhi"}
+    params = {:title => "title1", :signup_preference => "pref"}
     suggestion = Suggestion.new(params)
     suggestion.assignment_id = 2
     suggestion.status = 'Initiated'

@@ -599,8 +599,9 @@ end
     
   end
 
-  ##### Abhishek - To get the scores by each reviewer - Populating "scores-awarded" column ####
-  ##### returning hash review_scores[reviewer_id][reviewee_id] = score ##############
+
+  # Returns hash review_scores[reviewer_id][reviewee_id] = score
+  ### E210: Moved this method from ReviewMappingController to this class
   def compute_reviews_hash
     review_questionnaire_id = get_review_questionnaire_id()
     @questions = Question.find(:all, :conditions =>["questionnaire_id = ?", review_questionnaire_id])
@@ -616,7 +617,7 @@ end
 
     @response_maps=ResponseMap.find(:all, :conditions =>["reviewed_object_id = ? and type = ?", self.id, @response_type])
     for response_map in @response_maps
-      ## checking if response is there
+      # Check if response is there
       @corresponding_response = Response.find(:first, :conditions =>["map_id = ?", response_map.id])
       @respective_scores = Hash.new
       if (@review_scores[response_map.reviewer_id] != nil)
@@ -634,6 +635,7 @@ end
     return @review_scores
   end
 
+  ### E210: Moved this method from ReviewMappingController to this class
   def get_review_questionnaire_id()
     @revqids = []
 

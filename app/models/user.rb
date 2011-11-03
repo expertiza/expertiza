@@ -209,6 +209,7 @@ class User < ActiveRecord::Base
     @email_on_review_of_review = true
   end
 
+  ### E210: Moved this method from ReviewMappingController to this class
   def self.get_user(params)
       if params[:user_id]
         user = User.find(params[:user_id])

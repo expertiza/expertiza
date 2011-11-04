@@ -45,5 +45,6 @@ module ApplicationHelper
   def self.get_field(element,field,model,column)   
     item = Object.const_get(model).find(element[column.to_sym])
     return item[field.to_sym]
-  end 
+  end
+
 end

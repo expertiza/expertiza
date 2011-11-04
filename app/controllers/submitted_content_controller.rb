@@ -25,10 +25,13 @@ class SubmittedContentController < ApplicationController
   def submit_hyperlink
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
-
     begin
       participant.submmit_hyperlink(params['submission'])
-    rescue 
+      user = session[:user]
+      location = "submitted_content_controller/submit_hyperlink"
+      info = "hyperlink submitted"
+      LogEntry.create({:user => user, :location => location, :entry => info})
+    rescue
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end    
     redirect_to :action => 'edit', :id => participant.id
@@ -74,15 +77,70 @@ class SubmittedContentController < ApplicationController
     if params['unzip']
       SubmittedContentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
-    participant.update_resubmit_times       
+
+    participant.update_resubmit_times
+    user = session[:user]
+    location = "submitted_content_controller/submit_file"
+    info = "submitted_content_controller/submit_file"
+    LogEntry.create({:user => user, :location => location, :entry => info})
 
     #send message to reviewers when submission has been updated
     participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
 
     redirect_to :action => 'edit', :id => participant.id
   end
-  
-  
+
+  # Add a hosted document object to the associated participant
+  def submit_hosted_document
+    # First find the participant for the assignment
+    participant = AssignmentParticipant.find(params[:id]) 
+
+    # Retrieve the submitted document URL
+    url = URI.parse(params['doc_url'].strip)
+
+    # Check that the URL is valid
+    begin
+      Net::HTTP.start(url.host, url.port)
+    rescue 
+      flash[:error] = "The URL or URI is not valid. Reason: "+$!
+    end
+
+    if ( ! flash[:error] )
+        begin
+          # If the URL is valid then create a new Hosted Document object
+          doc = ParticipantHostedDocument.new
+          doc.assignment_participant_id = params[:id]
+          doc.url = params['doc_url'].strip
+          doc.label = params['doc_label'].strip
+          doc.service = params['doc_service'].strip
+          doc.document_type = params['doc_type'].strip
+
+          # Try to save the document
+          if ( ! doc.save )
+            flash[:error] = "An error occurred saving the URL"
+          end
+        rescue
+        end
+    end
+    user = session[:user]
+    location = "submitted_content_controller/submit_hosted_document"
+    info = "hosted document submitted"
+    LogEntry.create({:user => user, :location => location, :entry => info})
+    redirect_to :action => 'edit', :id => participant.id
+  end
+
+  # Remove a hosted document object from the associated participant
+  def remove_hosted_document
+    # Find the document passed in
+    doc = ParticipantHostedDocument.find(params[:id])
+
+    # Destroy the link
+    if ! doc.destroy
+      flash[:error] = "An error occurred deleting the Hosted Document"
+    end
+    redirect_to :action => 'edit', :id => doc.assignment_participant_id
+  end
+
   def folder_action
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)

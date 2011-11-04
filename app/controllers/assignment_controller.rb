@@ -32,7 +32,11 @@ class AssignmentController < ApplicationController
       
       DueDate.copy(old_assign.id, new_assign.id)           
       new_assign.create_node()
-      
+      user = session[:user]
+      location = "assignment_controller/copy"
+      info = "New assignment created as a copy"
+      LogEntry.create({:user => user, :location => location, :entry => info})
+
       flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
       redirect_to :action => 'edit', :id => new_assign.id
     else
@@ -52,7 +56,11 @@ class AssignmentController < ApplicationController
     @wiki_types = WikiType.find(:all)
     @private = params[:private] == true        
     #calling the defalut values mathods
-    get_limits_and_weights 
+    get_limits_and_weights
+    user = session[:user]
+    location = "assignment_controller/new"
+    info = "New assignment created from scratch"
+    LogEntry.create({:user => user, :location => location, :entry => info})
   end
   
   

@@ -50,7 +50,11 @@ class ReviewMappingController < ApplicationController
       end
     rescue
        msg = $!
-    end    
+    end
+    user = session[:user]
+    location = "review_mapping_controller/add"
+    info = "reviewer added to an assignment"
+    LogEntry.create({:user => user, :location => location, :entry => info})
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg    
   end
 

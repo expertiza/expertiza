@@ -91,13 +91,18 @@ class Team < ActiveRecord::Base
     end
   end
 
+# @param parent [Object]
+# @param team_type [Object]
+# @param team_size [Object]
   def self.randomize_all_by_parent(parent, team_type, team_size)
     participants = Participant.find(:all, :conditions => ["parent_id = ?", parent.id])
     participants = participants.sort{rand(3) - 1}
+    users = participants.map{|p| User.find_by_id(p.user_id)}
+    users = users.uniq
 
     Team.delete_all_by_parent(parent)
 
-    no_of_teams = participants.length.fdiv(team_size).ceil
+    no_of_teams = users.length.fdiv(team_size).ceil
     nextTeamMemberIndex = 0
 
     for i in 1..no_of_teams
@@ -105,9 +110,9 @@ class Team < ActiveRecord::Base
       TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
 
       team_size.times do
-        break if nextTeamMemberIndex >= participants.length
+        break if nextTeamMemberIndex >= users.length
 
-        user = User.find_by_id(participants[nextTeamMemberIndex].user_id)
+        user = users[nextTeamMemberIndex]
         team.add_member(user)
 
         nextTeamMemberIndex += 1

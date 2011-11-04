@@ -1,23 +1,23 @@
 class LogEntriesController < ApplicationController
   # GET /log_entries/list
   # GET /log_entries/list.xml
-  def list
+  def index
     @log_entries = LogEntry.find(:all)
 
     respond_to do |format|
-      format.html #  list.html.erb
+      format.html #  index.html.erb
       format.xml  { render :xml => @log_entries }
     end
   end
 
   # GET /log_entries
   # GET /log_entries.xml
-  def index
-    respond_to do |format|
-        format.html { redirect_to :controller => "log_entries", :action => "list" }
-        format.xml  { head :ok }
-    end
-  end
+  #def index
+  #  respond_to do |format|
+  #      format.html { redirect_to :controller => "log_entries", :action => "list" }
+  #      format.xml  { head :ok }
+  #  end
+  #end
 
   # GET /log_entries/new
   # GET /log_entries/new.xml
@@ -39,10 +39,7 @@ class LogEntriesController < ApplicationController
   # POST /log_entries.xml
   def create
     @log_entry = LogEntry.new(params[:log_entry])
-    @log_entry.user = params[:user]
-    @log_entry.location = params[:location]
-    @log_entry.entry = params[:entry]
-    @log_entry.save
+
     respond_to do |format|
       if @log_entry.save
         flash[:notice] = 'LogEntry was successfully created.'
@@ -79,7 +76,7 @@ class LogEntriesController < ApplicationController
     @log_entry.destroy
 
     respond_to do |format|
-      format.html { redirect_to :controller => "log_entries", :action => "list"  }
+      format.html { redirect_to :controller => "log_entries", :action => "index"  }
       format.xml  { head :ok }
       end
   end

@@ -6,6 +6,7 @@
     <th>User</th>
     <th>Location</th>
     <th>Entry</th>
+    <th>Created at</th>
   </tr>
 
 <% for log_entry in @log_entries %>
@@ -13,7 +14,8 @@
     <td><%=h log_entry.user.id %></td>
     <td><%=h log_entry.location %></td>
     <td><%=h log_entry.entry %></td>
-    <td><%= link_to 'Destroy', log_entry, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%=h log_entry.created_at %></td>
+    <td><%= link_to 'Destroy', :controller => "log_entries", :action => "destroy", :id => log_entry%></td>
   </tr>
 <% end %>
 </table>

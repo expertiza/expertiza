@@ -18,13 +18,15 @@ If not:
 ### Tools
 
  * [Set up git](http://help.github.com/set-up-git-redirect)
- * Install Ruby 1.8.7. (Ruby 1.9.2 may work but hasn't been tested)
-   Use [rvm](http://beginrescueend.com) on Linux/OSX, or [RailsInstaller](http://railsinstaller.org) on Windows
+ * Install Ruby 1.8.7. (Some plugins/gems we use are not yet 1.9.2 compatible)
+   On Linux/OSX, use [rvm](http://beginrescueend.com).
+   On Windows, use [RubyInstaller](http://rubyinstaller.org) and [RailsInstaller](http://railsinstaller.org).
  * `gem install bundler` (see [issues on Windows](http://matt-hulse.com/articles/2010/01/30/from-zero-to-rails3-on-windows-in-600-seconds/))
 
 ### Dependencies
 
  * libxslt development libraries [OSX: (already installed?) Ubuntu: `sudo apt-get install libxslt-dev` Fedora: `yum install libxslt-devel` Windows: ?]
+ * libmysqlclient [OSX: `brew install mysql` Ubuntu: `sudo apt-get install mysql-server mysql-client libmysqlclient-dev` Fedora: `yum install mysql mysql-server mysql-devel`]
  * (optional) [graphviz](http://www.graphviz.org)
  * bundled gems: `bundle install`
  

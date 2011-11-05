@@ -1,3 +1,4 @@
+puts "Loading seed data from db/seeds.rb"
 ###########################################################################
 # Goldberg tables
 ###########################################################################
@@ -266,6 +267,7 @@ SystemSettings.create(:site_name => 'Expertiza',
 
 ###### users
 # Default administrator
+puts "Creating admin user with password 'admin'"
 User.create!(:name => 'admin',
              :email => 'anything@mailinator.com',
              :clear_password => 'admin',

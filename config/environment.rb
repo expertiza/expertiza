@@ -21,6 +21,7 @@ Rails::Initializer.run do |config|
   config.gem 'RedCloth'
   config.gem 'rgl', :lib => 'rgl/adjacency'
   config.gem 'rubyzip', :lib => "zip/zip"
+  config.gem 'gchartrb', :lib => 'google_chart'
   raise 'graphviz dependency is not installed - missing dot executable' unless RUBY_PLATFORM =~ /mswin/ or %x(which dot).to_s.any?
 
   # Only load the plugins named here, in the order given (default is alphabetical).

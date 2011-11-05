@@ -18,6 +18,9 @@ class Assignment < ActiveRecord::Base
   belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy  
     
+  has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
+  # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
+  # has_many :responses, :through => :response_maps, :source => 'response'
   validates_presence_of :name
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
     
@@ -69,6 +72,7 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:team] = team
         assessments = TeamReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
+        #... = ScoreCache.get_participant_score(team, id, questionnaire.display_type)
         index += 1
       }
     end
@@ -414,7 +418,6 @@ def assign_reviewers_staggered(num_reviews,num_review_of_reviews)
 end
 
   def get_current_due_date()
-    #puts "~~~~~~~~~~Enter get_current_due_date()\n"
     due_date = self.find_current_stage()
     if due_date == nil or due_date == COMPLETE
       return COMPLETE
@@ -425,7 +428,6 @@ end
   end
   
   def get_next_due_date()
-    #puts "~~~~~~~~~~Enter get_next_due_date()\n"
     due_date = self.find_next_stage()
     
     if due_date == nil or due_date == COMPLETE
@@ -437,7 +439,6 @@ end
   end
   
   def find_next_stage()
-    #puts "~~~~~~~~~~Enter find_next_stage()\n"
     due_dates = DueDate.find(:all, 
                  :conditions => ["assignment_id = ?", self.id],
                  :order => "due_at DESC")
@@ -462,6 +463,100 @@ end
         return nil
       end
     end
+  end
+          
+  # Returns the number of reviewers assigned to a particular assignment
+  def get_total_reviews_assigned
+    self.response_maps.size
+  end
+
+  # get_total_reviews_assigned_by_type()
+  # Returns the number of reviewers assigned to a particular assignment by the type of review
+  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  def get_total_reviews_assigned_by_type(type)
+    count = 0
+    self.response_maps.each { |x| count = count + 1 if x.type == type}
+    count
+  end
+
+  # Returns the number of reviews completed for a particular assignment
+  def get_total_reviews_completed
+    # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+    # self.responses.size
+
+    response_count = 0
+    self.response_maps.each do |response_map|
+      response_count = response_count + 1 unless response_map.response.nil?
     end
+
+    response_count
+  end
+
+  # Returns the number of reviews completed for a particular assignment by type of review
+  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  def get_total_reviews_completed_by_type(type)
+    # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+    # self.responses.size
+
+    response_count = 0
+    self.response_maps.each do |response_map|
+      response_count = response_count + 1 if !response_map.response.nil? and response_map.type == type
+    end
+
+    response_count
+  end
+
+  # Returns the number of reviews completed for a particular assignment by type of review
+  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  # Param: date - Filter reviews that were not created on this date
+  def get_total_reviews_completed_by_type_and_date(type, date)
+    # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+    # self.responses.size
+
+    response_count = 0
+    self.response_maps.each do |response_map|
+      if !response_map.response.nil? and response_map.type == type
+        if (response_map.response.created_at.to_datetime.to_date <=> date) == 0 then
+          response_count = response_count + 1
+        end
+      end
+    end
+
+    response_count
+  end
+
+  # Returns the percentage of reviews completed as an integer (0-100)
+  def get_percentage_reviews_completed
+    if get_total_reviews_assigned == 0 then 0
+    else ((get_total_reviews_completed().to_f / get_total_reviews_assigned.to_f) * 100).to_i
+    end
+  end
+
+  # Returns the average of all responses for this assignment as an integer (0-100)
+  def get_average_score
+    return 0 if get_total_reviews_assigned == 0
+    
+    sum_of_scores = 0
+
+    self.response_maps.each do |response_map|
+      if !response_map.response.nil? then
+        sum_of_scores = sum_of_scores + response_map.response.get_average_score
+      end
+    end
+
+    (sum_of_scores / get_total_reviews_completed).to_i
+  end
+
+  def get_score_distribution
+    distribution = Array.new(101, 0)
+    
+    self.response_maps.each do |response_map|
+      if !response_map.response.nil? then
+        score = response_map.response.get_average_score.to_i
+        distribution[score] += 1 if score >= 0 and score <= 100
+      end
+    end
+      
+    distribution
+  end
 end
-  

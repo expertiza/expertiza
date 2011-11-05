@@ -7,7 +7,8 @@
   <li><%= link_to 'Add TA',:controller=>'course', :action=>'view_teaching_assistants', :id => node.node_object_id, :model => 'Course'%></li>
   <li><%= link_to 'Create assignment',:controller=>'assignment', :action=>'new', :parent_id => node.node_object_id %></li>
   <li><%= link_to 'Add participants',:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Course'%></li>
-  <li><%= link_to 'Create teams',:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Course' %></li>  
+  <li><%= link_to 'Create teams',:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Course' %></li>
+  <li><%= link_to '360-degree Dashboard',:controller=>'assessment360', :action=>'one_course_all_assignments', :course_id => node.node_object_id %></li>  
 <% end %>
 </ul>
 </li></ul>

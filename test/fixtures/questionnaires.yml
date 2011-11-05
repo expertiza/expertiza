@@ -1,3 +1,4 @@
+#7 Different questionnaires for different types like review, course survey etc.
 questionnaire0:
  name: questionnaire0
  instructor_id: <%= Fixtures.identify(:instructor1) %>
@@ -45,7 +46,7 @@ questionnaire4:
  display_type: "Survey"
  
 peer_review_questionnaire:
- name: questionnaire4
+ name: questionnaire5
  instructor_id: <%= Fixtures.identify(:instructor3) %>
  private: 0
  min_question_score: 0
@@ -54,7 +55,7 @@ peer_review_questionnaire:
  display_type: "AuthorFeedback"
 
 teammate_review_questionnaire:
- name: questionnaire5
+ name: questionnaire6
  instructor_id: <%= Fixtures.identify(:instructor3) %>
  private: 0
  min_question_score: 0
@@ -63,7 +64,7 @@ teammate_review_questionnaire:
  display_type: "TeammateReview"
 
 global_survey_questionnaire:
- name: questionnaire6
+ name: questionnaire7
  instructor_id: <%= Fixtures.identify(:instructor3) %>
  private: 0
  min_question_score: 0
@@ -71,7 +72,14 @@ global_survey_questionnaire:
  type: "GlobalSurveyQuestionnaire"
  display_type: "GlobalSurvey"
 
-
+course_evaluation_questionnaire:
+  name: course_eval_questionnaire
+  instructur_id: <%= Fixtures.identify(:instructor1) %>
+  private: 0
+  min_question_score: 0
+  max_question_score: 0
+  type: "CourseEvaluationQuestionnaire"
+  display_type: "Course Evaluation"
 
  
  

@@ -1,0 +1,35 @@
+#2 different teams and 3 individual student sign up for three topics.
+SignedUpUser1:
+  id: 1
+  topic_id: <%= Fixtures.identify(:Assignment_Project1_Team1) %>
+  is_waitlisted: 0
+
+SignedUpUser2:
+  id: 1
+  topic_id: <%= Fixtures.identify(:Assignment_Project1_Team2) %>
+  is_waitlisted: 0
+
+SignedUpUser3:
+  id: 1
+  topic_id: <%= Fixtures.identify(:Assignment_Project2_Team1) %>
+  is_waitlisted: 0
+
+SignedUpUser4:
+  id: 1
+  topic_id: <%= Fixtures.identify(:Assignment_Project2_Team2) %>
+  is_waitlisted: 0
+
+SignedUpUser5:
+  id: 1
+  topic_id: <%= Fixtures.identify(:student1) %>
+  is_waitlisted: 0
+
+SignedUpUser6:
+  id: 1
+  topic_id: <%= Fixtures.identify(:student2) %>
+  is_waitlisted: 0
+
+SignedUpUser7:
+  id: 1
+  topic_id: <%= Fixtures.identify(:student3) %>
+  is_waitlisted: 0

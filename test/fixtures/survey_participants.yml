@@ -1,0 +1,8 @@
+#inserts survey participants into the tables.
+<% i=1 %>
+<% User.find_all_by_role_id(Role.student.id).each do |user| %>
+survey_participant_<%= i %>:
+  user_id: <%= user.id %>
+  survey_deployment_id: <%= Fixtures.identify(:survey_deployment_1) %>
+<% i = i+1 %>
+<% end %>

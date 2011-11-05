@@ -74,7 +74,7 @@ global_survey_questionnaire:
 
 course_evaluation_questionnaire:
   name: course_eval_questionnaire
-  instructur_id: <%= Fixtures.identify(:instructor1) %>
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
   private: 0
   min_question_score: 0
   max_question_score: 0

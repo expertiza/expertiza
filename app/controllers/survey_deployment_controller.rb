@@ -1,11 +1,11 @@
 
 class SurveyDeploymentController < ApplicationController
 
-
+ 
   def new 
-    @surveys=Questionnaire.find_all_by_type(4).map{|u| [u.name, u.id] }
+    @surveys=Questionnaire.find_all_by_type('CourseEvaluationQuestionnaire').map{|u| [u.name, u.id] }
     @course = Course.find_all_by_instructor_id(session[:user].id).map{|u| [u.name, u.id] }
-    @total_students = CourseParticipant.find_all_by_parent_id(@course[0].id).count
+    @total_students = CourseParticipant.find_all_by_parent_id(@course[0][1]).count
   end
 
   def create
@@ -13,16 +13,16 @@ class SurveyDeploymentController < ApplicationController
     
     @survey_deployment=SurveyDeployment.new(survey_deployment)
     if(params[:random_subset]["value"]=="1")
-      @survey_deployment.num_of_students=User.find_all_by_role_id(1).length * rand
+      @survey_deployment.num_of_students=User.find_all_by_role_id(Role.student.id).length * rand
     end
     
     if(@survey_deployment.save)
       add_participants(@survey_deployment.num_of_students,@survey_deployment.id)
       redirect_to :action=>'list'
      else
-      @surveys=QuestionnaireType.find_all_by_id(4).map{|u| [u.name, u.id] }
-      @total_students=User.find_all_by_role_id(1).length
-      @course = Course.find_all_by_instructor_id(session[:user].id).map{|u| [u.title, u.id] }
+      @surveys=Questionnaire.find_all_by_type('CourseEvaluationQuestionnaire').map{|u| [u.name, u.id] }
+      @course = Course.find_all_by_instructor_id(session[:user].id).map{|u| [u.name, u.id] }
+      @total_students = CourseParticipant.find_all_by_parent_id(@course[0][1]).count
       render(:action=>'new')
      end     
   end
@@ -49,7 +49,7 @@ class SurveyDeploymentController < ApplicationController
    end
  
    def add_participants(num_of_participants,survey_deployment_id) #Add participants
-    users=User.find_all_by_role_id(1)
+    users=User.find_all_by_role_id(Role.student.id)
     users_rand=users.sort_by{rand} #randomize user list
     num_of_participants.times do |i|
       survey_participant=SurveyParticipant.new

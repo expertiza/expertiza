@@ -1,3 +1,6 @@
+############################################################################
+# Sets different permissions for unit testing purposes.
+############################################################################
 permission_administer_goldberg:
   name: administer_goldberg
 permission_public_pages_view:

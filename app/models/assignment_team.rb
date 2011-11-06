@@ -1,6 +1,59 @@
 class AssignmentTeam < Team
-  belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
-  has_many :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
+  
+  belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
+  has_many    :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
+  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, teams t WHERE r.map_id = m.id AND m.type = \'TeamReviewResponseMap\' AND m.reviewee_id = t.id AND t.id = #{id}'
+
+# START of contributor methods, shared with AssignmentParticipant
+
+  # Whether this team includes a given participant or not
+  def includes?(participant)
+    return participants.include?(participant)
+  end
+
+  def assign_reviewer(reviewer)
+    TeamReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+      :reviewed_object_id => assignment.id)
+  end
+
+  # Evaluates whether any contribution by this team was reviewed by reviewer
+  # @param[in] reviewer AssignmentParticipant object 
+  def reviewed_by?(reviewer)
+    return TeamReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+                                       self.id, reviewer.id, assignment.id]) > 0
+  end
+
+  # Topic picked by the team
+  def topic
+    team_topic = nil
+
+    participants.each do |participant|
+      team_topic = participant.topic
+      break if team_topic
+    end
+
+    team_topic
+  end
+
+  # Whether the team has submitted work or not
+  def has_submissions?
+    participants.each do |participant|
+      return true if participant.has_submissions?
+    end
+    return false
+  end
+
+  def reviewed_contributor?(contributor)
+    return TeamReviewResponseMap.find(:all, 
+      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+      contributor.id, self.id, assignment.id]).empty? == false
+  end
+
+# END of contributor methods
+
+  def participants
+    @participants ||= AssignmentParticipant.find(:all, :conditions => ['parent_id = ? and user_id IN (?)', parent_id, users])
+  end
 
   def delete
     if read_attribute(:type) == 'AssignmentTeam'
@@ -28,9 +81,7 @@ class AssignmentTeam < Team
   def get_hyperlinks
     links = Array.new
     for team_member in self.get_participants 
-     if team_member.submitted_hyperlink != nil and team_member.submitted_hyperlink.strip.length > 0      
-      links << team_member.submitted_hyperlink      
-     end
+      links.concat(team_member.get_hyperlinks_array)
     end
     return links
   end
@@ -131,7 +182,6 @@ class AssignmentTeam < Team
     return participants    
   end
 
-   
   def copy(course_id)
    new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})    
    copy_members(new_team)
@@ -143,13 +193,22 @@ class AssignmentTeam < Team
    end    
   end
  
-   
   def assignment
     Assignment.find(self.parent_id)
   end
  
-  def get_reviews
-    Review.get_assessments_for(self)
+  # return a hash of scores that the team has received for the questions
+  def get_scores(questions)
+    scores = Hash.new
+    scores[:team] = self # This doesn't appear to be used anywhere
+    assignment.questionnaires.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = Response.all(:joins => :map,
+        :conditions => {:response_maps => {:reviewee_id => self.id, :type => 'TeamReviewResponseMap'}})
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+    end
+    scores[:total_score] = assignment.compute_total_score(scores)
+    return scores
   end
   
   def self.get_team(participant)

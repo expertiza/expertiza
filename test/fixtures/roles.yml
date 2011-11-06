@@ -1,8 +1,14 @@
+#Inserts 5 main different roles from student to super admin.
 Student_role:
   name: Student
   default_page_id:
   description: ""
   parent_id:
+Teaching_Assistant_role:
+  name: Teaching Assistant
+  default_page_id:
+  description: ""
+  parent_id: <%= Fixtures.identify(:Student_role) %>
 Instructor_role:
   name: Instructor
   default_page_id:
@@ -17,8 +23,3 @@ SuperAdministrator_role:
   name: "SuperAdministrator"
   description: ""
   parent_id: <%= Fixtures.identify(:Administrator_role) %>
-Teaching_Assistant_role:
-  name: Teaching Assistant
-  default_page_id:
-  description: ""
-  parent_id: <%= Fixtures.identify(:Student_role) %>

@@ -13,7 +13,7 @@ class ScoreCache < ActiveRecord::Base
     @reviewmap = Response.find(rid).map_id
     @rm = ResponseMap.find(@reviewmap)
     @participant1 = AssignmentParticipant.new
-    @the_object_id = 0
+    @contributor_id = 0
     @map_type = @rm.type.to_s
     @t_score = 0
     @t_min = 0
@@ -29,11 +29,11 @@ class ScoreCache < ActiveRecord::Base
       @assignment1 = Assignment.find(@ass_id)
       @teammember =  TeamsUser.find(:first, :conditions => ["team_id = ?",@rm.reviewee_id])
       @participant1 = AssignmentParticipant.find(:first, :conditions =>["user_id = ? and parent_id = ?", @teammember.user_id, @ass_id])
-      @the_object_id = @teammember.team_id
+      @contributor_id = @teammember.team_id
       
     else
       @participant1 = AssignmentParticipant.find(@rm.reviewee_id)
-      @the_object_id = @participant1.id
+      @contributor_id = @participant1.id
       @assignment1 = Assignment.find(@participant1.parent_id)
       @ass_id = @assignment1.id
       
@@ -45,7 +45,13 @@ class ScoreCache < ActiveRecord::Base
       |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     } 
-    @allscores = @participant1.get_scores( @questions)
+    # scores that participant1 has given
+    if(@map_type == "TeamReviewResponseMap")
+      team = Team.find(@contributor_id)
+      @allscores = team.get_scores( @questions)
+    else
+      @allscores = @participant1.get_scores( @questions)
+    end
     
     @scorehash = get_my_scores(@allscores, @map_type) 
     
@@ -54,12 +60,12 @@ class ScoreCache < ActiveRecord::Base
     @p_min = @scorehash[:min]
     @p_max = @scorehash[:max]
     
-    sc = ScoreCache.find(:first,:conditions =>["reviewee_id = ? and object_type = ?",  @the_object_id, @map_type ])
+    sc = ScoreCache.find(:first,:conditions =>["reviewee_id = ? and object_type = ?",  @contributor_id, @map_type ])
     if ( sc == nil)
       presenceflag = 1
       @msgs = "first entry"
       sc = ScoreCache.new
-      sc.reviewee_id = @the_object_id
+      sc.reviewee_id = @contributor_id
       # sc.assignment_id = @ass_id
       
       range_string = ((@p_min*100).round/100.0).to_s + "-" + ((@p_max*100).round/100.0).to_s

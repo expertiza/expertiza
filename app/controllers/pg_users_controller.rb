@@ -5,21 +5,13 @@ class PgUsersController < UsersController
     user = User.new(params[:user])
     user.parent_id = (session[:user]).id
     user.role_id = role
-    
-    
 
-    if params[:user][:clear_password].length == 0 or
-        params[:user][:confirm_password] != params[:user][:clear_password]
-      flash[:error] = 'Passwords do not match!'
-      render :controller => controller, :action => failure_action
+    if user.save
+      user_type = Role.find(user.role_id).name
+      flash[:notice] = '#{user_type} was successfully created.'
+      redirect_to :controller => controller, :action => success_action
     else
-      if user.save
-        user_type = Role.find(user.role_id).name
-        flash[:notice] = '#{user_type} was successfully created.'
-        redirect_to :controller => controller, :action => success_action
-      else
-        render :controller => controller, :action => failure_action
-      end
+      render :controller => controller, :action => failure_action
     end
   end
   

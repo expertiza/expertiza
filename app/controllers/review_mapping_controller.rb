@@ -2,6 +2,7 @@ class ReviewMappingController < ApplicationController
   auto_complete_for :user, :name
   use_google_charts
   helper :dynamic_review_assignment
+  helper :submitted_content
   
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
@@ -53,49 +54,112 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg    
   end
 
-  def add_dynamic_reviewer
+  # Get all the available submissions
+  def show_available_submissions
     assignment = Assignment.find(params[:assignment_id])
     reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
     requested_topic_id = params[:topic_id]
-    
-    submission = DynamicReviewAssignmentHelper::dynamic_review_assignment(assignment.id, reviewer.id, requested_topic_id)
-    
+    @available_submissions =  Hash.new
+    @available_submissions = DynamicReviewAssignmentHelper::review_assignment(assignment.id ,
+                                                                              reviewer.id,
+                                                                              requested_topic_id ,
+                                                                              Assignment::RS_STUDENT_SELECTED)
+  end 
+  
+  # TODO: Refactor this method. Look at assign_reviewer_dynamically as an example
+  # Add the entry into the Response Map
+  def add_self_reviewer
+    assignment = Assignment.find(params[:assignment_id])
+    reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+    submission = AssignmentParticipant.find_by_id_and_parent_id(params[:submission_id],assignment.id)
+
     if submission.nil?
-        flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
-        redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
+      flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
+      redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
     else
-      contributor = AssignmentParticipant.find_by_id_and_parent_id(submission.id, assignment.id)
-    
-      potentialResponseDeadline = (DateTime.now.to_time + assignment.dynamic_reviewer_response_time_limit_hours.hours).to_datetime
-    
+      msg = String.new
+  
       begin
         if assignment.team_assignment
+          contributor = get_team_from_submission(submission)
           if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
-            TeamReviewResponseMap.create(:reviewee_id => contributor.id, 
+            TeamReviewResponseMap.create(:reviewee_id => contributor.id,
                                          :reviewer_id => reviewer.id,
-                                         :reviewed_object_id => assignment.id, 
-                                         :potential_response_deadline => potentialResponseDeadline)
+                                         :reviewed_object_id => assignment.id)
           else
-            raise "The reviewer is already assigned to this contributor. This shouldn't happen."
+            raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
           end
         else
-          if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',contributor.id,reviewer.id]).nil?
-            ParticipantReviewResponseMap.create(:reviewee_id => contributor.id, 
+          contributor = AssignmentParticipant.find_by_id_and_parent_id(submission.id, assignment.id)
+          if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',contributor.id ,reviewer.id]).nil?
+            ParticipantReviewResponseMap.create(:reviewee_id => contributor.id,
                                                 :reviewer_id => reviewer.id,
-                                                :reviewed_object_id => assignment.id, 
-                                                :potential_response_deadline => potentialResponseDeadline)
+                                                :reviewed_object_id => assignment.id)
           else
-            raise "The reviewer is already assigned to this contributor. This shouldn't happen."
+            flash[:error] = "There are no more submissions for you to review at this time."
+            raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
           end
         end
       rescue
-        flash[:error] = $!
+        msg = $!
+      end
+  
+      redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :msg => msg
+    end
+  end 
+
+  #  Looks up the Team from the submission.
+  def get_team_from_submission(submission)
+    # get the list of teams for this assignment.
+    teams = AssignmentTeam.find_all_by_parent_id( submission.parent_id)
+
+    teams.each do |team|
+      team.teams_users.each do |team_member|
+        if team_member.user_id == submission.user_id
+          # Found the team, return it!
+          return team
+        end
+      end
+    end
+
+    # We weren't able to find the team.
+    return nil
+  end
+
+  def assign_reviewer_dynamically
+    begin
+      assignment = Assignment.find(params[:assignment_id])
+      reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+      
+      unless params[:i_dont_care]
+        topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
+      else
+        topic = assignment.candidate_topics_to_review.to_a.shuffle[0] rescue nil
       end
 
-      redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
+      assignment.assign_reviewer_dynamically(reviewer, topic)
+
+    rescue Exception => e
+      flash[:alert] = (e.nil?) ? $! : e
     end
+
+    redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
   end
- 
+
+  def assign_metareviewer_dynamically
+    begin
+      assignment   = Assignment.find(params[:assignment_id])
+      metareviewer = AssignmentParticipant.find_by_user_id_and_parent_id(params[:metareviewer_id], assignment.id)
+
+      assignment.assign_metareviewer_dynamically(metareviewer)
+
+    rescue Exception => e
+      flash[:alert] = (e.nil?) ? $! : e
+    end
+
+    redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
+  end
+
   def add_metareviewer    
     mapping = ResponseMap.find(params[:id])  
     msg = String.new
@@ -107,7 +171,12 @@ class ReviewMappingController < ApplicationController
       if MetareviewResponseMap.find(:first, :conditions => ['reviewed_object_id = ? and reviewer_id = ?',mapping.id,reviewer.id]) != nil
          raise "The metareviewer \""+reviewer.user.name+"\" is already assigned to this reviewer."
       end
-      MetareviewResponseMap.create(:reviewed_object_id => mapping.id,                        
+      # Code Review: Semantically it doesn't make sense to review the 'response map'
+      #              the object to be reviewed should be the 'response' itself.
+      #              Another reason is that a response map doesn't necessarily have a
+      #              response (i.e. a review hasn't been submitted yet)
+      #              Consider refactoring this.
+      MetareviewResponseMap.create(:reviewed_object_id => mapping.id,
                                    :reviewer_id => reviewer.id,
                                    :reviewee_id => mapping.reviewer.id)                         
     rescue  
@@ -283,7 +352,7 @@ class ReviewMappingController < ApplicationController
     revmapid = mapping.review_mapping.id
     mapping.delete
     
-    flash[:note] = "The review of reviewer has been deleted."
+    flash[:note] = "The metareviewer has been deleted."
     redirect_to :action => 'list_rofreviewers', :id => revmapid  
   end     
     
@@ -377,17 +446,14 @@ class ReviewMappingController < ApplicationController
   
   def generate_reviewer_mapping
     assignment = Assignment.find(params[:id])
-    assignment.update_attribute('review_strategy_id',1)
-    assignment.update_attribute('mapping_strategy_id',1)    
        
     if params[:selection]
-      
       mapping_strategy = {}
-      params[:selection].each{|a|
-      if a[0] =~ /^m_/
-        mapping_strategy[a[0]] = a[1]
+      params[:selection].each do |a|
+        if a[0] =~ /^m_/
+          mapping_strategy[a[0]] = a[1]
+        end
       end
-    }
     else
       mapping_strategy = 1
     end      
@@ -409,8 +475,6 @@ class ReviewMappingController < ApplicationController
   #this is for staggered deadline assignment. Can be merged later
   def automatic_reviewer_mapping
     assignment = Assignment.find(params[:id])
-    assignment.update_attribute('review_strategy_id',1)
-    assignment.update_attribute('mapping_strategy_id',1)
 
     message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_review_of_reviews])
     flash[:note] = message

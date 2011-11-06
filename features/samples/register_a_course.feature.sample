@@ -1,0 +1,14 @@
+Feature: Register a Course as an Admin
+  In order to register a course
+  As an expertiza admin
+  I want to use the register course form in expertiza
+
+Scenario: Register new course
+  Given I am on the new course page and private = 0
+  When I fill in "Course name" with "course_name 1"
+  And I fill in "Course directory path" with "course_directory_path 1"
+  And I fill in "Course info" with "course_info 1"
+  And I press "Create"
+  Then I should see "course_name 1"
+  And I should see "course_directory_path 1"
+  And I should see "course_info 1"

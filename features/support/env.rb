@@ -72,3 +72,11 @@ end
 # Forces all threads to share the same connection. This works on
 # Capybara because it starts the web server in a thread.
 ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection
+
+# Show pages for failures (up to 3)
+After do |scenario|
+  if scenario.respond_to?(:status) && scenario.status == :failed
+    $fail_count = $fail_count.to_i + 1
+    save_and_open_page if $fail_count <= 3
+  end
+end

@@ -1,5 +1,4 @@
 require 'zip/zip'
-require 'uri'  
 
 class SubmittedContentController < ApplicationController
   helper :wiki
@@ -9,6 +8,11 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(@participant.user_id)
     
     @assignment = @participant.assignment
+    
+    if @assignment.team_assignment && @participant.team.nil?
+      flash[:alert] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_team/view/#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
+      redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
+    end
   end
   
   def view
@@ -22,16 +26,26 @@ class SubmittedContentController < ApplicationController
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
 
-    url = URI.parse(params['submission'].strip)
     begin
-      Net::HTTP.start(url.host, url.port)
-      participant.update_attribute('submitted_hyperlink',params['submission'].strip)
+      participant.submmit_hyperlink(params['submission'])
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end    
     redirect_to :action => 'edit', :id => participant.id
   end    
-  
+
+  # Note: This is not used yet in the view until we all decide to do so
+  def remove_hyperlink
+    participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(participant.user_id)
+
+    begin
+      participant.remove_hyperlink(params['index'].to_i)
+    rescue 
+      flash[:error] = $!
+    end    
+    redirect_to :action => 'edit', :id => participant.id
+  end
   
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
@@ -63,7 +77,7 @@ class SubmittedContentController < ApplicationController
     participant.update_resubmit_times       
 
     #send message to reviewers when submission has been updated
-    participant.assignment.email(participant.id)
+    participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
 
     redirect_to :action => 'edit', :id => participant.id
   end
@@ -104,15 +118,53 @@ class SubmittedContentController < ApplicationController
         send_file(folder_name+ "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline')
       else
         if !File.directory?(folder_name + "/" + file_name)
-          send_file( folder_name + "/" + file_name, :disposition => 'inline')
+          file_ext = File.extname(file_name)[1..-1]
+          file_ext = 'bin' if file_ext.blank? # default to application/octet-stream
+          send_file folder_name + "/" + file_name,
+                    :disposition => 'inline',
+                    :type => Mime::Type.lookup_by_extension(file_ext)
         else
-           Net::SFTP.start("http://pg-server.csc.ncsu.edu", "*****", "****") do |sftp|
-              sftp.download!(folder_name + "/" + file_name, "C:/expertiza", :recursive => true)
-           end
+          raise "Directory downloads are not supported"
         end
       end 
   end  
   
+  # This was written for a custom rubric used by Dr. Jennifer Kidd (ODU)
+  # Note that the file that is being uploaded here is a REVIEW, not submitted work. 
+  def custom_submit_file 
+
+    begin
+      file = params[:uploaded_file]
+      participant = Participant.find(params[:participant_id])
+
+      @current_folder = DisplayOption.new
+      @current_folder.name = "/"
+      if params[:current_folder]
+        @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
+      end
+
+      curr_directory = participant.assignment.get_path.to_s+ "/" +params[:map].to_s + @current_folder.name
+      if !File.exists? curr_directory
+         FileUtils.mkdir_p(curr_directory)
+      else
+         FileUtils.rm_rf(curr_directory)
+         FileUtils.mkdir_p(curr_directory)
+      end
+
+      safe_filename = file.original_filename.gsub(/\\/,"/")
+      safe_filename = FileHelper::sanitize_filename(safe_filename) # new code to sanitize file path before upload*
+      full_filename =  curr_directory + File.split(safe_filename).last.gsub(" ",'_') #safe_filename #curr_directory +
+      File.open(full_filename, "wb") { |f| f.write(file.read) }
+    rescue
+    end
+
+    if params[:return_to] == "edit"
+      redirect_to :controller=>'response', :action => params[:return_to], :id => params[:id]
+    else
+      redirect_to :controller=>'response', :action => params[:return_to], :id => params[:map]      
+    end
+  end
+
 private  
   
   def get_file_type file_name

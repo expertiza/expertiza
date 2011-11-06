@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class LanguageTest < Test::Unit::TestCase
+class LanguageTest < ActiveSupport::TestCase
   fixtures :languages
 
   # Replace this with your real tests.

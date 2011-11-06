@@ -1,0 +1,3 @@
+<%= form_tag({:controller=> 'submitted_content',:action=>'custom_submit_file',:participant_id => params[:participant_id], :map => params[:map], :id=>params[:id], :return_to => params[:return_to]},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) %>
+    	    <br/><input type="file" id="uploaded_file" name="uploaded_file" size=40 />
+<%= submit_tag 'Upload file' %>

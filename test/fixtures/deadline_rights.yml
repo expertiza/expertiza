@@ -1,4 +1,8 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+############################################################################
+#Three dead line types NO, LATE and OK will be inserted into the tables for
+#testing
+############################################################################
 first:
   id: 1
   name: "No"

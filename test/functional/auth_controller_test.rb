@@ -4,7 +4,7 @@ require 'auth_controller'
 # Re-raise errors caught by the controller.
 class AuthController; def rescue_action(e) raise e end; end
 
-class AuthControllerTest < Test::Unit::TestCase
+class AuthControllerTest < ActionController::TestCase
   fixtures :users
   
   def setup
@@ -27,20 +27,20 @@ class AuthControllerTest < Test::Unit::TestCase
   
   # Verify that student accounts are sent to student_assignment.
   def test_valid_instr_login
-    post :login, :login => {:name => users(:student).name, :password => users(:student).name}
+    post :login, :login => {:name => users(:student1).name, :password => users(:student1).name}
     assert_redirected_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])
   end    
   
   # Verify that invalid accounts are sent to login failed.
   def test_invalid_account
     post :login, :login => {:name => 'noname', :password => 'badpass'}
-    assert_redirected_to :controller => 'auth', :action => 'login_failed'
+    assert_redirected_to :controller => 'password_retrieval', :action => 'forgotten'
   end  
   
 # Verify that sign on attempts with incorrect passwords are sent to login failed.  
   def test_invalid_password
     post :login, :login => {:name => 'admin', :password => 'badpass'}
-    assert_redirected_to :controller => 'auth', :action => 'login_failed'
+    assert_redirected_to :controller => 'password_retrieval', :action => 'forgotten'
   end  
   
   # Logout should redirect to root location
@@ -59,7 +59,7 @@ class AuthControllerTest < Test::Unit::TestCase
 
   # Test for accessing an unauthorized page
   def test_unauthorized
-    post :login, :login => {:name => users(:student).name, :password => users(:student).name}
+    post :login, :login => {:name => users(:student1).name, :password => users(:student1).name}
     params = {:controller => 'impersonate', :action => 'start'}
     assert_equal AuthController.authorised?(@response.session, params), false    
   end

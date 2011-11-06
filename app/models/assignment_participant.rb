@@ -1,9 +1,44 @@
+require 'uri'
+require 'yaml'
+
+# Code Review: Notice that Participant overloads two different concepts: 
+#              contribution and participant (see fields of the participant table).
+#              Consider creating a new table called contributions.
 class AssignmentParticipant < Participant  
   require 'wiki_helper'
-  belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
-  has_many :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
-  belongs_to :user
+  
+  belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
+  has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
+  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
+  belongs_to  :user
+
   validates_presence_of :handle
+  
+# START of contributor methods, shared with AssignmentTeam
+
+  def includes?(participant)
+    return participant == self
+  end
+
+  def assign_reviewer(reviewer)
+    ParticipantReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+      :reviewed_object_id => assignment.id)
+  end
+
+  # Evaluates whether this participant contribution was reviewed by reviewer
+  # @param[in] reviewer AssignmentParticipant object 
+  def reviewed_by?(reviewer)
+    return ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
+                                              self.id, reviewer.id, assignment.id]) > 0
+  end
+
+  def has_submissions?
+    return ((get_submitted_files.length > 0) or 
+            (get_wiki_submissions.length > 0) or 
+            (get_hyperlinks_array.length > 0)) 
+  end
+
+# END of contributor methods
   
   def fullname
     self.user.fullname
@@ -13,30 +48,65 @@ class AssignmentParticipant < Participant
     self.user.name
   end
 
+  # Return scores that this participant has given
   def get_scores(questions)
-      scores = Hash.new
-      scores[:participant] = self
-      assignment.questionnaires.each{
-        | questionnaire |
-        scores[questionnaire.symbol] = Hash.new
-        scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-        scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
-      }  
-      scores[:total_score] = compute_total_score(scores)
+    scores = Hash.new
+    scores[:participant] = self # This doesn't appear to be used anywhere
+    assignment.questionnaires.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+    end
+    scores[:total_score] = assignment.compute_total_score(scores)
     return scores
   end
 
-  def get_hyperlinks             
+  # Appends the hyperlink to a list that is stored in YAML format in the DB
+  # @exception  If is hyperlink was already there
+  #             If it is an invalid URL
+  def submmit_hyperlink(hyperlink)
+    hyperlink.strip!
+    raise "The hyperlink cannot be empty" if hyperlink.empty?
+
+    url = URI.parse(hyperlink)
+
+    # If not a valid URL, it will throw an exception
+    Net::HTTP.start(url.host, url.port)
+
+    hyperlinks = get_hyperlinks_array
+
+    hyperlinks << hyperlink
+    self.submitted_hyperlinks = YAML::dump(hyperlinks)
+
+    self.save
+  end
+
+  # Note: This method is not used yet. It is here in the case it will be needed.
+  # @exception  If the index does not exist in the array
+  def remove_hyperlink(index)
+    hyperlinks = get_hyperlinks
+    raise "The link does not exist" unless index < hyperlinks.size
+
+    hyperlinks.delete_at(index)
+    self.submitted_hyperlinks = hyperlinks.empty? ? nil : YAML::dump(hyperlinks)
+
+    self.save
+  end
+
+  # TODO:REFACTOR: This shouldn't be handled using an if statement, but using 
+  # polymorphism for individual and team participants
+  def get_hyperlinks         
     if self.team     
       links = self.team.get_hyperlinks     
     else        
-      links = Array.new  
-      if self.submitted_hyperlink and self.submitted_hyperlink.strip.length > 0
-        links << self.submitted_hyperlink
-      end
+      links = get_hyperlinks_array
     end
-    
+
     return links
+  end
+
+  def get_hyperlinks_array
+    self.submitted_hyperlinks.nil? ? [] : YAML::load(self.submitted_hyperlinks)
   end
 
   #Copy this participant to a course
@@ -79,18 +149,7 @@ class AssignmentParticipant < Participant
   def get_teammate_reviews
     TeammateReviewResponseMap.get_assessments_for(self)
   end
-  
-  def has_submissions    
-    if (self.submitted_hyperlink and self.submitted_hyperlink.strip.length > 0)
-      hplink = true
-    else
-      hplink = false
-    end
-    return ((get_submitted_files.length > 0) or 
-            (get_wiki_submissions.length > 0) or 
-            (hplink)) 
-  end
- 
+
   def get_submitted_files()
     files = Array.new
     if(self.directory_num)      
@@ -144,15 +203,6 @@ class AssignmentParticipant < Participant
     AssignmentTeam.get_team(self)
   end
   
-  def compute_total_score(scores)     
-    total = 0
-    self.assignment.questionnaires.each{
-      | questionnaire |      
-      total += questionnaire.get_weighted_score(self.assignment, scores)
-    }
-    return total
-  end  
-  
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row,session,id)    
@@ -200,6 +250,77 @@ class AssignmentParticipant < Participant
     return fields            
   end
   
+  # generate a hash string that we can digitally sign, consisting of the 
+  # assignment name, user name, and time stamp passed in.
+  def get_hash(time_stamp)
+    # first generate a hash from the assignment name itself
+    hash_data = Digest::SHA1.digest(self.assignment.name.to_s)
+    
+    # second generate a hash from the first hash plus the user name and time stamp
+    sign = hash_data + self.user.name.to_s + time_stamp.strftime("%Y-%m-%d %H:%M:%S")
+    Digest::SHA1.digest(sign)
+  end
+  
+  # grant publishing rights to one or more assignments. Using the supplied private key, 
+  # digital signatures are generated.
+  # reference: http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
+  def self.grant_publishing_rights(privateKey, participants)
+    for participant in participants
+      # get the current time in UTC
+      time_now = Time.now.utc
+      
+      # generate a hash to digitally sign
+      hash_data = participant.get_hash(time_now)
+            
+      # generate a digital signature of the hash
+      private_key2 = OpenSSL::PKey::RSA.new(privateKey)
+      cipher_text = Base64.encode64(private_key2.private_encrypt(hash_data))
+      
+      # save the digital signature and the time stamp in the database.  Time stamp needs to be 
+      # saved so we can generate the hash again later and compare it to the one digitally signed.
+      participant.digital_signature = cipher_text
+      participant.time_stamp = time_now
+      
+      #now, check to make sure the digital signature is valid, if not raise error
+      if (participant.verify_digital_signature(cipher_text))
+        participant.update_attribute('permission_granted', 1)
+        participant.save
+      else
+        participant.update_attribute('permission_granted', 0)
+        participant.digital_signature=nil
+        participant.time_stamp=nil
+        raise "invalid key"
+      end
+      
+    end
+  end
+  
+  # verify the digital signature is valid
+  def verify_digital_signature(cipher_text)
+    # get a hash based on the time stamp saved in the database
+    hash_data = get_hash(self.time_stamp)
+
+    # get the public key from the digital certificate saved in the database
+    certificate1 = self.user.digital_certificate 
+    cert = OpenSSL::X509::Certificate.new(certificate1)
+    begin
+      public_key1 = cert.public_key 
+      public_key = OpenSSL::PKey::RSA.new(public_key1)
+      
+      # decrypt the hash from the passed in digital signature and compare to the one
+      # we just generated to see if it is valid
+      clear_text = public_key.public_decrypt(Base64.decode64(cipher_text))
+      if (hash_data == clear_text)
+        true
+      else
+        false;
+      end
+      
+    rescue Exception => msg  
+      false
+    end
+  end
+  
   #define a handle for a new participant
   def set_handle()
     if self.user.handle == nil or self.user.handle == ""
@@ -244,4 +365,18 @@ class AssignmentParticipant < Participant
       end
     end
   end   
+
+private
+
+  # Use submmit_hyperlink(), remove_hyperlink() instead
+  def submitted_hyperlinks=(val)
+    write_attribute :submitted_hyperlinks, val
+  end
 end
+
+def get_topic_string
+    if topic.nil? or topic.topic_name.empty?
+      return "<center>&#8212;</center>"
+    end
+    return topic.topic_name
+  end

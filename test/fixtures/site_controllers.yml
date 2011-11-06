@@ -50,6 +50,10 @@ site_controller_impersonate:
   name: impersonate
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
   builtin: "0"
+site_controller_publishing:
+  name: publishing
+  permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+  builtin: "0"
 site_controller_reviewing:
   name: reviewing
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>

@@ -25,7 +25,7 @@ class CreateSwitchTopics < ActiveRecord::Migration
  
 #While creating the switch deadline table, we insert into the table deadline types, the new type of deadline
 #switch_topics
-execute "INSERT INTO `deadline_types` VALUES  (6,'switch_topics');"
+execute "INSERT INTO deadline_types VALUES  (6,'switch_topics')"
 end
   def self.down
     drop_table :switch_topics

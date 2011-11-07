@@ -22,8 +22,8 @@ class PasswordRetrievalControllerTest < ActionController::TestCase
     end
     user = User.find_by_email user.email
     
-    assert_equal nil, flash[:pwerr]         # checks if the error is flashed
-    assert flash[:pwnote].present?          # checks if the note is flashed
-    assert_not_equal original_password, user.password     # checks if the original password is not equal to the reset password
+    assert_equal nil, flash[:pwerr]         # check if the error is flashed
+    assert flash[:pwnote].present?          # check if the note is flashed
+    assert_not_equal original_password, user.password     # check if the original password is not equal to the reset password
   end
 end

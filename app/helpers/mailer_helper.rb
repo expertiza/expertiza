@@ -2,7 +2,7 @@ module MailerHelper
 # @param user [Object]
 # @param subject [Object]
 # @param partial_name [Object]
-# MailerHelper which takes the subject, partial name and password and sends the mail to the user with this information.
+# MailerHelper which takes the subject, partial name and password and sends the mail to user with this information.
 def self.send_mail_to_user(user,subject,partial_name,password)
 
  return  Mailer.deliver_message(

@@ -26,7 +26,7 @@ class User < ActiveRecord::Base
 
   # happens in this order. see http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html
   before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.clear_password.blank? } # AuthLogic
-  after_create :email_welcome # MailerHelper::send_mail_to_user(self,"Your Expertiza password has been created","user_welcome", clear_password)
+  after_create :email_welcome
 
   def list_mine(object_type, user_id)
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
@@ -58,6 +58,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
        MailerHelper::send_mail_to_user(self,"Your Expertiza password has been created","user_welcome",clear_password)
   end
@@ -67,7 +68,7 @@ class User < ActiveRecord::Base
     Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + clear_password])
   end
 
-  # Generate email to user with new password
+  # Resets the password to be mailed to the user
   def reset_password
       randomize_password
       save

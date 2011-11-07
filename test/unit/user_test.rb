@@ -109,10 +109,10 @@ class UserTest < ActiveSupport::TestCase
     user.save! # an exception is thrown if the user is invalid
 
     email = MailerHelper::send_mail_to_user(user,"Test Email","user_welcome",user.clear_password)
-    assert !ActionMailer::Base.deliveries.empty?
+    assert !ActionMailer::Base.deliveries.empty?         # Checks if the mail has been queued in the delivery queue
 
-    assert_equal [user.email], email.to
-    assert_equal "Test Email", email.subject
+    assert_equal [user.email], email.to                  # Checks if the mail is being sent to proper user
+    assert_equal "Test Email", email.subject             # Checks if the mail subject is the same
 
   end
 

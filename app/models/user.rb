@@ -10,7 +10,6 @@ class User < ActiveRecord::Base
   end
 
   has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id', :dependent => :destroy
-  # FIXME:          :class_name should be AssignmentParticipant, probably. In most cases it's used that way. But all?
   has_many :assignments, :through => :participants
   
   belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
@@ -26,6 +25,10 @@ class User < ActiveRecord::Base
 
   # happens in this order. see http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html
   before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.clear_password.blank? } # AuthLogic
+  
+  # Nov-08-2011
+  # Refactored welcome email
+  # Sends an email to the user on account creation by the admin
   after_create :email_welcome
 
   def list_mine(object_type, user_id)
@@ -58,13 +61,15 @@ class User < ActiveRecord::Base
     end
   end
 
+  # Nov-08-2011
+  # Refactored welcome email
   def email_welcome
     Mailer.deliver_message(
         {:recipients => self.email,
          :subject => "Your Expertiza account has been created",
          :body => {
            :user => self,
-           :password => clear_password, #FIXME
+           :password => clear_password, 
            :first_name => ApplicationHelper::get_user_first_name(self),
            :partial_name => "user_welcome_html"
          }

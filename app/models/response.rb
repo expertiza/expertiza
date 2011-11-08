@@ -5,6 +5,7 @@ class Response < ActiveRecord::Base
   # Callbacks
   after_save(:email_response) 
   
+  # Sends an email to the reviewee that her work has been reviewed
   def email_response
     user = self.map.reviewee.user
     Mailer.deliver_message (

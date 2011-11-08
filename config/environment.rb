@@ -43,15 +43,19 @@ Rails::Initializer.run do |config|
   }
 
   config.action_controller.session_store = :active_record_store
-  
   config.action_mailer.delivery_method = :smtp
+  # Nov-08-2011
+  # Refactored email settings
+  # Please change user_name and password to one in expertiza domain
+  # We couldn't get a valid email yet.
   config.action_mailer.smtp_settings = {
     :address              => "smtp.gmail.com",
     :port                 => 587,
     :domain               => 'gmail.com',
-    :user_name            => 'customercare.quickfix@gmail.com',
-    :password             => 'fall2011csc517',
+    :user_name            => 'expertiza.notifications@gmail.com',
+    :password             => 'expertiza',
     :authentication       => 'plain',
     :enable_starttls_auto => true
   } 
+  
 end

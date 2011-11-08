@@ -1,5 +1,46 @@
 Project E208: Changes to permissions (rereview, etc.)
 
+Contact: Ed Gehringer (efg@ncsu.edu)
+
+Classes:
+assignment_controller.rb
+sign_up_sheet_controller.rb
+student_review_controller.rb
+student_task_controller.rb
+assignment.rb
+views/assignment/_due_dates.html.erb
+views/assignment/edit.html.erb
+views/student_task/list.html.erb
+
+What it does: In Expertiza, each assignment has a set of due dates. Before each due date
+(and between each two due dates), different actions are either possible or not possible.
+Currently the set of these actions are …
+submission (initial submission of work)
+review (initial review of that work)
+resubmission
+re-review
+metareview (sometimes called “review of review”)
+
+What is wrong: It really doesn’t make sense to have separate permissions for submission &
+resubmission, or for review and rereview. No instructor has ever created an assignment that
+at any time allowed one but not the other. On the other hand, several other kinds of operations
+are available in Expertiza, which should have their own permissions, but don’t
+signup for a topic
+dropping of a topic previously signed up for
+teammate review
+responding to a survey
+
+How to fix
+The point of this task is to remove the unneeded permissions from Expertiza, substituting
+submission for resubmission, and review for rereview; and also to add new permissions for
+signing up, dropping a topic, performing a teammate review, and responding to a survey. You
+should also set up the tables so it is easy to add new permissions later.
+Also see https://github.com/expertiza/expertiza/issues/107.
+Testing
+Submit functional tests that set the permissions, and attempt to perform various operations
+(e.g., submission or review) when they are allowed and when they are not allowed.
+
+
 Team:
 Gaurav Maheshwari
 Munawira Kotyad

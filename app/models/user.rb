@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
   
   belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
 
-  #Couldnt find the corresponding databse table, hence commenting it out
+  # Couldnt find the corresponding databse table, hence commenting it out
   # has_many :bookmark_users
 
   belongs_to :role
@@ -37,6 +37,7 @@ class User < ActiveRecord::Base
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end
   
+  #fetches all the users whose name field matches the input "name" 
   def get_available_users(name)    
     lesser_roles = role.get_parents
     all_users = User.find(:all, :conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
@@ -103,6 +104,7 @@ class User < ActiveRecord::Base
     random_pronouncable_password((size/2).round) + rand.to_s[2,3]
   end
 
+  #Used to import existing user data
   def self.import(row,session,id = nil)
       if row.length != 4
        raise ArgumentError, "Not enough items" 

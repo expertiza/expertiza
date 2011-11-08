@@ -6,7 +6,7 @@ class Suggestion < ActiveRecord::Base
       find(:all, :conditions => ["assignment_id = ?", assignment_id])
   end
   
-    # Generate emails for reviewers when new content is available for review
+  # Generate emails for reviewers when new content is available for review
   #ajbudlon, sept 07, 2007   
   def email(user_id, editor) 
   

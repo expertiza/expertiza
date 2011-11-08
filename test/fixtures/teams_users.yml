@@ -1,5 +1,4 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-#Seven different teams for unit testing purposes.
 teams_users0:
   team_id: <%= Fixtures.identify(:team0) %>
   user_id: <%= Fixtures.identify(:student1) %>
@@ -31,29 +30,4 @@ teams_users6:
 teams_users7:
   team_id: <%= Fixtures.identify(:team5) %>
   user_id: <%= Fixtures.identify(:student5) %>
-
-
-#Mapping three different students to four different teams
-teams_usersA:
-  team_id: <%= Fixtures.identify(:Assignment_Project1_Team1) %>
-  user_id: <%= Fixtures.identify(:student1) %>
-
-teams_usersB:
-  team_id: <%= Fixtures.identify(:Assignment_Project1_Team1) %>
-  user_id: <%= Fixtures.identify(:student2) %>
-
-teams_usersC:
-  team_id: <%= Fixtures.identify(:Assignment_Project1_Team2) %>
-  user_id: <%= Fixtures.identify(:student3) %>
-
-teams_usersD:
-  team_id: <%= Fixtures.identify(:Assignment_Project2_Team1) %>
-  user_id: <%= Fixtures.identify(:student1) %>
-
-teams_usersE:
-  team_id: <%= Fixtures.identify(:Assignment_Project2_Team1) %>
-  user_id: <%= Fixtures.identify(:student2) %>
-
-teams_usersF:
-  team_id: <%= Fixtures.identify(:Assignment_Project2_Team2) %>
-  user_id: <%= Fixtures.identify(:student2) %>
+  

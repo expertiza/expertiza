@@ -18,18 +18,3 @@ course_e_commerce:
   directory_path: csc511
   info: E Commerce Class
   private: 0
-
-
-
-################################################################
-#The course inserted below is the course that will be used
-# for setting up the class environment for testing. The instructor
-# for the class will be instructor1
-################################################################
-
-course_object_oriented:
-  name: Object_Oriented_Programming
-  instructor_id: <%= Fixtures.identify(:instructor1) %>
-  directory_path: CSC517_instructor1
-  info: Test CSC517 class Object Oriented Programming
-  private: 0

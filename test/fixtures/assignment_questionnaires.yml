@@ -1,7 +1,3 @@
-##################################################
-#Inserts user id 3 and assignment participant in 4
-#different assignments
-##################################################
 first:
   id: 1
   assignment_id: 1

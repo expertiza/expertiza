@@ -1,5 +1,4 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-# Responses to different reveiews
 response0:
  map_id: <%= Fixtures.identify(:response_maps0)%>
  additional_comment: "review0"

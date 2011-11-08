@@ -24,7 +24,8 @@ class UsersController < ApplicationController
     @users = User.find(:all, :conditions => ['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%",role.get_available_roles, user.id])
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
-    
+
+  #for displaying the list of users
   def list
     user = session[:user]
     role = Role.find(user.role_id)
@@ -176,6 +177,7 @@ class UsersController < ApplicationController
     end
   end
 
+  #E205: For filtering the users list with proper search and pagination.
   def paginate_list(role, user_id, letter)
     paginate_options = {"1" => 25, "2" => 50, "3" => 100}
 
@@ -184,7 +186,9 @@ class UsersController < ApplicationController
     #
     # Just a point to remember, when we use pagination, the
     # 'users' variable should be an object, not an array
-    condition = "(role_id in (?) or id = ?) and name like ?"
+
+    #The type of condition for the search depends on what the user has selected from the search_by dropdown
+    condition = "(role_id in (?) or id = ?) and name like ?" #default used when clicking on letters
     search_filter = letter + '%'
     @search_by = params[:search_by]
     if @search_by == '1'  #search by user name
@@ -198,9 +202,9 @@ class UsersController < ApplicationController
       search_filter = '%' + letter + '%'
     end
 
-    if (paginate_options["#{@per_page}"].nil?)
+    if (paginate_options["#{@per_page}"].nil?) #displaying all - no pagination
       users = User.paginate(:page => params[:page], :order => 'name', :per_page => User.count(:all), :conditions => [condition, role.get_available_roles, user_id, search_filter])
-    else
+    else #some pagination is active - use the per_page
       users = User.paginate(:page => params[:page], :order => 'name', :per_page => paginate_options["#{@per_page}"], :conditions => [condition, role.get_available_roles, user_id, search_filter])
     end
     users

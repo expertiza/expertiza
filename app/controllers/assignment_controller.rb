@@ -88,7 +88,8 @@ class AssignmentController < ApplicationController
       @weeks = params[:weeks].to_i      
     end
     
-    
+ # E-208 No point having seperate permissions for resubmission and rereviewing so we made sure that submission and resubmission
+    # have same kind of permissions and also reviewing and rereviewing
     @assignment.days_between_submissions = @days + (@weeks*7)
     
     # Deadline types used in the deadline_types DB table

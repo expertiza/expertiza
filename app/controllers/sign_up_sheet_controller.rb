@@ -559,6 +559,8 @@ class SignUpSheetController < ApplicationController
     set_of_topics
   end
 
+# E-208changes have been made to accomodate new permissions
+# Removed sepearte permissions for rereview and resubmission
   def create_topic_deadline(due_date, offset, topic_id)
     topic_deadline = TopicDeadline.new
     topic_deadline.topic_id = topic_id

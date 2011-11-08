@@ -1,3 +1,5 @@
+<!---E-208 Applied same kind of changes as we had done to accomodate new table of permissions since an assignment can be edited too-->
+
 <h1>Editing assignment</h1>
 
 <% form_tag({:action => 'update', :id => @assignment, :review_limit => @limits[:review], :metareview_limit => @limits[:metareview], :teammate_limit => @limits[:teammate], :feedback_limit => @limits[:feedback]}, :onsubmit => 'return checkForm();') do %>

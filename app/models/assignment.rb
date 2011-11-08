@@ -1,3 +1,6 @@
+# E-208 We have removed seperate permissions for submission and resubmission and for review and rereview here
+# Also added for new permissions like team mate review, sign up for topic and drop topic
+
 class Assignment < ActiveRecord::Base
   include DynamicReviewMapping
 

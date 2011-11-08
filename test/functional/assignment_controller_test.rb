@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 require 'assignment_controller'
+require 'assignment'
 
 # Re-raise errors caught by the controller.
 class AssignmentController; def rescue_action(e) raise e end; end
@@ -121,7 +122,56 @@ class AssignmentControllerTest < ActionController::TestCase
 
   end
 
+# OOLS Project E208
+
+#This functional test tests is the review is allowed before submission.
+
+  def test_review_not_allowed
+
+      session[:user] = User.find(participants(:par_test_review).user_id)
+      get :review_allowed,:column=> due_dates(:due_date_test).review_allowed_id, :topic_id => participants(:par_test_review).topic_id
+      #or if "NO" has to be passed then use the below condition instead
+    #get :review_allowed, :column=> "NO", :topic_id => participants(:par_test_submit).topic_id
+    !assert_redirected_to :controller => 'student_review', :action => 'list'
+  end
+#This functional test tests if the review is allowed after submission #date
+  def test_review_allowed
+  fixtures :due_date
+  fixtures :participant
+  fixtures :assignments
+  session[:user] = User.find(participants(:par_test_review).user_id)
+  get :review_allowed,:column=> due_dates(:due_date_test4).submission_allowed_id, :topic_id => participants(:par_test_review).topic_id
+  #get :review_allowed, :column=> "OK", :topic_id => participants(:par_test_submit).topic_id
+  assert_redirected_to :controller => 'student_review', :action => 'list'
+  end
+
+# This functional test tests if the submission can be edited before the #submit date
+
+  def test_submit_after_submit_date
+    fixtures :due_date
+      fixtures :participant
+      fixtures :assignments
+    session[:user] = User.find(participants(:par_test_submit).user_id)
+    get :submission_allowed, :column=> due_dates(:due_date_test2).submission_allowed_id, :topic_id => participants(:par_test_submit).topic_id
+    #or if "NO" has to be passed then use the below condition instead
+    #get :submission_allowed, :column=> "OK", :topic_id => participants(:par_test_submit).topic_id
+    assert_redirected_to :controller => 'submitted_content', :action => 'edit'
+
+  end
+
+# This functional test tests if the submission can be edited after the #submit date
+  def test_submit_before_submit_date
+     fixtures :participant
+      fixtures :assignments
+    session[:user] = User.find(participants(:par_test_nosubmit).user_id)
+   get :submission_allowed, :column => due_dates(:due_date_test1).submission_allowed_id, :topic_id => participants(:par_test_nosubmit).topic_id
+     #or if "NO" has to be passed then use the below condition instead
+    #get :submission_allowed, :column=> "NO", :topic_id => participants(:par_test_nosubmit).topic_id
+   assert_redirected_to :controller => 'submitted_content', :action => 'view'
+  end
+
 end
+
 
 
 

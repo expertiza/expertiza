@@ -153,6 +153,9 @@ class StudentTaskController < ApplicationController
       end
     end
 
+# E-208 No changes we made here since it was not needed.
+#In the project document it was mentioned to give a guideline not to make changes .We confirmed with the Professor about it
+#review_of_review_* has been refactored to metareview_*
     @review_phase = next_due_date.deadline_type_id;
     if next_due_date.metareview_allowed_id == DueDate::LATE or next_due_date.metareview_allowed_id == DueDate::OK
       if @review_phase == DeadlineType.find_by_name("metareview").id

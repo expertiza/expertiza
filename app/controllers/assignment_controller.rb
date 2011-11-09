@@ -331,24 +331,11 @@ class AssignmentController < ApplicationController
   #  make updates to assignment
   #--------------------------------------------------------------------------------------------------------------------
   def update
-=begin
-    if params[:assignment][:course_id]
-      begin
-        Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
-      rescue
-        flash[:error] = $!
-      end
-    end
-=end
+    #if course is given, find course participants
     copy_participants_from_course
+    #find the assignment by id
     @assignment = Assignment.find(params[:id])
-=begin
-    begin
-      oldpath = @assignment.get_path
-    rescue
-      oldpath = nil
-    end
-=end
+    #get file old location
     oldpath = get_path
 
     #Calculate days between submissions
@@ -360,13 +347,7 @@ class AssignmentController < ApplicationController
         set_questionnaires
         set_limits_and_weights
       end
-=begin
-      begin
-        newpath = @assignment.get_path
-      rescue
-        newpath = nil
-      end
-=end
+
       # Following modified by Sterling Alexander
       #
       # Added flag to each assignment.  When an assignment is copied, initially the flag will be "true",
@@ -386,7 +367,7 @@ class AssignmentController < ApplicationController
           @assignment.save
         end
       end
-
+      #update due dates
       begin
         # Iterate over due_dates, from due_date[0] to the maximum due_date
         if params[:due_date]

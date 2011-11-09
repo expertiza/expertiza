@@ -1,6 +1,6 @@
 class SuggestionController < ApplicationController
 
-  # When an instructor adds a comment to a suggestion given by a student, the student gets notified via this method
+  ## When an instructor adds a comment to a suggestion given by a student, the student gets notified via this method
   #Please note that as per docs/email_readme, we are supposed to have one method per email. We are complying
   #to that and hence the code repetition. Please consider this while rating code repetition.
   #PART OF IMPROVEMENT TO SUGGEST AND APPROVE

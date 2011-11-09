@@ -22,5 +22,10 @@ Refactor List:
   - Fix several method not found errors that were caused by entering invalid information
   - Added dynamic display actions for rubrics and deadlines
 
+User for testing:
+Administrator: admin / password
+Student: acol / password
+Instructor: jsmith / password
+
 
 

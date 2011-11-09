@@ -21,7 +21,7 @@ function deleteQuestions(){
         	    if(document.forms[0].elements[i].checked==true){
 				    num_questions--;
                     tbl.deleteRow(numChecks+1);
-
+//whenever a question is deleted remove it from the drop down menu and update values in the dropdown.
                     var drop_down=document.getElementById("previous_questions")
                     for(i=0;i<drop_down.length;i++)
                     {
@@ -34,7 +34,7 @@ function deleteQuestions(){
                         {
                                               drop_down.options[i].value=parseInt(drop_down.options[i].value)-1;
                         }
-                    }
+                    }//when question is deleted update position numbers of the questions accordingly 
                     for(j=0; j<document.forms[0].elements.length; j++){
 	                	if(document.forms[0].elements[j].type=="hidden" &&
 		                (document.forms[0].elements[j].id.indexOf("_position_num")!=-1) &&
@@ -62,7 +62,7 @@ function deleteQuestions(){
 }
 
 function addQuestions(){
-
+//based on the question from the drop down determine the position where the new question has to be inserted
     if(parseInt(document.forms[0].previous_questions.length)!=0){
         var position_number=parseInt(document.getElementById("previous_questions").value);
 
@@ -85,7 +85,7 @@ function addQuestions(){
 		curr_loop_value=i;
         addQuestion();
 	}
-
+//update the position numbers of the questions that are present after the position where the new question is inserted
     if(parseInt(document.forms[0].previous_questions.length)!=0){
      for(i=0; i<document.forms[0].elements.length; i++){
 		if(document.forms[0].elements[i].type=="hidden" &&
@@ -103,7 +103,7 @@ function addQuestions(){
         }
     }
     flag=0;
-
+//update the button ids similarly
     for(i=0; i<document.forms[0].elements.length; i++){
 		if(document.forms[0].elements[i].type=="button" &&
            parseInt(document.forms[0].elements[i].id)>=new_position-parseInt(curr_loop_value)-1)
@@ -124,7 +124,7 @@ function addQuestions(){
     flag=0;
 
     }
-
+//update the values of position numbers associated with the drop down as new questions are added
     var drop_down=document.getElementById("previous_questions")
                 for(i=0;i<drop_down.length;i++)
                 {
@@ -135,7 +135,7 @@ function addQuestions(){
 }
 
 function addQuestion(){
-
+//add a new question 
     number=number+1;
     table = document.getElementById("questions_table");
 
@@ -314,7 +314,7 @@ function reorderdown(tableID,jid)
 
     document.forms[0].elements[a1[1]].id=parseInt(document.forms[0].elements[a1[1]].id)+1
 
-
+//whenever reordering is done update the associated position numbers for the questions in the dropdown
     var drop_down=document.getElementById("previous_questions")
     var temp_arr=new Array(2);
     for(i=0;i<drop_down.length;i++){
@@ -429,7 +429,7 @@ function reorderdown(tableID,jid)
 
     document.forms[0].elements[a1[1]].id=parseInt(document.forms[0].elements[a1[1]].id)-1
 
-
+//whenever reordering is done update the associated position numbers for questions in the dropdown
     var drop_down=document.getElementById("previous_questions")
         var temp_arr1=new Array(2);
         for(i=0;i<drop_down.length;i++){

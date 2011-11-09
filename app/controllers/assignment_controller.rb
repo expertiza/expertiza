@@ -14,7 +14,7 @@ class AssignmentController < ApplicationController
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(new_assign)
-    new_assign.update_attribute('name','Copy of '+new_assign.name)     
+    new_assign.update_attribute('name','Copy of '+ new_assign.name)
     new_assign.update_attribute('created_at',Time.now)
     new_assign.update_attribute('updated_at',Time.now)
     session[:copy_flag] = true
@@ -83,8 +83,8 @@ class AssignmentController < ApplicationController
     #Calculate days between submissions
     set_days_btw_sub
 
-    if @assignment.save 
-      set_questionnaires   
+    if @assignment.save
+      set_questionnaires
       set_limits_and_weights
 
       begin
@@ -353,21 +353,24 @@ class AssignmentController < ApplicationController
 
       # Following modified by Sterling Alexander
       #
-      # Added flag to each assignment.  When an assignment is copied, initially the flag will be "true",
+      # Added flag to each assignment.  When an assignment is copied, the flag will be "true",
       #   a new directory will be created and the old directory will be conserved with it's files intact.
-      #   After the new path is created, the flag is set to false and each edit will then keep the new
-      #   directory intact
-      puts session[:copy_flag].to_s + " <--- Value of session_flag as a string"
+
+      # puts session[:copy_flag].to_s + " <--- Value of session_flag as a string"
       newpath = get_path
       if session[:copy_flag] == false
         if oldpath != nil and newpath != nil
           FileHelper.update_file_location(oldpath,newpath)
         end
       else
-        if newpath != nil
-          FileHelper.create_directory_from_path(newpath)
-          session[:copy_flag] = false
+        if newpath == nil or newpath == oldpath
+          newpath += "_Copy"
+          assign_directory = @assignment.directory_path + "_Copy"
+          @assignment.directory_path = assign_directory
+          @assignment.save
         end
+        FileHelper.create_directory_from_path(newpath)
+        session[:copy_flag] = false
       end
       #update due dates
       begin
@@ -376,7 +379,8 @@ class AssignmentController < ApplicationController
           for due_date_key in params[:due_date].keys
             due_date_temp = DueDate.find(due_date_key)
             due_date_temp.update_attributes(params[:due_date][due_date_key])
-            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+            type = DeadlineType.find_by_id(due_date_temp.deadline_type_id).name.capitalize
+            raise "Please enter a valid #{type} deadline" if due_date_temp.errors.length > 0
           end
         end
 

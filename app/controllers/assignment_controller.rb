@@ -17,9 +17,12 @@ class AssignmentController < ApplicationController
     new_assign.update_attribute('name','Copy of '+ new_assign.name)
     new_assign.update_attribute('created_at',Time.now)
     new_assign.update_attribute('updated_at',Time.now)
+    if new_assign.directory_path != nil
+        new_assign.update_attribute('directory_path',new_assign.directory_path+'_copy')
+    end
     session[:copy_flag] = true
     new_assign.copy_flag = true
-    
+
     if new_assign.save
       Assignment.record_timestamps = true
 
@@ -363,12 +366,6 @@ class AssignmentController < ApplicationController
           FileHelper.update_file_location(oldpath,newpath)
         end
       else
-        if newpath == nil or newpath == oldpath
-          newpath += "_Copy"
-          assign_directory = @assignment.directory_path + "_Copy"
-          @assignment.directory_path = assign_directory
-          @assignment.save
-        end
         FileHelper.create_directory_from_path(newpath)
         session[:copy_flag] = false
       end

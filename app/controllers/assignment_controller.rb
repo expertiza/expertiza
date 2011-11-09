@@ -110,12 +110,14 @@ class AssignmentController < ApplicationController
         flash[:error] = $!
         prepare_to_edit
         @wiki_types = WikiType.find(:all)
+        @private = params[:private] == true
         render :action => 'new'
       end
       
     else
       get_limits_and_weights
       @wiki_types = WikiType.find(:all)
+      @private = params[:private] == true
       render :action => 'new'
     end
     

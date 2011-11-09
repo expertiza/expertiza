@@ -139,53 +139,14 @@ class AssignmentController < ApplicationController
 
   def set_due_dates
 
-    # Deadline types used in the deadline_types DB table
-    @Submission_deadline = DeadlineType.find_by_name("submission").id
-    @Review_deadline = DeadlineType.find_by_name("review").id
-    @Resubmission_deadline = DeadlineType.find_by_name("resubmission").id
-    @Rereview_deadline = DeadlineType.find_by_name("rereview").id
-    @Review_of_review_deadline = DeadlineType.find_by_name("metareview").id
-    @drop_topic_deadline = DeadlineType.find_by_name("drop_topic").id
-
     return_string = ""
-    max_round = 1
-
-    #Submission Deadline
-    if (!params[:submit_deadline][:id].blank?)
-      due_date_temp = DueDate.find_by_id(params[:submit_deadline][:id])
-      due_date_temp.update_attributes(params[:submit_deadline])
-      return_string += "Please enter a valid Submission deadline </br>" if due_date_temp.errors.length > 0
-    elsif (!params[:submit_deadline][:due_at].blank?)
-      due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
-      return_string += "Please enter a valid Submission deadline </br>" if !due_date
-    end
-
-    #Review Deadline
-    if (!params[:review_deadline][:id].blank?)
-      due_date_temp = DueDate.find_by_id(params[:review_deadline][:id])
-      due_date_temp.update_attributes(params[:review_deadline])
-      return_string += "Please enter a valid Review deadline </br>" if due_date_temp.errors.length > 0
-    elsif (!params[:review_deadline][:due_at].blank?)
-      due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
-      return_string += "Please enter a valid Review deadline </br>" if !due_date
-    end
 
     max_round = 2
-
-    #Drop Topic Deadline
-    if (!params[:drop_topic_deadline][:id].blank?)
-      due_date_temp = DueDate.find_by_id(params[:drop_topic_deadline][:id])
-      due_date_temp.update_attributes(params[:drop_topic_deadline])
-      return_string += "Please enter a valid Drop Topic deadline </br>" if due_date_temp.errors.length > 0
-    elsif (!params[:drop_topic_deadline][:due_at].blank?)
-      due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
-      return_string += "Please enter a valid Drop Topic deadline </br>" if !due_date
-    end
-
 
     if params[:assignment][:rounds_of_reviews].to_i >= 2
 
       #Resubmission Deadlines
+      @Resubmission_deadline = DeadlineType.find_by_name("resubmission").id
       for resubmit_duedate_key in params[:additional_submit_deadline].keys
         if (!params[:additional_submit_deadline][resubmit_duedate_key][:id].blank?)
           due_date_temp = DueDate.find_by_id(params[:additional_submit_deadline][resubmit_duedate_key][:id])
@@ -200,6 +161,7 @@ class AssignmentController < ApplicationController
       max_round = 2
 
       #ReReview Deadlines
+      @Rereview_deadline = DeadlineType.find_by_name("rereview").id
       for rereview_duedate_key in params[:additional_review_deadline].keys
         if (!params[:additional_review_deadline][rereview_duedate_key][:id].blank?)
           due_date_temp = DueDate.find_by_id(params[:additional_review_deadline][rereview_duedate_key][:id])
@@ -213,14 +175,29 @@ class AssignmentController < ApplicationController
       end
     end
 
-    #Metareview Deadlines
-    if (!params[:reviewofreview_deadline][:id].blank?)
-      due_date_temp = DueDate.find_by_id(params[:reviewofreview_deadline][:id])
-      due_date_temp.update_attributes(params[:reviewofreview_deadline])
-      return_string += "Please enter a valid Metareview deadline </br>" if due_date_temp.errors.length > 0
-    elsif (!params[:reviewofreview_deadline][:due_at].blank?)
-      due_date = DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
-      return_string += "Please enter a valid Metareview deadline</br>" if !due_date
+    #Build array for other deadlines
+    rows, cols = 5,2
+    param_deadline = Array.new(rows) { Array.new(cols) }
+
+    param_deadline[DeadlineType.find_by_name("submission").id] = [:submit_deadline, 1]
+    param_deadline[DeadlineType.find_by_name("review").id] = [:review_deadline,1]
+    param_deadline[DeadlineType.find_by_name("drop_topic").id] = [:drop_topic_deadline,0]
+    param_deadline[DeadlineType.find_by_name("metareview").id] = [:reviewofreview_deadline, max_round]
+
+    puts param_deadline
+   #Update/Create all deadlines
+    param_deadline.each_with_index do |type, index|
+      if (!type[0].nil?)
+        type_name = DeadlineType.find_by_id(index).name.capitalize
+        if (!params["#{type[0]}"][:id].blank?)
+          due_date_temp = DueDate.find_by_id(params["#{type[0]}"][:id])
+          due_date_temp.update_attributes(params["#{type[0]}"])
+          (return_string += "Please enter a valid #{type_name} deadline </br>") if due_date_temp.errors.length > 0
+        elsif (!params["#{type[0]}"][:due_at].blank?)
+          due_date = DueDate::set_duedate(params["#{type[0]}"],index, @assignment.id, type[1] )
+          return_string += "Please enter a valid #{type_name} deadline </br>" if !due_date
+        end
+      end
     end
 
 

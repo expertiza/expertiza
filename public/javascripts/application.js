@@ -99,7 +99,8 @@ function addElement() {
 		rereview_var = 'Re-review-'+j+' deadline '
 	}
   	ni.innerHTML = ni.innerHTML + 
-  	                    '<TR><TD ALIGN=LEFT WIDTH=20%> '+submission_var+' </TD>'+
+  	                    '<table class="exp">'+
+                        '<TR><TD ALIGN=LEFT WIDTH=20%> '+submission_var+' </TD>'+
   	                    '<TD ALIGN=CENTER WIDTH=20%><input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]"/>' +
                         ' <img src="/images/cal.gif" onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>'+
 
@@ -167,7 +168,8 @@ function addElement() {
 						'</select></TD>'+
 
 
-						'</TR>';
+						'</TR>'+
+                        '</table>';
   }
 }
 

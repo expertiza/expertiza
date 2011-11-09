@@ -13,6 +13,7 @@ class AssignmentSignupsController < ApplicationController
     @assignment_signups = SignupSheet.find(:all)
   end
 
+  # renamed method name
   def list_user
     @user_id = session[:user].id  
     if (session[:user].role_id == 1)

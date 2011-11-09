@@ -1,3 +1,5 @@
+# This functional test, tests functions associated with administrator
+# It includes check for list and show for administrator.
 #require File.dirname(__FILE__) + '/../test_helper'
 #require 'admin_controller'
 require 'test_helper'
@@ -49,6 +51,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_redirected_to '/denied' 
   end
 
+  # show current session administrator
   def test_show_admin
     post :show,{:id => users(:admin).id}, session_for(users(:admin))
     assert_response  :success

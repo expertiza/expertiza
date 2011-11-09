@@ -1,4 +1,6 @@
-# This controller is used for the Admin functionality
+# This controller is used for the Instructor functionality
+# These include instructor search, create new instructor, show a particular instructor, list all instructors,
+# remove an instructor, edit instructor details.
 # Author: unknown
 class InstructorController < ApplicationController
   helper :administrator_instructor
@@ -36,6 +38,7 @@ class InstructorController < ApplicationController
       @user.role_id = Role::INSTRUCTOR
       #@user.mru_directory_path = "/"
 
+      #if instructor was successfully created flash message
       if @user.save
         flash[:notice] = 'Instructor was successfully created.'
         redirect_to :action => 'list'
@@ -51,6 +54,7 @@ class InstructorController < ApplicationController
    @users = User.paginate(:page => params[:page], :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role::INSTRUCTOR], :per_page => 50)
   end
 
+  # added functionality for showing an instructor
   def show
     @user = User.find(params[:id])
     if @user.role_id
@@ -60,11 +64,13 @@ class InstructorController < ApplicationController
     end
   end
 
+  #added functionality for removing instructor and redirecting to list page
   def remove
     User.find(params[:id]).destroy
     redirect_to :action => 'list'
   end
 
+  # added functionality for editing instructor details
   def edit
     redirect_to :action => 'new', :params => {:name => User.find(params[:id]).name }
   end

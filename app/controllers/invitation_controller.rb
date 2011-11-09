@@ -17,11 +17,14 @@ class InvitationController < ApplicationController
       if !participant
         flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment." 
       else
+        #check is to see if user is already in the team. changed to more meaningful name
         team_member = TeamsUser.find(:all, :conditions => ['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
+        # flash message if user is already in team.
         if (team_member.size > 0)
           flash[:notice] = "\"#{user.name}\" is already a member of team."
         else
+          #check to see if the user has already been sent an invitation to join a team.
           sent_invitation = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.parent_id])
           #check if the invited user is already invited (i.e. awaiting reply)
           if sent_invitation.length == 0
@@ -32,6 +35,7 @@ class InvitationController < ApplicationController
             @invitation.reply_status = 'W' 
             @invitation.save
           else
+            # if invitation already sent flash a message
             flash[:notice] = "You have already sent an invitation to \"#{user.name}\"."
           end   
         end

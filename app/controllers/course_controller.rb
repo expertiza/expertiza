@@ -102,6 +102,7 @@ class CourseController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
+  # list teaching assistants
   def list_ta
     @course = Course.find(params[:id])
     @ta_mappings = @course.ta_mappings
@@ -110,17 +111,21 @@ class CourseController < ApplicationController
     end
   end
 
+  # add teaching assistant to a course
   def add_ta
     @course = Course.find(params[:course_id])
     @user = User.find_by_name(params[:user][:name])
     if(@user==nil)
+      # if teaching assistant not found then goto list
       redirect_to :action => 'list_ta', :id => @course.id
     else
+      # if existing teaching assistant exists,  then map the teaching assistant to the course
       @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
       redirect_to :action => 'list_ta', :id => @course.id
     end
   end
 
+  # remove teaching assistant
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
     @ta_mapping.destroy

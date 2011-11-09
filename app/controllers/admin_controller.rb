@@ -1,4 +1,6 @@
 # This controller is used for the Admin functionality
+# This contains functionality for administrator and super-administrator. There can be only one
+# super-administrator in system.
 # Author: unknown
 class AdminController < ApplicationController
   helper :administrator_instructor
@@ -46,6 +48,7 @@ class AdminController < ApplicationController
     @users = User.find(:all, :conditions => ["role_id = ?", Role::SUPERADMINISTRATOR])
   end
 
+  # added functionality for editing administrator / super-administrator details
   def edit
     redirect_to :action => 'new', :params => {:name => User.find(params[:id]).name }
   end

@@ -1,3 +1,5 @@
+# This functional test, tests functions associated with instructor
+# It includes check for list , show and remove of an instructor.
 #require File.dirname(__FILE__) + '/../test_helper'
 #require 'instructor_controller'
 require 'test_helper'
@@ -29,11 +31,13 @@ class InstructorControllerTest < ActionController::TestCase
     assert_redirected_to '/denied'
   end
 
+  # Check a particular instructor by administrator
   def test_show_instr
     post :show,{:id => users(:instructor1).id}, session_for(users(:admin))
     assert_response  :success
   end
 
+  # Remove a particular instructor by administrator
   def test_remove_instr
     post :remove,{ :id => users(:instructor2).id }, session_for(users(:admin))
     assert_redirected_to '/instructor/list'

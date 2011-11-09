@@ -82,8 +82,8 @@ class AssignmentController < ApplicationController
     #Calculate days between submissions
     set_days_btw_sub
 
-    if @assignment.save 
-      set_questionnaires   
+    if @assignment.save
+      set_questionnaires
       set_limits_and_weights
 
       begin
@@ -376,7 +376,8 @@ class AssignmentController < ApplicationController
           for due_date_key in params[:due_date].keys
             due_date_temp = DueDate.find(due_date_key)
             due_date_temp.update_attributes(params[:due_date][due_date_key])
-            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+            type = DeadlineType.find_by_id(due_date_temp.deadline_type_id).name.capitalize
+            raise "Please enter a valid #{type} deadline" if due_date_temp.errors.length > 0
           end
         end
 

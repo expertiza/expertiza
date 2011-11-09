@@ -9,7 +9,7 @@ require 'impersonate_controller'
 class ImpersonateController; def rescue_action(e) raise e end; end
 
 class ImpersonateControllerTest < ActionController::TestCase
-  fixtures :users, :roles, :goldberg_system_settings
+  fixtures :users, :roles, :system_settings
 
   # puts "Now entering ImpersonateController Test...."
   set_fixture_class :system_settings => 'SystemSettings'    

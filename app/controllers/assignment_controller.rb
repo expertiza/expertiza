@@ -166,6 +166,7 @@ class AssignmentController < ApplicationController
       end
       
     else
+      get_limits_and_weights
       @wiki_types = WikiType.find(:all)
       render :action => 'new'
     end

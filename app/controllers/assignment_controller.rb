@@ -27,25 +27,25 @@ class AssignmentController < ApplicationController
       Assignment.record_timestamps = true
 
       old_assign.assignment_questionnaires.each{
-        | aq |
+          | aq |
         AssignmentQuestionnaires.create(
-          :assignment_id => new_assign.id,
-          :questionnaire_id => aq.questionnaire_id,
-          :user_id => session[:user].id,
-          :notification_limit => aq.notification_limit,
-          :questionnaire_weight => aq.questionnaire_weight
+            :assignment_id => new_assign.id,
+            :questionnaire_id => aq.questionnaire_id,
+            :user_id => session[:user].id,
+            :notification_limit => aq.notification_limit,
+            :questionnaire_weight => aq.questionnaire_weight
         )
-      }      
-      
-      DueDate.copy(old_assign.id, new_assign.id)           
+      }
+
+      DueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node()
-      
+
       flash[:note] = 'A PATCH HAS BEEN APPLIED FOR THE FOLLOWING WARNING, PLEASE REPORT ANY ISSUES --> Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
       redirect_to :action => 'edit', :id => new_assign.id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
       redirect_to :action => 'list', :controller => 'tree_display'
-    end    
+    end
   end
 
   #--------------------------------------------------------------------------------------------------------------------
@@ -55,15 +55,18 @@ class AssignmentController < ApplicationController
   def new
     #creating
     if params[:parent_id]
-      @course = Course.find(params[:parent_id])           
-    end    
-    
+      @course = Course.find(params[:parent_id])
+    end
+
     @assignment = Assignment.new
-    
+
     @wiki_types = WikiType.find(:all)
-    @private = params[:private] == true        
+    @private = params[:private] == true
     #calling the defalut values mathods
-    get_limits_and_weights 
+    get_limits_and_weights
+
+
+
   end
 
   #--------------------------------------------------------------------------------------------------------------------
@@ -75,12 +78,12 @@ class AssignmentController < ApplicationController
   #  home directory (named after his user.name). However, when an administrator creates an assignment,
   # (s)he needs to preface the path with the user.name of the instructor whose assignment it is.
   #--------------------------------------------------------------------------------------------------------------------
-  
+
   def create
-    @assignment = Assignment.new(params[:assignment])    
+    @assignment = Assignment.new(params[:assignment])
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
-    @user.set_instructor(@assignment) 
+    @user.set_instructor(@assignment)
     @assignment.submitter_count = 0
 
     #Calculate days between submissions
@@ -95,14 +98,14 @@ class AssignmentController < ApplicationController
         #Create and set due dates (Raise error if problem)
         ddset = set_due_dates
         raise ddset if (ddset != "")
-               
+
         # Create submission directory for this assignment
         # If assignment is a Wiki Assignment (or has no directory) the helper will not create a path
-        FileHelper.create_directory(@assignment)      
-        
+        FileHelper.create_directory(@assignment)
+
         # Creating node information for assignment display
         @assignment.create_node()
-        
+
         #Alert that there is an assignment with same name (Assignment is still created - this is just a nicety)
         flash[:alert] = "There is already an assignment named \"#{@assignment.name}\". &nbsp;<a style='color: blue;' href='../../assignment/edit/#{@assignment.id}'>Edit assignment</a>" if @assignment.duplicate_name?
 
@@ -117,14 +120,14 @@ class AssignmentController < ApplicationController
         @private = params[:private] == true
         render :action => 'new'
       end
-      
+
     else
       get_limits_and_weights
       @wiki_types = WikiType.find(:all)
       @private = params[:private] == true
       render :action => 'new'
     end
-    
+
   end
 
   #---------------------------------------------------------------------------------------------------------------------
@@ -156,7 +159,7 @@ class AssignmentController < ApplicationController
     due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
     return "Please enter a valid drop topic deadline" if !due_date
 
-    if params[:assignment_helper][:no_of_reviews].to_i >= 2
+    if params[:assignment][:rounds_of_reviews].to_i >= 2
 
       #Resubmission Deadlines
       for resubmit_duedate_key in params[:additional_submit_deadline].keys
@@ -175,13 +178,9 @@ class AssignmentController < ApplicationController
     end
 
     #Metareview Deadlines
-    @assignment.questionnaires.each{
-        |questionnaire|
-      if questionnaire.instance_of? MetareviewQuestionnaire
-        due_date = DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
-        return "Please enter a valid Metareview deadline" if !due_date
-      end
-    }
+    due_date = DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
+    return "Please enter a valid Metareview deadline" if !due_date
+
 
     return ""
 
@@ -217,7 +216,7 @@ class AssignmentController < ApplicationController
     @assignment = Assignment.find(params[:id])
     prepare_to_edit
   end
-  
+
   #--------------------------------------------------------------------------------------------------------------------
   # PREPARE_TO_EDIT  (Helper function for CREATE, EDIT and UPDATE)
   # Prepare to edit existing assignment
@@ -231,7 +230,7 @@ class AssignmentController < ApplicationController
       @days = 0
     end
 
-    get_limits_and_weights    
+    get_limits_and_weights
     @wiki_types = WikiType.find(:all)
   end
 
@@ -242,19 +241,19 @@ class AssignmentController < ApplicationController
   def set_questionnaires
     @assignment.questionnaires = Array.new
     params[:questionnaires].each{
-      | key, value |       
+        | key, value |
       if value.to_i > 0 and (q = Questionnaire.find(value))
         @assignment.questionnaires << q
-     end
-    }     
+      end
+    }
   end
 
   #--------------------------------------------------------------------------------------------------------------------
   # GET_LIMITS_AND_WEIGHTS  (Helper function for CREATE, NEW, and PREPARE_TO_EDIT)
   #  Set default limits and weights
   #--------------------------------------------------------------------------------------------------------------------
-  def get_limits_and_weights 
-    @limits = Hash.new   
+  def get_limits_and_weights
+    @limits = Hash.new
     @weights = Hash.new
 
     user_id = (session[:user].role.name == "Teaching Assistant") ? TA.get_my_instructor(session[:user]).id : session[:user].id
@@ -267,18 +266,18 @@ class AssignmentController < ApplicationController
     @limits[:metareview] = default_limit_value
     @limits[:feedback]   = default_limit_value
     @limits[:teammate]   = default_limit_value
-   
+
     @weights[:review] = 100
     @weights[:metareview] = 0
     @weights[:feedback] = 0
-    @weights[:teammate] = 0    
-    
+    @weights[:teammate] = 0
+
     @assignment.questionnaires.each{
-      | questionnaire |
+        | questionnaire |
       aq = AssignmentQuestionnaires.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
-      @limits[questionnaire.symbol] = aq.notification_limit   
+      @limits[questionnaire.symbol] = aq.notification_limit
       @weights[questionnaire.symbol] = aq.questionnaire_weight
-    }             
+    }
   end
 
 
@@ -289,11 +288,11 @@ class AssignmentController < ApplicationController
   def set_limits_and_weights
 
     user_id = (session[:user].role.name == "Teaching Assistant") ? TA.get_my_instructor(session[:user]).id : session[:user].id
-    
-    default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil) 
-    
+
+    default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)
+
     @assignment.questionnaires.each{
-      | questionnaire |
+        | questionnaire |
       aq = AssignmentQuestionnaires.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
       if params[:limits][questionnaire.symbol].length > 0
         aq.update_attribute('notification_limit',params[:limits][questionnaire.symbol])
@@ -371,15 +370,10 @@ class AssignmentController < ApplicationController
       end
       #update due dates
       begin
-        # Iterate over due_dates, from due_date[0] to the maximum due_date
-        if params[:due_date]
-          for due_date_key in params[:due_date].keys
-            due_date_temp = DueDate.find(due_date_key)
-            due_date_temp.update_attributes(params[:due_date][due_date_key])
-            type = DeadlineType.find_by_id(due_date_temp.deadline_type_id).name.capitalize
-            raise "Please enter a valid #{type} deadline" if due_date_temp.errors.length > 0
-          end
-        end
+
+        update = update_due_dates
+        raise update if (update != "")
+
 
         flash[:notice] = 'Assignment was successfully updated.'
         redirect_to :action => 'show', :id => @assignment
@@ -394,6 +388,85 @@ class AssignmentController < ApplicationController
       render :action => 'edit'
     end
   end
+  #---------------------------------------------------------------------------------------------------------------------
+  #  UPDATE_DUE_DATES  (Helper function for CREATE)
+  #   Updates and creates,if necessary, review deadlines using a helper function written in DueDate.rb
+  #---------------------------------------------------------------------------------------------------------------------
+  def update_due_dates
+
+    return_string = ""
+
+    @Submission_deadline = DeadlineType.find_by_name("submission").id
+    @Review_deadline = DeadlineType.find_by_name("review").id
+    @Resubmission_deadline = DeadlineType.find_by_name("resubmission").id
+    @Rereview_deadline = DeadlineType.find_by_name("rereview").id
+    @Review_of_review_deadline = DeadlineType.find_by_name("metareview").id
+    @drop_topic_deadline = DeadlineType.find_by_name("drop_topic").id
+
+    if params[:submit_deadline]
+      temp_id = params[:submit_deadline][:id]
+      due_date_temp = DueDate.find_by_id(temp_id)
+      due_date_temp.update_attributes(params[:submit_deadline])
+      return_string += "Please enter a valid Submission deadline </br>" if due_date_temp.errors.length > 0
+    end
+
+    if params[:review_deadline]
+      temp_id = params[:review_deadline][:id]
+      due_date_temp = DueDate.find_by_id(temp_id)
+      due_date_temp.update_attributes(params[:review_deadline])
+      return_string += "Please enter a valid Review deadline </br>" if due_date_temp.errors.length > 0
+    end
+
+    if params[:reviewofreview_deadline]
+      temp_id = params[:reviewofreview_deadline][:id]
+      due_date_temp = DueDate.find_by_id(temp_id)
+      due_date_temp.update_attributes(params[:reviewofreview_deadline])
+      return_string += "Please enter a valid Metareview deadline </br>" if due_date_temp.errors.length > 0
+    end
+
+    if params[:drop_topic_deadline]
+      temp_id = params[:drop_topic_deadline][:id]
+      due_date_temp = DueDate.find_by_id(temp_id)
+      due_date_temp.update_attributes(params[:drop_topic_deadline])
+      return_string += "Please enter a valid Drop Topic deadline </br>" if due_date_temp.errors.length > 0
+    end
+
+    if params[:assignment][:rounds_of_reviews].to_i >= 2
+
+      #Resubmission Deadlines
+      if params[:additional_submit_deadline]
+        for resubmit_duedate_key in params[:additional_submit_deadline].keys
+          temp_id = params[:additional_submit_deadline][resubmit_duedate_key][:id]
+          due_date_temp = DueDate.find_by_id(temp_id)
+          if (due_date_temp)
+            due_date_temp.update_attributes(params[:additional_submit_deadline][resubmit_duedate_key])
+            return_string += "Please enter a valid Resubmission deadline </br>" if due_date_temp.errors.length > 0
+          else
+            max_round = resubmit_duedate_key
+            due_date = DueDate::set_duedate(params[:additional_submit_deadline][resubmit_duedate_key],@Resubmission_deadline, @assignment.id, max_round )
+            return_string += "Please enter a valid Resubmission deadline </br>" if !due_date
+          end
+        end
+      end
+
+      #ReReview Deadlines
+      if params[:additional_review_deadline]
+        for rereview_duedate_key in params[:additional_review_deadline].keys
+          temp_id = params[:additional_review_deadline][rereview_duedate_key][:id]
+          due_date_temp = DueDate.find_by_id(temp_id)
+          if (due_date_temp)
+            due_date_temp.update_attributes(params[:additional_review_deadline][rereview_duedate_key])
+            return_string += "Please enter a valid Rereview deadline </br>" if due_date_temp.errors.length > 0
+          else
+            max_round = rereview_duedate_key
+            due_date = DueDate::set_duedate(params[:additional_review_deadline][rereview_duedate_key],@Rereview_deadline, @assignment.id, max_round )
+            return_string += "Please enter a valid Rereview deadline </br>" if !due_date
+          end
+        end
+      end
+    end
+    return return_string
+  end
 
   #--------------------------------------------------------------------------------------------------------------------
   # SHOW
@@ -402,16 +475,16 @@ class AssignmentController < ApplicationController
   def show
     @assignment = Assignment.find(params[:id])
   end
-  
+
   #--------------------------------------------------------------------------------------------------------------------
   # DELETE
   #  delete assignment
   #--------------------------------------------------------------------------------------------------------------------
   def delete
     assignment = Assignment.find(params[:id])
-    
+
     # If the assignment is already deleted, go back to the list of assignments
-    if assignment 
+    if assignment
       begin
         @user = session[:user]
         id = @user.get_instructor
@@ -420,7 +493,7 @@ class AssignmentController < ApplicationController
         end
         assignment.delete(params[:force])
         @a = Node.find(:first, :conditions => ['node_object_id = ? and type = ?',params[:id],'AssignmentNode'])
-     
+
         @a.destroy
         flash[:notice] = "The assignment is deleted"
       rescue
@@ -430,10 +503,10 @@ class AssignmentController < ApplicationController
         flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
       end
     end
-    
+
     redirect_to :controller => 'tree_display', :action => 'list'
-  end  
-  
+  end
+
   #--------------------------------------------------------------------------------------------------------------------
   # LIST
   #
@@ -464,9 +537,9 @@ class AssignmentController < ApplicationController
     existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
     if existing.nil?
       NotificationLimit.create(:user_id => session[:user].id,
-                                :assignment_id => assignment_id,
-                                :questionnaire_id => questionnaire_id,
-                                :limit => limit)
+                               :assignment_id => assignment_id,
+                               :questionnaire_id => questionnaire_id,
+                               :limit => limit)
     else
       existing.limit = limit
       existing.save

@@ -88,7 +88,7 @@
           <% @add_submit_deadline = @assignment.due_dates.find_by_deadline_type_id_and_round(DeadlineType.find_by_name("resubmission").id, i )  %>
           <% if @add_submit_deadline %>
               <%= hidden_field 'add_submit_deadline', 'id', :id=> "add_submit_id_#{i-1}" %>
-              <%= hidden_field 'add_submit_deadline', 'due_at', :value=> @add_submit_deadline.due_at.to_s.gsub!(" ", "\302\240")[0..19], :id=> "add_submit_due_at_#{i-1}" %>
+              <%= hidden_field 'add_submit_deadline', 'due_at', :value=> @add_submit_deadline.due_at.nil? ? "" : @add_submit_deadline.due_at.to_s.gsub!(" ", "\302\240")[0..19] , :id=> "add_submit_due_at_#{i-1}" %>
               <%= hidden_field 'add_submit_deadline', 'submission_allowed_id', :id=> "add_submit_submit_allowed_id_#{i-1}" %>
               <%= hidden_field 'add_submit_deadline', 'review_allowed_id', :id=> "add_submit_review_allowed_id_#{i-1}" %>
               <%= hidden_field 'add_submit_deadline', 'resubmission_allowed_id', :id=> "add_submit_resubmit_allowed_id_#{i-1}" %>
@@ -99,7 +99,7 @@
           <% @add_review_deadline = @assignment.due_dates.find_by_deadline_type_id_and_round(DeadlineType.find_by_name("rereview").id, i )  %>
           <% if @add_review_deadline %>
               <%= hidden_field 'add_review_deadline', 'id', :id=> "add_review_id_#{i-1}" %>
-              <%= hidden_field 'add_review_deadline', 'due_at', :value=> @add_review_deadline.due_at.to_s.gsub!(" ", "\302\240")[0..19], :id=> "add_review_due_at_#{i-1}" %>
+              <%= hidden_field 'add_review_deadline', 'due_at', :value=> @add_review_deadline.due_at.nil? ? "" :@add_review_deadline.due_at.to_s.gsub!(" ", "\302\240")[0..19], :id=> "add_review_due_at_#{i-1}" %>
               <%= hidden_field 'add_review_deadline', 'submission_allowed_id', :id=> "add_review_submit_allowed_id_#{i-1}" %>
               <%= hidden_field 'add_review_deadline', 'review_allowed_id', :id=> "add_review_review_allowed_id_#{i-1}" %>
               <%= hidden_field 'add_review_deadline', 'resubmission_allowed_id', :id=> "add_review_resubmit_allowed_id_#{i-1}" %>

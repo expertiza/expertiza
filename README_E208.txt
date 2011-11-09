@@ -72,3 +72,9 @@ Tests Covered:
 
 4)Unit tests to check the validity of entries into the participants table, having review and submission permissions but no rereview and resubmission permission.
 
+VCL Login:
+User name: admin
+Password: admin
+
+Kindly have a look at the "http://152.1.13.208:3000/assignment/new" page to observe the changes done to the permissions table. (resubmission_allowed and rereview_allowed have been removed. signup_allowed,  teammate_review_allowed, drop_topic_allowed, survey_response_allowed have been added.Also review of review has been refactored to metareview)
+

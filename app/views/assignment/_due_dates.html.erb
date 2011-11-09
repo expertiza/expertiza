@@ -1,10 +1,13 @@
 <div>
  <div style="font-size:large;"><b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b></div><br/>
     <div style="padding: 5px">Number of rounds of review:
-        <input type="text" id="assignment_helper_no_of_reviews" name="assignment_helper[no_of_reviews]" maxlength="5" size="5" value="1" onchange="addElement();" />
+        <%= text_field 'assignment', 'rounds_of_reviews', :maxlength => "5",  :size=> "5", :id=>"assignment_helper_no_of_reviews", :onchange=>"addElement();", :value => (1 if @assignment.rounds_of_reviews==0)%>
+       <!--  <input type="text" id="assignment_helper_no_of_reviews" name="assignment_helper[no_of_reviews]" maxlength="5" size="5" value="1" onchange="addElement();" />   -->
         <input type="button" name="selectButton" value="Set" onclick="addElement();" />
     </div>
-        <br/>   
+
+
+        <br/>
         <TABLE class="exp">
            <TR>
                <TH>Deadline</TH>
@@ -17,102 +20,143 @@
                <TH>Metareview allowed</TH>
 			   <TH>Reminder (hrs)</TH>
            </TR>
+
+
+
            <TR>
+               <%@submit_deadline = @assignment.due_dates.find_by_deadline_type_id(DeadlineType.find_by_name("submission").id) %>
                <TD ALIGN=LEFT WIDTH=20%>
-                   Submission deadline
+                   <%=hidden_field 'submit_deadline', 'id' %>Submission deadline
                </TD>
                <TD ALIGN="CENTER">
-                    <input type="text" id="submit_deadline_due_at" name ="submit_deadline[due_at]"/>
-                    <img src="/images/cal.gif"  onClick="NewCal('submit_deadline_due_at','YYYYMMDD',true,24); return false;"/>
+                     <%=text_field 'submit_deadline', 'due_at', :size => 20, id => "submit_deadline_due_at" %>
+                     <img src="/images/cal.gif"  onClick="NewCal('submit_deadline_due_at','YYYYMMDD',true,24); return false;"/>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('submit_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>3 )%>
+                 <%= select('submit_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @submit_deadline.nil? ? { :selected => 3 } : { :selected =>  @submit_deadline.submission_allowed_id.to_i} )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('submit_deadline', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
+                   <%= select('submit_deadline', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @submit_deadline.nil? ? { :selected => 1 } : { :selected => @submit_deadline.review_allowed_id.to_i } )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('submit_deadline', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
+                   <%= select('submit_deadline', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @submit_deadline.nil? ? { :selected => 1 } : { :selected => @submit_deadline.resubmission_allowed_id.to_i } )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('submit_deadline', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
+                   <%= select('submit_deadline', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @submit_deadline.nil? ? { :selected => 1 } : { :selected => @submit_deadline.rereview_allowed_id.to_i } )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('submit_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
+                   <%= select('submit_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @submit_deadline.nil? ? { :selected => 1 } : { :selected => @submit_deadline.review_of_review_allowed_id.to_i } )%>
                </TD>
 			   <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('submit_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
+                   <%= select('submit_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ], @submit_deadline.nil? ? { :selected => 1 } : { :selected => @submit_deadline.threshold.to_i }  )%>
                </TD>
            </TR>
            <TR>
+               <%@review_deadline = @assignment.due_dates.find_by_deadline_type_id(DeadlineType.find_by_name("review").id) %>
                <TD ALIGN=LEFT WIDTH=20%>
-                   <input name="deadlineTitle0" size=10	maxlength=10 value="Submission deadline" type="hidden"/>Review deadline
+                   <!-- <input name="deadlineTitle0" size=10	maxlength=10 value="Submission deadline" type="hidden"/> -->
+                   <%=hidden_field 'review_deadline', 'id' %>Review deadline
                </TD>
                <TD ALIGN="CENTER">
-                   <input type="text" id="review_deadline_due_at" name ="review_deadline[due_at]"/>
-                   <img src="/images/cal.gif" onClick="NewCal('review_deadline_due_at','YYYYMMDD',true,24); return false;"/>
+                    <%=text_field 'review_deadline', 'due_at', :size => 20, id => "review_deadline_due_at"  %>
+                    <img src="/images/cal.gif" onClick="NewCal('review_deadline_due_at','YYYYMMDD',true,24); return false;"/>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('review_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>2 )%>
+                   <%= select('review_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @review_deadline.nil? ? { :selected => 2 } : { :selected =>  @review_deadline.submission_allowed_id.to_i}  )%>
                </TD>
 
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('review_deadline', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>3 )%>
+                   <%= select('review_deadline', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @review_deadline.nil? ? { :selected => 3 } : { :selected =>  @review_deadline.review_allowed_id.to_i}  )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('review_deadline', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
+                   <%= select('review_deadline', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @review_deadline.nil? ? { :selected => 1 } : { :selected =>  @review_deadline.resubmission_allowed_id.to_i} )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('review_deadline', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
+                   <%= select('review_deadline', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @review_deadline.nil? ? { :selected => 1 } : { :selected =>  @review_deadline.rereview_allowed_id.to_i} )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('review_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
+                   <%= select('review_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @review_deadline.nil? ? { :selected => 1 } : { :selected =>  @review_deadline.review_of_review_allowed_id.to_i} )%>
                </TD>
 			   <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('review_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
+                   <%= select('review_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ], @review_deadline.nil? ? { :selected => 1 } : { :selected =>  @review_deadline.threshold.to_i} )%>
                </TD>
            </TR>
        </TABLE>
 
-       <!-- <table class="exp" id=extra_deadlines></table> -->
+
+      <% for i in 2..@assignment.rounds_of_reviews.to_i %>
+          <% @add_submit_deadline = @assignment.due_dates.find_by_deadline_type_id_and_round(DeadlineType.find_by_name("resubmission").id, i )  %>
+          <% if @add_submit_deadline %>
+              <%= hidden_field 'add_submit_deadline', 'id', :id=> "add_submit_id_#{i-1}" %>
+              <%= hidden_field 'add_submit_deadline', 'due_at', :value=> @add_submit_deadline.due_at.to_s.gsub!(" ", "\302\240")[0..19], :id=> "add_submit_due_at_#{i-1}" %>
+              <%= hidden_field 'add_submit_deadline', 'submission_allowed_id', :id=> "add_submit_submit_allowed_id_#{i-1}" %>
+              <%= hidden_field 'add_submit_deadline', 'review_allowed_id', :id=> "add_submit_review_allowed_id_#{i-1}" %>
+              <%= hidden_field 'add_submit_deadline', 'resubmission_allowed_id', :id=> "add_submit_resubmit_allowed_id_#{i-1}" %>
+              <%= hidden_field 'add_submit_deadline', 'rereview_allowed_id', :id=> "add_submit_rereview_allowed_id_#{i-1}" %>
+              <%= hidden_field 'add_submit_deadline', 'review_of_review_allowed_id', :id=> "add_submit_review_of_review_allowed_id_#{i-1}" %>
+              <%= hidden_field 'add_submit_deadline', 'threshold', :id=> "add_submit_threshold_#{i-1}" %>
+          <%end %>
+          <% @add_review_deadline = @assignment.due_dates.find_by_deadline_type_id_and_round(DeadlineType.find_by_name("rereview").id, i )  %>
+          <% if @add_review_deadline %>
+              <%= hidden_field 'add_review_deadline', 'id', :id=> "add_review_id_#{i-1}" %>
+              <%= hidden_field 'add_review_deadline', 'due_at', :value=> @add_review_deadline.due_at.to_s.gsub!(" ", "\302\240")[0..19], :id=> "add_review_due_at_#{i-1}" %>
+              <%= hidden_field 'add_review_deadline', 'submission_allowed_id', :id=> "add_review_submit_allowed_id_#{i-1}" %>
+              <%= hidden_field 'add_review_deadline', 'review_allowed_id', :id=> "add_review_review_allowed_id_#{i-1}" %>
+              <%= hidden_field 'add_review_deadline', 'resubmission_allowed_id', :id=> "add_review_resubmit_allowed_id_#{i-1}" %>
+              <%= hidden_field 'add_review_deadline', 'rereview_allowed_id', :id=> "add_review_rereview_allowed_id_#{i-1}" %>
+              <%= hidden_field 'add_review_deadline', 'review_of_review_allowed_id', :id=> "add_review_review_of_review_allowed_id_#{i-1}" %>
+              <%= hidden_field 'add_review_deadline', 'threshold', :id=> "add_review_threshold_#{i-1}" %>
+          <%end %>
+      <% end %>
+
+
        <div id=extra_deadlines></div>
 
        <table class="exp">
-           <TR>
+           <TR id = "metareview_due_date_label" >
+               <%@reviewofreview_deadline = @assignment.due_dates.find_by_deadline_type_id(DeadlineType.find_by_name("metareview").id) %>
                <TD ALIGN=LEFT WIDTH=20%>
-                   Metareview deadline
+                   <%=hidden_field 'reviewofreview_deadline', 'id' %>Metareview deadline
                </TD>
                <TD ALIGN="CENTER">
-                  <input type="text" id="reviewofreview_deadline_due_at" name ="reviewofreview_deadline[due_at]"/>
+                  <%=text_field 'reviewofreview_deadline', 'due_at', :size => 20, id => "reviewofreview_deadline_due_at"  %>
                   <img src="/images/cal.gif" onClick="NewCal('reviewofreview_deadline_due_at','YYYYMMDD',true,24); return false;"/>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('reviewofreview_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>2 )%>
+                   <%= select('reviewofreview_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @reviewofreview_deadline.nil? ? { :selected => 2 } : { :selected =>  @reviewofreview_deadline.submission_allowed_id.to_i}  )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('reviewofreview_deadline', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>2 )%>
+                   <%= select('reviewofreview_deadline', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @reviewofreview_deadline.nil? ? { :selected => 2 } : { :selected =>  @reviewofreview_deadline.review_allowed_id.to_i} )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('reviewofreview_deadline', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>2 )%>
+                   <%= select('reviewofreview_deadline', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @reviewofreview_deadline.nil? ? { :selected => 2 } : { :selected =>  @reviewofreview_deadline.resubmission_allowed_id.to_i} )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('reviewofreview_deadline', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>2 )%>
+                   <%= select('reviewofreview_deadline', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @reviewofreview_deadline.nil? ? { :selected => 2 } : { :selected =>  @reviewofreview_deadline.rereview_allowed_id.to_i} )%>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('reviewofreview_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>3 )%>
+                   <%= select('reviewofreview_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @reviewofreview_deadline.nil? ? { :selected => 3 } : { :selected =>  @reviewofreview_deadline.review_of_review_allowed_id.to_i})%>
                </TD>
 			   <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('reviewofreview_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
+                   <%= select('reviewofreview_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ], @reviewofreview_deadline.nil? ? { :selected => 1 } : { :selected =>  @reviewofreview_deadline.threshold.to_i} )%>
                </TD>
            </TR>
 		   <TR>
+               <%@drop_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(DeadlineType.find_by_name("drop_topic").id) %>
                <TD ALIGN=LEFT WIDTH=20%>
-                   Drop-topic deadline
+                   <%=hidden_field 'drop_topic_deadline', 'id' %>Drop-topic deadline
                </TD>
                <TD ALIGN="CENTER">
-                  <input type="text" id="drop_topic_due_at" name ="drop_topic_deadline[due_at]"/>
-                  <img src="/images/cal.gif" onClick="NewCal('drop_topic_due_at','YYYYMMDD',true,24); return false;"/>
+                  <%=text_field 'drop_topic_deadline', 'due_at', :size => 20, id => "drop_topic_deadline_due_at"  %>
+                  <!-- <input type="text" id="drop_topic_due_at" name ="drop_topic_deadline[due_at]"/> -->
+                  <img src="/images/cal.gif" onClick="NewCal('drop_topic_deadline_due_at','YYYYMMDD',true,24); return false;"/>
                </TD>
+               <TD ALIGN=CENTER WIDTH=10%></td>
+               <TD ALIGN=CENTER WIDTH=10%></td>
+               <TD ALIGN=CENTER WIDTH=10%></td>
+               <TD ALIGN=CENTER WIDTH=10%></td>
+               <TD ALIGN=CENTER WIDTH=10%></td>
+               <TD ALIGN=CENTER WIDTH=10%></td>
            </TR>
        </table>
     </div>
@@ -120,8 +164,10 @@
 
 <div id="days_between_chapters" style="position:relative">
   <label>Number of {weeks, days} between submission of successive chapters:</label>
-  <input type="text" id="weeks" name ="weeks" maxlength="2" size="3"/> week(s) &nbsp;
-  <input type="text" id="days" name ="days" maxLength="2" size="3"/> day(s)      
+  <input type="text" id="weeks" name ="weeks" maxlength="2" size="3" value="<%=@weeks%>"/> week(s) &nbsp;
+  <input type="text" id="days" name ="days" maxLength="2" size="3" value="<%=@days%>"/> day(s)
 </div>
 <br/>
-<script>get_assignment_startdate();</script>
+<script type="text/javascript">get_assignment_startdate();</script>
+<script type="text/javascript">metareview_due_date();</script>
+<script type="text/javascript">addElement();</script>

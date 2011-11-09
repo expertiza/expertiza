@@ -5,17 +5,6 @@
       <change type="DELETED" beforePath="C:\Users\ramanarayana\Project 2\expertiza\app\views\admin\list_instructors.html.erb" afterPath="" />
       <change type="DELETED" beforePath="C:\Users\ramanarayana\Project 2\expertiza\app\views\admin\new_instructor.html.erb" afterPath="" />
       <change type="DELETED" beforePath="C:\Users\ramanarayana\Project 2\expertiza\app\views\admin\show_instructor.html.erb" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/expertiza.iml" afterPath="$PROJECT_DIR$/.idea/expertiza.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/admin_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/admin_controller.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/assignment_signups_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/assignment_signups_controller.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/course_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/course_controller.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/instructor_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/instructor_controller.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/invitation_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/invitation_controller.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/menu_items_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/menu_items_controller.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/helpers/administrator_instructor_helper.rb" afterPath="$PROJECT_DIR$/app/helpers/administrator_instructor_helper.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/functional/admin_controller_test.rb" afterPath="$PROJECT_DIR$/test/functional/admin_controller_test.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/functional/instructor_controller_test.rb" afterPath="$PROJECT_DIR$/test/functional/instructor_controller_test.rb" />
     </list>
     <ignored path="expertiza.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -651,7 +640,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="0" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="1" />
     <editor active="false" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17589083" sideWeight="0.6162602" order="3" side_tool="false" content_ui="tabs" />

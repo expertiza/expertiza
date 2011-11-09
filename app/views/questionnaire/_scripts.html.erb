@@ -135,7 +135,7 @@ function addQuestions(){
 }
 
 function addQuestion(){
-//add a new question 
+//add a new question. Based on all the calculations that we have done in addQuestions() we add that particular question here. 
     number=number+1;
     table = document.getElementById("questions_table");
 
@@ -226,6 +226,8 @@ function addQuestion(){
 function reorderdown(tableID,jid)
 {
 
+//This function is written for the movedown button that we have placed to allow editing a rubric. 
+//When the button is clicked it does some appropriate calculation and moves the questions in the rubric down. 
     if(jid!=num_questions)
 {
     var id=parseInt(jid);
@@ -334,6 +336,9 @@ function reorderdown(tableID,jid)
 }
  function reorder(tableID,jid)
 {
+	//This function is used to move a question in the rubric up by one position. 
+	//It does some appropriate calculation and swaps two row elements to show the visual change in the front end,
+	//at the same time updates some values to reflect the changes in the backend when the rubric is saved with these new positions.
 
     if(jid!=0)
 {

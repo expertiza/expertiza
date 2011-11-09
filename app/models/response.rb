@@ -33,7 +33,7 @@ class Response < ActiveRecord::Base
       if self.map.assignment.id < 469
         return custom_display_as_html(code, file_url) + "</div>"
       elsif self.map.assignment.id < 475
-        return custom_display_as_html_2011(code, file_url) + "</div>"
+        return custom_response_code_2011(code, file_url) + "</div>"
       else
         return custom_display_as_html_dynamic(code, file_url) + "</div>"
       end

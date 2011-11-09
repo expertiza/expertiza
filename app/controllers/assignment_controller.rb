@@ -270,8 +270,18 @@ class AssignmentController < ApplicationController
       aq.update_attribute('user_id',user_id)
     }
   end
-  
-  def update      
+
+  #return the file location if there is any for the assignment
+  def get_path
+    begin
+      file_path = @assignment.get_path
+    rescue
+      file_path = nil
+    end
+    return file_path
+  end
+  #if assignment and course are given copy the course participants to assignment
+  def copy_participants_from_course
     if params[:assignment][:course_id]
       begin
         Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
@@ -279,12 +289,28 @@ class AssignmentController < ApplicationController
         flash[:error] = $!
       end
     end
+  end
+
+  def update
+=begin
+    if params[:assignment][:course_id]
+      begin
+        Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
+      rescue
+        flash[:error] = $!
+      end
+    end
+=end
+    copy_participants_from_course
     @assignment = Assignment.find(params[:id])
-    begin 
+=begin
+    begin
       oldpath = @assignment.get_path
     rescue
       oldpath = nil
     end
+=end
+    oldpath = get_path
 
     if params[:days].nil? && params[:weeks].nil?
       @days = 0
@@ -302,34 +328,36 @@ class AssignmentController < ApplicationController
     @assignment.days_between_submissions = @days + (@weeks*7)
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
-    if @assignment.update_attributes(params[:assignment])     
+    if @assignment.update_attributes(params[:assignment])
       if params[:questionnaires] and params[:limits] and params[:weights]
         set_questionnaires
         set_limits_and_weights
       end
-
+=begin
       begin
-        newpath = @assignment.get_path        
+        newpath = @assignment.get_path
       rescue
         newpath = nil
       end
+=end
+      newpath = get_path
       if oldpath != nil and newpath != nil
         FileHelper.update_file_location(oldpath,newpath)
       end
-      
+
       begin
         # Iterate over due_dates, from due_date[0] to the maximum due_date
         if params[:due_date]
           for due_date_key in params[:due_date].keys
             due_date_temp = DueDate.find(due_date_key)
-            due_date_temp.update_attributes(params[:due_date][due_date_key])     
+            due_date_temp.update_attributes(params[:due_date][due_date_key])
             raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
           end
         end
-     
+
         flash[:notice] = 'Assignment was successfully updated.'
-        redirect_to :action => 'show', :id => @assignment                  
-     
+        redirect_to :action => 'show', :id => @assignment
+
       rescue
         flash[:error] = $!
         prepare_to_edit
@@ -338,9 +366,9 @@ class AssignmentController < ApplicationController
     else # Simply refresh the page
       @wiki_types = WikiType.find(:all)
       render :action => 'edit'
-    end    
+    end
   end
-  
+
   def show
     @assignment = Assignment.find(params[:id])
   end

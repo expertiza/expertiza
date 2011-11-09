@@ -31,6 +31,7 @@ We took the following approach to integrate previous work done on Expertiza:
 	--	Fix any failures/make changes to ensure that the features are working
 	--	Run integration tests to ensure final quality 
 	--	Merge our branch E15-Notification with the Master
+	-- 	Decorator design pattern is being used in this feature. We're using it in the form of filters: before_save, before_create, after_save, after_create to fire up specific methods, that send emails based on the state of the model object.
 
 How to setup and start the application:
 

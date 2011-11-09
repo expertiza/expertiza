@@ -7,6 +7,7 @@ Vartika Singh (vsingh3)
 
 E3: Enhancements to Suggest and Approve
 
+Please refer to the checklist at this Trello link for the details about the files modified with regard to this feature:
 https://trello.com/card/board/e3-enhancements-to-suggest-and-approve/4e97910a88107fb718001fd1/4e979b7f88107fb718025fed
 
 Checklist:

@@ -7,6 +7,7 @@ Vartika Singh (vsingh3)
 
 E15: Notification of more kinds of events
 
+Please refer to the checklist at the following Trello link about the modified files with respect to this feature: 
 https://trello.com/card/board/e15-notification-of-more-kinds-of-events/4e97910a88107fb718001fd1/4e979b5888107fb7180255b3
 
 Notification should be sent for the following events:

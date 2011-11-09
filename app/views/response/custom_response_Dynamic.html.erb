@@ -1,0 +1,87 @@
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+ <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+  <script>
+  $(document).ready(function() {
+    $("#accordion").accordion({ autoHeight: false });
+  });
+  </script>
+ <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
+ <% if !@map.contributor.nil?   %>
+     <% if !@topic_id.nil? %>
+              <h2>You are reviewing <%= @signedUpTopic %></h2>
+      <% end %>
+      <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
+ <% end %>
+
+<%= @map.show_review() %>
+
+
+ <%
+ #TODO: Put this in some other place
+ def label(object_name, method, label)
+    content_tag(:label, h(label), :for => "#{object_name}_#{method}")
+  end
+ %>
+
+<%= form_tag :action => @next_action, :id => @modified_object %>
+
+<% i = 0
+currentTopic = nil %>
+<% questions = @questionnaire.questions %>
+   <% questions.each{
+    | question | %>
+    <% topic = question.txt.split("::")[0] %>
+    <% if topic != currentTopic && currentTopic != nil %>
+            </p>
+        </div>
+        <h3><a href="#"><b><%= topic %></b></a></h3>
+        <div>
+            <p>
+        <% currentTopic = topic %>
+    <% elsif topic != currentTopic && currentTopic == nil %>
+        <div id="accordion">
+            <h3><a href="#"><b><%= topic %></b></a></h3>
+            <div>
+                <p>
+        <% currentTopic = topic %>
+    <%end%>
+    <%  types = Array.new
+         types[0] = "Knowledge"
+         types[1] = "Application"
+     %>
+    <% if i == 5 %>
+        <% grades = 0, 1, 2, 3, 4, 5 %>
+
+        <p><%=label("custom_response", i, question.txt)%>
+          <% if controller.action_name == 'new' %>
+            <%= select_tag "custom_response[5]", options_for_select(grades,nil)%>
+          <% else %>
+            <%= select_tag "custom_response[5]", options_for_select(grades,@review_scores[5].comments.gsub(/\"/,'&quot;').to_i)%>
+          <% end %>
+        </p>
+    <% end %>
+    <% if i == 7 %>
+        <%= render :partial => "fileUpload" %>
+    <% end %>
+    <% case question.weight %>
+        <% when 1: %>
+            <%= render :partial => "checkbox", :locals => {:ques_num => i, :ques_text => question.txt.split("::")[1]} %>
+        <% when 2: %>
+            <%= render :partial => "textfield", :locals => {:ques_num => i, :field_size => 3, :ques_text => question.txt.split("::")[1]} %>
+        <% when 3: %>
+            <%= render :partial => "textarea", :locals => {:ques_num => i, :area_size => "40x5", :ques_text => question.txt.split("::")[1]} %>
+        <% when 4: %>
+            <%= render :partial => "textfield_inline", :locals => {:ques_num => i, :field_size => 3} %>
+        <% when 5: %>
+            <%= render :partial => "rating", :locals => {:ques_num => i, :size => "60x5", :dropdown1_title => "Type:", :selections => types, :dropdown2_title => "Grade:", :grades => grades} %>
+            <% i += 2 %>
+        <% end
+    i += 1}%>
+    </p>
+    </div>
+    </div>
+ <br/>
+ <%= submit_tag "Save "+@title, :name=>"save" %>
+</form>

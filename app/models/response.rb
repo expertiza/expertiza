@@ -33,8 +33,10 @@ class Response < ActiveRecord::Base
     if ((self.map.assignment.instructor_id == User.find_by_name("jkidd").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
       if self.map.assignment.id < 469
         return custom_display_as_html(code, file_url) + "</div>"
-      else
+      elsif self.map.assignment.id < 475
         return custom_display_as_html_2011(code, file_url) + "</div>"
+      else
+        return custom_display_as_html_dynamic(code, file_url) + "</div>"
       end
     end
     
@@ -106,6 +108,40 @@ class Response < ActiveRecord::Base
   end  
 end
 
+def custom_display_as_html_dynamic(code, file_url)
+  begin
+  review_scores = self.scores
+  @map = self.map
+  @questionnaire = @map.questionnaire
+  questions = @questionnaire.questions
+  i = 0
+  currentTopic = nil
+  questions.each{
+    | question |
+    topic = question.txt.split("::")[0]
+    if topic != currentTopic
+        code += "<h2>" + topic + "</h2><hr>"
+        currentTopic = topic
+    end
+      case question.weight
+        when 1:
+          if review_scores[i].comments != "1"
+            code += "<img src=\"/images/Check-icon.png\">" + question.txt.split("::")[1] + "<br/>"
+          else
+            code += "<img src=\"/images/delete_icon.png\">" + question.txt.split("::")[1] + "<br/>"
+          end
+        when 2:
+          code += "</br><b>" + question.txt.split("::")[1] + ":</b></br>&nbsp;&nbsp;&nbsp;&nbsp;" + review_scores[i].comments.gsub(/\"/,'&quot;').to_s
+      end
+    i += 1
+    }
+    rescue
+      code += "Error " + $!
+    i += 1
+  end
+  code
+end
+
 def custom_display_as_html(code, file_url)
   begin
   review_scores = self.scores
@@ -115,7 +151,7 @@ code = code + "<h2>Learning Targets</h2><hr>"
 for i in 0..3
 if review_scores[i].comments == "1"
 case i
-when 0 :code = code + "<img src=\"/images/Check-icon.png\"> They state what the reader should know or be able to do after reading the lesson<br/>"
+when 0 :code = code + "<img src=\"/images/Check-icon.png\"> ???They state what the reader should know or be able to do after reading the lesson<br/>"
 when 1 :code = code + "<img src=\"/images/Check-icon.png\"> They are specific<br/>"
 when 2 :code = code + "<img src=\"/images/Check-icon.png\"> They are appropriate and reasonable i.e. not too easy or too difficult for TLED 301 students<br/>"
 when 3 :code = code + "<img src=\"/images/Check-icon.png\"> They are observable i.e. you wouldn't have to look inside the readers' head to know if they met this target<br/>"
@@ -287,7 +323,8 @@ when 59 :code = code + "<li>Is mostly the author's opinion.</li>"
 when 60 :code = code + "<li>Is mostly irrelevant in today's schools</li>" 
 when 61 :code = code + "<li>Focused on unimportant subtopics OR is overly general</li>"  
 end end end
-code = code + "</ul></td>"  code = code + "<td><ul>"  
+code = code + "</ul></td>"
+code = code + "<td><ul>"
 for i in 62..65
 if review_scores[i].comments == "1"
 case i

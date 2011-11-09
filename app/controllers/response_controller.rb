@@ -41,9 +41,12 @@ class ResponseController < ApplicationController
       if @assignment.id < 469
          @next_action = "custom_update"
          render :action => 'custom_response'
-     else
+     elsif @assignment.id < 475
          @next_action = "custom_update"
          render :action => 'custom_response_2011'
+     else
+         @next_action = "custom_update"
+         render :action => 'custom_response_Dynamic'
      end
     else
       # end of special code (except for the end below, to match the if above)
@@ -155,9 +158,12 @@ class ResponseController < ApplicationController
         end
         @next_action = "custom_create"
         render :action => 'custom_response'
-     else
+     elsif @assignment.id < 475
          @next_action = "custom_create"
          render :action => 'custom_response_2011'
+     else
+         @next_action = "custom_create"
+         render :action => 'custom_response_dynamic'
      end
     else
       # end of special code (except for the end below, to match the if above)

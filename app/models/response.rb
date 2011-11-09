@@ -1,8 +1,7 @@
 class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
-  
-  def display_as_html(prefix = nil, count = nil, file_url = nil)
+   def display_as_html(prefix = nil, count = nil, file_url = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -39,9 +38,8 @@ class Response < ActiveRecord::Base
         return custom_display_as_html_dynamic(code, file_url) + "</div>"
       end
     end
-    
+  
     # End of custom code
-
     count = 0
     self.scores.each{
       | reviewScore |
@@ -63,7 +61,7 @@ class Response < ActiveRecord::Base
     return code
   end  
   
-  # Computes the total score awarded for a review
+ # Computes the total score awarded for a review
   def get_total_score
     total_score = 0
     
@@ -176,8 +174,7 @@ end end end
   else
     code = code + file_url.to_s + "<br/>"
   end
-  
-  code = code + "<i>Compliment:</i>"
+   code = code + "<i>Compliment:</i>"
     code = code + "<ul><li>#{review_scores[8].comments.gsub(/\"/,'&quot;').to_s}</li><li>#{review_scores[9].comments.gsub(/\"/,'&quot;').to_s}</li></ul>"
   code = code + "<i>Suggestion:</i>"
     code = code + "<ul><li>#{review_scores[10].comments.gsub(/\"/,'&quot;').to_s}</li><li>#{review_scores[11].comments.gsub(/\"/,'&quot;').to_s}</li></ul>"
@@ -216,7 +213,6 @@ if review_scores[23].comments == "1"
   else
     code = code + "<img src=\"/images/delete_icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the lesson in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible<br/>"
   end
-
   code = code + "<br/><b>If not, which one(s) may infringe copyrights, or what areas of text may need citations, revisions or elaboration?</b><br/>"
     code = code + "<dl><dd>#{review_scores[24].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
 
@@ -225,7 +221,6 @@ if review_scores[23].comments == "1"
 
   #*******************Multiple Choice Questions************************
   code = code + "<h2>Multiple Choice Questions</h2><hr>"
-
 for i in 26..33
 if review_scores[i].comments == "1"
 case i
@@ -251,7 +246,6 @@ when 32 :code = code + "<img src=\"/images/delete_icon.png\"> The response optio
 when 33 :code = code + "<img src=\"/images/delete_icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
 end end end 
 code = code + "<br/><h3>Questions</h3>"
-
     code = code + "<i>Type: </i><b>#{review_scores[34].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Grade: </i><b>#{review_scores[35].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Comment: </i><dl><dd>#{review_scores[36].comments.gsub(/\"/,'&quot;').to_s}</dl></dd><br/>"
@@ -267,7 +261,6 @@ code = code + "<br/><h3>Questions</h3>"
     code = code + "<i>Type: </i><b>#{review_scores[43].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Grade: </i><b>#{review_scores[44].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Comment: </i><dl><dd>#{review_scores[45].comments.gsub(/\"/,'&quot;').to_s}</dl></dd><br/>"
-
 
   #*******************Rubric************************
   code = code + "<h2>Rubric</h2><hr>"
@@ -609,10 +602,9 @@ code = code + "</table>"
   code
 end
 
-def custom_display_as_html_2011(code, file_url)
+def custom_response_code_2011(code, file_url)
   begin
   review_scores = self.scores
-
   #********************Learning Targets******************
   code = code + "<h2>Learning Targets</h2><hr>"
   if review_scores[0].comments == "1"
@@ -704,8 +696,8 @@ def custom_display_as_html_2011(code, file_url)
     code = code + "<img src=\"/images/delete_icon.png\"> The sources represent different viewpoints<br/>"
   end
 
-  code = code + "<br/><b>What other sources or perspectives might the author want to consider?</b><br/>"
-    code = code + "<dl><dd>#{review_scores[22].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
+ code = code + "<br/><b>What other sources or perspectives might the author want to consider?</b><br/>"
+ code = code + "<dl><dd>#{review_scores[22].comments.gsub(/\"/,'&quot;').to_s}</dl></dd>"
 
   if review_scores[23].comments == "1"
     code = code + "<img src=\"/images/Check-icon.png\"> All materials (such as tables, graphs, images or videos created by other people or organizations) posted are in the lesson in accordance with the Attribution-Noncommercial-Share Alike 3.0 Unported license, or compatible <b>and</b> all information quoted or paraphrased from other sources is properly cited and commented on so there is no evidence of plagiarism. There are no large sections of text copied from (or closely resembling) other sources.<br/>"
@@ -721,54 +713,31 @@ def custom_display_as_html_2011(code, file_url)
 
   #*******************Multiple Choice Questions************************
   code = code + "<h2>Multiple Choice Questions</h2><hr>"
-  if review_scores[26].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> There are 4 multiple-choice questions<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> There are 4 multiple-choice questions<br/>"
-  end
-
-  if review_scores[27].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> They each have four answer choices (A-D)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> They each have four answer choices (A-D)<br/>"
-  end
-
-  if review_scores[28].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> There is a single correct (aka: not opinion-based) answer for each question<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> There is a single correct (aka: not opinion-based) answer for each question<br/>"
-  end
-
-  if review_scores[29].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The questions assess the learning target(s)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The questions assess the learning target(s)<br/>"
-  end
-
-  if review_scores[30].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The questions are appropriate and reasonable (not too easy and not too difficult)<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The questions are appropriate and reasonable (not too easy and not too difficult)<br/>"
-  end
-
-  if review_scores[31].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers<br/>"
-  end
-
-  if review_scores[32].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The response options are listed in alphabetical order<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The response options are listed in alphabetical order<br/>"
-  end
-
-  if review_scores[33].comments == "1"
-    code = code + "<img src=\"/images/Check-icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
-  else
-    code = code + "<img src=\"/images/delete_icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
-  end
-  code = code + "<br/><h3>Questions</h3>"
+for i in 26..33
+if review_scores[i].comments == "1"
+case i
+when 26 :code = code + "<img src=\"/images/Check-icon.png\"> There are 4 multiple-choice questions<br/>"
+when 27 :code = code + "<img src=\"/images/Check-icon.png\"> They each have four answer choices (A-D)<br/>"
+when 28 :code = code + "<img src=\"/images/Check-icon.png\"> There is a single correct (aka: not opinion-based) answer for each question<br/>"
+when 29 :code = code + "<img src=\"/images/Check-icon.png\"> The questions assess the learning target(s)<br/>"
+when 30 :code = code + "<img src=\"/images/Check-icon.png\"> The questions are appropriate and reasonable (not too easy and not too difficult)<br/>"
+when 31 :code = code + "<img src=\"/images/Check-icon.png\"> The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers<br/>"
+when 32 :code = code + "<img src=\"/images/Check-icon.png\"> The response options are listed in alphabetical order<br/>"
+when 33 :code = code + "<img src=\"/images/Check-icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
+end end end 
+for i in 26..33
+if review_scores[i].comments != "1"
+case i
+when 26 :code = code + "<img src=\"/images/delete_icon.png\"> There are 4 multiple-choice questions<br/>"
+when 27 :code = code + "<img src=\"/images/delete_icon.png\"> They each have four answer choices (A-D)<br/>"
+when 28 :code = code + "<img src=\"/images/delete_icon.png\"> There is a single correct (aka: not opinion-based) answer for each question<br/>"
+when 29 :code = code + "<img src=\"/images/delete_icon.png\"> The questions assess the learning target(s)<br/>"
+when 30 :code = code + "<img src=\"/images/delete_icon.png\"> The questions are appropriate and reasonable (not too easy and not too difficult)<br/>"
+when 31 :code = code + "<img src=\"/images/delete_icon.png\"> The foils (the response options that are NOT the answer) are reasonable i.e. they are not very obviously incorrect answers<br/>"
+when 32 :code = code + "<img src=\"/images/delete_icon.png\"> The response options are listed in alphabetical order<br/>"  
+when 33 :code = code + "<img src=\"/images/delete_icon.png\"> The correct answers are provided and listed BELOW all the questions<br/>"
+end end end 
+    code = code + "<br/><h3>Questions</h3>"
     code = code + "<i>Type: </i><b>#{review_scores[34].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Grade: </i><b>#{review_scores[35].comments.gsub(/\"/,'&quot;').to_s}</b><br/>"
     code = code + "<i>Comment: </i><dl><dd>#{review_scores[36].comments.gsub(/\"/,'&quot;').to_s}</dl></dd><br/>"
@@ -989,78 +958,54 @@ def custom_display_as_html_2011(code, file_url)
             <tr>"
 
   code = code + "<td><ul>"
-  if review_scores[83].comments == "1"
-    code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the lesson.</li>"
-  end
-  if review_scores[84].comments == "1"
-    code = code + "<li>The lesson accomplishes its established goals.</li>"
-  end
-  if review_scores[85].comments == "1"
-    code = code + "<li>Well constructed MC questions (1&2 knowledge; 3&4 application) align with learning targets and assess important content.</li>"
-  end
-  if review_scores[88].comments == "1"
-    code = code + "<li>An anticipatory set engages the reader, introduces the topic and its importance to future teachers, and helps readers connect to the content; the lesson closure synthesizes the material presented and stimulates further thinking on the issue.</li>"
-  end
+for i = 83..86
+if review_scores[i] == "1"
+case i
+when 83 :code = code + "<li>Specific, appropriate, observable learning targets establish the purpose of the lesson.</li>"
+when 84 :code = code + "<li>The lesson accomplishes its established goals.</li>"
+when 85 :code = code + "<li>Well constructed MC questions (1&2 knowledge; 3&4 application) align with learning targets and assess important content.</li>"
+when 86 : code = code + "<li>An anticipatory set engages the reader, introduces the topic and its importance to future teachers, and helps readers connect to the content; the lesson closure synthesizes the material presented and stimulates further thinking on the issue.</li>"
+end end end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i = 87..90
+if review_scores[i].comments == "1"
+case i
+when 87 :code = code + "<li>Specific and reasonable learning targets are stated.</li>"
+when 88 :code = code + "<li>The lesson partially meets its established goals</li>"
+when 89 :code = code + "<li>Well constructed MC questions (4) assess important content.</li>"
+when 90 :code = code + "<li>An anticipatory set engages the reader and introduces the topic; the lesson ends with a conclusion that summarizes the content.</li>"
+end end end
   code = code + "</ul></td>"
-
   code = code + "<td><ul>"
-  if review_scores[87].comments == "1"
-    code = code + "<li>Specific and reasonable learning targets are stated.</li>"
-  end
-  if review_scores[88].comments == "1"
-    code = code + "<li>The lesson partially meets its established goals</li>"
-  end
-  if review_scores[89].comments == "1"
-    code = code + "<li>Well constructed MC questions (4) assess important content.</li>"
-  end
-  if review_scores[90].comments == "1"
-    code = code + "<li>An anticipatory set engages the reader and introduces the topic; the lesson ends with a conclusion that summarizes the content.</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[91].comments == "1"
-    code = code + "<li>Reasonable learning targets are stated.</li>"
-  end
-  if review_scores[92].comments == "1"
-    code = code + "<li>The content relates to its goals.</li>"
-  end
-  if review_scores[93].comments == "1"
-    code = code + "<li>MC questions (4) assess important content.</li>"
-  end
-  if review_scores[94].comments == "1"
-    code = code + "<li>An introduction and conclusion are included.</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[95].comments == "1"
-    code = code + "<li>A learning target is included.</li>"
-  end
-  if review_scores[96].comments == "1"
-    code = code + "<li>Content does not achieve its goal, or goal is unclear.</li>"
-  end
-  if review_scores[97].comments == "1"
-    code = code + "<li>4 questions are included.</li>"
-  end
-  if review_scores[98].comments == "1"
-    code = code + "<li>An introduction or a conclusion is included.</li>"
-  end
-  code = code + "</ul></td>"
-
-  code = code + "<td><ul>"
-  if review_scores[99].comments == "1"
-    code = code + "<li>Learning target is missing/ not actually a learning target</li>"
-  end
-  if review_scores[100].comments == "1"
-    code = code + "<li>Lesson has no goal/ content is unfocused.</li>"
-  end
-  if review_scores[101].comments == "1"
-    code = code + "<li>Questions are missing.</li>"
-  end
-  if review_scores[102].comments == "1"
-    code = code + "<li>Neither an introduction nor a conclusion are included.</li>"
-  end
+for i = 91..94
+if review_scores[i].comments == "1"
+case i
+when 91 :code = code + "<li>Reasonable learning targets are stated.</li>"
+when 92 :code = code + "<li>The content relates to its goals.</li>"
+when 93 :code = code + "<li>MC questions (4) assess important content.</li>"
+when 94 :code = code + "<li>An introduction and conclusion are included.</li>" 
+end end end
+code = code + "</ul></td>"
+code = code + "<td><ul>"
+for i = 95..98
+if review_scores[i].comments == "1"
+case i
+when 95 :code = code + "<li>A learning target is included.</li>"
+when 96 :code = code + "<li>Content does not achieve its goal, or goal is unclear.</li>"
+when 97 :code = code + "<li>4 questions are included.</li>"
+when 98 :code = code + "<li>An introduction or a conclusion is included.</li>"
+end end end
+ code = code + "</ul></td>"
+ code = code + "<td><ul>"
+for i = 99..102
+if review_scores[i].comments == "1"
+case i
+when 99 :code = code + "<li>Learning target is missing/ not actually a learning target</li>"
+when 100 :code = code + "<li>Lesson has no goal/ content is unfocused.</li>"
+when 101 :code = code + "<li>Questions are missing.</li>"
+when 102 :code = code + "<li>Neither an introduction nor a conclusion are included.</li>"
+end end end 
   code = code + "</ul></td></tr>"
   code = code + "</table>"
   code = code + "<h3>Writing Quality</h3>"

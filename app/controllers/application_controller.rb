@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  /#This function collects all the questions(the ones that are currently in the rubric and the ones that have been added
+  #This function collects all the questions(the ones that are currently in the rubric and the ones that have been added
   #)and sorts them according to their position number so that the position number field is correctly updated in the 
   #database
   def check

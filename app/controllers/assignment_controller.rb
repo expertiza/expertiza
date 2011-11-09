@@ -17,6 +17,7 @@ class AssignmentController < ApplicationController
     new_assign.update_attribute('name','Copy of '+new_assign.name)     
     new_assign.update_attribute('created_at',Time.now)
     new_assign.update_attribute('updated_at',Time.now)
+    session[:copy_flag] = true
     new_assign.copy_flag = true
     
     if new_assign.save
@@ -82,8 +83,8 @@ class AssignmentController < ApplicationController
     #Calculate days between submissions
     set_days_btw_sub
 
-    if @assignment.save
-      set_questionnaires
+    if @assignment.save 
+      set_questionnaires   
       set_limits_and_weights
 
       begin
@@ -356,17 +357,16 @@ class AssignmentController < ApplicationController
       #   a new directory will be created and the old directory will be conserved with it's files intact.
       #   After the new path is created, the flag is set to false and each edit will then keep the new
       #   directory intact
-
+      puts session[:copy_flag].to_s + " <--- Value of session_flag as a string"
       newpath = get_path
-      if @assignment.copy_flag == false
+      if session[:copy_flag] == false
         if oldpath != nil and newpath != nil
           FileHelper.update_file_location(oldpath,newpath)
         end
       else
         if newpath != nil
           FileHelper.create_directory_from_path(newpath)
-          @assignment.copy_flag = 0
-          @assignment.save
+          session[:copy_flag] = false
         end
       end
       #update due dates
@@ -376,8 +376,7 @@ class AssignmentController < ApplicationController
           for due_date_key in params[:due_date].keys
             due_date_temp = DueDate.find(due_date_key)
             due_date_temp.update_attributes(params[:due_date][due_date_key])
-            type = DeadlineType.find_by_id(due_date_temp.deadline_type_id).name.capitalize
-            raise "Please enter a valid #{type} deadline" if due_date_temp.errors.length > 0
+            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
           end
         end
 

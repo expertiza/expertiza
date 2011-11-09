@@ -11,6 +11,11 @@ class StudentTaskController < ApplicationController
     @tasknotstarted = Array.new
     @taskrevisions = Array.new
     @notifications = Array.new
+    puts "~~~~~~~~~~~~~~~~~~~~~~"
+    puts @participants.to_s
+
+    #Sorts assignments by due dates
+    @participants.sort! { |a, b| a.assignment.get_stage_deadline <=> b.assignment.get_stage_deadline}
 
      for participant in @participants
       stage = participant.assignment.get_current_stage(participant.topic_id)

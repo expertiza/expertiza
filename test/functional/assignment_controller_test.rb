@@ -59,10 +59,10 @@ class AssignmentControllerTest < ActionController::TestCase
     # copy an assignment
     assignment = Assignment.first
     #puts assignment.to_s
-    #redirect_to "assignments/copy/" + assignment.id.to_s, :action => 'copy', :controller => 'copy'
+    #redirect_to "assignments/copy/" + "Copy of " + assignment.id.to_s, :action => 'copy', :controller => 'copy'
     #get :copy, :id => assignment.id
     #p flash[:notice].to_s
-    newname = "Copy of " + assignment.name
+    newname = assignment.name
     assert Assignment.find_by_name(newname)
   end
 

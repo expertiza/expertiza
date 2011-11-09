@@ -1,8 +1,4 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-############################################################################
-# Five different types of deadline submission, review, resubmission, rereview
-# and metareview will be added to the table for testing
-############################################################################
 deadline_type_submission:
   name: submission
 deadline_type_review:

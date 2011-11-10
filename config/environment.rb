@@ -44,24 +44,12 @@ Rails::Initializer.run do |config|
 
   config.action_controller.session_store = :active_record_store
   
- # if RAILS_ENV == 'production'
- #   config.action_mailer.delivery_method = :smtp
- #   config.action_mailer.smtp_settings = {
- #    :address => "smtp.ncsu.edu",
- #    :port => 25,
- #    :domain => "localhost"
- #   }
- # end
-
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-    :address              => "smtp.gmail.com",
-    :port                 => "587",
-    :domain               => "localhost",
-    :user_name            => "expertiza.ncsu.edu",
-    :password             => "expertiza1234",
-    :authentication       => :plain,
-    :enable_starttls_auto => true
-  }
-  #end
+  if RAILS_ENV == 'production'
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      :address => "smtp.ncsu.edu",
+      :port => 25,
+      :domain => "localhost"
+    }
+  end
 end

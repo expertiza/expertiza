@@ -28,10 +28,12 @@
                <TD ALIGN=LEFT WIDTH=20%>
                    <%=hidden_field 'submit_deadline', 'id' %>Submission deadline
                </TD>
-               <TD ALIGN="CENTER">
-                     <%=text_field 'submit_deadline', 'due_at', :size => 20, id => "submit_deadline_due_at" %>
-                     <img src="/images/cal.gif"  onClick="NewCal('submit_deadline_due_at','YYYYMMDD',true,24); return false;"/>
-               </TD>
+                 <TD ALIGN="CENTER" WIDTH=20%>
+                   <table><tr>
+                     <td><%=text_field 'submit_deadline', 'due_at', :size => 20, id => "submit_deadline_due_at" %> </td>
+                     <td><img src="/images/cal.gif"  onClick="NewCal('submit_deadline_due_at','YYYYMMDD',true,24); return false;"/> </td>
+                   </tr></table>
+                 </TD>
                <TD ALIGN=CENTER WIDTH=10%>
                  <%= select('submit_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @submit_deadline.nil? ? { :selected => 3 } : { :selected =>  @submit_deadline.submission_allowed_id.to_i} )%>
                </TD>
@@ -118,10 +120,12 @@
                <TD ALIGN=LEFT WIDTH=20%>
                    <%=hidden_field 'reviewofreview_deadline', 'id' %>Metareview deadline
                </TD>
-               <TD ALIGN="CENTER">
-                  <%=text_field 'reviewofreview_deadline', 'due_at', :size => 20, id => "reviewofreview_deadline_due_at"  %>
-                  <img src="/images/cal.gif" onClick="NewCal('reviewofreview_deadline_due_at','YYYYMMDD',true,24); return false;"/>
-               </TD>
+             <TD ALIGN="CENTER">
+               <table><tr>
+                 <TD><%=text_field 'reviewofreview_deadline', 'due_at', :size => 20, id => "reviewofreview_deadline_due_at"  %></TD>
+                 <TD><img src="/images/cal.gif" onClick="NewCal('reviewofreview_deadline_due_at','YYYYMMDD',true,24); return false;"/></TD>
+               </TR></table>
+              </TD>
                <TD ALIGN=CENTER WIDTH=10%>
                    <%= select('reviewofreview_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]], @reviewofreview_deadline.nil? ? { :selected => 2 } : { :selected =>  @reviewofreview_deadline.submission_allowed_id.to_i}  )%>
                </TD>

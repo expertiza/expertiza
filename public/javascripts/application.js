@@ -124,8 +124,12 @@ function addElement() {
   	                    '<table class="exp">'+
                         '<TR> <input type="hidden" id="additional_submit_deadline_'+j+'_id" name ="additional_submit_deadline['+j+'][id]" value='+submit_id+' >' +
                         '<TD ALIGN=LEFT WIDTH=20%> '+submission_var+' </TD>'+
-  	                    '<TD ALIGN=CENTER WIDTH=20%><input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]" value='+submit_due+' >' +
-                        ' <img src="/images/cal.gif" onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>'+
+  	                    '<TD ALIGN=CENTER WIDTH=20%>' +
+                        '<table><tr>' +
+                        '<TD><input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]" value='+submit_due+' ></TD>' +
+                        '<TD><img src="/images/cal.gif" onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>' +
+                        '</TR></table>' +
+                        '</TD>'+
 
 
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_submission_allowed_id" name ="additional_submit_deadline['+j+'][submission_allowed_id]">'+

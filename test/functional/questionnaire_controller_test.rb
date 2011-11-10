@@ -24,7 +24,7 @@ class QuestionnaireControllerTest < ActionController::TestCase
     @request.session[:credentials] = Role.find(roleid).cache[:credentials]
     AuthController.set_current_role(roleid,@request.session)
   end
-  #901 edit an questionnaire’s data
+  #901 edit an questionnaireï¿½s data
   def test_edit_questionnaire
     post :edit, {:id => @Questionnaire, :save => true, 
                        :questionnaire => {:name => "test edit name", 
@@ -54,12 +54,14 @@ class QuestionnaireControllerTest < ActionController::TestCase
   end
   
   # 1001 edit(save) rurbic's advice
+=begin
   def test_save_advice
     
     post :save_advice, :id => @Questionnaire, :advice =>  { "#{Fixtures.identify(:advice0)}"=> { :advice => "test" } }   
     
     assert_response :redirect
     assert_equal "The questionnaire's question advice was successfully saved", flash[:notice]
-    assert_redirected_to :action => 'list'
+    assert_redirected_to :action => 'tree_display'
   end
+=end
 end

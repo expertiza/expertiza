@@ -68,7 +68,7 @@ class User < ActiveRecord::Base
     Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + clear_password])
   end
 
-  # Reset the password to be mailed to the user
+  # Resets the password to be mailed to the user
   def reset_password
       randomize_password
       save

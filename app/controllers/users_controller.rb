@@ -177,7 +177,7 @@ class UsersController < ApplicationController
     end
   end
 
-  #E205: For filtering the users list with proper search and pagination.
+  # For filtering the users list with proper search and pagination.
   def paginate_list(role, user_id, letter)
     paginate_options = {"1" => 25, "2" => 50, "3" => 100}
 

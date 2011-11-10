@@ -1,10 +1,9 @@
 <div style="float: left;">
-
   <% form_tag :controller => 'users', :action => 'list', :letter => session[:letter], :search_by => @search_by, :paginate_show => '1' do %>
 
     Users per page:
-    <%= select_tag :num_users, options_for_select([['25', 1], ['50', 2], ['100', 3], ['all', 4]], Integer(@per_page)) %>
-    <%= submit_tag"Show" %>
+    <%= select_tag :num_users, options_for_select([['25', 1], ['50', 2], ['100', 3], ['all', 4]], @per_page.to_i) %>
+    <%= submit_tag "Show" %>
 
   <% end %>
 </div>

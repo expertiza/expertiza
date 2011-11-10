@@ -97,4 +97,42 @@ module QuestionnaireHelper
     
     return false
   end
+
+  def self.copyqn(questionnaire,usersess)
+    orig_questionnaire=questionnaire
+    currid=orig_questionnaire.id
+    user_sess=usersess
+    questions = Question.find_all_by_questionnaire_id(currid)
+    @questionnaire = orig_questionnaire.clone
+     if user_sess.role.name != "Teaching Assistant"
+      @questionnaire.instructor_id = user_sess.id
+    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+      @questionnaire.instructor_id = Ta.get_my_instructor(user_sess.id)
+    end
+    @questionnaire.name = 'Copy of '+orig_questionnaire.name
+
+    begin
+      @questionnaire.save!
+      @questionnaire.update_attribute('created_at',Time.now)
+      questions.each{
+        | question |
+        newquestion = question.clone
+        newquestion.questionnaire_id = @questionnaire.id
+        newquestion.save
+
+        advice = QuestionAdvice.find_by_question_id(question.id)
+        newadvice = advice.clone
+        newadvice.question_id = newquestion.id
+        newadvice.save
+      }
+      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
+      parent = FolderNode.find_by_node_object_id(pFolder.id)
+      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
+        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+      end
+      return true
+    rescue
+      return false
+    end
+  end
 end

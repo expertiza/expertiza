@@ -12,6 +12,9 @@ class StudentTaskController < ApplicationController
     @taskrevisions = Array.new
     @notifications = Array.new
 
+    #Sorts assignments by due dates
+    @participants.sort! { |a, b| a.assignment.get_stage_deadline <=> b.assignment.get_stage_deadline}
+
      for participant in @participants
       stage = participant.assignment.get_current_stage(participant.topic_id)
       duedate = participant.assignment.get_stage_deadline(participant.topic_id)

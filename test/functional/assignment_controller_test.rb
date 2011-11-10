@@ -49,8 +49,21 @@ class AssignmentControllerTest < ActionController::TestCase
       :instructor_id => instructorid,
       :course_id => courseid
     )
+
     #p flash[:notice].to_s
     assert assignment.save
+  end
+
+    # Test Case 1101-A
+  def test_copy
+    # copy an assignment
+    assignment = Assignment.first
+    #puts assignment.to_s
+    #redirect_to "assignments/copy/" + "Copy of " + assignment.id.to_s, :action => 'copy', :controller => 'copy'
+    #get :copy, :id => assignment.id
+    #p flash[:notice].to_s
+    newname = assignment.name
+    assert Assignment.find_by_name(newname)
   end
 
   # Test Case 1102
@@ -119,9 +132,3 @@ class AssignmentControllerTest < ActionController::TestCase
   end
 
 end
-
-
-
-
-
-

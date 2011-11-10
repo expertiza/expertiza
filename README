@@ -1,0 +1,42 @@
+E207 - Questionnaires and advice
+--------------------------------
+
+This project requires 
+	- Advice has its own MVC
+	- Certain methods are moved to helper class
+	- Advice should be set while creating questionnaire
+	
+
+Changes
+-------
+Changes made are as follows:
+
+1. questionnaire_controller.rb:
+	a. "copy" method was moved from this controller to app\helpers\questionnaire_helper.rb. All references to this method were changed.
+	b. The methods concerning "advice" were removed from this controller.
+	
+2. question_advice_controller.rb:
+	a. New controller to handle advice was created.
+	b. Corresponding views were also created.
+	c. Methods concerning advice like saving advice and editing advice can be found in this controller.
+	
+3. There was no option to create advice while creating the questionnaire itself. This has been included. When the questionnaire is created. once the questions are set, it is redirected to a page where advice can be set.
+
+Clarifications
+--------------
+1. There are few methods used to save questions (which are a part of the questionnaire). These methods are still a part of questionnaire controller since they form the basis of questionnaires.
+2. Saving advice functionality was not working previously and we have raised a support case with expertiza support.
+3. Right now the only questionnaires that are present are the various kinds of reviews and surveys. This functionality still remains.
+
+	
+Existing bugs
+-------------
+Saving advice does not work, it always saves a blank advice.
+This bug is already existing in expertiza, and is not a part of the requirements for this project.
+However, we are working on resolving this.
+
+Team
+----
+Mythri Nagaraju, Unity ID -mmythri
+Sri Samyuktha Potluri, Unity ID - spotlur
+Smitha Kalkere Sudarshan, Unity ID - kkalker

@@ -7,44 +7,18 @@ class QuestionnaireController < ApplicationController
   
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
-  def copy
-    orig_questionnaire = Questionnaire.find(params[:id])
-    questions = Question.find_all_by_questionnaire_id(params[:id])               
-    @questionnaire = orig_questionnaire.clone
-    
-    if (session[:user]).role.name != "Teaching Assistant"
-      @questionnaire.instructor_id = session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    end
-    @questionnaire.name = 'Copy of '+orig_questionnaire.name
-    
-    begin
-      @questionnaire.save! 
-      @questionnaire.update_attribute('created_at',Time.now)
-      questions.each{
-        | question |
-        newquestion = question.clone
-        newquestion.questionnaire_id = @questionnaire.id
-        newquestion.save        
-        
-        advice = QuestionAdvice.find_by_question_id(question.id)
-        newadvice = advice.clone
-        newadvice.question_id = newquestion.id
-        newadvice.save
-      }       
-      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
-      parent = FolderNode.find_by_node_object_id(pFolder.id)
-      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
-        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end
-      redirect_to :controller => 'questionnaire', :action => 'view', :id => @questionnaire.id
-    rescue
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!      
+def copy
+  orig_questionnaire = Questionnaire.find(params[:id])
+  usersess= session[:user]
+  @result = QuestionnaireHelper::copyqn(orig_questionnaire,usersess)
+  if (@result == "false")
+    flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
       redirect_to :action => 'list', :controller => 'tree_display'
-    end            
+  else
+    redirect_to :controller => 'questionnaire', :action => 'view', :id => params[:id]
   end
-     
+end
+
   # Remove a given questionnaire
   def delete
     questionnaire = Questionnaire.find(params[:id])
@@ -104,7 +78,7 @@ class QuestionnaireController < ApplicationController
     end
     
     if params['view_advice']
-        redirect_to :action => 'edit_advice', :id => params[:questionnaire][:id]
+        redirect_to :controller => 'question_advice', :action => 'edit', :id => params[:questionnaire][:id]
     end
     rescue
       flash[:error] = $!
@@ -129,62 +103,26 @@ class QuestionnaireController < ApplicationController
       @questionnaire.instructor_id = session[:user].id
     end       
     save_questionnaire    
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to :controller => 'question_advice', :action => 'create', :id => @questionnaire.id
   end
-  
-  # Modify the advice associated with a questionnaire
-  def edit_advice
-    @questionnaire = get(Questionnaire, params[:id])
-    
-    for question in @questionnaire.questions
-      if question.true_false
-        num_questions = 2
-      else
-        num_questions = @questionnaire.max_question_score - @questionnaire.min_question_score
-      end
-      
-      sorted_advice = question.question_advices.sort {|x,y| y.score <=> x.score } 
-      if question.question_advices.length != num_questions or
-         sorted_advice[0].score != @questionnaire.min_question_score or
-         sorted_advice[sorted_advice.length-1] != @questionnaire.max_question_score
-        #  The number of advices for this question has changed.
-        QuestionnaireHelper::adjust_advice_size(@questionnaire, question)
-      end
-    end
-    @questionnaire = get(Questionnaire, params[:id])
-  end
-  
-  # save the advice for a questionnaire
-  def save_advice
-    begin
-      for advice_key in params[:advice].keys
-        QuestionAdvice.update(advice_key, params[:advice][advice_key])
-      end
-      flash[:notice] = "The questionnaire's question advice was successfully saved"
-      redirect_to :action => 'list'
-      
-    rescue ActiveRecord::RecordNotFound
-      render :action => 'edit_advice'
-    end
-  end
-  
-  private  
+
+  private
   #save questionnaire object after create or edit
   def save_questionnaire     
     begin
       @questionnaire.save!
       save_questions @questionnaire.id if @questionnaire.id != nil and @questionnaire.id > 0
-      
+
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end      
+      end
     rescue
       flash[:error] = $!
     end
   end
-  
+
   
   # save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id)

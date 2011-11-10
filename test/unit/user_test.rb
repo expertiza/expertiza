@@ -112,4 +112,22 @@ class UserTest < ActiveSupport::TestCase
     assert u.valid?, "User should be valid with a duplicate email"
   end
 
+  def test_check_email
+    user = User.new
+    user.name = "testStudent1"
+    user.fullname = "test_Student_1"
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
+    user.email = "testStudent1@foo.edu"
+    user.role_id = "1"
+    user.save! # an exception is thrown if the user is invalid
+
+    email = MailerHelper::send_mail_to_user(user,"Test Email","user_welcome",user.clear_password)
+    assert !ActionMailer::Base.deliveries.empty?         # Checks if the mail has been queued in the delivery queue
+
+    assert_equal [user.email], email.to                  # Checks if the mail is being sent to proper user
+    assert_equal "Test Email", email.subject             # Checks if the mail subject is the same
+
+  end
+
 end

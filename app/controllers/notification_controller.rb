@@ -2,12 +2,11 @@ class NotificationController < ApplicationController
   include NotificationHelper
   
   def sample
-
-    notification_set = Notification.find(:all)
-    for notification_description in notification_set
-      # DEBUG: puts "Sending Notifications: " + notification_description.description
-      meta_conditions = MetaCondition.find_all_by_notification_id(notification_description.id)
-      notification_message = NotificationMessage.find_by_id(notification_description.notification_message_id)
+    notifications = Notification.find(:all)
+    notifications.each do |notification|
+      # DEBUG: puts "Sending Notifications: " + notification.description
+      meta_conditions = MetaCondition.find_all_by_notification_id(notification.id)
+      notification_message = NotificationMessage.find_by_id(notification.notification_message_id)
 
       # build array of all variables required for the message
       vars_required = ["users.email"]
@@ -20,7 +19,7 @@ class NotificationController < ApplicationController
       end
 
       # extract the data for every notification that needs to be send for this event
-      query_result = find_entries_meeting_conditions(notification_description.base_data_type, notification_description.relationship, meta_conditions, vars_required)
+      query_result = find_entries_meeting_conditions(notification.base_data_type, notification.relationship, meta_conditions, vars_required)
 
       for message_data in query_result
         # replace message placeholders with values

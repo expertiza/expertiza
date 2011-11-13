@@ -6,7 +6,7 @@ class NotificationController < ApplicationController
     notifications.each do |notification|
       # DEBUG: puts "Sending Notifications: " + notification.description
       meta_conditions = MetaCondition.find_all_by_notification_id(notification.id)
-      notification_message = NotificationMessage.find_by_id(notification.notification_message_id)
+      notification_message = NotificationMessage.find(:first, :conditions => ["id = #{notification.notification_message_id}"])
 
       # build array of all variables required for the message
       vars_required = ["users.email"]

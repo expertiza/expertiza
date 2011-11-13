@@ -60,7 +60,7 @@ class ResponseController < ApplicationController
     begin 
       @myid = @response.id
       @map = @response.map
-      @response.update_attribute('additional_comment',params[:review][:comments])
+      @response.additional_comment = params[:review][:comments]
       # This is a hack to allow the before save callback which sends notification
       # This is done since, update_attribute method skips callbacks 
       @response.updated_at = DateTime.now

@@ -81,9 +81,11 @@ class Response < ActiveRecord::Base
 def notify_on_difference(new_pct,avg_pct,limit,host)
    mapping = self.map
    instructor = mapping.assignment.instructor
+
+   #generate a link to response/view/id for user to access review that differs by threshold
    redirect_url = url_for(:host=>host, :controller => "response" , :action => "view" , :id => mapping.response.id)
    redirect_url = CGI::escape(redirect_url)
-   puts url_for(:host=>host, :controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
+   puts "abcd" + host
    Mailer.deliver_message(
      {:recipients => instructor.email,
       :subject => "Expertiza Notification: A review score is outside the acceptable range",
@@ -99,7 +101,7 @@ def notify_on_difference(new_pct,avg_pct,limit,host)
         :performer => "reviewer",
         :assignment => mapping.assignment,    
         :partial_name => 'limit_notify',
-        :link => url_for(:host=>host, :controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
+        :link => url_for(:host=>host, :controller => "auth" , :action => "url_redirect" , :redirect_link => redirect_url)
       }
      }
    )         

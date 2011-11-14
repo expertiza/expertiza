@@ -1,6 +1,6 @@
 class AuthController < ApplicationController
   helper :auth
-  before_filter :authorize, :except =>[:login, :review_redirect]
+  before_filter :authorize, :except =>[:login, :url_redirect]
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :login, :logout ],
@@ -17,11 +17,11 @@ class AuthController < ApplicationController
         session[:user] = user
         AuthController.set_current_role(user.role_id,session)
 
-        if session[:redirect_link]!=nil
+        if session[:redirect_link]!=nil            # if user has logged in using a embedded url
            url = session[:redirect_link]
-           session[:redirect_link]=nil
-           redirect_to url
-        else
+           session[:redirect_link]=nil              # remove url from session
+           redirect_to url                          # redirect to link
+        else                         # normal login
         respond_to do |wants|
           wants.html do
             ## This line must be modified to read as shown at left when a new version of Goldberg is installed!
@@ -47,14 +47,16 @@ class AuthController < ApplicationController
     end
   end  # def login
 
-  def review_redirect
 
-    if !session[:user]
-          session[:redirect_link] = CGI::unescape(params[:redirect_link])
-      redirect_to '/'
-    else
+  # link embedded in email redirects to this action for authorization.
+  def url_redirect
 
-      redirect_to CGI::unescape(params[:redirect_link])
+  link = CGI::unescape(params[:redirect_link])
+  if !session[:user]                     #check if user is logged in
+          session[:redirect_link] = link #stores link in session variable.
+      redirect_to '/'                   #redirects to login page
+    else                          #user is logged in
+      redirect_to link
     end
   end
 

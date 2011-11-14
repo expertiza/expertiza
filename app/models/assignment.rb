@@ -410,6 +410,8 @@ class Assignment < ActiveRecord::Base
           user = mapping.reviewer.user
           puts 'in email'
           puts mapping.response.id
+
+          #generate link to response/edit/id to redirect the reviewers to his review of the submissions
           redirect_url = url_for(:host=>host ,:controller => "response" , :action => "edit" , :id => mapping.response.id)
           redirect_url = CGI::escape(redirect_url)
           Mailer.deliver_message(
@@ -421,7 +423,7 @@ class Assignment < ActiveRecord::Base
               :location => get_review_number(mapping).to_s,
               :first_name => ApplicationHelper::get_user_first_name(user),
               :partial_name => "update",
-              :link => url_for(:host=>host , :controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
+              :link => url_for(:host=>host , :controller => "auth" , :action => "url_redirect" , :redirect_link => redirect_url)
              }
             }
           )

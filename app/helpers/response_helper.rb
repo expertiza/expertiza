@@ -1,16 +1,20 @@
 module ResponseHelper
 
+  class << self
+    attr_accessor :host
+  end
+
   # Compute the currently awarded scores for the reviewee
   # If the new teammate review's score is greater than or less than 
   # the existing scores by a given percentage (defined by
   # the instructor) then notify the instructor.
   # ajbudlon, nov 18, 2008
-  def self.compare_scores(new_response, questionnaire,host)
+  def self.compare_scores(new_response, questionnaire)
     map_class = new_response.map.class
     existing_responses = map_class.get_assessments_for(new_response.map.reviewee)
     total, count = get_total_scores(existing_responses,new_response)     
     if count > 0
-      notify_instructor(new_response.map.assignment, new_response, questionnaire, total, count,host)
+      notify_instructor(new_response.map.assignment, new_response, questionnaire, total, count)
     end
   end   
   
@@ -31,7 +35,7 @@ module ResponseHelper
   
   # determine if the instructor should be notified
   # ajbudlon, nov 18, 2008
-  def self.notify_instructor(assignment,curr_item,questionnaire,total,count,host)
+  def self.notify_instructor(assignment,curr_item,questionnaire,total,count)
      max_possible_score, weights = assignment.get_max_score_possible(questionnaire)
      new_score = curr_item.get_total_score.to_f*weights            
      existing_score = (total.to_f/count).to_f*weights 
@@ -45,7 +49,7 @@ module ResponseHelper
        new_pct = new_score.to_f/max_possible_score
        avg_pct = existing_score.to_f/max_possible_score
 
-       curr_item.notify_on_difference(new_pct,avg_pct,aq.notification_limit,host)
+       curr_item.notify_on_difference(new_pct,avg_pct,aq.notification_limit,self.host)
      end    
   end  
   

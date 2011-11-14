@@ -1,5 +1,6 @@
 
 desc "Send email reminders to all students with upcoming assignment deadlines"
+#store server address - port
 HOST = 'localhost:3000'
 
 task :send_email_reminders => :environment do
@@ -81,10 +82,14 @@ end
     assign_type = DeadlineType.find(due_date.deadline_type_id).name
     for participant in allParticipants 
       email = participant.user.email
+      #generate a link to submitted/edit/id for user to access submission page
       redirect_url = url_for(:host => HOST ,:controller => "submitted_content" , :action => "edit" , :id => participant.id)
       redirect_url = CGI::escape(redirect_url)
-      url = url_for(:host => HOST ,:controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
-      #puts "~~~~~~~~~~Email: #{email}\n"                  
+
+      #embed url as param in url to auth/url_redirect for login purpose
+      url = url_for(:host => HOST ,:controller => "auth" , :action => "url_redirect" , :redirect_link => redirect_url)
+
+      #puts "~~~~~~~~~~Email: #{email}\n"
       assign_name = assign.name        
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
@@ -108,9 +113,13 @@ end
     #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
     for participant in allParticipants                
       email = participant.user.email
+
+      #generate a link to student_review/list/id for user to access review page
       redirect_url = url_for(:host => HOST ,:controller => "student_review" , :action => "list" , :id => participant.id)
       redirect_url = CGI::escape(redirect_url)
-      url = url_for(:host => HOST ,:controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
+
+      #embed url as param in url to auth/url_redirect for login purpose
+      url = url_for(:host => HOST ,:controller => "auth" , :action => "url_redirect" , :redirect_link => redirect_url)
       #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
@@ -158,9 +167,13 @@ end
     #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
     for participant in allParticipants               
       email = participant.user.email
+
+      #generate a link to student_review/list/id for user to access review page
       redirect_url = url_for(:host => HOST ,:controller => "student_review" , :action => "list" , :id => participant.id)
       redirect_url = CGI::escape(redirect_url)
-      url = url_for(:host => HOST ,:controller => "auth" , :action => "review_redirect" , :redirect_link => redirect_url)
+
+      #embed url as param in url to auth/url_redirect for login purpose
+      url = url_for(:host => HOST ,:controller => "auth" , :action => "url_redirect" , :redirect_link => redirect_url)
       #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
@@ -200,6 +213,7 @@ end
       end
       puts emails
       (0..(emails.length-1)).each do|participant|
+         #generate a custom body with redirection link
          participantBody = body + "To complete this assignment please follow this <a href=\"#{urls[participant]}\">link</a>."
          Mailer.deliver_message(
         {:recipients => emails[participant],

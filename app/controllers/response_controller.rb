@@ -2,7 +2,8 @@ class ResponseController < ApplicationController
   helper :wiki
   helper :submitted_content
   helper :file
-  
+
+
   def view
     @response = Response.find(params[:id])
     return if ( redirect_when_disallowed(@response) )
@@ -37,19 +38,19 @@ class ResponseController < ApplicationController
     }
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("efg").id) && @title == "Review"
-      if @assignment.id < 469
-         @next_action = "custom_update"
-         render :action => 'custom_response'
-     else
-         @next_action = "custom_update"
-         render :action => 'custom_response_2011'
-     end
-    else
+    #if (@assignment.instructor_id == User.find_by_name("efg").id) && @title == "Review"
+     # if @assignment.id < 469
+     #    @next_action = "custom_update"
+     #    render :action => 'custom_response'
+     #else
+     #    @next_action = "custom_update"
+     #    render :action => 'custom_response_2011'
+    # end
+   # else
       # end of special code (except for the end below, to match the if above)
       #**********************
       render :action => 'response'
-    end
+   # end
   end  
   
   def update
@@ -79,8 +80,10 @@ class ResponseController < ApplicationController
       msg = "Your response was not saved. Cause: "+ $!
     end
 
+
     begin
-       ResponseHelper.compare_scores(@response, @questionnaire,request.host_with_port)
+       ResponseHelper.host = request.host_with_port      #storing the host address-port
+       ResponseHelper.compare_scores(@response, @questionnaire)
        ScoreCache.update_cache(@response.id)
     
       msg = "Your response was successfully saved."
@@ -174,7 +177,8 @@ class ResponseController < ApplicationController
     end
     
     begin
-      ResponseHelper.compare_scores(@response, @questionnaire,request.host_with_port)
+      ResponseHelper.host = request.host_with_port      #storing the host address-port
+      ResponseHelper.compare_scores(@response, @questionnaire)
       ScoreCache.update_cache(@res)
       @map.save
       msg = "Your response was successfully saved."

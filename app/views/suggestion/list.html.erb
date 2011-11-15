@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <h3>Suggested topics for <%=h @assignment.name %></h3>
 <%if @suggestions.size > 0 %>
 <div class="flash_note">
@@ -23,4 +28,61 @@
 </table>
 <%else%>
 	<b>No suggestions yet.</b>
+<<<<<<< HEAD
+=======
+=======
+<h3>Suggested topics for <%=h @assignment.name %></h3>
+<%if @suggestions.size > 0 %>
+<div class="flash_note">
+	Click View link to view the suggestion and to comment and/or approve
+</div>
+
+<table class="general" cellpadding=5 width=100% border=1>
+  <tr>
+    <th>Title</th>
+	<th>Status</th>
+	<th>Submitter's unity ID</th>
+	<th>Action</th>
+  </tr>
+
+<% for suggestion in @suggestions %>
+  <tr class="listingRow">
+    <td><%=h suggestion.title %></td>
+    <td align="center"><%=h suggestion.status %></td>
+	<td align="center"><%=h suggestion.unityID %></td>
+	<td align="center"><%= link_to 'View', :action => 'show', :id => suggestion %></td>	
+  </tr>
+<% end %>
+</table>
+<%else%>
+	<b>No suggestions yet.</b>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<h3>Suggested topics for <%=h @assignment.name %></h3>
+<%if @suggestions.size > 0 %>
+<div class="flash_note">
+	Click View link to view the suggestion and to comment and/or approve
+</div>
+
+<table class="general" cellpadding=5 width=100% border=1>
+  <tr>
+    <th>Title</th>
+	<th>Status</th>
+	<th>Submitter's unity ID</th>
+	<th>Action</th>
+  </tr>
+
+<% for suggestion in @suggestions %>
+  <tr class="listingRow">
+    <td><%=h suggestion.title %></td>
+    <td align="center"><%=h suggestion.status %></td>
+	<td align="center"><%=h suggestion.unityID %></td>
+	<td align="center"><%= link_to 'View', :action => 'show', :id => suggestion %></td>	
+  </tr>
+<% end %>
+</table>
+<%else%>
+	<b>No suggestions yet.</b>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <%end%>

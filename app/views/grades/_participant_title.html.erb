@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <% namecolwidth = 18 %>
 <% colwidth = 7  %>
 
@@ -24,4 +29,63 @@
   <TH WIDTH="<%= colwidth %>%">Range </TH>
 <% end %>   
 <TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
+<<<<<<< HEAD
+=======
+=======
+<% namecolwidth = 18 %>
+<% colwidth = 7  %>
+
+<TR <% if prefix %>id='<%= prefix %>_1' style="display:none"<% end %>>
+<TH WIDTH="<%= namecolwidth %>%">&nbsp;</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
+<% if @assignment.team_assignment %>
+  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
+<% end %>
+<TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
+
+<TR <% if prefix %>id='<%= prefix %>_2' style="display:none"<% end %>>
+<TH WIDTH="<%= namecolwidth %>%" ALIGN="LEFT">Contributor</TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range</TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH> 
+<% if @assignment.team_assignment %>
+  <TH WIDTH="<%= colwidth %>%">Average</TH>
+  <TH WIDTH="<%= colwidth %>%">Range </TH>
+<% end %>   
+<TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<% namecolwidth = 18 %>
+<% colwidth = 7  %>
+
+<TR <% if prefix %>id='<%= prefix %>_1' style="display:none"<% end %>>
+<TH WIDTH="<%= namecolwidth %>%">&nbsp;</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
+<% if @assignment.team_assignment %>
+  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
+<% end %>
+<TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
+
+<TR <% if prefix %>id='<%= prefix %>_2' style="display:none"<% end %>>
+<TH WIDTH="<%= namecolwidth %>%" ALIGN="LEFT">Contributor</TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range</TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH> 
+<% if @assignment.team_assignment %>
+  <TH WIDTH="<%= colwidth %>%">Average</TH>
+  <TH WIDTH="<%= colwidth %>%">Range </TH>
+<% end %>   
+<TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     

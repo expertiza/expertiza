@@ -186,3 +186,23 @@ admin_test:
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
+<<<<<<< HEAD
+=======
+
+
+<% (10..50).each do |i| %>
+student<%= i %>:
+  name: stud<%= i %>
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: student<%= i %>_fullname
+  password: <%= Digest::SHA1.hexdigest("student") %>
+  password_salt:
+  email: student<%= i %>@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review_of_review: 1
+  master_permission_granted: 1
+
+<% end %>
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0

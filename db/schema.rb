@@ -9,7 +9,19 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(:version => 20110512155258) do
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+ActiveRecord::Schema.define(:version => 20110512155258) do
+=======
+ActiveRecord::Schema.define(:version => 20111025015938) do
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+ActiveRecord::Schema.define(:version => 20111025015938) do
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -37,14 +49,43 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.integer  "num_review_of_reviewers",           :default => 0,     :null => false
     t.integer  "review_questionnaire_id"
     t.integer  "review_of_review_questionnaire_id"
+<<<<<<< HEAD
     t.boolean  "reviews_visible_to_all"
     t.boolean  "team_assignment"
     t.integer  "wiki_type_id"
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.boolean  "reviews_visible_to_all"
+    t.boolean  "team_assignment"
+    t.integer  "wiki_type_id"
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+    t.integer  "teammate_review_questionnaire_id"
+    t.boolean  "reviews_visible_to_all"
+    t.boolean  "team_assignment"
+    t.integer  "wiki_type_id",                      :default => 0,     :null => false
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false
     t.text     "spec_location"
     t.integer  "author_feedback_questionnaire_id"
+<<<<<<< HEAD
     t.integer  "teammate_review_questionnaire_id"
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.integer  "teammate_review_questionnaire_id"
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.integer  "team_count",                        :default => 0,     :null => false
     t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
@@ -61,9 +102,27 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
 
   create_table "comments", :force => true do |t|
+<<<<<<< HEAD
     t.integer "participant_id", :null => false
     t.boolean "private",        :null => false
     t.text    "comment",        :null => false
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.integer "participant_id", :null => false
+    t.boolean "private",        :null => false
+    t.text    "comment",        :null => false
+=======
+    t.integer "participant_id", :default => 0,     :null => false
+    t.boolean "private",        :default => false, :null => false
+    t.text    "comment",                           :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.integer "participant_id", :default => 0,     :null => false
+    t.boolean "private",        :default => false, :null => false
+    t.text    "comment",                           :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   end
 
   create_table "content_pages", :force => true do |t|
@@ -128,6 +187,11 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "due_dates", ["assignment_id"], :name => "fk_due_dates_assignments"
   add_index "due_dates", ["deadline_type_id"], :name => "fk_deadline_type_due_date"
   add_index "due_dates", ["late_policy_id"], :name => "fk_due_date_late_policies"
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   add_index "due_dates", ["rereview_allowed_id"], :name => "idx_rereview_allowed"
   add_index "due_dates", ["resubmission_allowed_id"], :name => "idx_resubmission_allowed"
   add_index "due_dates", ["review_allowed_id"], :name => "idx_review_allowed"
@@ -252,6 +316,21 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   end
 
   add_index "goldberg_users", ["role_id"], :name => "fk_user_role_id"
+<<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+  add_index "due_dates", ["rereview_allowed_id"], :name => "fk_due_date_rereview_allowed"
+  add_index "due_dates", ["resubmission_allowed_id"], :name => "fk_due_date_resubmission_allowed"
+  add_index "due_dates", ["review_allowed_id"], :name => "fk_due_date_review_allowed"
+  add_index "due_dates", ["review_of_review_allowed_id"], :name => "fk_due_date_review_of_review_allowed"
+  add_index "due_dates", ["submission_allowed_id"], :name => "fk_due_date_submission_allowed"
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 
   create_table "institutions", :force => true do |t|
     t.string "name", :default => "", :null => false
@@ -311,15 +390,45 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   end
 
   create_table "participants", :force => true do |t|
+<<<<<<< HEAD
     t.boolean  "submit_allowed",                      :default => true
     t.boolean  "review_allowed",                      :default => true
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.boolean  "submit_allowed",                      :default => true
+    t.boolean  "review_allowed",                      :default => true
+=======
+    t.boolean  "submit_allowed",       :default => true
+    t.boolean  "review_allowed",       :default => true
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.boolean  "submit_allowed",       :default => true
+    t.boolean  "review_allowed",       :default => true
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.integer  "user_id"
     t.integer  "parent_id"
     t.integer  "directory_num"
     t.datetime "submitted_at"
     t.boolean  "permission_granted"
+<<<<<<< HEAD
     t.integer  "penalty_accumulated",                 :default => 0,    :null => false
     t.string   "submitted_hyperlinks", :limit => 500
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.integer  "penalty_accumulated",                 :default => 0,    :null => false
+    t.string   "submitted_hyperlinks", :limit => 500
+=======
+    t.integer  "penalty_accumulated",  :default => 0,    :null => false
+    t.text     "submitted_hyperlinks"
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.integer  "penalty_accumulated",  :default => 0,    :null => false
+    t.text     "submitted_hyperlinks"
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.float    "grade"
     t.string   "type"
     t.string   "handle"
@@ -370,18 +479,52 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
   create_table "response_maps", :force => true do |t|
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.integer "reviewed_object_id",                       :null => false
     t.integer "reviewer_id",                              :null => false
     t.integer "reviewee_id",                              :null => false
     t.string  "type",                                     :null => false
+<<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+    t.integer "reviewed_object_id",    :default => 0,     :null => false
+    t.integer "reviewer_id",           :default => 0,     :null => false
+    t.integer "reviewee_id",           :default => 0,     :null => false
+    t.string  "type",                  :default => "",    :null => false
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.boolean "notification_accepted", :default => false
   end
 
   add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"
 
   create_table "responses", :force => true do |t|
+<<<<<<< HEAD
     t.integer  "map_id",             :null => false
     t.string   "additional_comment"
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.integer  "map_id",             :null => false
+    t.string   "additional_comment"
+=======
+    t.integer  "map_id",             :default => 0, :null => false
+    t.text     "additional_comment"
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.integer  "map_id",             :default => 0, :null => false
+    t.text     "additional_comment"
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -417,6 +560,11 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
 
   create_table "score_caches", :force => true do |t|
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.integer "reviewee_id", :default => 0,   :null => false
     t.float   "score",       :default => 0.0, :null => false
     t.string  "range",       :default => ""
@@ -425,6 +573,24 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
 
   create_table "scores", :force => true do |t|
     t.integer "question_id", :null => false
+<<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+    t.integer "reviewee_id"
+    t.float   "score",       :default => 0.0, :null => false
+    t.string  "range",       :default => ""
+    t.string  "object_type", :default => "",  :null => false
+  end
+
+  create_table "scores", :force => true do |t|
+    t.integer "question_id", :default => 0, :null => false
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.integer "score"
     t.text    "comments"
     t.integer "response_id"
@@ -434,7 +600,19 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "scores", ["response_id"], :name => "fk_score_response"
 
   create_table "sessions", :force => true do |t|
+<<<<<<< HEAD
     t.string   "session_id", :null => false
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.string   "session_id", :null => false
+=======
+    t.string   "session_id", :default => "", :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.string   "session_id", :default => "", :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.text     "data"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -444,9 +622,27 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "sign_up_topics", :force => true do |t|
+<<<<<<< HEAD
     t.text    "topic_name",                     :null => false
     t.integer "assignment_id",                  :null => false
     t.integer "max_choosers",                   :null => false
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.text    "topic_name",                     :null => false
+    t.integer "assignment_id",                  :null => false
+    t.integer "max_choosers",                   :null => false
+=======
+    t.text    "topic_name",                                    :null => false
+    t.integer "assignment_id",                  :default => 0, :null => false
+    t.integer "max_choosers",                   :default => 0, :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.text    "topic_name",                                    :null => false
+    t.integer "assignment_id",                  :default => 0, :null => false
+    t.integer "max_choosers",                   :default => 0, :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
   end
@@ -454,9 +650,27 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"
 
   create_table "signed_up_users", :force => true do |t|
+<<<<<<< HEAD
     t.integer "topic_id",                   :null => false
     t.integer "creator_id",                 :null => false
     t.boolean "is_waitlisted",              :null => false
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.integer "topic_id",                   :null => false
+    t.integer "creator_id",                 :null => false
+    t.boolean "is_waitlisted",              :null => false
+=======
+    t.integer "topic_id",                   :default => 0,     :null => false
+    t.integer "creator_id",                 :default => 0,     :null => false
+    t.boolean "is_waitlisted",              :default => false, :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.integer "topic_id",                   :default => 0,     :null => false
+    t.integer "creator_id",                 :default => 0,     :null => false
+    t.boolean "is_waitlisted",              :default => false, :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.integer "preference_priority_number"
   end
 
@@ -481,7 +695,19 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   create_table "suggestions", :force => true do |t|
     t.integer "assignment_id"
     t.string  "title"
+<<<<<<< HEAD
     t.string  "description",       :limit => 750
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.string  "description",       :limit => 750
+=======
+    t.text    "description"
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.text    "description"
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.string  "status"
     t.string  "unityID"
     t.string  "signup_preference"
@@ -493,6 +719,17 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.datetime "end_date"
     t.integer  "num_of_students"
     t.datetime "last_reminder"
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    t.integer  "course_id",            :default => 0, :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.integer  "course_id",            :default => 0, :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   end
 
   create_table "survey_participants", :force => true do |t|
@@ -510,10 +747,22 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.integer "survey_deployment_id"
   end
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   add_index "survey_responses", ["assignment_id"], :name => "fk_survey_assignments"
   add_index "survey_responses", ["question_id"], :name => "fk_survey_questions"
   add_index "survey_responses", ["survey_id"], :name => "fk_survey_questionnaires"
 
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   create_table "system_settings", :force => true do |t|
     t.string  "site_name",                 :default => "", :null => false
     t.string  "site_subtitle"
@@ -544,7 +793,19 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
 
   create_table "teams", :force => true do |t|
     t.string  "name"
+<<<<<<< HEAD
     t.integer "parent_id", :default => 0, :null => false
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.integer "parent_id", :default => 0, :null => false
+=======
+    t.integer "parent_id"
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.integer "parent_id"
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.string  "type"
   end
 
@@ -569,6 +830,19 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.integer  "round"
   end
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  add_index "topic_deadlines", ["deadline_type_id"], :name => "fk_deadline_type_topic_deadlines"
+  add_index "topic_deadlines", ["late_policy_id"], :name => "fk_topic_deadlines_late_policies"
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+  add_index "topic_deadlines", ["deadline_type_id"], :name => "fk_deadline_type_topic_deadlines"
+  add_index "topic_deadlines", ["late_policy_id"], :name => "fk_topic_deadlines_late_policies"
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   add_index "topic_deadlines", ["rereview_allowed_id"], :name => "idx_rereview_allowed"
   add_index "topic_deadlines", ["resubmission_allowed_id"], :name => "idx_resubmission_allowed"
   add_index "topic_deadlines", ["review_allowed_id"], :name => "idx_review_allowed"
@@ -577,8 +851,23 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
   add_index "topic_deadlines", ["topic_id"], :name => "fk_topic_deadlines_topics"
 
   create_table "topic_dependencies", :force => true do |t|
+<<<<<<< HEAD
     t.integer "topic_id",     :null => false
     t.string  "dependent_on", :null => false
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.integer "topic_id",     :null => false
+    t.string  "dependent_on", :null => false
+=======
+    t.integer "topic_id",     :default => 0,  :null => false
+    t.string  "dependent_on", :default => "", :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.integer "topic_id",     :default => 0,  :null => false
+    t.string  "dependent_on", :default => "", :null => false
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   end
 
   create_table "tree_folders", :force => true do |t|
@@ -600,8 +889,23 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
+<<<<<<< HEAD
     t.boolean "is_new_user",                              :default => true
     t.boolean "master_permission_granted"
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    t.boolean "is_new_user",                              :default => true
+    t.boolean "master_permission_granted"
+=======
+    t.boolean "is_new_user",                              :default => true,  :null => false
+    t.integer "master_permission_granted", :limit => 1,   :default => 0
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    t.boolean "is_new_user",                              :default => true,  :null => false
+    t.integer "master_permission_granted", :limit => 1,   :default => 0
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     t.string  "handle"
     t.boolean "leaderboard_privacy",                      :default => false
     t.text    "digital_certificate"

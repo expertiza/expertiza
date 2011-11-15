@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 Manifest
 README
 LICENSE
@@ -11,4 +16,37 @@ lib/graph/graphviz_dot.rb
 tests/runtests.rb
 tests/utest_directed_graph.rb
 tests/utest_graphviz_dot.rb
+<<<<<<< HEAD
+=======
+=======
+Manifest
+README
+LICENSE
+BUGS
+VERSION
+Changelog
+install.rb
+lib/graph/base_extensions.rb
+lib/graph/directed_graph.rb
+lib/graph/graphviz_dot.rb
+tests/runtests.rb
+tests/utest_directed_graph.rb
+tests/utest_graphviz_dot.rb
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+Manifest
+README
+LICENSE
+BUGS
+VERSION
+Changelog
+install.rb
+lib/graph/base_extensions.rb
+lib/graph/directed_graph.rb
+lib/graph/graphviz_dot.rb
+tests/runtests.rb
+tests/utest_directed_graph.rb
+tests/utest_graphviz_dot.rb
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 tests/example_from_readme.rb

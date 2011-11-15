@@ -139,7 +139,19 @@ class AuthController < ApplicationController
   def self.clear_user_info(session, assignment_id)
     session[:user_id] = nil
     session[:user] = ""  #sets user to an empty string instead of nil, to show that the user was logged in
+<<<<<<< HEAD
     role = Role.find(1)
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    role = Role.find(1)
+=======
+    role = Role.student
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    role = Role.student
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
       if role
         if not role.cache or not role.cache.has_key?(:credentials)
           Role.rebuild_cache

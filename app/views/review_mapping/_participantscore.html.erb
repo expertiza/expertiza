@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <% @qid = "ParticipantReviewResponseMap" %>
  <%@myuser%>
 <%@id%>
@@ -62,4 +67,139 @@
 
  
 
+<<<<<<< HEAD
+=======
+=======
+<% @qid = "ParticipantReviewResponseMap" %>
+ <%@myuser%>
+<%@id%>
+<%@this_reviewer%>
+<%@sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",@myuser, @qid  ])%>
+
+
+<% #########################################    %>
+<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+<% if @review_scores[@this_reviewer][@myuser] != 0 %>
+   <%=@review_scores[@this_reviewer][@myuser] %>
+   <% else%>
+   --
+<% end %>
+</td>
+<% #####################################        %>
+
+
+<%if @sc %>
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center'>
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>					
+			<%= @sc.score %>
+			</td> 
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+			(<%= @sc.range%>)
+		</td>
+
+<%else%>
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center'>
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>					
+			--
+			</td> 
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+			--
+		</td>
+	
+
+<%end%>
+					
+
+ 
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<% @qid = "ParticipantReviewResponseMap" %>
+ <%@myuser%>
+<%@id%>
+<%@this_reviewer%>
+<%@sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",@myuser, @qid  ])%>
+
+
+<% #########################################    %>
+<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+<% if @review_scores[@this_reviewer][@myuser] != 0 %>
+   <%=@review_scores[@this_reviewer][@myuser] %>
+   <% else%>
+   --
+<% end %>
+</td>
+<% #####################################        %>
+
+
+<%if @sc %>
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center'>
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>					
+			<%= @sc.score %>
+			</td> 
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+			(<%= @sc.range%>)
+		</td>
+
+<%else%>
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center'>
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>					
+			--
+			</td> 
+
+		<% if (@l%2) == 0%>
+			<td bgcolor="#ffffff" align = 'center' >
+		<%else%>
+			<td  bgcolor="#DDDDBB" align = 'center' >
+		<%end%>
+			--
+		</td>
+	
+
+<%end%>
+					
+
+ 
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 		

@@ -70,6 +70,7 @@ global_survey_questionnaire:
  max_question_score: 5
  type: "GlobalSurveyQuestionnaire"
  display_type: "GlobalSurvey"
+<<<<<<< HEAD
 
 
 
@@ -79,3 +80,5 @@ global_survey_questionnaire:
  
  
  
+=======
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0

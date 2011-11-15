@@ -51,6 +51,11 @@ Rails::Initializer.run do |config|
       :port => 25,
       :domain => "localhost"
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     #config.action_mailer.hostName = "http://expertiza.ncsu.edu/"
  end
 
@@ -63,4 +68,16 @@ Rails::Initializer.run do |config|
     }
     #config.action_mailer.hostName = "http://localhost:3000/"
  end
+<<<<<<< HEAD
 end
+=======
+end
+=======
+  end
+end
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+  end
+end
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0

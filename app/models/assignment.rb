@@ -324,6 +324,19 @@ class Assignment < ActiveRecord::Base
     right_id = next_due_date.send column
 
     right = DeadlineRight.find(right_id)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    puts "DEBUG RIGHT_ID = " + right_id.to_s
+    puts "DEBUG RIGHT = " + right.name
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    puts "DEBUG RIGHT_ID = " + right_id.to_s
+    puts "DEBUG RIGHT = " + right.name
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     return (right and (right.name == "OK" or right.name == "Late"))    
   end
     
@@ -332,9 +345,27 @@ class Assignment < ActiveRecord::Base
     return (check_condition("submission_allowed_id",topic_id) or check_condition("resubmission_allowed_id",topic_id))
   end
   
+<<<<<<< HEAD
   # Determine if the next due date from now allows for reviews or metareviews
   def review_allowed(topic_id=nil)
     return (check_condition("review_allowed_id",topic_id) or check_condition("rereview_allowed_id",topic_id) or self.metareview_allowed)
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+  # Determine if the next due date from now allows for reviews or metareviews
+  def review_allowed(topic_id=nil)
+    return (check_condition("review_allowed_id",topic_id) or check_condition("rereview_allowed_id",topic_id) or self.metareview_allowed)
+=======
+  # Determine if the next due date from now allows for reviews
+  def review_allowed(topic_id=nil)
+    return (check_condition("review_allowed_id",topic_id) or check_condition("rereview_allowed_id",topic_id))
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+  # Determine if the next due date from now allows for reviews
+  def review_allowed(topic_id=nil)
+    return (check_condition("review_allowed_id",topic_id) or check_condition("rereview_allowed_id",topic_id))
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   end  
   
   # Determine if the next due date from now allows for metareviews

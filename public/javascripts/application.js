@@ -2,7 +2,19 @@
 // This file is automatically included by javascript_include_tag :defaults
 function checkForm()
 {
+<<<<<<< HEAD
 	return checkWeights(); // && checkDeadlines();
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+	return checkWeights(); // && checkDeadlines();
+=======
+	return checkWeights(); // && checkDeadlines();
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+	return checkWeights(); // && checkDeadlines();
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 }
 
 function checkWeights()
@@ -61,7 +73,19 @@ function checkDeadlines()
 		if (date1 >= date2) error = true;		
 		if (error) alert("At least one set of deadlines occur out of chronological order. Please correct this and try again.")
 		return !error		
+<<<<<<< HEAD
 	}
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+	}
+=======
+	}
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+	}
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 }
 
 function addElement() {
@@ -73,7 +97,19 @@ function addElement() {
   	alert("Please enter a value between 1 to 10")
 	numReviews.value=2
 	addElement()
+<<<<<<< HEAD
 	return
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+	return
+=======
+	return
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+	return
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   }
   var authHTML = "";
    //alert (numi.value);
@@ -170,11 +206,33 @@ function addElement() {
 						'</TR>';
   }
 }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
 
 function updateDropDownMenu(advice,question,min){			
 	var id = 'responses_' + question + '_score'			
 	document.getElementById(id).selectedIndex = advice - min
 }
+=======
+
+function updateDropDownMenu(advice,question,min){			
+	var id = 'responses_' + question + '_score'			
+	document.getElementById(id).selectedIndex = advice - min
+}
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
+
+function updateDropDownMenu(advice,question,min){			
+	var id = 'responses_' + question + '_score'			
+	document.getElementById(id).selectedIndex = advice - min
+}
+<<<<<<< HEAD
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 
 function toggleVis(id) {
     var elem = document.getElementById(id + "_myDiv");

@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <%   
    session[:mapping] = Hash.new
    session[:mapping][:contributor] = @mapping.reviewee
@@ -17,4 +22,49 @@
   <% if !@mapping.assignment.team_assignment %>
      <%= check_box 'options','include', {:checked => 'checked'},  "true", "false"  %>&nbsp;Include the selected user as a participant in the assignment.<br/>
   <% end %>
+<<<<<<< HEAD
+=======
+=======
+<%   
+   session[:mapping] = Hash.new
+   session[:mapping][:contributor] = @mapping.reviewee
+   session[:mapping][:assignment] = @mapping.assignment
+%>
+
+<h1>Add Reviewer</h1>
+<h2>Contributor: <%= @mapping.reviewee.name %></h2>
+<h2>Reviewer: <%= @mapping.reviewer.name %></h2>
+<h2>Assignment: <%= @mapping.assignment.name %></h2>
+<br/>
+
+<% form_tag({:action => 'add_metareviewer'}, {:method => 'post'}) do %>
+  Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+  <%= hidden_field_tag('id', @mapping.id) %>
+  <input type='submit' value='Add Metareviewer'/><br/><br/>
+  <% if !@mapping.assignment.team_assignment %>
+     <%= check_box 'options','include', {:checked => 'checked'},  "true", "false"  %>&nbsp;Include the selected user as a participant in the assignment.<br/>
+  <% end %>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<%   
+   session[:mapping] = Hash.new
+   session[:mapping][:contributor] = @mapping.reviewee
+   session[:mapping][:assignment] = @mapping.assignment
+%>
+
+<h1>Add Reviewer</h1>
+<h2>Contributor: <%= @mapping.reviewee.name %></h2>
+<h2>Reviewer: <%= @mapping.reviewer.name %></h2>
+<h2>Assignment: <%= @mapping.assignment.name %></h2>
+<br/>
+
+<% form_tag({:action => 'add_metareviewer'}, {:method => 'post'}) do %>
+  Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+  <%= hidden_field_tag('id', @mapping.id) %>
+  <input type='submit' value='Add Metareviewer'/><br/><br/>
+  <% if !@mapping.assignment.team_assignment %>
+     <%= check_box 'options','include', {:checked => 'checked'},  "true", "false"  %>&nbsp;Include the selected user as a participant in the assignment.<br/>
+  <% end %>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <% end %>

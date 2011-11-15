@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <% child_nodes = node.get_children(@sortvar,@sortorder,@show) %>
 <%= render :partial => 'row_header', 
            :locals => {
@@ -19,4 +24,53 @@
                :prefix => prefix, 
                :parent_node => node,
                :child_nodes => child_nodes 
+<<<<<<< HEAD
+=======
+=======
+<% child_nodes = node.get_children(@sortvar,@sortorder,@show) %>
+<%= render :partial => 'row_header', 
+           :locals => {
+               :depth => depth, 
+               :prefix => prefix, 
+               :rowtype => rowtype,               
+               :parent_node => node,
+               :child_nodes => child_nodes               
+            } %>
+<% if node.get_partial_name %>           
+<%= render :partial => '/tree_display/actions/'+node.get_partial_name, 
+           :locals => {:id => node.node_object_id} %>
+<% else %>
+    <%= render :partial=> '/tree_display/actions/no_actions' %>
+<% end %>                        
+<%= render :partial => 'row_footer', 
+           :locals => {
+               :depth => depth, 
+               :prefix => prefix, 
+               :parent_node => node,
+               :child_nodes => child_nodes 
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<% child_nodes = node.get_children(@sortvar,@sortorder,@show) %>
+<%= render :partial => 'row_header', 
+           :locals => {
+               :depth => depth, 
+               :prefix => prefix, 
+               :rowtype => rowtype,               
+               :parent_node => node,
+               :child_nodes => child_nodes               
+            } %>
+<% if node.get_partial_name %>           
+<%= render :partial => '/tree_display/actions/'+node.get_partial_name, 
+           :locals => {:id => node.node_object_id} %>
+<% else %>
+    <%= render :partial=> '/tree_display/actions/no_actions' %>
+<% end %>                        
+<%= render :partial => 'row_footer', 
+           :locals => {
+               :depth => depth, 
+               :prefix => prefix, 
+               :parent_node => node,
+               :child_nodes => child_nodes 
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
             } %> 

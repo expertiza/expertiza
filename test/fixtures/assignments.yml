@@ -84,4 +84,7 @@ assignment_review0:
   team_count: 2
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %> 
  
+<<<<<<< HEAD
   
+=======
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0

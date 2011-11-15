@@ -11,7 +11,19 @@ class Course < ActiveRecord::Base
   def get_teams
     return CourseTeam.find_all_by_parent_id(self.id)        
   end
+<<<<<<< HEAD
   
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+  
+=======
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   #Returns this object's submission directory
   def get_path
     if self.instructor_id == nil

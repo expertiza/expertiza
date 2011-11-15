@@ -10,11 +10,41 @@ class Role < ActiveRecord::Base
 
   attr_reader :student,:ta,:instructor,:administrator,:superadministrator
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   STUDENT = 1
   TA = 6
   INSTRUCTOR = 2
   ADMINISTRATOR = 3
   SUPERADMINISTRATOR = 4
+<<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+  def self.student
+    @@student_role ||= find_by_name 'Student'
+  end
+  def self.ta
+    @@ta_role ||= find_by_name 'Teaching Assistant'
+  end
+  def self.instructor
+    @@instructor_role ||= find_by_name 'Instructor'
+  end
+  def self.administrator
+    @@administrator_role ||= find_by_name 'Administrator'
+  end
+  def self.superadministrator
+    @@superadministrator_role ||= find_by_name 'Super-Administrator'
+  end
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   
   def Role.rebuild_cache
     roles = Role.find(:all)

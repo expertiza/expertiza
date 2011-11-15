@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <H1>Score for <%= @participant.fullname %></H1>
 <% pscore = @participant.get_scores(@questions) %>
 <% form_tag :action => 'update', :id => @participant.id do %>
@@ -13,4 +18,41 @@
 <%= submit_tag "Update" %>
 <% end %>
 <BR/><BR/>
+<<<<<<< HEAD
+=======
+=======
+<H1>Score for <%= @participant.fullname %></H1>
+<% pscore = @participant.get_scores(@questions) %>
+<% form_tag :action => 'update', :id => @participant.id do %>
+<TABLE class="grades" >
+<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
+<%= render :partial => 'grades/participant',
+                       :locals => {:prefix => 'user', 
+                                   :team => false,
+                                   :pscore => pscore} %>                                                                                   
+</TABLE>
+<BR/>
+<%= hidden_field_tag 'total_score', pscore[:total_score] %>
+<%= submit_tag "Update" %>
+<% end %>
+<BR/><BR/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<H1>Score for <%= @participant.fullname %></H1>
+<% pscore = @participant.get_scores(@questions) %>
+<% form_tag :action => 'update', :id => @participant.id do %>
+<TABLE class="grades" >
+<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
+<%= render :partial => 'grades/participant',
+                       :locals => {:prefix => 'user', 
+                                   :team => false,
+                                   :pscore => pscore} %>                                                                                   
+</TABLE>
+<BR/>
+<%= hidden_field_tag 'total_score', pscore[:total_score] %>
+<%= submit_tag "Update" %>
+<% end %>
+<BR/><BR/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <%= link_to 'Back', :action => 'view', :id => @participant.parent_id %>

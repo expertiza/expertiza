@@ -28,7 +28,19 @@ class MenuUpdateTreeDisplay < ActiveRecord::Migration
      menuParent = MenuItem.create(:parent_id => nil, :name => 'Survey Deployments', :label => 'Survey Deployments', :seq => 3, :controller_action_id =>action.id )
      
      site_controller = SiteController.find_or_create_by_name('statistics')
+<<<<<<< HEAD
      site_controller.permission_id = permission1.id
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+     site_controller.permission_id = permission1.id
+=======
+     site_controller.permission_id = permission1.id
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+     site_controller.permission_id = permission1.id
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
      site_controller.save
      action = ControllerAction.find(:first, :conditions => ['site_controller_id = ? and name = ?',site_controller.id,'list_surveys'])
      if action == nil

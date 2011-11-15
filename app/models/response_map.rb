@@ -51,7 +51,6 @@ class ResponseMap < ActiveRecord::Base
       :reviewer_id => metareviewer.id, :reviewee_id => reviewer.id)
   end
 
-  #---------- E210: Moved this method from ReviewMappingController to this class ----------#
   def self.delete_mappings(mappings, force=nil)
     failedCount = 0
     mappings.each{
@@ -65,6 +64,5 @@ class ResponseMap < ActiveRecord::Base
     }
     return failedCount
   end
-  #----------------------------------------------------------------------------------------#
-  
+
 end

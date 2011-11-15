@@ -29,16 +29,7 @@ class ReviewMappingController < ApplicationController
     msg = String.new
     begin
 
-      ### E210: Get the user given the id or full name (use User class method 'get_user')
-      #----------- E210: removed ---------------#
-      # removed the following line, earlier the get_user method was defined in this class only
-      # user = get_user(params)
-      #-----------------------------------------#
-
-      #------------- E210: added ---------------#
-      # added this line, now the get_user method is defined in User class
       user = User.get_user(params)
-      #-----------------------------------------#
 
       regurl = url_for :action => 'add_user_to_assignment',
           :id => assignment.id, 
@@ -48,31 +39,10 @@ class ReviewMappingController < ApplicationController
       # Get the assignment's participant corresponding to the user
       reviewer = get_reviewer(user,assignment,regurl)
 
-      ### E210: Add an entry in ResponseMap (use ReviewResponseMap class method 'add_reviewer')
       if assignment.team_assignment
-        #----------- E210: removed --------------#
-        #if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).nil?
-        #  TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
-        #else
-        #  raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
-        #end
-        #----------------------------------------#
-
-        #----------- E210: added ----------------#
         TeamReviewResponseMap.add_reviewer(params[:contributor_id], reviewer.id, assignment.id)
-        #----------------------------------------#
       else
-        #----------- E210: removed --------------#
-        #if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).nil?
-        #   ParticipantReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
-        #else
-        #   raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
-        #end
-        #----------------------------------------#
-
-        #----------- E210: added ----------------#
         ParticipantReviewResponseMap.add_reviewer(params[:contributor_id], reviewer.id, assignment.id)
-        #----------------------------------------#
       end
 
     rescue
@@ -106,40 +76,12 @@ class ReviewMappingController < ApplicationController
       msg = String.new
   
       begin
-        ### E210: Add an entry in ResponseMap (use ReviewResponseMap class method 'add_reviewer')
         if assignment.team_assignment
           contributor = get_team_from_submission(submission)
-
-          #------------ E210: removed ---------------#
-          #if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
-          #  TeamReviewResponseMap.create(:reviewee_id => contributor.id,
-          #                               :reviewer_id => reviewer.id,
-          #                               :reviewed_object_id => assignment.id)
-          #else
-          #  raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
-          #end
-          #------------------------------------------#
-
-          #------------ E210: added -----------------#
           TeamReviewResponseMap.add_reviewer(contributor.id, reviewer.id, assignment.id)
-          #------------------------------------------#
         else
           contributor = AssignmentParticipant.find_by_id_and_parent_id(submission_id, assignment_id)
-
-          #------------ E210: removed ---------------#
-          #if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',contributor.id ,reviewer.id]).nil?
-          #  ParticipantReviewResponseMap.create(:reviewee_id => contributor.id,
-          #                                      :reviewer_id => reviewer.id,
-          #                                      :reviewed_object_id => assignment.id)
-          #else
-          #  flash[:error] = "There are no more submissions for you to review at this time."
-          #  raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
-          #end
-          #------------------------------------------#
-
-          #------------ E210: added -----------------#
           ParticipantReviewResponseMap.add_reviewer(submission.id, assignment.id, reviewer.id)
-          #------------------------------------------#
         end
       rescue
         msg = $!
@@ -205,17 +147,7 @@ class ReviewMappingController < ApplicationController
     mapping = ResponseMap.find(params[:id])  
     msg = String.new
     begin
-
-      ### E210: Get the user given the id or full name (use User class method 'get_user')
-      #----------- E210: removed ---------------#
-      # removed the following line, earlier the get_user method was defined in this class only
-      # user = get_user(params)
-      #-----------------------------------------#
-
-      #------------- E210: added ---------------#
-      # added this line, now the get_user method is defined in User class
       user = User.get_user(params)
-      #-----------------------------------------#
 
       regurl = url_for :action => 'add_user_to_assignment', :id => mapping.id, :user_id => user.id               
       reviewer = get_reviewer(user,mapping.assignment,regurl)
@@ -231,21 +163,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => mapping.assignment.id, :msg => msg                                  
   end
 
-  #-------------------- E210: removed the method, moved to User class ---------------------#
-  #def get_user(params)
-  #    if params[:user_id]
-  #      user = User.find(params[:user_id])
-  #    else
-  #      user = User.find_by_name(params[:user][:name])
-  #    end
-  #    if user.nil?
-  #       newuser = url_for :controller => 'users', :action => 'new'
-  #       raise "Please <a href='#{newuser}'>create an account</a> for this user to continue."
-  #    end
-  #    return user
-  #end
-  #----------------------------------------------------------------------------------------#
-  
   def get_reviewer(user,assignment,reg_url)
       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,assignment.id)
       if reviewer.nil?
@@ -280,14 +197,7 @@ class ReviewMappingController < ApplicationController
   def delete_all_reviewers_and_metareviewers
     assignment = Assignment.find(params[:id])
 
-    ### E210: Delete entries in ResponseMap (use ResponseMap class method 'delete_mappings')
-    #------------- E210: removed -------------#
-    #failedCount = delete_mappings(assignment.review_mappings,params[:force])
-    #-----------------------------------------#
-
-    #------------- E210: added ---------------#
     failedCount = ResponseMap.delete_mappings(assignment.review_mappings,params[:force])
-    #-----------------------------------------#
     if failedCount > 0
       url_yes = url_for :action => 'delete_all_reviewers_and_metareviewers', :id => params[:id], :force => 1
       url_no  = url_for :action => 'delete_all_reviewers_and_metareviewers', :id => params[:id]
@@ -303,15 +213,7 @@ class ReviewMappingController < ApplicationController
     contributor = assignment.get_contributor(params[:contributor_id])
     mappings = contributor.review_mappings
 
-    ### E210: Delete entries in ResponseMap (use ResponseMap class method 'delete_mappings')
-    #------------- E210: removed -------------#
-    #failedCount = delete_mappings(mappings,params[:force])
-    #-----------------------------------------#
-
-    #------------- E210: added ---------------#
     failedCount = ResponseMap.delete_mappings(mappings, params[:force])
-    #-----------------------------------------#
-
     if failedCount > 0
       url_yes = url_for :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id, :force => 1
       url_no  = url_for :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id
@@ -326,15 +228,7 @@ class ReviewMappingController < ApplicationController
     mapping = ResponseMap.find(params[:id])    
     mmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(mapping.id)
 
-    ### E210: Delete entries in ResponseMap (use ResponseMap class method 'delete_mappings')
-    #------------- E210: removed -------------#
-    #failedCount = delete_mappings(mmappings,params[:force])
-    #-----------------------------------------#
-
-    #------------- E210: added ---------------#
     failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
-    #-----------------------------------------#
-
     if failedCount > 0
       url_yes = url_for :action => 'delete_all_metareviewers', :id => mapping.id, :force => 1
       url_no  = url_for :action => 'delete_all_metareviewers', :id => mapping.id
@@ -345,37 +239,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => mapping.assignment.id
   end   
 
-  #-------------- E210: removed this method, moved to ResponseMap class -------------#
-  #def delete_mappings(mappings, force=nil)
-  #  failedCount = 0
-  #  mappings.each{
-  #     |mapping|
-  #     assignment_id = mapping.assignment.id
-  #     begin
-  #       mapping.delete(force)
-  #     rescue
-  #       failedCount += 1
-  #     end
-  #  }
-  #  return failedCount
-  #end
-  #----------------------------------------------------------------------------------#
-
-  #-------- E210: removed this method, moved to ParticipantsController class --------#
-  #def delete_participant
-  #  contributor = AssignmentParticipant.find(params[:id])
-  #  name = contributor.name
-  #  assignment_id = contributor.assignment
-  #  begin
-  #    contributor.destroy
-  #    flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
-  #  rescue
-  #    flash[:error] = "\"#{name}\" was not removed. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
-  #  end
-  #  redirect_to :action => 'list_mappings', :id => assignment_id
-  #end
-  #----------------------------------------------------------------------------------#
-  
   def delete_reviewer
     mapping = ResponseMap.find(params[:id]) 
     assignment_id = mapping.assignment.id
@@ -423,18 +286,7 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => mapping.review_mapping.assignment_id
   end
 
-  #--------- E210: removed this method as it is never used ---------#
-  #def delete_rofreviewer
-  #  mapping = ResponseMapping.find(params[:id])
-  #  revmapid = mapping.review_mapping.id
-  #  mapping.delete
-  #
-  #  flash[:note] = "The metareviewer has been deleted."
-  #  redirect_to :action => 'list_rofreviewers', :id => revmapid
-  #end
-  #-----------------------------------------------------------------#
-    
-  def list       
+  def list
     all_assignments = Assignment.find(:all, :order => 'name', :conditions => ["instructor_id = ?",session[:user].id])
     
     letter = params[:letter]
@@ -565,8 +417,6 @@ class ReviewMappingController < ApplicationController
     @mapping_strategies = MappingStrategy.find(:all, :order => 'name')
   end
 
-  ### E210: This same method is now called to search by reviewers instead of the search method, deleted the search method
-  ### E210: Converted the variables which don't need to be instance variables to local variables
   def review_report
     # Get the assignment id and set it in an instance variable which will be used in view
     @id = params[:id]
@@ -577,7 +427,6 @@ class ReviewMappingController < ApplicationController
       @type = "ParticipantReviewResponseMap"
     end
 
-    #----------- E210: added the following condition to check if it is search or not -----------#
     if params[:user].nil?
       # This is not a search, so find all reviewers for this assignment
       @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", @id, @type] )
@@ -587,26 +436,11 @@ class ReviewMappingController < ApplicationController
       participants = Participant.find(:all, :select => "DISTINCT id", :conditions => ["user_id IN (?) and parent_id = ?", us, @assignment.id] )
       @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, participants] )
     end
-    #------------ ------------------------------------------------------------------------------#
 
     # Arranged as the hash @review_scores[reveiwer_id][reviewee_id] = score for this particular assignment
-    ### E210: Get review scores for the assignment (use instance method 'compute_reviews_hash' of Assignment class)
-    #---------------------- E210: removed -----------------------#
-    #@review_scores = compute_reviews_hash(@assignment.id)
-    #------------------------------------------------------------#
-
-    #---------------------- E210: added -------------------------#
     @review_scores = @assignment.compute_reviews_hash
-    #------------------------------------------------------------#
 
-    ### E210: Get questionnaire id for the assignment (use instance method 'get_review_questionnaire_id' of Assignment class)
-    #----------------------- E210: removed ------------------------#
-    #@review_questionnaire_id =get_review_questionnaire_id_for_assignment(@assignment)
-    #--------------------------------------------------------------#
-
-    #----------------------- E210: added --------------------------#
     review_questionnaire_id = @assignment.get_review_questionnaire_id()
-    #--------------------------------------------------------------#
     if(review_questionnaire_id)
       review_questionnaire = Questionnaire.find(review_questionnaire_id)
       maxscore = review_questionnaire.max_question_score
@@ -616,94 +450,10 @@ class ReviewMappingController < ApplicationController
 
   end
 
-  #-------- E210: removed this method, the same functionality is provided by review_report method ---------#
-  #def search
-  #  @assignment = Assignment.find(params[:id])
-  #  @id = params[:id]
-  #
-  #  if @assignment.team_assignment
-  #    @type = "TeamReviewResponseMap"
-  #  else
-  #    @type = "ParticipantReviewResponseMap"
-  #  end
-  #
-  #  @us = User.find(:all, :select => "DISTINCT id", :conditions => ["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
-  #  @participants = Participant.find(:all, :select => "DISTINCT id", :conditions => ["user_id IN (?) and parent_id = ?", @us, @assignment.id] )
-  #  @review_scores = compute_reviews_hash( @assignment.id)
-  #  @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, @participants] )
-  #  @review_questionnaire_id =get_review_questionnaire_id_for_assignment(@assignment)
-  #  @review_questionnaire = Questionnaire.find(@review_questionnaire_id)
-  #  @review_questions = @review_questionnaire.questions
-  #  render :action => 'review_report'
-  #end
-  #--------------------------------------------------------------------------------------------------------#
-
-
-  #---------------- E210: removed this method, moved to Assignment class --------------------#
-  #def compute_reviews_hash(assignment_id)
-  #
-  #  @assignment = Assignment.find(assignment_id)
-  #  review_questionnaire_id =get_review_questionnaire_id_for_assignment(@assignment)
-  #  @questions = Question.find(:all, :conditions =>["questionnaire_id = ?", review_questionnaire_id])
-  #  @review_scores = Hash.new
-  #  if (@assignment.team_assignment)
-  #    @response_type = "TeamReviewResponseMap"
-  #  else
-  #    @response_type = "ParticipantReviewResponseMap"
-  #  end
-  #
-  #
-  #  @myreviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", @assignment.id, @type] )
-  #
-  #  @response_maps=ResponseMap.find(:all, :conditions =>["reviewed_object_id = ? and type = ?", @assignment.id, @response_type])
-  #  for response_map in @response_maps
-  #    ## checking if response is there
-  #    @corresponding_response = Response.find(:first, :conditions =>["map_id = ?", response_map.id])
-  #    @respective_scores = Hash.new
-  #    if (@review_scores[response_map.reviewer_id] != nil)
-  #      @respective_scores = @review_scores[response_map.reviewer_id]
-  #    end
-  #    if (@corresponding_response != nil)
-  #      @this_review_score_raw = Score.get_total_score(@corresponding_response, @questions)
-  #      @this_review_score = ((@this_review_score_raw*100).round/100.0)
-  #    else
-  #      @this_review_score = 0.0
-  #    end
-  #    @respective_scores[response_map.reviewee_id] = @this_review_score
-  #    @review_scores[response_map.reviewer_id] = @respective_scores
-  #  end
-  #  return @review_scores
-  #end
-  #------------------------------------------------------------------------------------------#
-
-  #---------------- E210: removed this method, moved to Assignment class --------------------#
-  #def get_review_questionnaire_id_for_assignment(assignment)
-  #  @revqids = []
-  #
-  #  @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",assignment.id])
-  #  @revqids.each do |rqid|
-  #    rtype = Questionnaire.find(rqid.questionnaire_id).type
-  #    if( rtype == "ReviewQuestionnaire")
-  #      @review_questionnaire_id = rqid.questionnaire_id
-  #    end
-  #
-  #  end
-  #  return @review_questionnaire_id
-  #end
-  #------------------------------------------------------------------------------------------#
-
-  ### E210: Converted the variables which don't need to be instance variables to local variables
   def distribution
   
     @assignment = Assignment.find(params[:id])
-    ### E210: Get questionnaire id for the assignment (use instance method 'get_review_questionnaire_id' of Assignment class)
-    #----------------------- E210: removed ------------------------#
-    #@review_questionnaire_id =get_review_questionnaire_id_for_assignment(@assignment)
-    #--------------------------------------------------------------#
-
-    #----------------------- E210: added --------------------------#
     review_questionnaire_id = @assignment.get_review_questionnaire_id()
-    #--------------------------------------------------------------#
 
     review_questionnaire = Questionnaire.find(review_questionnaire_id)
     review_questions = review_questionnaire.questions
@@ -751,14 +501,7 @@ class ReviewMappingController < ApplicationController
     ### For every responsemapping for this assgt, find the reviewer_id and reviewee_id #####
     @reviews_not_done = 0
     response_maps =  ResponseMap.find(:all, :conditions =>["reviewed_object_id = ? and type = ?", @assignment.id, objtype])
-    ### E210: Get review scores for the assignment (use instance method 'compute_reviews_hash' of Assignment class)
-    #---------------------- E210: removed -----------------------#
-    #review_report = compute_reviews_hash(@assignment.id)
-    #------------------------------------------------------------#
-
-    #---------------------- E210: added -------------------------#
     review_report = @assignment.compute_reviews_hash
-    #------------------------------------------------------------#
     for response_map in response_maps
       score_for_this_review = review_report[response_map.reviewer_id][response_map.reviewee_id]
       if(score_for_this_review != 0)

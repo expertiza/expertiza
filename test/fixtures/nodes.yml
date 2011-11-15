@@ -114,3 +114,7 @@ node22:
  type: TeamUserNode
  type: TeamUser
 
+node23:
+  parent_id: <%= Fixtures.identify(:instructor3) %>
+  node_object_id: <%= Fixtures.identify(:course0) %>
+  type: CourseNode

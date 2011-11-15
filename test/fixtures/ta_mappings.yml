@@ -1,8 +1,0 @@
-#One ta will be mapped to one course
-ta_mapping:
-  ta_id:  <%= Fixtures.identify(:ta1) %>
-  course_id: <%= Fixtures.identify(:course_object_oriented) %>
-
-
-
-

@@ -1,5 +1,4 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-#Insert data for different resubmission_times
 first:
   participant_id: 1
 another:

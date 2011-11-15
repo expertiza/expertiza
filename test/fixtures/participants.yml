@@ -1,8 +1,4 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-############################################################################
-#Inserts 16 different participants for the different assignments for testing
-#purposes.
-############################################################################
 par0:
   submit_allowed: 1
   review_allowed: 0

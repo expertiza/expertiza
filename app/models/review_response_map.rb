@@ -96,8 +96,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  #---------- E210: Added this new method which is used in ReviewMappingController ---------#
-  ### E210: This method adds a new entry in the ResponseMap
+  # This method adds a new entry in the ResponseMap
   def self.add_reviewer contributor_id, reviewer_id, assignment_id
       if find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor_id, reviewer_id]).nil?
       create(:reviewee_id => contributor_id,
@@ -107,6 +106,5 @@ class ReviewResponseMap < ResponseMap
       raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
     end
   end
-  #-----------------------------------------------------------------------------------------#
-  
+
 end

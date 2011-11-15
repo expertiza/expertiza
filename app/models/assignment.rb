@@ -601,7 +601,6 @@ end
 
 
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
-  #---------- E210: Moved this method from ReviewMappingController to this class ----------#
   def compute_reviews_hash
     review_questionnaire_id = get_review_questionnaire_id()
     @questions = Question.find(:all, :conditions =>["questionnaire_id = ?", review_questionnaire_id])
@@ -634,9 +633,7 @@ end
     end
     return @review_scores
   end
-  #----------------------------------------------------------------------------------------#
 
-  #---------- E210: Moved this method from ReviewMappingController to this class ----------#
   def get_review_questionnaire_id()
     @revqids = []
 
@@ -650,7 +647,6 @@ end
     end
     return @review_questionnaire_id
   end
-  #----------------------------------------------------------------------------------------#
 
   def get_next_due_date()
     #puts "~~~~~~~~~~Enter get_next_due_date()\n"

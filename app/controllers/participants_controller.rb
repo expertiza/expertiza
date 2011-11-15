@@ -117,7 +117,6 @@ end
     end
   end
 
-  #---------- E210: Moved this method from ReviewMappingController to this class ----------#
   def delete_assignment_participant
     contributor = AssignmentParticipant.find(params[:id])
     name = contributor.name
@@ -130,7 +129,6 @@ end
     end
     redirect_to :controller => 'review_mapping', :action => 'list_mappings', :id => assignment_id
   end
-  #----------------------------------------------------------------------------------------#
 
 
 end

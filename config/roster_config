@@ -1,8 +1,15 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 dlm=:
 name=0
 fullname=1
 email=4
+=======
+dlm=:
+name=0
+fullname=1
+email=4
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 dlm=:
 name=0

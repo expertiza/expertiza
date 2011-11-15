@@ -15,7 +15,11 @@ development:
   database: pg_development
   username: root
 <<<<<<< HEAD
+<<<<<<< HEAD
   password: root
+=======
+  password:
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
   password:
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
@@ -36,15 +40,21 @@ production:
   database: pg_development
   username: root
 <<<<<<< HEAD
+<<<<<<< HEAD
   password:
   host: localhost
 
 cucumber:
   <<: *test
 =======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
   password: 
   host: localhost
 
 cucumber:
   <<: *test
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee

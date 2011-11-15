@@ -7,12 +7,15 @@ gem 'gdata', :require => false
 gem 'hoptoad_notifier'
 gem 'mysql'
 <<<<<<< HEAD
+<<<<<<< HEAD
 gem 'rails', '~> 2.3.14'
 gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rubyzip', :require => 'zip/zip'
 gem 'rdoc'
 =======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 gem 'rdoc'
 gem 'rails', '~> 2.3.14'
 gem 'RedCloth'
@@ -21,6 +24,9 @@ gem 'rgl', :require => 'rgl/adjacency'
 gem 'rubyzip', :require => 'zip/zip'
 gem 'rdoc'
 gem "rspec-rails", "1.3.2"
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 
 group :development do
@@ -34,6 +40,10 @@ group :test do
   gem 'capybara', '0.3.9'
   gem 'database_cleaner', '>=0.5.0', :require => false
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  gem 'launchy', '0.4.0'
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
   gem 'launchy', '0.4.0'
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee

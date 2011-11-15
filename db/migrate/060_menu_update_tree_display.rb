@@ -29,7 +29,11 @@ class MenuUpdateTreeDisplay < ActiveRecord::Migration
      
      site_controller = SiteController.find_or_create_by_name('statistics')
 <<<<<<< HEAD
+<<<<<<< HEAD
      site_controller.permission_id = permission1.id
+=======
+     site_controller.permission_id = permission1.id
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
      site_controller.permission_id = permission1.id
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee

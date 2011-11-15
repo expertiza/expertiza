@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <H1>Edit Team</H1>
 <% form_tag :action => 'update' do %>
 <%= hidden_field_tag 'team_id', @team.id %>
@@ -10,6 +11,19 @@
 <%= submit_tag "Save" %>
 <% end %>
 <br/>
+=======
+<H1>Edit Team</H1>
+<% form_tag :action => 'update' do %>
+<%= hidden_field_tag 'team_id', @team.id %>
+<%= hidden_field_tag 'student_id', @student.id %>
+<label for="team_name">Team Name:</label>&nbsp;
+<%= text_field 'team', 'name'%>
+<br>
+<br>
+<%= submit_tag "Save" %>
+<% end %>
+<br/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <H1>Edit Team</H1>
 <% form_tag :action => 'update' do %>

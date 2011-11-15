@@ -325,6 +325,11 @@ class Assignment < ActiveRecord::Base
 
     right = DeadlineRight.find(right_id)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    puts "DEBUG RIGHT_ID = " + right_id.to_s
+    puts "DEBUG RIGHT = " + right.name
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
     puts "DEBUG RIGHT_ID = " + right_id.to_s
     puts "DEBUG RIGHT = " + right.name
@@ -338,9 +343,15 @@ class Assignment < ActiveRecord::Base
   end
   
 <<<<<<< HEAD
+<<<<<<< HEAD
   # Determine if the next due date from now allows for reviews or metareviews
   def review_allowed(topic_id=nil)
     return (check_condition("review_allowed_id",topic_id) or check_condition("rereview_allowed_id",topic_id) or self.metareview_allowed)
+=======
+  # Determine if the next due date from now allows for reviews
+  def review_allowed(topic_id=nil)
+    return (check_condition("review_allowed_id",topic_id) or check_condition("rereview_allowed_id",topic_id))
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
   # Determine if the next due date from now allows for reviews
   def review_allowed(topic_id=nil)

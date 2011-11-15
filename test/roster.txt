@@ -1,6 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 "student1"*"student1"*"student1@foo.edu"*"-"*
 "student2"*"student2"*"student2@foo.edu"*"-"*
+=======
+"student1"*"student1"*"student1@foo.edu"*"-"*
+"student2"*"student2"*"student2@foo.edu"*"-"*
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 "student1"*"student1"*"student1@foo.edu"*"-"*
 "student2"*"student2"*"student2@foo.edu"*"-"*

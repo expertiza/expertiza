@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <h1><%= @title %> for <%= @assignment.name %></h1>
 <% if !(@map.instance_of? TeammateReviewResponseMap) %>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
@@ -39,6 +40,48 @@
 
 <%= @map.show_feedback() %>
 <br/>
+=======
+<h1><%= @title %> for <%= @assignment.name %></h1>
+<% if !(@map.instance_of? TeammateReviewResponseMap) %>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
+  <br/><hr/><br/>  
+<% end %>
+<%= @map.show_review() %>
+
+<% if false %>[start erb comment] Changes to accommodate Jen's custom rubric [end erb comment]<% end %>
+<% file_url = nil
+   if @assignment.instructor_id == User.find_by_name("jkidd").id
+      @current_folder = DisplayOption.new
+      @current_folder.name = ""
+      @participant = Participant.find(@map.reviewer_id)
+      files_list = Dir[@participant.assignment.get_path.to_s+ "/" +@map.id.to_s + @current_folder.name + "/*"]
+      files = Array.new
+      for file in files_list
+        if File.directory?(file) then
+          dir_files = get_files(file)
+          dir_files.each{|f| files << f}
+        end
+        files << file
+      end
+      file = files[0]
+
+      if !file.nil?
+         #parentFolder = File.dirname(file)
+         #location = parentFolder + File.basename(file)
+         file_url = ""
+         file_url = "<u><i> "
+         file_url += link_to File.basename(file), :controller=>'submitted_content', :action=>'download', :download=>File.basename(file), 'current_folder[name]'=>File.dirname(file)
+         file_url += " </i></u><br/>"
+       end
+   end
+%>
+
+<HR>
+<%= @response.display_as_html(nil,nil,file_url) %>
+
+<%= @map.show_feedback() %>
+<br/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <h1><%= @title %> for <%= @assignment.name %></h1>
 <% if !(@map.instance_of? TeammateReviewResponseMap) %>

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <% if flash[:pwnote] -%>
 <div class="flash_note"><%= flash[:pwnote] %></div>
 <% elsif flash[:pwerr] -%>
@@ -11,6 +12,20 @@
 <p><label for="login_name">Enter the e-mail address associated with your account</label><br/>
 <%= text_field 'user', 'email'  %></p>
 <%= submit_tag "Request password" %>
+=======
+<% if flash[:pwnote] -%>
+<div class="flash_note"><%= flash[:pwnote] %></div>
+<% elsif flash[:pwerr] -%>
+<div class="flash_error"><h1>Error!</h1><%= flash[:pwerr] %></div>
+<% end -%>
+
+<h1> Forgotten Your Password? </h1>
+
+<% form_tag :action => 'send_password' do %>
+<p><label for="login_name">Enter the e-mail address associated with your account</label><br/>
+<%= text_field 'user', 'email'  %></p>
+<%= submit_tag "Request password" %>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <% if flash[:pwnote] -%>
 <div class="flash_note"><%= flash[:pwnote] %></div>

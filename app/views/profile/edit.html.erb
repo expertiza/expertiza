@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <h1>User Profile Information</h1>
 
 <br/>
@@ -18,6 +19,27 @@
   <% end %>    
   <%= submit_tag 'Save' %>
 <% end %>
+=======
+<h1>User Profile Information</h1>
+
+<br/>
+
+<% form_tag({:action => 'update', :id => @user}) do %>
+  <%= render :partial => 'users/name' %>
+  <hr/>
+  <%= render :partial => 'users/password' %> 
+  <i><font size=-2>If password field is blank, the password will not be updated.</font></i>
+  <hr/>
+  <%= render :partial => 'users/email' %>
+  <hr/>
+  <%= render :partial => 'users/prefs' %>
+  <%= render :partial => 'handle' %>  
+  <% if @user.role.parent_id != nil %>
+    <%= render :partial => 'limit' %>
+  <% end %>    
+  <%= submit_tag 'Save' %>
+<% end %>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <h1>User Profile Information</h1>
 

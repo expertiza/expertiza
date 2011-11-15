@@ -3,6 +3,7 @@
 <br/>
 <% form_tag :action => 'show_selection' do %>
 <<<<<<< HEAD
+<<<<<<< HEAD
 Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
 <input type='submit' value='Edit'/>
 <% end %>
@@ -27,6 +28,8 @@ Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} 
     <td ><%= User.yesorno(user.email_on_review_of_review) %></td>
 	<td ><%= User.yesorno(user.leaderboard_privacy) %></td>
 =======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
 <input type='submit' value='Edit'/>
 <% end %>
@@ -59,6 +62,9 @@ View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {
     <td><%= User.yesorno(user.email_on_submission) %></td>
     <td><%= User.yesorno(user.email_on_review_of_review) %></td>
     <td><%= User.yesorno(user.leaderboard_privacy) %></td>
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
   </tr>
 <% end -%>
@@ -66,6 +72,11 @@ View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {
 </div>
 <hr/>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<%= render :partial => 'users/pagination' %>
+<hr/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <%= render :partial => 'users/pagination' %>
 <hr/>
@@ -76,8 +87,13 @@ View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {
 
 <p>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <% 
   session[:return_to] = request.request_uri  
+=======
+<%
+  session[:return_to] = request.request_uri
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <%
   session[:return_to] = request.request_uri
@@ -87,8 +103,12 @@ View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {
 <%= link_to 'New User', :action => 'new' %> |
 <%= link_to 'Import Users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username, full name (first[ middle] last), e-mail address, password' %>
 <<<<<<< HEAD
+<<<<<<< HEAD
 </p>
 
+=======
+</p>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 </p>
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee

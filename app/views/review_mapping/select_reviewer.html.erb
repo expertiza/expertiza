@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <h1>Add Reviewer</h1>
 <h2>Contributor: <%= @contributor.name %></h2>
 <h2>Assignment: <%= @contributor.assignment.name %></h2>
@@ -8,6 +9,17 @@
   Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>  
   <%= hidden_field_tag('contributor_id', @contributor.id) %>
   <input type='submit' value='Add Reviewer'/>
+=======
+<h1>Add Reviewer</h1>
+<h2>Contributor: <%= @contributor.name %></h2>
+<h2>Assignment: <%= @contributor.assignment.name %></h2>
+<br/>
+
+<% form_tag :action => 'add_reviewer', :id => @contributor.parent_id do %>
+  Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>  
+  <%= hidden_field_tag('contributor_id', @contributor.id) %>
+  <input type='submit' value='Add Reviewer'/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <h1>Add Reviewer</h1>
 <h2>Contributor: <%= @contributor.name %></h2>

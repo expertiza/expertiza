@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 <H1>Create Teams for <%= @parent.name %> </H1>
 <% form_tag :action => 'create_teams' do %>
@@ -6,6 +7,15 @@
 
 <%= submit_tag "Create Teams" %>
 <% end %>
+=======
+
+<H1>Create Teams for <%= @parent.name %> </H1>
+<% form_tag :action => 'create_teams' do %>
+<%= hidden_field_tag 'id', @parent.id %>
+
+<%= submit_tag "Create Teams" %>
+<% end %>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 
 <H1>Create Teams for <%= @parent.name %> </H1>

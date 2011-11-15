@@ -109,7 +109,10 @@ class GradesController < ApplicationController
 
   def send_grading_conflict_email
 <<<<<<< HEAD
+<<<<<<< HEAD
     puts "!!!!!!!!!!!!!!in grading controller conflict_email"
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
     email_form = params[:mailer]
@@ -117,10 +120,13 @@ class GradesController < ApplicationController
     recipient = User.find(:first, :conditions => ["email = ?", email_form[:recipients]])
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     controller = "student_review"
     action = "list"
     participantID = email_form[:author]
 
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
     body_text = email_form[:body_text]
@@ -136,10 +142,14 @@ class GradesController < ApplicationController
                      :body_text => body_text,
                      :partial_name => "grading_conflict"
 <<<<<<< HEAD
+<<<<<<< HEAD
              },
             :controller => controller,
             :action => action,
             :assignmentID => participantID
+=======
+             }
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
              }
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee

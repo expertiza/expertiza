@@ -12,7 +12,11 @@ class Course < ActiveRecord::Base
     return CourseTeam.find_all_by_parent_id(self.id)        
   end
 <<<<<<< HEAD
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee

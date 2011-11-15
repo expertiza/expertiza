@@ -1,6 +1,10 @@
 class Mailer < ActionMailer::Base
 <<<<<<< HEAD
+<<<<<<< HEAD
   @redirectURL = ""
+=======
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
@@ -23,6 +27,7 @@ class Mailer < ActionMailer::Base
        @bcc = defn[:bcc]
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      @from = "expertiza-support@lists.ncsu.edu"
      @body = defn[:body]
      @url = defn[:url]
@@ -43,11 +48,16 @@ class Mailer < ActionMailer::Base
 
      p "redirect : #{@redirectURL}"
 =======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 
      @from = "expertiza-support@lists.ncsu.edu"
      @body = defn[:body]
      @sent_on = Time.now 
      @content_type = 'text/html'
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
   end
 end

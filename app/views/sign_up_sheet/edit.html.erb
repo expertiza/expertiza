@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <h1>Edit topic</h1>
 
 <% form_tag :action => 'update'do %>
@@ -10,6 +11,19 @@
   <%= submit_tag "Update"%>
 <% end %>
 
+=======
+<h1>Edit topic</h1>
+
+<% form_tag :action => 'update'do %>
+  
+
+  <%= render :partial => 'topic' %>
+  <%= hidden_field_tag('id', params[:id]) %>
+  <%= hidden_field_tag('assignment_id', params[:assignment_id]) %>
+  <%= submit_tag "Update"%>
+<% end %>
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <h1>Edit topic</h1>
 

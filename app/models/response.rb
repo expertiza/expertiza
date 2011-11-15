@@ -31,7 +31,11 @@ class Response < ActiveRecord::Base
     
     # Test for whether Jen's custom rubric needs to be used
 <<<<<<< HEAD
+<<<<<<< HEAD
     if ((self.map.assignment.instructor_id == User.find_by_name("payyapp").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
+=======
+    if ((self.map.assignment.instructor_id == User.find_by_name("jkidd").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
     if ((self.map.assignment.instructor_id == User.find_by_name("jkidd").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee

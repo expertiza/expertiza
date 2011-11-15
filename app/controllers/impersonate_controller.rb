@@ -3,7 +3,11 @@ class ImpersonateController < ApplicationController
   
   def auto_complete_for_user_name     
 <<<<<<< HEAD
+<<<<<<< HEAD
      @users = session[:user].get_available_users(params[:user][:name])        
+=======
+     @users = session[:user].get_available_users(params[:user][:name])
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
      @users = session[:user].get_available_users(params[:user][:name])
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee

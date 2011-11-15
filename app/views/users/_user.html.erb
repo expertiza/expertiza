@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <%= error_messages_for 'user' %>
 
 <!--[form:user]-->
@@ -12,6 +13,21 @@
 <%= render :partial => 'users/prefs' %>
 <!--[eoform:user]-->
 <br/>
+=======
+<%= error_messages_for 'user' %>
+
+<!--[form:user]-->
+<p><label for="user_name">Username</label><br/>
+<%= text_field 'user', 'name'  %></p>
+
+<% new_user ||= false %>
+<%= render :partial => 'users/name' %>
+<%= render :partial => 'users/email' %>
+<%= render :partial => 'users/password', :locals => { :new_user => new_user } %>
+<%= render :partial => 'users/prefs' %>
+<!--[eoform:user]-->
+<br/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <%= error_messages_for 'user' %>
 

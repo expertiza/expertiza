@@ -2,6 +2,10 @@ class User < ActiveRecord::Base
   
   acts_as_authentic do |config|
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    config.validates_uniqueness_of_email_field_options = {:if => lambda { false }} # Don't validate email uniqueness
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
     config.validates_uniqueness_of_email_field_options = {:if => lambda { false }} # Don't validate email uniqueness
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
@@ -63,6 +67,7 @@ class User < ActiveRecord::Base
   end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   def email_welcome
     Mailer.deliver_message(
         {:recipients => self.email,
@@ -81,6 +86,11 @@ class User < ActiveRecord::Base
   def email_welcome
     MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", clear_password)
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+  # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
+  def email_welcome
+    MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", clear_password)
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
   end
 
   def check_password(clear_password)
@@ -88,6 +98,7 @@ class User < ActiveRecord::Base
     Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + clear_password])
   end
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   # Generate email to user with new password
   def reset_and_mail_password
@@ -105,11 +116,16 @@ class User < ActiveRecord::Base
         }
     )
 =======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
   # Resets the password to be mailed to the user
   def reset_password
     randomize_password
     save
     clear_password
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
   end
 

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <h1>New topic</h1>
 
 <% form_tag :action => 'create'do %>
@@ -9,6 +10,18 @@
   <%= submit_tag "Create"%>
 <% end %>
 
+=======
+<h1>New topic</h1>
+
+<% form_tag :action => 'create'do %>
+  
+
+  <%= render :partial => 'topic' %>
+  <%= hidden_field_tag('id', @id) %>
+  <%= submit_tag "Create"%>
+<% end %>
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <h1>New topic</h1>
 

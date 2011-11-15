@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <h1>New Course</h1>
 
 <% form_tag :action => 'create' do %>
@@ -9,6 +10,18 @@
 <% end %>
        
 <br/>
+=======
+<h1>New Course</h1>
+
+<% form_tag :action => 'create' do %>
+   <%= render :partial => 'course' %>
+   <%= submit_tag "Create" %>
+   <%= hidden_field_tag 'course[private]', @private %>
+   
+<% end %>
+       
+<br/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <h1>New Course</h1>
 

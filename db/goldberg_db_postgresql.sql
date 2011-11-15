@@ -271,6 +271,7 @@ CREATE VIEW view_menu_items AS
 --
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 INSERT INTO content_pages (id, title, name, markup_style_id, content, permission_id, created_at, updated_at) VALUES (1, 'Home Page', 'home', 1, 'h1. Welcome to Goldberg!
 
 Looks like you have succeeded in getting Goldberg up and running.  Now you will probably want to customise your site.
@@ -419,6 +420,156 @@ h3. Tabbed Panels
 Goldberg''s implementation of tabbed panels was adapted from 
 "InternetConnection":http://support.internetconnection.net/CODE_LIBRARY/Javascript_Show_Hide.shtml.
 
+=======
+INSERT INTO content_pages (id, title, name, markup_style_id, content, permission_id, created_at, updated_at) VALUES (1, 'Home Page', 'home', 1, 'h1. Welcome to Goldberg!
+
+Looks like you have succeeded in getting Goldberg up and running.  Now you will probably want to customise your site.
+
+*Very important:* The default login for the administrator is "admin", password "admin".  You must change that before you make your site public!
+
+h2. Administering the Site
+
+At the login prompt, enter an administrator username and password.  The top menu should change: a new item called "Administration" will appear.  Go there for further details.
+
+
+', 3, '2006-06-12 00:31:56', '2006-10-01 23:43:39');
+INSERT INTO content_pages (id, title, name, markup_style_id, content, permission_id, created_at, updated_at) VALUES (2, 'Session Expired', 'expired', 1, 'h1. Session Expired
+
+Your session has expired due to inactivity.
+
+To continue please login again.
+
+', 3, '2006-06-12 00:33:14', '2006-10-01 23:43:03');
+INSERT INTO content_pages (id, title, name, markup_style_id, content, permission_id, created_at, updated_at) VALUES (3, 'Not Found!', 'notfound', 1, 'h1. Not Found
+
+The page you requested was not found!
+
+Please contact your system administrator.', 3, '2006-06-12 00:33:49', '2006-10-01 23:44:55');
+INSERT INTO content_pages (id, title, name, markup_style_id, content, permission_id, created_at, updated_at) VALUES (4, 'Permission Denied!', 'denied', 1, 'h1. Permission Denied
+
+Sorry, but you don''t have permission to view that page.
+
+Please contact your system administrator.', 3, '2006-06-12 00:34:30', '2006-10-01 23:41:24');
+INSERT INTO content_pages (id, title, name, markup_style_id, content, permission_id, created_at, updated_at) VALUES (6, 'Contact Us', 'contact_us', 1, 'h1. Contact Us
+
+Visit the Goldberg Project Homepage at "http://goldberg.rubyforge.org":http://goldberg.rubyforge.org for further information on Goldberg.  Visit the Goldberg RubyForge Project Info Page at "http://rubyforge.org/projects/goldberg":http://rubyforge.org/projects/goldberg to access the project''s files and development information.
+', 3, '2006-06-12 10:13:47', '2006-10-02 14:01:19');
+INSERT INTO content_pages (id, title, name, markup_style_id, content, permission_id, created_at, updated_at) VALUES (8, 'Site Administration', 'site_admin', 1, 'h1. Goldberg Setup
+
+This is where you will find all the Goldberg-specific administration and configuration features.  In here you can:
+
+* Set up Users.
+
+* Manage Roles and their Permissions.
+
+* Set up any Controllers and their Actions for your application.
+
+* Edit the Content Pages of the site.
+
+* Adjust Goldberg''s system settings.
+
+
+h2. Users
+
+You can set up Users with a username, password and a Role.
+
+
+h2. Roles and Permissions
+
+A User''s Permissions affect what Actions they can perform and what Pages they can see.  And because each Menu Item is based either on a Page or an Action, the Permissions determine what Menu Items the User can and cannot see.
+
+A Role is a set of Permissions.  Roles are assigned to Users.  Roles are hierarchical: a Role can have a parent Role; and if so it will inherit the Permissions of the parent Role, and all its parents.
+
+
+h2. Controllers and Actions
+
+To execute any Action, a user must have the appropriate Permission.  Therefore all Controllers and Actions you set up for your Rails application need to be entered here, otherwise no user will be able to execute them.
+
+You start by setting up the Controller and assigning it a Permission.  The Permission will be used as the default for any Actions invoked for that Controller.
+
+You have the option of setting up specific Actions for the Controllers.  You would want to do that if the Action were to appear as a Menu Item, or if it were to have a different level of security to the default for the Controller.
+
+
+h2. Content Pages
+
+Goldberg has a very simple CMS built in.  You can create pages to be displayed on the site, possibly in menu items.
+
+
+h2. Menu Editor
+
+Once you have set up your Controller Actions and Content Pages, you can put them into the site''s menu using the Menu Editor.
+
+In the Menu Editor you can add and remove Menu Items and move them around.  The security of a Menu Item (whether the user can see it or not) depends on the Permission of the Action or Page attached to that Menu Item.
+
+h2. System Settings
+
+Go here to view and edit the settings that determine how Goldberg operates.
+', 1, '2006-06-21 21:32:35', '2006-10-01 23:46:01');
+INSERT INTO content_pages (id, title, name, markup_style_id, content, permission_id, created_at, updated_at) VALUES (9, 'Administration', 'admin', 1, 'h1. Site Administration
+
+This is where the administrator can set up the site.
+
+There is one menu item here by default -- "Setup":/menu/setup.  That contains all the Goldberg configuration options.
+
+You can add more menu items here to administer your application if you want, by going to "Setup, Menu Editor":/menu/setup/menus.
+', 1, '2006-06-26 16:47:09', '2006-10-01 23:38:20');
+INSERT INTO content_pages (id, title, name, markup_style_id, content, permission_id, created_at, updated_at) VALUES (10, 'Credits and Licence', 'credits', 1, 'h1. Credits and Licence
+
+Goldberg contains original material and third party material from various sources.
+
+All original material is (p) Public Domain, No Rights Reserved.  Goldberg comes with no warranty whatsoever.
+
+The copyright for any third party material remains with the original author, and the material is distributed here under the original terms.  
+
+Material has been selected from sources with licensing terms and conditions that allow use and redistribution for both personal and business purposes.  These licences include public domain, BSD-style licences, and Creative Commons licences (but *not* Creative Commons Non-Commercial).
+
+If you are an author and you believe your copyrighted material has been included in Goldberg in breach of your licensing terms and conditions, please contact Dave Nelson (urbanus at 240gl dot org).
+
+
+h2. Layouts
+
+Goldberg comes with a choice of layouts, adapted from various sources.
+
+h3. The Default
+
+The default layout is a modified version of Andreas09 by Anreas Viklund.  Andreas09 is distributed under free/unlicensed terms, with an informal request that credit be given to the original author.  The original template can be obtained from "Open Source Web Design":http://www.oswd.org/design/preview/id/2493/.
+
+Author''s website: "andreasviklund.com":http://andreasviklund.com/.
+
+
+h3. "Earth Wind and Fire"
+
+Originally designed by Brett Hillesheim (brett7481 at msn dot com) and distributed under free terms (from the MadSeason website: "Every template we create is completely open source, meaning you can take it and do whatever you want with it").  The original template can be obtained from "Open Source Web Design":http://www.oswd.org/design/preview/id/2453/.
+
+Author''s website: "www.madseason.co.uk":http://www.madseason.co.uk/.
+
+
+h3. "Snooker"
+
+"Snooker" is an original design and is therefore Public Domain.  It incorporates dynamic two-column layout techniques described on the "A List Apart":http://alistapart.com/articles/negativemargins website.
+
+
+h3. "Spoiled Brat"
+
+Originally designed by "Rayk Web Design":http://www.raykdesign.net/ and distributed under the terms of the "Creative Commons Attribution Share Alike":http://creativecommons.org/licenses/by-sa/2.5/legalcode licence.  The original template can be obtained from "Open Web Design":http://www.openwebdesign.org/viewdesign.phtml?id=2894/.
+
+Author''s website: "www.csstinderbox.com":http://www.csstinderbox.com/.
+
+
+h2. Other Features
+
+Goldberg also contains some miscellaneous code and techniques from other sources.
+
+h3. Suckerfish Menus
+
+The three templates "Earth Wind and Fire", "Snooker" and "Spoiled Brat" have all been configured to use Suckerfish menus.  This technique of using a combination of CSS and Javascript to implement dynamic menus was first described by "A List Apart":http://www.alistapart.com/articles/dropdowns/.  Goldberg''s implementation also incorporates techniques described by "HTMLDog":http://www.htmldog.com/articles/suckerfish/dropdowns/.
+
+h3. Tabbed Panels
+
+Goldberg''s implementation of tabbed panels was adapted from 
+"InternetConnection":http://support.internetconnection.net/CODE_LIBRARY/Javascript_Show_Hide.shtml.
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 INSERT INTO content_pages (id, title, name, markup_style_id, content, permission_id, created_at, updated_at) VALUES (1, 'Home Page', 'home', 1, 'h1. Welcome to Goldberg!
 

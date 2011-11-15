@@ -3,7 +3,11 @@
 function checkForm()
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return checkWeights(); // && checkDeadlines();
+=======
+	return checkWeights(); // && checkDeadlines();
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 	return checkWeights(); // && checkDeadlines();
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
@@ -66,7 +70,11 @@ function checkDeadlines()
 		if (error) alert("At least one set of deadlines occur out of chronological order. Please correct this and try again.")
 		return !error		
 <<<<<<< HEAD
+<<<<<<< HEAD
 	}
+=======
+	}
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 	}
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
@@ -82,7 +90,11 @@ function addElement() {
 	numReviews.value=2
 	addElement()
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return
+=======
+	return
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 	return
 >>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
@@ -183,11 +195,19 @@ function addElement() {
   }
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 function updateDropDownMenu(advice,question,min){			
 	var id = 'responses_' + question + '_score'			
 	document.getElementById(id).selectedIndex = advice - min
 }
+=======
+
+function updateDropDownMenu(advice,question,min){			
+	var id = 'responses_' + question + '_score'			
+	document.getElementById(id).selectedIndex = advice - min
+}
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 
 function updateDropDownMenu(advice,question,min){			

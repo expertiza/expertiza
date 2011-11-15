@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a href="#<%= i %>" onClick="toggleVis('<%=i%>'); return false;">
   <span class="inline" id="<%= i %>_show"><%= topic.topic_name %></span>
   <span class="inline" id="<%= i %>_hide" style="display: none"><%= topic.topic_name %></span>
@@ -23,6 +24,32 @@
       <br/>
   <% end %>
 </div>
+=======
+<a href="#<%= i %>" onClick="toggleVis('<%=i%>'); return false;">
+  <span class="inline" id="<%= i %>_show"><%= topic.topic_name %></span>
+  <span class="inline" id="<%= i %>_hide" style="display: none"><%= topic.topic_name %></span>
+</a>
+
+<div id="<%= i %>_myDiv" style="display:none">
+  <% if !@participants.nil? && @participants.size > 0 %>
+      <% chooser_present = false %>
+      <% for participant in @participants %>
+          <% if topic.id == participant.topic_id %>
+              <% chooser_present = true %>
+              <%= participant.name %>
+              <% if participant.is_waitlisted == true %>
+                  <font color='red'>(waitlisted)</font>
+              <% end %>
+              <br/>
+          <% end %>
+      <% end %>
+      <% if chooser_present == false %>
+          No choosers.
+      <% end %>
+      <br/>
+  <% end %>
+</div>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <a href="#<%= i %>" onClick="toggleVis('<%=i%>'); return false;">
   <span class="inline" id="<%= i %>_show"><%= topic.topic_name %></span>

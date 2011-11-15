@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <% found_in_slots = false %>
 <% for slot in @slots_filled %>
     <% if slot.topic_id.to_s == topic.id.to_s %>
@@ -8,6 +9,17 @@
 <% end %>
 <% if found_in_slots == false %>
     <td align="center">0</td>
+=======
+<% found_in_slots = false %>
+<% for slot in @slots_filled %>
+    <% if slot.topic_id.to_s == topic.id.to_s %>
+        <td align="center"><%= slot.count %></td>
+        <% found_in_slots = true %>
+    <% end %>
+<% end %>
+<% if found_in_slots == false %>
+    <td align="center">0</td>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <% found_in_slots = false %>
 <% for slot in @slots_filled %>

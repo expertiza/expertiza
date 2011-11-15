@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <H3>Impersonate User</H3>
 
 <TABLE>
@@ -9,6 +10,18 @@
 <% end %>
 </TR>
 </TABLE>
+=======
+<H3>Impersonate User</H3>
+
+<TABLE>
+<TR>
+<% form_tag :action => 'impersonate' do %>
+<TD>Enter user account: <%= text_field_with_auto_complete :user, :name, {:size => 41} %></TD>
+<TD><input type='submit' value='Impersonate'/></TD>
+<% end %>
+</TR>
+</TABLE>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 =======
 <H3>Impersonate User</H3>
 

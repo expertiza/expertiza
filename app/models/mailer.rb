@@ -1,5 +1,17 @@
 class Mailer < ActionMailer::Base
+<<<<<<< HEAD
+  @redirectURL = ""
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+  @redirectURL = ""
+=======
 
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   #Creates message content
   #defn - A hash object containing the following items:
   #    subject - message's subject line
@@ -18,10 +30,44 @@ class Mailer < ActionMailer::Base
      if defn[:bcc] != nil
        @bcc = defn[:bcc]
      end
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
+     @from = "expertiza-support@lists.ncsu.edu"
+     @body = defn[:body]
+     @url = defn[:url]
+     @sent_on = Time.now 
+     @content_type = 'text/html'
+
+     @controller = defn[:controller]
+     @action = defn[:action]
+     @assignmentID = defn[:assignmentID]
+     @host = self.hostName
+
+     @redirectURL = @host.to_s
+     @redirectURL << @controller.to_s
+     @redirectURL << "/"
+     @redirectURL << @action.to_s
+     @redirectURL << "/"
+     @redirectURL << @assignmentID.to_s
+
+     p "redirect : #{@redirectURL}"
+<<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
 
      @from = "expertiza-support@lists.ncsu.edu"
      @body = defn[:body]
      @sent_on = Time.now 
      @content_type = 'text/html'
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   end
 end

@@ -186,6 +186,8 @@ admin_test:
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
+<<<<<<< HEAD
+=======
 
 
 <% (10..50).each do |i| %>
@@ -203,3 +205,4 @@ student<%= i %>:
   master_permission_granted: 1
 
 <% end %>
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0

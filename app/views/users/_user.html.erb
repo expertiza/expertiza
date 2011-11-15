@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <%= error_messages_for 'user' %>
 
 <!--[form:user]-->
@@ -11,3 +16,36 @@
 <%= render :partial => 'users/prefs' %>
 <!--[eoform:user]-->
 <br/>
+<<<<<<< HEAD
+=======
+=======
+<%= error_messages_for 'user' %>
+
+<!--[form:user]-->
+<p><label for="user_name">Username</label><br/>
+<%= text_field 'user', 'name'  %></p>
+
+<% new_user ||= false %>
+<%= render :partial => 'users/name' %>
+<%= render :partial => 'users/email' %>
+<%= render :partial => 'users/password', :locals => { :new_user => new_user } %>
+<%= render :partial => 'users/prefs' %>
+<!--[eoform:user]-->
+<br/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<%= error_messages_for 'user' %>
+
+<!--[form:user]-->
+<p><label for="user_name">Username</label><br/>
+<%= text_field 'user', 'name'  %></p>
+
+<% new_user ||= false %>
+<%= render :partial => 'users/name' %>
+<%= render :partial => 'users/email' %>
+<%= render :partial => 'users/password', :locals => { :new_user => new_user } %>
+<%= render :partial => 'users/prefs' %>
+<!--[eoform:user]-->
+<br/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0

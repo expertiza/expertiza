@@ -19,6 +19,10 @@ Administrator_role:
   description: ""
   parent_id: <%= Fixtures.identify(:Instructor_role) %>
 SuperAdministrator_role:
+<<<<<<< HEAD
+  name: "SuperAdministrator"
+=======
   name: "Super-Administrator"
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   description: ""
   parent_id: <%= Fixtures.identify(:Administrator_role) %>

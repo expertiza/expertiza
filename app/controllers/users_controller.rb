@@ -24,8 +24,21 @@ class UsersController < ApplicationController
     @users = User.find(:all, :conditions => ['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%",role.get_available_roles, user.id])
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
+<<<<<<< HEAD
+    
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    
+=======
 
   #for displaying the list of users
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+
+  #for displaying the list of users
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   def list
     user = session[:user]
     role = Role.find(user.role_id)
@@ -35,6 +48,20 @@ class UsersController < ApplicationController
     session[:letter] = letter
     if letter == nil
       letter = all_users.first.name[0,1].downcase
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
+    end 
+    logger.info "#{letter}"
+    @letters = Array.new
+    @users = User.paginate(:page => params[:page], :order => 'name', :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter])
+<<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
     end
     logger.info "#{letter}"
     @letters = Array.new
@@ -58,6 +85,11 @@ class UsersController < ApplicationController
     # Get the users list to show on current page
     @users = paginate_list(role, user.id, letter)
 
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     all_users.each {
        | userObj |
        first = userObj.name[0,1].downcase
@@ -66,7 +98,19 @@ class UsersController < ApplicationController
        end
     }
   end
+<<<<<<< HEAD
+  
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+  
+=======
 
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   def show_selection
     @user = User.find_by_name(params[:user][:name])
     if @user != nil
@@ -177,6 +221,13 @@ class UsersController < ApplicationController
     end
   end
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
   # For filtering the users list with proper search and pagination.
   def paginate_list(role, user_id, letter)
     paginate_options = {"1" => 25, "2" => 50, "3" => 100}
@@ -209,4 +260,9 @@ class UsersController < ApplicationController
     end
     users
   end
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 end

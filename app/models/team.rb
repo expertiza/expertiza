@@ -74,6 +74,15 @@ class Team < ActiveRecord::Base
    create(:name => name, :parent_id => parent_id)
    parent = Object.const_get(self.get_parent_model).find(parent_id)
    Object.const_get(self.get_node_type).create(:parent_id => parent.id, :node_object_id => self.id)
+<<<<<<< HEAD
+ end 
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+ end 
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
  end
 
  def self.check_for_existing(parent, name, team_type)
@@ -119,4 +128,9 @@ class Team < ActiveRecord::Base
       end
     end
   end
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 end

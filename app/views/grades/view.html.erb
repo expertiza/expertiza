@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <h1>Summary report for <%= @assignment.name %></h1>
 <BR/>
 <% if @scores[:teams] %>
@@ -15,3 +20,44 @@
 </TABLE>
 <a href="javascript:window.history.back()">Back</a>
 
+<<<<<<< HEAD
+=======
+=======
+<h1>Summary report for <%= @assignment.name %></h1>
+<BR/>
+<% if @scores[:teams] %>
+	<a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
+    <BR/><BR/>
+<% end %>
+<TABLE class="grades" width="100%">
+<% if @assignment.team_assignment && @scores[:teams].length > 0 %>
+  <%= render :partial => 'teams' %>
+<% elsif !@assignment.team_assignment && @scores[:participants].length > 0 %>
+  <%= render :partial => 'participants' %>
+<% else %>
+  <TR><TD>No <%if @assignment.team_assignment%>teams<%else%>participants<%end%> are defined for this assignment</TD></TR>
+<% end %>
+</TABLE>
+<a href="javascript:window.history.back()">Back</a>
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<h1>Summary report for <%= @assignment.name %></h1>
+<BR/>
+<% if @scores[:teams] %>
+	<a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
+    <BR/><BR/>
+<% end %>
+<TABLE class="grades" width="100%">
+<% if @assignment.team_assignment && @scores[:teams].length > 0 %>
+  <%= render :partial => 'teams' %>
+<% elsif !@assignment.team_assignment && @scores[:participants].length > 0 %>
+  <%= render :partial => 'participants' %>
+<% else %>
+  <TR><TD>No <%if @assignment.team_assignment%>teams<%else%>participants<%end%> are defined for this assignment</TD></TR>
+<% end %>
+</TABLE>
+<a href="javascript:window.history.back()">Back</a>
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0

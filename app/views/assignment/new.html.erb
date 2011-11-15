@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <h1>New Assignment</h1>
 
 <% form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();', :onload => 'addElement();')do %>
@@ -18,4 +23,51 @@
 <br />
 <div style="padding: 15px">
 <%= render :partial => '/shared_scripts/back' %>
+<<<<<<< HEAD
+=======
+=======
+<h1>New Assignment</h1>
+
+<% form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();', :onload => 'addElement();')do %>
+  <%= render :partial => 'content' %>
+  <hr/>
+  <%= render :partial => 'rubrics' %>
+  <%= render :partial => 'review_strategy'  %>
+  <hr/>
+  <%= render :partial => 'due_dates' %>
+  <% if @course != nil %>
+  	<%= hidden_field_tag('assignment[course_id]', @course.id) %>
+  <% else %>
+    <%= hidden_field_tag('assignment[course_id]', nil) %>
+  <% end %>
+  <%= hidden_field_tag('assignment[private]',@private) %>
+  &nbsp;&nbsp;<%= submit_tag "Save assignment", :name=>"save" %>
+<% end %>
+<br />
+<div style="padding: 15px">
+<%= render :partial => '/shared_scripts/back' %>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<h1>New Assignment</h1>
+
+<% form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();', :onload => 'addElement();')do %>
+  <%= render :partial => 'content' %>
+  <hr/>
+  <%= render :partial => 'rubrics' %>
+  <%= render :partial => 'review_strategy'  %>
+  <hr/>
+  <%= render :partial => 'due_dates' %>
+  <% if @course != nil %>
+  	<%= hidden_field_tag('assignment[course_id]', @course.id) %>
+  <% else %>
+    <%= hidden_field_tag('assignment[course_id]', nil) %>
+  <% end %>
+  <%= hidden_field_tag('assignment[private]',@private) %>
+  &nbsp;&nbsp;<%= submit_tag "Save assignment", :name=>"save" %>
+<% end %>
+<br />
+<div style="padding: 15px">
+<%= render :partial => '/shared_scripts/back' %>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 </div>

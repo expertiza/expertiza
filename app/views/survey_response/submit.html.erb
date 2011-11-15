@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <h1>Thank you for your input.</h1>
 <% if @surveys %>
 <% if @surveys.length != 1 -%>
@@ -16,4 +21,47 @@
 <% end -%>
 <% else %>
 <p>Please log back in to continue.</p>	
+<<<<<<< HEAD
+=======
+=======
+<h1>Thank you for your input.</h1>
+<% if @surveys %>
+<% if @surveys.length != 1 -%>
+	<p>Other surveys for this assignment: </p>
+	<% form_tag(:action => 'create') do %>
+			<select name="survey_id">
+				<% for survey in @surveys %>
+					<% if @survey.id != survey.id %>
+						<option value="<%= survey.id %>"><%= survey.name %></option>
+					<% end %>
+				<% end %>
+			</select>
+			<input type="hidden" name="assignment_id" value="<%= @assignment_id %>" />
+			<%= submit_tag "Go", :name=>"go" %>
+	<% end %>
+<% end -%>
+<% else %>
+<p>Please log back in to continue.</p>	
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<h1>Thank you for your input.</h1>
+<% if @surveys %>
+<% if @surveys.length != 1 -%>
+	<p>Other surveys for this assignment: </p>
+	<% form_tag(:action => 'create') do %>
+			<select name="survey_id">
+				<% for survey in @surveys %>
+					<% if @survey.id != survey.id %>
+						<option value="<%= survey.id %>"><%= survey.name %></option>
+					<% end %>
+				<% end %>
+			</select>
+			<input type="hidden" name="assignment_id" value="<%= @assignment_id %>" />
+			<%= submit_tag "Go", :name=>"go" %>
+	<% end %>
+<% end -%>
+<% else %>
+<p>Please log back in to continue.</p>	
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <% end %>

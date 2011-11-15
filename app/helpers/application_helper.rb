@@ -17,6 +17,25 @@ module ApplicationHelper
     
     ## Mrunal will convert this to use reflection
     case l_user.role_id
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
+      when Role::STUDENT  
+        user = Student.new
+      when Role::TA
+        user = Ta.new 
+      when Role::INSTRUCTOR 
+        user = Instructor.new 
+      when Role::ADMINISTRATOR
+        user = Administrator.new
+      when Role::SUPERADMINISTRATOR
+<<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
       when Role.student.id  
         user = Student.new
       when Role.ta.id
@@ -26,6 +45,11 @@ module ApplicationHelper
       when Role.administrator.id
         user = Administrator.new
       when Role.superadministrator.id
+<<<<<<< HEAD
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
         user = SuperAdministrator.new
     end
     user

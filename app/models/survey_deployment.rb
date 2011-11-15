@@ -15,8 +15,23 @@ class SurveyDeployment < ActiveRecord::Base
       errors.add_to_base("End Date should be in the future.")
     end
     
+<<<<<<< HEAD
+    if(num_of_students!=nil && num_of_students > User.find_all_by_role_id(1).length)
+      errors.add(:num_of_students," - Too many students.")
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    if(num_of_students!=nil && num_of_students > User.find_all_by_role_id(1).length)
+      errors.add(:num_of_students," - Too many students.")
+=======
     if(num_of_students!=nil && num_of_students > User.find_all_by_role_id(Role.student.id).length)
       errors.add(:num_of_students," - Too many students. #{num_of_students} : #{User.find_all_by_role_id(Role.student.id).length}")
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    if(num_of_students!=nil && num_of_students > User.find_all_by_role_id(Role.student.id).length)
+      errors.add(:num_of_students," - Too many students. #{num_of_students} : #{User.find_all_by_role_id(Role.student.id).length}")
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
     end
       
       

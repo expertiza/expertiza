@@ -1,4 +1,27 @@
 When /^I invite another student to join my team$/ do
+<<<<<<< HEAD
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should see that student in my sent invitations list$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+Given /^another student has invited me to their team$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should see that I have an invite pending$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+When /^I accept the invitation$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should see the person I invited on my team$/ do
+  pending # express the regexp above with the code you wish you had
+=======
 
   invite_flag = false
   if(!find_button("Create Team").nil?)
@@ -42,4 +65,5 @@ end
 
 Then /^I should see the person I invited on my team$/ do
   should have_content('admin')
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 end

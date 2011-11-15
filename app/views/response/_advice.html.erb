@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 &nbsp;&nbsp;&nbsp;<a href="#" id="advice_<%= i %>Link" name="advice_<%= i %>Link" onClick="toggleElement('advice_<%= i %>','advice');return false;">show advice</a><br/>							         
 <div id="advice_<%= i %>" style="display:none;padding:12px">			
 <b>Click advice to adjust score</b><br/><br/>									
@@ -10,3 +15,34 @@
   <% end %>
 <%}%>				
 </div> 
+<<<<<<< HEAD
+=======
+=======
+&nbsp;&nbsp;&nbsp;<a href="#" id="advice_<%= i %>Link" name="advice_<%= i %>Link" onClick="toggleElement('advice_<%= i %>','advice');return false;">show advice</a><br/>							         
+<div id="advice_<%= i %>" style="display:none;padding:12px">			
+<b>Click advice to adjust score</b><br/><br/>									
+<% advice_list.each{ | item | %>  						
+  <div onClick="updateDropDownMenu(<%=item.score%>,<%=i%>,<%=@min%>)" onMouseover="style.color = '#986633'" onMouseOut="style.color = 'black'">			
+  <%=item.score%>:&nbsp;<%=item.advice %>  
+  </div>
+  <% if item.score < @max %>
+  	<br/>
+  <% end %>
+<%}%>				
+</div> 
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+&nbsp;&nbsp;&nbsp;<a href="#" id="advice_<%= i %>Link" name="advice_<%= i %>Link" onClick="toggleElement('advice_<%= i %>','advice');return false;">show advice</a><br/>							         
+<div id="advice_<%= i %>" style="display:none;padding:12px">			
+<b>Click advice to adjust score</b><br/><br/>									
+<% advice_list.each{ | item | %>  						
+  <div onClick="updateDropDownMenu(<%=item.score%>,<%=i%>,<%=@min%>)" onMouseover="style.color = '#986633'" onMouseOut="style.color = 'black'">			
+  <%=item.score%>:&nbsp;<%=item.advice %>  
+  </div>
+  <% if item.score < @max %>
+  	<br/>
+  <% end %>
+<%}%>				
+</div> 
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0

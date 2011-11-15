@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 .ddpanel .ddpanelcontent{ /*CSS for "content" DIV of Drop Down Panel*/
 color: white;
 background: black; /*background of Drop Down Panel*/
@@ -5,3 +10,24 @@ background: black; /*background of Drop Down Panel*/
 }
 
 
+<<<<<<< HEAD
+=======
+=======
+.ddpanel .ddpanelcontent{ /*CSS for "content" DIV of Drop Down Panel*/
+color: white;
+background: black; /*background of Drop Down Panel*/
+/*Do NOT add any "padding" or "margin" properties here! Any padding/margin should be added to your content's container within this DIV instead */
+}
+
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+.ddpanel .ddpanelcontent{ /*CSS for "content" DIV of Drop Down Panel*/
+color: white;
+background: black; /*background of Drop Down Panel*/
+/*Do NOT add any "padding" or "margin" properties here! Any padding/margin should be added to your content's container within this DIV instead */
+}
+
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0

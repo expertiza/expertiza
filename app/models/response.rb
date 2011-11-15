@@ -30,7 +30,19 @@ class Response < ActiveRecord::Base
     code += '<div id="review_'+str+'" style=""><BR/><BR/>'
     
     # Test for whether Jen's custom rubric needs to be used
+<<<<<<< HEAD
+    if ((self.map.assignment.instructor_id == User.find_by_name("payyapp").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    if ((self.map.assignment.instructor_id == User.find_by_name("payyapp").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
+=======
     if ((self.map.assignment.instructor_id == User.find_by_name("jkidd").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+    if ((self.map.assignment.instructor_id == User.find_by_name("jkidd").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
       if self.map.assignment.id < 469
         return custom_display_as_html(code, file_url) + "</div>"
       else

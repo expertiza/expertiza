@@ -1,11 +1,19 @@
 Feature: Add Participants to an Assignment as an Admin
   In order to add participants to an assignment
+<<<<<<< HEAD
+  As an expertiza admin
+=======
   As an expertiza instructor
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   I want to use the add participants page in expertiza
 
 Scenario:Add Participants to an Assignment
   Given a browser is open to Expertiza with logging add_participants_assignment-log.txt
+<<<<<<< HEAD
+  And I am logged into Expertiza as an Admin
+=======
   And I am logged into Expertiza as an Instructor
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
   And I navigate to the ASSIGNMENT_MENU_LIST
   Then I click to Add Participants for assignment ASSIGN_ASSIGNMENT_NAME
   And I fill in the text_field "user_name" with "cukeuser1"

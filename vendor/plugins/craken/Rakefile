@@ -1,7 +1,11 @@
 require 'rubygems'
 require 'rake'
 require 'rake/testtask'
+<<<<<<< HEAD
+require 'rake/rdoctask'
+=======
 require 'rake/task'
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 require 'spec/rake/spectask'
 
 desc 'Default: run unit tests.'

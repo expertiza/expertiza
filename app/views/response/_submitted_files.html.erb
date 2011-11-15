@@ -1,7 +1,31 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <% @files = participant.get_submitted_files %>
 <% if @files and @files.length > 0 %>
 <b>Submitted Files</b>&nbsp;&nbsp;&nbsp;<a href="#" id="filesLink" name="filesLink" onClick="toggleElement('files','files');return false;">show files</a><br/>
   <div id="files" style="display:none">
      <%= display_directory_tree(participant, @files, true) %>
   </div>
+<<<<<<< HEAD
+=======
+=======
+<% @files = participant.get_submitted_files %>
+<% if @files and @files.length > 0 %>
+<b>Submitted Files</b>&nbsp;&nbsp;&nbsp;<a href="#" id="filesLink" name="filesLink" onClick="toggleElement('files','files');return false;">show files</a><br/>
+  <div id="files" style="display:none">
+     <%= display_directory_tree(participant, @files, true) %>
+  </div>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<% @files = participant.get_submitted_files %>
+<% if @files and @files.length > 0 %>
+<b>Submitted Files</b>&nbsp;&nbsp;&nbsp;<a href="#" id="filesLink" name="filesLink" onClick="toggleElement('files','files');return false;">show files</a><br/>
+  <div id="files" style="display:none">
+     <%= display_directory_tree(participant, @files, true) %>
+  </div>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <% end %>

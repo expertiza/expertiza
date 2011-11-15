@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <h1>New topic</h1>
 
 <% form_tag :action => 'create'do %>
@@ -8,4 +13,31 @@
   <%= submit_tag "Create"%>
 <% end %>
 
+<<<<<<< HEAD
+=======
+=======
+<h1>New topic</h1>
+
+<% form_tag :action => 'create'do %>
+  
+
+  <%= render :partial => 'topic' %>
+  <%= hidden_field_tag('id', @id) %>
+  <%= submit_tag "Create"%>
+<% end %>
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+<h1>New topic</h1>
+
+<% form_tag :action => 'create'do %>
+  
+
+  <%= render :partial => 'topic' %>
+  <%= hidden_field_tag('id', @id) %>
+  <%= submit_tag "Create"%>
+<% end %>
+
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 <%= link_to 'Back', :action => 'add_signup_topics', :id => params[:id]%>

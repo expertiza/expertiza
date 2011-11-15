@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0
 Hi <%= @first_name %>,
 
 One of the <%=@type%>s you are reviewing for the "<%= @obj_name %>" assignment has
@@ -26,3 +31,66 @@ Comment: <%=@rs.comments%>
 Score: <%=@rs.score%>
 <% end %>
 <% end %>
+<<<<<<< HEAD
+=======
+=======
+Hi <%= @first_name %>,
+
+One of the <%=@type%>s you are reviewing for the "<%= @obj_name %>" assignment has
+just been entered or revised. You may log into Expertiza and review the work now.
+
+<% if @review_scores != nil %>
+Review Content:
+<% for @rs in @review_scores %>
+-----------------------------------------------------------
+Question: <%=Question.find(@rs.question_id).txt %>
+
+Comment: <%=@rs.comments%>
+
+Score: <%=@rs.score%>
+<% end %>
+<% end %>
+
+<% if @ror_review_scores != nil %>
+Review Content:
+<% for @rs in @ror_review_scores %>
+-----------------------------------------------------------
+Question: <%=Question.find(@rs.question_id).txt %>
+
+Comment: <%=@rs.comments%>
+
+Score: <%=@rs.score%>
+<% end %>
+<% end %>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+=======
+Hi <%= @first_name %>,
+
+One of the <%=@type%>s you are reviewing for the "<%= @obj_name %>" assignment has
+just been entered or revised. You may log into Expertiza and review the work now.
+
+<% if @review_scores != nil %>
+Review Content:
+<% for @rs in @review_scores %>
+-----------------------------------------------------------
+Question: <%=Question.find(@rs.question_id).txt %>
+
+Comment: <%=@rs.comments%>
+
+Score: <%=@rs.score%>
+<% end %>
+<% end %>
+
+<% if @ror_review_scores != nil %>
+Review Content:
+<% for @rs in @ror_review_scores %>
+-----------------------------------------------------------
+Question: <%=Question.find(@rs.question_id).txt %>
+
+Comment: <%=@rs.comments%>
+
+Score: <%=@rs.score%>
+<% end %>
+<% end %>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+>>>>>>> 126e61ecf11c9abb3ccdba784bf9528251d30eb0

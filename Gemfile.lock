@@ -48,11 +48,14 @@ GEM
     fastercsv (1.5.4)
     fastthread (1.0.7)
     ffi (1.0.9)
+    ffi (1.0.9-x86-mingw32)
     gdata (1.1.2)
     gem_plugin (0.2.3)
     gherkin (2.2.9)
       json (~> 1.4.6)
       term-ansicolor (~> 1.0.5)
+    gherkin (2.5.3-x86-mingw32)
+      json (>= 1.4.6)
     highline (1.6.2)
     hoptoad_notifier (2.4.11)
       activesupport
@@ -70,7 +73,11 @@ GEM
       daemons (>= 1.0.3)
       fastthread (>= 1.0.1)
       gem_plugin (>= 0.2.3)
+    mongrel (1.1.5-x86-mingw32)
+      cgi_multipart_eof_fix (>= 2.4)
+      gem_plugin (>= 0.2.3)
     mysql (2.8.1)
+    mysql (2.8.1-x86-mingw32)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
     net-sftp (2.0.5)
@@ -79,6 +86,7 @@ GEM
     net-ssh-gateway (1.1.0)
       net-ssh (>= 1.99.1)
     nokogiri (1.5.0)
+    nokogiri (1.5.0-x86-mingw32)
     rack (1.1.2)
     rack-test (0.6.1)
       rack (>= 1.0)
@@ -123,6 +131,7 @@ GEM
 
 PLATFORMS
   ruby
+  x86-mingw32
 
 DEPENDENCIES
   RedCloth

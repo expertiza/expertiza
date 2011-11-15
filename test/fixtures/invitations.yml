@@ -1,8 +1,4 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-############################################################################
-# Different combination of invitations will be inserted into the tables
-# for unit testing purposes.
-############################################################################
 create_invitation_with_waiting_reply:
   from_id: <%= Fixtures.identify(:student4) %>
   to_id: <%= Fixtures.identify(:student7) %>
@@ -38,22 +34,3 @@ accept_invitation_with_team_and_no_members:
   to_id: <%= Fixtures.identify(:student9) %>
   assignment_id: <%= Fixtures.identify(:assignment0) %>
   reply_status: 'A'
-
-
-############################################################################
-#Two default accepted invitations will be created for the course_object_oriented
-#course and the three assignment associated with it.
-############################################################################
-invitation1:
-  id: 1
-  assignment_id: <%= Fixtures.identify(:assignment_project1) %>
-  from_id: <%= Fixtures.identify(:student1) %>
-  to_id: <%= Fixtures.identify(:student2) %>
-  reply_status: A
-
-invitation2:
-  id: 1
-  assignment_id: <%= Fixtures.identify(:assignment_project2) %>
-  from_id: <%= Fixtures.identify(:student3) %>
-  to_id: <%= Fixtures.identify(:student1) %>
-  reply_status: A

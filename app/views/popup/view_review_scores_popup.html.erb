@@ -1,0 +1,37 @@
+<h2> Review scores </h2>
+<table>
+<tr>
+	
+	<th align = 'left'> Question </th>
+	<th> Score </th>
+	<th> Comments </th>
+	
+</tr>		
+<% @scores.each do |s|%>
+
+<tr>
+	
+	<td align = 'left'> <%= Question.find(s.question_id).txt%></td>
+	<td align = 'center'> <%= s.score%></td>
+	<td align = 'left'> <%= s.comments %> </td>
+	
+	
+</tr>
+	
+	
+<%end%>
+	<tr>
+		<th> Additional Comment</th>
+	</tr>
+	
+	<tr>
+		<%if (Review.find(@reviewid).additional_comment)%>
+			<td> <%= Review.find(@reviewid).additional_comment%> </td>
+			<%else%>
+			<td> No Comments </td>
+		<%end%>
+	</tr>
+</table>
+
+
+<br/>

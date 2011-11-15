@@ -1,0 +1,9 @@
+<h1>Editing Content Page</h1>
+
+<% form_tag :action => 'update', :id => @content_page do %>
+  <%= render :partial => 'form' %>
+  <%= submit_tag 'Edit' %>
+<% end %>
+
+<%= link_to 'Show', :action => 'show', :id => @content_page %> |
+<%= link_to 'Back', :action => 'list' %>

@@ -1,0 +1,6 @@
+<p> <% if controller.action_name == 'new' %>
+        <%=check_box("custom_response", ques_num)%>
+    <%else%>
+        <%=check_box("custom_response", ques_num, {:checked => @review_scores[ques_num].comments.gsub(/\"/,'&quot;').to_i == 1})%>
+    <%end%>
+ <%=label("custom_response", ques_num, ques_text)%></p>

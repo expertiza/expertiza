@@ -1,0 +1,14 @@
+advice0:
+ question_id: <%= Fixtures.identify(:question5)%>
+ score: 2
+ advice: Good
+ 
+advice1:
+ question_id: <%= Fixtures.identify(:questionnaire2)%>
+ score: 3
+ advice: bad
+ 
+advice2:
+ question_id: <%= Fixtures.identify(:questionnaire0)%>
+ score: 4
+ advice: great

@@ -1,0 +1,7 @@
+<p><%=label("custom_response", ques_num, ques_text)%></p>
+    <% if controller.action_name == 'new' %>
+       <%=text_area("custom_response", ques_num, :size => area_size)%>
+    <% else %>
+       <%=text_area("custom_response", ques_num, :size => area_size, :value => @review_scores[ques_num].comments.gsub(/\"/,'&quot;'))%>
+    <% end %>
+</p>

@@ -1,0 +1,21 @@
+<h1>Roles</h1>
+
+<table>
+  <tr>
+    <th>Name</th><th>Description</th><th>Created At</th>
+    <th>Updated At</th>
+  </tr>
+  
+<% for role in @roles %>
+  <tr>
+    <td><%= link_to role.name, :action => 'show', :id => role %></td>
+    <td><%= role.description %></td>
+    <td><%= role.created_at.to_s(:short) %></td>
+    <td><%= role.updated_at.to_s(:short) %></td>
+    <!--td><%= link_to 'Delete', { :action => 'destroy', :id => role }, :confirm => 'Are you sure?' %></td-->
+  </tr>
+<% end %>
+</table>
+
+<hr/>
+<p><%= link_to 'New role', :action => 'new' %></p>

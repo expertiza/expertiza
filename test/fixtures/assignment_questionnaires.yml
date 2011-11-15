@@ -1,0 +1,34 @@
+first:
+  id: 1
+  assignment_id: 1
+  questionnaire_id: 1
+  user_id: 3
+  notification_limit: 15
+  questionnaire_weight: 100
+
+second:
+  id: 2
+  assignment_id: 3
+  questionnaire_id: 2
+  user_id: 3
+  notification_limit: 15
+  questionnaire_weight: 100
+
+third:
+  id: 3
+  assignment_id: 2
+  questionnaire_id: 1
+  user_id: 3
+  notification_limit: 15
+  questionnaire_weight: 100
+
+fourth:
+  id: 4
+  assignment_id: 5
+  questionnaire_id: 2
+  user_id: 3
+  notification_limit: 15
+  questionnaire_weight: 100
+
+
+

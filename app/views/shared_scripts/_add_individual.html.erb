@@ -1,0 +1,6 @@
+<% form_tag({:action => form_action}, {:method => 'post'}) do %>
+Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+<%= hidden_field_tag(obj_type, obj_id) %>
+<%= hidden_field_tag('model', model) %>
+<input type='submit' value='Add Participant'/>
+<% end %>

@@ -1,0 +1,33 @@
+<h1 class="restrictLength">Comments on:  "<%= @question.txt %>"</h1>
+<table>
+	<tr>
+		<th colspan="3"><h3>Survey: <%= @survey.name %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+				Assignment: <%= @assignment.name %></h3></th>
+	</tr>
+	<tr></tr>
+<% if @responses.length > 0 %>
+
+	<tr>
+		<th>Score</th>
+		<th>Comment</th>
+		<th>Email Address</th>
+	</tr>
+<% for response in @responses %>
+	<% if response.comments != "" -%>
+		<tr class="center">
+			<td><%= response.score %></td>
+			<td><%= response.comments %></td>
+			<td><%= response.email %></td>
+		<tr>
+	<% end -%>
+<% end %>
+<% else %>
+	<tr class="center"><td colspan="3">No comments exist for this question.</td></tr>
+<% end %>
+</table>
+<br />
+<% unless @course_eval %>
+<%= link_to 'Back', :action => 'view_responses', :id => params[:assignment_id] %>
+<% else %>
+<%= link_to 'Back', :action => 'view_responses', :id => params[:assignment_id] , :course_eval=>@course_eval %>
+<% end %>

@@ -1,0 +1,55 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+question1:
+ txt: This is test question 1?
+ true_false: true
+ questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
+ weight: 5
+  
+question2:
+ txt: This is test question 2?
+ true_false: true
+ questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
+ weight: 5
+    
+question3:
+ txt: This is test question 3?
+ true_false: true
+ questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
+ weight: 5
+  
+question4:
+ txt: This is test question 4?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
+ weight: 2
+
+
+question5:
+ txt: This is test question 1?
+ true_false: true
+ questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+ weight: 5
+
+question6:
+ txt: This is test question 1?
+ true_false: true
+ questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+ weight: 5
+
+question7:
+ txt: This is test question 1?
+ true_false: true
+ questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+ weight: 5
+
+question8:
+ txt: This is test question 1?
+ true_false: true
+ questionnaire_id: <%= Fixtures.identify(:questionnaire3) %>
+ weight: 5
+
+question9:
+ txt: This is test question 1?
+ true_false: true
+ questionnaire_id: <%= Fixtures.identify(:questionnaire3) %>
+ weight: 5

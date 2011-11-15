@@ -1,0 +1,27 @@
+<h1>Listing Markup Styles</h1>
+
+<table>
+  <tr>
+  <% for column in MarkupStyle.content_columns %>
+    <th><%= column.human_name %></th>
+  <% end %>
+  </tr>
+  
+<% for markup_style in @markup_styles %>
+  <tr>
+  <% for column in MarkupStyle.content_columns %>
+    <td><%=h markup_style.send(column.name) %></td>
+  <% end %>
+    <td><%= link_to 'Show', :action => 'show', :id => markup_style %></td>
+    <td><%= link_to 'Edit', :action => 'edit', :id => markup_style %></td>
+    <td><%= link_to 'Destroy', { :action => 'destroy', :id => markup_style }, :confirm => 'Are you sure?' %></td>
+  </tr>
+<% end %>
+</table>
+
+<%= link_to 'Previous page', { :page => @markup_style_pages.current.previous } if @markup_style_pages.current.previous %>
+<%= link_to 'Next page', { :page => @markup_style_pages.current.next } if @markup_style_pages.current.next %> 
+
+<br />
+
+<%= link_to 'New markup_style', :action => 'new' %>

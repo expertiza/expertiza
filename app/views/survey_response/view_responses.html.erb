@@ -1,0 +1,80 @@
+<script type="text/javascript">
+	function toggleVis(id) { 
+		var elem = document.getElementById(id+"_inner");
+		if(elem.style.display == 'none'){
+			elem.style.display = '';
+			document.getElementById(id+"_show").style.display = 'none';
+			document.getElementById(id+"_hide").style.display = '';
+		} else {
+			elem.style.display = 'none';
+			document.getElementById(id+"_show").style.display = '';
+			document.getElementById(id+"_hide").style.display = 'none';
+		}
+	}
+</script>
+
+
+<h1>
+	Survey Responses for Assignment: <%= @assignment.name %>
+</h1>
+<% if @empty %>
+	<p>No survey responses exist for <%= @assignment.name %>.</p>
+<% else %>
+	<% for survey in @responses -%>
+		<div class="survey_wrapper" id="<%= survey[:id] %>">
+		<h3 class="inline">Survey: <%= survey[:name] %></h3>
+		<a href="#<%= survey[:id] %>" onClick="toggleVis('<%= survey[:id] %>');">
+			<p class="inline" id="<%= survey[:id] %>_show">Show Details</p>
+			<p class="inline" id="<%= survey[:id] %>_hide" style="display: none">Hide Details</p>
+		</a>
+		<br />
+		<% if survey[:avg_labels].length != 0 -%>
+			<img class="barchart" src="<%= ChartsHelper::get_bar_chart_url(survey[:avg_labels],survey[:avg_values],survey[:max]) %>" />
+		<% end -%>
+		<br />
+		<div style="display: none" id="<%= survey[:id] %>_inner" >
+		<% if survey[:empty] -%>
+		<p>&nbsp;&nbsp;&nbsp;&nbsp;No scores exist for this survey.</p>
+		<% else %>
+			<% for question in survey[:questions] -%>
+				<% if question[:count] == 0 -%>
+					<div class="empty_question_wrapper">	
+					<p class="noBottom"><b><%= question[:name] %></b></p>
+					<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					No scores exist for this question.</p>
+					<p> <!-- open p tag link to comments -->
+					</div>
+				<% else %>
+					<div class="question_wrapper">
+					<p class="noBottom"><b><%= question[:name] %></b></p>
+					<img class="floatleft" src="<%= ChartsHelper::get_pie_chart_url(question[:labels],question[:values]) %>" />
+					<ul class="floatleft">
+					<% i = 0 %>
+					<% for label in question[:labels] -%>
+						<% val =  question[:values][i].to_f*100/question[:count] %>
+						<li><b><%= label %></b>: <%=  sprintf("%.2f", val)%>% &nbsp;</li>
+						<% i += 1 -%>
+					<% end -%>
+					</ul>
+					<p class="responseDisplay">&nbsp;&nbsp;Total Responses: <%= question[:count] %> &nbsp;&nbsp;&nbsp; Average Score: <%= sprintf("%.2f",question[:average]) %> &nbsp;
+				<% end %><% #end if question empty %>
+				&nbsp;
+				<% unless params[:course_eval] %><% # Check if survey is a course evaluation %>	
+					<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id] %>
+				<% else %>
+					<%= link_to 'Comments', :controller => 'survey_response', :action => 'comments', :id => params[:id], :assignment_id => params[:id], :question_id => question[:id], :survey_id => survey[:id], :course_eval=>'1' %>
+				<% end %>					
+				</p>
+				</div>
+			<% end %><% #end for question in survey %>
+		<% end %><% #end survey empty %>	
+		</div>
+		</div>
+		<br />					
+	<% end %>
+	<% unless @course_eval %>
+		<p class="clearBoth"><%= link_to 'Back', :controller => 'assignment',:action => 'list' %></p>
+	<% else %>
+		<%= link_to 'Back', :controller => 'survey_deployment',:action => 'list' %>
+	<% end %>
+<% end %>				

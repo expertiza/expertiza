@@ -1,0 +1,6 @@
+<% if participant.get_submitted_files() %>
+<b>Submitted Files</b><br/>
+  <div id="files_submitted">
+     <%= display_directory_tree(participant, participant.get_submitted_files(), true) %>
+  </div>
+<% end %>

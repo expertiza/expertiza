@@ -1,0 +1,104 @@
+<link href="/stylesheets/jquery.multiselect.css" rel="stylesheet" type="text/css"/>
+
+<link href="/stylesheets/style.css" rel="stylesheet" type="text/css"/>
+
+<link href="/stylesheets/jquery-ui-1.8rc3.custom.css" rel="stylesheet" type="text/css"/>
+<script src="/javascripts/jquery.min.js" type="text/javascript"></script>                                        
+<script src="/javascripts/jquery.bgiframe.js" type="text/javascript"></script>
+<script src="/javascripts/jquery.multiselect.js" type="text/javascript"></script>
+<script src="/javascripts/jquery.dataTables.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+    $(function() {
+        $('select').multiSelect({ selectedList:5, minWidth:235, noneSelected:"No dependency"});
+    });
+
+
+</script>
+
+<% @assignment = Assignment.find(params[:id]) %>
+<% form_tag({:action => 'save_topic_dependencies', :id => 'dependency', :assignment_id => @assignment.id}, { :id => 'dependency' }) do %>
+  <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
+
+  <% if flash[:notice] %>
+      <div class="flash_note"><%= flash[:notice] %></div>
+  <% end %>
+
+  <% if @sign_up_topics.size != 0 %>
+      <table class="general" id="topics">
+        <tr><%= render :partial => 'table_header' %></tr>
+        <% i=1 %>
+        <% for topic in @sign_up_topics %>
+        <tr>
+              <td><%= topic.topic_identifier %></td>
+
+              <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
+
+              <td align="center"><%= topic.max_choosers %></td>
+
+              <%= render :partial => 'num_of_choosers', :locals => {:topic=>topic} %>
+
+              <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic}  %>
+
+              <td align="center">
+                  <% topic_identifier = SignUpTopic.find_all_by_assignment_id(@assignment.id).map {|u| [u.topic_identifier, u.id] } %>
+                  <% topic_identifier.delete([topic.topic_identifier, topic.id]) %>
+                  <% select = TopicDependency.find_by_topic_id(topic.id)%>
+                  <% selected = Array.new%>
+                  <% if !select.nil?
+                      selected = select[:dependent_on].to_a 
+                  end%>
+                  <%= select_tag 'topic_dependencies_' + topic.id.to_s + '[dependent_on][]', options_for_select( topic_identifier, selected), :multiple => true, :size => 2 %>
+              </td>
+
+              <td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>
+            </tr>
+            <% i=i+1 %>
+        <% end %>
+      </table>
+      <br/>
+      <input type="submit" id="submit" value="Save dependencies"/>
+
+    <% else %>
+      <div class="flash_note"><%= "Signup topics have not yet been created." %></div>
+    <% end %>
+<% end %>
+
+  <% session[:return_to] = request.request_uri %>
+  <br/><br/>
+  <%= render :partial => 'add_topics' %>
+
+  <% if @assignment.staggered_deadline == true %>
+      | <a href="#image" onClick="toggleVis('image');">
+  <span class="inline" id="image_show">Show dependency graph</span>
+  <span class="inline" id="image_hide" style="display: none">Hide dependency graph</span>
+</a>
+
+      <div id="image_myDiv" style="display:none" align="center">
+        <img src='/images/staggered_deadline_assignment_graph/graph_<%= @assignment.id %>.jpg'/>
+      </div>
+
+      | <a href="#due_date" onClick="toggleVis('due_date');">
+  <span class="inline" id="due_date_show">Show start/due date</span>
+  <span class="inline" id="due_date_hide" style="display: none">Hide start/due date</span>
+</a>
+
+      <% form_tag :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
+      <div id="due_date_myDiv" style="display:none" align="left">
+        <br/>
+
+        <%if !@duedates.nil?%>
+
+            <%if !@duedates[0].nil? && !@duedates[0]['submission_1'].nil?%>
+                <%= render :partial => 'due_dates', :locals => {} %>
+            <%end%>
+        <%else%>
+            Please set the dependencies and click 'Save dependencies'.
+        <%end%>
+      </div>
+      <br/>
+      <% end %>
+
+  <% end %>
+

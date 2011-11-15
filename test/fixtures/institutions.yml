@@ -1,0 +1,12 @@
+<<<<<<< HEAD
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+institution0:
+  name: North Carolina State University
+institution1:
+=======
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+institution0:
+  name: North Carolina State University
+institution1:
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+  name: Test state university

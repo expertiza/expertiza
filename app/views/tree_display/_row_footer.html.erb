@@ -1,0 +1,33 @@
+<<<<<<< HEAD
+</TR>
+<% 
+   if child_nodes 
+   index = 1 
+   for node in child_nodes
+%>
+
+<!-- Start Listing -->
+<%= render :partial=> '/tree_display/entry', :locals => {:node => node, :prefix => prefix+"_"+index.to_s, :depth => depth + 1, :rowtype => rowtype } %>
+<!-- End Listing -->
+<% 
+   index+=1   
+   end 
+%>
+<% end %>
+=======
+</TR>
+<% 
+   if child_nodes 
+   index = 1 
+   for node in child_nodes
+%>
+
+<!-- Start Listing -->
+<%= render :partial=> '/tree_display/entry', :locals => {:node => node, :prefix => prefix+"_"+index.to_s, :depth => depth + 1, :rowtype => rowtype } %>
+<!-- End Listing -->
+<% 
+   index+=1   
+   end 
+%>
+<% end %>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee

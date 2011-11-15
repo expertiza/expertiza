@@ -1,0 +1,9 @@
+<h1>Editing roles_permission</h1>
+
+<% form_tag :action => 'update', :id => @roles_permission do %>
+  <%= render :partial => 'form' %>
+  <%= submit_tag 'Edit' %>
+<% end %>
+
+<%= link_to 'Show', :action => 'show', :id => @roles_permission %> |
+<%= link_to 'Back', :action => 'list' %>

@@ -1,0 +1,37 @@
+<table cellspacing="12">
+<% @last_course = "" %>
+<%@top3LeaderBoards.each do |leadBoard|%>
+  <tr>
+    <td>
+      <table class="sofT" cellspacing="0">
+        <tr>
+          <td colspan="2" class="helpHed">Top 3 <%=leadBoard[:achievement] %> <br/>in <%= leadBoard[:courseName]%></td>
+        </tr>
+        <%3.times do |i|%>
+        <tr>
+          <% if (leadBoard[:sortedGrades][i] != nil) %>
+          <td   
+          <% if session[:user].id == leadBoard[:sortedGrades][i][0]%>   
+            class="selfRef"
+          <% else %>
+            class="noSelfRef"
+          <% end %>
+          >
+          <%= LeaderboardHelper.getUserName(session[:user].id, leadBoard[:sortedGrades][i][0]) %></td>
+          <td
+          <% if session[:user].id == leadBoard[:sortedGrades][i][0]%>   
+            class="selfRef"
+          <% else %>
+            class="noSelfRef"
+          <% end %>
+          >
+          <%= leadBoard[:sortedGrades][i][1][0] %></td>
+          <% end %>
+        </tr>
+        <% end %>
+      </table>
+    </td>
+  </tr>
+  <% @last_course = leadBoard[:courseName] %>
+<% end %>
+</table>

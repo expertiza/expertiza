@@ -1,0 +1,6 @@
+<<<<<<< HEAD
+* the color attribute doesn't seem to work. Problem seems to be in dot
+=======
+* the color attribute doesn't seem to work. Problem seems to be in dot
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+  and not in GraphR though. Setting colors on nodes works ok.

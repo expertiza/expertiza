@@ -1,0 +1,24 @@
+<<<<<<< HEAD
+<h1>Courses</h1>
+
+<table>
+  <tr><th>Title</th><th>Information</th></tr>
+<% for course in @courses %>
+  <tr>
+    <td><%= link_to course.title, :action => 'list', :id => course.id %></td>
+    <td><%= course.info %></td>
+  </tr>
+<% end -%>
+=======
+<h1>Courses</h1>
+
+<table>
+  <tr><th>Title</th><th>Information</th></tr>
+<% for course in @courses %>
+  <tr>
+    <td><%= link_to course.title, :action => 'list', :id => course.id %></td>
+    <td><%= course.info %></td>
+  </tr>
+<% end -%>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+</table>

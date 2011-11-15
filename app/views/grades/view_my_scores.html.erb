@@ -1,0 +1,24 @@
+<<<<<<< HEAD
+<H1>Score for <%= @assignment.name %></H1>
+   
+<TABLE class="grades" >
+<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
+<%= render :partial => 'grades/participant',
+                       :locals => {:prefix => 'user', 
+                                   :team => false,
+                                   :pscore => @participant.get_scores(@questions)} %>                                                                                   
+</TABLE>
+<BR/>
+=======
+<H1>Score for <%= @assignment.name %></H1>
+   
+<TABLE class="grades" >
+<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
+<%= render :partial => 'grades/participant',
+                       :locals => {:prefix => 'user', 
+                                   :team => false,
+                                   :pscore => @participant.get_scores(@questions)} %>                                                                                   
+</TABLE>
+<BR/>
+>>>>>>> c4cd6ee2acd0c2721114a9165e8bf6050a7dd1ee
+<a href="javascript:window.history.back()">Back</a>   

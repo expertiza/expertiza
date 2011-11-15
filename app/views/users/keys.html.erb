@@ -1,0 +1,24 @@
+<h1>User: <%=h @user.name %></h1>
+
+<table>
+
+<tr><th>Full Name:</th>
+<td><%= @user.fullname %></td>
+</tr>
+
+<tr><th>Email Address:</th>
+<td><%= @user.email %></td>
+</tr>
+
+<tr><th valign="top">Private Key:</th>
+<td><textarea rows="10" cols="65"><%= @private_key %></textarea></td>
+</tr>
+
+</table>
+
+<p>SAVE your Private key in a safe place. You will be asked to supply it when granting publishing 
+rights for your work. The digital certificate containing your Public key has been saved by Expertiza.</p>
+
+<hr/>
+
+<p><%= link_to 'Back', {:controller=>:publishing, :action=>:view }%> to publishing rights</p>

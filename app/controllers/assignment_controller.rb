@@ -121,7 +121,7 @@ class AssignmentController < ApplicationController
         max_round = 2;
         
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
-        raise "Please enter a valid drop toipic deadline" if !due_date
+        raise "Please enter a valid Drop-Topic deadline" if !due_date
         
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys

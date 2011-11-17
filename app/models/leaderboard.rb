@@ -40,7 +40,7 @@ class Leaderboard < ActiveRecord::Base
      assignmentList = getAssignmentsInCourses(courseArray)
      independantAssignments = getIndependantAssignments(user_id)
     for iA in independantAssignments
-         assignmentList <<iA
+         assignmentList << iA
     end
      questionnaireHash = getParticipantEntriesInAssignmentList(assignmentList)
   end

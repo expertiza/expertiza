@@ -321,7 +321,7 @@ end
 Role.rebuild_cache
 
 
-# Deadline Types
+###### Deadline Types - necessary because there is no configuration from the UI.
 DeadlineType.create(:name => 'submission')
 DeadlineType.create(:name => 'review')
 DeadlineType.create(:name => 'resubmission')

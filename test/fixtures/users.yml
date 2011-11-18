@@ -55,10 +55,25 @@ instructor3:
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
-    
+
+ta1:
+  name: ta1
+  parent_id: <%= Fixtures.identify(:instructor1) %>
+  fullname: teaching_assistance1_fullname
+  password: <%= Digest::SHA1.hexdigest("ta1") %>
+  password_salt:
+  email: student1@mailinator.com
+  role_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review: 1
+  master_permission_granted: 1
+  handle: stu1
+
+
 student1:
   name: student1
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= Fixtures.identify(:instructor1) %>
   fullname: student1_fullname
   password: <%= Digest::SHA1.hexdigest("student1") %>
   password_salt: 
@@ -71,7 +86,7 @@ student1:
   handle: stu1
   
 student2:
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= Fixtures.identify(:instructor1) %>
   name: student2
   fullname: student2_fullname
   password: <%= Digest::SHA1.hexdigest("student2") %>
@@ -86,7 +101,7 @@ student2:
 
 student3:
   name: student3
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= Fixtures.identify(:instructor1) %>
   fullname: student3_fullname
   password: <%= Digest::SHA1.hexdigest("student3") %>
   password_salt:
@@ -175,19 +190,6 @@ student9:
   email_on_review_of_review: 1   
   master_permission_granted: 1
   
-
-admin_test:
-  name: admin_test
-  parent_id: <%= Fixtures.identify(:admin) %>
-  password: <%= Digest::SHA1.hexdigest("admin_test") %>
-  email: admin_test@mailinator.com
-  password_salt:
-  role_id: <%= Fixtures.identify(:Administrator_role) %>
-  email_on_review: 1
-  email_on_submission: 1
-  email_on_review: 1
-
-
 <% (10..50).each do |i| %>
 student<%= i %>:
   name: stud<%= i %>
@@ -203,3 +205,16 @@ student<%= i %>:
   master_permission_granted: 1
 
 <% end %>
+
+
+admin_test:
+  name: admin_test
+  parent_id: <%= Fixtures.identify(:admin) %>
+  password: <%= Digest::SHA1.hexdigest("admin_test") %>
+  email: admin_test@mailinator.com
+  password_salt:
+  role_id: <%= Fixtures.identify(:Administrator_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review: 1
+  

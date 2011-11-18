@@ -233,11 +233,11 @@ MenuItem.create(:parent_id => MenuItem.find_by_name('show').id, :name => 'show/i
   :controller_action_id => ControllerAction.find_by_site_controller_id_and_name(SiteController.find_by_name('admin').id, 'list_instructors').id)
 
 ###### roles
-Role.create(:id => 1, :name => 'Student', :parent_id => nil)
-Role.create(:id => 6, :name => 'Teaching Assistant', :parent_id => Role.find_by_name('Student').id)
-Role.create(:id => 2, :name => 'Instructor', :parent_id => Role.find_by_name('Teaching Assistant').id)
-Role.create(:id => 3, :name => 'Administrator', :parent_id => Role.find_by_name('Instructor').id)
-Role.create(:id => 4, :name => 'Super-Administrator', :parent_id => Role.find_by_name('Administrator').id)
+Role.create(:name => 'Student', :parent_id => nil)
+Role.create(:name => 'Teaching Assistant', :parent_id => Role.find_by_name('Student').id)
+Role.create(:name => 'Instructor', :parent_id => Role.find_by_name('Teaching Assistant').id)
+Role.create(:name => 'Administrator', :parent_id => Role.find_by_name('Instructor').id)
+Role.create(:name => 'Super-Administrator', :parent_id => Role.find_by_name('Administrator').id)
 
 ###### roles_permissions
 RolesPermission.create(:role_id => Role.find_by_name('Student').id, :permission_id => Permission.find_by_name('public pages - view').id)
@@ -319,3 +319,12 @@ end
 ###### extra stuff
 # Rebuild the role cache.
 Role.rebuild_cache
+
+
+###### Deadline Types - necessary because there is no configuration from the UI.
+DeadlineType.create(:name => 'submission')
+DeadlineType.create(:name => 'review')
+DeadlineType.create(:name => 'resubmission')
+DeadlineType.create(:name => 'rereview')
+DeadlineType.create(:name => 'metareview')
+DeadlineType.create(:name => 'drop_topic')

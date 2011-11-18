@@ -137,7 +137,7 @@ class UsersControllerTest < ActionController::TestCase
 
   def test_search_by_email
     #search for something that is there
-    get :list, :letter => '9@foo.edu', :num_users => 4, :search_by => 3
+    get :list, :letter => '9@mailinator.com', :num_users => 4, :search_by => 3
     assert_response :success
     assert assigns(:users)
     assert_not_equal assigns(:users).size, 0

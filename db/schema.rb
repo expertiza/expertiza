@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110512155258) do
+ActiveRecord::Schema.define(:version => 20111118044951) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -384,6 +384,7 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.text     "additional_comment"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "version_num"
   end
 
   add_index "responses", ["map_id"], :name => "fk_response_response_map"

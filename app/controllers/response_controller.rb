@@ -25,7 +25,32 @@ class ResponseController < ApplicationController
     @response.delete
     redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
   end
-  
+
+  def rereview
+          @header = "New"
+    @next_action = "create"
+    @feedback = params[:feedback]
+    @map = ResponseMap.find(params[:id])
+    @return = params[:return]
+    @modified_object = @map.id
+    get_content
+    #**********************
+    # Check whether this is Jen's assgt. & if so, use her rubric
+    if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
+      if @assignment.id < 469
+         @next_action = "custom_create"
+         render :action => 'custom_response'
+     else
+         @next_action = "custom_create"
+         render :action => 'custom_response_2011'
+     end
+    else
+      # end of special code (except for the end below, to match the if above)
+      #**********************
+    render :action => 'response'
+    end
+    end
+
   def edit
     @header = "Edit"
     @next_action = "update"
@@ -216,6 +241,8 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.notification_accepted = false;
+    puts("saving for me ")
+    puts(params[:id]);
     @map.save
     
     redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]

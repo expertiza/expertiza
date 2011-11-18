@@ -23,6 +23,7 @@
 		 <td>&nbsp;</td>
      <% if map.response %>            
        <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
+           <td><%= link_to "Re-Review",{:controller => 'response', :action => 'new', :id => map.id} %></td>
        <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
         <td><%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
 			<% end %>

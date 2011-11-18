@@ -3,7 +3,7 @@ class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
   
-  def view
+  def view_now
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
     @map = @response.map

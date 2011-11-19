@@ -57,8 +57,11 @@ GEM
     gherkin (2.2.9-x86-mingw32)
       json (~> 1.4.6)
       term-ansicolor (~> 1.0.5)
+<<<<<<< HEAD
     gherkin (2.5.3-x86-mingw32)
       json (>= 1.4.6)
+=======
+>>>>>>> 0fc66325dc04d792b1487ff2bb18d4d2311c4f06
     highline (1.6.2)
     hoptoad_notifier (2.4.11)
       activesupport

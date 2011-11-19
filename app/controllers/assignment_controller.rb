@@ -104,6 +104,8 @@ class AssignmentController < ApplicationController
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
+    deadline = DeadlineType.find_by_name("quiz")
+    @quiz_deadline = deadline.id
     
     if @assignment.save 
       set_questionnaires   
@@ -122,7 +124,7 @@ class AssignmentController < ApplicationController
         
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
         raise "Please enter a valid Drop-Topic deadline" if !due_date
-        
+
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys
             #setting the Due Dates with a helper function written in DueDate.rb
@@ -146,6 +148,9 @@ class AssignmentController < ApplicationController
             raise "Please enter a valid Metareview deadline" if !due_date
           end
         }
+
+        due_date = DueDate::set_duedate(params[:quiz_deadline],@quiz_deadline, @assignment.id, 0) #ccc
+        raise "Please enter a valid Quiz deadline" if !due_date                                   #ccc
                
         # Create submission directory for this assignment
         # If assignment is a Wiki Assignment (or has no directory)

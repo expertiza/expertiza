@@ -124,6 +124,16 @@ function onChangeWikiType(){
   <td colspan="2" height="50">&nbsp;</td>
 </tr> 
 </table></td>
+  <!-- ccc++ -->
+  <tr>
+  <td><label for="require_quiz">Contributor should create a quiz for this assignment</label></td>
+  <td><%= check_box 'assignment', 'require_quiz', {}, true, false%></td>
+ </tr>
+  <td><label for="num_quiz_questions">Number of Quiz questions:</label></td>
+  <td valign="top"><%= text_field 'assignment', 'num_quiz_questions', :size => 5%></td>
+  <!-- ccc-- -->
+  </td>
+</tr>
 </tr>
 </table>
 

@@ -2,7 +2,7 @@ content_home:
     markup_style_id: <%= Fixtures.identify(:markup_textile) %>
     name: home
     title: Home Page
-    permission_id: <%= Fixtures.identify(:public_pages_view) %>
+    permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
     content: |
       h1. Welcome to Expertiza
       
@@ -12,7 +12,7 @@ content_expired:
     markup_style_id: <%= Fixtures.identify(:markup_textile) %>
     name: expired
     title: Session Expired
-    permission_id: <%= Fixtures.identify(:public_pages_view) %>
+    permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
     content: |
       h1. Session Expired
       
@@ -24,7 +24,7 @@ content_notfound:
     markup_style_id: <%= Fixtures.identify(:markup_textile) %>
     name: notfound
     title: Not Found!
-    permission_id: <%= Fixtures.identify(:public_pages_view) %>
+    permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
     content: |-
       h1. Not Found
       
@@ -35,7 +35,7 @@ content_denied:
     markup_style_id: <%= Fixtures.identify(:markup_textile) %>
     name: denied
     title: Permission Denied!
-    permission_id: <%= Fixtures.identify(:public_pages_view) %>
+    permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
     content: |-
       h1. Permission Denied
       
@@ -46,7 +46,7 @@ content_contact_us:
     markup_style_id: <%= Fixtures.identify(:markup_textile) %>
     name: contact_us
     title: Contact Us
-    permission_id: <%= Fixtures.identify(:public_pages_view) %>
+    permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
     content: |
       h1. Contact Us
       
@@ -127,7 +127,7 @@ content_credits:
     markup_style_id: <%= Fixtures.identify(:markup_textile) %>
     name: credits
     title: Credits and Licence
-    permission_id: <%= Fixtures.identify(:public_pages_view) %>
+    permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
     content: |
       h1. Credits and Licence
       

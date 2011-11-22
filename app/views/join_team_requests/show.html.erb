@@ -1,0 +1,23 @@
+<p>
+  <b>Participant:</b>
+  <%=h @join_team_request.participant_id %>
+</p>
+
+<p>
+  <b>Team:</b>
+  <%=h @join_team_request.team_id %>
+</p>
+
+<p>
+  <b>Comments:</b>
+  <%=h @join_team_request.comments %>
+</p>
+
+<p>
+  <b>Status:</b>
+  <%=h @join_team_request.status %>
+</p>
+
+
+<%= link_to 'Edit', edit_join_team_request_path(@join_team_request) %> |
+<%= link_to 'Back', join_team_requests_path %>

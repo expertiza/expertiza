@@ -53,5 +53,6 @@ Rails::Initializer.run do |config|
       :domain => "localhost"
     }
   end
+
 end
 

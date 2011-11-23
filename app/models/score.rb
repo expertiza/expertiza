@@ -48,4 +48,15 @@ class Score < ActiveRecord::Base
     }
     return (weighted_score.to_f / (sum_of_weights.to_f * questions.first.questionnaire.max_question_score.to_f)) * 100   
   end
+
+#Override ActiveRecord::Base's update_attribute and create methods so that ScoreCache is updated simultaneously
+  def update_attribute(name, value)   
+    ScoreCache.update_cache(response_id)
+    super.update_attribute(name,value)  
+  end
+
+  def create(attributes = nil, &block)
+   ScoreCache.update_cache(response_id)
+   super.create(attributes,&block)  
+  end   
 end

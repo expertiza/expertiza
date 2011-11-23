@@ -14,9 +14,10 @@ Rails::Initializer.run do |config|
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
-  if RAILS_ENV == 'production' and RUBY_PLATFORM !~ /mswin|mingw/ # Don't check on Windows, because there's no "which" command to check
-    raise 'dot executable missing - install graphviz' if %x(which dot).to_s.empty?
-  end
+# Commenting out graphviz
+#  if RAILS_ENV == 'production' and RUBY_PLATFORM !~ /mswin|mingw/ # Don't check on Windows, because there's no "which" command to check
+#    raise 'dot executable missing - install graphviz' if %x(which dot).to_s.empty?
+#  end
 
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named
@@ -43,7 +44,7 @@ Rails::Initializer.run do |config|
   }
 
   config.action_controller.session_store = :active_record_store
-  
+
   if RAILS_ENV == 'production'
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
@@ -53,3 +54,4 @@ Rails::Initializer.run do |config|
     }
   end
 end
+

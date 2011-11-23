@@ -10,6 +10,7 @@
     <%if @show_actions%>
     <th width="5%">Action</th>
     <%end%>
+    <th width="5%">Bookmarks</th>
   </tr>
 
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
@@ -57,6 +58,10 @@
                 <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
             <% end %>
         <% end %>
+	<td>
+	<%= link_to 'View', :controller=>'bookmarks', :action=> 'view_topic_bookmarks', :id => topic.id, :assignment_id => params[:id] %>
+	<%= link_to 'Add', :controller=>'bookmarks', :action=> 'add_bookmark_form', :id => topic.id, :assignment_id => params[:id] %>
+	</td>
       </tr>
       <% i=i+1 %>
   <% end %>

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101001183244) do
+ActiveRecord::Schema.define(:version => 20111123081903) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -60,6 +60,33 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
+
+  create_table "bmappings", :force => true do |t|
+    t.integer  "bookmark_id",   :null => false
+    t.string   "title"
+    t.integer  "user_id",       :null => false
+    t.string   "description"
+    t.datetime "date_created",  :null => false
+    t.datetime "date_modified", :null => false
+  end
+
+  create_table "bmappings_sign_up_topics", :id => false, :force => true do |t|
+    t.integer "sign_up_topic_id", :null => false
+    t.integer "bmapping_id",      :null => false
+  end
+
+  create_table "bmappings_tags", :force => true do |t|
+    t.integer  "tag_id",      :null => false
+    t.integer  "bmapping_id", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bookmarks", :force => true do |t|
+    t.string  "url",                :null => false
+    t.integer "discoverer_user_id", :null => false
+    t.integer "user_count",         :null => false
+  end
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -549,6 +576,10 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
 
   add_index "ta_mappings", ["course_id"], :name => "fk_ta_mappings_course_id"
   add_index "ta_mappings", ["ta_id"], :name => "fk_ta_mappings_ta_id"
+
+  create_table "tags", :force => true do |t|
+    t.string "tagname", :null => false
+  end
 
   create_table "teams", :force => true do |t|
     t.string  "name"

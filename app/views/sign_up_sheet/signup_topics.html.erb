@@ -1,15 +1,16 @@
 <h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
-	<table class="general">
-	  <tr>
-	    <th width="5%">Topic #</th>
-	    <th width="75%">Topic name(s)</th>
-	    <th width="5%">Max choosers</th>
-	    <th width="5%">Available slots</th>
-	    <th width="5%">Waitlist</th>
-	    <%if @show_actions%>
-	    <th width="5%">Action</th>
-	    <%end%>
-	  </tr>
+<table class="general">
+  <tr>
+    <th width="5%">Topic #</th>
+    <th width="75%">Topic name(s)</th>
+    <th width="5%">Max choosers</th>
+    <th width="5%">Available slots</th>
+    <th width="5%">Waitlist</th>
+    <%if @show_actions%>
+    <th width="5%">Action</th>
+    <%end%>
+    <th width="5%">Bookmarks</th>
+  </tr>
 
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
       <b>Your topic(s):</b>
@@ -66,6 +67,10 @@
                 <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
             <% end %>
         <% end %>
+	<td>
+	<%= link_to 'View', :controller=>'bookmarks', :action=> 'view_topic_bookmarks', :id => topic.id, :assignment_id => params[:id] %>
+	<%= link_to 'Add', :controller=>'bookmarks', :action=> 'add_bookmark_form', :id => topic.id, :assignment_id => params[:id] %>
+	</td>
       </tr>
       <% i=i+1 %>
   <% end %>
@@ -76,5 +81,6 @@
    session[:return_to] = request.request_uri
 %>
 <br/><br/>
-<a href="javascript:history.back()">Back</a>  
+<a href="javascript:history.back()">Back</a>
 <br/>
+

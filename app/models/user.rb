@@ -209,7 +209,7 @@ class User < ActiveRecord::Base
     @email_on_review_of_review = true
   end
 
-  def self.get_user(params)
+  def self.from_params(params)
       if params[:user_id]
         user = User.find(params[:user_id])
       else

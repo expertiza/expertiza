@@ -29,7 +29,7 @@ class ReviewMappingController < ApplicationController
     msg = String.new
     begin
 
-      user = User.get_user(params)
+      user = User.from_params(params)
 
       regurl = url_for :action => 'add_user_to_assignment',
           :id => assignment.id, 
@@ -147,7 +147,7 @@ class ReviewMappingController < ApplicationController
     mapping = ResponseMap.find(params[:id])  
     msg = String.new
     begin
-      user = User.get_user(params)
+      user = User.from_params(params)
 
       regurl = url_for :action => 'add_user_to_assignment', :id => mapping.id, :user_id => user.id               
       reviewer = get_reviewer(user,mapping.assignment,regurl)
@@ -505,9 +505,9 @@ class ReviewMappingController < ApplicationController
     for response_map in response_maps
       score_for_this_review = review_report[response_map.reviewer_id][response_map.reviewee_id]
       if(score_for_this_review != 0)
-        @review_distribution[(score_for_this_review/10).to_i] = @review_distribution[(score_for_this_review/10).to_i] + 1
-        if (@review_distribution[(score_for_this_review/10).to_i] > max_score)
-          max_score = @review_distribution[(score_for_this_review/10).to_i]
+        @review_distribution[(score_for_this_review/10-1).to_i] = @review_distribution[(score_for_this_review/10-1).to_i] + 1
+        if (@review_distribution[(score_for_this_review/10-1).to_i] > max_score)
+          max_score = @review_distribution[(score_for_this_review/10-1).to_i]
         end
       else
         @reviews_not_done +=1

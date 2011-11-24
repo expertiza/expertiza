@@ -17,7 +17,7 @@ class AssignmentController < ApplicationController
     new_assign.update_attribute('name','Copy of '+ new_assign.name)
     new_assign.update_attribute('created_at',Time.now)
     new_assign.update_attribute('updated_at',Time.now)
-    if new_assign.directory_path != nil
+    if new_assign.directory_path.present?
       new_assign.update_attribute('directory_path',new_assign.directory_path+'_copy')
     end
     session[:copy_flag] = true

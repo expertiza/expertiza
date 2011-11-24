@@ -64,19 +64,17 @@ class AssignmentController < ApplicationController
     @private = params[:private] == true
     #calling the defalut values mathods
     get_limits_and_weights
-
-
+    if (session[:user].role.name == "Administrator") or (session[:user].role.name == "Super-Administrator")
+      flash[:note] = "Note: The Submission Directory field to be filled in is the path relative to the instructor\'s
+      home directory (named after his user.name). However, when an administrator creates an assignment,
+      (s)he needs to preface the path with the user.name of the instructor whose assignment it is."
+    end
 
   end
 
   #--------------------------------------------------------------------------------------------------------------------
   #  CREATE
   #  Populates new assignment
-  #
-  #  Note:
-  #  The Assignment Directory field to be filled in is the path relative to the instructor's
-  #  home directory (named after his user.name). However, when an administrator creates an assignment,
-  # (s)he needs to preface the path with the user.name of the instructor whose assignment it is.
   #--------------------------------------------------------------------------------------------------------------------
 
   def create

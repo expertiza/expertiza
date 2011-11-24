@@ -86,12 +86,12 @@ class UsersController < ApplicationController
     
     if @user.save
       #Instructor and Administrator users need to have a default set for their notifications
-      # the creation of an AssignmentQuestionnaires object with only the User ID field populated
+      # the creation of an AssignmentQuestionnaire object with only the User ID field populated
       # ensures that these users have a default value of 15% for notifications.
       #TAs and Students do not need a default. TAs inherit the default from the instructor,
       # Students do not have any checks for this information.
       if @user.role.name == "Instructor" or @user.role.name == "Administrator"
-        AssignmentQuestionnaires.create(:user_id => @user.id)
+        AssignmentQuestionnaire.create(:user_id => @user.id)
       end
       flash[:notice] = 'User was successfully created.'
       redirect_to :action => 'list'
@@ -126,7 +126,7 @@ class UsersController < ApplicationController
        user = User.find(params[:id])
        AssignmentParticipant.find_all_by_user_id(user.id).each{|participant| participant.delete}
        TeamsUser.find_all_by_user_id(user.id).each{|teamuser| teamuser.delete}
-       AssignmentQuestionnaires.find_all_by_user_id(user.id).each{|aq| aq.destroy}           
+       AssignmentQuestionnaire.find_all_by_user_id(user.id).each{|aq| aq.destroy}
        user.destroy
     rescue
       flash[:error] = $!

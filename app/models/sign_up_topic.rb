@@ -6,6 +6,10 @@ class SignUpTopic < ActiveRecord::Base
 
   belongs_to :assignment
 
+  def get_team_id_from_topic_id(user_id)
+    return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
+  end
+
   def self.import(row,session,id = nil)
 
       if row.length != 4

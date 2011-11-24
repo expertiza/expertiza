@@ -13,7 +13,7 @@ class Team < ActiveRecord::Base
     end
     self.destroy
   end
-  
+
   def get_node_type
     "TeamNode"
   end

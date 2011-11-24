@@ -37,20 +37,20 @@ class ResponseController < ApplicationController
     }
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
+    jkidd = User.find_by_name("jkidd")
+    if jkidd && jkidd.id == @assignment.instructor_id && @title == "Review"
       if @assignment.id < 469
-         @next_action = "custom_update"
-         render :action => 'custom_response'
-     else
-         @next_action = "custom_update"
-         render :action => 'custom_response_2011'
-     end
+        @next_action = "custom_update"
+        render :action => 'custom_response'
+      else
+        @next_action = "custom_update"
+        render :action => 'custom_response_2011'
+      end
+    #**********************
     else
-      # end of special code (except for the end below, to match the if above)
-      #**********************
       render :action => 'response'
     end
-  end  
+  end
   
   def update
     @response = Response.find(params[:id])
@@ -140,18 +140,18 @@ class ResponseController < ApplicationController
     get_content  
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
+    jkidd = User.find_by_name("jkidd")
+    if jkidd && jkidd.id == @assignment.instructor_id && @title == "Review"
       if @assignment.id < 469
-         @next_action = "custom_create"
-         render :action => 'custom_response'
-     else
-         @next_action = "custom_create"
-         render :action => 'custom_response_2011'
-     end
+        @next_action = "custom_create"
+        render :action => 'custom_response'
+      else
+        @next_action = "custom_create"
+        render :action => 'custom_response_2011'
+      end
+    #**********************
     else
-      # end of special code (except for the end below, to match the if above)
-      #**********************
-    render :action => 'response'
+      render :action => 'response'
     end
   end
   

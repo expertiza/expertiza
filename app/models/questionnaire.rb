@@ -4,7 +4,7 @@ class Questionnaire < ActiveRecord::Base
     has_many :questions # the collection of questions associated with this Questionnaire
     belongs_to :instructor, :class_name => "User", :foreign_key => "instructor_id" # the creator of this questionnaire
     
-    has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaires', :foreign_key => 'questionnaire_id'  
+    has_many :assignment_questionnaires
     has_many :assignments, :through => :assignment_questionnaires
     
     validates_presence_of :name

@@ -14,7 +14,7 @@ class Assignment < ActiveRecord::Base
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
-  has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaires', :foreign_key => 'assignment_id'
+  has_many :assignment_questionnaires
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy  
@@ -637,7 +637,7 @@ end
   def get_review_questionnaire_id()
     @revqids = []
 
-    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",self.id])
+    @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",self.id])
     @revqids.each do |rqid|
       rtype = Questionnaire.find(rqid.questionnaire_id).type
       if( rtype == "ReviewQuestionnaire")

@@ -88,7 +88,7 @@ class AssignmentController < ApplicationController
 
 
     #Calculate days between submissions
-    set_days_btw_sub
+    set_days_between_submissions
 
     if @assignment.save
       set_questionnaires
@@ -206,10 +206,10 @@ class AssignmentController < ApplicationController
   end
 
   #---------------------------------------------------------------------------------------------------------------------
-  #  SET_DAYS_BTW_SUB  (Helper function for CREATE and UPDATE)
+  #  SET_DAYS_BETWEEN_SUBMISSIONS  (Helper function for CREATE and UPDATE)
   #   Sets days between submissions for staggered assignments
   #---------------------------------------------------------------------------------------------------------------------
-  def set_days_btw_sub
+  def set_days_between_submissions
 
     if params[:days].nil? && params[:weeks].nil?
       @days = 0
@@ -363,7 +363,7 @@ class AssignmentController < ApplicationController
     oldpath = get_path
 
     #Calculate days between submissions
-    set_days_btw_sub
+    set_days_between_submissions
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])

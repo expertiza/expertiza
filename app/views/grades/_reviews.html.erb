@@ -18,10 +18,11 @@
     <% count = count + 1 %>
 		
 		<% file_url = nil
-       if (participant.assignment.instructor_id == User.find_by_name("jkidd").id)
-            @current_folder = DisplayOption.new
-            @current_folder.name = ""
-            @participant = Participant.find(review.map.reviewer_id)
+			 jkidd = User.find_by_name("jkidd")
+			 if jkidd && jkidd.id == participant.assignment.instructor_id
+						@current_folder = DisplayOption.new
+						@current_folder.name = ""
+						@participant = Participant.find(review.map.reviewer_id)
 						files_list = Dir[@participant.assignment.get_path.to_s + "/" + review.map.id.to_s + @current_folder.name + "/*"]
 						files = Array.new
 						for file in files_list
@@ -34,9 +35,9 @@
 					file = files[0]
 					file_url = ""
 					if !file.nil?
-             # parentFolder = File.dirname(file)
-             # location = parentFolder + File.basename(file)
-					   file_url = ""
+						 # parentFolder = File.dirname(file)
+						 # location = parentFolder + File.basename(file)
+						 file_url = ""
 						 file_url = "<u><i> "
 						 file_url += link_to File.basename(file), :controller=>'submitted_content', :action=>'download', :download=>File.basename(file), 'current_folder[name]'=>File.dirname(file)
 						 file_url += " </i></u><br/>"

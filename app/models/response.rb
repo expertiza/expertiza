@@ -30,14 +30,14 @@ class Response < ActiveRecord::Base
     code += '<div id="review_'+str+'" style=""><BR/><BR/>'
     
     # Test for whether Jen's custom rubric needs to be used
-    if ((self.map.assignment.instructor_id == User.find_by_name("jkidd").id) && (self.map.type.to_s != 'FeedbackResponseMap'))
+    jkidd = User.find_by_name("jkidd")
+    if jkidd && jkidd.id == self.map.assignment.instructor_id && self.map.type.to_s != 'FeedbackResponseMap'
       if self.map.assignment.id < 469
         return custom_display_as_html(code, file_url) + "</div>"
       else
         return custom_display_as_html_2011(code, file_url) + "</div>"
       end
     end
-    
     # End of custom code
 
     count = 0

@@ -1,71 +1,79 @@
 <h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
-	<table class="general">
-	  <tr>
-	    <th width="5%">Topic #</th>
-	    <th width="75%">Topic name(s)</th>
-	    <th width="5%">Max choosers</th>
-	    <th width="5%">Available slots</th>
-	    <th width="5%">Waitlist</th>
-	    <%if @show_actions%>
-	    <th width="5%">Action</th>
-	    <%end%>
-	  </tr>
+<table class="general">
+  <tr>
+    <th width="5%">Topic #</th>
+    <th width="75%">Topic name(s)</th>
+    <th width="5%">Max choosers</th>
+    <th width="5%">Available slots</th>
+    <th width="5%">Waitlist</th>
+    <th width="5%">Advertisement(s)</th>
+    <% if @show_actions %>
+        <th width="5%">Action</th>
+    <% end %>
+  </tr>
 
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
       <b>Your topic(s):</b>
       <% for selected_topic in @selected_topics %>
           <br/><%= selected_topic.topic_name %>
-          <%if selected_topic.is_waitlisted == true%>
-            <font color='red'>(waitlisted)</font>
-          <%end%>
+          <% if selected_topic.is_waitlisted == true %>
+              <font color='red'>(waitlisted)</font>
+          <% end %>
       <% end %>
   <% end %>
   <br/><br/>
 
   <% i=1 %>
   <% for topic in @sign_up_topics %>
-  	<% if !@selected_topics.nil? && @selected_topics.size != 0 %>
-     <% for selected_topic in @selected_topics %>
-       <% if selected_topic.topic_id == topic.id %>
-        <tr bgcolor="yellow">
-       <% else %>
-	     <tr>
-	   <% end%>
-	 <%end %>
-	 <%else%>
-	 	<tr>
-	<%end%>
-        <td><%=topic.topic_identifier%></td>
-        <td><%= topic.topic_name %></td>
-        <td align="center"><%= topic.max_choosers %></td>
+      <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+          <% for selected_topic in @selected_topics %>
+              <% if selected_topic.topic_id == topic.id %>
+                  <tr bgcolor="yellow">
+              <% else %>
+                  <tr>
+              <% end %>
+          <% end %>
+      <% else %>
+          <tr>
+      <% end %>
+      <td><%= topic.topic_identifier %></td>
+      <td><%= topic.topic_name %></td>
+      <td align="center"><%= topic.max_choosers %></td>
 
-        <% found_in_slots = false %>
-        <% for slot in @slots_filled %>
-            <% if slot.topic_id.to_s == topic.id.to_s %>
-                <% available_slots = topic.max_choosers.to_int - slot.count.to_i %>
-                <td align="center"><%= available_slots %></td>
-                <% found_in_slots = true %>
-            <% end %>
-        <% end %>
-        <% if found_in_slots == false %>
-            <td align="center"><%= topic.max_choosers %></td>
-        <% end %>
+      <% found_in_slots = false %>
+      <% for slot in @slots_filled %>
+          <% if slot.topic_id.to_s == topic.id.to_s %>
+              <% available_slots = topic.max_choosers.to_int - slot.count.to_i %>
+              <td align="center"><%= available_slots %></td>
+              <% found_in_slots = true %>
+          <% end %>
+      <% end %>
+      <% if found_in_slots == false %>
+          <td align="center"><%= topic.max_choosers %></td>
+      <% end %>
 
-        <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
-        <%if @show_actions%>
-            <%action_symbol_added = false%>
-            <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
-                <% for selected_topic in @selected_topics %>
-                    <% if selected_topic.topic_id == topic.id %>
-                        <td align="center" bgcolor="yellow"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
-                        <%action_symbol_added = true%>
-                    <% end %>
-                <% end %>
-            <% end %>
-            <%if action_symbol_added == false %>
-                <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
-            <% end %>
-        <% end %>
+      <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
+      <% if @show_actions %>
+          <% action_symbol_added = false %>
+          <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+              <% for selected_topic in @selected_topics %>
+                  <% if selected_topic.topic_id == topic.id %>
+                      <td align="center" bgcolor="yellow"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+                      <% action_symbol_added = true %>
+                  <% end %>
+              <% end %>
+          <% end %>
+          <% if action_symbol_added == false %>
+              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
+          <% end %>
+      <% end %>
+      <td align="center">
+      <% if !(participant = Participant.find_by_topic_id(topic.id)).nil? %>
+          <% if Team.find(TeamsUser.find_by_user_id(participant.user_id).team_id).advertise_for_partner? %>
+              <%= link_to image_tag("ad.png", :height => 25, :width => 25, :alt=>'Advertise for partners') %>
+          <% end %>
+      <% end %>
+      </td>
       </tr>
       <% i=i+1 %>
   <% end %>
@@ -76,5 +84,5 @@
    session[:return_to] = request.request_uri
 %>
 <br/><br/>
-<a href="javascript:history.back()">Back</a>  
+<a href="javascript:history.back()">Back</a>
 <br/>

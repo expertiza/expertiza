@@ -9,6 +9,9 @@ class AssignmentParticipant < Participant
   
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
   has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
+  # ------- added by sachin -------- #
+  has_many    :quiz_mappings, :class_name => 'QuizResponseMap', :foreign_key => 'reviewee_id'
+  # -------------------------------- #
   has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   belongs_to  :user
 
@@ -24,6 +27,14 @@ class AssignmentParticipant < Participant
     ParticipantReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
       :reviewed_object_id => assignment.id)
   end
+
+  # ------- added by sachin --------- #
+  def assign_quiz(contributor)
+     quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
+     QuizResponseMap.create(:reviewee_id => contributor.id, :reviewer_id => self.id,
+      :reviewed_object_id => quiz.id)
+  end
+  # --------------------------------- #
 
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object 

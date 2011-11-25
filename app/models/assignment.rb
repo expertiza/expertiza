@@ -57,6 +57,32 @@ class Assignment < ActiveRecord::Base
     candidate_topics
   end
 
+  # ---------- added by sachin ----------------#
+  # Returns a set of topics that can be used for taking the quiz.
+  # We choose the topics if one of its submissions has received the fewest quizzes' attempts so far
+  def candidate_topics_for_quiz
+    return nil if sign_up_topics.empty?   # This is not a topic assignment
+
+    contributor_set = Array.new(contributors)
+
+    # Reject contributors that have not selected a topic, or have no submissions
+    contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
+
+    # Reject contributions of topics whose deadline has passed
+    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
+                                            contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
+    # Filter the contributors with the least number of reviews
+    # (using the fact that each contributor is associated with a topic)
+    contributor = contributor_set.min_by { |contributor| contributor.quiz_mappings.count }
+
+    min_quizzes = contributor.quiz_mappings.count rescue 0
+    contributor_set.reject! { |contributor| contributor.quiz_mappings.count > min_quizzes + review_topic_threshold }
+
+    candidate_topics = Set.new
+    contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
+    candidate_topics
+  end
+
   def has_topics?
     @has_topics ||= !sign_up_topics.empty?
   end
@@ -67,7 +93,15 @@ class Assignment < ActiveRecord::Base
     contributor = contributor_to_review(reviewer, topic)
     
     contributor.assign_reviewer(reviewer)
+
   end
+
+  # ---------added by sachin---------- #
+  def assign_quiz_dynamically(reviewer, topic)
+    contributor = contributor_to_review(reviewer, topic)
+    reviewer.assign_quiz(contributor)
+  end
+  # ---------------------------------- #
   
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
@@ -333,7 +367,14 @@ class Assignment < ActiveRecord::Base
   def submission_allowed(topic_id=nil)
     return (check_condition("submission_allowed_id",topic_id) or check_condition("resubmission_allowed_id",topic_id))
   end
-  
+
+  # -------- added by sachin ------- #
+  # Determine if the next due date from now allows to take the quizzes
+  def quiz_allowed(topic_id=nil)
+    return check_condition("quiz_allowed_id",topic_id)
+  end
+  # -------------------------------- #
+
   # Determine if the next due date from now allows for reviews
   def review_allowed(topic_id=nil)
     return (check_condition("review_allowed_id",topic_id) or check_condition("rereview_allowed_id",topic_id))

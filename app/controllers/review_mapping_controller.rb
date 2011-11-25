@@ -146,6 +146,53 @@ class ReviewMappingController < ApplicationController
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
   end
 
+  # ---------- added by sachin ------------#
+  def assign_quiz_dynamically
+      begin
+      assignment = Assignment.find(params[:assignment_id])
+      reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+
+      unless params[:i_dont_care]
+        topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
+      else
+        topic = assignment.candidate_topics_for_quiz.to_a.shuffle[0] rescue nil
+      end
+
+      assignment.assign_quiz_dynamically(reviewer, topic)
+
+    rescue Exception => e
+      flash[:alert] = (e.nil?) ? $! : e
+    end
+
+    redirect_to :controller => 'student_quiz', :action => 'list', :id => reviewer.id
+  end
+  # ---------------------------------------#
+
+
+  def add_metareviewer
+    mapping = ResponseMap.find(params[:id])
+    msg = String.new
+    begin
+      user = get_user(params)
+      regurl = url_for :action => 'add_user_to_assignment', :id => mapping.id, :user_id => user.id
+      reviewer = get_reviewer(user,mapping.assignment,regurl)
+
+      if MetareviewResponseMap.find(:first, :conditions => ['reviewed_object_id = ? and reviewer_id = ?',mapping.id,reviewer.id]) != nil
+        raise "The metareviewer \""+reviewer.user.name+"\" is already assigned to this reviewer."
+      end
+      # Code Review: Semantically it doesn't make sense to review the 'response map'
+      #              the object to be reviewed should be the 'response' itself.
+      #              Another reason is that a response map doesn't necessarily have a
+      #              response (i.e. a review hasn't been submitted yet)
+      #              Consider refactoring this.
+      MetareviewResponseMap.create(:reviewed_object_id => mapping.id,
+                                   :reviewer_id => reviewer.id,
+                                   :reviewee_id => mapping.reviewer.id)
+    rescue
+      msg = $!
+    end
+    redirect_to :action => 'list_mappings', :id => mapping.assignment.id, :msg => msg
+  end
   def assign_metareviewer_dynamically
     begin
       assignment   = Assignment.find(params[:assignment_id])
@@ -160,31 +207,7 @@ class ReviewMappingController < ApplicationController
     redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
   end
 
-  def add_metareviewer    
-    mapping = ResponseMap.find(params[:id])  
-    msg = String.new
-    begin
-      user = get_user(params)   
-      regurl = url_for :action => 'add_user_to_assignment', :id => mapping.id, :user_id => user.id               
-      reviewer = get_reviewer(user,mapping.assignment,regurl)
-      
-      if MetareviewResponseMap.find(:first, :conditions => ['reviewed_object_id = ? and reviewer_id = ?',mapping.id,reviewer.id]) != nil
-         raise "The metareviewer \""+reviewer.user.name+"\" is already assigned to this reviewer."
-      end
-      # Code Review: Semantically it doesn't make sense to review the 'response map'
-      #              the object to be reviewed should be the 'response' itself.
-      #              Another reason is that a response map doesn't necessarily have a
-      #              response (i.e. a review hasn't been submitted yet)
-      #              Consider refactoring this.
-      MetareviewResponseMap.create(:reviewed_object_id => mapping.id,
-                                   :reviewer_id => reviewer.id,
-                                   :reviewee_id => mapping.reviewer.id)                         
-    rescue  
-      msg = $!
-    end
-    redirect_to :action => 'list_mappings', :id => mapping.assignment.id, :msg => msg                                  
-  end 
-  
+
   def get_user(params)      
       if params[:user_id]
         user = User.find(params[:user_id])

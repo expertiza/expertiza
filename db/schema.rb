@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111122010416) do
+ActiveRecord::Schema.define(:version => 20111124232053) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -269,12 +269,12 @@ ActiveRecord::Schema.define(:version => 20111122010416) do
   add_index "invitations", ["to_id"], :name => "fk_invitationto_users"
 
   create_table "join_team_requests", :force => true do |t|
-    t.text     "comments"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.integer  "participant_id"
     t.integer  "team_id"
+    t.text     "comments"
     t.string   "status",         :limit => 1
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "languages", :force => true do |t|
@@ -553,9 +553,9 @@ ActiveRecord::Schema.define(:version => 20111122010416) do
 
   create_table "teams", :force => true do |t|
     t.string  "name"
-    t.integer "parent_id",             :default => 0, :null => false
+    t.integer "parent_id",                  :default => 0, :null => false
     t.string  "type"
-    t.text    "comment"
+    t.text    "comments_for_advertisement"
     t.boolean "advertise_for_partner"
   end
 

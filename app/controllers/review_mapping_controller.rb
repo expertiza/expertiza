@@ -81,7 +81,7 @@ class ReviewMappingController < ApplicationController
           TeamReviewResponseMap.add_reviewer(contributor.id, reviewer.id, assignment.id)
         else
           contributor = AssignmentParticipant.find_by_id_and_parent_id(submission_id, assignment_id)
-          ParticipantReviewResponseMap.add_reviewer(submission.id, assignment.id, reviewer.id)
+          ParticipantReviewResponseMap.add_reviewer(contributor.id, reviewer.id, assignment.id)
         end
       rescue
         msg = $!
@@ -439,26 +439,13 @@ class ReviewMappingController < ApplicationController
 
     # Arranged as the hash @review_scores[reveiwer_id][reviewee_id] = score for this particular assignment
     @review_scores = @assignment.compute_reviews_hash
-
-    review_questionnaire_id = @assignment.get_review_questionnaire_id()
-    if(review_questionnaire_id)
-      review_questionnaire = Questionnaire.find(review_questionnaire_id)
-      maxscore = review_questionnaire.max_question_score
-      review_questions = review_questionnaire.questions
-    end
-    userid = session[:user].id
-
   end
 
   def distribution
   
     @assignment = Assignment.find(params[:id])
-    review_questionnaire_id = @assignment.get_review_questionnaire_id()
 
-    review_questionnaire = Questionnaire.find(review_questionnaire_id)
-    review_questions = review_questionnaire.questions
     @scores = [0,0,0,0,0,0,0,0,0,0]
-    t_score = 0
     if(@assignment.team_assignment)
       teams = Team.find_all_by_parent_id(params[:id])
       objtype = "TeamReviewResponseMap"
@@ -469,19 +456,12 @@ class ReviewMappingController < ApplicationController
     
     teams.each do |team|
       score_cache = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",team.id,  objtype])
-      score_distribution = Hash.new
       t_score = 0
       if score_cache!= nil
         t_score = score_cache.score
       end
       if (t_score != 0)
-        
         @scores[(t_score/10).to_i] =  @scores[(t_score/10).to_i] + 1
-        if(score_distribution[(t_score/10).to_i] == nil)
-          score_distribution[(t_score/10).to_i] = 1
-        else
-          score_distribution[(t_score/10).to_i] = score_distribution[(t_score/10).to_i] + 1
-        end
       end
     end
     

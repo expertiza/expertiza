@@ -1,4 +1,5 @@
 class ReviewFilesController < ApplicationController
+  helper :diff
 
   def upload_review_file
     @participant = AssignmentParticipant.find(params[:participant_id])
@@ -67,6 +68,116 @@ class ReviewFilesController < ApplicationController
                                        participant, @version_number))
   end
 
+
+
+  def method1
+
+    first_file = '/home/shyam/Desktop/GIT_HELP'
+    second_file = '/home/shyam/Desktop/heroku_HELP'
+
+    processor = DiffHelper::Processor.new(first_file,second_file)
+    processor.process!
+
+    @first_line_num = []
+    @second_line_num = []
+    @first_offset = []
+    @second_offset = []
+    @firstcnt = 0
+    @secondcnt = 0
+    @offsetswithcomments_file1 = []
+    @offsetswithcomments_file2 = []
+
+    @first_offset << 0
+    @second_offset << 0
+
+    for i in (0..processor.absolute_line_num)
+
+      if(i>0)
+        @first_offset << (@first_offset[i-1] + processor.first_file_array[i-1].size)
+        @second_offset << (@second_offset[i-1] + processor.second_file_array[i-1].size)
+
+      end
+      first =   processor.first_file_array[i].to_s
+      if(first != "$")
+        @first_line_num << @firstcnt+1
+        @firstcnt += 1
+      else
+        processor.first_file_array[i] = ""
+        @first_line_num << ""
+      end
+
+
+      second = processor.second_file_array[i].to_s
+
+      if(second != "$")
+
+        @second_line_num << @secondcnt+1
+        @secondcnt += 1
+      else
+        processor.second_file_array[i] = ""
+        @second_line_num << ""
+      end
+
+      third = processor.comparison_array[i]
+      first = first.gsub("\n","")
+      second = second.gsub("\n","")
+      #print " i: ",i
+      #print "first",@first_line_num[i]
+      #print " FIRST:",first
+      #print "first",@second_line_num[i]
+      #print " SECOND: ",second
+      #print "TYPE: ",third
+      #puts "\n"
+      if(third == 'MATCH')then @offsetswithcomments_file1 << @first_offset[i] end
+      if(third == 'change')then @offsetswithcomments_file2 << @second_offset[i] end
+
+      if(processor.first_file_array[i] != nil)
+        processor.first_file_array[i] = processor.first_file_array[i].chomp
+      end
+      if(processor.second_file_array[i] != nil)
+        processor.second_file_array[i] = processor.second_file_array[i].chomp
+      end
+
+    end
+
+    puts @offsetswithcomments_file1
+    puts @offsetswithcomments_file2
+
+    @shareObj = Hash.new()
+    @shareObj['linearray1'] = processor.first_file_array
+    @shareObj['linearray2'] = processor.second_file_array
+    @shareObj['comparator'] = processor.comparison_array
+    @shareObj['linenumarray1'] = @first_line_num
+    @shareObj['linenumarray2'] = @second_line_num
+    @shareObj['offsetarray1'] = @first_offset
+    @shareObj['offsetarray2'] = @second_offset
+    @shareObj['file1'] = first_file
+    @shareObj['file2'] = second_file
+    @shareObj['highlightfile1'] = @offsetswithcomments_file1
+    @shareObj['highlightfile2'] = @offsetswithcomments_file2
+
+
+
+  end
+
+  def method2
+    incoming_data = params[:key]
+    puts (params)
+    puts "#####"
+    array_data = incoming_data.to_s.split("$")
+    puts array_data
+  end
+
+  def method3
+
+    puts params[:key]
+    array_data = params[:key].to_s.gsub("$","<br>")
+    puts array_data
+    respond_to do |format|
+      format.js { render :json => array_data }
+    end
+
+  end
 
 
 

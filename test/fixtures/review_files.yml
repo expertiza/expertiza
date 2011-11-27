@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  filepath: MyString
+  author_participant_id: 1
+  version_number: 1
+
+two:
+  filepath: MyString
+  author_participant_id: 1
+  version_number: 1

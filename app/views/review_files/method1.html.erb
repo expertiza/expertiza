@@ -1,0 +1,284 @@
+
+<head>
+
+  <link type='text/css' href='/stylesheets/demo.css' rel='stylesheet' media='screen' />
+
+  <!-- OSX Style CSS files -->
+  <link type='text/css' href='/stylesheets/osx.css' rel='stylesheet' media='screen' />
+
+
+
+
+  <script type="text/javascript"
+          src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+  <script type="text/javascript"
+          src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js"></script>
+
+  <script type="text/javascript">
+
+
+      //#######################
+      function ajaxSubmit()
+      {
+          var newdom = document.getElementById('invisible')
+          var comment = document.getElementById('forminput_2')
+          var passvalue = newdom.value+comment.value
+          //alert(A);
+
+          new Ajax.Request('/review_files/method2', {
+              method:'get',
+              parameters: { key :passvalue}
+
+          });
+      }
+      //#######################
+
+
+      //#######################
+
+      //********** HIDES THE DIV myDiv2 ****************
+      function hideit()
+      {
+          document.getElementById('myDiv2').innerHTML = ""
+          $("#myDiv2").fadeOut();
+      }
+      //#######################
+
+
+      //##################################################
+
+      //******************* ONLY DISPLAYS COMMENTS ***********
+      function olderVersion(e, filepath, offset)
+      {
+
+          var append = filepath +"$"+offset+"$"
+          var domObj = document.getElementById('myDiv2')
+          if(domObj.innerHTML =="")
+          {
+              new Ajax.Request('/review_files/method3', {
+                  method:'get',
+                  parameters: { key :append},
+                  onSuccess: function(ret_val)
+                  {
+
+                      var osx = document.getElementById('osx-modal-data')
+                      osx.innerHTML="<br><br>"+ret_val.responseText+"<br><br><a href='#' onclick='hideit()'>Close [X]</a><br><br>"
+                      $('#mybutton').trigger('click');
+
+//domObj.innerHTML = "<br><br>"+ret_val.responseText+"<br><br><a href='#' onclick='hideit()'>Close [X]</a><br><br>";
+//$('#myDiv2').fadeIn();
+
+                      //###################### click and highlight code ###############
+                      var testdom = document.getElementById('td'+e)
+                      testdom.bgColor = "RED"
+                      //###############################################################
+                  },
+                  onFailure: function(){ alert('Something went wrong...') }
+              });
+          }
+          else
+          {
+              domObj.innerHTML=""
+              domObj.fadeOut('slow');
+          }
+      }
+      //#####################################################
+
+      //###########################################################
+
+      //***** DISPLAYS PREVIOUS COMMENTS AND FORM IS PRESENT********
+      function recentVersion(e, filepath, offset)
+      {
+
+
+          var newdom = document.getElementById('invisible')
+          var append = filepath +"$"+offset+"$"
+          newdom.value = append
+
+          var form = document.getElementById('add_subject').innerHTML;
+
+
+          var domObj = document.getElementById('myDiv2')
+          var value="";
+
+          if(domObj.innerHTML=="")
+          {
+
+              new Ajax.Request('/review_files/method3', {
+                  method:'get',
+                  parameters: { key :append},
+                  onSuccess: function(ret_val)
+                  {
+
+                      var setter = "<br><br>"+ret_val.responseText+"<br><br>"+form+"<a href='#' onclick='hideit()'>Close [X]</a><br>";
+
+                      setter = setter.replace("invisible","invisbile_2");
+                      setter = setter.replace("forminput","forminput_2");
+                      var osx = document.getElementById('osx-modal-data')
+                      osx.innerHTML=setter
+                      $('#mybutton').trigger('click');
+
+                      //###################### click and highlight code ###############
+                      var testdom = document.getElementById('td'+e)
+                      testdom.bgColor = "RED"
+                      //###############################################################
+
+                      //domObj.innerHTML = setter
+
+
+                      //$('#myDiv2').fadeIn();
+                  },
+                  onFailure: function(){ alert('Something went wrong...') }
+              });
+
+
+              domObj.fadeIn("slow");
+
+          }
+          else
+          {
+              domObj.slideUp('slow');
+              domObj.innerHTML=""
+
+          }
+      }
+      //##################################################
+
+  </script>
+
+
+  <style >
+      .parentDisable {
+          position:fixed;
+          width:400px; top:350px; left:250px; height:400px;
+          display:none;
+          z-index:3;
+          color: blue;
+          background-color: rgba(0,205,0,0.9);
+          border:1px solid #DEDEDE;
+          border-radius:5px; -moz-border-radius:5px; -webkit-border-radius:5px;
+
+      }
+
+      a:link {
+          COLOR: BLUE;
+      }
+      a:visited {
+          COLOR: BLUE;
+      }
+      a:hover {
+          COLOR: BLUE;
+      }
+      a:active {
+          COLOR: BLUE;
+      }
+
+      .curved {
+          -moz-border-radius:10px;
+          -webkit-border-radius:10px;
+          behavior:url(border-radius.htc);
+      }
+
+      td{vertical-align: middle} pre{margin: 0px}
+
+  </style>
+
+</head>
+
+
+<font face="courier" size="2">
+
+  </br></br>
+  <div id="myDiv2" class="parentDisable" onLoad="assign()"></div>
+  <SCRIPT>
+      $(document).ready(function(){
+          $("#myDiv2").draggable();
+          $("#add_subject").fadeOut();
+      });
+  </SCRIPT>
+
+
+  <!--   The popup which pops up as one intends to click or view comments -->
+
+  <!-- DO NOT REMOVE THIS BUTTON. ITS NEEDED TO GENERATE THE POPUP -->
+  <input type='button' id="mybutton" name='osx' value='Demo' class='osx demo' style="display:none">
+
+  <div id="osx-modal-content">
+    <div id="osx-modal-title">Comments</div>
+    <div class="close"><a href="#" class="simplemodal-close">x</a></div>
+    <div id="osx-modal-data">
+
+      <p><button class="simplemodal-close">Close</button> <span>(or press ESC or click the overlay)</span></p>
+    </div>
+  </div>
+  </div>
+  <!-- COMMENT DIV COMPLETE -->
+
+  <!--  THE DIV OF THE TABLE -->
+  <div  style= "border-style: solid; width: 1100px; height: 500px; overflow: scroll;" >
+    <table width="100%" cellpadding='0' cellspacing='0'>
+      <% for i in 0..@shareObj['linearray1'].size %>
+
+          <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE ROW -->
+          <% if (@shareObj['comparator'][i]=="ADD") then @color="#66FFCC"%><%end%>
+          <% if (@shareObj['comparator'][i]=="DELETE") then @color="#FF9999"%><%end%>
+          <% if (@shareObj['comparator'][i]=="change") then @color="#CCCCCC"%><%end%>
+          <% if (@shareObj['comparator'][i]=="MATCH") then @color="WHITE"%><%end%>
+
+
+
+          <tr bgcolor="<%=@color%>">
+
+            <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE LEFT LINE NUMBER -->
+            <% if @shareObj['highlightfile1'].include?@shareObj['offsetarray1'][i]  %>
+                <%td1color = 'RED'%>
+            <%else%>
+                <%td1color = 'YELLOW'%>
+            <%end%>
+
+            <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE RIGHT LINE NUMBER -->
+            <% if @shareObj['highlightfile2'].include?@shareObj['offsetarray2'][i]  %>
+                <%td1color_2 = 'RED'%>
+            <%else%>
+                <%td1color_2 = 'YELLOW'%>
+            <%end%>
+
+            <!-- LINE NUMBER 1 -->
+            <td width="1%" id="tdx_<%=i%>" bgcolor="<%=td1color%>"><a style="display:block" href="#" onclick="olderVersion('x_<%=i%>','<%=@shareObj['file1']%>','<%=@shareObj['offsetarray1'][i]%>')"><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
+
+            <!-- OFFSET FOR FILE 1 -->
+            <td width="1%"><pre><% @shareObj['offsetarray1'][i]%> </pre></td>
+
+            <!-- THE ACTUAL DATA LINE -->
+            <td width="48%"><pre><%= @shareObj['linearray1'][i]%></pre></td>
+
+            <!-- LINE NUMBER 2 -->
+            <td width="1%" id="td<%=i%>" bgcolor="<%=td1color_2%>"><a style="display:block" href="#" onclick="recentVersion('<%=i%>','<%=@shareObj['file2']%>','<%=@shareObj['offsetarray2'][i]%>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
+
+            <!-- OFFSET FOR FILE 2  -->
+            <td width="1%"><pre><% @shareObj['offsetarray2'][i]%> </pre></td>
+
+            <!--  THE ACTUAL DATA LINE-->
+            <td width="48%"><pre><%= @shareObj['linearray2'][i]%> </pre></td>
+
+          </tr>
+          <tr><td></td><td></td><td><div id="x_<%=i%>"></div></td><td></td><td></td> <td><div id="<%=i%>"></div></td></tr>
+
+      <%end%>
+    </table>
+  </div>
+
+  <!--  HIDDEN DIV WHICH LATER CREEPS INTO THE POPUP -->
+  <div id="add_subject">
+    <textarea id="forminput" rows="10" cols="20"></textarea> <br>
+    <button onclick="ajaxSubmit()"><b>Comment!</b></button>
+    <input type="textarea" id="invisible" style="display:none">
+  </div>
+</font>
+
+
+<script type='text/javascript' src='/javascripts/jquery.simplemodal.js'></script>
+<script type='text/javascript' src='/javascripts/osx.js'></script>
+		
+
+      

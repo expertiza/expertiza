@@ -4,11 +4,15 @@
 <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
   <% form_tag :action=>'submit_hyperlink', :id => participant.id do %> 
 	 <b>Submit a hyperlink:</b><BR/>
-   <input type="text" name="submission" size=40/ value="http://"><input type="submit" name="upload_link" value="Upload link"/>     
+   <input type="text" name="submission" size=40 value="http://"><input type="submit" name="upload_link" value="Upload link"/>
 	<% end %>
 <% end %>	
 
 <% if participant.assignment.wiki_type_id == 1%>
+    <br/>
+    <%= link_to "Upload Code Review Files" , :controller => 'review_files',
+                :action => 'upload_review_file', :participant_id => participant.id %>
+    <br/><br/>
   <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>
 <% else %> 
   <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>

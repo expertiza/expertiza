@@ -1,0 +1,7 @@
+<h2>Code Review Dashboard</h2>
+All Files of Version <%= @version_number %>:<br/><br/>
+<% if @files %>
+    <% @files.each do |each_file| %>
+        <b><%= File.basename(each_file).to_s %><br/></b>
+    <% end %>
+<% end %>

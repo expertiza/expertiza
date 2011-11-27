@@ -58,6 +58,15 @@
     <%= link_to image_tag("rm_ad.png", :height => 25, :width => 25, :alt=>'Remove your advertisement'), :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
 <% end %>
      <% end %>
+<% if @student.team!=nil %>
+<h2>Received Requests</h2>
+
+<%= render :partial => 'join_team_requests/list',
+           :locals =>{:team_id=>@student.team.id,
+                      :teams_user_id=>params[:id]} %>
+<% end %>
+
+
 <table>
   <h2>Sent Invitations</h2>
   <tr>

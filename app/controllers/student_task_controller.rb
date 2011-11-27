@@ -106,8 +106,8 @@ class StudentTaskController < ApplicationController
   def view
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
-    
-    @assignment = @participant.assignment    
+
+    @assignment = @participant.assignment
     @can_provide_suggestions = Assignment.find(@assignment.id).allow_suggestions
     @reviewee_topic_id = nil
     #Even if one of the reviewee's work is ready for review "Other's work" link should be active
@@ -139,7 +139,7 @@ class StudentTaskController < ApplicationController
   def others_work
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
-    
+
     @assignment = @participant.assignment
     # Finding the current phase that we are in
     due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id])

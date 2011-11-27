@@ -1,45 +1,65 @@
 <h1>Editing assignment</h1>
 
-<% form_tag({:action => 'update', :id => @assignment, :review_limit => @limits[:review], :metareview_limit => @limits[:metareview], :teammate_limit => @limits[:teammate], :feedback_limit => @limits[:feedback]},:onsubmit => 'return checkForm();') do %>
-  <%= render :partial => 'content' %>
+  <% form_tag({:action => 'update', :id => @assignment, :review_limit => @limits[:review], :metareview_limit => @limits[:metareview], :teammate_limit => @limits[:teammate], :feedback_limit => @limits[:feedback]}, :onsubmit => 'return checkForm();') do %>
+    <%= render :partial => 'content' %>
+
     <hr/>
-  <%= render :partial => 'rubrics' %>
-  <%= render :partial => 'review_strategy' %>
-<br/>
-<hr/>
-<div style="font-size:large;"><b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b></div>  
-  <table>
-    <tr style="font-size:12px;padding:15px">
+    <%= render :partial => 'rubrics' %>
+    <%= render :partial => 'review_strategy' %>
+    <br/>
+    <hr/>
+     <div style="font-size:large;">
+     <b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b></div>
+      <table>
+        <tr style="font-size:12px;padding:15px">
         <th style="padding:10px">Deadline type</th>
         <th style="padding:10px">Date &amp; time</th>
         <th style="padding:10px">Submission allowed</th>
         <th style="padding:10px">Review allowed</th>
-        <th style="padding:10px">Resubmission allowed</th>
-        <th style="padding:10px">Re-review allowed</th>
         <th style="padding:10px">Metareview allowed</th>
-		<th style="padding:10px">Reminder (hrs)</th>
-    </tr>
-    <% 	i = 0;
-        duedates = @assignment.due_dates
-		 
-        duedates.sort! {|a,b| a.due_at <=> b.due_at}
-		for @due_date in duedates %>
-	        <% heading = @due_date.deadline_type.name.titleize + " deadline" %>
-			<tr>
-				<td align ="center"><%= heading%></td>
-				<td align ="center"><%= text_field 'due_date[]', 'due_at', :size=>30%></td>
-			<% if @due_date.deadline_type_id != 6 %>
-				<td align ="center"><%= select('due_date[]', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96]])%></td>
-				<td align ="center"><%= hidden_field('due_date[]', 'flag', 'value' => 0)%></td>
-			<% end %>
-			</tr>
-			<% i += 1 %>
-		<% end %>
+		<th style="padding:10px">Signup allowed</th>
+        <th style="padding:10px">Drop allowed</th>
+        <th id="team_allowed"
+            <% if !@assignment.team_assignment %>style="display:none"
+        <% end %>>
+        Teammate Review allowed
+        </th>
+        <th style="padding:10px">Author Feedback allowed</th>
+        <th style="padding:10px">Survey Response allowed</th>
+        <th style="padding:10px">Reminder (hrs)</th>
+      </tr>
+      <% i = 0;
+         duedates = @assignment.due_dates
+         duedates.sort! { |a, b| a.due_at <=> b.due_at }
+         for @due_date in duedates %>
+          <% heading = @due_date.deadline_type.name.titleize + " deadline" %>
+          <tr>
+            <td align="center"><%= heading %></td>
+            <td align="center"><%= text_field 'due_date[]', 'due_at', :size=>30 %></td>
+            <% if @due_date.deadline_type_id != 7 %>
+                <td align="center"><%= select('due_date[]', 'submission_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]]) %></td>
+                <td align="center"><%= select('due_date[]', 'review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]]) %></td>
+                <td align="center"><%= select('due_date[]', 'review_of_review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]]) %></td>
+                <td align="center"><%= select('due_date[]', 'signup_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]]) %></td>
+                <td align="center"><%= select('due_date[]', 'drop_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]]) %></td>
+
+                <% if @due_date.deadline_type_id == 1 %>
+                    <td id="team_allowed1"
+                        <% if !@assignment.team_assignment %>style="display:none"
+                        <% end %> align="center"><%= select('due_date[]', 'teammate_review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]]) %></td>
+                <% else %>
+                    <td id="team_allowed2"
+                        <% if !@assignment.team_assignment %>style="display:none"
+                        <% end %> align="center"><%= select('due_date[]', 'teammate_review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]]) %></td>
+                <% end %>
+                <td align="center"><%= select('due_date[]', 'author_feedback_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]]) %></td>
+                <td align="center"><%= select('due_date[]', 'survey_response_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]]) %></td>
+                <td align="center"><%= select('due_date[]', 'threshold', [[8, 8], [16, 16], [24, 24], [32, 32], [40, 40], [48, 48], [56, 56], [64, 64], [72, 72], [80, 80], [88, 88], [96, 96]]) %></td>
+                <td align="center"><%= hidden_field('due_date[]', 'flag', 'value' => 0) %></td>
+            <% end %>
+          </tr>
+          <% i += 1 %>
+      <% end %>
     </table>
 <br/>
 <div id="days_between_chapters" style="position:relative">

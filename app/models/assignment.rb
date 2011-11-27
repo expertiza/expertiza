@@ -32,6 +32,7 @@ class Assignment < ActiveRecord::Base
 
   DEFAULT_MAX_REVIEWERS = 3
 
+
   # Returns a set of topics that can be reviewed.
   # We choose the topics if one of its submissions has received the fewest reviews so far
   def candidate_topics_to_review
@@ -334,14 +335,34 @@ class Assignment < ActiveRecord::Base
     return (check_condition("submission_allowed_id",topic_id) or check_condition("resubmission_allowed_id",topic_id))
   end
   
-  # Determine if the next due date from now allows for reviews
+# Determine if the next due date from now allows for reviews
   def review_allowed(topic_id=nil)
     return (check_condition("review_allowed_id",topic_id) or check_condition("rereview_allowed_id",topic_id))
-  end  
+  end
   
   # Determine if the next due date from now allows for metareviews
   def metareview_allowed(topic_id=nil)
     return check_condition("review_of_review_allowed_id",topic_id)
+  end
+
+  def signup_allowed(topic_id=nil)
+    return check_condition("signup_allowed_id",topic_id)
+  end
+
+  def drop_allowed(topic_id=nil)
+    return check_condition("drop_allowed_id",topic_id)
+  end
+
+  def teammate_review_allowed(topic_id=nil)
+    return check_condition("teammate_review_allowed_id",topic_id)
+  end
+
+  def author_feedback_allowed(topic_id=nil)
+    return check_condition("author_feedback_allowed_id",topic_id)
+  end
+
+  def survey_response_allowed(topic_id=nil)
+    return check_condition("survey_response_allowed_id",topic_id)
   end
     
   def delete(force = nil)
@@ -675,5 +696,6 @@ end
         return contributors_signup_topic
       end
   end
+
 end
   

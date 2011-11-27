@@ -93,7 +93,7 @@ class AssignmentTeam < Team
   def get_submitted_files
     self.get_participants.first.get_submitted_files
   end
-  
+
   def get_review_map_type
     return 'TeamReviewResponseMap'
   end  

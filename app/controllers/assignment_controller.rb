@@ -117,7 +117,7 @@ class AssignmentController < ApplicationController
         
         due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
         raise "Please enter a valid Review deadline" if !due_date
-        max_round = 2;
+        #max_round = 2;
         
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
         raise "Please enter a valid Drop-Topic deadline" if !due_date

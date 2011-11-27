@@ -33,7 +33,7 @@
       <TH>Reminder (hrs)</TH>
     </TR>
     <TR>
-      <TD ALIGN=LEFT WIDTH=20%>
+      <TD ALIGN=LEFT WIDTH=22%>
         Submission deadline
       </TD>
       <TD ALIGN="CENTER">
@@ -69,7 +69,7 @@
       </TD>
     </TR>
     <TR>
-      <TD ALIGN=LEFT WIDTH=20%>
+      <TD ALIGN=LEFT WIDTH=22%>
         <input name="deadlineTitle0" size=10 maxlength=10 value="Submission deadline" type="hidden"/>Review deadline
       </TD>
       <TD ALIGN="CENTER">
@@ -95,7 +95,7 @@
         <%= select('review_deadline', 'teammate_review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>
       </TD>
       <TD ALIGN=CENTER WIDTH=10%>
-        <%= select('review_deadline', 'author_feedback_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>
+        <%= select('review_deadline', 'author_feedback_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>3) %>
       </TD>
       <TD ALIGN=CENTER WIDTH=10%>
         <%= select('review_deadline', 'survey_response_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>
@@ -111,17 +111,18 @@
   <table class="exp">
     <TR>
       <TD ALIGN=LEFT WIDTH=20%>
-        Metareview deadline
+        Metareview
+        <deadline></deadline>
       </TD>
       <TD ALIGN="CENTER">
         <input type="text" id="reviewofreview_deadline_due_at" name="reviewofreview_deadline[due_at]"/>
         <img src="/images/cal.gif" onClick="NewCal('reviewofreview_deadline_due_at','YYYYMMDD',true,24); return false;"/>
       </TD>
       <TD ALIGN=CENTER WIDTH=10%>
-        <%= select('reviewofreview_deadline', 'submission_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>2) %>
+        <%= select('reviewofreview_deadline', 'submission_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>
       </TD>
       <TD ALIGN=CENTER WIDTH=10%>
-        <%= select('reviewofreview_deadline', 'review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>2) %>
+        <%= select('reviewofreview_deadline', 'review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>
       </TD>
       <TD ALIGN=CENTER WIDTH=10%>
         <%= select('reviewofreview_deadline', 'review_of_review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>3) %>
@@ -133,10 +134,10 @@
         <%= select('reviewofreview_deadline', 'drop_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>
       </TD>
       <TD id="team_allowed3" <%if !@assignment.team_assignment %>style="display:none"<% end %> ALIGN=CENTER WIDTH=10%>
-        <%= select('reviewofreview_deadline', 'teammate_review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>
+        <%= select('reviewofreview_deadline', 'teammate_review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>3) %>
       </TD>
       <TD ALIGN=CENTER WIDTH=10%>
-        <%= select('reviewofreview_deadline', 'author_feedback_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>
+        <%= select('reviewofreview_deadline', 'author_feedback_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>2) %>
       </TD>
       <TD ALIGN=CENTER WIDTH=10%>
         <%= select('reviewofreview_deadline', 'survey_response_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>
@@ -161,7 +162,7 @@
         <%= select('droptopic_deadline', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
       </TD>
       <TD ALIGN=CENTER WIDTH=10%>
-        <%= select('droptopic_deadline', 'review_of_review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>3) %>
+        <%= select('droptopic_deadline', 'review_of_review_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>
       </TD>
       <TD ALIGN=CENTER WIDTH=10%>
         <%= select('droptopic_deadline', 'signup_allowed_id', [['No', 1], ['Late', 2], ['OK', 3]], :selected =>1) %>

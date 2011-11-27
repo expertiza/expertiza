@@ -602,7 +602,6 @@ end
 
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
   def compute_reviews_hash
-    review_questionnaire_id = get_review_questionnaire_id()
     @questions = Question.find(:all, :conditions =>["questionnaire_id = ?", review_questionnaire_id])
     @review_scores = Hash.new
     if (self.team_assignment)
@@ -632,20 +631,6 @@ end
       @review_scores[response_map.reviewer_id] = @respective_scores
     end
     return @review_scores
-  end
-
-  def get_review_questionnaire_id()
-    @revqids = []
-
-    @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",self.id])
-    @revqids.each do |rqid|
-      rtype = Questionnaire.find(rqid.questionnaire_id).type
-      if( rtype == "ReviewQuestionnaire")
-        @review_questionnaire_id = rqid.questionnaire_id
-      end
-
-    end
-    return @review_questionnaire_id
   end
 
   def get_next_due_date()

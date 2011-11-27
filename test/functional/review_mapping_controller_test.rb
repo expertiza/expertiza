@@ -26,11 +26,10 @@ class ReviewMappingControllerTest < ActionController::TestCase
   end
 
    def test_delete_reviewer
-    id = ResponseMap.first(:conditions => {:reviewer_id => Fixtures.identify(:par2)}).id
+    mapping = ResponseMap.find(Fixtures.identify(:response_maps0))
+    post :delete_reviewer, {:id => mapping.id} , session_for(users(:admin))
 
-    post :delete_reviewer, {:id => Fixtures.identify(:response_maps0)} , session_for(users(:admin))
-
-    assert_redirected_to :action => 'list_mappings'
+    assert_redirected_to :action => 'list_mappings', :id => mapping.assignment.id
     assert_raise(ActiveRecord::RecordNotFound){ ResponseMap.find(:id) }
    end
 
@@ -44,7 +43,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
     post :add_reviewer, {:id => assign_id, :contributor_id => contributor_id, :user_id => user_id }, session_for(users(:admin))
 
     assert_equal number_of_responses+1, ResponseMap.count
-    assert_redirected_to :action => 'list_mappings'
+    assert_redirected_to :action => 'list_mappings', :id => assign_id, :msg => ''
   end
 
   def test_add_metareviewer
@@ -57,7 +56,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
     post :add_metareviewer, {:id => mapping_id, :user_id => user_id }, session_for(users(:admin))
 
     assert_equal number_of_responses+1, ResponseMap.count
-    assert_redirected_to :action => 'list_mappings'
+    assert_redirected_to :action => 'list_mappings', :id => mapping.assignment.id, :msg => ''
   end
 
   def test_delete_all_reviewers
@@ -71,7 +70,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
     post :delete_all_reviewers, {:id => assign_id, :contributor_id => contributor_id, :force => true }, session_for(users(:admin))
 
     assert_equal number_of_responses-deleted_count, ResponseMap.count
-    assert_redirected_to :action => 'list_mappings'
+    assert_redirected_to :action => 'list_mappings', :id => assign_id
     assert_equal "All review mappings for \""+contributor.name+"\" have been deleted.", flash[:note]
   end
 
@@ -84,7 +83,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
     post :delete_all_metareviewers, {:id => mapping_id, :force => true }, session_for(users(:admin))
 
     assert_equal number_of_responses-deleted_count, ResponseMap.count
-    assert_redirected_to :action => 'list_mappings'
+    assert_redirected_to :action => 'list_mappings', :id => mapping.assignment.id
     assert_equal "All metareview mappings for contributor \""+mapping.reviewee.name+"\" and reviewer \""+mapping.reviewer.name+"\" have been deleted.", flash[:note]
   end
 
@@ -95,7 +94,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
 
     post :delete_all_reviewers_and_metareviewers, {:id => assign_id, :force => true }, session_for(users(:admin))
 
-    assert_redirected_to :action => 'list_mappings'
+    assert_redirected_to :action => 'list_mappings', :id => assign_id
     assert_equal "All review mappings for this assignment have been deleted.", flash[:note]
   end
 
@@ -115,12 +114,6 @@ class ReviewMappingControllerTest < ActionController::TestCase
     post :review_report, {:id => assign_id, :user => {:fullname => user.fullname}}, session_for(users(:admin))
 
     assert_template :review_report
-  end
-
-  def test_get_questionnaire_id
-    assignment = Assignment.find(Fixtures.identify(:assignment1))
-    id = assignment.get_review_questionnaire_id()
-    assert (id > 0)
   end
 
 end

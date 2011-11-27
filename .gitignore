@@ -8,3 +8,4 @@ pg_development.png
 .loadpath
 .rvmrc
 .idea
+config/database.yml

@@ -82,6 +82,37 @@ class BookmarksController < ApplicationController
     end
   end
 
+ #Listing all the bookmarks for a topic
+  def view_review_bookmarks
+    @assignment_id=params[:assignment_id]
+    @topic = SignUpTopic.find(params[:id])
+    @search_results = Array.new
+    if @topic
+      for bmapping in @topic.bmappings
+        result_hash = Hash.new
+        result_hash["id"] = bmapping.id
+        result_hash["url"] = bmapping.bookmark.url
+        result_hash["user"] = bmapping.user.name
+        result_hash["title"] = bmapping.title
+        result_hash["description"] = bmapping.description
+        result_hash["copied_by"] = bmapping.bookmark.user_count
+        result_hash["created_at"] = bmapping.date_created
+        # Now retrieving tags for this user-bookmark mapping
+        # First retrieve all the tag_ids mapped to the BMapping id.
+        # Then retrieve all the tag names of the tag_ids picked up.
+        # Append all these into a comma separated string, and push them onto the hash
+        tag_fetchs = BmappingsTags.find(:all, :conditions=>["bmapping_id=?",bmapping.id])
+        tag_array = Array.new
+        for tag_fetch in tag_fetchs
+          tag_array << Tag.find(tag_fetch.tag_id).tagname
+        end
+        result_hash["tags"] = BookmarksHelper.join_tags(tag_array)
+        result_hash["bookmark"] = bmapping.bookmark
+        @search_results << result_hash
+      end
+    end
+  end
+
    # Viewing a particualr bookmark
   def view
     @bookmark_mapping_id = params[:id]

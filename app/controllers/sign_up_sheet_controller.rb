@@ -623,6 +623,54 @@ class SignUpSheetController < ApplicationController
 
   end
 
+  def team_details
+    if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
+      @results =get_team_details(assignment.id, topic.topic_identifier)
+      @results.each do |result|
+      result.attributes().each do |attr|
+        if attr[0].equal? "name"
+          @current_team_name = attr[1]
+          
+        end
+         
+          
+      end
+        
+      end
+      @results.each {|result|
+                 @team_members = ""
+                 TeamsUser.find_all_by_team_id(result[:team_id]).each{|teamuser|
+                    puts User.find(teamuser.user_id).to_json                      
+                   @team_members+=User.find(teamuser.user_id).name+" "
+                   }
+
+      }
+      #@team_members = find_team_members(topic)  
+    end
+  end
+  
+  def find_team_members(team_id)
+  TeamsUser.find_all_by_team_id(team_id).each{|teamuser|
+       team_members+=User.find(teamuser.user_id).handle+" "
+    }
+  end
+  
+  
+
+  def get_team_details(assignment_id, topic_id)
+    query = "select t.name, t.comments_for_advertisement, p.handle,t.id as team_id, p.id as participant_id, p.topic_id as topic_id, p.parent_id as assignment_id"
+    query = query + " from teams t, teams_users tu, participants p"
+    query = query + " where"
+    query = query + " p.parent_id = '#{assignment_id}' and"
+    query = query + " p.topic_id = '#{topic_id}'  and"
+    query = query + " t.parent_id = p.parent_id and"
+    query = query + " tu.user_id = p.user_id and"
+    query = query + " t.id = tu.team_id"
+    query = query + " group by t.name;"
+    SignUpTopic.find_by_sql(query)
+  end
+
+  end
 
 
-end
+

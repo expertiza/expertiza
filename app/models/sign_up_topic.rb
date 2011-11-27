@@ -89,6 +89,5 @@ class SignUpTopic < ActiveRecord::Base
         participant.update_topic_id(self.id)
       end
     }
-  end  
-
+  end
 end

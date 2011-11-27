@@ -14,7 +14,6 @@ class JoinTeamRequestsController < ApplicationController
   # GET /join_team_requests/1.xml
   def show
     @join_team_request = JoinTeamRequest.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @join_team_request }
@@ -25,7 +24,6 @@ class JoinTeamRequestsController < ApplicationController
   # GET /join_team_requests/new.xml
   def new
     @join_team_request = JoinTeamRequest.new
-
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @join_team_request }
@@ -40,8 +38,12 @@ class JoinTeamRequestsController < ApplicationController
   # POST /join_team_requests
   # POST /join_team_requests.xml
   def create
-    @join_team_request = JoinTeamRequest.new(params[:join_team_request])
-
+    @join_team_request = JoinTeamRequest.new
+    @join_team_request.comments = params[:comments][0]
+    @join_team_request.status = 'P'
+    @join_team_request.team_id = params[:team_id]
+    participant = Participant.find_by_user_id_and_parent_id(session[:user][:id],params[:assignment_id])
+    @join_team_request.participant_id= participant.id
     respond_to do |format|
       if @join_team_request.save
         format.html { redirect_to(@join_team_request, :notice => 'JoinTeamRequest was successfully created.') }

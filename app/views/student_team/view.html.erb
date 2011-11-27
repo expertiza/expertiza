@@ -48,11 +48,16 @@
     <%= link_to "Leave Team",
                 {:controller => 'student_team', :action => 'leave', :student_id => @student.id, :team_id => @student.team.id} %>
 <% end %>
-<h2>Team Advertisement</h2>
+
+<% if !@student.team == nil %>
+    <h2>Team Advertisement</h2>
 <%= link_to image_tag("ad.png", :height => 25, :width => 25, :alt=>'Advertise for partners'), :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
+
 <% if @student.team.advertise_for_partner %>
+    <%= link_to '', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
     <%= link_to image_tag("rm_ad.png", :height => 25, :width => 25, :alt=>'Remove your advertisement'), :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
 <% end %>
+     <% end %>
 <table>
   <h2>Sent Invitations</h2>
   <tr>

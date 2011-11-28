@@ -40,7 +40,7 @@ class AssignmentControllerTest < ActionController::TestCase
     instructorid = Instructor.first.id
     courseid = Course.first.id
     # create a new assignment
-    assignment = Assignment.new( :name                => "2_valid_test",
+    assignment = Assignment.new( :name => "2_valid_test",
       :course_id           => 1,
       :directory_path      => "2_valid_test",
       :review_questionnaire_id    => questionnaire_id,
@@ -57,13 +57,20 @@ class AssignmentControllerTest < ActionController::TestCase
     # Test Case 1101-A
   def test_copy
     # copy an assignment
-    assignment = Assignment.first
-    #puts assignment.to_s
-    #redirect_to "assignments/copy/" + "Copy of " + assignment.id.to_s, :action => 'copy', :controller => 'copy'
-    #get :copy, :id => assignment.id
-    #p flash[:notice].to_s
-    newname = assignment.name
-    assert Assignment.find_by_name(newname)
+
+    @assignment = Assignment.first
+    #puts "======================================================================================"
+    #puts "Wiki_type_id = " + @assignment.wiki_type_id.to_s
+    #puts "Course_id = " + @assignment.course_id.to_s
+    #@assignment.wiki_type_id = 1
+    #@assignment.course_id = 157679937
+    #@assignment.save
+    assignment_id = @assignment.id
+    assignment_name = @assignment.name
+    post :copy, :id => assignment_id
+    assert_response :redirect
+    assert Assignment.find( :all, :conditions => ['name = ?', "Copy of " + assignment_name] )
+
   end
 
   # Test Case 1102

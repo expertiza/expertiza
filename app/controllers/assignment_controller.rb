@@ -40,7 +40,6 @@ class AssignmentController < ApplicationController
       DueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node()
 
-      flash[:note] = 'A PATCH HAS BEEN APPLIED FOR THE FOLLOWING WARNING, PLEASE REPORT ANY ISSUES --> Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
       redirect_to :action => 'edit', :id => new_assign.id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'

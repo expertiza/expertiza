@@ -1,5 +1,5 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-markup_style1:
-  name: markup1
-markup_style2:
-  name: markup2
+markup_textile:
+  name: 'Textile'
+markup_markdown:
+  name: 'Markdown'

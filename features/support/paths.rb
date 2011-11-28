@@ -10,12 +10,23 @@ module NavigationHelpers
 
     when /the home\s?page|the login page/
       '/'
+    when /the new feature page/
+      new_feature_path
+
+    when /the new login page/
+      new_login_path
+
     
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
     #
     #   when /^(.*)'s profile page$/i
     #     user_profile_path(User.find_by_login($1))
+    when /manage my team/
+      current_url
+
+    when /edit my team/
+      current_url
 
     else
       begin

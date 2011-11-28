@@ -17,7 +17,7 @@ class AssignmentController < ApplicationController
     new_assign.update_attribute('name','Copy of '+ new_assign.name)
     new_assign.update_attribute('created_at',Time.now)
     new_assign.update_attribute('updated_at',Time.now)
-    if new_assign.directory_path != nil
+    if new_assign.directory_path.present?
       new_assign.update_attribute('directory_path',new_assign.directory_path+'_copy')
     end
     session[:copy_flag] = true
@@ -63,19 +63,17 @@ class AssignmentController < ApplicationController
     @private = params[:private] == true
     #calling the defalut values mathods
     get_limits_and_weights
-
-
+    if (session[:user].role.name == "Administrator") or (session[:user].role.name == "Super-Administrator")
+      flash[:note] = "Note: The Submission Directory field to be filled in is the path relative to the instructor\'s
+      home directory (named after his user.name). However, when an administrator creates an assignment,
+      (s)he needs to preface the path with the user.name of the instructor whose assignment it is."
+    end
 
   end
 
   #--------------------------------------------------------------------------------------------------------------------
   #  CREATE
   #  Populates new assignment
-  #
-  #  Note:
-  #  The Assignment Directory field to be filled in is the path relative to the instructor's
-  #  home directory (named after his user.name). However, when an administrator creates an assignment,
-  # (s)he needs to preface the path with the user.name of the instructor whose assignment it is.
   #--------------------------------------------------------------------------------------------------------------------
 
   def create
@@ -87,7 +85,7 @@ class AssignmentController < ApplicationController
 
 
     #Calculate days between submissions
-    set_days_btw_sub
+    set_days_between_submissions
 
     if @assignment.save
       set_questionnaires
@@ -205,10 +203,10 @@ class AssignmentController < ApplicationController
   end
 
   #---------------------------------------------------------------------------------------------------------------------
-  #  SET_DAYS_BTW_SUB  (Helper function for CREATE and UPDATE)
+  #  SET_DAYS_BETWEEN_SUBMISSIONS  (Helper function for CREATE and UPDATE)
   #   Sets days between submissions for staggered assignments
   #---------------------------------------------------------------------------------------------------------------------
-  def set_days_btw_sub
+  def set_days_between_submissions
 
     if params[:days].nil? && params[:weeks].nil?
       @days = 0
@@ -362,7 +360,7 @@ class AssignmentController < ApplicationController
     oldpath = get_path
 
     #Calculate days between submissions
-    set_days_btw_sub
+    set_days_between_submissions
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])

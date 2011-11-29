@@ -1,7 +1,7 @@
 <%= 
 #Displays the list of bookmarks submitted for the topics that this user is reviewing 
 %>
-<%= link_to( "Bookmarks",:controller => "bookmarks", :action =>"view_review_bookmarks", :params_mine => {:assignment_id =>  @assignment.id, :id => @reviewee_topic_id})  %> 
+<%= link_to( "Bookmarks",:controller => "bookmarks", :action =>"view_review_bookmarks", :id => @participant.id)  %> 
 <BR />
 
 <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage() == "Complete" %>

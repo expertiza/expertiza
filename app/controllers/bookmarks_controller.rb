@@ -84,34 +84,64 @@ class BookmarksController < ApplicationController
 
  #Listing all the bookmarks for a topic
   def view_review_bookmarks
-    @assignment_id=params[:assignment_id]
-    @topic = SignUpTopic.find(params[:id])
-    @search_results = Array.new
-    if @topic
-      for bmapping in @topic.bmappings
-        result_hash = Hash.new
-        result_hash["id"] = bmapping.id
-        result_hash["url"] = bmapping.bookmark.url
-        result_hash["user"] = bmapping.user.name
-        result_hash["title"] = bmapping.title
-        result_hash["description"] = bmapping.description
-        result_hash["copied_by"] = bmapping.bookmark.user_count
-        result_hash["created_at"] = bmapping.date_created
-        # Now retrieving tags for this user-bookmark mapping
-        # First retrieve all the tag_ids mapped to the BMapping id.
-        # Then retrieve all the tag names of the tag_ids picked up.
-        # Append all these into a comma separated string, and push them onto the hash
-        tag_fetchs = BmappingsTags.find(:all, :conditions=>["bmapping_id=?",bmapping.id])
-        tag_array = Array.new
-        for tag_fetch in tag_fetchs
-          tag_array << Tag.find(tag_fetch.tag_id).tagname
-        end
-        result_hash["tags"] = BookmarksHelper.join_tags(tag_array)
-        result_hash["bookmark"] = bmapping.bookmark
-        @search_results << result_hash
-      end
+
+    #NExt few lines can be directly obtained from others' work view itself.
+    
+    #Reviewer
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
+    
+    @assignment  = @participant.assignment
+    
+    if @assignment.team_assignment
+      @review_mappings = TeamReviewResponseMap.find_all_by_reviewer_id(@participant.id)
+    else           
+      @review_mappings = ParticipantReviewResponseMap.find_all_by_reviewer_id(@participant.id)
     end
-  end
+	
+    @review_mappings.each do | map | 
+      if @assignment.team_assignment?
+        participant = AssignmentTeam.get_first_member(map.reviewee_id)
+      else
+        participant = map.reviewee 
+      end
+
+      if participant 
+
+	    #For each topic that this user is reviewing, we have to display the bmappings for that topic
+	    topic = SignUpTopic.find(participant.topic.id)
+	    @topics_bookmarks = Hash.new
+	    if topic	     
+	      bookmarks = Array.new
+	      for bmapping in topic.bmappings
+		
+		bookmark_hash = Hash.new
+		bookmark_hash["id"] = bmapping.id
+		bookmark_hash["url"] = bmapping.bookmark.url
+		bookmark_hash["user"] = bmapping.user.name
+		bookmark_hash["title"] = bmapping.title
+		bookmark_hash["description"] = bmapping.description
+		bookmark_hash["copied_by"] = bmapping.bookmark.user_count
+		bookmark_hash["created_at"] = bmapping.date_created
+		# Now retrieving tags for this user-bookmark mapping
+		# First retrieve all the tag_ids mapped to the BMapping id.
+		# Then retrieve all the tag names of the tag_ids picked up.
+		# Append all these into a comma separated string, and push them onto the hash
+		tag_fetchs = BmappingsTags.find(:all, :conditions=>["bmapping_id=?",bmapping.id])
+		tag_array = Array.new
+		for tag_fetch in tag_fetchs
+		  tag_array << Tag.find(tag_fetch.tag_id).tagname
+		end
+		bookmark_hash["tags"] = BookmarksHelper.join_tags(tag_array)
+		bookmark_hash["bookmark"] = bmapping.bookmark
+		bookmarks << bookmark_hash
+	      end
+
+	    @topics_bookmarks[participant.topic.topic_name] = bookmarks
+	    end
+      end 
+    end
+ end
 
    # Viewing a particualr bookmark
   def view

@@ -1,1 +1,22 @@
-view_review_bookmarks
+
+<table width = "100%">
+	<% @topics_bookmarks.each_pair do |topic,bookmarks| %> 
+		<b> <%= topic %> </b>
+
+		<% bookmarks.each { |search_result| %>
+			<tr>
+			<% bookmark_title = search_result["title"] %> <td width = "60%"><%= link_to( bookmark_title, :action =>"view", :id =>search_result["id"]) %> </td>
+			<% if (@order_by == "most_recent") %> 
+				<td width = "400%">Added at <%= search_result["created_at"].asctime %> </td>
+			<% else%> 
+				<td width = "40%">Bookmarked by <%= search_result["copied_by"] %> users</td>
+			<% end%>
+			</tr>
+			<tr>
+			<td width = "60%">Tags: <%= search_result["tags"] %></td>
+			<td width = "40%">Owned by <%= search_result["user"]%></td>
+			<td> <%= %> </td>
+			</tr>
+		<% } %>
+	<% end %>
+</table>

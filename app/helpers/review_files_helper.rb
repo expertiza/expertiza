@@ -21,15 +21,17 @@ module ReviewFilesHelper
   end
 
   # Calculate version directory
-  def self.get_version_directory(participant, new_version_number)
+  def self.get_version_directory(participant, version_number)
     return participant.get_path.to_s + CODE_REVIEW_DIR_SUFFIX + '/' +
-        VERSION_DIR_SUFFIX + new_version_number.to_s + '/'
+        VERSION_DIR_SUFFIX + version_number.to_s + '/'
   end
 
   # Calculate code review file directory
   def self.get_code_review_file_dir(participant)
     return participant.get_path.to_s + CODE_REVIEW_DIR_SUFFIX + '/'
   end
+
+
 
 end
 

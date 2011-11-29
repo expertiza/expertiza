@@ -1,0 +1,27 @@
+<h2>All Submitted Code files across all Versions</h2>
+<% if @file_version_map %>
+    <table width="40%">
+      <tr>
+        <td ><b>Code Filename</b></td>
+        <td ><b>Present in Version</b></td>
+      </tr>
+      <% @file_version_map.each do |filename, versions| %>
+          <tr>
+            <td><b>
+              <%= link_to filename,
+                          :controller  => 'review_files',
+                          :action      => 'show_code_file',
+                          :review_file_id => @file_id_map[filename],
+                          :participant_id => @participant.id,
+                          :versions => versions %>
+              </b><br/>
+            </td>
+            <td>
+              <%= versions.join(', ') %>
+            </td>
+          </tr>
+      <% end %>
+    </table>
+<% else %>
+    Nothing in file version map
+<% end %>

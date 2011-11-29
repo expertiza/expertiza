@@ -1,4 +1,8 @@
 module DiffHelper
+  ADDED     = 'A'
+  DELETED   = 'D'
+  CHANGED   = 'C'
+  UNCHANGED = 'U'
 
   class InputFile < Array
 
@@ -25,9 +29,7 @@ module DiffHelper
   class OutputFile < Array
 
     class Line < String
-
       attr_accessor :type, :original_number
-
 
       def initialize(type, input_file)
         self.type = type
@@ -36,11 +38,13 @@ module DiffHelper
         self.original_number = input_file.pointer + 1
         input_file.advance_pointer!
       end
+
     end
 
     def add_line(type, input_file = nil)
       self.push(Line.new(type, input_file))
     end
+
   end
 
   class Processor
@@ -69,78 +73,46 @@ module DiffHelper
       IO.readlines(target_file_name).each do |line|
         self.target << line
       end
-
-      ##################################
-      #source_file_name.each do |line|
-      #self.source << line
-      #end
-      #target_file_name.each do |line|
-      #self.target << line
-      #end
-      ##################################
-
     end
 
     def handle_exactly_matched
-
-      #puts "##BEGIN-MATCH##"
-      @absolute_line_num+=1
-      #puts(@absolute_line_num)
-      #puts source.current_line,target.current_line
-      @first_file_array << source.current_line
-      @second_file_array << target.current_line
-      @comparison_array << "MATCH"
+      @absolute_line_num += 1
+      @first_file_array   << source.current_line
+      @second_file_array  << target.current_line
+      @comparison_array   << DiffHelper::UNCHANGED
       source_output.add_line(:unchanged, source)
       target_output.add_line(:unchanged, target)
-      #puts "##END##"
     end
 
     def handle_line_changed
-
-      #puts "##BEGIN-CHANGED##"
-      @absolute_line_num+=1
-      #puts(@absolute_line_num)
-      #puts source.current_line,target.current_line
-      @first_file_array << source.current_line
-      @second_file_array << target.current_line
-      @comparison_array << "change"
+      @absolute_line_num += 1
+      @first_file_array   << source.current_line
+      @second_file_array  << target.current_line
+      @comparison_array   << DiffHelper::CHANGED
       source_output.add_line(:changed, source)
       target_output.add_line(:changed, target)
-      #puts "##END##"
-
-
     end
 
     def handle_block_added(size)
-
-      #puts "##BEGIN-ADDED##"
       size.times do
-        @absolute_line_num+=1
-        #puts(@absolute_line_num)
-        #puts source.current_line,target.current_line.gsub(/\n/," ")
-        @first_file_array << "$"
-        @second_file_array << target.current_line
-        @comparison_array << "ADD"
+        @absolute_line_num += 1
+        @first_file_array   << ""#"$"
+        @second_file_array  << target.current_line
+        @comparison_array   << DiffHelper::ADDED
         source_output.add_line(:added) # Empty line in the left side of the diff
         target_output.add_line(:added, target)
       end
-      # puts "##END##"
     end
 
     def handle_block_deleted(size)
-
-      #puts "#BEGIN-DELETED##"
       size.times do
         @absolute_line_num+=1
-        #puts(@absolute_line_num)
-        # puts source.current_line,target.current_line
-        @first_file_array << source.current_line
-        @second_file_array << "$"
-        @comparison_array << "DELETE"
+        @first_file_array   << source.current_line
+        @second_file_array  << ""#"$"
+        @comparison_array   << DiffHelper::DELETED
         source_output.add_line(:deleted, source)
         target_output.add_line(:deleted)  # Empty line in the right side of the diff
       end
-      #puts "##ENDdeleted##"
     end
 
     def process!
@@ -171,24 +143,3 @@ module DiffHelper
   end
 
 end
-
-
-#processor = DiffHelper::Processor.new('left.txt', 'right.txt')
-#
-#
-#DiffHelper::Formatter::Html.new(processor.process!, 'diff.html').format
-#
-#for i in (0..processor.absolute_line_num)
-#  first =   processor.first_file_array[i].to_s
-#  second = processor.second_file_array[i].to_s
-#  third = processor.comparison_array[i]
-#  first = first.gsub("\n","")
-#  second = second.gsub("\n","")
-#  #print " { "
-#  print " i: ",i
-#  print " FIRST:",first
-#  print " SECOND: ",second
-#  print "TYPE: ",third
-#  #puts " }"
-#  puts "\n"
-#end

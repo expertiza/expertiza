@@ -9,6 +9,9 @@
     <br/><br/>
     <%= link_to "Code Review Dashboard", :controller => 'review_files',
                 :action => 'show_code_review_dashboard',
+                :participant_id => @participant.id %><br/><br/><br/>
+    <%= link_to "Show_all_submitted_files", :controller => 'review_files',
+                :action => 'show_all_submitted_files',
                 :participant_id => @participant.id %>
 
 <% end %>

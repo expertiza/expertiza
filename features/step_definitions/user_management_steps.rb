@@ -25,13 +25,6 @@ Given /I import a CSV with (invalid|valid) data for 3 new users/ do |validity|
   And "I press \"Import\""
 end
 
-Given /I verify that I want to delete the user/ do
-  selenium.is_alert_present.should be_true
-  selenium.get_alert.should eql("Delete this user?")
-  selenium.chooseOkOnNextConfirmation()
-end
-
 Given /I delete the user/ do
-  # page.driver.browser.switch_to.alert.accept
   Then "I follow \"Delete\""
 end

@@ -54,6 +54,16 @@ Feature: Manage the users in Expertiza
       And I should not see "zelly_zinger does not exist."
       
   @instructor
+  Scenario: Import an invalid delimited list of users
+    Given I am logged in as "ed_gehringer"
+      And I follow "Users"
+      And I click the "Import Users" link
+    When I import a CSV with invalid data for 3 new users
+    Then I should see "Validation failed: Email should look like an email address., Email is invalid"
+      And I should see "Validation failed: Name can't be blank"
+      And I should see "Not enough items" 
+      
+  @instructor
   Scenario: Edit an existing user
     Given I am logged in as "ed_gehringer"
       And I follow "Users"
@@ -64,12 +74,12 @@ Feature: Manage the users in Expertiza
     Then I should see "User: tonka_tommy"
       And I should not see "prohibited this user from being saved"
       
-  # @instructor
-  # Scenario: Delete a user
-    # Given I am logged in as "ed_gehringer"
-      # And I follow "Users"
-      # And I View User "charlie_chevy"
-      # And I delete the user
-    # When I View User "charlie_chevy"
-    # Then I should see "charlie_chevy does not exist."
-      # And I should not see "User: charlie_chevy"
+  @instructor
+  Scenario: Delete a user
+    Given I am logged in as "ed_gehringer"
+      And I follow "Users"
+      And I View User "charlie_chevy"
+      And I delete the user
+    When I View User "charlie_chevy"
+    Then I should see "charlie_chevy does not exist."
+      And I should not see "User: charlie_chevy"

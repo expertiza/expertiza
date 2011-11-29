@@ -19,10 +19,9 @@ Given /I try to create a "([^"]+)" user named "([^"]*)"/ do |role,name|
   And "I press \"Create\""
 end
 
-Given /I import a CSV with valid data for 3 new users/ do
+Given /I import a CSV with (invalid|valid) data for 3 new users/ do |validity| 
   When "I choose \"delim_type_comma\""
-  And "I attach the file \"#{File.join(RAILS_ROOT,'features','upload_files','new_users_valid.csv')}\" to \"file\""
-  # attach_file(:file, File.join(RAILS_ROOT,'features','upload_files','new_users_valid.csv'))
+  And "I attach the file \"#{File.join(RAILS_ROOT,'features','upload_files','new_users_'+validity+'.csv')}\" to \"file\""
   And "I press \"Import\""
 end
 
@@ -33,6 +32,6 @@ Given /I verify that I want to delete the user/ do
 end
 
 Given /I delete the user/ do
-  page.driver.browser.switch_to.alert.accept
+  # page.driver.browser.switch_to.alert.accept
   Then "I follow \"Delete\""
 end

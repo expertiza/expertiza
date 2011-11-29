@@ -1,6 +1,9 @@
 <script type="text/javascript">
 num_questions = <%= [@questionnaire.questions.length,1].max %>;
+window.onload()
+{
 
+}
 function deleteQuestions(){
 	var checkedObjArray = new Array();
 	var deleteCount = 0;
@@ -28,19 +31,23 @@ function addQuestions(){
 
 function addQuestion(){
 	table = document.getElementById("questions_table");
-	var row = table.insertRow(-1);
-	
+	var main_row = table.insertRow(-1);
+	main_column = document.createElement("td");
+    main_column.setAttribute('colspan',4);
 	id = num_questions;
+    add_table = document.createElement("table");
+    //add_table.innerHTML = "<tbody> </tbody>";
+    var row = add_table.insertRow(-1);
 	column = document.createElement("td");
 	column.innerHTML = "<center><input type=checkbox id='question_chk" + num_questions + "'></center>";
 	row.appendChild(column);
 	
 	column = document.createElement("td");
-	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][txt] size=70 type=text/>";
+	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][txt] size=55 type=text/>";
 	row.appendChild(column);
 	
 	column = document.createElement("td");
-	gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
+	gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false] "+ "onchange=\"handleQuestionType(this);\" data-id =\""+id+"\">";
 	<% for type in Question::GRADING_TYPES %>
 		<%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
 	<% end %>
@@ -56,6 +63,37 @@ function addQuestion(){
 	weights = weights + "</select>";
 	column.innerHTML = weights;
 	row.appendChild(column);
+
+    main_row.appendChild(main_column);
+    main_column.appendChild(add_table);
+    add_table.appendChild(row);
 	num_questions = num_questions + 1;
+}
+function handleQuestionType(element)
+{
+
+    selected_option = element.options[element.selectedIndex].text;
+    alert(selected_option);
+    question_id = element.getAttribute("data-id");
+    if(selected_option == "<%=Question::CHECK_BOX %>")
+    {
+       table = element.parentNode.parentNode.parentNode; //to get the row in which this is being added
+       row = table.insertRow(-1);
+       column = document.createElement("td");
+        column.setAttribute('colspan',4);
+       innertable = document.createElement("table"); //create a column which
+       checkbox_options = "<tbody>";
+        for(i=1;i<5;i++)
+        {
+         checkbox_options = checkbox_options + "<tr> ";
+           checkbox_options = checkbox_options + "<td> Enter option "+i+" for checkbox </td>";
+           checkbox_options = checkbox_options + "<td> <input id=checkbox_option_" + i + " size=50 type=text/> </td>";
+         checkbox_options = checkbox_options + "</tr>";
+        }
+        checkbox_options = checkbox_options +"</tbody>";
+        innertable.innerHTML = checkbox_options;
+        column.appendChild(innertable);
+       row.appendChild(column);
+    }
 }
 </script>

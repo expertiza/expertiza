@@ -8,17 +8,18 @@
 			<%= text_field 'questionnaire', 'name'  %>
 			<%= hidden_field 'questionnaire', 'id' %>
 			<%= hidden_field 'questionnaire', 'type' %>
-		</td>		
+		</td>
 	</tr>
 </table>
+
 <table>
 	<tr>
 		<td>Min question score:</td>
 		<td><%= text_field 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
 		<td>Max question score:</td>
 		<td><%= text_field 'questionnaire', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
-		<td>Is this <%= @questionnaire.display_type %> private:</td> 
-		<td><%= select(:questionnaire, :private, [ ['no', false], 
+		<td>Is this <%= @questionnaire.display_type %> private:</td>
+		<td><%= select(:questionnaire, :private, [ ['no', false],
 									 		['yes',  true]])%>
 		</td>
 	</tr>
@@ -36,18 +37,19 @@
 	<tr>
 		<td align=left width=30>Delete</td>
 		<td align=center width=300>Question</td>
-		<td align=center width=100>Scoring</td>
-		<td align=left>Weight</td>
+		<td align=right width=100>Scoring</td>
+		<td align=right>Weight</td>
 	</tr>
-	
+
 	<% 	i = 1;
 		for @question in @questionnaire.questions %>
 	<tr>
 		<td align=center><input type=checkbox id="question_chk<%= i %>"></td>
 		<td><%= text_field "question[]", 'txt', :size=>70 %></td>
-		<td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
+        <td><%= select("question[]",:true_false,Question::GRADING_TYPES, :onchange => "alert('Ani')" )%></td>
 		<td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
 	</tr>
+
 	<% 	i += 1;
 		end %>
 </table>

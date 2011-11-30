@@ -63,9 +63,27 @@ class CourseController < ApplicationController
   def create
     course = Course.new(params[:course])
     course.instructor_id = session[:user].id
+
     begin
       course.save!
       course.create_node
+
+      # save assignments if min_unique_pairings is given
+      if course.min_unique_pairings
+        index = 0
+
+        while(params["assignment#{index}".to_sym])
+          assignment = Assignment.new(params["assignment#{index}".to_sym])
+          session[:user].set_instructor(assignment)
+          assignment.course_id = course.id
+
+          assignment.save
+          assignment.create_node
+
+          index += 1
+        end
+      end
+
       FileHelper.create_directory(course)
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue

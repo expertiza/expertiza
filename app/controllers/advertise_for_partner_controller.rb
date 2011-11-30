@@ -15,7 +15,20 @@ class AdvertiseForPartnerController < ApplicationController
     redirect_to :controller => 'student_team', :action => 'view' , :id => params[:id]
   end
 
+  def update
+    @team=Team.find(params[:id])
+    @team.comments_for_advertisement = params[:team][:comments_for_advertisement]
+    puts 'yay!!!!'+params[:team][:comments_for_advertisement].to_json
+    if @team.save
+      flash[:notice]='Advertisement edited successfully!'
+      redirect_to :controller => 'student_team', :action => 'view' , :id => params[:id]
+    else
+      flash[:notice]='Advertisement edited successfully!'
+      redirect_to :controller => 'student_team', :action => 'edit' , :id => @team.id
+    end
+  end
+
   def edit
-    #TODO: edit the comments for advertisement for partners||||
+    @team = Team.find(params[:team_id])
   end
 end

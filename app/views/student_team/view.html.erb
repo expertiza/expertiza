@@ -49,21 +49,32 @@
                 {:controller => 'student_team', :action => 'leave', :student_id => @student.id, :team_id => @student.team.id} %>
 <% end %>
 
-<% if !@student.team == nil %>
-    <h2>Team Advertisement</h2>
-<%= link_to image_tag("ad.png", :height => 25, :width => 25, :alt=>'Advertise for partners'), :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
+<% if @student.team != nil %>
+<h2>Team Advertisement</h2>
 
-<% if @student.team.advertise_for_partner %>
-    <%= link_to '', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
-    <%= link_to image_tag("rm_ad.png", :height => 25, :width => 25, :alt=>'Remove your advertisement'), :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
+
+<% if @student.team.advertise_for_partner == true %>
+        <label><%= @student.team.comments_for_advertisement%></label>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <%= link_to 'edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
+    <%= link_to 'destroy', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
+<% else %>
+    <%= link_to 'new', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
 <% end %>
-     <% end %>
-<% if @student.team!=nil %>
-<h2>Received Requests</h2>
+<% end %>
 
-<%= render :partial => 'join_team_requests/list',
+<%= render :partial => 'join_team_requests/list_sent',
+           :locals =>{:teams_user_id=>params[:id],
+                      :assignment_id => @student.assignment.id
+                     } %>
+
+<% if @student.team!=nil %>
+
+
+<%= render :partial => 'join_team_requests/list_received',
            :locals =>{:team_id=>@student.team.id,
-                      :teams_user_id=>params[:id]} %>
+                      :teams_user_id=>params[:id],
+                      :assignment_id => @student.assignment.id} %>
 <% end %>
 
 
@@ -112,7 +123,7 @@
   <% else %>
       <% for inv in @received_invs %>
           <!-->
-          <% if inv.reply_status == 'W' %> <-->
+          <% if inv.reply_status == 'W' %>
               <tr>
                 <td><%= inv.from_user.name %></td>
                 <td>
@@ -138,7 +149,7 @@
                 </td>
               </tr>
               <!-->
-          <% end %> <-->
+          <% end %>
       <% end %>
   <% end %>
 </table>

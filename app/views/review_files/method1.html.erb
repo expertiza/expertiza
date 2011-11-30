@@ -139,7 +139,8 @@
           height:500px;
       }
 
-      tr:hover { font-weight: bold; color: black; }
+      tr.highlight :hover { font-weight: bold;  }
+
 
   </style>
 
@@ -190,6 +191,13 @@
 
           <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE ROW -->
           <% @color = "White" %>
+          <tr bgcolor="<%=@color%>" class="highlight">
+            <% line1_font_weight = "normal" %>
+            <% line2_font_weight = "normal" %>
+            <% linecolor = 'lightgray'%>
+            <% linecolor2 = 'lightgray'%>
+
+
           <% if (@shareObj['comparator'][i] == DiffHelper::ADDED) then @color="palegreen"%><%end%>
           <% if (@shareObj['comparator'][i] == DiffHelper::DELETED) then @color="pink"%><%end%>
           <% if (@shareObj['comparator'][i] == DiffHelper::CHANGED) then @color="#FEF5CA"%><%end%>
@@ -205,10 +213,6 @@
           <% if (@shareObj['comparator'][i] == DiffHelper::CHANGED) then linecolor2="khaki"%><%end%>
           <% if (@shareObj['comparator'][i] == DiffHelper::UNCHANGED) then linecolor2="lightgray"%><%end%>
 
-          <tr bgcolor="<%=@color%>">
-          <% line1_font_weight = "normal" %>
-          <% line2_font_weight = "normal" %>
-
 
             <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE LEFT LINE NUMBER -->
             <% if @shareObj['highlightfile1'].include?@shareObj['offsetarray1'][i]  %>
@@ -223,7 +227,7 @@
             <%end%>
 
             <!-- LINE NUMBER 1 -->
-            <td width="28px" id="td_old_<%=i%>" bgcolor="<%=linecolor%>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="olderVersion('<%=i%>', '<%= @shareObj['linenumarray1'][i] %>', '<%=@shareObj['file1']%>','<%=@shareObj['offsetarray1'][i]%>')"><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
+            <td width="28px" id="td_old_<%=i%>" bgcolor="<%= linecolor %>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="olderVersion('<%=i%>', '<%= @shareObj['linenumarray1'][i] %>', '<%=@shareObj['file1']%>','<%=@shareObj['offsetarray1'][i]%>')"><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
 
             <!-- OFFSET FOR FILE 1 -->
             <td width="1%"><pre><% @shareObj['offsetarray1'][i]%> </pre></td>

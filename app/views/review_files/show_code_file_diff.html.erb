@@ -16,53 +16,34 @@
       var highlight_cell_id = -1;
 
       /**
-      *
-      * @param table_cell_id
-      */
+       * Sends the comment content corresponding to the file offset indicated by
+       * global variable 'comment_offset' to the controller submit_comment which
+       * inserts the comment in the database.
+       */
       function ajaxSubmitComment() {
-          var commentMiscInfo = document.getElementById('invisible').value.split("$");
-          var commentContent  = document.getElementById('forminput_2');
-
-          var table_cell_id = commentMiscInfo[1];
-
-          new Ajax.Request('/review_files/save_comment', {
+          var commentText = document.getElementById('forminput_2')
+          new Ajax.Request('/review_files/submit_comment', {
               method:'get',
               parameters: {
-                  file_id :commentMiscInfo[0],
-                  comment_content :commentContent.value
+                  file_id :file_id,
+                  file_offset :comment_offset,
+                  comment_content :commentText.value
               }
           });
+          // Highlight the table cell (containing the line number) just clicked
+          var lineNumCellDom = document.getElementById(highlight_cell_id);
+          lineNumCellDom.style.fontWeight="900";
+          lineNumCellDom.bgColor = "cyan";
 
-          alert("fileID:" + file_id + "|| comment_offset:" + comment_offset + "||cell:" +highlight_cell_id)
-
-//          // Highlight the table cell (containing the line number) just clicked
-//          var lineNumCellDom = document.getElementById(table_cell_id);
-//          lineNumCellDom.style.fontWeight="900";
-//          lineNumCellDom.bgColor = "cyan";
+          createComments(highlight_cell_id, line_number, comment_offset, file_id);
       }
 
       /**
        * Hides the comment Window.
        */
       function hideCommentWindow() {
-          document.getElementById('myDiv2').innerHTML = ""
+//          document.getElementById('myDiv2').innerHTML = ""
           $("#myDiv2").fadeOut();
-      }
-
-
-      /**
-       * Returns String representation of all comments in a HTML Table format.
-       *
-       * @param commentArray Array of review_comment Objects whose comment_content
-       *        is to be displayed.
-       */
-      function constructCommentWindow(commentArray) {
-          var commentWindowHtml = "<table>";
-          for (var i=0; i < commentArray.length; i++) {
-              commentWindowHtml += "<tr><td>Comment: "+ (i+1) +"</td><td>" + commentArray.comment_content + "</td></tr>";
-          }
-          commentWindowHtml += "<tr><td>End of Table</td></tr></table>"
-          return commentWindowHtml;
       }
 
       /**
@@ -74,69 +55,37 @@
        */
       function viewComments(line, allComments) {
           var commentWindowDom = document.getElementById('myDiv2')
-          // Construct a proper scrollable table of comments
-          commentWindowDom.innerHTML = "<b>Comments for Line# " + line + "</b><br>" + constructCommentWindow(allComments);
-          commentWindowDom.innerHTML += "<a class='line_number' href='#' onclick='hideCommentWindow()'> Close [X]</a><br><br>";
 
-//          commentWindowDom.fadeIn();
+          var closeWindowLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                  "<a align='right' class='line_number' href='#' " +
+                  "onclick='hideCommentWindow()'>Close [X]</a><br>";
+
+          if (!allComments) {
+              allComments = "<br/>No Comments";
+          }
+          commentWindowDom.innerHTML = "<b><u>Comments for Line# " + line +
+                  "</u></b><br>" + allComments + closeWindowLink;
+
           $('#myDiv2').fadeIn();
-
-          file_id = 000;
-          comment_offset = 111;
-          highlight_cell_id = 55;
-          var str = "fileID:" + file_id + "|| comment_offset:" + comment_offset + "||cell:" +highlight_cell_id;
-          alert(str);
       }
 
       /**
        * Method to display all existing comments corresponding to the 'clicked'
        * line number and to also display the form for submitting more comments.
        *
+       * @param cell_id contains the div id of the cell in the main diff display table
+       *          tp be highlighted.
        * @param line Line Number for which the comments are to be displayed/saved.
        * @param offset Character offset of the beginning of this line from file start.
-//       * @param allComments Array of all comments already existing for this line.
        * @param fileId The fileId of the review file which is being commented.
        */
-//      function createComment(line, offset, allComments, fileId) { // or filepath
-//          alert('createCommentStarted');
-//          // Dom corr to the comment Window. This dom will be populated with
-//          // (a) existing comments and (b) form to submit a new comment
-//          var commentWindowDom = document.getElementById('myDiv2');
-//
-//          // Invisible div in which the comment information will be stored for
-//          // easy access in another method e.g. ajaxSubmitComment()
-//          var commentInfoDom = document.getElementById('invisible');
-//          commentInfoDom.value = fileId + "$" + "blah";
-//
-//          // Grab existing HTML of the comment window -- contains textarea for
-//          // writing comments plus a Submit button.
-//          var commentForm = document.getElementById('add_subject').innerHTML;
-//
-//          var closeWindowLink = "<a class='line_number' href='#' onclick='hideCommentWindow()'>Close [X]</a><br>";
-//
-//          var commentWindowHtml = "<b>Comments for Line# " + line + "</b><br>" + constructCommentWindow(allComments) + "<br><br>" + commentForm + closeWindowLink;
-//
-//          // To avoid div id contention, change name of div ids.
-//          commentWindowHtml = commentWindowHtml.replace("invisible","invisbile_2");
-//          commentWindowHtml = commentWindowHtml.replace("forminput","forminput_2");
-//
-//          commentWindowDom.innerHTML = commentWindowHtml;
-//          $('#myDiv2').fadeIn();
-//
-////          file_id = fileId;
-////          comment_offset = 111;  // offset
-////          highlight_cell_id = 55;
-////          alert("fileID:" + file_id + "|| comment_offset:" + comment_offset + "||cell:" +highlight_cell_id)
-//          alert('createCommentDone.');
-//      }
+      function createComments(cell_id, line_num, offset, fileId) { // or filepath
 
-      function newerVersion(e, line, filepath, offset) { // or filepath
-          alert('createCommentStarted');
-
-          // Invisible div in which the comment information will be stored for
-          // easy access in another method e.g. ajaxSubmitComment()
-          var commentInfoDom = document.getElementById('invisible');
-          commentInfoDom.value = filepath + "$" + offset;
+          // Store the following data in the global variables for access in another method
+          file_id = fileId;
+          comment_offset = offset;
+          highlight_cell_id = cell_id;
+          line_number = line_num;
 
           // Grab existing HTML of the comment window -- contains textarea for
           // writing comments plus a Submit button.
@@ -146,32 +95,31 @@
           // (a) existing comments and (b) form to submit a new comment
           var commentWindowDom = document.getElementById('myDiv2');
 
-          new Ajax.Request('/review_files/method3', {
+          var closeWindowLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                  "<a align='right' class='line_number' href='#' " +
+                  "onclick='hideCommentWindow()'>Close [X]</a><br>";
+
+          new Ajax.Request('/review_files/get_comments', {
               method: 'get',
               parameters: {
-                  file_path :filepath,
-                  file_offset :offset,
-                  line_num :line
+                  file_id: fileId,
+                  file_offset: offset
               },
-              onSuccess: function(ret_val) {
-//                  var closeWindowLink = "<a class='line_number' href='#' onclick='hideCommentWindow()'>Close [X]</a><br>";
-                  var commentWindowHtml = "<b>Comments for Line# " + line + "</b><br>" + ret_val.responseText + "<br><br>" + commentForm + "<a class='line_number' href='#' onclick='hideCommentWindow()'>Close [X]</a><br>";
+              onSuccess: function(return_value) {
+                  var all_comments = return_value.responseText ?
+                          return_value.responseText : "No Comments<br/>";
 
-                  commentWindowHtml = commentWindowHtml.replace("invisible","invisbile_2");
+                  var commentWindowHtml = "<b><u>Comments for Line# "+ line_num +
+                          "</u></b><br><br>" + all_comments + "<br>" +
+                          commentForm + closeWindowLink;
+
+                  // To avoid div id contention, change name of div ids.
                   commentWindowHtml = commentWindowHtml.replace("forminput","forminput_2");
-
-                  // click and highlight code
-                  var testdom = document.getElementById('td_new_'+e)
-                  testdom.style.fontWeight="900";
-                  testdom.bgColor = "cyan";
-
                   commentWindowDom.innerHTML = commentWindowHtml
                   $('#myDiv2').fadeIn();
               },
-              onFailure: function() { alert('Something went horribly Wrong...')}
+              onFailure: function(){ alert("Failed to retrieve comments for this Line") }
           });
-          commentWindowDom.fadeIn("slow");
-          alert('createCommentDone.');
       }
 
 
@@ -184,10 +132,11 @@
           /*height:200px;*/
           top:350px;    left:250px;
           display:none;
+          padding: 6px;
           z-index:3;
-          color: blue;
-          background-color: rgba(0,205,0,0.9);
-          border:1px solid #DEDEDE;
+          color: black;
+          background-color: rgba(206, 212, 211, 0.93);
+          border:1px solid black;
           border-radius:5px;
           -moz-border-radius:5px;
           -webkit-border-radius:5px;
@@ -241,6 +190,7 @@
       tr.highlight :hover { font-weight: bold;  }
 
       td.version_number {
+          background-color: rgb(229, 230, 124);
           border-left: thin solid gray;
           border-right: thin solid gray;
           border-top: thin solid gray;
@@ -253,7 +203,7 @@
       }
 
       td.current_version {
-          background-color: #de3c3c;
+          background-color: rgba(255, 0, 6, 0.36);
           color: black;
           font-weight: bold;
           border-left: thin solid black;
@@ -296,8 +246,6 @@
           function() {
               $("#myDiv2").draggable();
               $("#add_subject").fadeOut(0);
-              alert("shyamfileID:" + file_id + "|| comment_offset:" + comment_offset + "||cell:" +highlight_cell_id)
-
           }
       );
   </script>
@@ -305,13 +253,13 @@
   </br>
 
   <div id="dashboard_header" class="dashboard_header_css" >
-    <table  cellpadding='3' cellspacing='4' >
+    <table  cellpadding='3' cellspacing='4'  >
       <tr ><td class="top_header"><b style="font-size: large;"><%= File.basename(@file_on_left.filepath) %> </b><i style="font-size: smaller;">(Version <%= @current_review_file.version_number %>)</i></td></tr>
     </table>
   </div>
 
   <div id="dashboard_header" style= "border: thin solid; border-width: 1px; background-color: #fafad2;" >
-    <table  cellpadding='3' cellspacing='4' >
+    <table  cellpadding='5px' cellspacing='4' >
       <tr>
         <td align="right">View Version:</td>
         <!-- Prepare the 'versions' array from the @version_fileId_map -->
@@ -324,8 +272,12 @@
              corresponding to each hash -->
         <% @version_fileId_map.each do |each_version, review_file_id| %>
             <% if each_version.to_s == @current_review_file.version_number.to_s %>
-                <td class="current_version" >
-                  <%= each_version %>
+                <td class="version_number current_version" >
+                  <%= link_to each_version, :controller => 'review_files',
+                              :action => 'show_code_file',
+                              :review_file_id => review_file_id,
+                              :participant_id => @participant.id,
+                              :versions => file_versions %>
                 </td>
             <% else %>
                 <td class="version_number" >
@@ -365,7 +317,7 @@
     </table>
   </div>
 
-  <br/><br/>
+  <br/>
 
 
 
@@ -374,12 +326,10 @@
       <tr >
         <td>&nbsp;</td>
         <td><b style="font-size: large;">
-           <%= File.basename(@file_on_left.filepath) %></b>  <b style="font-size: large;">[</b>Version:
-          <b style="font-size: large;"><%= @file_on_left.version_number %>]</b></td>
+           <%= File.basename(@file_on_left.filepath) %></b>&nbsp;&nbsp;Version:<b style="font-size: large;">[<%= @file_on_left.version_number %>]</b></td>
         <td>&nbsp;</td>
         <td><b style="font-size: large;">
-           <%= File.basename(@file_on_right.filepath) %></b>  <b style="font-size: large;">[</b>Version:
-          <b style="font-size: large;"><%= @file_on_right.version_number %>]</b></td>
+           <%= File.basename(@file_on_right.filepath) %></b>&nbsp;&nbsp;Version:<b style="font-size: large;">[<%= @file_on_right.version_number %>]</b></td>
       </tr>
     </table>
   </div>
@@ -394,10 +344,10 @@
           <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE ROW -->
           <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE ROW -->
           <% @color = "White" %>
-            <% line1color = "lightgray"%>
-            <% line2color = "lightgray"%>
-            <% line1_font_weight = "normal" %>
-            <% line2_font_weight = "normal" %>
+          <% line1color = "lightgray"%>
+          <% line2color = "lightgray"%>
+          <% line1_font_weight = "normal" %>
+          <% line2_font_weight = "normal" %>
 
           <% if (@shareObj['comparator'][i] == DiffHelper::ADDED) then @color="palegreen"%><%end%>
           <% if (@shareObj['comparator'][i] == DiffHelper::DELETED) then @color="pink"%><%end%>
@@ -428,26 +378,37 @@
                 <% line2_font_weight = "bold" %>
             <%end%>
 
-            <!-- LINE NUMBER 1 -->
-            <td width="28px" id="td_old_<%=i%>" bgcolor="<%=line1color%>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="viewComments('<%= @shareObj['linenumarray1'][i] %>', '<%= @tableRow_comment_map_old_version[i] %>' )"><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
+            <% if @tableRow_comment_map_old_version[i] %>
+                <% commentsTable = ReviewCommentsHelper::constructCommentsTable(@tableRow_comment_map_old_version[i]) %>
+            <% else %>
+                <% commentsTable = nil %>
+            <% end %>
+
+            <!-- LINE NUMBER 1   -->
+            <td width="28px" id="td_old_<%=i%>" bgcolor="<%=line1color%>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="viewComments('<%= @shareObj['linenumarray1'][i] %>', '<%= commentsTable %>' )"><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
 
             <!-- OFFSET FOR FILE 1 -->
-            <td width="1%"><pre><% @shareObj['offsetarray1'][i]%> </pre></td>
+            <td width="1%"></td>
 
             <!-- THE ACTUAL DATA LINE -->
             <td width="48%" style="vertical-align: middle;"><pre><%=@shareObj['linearray1'][i]%></pre></td>
 
+            <% if @tableRow_comment_map_new_version[i] %>
+                <% commentsTable = ReviewCommentsHelper::constructCommentsTable(@tableRow_comment_map_new_version[i]) %>
+            <% else %>
+                <% commentsTable = nil %>
+            <% end %>
 
             <!-- Allow commenting on codefile only if this is the most recent version
             AND if current user is reviewer (i.e. != author/author's team) -->
             <% if @current_review_file.version_number.to_i >= file_versions.sort[-2]  %>
-                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="newerVersion('<%= i %>', '<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['file2'] %>','<%=@shareObj['offsetarray2'][i]%>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
+                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="createComments('td_new_<%= i %>', '<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@file_on_right.id %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
             <% else %>
-                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="viewComments('<%= @shareObj['linenumarray2'][i] %>', '<%= @tableRow_comment_map_new_version[i] %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
+                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="viewComments('<%= @shareObj['linenumarray2'][i] %>', '<%= commentsTable %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
             <% end %>
 
             <!-- OFFSET FOR FILE 2  -->
-            <td width="1%"><pre><% @shareObj['offsetarray2'][i]%> </pre></td>
+            <td width="1%"></td>
 
             <!-- THE ACTUAL DATA LINE -->
             <td width="48%" style="vertical-align: middle;"><pre><%=@shareObj['linearray2'][i]%></pre></td>
@@ -473,10 +434,8 @@
   <div id="myDiv2" class="parentDisable" onLoad="assign()"></div>
   <!--  HIDDEN DIV WHICH LATER CREEPS INTO THE POPUP -->
   <div id="add_subject">
-    <table><tr><td>FOO-BAZZLE</td></tr></table>
-    <textarea id="forminput" ></textarea> <br>
+    <textarea id="forminput" cols=28 rows=5></textarea> <br>
     <button onclick="ajaxSubmitComment()"><b>Save Comment</b></button>
-    <input type="textarea" id="invisible" style="display:none">
   </div>
 </font>
 

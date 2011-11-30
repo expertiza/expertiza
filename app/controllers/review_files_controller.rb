@@ -264,7 +264,7 @@ class ReviewFilesController < ApplicationController
       table_row_num = @first_offset.index(each_comment.file_offset)
       @tableRow_comment_map_old_version[table_row_num] = Array.new unless
           @tableRow_comment_map_old_version[table_row_num]
-      @tableRow_comment_map_old_version[table_row_num] << each_comment
+      @tableRow_comment_map_old_version[table_row_num] << each_comment.comment_content.gsub("\n", " ")
     end
 
     @tableRow_comment_map_new_version = Hash.new
@@ -272,16 +272,36 @@ class ReviewFilesController < ApplicationController
       table_row_num = @second_offset.index(each_comment.file_offset)
       @tableRow_comment_map_new_version[table_row_num] = Array.new unless
           @tableRow_comment_map_new_version[table_row_num]
-      @tableRow_comment_map_new_version[table_row_num] << each_comment
+      @tableRow_comment_map_new_version[table_row_num] << each_comment.
+          comment_content.gsub("\n", " ")
     end
 
   end
 
 
 
-  def save_comment
-    # line, offset, allComments, fileId
-    # line, allComments
+  def submit_comment
+    @comment = ReviewComment.new
+    @comment.review_file_id = params[:file_id]
+    @comment.file_offset = params[:file_offset]
+    @comment.comment_content = params[:comment_content]
+    @comment.reviewer_participant_id = AssignmentParticipant.find_by_user_id(
+        session[:user].id).id
+    @comment.save
+  end
+
+  def get_comments
+    all_comment_contents = []
+    ReviewComment.find_all_by_review_file_id_and_file_offset(
+        params[:file_id], params[:file_offset]).each { |comment|
+      all_comment_contents << comment.comment_content.gsub("\n", " ")
+    }
+    comments_in_table = ReviewCommentsHelper::constructCommentsTable(
+        all_comment_contents)
+
+    respond_to do |format|
+      format.js { render :json => comments_in_table }
+    end
   end
 
 
@@ -289,22 +309,40 @@ class ReviewFilesController < ApplicationController
   def method2
     incoming_data = params[:key]
     puts "!!!!!!!!! METHOD 2 !!!!!!!!!!"
-    puts "params[:key]: #{(params)}"
+    puts "params[:key]: #{params[:key]}"
     #puts "incoming data #{incoming_data}"
     array_data = incoming_data.to_s.split("$")
-    puts "array_data: #{array_data}"
+    #puts "array_data: #{array_data}"
+    puts "review_file_id: #{array_data[0]}"
+    puts "file_offset: #{array_data[1]}"
+    puts "comment content: #{array_data[2]}"
+    puts "reviewer id: 11"
+
+
+    @comment = ReviewComment.new
+    @comment.review_file_id = array_data[0]
+    @comment.file_offset = array_data[1]
+    @comment.comment_content = array_data[2]
+    #comment.reviewer_participant_id = AssignmentParticipant.find_by_user_id(session[:user_id].id).id
+    @comment.reviewer_participant_id = 11
+    @comment.save
+
+    return array_data.join("$").gsub("$", "<br>")
   end
 
   def method3
     puts "!!!!!!!!! METHOD 3 !!!!!!!!!!"
     #puts " params[:key]: #{params[:key]}"
     #puts "incoming data #{incoming_data}"
-    puts " params[:ffpath]: #{params[:file_path]}"
+    puts " params[:fid]: #{params[:file_id]}"
     puts " params[:offs]: #{params[:file_offset]}"
     puts " params[:lins_num]: #{params[:line_num]}"
+    puts " params[:comment_content]: #{params[:comment_content]}"
+
     #array_data = params[:key].to_s.gsub("$","<br>")
-    array_data = "PATH: #{params[:file_path]}"+
-        "<br>OFFSET:#{params[:file_offset]}<br>LINE:#{params[:line_num]}"
+    array_data = "FileId: #{params[:file_id]}"+
+        "<br>OFFSET:#{params[:file_offset]}<br>LINE:#{params[:line_num]}"+
+        "<br>CommentContent:#{params[:comment_content]}"
     puts "array_data: #{array_data}"
 
     respond_to do |format|

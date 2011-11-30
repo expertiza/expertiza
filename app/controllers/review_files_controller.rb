@@ -250,6 +250,8 @@ class ReviewFilesController < ApplicationController
     @shareObj['comparator'] = processor.comparison_array
     @shareObj['linenumarray1'] = @first_line_num
     @shareObj['linenumarray2'] = @second_line_num
+    @shareObj['file1'] = older_file.filepath
+    @shareObj['file2'] = newer_file.filepath
     @shareObj['offsetarray1'] = @first_offset
     @shareObj['offsetarray2'] = @second_offset
     @file_on_left = older_file
@@ -313,6 +315,7 @@ class ReviewFilesController < ApplicationController
 
 
 
+  #                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="createComment('<%= @shareObj['linenumarray2'][i] %>', '<%= @shareObj['offsetarray2'][i] %>', '<%= @tableRow_comment_map_new_version[i] %>', '<%= @file_on_right.id %>' )"><u> <pre><%=i%></pre></u></a></td>
 
 
 

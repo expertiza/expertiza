@@ -97,45 +97,91 @@
 //       * @param allComments Array of all comments already existing for this line.
        * @param fileId The fileId of the review file which is being commented.
        */
-      function createComment(line, offset, allComments, fileId) { // or filepath
+//      function createComment(line, offset, allComments, fileId) { // or filepath
+//          alert('createCommentStarted');
+//          // Dom corr to the comment Window. This dom will be populated with
+//          // (a) existing comments and (b) form to submit a new comment
+//          var commentWindowDom = document.getElementById('myDiv2');
+//
+//          // Invisible div in which the comment information will be stored for
+//          // easy access in another method e.g. ajaxSubmitComment()
+//          var commentInfoDom = document.getElementById('invisible');
+//          commentInfoDom.value = fileId + "$" + "blah";
+//
+//          // Grab existing HTML of the comment window -- contains textarea for
+//          // writing comments plus a Submit button.
+//          var commentForm = document.getElementById('add_subject').innerHTML;
+//
+//          var closeWindowLink = "<a class='line_number' href='#' onclick='hideCommentWindow()'>Close [X]</a><br>";
+//
+//          var commentWindowHtml = "<b>Comments for Line# " + line + "</b><br>" + constructCommentWindow(allComments) + "<br><br>" + commentForm + closeWindowLink;
+//
+//          // To avoid div id contention, change name of div ids.
+//          commentWindowHtml = commentWindowHtml.replace("invisible","invisbile_2");
+//          commentWindowHtml = commentWindowHtml.replace("forminput","forminput_2");
+//
+//          commentWindowDom.innerHTML = commentWindowHtml;
+//          $('#myDiv2').fadeIn();
+//
+////          file_id = fileId;
+////          comment_offset = 111;  // offset
+////          highlight_cell_id = 55;
+////          alert("fileID:" + file_id + "|| comment_offset:" + comment_offset + "||cell:" +highlight_cell_id)
+//          alert('createCommentDone.');
+//      }
+
+      function newerVersion(e, line, filepath, offset) { // or filepath
           alert('createCommentStarted');
-          // Dom corr to the comment Window. This dom will be populated with
-          // (a) existing comments and (b) form to submit a new comment
-          var commentWindowDom = document.getElementById('myDiv2');
 
           // Invisible div in which the comment information will be stored for
           // easy access in another method e.g. ajaxSubmitComment()
           var commentInfoDom = document.getElementById('invisible');
-          commentInfoDom.value = fileId + "$" + "blah";
+          commentInfoDom.value = filepath + "$" + offset;
 
           // Grab existing HTML of the comment window -- contains textarea for
           // writing comments plus a Submit button.
           var commentForm = document.getElementById('add_subject').innerHTML;
 
-          var closeWindowLink = "<a class='line_number' href='#' onclick='hideCommentWindow()'>Close [X]</a><br>";
+          // Dom corr to the comment Window. This dom will be populated with
+          // (a) existing comments and (b) form to submit a new comment
+          var commentWindowDom = document.getElementById('myDiv2');
 
-          var commentWindowHtml = "<b>Comments for Line# " + line + "</b><br>" + constructCommentWindow(allComments) + "<br><br>" + commentForm + closeWindowLink;
+          new Ajax.Request('/review_files/method3', {
+              method: 'get',
+              parameters: {
+                  file_path :filepath,
+                  file_offset :offset,
+                  line_num :line
+              },
+              onSuccess: function(ret_val) {
+//                  var closeWindowLink = "<a class='line_number' href='#' onclick='hideCommentWindow()'>Close [X]</a><br>";
+                  var commentWindowHtml = "<b>Comments for Line# " + line + "</b><br>" + ret_val.responseText + "<br><br>" + commentForm + "<a class='line_number' href='#' onclick='hideCommentWindow()'>Close [X]</a><br>";
 
-          // To avoid div id contention, change name of div ids.
-          commentWindowHtml = commentWindowHtml.replace("invisible","invisbile_2");
-          commentWindowHtml = commentWindowHtml.replace("forminput","forminput_2");
+                  commentWindowHtml = commentWindowHtml.replace("invisible","invisbile_2");
+                  commentWindowHtml = commentWindowHtml.replace("forminput","forminput_2");
 
-          commentWindowDom.innerHTML = commentWindowHtml;
-          $('#myDiv2').fadeIn();
+                  // click and highlight code
+                  var testdom = document.getElementById('td_new_'+e)
+                  testdom.style.fontWeight="900";
+                  testdom.bgColor = "cyan";
 
-//          file_id = fileId;
-//          comment_offset = 111;  // offset
-//          highlight_cell_id = 55;
-//          alert("fileID:" + file_id + "|| comment_offset:" + comment_offset + "||cell:" +highlight_cell_id)
+                  commentWindowDom.innerHTML = commentWindowHtml
+                  $('#myDiv2').fadeIn();
+              },
+              onFailure: function() { alert('Something went horribly Wrong...')}
+          });
+          commentWindowDom.fadeIn("slow");
           alert('createCommentDone.');
       }
+
 
   </script>
 
   <style >
       .parentDisable {
           position:absolute;
-          width:250px;  height:200px;
+          width:250px;
+          /*height:200px;*/
           top:350px;    left:250px;
           display:none;
           z-index:3;
@@ -395,7 +441,7 @@
             <!-- Allow commenting on codefile only if this is the most recent version
             AND if current user is reviewer (i.e. != author/author's team) -->
             <% if @current_review_file.version_number.to_i >= file_versions.sort[-2]  %>
-                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="createComment('<%= @shareObj['linenumarray2'][i] %>', '<%= @shareObj['offsetarray2'][i] %>', '<%= @tableRow_comment_map_new_version[i] %>', '<%= @file_on_right.id %>' )"><u> <pre><%=i%></pre></u></a></td>
+                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="newerVersion('<%= i %>', '<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['file2'] %>','<%=@shareObj['offsetarray2'][i]%>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
             <% else %>
                 <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="viewComments('<%= @shareObj['linenumarray2'][i] %>', '<%= @tableRow_comment_map_new_version[i] %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
             <% end %>
@@ -427,7 +473,8 @@
   <div id="myDiv2" class="parentDisable" onLoad="assign()"></div>
   <!--  HIDDEN DIV WHICH LATER CREEPS INTO THE POPUP -->
   <div id="add_subject">
-    <textarea id="forminput" rows="10" cols="20"></textarea> <br>
+    <table><tr><td>FOO-BAZZLE</td></tr></table>
+    <textarea id="forminput" ></textarea> <br>
     <button onclick="ajaxSubmitComment()"><b>Save Comment</b></button>
     <input type="textarea" id="invisible" style="display:none">
   </div>

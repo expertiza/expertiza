@@ -153,23 +153,178 @@ class ReviewFilesController < ApplicationController
   # params[:diff_with_file_id] - Id of current file to be diffed with
   # params[:current_version_id] the if of current version of file
   def show_code_file_diff
+    @participant = AssignmentParticipant.find(params[:participant_id])
 
-    ## TODO
-    ## if :diff_with_file_id is nil? then default it to previous version
-    #
-    ## Get the filepath of both the files.
-    #older_file = ReviewFile.find(params[:current_version_id])
-    #newer_file = ReviewFile.find(params[:diff_with_file_id])
-    #
-    ## Swap them if older is more recent than newer
-    #if older_file.version_number > newer_file.version_number
-    #  temp = older_file
-    #  older_file = newer_file
-    #  newer_file = temp
-    #end
+    # TODO
+    # if :diff_with_file_id is nil? then default it to previous version
+
+    # Get the filepath of both the files.
+    older_file = ReviewFile.find(params[:current_version_id])
+    newer_file = ReviewFile.find(params[:diff_with_file_id])
+
+    @current_review_file = older_file
+
+    @version_fileId_map = Hash.new
+    params[:versions].each do |each_version|
+      this_file = ReviewFile.get_file(
+          ReviewFilesHelper::get_code_review_file_dir(@participant),
+          each_version, File.basename(@current_review_file.filepath))
+      @version_fileId_map[each_version] = this_file ? this_file.id : nil
+    end
+
+    # Swap them if older is more recent than newer
+    if older_file.version_number > newer_file.version_number
+      temp = older_file
+      older_file = newer_file
+      newer_file = temp
+    end
+
+    processor = DiffHelper::Processor.new(older_file.filepath, newer_file.filepath)
+    processor.process!
+
+    @first_line_num = []
+    @second_line_num = []
+    @first_offset = []
+    @second_offset = []
+    first_count = 0
+    second_count = 0
+    @offsetswithcomments_file1 = []
+    @offsetswithcomments_file2 = []
+
+    @first_offset << 0
+    @second_offset << 0
+
+    for i in (0..processor.absolute_line_num)
+
+      if i > 0
+        @first_offset  << (@first_offset[i-1]  + processor.first_file_array[i-1].size)
+        @second_offset << (@second_offset[i-1] + processor.second_file_array[i-1].size)
+      end
+
+      first = processor.first_file_array[i].to_s
+
+      if(first != "") ## DOLLAR HERE ##
+        @first_line_num << first_count+1
+        first_count += 1
+      else # empty
+           #processor.first_file_array[i] = ""
+        @first_line_num << ""
+      end
+
+
+      second = processor.second_file_array[i].to_s
+
+      if(second != "") ## DOLLAR HERE ##
+        @second_line_num << second_count+1
+        second_count += 1
+      else
+        #processor.second_file_array[i] = ""
+        @second_line_num << ""
+      end
+
+      third = processor.comparison_array[i]
+      first = first.gsub("\n","")
+      second = second.gsub("\n","")
+
+      # HACK ! HACK ! HACK ! TODO Initialize differently
+      #if(third == DiffHelper::UNCHANGED)then @offsetswithcomments_file1 << @first_offset[i] end
+      #if(third == DiffHelper::CHANGED)then @offsetswithcomments_file2 << @second_offset[i] end
+
+      # Remove newlines at the end of this line of code
+      if(processor.first_file_array[i] != nil)
+        processor.first_file_array[i] = processor.first_file_array[i].chomp
+      end
+      if(processor.second_file_array[i] != nil)
+        processor.second_file_array[i] = processor.second_file_array[i].chomp
+      end
+
+    end
+
+    older_version_comments = ReviewComment.find_all_by_review_file_id(older_file.id)
+    newer_version_comments = ReviewComment.find_all_by_review_file_id(newer_file.id)
+
+
+    @shareObj = Hash.new()
+    @shareObj['linearray1'] = processor.first_file_array
+    @shareObj['linearray2'] = processor.second_file_array
+    @shareObj['comparator'] = processor.comparison_array
+    @shareObj['linenumarray1'] = @first_line_num
+    @shareObj['linenumarray2'] = @second_line_num
+    @shareObj['offsetarray1'] = @first_offset
+    @shareObj['offsetarray2'] = @second_offset
+    @file_on_left = older_file
+    @file_on_right = newer_file
+
+
+    # TODO: REFACTOR!!! Code Duplication
+    @tableRow_comment_map_old_version = Hash.new
+    older_version_comments.each do |each_comment|
+      table_row_num = @first_offset.index(each_comment.file_offset)
+      @tableRow_comment_map_old_version[table_row_num] = Array.new unless
+          @tableRow_comment_map_old_version[table_row_num]
+      @tableRow_comment_map_old_version[table_row_num] << each_comment
+    end
+
+    @tableRow_comment_map_new_version = Hash.new
+    newer_version_comments.each do |each_comment|
+      table_row_num = @second_offset.index(each_comment.file_offset)
+      @tableRow_comment_map_new_version[table_row_num] = Array.new unless
+          @tableRow_comment_map_new_version[table_row_num]
+      @tableRow_comment_map_new_version[table_row_num] << each_comment
+    end
 
   end
 
+
+
+  def save_comment
+    # line, offset, allComments, fileId
+    # line, allComments
+  end
+
+
+
+  def method2
+    incoming_data = params[:key]
+    puts "!!!!!!!!! METHOD 2 !!!!!!!!!!"
+    puts "params[:key]: #{(params)}"
+    #puts "incoming data #{incoming_data}"
+    array_data = incoming_data.to_s.split("$")
+    puts "array_data: #{array_data}"
+  end
+
+  def method3
+    puts "!!!!!!!!! METHOD 3 !!!!!!!!!!"
+    #puts " params[:key]: #{params[:key]}"
+    #puts "incoming data #{incoming_data}"
+    puts " params[:ffpath]: #{params[:file_path]}"
+    puts " params[:offs]: #{params[:file_offset]}"
+    puts " params[:lins_num]: #{params[:line_num]}"
+    #array_data = params[:key].to_s.gsub("$","<br>")
+    array_data = "PATH: #{params[:file_path]}"+
+        "<br>OFFSET:#{params[:file_offset]}<br>LINE:#{params[:line_num]}"
+    puts "array_data: #{array_data}"
+
+    respond_to do |format|
+      format.js { render :json => array_data }
+    end
+
+  end
+
+
+
+
+
+
+
+
+
+  ############################################################################
+  ############################################################################
+  ############################################################################
+  ############################################################################
+  ############################################################################
+  ############################################################################
 
 
   def method1()
@@ -206,7 +361,7 @@ class ReviewFilesController < ApplicationController
         @first_line_num << first_count+1
         first_count += 1
       else # empty
-        #processor.first_file_array[i] = ""
+           #processor.first_file_array[i] = ""
         @first_line_num << ""
       end
 
@@ -256,34 +411,6 @@ class ReviewFilesController < ApplicationController
 
   end
 
-
-  #
-  def method2
-    incoming_data = params[:key]
-    puts "!!!!!!!!! METHOD 2 !!!!!!!!!!"
-    puts "params[:key]: #{(params)}"
-    #puts "incoming data #{incoming_data}"
-    array_data = incoming_data.to_s.split("$")
-    puts "array_data: #{array_data}"
-  end
-
-  def method3
-    puts "!!!!!!!!! METHOD 3 !!!!!!!!!!"
-    #puts " params[:key]: #{params[:key]}"
-    #puts "incoming data #{incoming_data}"
-    puts " params[:ffpath]: #{params[:file_path]}"
-    puts " params[:offs]: #{params[:file_offset]}"
-    puts " params[:lins_num]: #{params[:line_num]}"
-    #array_data = params[:key].to_s.gsub("$","<br>")
-    array_data = "PATH: #{params[:file_path]}"+
-        "<br>OFFSET:#{params[:file_offset]}<br>LINE:#{params[:line_num]}"
-    puts "array_data: #{array_data}"
-
-    respond_to do |format|
-      format.js { render :json => array_data }
-    end
-
-  end
 
 
 

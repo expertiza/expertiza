@@ -131,10 +131,10 @@
 
       .margin{ margin: 0cm; }
 
-      #shyamdiv{
+      #code_review_frame_div{
           border:1;
           width:100%;
-          height:500px;
+          height:440px;
       }
 
       tr.highlight :hover { font-weight: bold;  }
@@ -152,16 +152,27 @@
       }
       
       td.current_version {
-          background-color: black;
-          color: white;
+          background-color: #de3c3c;
+          color: black;
           font-weight: bold;
           border-left: thin solid black;
           border-right: thin solid black;
           border-top: thin solid black;
           border-bottom: thin solid black;
       }
+          
+      td.top_header {
+          border-bottom: thin brown;
+      }
 
-
+      .dashboard_header_css {
+        border-bottom: none;
+          border-left: thin solid black;
+          border-right: thin solid black;
+          border-top: thin solid black;
+          border-width: 1px;
+          background-color: #e0d1a0;
+      }
 
 
   </style>
@@ -175,16 +186,21 @@
       $(document).ready (
               function() {
                   $("#myDiv2").draggable();
-                  $("#add_subject").fadeOut();
+                  $("#add_subject").fadeOut(0);
               }
       );
   </script>
 
   </br>
 
-  <div id="dashboard_header" style= "border-style: solid; border-width: 2px; background-color: #fafad2;" >
+  <div id="dashboard_header" class="dashboard_header_css" >
     <table  cellpadding='3' cellspacing='4' >
-      <tr><td><b style="font-size: large;"><%= File.basename(@shareObj['file1']) %> </b><i style="font-size: smaller;">(Version <%= @current_review_file.version_number %>)</i></td></tr>
+      <tr ><td class="top_header"><b style="font-size: large;"><%= File.basename(@shareObj['file1']) %> </b><i style="font-size: smaller;">(Version <%= @current_review_file.version_number %>)</i></td></tr>
+    </table>
+  </div>
+
+  <div id="dashboard_header" style= "border: thin solid; border-width: 1px; background-color: #fafad2;" >
+    <table  cellpadding='3' cellspacing='4' >
       <tr>
         <td align="right">View Version:</td>
         <!-- Prepare the 'versions' array from the @version_fileId_map -->
@@ -226,11 +242,10 @@
                 <td class="version_number" >
                   <%= link_to each_version, :controller => 'review_files',
                               :action => 'show_code_file_diff',
-                              :review_file_id => review_file_id,
                               :participant_id => @participant.id,
                               :versions => file_versions,
-                              :diff_with_version => each_version,
-                              :current_version => @current_review_file.version_number.to_i %>
+                              :diff_with_file_id => review_file_id,
+                              :current_version_id => @current_review_file.id %>
                 </td>
             <% end %>
 
@@ -243,7 +258,7 @@
 
 
   <!--  THE DIV OF THE TABLE -->
-  <div  id="shyamdiv" class="margin" style= "border-style: solid;  overflow: auto; border-width: 2px;" >
+  <div  id="code_review_frame_div" class="margin" style= "border: thin solid;  overflow: auto; border-width: 1px;" >
     <table width="100%" cellpadding='0' cellspacing='0' style="table-layout: fixed; word-wrap: break-word;">
       <% for i in 0..@shareObj['linearray1'].size %>
 
@@ -254,14 +269,8 @@
 
           <tr bgcolor="<%=@color%>" class="highlight">
 
-            <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE LEFT LINE NUMBER -->
-            <% if @shareObj['highlightfile1'].include?@shareObj['offsetarray1'][i]  %>
-                <%linecolor = 'cyan'%>
-                <% line_font_weight = "bold" %>
-            <%end%>
-
                 <!-- Allow adding comments only if this is the most recent version-->
-            <% if file_versions.sort.last == @current_review_file.version_number.to_i %>
+            <% if @current_review_file.version_number.to_i == file_versions.sort.last %>
                 <td width="20px" id="td_new_<%=i%>" bgcolor="<%=linecolor%>" style=" font-weight: <%= line_font_weight %> ; border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="recentVersion('<%= i %>', '<%= i %>', '<%=@shareObj['file1']%>','<%=@shareObj['offsetarray1'][i]%>')"><u> <pre><%=i%></pre></u></a></td>
             <% else %>
                 <td width="20px" id="td_old_<%=i%>" bgcolor="<%=linecolor%>" style=" font-weight: <%= line_font_weight %> ; border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="olderVersion('<%= i %>', '<%= i %>', '<%=@shareObj['file1']%>','<%=@shareObj['offsetarray1'][i]%>')"><u> <pre><%=i%></pre></u></a></td>
@@ -280,13 +289,17 @@
   <br/><%= link_to "Back to File Listing", :controller => 'review_files',
                    :action => 'show_all_submitted_files',
                    :participant_id => @participant.id %>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <%= link_to "Upload next Version", :controller => 'review_files',
+              :action => 'upload_review_file',
+              :participant_id => @participant.id %>
 
   <!--   The popup which pops up as one intends to click or view comments -->
   <div id="myDiv2" class="parentDisable" onLoad="assign()"></div>
   <!--  HIDDEN DIV WHICH LATER CREEPS INTO THE POPUP -->
   <div id="add_subject">
     <table><tr><td>FOO-BAZZLE</td></tr></table>
-    <textarea id="forminput" rows="10" cols="20"></textarea> <br>
+    <textarea id="forminput" ></textarea> <br>
     <button onclick="ajaxSubmitComment()"><b>Save Comment</b></button>
     <input type="textarea" id="invisible" style="display:none">
   </div>

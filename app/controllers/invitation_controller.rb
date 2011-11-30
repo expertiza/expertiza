@@ -7,15 +7,21 @@ class InvitationController < ApplicationController
     user = User.find_by_name(params[:user][:name].strip)
     team = AssignmentTeam.find_by_id(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
+    puts 'student' + user.to_json
+    participant = Participant.find_by_user_id(user.id)
+    @join_team_request = JoinTeamRequest.find_by_participant_id(participant.id)
+    puts 'Join team request::::::++>>'+@join_team_request.to_json
+    @join_team_request.status = 'A'
+    @join_team_request.save
     return unless current_user_id?(student.user_id)
-    
+
     #check if the invited user is valid
     if !user
-      flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct." 
+      flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
     else
       participant = AssignmentParticipant.find(:first, :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
       if !participant
-        flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment." 
+        flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
       else
         team_member = TeamsUser.find(:all, :conditions => ['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
@@ -29,11 +35,11 @@ class InvitationController < ApplicationController
             @invitation.to_id = user.id
             @invitation.from_id = student.user_id
             @invitation.assignment_id = student.parent_id
-            @invitation.reply_status = 'W' 
+            @invitation.reply_status = 'W'
             @invitation.save
           else
             flash[:notice] = "You have already sent an invitation to \"#{user.name}\"."
-          end   
+          end
         end
       end
     end

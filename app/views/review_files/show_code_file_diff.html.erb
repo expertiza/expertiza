@@ -195,12 +195,15 @@
       tr.highlight :hover { font-weight: bold;  }
 
       td.version_number {
-          background-color: #faee7f;
+          /*background-color: #faee7f;*/
+          background-color: #f6f6fa;
+          color: black;
           border-left: thin solid gray;
           border-right: thin solid gray;
           border-top: thin solid gray;
           border-bottom: thin solid gray;
       }
+      
 
       td.version_number :hover {
           font-weight: bold;
@@ -208,7 +211,8 @@
       }
 
       td.current_version {
-          background-color: rgb(249, 255, 0);
+          /*background-color: rgb(249, 255, 0);*/
+          background-color: rgb(222, 0, 1);
           color: black;
           font-weight: bold;
           border-left: thin solid black;
@@ -227,17 +231,24 @@
           border-right: thin solid black;
           border-top: thin solid black;
           border-width: 1px;
-          background-color: rgba(219, 208, 91, 0.91);
+          color: white;
+          background-color: rgb(150, 0, 4);
       }
 
-      .version_diff_header{
+      .version_diff_header {
           border-bottom: none;
           border-left: thin solid black;
           border-right:thin solid black;
           border-top: thin solid black;
           border-width: 1px;
-          background-color: #faee7f;
+          /*background-color: rgba(250, 3, 0, 0.37);*/
+          background-color: rgb(150, 0, 4);
+          color: white;
       }
+
+          a.version_link {
+              color: black;
+          }
 
   </style>
 
@@ -263,7 +274,7 @@
     </table>
   </div>
 
-  <div id="dashboard_header" style= "border: thin solid; border-width: 1px; background-color: #fafad2;" >
+  <div id="dashboard_header" style= "border: thin solid; border-width: 1px; background-color: rgba(250, 3, 0, 0.37);" >
     <table  cellpadding='5px' cellspacing='4' >
       <tr>
         <td align="right">View Version:</td>
@@ -278,19 +289,21 @@
         <% @version_fileId_map.sort.each do |each_version, review_file_id| %>
             <% if each_version.to_s == @current_review_file.version_number.to_s %>
                 <td class="version_number current_version" >
-                  <%= link_to each_version, :controller => 'review_files',
+                  <%= link_to each_version,
+                              {:controller => 'review_files',
                               :action => 'show_code_file',
                               :review_file_id => review_file_id,
                               :participant_id => @participant.id,
-                              :versions => file_versions %>
+                              :versions => file_versions}, :class =>"version_link" %>
                 </td>
             <% else %>
                 <td class="version_number" >
-                  <%= link_to each_version, :controller => 'review_files',
+                  <%= link_to each_version,
+                              {:controller => 'review_files',
                               :action => 'show_code_file',
                               :review_file_id => review_file_id,
                               :participant_id => @participant.id,
-                              :versions => file_versions %>
+                              :versions => file_versions}, :class =>"version_link" %>
                 </td>
             <% end %>
 
@@ -303,17 +316,18 @@
              corresponding to each hash -->
         <% @version_fileId_map.sort.each do |each_version, review_file_id| %>
             <% if each_version.to_s == @current_review_file.version_number.to_s %>
-                <td style="color: #986633">
+                <td style="color: black">
                   <%= each_version %>
                 </td>
             <% else %>
                 <td class="version_number" >
-                  <%= link_to each_version, :controller => 'review_files',
+                  <%= link_to each_version, {:controller => 'review_files',
                               :action => 'show_code_file_diff',
                               :participant_id => @participant.id,
                               :versions => file_versions,
                               :diff_with_file_id => review_file_id,
-                              :current_version_id => @current_review_file.id %>
+                              :current_version_id => @current_review_file.id},
+                              :class =>"version_link" %>
                 </td>
             <% end %>
 

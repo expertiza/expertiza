@@ -25,10 +25,10 @@
         duedates.sort! {|a,b| a.due_at <=> b.due_at}
 		for @due_date in duedates %>
 	        <% heading = @due_date.deadline_type.name.titleize + " deadline" %>
-			<tr>
+			<tr<% if @due_date.deadline_type_id == 7%> id="team_formation_row"<% end %>>
 				<td align ="center"><%= heading%></td>
 				<td align ="center"><%= text_field 'due_date[]', 'due_at', :size=>30%></td>
-			<% if @due_date.deadline_type_id != 6 %>
+			<% if @due_date.deadline_type_id != 6 && @due_date.deadline_type_id != 7 %>
 				<td align ="center"><%= select('due_date[]', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 				<td align ="center"><%= select('due_date[]', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 				<td align ="center"><%= select('due_date[]', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>

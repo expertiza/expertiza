@@ -332,12 +332,12 @@ class Assignment < ActiveRecord::Base
     
   # Determine if the next due date from now allows for submissions
   def submission_allowed(topic_id=nil)
-    return (check_condition("submission_allowed_id",topic_id) or check_condition("resubmission_allowed_id",topic_id))
+    return (check_condition("submission_allowed_id",topic_id))
   end
   
 # Determine if the next due date from now allows for reviews
   def review_allowed(topic_id=nil)
-    return (check_condition("review_allowed_id",topic_id) or check_condition("rereview_allowed_id",topic_id))
+    return (check_condition("review_allowed_id",topic_id))
   end
   
   # Determine if the next due date from now allows for metareviews

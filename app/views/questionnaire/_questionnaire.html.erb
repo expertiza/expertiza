@@ -8,11 +8,16 @@
 			<%= text_field 'questionnaire', 'name'  %>
 			<%= hidden_field 'questionnaire', 'id' %>
 			<%= hidden_field 'questionnaire', 'type' %>
+            <%= hidden_field 'questionnaire', 'section' %>
 		</td>		
 	</tr>
 </table>
 <table>
 	<tr>
+        <td>Questionnaire Type</td>
+        <td><input id="section" type="text" value='<%="#{@questionnaire.section}"%>' size=3 disabled="true"></td>
+      </tr>
+  <tr>
 		<td>Min question score:</td>
 		<td><%= text_field 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
 		<td>Max question score:</td>
@@ -37,6 +42,9 @@
 		<td align=left width=30>Delete</td>
 		<td align=center width=300>Question</td>
 		<td align=center width=100>Scoring</td>
+        <% if (@questionnaire.section == "Custom") %>
+          <td align=center width=100>Parameters</td>
+         <%end%>
 		<td align=left>Weight</td>
 	</tr>
 	

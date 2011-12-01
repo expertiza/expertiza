@@ -144,7 +144,7 @@ def custom_display_as_html(code, file_url)
   begin
   review_scores = self.scores
 
-  #********************Learning Targets******************
+  #********************Learning Targets***************
 code = code + "<h2>Learning Targets</h2><hr>"
 for i in 0..3
 if review_scores[i].comments == "1"

@@ -10,10 +10,15 @@ class Question < ActiveRecord::Base
     validates_numericality_of :weight # the weight must be numeric
     
     # Class variables
+    # Class variables
     NUMERIC = 'Numeric' # Display string for NUMERIC questions
     TRUE_FALSE = 'True/False' # Display string for TRUE_FALSE questions
-    
     GRADING_TYPES = [[NUMERIC,false],[TRUE_FALSE,true]]
+
+    CHECKBOX = 'Checkbox' # Display string for NUMERIC questions
+    TEXTAREA = 'Text Area' # Display string for TRUE_FALSE questions
+
+    GRADING_TYPES_CUSTOM = [[NUMERIC,0],[TRUE_FALSE,1],[CHECKBOX,2],[TEXTAREA,3]]
     WEIGHTS = [['1',1],['2',2],['3',3],['4',4],['5',5]]
     
     attr_accessor :checked

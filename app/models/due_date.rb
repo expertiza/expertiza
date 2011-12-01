@@ -10,8 +10,10 @@ class DueDate < ActiveRecord::Base
 
   def due_at_is_valid_datetime
     #ignore unnecessary(?) datetime format validation
+	#^> They are necessary because null dates yield an invalid comparison when sorting
+	
 	# puts "Trying to validate this datetime: #{due_at.to_s}..."
-    # errors.add(:due_at, 'must be a valid datetime') if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
+    errors.add(:due_at, 'must be a valid datetime') if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
   end
 
   def self.copy(old_assignment_id, new_assignment_id)    

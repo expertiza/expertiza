@@ -104,6 +104,8 @@ class AssignmentController < ApplicationController
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
+	deadline = DeadlineType.find_by_name("team_formation")
+    @team_formation_deadline = deadline.id
     
     if @assignment.save 
       set_questionnaires   
@@ -121,7 +123,14 @@ class AssignmentController < ApplicationController
         max_round = 2;
         
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
-        raise "Please enter a valid drop toipic deadline" if !due_date
+        raise "Please enter a valid drop topic deadline" if !due_date
+		
+		if @assignment.team_formation_required
+		  due_date = DueDate::set_duedate(params[:team_formation_deadline],@team_formation_deadline, @assignment.id, 0)
+          if params[:team_formation_required] == "1"
+			  raise "Please enter a valid team formation deadline" if !due_date
+		  end
+		end
         
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys
@@ -318,14 +327,36 @@ class AssignmentController < ApplicationController
       end
       
       begin
+	    found_formation = false
+		
         # Iterate over due_dates, from due_date[0] to the maximum due_date
         if params[:due_date]
           for due_date_key in params[:due_date].keys
             due_date_temp = DueDate.find(due_date_key)
-            due_date_temp.update_attributes(params[:due_date][due_date_key])     
-            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+            due_date_temp.update_attributes(params[:due_date][due_date_key])
+			
+			# Raise a flag if the team formation deadline was found for this assignment
+			found_formation = true if due_date_temp.deadline_type_id == 7
+			
+			# Only validate the date if we "care" about it
+			if due_date_temp.deadline_type_id != 7 || (@assignment.team_formation_required && due_date_temp.deadline_type_id == 7)
+				raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+			end
+			
+			# If we find that we don't need the team formation deadline, delete it
+			due_date_temp.delete if due_date_temp.deadline_type_id == 7 && !@assignment.team_formation_required
+			
           end
         end
+		
+		if !found_formation && @assignment.team_formation_required
+		  formation_due_date = DueDate.new
+		  formation_due_date.assignment_id = @assignment.id
+		  formation_due_date.due_at = params[:formation_deadline]
+		  formation_due_date.deadline_type = DeadlineType.find_by_name("team_formation")
+		  formation_due_date.save
+		  raise "Please enter a valid date & time for the team formation deadline" if formation_due_date.errors.length > 0
+		end
      
         flash[:notice] = 'Assignment was successfully updated.'
         redirect_to :action => 'show', :id => @assignment                  

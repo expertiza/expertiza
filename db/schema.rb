@@ -97,7 +97,9 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.text     "info"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "private",        :default => false, :null => false
+    t.boolean  "private",                :default => false, :null => false
+    t.integer  "max_duplicate_pairings"
+    t.integer  "min_unique_pairings"
   end
 
   add_index "courses", ["instructor_id"], :name => "fk_course_users"

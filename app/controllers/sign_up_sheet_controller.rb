@@ -623,4 +623,38 @@ class SignUpSheetController < ApplicationController
 
   end
 
+  def create_default_for_microtask
+    assignment_id = params[:id]
+    @sign_up_topic = SignUpTopic.new
+    @sign_up_topic.topic_identifier = 'MT1'
+    @sign_up_topic.topic_name = 'Microtask Topic'
+    @sign_up_topic.max_choosers = '1'
+    @sign_up_topic.assignment_id = assignment_id
+
+    @assignment = Assignment.find(params[:id])
+
+    if @assignment.staggered_deadline?
+      topic_set = Array.new
+      topic = @sign_up_topic.id
+
+    end
+
+    if @sign_up_topic.save
+
+      flash[:notice] = 'Default Microtask topic was created - please update.'
+      redirect_to_sign_up(assignment_id)
+    else
+      render :action => 'new', :id => assignment_id
+    end
+  end
+
+
+  def redirect_to_sign_up(assignment_id)
+    assignment = Assignment.find(assignment_id)
+    if assignment.staggered_deadline == true
+      redirect_to :action => 'add_signup_topics_staggered', :id => assignment_id
+    else
+      redirect_to :action => 'add_signup_topics', :id => assignment_id
+    end
+  end
 end

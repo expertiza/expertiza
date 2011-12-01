@@ -202,6 +202,7 @@ class SignUpSheetController < ApplicationController
 
       topic.category = params[:topic][:category]
       topic.topic_name = params[:topic][:topic_name]
+      topic.micropayment = params[:topic][:micropayment]
       topic.save
     else
       flash[:error] = "Topic could not be updated"

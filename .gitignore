@@ -25,3 +25,4 @@ config/*.yml
 rerun.txt
 pickle-email-*.html
 .idea*
+/ruby/

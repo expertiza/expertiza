@@ -223,5 +223,33 @@ class AssignmentTeam < Team
     }
     team  
   end
-end  
+
+  #Whether there is a pairing conflict or not.
+  def has_pairing_conflicts?(participant)
+    max_duplicate_pairings = assignment.course.max_duplicate_pairings
+    max_unique_pairings = assignment.course.min_unique_pairings
+    if max_duplicate_pairings == nil and max_unique_pairings == nil
+      return false
+    else
+      participants.each do |other_participant|
+        past_teams = TeamsUser.find_all_by_user_id(other_participant.user_id)
+        past_teammates = TeamsUser.find_all_by_team_id(past_teams)
+        past_users = past_teammates.map {|teammate| teammate.user_id}
+        if past_users.include?(participant)
+
+          # De-duping users will give us number of pairings used so far.
+          unique_users = past_users.uniq
+          user_difference = past_users.length - unique_users.length
+
+          # account for self
+          user_difference -= past_teams.length + 1
+
+          if user_difference > max_unique_pairings
+            #whatever
+          end
+        end
+      end
+    end
+  end
+end
 

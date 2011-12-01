@@ -126,7 +126,7 @@ class SignUpSheetController < ApplicationController
       @sign_up_topic.max_choosers = params[:topic][:max_choosers]
       @sign_up_topic.category = params[:topic][:category]
       @sign_up_topic.assignment_id = params[:id]
-
+      @sign_up_topic.micropayment = params[:micropayment]
       @assignment = Assignment.find(params[:id])
 
       if @assignment.staggered_deadline?
@@ -629,6 +629,7 @@ class SignUpSheetController < ApplicationController
     @sign_up_topic.topic_identifier = 'MT1'
     @sign_up_topic.topic_name = 'Microtask Topic'
     @sign_up_topic.max_choosers = '1'
+    @sign_up_topic.micropayment = 0
     @sign_up_topic.assignment_id = assignment_id
 
     @assignment = Assignment.find(params[:id])

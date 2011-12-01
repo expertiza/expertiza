@@ -15,9 +15,16 @@
   </tr>
 </table>
 
-<p><label for="max_choosers">Maximum choosers</label><br/>
-  <%= text_field 'topic', 'max_choosers' %></p>
-
-
+<table>
+  <tr>
+     <td><label for="max_choosers">Maximum choosers</label></td>
+     <td><label for="micropayment">Micropayment Credit</label></td>
+  </tr>
+  <tr>
+     <td><%= text_field 'topic', 'max_choosers' %></td>
+     <td><%= text_field 'topic', 'micropayment' %></td>
+  </tr>
+</table>
+<br/>
 <!--[eoform:topic]-->
 <br/>

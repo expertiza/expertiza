@@ -2,7 +2,7 @@
 <% form_tag({:controller => 'review_files' , :action=>'submit_review_file',
              :participant_id => @participant.id},
             {:method => 'post', :enctype => "multipart/form-data",
-             :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
+             :onSubmit => "return checkIfFileExists(uploaded_review_file.value,1);"}) do %>
     <br/>Please Upload a Zip file containing all files for Code Review.<br/>
     <br/><input type="file" id="uploaded_review_file" name="uploaded_review_file" size=40 />
     <%= submit_tag 'Upload Zip' %>

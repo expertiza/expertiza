@@ -1,12 +1,12 @@
 <head>
 
   <script type="text/javascript"
-      src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js">
-      </script>
+          src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js">
+  </script>
 
   <script type="text/javascript"
-      src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js">
-      </script>
+          src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js">
+  </script>
 
   <script type="text/javascript">
 
@@ -26,6 +26,7 @@
           document.getElementById('myDiv2').innerHTML = ""
           $("#myDiv2").fadeOut();
       }
+
 
       //******************* ONLY DISPLAYS COMMENTS ***********
       function olderVersion(e, line, filepath, offset) {
@@ -100,14 +101,15 @@
 
       a.line_number:link {
           COLOR: black;
-          text-decoration: none;
+          text-decoration: underline;
       }
       a.line_number:visited {
           COLOR: black;
-          text-decoration: none;
+          text-decoration: underline;
       }
       a.line_number:active {
           COLOR: black;
+          text-decoration: underline;
       }
 
       a.line_number_hover :hover {
@@ -115,10 +117,6 @@
           COLOR: white;
           text-decoration: underline;
           font-weight: bold;
-      }
-      .close_line_hover :hover {
-          font-weight: bold;
-          text-decoration: underline;
       }
 
       .curved {
@@ -133,13 +131,48 @@
 
       .margin{ margin: 0cm; }
 
-      #shyamdiv{
+      #code_review_frame_div{
           border:1;
           width:100%;
-          height:500px;
+          height:440px;
       }
 
       tr.highlight :hover { font-weight: bold;  }
+
+      td.version_number {
+          border-left: thin solid gray;
+          border-right: thin solid gray;
+          border-top: thin solid gray;
+          border-bottom: thin solid gray;
+      }
+
+      td.version_number :hover {
+          font-weight: bold;
+          color: black;
+      }
+
+      td.current_version {
+          background-color: #de3c3c;
+          color: black;
+          font-weight: bold;
+          border-left: thin solid black;
+          border-right: thin solid black;
+          border-top: thin solid black;
+          border-bottom: thin solid black;
+      }
+
+      td.top_header {
+          border-bottom: thin brown;
+      }
+
+      .dashboard_header_css {
+          border-bottom: none;
+          border-left: thin solid black;
+          border-right: thin solid black;
+          border-top: thin solid black;
+          border-width: 1px;
+          background-color: #e0d1a0;
+      }
 
 
   </style>
@@ -149,114 +182,124 @@
 
 <font face="courier" size="2">
 
-  </br></br>
-
-
   <script>
       $(document).ready (
-          function() {
-              $("#myDiv2").draggable();
-              $("#add_subject").fadeOut();
-          }
+              function() {
+                  $("#myDiv2").draggable();
+                  $("#add_subject").fadeOut(0);
+              }
       );
   </script>
 
+  </br>
 
-  <div id="dashboard_header" style= "border-style: solid;  overflow: auto; border-width: 2px;" >
-    <table width="100%" cellpadding='1' cellspacing='1' style="table-layout: fixed; ">
-      <tr><td>This is Code Review Dashboard</td></tr>
-      <tr>
-        <td>View Version:</td>
-        <% for i in (0..2) %>
-            <td><%= link_to i, :controller => 'review_files',
-                               :action => 'show_code_review_dashboard' %></td>
-        <% end %>
-        
-
-      </tr>
-      <tr><td>View Diff:</td></tr>
-
-      <tr><td colspan="4"><br/><br/><%= link_to "Upload Next version of Code files",
-                          :controller => 'review_files',
-                          :action => 'upload_review_file',
-                          :participant_id => @participant.id %></td></tr>
+  <div id="dashboard_header" class="dashboard_header_css" >
+    <table  cellpadding='3' cellspacing='4' >
+      <tr ><td class="top_header"><b style="font-size: large;"><%= File.basename(@shareObj['file1']) %> </b><i style="font-size: smaller;">(Version <%= @current_review_file.version_number %>)</i></td></tr>
     </table>
   </div>
-    
-  <br/>
+
+  <div id="dashboard_header" style= "border: thin solid; border-width: 1px; background-color: #fafad2;" >
+    <table  cellpadding='3' cellspacing='4' >
+      <tr>
+        <td align="right">View Version:</td>
+        <!-- Prepare the 'versions' array from the @version_fileId_map -->
+        <% file_versions = [] %>
+        <% @version_fileId_map.sort.each do |version, review_file_id| %>
+            <% file_versions << version.to_i %>
+        <% end %>
+
+        <!-- Iterate over all hashes and display the version and link
+             corresponding to each hash -->
+        <% @version_fileId_map.each do |each_version, review_file_id| %>
+            <% if each_version.to_s == @current_review_file.version_number.to_s %>
+                <td class="current_version" >
+                  <%= each_version %>
+                </td>
+            <% else %>
+                <td class="version_number" >
+                  <%= link_to each_version, :controller => 'review_files',
+                              :action => 'show_code_file',
+                              :review_file_id => review_file_id,
+                              :participant_id => @participant.id,
+                              :versions => file_versions %>
+                </td>
+            <% end %>
+
+        <% end %>
+      </tr>
+
+      <tr>
+        <td align="right">View Diff with:</td>
+        <!-- Iterate over all hashes and display the version and link
+             corresponding to each hash -->
+        <% @version_fileId_map.each do |each_version, review_file_id| %>
+            <% if each_version.to_s == @current_review_file.version_number.to_s %>
+                <td style="color: #986633">
+                  <%= each_version %>
+                </td>
+            <% else %>
+                <td class="version_number" >
+                  <%= link_to each_version, :controller => 'review_files',
+                              :action => 'show_code_file_diff',
+                              :participant_id => @participant.id,
+                              :versions => file_versions,
+                              :diff_with_file_id => review_file_id,
+                              :current_version_id => @current_review_file.id %>
+                </td>
+            <% end %>
+
+        <% end %>
+      </tr>
+    </table>
+  </div>
+
+  <br/><br/>
+
+
   <!--  THE DIV OF THE TABLE -->
-  <div  id="shyamdiv" class="margin" style= "border-style: solid;  overflow: auto; border-width: 2px;" >
+  <div  id="code_review_frame_div" class="margin" style= "border: thin solid;  overflow: auto; border-width: 1px;" >
     <table width="100%" cellpadding='0' cellspacing='0' style="table-layout: fixed; word-wrap: break-word;">
       <% for i in 0..@shareObj['linearray1'].size %>
 
           <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE ROW -->
-          <% @color = "White" %>
+          <% @color = "#ECF1EF" %>
+          <% linecolor = "lightgreen"%>
+          <% line_font_weight = "normal" %>
+
           <tr bgcolor="<%=@color%>" class="highlight">
-            <% line1_font_weight = "normal" %>
-            <% line2_font_weight = "normal" %>
-            <% linecolor = 'lightgray'%>
-            <% linecolor2 = 'lightgray'%>
 
-
-          <% if (@shareObj['comparator'][i] == DiffHelper::ADDED) then @color="palegreen"%><%end%>
-          <% if (@shareObj['comparator'][i] == DiffHelper::DELETED) then @color="pink"%><%end%>
-          <% if (@shareObj['comparator'][i] == DiffHelper::CHANGED) then @color="#FEF5CA"%><%end%>
-          <% if (@shareObj['comparator'][i] == DiffHelper::UNCHANGED) then @color="WHITE"%><%end%>
-
-          <% if (@shareObj['comparator'][i] == DiffHelper::ADDED) then linecolor="#7CCD7C"%><%end%>
-          <% if (@shareObj['comparator'][i] == DiffHelper::DELETED) then linecolor="#FF6A6A"%><%end%>
-          <% if (@shareObj['comparator'][i] == DiffHelper::CHANGED) then linecolor="khaki"%><%end%>
-          <% if (@shareObj['comparator'][i] == DiffHelper::UNCHANGED) then linecolor="lightgray"%><%end%>
-
-          <% if (@shareObj['comparator'][i] == DiffHelper::ADDED) then linecolor2="#7CCD7C"%><%end%>
-          <% if (@shareObj['comparator'][i] == DiffHelper::DELETED) then linecolor2="#FF6A6A"%><%end%>
-          <% if (@shareObj['comparator'][i] == DiffHelper::CHANGED) then linecolor2="khaki"%><%end%>
-          <% if (@shareObj['comparator'][i] == DiffHelper::UNCHANGED) then linecolor2="lightgray"%><%end%>
-
-
-            <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE LEFT LINE NUMBER -->
-            <% if @shareObj['highlightfile1'].include?@shareObj['offsetarray1'][i]  %>
-                <% linecolor = 'cyan'%>
-                <% line1_font_weight = "bold" %>
-            <%end%>
-
-            <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE RIGHT LINE NUMBER -->
-            <% if @shareObj['highlightfile2'].include?@shareObj['offsetarray2'][i]  %>
-                <% linecolor2 = 'cyan'%>
-                <% line2_font_weight = "bold" %>
-            <%end%>
-
-            <!-- LINE NUMBER 1 -->
-            <td width="28px" id="td_old_<%=i%>" bgcolor="<%= linecolor %>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="olderVersion('<%=i%>', '<%= @shareObj['linenumarray1'][i] %>', '<%=@shareObj['file1']%>','<%=@shareObj['offsetarray1'][i]%>')"><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
-
-            <!-- OFFSET FOR FILE 1 -->
-            <td width="1%"><pre><% @shareObj['offsetarray1'][i]%> </pre></td>
-
+            <!-- Allow adding comments only if this is the most recent version-->
+            <% if @current_review_file.version_number.to_i == file_versions.sort.last %>
+                <td width="20px" id="td_new_<%=i%>" bgcolor="<%=linecolor%>" style=" font-weight: <%= line_font_weight %> ; border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="recentVersion('<%= i %>', '<%= i %>', '<%=@shareObj['file1']%>','<%=@shareObj['offsetarray1'][i]%>')"><u> <pre><%=i%></pre></u></a></td>
+            <% else %>
+                <td width="20px" id="td_old_<%=i%>" bgcolor="<%=linecolor%>" style=" font-weight: <%= line_font_weight %> ; border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="olderVersion('<%= i %>', '<%= i %>', '<%=@shareObj['file1']%>','<%=@shareObj['offsetarray1'][i]%>')"><u> <pre><%=i%></pre></u></a></td>
+            <% end %>
             <!-- THE ACTUAL DATA LINE -->
             <td width="48%" style="vertical-align: middle;"><pre><%=@shareObj['linearray1'][i]%></pre></td>
 
-            <!-- LINE NUMBER 2 -->
-            <td width="28px" id="td_new_<%=i%>" bgcolor="<%=linecolor2%>" style="font-weight: <%= line2_font_weight %> ;vertical-align: top; border-left: thin solid black; border-right: thin solid black;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="recentVersion('<%=i%>', '<%= @shareObj['linenumarray2'][i] %>' ,'<%=@shareObj['file2']%>','<%=@shareObj['offsetarray2'][i]%>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
-
-            <!-- OFFSET FOR FILE 2  -->
-            <td width="1%"><pre><% @shareObj['offsetarray2'][i]%> </pre></td>
-
-            <!--  THE ACTUAL DATA LINE-->
-            <td width="48%" style="vertical-align: middle;"><pre><%=@shareObj['linearray2'][i]%> </pre></td>
 
           </tr>
-          <tr><td></td><td></td><td><div id="x_<%=i%>"></div></td><td></td><td></td> <td><div id="<%=i%>"></div></td></tr>
+          <tr></td><td><div id="x_<%=i%>"></div></td></tr>
 
       <%end%>
     </table>
   </div>
+
+  <br/><%= link_to "Back to File Listing", :controller => 'review_files',
+                   :action => 'show_all_submitted_files',
+                   :participant_id => @participant.id %>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <%= link_to "Upload next Version", :controller => 'review_files',
+              :action => 'upload_review_file',
+              :participant_id => @participant.id %>
 
   <!--   The popup which pops up as one intends to click or view comments -->
   <div id="myDiv2" class="parentDisable" onLoad="assign()"></div>
   <!--  HIDDEN DIV WHICH LATER CREEPS INTO THE POPUP -->
   <div id="add_subject">
     <table><tr><td>FOO-BAZZLE</td></tr></table>
-    <textarea id="forminput" rows="10" cols="20"></textarea> <br>
+    <textarea id="forminput" ></textarea> <br>
     <button onclick="ajaxSubmitComment()"><b>Save Comment</b></button>
     <input type="textarea" id="invisible" style="display:none">
   </div>

@@ -76,22 +76,34 @@
           return windowHeaderHtml;
       }
       /**
-       * Displays the comments corresponding to 'line' in a comment Window.
+       * Displays the comments corresponding to 'line_number' in a comment Window.
        *
-       * @param line Line number for which comments are to be displayed.
-       * @param allComments Array of review_comment Objects whose comment_content
-       *        is to be displayed.
+       * @param line_number Line number for which comments are to be displayed.
+       * @param offset the file offset for which the comments are to be fetched
+       * @param fileId the file id of the review file for which comments are to
+       *               be fetched.
        */
-      function viewComments(line_number, allComments) {
-          var commentWindowDom = document.getElementById('myDiv2')
+      function viewComments(line_number, offset, fileId) {
+          var commentWindowDom = document.getElementById('myDiv2');
 
-          if (!allComments) {
-              allComments = noCommentsHtml;//"<br/>No Comments yet";
-          }
-          commentWindowDom.innerHTML = constructWindowHeader(line_number) +
-                  allComments + constructCloseWindowLink();
+          new Ajax.Request('/review_files/get_comments', {
+              method: 'get',
+              parameters: {
+                  file_id: fileId,
+                  file_offset: offset
+              },
+              onSuccess: function(return_value) {
+                  var all_comments = return_value.responseText ?
+                          return_value.responseText : noCommentsHtml;//"No Comments yet<br/>";
 
-          $('#myDiv2').fadeIn();
+                  var commentWindowHtml = constructWindowHeader(line_number) + "<br>" +
+                          all_comments + "<br>" + constructCloseWindowLink();
+
+                  commentWindowDom.innerHTML = commentWindowHtml
+                  $('#myDiv2').fadeIn();
+              },
+              onFailure: function() { alert("Failed to retrieve comments for this Line") }
+          });
       }
 
       /**
@@ -291,11 +303,11 @@
 
   <div id="dashboard_header" class="dashboard_header_css" >
     <table  cellpadding='3' cellspacing='4'  >
-      <tr ><td class="top_header"><b style="font-size: large;"><%= File.basename(@file_on_left.filepath) %> </b><b style="font-size: smaller;">(Version <%= @current_review_file.version_number %>)</b></td></tr>
+      <tr ><td class="top_header"><b style="font-size: large;"><%= File.basename(@current_review_file.filepath) %> </b><b style="font-size: smaller;">(Version <%= @current_review_file.version_number %>)</b></td></tr>
     </table>
   </div>
 
-  <div id="dashboard_header" class = "dashboard_content_css" >
+  <div id="dashboard_header_content" class = "dashboard_content_css" >
     <table  cellpadding='5px' cellspacing='4' >
       <tr>
         <td align="right">View Version:</td>
@@ -405,70 +417,75 @@
           <% if (@shareObj['comparator'][i] == DiffHelper::UNCHANGED) then line2color="lightgray"%><%end%>
           <tr bgcolor="<%=@color%>" class="highlight">
 
-
+            <!-- FILE ON LEFT -->
             <!-- If map contains an entry for this line number then there exists
             a comment of this row in the html table. -->
-            <% if @tableRow_comment_map_old_version[i] %>
+            <% if @highlight_cell_left_file[i] %>
                 <% line1color = 'cyan' %>
                 <% line1_font_weight = "bold" %>
             <%end%>
 
-            <% if @tableRow_comment_map_new_version[i] %>
+
+            <!-- LINE NUMBER 1   -->
+            <td width="4%" id="td_old_<%=i%>" bgcolor="<%=line1color%>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="viewComments('<%= @shareObj['linenumarray1'][i] %>', '<%=@shareObj['offsetarray1'][i]%>', '<%=@file_on_left.id %>' )"><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
+            <td width="1%"></td>
+
+            <!-- THE ACTUAL DATA LINE -->
+            <td width="45%" style="vertical-align: middle;"><pre><%=@shareObj['linearray1'][i]%></pre></td>
+
+            <!-- FILE ON RIGHT -->
+            <!-- If map contains an entry for this line number then there exists
+            a comment of this row in the html table. -->
+            <% if @highlight_cell_right_file[i] %>
                 <% line2color = 'cyan' %>
                 <% line2_font_weight = "bold" %>
             <%end%>
 
-            <% if @tableRow_comment_map_old_version[i] %>
-                <% commentsTable = ReviewCommentsHelper::constructCommentsTable(@tableRow_comment_map_old_version[i]) %>
-            <% else %>
-                <% commentsTable = nil %>
-            <% end %>
-
-            <!-- LINE NUMBER 1   -->
-            <td width="28px" id="td_old_<%=i%>" bgcolor="<%=line1color%>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="viewComments('<%= @shareObj['linenumarray1'][i] %>', '<%= commentsTable %>' )"><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
-
-            <!-- OFFSET FOR FILE 1 -->
-            <td width="1%"></td>
-
-            <!-- THE ACTUAL DATA LINE -->
-            <td width="48%" style="vertical-align: middle;"><pre><%=@shareObj['linearray1'][i]%></pre></td>
-
-            <% if @tableRow_comment_map_new_version[i] %>
-                <% commentsTable = ReviewCommentsHelper::constructCommentsTable(@tableRow_comment_map_new_version[i]) %>
-            <% else %>
-                <% commentsTable = nil %>
-            <% end %>
-
-            <!-- Allow commenting on codefile only if this is the most recent version
+            <!-- Allow commenting on code file only if this is the most recent version
             AND if current user is reviewer (i.e. != author/author's team) -->
             <% if @current_review_file.version_number.to_i >= file_versions.sort[-2]  %>
-                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="createComments('td_new_<%= i %>', '<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@file_on_right.id %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
+                <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="createComments('td_new_<%= i %>', '<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@file_on_right.id %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
             <% else %>
-                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="viewComments('<%= @shareObj['linenumarray2'][i] %>', '<%= commentsTable %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
+                <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="viewComments('<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@file_on_right.id %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
             <% end %>
 
-            <!-- OFFSET FOR FILE 2  -->
             <td width="1%"></td>
 
             <!-- THE ACTUAL DATA LINE -->
-            <td width="48%" style="vertical-align: middle;"><pre><%=@shareObj['linearray2'][i]%></pre></td>
-
+            <td width="45%" style="vertical-align: middle;"><pre><%=@shareObj['linearray2'][i]%></pre></td>
 
           </tr>
-          <tr><td></td><td></td><td><div id="x_<%=i%>"></div></td><td></td><td></td> <td><div id="<%=i%>"></div></td></tr>
-
 
       <%end%>
     </table>
   </div>
 
-  <br/><%= link_to "Back to File Listing", :controller => 'review_files',
-                   :action => 'show_all_submitted_files',
-                   :participant_id => @participant.id %>
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <%= link_to "Upload next Version", :controller => 'review_files',
-                   :action => 'upload_review_file',
-                   :participant_id => @participant.id %>
+  <br/><br/>
+
+  <table width="100%">
+    <tr>
+      <td valign="top">
+        <%= link_to "<< Back to File Listing", :controller => 'review_files',
+                    :action => 'show_all_submitted_files',
+                    :participant_id => @participant.id %>
+      </td>
+
+      <td valign="top" align="right">
+        <a href="javascript:void(0)" id="color_guide_link" name="color_guideLink" onClick="toggleElement('color_guide','colorGuide');return false;">Color guide</a><br/>
+        <div id="color_guide" style="display: none;">
+          <table class="general">
+            <br/>
+            <tr align="center">
+              <td bgcolor="white" width="25%">Unchanged</td>
+              <td bgcolor="#FEF5CA" width="25%">Changed</td>
+              <td bgcolor="pink" width="25%">Deleted</td>
+              <td bgcolor="palegreen" width="25%">Added</td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
 
   <!--   The popup which pops up as one intends to click or view comments -->
   <div id="myDiv2" class="parentDisable" onLoad="assign()"></div>

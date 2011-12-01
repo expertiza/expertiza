@@ -1,6 +1,7 @@
 class ReviewFilesController < ApplicationController
   helper :diff
 
+  # @DEPRECATED
   def upload_review_file
     @participant = AssignmentParticipant.find(params[:participant_id])
   end
@@ -44,16 +45,16 @@ class ReviewFilesController < ApplicationController
     respond_to do |format|
       if @success
         flash[:notice] = "Code Review File was successfully Uploaded."
-        format.html { redirect_to :action => 'show_code_review_dashboard',
+        format.html { redirect_to :action => 'show_all_submitted_files',
                                   :participant_id => participant.id and return}
-        format.xml  { render :xml => @code_review_file, :status => :created,
-                             :location => @code_review_file and return}
+        format.xml  { render :xml => @review_file, :status => :created,
+                             :location => @review_file and return}
       else
         flash[:notice] = "Code Review File was <b>not</b> successfully" +
             "uploaded. Please Re-Submit."
         format.html { redirect_to :action => 'upload_review_file',
                                   :participant_id => participant.id and return}
-        format.xml  { render :xml => @code_review_file.errors,
+        format.xml  { render :xml => @review_file.errors,
                              :status => :unprocessable_entity and return}
       end
     end
@@ -61,16 +62,15 @@ class ReviewFilesController < ApplicationController
   end
 
 
+  # @DEPRECATED
   # Needs params[:participant_id]
   def show_code_review_dashboard
-    #DEPRECATED
     participant = AssignmentParticipant.find(params[:participant_id])
     @version_number = ReviewFile.get_max_version_num(participant)
 
     @files = participant.get_files(
         ReviewFilesHelper::get_version_directory(participant, @version_number))
   end
-
 
 
   # Needs params[:participant_id]
@@ -100,11 +100,16 @@ class ReviewFilesController < ApplicationController
     # For each file in the above map create a new map, to store the
     #   filename -> review_file_id mapping.
     @file_id_map = Hash.new
+    @latest_version_number = 0
     @file_version_map.each do |base_filename, versions|
       review_file = ReviewFile.get_file(code_review_dir, versions.sort.last,
                                         base_filename)
       @file_id_map[base_filename] = review_file ? review_file.id : nil
       @file_version_map[base_filename] =  versions.sort
+      #puts "CLASS: #{@file_version_map[base_filename][-1]}"
+      @latest_version_number = (@file_version_map[base_filename][-1] >
+          @latest_version_number) ? @file_version_map[base_filename][-1] :
+                                    @latest_version_number
     end
 
   end
@@ -127,24 +132,30 @@ class ReviewFilesController < ApplicationController
       @version_fileId_map[each_version] = this_file ? this_file.id : nil
     end
 
+    file_contents = File.open(@current_review_file.filepath).readlines
 
-    # TODO !!!! NEED to REFACTOR !!!!
-    @shareObj = Hash.new()
-    array = File.open(@current_review_file.filepath).readlines
-    @shareObj['linearray1'] = array
-
-    # TODO remove !! REDUNDANT. Already contained in @current_review_file
-    @shareObj['file1'] = @current_review_file.filepath         #review_file.filepath
-
-    first_offset = [0]
-    for i in (1..array.length)
-      first_offset << (first_offset[i-1] + array[i-1].size)
+    offset_array = [0]
+    for i in (1..file_contents.length)
+      offset_array << (offset_array[i-1] + file_contents[i-1].size-1)
     end
-    @shareObj['offsetarray1'] = first_offset
 
-    #[171, 535, 330] #5, 18, 10
-    @shareObj['highlightfile1'] = ReviewComment.
-                                  find_all_by_file_offset(@current_review_file.id)
+    @shareObj = Hash.new()
+    @shareObj['linearray2'] = file_contents
+    @shareObj['offsetarray2'] = offset_array
+
+    newer_version_comments = ReviewComment.find_all_by_review_file_id(
+        @current_review_file.id)
+
+    @highlight_cell_right_file = Hash.new
+    newer_version_comments.each do |each_comment|
+      table_row_num = offset_array.index(each_comment.file_offset)
+
+      @highlight_cell_right_file[table_row_num] = Array.new unless
+          @highlight_cell_right_file[table_row_num]
+      @highlight_cell_right_file[table_row_num] << each_comment.
+          comment_content.gsub("\n", " ")
+    end
+
   end
 
 
@@ -226,10 +237,6 @@ class ReviewFilesController < ApplicationController
       first = first.gsub("\n","")
       second = second.gsub("\n","")
 
-      # HACK ! HACK ! HACK ! TODO Initialize differently
-      #if(third == DiffHelper::UNCHANGED)then @offsetswithcomments_file1 << @first_offset[i] end
-      #if(third == DiffHelper::CHANGED)then @offsetswithcomments_file2 << @second_offset[i] end
-
       # Remove newlines at the end of this line of code
       if(processor.first_file_array[i] != nil)
         processor.first_file_array[i] = processor.first_file_array[i].chomp
@@ -250,30 +257,39 @@ class ReviewFilesController < ApplicationController
     @shareObj['comparator'] = processor.comparison_array
     @shareObj['linenumarray1'] = @first_line_num
     @shareObj['linenumarray2'] = @second_line_num
-    @shareObj['file1'] = older_file.filepath
-    @shareObj['file2'] = newer_file.filepath
     @shareObj['offsetarray1'] = @first_offset
     @shareObj['offsetarray2'] = @second_offset
     @file_on_left = older_file
     @file_on_right = newer_file
 
 
-    # TODO: REFACTOR!!! Code Duplication
-    @tableRow_comment_map_old_version = Hash.new
+    # REFACTOR: Code Duplication
+
+    @highlight_cell_left_file = Hash.new
     older_version_comments.each do |each_comment|
       table_row_num = @first_offset.index(each_comment.file_offset)
-      @tableRow_comment_map_old_version[table_row_num] = Array.new unless
-          @tableRow_comment_map_old_version[table_row_num]
-      @tableRow_comment_map_old_version[table_row_num] << each_comment.comment_content.gsub("\n", " ")
+
+      # Increment table_row_num until a non "" string is encountered in @first_line_num
+      while (@first_line_num[table_row_num].equal?("") and
+          table_row_num < @first_line_num.length)
+        table_row_num += 1
+      end
+
+      @highlight_cell_left_file[table_row_num] = true
     end
 
-    @tableRow_comment_map_new_version = Hash.new
+
+    @highlight_cell_right_file = Hash.new
     newer_version_comments.each do |each_comment|
       table_row_num = @second_offset.index(each_comment.file_offset)
-      @tableRow_comment_map_new_version[table_row_num] = Array.new unless
-          @tableRow_comment_map_new_version[table_row_num]
-      @tableRow_comment_map_new_version[table_row_num] << each_comment.
-          comment_content.gsub("\n", " ")
+
+      # Increment table_row_num until a non "" string is encountered in @first_line_num
+      while (@second_line_num[table_row_num].equal?("") and
+          table_row_num < @second_line_num.length)
+        table_row_num += 1
+      end
+
+      @highlight_cell_right_file[table_row_num] = true
     end
 
   end
@@ -284,19 +300,20 @@ class ReviewFilesController < ApplicationController
     @comment = ReviewComment.new
     @comment.review_file_id = params[:file_id]
     @comment.file_offset = params[:file_offset]
-    @comment.comment_content = params[:comment_content]
+    @comment.comment_content = params[:comment_content].gsub("\n", " ")
     @comment.reviewer_participant_id = AssignmentParticipant.find_by_user_id(
         session[:user].id).id
     @comment.save
   end
 
+  # Needs params[:file_id], params[:file_offset]
   def get_comments
     all_comment_contents = []
     ReviewComment.find_all_by_review_file_id_and_file_offset(
         params[:file_id], params[:file_offset]).each { |comment|
       all_comment_contents << comment.comment_content.gsub("\n", " ")
     }
-    comments_in_table = ReviewCommentsHelper::constructCommentsTable(
+    comments_in_table = ReviewCommentsHelper::construct_comments_table(
         all_comment_contents)
 
     respond_to do |format|
@@ -353,7 +370,7 @@ class ReviewFilesController < ApplicationController
 
 
 
-  #                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="createComment('<%= @shareObj['linenumarray2'][i] %>', '<%= @shareObj['offsetarray2'][i] %>', '<%= @tableRow_comment_map_new_version[i] %>', '<%= @file_on_right.id %>' )"><u> <pre><%=i%></pre></u></a></td>
+  #                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="createComment('<%= @shareObj['linenumarray2'][i] %>', '<%= @shareObj['offsetarray2'][i] %>', '<%= @highlight_cell_right_file[i] %>', '<%= @file_on_right.id %>' )"><u> <pre><%=i%></pre></u></a></td>
 
 
 

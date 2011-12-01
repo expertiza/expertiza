@@ -226,7 +226,21 @@ class Assignment < ActiveRecord::Base
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
       } 
-      scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
+      total = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
+      
+      # KHH
+      #scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
+      # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
+      if self.is_microtask?
+        topic = signed_up_topic(participant)
+        if !topic.nil?
+          total *= (topic.micropayment / 100).to_f
+          scores[:participants][participant.id.to_s.to_sym][:pts_available] = topic.micropayment
+        else
+          # How do we handle this? Flash maybe?
+        end
+      end
+      scores[:participants][participant.id.to_s.to_sym][:total_score] = total
     }        
     
     if self.team_assignment
@@ -445,6 +459,11 @@ class Assignment < ActiveRecord::Base
  # It appears that this method is not used at present!
  def is_wiki_assignment
    return (self.wiki_type_id > 1)
+ end
+
+# KHH
+ def is_microtask?
+   return (self.microtask.nil?) ? False : self.microtask
  end
  
  #

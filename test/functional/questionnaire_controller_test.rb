@@ -24,7 +24,7 @@ class QuestionnaireControllerTest < ActionController::TestCase
     @request.session[:credentials] = Role.find(roleid).cache[:credentials]
     AuthController.set_current_role(roleid,@request.session)
   end
-  #901 edit an questionnaire’s data
+  #901 edit an questionnaireï¿½s data
   def test_edit_questionnaire
     post :edit, {:id => @Questionnaire, :save => true, 
                        :questionnaire => {:name => "test edit name", 

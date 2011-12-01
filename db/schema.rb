@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110512155258) do
+ActiveRecord::Schema.define(:version => 20111130205809) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -52,6 +52,9 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.string   "review_assignment_strategy"
     t.integer  "max_reviews_per_submission"
     t.integer  "review_topic_threshold",            :default => 0
+    t.boolean  "copy_flag",                         :default => false
+    t.integer  "rounds_of_reviews",                 :default => 0
+    t.boolean  "microtask",                         :default => false
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -449,6 +452,7 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.integer "max_choosers",                   :default => 0, :null => false
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
+    t.integer "micropayment"
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"

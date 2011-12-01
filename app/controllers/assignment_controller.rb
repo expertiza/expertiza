@@ -186,7 +186,7 @@ class AssignmentController < ApplicationController
     param_deadline[DeadlineType.find_by_name("metareview").id] = [:reviewofreview_deadline, max_round]
 
     puts param_deadline
-   #Update/Create all deadlines
+    #Update/Create all deadlines
     param_deadline.each_with_index do |type, index|
       if (!type[0].nil?)
         type_name = DeadlineType.find_by_id(index).name.capitalize
@@ -396,7 +396,26 @@ class AssignmentController < ApplicationController
 
 
         flash[:notice] = 'Assignment was successfully updated.'
-        redirect_to :action => 'show', :id => @assignment
+
+
+        #Microtask Logic
+        if (@assignment.microtask)
+          topics = SignUpTopic.find_all_by_assignment_id(@assignment.id)
+          #already has sign-up topics associated with it
+          if (!topics.nil? && topics.size != 0)
+            if @assignment.staggered_deadline == true
+              redirect_to :action => 'add_signup_topics_staggered', :controller => 'sign_up_sheet', :id => @assignment.id
+            else
+              redirect_to :action => 'add_signup_topics', :controller => 'sign_up_sheet', :id => @assignment.id
+            end
+          #if it has been copied or changed TO microtask
+          else
+            redirect_to :action => 'create_default_for_microtask', :controller => 'sign_up_sheet' , :id => @assignment.id
+
+          end
+        else
+          redirect_to :action => 'show', :id => @assignment
+        end
 
       rescue
         flash[:error] = $!

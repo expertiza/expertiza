@@ -227,7 +227,7 @@ class AssignmentParticipant < Participant
   end  
   
   # provide export functionality for Assignment Participants
-  def self.export(csv,parent_id)
+  def self.export(csv,parent_id,options)
      find_all_by_parent_id(parent_id).each{
           |part|
           user = part.user
@@ -245,7 +245,7 @@ class AssignmentParticipant < Participant
       } 
   end
   
-  def self.get_export_fields
+  def self.get_export_fields(options)
     fields = ["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"]
     return fields            
   end

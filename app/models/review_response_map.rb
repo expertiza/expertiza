@@ -22,12 +22,12 @@ class ReviewResponseMap < ResponseMap
     self.destroy
   end  
 
-  def self.get_export_fields
+  def self.get_export_fields(options)
     fields = ["contributor","reviewed by"]
     return fields            
   end   
   
-  def self.export(csv,parent_id)
+  def self.export(csv,parent_id,options)
     mappings = find(:all, :conditions => ['reviewed_object_id=?',parent_id])
     mappings.sort!{|a,b| a.reviewee.name <=> b.reviewee.name} 
     mappings.each{

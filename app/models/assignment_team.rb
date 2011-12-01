@@ -226,27 +226,82 @@ class AssignmentTeam < Team
 
   #Whether there is a pairing conflict or not.
   def has_pairing_conflicts?(participant)
+
+    course_assignments = assignment.course.assignments
+    team_assignments = course_assignments.find_all {|assignment| assignment.team_assignment}
+    total_pairing_opportunities = team_assignments.inject(0) {|sum, team| sum += team.team_count}
+    total_pairing_opportunities -= team_assignments.length
+
     max_duplicate_pairings = assignment.course.max_duplicate_pairings
-    max_unique_pairings = assignment.course.min_unique_pairings
-    if max_duplicate_pairings == nil and max_unique_pairings == nil
+    min_unique_pairings = assignment.course.min_unique_pairings
+
+    all_participants = participants
+    all_participants << participant
+
+    if max_duplicate_pairings == nil and min_unique_pairings == nil
       return false
     else
-      participants.each do |other_participant|
-        past_teams = TeamsUser.find_all_by_user_id(other_participant.user_id)
-        past_teammates = TeamsUser.find_all_by_team_id(past_teams)
-        past_users = past_teammates.map {|teammate| teammate.user_id}
-        if past_users.include?(participant)
+      all_participants.each do |current_participant|
 
-          # De-duping users will give us number of pairings used so far.
-          unique_users = past_users.uniq
-          user_difference = past_users.length - unique_users.length
+        past_team_associations = TeamsUser.find_all_by_user_id(current_participant.user_id)
+        past_team_associations.delete_if {|association| association.team_id == id}
 
-          # account for self
-          user_difference -= past_teams.length + 1
+        past_teams = course_assignments.find_all(past_team_associations.map{|team| team.team_id})
+        max_teammates = past_teams.inject(0) {|sum, team| sum += team.team_count}
+        past_teammates = TeamsUser.find_all_by_team_id(past_team_associations)
+        past_user_ids = past_teammates.map {|teammate| teammate.user_id}
 
-          if user_difference > max_unique_pairings
-            #whatever
+        unique_user_ids = past_user_ids - participants.map{|user| user.user_id}
+        else
+          unique_user_ids = past_user_ids - [participant.user_id]
+        end if
+
+        if past_user_ids.length >
+
+          if max_duplicate_pairings != nil and current_participant != participant
+            if duplicates.length >= max_duplicate_pairings
+              return true
+            end
           end
+
+          if min_unique_pairings != nil
+
+            unique_user_ids = past_use_ids - participant.user_ids
+            lost_pairing_opportunities = max_teammates - past_user_ids.length
+
+            # De-duping users will give us number of pairings used so far.
+            if current_participant != participant
+              unique_users = past_users.delete_if
+            user_difference = past_users.length - unique_users.length
+            user_difference -= past_team_associations.length + 1
+
+            lost_pairing_opportunities += user_difference
+
+            if total_pairing_opportunities - lost_pairing_opportunities < min_unique_pairings
+              return false
+            end
+          end
+        end
+      end
+
+      if min_unique_pairings != nil and duplicate
+        past_team_associations = TeamsUser.find_all_by_user_id(participant.user_id)
+        past_team_associations << TeamsUser.find_by_user_id(participants[0].user_id)
+        past_teams = course_assignments.find_all(past_team_associations.map{|team| team.team_id})
+        max_teammates = past_teams.inject(0) {|sum, team| sum += team.team_count}
+        past_teammates = TeamsUser.find_all_by_team_id(past_team_associations)
+        past_users = past_teammates.map {|teammate| teammate.user_id}
+        lost_pairing_opportunities = max_teammates - past_users.length
+
+        # De-duping users will give us number of pairings used so far.
+        unique_users = past_users.uniq
+        user_difference = past_users.length - unique_users.length
+        user_difference -= past_team_associations.length + 1
+
+        lost_pairing_opportunities += user_difference
+
+        if total_pairing_opportunities - lost_pairing_opportunities < min_unique_pairings
+          return false
         end
       end
     end

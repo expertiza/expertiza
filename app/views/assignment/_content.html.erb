@@ -114,6 +114,17 @@ function onChangeWikiType(){
 
  </tr>
 
+  <tr><td><label>Microtask Assignment?</label></td>
+
+ <td>
+  		<select id="microtask" name="assignment[microtask]" >
+  		 <option value=false style="width:75px">No</option>
+         <option value=true style="width:75px" <% if @assignment.microtask %>SELECTED<%end%>>Yes</option>
+        </select>
+  </td>
+
+ </tr>
+
 <tr id="team_count1" style="display:none">  
   <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>   
   <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5%></td>  

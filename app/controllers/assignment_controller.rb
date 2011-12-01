@@ -109,7 +109,11 @@ class AssignmentController < ApplicationController
 
         #Notify Assignment created
         flash[:note] = 'Assignment was successfully created.'
-        redirect_to :action => 'list', :controller => 'tree_display'
+        if(@assignment.microtask)
+          redirect_to :action => 'create_default_for_microtask', :controller => 'sign_up_sheet' , :id => @assignment.id
+        else
+          redirect_to :action => 'list', :controller => 'tree_display'
+        end
 
       rescue
         flash[:error] = $!

@@ -114,9 +114,20 @@ class QuestionnaireController < ApplicationController
   # Define a new questionnaire
   def new
     @questionnaire = Object.const_get(params[:model]).new
-    @questionnaire.private = params[:private] 
+    @questionnaire.private = params[:private]
     @questionnaire.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
-    @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE    
+    @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE
+    @questionnaire.section = "Regular"
+  end
+
+  def select_questionnaire_type
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
+    @questionnaire.private = params[:questionnaire][:private]
+    @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+    @questionnaire.max_question_score = params[:questionnaire][:min_question_score]
+    @questionnaire.section = params[:questionnaire][:section]
+    @questionnaire.id = params[:questionnaire][:id]
+    @questionnaire.display_type = params[:questionnaire][:display_type]
   end
 
   # Save the new questionnaire to the database

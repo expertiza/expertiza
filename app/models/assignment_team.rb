@@ -224,6 +224,7 @@ class AssignmentTeam < Team
     team  
   end
 
+  # Get the number of pairing opportunities
   def get_pairing_opportunities
     course_assignments = assignment.course.assignments
     team_assignments = course_assignments.find_all {|assignment| assignment.team_assignment}
@@ -231,7 +232,7 @@ class AssignmentTeam < Team
     return pairing_opportunities - team_assignments.length
   end
 
-  # Gets non-deduped list of past teammate user ids
+  # Get non-deduped list of past teammate user ids
   def get_past_teammate_user_ids(participant)
     past_team_associations = TeamsUser.find_all_by_user_id(participant.user_id)
     past_team_associations -= TeamsUser.find_all_by_team_id(id)
@@ -239,8 +240,8 @@ class AssignmentTeam < Team
     return past_teammates.map{|teammate| teammate.user_id}
   end
 
-  #Whether there is a pairing conflict or not.
-  def has_pairing_conflicts?(participant)
+  # Determine if there is a pairing conflict or not
+  def get_pairing_conflict(participant)
 
     # Check if maximum duplicate pairings has been exceeded
     max_duplicate_pairings = assignment.course.max_duplicate_pairings
@@ -253,7 +254,7 @@ class AssignmentTeam < Team
       participants.each do |current_participant|
         unique_teammate_ids = past_teammate_ids - [current_participant.user_id]
         if past_teammate_ids.length - unique_teammate_ids.length >= max_duplicate_pairings
-          return true
+          return TeamConflict.new(current_participant, participant, :max_duplicate_pairings, max_duplicate_pairings)
         end
       end
 
@@ -277,13 +278,14 @@ class AssignmentTeam < Team
         unique_teammate_ids = past_teammate_ids - participants.map {|participant| participant.user_id}
         unique_teammate_ids -= [participant.user_id]
         if max_past_teammates - unique_teammate_ids.length >= max_course_duplicate_pairings
-          return true
+          return TeamConflict(other_participant, participant, :min_unique_pairings, min_unique_pairings)
         end
       end
 
     end
 
-    return false
+    # No conflicts
+    return nil
 
   end
 

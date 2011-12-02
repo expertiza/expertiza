@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111130205809) do
+ActiveRecord::Schema.define(:version => 20111202011414) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -456,7 +456,7 @@ ActiveRecord::Schema.define(:version => 20111130205809) do
     t.integer "max_choosers",                   :default => 0, :null => false
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
-    t.integer "micropayment"
+    t.integer "micropayment",                   :default => 0
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"

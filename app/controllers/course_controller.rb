@@ -67,6 +67,7 @@ class CourseController < ApplicationController
     begin
       course.save!
       course.create_node
+      FileHelper.create_directory(course)
 
       # save assignments if min_unique_pairings is given
       if course.min_unique_pairings
@@ -74,17 +75,20 @@ class CourseController < ApplicationController
 
         while(params["assignment#{index}".to_sym])
           assignment = Assignment.new(params["assignment#{index}".to_sym])
-          session[:user].set_instructor(assignment)
+          assignment.set_defaults
           assignment.course_id = course.id
+          session[:user].set_instructor(assignment)
 
-          assignment.save
-          assignment.create_node
+          if assignment.save
+            assignment.create_default_dates
+            FileHelper.create_directory(assignment)
+            assignment.create_node
+          end
 
           index += 1
         end
       end
 
-      FileHelper.create_directory(course)
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = "The following error occurred while saving the course: "+$!

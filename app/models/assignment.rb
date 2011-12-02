@@ -662,16 +662,43 @@ end
     end
   end
   
-    def signed_up_topic(contributor)
-      # The purpose is to return the topic that the contributor has signed up to do for this assignment.
-      # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
-      # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
-      contributors_topic = SignedUpUser.find_by_creator_id(contributor.id)
-      if !contributors_topic.nil?
-        contributors_signup_topic = SignUpTopic.find_by_id(contributors_topic.topic_id)
-        #returns the topic
-        return contributors_signup_topic
-      end
+  def signed_up_topic(contributor)
+    # The purpose is to return the topic that the contributor has signed up to do for this assignment.
+    # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
+    # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
+    contributors_topic = SignedUpUser.find_by_creator_id(contributor.id)
+    if !contributors_topic.nil?
+      contributors_signup_topic = SignUpTopic.find_by_id(contributors_topic.topic_id)
+      #returns the topic
+      return contributors_signup_topic
+    end
+  end
+
+  def set_defaults
+    self.directory_path = ''
+    self.spec_location = ''
+    self.staggered_deadline= false
+    self.submitter_count = 0
+    self.days_between_submissions = 0
+    self.wiki_type_id = 1
+    self.team_assignment= true
+    self.questionnaires = []
+  end
+
+  def create_default_dates
+    hash = { 'due_at' => Time.now }
+
+    submissionDeadline = DeadlineType.find_by_name("submission").id
+    DueDate::set_duedate(hash, submissionDeadline, self.id, 1)
+
+    reviewDeadline = DeadlineType.find_by_name("review").id
+    DueDate::set_duedate(hash, reviewDeadline, self.id, 1)
+
+    dropTopicDeadline = DeadlineType.find_by_name("drop_topic").id
+    DueDate::set_duedate(hash , dropTopicDeadline, self.id, 0)
+
+    metaReviewDeadline = DeadlineType.find_by_name("metareview").id
+    DueDate::set_duedate(hash, metaReviewDeadline, self.id, 2)
   end
 end
   

@@ -353,7 +353,7 @@ ActiveRecord::Schema.define(:version => 20111129232252) do
     t.integer "question_id", :default => 1, :null => false
   end
 
-  add_index "question_types", ["question_id"], :name => "fk_question"
+  add_index "question_types", ["question_id"], :name => "fk_question_type_question"
 
   create_table "questionnaires", :force => true do |t|
     t.string   "name",                :limit => 64

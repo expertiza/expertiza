@@ -1,0 +1,2 @@
+class InteractionWeight < ActiveRecord::Base
+end

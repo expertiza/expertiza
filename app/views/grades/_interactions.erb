@@ -1,0 +1,33 @@
+<% if rscore.length > 0 %>
+    <BR/>
+    <table class="grades">
+      <tr><th>&nbsp;</th>
+        <% for i in 0...rscore.size%>
+            <th><%= rscore[i].team.name %>&nbsp;</th>
+        <% end %>
+      </tr>
+
+      <tr class="head"><td align="right"><b>Score</b></td>
+        <% for interaction in rscore %>
+            <td align="center">
+
+              <%= sprintf("%.2f",interaction.score) %> &nbsp;
+            </td>
+        <% end %>
+      </tr>
+    </table>
+    <HR/>
+    <% count = 1 %>
+    <% for review in rscore %>
+        <b>Interaction <%=count%></b>
+        <a href="#" id="<%=count%>_detailsLink" name="<%=count%>_detailsLink" onClick="toggleElement('<%=count%>_details','Details');return false;">hide Details</a>
+        <%= render :partial=>'interaction/details', :locals => {:review => review , :count => count} %>
+        <%count+=1%>
+
+
+    <% end %>
+
+<% else %>
+    <i>No interactions have been recorded for this user.</i><BR/>
+    <i>*Interactions will be scored only after being approved by the instructor</i>
+<% end %>

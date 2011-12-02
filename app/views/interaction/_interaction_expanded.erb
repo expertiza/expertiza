@@ -1,0 +1,96 @@
+<TABLE border="1" cellspacing="0" align="center">
+  <TR>
+    <TH class="interactions">&nbsp;</TH>
+    <TH class="interactions">Helper</TH>
+    <TH class="interactions">Helpee</TH>
+  </TR>
+  <TR>
+    <TD class="interactions" >Name</TD>
+    <% if !helper.nil? %>
+        <TD class="interactions"><%=Participant.find(helper.participant_id).user.name%></TD>
+    <%else%>
+        <TD class="interactions">--</TD>
+    <%end%>
+
+    <% if !helpee.nil? %>
+        <TD class="interactions"><%=helpee.team.name%></TD>
+    <%else%>
+        <TD class="interactions">--</TD>
+    <%end%>
+
+  </TR>
+
+  <TR>
+    <TD class="interactions">Date of Interaction</TD>
+    <% if !helper.nil? %>
+        <TD class="interactions"><%=helper.interaction_datetime.strftime("%d/%m/%Y")%></TD>
+    <%else%>
+        <TD class="interactions">--</TD>
+    <%end%>
+    <% if !helpee.nil? %>
+        <TD class="interactions"><%=helpee.interaction_datetime.strftime("%d/%m/%Y")%></TD>
+    <%else%>
+        <TD class="interactions">--</TD>
+    <%end%>
+
+  </TR>
+  <TR>
+    <TD class="interactions">Minutes Interacted</TD>
+
+
+    <% if !helper.nil? %>
+        <TD class="interactions"><%=helper.number_of_minutes%></TD>
+    <%else%>
+        <TD class="interactions">--</TD>
+    <%end%>
+
+
+
+    <% if !helpee.nil? %>
+        <TD class="interactions"><%=helpee.number_of_minutes%></TD>
+    <%else%>
+        <TD class="interactions">--</TD>
+    <%end%>
+
+  </TR>
+  <TR>
+    <TD class="interactions">Comments</TD>
+
+    <% if !helper.nil? %>
+        <TD class="interactions"><%=helper.comments%></TD>
+    <%else%>
+        <TD class="interactions">--</TD>
+    <%end%>
+
+
+    <% if !helpee.nil? %>
+        <TD class="interactions"><%=helpee.comments%></TD>
+    <%else%>
+        <TD class="interactions">--</TD>
+    <%end%>
+
+  </TR>
+  <TR>
+
+    <TD class="interactions">Score</TD>
+    <% if !helpee.nil? %>
+        <TD class="interactions" colspan="2"><%=helpee.score%></TD>
+    <%else%>
+        <TD class="interactions" colspan="2">--</TD>
+    <%end%>
+
+
+
+  </TR>
+  <TR>
+    <TD class="interactions">Status</TD>
+
+    <% if !helpee.nil? %>
+        <TD class="interactions" colspan="2"><%=helpee.status%></TD>
+    <%else%>
+        <TD class="interactions" colspan="2">--</TD>
+    <%end%>
+
+
+  </TR>
+</TABLE>

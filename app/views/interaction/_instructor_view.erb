@@ -1,0 +1,96 @@
+<TABLE width="100%" cellspacing="0" cellpadding="2" border="0">
+      <TR align="center"  >
+    <TD width="100" class="interactions"><%=Participant.find(interaction.participant_id).user.name%></TD>
+    <TD width="100" class="interactions"><%=interaction.team.name%></TD>
+    <TD width="100" class="interactions"><%=interaction.score%></TD>
+      <TD width="100" class="interactions"><%=interaction.status%></TD>
+      <TD width="100" class="interactions">
+        <% puts "interaction"+interaction.to_s %>
+     <% form_remote_tag(:url => {:action => 'interaction_view',:type=>'Show',:id=>interaction.id, :expanded => expanded=="true"?"false":"true"},
+           :update =>  "interaction_"+interaction.id.to_s
+         ) do %>
+              <%if params[:expanded] == "true"%>
+                  <%= submit_tag 'Hide' %>
+              <%else%>
+                  <%= submit_tag 'Show' %>
+              <% end %>
+          <%end%>
+
+      </TD>
+      <TD width="100" class="interactions">
+        <%if interaction.status=="Confirmed" %>
+        <% form_remote_tag(:url => {:action => 'interaction_view',:type=>'Approve',:id=>interaction.id, :expanded => expanded},
+          :update => "interaction_"+interaction.id.to_s
+         ) do %>
+              <%= submit_tag 'Approve' %>
+          <%end%>
+            <% end %>
+      </TD>
+</TR>
+          </TABLE>
+
+
+
+  <%if expanded == "true"%>
+
+      <TABLE width="100%" cellspacing="0" cellpadding="2" border="0">
+           <tr bgcolor="#CCCCCC">
+            <TH class="interactions">&nbsp;</TH>
+            <TH class="interactions">Helper</TH>
+            <TH class="interactions">Helpee</TH>
+          </TR>
+          <TR>
+            <TD class="interactions" >Name</TD>
+
+            <TD class="interactions"> <% if @helper_record %><%=Participant.find(@helper_record.participant_id).user.name%><% end %></TD>
+
+
+            <TD class="interactions"> <% if @helpee_record %><%=@helpee_record.team.name%><% end %></TD>
+
+          </TR>
+
+          <TR>
+            <TD class="interactions">Timestamp</TD>
+
+            <TD class="interactions"><% if @helper_record %><%=@helper_record.interaction_datetime.to_s%><% end %></TD>
+
+
+                <TD class="interactions"><% if @helpee_record %><%=@helpee_record.interaction_datetime.to_s%><% end %></TD>
+
+          </TR>
+          <TR>
+            <TD class="interactions">Minutes Interacted</TD>
+
+            <TD class="interactions"><% if @helper_record %><%=@helper_record.number_of_minutes%><% end %></TD>
+
+
+            <TD class="interactions"><% if @helpee_record %><%=@helpee_record.number_of_minutes%><% end %></TD>
+
+                    </TR>
+          <TR>
+            <TD class="interactions">Comments</TD>
+
+            <TD class="interactions"><% if @helper_record %><%=@helper_record.comments%><% end %></TD>
+
+
+            <TD class="interactions"><% if @helpee_record %><%=@helpee_record.comments%><% end %></TD>
+
+             </TR>
+          <TR>
+              <TD class="interactions">Score</TD>
+
+              <TD class="interactions" colspan="2"><% if @helpee_record %><%=@helpee_record.score%><% end %></TD>
+
+          </TR>
+          <TR>
+              <TD class="interactions">Status</TD>
+
+              <TD class="interactions" colspan="2"><% if @helpee_record %><%=@helpee_record.status%><% end %></TD>
+
+          </TR>
+      </TABLE>
+
+<%end%>
+
+
+

@@ -1,0 +1,29 @@
+<% colwidth = 7  %>
+
+<TABLE align="center">
+  <TR align="center"  >
+
+    <TD class="interactions"><%=interaction[:name]%></TD>
+    <TD class="interactions"><%=interaction[:score]%></TD>
+    <TD class="interactions"><%=interaction[:status]%></TD>
+    <TD class="interactions">
+
+      <a href="#" id="<%=type%>_<%=interaction[:name]%>Link" name="<%=type%>_<%=interaction[:name]%>Link" onClick="toggleElement('interaction_<%=type%>_<%=interaction[:name]%>','interactions');return false;">show interactions</a>
+
+    </TD>
+    <TD class="interactions">
+      <% if type == "helper" and interaction[:helper_entry].nil? %>
+          <%= link_to "Confirm",{:controller => 'interaction', :action => 'new', :id => @participant.id , :team_name => interaction[:name]} %>
+      <%elsif type == "helpee" and interaction[:helpee_entry].nil?%>
+          <%= link_to "Confirm",{:controller => 'interaction', :action => 'new', :id => @participant.id , :team_name => @participant.team.id} %>
+      <%end%>
+    </TD>
+
+  </TR>
+</TABLE>
+<div id="interaction_<%=type%>_<%=interaction[:name]%>" style="display: none;">
+  <%= render :partial => 'interaction_expanded', :locals => {:helper => interaction[:helper_entry] , :helpee =>interaction[:helpee_entry]} %>
+</div>
+
+
+

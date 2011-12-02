@@ -224,87 +224,68 @@ class AssignmentTeam < Team
     team  
   end
 
+  def get_pairing_opportunities
+    course_assignments = assignment.course.assignments
+    team_assignments = course_assignments.find_all {|assignment| assignment.team_assignment}
+    pairing_opportunities = team_assignments.inject(0) {|sum, team| sum += team.team_count}
+    return pairing_opportunities - team_assignments.length
+  end
+
+  # Gets non-deduped list of past teammate user ids
+  def get_past_teammate_user_ids(participant)
+    past_team_associations = TeamsUser.find_all_by_user_id(participant.user_id)
+    past_team_associations -= TeamsUser.find_all_by_team_id(id)
+    past_teammates = TeamsUser.find_all_by_team_id(past_team_associations)
+    return past_teammates.map{|teammate| teammate.user_id}
+  end
+
   #Whether there is a pairing conflict or not.
   def has_pairing_conflicts?(participant)
 
-    course_assignments = assignment.course.assignments
-    team_assignments = course_assignments.find_all {|assignment| assignment.team_assignment}
-    total_pairing_opportunities = team_assignments.inject(0) {|sum, team| sum += team.team_count}
-    total_pairing_opportunities -= team_assignments.length
-
+    # Check if maximum duplicate pairings has been exceeded
     max_duplicate_pairings = assignment.course.max_duplicate_pairings
-    min_unique_pairings = assignment.course.min_unique_pairings
+    if max_duplicate_pairings != nil
 
-    all_participants = participants
-    all_participants << participant
+      # Get past teammate user ids.
+      past_teammate_ids = participant.get_past_teammate_user_ids
 
-    if max_duplicate_pairings == nil and min_unique_pairings == nil
-      return false
-    else
-      all_participants.each do |current_participant|
-
-        past_team_associations = TeamsUser.find_all_by_user_id(current_participant.user_id)
-        past_team_associations.delete_if {|association| association.team_id == id}
-
-        past_teams = course_assignments.find_all(past_team_associations.map{|team| team.team_id})
-        max_teammates = past_teams.inject(0) {|sum, team| sum += team.team_count}
-        past_teammates = TeamsUser.find_all_by_team_id(past_team_associations)
-        past_user_ids = past_teammates.map {|teammate| teammate.user_id}
-
-        unique_user_ids = past_user_ids - participants.map{|user| user.user_id}
-        else
-          unique_user_ids = past_user_ids - [participant.user_id]
-        end if
-
-        if past_user_ids.length >
-
-          if max_duplicate_pairings != nil and current_participant != participant
-            if duplicates.length >= max_duplicate_pairings
-              return true
-            end
-          end
-
-          if min_unique_pairings != nil
-
-            unique_user_ids = past_use_ids - participant.user_ids
-            lost_pairing_opportunities = max_teammates - past_user_ids.length
-
-            # De-duping users will give us number of pairings used so far.
-            if current_participant != participant
-              unique_users = past_users.delete_if
-            user_difference = past_users.length - unique_users.length
-            user_difference -= past_team_associations.length + 1
-
-            lost_pairing_opportunities += user_difference
-
-            if total_pairing_opportunities - lost_pairing_opportunities < min_unique_pairings
-              return false
-            end
-          end
+      # Check against user id of each participant already in team
+      participants.each do |current_participant|
+        unique_teammate_ids = past_teammate_ids - [current_participant.user_id]
+        if past_teammate_ids.length - unique_teammate_ids.length >= max_duplicate_pairings
+          return true
         end
       end
 
-      if min_unique_pairings != nil and duplicate
-        past_team_associations = TeamsUser.find_all_by_user_id(participant.user_id)
-        past_team_associations << TeamsUser.find_by_user_id(participants[0].user_id)
-        past_teams = course_assignments.find_all(past_team_associations.map{|team| team.team_id})
-        max_teammates = past_teams.inject(0) {|sum, team| sum += team.team_count}
-        past_teammates = TeamsUser.find_all_by_team_id(past_team_associations)
-        past_users = past_teammates.map {|teammate| teammate.user_id}
-        lost_pairing_opportunities = max_teammates - past_users.length
-
-        # De-duping users will give us number of pairings used so far.
-        unique_users = past_users.uniq
-        user_difference = past_users.length - unique_users.length
-        user_difference -= past_team_associations.length + 1
-
-        lost_pairing_opportunities += user_difference
-
-        if total_pairing_opportunities - lost_pairing_opportunities < min_unique_pairings
-          return false
-        end
-      end
     end
+
+    # Check if minimum unique pairings can still be met
+    min_unique_pairings = assignment.course.min_unique_pairings
+    if min_unique_pairings != nil
+
+      # Get maximum number of past pairing opportunities
+      past_teams = assignment.course.assignments.find_all(past_teammate_ids)
+      max_past_teammates = past_teams.inject(0) {|sum, team| sum += team.team_count - 1}
+
+      # Get maximum number of duplicate pairings for the course
+      max_course_duplicate_pairings = min_unique_pairings - get_pairing_opportunities
+
+      # Check if each participant can meet minimum unique pairings
+      all_participants = participants + [participant]
+      all_participants.each do |other_participant|
+        past_teammate_ids = get_past_teammate_user_ids(other_participant)
+        unique_teammate_ids = past_teammate_ids - participants.map {|participant| participant.user_id}
+        unique_teammate_ids -= [participant.user_id]
+        if max_past_teammates - unique_teammate_ids.length >= max_course_duplicate_pairings
+          return true
+        end
+      end
+
+    end
+
+    return false
+
   end
+
 end
 

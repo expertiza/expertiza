@@ -26,6 +26,18 @@ jQuery(function() {
         jQuery("#addAssignmentsWrapper").toggle(jQuery(this).val().length > 0);
     });
 
+    var allowedCodes = [8,9,13,37,38,39,40,46];
+
+    jQuery("#course_max_duplicate_pairings,#course_min_unique_pairings").keydown(function(e){
+        var modifiers = (e.altkey || e.shiftKey || e.ctrlKey || e.metaKey);
+
+        if((!modifiers && e.keyCode >= 48 && e.keyCode <= 57) || allowedCodes.indexOf(e.keyCode) > -1) {
+            return true;
+        }
+        e.preventDefault();
+        return false;
+    });
+
     /**
      * Handles the delete assignment click by first renaming all the assignments
      * that follow the one being deleted and then deleting it.

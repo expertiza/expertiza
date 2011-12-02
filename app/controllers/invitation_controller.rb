@@ -25,12 +25,22 @@ class InvitationController < ApplicationController
           current_invs = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.parent_id])
           #check if the invited user is already invited (i.e. awaiting reply)
           if current_invs.length == 0
-            @invitation = Invitation.new
-            @invitation.to_id = user.id
-            @invitation.from_id = student.user_id
-            @invitation.assignment_id = student.parent_id
-            @invitation.reply_status = 'W' 
-            @invitation.save
+            conflict = team.get_pairing_conflict(participant)
+            if !conflict || params[:force]
+              @invitation = Invitation.new
+              @invitation.to_id = user.id
+              @invitation.from_id = student.user_id
+              @invitation.assignment_id = student.parent_id
+              @invitation.reply_status = 'W'
+              @invitation.save
+            else
+              flash[:warning] = render_to_string :partial => "student_team/warning", :locals => {
+                :team => team,
+                :student => student,
+                :user => user,
+                :message => "There is a conflict"
+              }
+            end
           else
             flash[:notice] = "You have already sent an invitation to \"#{user.name}\"."
           end   

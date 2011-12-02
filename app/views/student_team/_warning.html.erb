@@ -1,0 +1,10 @@
+<p><%= message %></p>
+<% form_tag '/invitation/create', :id => "warningForm" do %>
+    <%= hidden_field_tag 'team_id', team.id %>
+    <%= hidden_field_tag 'student_id', student.id %>
+    <%= hidden_field_tag 'session[:dummy][:assignment_id]', student.parent_id %>
+    <%= hidden_field_tag 'user[name]', user.name %>
+    <%= hidden_field_tag 'force', true %>
+    <input type="submit" value="Proceed" class="looksLikeLink" />
+<% end %>
+ | <a href="/student_team/view/<%= student.id %>">Cancel</a>

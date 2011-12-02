@@ -686,19 +686,44 @@ end
   end
 
   def create_default_dates
-    hash = { 'due_at' => Time.now }
-
+    submissionDefaults = {
+      'due_at' => Time.now,
+      'submission_allowed_id' => '3',
+      'review_allowed_id' => '1',
+      'resubmission_allowed_id' => '1',
+      'rereview_allowed_id' => '1',
+      'review_of_review_allowed_id' => '1',
+      'threshold' => '8'
+    }
     submissionDeadline = DeadlineType.find_by_name("submission").id
-    DueDate::set_duedate(hash, submissionDeadline, self.id, 1)
+    DueDate::set_duedate(submissionDefaults, submissionDeadline, self.id, 1)
 
+    reviewDefaults = {
+      'due_at' => Time.now,
+      'submission_allowed_id' => '2',
+      'review_allowed_id' => '3',
+      'resubmission_allowed_id' => '1',
+      'rereview_allowed_id' => '1',
+      'review_of_review_allowed_id' => '1',
+      'threshold' => '8'
+    }
     reviewDeadline = DeadlineType.find_by_name("review").id
-    DueDate::set_duedate(hash, reviewDeadline, self.id, 1)
+    DueDate::set_duedate(reviewDefaults, reviewDeadline, self.id, 1)
 
     dropTopicDeadline = DeadlineType.find_by_name("drop_topic").id
-    DueDate::set_duedate(hash , dropTopicDeadline, self.id, 0)
+    DueDate::set_duedate({ 'due_at' => Time.now } , dropTopicDeadline, self.id, 0)
 
+    metaReviewDefaults = {
+      'due_at' => Time.now,
+      'submission_allowed_id' => '2',
+      'review_allowed_id' => '2',
+      'resubmission_allowed_id' => '2',
+      'rereview_allowed_id' => '2',
+      'review_of_review_allowed_id' => '3',
+      'threshold' => '8'
+    }
     metaReviewDeadline = DeadlineType.find_by_name("metareview").id
-    DueDate::set_duedate(hash, metaReviewDeadline, self.id, 2)
+    DueDate::set_duedate(metaReviewDefaults, metaReviewDeadline, self.id, 2)
   end
 end
   

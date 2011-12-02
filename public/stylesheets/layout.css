@@ -404,6 +404,30 @@ background-color: #EAEAEA;
 text-decoration: none;
 }
 
+
+
+th.interactions{
+    color: Black;
+    background-color: #EAEAEA;
+    text-decoration: none;
+    width: 7%;
+}
+
+td.interactions{
+    color: Black;
+    width: 7%;
+    text-align: center;
+
+}
+
+table.interaction_report{
+    border-style: inset;
+    text-align: center ;
+
+
+}
+
+
 .row {
   padding:5px;
   margin:0px;

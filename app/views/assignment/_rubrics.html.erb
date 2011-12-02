@@ -62,6 +62,10 @@
    <td style="padding: 15px;">
        <input id="limits_feedback" name="limits[feedback]" size="5" type="text" value="<%= @limits[:feedback] %>"/>%                         
    </td></tr>
+
+
+
+
  <tr id="teammate_review" <%if !@assignment.team_assignment %>style="display:none"<% end %>>  
    <td>Teammate Review:</td>
    <td style="padding: 15px;">        
@@ -80,7 +84,17 @@
    <td style="padding: 15px;">
        <input id="limits_teammate" name="limits[teammate]" size="5" type="text" value="<%= @limits[:teammate] %>"/>%                         
    </td>
-  </tr>     
+  </tr>
+  <tr id="interaction_review" <%if !@assignment.team_assignment %>style="display:none"<% end %>>
+   <td>Interaction Review:</td>
+   <td style="padding: 15px;">
+       Maximum Score:  <input id="limits_interaction" name="limits[interaction]" size="5" type="text" value="<%= @limits[:interaction] %>"/>%
+     </td>
+    <td style="padding: 15px;">
+         <input id="weights_interaction" name="weights[interaction]" size="5" type="text" value="<%= @weights[:interaction] %>"/>%
+     </td>
+    </tr>
+
 </table>
 <br/>
   

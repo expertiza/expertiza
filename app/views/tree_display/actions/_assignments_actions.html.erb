@@ -10,7 +10,10 @@
   <%@assignment = Assignment.find(node.node_object_id)%>
   <% if @assignment.team_assignment %>
     <%= link_to image_tag('/images/tree_view/create-teams-24.png', :title => 'Create teams'),:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Assignment' %>
+      <% if InteractionWeight.find_by_assignment_id(@assignment.id) %>
+      <%= link_to image_tag('/images/tree_view/view-publish-rights-24.png', :title => 'View Interaction Report'),:controller => 'interaction', :action => 'instructor_view',  :id =>node.node_object_id, :locals=>{:expanded => "false"} %>
   <% end %>
+      <% end %>
   <% signup_topic = SignUpTopic.find(:first, :conditions => ['assignment_id = ?',node.node_object_id]) %>
   <% if signup_topic %>
     <% if @assignment.staggered_deadline == true %>

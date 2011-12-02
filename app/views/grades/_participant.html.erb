@@ -20,7 +20,13 @@
   	tr_max = pscore[:teammate][:scores][:max]
   	tr_min = pscore[:teammate][:scores][:min] 
   	tr_avg = pscore[:teammate][:scores][:avg]   
-  end  	
+  end
+   if pscore[:interactions]
+  	in_achieved = pscore[:interactions][:scores][:achieved]
+    in_max = pscore[:interactions][:scores][:max]
+  	in_percentage = in_achieved *100/ in_max
+
+  end
 %>
 
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
@@ -65,7 +71,7 @@
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'review_feedback' %></FONT>
-    <% end %>  	    
+    <% end %>
     </TD>
     <% else %>
     <TD ALIGN="CENTER">---</TD>
@@ -84,7 +90,13 @@
     <% else %>
     <TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>
-    <% end %>    
+    <% end %>
+    <%if @assignment.interaction_weight %>
+    <TD ALIGN="CENTER"><%=in_achieved%>/<%=in_max%></TD>
+    <TD ALIGN="CENTER"><%=in_percentage%>%
+    <BR/><a href="#" id="<%=prefix%>_interactionsLink" name="<%=prefix%>_interactionsLink" onClick="toggleElement('<%=prefix%>_interactions','interactions');return false;">show interactions</a>
+    </TD>
+    <%end%>
     <% end %>
     <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
@@ -114,18 +126,22 @@
    	<% end %>
 </TR>
 <TR  class="row" id="<%= prefix %>_files" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
+	<TD COLSPAN="12"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_reviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
+	<TD COLSPAN="12"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
+	<TD COLSPAN="12"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_feedback" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
+	<TD COLSPAN="12"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
+	<TD COLSPAN="12"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
 </TR>
+<TR  class="row" id="<%= prefix %>_interactions" style="display:none">
+	<TD COLSPAN="12"><%= render :partial=>'grades/interactions', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:interactions][:details]} %></TD>
+</TR>
+
 <!-- END PARTICIPANT -->

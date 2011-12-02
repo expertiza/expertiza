@@ -52,4 +52,12 @@ Rails::Initializer.run do |config|
       :domain => "localhost"
     }
   end
+  if RAILS_ENV == 'test'
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      :address => "smtp.ncsu.edu",
+      :port => 25,
+      :domain => "localhost"
+    }
+  end
 end

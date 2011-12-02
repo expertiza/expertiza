@@ -1,45 +1,31 @@
+#require File.dirname(__FILE__) + '/../test_helper'
 require 'test_helper'
+#require 'join_team_requests_controller'
 
 class JoinTeamRequestsControllerTest < ActionController::TestCase
-  test "should get index" do
-    get :index
-    assert_response :success
-    assert_not_nil assigns(:join_team_requests)
+  fixtures :join_team_requests
+
+  def setup
+    @join_team_requests = join_team_requests(:one)
+    puts 'join_team:'+@join_team_requests.to_json
   end
 
-  test "should get new" do
-    get :new
-    assert_response :success
-  end
-
-  test "should create join_team_request" do
-    assert_difference('JoinTeamRequest.count') do
-      post :create, :join_team_request => { }
-    end
-
-    assert_redirected_to join_team_request_path(assigns(:join_team_request))
-  end
-
-  test "should show join_team_request" do
-    get :show, :id => join_team_requests(:one).to_param
-    assert_response :success
+  def test_should_get_new
+    join_team_requests = JoinTeamRequest.new(:id => 1, :participant_id => 1, :team_id => 5, :comments => 'new Comments', :status => 'P')
+    assert join_team_requests.save
   end
 
   test "should get edit" do
-    get :edit, :id => join_team_requests(:one).to_param
+    join_team_requests = JoinTeamRequest.find_by_participant_id(join_team_requests(:one).participant_id)
+    join_team_requests.comments = 'Hello'
+    join_team_requests.save
     assert_response :success
-  end
-
-  test "should update join_team_request" do
-    put :update, :id => join_team_requests(:one).to_param, :join_team_request => { }
-    assert_redirected_to join_team_request_path(assigns(:join_team_request))
   end
 
   test "should destroy join_team_request" do
     assert_difference('JoinTeamRequest.count', -1) do
-      delete :destroy, :id => join_team_requests(:one).to_param
+      delete :destroy, :id => 11
     end
-
     assert_redirected_to join_team_requests_path
   end
 end

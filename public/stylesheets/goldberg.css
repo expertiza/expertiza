@@ -44,6 +44,7 @@ div.flash_warning a {
     font-family: Verdana,Tahoma,Arial,sans-serif;
     padding: 0;
     font-size: 1em;
+    cursor: pointer;
 }
 
 #warningForm input.looksLikeLink:hover {

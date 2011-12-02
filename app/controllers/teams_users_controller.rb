@@ -24,7 +24,13 @@ class TeamsUsersController < ApplicationController
     end
     team = Team.find_by_id(params[:id])    
     
-      team.add_member(user)
+    if team.type.downcase.include? "course"
+      course = Course.find_by_id(team.parent_id)
+      if course.min_unique_pairings || course.max_duplicate_pairings
+        # Get conflicts somehow
+      end
+    end
+    team.add_member(user)
     
     #  flash[:error] = $!
     #end

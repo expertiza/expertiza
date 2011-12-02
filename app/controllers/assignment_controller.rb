@@ -126,10 +126,9 @@ class AssignmentController < ApplicationController
         raise "Please enter a valid drop topic deadline" if !due_date
 		
 		if @assignment.team_formation_required
-		  due_date = DueDate::set_duedate(params[:team_formation_deadline],@team_formation_deadline, @assignment.id, 0)
-          if params[:team_formation_required] == "1"
-			  raise "Please enter a valid team formation deadline" if !due_date
-		  end
+		  due_date = DueDate::set_team_formation_deadline(@assignment.id,params[:team_formation_deadline]['due_at'])
+		  #due_date = DueDate::set_duedate(params[:team_formation_deadline],@team_formation_deadline, @assignment.id, 0)
+		  raise "Please enter a valid team formation deadline" if !due_date
 		end
         
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
@@ -349,13 +348,11 @@ class AssignmentController < ApplicationController
           end
         end
 		
+		# set user options for deadline formation if it's being newly added
 		if !found_formation && @assignment.team_formation_required
-		  formation_due_date = DueDate.new
-		  formation_due_date.assignment_id = @assignment.id
-		  formation_due_date.due_at = params[:formation_deadline]
-		  formation_due_date.deadline_type = DeadlineType.find_by_name("team_formation")
-		  formation_due_date.save
-		  raise "Please enter a valid date & time for the team formation deadline" if formation_due_date.errors.length > 0
+		  # try to insert the team formation deadline
+		  formation_due_date = DueDate::set_team_formation_deadline(@assignment.id,params[:formation_deadline])
+		  raise "Please enter a valid date & time for the team formation deadline" if !formation_due_date
 		end
      
         flash[:notice] = 'Assignment was successfully updated.'

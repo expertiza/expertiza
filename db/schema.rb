@@ -419,10 +419,6 @@ ActiveRecord::Schema.define(:version => 20111130205809) do
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
 
-  create_table "schema_info", :id => false, :force => true do |t|
-    t.integer "version"
-  end
-
   create_table "score_caches", :force => true do |t|
     t.integer "reviewee_id"
     t.float   "score",       :default => 0.0, :null => false

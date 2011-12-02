@@ -6,6 +6,7 @@
 	    <th width="5%">Max choosers</th>
 	    <th width="5%">Available slots</th>
 	    <th width="5%">Waitlist</th>
+        <th width="5%">Micropayment</th>
 	    <%if @show_actions%>
 	    <th width="5%">Action</th>
 	    <%end%>
@@ -37,6 +38,9 @@
 	<%end%>
         <td><%=topic.topic_identifier%></td>
         <td><%= topic.topic_name %></td>
+        <% if topic.assignment.is_microtask? %>
+                <td><%= topic.micropayment %></td>
+        <% end %>
         <td align="center"><%= topic.max_choosers %></td>
 
         <% found_in_slots = false %>
@@ -66,6 +70,7 @@
                 <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
             <% end %>
         <% end %>
+
       </tr>
       <% i=i+1 %>
   <% end %>

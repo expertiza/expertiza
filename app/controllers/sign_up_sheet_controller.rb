@@ -87,6 +87,8 @@ class SignUpSheetController < ApplicationController
   def new
     @id = params[:id]
     @sign_up_topic = SignUpTopic.new
+    @sign_up_topic.assignment = Assignment.find(params[:id])
+    @topic = @sign_up_topic
   end
 
   #This method is used to create signup topics

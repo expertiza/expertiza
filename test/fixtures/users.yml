@@ -186,3 +186,55 @@ admin_test:
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
+
+student_conflict_1:
+  name: student_conflict1
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: conflict_1_fullname
+  password: <%= Digest::SHA1.hexdigest("conflict_1_fullname") %>
+  password_salt:
+  email: conflict_1_fullname9@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review_of_review: 1
+  master_permission_granted: 1
+
+student_conflict_2:
+  name: student_conflict2
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: conflict_1_fullname
+  password: <%= Digest::SHA1.hexdigest("conflict_2_fullname") %>
+  password_salt:
+  email: conflict_2_fullname9@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review_of_review: 1
+  master_permission_granted: 1
+
+student_conflict_3:
+  name: student_conflict3
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: conflict_3_fullname
+  password: <%= Digest::SHA1.hexdigest("conflict_3_fullname") %>
+  password_salt:
+  email: conflict_3_fullname9@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review_of_review: 1
+  master_permission_granted: 1
+
+student_conflict_4:
+  name: student_conflict4
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: conflict_4_fullname
+  password: <%= Digest::SHA1.hexdigest("conflict_4_fullname") %>
+  password_salt:
+  email: conflict_4_fullname9@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review_of_review: 1
+  master_permission_granted: 1

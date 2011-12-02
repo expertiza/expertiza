@@ -18,3 +18,12 @@ course_e_commerce:
   directory_path: csc511
   info: E Commerce Class
   private: 0
+
+course_conflict:
+  name: conflict
+  instructor_id: <%= instructor_list[0] %>
+  directory_path: conflict
+  max_duplicate_pairings: 2
+  min_unique_pairings: 3
+  info: Conflict
+  private: 0

@@ -155,3 +155,123 @@ par15:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par15"
+
+par_conflict_1:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_1) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_1) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_1"
+
+par_conflict_2:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_2) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_1) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_2"
+
+par_conflict_3:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_3) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_1) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_3"
+
+par_conflict_4:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_1) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_2) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_4"
+
+par_conflict_5:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_2) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_2) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_5"
+
+par_conflict_6:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_3) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_2) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_6"
+
+par_conflict_7:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_1) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_3) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_7"
+
+par_conflict_8:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_2) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_3) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_8"
+
+par_conflict_9:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_3) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_3) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_9"
+
+par_conflict_10:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_4) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_1) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_10"
+
+par_conflict_11:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_4) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_2) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_11"
+
+par_conflict_12:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_4) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_3) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_12"

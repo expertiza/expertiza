@@ -240,6 +240,14 @@ class AssignmentTeam < Team
     return past_teammates.map{|teammate| teammate.user_id}
   end
 
+  # Get total number of past teammate possibilities
+  def get_max_past_teammates(participant)
+    past_team_associations = TeamsUser.find_all_by_user_id(participant.user_id)
+    past_team_associations -= TeamsUser.find_all_by_team_id(id)
+    past_assignments = past_team_associations.map{|association| Assignment.find_by_id(Team.find_by_id(association.team_id).parent_id)}
+    return past_assignments.inject(0) {|sum, assignment| sum += assignment.team_count - 1}
+  end
+
   # Determine if there is a pairing conflict or not
   def get_pairing_conflict(participant)
 
@@ -248,7 +256,7 @@ class AssignmentTeam < Team
     if max_duplicate_pairings != nil
 
       # Get past teammate user ids.
-      past_teammate_ids = participant.get_past_teammate_user_ids
+      past_teammate_ids = get_past_teammate_user_ids(participant)
 
       # Check against user id of each participant already in team
       participants.each do |current_participant|
@@ -265,8 +273,7 @@ class AssignmentTeam < Team
     if min_unique_pairings != nil
 
       # Get maximum number of past pairing opportunities
-      past_teams = assignment.course.assignments.find_all(past_teammate_ids)
-      max_past_teammates = past_teams.inject(0) {|sum, team| sum += team.team_count - 1}
+      max_past_teammates = get_max_past_teammates(participant)
 
       # Get maximum number of duplicate pairings for the course
       max_course_duplicate_pairings = min_unique_pairings - get_pairing_opportunities
@@ -278,7 +285,7 @@ class AssignmentTeam < Team
         unique_teammate_ids = past_teammate_ids - participants.map {|participant| participant.user_id}
         unique_teammate_ids -= [participant.user_id]
         if max_past_teammates - unique_teammate_ids.length >= max_course_duplicate_pairings
-          return TeamConflict(other_participant, participant, :min_unique_pairings, min_unique_pairings)
+          return TeamConflict.new(other_participant, participant, :min_unique_pairings, min_unique_pairings)
         end
       end
 

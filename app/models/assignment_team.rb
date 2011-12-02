@@ -244,7 +244,9 @@ class AssignmentTeam < Team
   def get_max_past_teammates(participant)
     past_team_associations = TeamsUser.find_all_by_user_id(participant.user_id)
     past_team_associations -= TeamsUser.find_all_by_team_id(id)
-    past_assignments = past_team_associations.map{|association| Assignment.find_by_id(Team.find_by_id(association.team_id).parent_id)}
+    past_team_ids = past_team_associations.map{|association| association.team_id}
+    past_teams = past_team_ids.map{|team_id| Team.find_by_id(team_id)}
+    past_assignments = past_teams.map{|team| Assignment.find_by_id(team.parent_id)}
     return past_assignments.inject(0) {|sum, assignment| sum += assignment.team_count - 1}
   end
 

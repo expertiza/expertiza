@@ -3,6 +3,12 @@ require File.dirname(__FILE__) + '/../test_helper'
 class AssignmentTeamTest < ActiveSupport::TestCase
   fixtures :courses, :assignments, :teams, :users, :participants
 
+  def test_get_max_past_teammates
+    team = AssignmentTeam.find_by_name("team_conflict3")
+    participant = AssignmentParticipant.find_by_handle("par_conflict_8")
+    assert_equal(2, team.get_max_past_teammates(participant))
+  end
+
   def test_get_pairing_conflict_is_nil
     team = AssignmentTeam.find_by_name("team_conflict3")
     participant = AssignmentParticipant.find_by_handle("par_conflict_9")

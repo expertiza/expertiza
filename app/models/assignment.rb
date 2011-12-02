@@ -224,8 +224,10 @@ class Assignment < ActiveRecord::Base
         | questionnaire |
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
-        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
-      } 
+        cache_map_type = Score.get_cache_map_type(questionnaire.type)
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.get_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol], participant.id, cache_map_type) #avalent
+        #scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      }
       scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
     }        
     
@@ -236,8 +238,10 @@ class Assignment < ActiveRecord::Base
         | team |
         scores[:teams][index.to_s.to_sym] = Hash.new
         scores[:teams][index.to_s.to_sym][:team] = team
+
         assessments = TeamReviewResponseMap.get_assessments_for(team)
-        scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
+        scores[:teams][index.to_s.to_sym][:scores] = Score.get_scores(assessments, questions[:review], team.id, "TeamReviewResponseMap")  #avalent
+        #scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
         index += 1
       }
     end

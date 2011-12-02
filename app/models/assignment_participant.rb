@@ -55,7 +55,9 @@ class AssignmentParticipant < Participant
     assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+      cache_map_type = Score.get_cache_map_type(questionnaire.type)
+      scores[questionnaire.symbol][:scores] = Score.get_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol], self.id, cache_map_type)
+      #scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)
     return scores

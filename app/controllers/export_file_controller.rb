@@ -7,6 +7,10 @@ class ExportFileController < ApplicationController
       @title = 'Grades'
     elsif(@model == 'CourseParticipant')
       @title = 'Course Participants'
+    elsif(@model == 'AssignmentTeam')
+      @title = 'Teams'
+    elsif(@model == 'CourseTeam')
+      @title = 'Teams'
     end
     @id = params[:id]
   end

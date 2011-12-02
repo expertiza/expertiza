@@ -34,8 +34,8 @@
 	<tr>
         <td colspan=2 style="padding-bottom: 5pt"><strong>Questions</strong>
 		  <input style="margin-left: 50pt" type="button" value="Add" onclick="addQuestions()">
-		  <input id="numQuestionsToAdd" type="text" value="1" size=1>
-		  more question(s)</td>
+		  <input id="numQuestionsToAdd" type="text" value="1" size=1> more question(s)
+        </td>
 		<td colspan=2><input type="button" value="Delete selected questions" onclick="deleteQuestions()"></td>
 	</tr>
 	<tr>
@@ -48,16 +48,24 @@
 		<td align=left>Weight</td>
 	</tr>
 	
-	<% 	i = 1;
-		for @question in @questionnaire.questions %>
-	<tr>
-		<td align=center><input type=checkbox id="question_chk<%= i %>"></td>
-		<td><%= text_field "question[]", 'txt', :size=>70 %></td>
-		<td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
-		<td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
-	</tr>
-	<% 	i += 1;
-		end %>
+	<% 	i = 1   %>
+    <% for @question in @questionnaire.questions %>
+      <% #q = @question_type_all.question_id(@question.id) %>
+        <tr>
+            <td align=center><input type=checkbox id="question_chk<%= i %>"></td>
+            <td><%= text_field "question[]", 'txt', :size=>70 %></td>
+            <% if (@questionnaire.section == "Custom") %>
+                <td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
+                <td><%= text_field "question[]", 'txt', :size=>70 %></td>
+             <%else%>
+                <td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
+
+              <% end%>
+
+            <td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
+        </tr>
+	<% 	i += 1 %>
+	<% end %>
 </table>
 <BR/>
 <!--[eoform:course]-->

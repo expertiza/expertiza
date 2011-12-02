@@ -8,6 +8,9 @@
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
 <% if @assignment.team_assignment %>
   <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
+  <%if @assignment.interaction_weight %>
+    <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Team Interactions</TH>
+  <%end%>
 <% end %>
 <TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
 
@@ -22,6 +25,10 @@
 <% if @assignment.team_assignment %>
   <TH WIDTH="<%= colwidth %>%">Average</TH>
   <TH WIDTH="<%= colwidth %>%">Range </TH>
+  <%if @assignment.interaction_weight  %>
+  <TH WIDTH="<%= colwidth %>%">Total</TH>
+  <TH WIDTH="<%= colwidth %>%">Percentage</TH>
+  <%end%>
 <% end %>   
 <TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
     

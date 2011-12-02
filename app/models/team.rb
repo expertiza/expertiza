@@ -1,7 +1,8 @@
 class Team < ActiveRecord::Base
   has_many :teams_users
   has_many :users, :through => :teams_users
-  
+  has_many :interaction, :class_name => 'Interaction', :foreign_key => 'team_id' , :dependent => :destroy
+
   def delete
     for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", self.id])       
        teamsuser.delete

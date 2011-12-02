@@ -198,7 +198,7 @@ class QuestionnaireController < ApplicationController
   #save parameters for new questions
   def save_new_question_parameters(qid, q_num)
     q = QuestionType.new
-    q.type = params[:question_type][q_num][:type]
+    q.q_type = params[:question_type][q_num][:type]
     q.parameters = params[:question_type][q_num][:parameters]
     q.question_id =  qid
     q.save

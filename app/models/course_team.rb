@@ -81,4 +81,36 @@ class CourseTeam < Team
      CourseParticipant.create(:parent_id => course_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
    end    
  end
+  def self.export(csv, parent_id, options)
+    course = Course.find(parent_id)
+    assignmentList = Assignment.find_all_by_course_id(parent_id)
+    assignmentList.each do |currentAssignment|
+      currentAssignment.teams.each { |team|
+        tcsv = Array.new
+        teamUsers = Array.new
+        tcsv.push(team.name)
+        if (options["team_name"] == "true")
+          teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
+          teamMembers.each do |user|
+            teamUsers.push(user.name)
+            teamUsers.push(" ")
+          end
+        end
+        tcsv.push(teamUsers)
+        tcsv.push(currentAssignment.name)
+        tcsv.push(course.name)
+        csv << tcsv
+      }
+    end
+  end
+
+  def self.get_export_fields(options)
+    fields = Array.new
+    fields.push("Team Name")
+    if (options["team_name"] == "true")
+      fields.push("Team members")
+    end
+    fields.push("Assignment Name")
+    fields.push("Course Name")
+  end
 end

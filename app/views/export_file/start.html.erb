@@ -42,6 +42,20 @@
         <label for="Export Fields">Handle:</label><br/>
         <br/>
     <% end %>
+    <% if @model == 'AssignmentTeam' %>
+        <br/>
+        <label for="Export Fields">Export : <br/></label><br/>
+        <%= check_box 'options', 'team_name', {:checked => 'checked'}, "true", "false" %>
+        <label for="Export Fields">Team Name Only:</label><br/>
+        <br/>
+    <% end %>
+    <% if @model == 'CourseTeam' %>
+        <br/>
+        <label for="Export Fields">Export : <br/></label><br/>
+        <%= check_box 'options', 'team_name', {:checked => 'checked'}, "true", "false" %>
+        <label for="Export Fields">Team Name Only:</label><br/>
+        <br/>
+    <% end %>
     <br/>
     <%= hidden_field_tag('model', @model) %>
     <%= hidden_field_tag('id', @id) %>

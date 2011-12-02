@@ -39,7 +39,15 @@ class SignedUpUser < ActiveRecord::Base
   end
 
   def self.find_team_users(assignment_id,user_id)
-    TeamsUser.find_by_sql("SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id =" + assignment_id.to_s + " and user_id =" + user_id.to_s)  
+    TeamsUser.find_by_sql("SELECT t.id as team_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id =" + assignment_id.to_s + " and user_id =" + user_id.to_s)  
+  end
+  
+  def self.find_teammates(assignment_id,user_id)
+    team_id = SignedUpUser.find_team_users(assignment_id,user_id)
+	team_lookup_id = nil
+	team_lookup_id = team_id[0].team_id if team_id && team_id.size > 0 && team_id[0]
+	return TeamsUser.find_by_sql("SELECT * FROM teams_users WHERE team_id = #{team_lookup_id}") if team_lookup_id
+	[]
   end
 
   def self.find_user_signup_topics(assignment_id,creator_id)

@@ -673,5 +673,23 @@ end
         return contributors_signup_topic
       end
   end
+  
+  # function that will get invoked either manually or by a polling mechanism
+  def enforce_team_formation_deadline
+    # make sure the assignment needs enforcing
+  
+    # get a list of signed up AND not waitlisted teams
+	
+	# run through the list and drop each team that does not meet minimum requirements
+	#  meanwhile, push e-mails onto a delivery stack
+	
+	# get a list of the topics
+	
+	# run through the topic list and get a list of preference-sorted teams
+	#  run through team list and add them to topic until topic is full
+	#   meanwhile, pop the added teams from waitlist stack
+	#   meanwhile, push e-mails onto a delivery stack
+  end
+  
 end
   

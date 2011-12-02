@@ -234,7 +234,7 @@ class SignUpSheetController < ApplicationController
         @selected_topics = nil
       else
         #TODO: fix this; cant use 0
-        @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
+        @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].team_id)
       end
     else
       @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)
@@ -261,7 +261,7 @@ class SignUpSheetController < ApplicationController
       if assignment.team_assignment == true
         #users_team will contain the team id of the team to which the user belongs
         users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
-        signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
+        signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].team_id)
       else
         signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, session[:user].id)
       end
@@ -331,9 +331,19 @@ class SignUpSheetController < ApplicationController
     if assignment.team_assignment == true
 
       #check whether the user already has a team for this assignment
-      users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
-
-      if users_team.size == 0
+      users_team = SignedUpUser.find_teammates(params[:assignment_id],(session[:user].id))
+	  
+	  # make sure the team is an appropriate size after the team_formation deadline
+	  if assignment.team_formation_required && users_team && (users_team.size < assignment.minimum_team_count || users_team.size > assignment.team_count)
+	    current_due_date = assignment.get_current_due_date
+	    if current_due_date && current_due_date.deadline_type_id == DeadlineType.find_by_name("team_formation").id
+	      flash[:error] = "Teams for this assignment need to have between #{assignment.minimum_team_count} and #{assignment.team_count} members (inclusive) <b>before</b> the formation deadline -- your team has #{users_team.size} member(s)"		
+		  redirect_to :action => 'signup_topics', :id => params[:assignment_id]
+		  return
+		end
+	  end
+	  
+	  if users_team.size == 0
         #if team is not yet created, create new team.
         team = create_team(params[:assignment_id])
         user = User.find(session[:user].id)
@@ -341,7 +351,7 @@ class SignUpSheetController < ApplicationController
        
         confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id],val)
       else
-        confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id],val)
+        confirmationStatus = confirmTopic(users_team[0].team_id, params[:id], params[:assignment_id],val)
       end
     else
       confirmationStatus = confirmTopic(session[:user].id, params[:id], params[:assignment_id],val)

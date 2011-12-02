@@ -232,10 +232,10 @@ class Assignment < ActiveRecord::Base
       #scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
       # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
       if self.is_microtask?
-        topic = signed_up_topic(participant)
+        topic = SignUpTopic.find_by_assignment_id(self.id)
         if !topic.nil?
-          total *= (topic.micropayment / 100).to_f
-          scores[:participants][participant.id.to_s.to_sym][:pts_available] = topic.micropayment
+          total *= (topic.micropayment.to_f / 100.to_f)
+          scores[:participants][participant.id.to_s.to_sym][:max_pts_available] = topic.micropayment
         else
           # How do we handle this? Flash maybe?
         end

@@ -631,7 +631,7 @@ class SignUpSheetController < ApplicationController
     @sign_up_topic = SignUpTopic.new
     @sign_up_topic.topic_identifier = 'MT1'
     @sign_up_topic.topic_name = 'Microtask Topic'
-    @sign_up_topic.max_choosers = '1'
+    @sign_up_topic.max_choosers = '0'
     @sign_up_topic.micropayment = 0
     @sign_up_topic.assignment_id = assignment_id
 

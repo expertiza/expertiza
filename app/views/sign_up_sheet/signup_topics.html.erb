@@ -67,7 +67,7 @@
             <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
                 <% for selected_topic in @selected_topics %>
                     <% if selected_topic.topic_id == topic.id %>
-                        <%tchk = 5.days.from_now.to_date%>
+                        <%tchk = 0.days.from_now.to_date%>
 						<%asnmt = Assignment.find(params[:id])%>
                  		<%if asnmt.staggered_deadline ==1%>
                				 <%topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, 1)%>
@@ -86,7 +86,7 @@
             <%if action_symbol_added == false %>
                 <%confirm_by = 0%>
 				<%tclose = Time.now.to_date%>
-				<%tchk = 5.days.from_now.to_date%>
+				<%tchk = 0.days.from_now.to_date%>
       			<%asnmt = Assignment.find(params[:id])%>
                  <%if asnmt.staggered_deadline ==1%>
                 <%topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, 1)%>

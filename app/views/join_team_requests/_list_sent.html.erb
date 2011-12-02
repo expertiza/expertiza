@@ -36,7 +36,13 @@
                 <%= request.comments %>
               </td>
               <td>
-                <%= request.status %>
+                <% if request.status == 'P' %>
+                    <%= "Pending" %>
+                <% elsif request.status == 'A' %>
+                     <%= "Accepted" %>
+                <% else %>
+                   <%= "Declined"  %>
+                <% end %>
               </td>
               <td>
                 <%= request.created_at %>

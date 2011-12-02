@@ -10,7 +10,7 @@
       <%}%>
   <% if notifyflag %>
   <p style="color: green;">
-    [Your already have a team so you cannnot make a request to join a team]
+    [You already have a team so you cannot make a request to join a team]
   </p>
       <% notfiyflag= false %>
 
@@ -54,6 +54,8 @@
             %>
             <img src="/images/info.png" title="Send request to join a team">
             </td>
+            <%else%>
+            <td></td>
             <% end %>
 
       </tr>

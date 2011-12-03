@@ -10,7 +10,7 @@
       <%}%>
   <% if notifyflag %>
   <p style="color: green;">
-    [Your already have a team so you cannnot make a request to join a team]
+    [You already have a team so you cannot make a request to join a team]
   </p>
       <% notfiyflag= false %>
 
@@ -30,9 +30,9 @@
   </tr>
 
   <% count=0 %>
-
     <% @results.each {|result|
     %>
+
       <%
            team_members = ""
            TeamsUser.find_all_by_team_id(result[:team_id]).each{|teamuser|

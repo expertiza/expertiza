@@ -6,25 +6,29 @@ class AdvertiseForPartnerController < ApplicationController
 
   def remove
     Team.update_all("advertise_for_partner=false",:id=>params[:team_id])
-    redirect_to :controller => 'student_team', :action => 'view' , :id => params[:team_id]
+    assignment=Assignment.find(Team.find(params[:team_id]).parent_id)
+    participant=Participant.find_by_parent_id_and_user_id(assignment.id,session[:user].id)
+    redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
   end
 
   def add_advertise_comment
     Team.update(params[:id],:comments_for_advertisement => params[:comment].to_s)
-    #Team.update_all("comments_for_advertisement=comments",:id=>params[:id])
-    redirect_to :controller => 'student_team', :action => 'view' , :id => params[:id]
+    assignment=Assignment.find(Team.find(params[:id]).parent_id)
+    participant=Participant.find_by_parent_id_and_user_id(assignment.id,session[:user].id)
+    redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
   end
 
   def update
     @team=Team.find(params[:id])
     @team.comments_for_advertisement = params[:team][:comments_for_advertisement]
-    puts 'yay!!!!'+params[:team][:comments_for_advertisement].to_json
+    assignment=Assignment.find(Team.find(params[:id]).parent_id)
+    participant=Participant.find_by_parent_id_and_user_id(assignment.id,session[:user].id)
     if @team.save
       flash[:notice]='Advertisement edited successfully!'
-      redirect_to :controller => 'student_team', :action => 'view' , :id => params[:id]
+      redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
     else
-      flash[:notice]='Advertisement edited successfully!'
-      redirect_to :controller => 'student_team', :action => 'edit' , :id => @team.id
+      flash[:error]='Advertisement not edited successfully!'
+      redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
     end
   end
 

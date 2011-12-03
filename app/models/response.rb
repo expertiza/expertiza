@@ -20,7 +20,7 @@ class Response < ActiveRecord::Base
       identifier += '<B>'+self.map.get_title+'</B> '+count.to_s+'</B>'
       str = self.id.to_s
     end    
-    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">hide review</a><BR/>'                
+    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">hide review</a><BR/>'
     code += "<B>Last reviewed:</B> "
     if self.updated_at.nil?
       code += "Not available"

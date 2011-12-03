@@ -198,6 +198,11 @@ class AssignmentTeam < Team
   end
  
   # return a hash of scores that the team has received for the questions
+
+
+
+
+
   def get_scores(questions)
     scores = Hash.new
     scores[:team] = self # This doesn't appear to be used anywhere

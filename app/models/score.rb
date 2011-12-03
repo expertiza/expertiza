@@ -11,19 +11,22 @@ class Score < ActiveRecord::Base
     sc = nil
     if assessments.length > 0
       sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", reviewee_id, object_type])
-      if sc == nil
-        ScoreCache.update_cache(response.id)
-        sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", reviewee_id, cache_map_type])
+      if sc != nil
+
         range = sc.range.split('-')
         scores[:max] = range[1].to_f
         scores[:min] = range[0].to_f
         scores[:avg] = sc.score
       else
+        return compute_scores(assessments,questions)
+      end
+    else
+        #sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", reviewee_id, cache_map_type])
         scores[:max] = nil
         scores[:min] = nil
         scores[:avg] = nil
-      end
     end
+
     return scores
   end
 
@@ -105,13 +108,13 @@ class Score < ActiveRecord::Base
   end
 
   #Override ActiveRecord::Base's update_attribute and create methods so that ScoreCache is updated simultaneously
-  def update_attribute(name, value)   
+  def update_attribute(name, value)
     ScoreCache.update_cache(response_id)
     super.update_attribute(name,value)  
   end
 
-  def create(attributes = nil, &block)
-    ScoreCache.update_cache(response_id)
-    super.create(attributes,&block)
-  end   
+  def self.create_score(attributes = nil, &block)
+    ScoreCache.update_cache(attributes[:response_id])
+    create(attributes, &block)
+  end
 end

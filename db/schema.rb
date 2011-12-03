@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110512155258) do
+ActiveRecord::Schema.define(:version => 20111129073615) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -98,6 +98,8 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "private",        :default => false, :null => false
+    t.date     "start_date"
+    t.date     "end_date"
   end
 
   add_index "courses", ["instructor_id"], :name => "fk_course_users"

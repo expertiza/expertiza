@@ -5,29 +5,141 @@
 <TD WIDTH="2%">&nbsp;</TD>
 <%   index += 1
      end
-   end %> 
+   end %>
 <% if parent_node.is_leaf %>
   <TD WIDTH="2%">&nbsp;</TD>
   <TD WIDTH="2%">&nbsp;</TD>
 <% else %>
-	<% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
-	<%else%>
-     <% if child_nodes %>
-       <TD WIDTH="2%" ALIGN="RIGHT"><a id="<%= prefix %>Link" name="<%= prefix %>Link" href="#" <% if child_nodes.length > 0  %>onclick="toggleList('<%= prefix %>',<%= child_nodes.length %>);alternate('theTable');return false;"><img src="/images/expand.png"><% else %>onclick="return false;"><img src="/images/noaction.png"><% end %></a></div></TD>
-       <TD WIDTH="2%" ALIGN="RIGHT"><%= link_to '<img src="/images/drill.png">', :controller => 'tree_display', :action => 'drill', :root => parent_node.id %></TD>
-     <% end %>
-	<%end%>	     
-<% end %>    
+    <% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
+
+    <%else%>
+        <% if( parent_node.get_name  =='Courses')%>
+          <SCRIPT LANGUAGE="JavaScript">
+            function expandCourses()
+            {
+                <% @extract_courses = Array.new %>
+                <% @temp_date = Array.new %>
+                <% @extract_assignments = Array.new %>
+                <% @extract_deadline_date = Array.new %>
+                <% @real = Array.new %>
+
+                <% @temp_least = @temp_greatest = nil %>
+                var prefixtest = '<%= prefix %>';
+                var chidnodel = '<%= child_nodes.length%>'
+
+                toggleList(prefixtest,chidnodel);
+
+                    <% @extract_courses = Course.find_all_by_instructor_id(session[:user].id) %>
+                    <% for course_check in @extract_courses %>
+                            var courseName ='<%= course_check.name %>';
+
+                        <% if course_check.start_date == nil && course_check.end_date == nil  %>
+
+                             <% @extract_assignments = Assignment.find_all_by_course_id(course_check.id) %>
+
+                                <% for assignment_check  in @extract_assignments %>
+
+                                        <% if assignment_check.id %>
+
+                                            <% @extract_deadline = DueDate.find_all_by_assignment_id(assignment_check.id) %>
+
+                                            <% for e_deadline in @extract_deadline %>
+                                               <% if e_deadline.due_at  %>
+                                                    <% r_crap = e_deadline.due_at.to_s %>
+                                                    <% @temp_store_date, @temp_time, @temp_area = r_crap.split(" ") %>
+                                                    <% @temp_date << @temp_store_date %>
+                                                    <% session[:biskit] = 1 %>
+
+                                                <% end %>
+                                            <% end %>
+
+                                        <% end %>
+
+                                <% end %>
+                                        <% if session[:biskit] == 1  %>
+                                        <% @extract_deadline_date = @temp_date.sort_by {|s| Date.strptime(s, "%Y-%m-%d") } %>
+                                        <% if Date.today > Date.strptime(@extract_deadline_date[0], "%Y-%m-%d") && Date.today < Date.strptime(@extract_deadline_date[-1], "%Y-%m-%d")  %>
+
+
+                                            var tab=document.getElementById("theTable");
+                                            for(var i=0; i<tab.rows.length; i++) {
+                                            if(tab.rows[i].id.substring(0,4)== "2_2_" && tab.rows[i].id.length<=6)
+                                             {
+                                                var temp_str=tab.rows[i].cells[3].innerHTML;
+                                                var location_value=temp_str.indexOf('\n')
+                                                var s_string=temp_str.substring(0,location)
+                                                 var xxx = temp_str.split("\n");
+                                                 var mmm = xxx[3];
+
+
+
+                                                if(mmm.match('      '+courseName))
+                                                {
+                                                    var coursesObject = document.getElementById(tab.rows[i].id+"Link");
+
+                                                    coursesObject.onclick();
+
+                                                }
+
+                                             }
+                                            }
+                                            <%  @temp_date.clear %>
+
+                                        <% end %>
+                                        <% end %>
+
+                        <% else %>
+
+
+
+                            <% if Date.today > course_check.start_date && Date.today < course_check.end_date  %>
+                               var tab1=document.getElementById("theTable");
+                               for(var i=0; i<tab1.rows.length; i++) {
+                                if(tab1.rows[i].id.substring(0,4)== "2_2_" && tab1.rows[i].id.length<=6)
+                                 {
+                                    var temp_str1=tab1.rows[i].cells[3].innerHTML;
+                                    if(temp_str1.indexOf(courseName)!=-1)
+                                    {
+                                        var coursesObject = document.getElementById(tab1.rows[i].id+"Link");
+
+
+                                        coursesObject.onclick();
+                                    }
+
+                                 }
+                                }
+
+                            <% end %>
+                        <% end %>
+                       <% session[:biskit] = 0 %>
+                    <% end %>
+
+            }
+
+          </SCRIPT>
+        <% end %>
+      <% if child_nodes %>
+
+         <TD WIDTH="2%" ALIGN="RIGHT"><a id="<%= prefix %>Link" name="<%= prefix %>Link" href="#" <% if child_nodes.length > 0  %>onclick="toggleList('<%= prefix %>',<%= child_nodes.length %>);alternate('theTable');return false;"><img src="/images/expand.png"><% else %>onclick="return false;"><img src="/images/noaction.png"><% end %></a></div></TD>
+         <TD WIDTH="2%" ALIGN="RIGHT"><%= link_to '<img src="/images/drill.png">', :controller => 'tree_display', :action => 'drill', :root => parent_node.id %></TD>
+      <% end %>
+    <%end%>
+<% end %>
 <% width = 66 - depth * 2 %>
-<TD COLSPAN="<%= 3 - depth %>" WIDTH="<%= width %>%">     
+<TD COLSPAN="<%= 3 - depth %>" WIDTH="<%= width %>%">
   <% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
   <%else%>
-	  <%= parent_node.get_name %>
-	  <% if parent_node.get_directory != nil%>
-	    <BR/><I>Directory:</I> <%= parent_node.get_directory %>
-	  <% end %>
-	  <% if parent_node.get_creation_date != nil %>
-	    <BR/><I>Creation Date:</I> <%= parent_node.get_creation_date %>
-	  <% end %>
-  <%end%>		  
+
+      <%= parent_node.get_name %>
+      <% if parent_node.get_directory != nil%>
+        <BR/><I>Directory:</I> <%= parent_node.get_directory %>
+      <% end %>
+      <% if parent_node.get_creation_date != nil %>
+        <BR/><I>Creation Date:</I> <%= parent_node.get_creation_date %>
+      <% end %>
+  <%end%>
+
+
+
+
 </TD>

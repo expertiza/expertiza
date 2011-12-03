@@ -1,6 +1,6 @@
 <BR/>
 <% form_tag({:action => 'list'}) do %>
-<TABLE width="80%">
+<TABLE width="80%" rowspan=2>
 <TR>
 <TD width="30%" align="left">
 <input type='radio' name='display[check]' id='public_radio' value='1' onclick='submit();' <% if @show == nil %>checked<% end %>>
@@ -24,8 +24,64 @@ Sort by:
 </TD>
 <TD width="5%" align="left"><%= submit_tag "Sort" %></TD>
 </TR>
+
 </TABLE>
+
+<table>
+  <br/>
+  <tr></tr>
+<TR>
+  <td>
+  <% if session[:assignment].to_i==1 %>
+
+Display Only Assignments not Related to any Course
+<form name="display[choice]">
+            <input type="radio" name="display[choice]" value='1' onclick="submit()" <% if @show_assign == nil %>checked<% end %>> Yes</input>
+            <input type="radio" name="display[choice]" value='0' onclick="submit()" <% if @show_assign != nil %>checked<% end %>> No </input>
+</form>
+
+<% end %>
+<% if session[:question_naire].to_i==1 && session[:sindhura]==nil%>
+
+Display Only Questionnaires not Related to any Assignment
+<form name="display[question]">
+            <input type="radio" name="display[question]" value='1' onclick="submit()" <% if @show_question == nil %>checked<% end %>> Yes</input>
+            <input type="radio" name="display[question]" value='0' onclick="submit()" <% if @show_question != nil %>checked<% end %>> No </input>
+</form>
+
+<% end %>
+</td>
+<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+<td>
+<% if @root_node %>
+  <% if @root_node.get_name == 'Courses' %>
+
+      <%= link_to 'Create Public Course',:controller=>'course', :action=>'new', :private => 0 %>
+
+             <%= link_to 'Create Private Course',:controller=>'course', :action=>'new', :private => 1 %>
+
+      <% end %>
+
+
+
+       <% if @root_node.get_name == 'Assignments' %>
+
+          <%= link_to 'Create Public Assignment',:controller=>'assignment', :action=>'new', :private => 0 %>
+
+          <%= link_to 'Create Private Assignment',:controller=>'assignment', :action=>'new', :private => 1 %>
+
+      <% end %>
+<% end %>
+</td>
+</tr>
+
+</table>
+
+
+
+
 <% if @root %>
-	<%= hidden_field_tag('root', @root_node.id) %>	
-<% end %>	
+	<%= hidden_field_tag('root', @root_node.id) %>
+<% end %>
+
 <% end %>

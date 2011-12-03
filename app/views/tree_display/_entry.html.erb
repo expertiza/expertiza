@@ -1,26 +1,129 @@
 <% child_nodes = node.get_children(@sortvar,@sortorder,session[:user].id,@show) %>
-<%= render :partial => '/tree_display/row_header', 
+<% if session[:course_rubrics]!=nil && session[:root]!=nil%>
+
+<%       questionnaires_array = Array.new
+         questionnaire_ids = Array.new
+
+            course_related_assignments = Assignment.find_all_by_course_id(session[:course_rubrics])
+
+            for a in course_related_assignments
+                temp=Assignment.find(a).instructor_id;
+                if(temp==session[:user].id)
+                      questionnaire_ids << AssignmentQuestionnaires.find_all_by_assignment_id(a.id)
+                end
+            end
+
+            #all questionnaires related to course
+            for b in questionnaire_ids
+              for f in b
+               questionnaires_array << Questionnaire.find_by_id(f.questionnaire_id).name
+              end
+            end
+
+            if session[:root].to_i!=nil  && child_nodes!=nil
+                      filtered_rubrics=Array.new
+                    for c in questionnaires_array
+                        for d in child_nodes
+                            if c==d.get_name
+                                  filtered_rubrics << d
+                            end
+                        end
+                    end
+                    #filter the rubrics
+                    seen={}
+                    child_nodes=Array.new
+                    for e in filtered_rubrics
+                       key=[e.get_name]
+                       if !seen.has_key?(key)
+                            child_nodes << e
+                            seen[key]=1
+                       end
+                    end
+                 if session[:root]==nil
+                    session[:course_rubrics]=nil
+                 end
+            end
+
+%>
+<% end %>
+
+
+<%
+   if session[:filter_questionnaires]==1  && session[:course_rubrics]==nil
+                   if session[:root] && FolderNode.find(session[:root]).node_object_id==1  %>
+
+                    <%  questionnaire_ids = Array.new
+                        questionnaires_array = Array.new
+                        filtered_rubrics = Array.new
+
+                           assignments_by_instructor = Assignment.find_all_by_instructor_id(session[:user].id)
+                           for a in assignments_by_instructor
+                                questionnaire_ids << AssignmentQuestionnaires.find_all_by_assignment_id(a.id)
+                           end
+                           #get all questionnaires associated with this instructors assignments
+                           seen={}
+                           for b in questionnaire_ids
+                              for temp_value in b
+                                  key=[Questionnaire.find_by_id(temp_value.questionnaire_id).name]
+                                  if !seen.has_key?(key)
+                                        questionnaires_array << Questionnaire.find_by_id(temp_value.questionnaire_id).name
+                                        seen[key]=1
+                                  end
+                              end
+                           end
+                           #filter the @child_nodes array
+                       if child_nodes
+                           seen={}
+                           for d in child_nodes
+                                  #check if this rubric is present in the list of rubrics associated with assignments
+                                  for c in questionnaires_array
+                                         if c==d.get_name
+                                                flag1=1
+                                         end
+                                  end
+                                  #if not present
+                                  if flag1!=1
+                                      key=[d.get_name]
+                                      if !seen.has_key?(key)
+                                           filtered_rubrics << d
+                                           seen[key]=1
+                                      end
+                                  end
+                           end
+
+                           child_nodes=Array.new
+                                for k in filtered_rubrics
+                                    child_nodes << k
+                           end
+                       end
+ end
+end
+%>
+
+
+
+<%= render :partial => '/tree_display/row_header',
            :locals => {
-               :depth => depth, 
-               :prefix => prefix, 
-               :rowtype => rowtype,               
+               :depth => depth,
+               :prefix => prefix,
+               :rowtype => rowtype,
                :parent_node => node,
-               :child_nodes => child_nodes               
-            } %>			
+               :child_nodes => child_nodes
+            } %>
 <% if node.get_partial_name %>
-	<%if node.get_partial_name == 'courses_folder_actions' && session[:user].role_id == 6 %>           
+	<%if node.get_partial_name == 'courses_folder_actions' && session[:user].role_id == 6 %>
 	<%else%>
-		<%= render :partial => '/tree_display/actions/'+node.get_partial_name, 
+		<%= render :partial => '/tree_display/actions/'+node.get_partial_name,
            :locals => {:node => node} %>
-	<%end%>	   
+	<%end%>
 <% else %>
     <%= render :partial=> '/tree_display/actions/no_actions' %>
-<% end %>                        
-<%= render :partial => '/tree_display/row_footer', 
+<% end %>
+<%= render :partial => '/tree_display/row_footer',
            :locals => {
-               :depth => depth, 
-               :prefix => prefix, 
+               :depth => depth,
+               :prefix => prefix,
                :parent_node => node,
                :child_nodes => child_nodes,
                :rowtype => nil
-            } %> 
+            } %>

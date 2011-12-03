@@ -8,7 +8,8 @@
   <%= link_to image_tag('/images/tree_view/add-ta-24.png', :title => 'Add TA'),:controller=>'course', :action=>'view_teaching_assistants', :id => node.node_object_id, :model => 'Course'%>
   <%= link_to image_tag('/images/tree_view/add-assignment-24.png', :title => 'Create assignment'),:controller=>'assignment', :action=>'new', :parent_id => node.node_object_id %>
   <%= link_to image_tag('/images/tree_view/add-participant-24.png', :title => 'Add participants'),:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Course'%>
-  <%= link_to image_tag('/images/tree_view/create-teams-24.png', :title => 'Create teams'),:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Course' %>  
+  <%= link_to image_tag('/images/tree_view/create-teams-24.png', :title => 'Create teams'),:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Course' %>
+  <%= link_to image_tag('/images/tree_view/gnome_view_restore.png', :title => 'View Rubrics'),:controller=>'tree_display', :action=>'goto_course_related_questionnaires', :id => node.node_object_id,:type => 'Course'%>
 </div>
 <% end %>
 </ul>

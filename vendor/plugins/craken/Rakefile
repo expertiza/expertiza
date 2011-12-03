@@ -1,14 +1,14 @@
 require 'rubygems'
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
+require 'rdoc/task'
 require 'spec/rake/spectask'
 
 desc 'Default: run unit tests.'
 task :default => :spec
 
 desc 'Generate documentation for the craken plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
+RDoc::Task.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title    = 'Craken'
   rdoc.options << '--line-numbers' << '--inline-source'

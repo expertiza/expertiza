@@ -66,7 +66,12 @@ class AssignmentNode < Node
   def get_directory
     Assignment.find(self.node_object_id).directory_path    
   end  
-  
+
+# Gets the directory_path from the associated object
+  def get_courseid
+    Assignment.find(self.node_object_id).course_id
+  end
+
   # Gets the created_at from the associated object   
   def get_creation_date
     Assignment.find(self.node_object_id).created_at

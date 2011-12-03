@@ -21,12 +21,12 @@
             action = "edit"
 
             # check if the assignment has a sign-up sheet
-	        if SignUpTopic.find_by_assignment_id(participant.assignment.id)
+       if SignUpTopic.find_by_assignment_id(participant.assignment.id)
                 selected_topics = nil
 
-  	    	    if participant.assignment.team_assignment == true
+         if participant.assignment.team_assignment == true
                     # get the user's team and check if they have signed up for a topic yet
-  		            users_team = SignedUpUser.find_team_users(participant.assignment.id,participant.user.id)
+             users_team = SignedUpUser.find_team_users(participant.assignment.id,participant.user.id)
                     if users_team.size > 0
                         selected_topics = SignedUpUser.find_user_signup_topics(participant.assignment.id,users_team[0].t_id)
                     end
@@ -93,9 +93,23 @@
   </div>
 
   <div class="topictable">
-    <table class="listing" cellpadding="2">
+    <% @store = {} %>
+    <%# @other_ass = {} %>
+    <% for participant1 in @participants %>
+        <% key = [participant1.get_course_string] %>
+        <% if @store.has_key?(key) %>
+        <% else %>
+      <% if participant1.assignment.course_id.nil? %>
+      <h1> Other Assignments</h1>
+      <% else %>
+         <h1> <%= participant1.get_course_string %> </h1>
+      <% end %>
+
+     <table class="listing" cellpadding="2">
+        <%# if participant1.assignment.course_id.nil? %>
+        <%# else %>
       <tr class="taskheader">
-        <th>&nbsp;</th>
+         <th>&nbsp;</th>
         <th>Assignment</th>
         <th>Course</th>
         <th>Topic</th>
@@ -103,14 +117,24 @@
         <th>Stage Deadline</th>
         <th>Publishing Rights</th>
       </tr>
+       <%# end %>
+          <% for participant in @participants %>
+          <% if participant.assignment != nil && participant.get_course_string == participant1.get_course_string%>
 
-      <% for participant in @participants %>
-          <% if participant.assignment != nil %>
+          <%# if participant1.assignment.course_id.nil? %>
+              <%# key1 =  [participant.get_course_string] %>
+              <%# @other_ass[key1] =1 %>
+          <%# end %>
+
+              <% key =  [participant.get_course_string] %>
+              <% @store[key] =1 %>
+
+              <%# if participant1.assignment.course_id.nil? %>
+              <%# else %>
               <tr class="listingRow">
                 <td>&nbsp;</td>
                 <td><b><%= link_to participant.assignment.name, :action => 'view', :id => participant %></b></td>
-                <td>
-                  <% participant.get_course_string %></td>
+                <td><%= participant.get_course_string %></td>
                 <td><%= participant.get_topic_string %></td>
                 <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
                 <td><%= participant.assignment.get_stage_deadline(participant.topic_id) %></td>
@@ -119,8 +143,14 @@
                   <% else %>denied
                   <% end %></td>
               </tr>
-          <% end %>
-      <% end %>
-    </table>
+              <%# end %>
+           <% end %>
+           <% end %>
+        </table>
+            </br>
+        <% end %>
+    <% end %>
+
+
   </div>
 </div>

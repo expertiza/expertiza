@@ -148,6 +148,7 @@ class MenuItemsController < ApplicationController
   end
 
   def link
+
     str = String.new(params[:name][0])
     for k in 1..params[:name].length-1
       str = String.new(str + "/" + params[:name][k])

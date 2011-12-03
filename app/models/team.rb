@@ -74,5 +74,39 @@ class Team < ActiveRecord::Base
    create(:name => name, :parent_id => parent_id)
    parent = Object.const_get(self.get_parent_model).find(parent_id)
    Object.const_get(self.get_node_type).create(:parent_id => parent.id, :node_object_id => self.id)
- end 
+ end
+
+ #SNVP:::
+   def to_submit?(assignment_id)
+    p "assignment id : #{assignment_id}"
+    teams_users = self.teams_users
+    teams_users.each do |teams_user|
+      participants = Participant.find_all_by_user_id(teams_user.id)
+      participants.each do |participant|
+        p "parent id : #{participant.parent_id}"
+        if(participant.parent_id == assignment_id)
+          return true
+        end
+      end
+    end
+
+    return false
+  end
+
+  def if_submitted?(assignment_id)
+    p "assignment id : #{assignment_id}"
+    teams_users = self.teams_users
+    teams_users.each do |teams_user|
+      participants = Participant.find_all_by_user_id(teams_user.id)
+      participants.each do |participant|
+        p "parent id : #{participant.parent_id}"
+        if(participant.parent_id == assignment_id and (!participant.submitted_hyperlinks.nil?))
+          return true
+        end
+      end
+    end
+
+    return false
+  end
+
 end

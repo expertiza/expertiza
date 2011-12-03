@@ -1,23 +1,154 @@
+<%
+    total_metareview_assigned = 0
+    total_feedback_assigned = 0
+    total_teammatereview_assigned = 0
+    total_participantreview_assigned = 0
+    total_teamreview_assigned = 0
+
+    total_metareview_completed = 0
+    total_feedback_completed = 0
+    total_teammatereview_completed = 0
+    total_participantreview_completed = 0
+    total_teamreview_completed = 0
+
+    total_assigned = 0
+    total_completed = 0
+   %>
+
 <div>
   <h1> <%= @course.name  %> </h1>
-  <table class="listing" cellpadding=2 border="1" >
-      <tr >
-      <th>Assignment</th>
-      <th>Class Average</th>
-      <th>Reviews submitted</th>
-      <th>Total Number of Reviews</th>
-      <th>Reviews completed (%)</th>
-      </tr>
+  <table style=margin-left:800px border:1>
+    <tr>
+      <td><b>Index</b></td>
+    </tr>
+    <tr>
+    <td bgcolor="FF3333"> 0-25%</td>
+    </tr>
+    <tr>
+    <td bgcolor=orange> 26-50%</td>
+    </tr>
+     <tr>
+    <td bgcolor=#adff2f> 51-75%</td>
+    </tr>
+     <tr>
+    <td bgcolor="green"> 76-100%</td>
+    </tr>
+</table>
+  <table>
     <% @assignments.each do |assignment| %>
-      <tr class="listingRow" align="justify">
-        <td align="justify"><%= link_to assignment.name, :action => 'one_assignment_all_students', :assignment_id => assignment.id%></td>
-        <td align="justify"><%= assignment.get_average_score().to_s + "%" %></td>
-        <td align="justify"><%= assignment.get_total_reviews_completed() %></td>
-        <td align="justify"><%= assignment.get_total_reviews_assigned() %></td>
-        <td align="justify"><%= assignment.get_percentage_reviews_completed().to_s + "%" %></td>
-      </tr>
+    <tr>
+      <td>
+        <%= link_to assignment.name, :action => 'one_assignment_all_students', :assignment_id => assignment.id, :flag => 'all' %>
+        Average Score : <%= assignment.get_average_score().to_s + "%" %>
+        <br>
+        <br>
+
+        <table class="listing" cellpadding=2 border:1px >
+            <tr>
+              <th>Type</th>
+              <th>Submitted</th>
+              <th>Total</th>
+              <th>(%)</th>
+            </tr>
+
+            <% total_submissions = assignment.get_total_submissions
+               actual_submissions = assignment.get_submitted_submissions
+			   if(total_submissions == 0)
+				submission_percentage = 0
+				else
+				submission_percentage = (actual_submissions/total_submissions)
+				end
+
+			   %>
+
+            <!-- TO-DO find number of submissions for an assignment -->
+            <tr class="listingRow" align="justify">
+              <td><b>Submissions</b></td>
+              <% if(submission_percentage<=25) %>
+                <td bgcolor= "#FF3333" align="justify"><%= actual_submissions %></td>
+                <td bgcolor= "#FF3333" align="justify"><%= total_submissions %></td>
+                <td bgcolor= "#FF3333" align="justify"><%= submission_percentage.to_s + "%" %></td>
+              <% elsif((submission_percentage)>25 && (submission_percentage)<=50) %>
+                <td bgcolor= orange align="justify"><%= actual_submissions %></td>
+                <td bgcolor= orange align="justify"><%= total_submissions %></td>
+                <td bgcolor= orange align="justify"><%= submission_percentage.to_s + "%" %></td>
+              <% elsif((submission_percentage)>50 && (submission_percentage)<=75) %>
+                <td bgcolor= #adff2f align="justify"><%= actual_submissions %></td>
+                <td bgcolor= #adff2f align="justify"><%= total_submissions %></td>
+                <td bgcolor=#adff2f align="justify"><%= submission_percentage.to_s + "%" %></td>
+              <% else((submission_percentage)>75 && (submission_percentage)<=100) %>
+                <td bgcolor= green align="justify"><%= actual_submissions %></td>
+                <td bgcolor= green align="justify"><%= total_submissions %></td>
+                <td bgcolor= green align="justify"><%= submission_percentage.to_s + "%" %></td>
+              <% end%>
+            </tr>
+            <%
+               @types.each do |key, value|
+               completed = assignment.get_total_reviews_completed_by_type(value)
+               assigned = assignment.get_total_reviews_assigned_by_type(value)
+               percentage = assignment.get_percentage_reviews_completed_by_type(value)
+            %>
+                <tr class="listingRow" align="justify">
+                    <td><b><%= key %></b></td>
+                    <% if(percentage<=25) %>
+                     <td bgcolor= "#FF3333" align="justify"><%= completed %></td>
+                    <td bgcolor= "#FF3333" align="justify"><%= assigned %></td>
+                    <td bgcolor= "#FF3333" align="justify"><%= percentage.to_s + "%" %></td>
+                    <% elsif((percentage)>25 && (percentage)<=50) %>
+                <td bgcolor= orange align="justify"><%= completed %></td>
+                <td bgcolor= orange align="justify"><%= assigned %></td>
+                <td bgcolor= orange align="justify"><%= percentage.to_s + "%" %></td>
+              <% elsif((percentage)>50 && (percentage)<=75) %>
+                <td bgcolor= #adff2f align="justify"><%= completed %></td>
+                <td bgcolor= #adff2f align="justify"><%= assigned %></td>
+                <td bgcolor=#adff2f align="justify"><%=  percentage.to_s + "%" %></td>
+              <% else((percentage)>75 && (percentage)<=100) %>
+                <td bgcolor= green align="justify"><%= completed %></td>
+                <td bgcolor= green align="justify"><%= assigned %></td>
+                <td bgcolor= green align="justify"><%= percentage.to_s + "%" %></td>
+              <% end%>
+
+                    <%
+                       if(key == 'Metareview')
+                           total_metareview_assigned += assigned
+                           total_metareview_completed += completed
+
+                           total_assigned = total_metareview_assigned
+                           total_completed = total_metareview_completed
+                       elsif(key == 'Feedback')
+                           total_feedback_assigned += assigned
+                           total_feedback_completed += completed
+
+                           total_assigned = total_feedback_assigned
+                           total_completed = total_feedback_completed
+                       elsif(key == 'Teammate Reviews')
+                           total_teammatereview_assigned += assigned
+                           total_teammatereview_completed += completed
+
+                           total_assigned = total_teammatereview_assigned
+                           total_completed = total_teammatereview_completed
+                       elsif(key == 'Participant Review')
+                           total_participantreview_assigned += assigned
+                           total_participantreview_completed += completed
+
+                           total_assigned = total_participantreview_assigned
+                           total_completed = total_participantreview_completed
+                       elsif(key == 'Team Review')
+                           total_teamreview_assigned += assigned
+                           total_teamreview_completed += completed
+
+                           total_assigned = total_teamreview_assigned
+                           total_completed = total_teamreview_completed
+                       end
+                    %>
+                </tr>
+            <% end %>
+        </table>
+      </td>
+    </tr>
     <% end %>
   </table>
+  </div>
   <div style="margin-top: 25px;">
     <%= link_to 'Back to All Courses', :action => 'index' %>
   </div>

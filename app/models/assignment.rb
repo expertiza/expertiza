@@ -639,6 +639,15 @@ end
       end
     end
   end
+
+
+  #SNVP:::: Returns the percentage of reviews completed as an integer (0-100)
+  def get_percentage_reviews_completed_by_type(type)
+    reviews = get_total_reviews_assigned_by_type(type)
+    if reviews == 0 then 0
+    else ((get_total_reviews_completed_by_type(type).to_f / reviews.to_f) * 100).to_i
+    end
+  end
           
   # Returns the number of reviewers assigned to a particular assignment
   def get_total_reviews_assigned
@@ -700,14 +709,14 @@ end
     response_count
   end
 
-  # Returns the percentage of reviews completed as an integer (0-100)
+  #SNVP:::: Returns the percentage of reviews completed as an integer (0-100)
   def get_percentage_reviews_completed
     if get_total_reviews_assigned == 0 then 0
     else ((get_total_reviews_completed().to_f / get_total_reviews_assigned.to_f) * 100).to_i
     end
   end
 
-  # Returns the average of all responses for this assignment as an integer (0-100)
+  # SNVP:::Returns the average of all responses for this assignment as an integer (0-100)
   def get_average_score
     return 0 if get_total_reviews_assigned == 0
     
@@ -769,4 +778,66 @@ end
       return contributors_signup_topic
     end
   end
+
+  #SNVP::: method to find the total submissions.
+  def get_total_submissions
+    if(self.team_assignment?)
+      teams = self.teams
+      count = 0
+
+      teams.each do |team|
+        if team.to_submit?(self.id)
+          count += 1
+        end
+      end
+      count
+    else
+       0
+    end
+  end
+
+  #SNVP
+  def get_submitted_submissions
+    if(self.team_assignment?)
+      teams = self.teams
+      count = 0
+
+      teams.each do |team|
+        if team.if_submitted?(self.id)
+          count += 1
+        end
+      end
+      count
+    else
+      0
+    end
+  end
+
+  #SNVP
+  def user_review_assignment(user_id, choice)
+    @types = {'Metareview' => 'MetareviewResponseMap','Feedback' => 'FeedbackResponseMap','Teammate Reviews' => 'TeammateReviewResponseMap','Participant Review' => 'ParticipantReviewResponseMap','Team Review' => 'TeamReviewResponseMap'}
+
+    self.response_maps.each do |response_map|
+        if((response_map.type.to_s == @types[choice]) && (response_map.reviewer.user.id == user_id))
+          if(!response_map.response.nil?)
+            return true
+          end
+        end
+    end
+    return false
+  end
+
+  #SNVP
+  def get_participants
+      @unique_users=Array.new
+
+      self.participants.each do |participant|
+          unique_user = User.find(participant.user.id)
+          if(!@unique_users.include?(unique_user))
+                 @unique_users.push(unique_user)
+          end
+      end
+      return @unique_users
+  end
+
 end

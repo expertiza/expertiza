@@ -1,11 +1,11 @@
 <div>
   <h1> <%= @course.name %> Dashboard </h1>
-  <table class="listing" cellpadding=2 border="1" >
+  <table class="listing" cellpadding=2 border:1px >
       <tr>
-      <th>Assignment</th>
-      <th>Grade Distribution</th>
-      <th>Review Progress</th>
-      <th>Review Progress By Date</th>
+          <th>Assignment</th>
+          <th>Grade Distribution</th>
+          <th>Review Progress</th>
+          <th>Review Progress By Date</th>
       </tr>
     <% @assignments.each do |assignment| %>
       <tr class="listingRow" align="justify">
@@ -19,6 +19,9 @@
       </tr>
     <% end %>
   </table>
+  <br>
+  <%= link_to 'See Statistics', :action => 'one_course_statistics', :course_id => @course.id %>
+  <br>
   <div style="margin-top: 25px;">
     <%= link_to 'Back to All Courses', :action => 'index' %>
   </div>

@@ -209,4 +209,53 @@ class User < ActiveRecord::Base
     @email_on_review_of_review = true
   end
 
+   # SNVP - Returns the number of reviewes assigned to a this participant
+  def get_total_reviews_assigned_by_type(type)
+    total_count=0
+    @participants=Participant.find_all_by_user_id(self.id)
+    @participants.each do |participant|
+      total_count=total_count+ participant.get_total_reviews_assigned_by_type(type)
+    end
+    total_count
+  end
+
+#  # SNVP - Returns the number of reviews completed by this participant
+ # Returns the number of reviews completed for a particular assignment by type of review
+  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  def get_total_reviews_completed_by_type(type)
+    total_count=0
+    @participants=Participant.find_all_by_user_id(self.id)
+    @participants.each do |participant|
+      total_count=total_count+ participant.get_total_reviews_completed_by_type(type)
+    end
+    total_count
+  end
+
+ # SNVP Returns the percentage of reviews completed as an integer (0-100)
+  def get_percentage_reviews_completed_by_type(type)
+    reviews = get_total_reviews_assigned_by_type(type)
+    if reviews == 0 then 0
+    else ((get_total_reviews_completed_by_type(type).to_f / reviews.to_f) * 100).to_i
+    end
+  end
+
+  # SNVP Returns the number of reviewers assigned to a particular assignment
+  def get_total_reviews_assigned
+    total_count=0
+    @participants=Participant.find_all_by_user_id(self.id)
+    @participants.each do |participant|
+      total_count=total_count+ participant.get_total_reviews_assigned
+    end
+    total_count
+  end
+
+   def get_total_reviews_completed
+    total_count=0
+    @participants=Participant.find_all_by_user_id(self.id)
+    @participants.each do |participant|
+      total_count=total_count+ participant.get_total_reviews_completed
+    end
+    total_count
+   end
+
 end

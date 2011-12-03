@@ -1,0 +1,42 @@
+Class contributions for <b><%= @choice %></b> in Course <b><%= @course.name %></b>
+<br>
+  <div>
+    <%= link_to "All", :action => 'show_student_list', :choice => @choice, :course_id => @course.id, :flag => 'all' %> |
+    <%= link_to "Only Submitted", :action => 'show_student_list', :choice => @choice, :course_id => @course.id, :flag => 'onlySubmitted' %> |
+    <%= link_to "Only Not Submitted", :action => 'show_student_list', :choice => @choice, :course_id => @course.id, :flag => 'onlyNotSubmitted' %>
+  </div>
+<br>
+
+<table class="listing" cellpadding=2 border:1px>
+  <tr>
+    <% @assignments.each do |assignment| %>
+        <th>
+
+        </th>
+        <th colspan="1">
+          <%= assignment.name %>
+        </th>
+
+    <% end %>
+  </tr>
+  <% @allUsers.each do |user| %>
+    <tr>
+      <td>
+        <%= user.name %>
+      </td>
+      <% @assignments.each do |assignment| %>
+          <% if(assignment.user_review_assignment(user.id, @choice)) %>
+            <td style="background-color: green;">
+            </td>
+          <% else %>
+            <td style="background-color: red;">
+            </td>
+          <% end %>
+      <% end %>
+    </tr>
+
+  <% end %>
+</table>
+
+<br>
+<%= link_to 'Back', :action => 'one_course_statistics', :course_id => @course.id %>

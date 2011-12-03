@@ -1,0 +1,35 @@
+Statistics for <b><%= @assignment.name %></b> assignment.
+<br>
+<table class="listing" cellpadding=2 border="1">
+  <tr>
+      <th>
+
+      </th>
+      <% @types.keys.each do |key| %>
+        <th>
+          <%= key %>
+        </th>
+      <% end %>
+  </tr>
+  <% @participants.each do |participant| %>
+    <tr>
+      <td>
+        <%= participant.name %>
+      </td>
+      <% @types.keys.each do |key| %>
+        <% if(@assignment.user_review_assignment(participant.id, key)) %>
+            <td style="background-color: green;">
+            </td>
+        <% else %>
+            <td style="background-color: red;">
+            </td>
+        <% end %>
+
+      <% end %>
+    </tr>
+  <% end %>
+
+</table>
+
+<br>
+<%= link_to "Back", :action => 'one_assignment_all_students', :assignment_id => @assignment.id, :flag => 'all' %>

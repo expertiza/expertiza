@@ -157,4 +157,47 @@ class Participant < ActiveRecord::Base
     (((sum_of_scores.to_f / number_of_scores.to_f) * 100).to_i) / 100.0
   end
 
+  # SNVP - Returns the number of reviewes assigned to a this participant
+  def get_total_reviews_assigned_by_type(type)
+    count = 0
+    self.reviews.each { |x| count = count + 1 if x.type == type}
+    count
+  end
+
+#  # SNVP - Returns the number of reviews completed by this participant
+ # Returns the number of reviews completed for a particular assignment by type of review
+  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  def get_total_reviews_completed_by_type(type)
+    # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+    # self.responses.size
+    response_count = 0
+    self.reviews.each do |review|
+      response_count = response_count + 1 if !review.response.nil? and review.type == type
+    end
+    response_count
+  end
+
+ # SNVP::: Returns the percentage of reviews completed as an integer (0-100)
+  def get_percentage_reviews_completed_by_type(type)
+    reviews = get_total_reviews_assigned_by_type(type)
+    if reviews == 0 then 0
+    else ((get_total_reviews_completed_by_type(type).to_f / reviews.to_f) * 100).to_i
+    end
+  end
+
+  # SNVP::: Returns the number of reviewers assigned to a particular assignment
+  def get_total_reviews_assigned
+    self.reviews.size
+  end
+
+   def get_total_reviews_completed
+    # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+    # self.responses.size
+    response_count = 0
+    self.reviews.each do |review|
+      response_count = response_count + 1 if !review.response.nil?
+    end
+    response_count
+   end
+
 end

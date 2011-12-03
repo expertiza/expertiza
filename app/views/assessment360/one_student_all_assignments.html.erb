@@ -1,0 +1,218 @@
+<div>
+  <h1><%=@user.fullname %></h1>
+  <p><img src="<%= @abc %>" ></p>
+  <p> Percentage of student contribution to all assignments= <b><%= @contribution %>%</b></p>
+  <table style=margin-left:700px><tr>
+   <tr>
+      <td><b>Index</b></td>
+    </tr>
+  <td>S/A = Total submitted/ Total Assigned.</td></tr>
+  <tr><td>%= Percentage submitted out of total assigned.</td></tr> </table>
+  <p>
+  <table style=margin-left:700px border:1>
+    <tr>
+    <td bgcolor="FF3333"> 0-25%</td>
+    </tr>
+    <tr>
+    <td bgcolor=orange> 26-50%</td>
+    </tr>
+     <tr>
+    <td bgcolor=#adff2f> 51-75%</td>
+    </tr>
+     <tr>
+    <td bgcolor="green"> 76-100%</td>
+    </tr>
+</table>
+  </p>
+  <table class="assignment_reviews" cellpadding="10" style= border:1px>
+      <tr>
+        <th>Assignment</th>
+        <th COLSPAN="2">Reviews</th>
+        <th COLSPAN="0.5"> </th>
+        <th COLSPAN="2">MetaReviews</th>
+        <th COLSPAN="0.5"> </th>
+        <th COLSPAN="2">Feedback</th>
+        <th COLSPAN="0.5"> </th>
+        <th COLSPAN="2">Teammate Reviews</th>
+        <th COLSPAN="0.5"> </th>
+        <th COLSPAN="2">Team Reviews</th>
+      </tr>
+      <tr>
+        <th></th>
+        <th>S/A</th>
+        <th>%</th>
+        <th></th>
+        <th>S/A</th>
+        <th>%</th>
+        <th></th>
+        <th>S/A</th>
+        <th>%</th>
+        <th></th>
+        <th>S/A</th>
+        <th>%</th>
+        <th></th>
+        <th>S/A</th>
+        <th>%</th>
+      </tr>
+
+      <% @participants.each do |participant| %>
+      <tr>
+        <% if participant.type.to_s != "CourseParticipant" %>
+         <td align="center"><%=Assignment.find(participant.parent_id).name %></td>
+            <% if(participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])<=25) %>
+                <td bgcolor= "FF3333" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[0])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[0])%></td>
+                <td bgcolor="FF3333" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])%></td>
+              <% elsif((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])>25) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])<=50)) %>
+                <td bgcolor= "orange" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[0])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[0])%></td>
+                <td bgcolor="orange" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])%></td>
+              <% elsif((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])>50) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])<=75)) %>
+                <td bgcolor= #adff2f align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[0])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[0])%></td>
+                <td bgcolor=#adff2f align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])%></td>
+              <% else((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])>75) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])<=100)) %>
+                <td bgcolor= "green" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[0])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[0])%></td>
+                <td bgcolor="green" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])%></td>
+              <% end%>
+           <th></th>
+           <% if(participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])<=25) %>
+                <td bgcolor= "FF3333" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[1])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[1])%></td>
+                <td bgcolor="FF3333" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])%></td>
+              <% elsif((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])>25) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])<=50)) %>
+                <td bgcolor= orange align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[1])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[1])%></td>
+                <td bgcolor= orange align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])%></td>
+              <% elsif((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])>50) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])<=75)) %>
+                <td bgcolor= #adff2f align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[1])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[1])%></td>
+                <td bgcolor=#adff2f align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])%></td>
+              <% else((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])>75) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])<=100)) %>
+                <td bgcolor= "green" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[1])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[1])%></td>
+                <td bgcolor="green" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])%></td>
+              <% end%>
+           <th></th>
+            <% if(participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])<=25) %>
+                <td bgcolor= "FF3333" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[2])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[2])%></td>
+                <td bgcolor="FF3333" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])%></td>
+              <% elsif((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])>25) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])<=50)) %>
+                <td bgcolor= orange align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[2])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[2])%></td>
+                <td bgcolor= orange align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])%></td>
+              <% elsif((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])>50) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])<=75)) %>
+                <td bgcolor= #adff2f align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[2])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[2])%></td>
+                <td bgcolor=#adff2f align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])%></td>
+              <% else((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])>75) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])<=100)) %>
+                <td bgcolor= "green" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[2])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[2])%></td>
+                <td bgcolor="green" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])%></td>
+              <% end%>
+            <th></th>
+           <% if(participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])<=25) %>
+                <td bgcolor= "FF3333" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[3])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[3])%></td>
+                <td bgcolor="FF3333" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])%></td>
+              <% elsif((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])>25) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])<=50)) %>
+                <td bgcolor= orange align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[3])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[3])%></td>
+                <td bgcolor=orange align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])%></td>
+              <% elsif((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])>50) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])<=75)) %>
+                <td bgcolor= #adff2f align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[3])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[3])%></td>
+                <td bgcolor=#adff2f align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])%></td>
+              <% else((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])>75) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])<=100)) %>
+                <td bgcolor= "green" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[3])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[3])%></td>
+                <td bgcolor="green" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])%></td>
+              <% end%>
+            <th></th>
+            <% if(participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])<=25) %>
+                <td bgcolor= "FF3333" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[4])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[4])%></td>
+                <td bgcolor="FF3333" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])%></td>
+              <% elsif((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])>25) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])<=50)) %>
+                <td bgcolor= orange align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[4])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[4])%></td>
+                <td bgcolor= orange align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])%></td>
+              <% elsif((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])>50) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])<=75)) %>
+                <td bgcolor= #adff2f align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[4])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[4])%></td>
+                <td bgcolor=#adff2f align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])%></td>
+              <% else((participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])>75) && (participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])<=100)) %>
+                <td bgcolor= "green" align="center"><%=participant.get_total_reviews_completed_by_type(@REVIEW_TYPES[4])%> / <%=participant.get_total_reviews_assigned_by_type(@REVIEW_TYPES[4])%></td>
+                <td bgcolor="green" align="center"><%=participant.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])%></td>
+              <% end%>
+          <% end %>
+            </tr>
+
+     <% end %>
+
+      <tr>
+           <th>Summary</th>
+           <% if(@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])<=25) %>
+                <td bgcolor= "FF3333" align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[0])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[0])%></td>
+                <td bgcolor="FF3333" align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])%></td>
+              <% elsif((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])>25) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])<=50)) %>
+                <td bgcolor= orange align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[0])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[0])%></td>
+                <td bgcolor= orange align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])%></td>
+              <% elsif((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])>50) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])<=75)) %>
+                <td bgcolor= #adff2f align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[0])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[0])%></td>
+                <td bgcolor=#adff2f align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])%></td>
+              <% else((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])>75) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])<=100)) %>
+                <td bgcolor= "green" align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[0])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[0])%></td>
+                <td bgcolor="green" align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[0])%></td>
+              <% end%>
+           <th></th>
+        <% if(@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])<=25) %>
+                        <td bgcolor= "FF3333" align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[1])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[1])%></td>
+                        <td bgcolor="FF3333" align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])%></td>
+                      <% elsif((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])>25) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])<=50)) %>
+                        <td bgcolor= orange align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[1])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[1])%></td>
+                        <td bgcolor=orange align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])%></td>
+                      <% elsif((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])>50) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])<=75)) %>
+                        <td bgcolor= #adff2f align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[1])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[1])%></td>
+                        <td bgcolor=#adff2f align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])%></td>
+                      <% else((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])>75) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])<=100)) %>
+                        <td bgcolor= "green" align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[1])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[1])%></td>
+                        <td bgcolor="green" align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[1])%></td>
+                      <% end%>
+            <th></th>
+        <% if(@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])<=25) %>
+                        <td bgcolor= "FF3333" align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[2])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[2])%></td>
+                        <td bgcolor="FF3333" align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])%></td>
+                      <% elsif((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])>25) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])<=50)) %>
+                        <td bgcolor= orange align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[2])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[0])%></td>
+                        <td bgcolor=orange align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])%></td>
+                      <% elsif((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])>50) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])<=75)) %>
+                        <td bgcolor= #adff2f align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[2])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[2])%></td>
+                        <td bgcolor=#adff2f align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])%></td>
+                      <% else((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])>75) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])<=100)) %>
+                        <td bgcolor= "green" align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[2])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[2])%></td>
+                        <td bgcolor="green" align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[2])%></td>
+                      <% end%>
+
+             <th></th>
+        <% if(@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])<=25) %>
+                        <td bgcolor= "FF3333" align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[3])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[3])%></td>
+                        <td bgcolor="FF3333" align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])%></td>
+                      <% elsif((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])>25) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])<=50)) %>
+                        <td bgcolor= orange align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[3])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[3])%></td>
+                        <td bgcolor=orange align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])%></td>
+                      <% elsif((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])>50) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])<=75)) %>
+                        <td bgcolor= #adff2f align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[3])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[3])%></td>
+                        <td bgcolor=#adff2f align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])%></td>
+                      <% else((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])>75) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])<=100)) %>
+                        <td bgcolor= "green" align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[3])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[3])%></td>
+                        <td bgcolor="green" align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[3])%></td>
+                      <% end%>
+
+             <th></th>
+        <% if(@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])<=25) %>
+                        <td bgcolor= "FF3333" align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[4])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[4])%></td>
+                        <td bgcolor="FF3333" align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])%></td>
+                      <% elsif((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])>25) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])<=50)) %>
+                        <td bgcolor= orange align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[4])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[4])%></td>
+                        <td bgcolor=orange align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])%></td>
+                      <% elsif((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])>50) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])<=75)) %>
+                        <td bgcolor= #adff2f align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[4])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[4])%></td>
+                        <td bgcolor=#adff2f align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])%></td>
+                      <% else((@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])>75) && (@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])<=100)) %>
+                        <td bgcolor= "green" align="center"><%=@user.get_total_reviews_completed_by_type(@REVIEW_TYPES[4])%> / <%=@user.get_total_reviews_assigned_by_type(@REVIEW_TYPES[4])%></td>
+                        <td bgcolor="green" align="center"><%=@user.get_percentage_reviews_completed_by_type(@REVIEW_TYPES[4])%></td>
+                      <% end%>
+      </tr>
+
+    </table>
+
+
+
+  <div style="margin-top: 25px;">
+    <%= link_to 'Back to All Courses', :action => 'index' %>
+  </div>
+</div>

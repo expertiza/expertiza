@@ -1,7 +1,34 @@
+#SNVP:::Controller has been modified for the E317-Assessment 360 project.
 class Assessment360Controller < ApplicationController
 
   def index
     @courses = Course.find_all_by_instructor_id(session[:user].id)
+  end
+
+  def one_assignment_statistics
+    @choice = params[:choice]
+    @assignment = Assignment.find(params[:assignment_id])
+    @participants = @assignment.get_participants
+    @types = {'Metareview' => 'MetareviewResponseMap','Feedback' => 'FeedbackResponseMap','Teammate Reviews' => 'TeammateReviewResponseMap','Participant Review' => 'ParticipantReviewResponseMap','Team Review' => 'TeamReviewResponseMap'}
+
+  end
+
+  def one_course_statistics
+    course_id = params[:course_id]
+    @course = Course.find(course_id)
+    @assignments = Assignment.find_all_by_course_id(@course)
+
+    @types = {'Metareview' => 'MetareviewResponseMap','Feedback' => 'FeedbackResponseMap','Teammate Reviews' => 'TeammateReviewResponseMap','Participant Review' => 'ParticipantReviewResponseMap','Team Review' => 'TeamReviewResponseMap'}
+  end
+
+  def show_student_list
+    @choice = params[:choice]
+    @course = Course.find(params[:course_id])
+    @assignments = Assignment.find_all_by_course_id(@course)
+
+    flag = params[:flag]
+
+    @allUsers = @course.get_course_participants
   end
 
   def one_course_all_assignments
@@ -67,8 +94,7 @@ class Assessment360Controller < ApplicationController
       color_2 = '4D89F9'
       min = 0
       max = 100
-
-      p '======================='
+       p '======================='
       p bar_2_data
       GoogleChart::BarChart.new("130x100", " ", :vertical, false) do |bc|
         bc.data "Review", bar_2_data, color_2
@@ -84,9 +110,57 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-  def all_assignments_all_students
-    @course = Course.find_by_id(params[:course_id]);
+
+  def one_course_all_students
+    @REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap","TeamReviewResponseMap"]
+    @course=Course.find_by_id(params[:course_id]);
+    @course_assigned_reviews_count=0
+    @unique_users=@course.get_course_participants
+
+       @unique_users.each do |user|
+          @course_assigned_reviews_count+=user.get_total_reviews_assigned
+       end
+    @course
+    @unique_users
+    @course_assigned_reviews_count
+  end
+
+  def one_student_all_assignments
+   @REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap","TeamReviewResponseMap"]
+   @user=User.find(params[:user_id])
+   @participants=Participant.find_all_by_user_id(params[:user_id])
+    bar_1_data = @user.get_total_reviews_completed
+    bar_2_data = params[:count]
+    @contribution = (((bar_1_data).to_f)/((bar_2_data).to_f))*100
+    puts("--contribution", @contribution.to_f)
+    color_1 = 'c53711'
+    color_2 = '0000ff'
+    min=0
+    max=100
+    puts(bar_1_data)
+    puts(bar_2_data)
+    puts (bar_1_data).is_a? Integer
+    puts (bar_2_data).is_a? Integer
+
+    abc=GoogleChart::BarChart.new("800x100", "Bar Chart", :horizontal, false)
+    abc.data " ", [100], 'ffffff'
+    abc.data "Total no. of reviews completed by student", [bar_1_data], color_1
+    abc.data "Total no. of reviews completed by class", [bar_2_data.to_i], color_2
+    abc.axis :x, :range => [min,max]
+    abc.show_legend = true
+    abc.stacked = false
+    abc.data_encoding = :extended
+    puts abc
+    @abc=abc.to_url
+    #puts abc.to_url({:chm => "000000,0,0.1,0.11"})
+    #abc.process_data()
+    end
+
+
+ def all_assignments_all_students
+    @course = Course.find_by_id(params[:course_id])
     @assignments = Assignment.find_all_by_course_id(@course)
+    @types = {'Metareview' => 'MetareviewResponseMap','Feedback' => 'FeedbackResponseMap','Teammate Reviews' => 'TeammateReviewResponseMap','Participant Review' => 'ParticipantReviewResponseMap','Team Review' => 'TeamReviewResponseMap'}
   end
 
   def one_assignment_all_students
@@ -139,5 +213,4 @@ class Assessment360Controller < ApplicationController
   def all_assignments_one_student
 
   end
-
-end
+ end

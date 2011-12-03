@@ -68,5 +68,21 @@ class Course < ActiveRecord::Base
         node.parent_id = parent.id       
       end
       node.save   
-   end  
+   end
+
+  def get_course_participants()
+      @assignments = Assignment.find_all_by_course_id(self)
+
+      @unique_users=Array.new
+      @assignments.each do |assignment|
+        assignment.participants.each do |participant|
+            unique_user = User.find(participant.user.id)
+            if(!@unique_users.include?(unique_user))
+                   @unique_users.push(unique_user)
+            end
+        end
+      end
+      return @unique_users
+  end
+
 end

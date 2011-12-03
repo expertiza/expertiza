@@ -210,5 +210,38 @@ class BookmarksController < ApplicationController
     redirect_to(:action => 'manage_bookmarks')
   end
 
+
+## search for bookmarks - specifying comma separated tags
+    def search_bookmarks
+      ## add all the java script validations later on
+      ## seaches for all bookmarks tagged with the values passed on the search string
+        @search_string = params[:s]
+        @my_user_temp = params[:users]
+        @order_by = params[:order_by]
+        if params[:order_by] == nil
+            @order_by = "most_recent"
+        else
+            @order_by = params[:order_by].to_s
+        end
+        #when getting the hidden variable from the form for the users to include.. you might get "value" appended to the string before the param that you
+        ##expect .. Remove that
+        @my_user = @my_user_temp.gsub (/value/, '');
+
+        @search_array  = BookmarksHelper.separate_tags( @search_string)
+        @method_name = "search_bookmarks"
+
+
+        @search_results = Array.new
+        if (@my_user != 'all_users')
+          @search_results = Bookmark.search_fortags_foruser(@search_array, @my_user, @order_by)
+        else
+           @search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
+        end
+        if(@my_user == "all_users")
+           render :action => "view_bookmarks"
+        else
+           render :action =>"manage_bookmarks"
+        end           
+    end
   
 end

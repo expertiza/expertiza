@@ -117,6 +117,141 @@ class Bookmark < ActiveRecord::Base
      return result_array
     end
 
+  ## Searches the system for bookmarks that were tagged with all the "words" passed in the tags_array. Orders these results based on the order_by pattern
+   def  self.search_fortags_allusers(tags_array, order_by)
+
+      result_array = Array.new # returns this array
+      ## find the tags associated with these tagnames
+      @tags = BookmarksHelper.find_tags(tags_array)
+      @q_tuples_with_all_tags = Array.new
+      ## retreive mapping_ids taggeed with all of the word tags
+      ## for every word, search for every bookmark that was tagged with that word. Then take the intersection of all the bmapping_ids
+      first_time = "true"
+      for each_tag in @tags
+         puts "for tag name -> #{each_tag.tagname}"
+
+          q_tuples = BmappingsTags.find(:all, :conditions =>["tag_id = ?", each_tag])
+
+          if first_time == "true"
+             puts "first time = #{first_time}"
+             for q_t in q_tuples
+                  @q_tuples_with_all_tags << q_t.bmapping_id
+             end
+
+             first_time = "false"
+           else
+             puts "first time = #{first_time}"
+             temp_array = Array.new
+             for q_t in q_tuples
+               temp_array << q_t.bmapping_id
+             end
+             @q_tuples_with_all_tags = @q_tuples_with_all_tags & temp_array ## returns the items  common to both arrays
+            end
+
+     end
+     ## now you have qualifer tuples with all the required bmapping ids - search for the req ones
+      temp_result_records =  Bmapping.find(:all, :conditions =>["id in (?)", @q_tuples_with_all_tags])
+      result_records = Array.new
+      ## organize these tuples in the order of most earliest, most popular
+        if (order_by =="most_recent")
+          result_records = temp_result_records.sort {|x,y| y.date_created <=> x.date_created}
+        else
+          result_records = temp_result_records.sort {|x,y| y.bookmark.user_count <=> x.bookmark.user_count }
+        end
+      ## for evey bmapping_id, create a hash, and push into the result_array
+      for result in result_records
+         result_hash = Hash.new
+         result_hash["id"] = result.id
+         result_hash["url"] = result.bookmark.url
+         result_hash["created_at"] = result.date_created
+         result_hash["user"] = result.user.name
+         result_hash["title"] = result.title
+         result_hash["description"] = result.description
+         result_hash["copied_by"] = result.bookmark.user_count
+         ## now retrieving tags for this user-bookmak mapping
+         ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
+         ## Append all these into a comma separated string, and push them onto the hash
+
+         tag_fetchs = BmappingsTags.find(:all,:conditions=>["bmapping_id =?",result.id])
+         tag_array = Array.new
+         for tag_fetch in tag_fetchs
+         tag_array <<  Tag.find(tag_fetch.tag_id).tagname
+         end
+           result_hash["tags"]  = BookmarksHelper.join_tags(tag_array)
+           result_array << result_hash
+        end
+     return result_array
+   end
+## searches for tspecified tags, among a specified user, orders them by most popular and the most recently added
+   def self.search_fortags_foruser(tags_array, this_user_id, order_by)
+     #order by is in "most_popular" and "most_recent"
+     result_array = Array.new
+
+    
+     ## search for ids of the tags
+      @tags = BookmarksHelper.find_tags(tags_array)
+      @q_tuples_with_all_tags = Array.new
+      first_time = "true"
+     for each_tag in @tags
+       puts "for tag name -> #{each_tag.tagname}"
+     ##search for all qualifier tuples with b
+       q_tuples = BmappingsTags.find(:all, :conditions =>["tag_id = ?", each_tag])
+           puts "printing out q_tuples"
+       for q_t in q_tuples
+         puts q_t.bmapping_id
+
+       end
+
+       if first_time == "true"
+           puts "first time = #{first_time}"
+         for q_t in q_tuples
+          @q_tuples_with_all_tags << q_t.bmapping_id
+         end
+
+         first_time = "false"
+       else
+           puts "first time = #{first_time}"
+           temp_array = Array.new
+           for q_t in q_tuples
+           temp_array << q_t.bmapping_id
+           end
+         @q_tuples_with_all_tags = @q_tuples_with_all_tags & temp_array ## returns the items  common to both arrays
+       end
+     end
+     ## now you have qualifer tuples with all the required bmapping ids - search for the req ones
+     temp_result_records =  Bmapping.find(:all, :conditions =>["id in (?) and user_id = ?", @q_tuples_with_all_tags,this_user_id ])
+      ## organize these tuples in the order of most earliest, most popular
+     result_records = Array.new
+     if (order_by == "most_recent")
+        result_records = temp_result_records.sort {|x,y| y.date_created <=> x.date_created}
+     else
+        result_records = temp_result_records.sort {|x,y| y.bookmark.user_count <=> x.bookmark.user_count }
+     end
+     for result in result_records
+        result_hash = Hash.new
+        result_hash["id"] = result.id
+        result_hash["url"] = result.bookmark.url
+        result_hash["user"] =  User.find(this_user_id).name
+        result_hash["title"] = result.title
+        result_hash["description"] = result.description
+        result_hash["copied_by"] = result.bookmark.user_count
+        result_hash["created_at"] = result.date_created
+        ## now retrieving tags for this user-bookmak mapping
+        ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
+        ## Append all these into a comma separated string, and push them onto the hash
+
+        tag_fetchs = BmappingsTags.find(:all, :conditions=>["bmapping_id=?",result.id])
+        tag_array = Array.new
+        for tag_fetch in tag_fetchs
+           tag_array <<  Tag.find(tag_fetch.tag_id).tagname
+        end
+        result_hash["tags"]  = BookmarksHelper.join_tags(tag_array)
+        result_array << result_hash
+     end
+     return result_array
+   end
+
+
   private
   # Utility methods
   # ---------------------------------------------------------------------------------------------------------

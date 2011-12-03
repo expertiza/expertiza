@@ -23,6 +23,10 @@
   <% end %>
   <br/><br/>
 
+<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <br/>
+<%= link_to 'Manage all Bookmarks', :controller=>'bookmarks', :action=> 'manage_bookmarks' %>
+  
+
   <% i=1 %>
   <% for topic in @sign_up_topics %>
   	<% if !@selected_topics.nil? && @selected_topics.size != 0 %>

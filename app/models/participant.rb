@@ -120,14 +120,28 @@ class Participant < ActiveRecord::Base
     end
   end
 
-  # Returns the average score of all reviews for this user on this assignment
+  # Returns the average score of all reviews for this user on this assignment (Which assignment ??? )
   def get_average_score()
     return 0 if self.response_maps.size == 0
     
     sum_of_scores = 0
 
     self.response_maps.each do |response_map|
-      if !response_map.response.nil? then
+      if !response_map.response.nil?  then
+        sum_of_scores = sum_of_scores + response_map.response.get_average_score
+      end
+    end
+
+    (sum_of_scores / self.response_maps.size).to_i
+  end
+
+    def get_average_score_per_assignment(assignment_id)
+    return 0 if self.response_maps.size == 0
+
+    sum_of_scores = 0
+
+    self.response_maps.metareview_response_maps.each do |metaresponse_map|
+      if !metaresponse_map.response.nil? && response_map == assignment_id then
         sum_of_scores = sum_of_scores + response_map.response.get_average_score
       end
     end

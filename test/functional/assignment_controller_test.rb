@@ -47,7 +47,8 @@ class AssignmentControllerTest < ActionController::TestCase
       :review_of_review_questionnaire_id => questionnaire_id,
       :author_feedback_questionnaire_id  => questionnaire_id,
       :instructor_id => instructorid,
-      :course_id => courseid
+      :course_id => courseid,
+      :wiki_type_id => 1
     )
 
     #p flash[:notice].to_s
@@ -72,6 +73,32 @@ class AssignmentControllerTest < ActionController::TestCase
     assert Assignment.find( :all, :conditions => ['name = ?', "Copy of " + assignment_name] )
 
   end
+
+# Test Case 1101B
+  def test_new_microtask
+    questionnaire_id = Questionnaire.first.id
+    instructorid = Instructor.first.id
+    courseid = Course.first.id
+    number_of_topics = SignUpTopic.count
+    # create a new assignment
+    post :create, :assignment => { :name => "mt_valid_test",
+      :course_id           => 1,
+      :directory_path      => "mt_valid_test",
+      :review_questionnaire_id    => questionnaire_id,
+      :review_of_review_questionnaire_id => questionnaire_id,
+      :author_feedback_questionnaire_id  => questionnaire_id,
+      :instructor_id => instructorid,
+      :course_id => courseid,
+      :wiki_type_id => 1,
+      :microtask => true  }
+
+
+    assert_response :redirect
+    assert Assignment.find(:all, :conditions => "name = 'mt_valid_test'")
+
+
+  end
+
 
   # Test Case 1102
   # edit an assignment, change should be

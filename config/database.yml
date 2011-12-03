@@ -14,7 +14,7 @@ development:
   adapter: mysql
   database: pg_development
   username: root
-  password: root
+  password: teamilabs
   host: localhost
 
 # Warning: The database defined as 'test' will be erased and
@@ -36,3 +36,4 @@ production:
 
 cucumber:
   <<: *test
+

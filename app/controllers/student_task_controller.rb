@@ -104,7 +104,6 @@ class StudentTaskController < ApplicationController
   end
 
   def view
-    puts "#####################view####################"
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     

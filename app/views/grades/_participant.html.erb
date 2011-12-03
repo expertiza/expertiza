@@ -94,7 +94,8 @@
       	    total_score = participant.grade
       	    title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
       	   else
-      	    total_score = pscore[:total_score] 
+      	    total_score = pscore[:total_score]
+               #  total_score = 20
       	    title = nil
       	   end %>
       	<div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %>%</div>       	    

@@ -48,5 +48,22 @@ teams_users_conflict_4:
   user_id: <%= Fixtures.identify(:student_conflict_2) %>
 
 teams_users_conflict_5:
+  team_id: <%= Fixtures.identify(:team_conflict_2) %>
+  user_id: <%= Fixtures.identify(:student_conflict_3) %>
+
+teams_users_conflict_6:
   team_id: <%= Fixtures.identify(:team_conflict_3) %>
   user_id: <%= Fixtures.identify(:student_conflict_1) %>
+
+teams_users_conflict_7:
+  team_id: <%= Fixtures.identify(:team_conflict_4) %>
+  user_id: <%= Fixtures.identify(:student_conflict_3) %>
+
+teams_users_conflict_8:
+  team_id: <%= Fixtures.identify(:team_conflict_4) %>
+  user_id: <%= Fixtures.identify(:student_conflict_4) %>
+
+teams_users_conflict_9:
+  team_id: <%= Fixtures.identify(:team_conflict_5) %>
+  user_id: <%= Fixtures.identify(:student_conflict_4) %>
+

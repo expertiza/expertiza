@@ -24,5 +24,6 @@ course_conflict:
   instructor_id: <%= instructor_list[0] %>
   directory_path: conflict
   max_duplicate_pairings: 2
+  min_unique_pairings: 3
   info: Conflict
   private: 0

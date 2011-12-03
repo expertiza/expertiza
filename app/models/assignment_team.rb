@@ -224,19 +224,12 @@ class AssignmentTeam < Team
     team  
   end
 
-  # Get the number of pairing opportunities
-  def get_pairing_opportunities
-    course_assignments = assignment.course.assignments
-    team_assignments = course_assignments.find_all {|assignment| assignment.team_assignment}
-    pairing_opportunities = team_assignments.inject(0) {|sum, team| sum += team.team_count}
-    return pairing_opportunities - team_assignments.length
-  end
-
   # Get non-deduped list of past teammate user ids
   def get_past_teammate_user_ids(participant)
     past_team_associations = TeamsUser.find_all_by_user_id(participant.user_id)
     past_team_associations -= TeamsUser.find_all_by_team_id(id)
-    past_teammates = TeamsUser.find_all_by_team_id(past_team_associations)
+    past_team_association_team_ids = past_team_associations.map{|association| association.team_id}
+    past_teammates = TeamsUser.find_all_by_team_id(past_team_association_team_ids)
     return past_teammates.map{|teammate| teammate.user_id}
   end
 
@@ -250,6 +243,14 @@ class AssignmentTeam < Team
     return past_assignments.inject(0) {|sum, assignment| sum += assignment.team_count - 1}
   end
 
+# Get the number of pairing opportunities
+  def get_pairing_opportunities
+    course_assignments = assignment.course.assignments
+    team_assignments = course_assignments.find_all {|assignment| assignment.team_assignment}
+    pairing_opportunities = team_assignments.inject(0) {|sum, team| sum += team.team_count}
+    return pairing_opportunities - team_assignments.length
+  end
+
   # Determine if there is a pairing conflict or not
   def get_pairing_conflict(participant)
 
@@ -260,6 +261,7 @@ class AssignmentTeam < Team
       # Get past teammate user ids.
       past_teammate_ids = get_past_teammate_user_ids(participant)
 
+      hey = participants
       # Check against user id of each participant already in team
       participants.each do |current_participant|
         unique_teammate_ids = past_teammate_ids - [current_participant.user_id]
@@ -278,7 +280,7 @@ class AssignmentTeam < Team
       max_past_teammates = get_max_past_teammates(participant)
 
       # Get maximum number of duplicate pairings for the course
-      max_course_duplicate_pairings = min_unique_pairings - get_pairing_opportunities
+      max_course_duplicate_pairings = get_pairing_opportunities - min_unique_pairings
 
       # Check if each participant can meet minimum unique pairings
       all_participants = participants + [participant]

@@ -5,6 +5,7 @@ class CreateQuestions < ActiveRecord::Migration
     t.column "true_false", :boolean # is this a true/false question?
     t.column "weight", :integer # the scoring weight
     t.column "questionnaire_id", :integer # the questionnaire to which this question belongs
+    t.column "question_type" ,:text #checks if it is radio button or checkbox else it will be null
   end
 
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"

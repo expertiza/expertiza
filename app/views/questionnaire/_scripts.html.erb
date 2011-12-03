@@ -1,9 +1,6 @@
 <script type="text/javascript">
 num_questions = <%= [@questionnaire.questions.length,1].max %>;
-window.onload()
-{
-
-}
+num_options = new Array();
 function deleteQuestions(){
 	var checkedObjArray = new Array();
 	var deleteCount = 0;
@@ -43,7 +40,7 @@ function addQuestion(){
 	row.appendChild(column);
 	
 	column = document.createElement("td");
-	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][txt] size=55 type=text/>";
+	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][txt] size=55 type=text />";
 	row.appendChild(column);
 	
 	column = document.createElement("td");
@@ -69,31 +66,170 @@ function addQuestion(){
     add_table.appendChild(row);
 	num_questions = num_questions + 1;
 }
+
+function addCheckboxOption(element)
+{
+  var table = element.parentNode.parentNode.parentNode; //takes to the table which this button is present.
+  var ques_id = element.getAttribute("data-questionid");
+    if(num_options[ques_id] == undefined)
+    {
+      num_options[ques_id] = <%= QuestionOption.find_by_sql("select max(id) as id from question_options ")[0].id%>;
+    }
+  var column = table.insertRow(-1);
+    num_options[ques_id] = num_options[ques_id] + 1;
+    checkbox_options = "<td> Option for checkbox </td>";
+    checkbox_options = checkbox_options + "<td> <input id=checkbox_option_" + num_options[ques_id] + "_option_text  name= checkbox_option["+ques_id+"]["+num_options[ques_id] + "][option_text] size=45 type=text /> </td>";
+    checkbox_options = checkbox_options + "<td> <input id=selected_option_" + num_options[ques_id] + " type=checkbox /> </td>";
+  column.innerHTML = checkbox_options;
+}
+
+function addRadioOption(element)
+{
+  var table = element.parentNode.parentNode.parentNode; //takes to the table which this button is present.
+  var ques_id = element.getAttribute("data-questionid");
+    if(num_options[ques_id] == undefined)
+    {
+      num_options[ques_id] = <%= QuestionOption.find_by_sql("select max(id) as id from question_options ")[0].id%>;
+    }
+  var column = table.insertRow(-1);
+    num_options[ques_id] = num_options[ques_id] + 1;
+    var radio_options = "<td> Option for Radio Button </td>";
+    radio_options = radio_options + "<td> <input id=radio_option_" + num_options[ques_id] + "_option_text name= radio_option["+ques_id+"]["+num_options[ques_id] + "][option_text] size=45 type=text /> </td>";
+    radio_options = radio_options + "<td> <input id=selected_option_" + num_options[ques_id] + " type=checkbox /> </td>";
+  column.innerHTML = radio_options;
+}
+
+function deleteRadioOption(element)
+{
+    var table = element.parentNode.parentNode.parentNode; //takes to the table which this button is present.
+    var rows = table.getElementsByTagName("tr");
+    for(var i=1;i< rows.length ;i++) //starts with 1 because the first row has buttons
+    {
+        var columns = rows[i].getElementsByTagName("td");
+        var checkbox = columns[2].getElementsByTagName("input")[0]; //third element is
+        if(checkbox.checked == true)
+        {
+            table.deleteRow(i);
+            i= i-1;
+        }
+    }
+}
+
+
+function deleteCheckboxOption(element)
+{
+    var table = element.parentNode.parentNode.parentNode; //takes to the table which this button is present.
+    var rows = table.getElementsByTagName("tr");
+    for(var i=1;i< rows.length ;i++) //starts with 1 because the first row has buttons
+    {
+        var columns = rows[i].getElementsByTagName("td");
+        var checkbox = columns[2].getElementsByTagName("input")[0]; //third element is
+        if(checkbox.checked == true)
+        {
+            table.deleteRow(i);
+            i= i-1;
+        }
+    }
+}
+
 function handleQuestionType(element)
 {
-
-    selected_option = element.options[element.selectedIndex].text;
-    alert(selected_option);
-    question_id = element.getAttribute("data-id");
+    var selected_option = element.options[element.selectedIndex].text;
+    var question_id = element.getAttribute("data-id");
+    num_options[question_id] = 0;
     if(selected_option == "<%=Question::CHECK_BOX %>")
     {
-       table = element.parentNode.parentNode.parentNode; //to get the row in which this is being added
-       row = table.insertRow(-1);
-       column = document.createElement("td");
-        column.setAttribute('colspan',4);
-       innertable = document.createElement("table"); //create a column which
-       checkbox_options = "<tbody>";
+        var table = element.parentNode.parentNode.parentNode; //to get the row in which this is being added
+        var rows = table.getElementsByTagName("tr");
+        var  no_rows  = rows.length;
+        if(no_rows > 1)
+        {
+            var type = rows[1].getAttribute("data-type");
+            if(type == "radio")
+            {
+                table.deleteRow(1);
+            }
+            if(type=="checkbox")
+            {
+                return;
+            }
+        }
+       var row = table.insertRow(-1);
+       row.setAttribute("data-type","checkbox");
+       var column = document.createElement("td");
+       column.setAttribute('colspan',4);
+       var innertable = document.createElement("table"); //create a column which
+       innertable.style.paddingLeft = "40px";
+        var checkbox_options = "<tbody>";
+        checkbox_options = checkbox_options + "<tr> <td colspan='4' align='right'> ";
+          checkbox_options = checkbox_options + "<input type=button value='Add Option' onclick='addCheckboxOption(this);' data-questionid='"+question_id+"'>&nbsp;&nbsp;&nbsp;";
+          checkbox_options = checkbox_options + "<input type=button value='Delete Selected' onclick='deleteCheckboxOption(this);' data-questionid='"+question_id+"'>";
+          checkbox_options = checkbox_options + "</td></tr> ";
         for(i=1;i<5;i++)
         {
          checkbox_options = checkbox_options + "<tr> ";
-           checkbox_options = checkbox_options + "<td> Enter option "+i+" for checkbox </td>";
-           checkbox_options = checkbox_options + "<td> <input id=checkbox_option_" + i + " size=50 type=text/> </td>";
+           checkbox_options = checkbox_options + "<td> Option for checkbox </td>";
+           checkbox_options = checkbox_options + "<td> <input id=checkbox_option_" + i + "_option_text  name= checkbox_option["+question_id+"][" + num_options[question_id] + "][option_text] size=45 type=text/> </td>";
+           checkbox_options = checkbox_options + "<td> <input id=selected_option_" + i + " type=checkbox /> </td>";
          checkbox_options = checkbox_options + "</tr>";
+            num_options[question_id] = num_options[question_id] + 1;
         }
         checkbox_options = checkbox_options +"</tbody>";
         innertable.innerHTML = checkbox_options;
         column.appendChild(innertable);
-       row.appendChild(column);
+        row.appendChild(column);
+    }
+    else if(selected_option == "<%=Question::TRUE_FALSE %>" || selected_option == "<%=Question::NUMERIC %>")
+    {
+        var table = element.parentNode.parentNode.parentNode; //to get the table in which this is a column
+        var rows = table.getElementsByTagName("tr");
+        var  no_rows  = rows.length;
+        if(no_rows > 1)
+        {
+            table.deleteRow(1);
+        }
+    }
+    else if(selected_option == "<%=Question::RADIO_BUTTON %>")
+    {
+         var table = element.parentNode.parentNode.parentNode; //to get the row in which this is being added
+         var rows = table.getElementsByTagName("tr");
+         var  no_rows  = rows.length;
+         if(no_rows > 1)
+         {
+             var type = rows[1].getAttribute("data-type");
+             if(type == "checkbox")
+             {
+                table.deleteRow(1);
+             }
+             if(type=="radio")
+             {
+                 return;
+             }
+         }
+         var row = table.insertRow(-1);
+         row.setAttribute("data-type","radio");
+         var column = document.createElement("td");
+         column.setAttribute('colspan',4);
+         var innertable = document.createElement("table"); //create a column which
+         innertable.style.paddingLeft = "40px";
+          var radio_options = "<tbody>";
+          radio_options = radio_options + "<tr> <td colspan='4' align='right'> ";
+            radio_options = radio_options + "<input type=button value='Add Option' onclick='addRadioOption(this);' data-questionid='"+question_id+"'>&nbsp;&nbsp;&nbsp;";
+            radio_options = radio_options + "<input type=button value='Delete Selected' onclick='deleteRadioOption(this);' data-questionid='"+question_id+"'>";
+            radio_options = radio_options + "</td></tr> ";
+          for(i=1;i<5;i++)
+          {
+           radio_options = radio_options + "<tr> ";
+             radio_options = radio_options + "<td> Option for Radio Button </td>";
+             radio_options = radio_options + "<td> <input id=radio_option_" + i + "_option_text name= radio_option["+question_id+"]["+num_options[question_id] + "][option_text] size=45 type=text/> </td>";
+             radio_options = radio_options + "<td> <input id=selected_option_" + i + " type=checkbox /> </td>";
+           radio_options = radio_options + "</tr>";
+           num_options[question_id] = num_options[question_id] + 1;
+          }
+          radio_options = radio_options +"</tbody>";
+          innertable.innerHTML = radio_options;
+          column.appendChild(innertable);
+          row.appendChild(column);
     }
 }
 </script>

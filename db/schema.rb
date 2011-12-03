@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110512155258) do
+ActiveRecord::Schema.define(:version => 20111129195056) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -347,6 +347,13 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
 
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
+  create_table "question_options", :force => true do |t|
+    t.text     "option_text"
+    t.integer  "questions_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "questionnaires", :force => true do |t|
     t.string   "name",                :limit => 64
     t.integer  "instructor_id",                     :default => 0,     :null => false
@@ -365,6 +372,7 @@ ActiveRecord::Schema.define(:version => 20110512155258) do
     t.boolean "true_false"
     t.integer "weight"
     t.integer "questionnaire_id"
+    t.text    "question_type"
   end
 
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"

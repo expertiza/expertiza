@@ -1,0 +1,12 @@
+<h1>Editing question_option</h1>
+
+<% form_for(@question_option) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @question_option %> |
+<%= link_to 'Back', question_options_path %>

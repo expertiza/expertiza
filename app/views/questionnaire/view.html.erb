@@ -5,12 +5,52 @@
 <B>Last modified at:</B> <%= @questionnaire.updated_at %>
 <BR/><BR/>
 <TABLE>
-<TR><TH align="left" width="60%">Question</TH><TH align="left">Type</TH><TH>Weight</TH><TH>Score Range</TH></TR>
+<TR><TH align="center" width="58%">Question</TH><TH align="left" width="12%">Type</TH><TH>Weight</TH><TH>Score Range</TH></TR>
 <% for question in @questionnaire.questions %>
-<TR><TD align="left"><%= question.txt %></TD>
-    <TD align="left"><% if question.true_false %>True/False<% else %>Multiple Choice<% end %></TD>
-    <TD align="center"><%= question.weight %></TD>
-    <TD align="center"><% if question.true_false %>&nbsp;<% else %><%= @questionnaire.min_question_score %> to <%= @questionnaire.max_question_score %><% end %></TD>
+<TR>
+  <TD colspan= 4>
+    <TABLE>
+      <TR>
+        <TD align="left" width="270px"><%= question.txt %></TD>
+        <TD align="left" width="110px">
+          <% if question.true_false %>True/False
+            <% elsif(question.question_type.nil? || question.question_type == "false")%>Multiple Choice
+              <%elsif(question.question_type == "checkbox")%>
+                Checkbox
+              <%elsif(question.question_type == "radio")%>
+                    Radio Button
+              <%end%>
+        </TD>
+        <TD align="left" width="50px"><%= question.weight %></TD>
+        <TD align="center"><% if question.true_false %>&nbsp;<% else %><%= @questionnaire.min_question_score %> to <%= @questionnaire.max_question_score %><% end %></TD>
+      </TR>
+      <%if !(question.question_type.nil?)%>
+        <TR>
+          <TD colspan="4">
+            <TABLE  style="padding-left:30px">
+              <%options = QuestionOption.find_all_by_questions_id(question.id)%>
+              <%i=1%>
+              <%for option in options%>
+                <TR>
+                  <TD width="270px">
+                   &nbsp;&nbsp;<%=option.option_text%>
+                  <%i = i+1%>
+                  </TD>
+                  <TD>
+                    <%if(question.question_type == "checkbox")%>
+                      <input type="checkbox">
+                    <%else%>
+                      <input type="radio">
+                    <%end%>
+                  </TD>
+                </TR>
+              <%end%>
+            </TABLE>
+          </TD>
+        </TR>
+      <%end%>
+    </TABLE>
+  </TD>
 </TR>
 <% end %>
 </TABLE>

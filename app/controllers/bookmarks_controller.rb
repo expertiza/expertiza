@@ -82,7 +82,7 @@ class BookmarksController < ApplicationController
     end
   end
 
- #Listing all the bookmarks for a topic
+ #Listing all the bookmarks for the topic being reviewed
   def view_review_bookmarks
 
     #NExt few lines can be directly obtained from others' work view itself.
@@ -98,6 +98,8 @@ class BookmarksController < ApplicationController
     else           
       @review_mappings = ParticipantReviewResponseMap.find_all_by_reviewer_id(@participant.id)
     end
+
+    @topics_bookmarks = Hash.new
 	
     @review_mappings.each do | map | 
       if @assignment.team_assignment?
@@ -109,8 +111,7 @@ class BookmarksController < ApplicationController
       if participant 
 
 	    #For each topic that this user is reviewing, we have to display the bmappings for that topic
-	    topic = SignUpTopic.find(participant.topic.id)
-	    @topics_bookmarks = Hash.new
+	    topic = SignUpTopic.find(participant.topic.id)	    
 	    if topic	     
 	      bookmarks = Array.new
 	      for bmapping in topic.bmappings

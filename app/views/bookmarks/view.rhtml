@@ -6,10 +6,11 @@ if (@check_mapping == nil ) %> <b>You don't have this bookmark in your repositor
 <%= link_to('  Edit', :controller => 'bookmarks', :action => 'edit_bookmark_form', :id => @check_mapping.id) %> 
 <%end %>
 <br />
+<br />
 <table>
 	<% myurl = @result_tuple["url"] %>
 	<tr>
-		<td>Bookmark Title:</td><td><a href="#<%= myurl %>" target="_blank" > <%= @result_tuple["title"] %> </a></td>
+		<td>Bookmark Title:</td><td> <%= @result_tuple["title"] %> </td>
 	</tr>
 	<tr>
 		<td>Bookmark Discoverer: </td><td> <%= @result_tuple["discoverer"] %> </td>

@@ -16,7 +16,10 @@ module BookmarksHelper
   def self.join_tags(my_tag_array)
     my_return_string = ""
     for each_tag in my_tag_array
-      my_return_string = my_return_string + each_tag + ", "
+      if(!my_return_string.empty?)
+        my_return_string = my_return_string + ", "
+      end
+      my_return_string = my_return_string + each_tag
     end
     return my_return_string
   end

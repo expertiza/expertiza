@@ -26,36 +26,135 @@ class ResponseController < ApplicationController
     redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
   end
 
+  #Determining the current phase and check if a review is already existing for this stage.
+  #If so, edit that version otherwise create a new version.
+
   def rereview
-          @header = "New"
-    @next_action = "create"
-    @feedback = params[:feedback]
-    @map = ResponseMap.find(params[:id])
-    @return = params[:return]
-    @modified_object = @map.id
-    get_content
+     @map=ResponseMap.find(params[:id])
+     get_content
+        array_not_empty=0
+      @sorted_array=Array.new
+      @prev=Response.all
+         #get all versions and find the latest version
+      for element in @prev
+        if(element.map_id==@map.id)
+          array_not_empty=1
+          @sorted_array<<element
+        end
+      end
+
+     #sort all the available versions in descending order.
+      if array_not_empty==1
+         @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
+         @largest_version_num=@sorted[0]
+         @latest_phase=@largest_version_num.created_at
+         due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id])
+         @sorted_deadlines=Array.new
+         @sorted_deadlines=due_dates.sort {|m1,m2|(m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1)}
+         current_time=Time.new.getutc
+         #get the highest version numbered review
+         next_due_date=@sorted_deadlines[0]
+
+         #check in which phase the latest review was done.
+          for deadline_version in @sorted_deadlines
+          if(@largest_version_num.created_at < deadline_version.due_at )
+            break
+          end
+         end
+         for deadline_time in @sorted_deadlines
+           if(current_time < deadline_time.due_at)
+             break
+           end
+         end
+      end
+
+         #check if the latest review is done in the current phase.
+         #if latest review is in current phase then edit the latest one.
+           #else create a new version and update it.
+
+        # editing the latest review
+     if(deadline_version.due_at== deadline_time.due_at)
+         #send it to edit here
+         @header = "Edit"
+         @next_action = "update"
+         @return = params[:return]
+         @response = Response.find_by_map_id_and_version_num(params[:id],@largest_version_num.version_num)
+         return if redirect_when_disallowed(@response)
+         @modified_object = @response.id
+         @map = @response.map
+         get_content
+         @review_scores = Array.new
+         @questions.each{
+         | question |
+           @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+         }
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
     if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
       if @assignment.id < 469
-         @next_action = "custom_create"
+         @next_action = "custom_update"
          render :action => 'custom_response'
      else
-         @next_action = "custom_create"
+         @next_action = "custom_update"
          render :action => 'custom_response_2011'
      end
     else
       # end of special code (except for the end below, to match the if above)
       #**********************
-    render :action => 'response'
+
+      render :action => 'response'
+
     end
-    end
+           #   render :action => 'edit'
+     else
+        #else create a new version and update it.
+
+          @header = "New"
+          @next_action = "create"
+          @feedback = params[:feedback]
+          @map = ResponseMap.find(params[:id])
+          @return = params[:return]
+          @modified_object = @map.id
+          get_content
+          #**********************
+          # Check whether this is Jen's assgt. & if so, use her rubric
+          if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
+            if @assignment.id < 469
+               @next_action = "custom_create"
+               render :action => 'custom_response'
+           else
+               @next_action = "custom_create"
+               render :action => 'custom_response_2011'
+           end
+          else
+            # end of special code (except for the end below, to match the if above)
+            #**********************
+          render :action => 'response'
+          end
+
+       end
+      end
 
   def edit
     @header = "Edit"
     @next_action = "update"
     @return = params[:return]
-    @response = Response.find(params[:id]) 
+    @map=ResponseMap.find(params[:id])
+     array_not_empty=0
+     @sorted_array=Array.new
+     @prev=Response.all
+     for element in @prev
+       if(element.map_id==@map.id)
+          array_not_empty=1
+          @sorted_array<<element
+        end
+      end
+
+     if array_not_empty==1
+      @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
+      @largest_version_num=@sorted[0]
+     end
+    @response = Response.find_by_map_id_and_version_num(params[:id],@largest_version_num.version_num)
     return if redirect_when_disallowed(@response)
 
     @modified_object = @response.id
@@ -75,7 +174,9 @@ class ResponseController < ApplicationController
     else
       # end of special code (except for the end below, to match the if above)
       #**********************
+
       render :action => 'response'
+
     end
   end
   
@@ -121,7 +222,6 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     @myid = @response.id
     msg = ""
-    
     begin
       @myid = @response.id
       @map = @response.map
@@ -157,6 +257,7 @@ class ResponseController < ApplicationController
   end
   
   def new
+
     @header = "New"
     @next_action = "create"    
     @feedback = params[:feedback]
@@ -188,15 +289,41 @@ class ResponseController < ApplicationController
     else
     render :action => 'response'
     end
-  end
+   end
   
   def create     
     @map = ResponseMap.find(params[:id])
     @res = 0
     msg = ""
     error_msg = ""
-    begin      
-      @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
+    begin
+
+      #get all previous versions of responses for the response map.
+      array_not_empty=0
+      @sorted_array=Array.new
+      @prev=Response.all
+      for element in @prev
+        if(element.map_id==@map.id)
+          array_not_empty=1
+          @sorted_array<<element
+        end
+      end
+
+      #if previous responses exist increment the version number.
+      if array_not_empty==1
+         @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
+         @largest_version_num=@sorted[0]
+         if(@largest_version_num.version_num==nil)
+            @version=1
+         else
+            @version=@largest_version_num.version_num+1
+         end
+
+        #if no previous version is available then initial version number is 1
+      else
+          @version=1
+      end
+      @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:version_num=>@version)
       @res = @response.id
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions     

@@ -2,8 +2,12 @@
 <ul id="actionmenu"><li class="daddy">&nbsp;
 <ul>
 <div>
-  <%= link_to image_tag('/images/tree_view/add-public-24.png', :title => 'Create Public Course'),:controller=>'course', :action=>'new', :private => 0 %>
-  <%= link_to image_tag('/images/tree_view/add-private-24.png', :title => 'Create Private Course'),:controller=>'course', :action=>'new', :private => 1 %>
+  <%= link_to image_tag('/images/tree_view/add-public-24.png'), 
+              { :controller=>'course', :action=>'new', :private => 0 }, #options
+              { :title => 'Create Public Course' }                      #html_options %>
+  <%= link_to image_tag('/images/tree_view/add-private-24.png'),
+              { :controller=>'course', :action=>'new', :private => 1 }, 
+              { :title => 'Create Private Course' } %>
 </div>
 </ul>
 </li></ul> 

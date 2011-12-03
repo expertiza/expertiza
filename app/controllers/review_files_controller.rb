@@ -1,11 +1,11 @@
 class ReviewFilesController < ApplicationController
+  rescue_from Exception, :with => :render_error_page
   helper :diff
 
-  # @DEPRECATED
-  def upload_review_file
-    @participant = AssignmentParticipant.find(params[:participant_id])
-  end
-
+  # This method accepts the review_file from the view-form and calculates/creates
+  # appropriate directories to store the file. The following two parameters need
+  # to be passed in from the view:
+  # params[:participant_id], params[:uploaded_review_file]
   def submit_review_file
     participant = AssignmentParticipant.find(params[:participant_id])
     return unless current_user_id?(participant.user_id)
@@ -23,9 +23,14 @@ class ReviewFilesController < ApplicationController
                                        file.original_filename.to_s)
     full_filename = version_dir + filename_only
 
-    # Check if file is a zip file. If not, raise ...
-    raise "Uploaded file is not a zip file. Please upload zip files only." unless
-        ReviewFilesHelper::get_file_type(filename_only) == "zip"
+    # Check if file is a zip file. If not, display flash message.
+    if ReviewFilesHelper::get_file_type(filename_only) != "zip"
+      flash[:error] = "Uploaded file is not a zip file. Please upload zip files" +
+        " only."
+      redirect_to :action => 'show_all_submitted_files',
+                  :participant_id => participant.id and return
+    end
+
 
     # Copy zip file into version_dir
     File.open(full_filename, "wb") { |f| f.write(file.read) }
@@ -44,15 +49,14 @@ class ReviewFilesController < ApplicationController
 
     respond_to do |format|
       if @success
-        flash[:notice] = "Code Review File was successfully Uploaded."
         format.html { redirect_to :action => 'show_all_submitted_files',
                                   :participant_id => participant.id and return}
         format.xml  { render :xml => @review_file, :status => :created,
                              :location => @review_file and return}
       else
-        flash[:notice] = "Code Review File was <b>not</b> successfully" +
+        flash[:error] = "Code Review File was <b>not</b> successfully" +
             "uploaded. Please Re-Submit."
-        format.html { redirect_to :action => 'upload_review_file',
+        format.html { redirect_to :action => 'show_all_submitted_files',
                                   :participant_id => participant.id and return}
         format.xml  { render :xml => @review_file.errors,
                              :status => :unprocessable_entity and return}
@@ -62,20 +66,13 @@ class ReviewFilesController < ApplicationController
   end
 
 
-  # @DEPRECATED
-  # Needs params[:participant_id]
-  def show_code_review_dashboard
-    participant = AssignmentParticipant.find(params[:participant_id])
-    @version_number = ReviewFile.get_max_version_num(participant)
-
-    @files = participant.get_files(
-        ReviewFilesHelper::get_version_directory(participant, @version_number))
-  end
-
-
-  # Needs params[:participant_id]
+  # This method computes the list of all files submitted by the participant along
+  # with all the versions the files are present in. This method needs the following
+  # two parameters:
+  # params[:participant_id], Needs params[:stage]
   def show_all_submitted_files
     @participant = AssignmentParticipant.find(params[:participant_id])
+    @stage = params[:stage]
 
     # Find all files over all versions submitted by the team
     all_review_files = []
@@ -106,7 +103,6 @@ class ReviewFilesController < ApplicationController
                                         base_filename)
       @file_id_map[base_filename] = review_file ? review_file.id : nil
       @file_version_map[base_filename] =  versions.sort
-      #puts "CLASS: #{@file_version_map[base_filename][-1]}"
       @latest_version_number = (@file_version_map[base_filename][-1] >
           @latest_version_number) ? @file_version_map[base_filename][-1] :
                                     @latest_version_number
@@ -116,6 +112,8 @@ class ReviewFilesController < ApplicationController
 
 
 
+  # This method is used to generate the view where the particular code file is
+  # viewed 'individually' (not diff).
   # params[:review_file_id] - Id of the review_file whose source is to be shown
   # params[:participant_id]
   # params[:versions] an array (in asc order) of all versions of the review file
@@ -149,11 +147,16 @@ class ReviewFilesController < ApplicationController
     @highlight_cell_right_file = Hash.new
     newer_version_comments.each do |each_comment|
       table_row_num = offset_array.index(each_comment.file_offset)
+      table_row_num = offset_array.length + 1 unless table_row_num
 
-      @highlight_cell_right_file[table_row_num] = Array.new unless
-          @highlight_cell_right_file[table_row_num]
-      @highlight_cell_right_file[table_row_num] << each_comment.
-          comment_content.gsub("\n", " ")
+      # Increment table_row_num until a non "" string is encountered in @first_line_num
+      while ( (file_contents[table_row_num].nil? or
+          file_contents[table_row_num].blank?) and
+          table_row_num < file_contents.length)
+        table_row_num += 1
+      end
+
+      @highlight_cell_right_file[table_row_num] = true
     end
 
   end
@@ -219,7 +222,7 @@ class ReviewFilesController < ApplicationController
         first_count += 1
       else # empty
            #processor.first_file_array[i] = ""
-        @first_line_num << ""
+        @first_line_num << nil
       end
 
 
@@ -230,7 +233,7 @@ class ReviewFilesController < ApplicationController
         second_count += 1
       else
         #processor.second_file_array[i] = ""
-        @second_line_num << ""
+        @second_line_num << nil
       end
 
       third = processor.comparison_array[i]
@@ -268,9 +271,10 @@ class ReviewFilesController < ApplicationController
     @highlight_cell_left_file = Hash.new
     older_version_comments.each do |each_comment|
       table_row_num = @first_offset.index(each_comment.file_offset)
+      table_row_num = @first_offset.length + 1 unless table_row_num
 
       # Increment table_row_num until a non "" string is encountered in @first_line_num
-      while (@first_line_num[table_row_num].equal?("") and
+      while (@first_line_num[table_row_num].nil? and
           table_row_num < @first_line_num.length)
         table_row_num += 1
       end
@@ -282,9 +286,10 @@ class ReviewFilesController < ApplicationController
     @highlight_cell_right_file = Hash.new
     newer_version_comments.each do |each_comment|
       table_row_num = @second_offset.index(each_comment.file_offset)
+      table_row_num = @second_offset.length + 1 unless table_row_num
 
       # Increment table_row_num until a non "" string is encountered in @first_line_num
-      while (@second_line_num[table_row_num].equal?("") and
+      while (@second_line_num[table_row_num].nil? and
           table_row_num < @second_line_num.length)
         table_row_num += 1
       end
@@ -321,155 +326,12 @@ class ReviewFilesController < ApplicationController
     end
   end
 
+  private
 
-
-  def method2
-    incoming_data = params[:key]
-    puts "!!!!!!!!! METHOD 2 !!!!!!!!!!"
-    puts "params[:key]: #{params[:key]}"
-    #puts "incoming data #{incoming_data}"
-    array_data = incoming_data.to_s.split("$")
-    #puts "array_data: #{array_data}"
-    puts "review_file_id: #{array_data[0]}"
-    puts "file_offset: #{array_data[1]}"
-    puts "comment content: #{array_data[2]}"
-    puts "reviewer id: 11"
-
-
-    @comment = ReviewComment.new
-    @comment.review_file_id = array_data[0]
-    @comment.file_offset = array_data[1]
-    @comment.comment_content = array_data[2]
-    #comment.reviewer_participant_id = AssignmentParticipant.find_by_user_id(session[:user_id].id).id
-    @comment.reviewer_participant_id = 11
-    @comment.save
-
-    return array_data.join("$").gsub("$", "<br>")
-  end
-
-  def method3
-    puts "!!!!!!!!! METHOD 3 !!!!!!!!!!"
-    #puts " params[:key]: #{params[:key]}"
-    #puts "incoming data #{incoming_data}"
-    puts " params[:fid]: #{params[:file_id]}"
-    puts " params[:offs]: #{params[:file_offset]}"
-    puts " params[:lins_num]: #{params[:line_num]}"
-    puts " params[:comment_content]: #{params[:comment_content]}"
-
-    #array_data = params[:key].to_s.gsub("$","<br>")
-    array_data = "FileId: #{params[:file_id]}"+
-        "<br>OFFSET:#{params[:file_offset]}<br>LINE:#{params[:line_num]}"+
-        "<br>CommentContent:#{params[:comment_content]}"
-    puts "array_data: #{array_data}"
-
-    respond_to do |format|
-      format.js { render :json => array_data }
-    end
+  def render_error_page(exception = nil)
+    redirect_to :controller => 'content_pages', :action => 'show',
+                :id => SystemSettings.find(:first).not_found_page_id
 
   end
-
-
-
-  #                <td width="28px" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="#" onclick="createComment('<%= @shareObj['linenumarray2'][i] %>', '<%= @shareObj['offsetarray2'][i] %>', '<%= @highlight_cell_right_file[i] %>', '<%= @file_on_right.id %>' )"><u> <pre><%=i%></pre></u></a></td>
-
-
-
-
-
-
-  ############################################################################
-  ############################################################################
-  ############################################################################
-  ############################################################################
-  ############################################################################
-  ############################################################################
-
-
-  def method1()
-    @participant = AssignmentParticipant.find(1)
-
-    first_file  = '/home/shyam/left.txt'
-    second_file = '/home/shyam/right.txt'
-
-    processor = DiffHelper::Processor.new(first_file,second_file)
-    processor.process!
-
-    @first_line_num = []
-    @second_line_num = []
-    @first_offset = []
-    @second_offset = []
-    first_count = 0
-    second_count = 0
-    @offsetswithcomments_file1 = []
-    @offsetswithcomments_file2 = []
-
-    @first_offset << 0
-    @second_offset << 0
-
-    for i in (0..processor.absolute_line_num)
-
-      if i > 0
-        @first_offset  << (@first_offset[i-1]  + processor.first_file_array[i-1].size)
-        @second_offset << (@second_offset[i-1] + processor.second_file_array[i-1].size)
-      end
-
-      first = processor.first_file_array[i].to_s
-
-      if(first != "") ## DOLLAR HERE ##
-        @first_line_num << first_count+1
-        first_count += 1
-      else # empty
-           #processor.first_file_array[i] = ""
-        @first_line_num << ""
-      end
-
-
-      second = processor.second_file_array[i].to_s
-
-      if(second != "") ## DOLLAR HERE ##
-        @second_line_num << second_count+1
-        second_count += 1
-      else
-        #processor.second_file_array[i] = ""
-        @second_line_num << ""
-      end
-
-      third = processor.comparison_array[i]
-      first = first.gsub("\n","")
-      second = second.gsub("\n","")
-
-      # HACK ! HACK ! HACK ! TODO Initialize differently
-      if(third == DiffHelper::UNCHANGED)then @offsetswithcomments_file1 << @first_offset[i] end
-      if(third == DiffHelper::CHANGED)then @offsetswithcomments_file2 << @second_offset[i] end
-
-      # Remove newlines at the end of this line of code
-      if(processor.first_file_array[i] != nil)
-        processor.first_file_array[i] = processor.first_file_array[i].chomp
-      end
-      if(processor.second_file_array[i] != nil)
-        processor.second_file_array[i] = processor.second_file_array[i].chomp
-      end
-
-    end
-
-    @shareObj = Hash.new()
-    @shareObj['linearray1'] = processor.first_file_array
-    @shareObj['linearray2'] = processor.second_file_array
-    @shareObj['comparator'] = processor.comparison_array
-    @shareObj['linenumarray1'] = @first_line_num
-    @shareObj['linenumarray2'] = @second_line_num
-    @shareObj['offsetarray1'] = @first_offset
-    @shareObj['offsetarray2'] = @second_offset
-    @shareObj['file1'] = first_file
-    @shareObj['file2'] = second_file
-    @shareObj['highlightfile1'] = @offsetswithcomments_file1
-    @shareObj['highlightfile2'] = @offsetswithcomments_file2
-
-
-
-  end
-
-
-
 
 end

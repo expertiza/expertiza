@@ -41,12 +41,12 @@
                    <td>&nbsp;&nbsp;</td>
                    <!-- Display link for code review if 'any' code review files -->
                    <!-- have been uploaded i.e. files present in code review dir-->
-                   <td>
+                   <td>&nbsp;&nbsp;&nbsp;&nbsp;
                      <% if participant.get_files(
                              ReviewFilesHelper::get_code_review_file_dir(
                                      participant)).length > 0 %>
                         <%= link_to "Review Code", { :controller => 'review_files',
-                                                     :action => 'show_code_review_dashboard',
+                                                     :action => 'show_all_submitted_files',
                                                      :participant_id => participant.id } %>
                      <% end %>
                    </td>
@@ -59,12 +59,12 @@
          <td>&nbsp;&nbsp;</td>
          <!-- Display link for code review if 'any' code review files -->
          <!-- have been uploaded i.e. files present in code review dir-->
-         <td>
+         <td>&nbsp;&nbsp;&nbsp;&nbsp;
            <% if participant.get_files(
                    ReviewFilesHelper::get_code_review_file_dir(
                            participant)).length > 0 %>
                <%= link_to "Review Code", { :controller => 'review_files',
-                                            :action => 'show_code_review_dashboard',
+                                            :action => 'show_all_submitted_files',
                                             :participant_id => participant.id } %>
            <% end %>
          </td>

@@ -214,7 +214,7 @@ class Assignment < ActiveRecord::Base
   
   def get_scores(questions)
     scores = Hash.new
-   
+
     scores[:participants] = Hash.new    
     self.participants.each{
       | participant |
@@ -225,7 +225,8 @@ class Assignment < ActiveRecord::Base
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
-      } 
+
+      }
       scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
     }        
     
@@ -321,6 +322,7 @@ class Assignment < ActiveRecord::Base
 
     # command pattern - get the attribute with the name in column
     # Here, column is usually something like 'review_allowed_id'
+
     right_id = next_due_date.send column
 
     right = DeadlineRight.find(right_id)

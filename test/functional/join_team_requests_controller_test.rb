@@ -1,31 +1,31 @@
-#require File.dirname(__FILE__) + '/../test_helper'
 require 'test_helper'
-#require 'join_team_requests_controller'
 
-class JoinTeamRequestsControllerTest < ActionController::TestCase
+class JoinTeamRequestTest < ActiveSupport::TestCase
   fixtures :join_team_requests
+  # Replace this with your real tests.
 
   def setup
+    # Do nothing  @course = courses(:course1)
     @join_team_requests = join_team_requests(:one)
-    puts 'join_team:'+@join_team_requests.to_json
+  end
+  def test_retrieval
+    assert_kind_of JoinTeamRequest, @join_team_requests
+    assert_equal join_team_requests(:one).participant_id, @join_team_requests.participant_id
+    assert_equal join_team_requests(:one).team_id, @join_team_requests.team_id
+    assert_equal 'MyText', @join_team_requests.comments
+    assert_equal join_team_requests(:one).status, @join_team_requests.status
   end
 
-  def test_should_get_new
-    join_team_requests = JoinTeamRequest.new(:id => 1, :participant_id => 1, :team_id => 5, :comments => 'new Comments', :status => 'P')
-    assert join_team_requests.save
+  def test_update
+    assert_equal "MyText", @join_team_requests.comments
+    @join_team_requests.comments = "Computer science"
+    @join_team_requests.save
+    @join_team_requests.reload
+    assert_equal "Computer science", @join_team_requests.comments
   end
 
-  test "should get edit" do
-    join_team_requests = JoinTeamRequest.find_by_participant_id(join_team_requests(:one).participant_id)
-    join_team_requests.comments = 'Hello'
-    join_team_requests.save
-    assert_response :success
-  end
-
-  test "should destroy join_team_request" do
-    assert_difference('JoinTeamRequest.count', -1) do
-      delete :destroy, :id => 11
-    end
-    assert_redirected_to join_team_requests_path
+  test "the truth" do
+    assert true
   end
 end
+

@@ -1,6 +1,5 @@
 
     <h1>Edit Advertisement</h1>
-    <%= @team.to_json %>
     <% form_tag :action => 'update',:id=>@team.id,:controller => 'advertise_for_partner' do %>
       <p><label>Please add comment to your advertisement</label><br/>
       <%= text_area(:team,:comments_for_advertisement) %>

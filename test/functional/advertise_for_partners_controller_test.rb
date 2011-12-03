@@ -17,11 +17,6 @@ class JoinTeamRequestsControllerTest < ActionController::TestCase
     )
     @team_advertisement_for_partner.save
     assert_not_nil(@team_advertisement_for_partner)
-    #@team_advertisement_for_partner.advertise_for_partner = true
-    #@team_advertisement_for_partner.comments_for_advertisement = "Me in!!!"
-    #@team_advertisement_for_partner.save
-    #assert_equal("Me in!!!",Team.find(1).comments_for_advertisement)
-    #assert_not_nil(Team.find(1))
   end
   def test_edit
     @team_advertisement_for_partner = Team.new(

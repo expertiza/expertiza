@@ -95,8 +95,8 @@ class CourseTeam < Team
             teamUsers.push(user.name)
             teamUsers.push(" ")
           end
+          tcsv.push(teamUsers)
         end
-        tcsv.push(teamUsers)
         tcsv.push(currentAssignment.name)
         tcsv.push(course.name)
         csv << tcsv

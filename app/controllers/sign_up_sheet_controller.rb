@@ -625,7 +625,7 @@ class SignUpSheetController < ApplicationController
 
   def team_details
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
-      @results =get_team_details(assignment.id, topic.topic_identifier)
+      @results =get_team_details(assignment.id, topic.id)
       @results.each do |result|
       result.attributes().each do |attr|
         if attr[0].equal? "name"
@@ -640,7 +640,7 @@ class SignUpSheetController < ApplicationController
       @results.each {|result|
                  @team_members = ""
                  TeamsUser.find_all_by_team_id(result[:team_id]).each{|teamuser|
-                    puts User.find(teamuser.user_id).to_json                      
+                    puts 'Userblaahsdb asd' +User.find(teamuser.user_id).to_json
                    @team_members+=User.find(teamuser.user_id).name+" "
                    }
 

@@ -1,16 +1,21 @@
+<% if flash[:notice] %>
+    <div class="flash_note"><%= flash[:notice] %></div>
+<% end %>
 <h3>Create a new Interaction</h3>
-<%= link_to 'Have you helped someone?', :controller => 'interaction', :action => 'new' ,:id => @participant.id ,:interactionType => 'Helper' %> <BR/>
-<%= link_to 'Have you been helped by someone?', :controller => 'interaction', :action => 'new' , :id => @participant.id ,:interactionType => 'Helpee' %>
-
+<%= link_to 'Have you helped someone?', :controller => 'interaction', :action => 'new' ,:id => @participant.id , :type=> 'helper', :assignment_id=>@assignment%> <BR/>
+<%= link_to 'Have you been helped by someone?', :controller => 'interaction', :action => 'new' , :id => @participant.id ,:type=>'helpee', :assignment_id=>@assignment %>
 <h3>Past Interactions</h3>
 <%if !@participant_helps.empty?%>
-<h4>Instance where you have helped:</h4>
-<%= render :partial => 'interaction/summary', :locals => {:interactions => @participant_helps , :type=>'helper' }  %>
+    <h4>Instance where you have helped:</h4>
+    <%= render :partial => 'interaction/summary', :locals => {:interactions => @participant_helps , :type=>'helper' }  %>
 <%end%>
 <%if !@participant_helped.empty?%>
-<h4>Instance where you have been helped:</h4>
-<%= render :partial => 'interaction/summary', :locals => {:interactions => @participant_helped , :type=>'helpee'} %>
+    <h4>Instance where you have been helped:</h4>
+    <%= render :partial => 'interaction/summary', :locals => {:interactions => @participant_helped , :type=>'helpee'} %>
 <%end%>
 
 
 <a href="javascript:window.history.back()">Back</a>
+
+
+

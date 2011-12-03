@@ -1,0 +1,80 @@
+
+
+
+<div class="ss-item  ss-text"><div class="ss-form-entry">
+  <label class="ss-q-title" for="entry_0">The project number on which help was given:
+  </label><br>
+  <td style="padding:50px">
+    <% selected = Team.find_by_parent_id(assignment_id) %>
+    <select style="width:250px" name="teams">
+      <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
+      <% Team.find(:all, :conditions => ['parent_id = ?',assignment_id],:order => "name").each{| team | %>
+          <option value="<%=team.name%>" <% if selected != nil and team.name == selected.name%>selected="yes"<%end%>><%=team.name %></option>
+      <% } %>
+    </select>
+  </td>
+  <br><br>
+</div></div>
+
+<% if(@type=='helpee') %>
+    <div class="ss-item  ss-text"><div class="ss-form-entry">
+      <label class="ss-q-title" for="entry_1">Enter the name of the helper:
+      </label>
+      <br>
+      <input type="text" name="helper">
+      <br><br>
+    </div></div>
+<%end%>
+
+
+
+<div class="ss-item  ss-text"><div class="ss-form-entry">
+  <label class="ss-q-title" for="entry_2">Describe what you worked on, and the results of your interaction:
+  </label>
+  <br>
+  <%= text_area'interactions', 'comments'%>
+  <br><br>
+</div></div>
+
+<div class="ss-item  ss-text"><div class="ss-form-entry">
+  <label class="ss-q-title" for="entry_3">Date and time you worked together:
+  </label>
+  <br>
+  <input id='interaction_id' name='interaction_date'>
+  <img src="/images/cal.gif" onClick="NewCal('interaction_id','YYYYMMDD',true,24); return false;"/>
+  <br><br>
+</div></div>
+
+<div class="ss-item  ss-text"><div class="ss-form-entry">
+  <label class="ss-q-title" for="entry_4">How long did you work together?
+  </label>
+  <label class="ss-q-help" for="entry_5">(Approx. number of minutes)
+  </label><br>
+  <%= text_field 'interactions', 'number_of_minutes' %>
+  <br><br>
+</div></div>
+
+<% if(@type=='helpee') %>
+    <div class="ss-item  ss-text"><div class="ss-form-entry">
+      <label class="ss-q-title" for="entry_6">Score:
+      </label><br>
+      <select id='score' style="width:250px" name="score">
+        <option value=1>1</option>
+        <option value=2>2</option>
+        <option value=3>3</option>
+        <option value=4>4</option>
+        <option value=5>5</option>
+      </select>
+      <%if @question_advices.size > 0%>
+          <%= render :partial => 'interaction/advice', :locals => {:i => "interaction", :advice_list => @question_advices} %>
+      <% else %>
+          <br/>
+      <% end %>
+
+      <br>
+    </div></div>
+    <div class="ss-item  ss-select"><div class="ss-form-entry">
+      <label class="ss-q-title" for="entry_7"></label>
+    </div></div>
+    <br>
+<%end%>

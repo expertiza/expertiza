@@ -1,0 +1,12 @@
+&nbsp;&nbsp;&nbsp;<a href="#" id="advice_<%= i %>Link" name="advice_<%= i %>Link" onClick="toggleElement('advice_<%= i %>','advice');return false;">show advice</a><br/>
+<div id="advice_<%= i %>" style="display:none;padding:12px">
+<b>Click advice to adjust score</b><br/><br/>
+<% advice_list.each_index{ | item | %>
+  <div onClick="updateInteractionScore(<%=item+1%>,<%=@min%>)" onMouseover="style.color = '#986633'" onMouseOut="style.color = 'black'">
+  <%=item+1%>:&nbsp;<%=advice_list[item] %>
+  </div>
+  <% if item+1 < @max %>
+  	<br/>
+  <% end %>
+<%}%>
+</div>

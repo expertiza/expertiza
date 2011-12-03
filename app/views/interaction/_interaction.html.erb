@@ -13,9 +13,9 @@
     </TD>
     <TD class="interactions">
       <% if type == "helper" and interaction[:helper_entry].nil? %>
-          <%= link_to "Confirm",{:controller => 'interaction', :action => 'new', :id => @participant.id , :team_name => interaction[:name]} %>
+          <%= link_to "Confirm",{:controller => 'interaction', :action => 'new', :id=>@participant.id,:assignment_id => @participant.assignment.id , :type => 'helper' } %>
       <%elsif type == "helpee" and interaction[:helpee_entry].nil?%>
-          <%= link_to "Confirm",{:controller => 'interaction', :action => 'new', :id => @participant.id , :team_name => @participant.team.id} %>
+          <%= link_to "Confirm",{:controller => 'interaction', :action => 'new', :id=>@participant.id, :assignment_id => @participant.assignment.id , :type => 'helpee' } %>
       <%end%>
     </TD>
 

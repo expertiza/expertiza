@@ -18,14 +18,14 @@
   </tr>
   </TABLE>
      <% interactions = Array.new %>
-  <% puts "len"+@team_helped.length.to_s %>
+
    <% for helpee in @team_helped%>
       <%if helpee.status=="Confirmed"%>
           <%interactions<<helpee%>
           <%end%>
       <%end%>
   <% for helpee in @team_helped%>
-      <% puts "id"+helpee.id.to_s %>
+
       <%if helpee.status=="Approved"%>
            <%interactions<<helpee%>
            <%end%>

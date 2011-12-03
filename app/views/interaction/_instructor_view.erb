@@ -5,7 +5,7 @@
     <TD width="100" class="interactions"><%=interaction.score%></TD>
       <TD width="100" class="interactions"><%=interaction.status%></TD>
       <TD width="100" class="interactions">
-        <% puts "interaction"+interaction.to_s %>
+
      <% form_remote_tag(:url => {:action => 'interaction_view',:type=>'Show',:id=>interaction.id, :expanded => expanded=="true"?"false":"true"},
            :update =>  "interaction_"+interaction.id.to_s
          ) do %>

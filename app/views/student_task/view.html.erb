@@ -36,7 +36,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 	<li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
     <% end %>
     <%if @assignment.interaction_weight %>
-     <li><%= link_to "Report an Interaction",{:controller => 'interaction', :action => 'view', :id => @participant.id} %></li>
+     <li><%= link_to "Report an Interaction",{:controller => 'interaction', :action => 'view', :id => @participant.id, :assignment=>@assignment.id} %></li>
     <% end %>
 
     <% if @assignment.get_current_stage(@participant.topic_id) == "Complete" %>

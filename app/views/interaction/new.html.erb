@@ -1,0 +1,22 @@
+<% error_messages_for 'interaction' %>
+
+<% if flash[:notice] %>
+	<div class="flash_note"><%= flash[:notice] %></div>
+<% end %>
+<h3>New Interaction</h3>
+
+<% form_tag :action => 'create'  , :locals=>{:assign=>@assignment,:type=>@type} do %>
+    <%= hidden_field_tag(:assign ,@assignment ) %>
+
+    <%= hidden_field_tag(:type ,@type ) %>
+
+
+
+    <%=   render :partial => 'report',:locals=>{:assignment_id=>@assignment} ,:id=>@id%>
+    <p>
+      <%= submit_tag 'Submit'%>
+    </p>
+<%end%>
+
+<%= link_to 'Back', :controller => 'interaction', :action => 'view' %>
+

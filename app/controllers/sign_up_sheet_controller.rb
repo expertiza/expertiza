@@ -217,6 +217,7 @@ class SignUpSheetController < ApplicationController
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
 
+    @bmappings = Bmapping.find(:all)     
     #find whether assignment is team assignment
     assignment = Assignment.find(params[:id])
 

@@ -1,3 +1,25 @@
+
+
+<script type="text/javascript">
+function toggle(divName){
+	if(document.getElementById)
+	{
+		var theDiv = document.getElementById(divName);
+		if(theDiv)
+		{
+			if(theDiv.style.display == 'none')
+			{
+				theDiv.style.display = 'block';
+			}
+			else
+			{
+				theDiv.style.display = 'none';
+			}
+		}
+	}
+}
+</script>
+
 <h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
 <table class="general">
   <tr>
@@ -12,17 +34,36 @@
     <th width="5%">Bookmarks</th>
   </tr>
 
+  
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
       <b>Your topic(s):</b>
       <% for selected_topic in @selected_topics %>
-          <br/><%= selected_topic.topic_name %>
-          <%if selected_topic.is_waitlisted == true%>
-            <font color='red'>(waitlisted)</font>
-          <%end%>
-      <% end %>
-  <% end %>
-  <br/><br/>
+						 	
+		<span class="inline" id="1_show">		
+		<ul>
+			<li><a href="javascript:toggle('letterA')"><b><%= selected_topic.topic_name %></b><x/a>
+			<ul id="letterA">
 
+			<%@topics_bmappings = SignUpTopic.find(:all, :conditions => ['id = ?',selected_topic.topic_id]) %>
+			<%if @topics_bmappings%>	
+				<% for thistopic in @topics_bmappings %>	
+					<%for bmap in thistopic.bmappings %>
+						<li class=""><%= link_to bmap.title, :controller=>'bookmarks', :action=> 'view', :id => bmap.bookmark_id %></span></li>
+					<% end%>				
+					<li><%= link_to "View All", :controller=>'bookmarks', :action=> 'view_topic_bookmarks', :id => selected_topic.topic_id, :assignment_id => params[:id] %></li>		
+					</ul>
+					</li>
+				<% end%>
+			<%end %>		
+		</ul>
+	   		 				
+	<%end %>
+        <%if selected_topic.is_waitlisted == true%>
+            <font color='red'>(waitlisted)</font>
+        <%end%>
+  <% end %>
+
+  
 <%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <br/>
 <%= link_to 'Manage all Bookmarks', :controller=>'bookmarks', :action=> 'manage_bookmarks' %>
   

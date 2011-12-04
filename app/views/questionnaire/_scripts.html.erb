@@ -45,7 +45,7 @@ function addQuestion(){
          gradingTypes = "<select id=question_" + id + "_true_false name=question_type["+id+"][type]>";
 
         <% for type in Question::GRADING_TYPES_CUSTOM %>
-            <%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
+            <%= "gradingTypes += '<option value=" + type[0].to_s + ">" + type[0].to_s + "</option>';"%>
         <% end %>
      }else{
         gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
@@ -59,7 +59,7 @@ function addQuestion(){
 
     if (qtype == "Custom"){
         column = document.createElement("td");
-	    column.innerHTML = "<input id=new_question" + id + "_txt name=question_type["+id+"][parameters] size=70 type=text/>";
+	    column.innerHTML = "<input id=new_question" + id + "_txt name=question_type["+id+"][parameters] size=30 type=text/>";
 	    row.appendChild(column);
     }
 	

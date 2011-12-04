@@ -238,3 +238,16 @@ student_conflict_4:
   email_on_submission: 1
   email_on_review_of_review: 1
   master_permission_granted: 1
+
+student_conflict_5:
+  name: student_conflict5
+  parent_id: <%= Fixtures.identify(:admin) %>
+  fullname: conflict_5_fullname
+  password: <%= Digest::SHA1.hexdigest("conflict_5_fullname") %>
+  password_salt:
+  email: conflict_5_fullname9@foo.edu
+  role_id: <%= Fixtures.identify(:Student_role) %>
+  email_on_review: 1
+  email_on_submission: 1
+  email_on_review_of_review: 1
+  master_permission_granted: 1

@@ -275,3 +275,33 @@ par_conflict_12:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par_conflict_12"
+
+par_conflict_13:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_5) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_1) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_13"
+
+par_conflict_14:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_5) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_2) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_14"
+
+par_conflict_15:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student_conflict_5) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_3) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par_conflict_15"

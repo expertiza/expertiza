@@ -150,4 +150,26 @@ assignment_conflict_3:
   wiki_type_id: 1
   team_count: 2
 
+assignment_conflict_4:
+  name: Assignment Conflict 4
+  directory_path: assignment_conflict_4_dir
+  submitter_count: 1
+  course: course_conflict
+  instructor_id: <%= prof_list[0] %>
+  private: 0
+  num_reviews: 1
+  num_review_of_reviews: 1
+  num_review_of_reviewers: 1
+  review_questionnaire_id: 1
+  review_of_review_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
+  author_feedback_questionnaire_id: <%= q_list[0] %>
+  teammate_review_questionnaire_id: <%= q_list[0] %>
+  reviews_visible_to_all: 1
+  require_signup: 1
+  num_reviewers: 1
+  spec_location:
+  team_assignment: 1
+  wiki_type_id: 1
+  team_count: 3
+
 

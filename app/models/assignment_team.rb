@@ -261,7 +261,6 @@ class AssignmentTeam < Team
       # Get past teammate user ids.
       past_teammate_ids = get_past_teammate_user_ids(participant)
 
-      hey = participants
       # Check against user id of each participant already in team
       participants.each do |current_participant|
         unique_teammate_ids = past_teammate_ids - [current_participant.user_id]
@@ -286,9 +285,10 @@ class AssignmentTeam < Team
       all_participants = participants + [participant]
       all_participants.each do |other_participant|
         past_teammate_ids = get_past_teammate_user_ids(other_participant)
-        unique_teammate_ids = past_teammate_ids - participants.map {|participant| participant.user_id}
-        unique_teammate_ids -= [participant.user_id]
-        if max_past_teammates - unique_teammate_ids.length >= max_course_duplicate_pairings
+        unique_teammate_ids = past_teammate_ids + all_participants.map {|part| part.user_id}
+        unique_teammate_ids.uniq!
+        unique_teammate_ids -= [other_participant.user_id]
+        if max_past_teammates - unique_teammate_ids.length + participants.length > max_course_duplicate_pairings
           return TeamConflict.new(other_participant, participant, :min_unique_pairings, min_unique_pairings)
         end
       end

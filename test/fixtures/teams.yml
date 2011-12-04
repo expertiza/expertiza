@@ -35,20 +35,25 @@ team_conflict_1:
 
 team_conflict_2:
   name: team_conflict2
-  parent_id: <%= Fixtures.identify(:assignment_conflict_2) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_1) %>
   type: AssignmentTeam
 
 team_conflict_3:
   name: team_conflict3
-  parent_id: <%= Fixtures.identify(:assignment_conflict_3) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_1) %>
   type: AssignmentTeam
 
 team_conflict_4:
   name: team_conflict4
-  parent_id: <%= Fixtures.identify(:assignment_conflict_1) %>
+  parent_id: <%= Fixtures.identify(:assignment_conflict_2) %>
   type: AssignmentTeam
 
 team_conflict_5:
   name: team_conflict5
   parent_id: <%= Fixtures.identify(:assignment_conflict_2) %>
+  type: AssignmentTeam
+
+team_conflict_6:
+  name: team_conflict6
+  parent_id: <%= Fixtures.identify(:assignment_conflict_3) %>
   type: AssignmentTeam

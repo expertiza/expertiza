@@ -276,28 +276,11 @@ ActiveRecord::Schema.define(:version => 20111127035200) do
 
   add_index "resubmission_times", ["participant_id"], :name => "fk_resubmission_times_participants"
 
-  create_table "review_comment", :force => true do |t|
-    t.integer  "review_file_id"
-    t.integer  "reviewer_participant_id"
-    t.text     "comment_content"
-    t.integer  "comment_offset"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "review_comments", :force => true do |t|
     t.integer  "review_file_id"
     t.text     "comment_content"
     t.integer  "reviewer_participant_id"
     t.integer  "file_offset"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "review_file", :force => true do |t|
-    t.string   "filepath"
-    t.integer  "author_participant_id"
-    t.integer  "version_number"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -2,7 +2,57 @@ class InvitationController < ApplicationController
   def new 
     @invitation = Invitation.new
   end
-  
+
+  def get_conflict_message(conflict, student)
+    if student == conflict.first_person
+      message = "If you choose to partner with "
+      message += conflict.second_person.handle
+      message += ", you will "
+
+      if conflict.type == :max_duplicate_pairings
+
+        message += "have exceed the allowed number of "
+        message += conflict.threshold.to_s
+        message += " times."
+        return message
+
+      elsif conflict.type == :min_unique_pairings
+
+        message += "not meet the requirement to have "
+        message += conflict.threshold.to_s
+        message += " partners for this course."
+        return message
+
+      end
+
+    else
+
+      message = "Inviting "
+      message += conflict.second_person.handle
+      message += " to this team will result in "
+      message += conflict.first_person.handle
+
+      if conflict.type == :max_duplicate_pairings
+
+        message += " partnering with "
+        message += conflict.second_person.handle
+        message += " more than the allowed number of "
+        message += conflict.threshold.to_s
+        message += " times."
+        return message
+
+      elsif conflict.type == :min_unique_pairings
+
+        message += " not meeting the requirement to have "
+        message += conflict.threshold.to_s
+        message += " different partners for this course."
+        return message
+
+      end
+
+    end
+  end
+
   def create    
     user = User.find_by_name(params[:user][:name].strip)
     team = AssignmentTeam.find_by_id(params[:team_id])
@@ -38,7 +88,7 @@ class InvitationController < ApplicationController
                 :team => team,
                 :student => student,
                 :user => user,
-                :message => "There is a conflict"
+                :message => get_conflict_message(conflict, student)
               }
             end
           else

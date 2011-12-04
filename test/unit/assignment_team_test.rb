@@ -39,7 +39,7 @@ class AssignmentTeamTest < ActiveSupport::TestCase
     conflict = @assignmentTeam.get_pairing_conflict(@participant2)
     assert_equal(@participant1, conflict.first_person)
     assert_equal(@participant2, conflict.second_person)
-    assert_equal(:max_duplicate_pairings, conflict.conflict_type)
+    assert_equal(:max_duplicate_pairings, conflict.type)
     assert_equal(2, conflict.threshold)
   end
 
@@ -47,15 +47,15 @@ class AssignmentTeamTest < ActiveSupport::TestCase
     conflict = @assignmentTeam.get_pairing_conflict(@participant3)
     assert_equal(@participant1, conflict.first_person)
     assert_equal(@participant3, conflict.second_person)
-    assert_equal(:min_unique_pairings, conflict.conflict_type)
+    assert_equal(:min_unique_pairings, conflict.type)
     assert_equal(5, conflict.threshold)
   end
 
   def test_get_pairing_conflict_is_min_2
     conflict = @assignmentTeam.get_pairing_conflict(@participant5)
     assert_equal(@participant5, conflict.first_person)
-    assert_nil(conflict.second_person)
-    assert_equal(:min_unique_pairings, conflict.conflict_type)
+    assert_equal(@participant5, conflict.second_person)
+    assert_equal(:min_unique_pairings, conflict.type)
     assert_equal(5, conflict.threshold)
   end
 end

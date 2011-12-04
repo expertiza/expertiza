@@ -117,7 +117,7 @@ class ReviewFilesController < ApplicationController
   # params[:review_file_id] - Id of the review_file whose source is to be shown
   # params[:participant_id]
   # params[:versions] an array (in asc order) of all versions of the review file
-  #                   params[:review_file_id]
+  #                   contained in params[:review_file_id]
   def show_code_file
     @participant = AssignmentParticipant.find(params[:participant_id])
     @current_review_file = ReviewFile.find(params[:review_file_id])
@@ -169,9 +169,6 @@ class ReviewFilesController < ApplicationController
   def show_code_file_diff
     @participant = AssignmentParticipant.find(params[:participant_id])
 
-    # TODO
-    # if :diff_with_file_id is nil? then default it to previous version
-
     # Get the filepath of both the files.
     older_file = ReviewFile.find(params[:current_version_id])
     newer_file = ReviewFile.find(params[:diff_with_file_id])
@@ -217,28 +214,21 @@ class ReviewFilesController < ApplicationController
 
       first = processor.first_file_array[i].to_s
 
-      if(first != "") ## DOLLAR HERE ##
+      if(first != "")
         @first_line_num << first_count+1
         first_count += 1
       else # empty
-           #processor.first_file_array[i] = ""
         @first_line_num << nil
       end
 
-
       second = processor.second_file_array[i].to_s
 
-      if(second != "") ## DOLLAR HERE ##
+      if(second != "")
         @second_line_num << second_count+1
         second_count += 1
       else
-        #processor.second_file_array[i] = ""
         @second_line_num << nil
       end
-
-      third = processor.comparison_array[i]
-      first = first.gsub("\n","")
-      second = second.gsub("\n","")
 
       # Remove newlines at the end of this line of code
       if(processor.first_file_array[i] != nil)
@@ -252,7 +242,6 @@ class ReviewFilesController < ApplicationController
 
     older_version_comments = ReviewComment.find_all_by_review_file_id(older_file.id)
     newer_version_comments = ReviewComment.find_all_by_review_file_id(newer_file.id)
-
 
     @shareObj = Hash.new()
     @shareObj['linearray1'] = processor.first_file_array
@@ -288,7 +277,7 @@ class ReviewFilesController < ApplicationController
       table_row_num = @second_offset.index(each_comment.file_offset)
       table_row_num = @second_offset.length + 1 unless table_row_num
 
-      # Increment table_row_num until a non "" string is encountered in @first_line_num
+      # Increment table_row_num until a non "" string is encountered in @second_line_num
       while (@second_line_num[table_row_num].nil? and
           table_row_num < @second_line_num.length)
         table_row_num += 1

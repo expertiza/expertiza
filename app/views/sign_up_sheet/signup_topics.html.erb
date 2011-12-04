@@ -22,9 +22,6 @@ function toggle(divName){
 
 
 	<h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
-  <div class="TopLevel">
-     
-    <div class="left"> <a class="TopLevel"> </a>
 
 	<table class="general">
 	  <tr>
@@ -67,6 +64,10 @@ function toggle(divName){
 		    <font color='red'>(waitlisted)</font>
 		<%end%>
 	  <% end %>
+
+	<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <br/>
+	<%= link_to 'Manage all Bookmarks', :controller=>'bookmarks', :action=> 'manage_bookmarks' %>
+
 
 	  <% i=1 %>
 	  <% for topic in @sign_up_topics %>
@@ -121,11 +122,7 @@ function toggle(divName){
 	  <% end %>
 
 	</table>
-    </div>
-<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <br/>
-	<%= link_to 'Manage all Bookmarks', :controller=>'bookmarks', :action=> 'manage_bookmarks' %>
-	
-</div>
+
 
 <%
    session[:return_to] = request.request_uri

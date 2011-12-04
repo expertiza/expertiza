@@ -439,7 +439,7 @@ class Assignment < ActiveRecord::Base
    return (self.wiki_type_id > 1)
  end
 
-# KHH
+ # Check to see if assignment is a microtask
  def is_microtask?
    return (self.microtask.nil?) ? False : self.microtask
  end

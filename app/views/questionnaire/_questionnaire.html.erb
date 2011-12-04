@@ -50,17 +50,24 @@
 	
 	<% 	i = 1   %>
     <% for @question in @questionnaire.questions %>
-      <% #q = @question_type_all.question_id(@question.id) %>
+      <% @q = QuestionType.find_by_question_id(@question.id) %>
         <tr>
             <td align=center><input type=checkbox id="question_chk<%= i %>"></td>
             <td><%= text_field "question[]", 'txt', :size=>70 %></td>
             <% if (@questionnaire.section == "Custom") %>
+              <% if @q.q_type == "Numeric"  %>
+                <% selected_value = 0 %>
+              <% elsif @q.q_type == "True/False"%>
+                <% selected_value = 1 %>
+              <% elsif @q.q_type == "Checkbox"%>
+                <% selected_value = 2 %>
+              <% else selected_value = 3 %>
+              <% end %>
+                <td><%= select("q[]", :q_type, Question::GRADING_TYPES_CUSTOM, :selected => selected_value)%></td>
+                <td><%= text_field "q[]",  'parameters', :size=>30 %></td>
+            <%else%>
                 <td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
-                <td><%= text_field "question[]", 'txt', :size=>70 %></td>
-             <%else%>
-                <td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
-
-              <% end%>
+            <% end%>
 
             <td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
         </tr>

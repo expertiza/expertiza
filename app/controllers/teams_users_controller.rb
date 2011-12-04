@@ -20,18 +20,28 @@ class TeamsUsersController < ApplicationController
     user = User.find_by_name(params[:user][:name].strip)
     if !user
       urlCreate = url_for :controller => 'users', :action => 'new'      
-      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."            
+      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
+      redirect_to :action => 'new', :id => params[:id] and return
     end
-    team = Team.find_by_id(params[:id])    
-    
-    if team.type.downcase.include? "course"
-      course = Course.find_by_id(team.parent_id)
-      if course.min_unique_pairings || course.max_duplicate_pairings
-        # Get conflicts somehow
+
+    team = Team.find_by_id(params[:id])
+
+    if !params[:force] and team.kind_of? AssignmentTeam
+      participant = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?', user.id, team.parent_id])
+      conflicts = team.get_pairing_conflict(participant)
+
+      if conflicts
+        flash[:warning] = render_to_string :partial => "warning", :locals => {
+          :team => team,
+          :user => user,
+          :message => "There was a conflict"
+        }
+        redirect_to :action => 'new', :id => params[:id] and return
       end
     end
+
     team.add_member(user)
-    
+
     #  flash[:error] = $!
     #end
     redirect_to :controller => 'team', :action => 'list', :id => team.parent_id

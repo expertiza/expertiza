@@ -33,11 +33,11 @@ div.flash_warning a {
     color: inherit;
 }
 
-#warningForm {
+div.flash_warning form {
     display: inline;
 }
 
-#warningForm input.looksLikeLink  {
+div.flash_warning input.looksLikeLink  {
     background: none;
     color: inherit;
     border: none;
@@ -47,7 +47,7 @@ div.flash_warning a {
     cursor: pointer;
 }
 
-#warningForm input.looksLikeLink:hover {
+div.flash_warning input.looksLikeLink:hover {
     text-decoration: underline;
 }
 

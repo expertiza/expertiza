@@ -1,0 +1,8 @@
+<p><%= message %></p>
+<% form_tag :action => 'create' do %>
+    <%= hidden_field_tag 'id', team.id %>
+    <%= hidden_field_tag 'user[name]', user.name %>
+    <%= hidden_field_tag 'force', true %>
+    <input type="submit" value="Proceed" class="looksLikeLink" />
+<% end %>
+ | <a href="/teams_users/new/<%= team.id %>">Cancel</a>

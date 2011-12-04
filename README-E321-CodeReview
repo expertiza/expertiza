@@ -1,0 +1,6 @@
+1) Go to mysql console and drop databases 'pg_development' and 'pg_test'
+2) Execute 'rake db:create:all'
+     and   'rake db:migrate'
+3) Execute 'ruby script/server'
+4) Goto 'http://localhost:3000' and start using Expertiza.
+5) Feel free to explore the new Code Review Feature! A screencast explaining how to use the feature can be found at: ''

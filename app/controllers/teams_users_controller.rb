@@ -15,7 +15,32 @@ class TeamsUsersController < ApplicationController
   def new
     @team = Team.find_by_id(params[:id])    
   end
-  
+
+  def get_conflict_message(conflict)
+    message = "Placing "
+    message += conflict.second_person.handle
+    message += " on this team will result in "
+    message += conflict.first_person.handle
+
+    if conflict.type == :max_duplicate_pairings
+
+      message += " partnering with "
+      message += conflict.second_person.handle
+      message += " more than the allowed number of "
+      message += conflict.threshold.to_s
+      message += " times."
+      return message
+
+    elsif conflict.type == :min_unique_pairings
+
+      message += " not meeting the requirement to have "
+      message += conflict.threshold.to_s
+      message += " different partners for this course."
+      return message
+
+    end
+  end
+
   def create    
     user = User.find_by_name(params[:user][:name].strip)
     if !user
@@ -28,13 +53,13 @@ class TeamsUsersController < ApplicationController
 
     if !params[:force] and team.kind_of? AssignmentTeam
       participant = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?', user.id, team.parent_id])
-      conflicts = team.get_pairing_conflict(participant)
+      conflict = team.get_pairing_conflict(participant)
 
-      if conflicts
+      if conflict
         flash[:warning] = render_to_string :partial => "warning", :locals => {
           :team => team,
           :user => user,
-          :message => "There was a conflict"
+          :message => get_conflict_message(conflict)
         }
         redirect_to :action => 'new', :id => params[:id] and return
       end

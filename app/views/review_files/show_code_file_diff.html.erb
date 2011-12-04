@@ -124,7 +124,7 @@
 
         // Grab existing HTML of the comment window -- contains textarea for
         // writing comments plus a Submit button.
-        var commentForm = document.getElementById('add_subject').innerHTML;
+        var commentForm = document.getElementById('comment_window').innerHTML;
 
         // Dom corr to the comment Window. This dom will be populated with
         // (a) existing comments and (b) form to submit a new comment
@@ -220,7 +220,6 @@
     tr.highlight :hover { font-weight: bold;  }
 
     td.version_number {
-        /*background-color: #faee7f;*/
         background-color: white;
         color: black;
         border-left: thin solid gray;
@@ -236,7 +235,6 @@
     }
 
     td.current_version {
-        /*background-color: rgb(249, 255, 0);*/
         background-color: rgb(255, 0, 28);
         color: black;
         font-weight: bold;
@@ -272,7 +270,6 @@
         border-right:thin solid black;
         border-top: thin solid black;
         border-width: 1px;
-        /*background-color: rgba(250, 3, 0, 0.37);*/
         background-color: rgb(150, 0, 4);
         color: white;
     }
@@ -290,10 +287,10 @@
 
 <script>
     $(document).ready (
-            function() {
-                $("#myDiv2").draggable();
-                $("#add_subject").fadeOut(0);
-            }
+        function() {
+            $("#myDiv2").draggable();
+            $("#comment_window").fadeOut(0);
+        }
     );
 </script>
 
@@ -315,8 +312,8 @@
           <% file_versions << version.to_i %>
       <% end %>
 
-      <!-- Iterate over all hashes and display the version and link
-  corresponding to each hash -->
+      <!-- Iterate over all hashes and display the version and link -->
+      <!-- corresponding to each hash -->
       <% @version_fileId_map.sort.each do |each_version, review_file_id| %>
           <% if each_version.to_s == @current_review_file.version_number.to_s %>
               <td class="version_number current_version" >
@@ -343,8 +340,8 @@
 
     <tr>
       <td align="right">View Diff with:</td>
-      <!-- Iterate over all hashes and display the version and link
-  corresponding to each hash -->
+      <!-- Iterate over all hashes and display the version and link -->
+      <!-- corresponding to each hash -->
       <% @version_fileId_map.sort.each do |each_version, review_file_id| %>
           <% if each_version.to_s == @current_review_file.version_number.to_s %>
               <td style="color: black">
@@ -391,14 +388,13 @@
 
     <% for i in 0..@shareObj['linearray1'].size %>
 
-        <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE ROW -->
-        <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE ROW -->
         <% @color = "White" %>
         <% line1color = "lightgray"%>
         <% line2color = "lightgray"%>
         <% line1_font_weight = "normal" %>
         <% line2_font_weight = "normal" %>
 
+        <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE ROW -->
         <% if (@shareObj['comparator'][i] == DiffHelper::ADDED) then @color="palegreen"%><%end%>
         <% if (@shareObj['comparator'][i] == DiffHelper::DELETED) then @color="pink"%><%end%>
         <% if (@shareObj['comparator'][i] == DiffHelper::CHANGED) then @color="#FEF5CA"%><%end%>
@@ -493,7 +489,7 @@
 
 <!--   The popup which pops up as one intends to click or view comments -->
 <div id="myDiv2" class="parentDisable" onLoad="assign()"></div>
-<div id="add_subject">
+<div id="comment_window">
   <textarea id="forminput" cols=28 rows=5></textarea> <br>
   <button onclick="ajaxSubmitComment()"><b>Save Comment</b></button>
 </div>

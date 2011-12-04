@@ -1,0 +1,15 @@
+<% form_tag(:action => :create_rating_rubric) do %>
+  <% unless @rating_rubric.errors.empty? %>
+    <%= error_messages_for(:rating_rubric) %>
+  <% end %>
+  <p>
+    <%= render(:partial => "rating_rubric_form") %>
+    <p>
+      <div>
+        <%= submit_tag("Create") %> &nbsp;&nbsp;
+        <%= link_to("View all bookmark rating rubrics", {:controller => "bookmarks", :action => "view_rating_rubrics"}) %>
+      </div>
+    </p>
+  </p>
+<% end %>
+

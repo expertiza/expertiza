@@ -17,7 +17,7 @@ class SignUpSheetController < ApplicationController
 
     #Use this until you figure out how to initialize this array
     @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
-    
+
     if !@topics.nil?
       i=0
       @topics.each {|topic|
@@ -81,7 +81,7 @@ class SignUpSheetController < ApplicationController
       @participants = SignedUpUser.find_participants(assignment_id)
     else
       @participants = SignedUpUser.find_team_participants(assignment_id)
-    end    
+    end
   end
 
   def new
@@ -90,8 +90,8 @@ class SignUpSheetController < ApplicationController
   end
 
   #This method is used to create signup topics
-  #In this code params[:id] is the assignment id and not topic id. The intuition is 
-  #that assignment id will virtually be the signup sheet id as well as we have assumed 
+  #In this code params[:id] is the assignment id and not topic id. The intuition is
+  #that assignment id will virtually be the signup sheet id as well as we have assumed
   #that every assignment will have only one signup sheet
   def create
     topic = SignUpTopic.find_by_topic_name_and_assignment_id(params[:topic][:topic_name], params[:id])
@@ -116,7 +116,7 @@ class SignUpSheetController < ApplicationController
       end
 
       topic.category = params[:topic][:category]
-      #topic.assignment_id = params[:id] 
+      #topic.assignment_id = params[:id]
       topic.save
       redirect_to_sign_up(params[:id])
     else
@@ -126,6 +126,7 @@ class SignUpSheetController < ApplicationController
       @sign_up_topic.max_choosers = params[:topic][:max_choosers]
       @sign_up_topic.category = params[:topic][:category]
       @sign_up_topic.assignment_id = params[:id]
+      @sign_up_topic.bookmark_rating_rubric_id = params[:topic][:bookmark_rating_rubric_id]
 
       @assignment = Assignment.find(params[:id])
 
@@ -164,7 +165,7 @@ class SignUpSheetController < ApplicationController
       flash[:error] = "Topic could not be deleted"
     end
 
-    #if this assignment has staggered deadlines then destroy the dependencies as well    
+    #if this assignment has staggered deadlines then destroy the dependencies as well
     if Assignment.find(params[:assignment_id])['staggered_deadline'] == true
       dependencies = TopicDependency.find_all_by_topic_id(params[:id])
       if !dependencies.nil?
@@ -198,10 +199,10 @@ class SignUpSheetController < ApplicationController
         else
           flash[:error] = 'Value of maximum choosers can only be increased! No change has been made to max choosers.'
         end
-      end               
-
+      end
       topic.category = params[:topic][:category]
       topic.topic_name = params[:topic][:topic_name]
+      topic.bookmark_rating_rubric_id = params[:topic][:bookmark_rating_rubric_id]
       topic.save
     else
       flash[:error] = "Topic could not be updated"
@@ -223,7 +224,7 @@ class SignUpSheetController < ApplicationController
     if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
       @show_actions = false
     end
-    
+
     #Find whether the user has signed up for any topics; if so the user won't be able to
     #sign up again unless the former was a waitlisted topic
     #if team assignment, then team id needs to be passed as parameter else the user's id
@@ -243,7 +244,7 @@ class SignUpSheetController < ApplicationController
 
   #this function is used to delete a previous signup
   def delete_signup
-    delete_signup_for_topic(params[:assignment_id],params[:id])    
+    delete_signup_for_topic(params[:assignment_id],params[:id])
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
@@ -269,13 +270,13 @@ class SignUpSheetController < ApplicationController
       if signup_record.is_waitlisted == false
         #find the first wait listed user if exists
         first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
-  
+
         if !first_waitlisted_user.nil?
           # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
           ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
           first_waitlisted_user.is_waitlisted = false
           first_waitlisted_user.save
-  
+
           #update the participants details
           if assignment.team_assignment?
             user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
@@ -284,11 +285,11 @@ class SignUpSheetController < ApplicationController
             participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
           end
           participant.update_topic_id(topic_id)
-  
+
           SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
         end
       end
-  
+
       if !signup_record.nil?
         participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
         #update participant's topic id to nil
@@ -340,7 +341,7 @@ class SignUpSheetController < ApplicationController
     sign_up = SignedUpUser.new
     sign_up.topic_id = params[:id]
     sign_up.creator_id = creator_id
-    
+
     result = false
     if user_signup.size == 0
 
@@ -349,10 +350,10 @@ class SignUpSheetController < ApplicationController
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
         if slotAvailable?(topic_id)
           sign_up.is_waitlisted = false
-  
+
           #Update topic_id in participant table with the topic_id
           participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-          
+
           participant.update_topic_id(topic_id)
         else
           sign_up.is_waitlisted = true
@@ -379,18 +380,18 @@ class SignUpSheetController < ApplicationController
             result = true
           end
         else
-          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user        
+          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
           SignUpTopic.cancel_all_waitlists(creator_id, assignment_id)
           sign_up.is_waitlisted = false
           sign_up.save
-  
+
           participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
           participant.update_topic_id(topic_id)
           result = true
         end
       end
     end
-    
+
     result
   end
 
@@ -422,7 +423,7 @@ class SignUpSheetController < ApplicationController
     end
     team = Team.find(team_id)
     team.add_member(user)
-  end  
+  end
 
   def has_user(user, team_id)
     if TeamsUser.find_by_team_id_and_user_id(team_id, user.id)
@@ -449,7 +450,7 @@ class SignUpSheetController < ApplicationController
 
 
     # Save the dependency in the topic dependency table
-    TopicDependency.save_dependency(topics)    
+    TopicDependency.save_dependency(topics)
 
     node = 'id'
     dg = build_dependency_graph(topics,node)
@@ -483,7 +484,7 @@ class SignUpSheetController < ApplicationController
   def save_topic_deadlines
 
     due_dates = params[:due_date]
-    
+
     review_rounds = Assignment.find(params[:assignment_id]).get_review_rounds
     due_dates.each {|due_date|
       for i in 1..review_rounds
@@ -498,7 +499,7 @@ class SignUpSheetController < ApplicationController
         topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_subm,i)
         topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + i.to_s]})
         flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
-        
+
         topic_deadline_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_rev,i)
         topic_deadline_rev.update_attributes({'due_at' => due_date['review_' + i.to_s]})
         flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
@@ -509,7 +510,7 @@ class SignUpSheetController < ApplicationController
       flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
     }
 
-    redirect_to_sign_up(params[:assignment_id])    
+    redirect_to_sign_up(params[:assignment_id])
   end
 
   def build_dependency_graph(topics,node)
@@ -592,20 +593,20 @@ class SignUpSheetController < ApplicationController
 
         set_of_due_dates.sort! {|a,b| a.due_at <=> b.due_at}
 
-        offset = days_between_submissions 
+        offset = days_between_submissions
       end
 
       set_of_topic.each { |topic_id|
         #if the due dates have already been created and the save dependency is being clicked,
         #then delete existing n create again
         prev_saved_due_dates = TopicDeadline.find_all_by_topic_id(topic_id)
-        
+
         #Only if there is a dependency for the topic
-        if !prev_saved_due_dates.nil?    
+        if !prev_saved_due_dates.nil?
           num_due_dates = prev_saved_due_dates.length
           #for each due date in the current topic he want to compare it to the previous due date
           for x in 0..num_due_dates - 1
-            #we don't want the old date to move earlier in time so we save it as the new due date and destroy the old one  
+            #we don't want the old date to move earlier in time so we save it as the new due date and destroy the old one
             if DateTime.parse(set_of_due_dates[x].due_at.to_s) + offset.to_i < DateTime.parse(prev_saved_due_dates[x].due_at.to_s)
               set_of_due_dates[x] = prev_saved_due_dates[x]
               offset = 0
@@ -624,3 +625,4 @@ class SignUpSheetController < ApplicationController
   end
 
 end
+

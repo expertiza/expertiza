@@ -1,4 +1,5 @@
 class BookmarksController < ApplicationController
+
   def add_bookmark_form
     # Fields: b_url b_type, b_title b_tags_text, b_type b_description
     @b_url = ""
@@ -53,8 +54,10 @@ class BookmarksController < ApplicationController
 
   #Listing all the bookmarks for a topic
   def view_topic_bookmarks
+    @current_user = User.find(session[:user].id)
     @assignment_id=params[:assignment_id]
     @topic = SignUpTopic.find(params[:id])
+    @topic_bookmark_rating_rubric = BookmarkRatingRubric.find(@topic.bookmark_rating_rubric_id)
     @search_results = Array.new
     if @topic
       for bmapping in @topic.bmappings
@@ -66,6 +69,7 @@ class BookmarksController < ApplicationController
         result_hash["description"] = bmapping.description
         result_hash["copied_by"] = bmapping.bookmark.user_count
         result_hash["created_at"] = bmapping.date_created
+        result_hash["bmapping_rating"] = bmapping.cumulative_rating
         # Now retrieving tags for this user-bookmark mapping
         # First retrieve all the tag_ids mapped to the BMapping id.
         # Then retrieve all the tag names of the tag_ids picked up.
@@ -86,36 +90,36 @@ class BookmarksController < ApplicationController
   def view_review_bookmarks
 
     #NExt few lines can be directly obtained from others' work view itself.
-    
+
     #Reviewer
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
-    
+
     @assignment  = @participant.assignment
-    
+
     if @assignment.team_assignment
       @review_mappings = TeamReviewResponseMap.find_all_by_reviewer_id(@participant.id)
-    else           
+    else
       @review_mappings = ParticipantReviewResponseMap.find_all_by_reviewer_id(@participant.id)
     end
 
     @topics_bookmarks = Hash.new
-	
-    @review_mappings.each do | map | 
+
+    @review_mappings.each do | map |
       if @assignment.team_assignment?
         participant = AssignmentTeam.get_first_member(map.reviewee_id)
       else
-        participant = map.reviewee 
+        participant = map.reviewee
       end
 
-      if participant 
+      if participant
 
 	    #For each topic that this user is reviewing, we have to display the bmappings for that topic
-	    topic = SignUpTopic.find(participant.topic.id)	    
-	    if topic	     
+	    topic = SignUpTopic.find(participant.topic.id)
+	    if topic
 	      bookmarks = Array.new
 	      for bmapping in topic.bmappings
-		
+
 		bookmark_hash = Hash.new
 		bookmark_hash["id"] = bmapping.id
 		bookmark_hash["url"] = bmapping.bookmark.url
@@ -140,7 +144,7 @@ class BookmarksController < ApplicationController
 
 	    @topics_bookmarks[participant.topic.topic_name] = bookmarks
 	    end
-      end 
+      end
     end
  end
 
@@ -164,7 +168,7 @@ class BookmarksController < ApplicationController
     end
     @result_tuple["tags"] = BookmarksHelper.join_tags(tag_array)
   end
-  
+
   # View bookmarks and search bookmarks of all the user
   def view_bookmarks
     @search_content = ""
@@ -183,7 +187,7 @@ class BookmarksController < ApplicationController
     # Call the model function with ordrer by parameter
     @search_results = Bookmark.search_alltags_allusers(@order_by)
   end
-  
+
   def edit_bookmark_form
     @bookmark_mapping = Bmapping.find(params[:id])
     @b_id = @bookmark_mapping.id
@@ -212,7 +216,7 @@ class BookmarksController < ApplicationController
   end
 
 
-## search for bookmarks - specifying comma separated tags
+    ## search for bookmarks - specifying comma separated tags
     def search_bookmarks
       ## add all the java script validations later on
       ## seaches for all bookmarks tagged with the values passed on the search string
@@ -226,7 +230,7 @@ class BookmarksController < ApplicationController
         end
         #when getting the hidden variable from the form for the users to include.. you might get "value" appended to the string before the param that you
         ##expect .. Remove that
-        @my_user = @my_user_temp.gsub (/value/, '');
+        @my_user = @my_user_temp.gsub(/value/, '');
 
         @search_array  = BookmarksHelper.separate_tags( @search_string)
         @method_name = "search_bookmarks"
@@ -242,7 +246,54 @@ class BookmarksController < ApplicationController
            render :action => "view_bookmarks"
         else
            render :action =>"manage_bookmarks"
-        end           
+        end
     end
-  
+
+    def add_rating_rubric_form
+      @rating_rubric = BookmarkRatingRubric.new
+    end
+
+    def create_rating_rubric
+      @rating_rubric = BookmarkRatingRubric.create(:display_text => params[:display_text].strip, :minimum_rating => params[:minimum_rating], :maximum_rating => params[:maximum_rating])
+      if @rating_rubric.errors.empty?
+        redirect_to(:action => :view_rating_rubrics)
+      else
+        render(:action => :add_rating_rubric_form)
+      end
+    end
+
+    def edit_rating_rubric_form
+      @rating_rubric = BookmarkRatingRubric.find(params[:id])
+    end
+
+    def update_rating_rubric
+      @rating_rubric = BookmarkRatingRubric.find(params[:id])
+      @rating_rubric.display_text = params[:display_text].strip
+      @rating_rubric.minimum_rating = params[:minimum_rating]
+      @rating_rubric.maximum_rating = params[:maximum_rating]
+      @rating_rubric.save
+      if @rating_rubric.errors.empty?
+        redirect_to(:action => :view_rating_rubrics)
+      else
+        render(:action => :edit_rating_rubric_form)
+      end
+    end
+
+    def view_rating_rubrics
+      @rating_rubrics = BookmarkRatingRubric.find(:all)
+    end
+
+    def save_rating
+      @current_user = User.find(session[:user].id)
+      # Check if the user has already rated the bmapping.
+      if old_rating = @current_user.bookmark_rated?(params[:bmapping_id])
+        old_rating.rating = params[:bookmark_rating]
+        old_rating.save
+      else
+        BmappingRatings.create(:bmapping_id => params[:bmapping_id], :user_id => @current_user.id, :rating => params[:bookmark_rating])
+      end
+      redirect_to(:action => :view_topic_bookmarks, :id => params[:topic_bookmark_id], :assignment_id => params[:assignment_id])
+    end
+
 end
+

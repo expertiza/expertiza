@@ -47,12 +47,20 @@ class QuestionnaireController < ApplicationController
      
   # Remove a given questionnaire
   def delete
-    questionnaire = Questionnaire.find(params[:id])
+
+    @questionnaire = Questionnaire.find(params[:id])
     
-    if questionnaire
+    if @questionnaire
        begin
-          name = questionnaire.name
-          questionnaire.delete
+          name = @questionnaire.name
+
+          for question in @questionnaire.questions
+            current_q_type = QuestionType.find_by_question_id(question.id)
+            if !current_q_type.nil?
+             current_q_type.delete
+            end
+          end
+          @questionnaire.delete
           flash[:note] = "Questionnaire <B>#{name}</B> was deleted."
       rescue
           flash[:error] = $!
@@ -72,10 +80,10 @@ class QuestionnaireController < ApplicationController
     begin
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to :action => 'list' if @questionnaire == nil
-    
+
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
-      save_questionnaire  
+      save_questionnaire
     end
     
     if params['export']
@@ -206,6 +214,7 @@ class QuestionnaireController < ApplicationController
   
   # save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id)
+
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
@@ -233,7 +242,6 @@ class QuestionnaireController < ApplicationController
           should_delete = false
         end
       end
-      
       if should_delete == true
         for advice in question.question_advices
           advice.destroy
@@ -242,6 +250,8 @@ class QuestionnaireController < ApplicationController
             delete_question_type(question.id)
         end
         question.destroy
+
+
       end
     end
   end
@@ -251,10 +261,27 @@ class QuestionnaireController < ApplicationController
     question_type = QuestionType.find_by_question_id(q_id)
     question_type.destroy
   end
+
+
+  def update_question_type (question_type_key)
+    this_q = QuestionType.find(question_type_key)
+    this_q.parameters = params[:q][question_type_key][:parameters]
+    if (params[:q][question_type_key][:q_type] == "0")
+        this_q.q_type =  Question::GRADING_TYPES_CUSTOM[0][0]
+    elsif (params[:q][question_type_key][:q_type] == "1")
+      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[1][0]
+    elsif (params[:q][question_type_key][:q_type] == "2")
+      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[2][0]
+    else
+      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[3][0]
+    end
+    if !this_q.nil?
+         this_q.save
+    end
+  end
   
   # Handles questions whose wording changed as a result of the edit    
   def save_questions(questionnaire_id)
-
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
 
@@ -263,12 +290,20 @@ class QuestionnaireController < ApplicationController
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
+            if (Questionnaire.find_by_id(questionnaire_id).section == "Custom")
+              QuestionType.find_by_question_id(question_key).delete
+            end
             Question.delete(question_key)
           else
             # Update existing question.
             Question.update(question_key, params[:question][question_key])
           end
         rescue ActiveRecord::RecordNotFound 
+        end
+      end
+      if (Questionnaire.find_by_id(questionnaire_id).section == "Custom")
+        for question_type_key in params[:q].keys
+          update_question_type(question_type_key)
         end
       end
     end

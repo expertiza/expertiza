@@ -141,7 +141,7 @@ class ResponseController < ApplicationController
     get_content  
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    # KHH: Comment this garbage out. I don't even know how this is got in here but its sad.
+    # KHH: Comment this breakage out
     #if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
     #  if @assignment.id < 469
     #     @next_action = "custom_create"

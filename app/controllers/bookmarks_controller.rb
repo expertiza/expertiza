@@ -57,7 +57,7 @@ class BookmarksController < ApplicationController
     @current_user = User.find(session[:user].id)
     @assignment_id=params[:assignment_id]
     @topic = SignUpTopic.find(params[:id])
-    @topic_bookmark_rating_rubric = BookmarkRatingRubric.find(@topic.bookmark_rating_rubric_id)
+    @topic_bookmark_rating_rubric = BookmarkRatingRubric.find(@topic.bookmark_rating_rubric_id) unless @topic.bookmark_rating_rubric_id.nil?
     @search_results = Array.new
     if @topic
       for bmapping in @topic.bmappings

@@ -4,5 +4,5 @@
     <%= hidden_field_tag 'user[name]', user.name %>
     <%= hidden_field_tag 'force', true %>
     <input type="submit" value="Proceed" class="looksLikeLink" />
+     | <a href="/teams_users/new/<%= team.id %>">Cancel</a>
 <% end %>
- | <a href="/teams_users/new/<%= team.id %>">Cancel</a>

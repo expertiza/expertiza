@@ -509,3 +509,24 @@ border-spacing: 0px; }
   float: left; width: 230px; margin-left: 16px; background: none repeat scroll 0pt 0pt rgb(250, 250, 234);
 }
 
+/*   course/_pairing_restrictions.html.erb
+------------------------------------------------*/
+#partnerRestrictionsWrapper {
+    background-color: #e6e6e6;
+}
+
+#addAssignmentsWrapper {
+    background-color: white;
+}
+
+#addAssignmentsWrapper h3 {
+    margin-top: 5px;
+}
+
+#assignmentsWrapper {
+    margin-top: 20px;
+}
+
+#assignmentsWrapper input {
+    margin-right: 8px;
+}

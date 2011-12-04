@@ -33,10 +33,6 @@ div.flash_warning a {
     color: inherit;
 }
 
-div.flash_warning form {
-    display: inline;
-}
-
 div.flash_warning input.looksLikeLink  {
     background: none;
     color: inherit;

@@ -22,8 +22,9 @@ jQuery(function() {
      * Handles when a user enters a value for the min number of unique pairings
      * by showing the interface to add assignments.
      */
-    jQuery("#course_min_unique_pairings").keyup(function() {
-        jQuery("#addAssignmentsWrapper").toggle(jQuery(this).val().length > 0);
+    jQuery("#course_min_unique_pairings").change(function() {
+        var val = jQuery(this).val();
+        jQuery("#addAssignmentsWrapper").toggle(val.length > 0 && parseInt(val) !== 0);
     });
 
     var allowedCodes = [8,9,13,37,38,39,40,46];
@@ -71,8 +72,10 @@ jQuery(function() {
 
         jQuery("#assignmentsWrapper").append(
             '<p>' +
-                '<label>Name: <input type="text" id="assignment' + i + '_name" name="assignment' + i + '[name]" /></label>' +
-                '<label>Team Size: <input type="text" id="assignment' + i + '_team_count" name="assignment' + i + '[team_count]" /></label>' +
+                '<label for="assignment' + i + '_name">Name:</label> ' +
+                '<input type="text" id="assignment' + i + '_name" name="assignment' + i + '[name]" /> ' +
+                '<label for="assignment' + i + '_team_count">Team Size:</label> ' +
+                '<input type="text" id="assignment' + i + '_team_count" name="assignment' + i + '[team_count]" /> ' +
                 '<a href="#" class="deleteAssignment"><img src="/images/delete.png" /></a>' +
             '</p>');
     });

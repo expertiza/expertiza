@@ -16,12 +16,15 @@ class CourseController < ApplicationController
   # if private is set to 1, then the course will
   # only be available to the instructor who created it.
   def new
+    @course = Course.new
     @private = params[:private]
+    @assignments = []
   end
 
   # Modify an existing course
   def edit
     @course = Course.find(params[:id])
+    @assignments = @course.assignments
   end
 
   def update
@@ -61,22 +64,27 @@ class CourseController < ApplicationController
 
   # create a course
   def create
-    course = Course.new(params[:course])
-    course.instructor_id = session[:user].id
+    @course = Course.new(params[:course])
+    @course.instructor_id = session[:user].id
+    @private = @course.private
+    @assignments = get_assignments_from_post
 
     begin
-      course.save!
-      course.create_node
-      FileHelper.create_directory(course)
+      pairings = @assignments.inject(0) {|sum, a| sum += (a.team_count - 1)}
+
+      if @course.min_unique_pairings and pairings < @course.min_unique_pairings
+        raise "There aren't enough opportunities for pairing."
+      end
+
+      @course.save!
+      @course.create_node
+      FileHelper.create_directory(@course)
 
       # save assignments if min_unique_pairings is given
-      if course.min_unique_pairings
-        index = 0
-
-        while(params["assignment#{index}".to_sym])
-          assignment = Assignment.new(params["assignment#{index}".to_sym])
+      if @course.min_unique_pairings
+        for assignment in @assignments
           assignment.set_defaults
-          assignment.course_id = course.id
+          assignment.course_id = @course.id
           session[:user].set_instructor(assignment)
 
           if assignment.save
@@ -84,15 +92,14 @@ class CourseController < ApplicationController
             FileHelper.create_directory(assignment)
             assignment.create_node
           end
-
-          index += 1
         end
       end
 
+      flash[:error] = nil # flash[:error] is not clearing when a previous validation error gets fixed
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = "The following error occurred while saving the course: "+$!
-      redirect_to :action => 'new'
+      render :action => 'new'
     end
   end
 
@@ -149,4 +156,17 @@ class CourseController < ApplicationController
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end
 
+  private
+
+  def get_assignments_from_post
+    assignments = []
+    index = 0
+
+    while(assignment = params["assignment#{index}".to_sym])
+      assignments.push(Assignment.new(assignment))
+      index += 1
+    end
+
+    return assignments
+  end
 end

@@ -12,11 +12,6 @@ class Course < ActiveRecord::Base
     return CourseTeam.find_all_by_parent_id(self.id)        
   end
 
-  def team_count
-    # I don't think this is working, but at least team_count is defined
-    return get_teams.length
-  end
-
   #Returns this object's submission directory
   def get_path
     if self.instructor_id == nil
@@ -73,5 +68,9 @@ class Course < ActiveRecord::Base
         node.parent_id = parent.id       
       end
       node.save   
-   end  
+   end
+
+  def has_pairing_restrictions
+    return (!self.min_unique_pairings.nil? or !self.max_duplicate_pairings.nil?)
+  end
 end

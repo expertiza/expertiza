@@ -1,0 +1,30 @@
+<p>
+  <input type="checkbox" id="restrictPartners" name="restrictPartners" <% if @course.has_pairing_restrictions  %>checked="checked"<% end %> />
+  <label for="restrictPartners">Add Restrictions on Team Partners</label>
+</p>
+
+<fieldset id="partnerRestrictionsWrapper" <% if !@course.has_pairing_restrictions  %>style="display:none;"<% end %>>
+  <p>
+    <%=label :course, :max_duplicate_pairings, 'Maximum number of times a student can have the same partner:' %><br />
+    <%=text_field :course, :max_duplicate_pairings %>
+  </p>
+
+  <p>
+    <%=label :course, :min_unique_pairings, 'Minimum number of unique partners a student must have:' %><br />
+    <%=text_field :course, :min_unique_pairings %>
+  </p>
+
+  <fieldset id="addAssignmentsWrapper" <% if !@course.min_unique_pairings %>style="display: none;"<% end %>>
+    <h3>Specify Assignments</h3>
+    <p>Since you have specified a minimum number of unique partners, you need to specify the assignments for this course by name including team size.</p>
+    <input type="button" id="plus1Assignment" value="Add Assignment" />
+
+    <div id="assignmentsWrapper">
+      <% @assignments.each_with_index do |assignment, index| %>
+        <%= render :partial => "assignment_skeleton", :locals => { :assignment => assignment, :i => index } %>
+      <% end %>
+    </div>
+  </fieldset>
+</fieldset>
+
+<script type="text/javascript" src="/javascripts/newCourse.js"></script>

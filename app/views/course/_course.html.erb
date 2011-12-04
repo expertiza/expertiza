@@ -1,36 +1,18 @@
 <!--[form:course]-->
-<p><label for="course_name">Course Name</label><br/>
-<%= text_field 'course', 'name'  %></p>
-<p><label for="course_directory_path">Course Directory</label><br/>
-<%= text_field 'course', 'directory_path'  %></p>
-<p><label for="course_info">Course Information</label><br/>
-<%= text_field 'course', 'info'  %></p>
+<p>
+  <%= label :course, :name %><br/>
+  <%= text_field :course, :name %>
+</p>
+<p>
+  <%= label :course, :directory_path, "Directory" %><br/>
+  <%= text_field :course, :directory_path %>
+</p>
+<p>
+  <%= label :course, :info, "Information" %><br/>
+  <%= text_field :course, :info %>
+</p>
 
-<p><label><input type="checkbox" id="restrictPartners" name="restrictPartners" />Add Restrictions on Team Partners</label></p>
-
-<fieldset id="partnerRestrictionsWrapper" style="display:none; background-color: #e6e6e6;">
-  <p>
-    <%=label 'course', 'max_duplicate_pairings', 'Maximum number of times a student can have the same partner:' %><br />
-    <%=text_field 'course', 'max_duplicate_pairings' %>
-  </p>
-
-  <p>
-    <%=label 'course', 'min_unique_pairings', 'Minimum number of unique partners a student must have:' %><br />
-    <%=text_field 'course', 'min_unique_pairings' %>
-  </p>
-
-  <fieldset id="addAssignmentsWrapper" style="background-color: white; display: none;">
-    <h3 style="margin-top: 5px;">Specify Assignments</h3>
-    <p>Since you have specified a minimum number of unique partners, you need to specify the assignments for this course by name including team size.</p>
-    <input type="button" id="plus1Assignment" value="Add Assignment" />
-
-    <div id="assignmentsWrapper">
-
-    </div>
-  </fieldset>
-</fieldset>
-
-<script type="text/javascript" src="/javascripts/newCourse.js"></script>
+<%= render :partial => 'pairing_restrictions' %>
 
 <!--[eoform:user]-->
 <br/>

@@ -28,22 +28,41 @@ class CourseController < ApplicationController
   end
 
   def update
-    course = Course.find(params[:id])
-    if params[:course][:directory_path] and course.directory_path != params[:course][:directory_path]
-      begin
-        FileHelper.delete_directory(course)
-      rescue
-        flash[:error] = $!
+    @course = Course.find(params[:id])
+
+    existing_assignments = get_existing_assignments_from_post
+    new_assignments = get_new_assignments_from_post
+    @assignments = new_assignments + existing_assignments
+
+    min_unique_pairings = params[:course][:min_unique_pairings]
+    pairings = @assignments.inject(0) {|sum, a| sum += (a.team_count - 1)}
+
+    begin
+      if min_unique_pairings and pairings < min_unique_pairings.to_i
+        raise "There aren't enough opportunities for pairing."
       end
 
-      begin
-        FileHelper.create_directory_from_path(params[:course][:directory_path])
-      rescue
-        flash[:error] = $!
+      @course.update_attributes(params[:course])
+
+      if @course.min_unique_pairings
+        existing_params = get_params_for_assignments(:existing)
+        existing_assignments.each_with_index {|a, index| a.update_attributes(existing_params[index]) }
+        save_assignments_with_defaults(new_assignments, @course.id)
       end
+
+      if params[:course][:directory_path] and @course.directory_path != params[:course][:directory_path]
+        begin
+          FileHelper.delete_directory(@course)
+          FileHelper.create_directory_from_path(params[:course][:directory_path])
+        rescue
+          flash[:error] = $!
+        end
+      end
+      redirect_to :controller => 'tree_display', :action => 'list'
+    rescue
+      flash[:error] = $!
+      render :action => 'edit'
     end
-    course.update_attributes(params[:course])
-    redirect_to :controller => 'tree_display', :action => 'list'
   end
 
   def copy
@@ -67,11 +86,10 @@ class CourseController < ApplicationController
     @course = Course.new(params[:course])
     @course.instructor_id = session[:user].id
     @private = @course.private
-    @assignments = get_assignments_from_post
+    @assignments = get_new_assignments_from_post
+    pairings = @assignments.inject(0) {|sum, a| sum += (a.team_count - 1)}
 
     begin
-      pairings = @assignments.inject(0) {|sum, a| sum += (a.team_count - 1)}
-
       if @course.min_unique_pairings and pairings < @course.min_unique_pairings
         raise "There aren't enough opportunities for pairing."
       end
@@ -80,22 +98,11 @@ class CourseController < ApplicationController
       @course.create_node
       FileHelper.create_directory(@course)
 
-      # save assignments if min_unique_pairings is given
       if @course.min_unique_pairings
-        for assignment in @assignments
-          assignment.set_defaults
-          assignment.course_id = @course.id
-          session[:user].set_instructor(assignment)
-
-          if assignment.save
-            assignment.create_default_dates
-            FileHelper.create_directory(assignment)
-            assignment.create_node
-          end
-        end
+        save_assignments_with_defaults(@assignments, @course.id)
       end
 
-      flash[:error] = nil # flash[:error] is not clearing when a previous validation error gets fixed
+      flash[:error] = nil # flash[:error] is not clearing on its own when a previous validation error gets fixed
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = "The following error occurred while saving the course: "+$!
@@ -158,15 +165,37 @@ class CourseController < ApplicationController
 
   private
 
-  def get_assignments_from_post
-    assignments = []
+  def get_params_for_assignments(new_or_existing)
+    assignment_params = []
     index = 0
 
-    while(assignment = params["assignment#{index}".to_sym])
-      assignments.push(Assignment.new(assignment))
+    while(param = params["assignment#{index}".to_sym])
+      assignment_params.push(param) if ((new_or_existing == :new and !param[:id]) or (new_or_existing == :existing and param[:id]))
       index += 1
     end
 
-    return assignments
+    return assignment_params
+  end
+
+  def get_new_assignments_from_post
+    get_params_for_assignments(:new).map {|p| Assignment.new(p) }
+  end
+
+  def get_existing_assignments_from_post
+    get_params_for_assignments(:existing).map {|p| Assignment.find(p[:id]) }
+  end
+
+  def save_assignments_with_defaults(assignments, course_id)
+    for assignment in assignments
+      assignment.set_defaults
+      assignment.course_id = course_id
+      session[:user].set_instructor(assignment)
+
+      if assignment.save
+        assignment.create_default_dates
+        FileHelper.create_directory(assignment)
+        assignment.create_node
+      end
+    end
   end
 end

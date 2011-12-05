@@ -11,7 +11,7 @@
 
   <p>
     <%=label :course, :min_unique_pairings, 'Minimum number of unique partners a student must have:' %><br />
-    <%=text_field :course, :min_unique_pairings %>
+    <%=text_field :course, :min_unique_pairings, :autocomplete => 'off' %>
   </p>
 
   <fieldset id="addAssignmentsWrapper" <% if !@course.min_unique_pairings %>style="display: none;"<% end %>>

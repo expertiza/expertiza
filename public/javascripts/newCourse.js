@@ -13,7 +13,9 @@ jQuery(function() {
         if(!checked) {
             jQuery("#course_max_duplicate_pairings").val("");
             jQuery("#course_min_unique_pairings").val("");
-            jQuery("#assignmentsWrapper").empty();
+            jQuery("#assignmentsWrapper").children("p").filter(function(){
+                return jQuery(this).find("input[id$='id']").length < 1;
+            }).remove();
             jQuery("#addAssignmentsWrapper").hide();
         }
     });
@@ -22,14 +24,14 @@ jQuery(function() {
      * Handles when a user enters a value for the min number of unique pairings
      * by showing the interface to add assignments.
      */
-    jQuery("#course_min_unique_pairings").change(function() {
+    jQuery("#course_min_unique_pairings").keyup(function() {
         var val = jQuery(this).val();
         jQuery("#addAssignmentsWrapper").toggle(val.length > 0 && parseInt(val) !== 0);
     });
 
     var allowedCodes = [8,9,13,37,38,39,40,46];
 
-    jQuery("#course_max_duplicate_pairings,#course_min_unique_pairings").keydown(function(e){
+    function onlyAllowNumericInput(e) {
         var modifiers = (e.altkey || e.shiftKey || e.ctrlKey || e.metaKey);
 
         if((!modifiers && e.keyCode >= 48 && e.keyCode <= 57) || allowedCodes.indexOf(e.keyCode) > -1) {
@@ -37,7 +39,10 @@ jQuery(function() {
         }
         e.preventDefault();
         return false;
-    });
+    }
+
+    jQuery("#course_max_duplicate_pairings,#course_min_unique_pairings").keydown(onlyAllowNumericInput);
+    jQuery("input[id$='team_count']").live('keydown',onlyAllowNumericInput);
 
     /**
      * Handles the delete assignment click by first renaming all the assignments
@@ -75,7 +80,7 @@ jQuery(function() {
                 '<label for="assignment' + i + '_name">Name:</label> ' +
                 '<input type="text" id="assignment' + i + '_name" name="assignment' + i + '[name]" /> ' +
                 '<label for="assignment' + i + '_team_count">Team Size:</label> ' +
-                '<input type="text" id="assignment' + i + '_team_count" name="assignment' + i + '[team_count]" /> ' +
+                '<input type="text" id="assignment' + i + '_team_count" name="assignment' + i + '[team_count]"  /> ' +
                 '<a href="#" class="deleteAssignment"><img src="/images/delete.png" /></a>' +
             '</p>');
     });

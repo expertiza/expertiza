@@ -5,7 +5,9 @@
   <label for="assignment<%= i %>_team_count">Team Size:</label>
   <input type="text" id="assignment<%= i %>_team_count" name="assignment<%= i %>[team_count]" value="<%= assignment.team_count %>" />
 
-  <% if !assignment.id %>
+  <% if assignment.id %>
+    <input type="hidden" id="assignment<%= i %>_id" name="assignment<%= i %>[id]" value="<%= assignment.id %>" />
+  <% else %>
     <a href="#" class="deleteAssignment"><img src="/images/delete.png" /></a>
   <% end %>
 </p>

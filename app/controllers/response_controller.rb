@@ -87,6 +87,7 @@ class ResponseController < ApplicationController
     rescue
       msg = "An error occurred while saving the response: "+$!
     end
+
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end  
   
@@ -207,6 +208,11 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @map.notification_accepted = false;
     @map.save
+
+    participantpenalty = Penalty.find_by_participant_id(@map.reviewer_id)
+
+    participantpenalty.calculate_penalty(@map.reviewer_id)
+
     
     redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
   end
@@ -216,6 +222,7 @@ class ResponseController < ApplicationController
     flash[:note]  = params[:msg] unless params[:msg] and params[:msg].empty?
     
     @map = ResponseMap.find(params[:id])
+
     if params[:return] == "feedback"
       redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
     elsif params[:return] == "teammate"

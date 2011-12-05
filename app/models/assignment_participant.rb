@@ -340,11 +340,14 @@ class AssignmentParticipant < Participant
      return path
   end
   
-  def update_resubmit_times
+  def update_resubmit_times()
     new_submit = ResubmissionTime.new(:resubmitted_at => Time.now.to_s)
     self.resubmission_times << new_submit
+
+
   end
-  
+
+
   def set_student_directory_num
     if self.directory_num.nil? or self.directory_num < 0           
       maxnum = AssignmentParticipant.find(:first, :conditions=>['parent_id = ?',self.parent_id], :order => 'directory_num desc').directory_num

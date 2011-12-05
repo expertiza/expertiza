@@ -190,7 +190,9 @@ class AssignmentTeam < Team
   def add_participant(assignment_id, user)
    if AssignmentParticipant.find_by_parent_id_and_user_id(assignment_id, user.id) == nil
      AssignmentParticipant.create(:parent_id => assignment_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
-   end    
+     participant_id =  AssignmentParticipant.find_by_parent_id_and_user_id(assignment_id, user.id)
+     Penalty.create(:participant_id => participant_id.id , :assignment_id => assignment_id, :user_id => user.id)
+   end
   end
  
   def assignment

@@ -5,6 +5,7 @@ class Participant < ActiveRecord::Base
   has_many   :comments, :dependent => :destroy
   has_many   :resubmission_times, :dependent => :destroy
   has_many   :reviews, :class_name => 'ResponseMap', :foreign_key => 'reviewer_id'
+  has_one    :penalty, :dependent => :destroy
   
   validates_numericality_of :grade, :allow_nil => true
 
@@ -28,10 +29,15 @@ class Participant < ActiveRecord::Base
   end
   
   def force_delete(maps)
-    times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])    
-    
+    times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])
+    partpenalty = Penalty.find_by_participant_id(:all, :conditions => ['participant_id =?', self.id])
+
     if times
       times.each { |time| time.destroy }
+    end
+
+    if partpenalty
+      partpenalty.each {|partpenalty| partpenalty.destroy}
     end
     
     if maps

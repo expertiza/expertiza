@@ -24,13 +24,16 @@ class SubmittedContentController < ApplicationController
   
   def submit_hyperlink
     participant = AssignmentParticipant.find(params[:id])
+    participantpenalty = Penalty.find_by_participant_id(participant.id)
     return unless current_user_id?(participant.user_id)
 
     begin
       participant.submmit_hyperlink(params['submission'])
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
-    end    
+    end
+     participant.update_resubmit_times()
+     participantpenalty.update_submit_times(participant.id)
     redirect_to :action => 'edit', :id => participant.id
   end    
 
@@ -49,6 +52,7 @@ class SubmittedContentController < ApplicationController
   
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
+    participantpenalty = ParticipantPenalty.find_by_participant_id(participant.id)
     return unless current_user_id?(participant.user_id)
 
     file = params[:uploaded_file]
@@ -74,7 +78,8 @@ class SubmittedContentController < ApplicationController
     if params['unzip']
       SubmittedContentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
-    participant.update_resubmit_times       
+    participant.update_resubmit_times()
+    participantpenalty.update_submit_times(participant.id)
 
     #send message to reviewers when submission has been updated
     participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.

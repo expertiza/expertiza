@@ -38,7 +38,8 @@ class ScoreCache < ActiveRecord::Base
       @ass_id = @assignment1.id
       
       
-    end 
+    end
+
     @questions = Hash.new    
     questionnaires = @assignment1.questionnaires
     questionnaires.each{
@@ -61,6 +62,8 @@ class ScoreCache < ActiveRecord::Base
     @p_max = @scorehash[:max]
     
     sc = ScoreCache.find(:first,:conditions =>["reviewee_id = ? and object_type = ?",  @contributor_id, @map_type ])
+
+
     if ( sc == nil)
       presenceflag = 1
       @msgs = "first entry"
@@ -73,22 +76,57 @@ class ScoreCache < ActiveRecord::Base
       
       
       sc.range =    range_string
-      sc.score = (@p_score*100).round/100.0
+
+      #deducting penalty from score
+
+      sc.score = ((@p_score*100).round/100.0)
       
       sc.object_type = @map_type                        
       
       sc.save
-      # make another new tuple for new score
+
+      #sc.score = sc.score / 2
+
+      #participantpenalty = Penalty.find_by_participant_id(@participant1.id)
+      #assignment = Assignment.find(@participant1.parent_id)
+      #@penalty_score = participantpenalty.calculate_penalty(@participant1)
+     #@stage = assignment.get_current_stage(@participant1.topic_id)
+      #if (@stage = "metareview")
+            #sc.score = sc.score - @penalty_score
+            #if sc.score < 0
+                 #sc.score = 0
+            #end
+      #end
+      #sc.save
+
+     # make another new tuple for new score
     else
       
       range_string = ((@p_min*100).round/100.0).to_s + "-" + ((@p_max*100).round/100.0).to_s
       
       sc.range =    range_string
-      sc.score = (@p_score*100).round/100.0
+
+      #deducting penalty from score
+      sc.score = ((@p_score*100).round/100.0)
       presenceflag = 2
+
       sc.save
+
+      #participantpenalty = Penalty.find_by_participant_id(@participant1.id)
+      #assignment = Assignment.find(@participant1.parent_id)
+      #@penalty_score = participantpenalty.calculate_penalty(@participant1)
+       #@stage = assignment.get_current_stage(@participant1.topic_id)
+
+       #if (@stage = "Complete")
+         #sc.score = sc.score - @penalty_score
+         #if sc.score < 0
+           #sc.score = 0
+         #end
+       #end
+      #sc.save
+
       #look for a consolidated score and change
-    end               
+    end
     
    
     #########################

@@ -502,15 +502,16 @@ class Assignment < ActiveRecord::Base
 def add_participant(user_name)
   user = User.find_by_name(user_name)
   if (user == nil) 
-    raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."
+    raise "No user account exists with the name "+user_name+"" #Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."
   end
   participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
   if !participant
     newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)      
-    newpart.set_handle()         
+    newpart.set_handle()
+    Penalty.create(:participant_id => newpart.id , :assignment_id => self.id, :user_id => user.id)
   else
     raise "The user \""+user.name+"\" is already a participant."
-  end
+    end
  end
  
  def create_node()
@@ -558,7 +559,7 @@ def add_participant(user_name)
     rounds = 0
     for i in (0 .. due_dates.length-1)
       deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
-      if deadline_type.name == "review" || deadline_type.name == "rereview"
+      if deadline_type.name == "review"
         rounds = rounds + 1
       end
     end

@@ -684,6 +684,11 @@ end
       @questions[questionnaire.symbol] = questionnaire.questions
     }
     @scores = @assignment.get_scores(@questions)
+
+    if(@scores[:teams].nil?)
+      return csv
+    end
+
     for index in 0 .. @scores[:teams].length - 1
       team = @scores[:teams][index.to_s.to_sym]
       for participant in team[:team].get_participants

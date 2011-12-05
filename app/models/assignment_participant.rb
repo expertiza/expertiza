@@ -5,6 +5,7 @@ require 'yaml'
 #              contribution and participant (see fields of the participant table).
 #              Consider creating a new table called contributions.
 class AssignmentParticipant < Participant  
+  include Artifact
   require 'wiki_helper'
   
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
@@ -49,7 +50,7 @@ class AssignmentParticipant < Participant
   end
 
   # Return scores that this participant has given
-  def get_scores(questions)
+  def get_scores_given(questions)
     scores = Hash.new
     scores[:participant] = self # This doesn't appear to be used anywhere
     assignment.questionnaires.each do |questionnaire|
@@ -61,55 +62,7 @@ class AssignmentParticipant < Participant
     return scores
   end
 
-  # Appends the hyperlink to a list that is stored in YAML format in the DB
-  # @exception  If is hyperlink was already there
-  #             If it is an invalid URL
-  def submmit_hyperlink(hyperlink)
-    hyperlink.strip!
-    raise "The hyperlink cannot be empty" if hyperlink.empty?
-
-    url = URI.parse(hyperlink)
-
-    # If not a valid URL, it will throw an exception
-    Net::HTTP.start(url.host, url.port)
-
-    hyperlinks = get_hyperlinks_array
-
-    hyperlinks << hyperlink
-    self.submitted_hyperlinks = YAML::dump(hyperlinks)
-
-    self.save
-  end
-
-  # Note: This method is not used yet. It is here in the case it will be needed.
-  # @exception  If the index does not exist in the array
-  def remove_hyperlink(index)
-    hyperlinks = get_hyperlinks
-    raise "The link does not exist" unless index < hyperlinks.size
-
-    hyperlinks.delete_at(index)
-    self.submitted_hyperlinks = hyperlinks.empty? ? nil : YAML::dump(hyperlinks)
-
-    self.save
-  end
-
-  # TODO:REFACTOR: This shouldn't be handled using an if statement, but using 
-  # polymorphism for individual and team participants
-  def get_hyperlinks         
-    if self.team     
-      links = self.team.get_hyperlinks     
-    else        
-      links = get_hyperlinks_array
-    end
-
-    return links
-  end
-
-  def get_hyperlinks_array
-    self.submitted_hyperlinks.nil? ? [] : YAML::load(self.submitted_hyperlinks)
-  end
-
-  #Copy this participant to a course
+  #Copy this participant to a coursedef copy(course_id)def copy(course_id)
   def copy(course_id)
     part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
     if part.nil?
@@ -150,27 +103,6 @@ class AssignmentParticipant < Participant
     TeammateReviewResponseMap.get_assessments_for(self)
   end
 
-  def get_submitted_files()
-    files = Array.new
-    if(self.directory_num)      
-      files = get_files(self.get_path)
-    end
-    return files
-  end  
-  
-  def get_files(directory)      
-      files_list = Dir[directory + "/*"]
-      files = Array.new
-      for file in files_list            
-        if File.directory?(file) then          
-          dir_files = get_files(file)          
-          dir_files.each{|f| files << f}
-        end
-        files << file               
-      end      
-      return files
-  end
-  
   def get_wiki_submissions
     currenttime = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
  
@@ -364,19 +296,16 @@ class AssignmentParticipant < Participant
         }
       end
     end
-  end   
-
-private
-
-  # Use submmit_hyperlink(), remove_hyperlink() instead
-  def submitted_hyperlinks=(val)
-    write_attribute :submitted_hyperlinks, val
   end
-end
 
-def get_topic_string
+
+
+
+
+  def get_topic_name
     if topic.nil? or topic.topic_name.empty?
       return "<center>&#8212;</center>"
     end
     return topic.topic_name
   end
+end

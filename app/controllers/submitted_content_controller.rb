@@ -27,7 +27,7 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(participant.user_id)
 
     begin
-      participant.submmit_hyperlink(params['submission'])
+      participant.submit_hyperlink(params['submission'])
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end    

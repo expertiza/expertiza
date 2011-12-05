@@ -82,7 +82,9 @@ class AssignmentController < ApplicationController
     @user = session[:user]
     @user.set_instructor(@assignment)
     @assignment.submitter_count = 0
-
+    if (@assignment.microtask)
+       @assignment.name = "MICROTASK - " + @assignment.name
+    end
 
     #Calculate days between submissions
     set_days_between_submissions
@@ -403,15 +405,11 @@ class AssignmentController < ApplicationController
           topics = SignUpTopic.find_all_by_assignment_id(@assignment.id)
           #already has sign-up topics associated with it
           if (!topics.nil? && topics.size != 0)
-            if @assignment.staggered_deadline == true
-              redirect_to :action => 'add_signup_topics_staggered', :controller => 'sign_up_sheet', :id => @assignment.id
-            else
-              redirect_to :action => 'add_signup_topics', :controller => 'sign_up_sheet', :id => @assignment.id
-            end
-          #if it has been copied or changed TO microtask
+            redirect_to :action => 'show', :id => @assignment
+          #has no sign-up topics associated with it
+          #i.e. - it has been copied or changed TO microtask
           else
             redirect_to :action => 'create_default_for_microtask', :controller => 'sign_up_sheet' , :id => @assignment.id
-
           end
         else
           redirect_to :action => 'show', :id => @assignment

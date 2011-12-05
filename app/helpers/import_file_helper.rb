@@ -4,7 +4,7 @@ module ImportFileHelper
  
   def self.define_attributes(row)   
     attributes = {}
-    attributes["role_id"] = Role.find_by_name "Student"
+    attributes["role_id"] = Role.student.id
     attributes["name"] = row[0].strip
     attributes["fullname"] = row[1]
     attributes["email"] = row[2].strip

@@ -26,7 +26,7 @@ class MetareviewResponseMap < ResponseMap
     self.review_mapping.assignment
   end
   
-  def self.export(csv,parent_id)    
+  def self.export(csv,parent_id,options)
     mappings = Assignment.find(parent_id).metareview_mappings    
     mappings = mappings.sort_by{|a| [a.review_mapping.reviewee.name,a.reviewee.name,a.reviewer.name]} 
     mappings.each{
@@ -39,7 +39,7 @@ class MetareviewResponseMap < ResponseMap
       } 
   end
   
-  def self.get_export_fields
+  def self.get_export_fields(options)
     fields = ["contributor","reviewed by","metareviewed by"]
     return fields            
   end   

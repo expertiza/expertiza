@@ -1,0 +1,37 @@
+<h2>Export <%= @title %></h2>
+<% form_tag({:controller => 'export_file', :action => 'export'}, {:method => 'post', :multipart => true, :name => 'export_form'}) do %>
+    <table>
+      <tr>
+        <td valign='Top'>Delimiter:</td>
+        <td>
+          <%= radio_button_tag 'delim_type', 'comma', true %> Comma<br/>
+          <%= radio_button_tag 'delim_type', 'space' %> Space<br/>
+          <%= radio_button_tag 'delim_type', 'tab' %> Tab<br/>
+          <%= radio_button_tag 'delim_type', 'other' %> Other <%= text_field_tag 'other_char' %>
+          <br/>
+        </td>
+      </tr>
+    </table>
+    <% if @model == 'Assignment' %>
+        <%= render :partial => 'scores' %>
+    <% end %>
+    <% if @model == 'CourseParticipant' %>
+        <%= render :partial => 'course_participants' %>
+    <% end %>
+    <% if @model == 'User' %>
+        <%= render :partial => 'users' %>
+    <% end %>
+    <% if @model == 'AssignmentTeam' %>
+        <%= render :partial => 'assignment_teams' %>
+    <% end %>
+    <% if @model == 'CourseTeam' %>
+        <%= render :partial => 'course_teams' %>
+    <% end %>
+    <br/>
+    <%= hidden_field_tag('model', @model) %>
+    <%= hidden_field_tag('id', @id) %>
+    <input type='submit' value='Export' onclick='{export_form.submit();}'/>
+    <br/><br/>
+<% end %>
+
+<a href="<%= session[:return_to] %>">Back</a>

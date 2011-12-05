@@ -13,7 +13,7 @@ class Questionnaire < ActiveRecord::Base
     
     DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
     DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
-    
+    DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517"
     def compute_weighted_score(symbol, assignment, scores)
       aq = self.assignment_questionnaires.find_by_assignment_id(assignment.id)      
       if scores[symbol][:scores][:avg]

@@ -88,7 +88,6 @@ class AssignmentControllerTest < ActionController::TestCase
       :wiki_type_id => 1,
       :microtask => true  }
 
-
     assert_response :redirect
     assert Assignment.find(:all, :conditions => "name = 'mt_valid_test'")
 

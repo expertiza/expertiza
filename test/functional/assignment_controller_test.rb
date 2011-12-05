@@ -60,18 +60,14 @@ class AssignmentControllerTest < ActionController::TestCase
     # copy an assignment
 
     @assignment = Assignment.first
-    #puts "======================================================================================"
-    #puts "Wiki_type_id = " + @assignment.wiki_type_id.to_s
-    #puts "Course_id = " + @assignment.course_id.to_s
-    #@assignment.wiki_type_id = 1
-    #@assignment.course_id = 157679937
-    #@assignment.save
     assignment_id = @assignment.id
     assignment_name = @assignment.name
     post :copy, :id => assignment_id
     assert_response :redirect
     assert Assignment.find( :all, :conditions => ['name = ?', "Copy of " + assignment_name] )
-
+    copied = Assignment.find( :first, :conditions => ['name = ?', "Copy of " + assignment_name] )
+    dir = copied.directory_path
+    assert Dir[dir].empty?
   end
 
 # Test Case 1101B

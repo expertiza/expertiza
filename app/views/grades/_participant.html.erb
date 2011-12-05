@@ -1,6 +1,11 @@
 <!-- PARTICIPANT -->
 <% 
   participant = pscore[:participant]
+  partpenalty = Penalty.find_by_participant_id(participant.id)
+  penalty = partpenalty.penalty_score
+   if penalty.nil?
+       penalty = 0
+   end
   if pscore[:review]
   	s_max = pscore[:review][:scores][:max]
   	s_min = pscore[:review][:scores][:min] 
@@ -90,14 +95,38 @@
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
     	<TD ALIGN="CENTER">
     	<% if stage == "Complete" %>      
-      	<% if participant.grade 
-      	    total_score = participant.grade
+      	<% if participant.grade
+              score_before_penalty = participant.grade
+             total_score = participant.grade - penalty
+              if total_score < 0
+                 total_score = 0
+              end
       	    title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
       	   else
-      	    total_score = pscore[:total_score] 
+                 score_before_penalty = pscore[:total_score]
+      	    total_score = pscore[:total_score]  - penalty
+              if total_score < 0
+                 total_score = 0
+              end
       	    title = nil
       	   end %>
-      	<div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %>%</div>       	    
+      	<div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %>%</div>
+
+
+<ul id="actionmenu"><li class="daddy">&nbsp;
+<ul>
+<div style="color:white">
+  <b>
+  <%= sprintf("Score before penalty = %.2f", score_before_penalty) %>%
+  <%= sprintf("Penalty = %.2f", penalty) %>% </b></div>
+
+  <!--<!%= link_to image_tag('/images/tree_view/add-public-24.png', :title => 'Create Public Assignment'),:controller=>'assignment', :action=>'new', :private => 0 %>
+  <!%= link_to image_tag('/images/tree_view/add-private-24.png', :title => 'Create Private Assignment'),:controller=>'assignment', :action=>'new', :private => 1 %>      -->
+</ul>
+</li></ul>
+
+
+
       	<% if controller.action_name != "view_my_scores" %> 
       	  <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
       	<% end %>

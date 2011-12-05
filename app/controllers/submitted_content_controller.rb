@@ -34,6 +34,7 @@ class SubmittedContentController < ApplicationController
     end
      participant.update_resubmit_times()
      participantpenalty.update_submit_times(participant.id)
+    participantpenalty.calculate_penalty(participant.id)
     redirect_to :action => 'edit', :id => participant.id
   end    
 

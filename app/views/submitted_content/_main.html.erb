@@ -4,7 +4,7 @@
 <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
   <% form_tag :action=>'submit_hyperlink', :id => participant.id do %> 
 	 <b>Submit a hyperlink:</b><BR/>
-   <input type="text" name="submission" size=40/ value="http://"><input type="submit" name="upload_link" value="Upload link"/>     
+   <input type="text" name="submission" size=40 value="http://"/><input type="submit" name="upload_link" value="Upload link"/>
 	<% end %>
 <% end %>	
 

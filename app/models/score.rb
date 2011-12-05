@@ -1,6 +1,15 @@
 class Score < ActiveRecord::Base
   belongs_to :question
 
+  QUESTIONNAIRE_TYPE_CACHE_MAP_TYPE = {
+      "ReviewQuestionnaire" => "ParticipantReviewResponseMap",
+      "MetareviewQuestionnaire" => "MetareviewResponseMap",
+      "AuthorFeedbackQuestionnaire" => "FeedbackResponseMap",
+      "TeammateReviewQuestionnaire" => "TeammateReviewResponseMap"
+  }
+
+
+
 
   #avalent
   # Same as compute_scores(assessments, questions) but it first checks if the score is available in the ScoreCache.
@@ -30,20 +39,20 @@ class Score < ActiveRecord::Base
     return scores
   end
 
-  def self.get_cache_map_type(questionnaire_type)
-    map_type = nil
-    case questionnaire_type
-      when "ReviewQuestionnaire"
-        map_type = "ParticipantReviewResponseMap"
-      when "MetareviewQuestionnaire"
-        map_type = "MetareviewResponseMap"
-      when "AuthorFeedbackQuestionnaire"
-        map_type = "FeedbackResponseMap"
-      when "TeammateReviewQuestionnaire"
-        map_type = "TeammateReviewResponseMap"
-    end
-    return map_type
-  end
+  #def self.get_cache_map_type(questionnaire_type)
+  #  map_type = nil
+  #  case questionnaire_type
+  #    when "ReviewQuestionnaire"
+  #      map_type = "ParticipantReviewResponseMap"
+  #    when "MetareviewQuestionnaire"
+  #      map_type = "MetareviewResponseMap"
+  #    when "AuthorFeedbackQuestionnaire"
+  #      map_type = "FeedbackResponseMap"
+  #    when "TeammateReviewQuestionnaire"
+  #      map_type = "TeammateReviewResponseMap"
+  #  end
+  #  return map_type
+  #end
 
   # Computes the total score for a list of assessments
   # parameters

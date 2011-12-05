@@ -31,9 +31,11 @@ class ResponseController < ApplicationController
     @map = @response.map           
     get_content    
     @review_scores = Array.new
+    @question_type = Array.new
     @questions.each{
       | question |
       @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+      @question_type << QuestionType.find_by_question_id(question.id)
     }
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric

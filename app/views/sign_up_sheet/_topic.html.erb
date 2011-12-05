@@ -17,7 +17,13 @@
 
 <p><label for="max_choosers">Maximum choosers</label><br/>
   <%= text_field 'topic', 'max_choosers' %></p>
+<p>
+  <label for="bookmark_rating_rubric_id">Select a bookmark rating rubric</label>
+  <br/>
+  <%= select("topic", "bookmark_rating_rubric_id", BookmarkRatingRubric.all.collect {|br| [ br.display_text, br.id ] }, { :include_blank => "Please select" }) %>
+</p>
 
 
 <!--[eoform:topic]-->
 <br/>
+

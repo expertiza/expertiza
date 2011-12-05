@@ -125,16 +125,16 @@ class StudentTaskController < ApplicationController
           participant = review_mapping.reviewee
         end
 
-        if !participant.nil? and !participant.topic_id.nil?
-          review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id, 1)
-
-          if review_due_date.due_at < Time.now && @assignment.get_current_stage(participant.topic_id) != 'Complete'
-            @reviewee_topic_id = participant.topic_id
+          if !participant.topic_id.nil?
+            review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id,1)
+            if review_due_date.due_at < Time.now && @assignment.get_current_stage(participant.topic_id) != 'Complete'
+              @reviewee_topic_id = participant.topic_id
+            end
           end
         end
       end
     end
-  end
+
 
   def others_work
     @participant = AssignmentParticipant.find(params[:id])

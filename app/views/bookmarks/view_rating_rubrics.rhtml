@@ -1,0 +1,37 @@
+<% if @rating_rubrics.empty? %>
+  <p> There are no bookmark rating rubrics. You can start here:
+    <%= link_to("Create new bookmark rating rubric", {:controller => "bookmarks", :action => "add_rating_rubric_form"}) %>
+  </p>
+<% else %>
+  <% @rating_rubrics.each do |rr| %>
+    <div style="border:1px solid #986633; padding:5px 15px;margin-bottom:15px;">
+      <p>
+        <div>
+          Display Text:
+        </div>
+        <div>
+          <%= rr.display_text %>
+        </div>
+      </p>
+      <p>
+        <div>
+          <span>Minimum Rating:</span>
+          <span><%= rr.minimum_rating %></span>
+          &nbsp;&nbsp;&nbsp;
+          <span>Maximum Rating:</span>
+          <span><%= rr.maximum_rating %></span>
+        </div>
+      </p>
+      <p>
+        <div>
+          <%= link_to("Edit", {:controller => "bookmarks", :action => "edit_rating_rubric_form", :id => rr.id}) %>
+          &nbsp;&nbsp;
+          <%= link_to("New", {:controller => "bookmarks", :action => "add_rating_rubric_form"}) %>
+          &nbsp;&nbsp;
+          <%= link_to("Delete", "#") %>
+        </div>
+      </p>
+    </div>
+  <% end %>
+<% end %>
+

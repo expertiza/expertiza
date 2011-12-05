@@ -1,4 +1,28 @@
-<h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
+
+
+<script type="text/javascript">
+function toggle(divName){
+	if(document.getElementById)
+	{
+		var theDiv = document.getElementById(divName);
+		if(theDiv)
+		{
+			if(theDiv.style.display == 'none')
+			{
+				theDiv.style.display = 'block';
+			}
+			else
+			{
+				theDiv.style.display = 'none';
+			}
+		}
+	}
+}
+</script>
+
+
+	<h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
+
 	<table class="general">
 	  <tr>
 	    <th width="5%">Topic #</th>
@@ -9,72 +33,101 @@
 	    <%if @show_actions%>
 	    <th width="5%">Action</th>
 	    <%end%>
+	    <th width="5%">Bookmarks</th>
 	  </tr>
 
-  <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
-      <b>Your topic(s):</b>
-      <% for selected_topic in @selected_topics %>
-          <br/><%= selected_topic.topic_name %>
-          <%if selected_topic.is_waitlisted == true%>
-            <font color='red'>(waitlisted)</font>
-          <%end%>
-      <% end %>
-  <% end %>
-  <br/><br/>
+	  
+	  <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+	      <b>Your topic(s):</b>
+	      <% for selected_topic in @selected_topics %>
+		<ul>
+			<li><a href="javascript:toggle('letterA')"><b><%= selected_topic.topic_name %></b><x/a>
+		
+			<ul id="letterA" style="display: none">						 	
+			<span class="inline" id="1_show" >				
 
-  <% i=1 %>
-  <% for topic in @sign_up_topics %>
-  	<% if !@selected_topics.nil? && @selected_topics.size != 0 %>
-     <% for selected_topic in @selected_topics %>
-       <% if selected_topic.topic_id == topic.id %>
-        <tr bgcolor="yellow">
-       <% else %>
-	     <tr>
-	   <% end%>
-	 <%end %>
-	 <%else%>
-	 	<tr>
-	<%end%>
-        <td><%=topic.topic_identifier%></td>
-        <td><%= topic.topic_name %></td>
-        <td align="center"><%= topic.max_choosers %></td>
+				<%@topics_bmappings = SignUpTopic.find(:all, :conditions => ['id = ?',selected_topic.topic_id]) %>
+				<%if @topics_bmappings%>	
+					<% for thistopic in @topics_bmappings %>	
+						<%for bmap in thistopic.bmappings %>
+							<li class=""><%= link_to bmap.title, :controller=>'bookmarks', :action=> 'view', :id => bmap.bookmark_id %></span></li>
+						<% end%>				
+						<%= link_to "<b>View All</b>", :controller=>'bookmarks', :action=> 'view_topic_bookmarks', :id => selected_topic.topic_id, :assignment_id => params[:id] %>
+						</ul>
+						</li>
+					<% end%>
+				<%end %>		
+			</ul>
+		   		 				
+		<%end %>
+		<%if selected_topic.is_waitlisted == true%>
+		    <font color='red'>(waitlisted)</font>
+		<%end%>
+	  <% end %>
 
-        <% found_in_slots = false %>
-        <% for slot in @slots_filled %>
-            <% if slot.topic_id.to_s == topic.id.to_s %>
-                <% available_slots = topic.max_choosers.to_int - slot.count.to_i %>
-                <td align="center"><%= available_slots %></td>
-                <% found_in_slots = true %>
-            <% end %>
-        <% end %>
-        <% if found_in_slots == false %>
-            <td align="center"><%= topic.max_choosers %></td>
-        <% end %>
+	<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <br/>
+	<%= link_to 'Manage all Bookmarks', :controller=>'bookmarks', :action=> 'manage_bookmarks' %>
 
-        <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
-        <%if @show_actions%>
-            <%action_symbol_added = false%>
-            <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
-                <% for selected_topic in @selected_topics %>
-                    <% if selected_topic.topic_id == topic.id %>
-                        <td align="center" bgcolor="yellow"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
-                        <%action_symbol_added = true%>
-                    <% end %>
-                <% end %>
-            <% end %>
-            <%if action_symbol_added == false %>
-                <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
-            <% end %>
-        <% end %>
-      </tr>
-      <% i=i+1 %>
-  <% end %>
 
-</table>
+	  <% i=1 %>
+	  <% for topic in @sign_up_topics %>
+	  	<% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+	     <% for selected_topic in @selected_topics %>
+	       <% if selected_topic.topic_id == topic.id %>
+		<tr bgcolor="yellow">
+	       <% else %>
+		     <tr>
+		   <% end%>
+		 <%end %>
+		 <%else%>
+		 	<tr>
+		<%end%>
+		<td><%=topic.topic_identifier%></td>
+		<td><%= topic.topic_name %></td>
+		<td align="center"><%= topic.max_choosers %></td>
+
+		<% found_in_slots = false %>
+		<% for slot in @slots_filled %>
+		    <% if slot.topic_id.to_s == topic.id.to_s %>
+		        <% available_slots = topic.max_choosers.to_int - slot.count.to_i %>
+		        <td align="center"><%= available_slots %></td>
+		        <% found_in_slots = true %>
+		    <% end %>
+		<% end %>
+		<% if found_in_slots == false %>
+		    <td align="center"><%= topic.max_choosers %></td>
+		<% end %>
+
+		<%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
+		<%if @show_actions%>
+		    <%action_symbol_added = false%>
+		    <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+		        <% for selected_topic in @selected_topics %>
+		            <% if selected_topic.topic_id == topic.id %>
+		                <td align="center" bgcolor="yellow"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+		                <%action_symbol_added = true%>
+		            <% end %>
+		        <% end %>
+		    <% end %>
+		    <%if action_symbol_added == false %>
+		        <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
+		    <% end %>
+		<% end %>
+		<td>
+		<%= link_to 'View', :controller=>'bookmarks', :action=> 'view_topic_bookmarks', :id => topic.id, :assignment_id => params[:id] %>
+		<%= link_to 'Add', :controller=>'bookmarks', :action=> 'add_bookmark_form', :id => topic.id, :assignment_id => params[:id] %>
+		</td>
+	      </tr>
+	      <% i=i+1 %>
+	  <% end %>
+
+	</table>
+
 
 <%
    session[:return_to] = request.request_uri
 %>
 <br/><br/>
-<a href="javascript:history.back()">Back</a>  
+<a href="javascript:history.back()">Back</a>
 <br/>
+

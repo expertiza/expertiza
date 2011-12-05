@@ -1,0 +1,10 @@
+<b>Bookmarks for the Topic:</b> 
+<%=@topic.topic_name%>
+<br>
+<br>
+
+<%= render :partial => 'results' %>
+<%= hidden_field_tag "id", @assignment_id %>
+ 
+<br/>
+<%= link_to('Back', :back) %>

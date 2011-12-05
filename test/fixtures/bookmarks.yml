@@ -1,0 +1,12 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+bookmark_1:
+ url : "www.google.com"
+ discoverer_user_id: <%= Fixtures.identify(:student1)%>
+
+
+
+bookmark_2:
+ url : "www.wiki.com"
+ discoverer_user_id: <%= Fixtures.identify(:student2)%>
+

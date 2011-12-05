@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111025015938) do
+ActiveRecord::Schema.define(:version => 20111204132541) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -59,6 +59,49 @@ ActiveRecord::Schema.define(:version => 20111025015938) do
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
+
+  create_table "bmapping_ratings", :force => true do |t|
+    t.integer  "bmapping_id", :null => false
+    t.integer  "user_id",     :null => false
+    t.integer  "rating",      :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bmappings", :force => true do |t|
+    t.integer  "bookmark_id",   :null => false
+    t.string   "title"
+    t.integer  "user_id",       :null => false
+    t.string   "description"
+    t.datetime "date_created",  :null => false
+    t.datetime "date_modified", :null => false
+  end
+
+  create_table "bmappings_sign_up_topics", :id => false, :force => true do |t|
+    t.integer "sign_up_topic_id", :null => false
+    t.integer "bmapping_id",      :null => false
+  end
+
+  create_table "bmappings_tags", :force => true do |t|
+    t.integer  "tag_id",      :null => false
+    t.integer  "bmapping_id", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bookmark_rating_rubrics", :force => true do |t|
+    t.string   "display_text",   :null => false
+    t.integer  "minimum_rating", :null => false
+    t.integer  "maximum_rating", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bookmarks", :force => true do |t|
+    t.string  "url",                :null => false
+    t.integer "discoverer_user_id", :null => false
+    t.integer "user_count",         :null => false
+  end
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -297,6 +340,10 @@ ActiveRecord::Schema.define(:version => 20111025015938) do
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
 
+  create_table "schema_info", :id => false, :force => true do |t|
+    t.integer "version"
+  end
+
   create_table "score_caches", :force => true do |t|
     t.integer "reviewee_id"
     t.float   "score",       :default => 0.0, :null => false
@@ -325,11 +372,12 @@ ActiveRecord::Schema.define(:version => 20111025015938) do
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "sign_up_topics", :force => true do |t|
-    t.text    "topic_name",                                    :null => false
-    t.integer "assignment_id",                  :default => 0, :null => false
-    t.integer "max_choosers",                   :default => 0, :null => false
+    t.text    "topic_name",                                             :null => false
+    t.integer "assignment_id",                           :default => 0, :null => false
+    t.integer "max_choosers",                            :default => 0, :null => false
     t.text    "category"
-    t.string  "topic_identifier", :limit => 10
+    t.string  "topic_identifier",          :limit => 10
+    t.integer "bookmark_rating_rubric_id"
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"
@@ -419,6 +467,10 @@ ActiveRecord::Schema.define(:version => 20111025015938) do
 
   add_index "ta_mappings", ["course_id"], :name => "fk_ta_mappings_course_id"
   add_index "ta_mappings", ["ta_id"], :name => "fk_ta_mappings_ta_id"
+
+  create_table "tags", :force => true do |t|
+    t.string "tagname", :null => false
+  end
 
   create_table "teams", :force => true do |t|
     t.string  "name"

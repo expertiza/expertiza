@@ -1,0 +1,13 @@
+
+
+bmapping_rating1:
+ user_id: <%= Fixtures.identify(:student1)%>
+ rating: 5
+ bmapping_id: <%= Fixtures.identify(:bmapping1)%>
+
+bmapping_rating2:
+ user_id: <%= Fixtures.identify(:student2)%>
+ rating: 4
+ bmapping_id: <%= Fixtures.identify(:bmapping2)%>
+
+

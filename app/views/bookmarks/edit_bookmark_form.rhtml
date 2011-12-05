@@ -1,0 +1,27 @@
+<h1>Edit this bookmark</h1>
+<h5>Please enter the following fields to create a new bookmark</h5>
+<table>
+	<% form_tag (:action => "edit_bookmark", :method => "post") do %>
+	<tr>
+		<td> Text field for Bookmark URL </td>
+		<td> <%= text_field_tag("b_url", @b_url, :size => 100, :maxlength => 300,:readonly => 'true' ) %> </td>
+	</tr>
+	<tr>
+		<td> Text field for Bookmark Title </td>
+		<td> <%= text_field_tag("b_title", @b_title, :size => 100, :maxlength => 300 ) %> </td>
+	</tr>
+	<tr>
+		<td> Text field for tags </td>
+		<td> <%= text_field_tag("b_tags_text", @b_tags_text, :size => 100, :maxlength => 300 ) %> </td>
+	</tr>
+	<tr colspan = 6>
+		<td> Text field for description </td>
+		<td> <%= text_area_tag("b_description", @b_description, :rows=>300, :cols=>100) %> </td>
+	</tr>
+	<tr>
+		<td> <%= submit_tag("Edit", :name => nil) %>
+		<br/>
+		</td>
+	</tr>
+	<% end %>
+</table>

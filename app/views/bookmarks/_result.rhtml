@@ -1,0 +1,35 @@
+<table width = "100%">
+	<tr>
+		<% bookmark_title = search_result["title"] %>
+		<td width = "60%"><%= link_to( bookmark_title, :action =>"view", :id =>search_result["id"]) %> </td>
+		<% if (@order_by == "most_recent") %>
+		  <td width = "400%">Added at <%= search_result["created_at"].asctime %> </td>
+		<% else%>
+		  <td width = "40%">Bookmarked by <%= search_result["copied_by"] %> users</td>
+		<% end%>
+	</tr>
+	<tr>
+		<td width = "60%">Tags: <%= search_result["tags"] %></td>
+		<td width = "40%">Owned by <%= search_result["user"]%></td>
+	</tr>
+	<% if search_result["bmapping_rating"] %>
+	  <tr>
+		  <td>Rating: <%= search_result["bmapping_rating"] %></td>
+	  </tr>
+	<% end %>
+</table>
+<% unless @topic_bookmark_rating_rubric.nil? || @current_user.bookmark_added?(search_result["id"]) %>
+  <% form_tag(:controller => :bookmarks, :action => :save_rating) do %>
+    <p>
+      <span>
+        <%= hidden_field_tag("topic_bookmark_id", params[:id])%>
+        <%= hidden_field_tag("assignment_id", params[:assignment_id])%>
+        <%= hidden_field_tag("bmapping_id", search_result["id"])%>
+        <%= @topic_bookmark_rating_rubric.display_text %>
+        <%= select_tag("bookmark_rating", options_for_select((@topic_bookmark_rating_rubric.minimum_rating..@topic_bookmark_rating_rubric.maximum_rating).to_a, @current_user.bookmark_rated?(search_result["id"]).nil? ? nil : @current_user.bookmark_rated?(search_result["id"]).rating)) %>
+        <%= submit_tag("Save") %>
+      </span>
+    </p>
+  <% end %>
+<% end %>
+

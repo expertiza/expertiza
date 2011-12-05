@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-  
+
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {:if => lambda { false }} # Don't validate email uniqueness
     config.password_field = :clear_password
@@ -13,13 +13,13 @@ class User < ActiveRecord::Base
   has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id', :dependent => :destroy
   # FIXME:          :class_name should be AssignmentParticipant, probably. In most cases it's used that way. But all?
   has_many :assignments, :through => :participants
-  
+
   belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
   belongs_to :role
-  
+
   has_many :teams_users, :dependent => :destroy
   has_many :teams, :through => :teams_users
-  
+
   validates_presence_of :name
   validates_presence_of :email, :message => "can't be blank; use anything@mailinator.com for test users"
   validates_format_of :email, :with => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, :allow_blank => true
@@ -29,11 +29,20 @@ class User < ActiveRecord::Base
   before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.clear_password.blank? } # AuthLogic
   after_create :email_welcome
 
+  # Bookmark related methods
+  def bookmark_rated?(bmapping_id)
+    BmappingRatings.find(:first, :conditions => ["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"])
+  end
+
+  def bookmark_added?(bmapping_id)
+    Bmapping.find(:first, :conditions => ["id = #{bmapping_id} AND user_id = #{self.id}"])
+  end
+
   def list_mine(object_type, user_id)
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end
-  
-  def get_available_users(name)    
+
+  def get_available_users(name)
     lesser_roles = role.get_parents
     all_users = User.find(:all, :conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
     visible_users = all_users.select{|user| lesser_roles.include? user.role}
@@ -82,10 +91,10 @@ class User < ActiveRecord::Base
 
   def self.import(row,session,id = nil)
       if row.length != 4
-       raise ArgumentError, "Not enough items" 
-      end    
-      user = User.find_by_name(row[0])    
-      
+       raise ArgumentError, "Not enough items"
+      end
+      user = User.find_by_name(row[0])
+
       if user == nil
         attributes = ImportFileHelper::define_attributes(row)
         user = ImportFileHelper::create_new_user(attributes,session)
@@ -96,12 +105,12 @@ class User < ActiveRecord::Base
         user.parent_id = (session[:user]).id
         user.save
       end
-  end  
-  
+  end
+
   def get_author_name
     return self.fullname
   end
-    
+
   def self.yesorno(elt)
     if elt==true
       "yes"
@@ -110,8 +119,8 @@ class User < ActiveRecord::Base
     else
       ""
     end
-  end    
-    
+  end
+
   # locate User based on provided login.
   # If user supplies e-mail or name, the
   # helper will try to find that User account.
@@ -122,25 +131,25 @@ class User < ActiveRecord::Base
          shortName = items[0]
          userList = User.find(:all, {:conditions=> ["name =?",shortName]})
          if userList != nil && userList.length == 1
-            user = userList.first            
+            user = userList.first
          end
       end
-      return user     
-  end 
-  
-  def set_instructor (new_assign)  
-    new_assign.instructor_id = self.id  
+      return user
   end
-  
+
+  def set_instructor (new_assign)
+    new_assign.instructor_id = self.id
+  end
+
   def get_instructor
     self.id
   end
-  
-  def set_courses_to_assignment 
-    @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')    
+
+  def set_courses_to_assignment
+    @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')
   end
 
-  # generate a new RSA public/private key pair and create our own X509 digital certificate which we 
+  # generate a new RSA public/private key pair and create our own X509 digital certificate which we
   # save in the database. The private key is returned by the method but not saved.
   def generate_keys
     # check if we are replacing a digital certificate already generated
@@ -156,28 +165,28 @@ class User < ActiveRecord::Base
     cert.version = 1
     cert.subject = cert.issuer = OpenSSL::X509::Name.parse("/C="+self.id.to_s)
     cert.public_key = new_public
-    
+
     # certificate will be valid for 1 year
     cert.not_before = Time.now
     cert.not_after = Time.now+3600*24*365
-    
+
     # self-sign (we trust our own certificates) it using the private key
     cert.sign(new_key, OpenSSL::Digest::SHA1.new)
-    
+
     # convert to a textual form and save it in the database
     self.digital_certificate = cert.to_pem
     self.save
-    
+
     # when replacing an existing key, update any digital signatures made previously with the new key
     if (replacing_key)
       participants = AssignmentParticipant.find_all_by_user_id(self.id)
       for participant in participants
         if (participant.permission_granted && !participant.digital_signature.nil?)
-          AssignmentParticipant.grant_publishing_rights(new_private, [ participant ]) 
+          AssignmentParticipant.grant_publishing_rights(new_private, [ participant ])
         end
       end
     end
-    
+
     # return the new private key
     new_private
   end
@@ -191,3 +200,4 @@ class User < ActiveRecord::Base
   end
 
 end
+

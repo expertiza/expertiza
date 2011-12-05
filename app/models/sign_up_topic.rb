@@ -1,32 +1,33 @@
 class SignUpTopic < ActiveRecord::Base
   has_many :signed_up_users, :foreign_key => 'topic_id', :dependent => :destroy
   has_many :topic_dependencies, :foreign_key => 'topic_id', :dependent => :destroy
-  has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy 
+  has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy
   has_many :assignment_participants, :foreign_key => 'topic_id'
 
   belongs_to :assignment
+  has_and_belongs_to_many :bmappings
 
   def self.import(row,session,id = nil)
 
       if row.length != 4
           raise ArgumentError, "CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category"
-      end      
+      end
 
       topic = SignUpTopic.find_by_topic_name_and_assignment_id(row[1],session[:assignment_id])
-      
-      if topic == nil        
+
+      if topic == nil
         attributes = ImportTopicsHelper::define_attributes(row)
         ImportTopicsHelper::create_new_sign_up_topic(attributes,session)
       else
         topic.max_choosers = row[2]
         topic.topic_identifier = row[0]
-        #topic.assignment_id = session[:assignment_id]  
+        #topic.assignment_id = session[:assignment_id]
         topic.save
       end
   end
 
   def self.find_slots_filled(assignment_id)
-    SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")    
+    SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")
   end
 
   def self.find_slots_waitlisted(assignment_id)
@@ -85,6 +86,7 @@ class SignUpTopic < ActiveRecord::Base
         participant.update_topic_id(self.id)
       end
     }
-  end  
+  end
 
 end
+

@@ -1,3 +1,4 @@
+=begin
 And /^I open assignment "([^"]*)"$/ do |test|
   should have_link "Assignments"
   click_link 'Assignments'
@@ -28,3 +29,4 @@ end
 Then /^I should see that the members "([^"]*)" are pending$/ do |name|
   should have_content name
 end
+=end

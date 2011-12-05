@@ -117,6 +117,7 @@ class QuestionnaireController < ApplicationController
     @questionnaire.private = params[:private] 
     @questionnaire.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
     @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE    
+    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
   end
 
   # Save the new questionnaire to the database

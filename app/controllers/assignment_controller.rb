@@ -103,24 +103,30 @@ class AssignmentController < ApplicationController
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
-    
-    if @assignment.save 
+
+    check_flag = @assignment.availability_flag
+
+    if(check_flag == true && params[:submit_deadline].nil?)
+      raise "Please enter a valid Submission deadline!!"
+      render :action => 'create'
+    elsif (@assignment.save)
       set_questionnaires   
       set_limits_and_weights
-      
       max_round = 1
-      
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
-        due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
-        raise "Please enter a valid Submission deadline" if !due_date
-        
+        if check_flag == true
+            due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
+            raise "Please enter a valid Submission deadline" if !due_date
+        else
+            due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
+        end
         due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
-        raise "Please enter a valid Review deadline" if !due_date
+#        raise "Please enter a valid Review deadline" if !due_date
         max_round = 2;
         
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
-        raise "Please enter a valid Drop-Topic deadline" if !due_date
+ #       raise "Please enter a valid Drop-Topic deadline" if !due_date
         
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys

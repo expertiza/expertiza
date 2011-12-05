@@ -37,18 +37,10 @@ class ResponseController < ApplicationController
       @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
       @question_type << QuestionType.find_by_question_id(question.id)
     }
-    #**********************
-    # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
-      if @assignment.id < 469
-         @next_action = "custom_update"
-         render :action => 'custom_response'
-     elsif @assignment.id < 475
-         @next_action = "custom_update"
-         render :action => 'custom_response_2011'
-     else
-         @next_action = "custom_update"
-         render :action => 'custom_response_Dynamic'
+    # Check whether this is a custom rubric
+    if @map.questionnaire.section.eql? "Custom"
+      @next_action = "custom_update"
+      render :action => 'custom_response_Dynamic'
      end
     else
       # end of special code (except for the end below, to match the if above)
@@ -144,32 +136,22 @@ class ResponseController < ApplicationController
     @modified_object = @map.id
     get_content  
     #**********************
-    # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
-      if @assignment.id < 469
-        if !@map.contributor.nil?
-          if @map.assignment.team_assignment?
-            team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
-            @topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
-          else
-            @topic_id = Participant.find(@map.contributor).topic_id
-          end
+    # Check whether this is a custom rubric
+    if @map.questionnaire.section.eql? "Custom"
+      if !@map.contributor.nil?
+        if @map.assignment.team_assignment?
+          team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
+          @topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
+        else
+          @topic_id = Participant.find(@map.contributor).topic_id
         end
-        if !@topic_id.nil?
-          @signedUpTopic = @SignUpTopic.find(@topic_id).topic_name
-        end
-        @next_action = "custom_create"
-        render :action => 'custom_response'
-     elsif @assignment.id < 475
-         @next_action = "custom_create"
-         render :action => 'custom_response_2011'
-     else
-         @next_action = "custom_create"
-         render :action => 'custom_response_dynamic'
-     end
+      end
+      if !@topic_id.nil?
+        @signedUpTopic = @SignUpTopic.find(@topic_id).topic_name
+      end
+      @next_action = "custom_create"
+      render :action => 'custom_response_dynamic'
     else
-      # end of special code (except for the end below, to match the if above)
-      #**********************
     render :action => 'response'
     end
   end

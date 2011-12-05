@@ -3,7 +3,7 @@
   <input type="text" id="assignment<%= i %>_name" name="assignment<%= i %>[name]" value="<%= assignment.name %>" />
 
   <label for="assignment<%= i %>_team_count">Team Size:</label>
-  <input type="text" id="assignment<%= i %>_team_count" name="assignment<%= i %>[team_count]" value="<%= assignment.team_count %>" />
+  <input type="text" id="assignment<%= i %>_team_count" name="assignment<%= i %>[team_count]" value="<%= assignment.team_count %>" class="numeric" />
 
   <% if assignment.id %>
     <input type="hidden" id="assignment<%= i %>_id" name="assignment<%= i %>[id]" value="<%= assignment.id %>" />

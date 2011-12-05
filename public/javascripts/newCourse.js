@@ -3,6 +3,15 @@
  */
 jQuery(function() {
     /**
+     * Removes the unsaved "temp" assignments added by the user when creating or editing a course
+     */
+    function removeTempAssignments() {
+        jQuery("#assignmentsWrapper").children("p").filter(function(){
+            return jQuery(this).find("input[id$='id']").length < 1;
+        }).remove();
+    }
+
+    /**
      * Handles when the user chooses to add restrictions on partners
      * by showing the text boxes for max_duplicate_pairings and min_unique_pairings.
      */
@@ -13,9 +22,7 @@ jQuery(function() {
         if(!checked) {
             jQuery("#course_max_duplicate_pairings").val("");
             jQuery("#course_min_unique_pairings").val("");
-            jQuery("#assignmentsWrapper").children("p").filter(function(){
-                return jQuery(this).find("input[id$='id']").length < 1;
-            }).remove();
+            removeTempAssignments();
             jQuery("#addAssignmentsWrapper").hide();
         }
     });
@@ -26,11 +33,21 @@ jQuery(function() {
      */
     jQuery("#course_min_unique_pairings").keyup(function() {
         var val = jQuery(this).val();
-        jQuery("#addAssignmentsWrapper").toggle(val.length > 0 && parseInt(val) !== 0);
+        var show = val.length > 0 && parseInt(val) !== 0;
+        jQuery("#addAssignmentsWrapper").toggle(show);
+
+        if(!show) {
+            removeTempAssignments();
+        }
     });
 
     var allowedCodes = [8,9,13,37,38,39,40,46];
 
+    /**
+     * Returns true if the key being pressed is numeric or has a keycode in the
+     * allowedCodes array, false otherwise.
+     * @param e: the mouse event
+     */
     function onlyAllowNumericInput(e) {
         var modifiers = (e.altkey || e.shiftKey || e.ctrlKey || e.metaKey);
 
@@ -41,6 +58,9 @@ jQuery(function() {
         return false;
     }
 
+    /**
+     * The following binding make the text boxes only accept numeric input
+     */
     jQuery("#course_max_duplicate_pairings,#course_min_unique_pairings").keydown(onlyAllowNumericInput);
     jQuery("input[id$='team_count']").live('keydown',onlyAllowNumericInput);
 
@@ -80,7 +100,7 @@ jQuery(function() {
                 '<label for="assignment' + i + '_name">Name:</label> ' +
                 '<input type="text" id="assignment' + i + '_name" name="assignment' + i + '[name]" /> ' +
                 '<label for="assignment' + i + '_team_count">Team Size:</label> ' +
-                '<input type="text" id="assignment' + i + '_team_count" name="assignment' + i + '[team_count]"  /> ' +
+                '<input type="text" id="assignment' + i + '_team_count" name="assignment' + i + '[team_count]"  class="numeric" /> ' +
                 '<a href="#" class="deleteAssignment"><img src="/images/delete.png" /></a>' +
             '</p>');
     });

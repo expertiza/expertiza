@@ -515,6 +515,11 @@ border-spacing: 0px; }
     background-color: #e6e6e6;
 }
 
+#partnerRestrictionsWrapper > p label {
+    display: inline-block;
+    width: 470px;
+}
+
 #addAssignmentsWrapper {
     background-color: white;
 }
@@ -529,4 +534,8 @@ border-spacing: 0px; }
 
 #assignmentsWrapper input {
     margin-right: 8px;
+}
+
+input.numeric {
+    width: 46px;
 }

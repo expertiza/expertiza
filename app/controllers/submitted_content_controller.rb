@@ -33,8 +33,8 @@ class SubmittedContentController < ApplicationController
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end
      participant.update_resubmit_times()
+    #Call the method to store the time at which the submission was made.
      participantpenalty.update_submit_times(participant.id)
-    participantpenalty.calculate_penalty(participant.id)
     redirect_to :action => 'edit', :id => participant.id
   end    
 
@@ -80,6 +80,7 @@ class SubmittedContentController < ApplicationController
       SubmittedContentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
     participant.update_resubmit_times()
+    #Call the method to store the time at which the submission was made.
     participantpenalty.update_submit_times(participant.id)
 
     #send message to reviewers when submission has been updated

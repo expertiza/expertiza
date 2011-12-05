@@ -209,9 +209,9 @@ class ResponseController < ApplicationController
     @map.notification_accepted = false;
     @map.save
 
-    participantpenalty = Penalty.find_by_participant_id(@map.reviewer_id)
+    #participantpenalty = Penalty.find_by_participant_id(@map.reviewer_id)
 
-    participantpenalty.calculate_penalty(@map.reviewer_id)
+    #participantpenalty.calculate_penalty(@map.reviewer_id)
 
     
     redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]

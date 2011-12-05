@@ -22,8 +22,10 @@ def calculate_penalty(participant_id)
 
     get_dates(participantpenalty.participant_id)
 
+     policy = PenaltyPolicy.find(1)
 
     @submission_deadline_type_id = 1
+
     @review_deadline_type_id=2
     @metareview_deadline_type_id=5
     @curr_date = Time.now
@@ -58,12 +60,12 @@ def calculate_penalty(participant_id)
        #check if their was any submission made
     if participantpenalty.submitted_at == nil
     #if no, then impose penalty of 50 points.
-      @submission_penalty = 50
+      @submission_penalty = policy.max_sub_penalty
     else @submission_delay = participantpenalty.submitted_at - @sub_due_date  #calculate the delay in submission
       if @submission_delay > 0
-        @submission_penalty = ((@submission_delay/3600).round) * 0.25         #compute penalty as a measure of 2 points per hour
-        if @submission_penalty > 50
-          @submission_penalty = 50
+        @submission_penalty = ((@submission_delay/3600).round) * policy.penalty_unit_in_percentage        #compute penalty as a measure of 0.25 percentage per hour
+        if @submission_penalty > policy.max_sub_penalty
+          @submission_penalty = policy.max_sub_penalty
         end
       else @submission_delay = 0
       end
@@ -81,23 +83,23 @@ def calculate_penalty(participant_id)
     @passed_deadline = (@rev_due_date - @curr_date )
     if @passed_deadline < 0
     if participantpenalty.reviewed1_at == nil
-      @review_penalty = 5
+      @review_penalty = policy.max_rev_penalty/2
     else  @review1_delay = participantpenalty.reviewed1_at - @rev_due_date    #calculate the delay in review1
       if @review1_delay > 0
-        @review_penalty = ((@review1_delay/3600).round) * 0.25      #compute penalty as a measure of 2 points per hour
-        if @review_penalty > 10
-          @review_penalty = 5
+        @review_penalty = ((@review1_delay/3600).round) * policy.penalty_unit_in_percentage        #compute penalty as a measure of 0.25 percentage per hour
+        if @review_penalty > policy.max_rev_penalty
+          @review_penalty = policy.max_rev_penalty/2
         end
         else @review1_delay = 0
       end
     end
      if participantpenalty.reviewed2_at == nil
-      @review_penalty += 5
+      @review_penalty += policy.max_rev_penalty/2
     else  @review2_delay = participantpenalty.reviewed2_at - @rev_due_date    #calculate the delay in review2
       if @review2_delay > 0
-        @review_penalty += ((@review2_delay/3600).round) * 0.25    #compute penalty as a measure of 2 points per hour
-        if @review_penalty > 10
-          @review_penalty = 10
+        @review_penalty += ((@review2_delay/3600).round) * policy.penalty_unit_in_percentage        #compute penalty as a measure of 0.25 percentage per hour
+        if @review_penalty > policy.max_rev_penalty
+          @review_penalty = policy.max_rev_penalty
         end
         else @review2_delay = 0
       end
@@ -115,23 +117,23 @@ def calculate_penalty(participant_id)
     if @passed_deadline < 0
 
     if participantpenalty.metareviewed1_at == nil
-      @metareview_penalty = 5
+      @metareview_penalty = policy.max_rev_penalty/2
     else  @metareview1_delay = participantpenalty.metareviewed1_at - @metarev_due_date    #calculate the delay in metareview1
       if @metareview1_delay > 0
-        @metareview_penalty = ((@metareview1_delay/3600).round) * 0.25     #compute penalty as a measure of 2 points per hour
-        if @metareview_penalty > 10
-          @metareview_penalty = 5
+        @metareview_penalty = ((@metareview1_delay/3600).round) * policy.penalty_unit_in_percentage        #compute penalty as a measure of 0.25 percentage per hour
+        if @metareview_penalty > policy.max_rev_penalty
+          @metareview_penalty = policy.max_rev_penalty/2
         end
         else @metareview1_delay = 0
       end
     end
     if participantpenalty.metareviewed2_at == nil
-      @metareview_penalty += 5
+      @metareview_penalty += policy.max_rev_penalty/2
     else  @metareview2_delay = participantpenalty.metareviewed2_at - @metarev_due_date    #calculate the delay in metareview2
       if @metareview2_delay > 0
-        @metareview_penalty += ((@metareview2_delay/3600).round) * 0.25
-        if @metareview_penalty > 10
-          @metareview_penalty = 10
+        @metareview_penalty += ((@metareview2_delay/3600).round) * policy.penalty_unit_in_percentage        #compute penalty as a measure of 0.25 percentage per hour
+        if @metareview_penalty > policy.max_rev_penalty
+          @metareview_penalty = policy.max_rev_penalty
         end
         else @metareview2_delay = 0
       end
@@ -139,12 +141,12 @@ def calculate_penalty(participant_id)
 
     #calculate penalty for late teammate reviews and no teammate reviews
     if participantpenalty.teammate_review_at == nil
-      @teammate_review_penalty = 10
+      @teammate_review_penalty = policy.max_rev_penalty
     else  @teammate_review_delay = participantpenalty.teammate_review_at - @metarev_due_date    #calculate the delay in teammate review
       if @teammate_review_delay > 0
-        @teammate_review_penalty = ((@teammate_review_delay/3600).round) * 0.25   #calculate the penalty as a measure of 2 per hour
-        if @teammate_review_penalty > 10
-          @teammate_review_penalty = 10
+        @teammate_review_penalty = ((@teammate_review_delay/3600).round) * policy.penalty_unit_in_percentage        #compute penalty as a measure of 0.25 percentage per hour
+        if @teammate_review_penalty > policy.max_rev_penalty
+          @teammate_review_penalty = policy.max_rev_penalty
         end
         else @teammate_review_delay = 0
       end
@@ -154,12 +156,12 @@ def calculate_penalty(participant_id)
     @passed_deadline = (@rev_due_date - @curr_date )
     if @passed_deadline < 0
     if participantpenalty.author_feedback_at == nil
-      @author_feedback_penalty = 10
+      @author_feedback_penalty = policy.max_rev_penalty
     else  @author_feedback_delay = participantpenalty.author_feedback_at - @rev_due_date   #calculate the delay in author_feedback
       if @author_feedback_delay > 0
-        @author_feedback_penalty = ((@author_feedback_delay/3600).round) * 0.25     #calculate the penalty as a measure of 2 per hour
-        if @author_feedback_penalty > 10
-          @author_feedback_penalty = 10
+        @author_feedback_penalty = ((@author_feedback_delay/3600).round) * policy.penalty_unit_in_percentage        #compute penalty as a measure of 0.25 percentage per hour
+        if @author_feedback_penalty > policy.max_rev_penalty
+          @author_feedback_penalty = policy.max_rev_penalty
         end
         else @author_feedback_delay = 0
       end
@@ -238,8 +240,10 @@ def calculate_penalty(participant_id)
            response_map_id = ResponseMap.find_by_reviewer_id_and_type(participantpenalty.participant_id,'TeammateReviewResponseMap')
            if !response_map_id.nil?
               response_at = Response.find_by_map_id(response_map_id.id)
-              participantpenalty.teammate_review_at = response_at.created_at
-              participantpenalty.save
+              if !response_at.nil?
+                participantpenalty.teammate_review_at = response_at.created_at
+                participantpenalty.save
+              end
              end
           end
 
@@ -248,8 +252,10 @@ def calculate_penalty(participant_id)
             response_map_id = ResponseMap.find_by_reviewer_id_and_type(participantpenalty.participant_id,'FeedbackResponseMap')
             if !response_map_id.nil?
               response_at = Response.find_by_map_id(response_map_id.id)
-              participantpenalty.teammate_review_at = response_at.created_at
-              participantpenalty.save
+              if !response_at.nil?
+                participantpenalty.teammate_review_at = response_at.created_at
+                participantpenalty.save
+              end
               end
     end
 

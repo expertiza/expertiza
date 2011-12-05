@@ -508,6 +508,7 @@ def add_participant(user_name)
   if !participant
     newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)      
     newpart.set_handle()
+    #add the participant to the Penalty table when the participant is addedto an assignment
     Penalty.create(:participant_id => newpart.id , :assignment_id => self.id, :user_id => user.id)
   else
     raise "The user \""+user.name+"\" is already a participant."

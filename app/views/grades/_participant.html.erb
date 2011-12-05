@@ -2,10 +2,7 @@
 <% 
   participant = pscore[:participant]
   partpenalty = Penalty.find_by_participant_id(participant.id)
-  penalty = partpenalty.penalty_score
-   if penalty.nil?
-       penalty = 0
-   end
+
   if pscore[:review]
   	s_max = pscore[:review][:scores][:max]
   	s_min = pscore[:review][:scores][:min] 
@@ -94,7 +91,13 @@
     <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
     	<TD ALIGN="CENTER">
-    	<% if stage == "Complete" %>      
+    	<% if stage == "Complete" %>
+              <!--calculate the penalty for the participant when stage is complete and no further submissions or reviews can take place -->
+              <%  penalty = partpenalty.calculate_penalty(participant.id)
+               if penalty.nil?
+                penalty = 0
+               end  %>
+              <!--deduct the penalty from the total score-->
       	<% if participant.grade
               score_before_penalty = participant.grade
              total_score = participant.grade - penalty

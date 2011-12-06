@@ -3,5 +3,112 @@
      and   'rake db:migrate'
 3) Execute 'ruby script/server'
 4) Goto 'http://localhost:3000' and start using Expertiza.
-5) Feel free to explore the new Code Review Feature! A screencast explaining how to use the feature can be found at: <http://www.youtube.com/watch?v=2-02--nnbvA>
+5) Feel free to explore the new Code Review Feature! A screencast explaining how
+   to use the it can be found at: <http://www.youtube.com/watch?v=2-02--nnbvA>
+   
 
+TODO -- Refactorings:
+---------------------
+
+View:
+1) All three files in /views/review_files/* are candidates for extracting parts 
+   of the view into partials.
+2) In show_code_file.html.erb and show_code_file_diff.html.erb, everything within
+   <style></style> can be extracted into a stylesheet and placed in
+   public/stylesheets/*.
+3) Same (as above) is applicable for the javascript as well. On a side note: I
+   think the javascript functions are pretty decent as-is. They are pretty
+   concise and no immediate refactorings come to mind for these functions. They
+   can probably be left alone.
+4) I would encourage looking at the diff between the two files (mentioned in
+   point 2) to see the similarities between them (and they are a lot) and extract
+   out the common content into another partial/partials. This is pretty important.
+5) There is some repetition of code (especially in the _diff file) and this
+   should be rectified (helper methods?).
+6) Some of the div's IDs (e.g. 'my_div_2) do not have very intuitive names. Most
+   (if not all the divs should be renamed properly). [Please note that the JS
+   functions call these divs and proper care should be taken while renaming.
+
+Controller:
+1) The show_code_file and the show_code_file_diff methods pass way to many
+   instance variables to the view. These need to be rectified (perhaps by merging
+   them into hash?). There is some code duplication here too and needs to be
+   extracted away to helper methods.
+2) Large Scale refactoring: A LOT of the logic is in the controller. This is a
+   gross violation of the 'Fat-models-skinny-controllers' paradigm. All heavy-duty
+   computation (which is most of the controller) should be shifted into the model.
+3) The submit_comment and get_comments (should be renamed to 'get_comment' --
+   singular) ideally don't belong in the 'review_files_controller' and should be
+   moved into another controller (maybe a 'review_comments_controller'). Please
+   note that the JavaScript functions in the view call these methods and if their
+   location is changed, the JS functions should be updated accordingly.
+4) Better naming in show_code_file and show_code_file_diff. This is really really
+   necessary especially in the latter method -- any changes made to the instance
+   variables must be updated in the corresponding view(s).
+5) There needs to be more comprehensive error handling, right from nil
+   de-referencing (of nil rows fetched from DB tables) to handling general
+   exceptions. Users need to be re-directed to proper pages within Expertiza --
+   refer to the render_error_page method at the bottom to see how/where the
+   redirection is done.
+
+Model:
+1) As mentioned in the controller, it would be preferable if most of the
+   computations are moved into the models. This needs to be properly thought-out.
+
+
+TODO -- Feature additions:
+--------------------------
+
+1) Allow uploading non-zip files (e.g. normal code files, .tar.gz etc.) with a
+   checkbox for 'Unzip Submission' which is very similar to how the current
+   submissions are handled. This is a trivial change and should be quite easy to
+   accomplish.
+
+2) Annotation of generic documents (e.g. wikis). The comment table already stores
+   the comment's file offset, so no change of table schema necessary. It is
+   possible to add functionality in the view such that one can highlight a block
+   of text, whose starting and ending offset will be calculated (int the view
+   itself) so that comments can now be associated with that text-block.
+   NOTE: This was a technique used by a team (in Fall '10) when attempting the
+   code-review feature. I would strongly recommend reading their codebase to get
+   an idea of how the above feature can be implemented. Their commit can be found
+   in Branch C of Expertiza having the name: 'E11: Code review feature commit'.
+   Just in case, the url where their commit can be found is:
+   <https://github.com/expertiza/expertiza/commit/8fd8e7dec2b4b3697a07401e66107de7e3d84ffb>
+   Alternately, you can ask Dr. Gehringer for 2010 batch's code review project
+   'code_review_ProjectB_team82_version2.zip'.
+
+3) Display/Hide the link 'Code Review Dashboard' on the page
+   'submitted_content/_main.html.erb' depending on whether the assignment involves
+   submission of code files (i.e. it is a programming assignment). Possible
+   solution is to add a column to the Assignment table as a 'flag', which can be
+   set to Yes/No while creating assignments. This is again, similar to what was
+   done by Fall '10 team. I recommend perusing their code, to get a more concrete
+   idea of how to go about doing this.
+
+4) Saving code review files in a sub-directory (of the directory obtained from
+   AssignmentParticipant.get_path. Let's call this 'main_directory') instead of
+   storing them in a sibling directory having a '_code_review_files' suffix
+   (which is how it is currently done). Please note that you CANNOT blindly put
+   all the code review files in the 'main_directory' because the system
+   recursively fetches ALL the files in there when executing 'participant.get_files()'
+   which it does a lot within Expertiza, for instance while displaying all the
+   submitted files in the submitted_content view. So special checks need to be
+   added to this method (or wherever else) if code review files (and/or any other
+   submissions that are different from normal submissions e.g. wikis/docs) are
+   going to be stored in sub-directories. This needs to be thought out really
+   carefully as changes made here have the potential of breaking a lot of other
+   code. Since this is the first time there are alternate 'parallel' submissions
+   other than the normal ones, and also since there is a high possibility that
+   there will be more features added to Expertiza that require such 'parallel'
+   submissions, I believe the current directory structure needs to be modified
+   somewhat. There could perhaps be another level of nesting after the
+   'AssignmentDir/TopicDir/<Participant.directory_num>' where ALL of the
+   team's/student's submissions reside, with special methods that calculate the
+   appropriate path for a type of submission. This is likely influence a lot of
+   things in the system, so my recommendation is to do this with a lot of careful
+   planning.
+
+That is all the refactoring/feature addition that I can think of for now. Feel
+free to append to this list if you have any ideas in mind. Thanks for your
+interest in Expertiza's Code Review Feature!

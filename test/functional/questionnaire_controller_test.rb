@@ -24,7 +24,7 @@ class QuestionnaireControllerTest < ActionController::TestCase
     @request.session[:credentials] = Role.find(roleid).cache[:credentials]
     AuthController.set_current_role(roleid,@request.session)
   end
-  #901 edit an questionnaire’s data
+  #901 edit an questionnaireï¿½s data
   def test_edit_questionnaire
     post :edit, {:id => @Questionnaire, :save => true, 
                        :questionnaire => {:name => "test edit name", 
@@ -61,5 +61,16 @@ class QuestionnaireControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_equal "The questionnaire's question advice was successfully saved", flash[:notice]
     assert_redirected_to :action => 'list'
+  end
+
+  def test_edit_questionnaire_instruction_url
+    post :edit, {:id => @Questionnaire, :save => true,
+                 :questionnaire => {:name => "test edit name",
+                                    :type => "ReviewQuestionnaire",
+                                    :min_question_score => 1,
+                                    :max_question_score => 3,
+                                    :instruction_loc => "http://www.expertiza.ncsu.edu"}}
+    assert_response(:success)
+    assert_not_nil(Questionnaire.find(:first, :conditions => ["name = ?", "test edit name"]))
   end
 end

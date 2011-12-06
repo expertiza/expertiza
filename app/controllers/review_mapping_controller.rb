@@ -576,7 +576,7 @@ class ReviewMappingController < ApplicationController
   def get_review_questionnaire_id_for_assignment(assignment)
     @revqids = []
     
-    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",assignment.id])
+    @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",assignment.id])
     @revqids.each do |rqid|
       rtype = Questionnaire.find(rqid.questionnaire_id).type
       if( rtype == "ReviewQuestionnaire")

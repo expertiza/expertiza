@@ -22,7 +22,7 @@ class PopupController < ApplicationController
     @scores = Score.find_all_by_response_id(@reviewid)
 
     ##3
-    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
+    @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
     @revqids.each do |rqid|
       rtype = Questionnaire.find(rqid.questionnaire_id).type
       if( rtype == 'ReviewQuestionnaire')
@@ -85,7 +85,7 @@ def participants_popup
     @participant = Participant.find(:first, :conditions => ["id = ? and parent_id = ? ", params[:id],@assignment_id])
 
     ##3
-    @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
+    @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
     @revqids.each do |rqid|
       rtype = Questionnaire.find(rqid.questionnaire_id).type
       if( rtype == 'ReviewQuestionnaire')

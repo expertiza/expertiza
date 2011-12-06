@@ -1,3 +1,5 @@
+Instructions to start Expertiza:
+--------------------------------
 1) Go to mysql console and drop databases 'pg_development' and 'pg_test'
 2) Execute 'rake db:create:all'
      and   'rake db:migrate'

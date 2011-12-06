@@ -28,7 +28,7 @@
                     # get the user's team and check if they have signed up for a topic yet
   		            users_team = SignedUpUser.find_team_users(participant.assignment.id,participant.user.id)
                     if users_team.size > 0
-                        selected_topics = SignedUpUser.find_user_signup_topics(participant.assignment.id,users_team[0].t_id)
+                        selected_topics = SignedUpUser.find_user_signup_topics(participant.assignment.id,users_team[0].team_id)
                     end
                 else
                     # check if the user has signed up for a topic yet

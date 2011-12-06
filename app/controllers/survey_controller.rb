@@ -27,7 +27,7 @@ class SurveyController < ApplicationController
         
         for survey in @submit_surveys
           unless @checked.include? survey.id
-            AssignmentsQuestionnaires.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
+            AssignmentQuestionnaire.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
             @assigned_surveys.delete(survey)
           end
         end 
@@ -35,14 +35,14 @@ class SurveyController < ApplicationController
         for checked_survey in @checked
           @current = Questionnaire.find(checked_survey)
           unless @assigned_surveys.include? @current
-            @new = AssignmentsQuestionnaires.new(:questionnaire_id => checked_survey, :assignment_id => @assignment.id)
+            @new = AssignmentQuestionnaire.new(:questionnaire_id => checked_survey, :assignment_id => @assignment.id)
             @new.save
             @assigned_surveys << @current
           end
         end
       else
         for survey in @submit_surveys
-          AssignmentsQuestionnaires.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
+          AssignmentQuestionnaire.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
           @assigned_surveys.delete(survey)
           @surveys.delete(survey)
         end 

@@ -14,7 +14,7 @@ class Assignment < ActiveRecord::Base
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
-  has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaires', :foreign_key => 'assignment_id'
+  has_many :assignment_questionnaires
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy  
@@ -674,6 +674,101 @@ end
         #returns the topic
         return contributors_signup_topic
       end
+  end
+  def self.export(csv, parent_id, options)
+    @assignment = Assignment.find(parent_id)
+    @questions = Hash.new
+    questionnaires = @assignment.questionnaires
+    questionnaires.each {
+        |questionnaire|
+      @questions[questionnaire.symbol] = questionnaire.questions
+    }
+    @scores = @assignment.get_scores(@questions)
+
+    if(@scores[:teams].nil?)
+      return csv
+    end
+
+    for index in 0 .. @scores[:teams].length - 1
+      team = @scores[:teams][index.to_s.to_sym]
+      for participant in team[:team].get_participants
+        pscore = @scores[:participants][participant.id.to_s.to_sym]
+        tcsv = Array.new
+        tcsv << 'team'+index.to_s
+
+        if (options["team_score"] == "true")
+          if (team[:scores])
+            tcsv.push(team[:scores][:max], team[:scores][:avg], team[:scores][:min], participant.fullname)
+          else
+            tcsv.push('---', '---', '---')
+          end
+        end
+
+        if (options["submitted_score"])
+          if (pscore[:review])
+            tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg])
+          else
+            tcsv.push('---', '---', '---')
+          end
+        end
+
+        if (options["metareview_score"])
+          if (pscore[:metareview])
+            tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg])
+          else
+            tcsv.push('---', '---', '---')
+          end
+        end
+
+        if (options["author_feedback_score"])
+          if (pscore[:feedback])
+            tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg])
+          else
+            tcsv.push('---', '---', '---')
+          end
+        end
+
+        if (options["teammate_review_score"])
+          if (pscore[:teammate])
+            tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg])
+          else
+            tcsv.push('---', '---', '---')
+          end
+        end
+
+        tcsv.push(pscore[:total_score])
+        csv << tcsv
+      end
+    end
+  end
+
+  def self.get_export_fields(options)
+    fields = Array.new
+    fields << "Team Name"
+
+        if (options["team_score"] == "true")
+            fields.push("Team Max", "Team Avg", "Team Min")
+        end
+
+        if (options["submitted_score"])
+            fields.push("Submitted Max", "Submitted Avg", "Submitted Min")
+        end
+
+        if (options["metareview_score"])
+            fields.push("Metareview Max", "Metareview Avg", "Metareview Min")
+        end
+
+        if (options["author_feedback_score"])
+            fields.push("Author Feedback Max", "Author Feedback Avg", "Author Feedback Min")
+        end
+
+        if (options["teammate_review_score"])
+            fields.push("Teammate Review Max", "Teammate Review Avg", "Teammate Review Min")
+        end
+
+        fields.push("Final Score")
+
+    return fields
   end
 end
   

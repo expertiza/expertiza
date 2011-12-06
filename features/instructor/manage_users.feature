@@ -9,8 +9,6 @@ Feature: Manage the users in Expertiza
       And a student named "tommy_tonka" created by "ed_gehringer"
       And a student named "charlie_chevy" created by "ed_gehringer"
     
-    
-    
   @instructor
   Scenario: View the list of users
     Given I am logged in as "ed_gehringer"

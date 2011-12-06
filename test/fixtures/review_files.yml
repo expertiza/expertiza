@@ -1,11 +1,11 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  filepath: /pg_data/admin/Assignment1/0_code_review_files/version_1/abc.rb
+  filepath: Path1
   author_participant_id: 1
   version_number: 1
 
 two:
-  filepath: /pg_data/admin/Assignment1/0_code_review_files/version_1/abc.rb
+  filepath: Path2
   author_participant_id: 1
   version_number: 2

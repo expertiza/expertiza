@@ -10,7 +10,7 @@
 
 <% if participant.assignment.wiki_type_id == 1%>
   <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>
-    <br/><br/><br/><b style="font-size: 120%;">
+    <br/><br/><br/><b>
     <%= link_to "Code Review Dashboard" , :controller => 'review_files',
                 :action => 'show_all_submitted_files',
                 :participant_id => participant.id,

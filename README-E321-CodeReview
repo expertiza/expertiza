@@ -28,8 +28,9 @@ View:
 5) There is some repetition of code (especially in the _diff file) and this
    should be rectified (helper methods?).
 6) Some of the div's IDs (e.g. 'my_div_2) do not have very intuitive names. Most
-   (if not all the divs should be renamed properly). [Please note that the JS
-   functions call these divs and proper care should be taken while renaming.
+   (if not all) of the divs should be renamed properly. [Please note that the JS
+   functions call these divs so if you rename them, make sure it gets reflected
+   everywhere].
 
 Controller:
 1) The show_code_file and the show_code_file_diff methods pass way to many
@@ -66,7 +67,18 @@ TODO -- Feature additions:
    submissions are handled. This is a trivial change and should be quite easy to
    accomplish.
 
-2) Annotation of generic documents (e.g. wikis). The comment table already stores
+2) Display every comment with an (anonymized) reviewer ID. You would have to 
+   maintain context across all the versions to ensure that if Reviewer ID 45 (say)
+   gets an anonymous id 1 while commenting on version 1, it stays consistent across
+   all versions i.e. any comments made by the reviewer in version 2, 3 ... also shows
+   up with an id 1. This feature is necessary so that authors can give directed 
+   feedback to the reviewers. Along with the reviewer, the time of reviewe should
+   also be displayed.
+
+3) Ability for authors to reply to comments made by reviewers. Replies/justifications
+   by authors should be clearly distinguishable from comments made by reviewers.
+
+4) Annotation of generic documents (e.g. wikis). The comment table already stores
    the comment's file offset, so no change of table schema necessary. It is
    possible to add functionality in the view such that one can highlight a block
    of text, whose starting and ending offset will be calculated (int the view
@@ -80,7 +92,7 @@ TODO -- Feature additions:
    Alternately, you can ask Dr. Gehringer for 2010 batch's code review project
    'code_review_ProjectB_team82_version2.zip'.
 
-3) Display/Hide the link 'Code Review Dashboard' on the page
+5) Display/Hide the link 'Code Review Dashboard' on the page
    'submitted_content/_main.html.erb' depending on whether the assignment involves
    submission of code files (i.e. it is a programming assignment). Possible
    solution is to add a column to the Assignment table as a 'flag', which can be
@@ -88,7 +100,7 @@ TODO -- Feature additions:
    done by Fall '10 team. I recommend perusing their code, to get a more concrete
    idea of how to go about doing this.
 
-4) Saving code review files in a sub-directory (of the directory obtained from
+6) Saving code review files in a sub-directory (of the directory obtained from
    AssignmentParticipant.get_path. Let's call this 'main_directory') instead of
    storing them in a sibling directory having a '_code_review_files' suffix
    (which is how it is currently done). Please note that you CANNOT blindly put

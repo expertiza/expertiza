@@ -380,6 +380,8 @@ class SignUpSheetController < ApplicationController
     result = false
 
     sign_up.confirm_by = val
+	user_signup = [] if !user_signup
+	
     if user_signup.size < asgnmt.max_topic_count
       #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
       if slotAvailable?(topic_id)

@@ -349,7 +349,7 @@ class AssignmentController < ApplicationController
         end
 		
 		# set user options for deadline formation if it's being newly added
-		if !found_formation && @assignment.team_formation_required
+		if !found_formation && @assignment.team_formation_required && params[:formation_deadline]
 		  # try to insert the team formation deadline
 		  formation_due_date = DueDate::set_team_formation_deadline(@assignment.id,params[:formation_deadline])
 		  raise "Please enter a valid date & time for the team formation deadline" if !formation_due_date

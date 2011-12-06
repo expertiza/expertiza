@@ -31,7 +31,7 @@ production:
   adapter: mysql
   database: pg_development
   username: root
-  password: 
+  password:
   host: localhost
 
 cucumber:

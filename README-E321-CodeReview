@@ -3,4 +3,5 @@
      and   'rake db:migrate'
 3) Execute 'ruby script/server'
 4) Goto 'http://localhost:3000' and start using Expertiza.
-5) Feel free to explore the new Code Review Feature! A screencast explaining how to use the feature can be found at: ''
+5) Feel free to explore the new Code Review Feature! A screencast explaining how to use the feature can be found at: <http://www.youtube.com/watch?v=2-02--nnbvA>
+

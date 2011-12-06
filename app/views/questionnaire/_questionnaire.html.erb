@@ -1,16 +1,15 @@
 <%= error_messages_for 'questionnaire' %>
 
 <!--[form:questionnaire]-->
-<table>
-	<tr>
-		<td valign="top"><label for="questionnaire_name">Name:</label>	</td>
-		<td>
-			<%= text_field 'questionnaire', 'name'  %>
-			<%= hidden_field 'questionnaire', 'id' %>
-			<%= hidden_field 'questionnaire', 'type' %>
-		</td>		
-	</tr>
-</table>
+<p>
+	<label for="questionnaire_name">Name:</label><td>
+	<%= text_field 'questionnaire', 'name'  %>
+	<%= hidden_field 'questionnaire', 'id' %>
+	<%= hidden_field 'questionnaire', 'type' %>
+</p>
+<p>
+	URL for review help: <%= text_field 'questionnaire', 'instruction_loc', :size=> 62 %>
+</p>
 <table>
 	<tr>
 		<td>Min question score:</td>

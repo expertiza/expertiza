@@ -51,5 +51,7 @@ View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {
 %>
 
 <%= link_to 'New User', :action => 'new' %> |
-<%= link_to 'Import Users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username, full name (first[ middle] last), e-mail address, password' %>
+<%= link_to 'Import Users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username, full name (first[ middle] last), e-mail address, password' %>|
+<%= link_to 'Export Users', :controller=>'export_file',:action=>'start',:model=> 'User',:id=> 1 %>
+
 </p>

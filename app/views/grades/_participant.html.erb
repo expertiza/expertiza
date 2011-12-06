@@ -93,10 +93,13 @@
     	<TD ALIGN="CENTER">
     	<% if stage == "Complete" %>
               <!--calculate the penalty for the participant when stage is complete and no further submissions or reviews can take place -->
-              <%  penalty = partpenalty.calculate_penalty(participant.id)
+              <%  penalty = partpenalty.penalty_score
+                 if penalty.nil?
+                 penalty = partpenalty.calculate_penalty(participant.id)
                if penalty.nil?
                 penalty = 0
-               end  %>
+               end
+              end%>
               <!--deduct the penalty from the total score-->
       	<% if participant.grade
               score_before_penalty = participant.grade

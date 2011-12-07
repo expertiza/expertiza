@@ -229,6 +229,7 @@ class AssignmentTeam < Team
     past_team_associations = TeamsUser.find_all_by_user_id(participant.user_id)
     past_team_associations -= TeamsUser.find_all_by_team_id(id)
     past_team_association_team_ids = past_team_associations.map{|association| association.team_id}
+    past_team_association_team_ids.delete_if {|team_id| Assignment.find_by_id(Team.find_by_id(team_id).parent_id).course_id != Assignment.find_by_id(parent_id).course_id}
     past_teammates = TeamsUser.find_all_by_team_id(past_team_association_team_ids)
     return past_teammates.map{|teammate| teammate.user_id}
   end
@@ -240,6 +241,7 @@ class AssignmentTeam < Team
     past_team_ids = past_team_associations.map{|association| association.team_id}
     past_teams = past_team_ids.map{|team_id| Team.find_by_id(team_id)}
     past_assignments = past_teams.map{|team| Assignment.find_by_id(team.parent_id)}
+    past_assignments.delete_if {|assignment| assignment.course_id != Assignment.find_by_id(parent_id).course_id}
     return past_assignments.inject(0) {|sum, assignment| sum += assignment.team_count - 1}
   end
 

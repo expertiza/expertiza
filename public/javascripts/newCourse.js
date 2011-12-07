@@ -99,7 +99,7 @@ jQuery(function() {
             '<p>' +
                 '<label for="assignment' + i + '_name">Name:</label> ' +
                 '<input type="text" id="assignment' + i + '_name" name="assignment' + i + '[name]" /> ' +
-                '<label for="assignment' + i + '_team_count">Team Size:</label> ' +
+                '<label for="assignment' + i + '_team_count">Max Team Size:</label> ' +
                 '<input type="text" id="assignment' + i + '_team_count" name="assignment' + i + '[team_count]"  class="numeric" /> ' +
                 '<a href="#" class="deleteAssignment"><img src="/images/delete.png" /></a>' +
             '</p>');

@@ -52,8 +52,6 @@ ActiveRecord::Schema.define(:version => 20111201222103) do
     t.string   "review_assignment_strategy"
     t.integer  "max_reviews_per_submission"
     t.integer  "review_topic_threshold",            :default => 0
-    t.boolean  "copy_flag",                         :default => false
-    t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "availability_flag"
   end
 
@@ -279,6 +277,23 @@ ActiveRecord::Schema.define(:version => 20111201222103) do
   end
 
   add_index "resubmission_times", ["participant_id"], :name => "fk_resubmission_times_participants"
+
+  create_table "review_comments", :force => true do |t|
+    t.integer  "review_file_id"
+    t.text     "comment_content"
+    t.integer  "reviewer_participant_id"
+    t.integer  "file_offset"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "review_files", :force => true do |t|
+    t.string   "filepath"
+    t.integer  "author_participant_id"
+    t.integer  "version_number"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "roles", :force => true do |t|
     t.string   "name",            :default => "", :null => false

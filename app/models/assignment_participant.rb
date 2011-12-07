@@ -364,7 +364,7 @@ class AssignmentParticipant < Participant
         }
       end
     end
-  end   
+  end
 
 private
 

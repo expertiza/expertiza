@@ -13,7 +13,7 @@ or<br/><br/>
     <% end %>
   <% end %>
   <% form_tag({:action=>'folder_action', :id => participant.id},{:multipart => true})do %>
-  <% if participant.directory_num != nil and participant.directory_num >= 0 %>
+  <% if files.length > 0 and participant.directory_num != nil and participant.directory_num >= 0 %>
 	<% if stage != "Complete" %>
 		<div style="background-color:#EEEEEE; padding-bottom:0.6em"><strong>File and folder actions</strong><br>
 		<input type="button" onclick="createNewFolder()"     value="Create new folder"    />

@@ -48,9 +48,9 @@ class ScoreCache < ActiveRecord::Base
     # scores that participant1 has given
     if(@map_type == "TeamReviewResponseMap")
       team = Team.find(@contributor_id)
-      @allscores = team.get_scores( @questions)
+      @allscores = team.get_scores( @questions, skipcache = true)
     else
-      @allscores = @participant1.get_scores( @questions)
+      @allscores = @participant1.get_scores( @questions, skipcache =true)
     end
     
     @scorehash = get_my_scores(@allscores, @map_type) 
@@ -67,16 +67,11 @@ class ScoreCache < ActiveRecord::Base
       sc = ScoreCache.new
       sc.reviewee_id = @contributor_id
       # sc.assignment_id = @ass_id
-      
       range_string = ((@p_min*100).round/100.0).to_s + "-" + ((@p_max*100).round/100.0).to_s
-      
-      
-      
       sc.range =    range_string
       sc.score = (@p_score*100).round/100.0
       
-      sc.object_type = @map_type                        
-      
+      sc.object_type = @map_type
       sc.save
       # make another new tuple for new score
     else

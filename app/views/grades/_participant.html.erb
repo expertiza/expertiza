@@ -20,7 +20,12 @@
   	tr_max = pscore[:teammate][:scores][:max]
   	tr_min = pscore[:teammate][:scores][:min] 
   	tr_avg = pscore[:teammate][:scores][:avg]   
-  end  	
+  end
+  if pscore[:quiz]
+  	q_max = pscore[:quiz][:scores][:max]
+  	q_min = pscore[:quiz][:scores][:min]
+  	q_avg = pscore[:quiz][:scores][:avg]
+  end
 %>
 
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
@@ -86,6 +91,18 @@
     <TD ALIGN="CENTER">---</TD>
     <% end %>    
     <% end %>
+    <% if @assignment.require_quiz %>
+    <% if q_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",q_avg) %>%
+    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_quizzesLink" name="<%=prefix%>_quizzesLink" onClick="toggleElement('<%=prefix%>_quizzes','quizzes taken');return false;">show quizzes taken</a> (<%= pscore[:quiz][:assessments].size %>)</FONT>
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",q_min) %>% - <%= sprintf("%.0f",q_max) %>%
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+    <% end %>
     <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
     	<TD ALIGN="CENTER">
@@ -127,5 +144,8 @@
 </TR>
 <TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
 	<TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
+</TR>
+<TR  class="row" id="<%= prefix %>_quizzes" style="display:none">
+	<TD COLSPAN="9"><%= render :partial=>'grades/quizzes', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:quiz]} %></TD>
 </TR>
 <!-- END PARTICIPANT -->

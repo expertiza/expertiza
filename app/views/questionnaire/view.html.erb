@@ -1,5 +1,26 @@
 <h1><%= @questionnaire.display_type %>: <%= @questionnaire.name %></h1>
 <BR/>
+<% if @questionnaire.type == "QuizQuestionnaire" %>
+<TABLE>
+<TR><TH align="left" width="100%">Questions</TH></TR>
+  <% i = 1 %>
+  <% questions = Question.find_all_by_questionnaire_id(@questionnaire.id) %>
+  <% for question in questions %>
+    <TR><TD align="left"><%=i%>.&nbsp;<%= question.txt %></TD></TR>
+    <% question_advices = QuestionAdvice.find_all_by_question_id(question.id) %>
+    <% for question_advice in question_advices %>
+      <TR><TD align="left">&nbsp;&nbsp;&nbsp;&nbsp;<%= question_advice.advice %>
+           <% if question_advice.score == 1 %>
+             &nbsp;(Correct Answer)
+           <% end %>
+          </TD></TR>
+    <% end %>
+    <% i += 1 %>
+  <% end %>
+</TABLE>
+<BR/>
+<%= link_to "Back", :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>
+<% else %>
 <B>Created by:</B> <%= link_to @questionnaire.instructor.name,"mailto:"+@questionnaire.instructor.email %><BR/>
 <B>Created at:</B> <%= @questionnaire.created_at %><BR/>
 <B>Last modified at:</B> <%= @questionnaire.updated_at %>
@@ -16,3 +37,4 @@
 </TABLE>
 <BR/>
 <%= link_to "Back", :controller => 'tree_display', :action => 'list' %>
+<% end %>

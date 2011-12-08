@@ -22,6 +22,7 @@ function toggleVis(value, id) {
     <table cellpadding="0" id="topic_list">
     <% candidate_topics_for_quiz = assignment.candidate_topics_for_quiz.to_a %>
 	  <% candidate_topics_for_quiz.sort! { |a, b| a.id <=> b.id } %>
+    <% puts assignment.sign_up_topics.inspect %>
     <% non_quizzable_topics = assignment.sign_up_topics - candidate_topics_for_quiz %>
 	  <% non_quizzable_topics.sort! { |a, b| a.id <=> b.id } %>
     <% candidate_topics_for_quiz.each do |topic| %>
@@ -40,6 +41,6 @@ function toggleVis(value, id) {
 	  <% end %>
     </table>
   <% end %>
-  <p><input type='submit' value='Request a new submission for quiz'/></p>
+  <p><input type='submit' value='Request a new quiz'/></p>
 <% end %>
 

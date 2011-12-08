@@ -1,12 +1,22 @@
 <%= render :partial => 'scripts' %>
 <h1>New <%= @questionnaire.display_type %></h1>
-<% form_tag :action => 'create_questionnaire' do %>
+<% if @questionnaire.type == "QuizQuestionnaire" %>    <!--handle a questionnaire differently if it is a quiz-->
+  <% form_tag :action => 'create_quiz_questionnaire', :pid => @participant_id, :aid => @assignment_id do %>
+  	<%= render :partial => 'questionnaire' %>
+  	<%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
+    <script>
+      var num_quiz_quest = <%= Assignment.find_by_id(@assignment_id).num_quiz_questions %>;
+      for (var x = 1; x <= num_quiz_quest; x++) {addQuestions();}
+    </script>
+  <% end %>
+<% else %>
+  <% form_tag :action => 'create_questionnaire', :pid => @participant_id, :aid => @assignment_id do %>
   	<%= render :partial => 'questionnaire' %>
   	<%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
     <script>
       for (var x = 1; x <= 5; x++) {addQuestions();}
     </script>
+  <% end %>
 <% end %>
 <br />
 <a href="javascript:window.history.back()">Back</a>
-

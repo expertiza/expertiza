@@ -1,0 +1,37 @@
+<div>
+<% i = 0 %>
+<% questions.each{ | question | %>
+    <%= i+1 %>. <%= question.txt %><BR/>
+    <%if question.question_advices.size > 0 %>
+      <% advice_list = question.question_advices.shuffle %>
+      <div id="option_<%= quiz_id %>_<%= i %>" style="padding:12px">
+      <% k = 1 %>
+      <% answer = Score.find_all_by_response_id_and_question_id(response.id,question.id) %>
+      <% advice_list.each{ | item | %>
+        <div>
+          <% if (item.advice == answer[0].comments)%>
+          <br><%= radio_button_tag 'option_' + quiz_id.to_s + i.to_s, item.id, true, :disabled => true %>&nbsp;<%=item.advice %>
+          <% else %>
+          <br><%= radio_button_tag 'option_' + quiz_id.to_s + i.to_s, item.id, false, :disabled => true %>&nbsp;<%=item.advice %>
+          <% end %>
+
+        </div>
+        <% k+=1 %>
+      <%}%>
+</div>
+    <% else %>
+        <br/>
+    <% end %>
+  <BR/><BR/>
+  <% i+=1
+   } %>
+
+<p>
+	<label for="review_comments">Comments: </label>
+	<% if controller.action_name != 'new' and response.additional_comment != nil %><%= response.additional_comment.strip%><% end %>
+</p>
+
+<br/>
+<%= hidden_field_tag('return', @return) %>
+
+</div>

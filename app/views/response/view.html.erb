@@ -1,13 +1,14 @@
 <h1><%= @title %> for <%= @assignment.name %></h1>
 <% if !(@map.instance_of? TeammateReviewResponseMap) %>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
-  <br/><hr/><br/>  
+  <br/><hr/><br/>
 <% end %>
 <%= @map.show_review() %>
 
 <% if false %>[start erb comment] Changes to accommodate Jen's custom rubric [end erb comment]<% end %>
 <% file_url = nil
-   if @assignment.instructor_id == User.find_by_name("jkidd").id
+   jkidd = User.find_by_name("jkidd")
+   if jkidd && jkidd.id == @assignment.instructor_id
       @current_folder = DisplayOption.new
       @current_folder.name = ""
       @participant = Participant.find(@map.reviewer_id)
@@ -33,8 +34,11 @@
    end
 %>
 
-<HR>
+<% if @map.type.to_s == 'QuizResponseMap' %>
+<%= render :partial => 'view_quiz_response', :locals => {:quiz_id => QuizQuestionnaire.find(@map.reviewed_object_id), :questions => QuizQuestionnaire.find(@map.reviewed_object_id).questions, :response => @response} %>
+<% else %>
 <%= @response.display_as_html(nil,nil,file_url) %>
+<% end %>
 
 <%= @map.show_feedback() %>
 <br/>

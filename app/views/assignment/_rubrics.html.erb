@@ -1,3 +1,24 @@
+<script type="text/javascript">
+//Show/Hide Number of quiz questions and Quiz deadline fields when Quiz is enabled/disabled
+function onChangefunction(){
+	count = document.getElementById("quiz");
+	hidden = document.getElementById("noquiz");
+	var dropdownIndex = document.getElementById('requireQuiz').selectedIndex;
+	var dropdownValue = document.getElementById('requireQuiz')[dropdownIndex].value;
+    document.poppedLayer3 = eval('document.getElementById("deadline_quiz")');
+	if(dropdownValue == "true"){
+		count.style.display = "";
+		hidden.style.display = "none";
+        document.poppedLayer3.style.display = "";
+
+	}else{
+		count.style.display = "none";
+		hidden.style.display  = "";
+        document.poppedLayer3.style.display = "none";
+
+	}
+}
+</script>
 <% if session[:user].role.name == "Teaching Assistant"
       user_id = Ta.get_my_instructor(session[:user].id)
    else
@@ -86,13 +107,32 @@
   
 <table>
  <tr>
-  <td><label for="reviews_visible_to_all">Reviews should be visible to all other reviewers</label></td>
+  <td width="400"><label for="reviews_visible_to_all">Reviews should be visible to all other reviewers</label></td>
   <td><%= check_box 'assignment', 'reviews_visible_to_all', {}, true, false %></td>
  </tr>
  
  <tr>
-  <td><label for="allow_suggestions">Students can suggest topics for this assignment</label></td>
+  <td width="400"><label for="allow_suggestions">Students can suggest topics for this assignment</label></td>
   <td><%= check_box 'assignment', 'allow_suggestions', {}, true, false %></td>
+ </tr>
+  <!--Quiz fields-->
+  <tr>
+  <td width="400"><label for="require_quiz">Contributor should create a quiz for this assignment</label></td>
+  <td><select id="requireQuiz" name="assignment[require_quiz]" onchange="onChangefunction();">
+      <option value=false style="width:75px">No</option>
+      <option value=true style="width:75px" <% if @assignment.require_quiz %>SELECTED<%end%>>Yes</option>
+      </select>
+   </td>
+
+ </tr>
+
+ <tr id="quiz" style="display:none">
+ <td valign="top" width="400" height="50"><label for="num_quiz_questions">Number of Quiz questions:</label></td>
+ <td valign="top"><%= text_field 'assignment', 'num_quiz_questions', :size => 5%></td>
+ </tr>
+
+ <tr id="noquiz">
+ <td colspan="2" height="50">&nbsp;</td>
  </tr>
 
 </table>

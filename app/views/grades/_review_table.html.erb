@@ -20,9 +20,13 @@
 	<tr class="head"><td align="right"><b>Average score</b></td>
 		<% for review in reviews %>
 		   <td align="center">
-		       <% score = Score.get_total_score(review, @questions[symbol]) %>
+		     <% if (review.map.type.to_s == 'QuizResponseMap') %>
+             <% score = Score.get_total_score(review, QuizQuestionnaire.find(review.map.reviewed_object_id).questions) %>
+             <% else %>
+             <% score = Score.get_total_score(review, @questions[symbol]) %>
+             <% end %>
 		       <% if controller.action_name != "view_my_scores" %>
-		       	<input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>" %>
+		       	<input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>" />
 		       <% end %>   
 	  	       <%= sprintf("%.2f",score) %>% &nbsp;
 	  	   </td>

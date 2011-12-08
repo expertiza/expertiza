@@ -1,5 +1,8 @@
 <script type="text/javascript">
 num_questions = <%= [@questionnaire.questions.length,1].max %>;
+num_choices = 1;
+choice_id = 1;
+
 
 function deleteQuestions(){
 	var checkedObjArray = new Array();
@@ -20,7 +23,11 @@ function deleteQuestions(){
 }
 
 function addQuestions(){
-	numQuestionsToAdd = parseInt(document.getElementById("numQuestionsToAdd").value);
+    <% if @questionnaire.type == "QuizQuestionnaire" %>
+      numQuestionsToAdd = 1;
+    <% else %>
+	  numQuestionsToAdd = parseInt(document.getElementById("numQuestionsToAdd").value);
+    <% end %>
 	for(i=0; i<numQuestionsToAdd; i++){
 		addQuestion();
 	}
@@ -29,33 +36,55 @@ function addQuestions(){
 function addQuestion(){
 	table = document.getElementById("questions_table");
 	var row = table.insertRow(-1);
-	
+
 	id = num_questions;
+	<% if @questionnaire.type != 'QuizQuestionnaire' %>
 	column = document.createElement("td");
 	column.innerHTML = "<center><input type=checkbox id='question_chk" + num_questions + "'></center>";
 	row.appendChild(column);
-	
+	<% end %>
 	column = document.createElement("td");
 	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][txt] size=70 type=text/>";
 	row.appendChild(column);
-	
-	column = document.createElement("td");
-	gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
-	<% for type in Question::GRADING_TYPES %>
-		<%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
-	<% end %>
-	gradingTypes += "</select>"
-	column.innerHTML = gradingTypes;
-	row.appendChild(column);
-	
-	column = document.createElement("td");
-	weights = "<select id=new_question_" + id + "_weight name=new_question[" + id + 		"][weight]>";
-	<% for weight in Question::WEIGHTS %>
-		<%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
-	<% end %>
+
+    <% if @questionnaire.type == 'QuizQuestionnaire' %>  //add choices in the view if it is a quiz questionnaire
+        for(i = 1; i < 5; i++) {
+            var row_for_choices = table.insertRow(-1);
+            cid = i;
+            column = document.createElement("td");
+            column.innerHTML = "&nbsp;&nbsp;&nbsp;" + i + ".&nbsp; <input id=new_choices_" + cid + "_txt name=new_choices[" + id + "][" + cid + "] size=40     type=text/>";
+            row_for_choices.appendChild(column);
+        }
+        column = document.createElement("td");
+	    weights = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id=new_question_" + id + "_weight name=new_question[" + id + 		"][weight]>";
+
+        //Listing the options for a quiz questionnaire
+        <% for weight in Question::ANSWERS %>
+		  <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+	    <% end %>
+    <% else %>
+	    column = document.createElement("td");
+	    gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
+	    <% for type in Question::GRADING_TYPES %>
+		    <%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
+	    <% end %>
+	    gradingTypes += "</select>"
+	    column.innerHTML = gradingTypes;
+	    row.appendChild(column);
+
+	    column = document.createElement("td");
+	    weights = "<select id=new_question_" + id + "_weight name=new_question[" + id + 		"][weight]>";
+
+	    <% for weight in Question::WEIGHTS %>
+		    <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+	    <% end %>
+    <% end %>
+
 	weights = weights + "</select>";
 	column.innerHTML = weights;
 	row.appendChild(column);
+
 	num_questions = num_questions + 1;
 }
+
 </script>

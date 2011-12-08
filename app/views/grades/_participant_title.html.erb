@@ -9,6 +9,9 @@
 <% if @assignment.team_assignment %>
   <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
 <% end %>
+<% if @assignment.require_quiz? %>
+  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Quiz</TH>
+<% end %>
 <TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
 
 <TR <% if prefix %>id='<%= prefix %>_2' style="display:none"<% end %>>
@@ -22,6 +25,10 @@
 <% if @assignment.team_assignment %>
   <TH WIDTH="<%= colwidth %>%">Average</TH>
   <TH WIDTH="<%= colwidth %>%">Range </TH>
-<% end %>   
+<% end %>
+<% if @assignment.require_quiz %>
+  <TH WIDTH="<%= colwidth %>%">Average</TH>
+  <TH WIDTH="<%= colwidth %>%">Range </TH>
+<% end %>
 <TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
     

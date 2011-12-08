@@ -24,11 +24,8 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
         <% end %>	    		
 		(Submit and view your work)
 	</li>
-
-    <!-- added by sachin -->
     <li>
-        <% # TODO: what to check here %>
-		<% if @assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
+		<% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Complete") %>
 			<%= link_to "Quiz",{:controller => 'student_quiz', :action => 'list', :id => @participant.id} %>
 		<% else %>
 			<font color="gray">Quiz</font>

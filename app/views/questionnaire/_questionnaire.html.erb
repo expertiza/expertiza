@@ -11,7 +11,47 @@
 		</td>		
 	</tr>
 </table>
+
+<% if @questionnaire.type == 'QuizQuestionnaire' %>        <!--handle a questionnaire differently if it is a quiz-->
+    <table id="questions_table">
+        <tr>
+            <td colspan=2 style="padding-bottom: 5pt"><strong>Questions</strong>
+        </tr>
+        <tr>
+            <td align=center width=300>Question</td>
+            <td align=left>Correct Answer</td>
+        </tr>
+
+    <% for @question in @questionnaire.questions %>
+	  <tr>
+	    <td><%= text_field "question[]", 'txt', :size=>70 %></td>
+        <% i=1
+          @question_advices = QuestionAdvice.find_all_by_question_id(@question.id)
+          for @question_advice in @question_advices
+            if @question_advice.score == 1
+              @question.weight = i
+              break
+            else
+              i+=1
+            end
+          end %>
+		<td><%= select("question[]", :weight, Question::ANSWERS)%></td>
+	  </tr>
+      <% i=1 %>
+
+	  <% for @question_advice in @question_advices %>
+        <tr>
+		  <td>
+            &nbsp;&nbsp;&nbsp;<%= i%>.&nbsp;<%= text_field "question_advice[]", 'advice', :size=>40 %>
+
+          </td>
+	    </tr>
+      <% end
+    end %>
+    </table>
+<% else %>
 <table>
+
 	<tr>
 		<td>Min question score:</td>
 		<td><%= text_field 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
@@ -28,10 +68,12 @@
 <table id="questions_table">
 	<tr>
         <td colspan=2 style="padding-bottom: 5pt"><strong>Questions</strong>
+        <% if @questionnaire.type != "QuizQuestionnaire" %>
 		  <input style="margin-left: 50pt" type="button" value="Add" onclick="addQuestions()">
 		  <input id="numQuestionsToAdd" type="text" value="1" size=1>
 		  more question(s)</td>
-		<td colspan=2><input type="button" value="Delete selected questions" onclick="deleteQuestions()"></td>
+		  <td colspan=2><input type="button" value="Delete selected questions" onclick= "deleteQuestions()"></td>
+        <% end %>
 	</tr>
 	<tr>
 		<td align=left width=30>Delete</td>
@@ -39,7 +81,7 @@
 		<td align=center width=100>Scoring</td>
 		<td align=left>Weight</td>
 	</tr>
-	
+
 	<% 	i = 1;
 		for @question in @questionnaire.questions %>
 	<tr>
@@ -50,6 +92,7 @@
 	</tr>
 	<% 	i += 1;
 		end %>
+  <% end %>
 </table>
 <BR/>
 <!--[eoform:course]-->

@@ -8,7 +8,11 @@
         <% topic_id = Participant.find(@map.contributor).topic_id%>
   <%end%>  
   <%if !topic_id.nil?%>
-    <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
+  <% if (@map.type.to_s != 'QuizResponseMap') %>
+  <h2>You are taking quiz for <%=SignUpTopic.find(topic_id).topic_name%></h2>
+  <% else %>
+  <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
+  <% end %>
   <%end%>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
   <hr/>
@@ -19,13 +23,15 @@
 <% i = 0
    @questions.each{
     | question | %>
-    <%= question.txt %><BR/>
+    <%= i+1 %>. <%= question.txt %><BR/>
+    <% if @map.type.to_s!='QuizResponseMap' %>
     <% if controller.action_name != 'new' and @review_scores[i] != nil and @review_scores[i].comments != nil %>  	    
 	    <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
 	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
     <% else %>
-	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>	
+	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>
     <% end %>
+
     <% if question.true_false? %>
       <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
          <%if controller.action_name != 'new' %>
@@ -46,24 +52,42 @@
 	        <% end %>
           <% end %>
       </select>     
-  <% end %> 
+  <% end %>
+
   <%if question.question_advices.size > 0%>
       <%= render :partial => 'advice', :locals => {:i => i, :advice_list => question.question_advices} %>
   <% else %>
       <br/>
-  <% end %>      
+  <% end %>
+  <% else %>
+    <%if question.question_advices.size > 0%>
+      <%= render :partial => 'options', :locals => {:i => i, :advice_list => question.question_advices} %>
+    <% else %>
+        <br/>
+    <% end %>
+  <% end %>
   <BR/><BR/>
   <% i+=1 
    } %>
 
        
 <p>
-	<label for="review_comments">Additional Comments</label><BR/>
+    <% if (@map.type.to_s == 'QuizResponseMap') %>
+        <label for="review_comments">Comments</label><BR/>
+    <% else %>
+        <label for="review_comments">Additional Comments</label><BR/>
+    <% end %>
 	<textarea cols="70" rows="1" id="review_comments" name="review[comments]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><% if controller.action_name != 'new' and @response.additional_comment != nil %><%=@response.additional_comment.strip%><% end %></textarea>
 </p>
 
 <br/>
-<%= submit_tag "Save "+@title, :name=>"save" %>
+
+<% if (@map.type.to_s == 'QuizResponseMap') %>
+    <%= submit_tag "Submit "+@title, :name=>"save", :confirm => "Once submitted you will not be able to edit the responses. \nAre you sure you want to submit the quiz? " %>
+<% else %>
+    <%= submit_tag "Save "+@title, :name=>"save" %>
+<% end %>
+
 <%= hidden_field_tag('return', @return) %>
 <% end %>
 

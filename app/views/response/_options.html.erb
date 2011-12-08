@@ -1,0 +1,11 @@
+
+<div id="option_<%= i %>" style="padding:12px">
+<% k = 1 %>
+<% advice_list.each{ | item | %>
+  <div>
+
+  <br><%= radio_button_tag 'option_'+ i.to_s, item.id, false %>&nbsp;<%=item.advice %>
+  </div>
+  <% k+=1 %>
+<%}%>
+</div>

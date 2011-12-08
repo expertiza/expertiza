@@ -81,7 +81,6 @@ class ResponseController < ApplicationController
 
     begin
        ResponseHelper.compare_scores(@response, @questionnaire)
-       #ScoreCache.update_cache(@response.id)
     
       msg = "Your response was successfully saved."
     rescue
@@ -166,7 +165,7 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions     
       params[:responses].each_pair do |k,v|
-        score = Score.create_score(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+        score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
       end  
     rescue
       error_msg = "Your response was not saved. Cause: " + $!
@@ -193,7 +192,7 @@ class ResponseController < ApplicationController
     
     for i in 0..questions.size-1
         # Local variable score is unused; can it be removed?
-        score = Score.create_score(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
+        score = Score.create(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
           
 
     end

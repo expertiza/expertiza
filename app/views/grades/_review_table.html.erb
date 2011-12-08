@@ -20,8 +20,7 @@
 	<tr class="head"><td align="right"><b>Average score</b></td>
 		<% for review in reviews %>
 		   <td align="center">
-	<%#=	       <% score = Score.get_total_score(review, @questions[symbol]) %>
-             <% score = Score.get_total_score_from_cache(review, @questions[symbol]) %>
+               <% score = Score.get_total_score(review, @questions[symbol]) %>
 		       <% if controller.action_name != "view_my_scores" %>
 		       	<input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>" %>
 		       <% end %>   

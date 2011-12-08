@@ -1,5 +1,5 @@
 class Assessment360Controller < ApplicationController
-
+  # Added the @instructor to display the instrucor name in the home page of the 360 degree assessment
   def index
     @courses = Course.find_all_by_instructor_id(session[:user].id)
     @instructor_id = session[:user].id
@@ -116,19 +116,17 @@ class Assessment360Controller < ApplicationController
     end
   end
 
+# Find the list of all students and assignments pertaining to the course. This data is used to compute the metareview and teammate review scores. This information is used in the view.
   def all_students_all_reviews
+  
      @course = Course.find_by_id(params[:course_id])
      @students = @course.get_participants()
      @assignments = Assignment.find_all_by_course_id(@course.id);
-
-     #@students.each {  |student|
-       #@assignments.each { |assignment|
-      # @metareviews = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(student.id, assignment.id) #:reviewed_object_id => assignment.id, :reviewee_id => student.id, :type => "MetaReviewResponseMap"
-       #  }
-       #}
   end
 
+# Find all the assignments for a given student pertaining to the course. This data is given a graphical display using bar charts. Individual teammate and metareview scores are displayed along with their aggregate
   def one_student_all_reviews
+
     @course = Course.find_by_id(params[:course_id])
     @students = @course.get_participants()
     @students.each { |student|
@@ -202,7 +200,7 @@ class Assessment360Controller < ApplicationController
             average = average.to_i / (j-1).to_i
             bc.data assignment.name.to_s + ", Average: "+ average.to_s, [average], '000000'
         end
-        #bc.data assignment.name.to_s, [32], '00ff00'
+
        end
        i = i +1
      end

@@ -8,7 +8,11 @@ class ResponseMap < ActiveRecord::Base
     responses = Array.new   
     
     if participant
-      maps = find(:all, :conditions => ['reviewee_id = ? and type = ?',participant.id,self.to_s])
+      if (self.to_s == 'QuizResponseMap')
+        maps = find(:all, :conditions => ['reviewer_id = ? and type = ?',participant.id,self.to_s])
+      else
+        maps = find(:all, :conditions => ['reviewee_id = ? and type = ?',participant.id,self.to_s])
+      end
       maps.each{ |map|
         if map.response
           responses << map.response

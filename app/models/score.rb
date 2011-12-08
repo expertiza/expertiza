@@ -12,8 +12,8 @@ class Score < ActiveRecord::Base
       scores[:min] = 999999999
       total_score = 0
       assessments.each {
-        | assessment | 
-        curr_score = get_total_score(assessment, questions)       
+        | assessment |
+        curr_score = get_total_score(assessment, questions)
         if curr_score > scores[:max]
           scores[:max] = curr_score
         end
@@ -29,7 +29,34 @@ class Score < ActiveRecord::Base
       scores[:avg] = nil
     end
     return scores 
-  end  
+  end
+
+  def self.compute_quiz_scores(responses)
+    scores = Hash.new
+    if responses.length > 0
+      scores[:max] = -999999999
+      scores[:min] = 999999999
+      total_score = 0
+      responses.each {
+        | response |
+        questions = QuizQuestionnaire.find(response.map.reviewed_object_id).questions
+        curr_score = get_total_score(response, questions)
+        if curr_score > scores[:max]
+          scores[:max] = curr_score
+        end
+        if curr_score < scores[:min]
+          scores[:min] = curr_score
+        end
+        total_score += curr_score
+      }
+      scores[:avg] = total_score.to_f / responses.length.to_f
+    else
+      scores[:max] = nil
+      scores[:min] = nil
+      scores[:avg] = nil
+    end
+    return scores
+  end
   
   # Computes the total score for an assessment
   # params
@@ -46,6 +73,6 @@ class Score < ActiveRecord::Base
       end      
       sum_of_weights += question.weight
     }
-    return (weighted_score.to_f / (sum_of_weights.to_f * questions.first.questionnaire.max_question_score.to_f)) * 100   
+    return (weighted_score.to_f / (sum_of_weights.to_f * questions.first.questionnaire.max_question_score.to_f)) * 100
   end
 end

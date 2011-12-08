@@ -9,9 +9,9 @@ class AssignmentParticipant < Participant
   
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
   has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
-  # ------- added by sachin -------- #
   has_many    :quiz_mappings, :class_name => 'QuizResponseMap', :foreign_key => 'reviewee_id'
-  # -------------------------------- #
+  has_many    :quiz_responses,  :class_name => 'Response', :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'QuizResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
+
   has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   belongs_to  :user
 
@@ -28,13 +28,11 @@ class AssignmentParticipant < Participant
       :reviewed_object_id => assignment.id)
   end
 
-  # ------- added by sachin --------- #
   def assign_quiz(contributor)
-     quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
-     QuizResponseMap.create(:reviewee_id => contributor.id, :reviewer_id => self.id,
+    quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
+    QuizResponseMap.create(:reviewee_id => contributor.id, :reviewer_id => self.id,
       :reviewed_object_id => quiz.id)
   end
-  # --------------------------------- #
 
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object 
@@ -43,10 +41,20 @@ class AssignmentParticipant < Participant
                                               self.id, reviewer.id, assignment.id]) > 0
   end
 
+  def quiz_taken_by?(contributor, reviewer)
+    quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id)
+    return QuizResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
+                                              self.id, reviewer.id, quiz_id]) > 0
+  end
+
   def has_submissions?
     return ((get_submitted_files.length > 0) or 
             (get_wiki_submissions.length > 0) or 
             (get_hyperlinks_array.length > 0)) 
+  end
+
+  def has_quiz?
+    return !QuizQuestionnaire.find_by_instructor_id(self.id).nil?
   end
 
 # END of contributor methods
@@ -66,10 +74,35 @@ class AssignmentParticipant < Participant
     assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
+
+    # for all quiz questionnaires (quizzes) taken by the participant
+    quiz_responses = Array.new
+    quiz_response_mappings = QuizResponseMap.find_all_by_reviewer_id(self.id)
+    quiz_response_mappings.each do |qmapping|
+      if (qmapping.response)
+      quiz_responses << qmapping.response
+      end
+    end
+
+    scores[:quiz] = Hash.new
+    scores[:quiz][:assessments] = quiz_responses
+    scores[:quiz][:scores] = Score.compute_quiz_scores(scores[:quiz][:assessments])
+
     scores[:total_score] = assignment.compute_total_score(scores)
+    scores[:total_score] += compute_quiz_scores(scores)
     return scores
+  end
+
+  def compute_quiz_scores(scores)
+    total = 0
+    if scores[:quiz][:scores][:avg]
+      return scores[:quiz][:scores][:avg] * 100  / 100.to_f
+    else
+      return 0
+    end
+    return total
   end
 
   # Appends the hyperlink to a list that is stored in YAML format in the DB
@@ -152,7 +185,11 @@ class AssignmentParticipant < Participant
       return ParticipantReviewResponseMap.get_assessments_for(self)
     end
   end
-   
+
+  def get_quizzes_taken
+      return QuizResponseMap.get_assessments_for(self)
+  end
+
   def get_metareviews
     MetareviewResponseMap.get_assessments_for(self)  
   end

@@ -37,7 +37,8 @@ class ResponseController < ApplicationController
     }
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
+    jkidd = User.find_by_name("jkidd")
+    if jkidd && jkidd.id == @assignment.instructor_id && @title == "Review"
       if @assignment.id < 469
          @next_action = "custom_update"
          render :action => 'custom_response'
@@ -140,7 +141,8 @@ class ResponseController < ApplicationController
     get_content  
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
+    jkidd = User.find_by_name("jkidd")
+    if jkidd && jkidd.id == @assignment.instructor_id && @title == "Review"
       if @assignment.id < 469
          @next_action = "custom_create"
          render :action => 'custom_response'
@@ -155,25 +157,36 @@ class ResponseController < ApplicationController
     end
   end
   
-  def create     
+  def create
     @map = ResponseMap.find(params[:id])
     @res = 0
     msg = ""
     error_msg = ""
-    begin      
+    begin
       @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
       @res = @response.id
       @questionnaire = @map.questionnaire
-      questions = @questionnaire.questions     
-      params[:responses].each_pair do |k,v|
-        score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
-      end  
+      questions = @questionnaire.questions
+      if (@map.type.to_s == 'QuizResponseMap')
+        questions.each_with_index do |question, k|
+         selected_option_id =  params[('option_'+k.to_s).to_sym]
+         selected_option = QuestionAdvice.find(selected_option_id)
+         score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => selected_option.score, :comments => selected_option.advice)
+        end
+      else
+        params[:responses].each_pair do |k,v|
+          score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+        end
+      end
     rescue
+      @response.delete
       error_msg = "Your response was not saved. Cause: " + $!
     end
-    
+
     begin
-      ResponseHelper.compare_scores(@response, @questionnaire)
+      if (@map.type.to_s != 'QuizResponseMap')
+        ResponseHelper.compare_scores(@response, @questionnaire)
+      end
       ScoreCache.update_cache(@res)
       @map.save
       msg = "Your response was successfully saved."
@@ -223,21 +236,33 @@ class ResponseController < ApplicationController
     elsif params[:return] == "instructor"
       redirect_to :controller => 'grades', :action => 'view', :id => @map.assignment.id
     else
-      redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
-    end 
+      if(@map.type.to_s == 'QuizResponseMap')
+        redirect_to :controller => 'student_quiz', :action => 'list', :id => @map.reviewer.id
+      else
+        redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
+      end
+    end
   end
   
   private
     
   def get_content    
-    @title = @map.get_title 
+    @title = @map.get_title
+    if (@map.type.to_s=="QuizResponseMap")
+      quiz_id = @map.reviewed_object_id
+      participant_id = QuizQuestionnaire.find(quiz_id).instructor_id
+      assignment_id = Participant.find(participant_id).parent_id
+      assignment =  Assignment.find(assignment_id)
+      @map.assignment = Assignment.find(assignment_id)
+    end
     @assignment = @map.assignment
     @participant = @map.reviewer
     @contributor = @map.contributor
     @questionnaire = @map.questionnaire
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score
-    @max = @questionnaire.max_question_score     
+    @max = @questionnaire.max_question_score
+
   end
   
   def redirect_when_disallowed(response)

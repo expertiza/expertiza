@@ -146,12 +146,11 @@ class ReviewMappingController < ApplicationController
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
   end
 
-  # ---------- added by sachin ------------#
+  # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically
       begin
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
-
       unless params[:i_dont_care]
         topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
       else
@@ -166,8 +165,6 @@ class ReviewMappingController < ApplicationController
 
     redirect_to :controller => 'student_quiz', :action => 'list', :id => reviewer.id
   end
-  # ---------------------------------------#
-
 
   def add_metareviewer
     mapping = ResponseMap.find(params[:id])
@@ -536,7 +533,7 @@ class ReviewMappingController < ApplicationController
     end
     @userid = session[:user].id
   end
-  
+
   def search
     @assignment = Assignment.find(params[:id])
     @id = params[:id]
@@ -595,7 +592,7 @@ class ReviewMappingController < ApplicationController
     end
     return @review_scores
   end
-  
+
   def get_review_questionnaire_id_for_assignment(assignment)
     @revqids = []
     

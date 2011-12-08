@@ -30,21 +30,24 @@ class ScoreCache < ActiveRecord::Base
       @teammember =  TeamsUser.find(:first, :conditions => ["team_id = ?",@rm.reviewee_id])
       @participant1 = AssignmentParticipant.find(:first, :conditions =>["user_id = ? and parent_id = ?", @teammember.user_id, @ass_id])
       @contributor_id = @teammember.team_id
-      
+    elsif(@map_type == "QuizResponseMap")
+      @participant1 = AssignmentParticipant.find(@rm.reviewer_id)
+      @contributor_id = @participant1.id
+      @assignment1 = Assignment.find(@participant1.parent_id)
+      @ass_id = @assignment1.id
     else
       @participant1 = AssignmentParticipant.find(@rm.reviewee_id)
       @contributor_id = @participant1.id
       @assignment1 = Assignment.find(@participant1.parent_id)
       @ass_id = @assignment1.id
-      
-      
     end 
     @questions = Hash.new    
     questionnaires = @assignment1.questionnaires
     questionnaires.each{
       |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
-    } 
+    }
+
     # scores that participant1 has given
     if(@map_type == "TeamReviewResponseMap")
       team = Team.find(@contributor_id)
@@ -53,8 +56,8 @@ class ScoreCache < ActiveRecord::Base
       @allscores = @participant1.get_scores( @questions)
     end
     
-    @scorehash = get_my_scores(@allscores, @map_type) 
-    
+    @scorehash = get_my_scores(@allscores, @map_type)
+
     
     @p_score = @scorehash[:avg]               
     @p_min = @scorehash[:min]
@@ -105,7 +108,7 @@ class ScoreCache < ActiveRecord::Base
     #  MetareviewResponseMap - Metareview mappings
     #  TeammateReviewResponseMap - Review mapping between teammates
     #  FeedbackResponseMap - Feedback from author to reviewer
-    
+    #  QuizResponseMap - Quiz taken by the participant
     
     if(map_type == "ParticipantReviewResponseMap")
       
@@ -139,6 +142,12 @@ class ScoreCache < ActiveRecord::Base
         @p_score = scorehash[:feedback][:scores][:avg]               
         @p_min = scorehash[:feedback][:scores][:min]
         @p_max = scorehash[:feedback][:scores][:max]
+      end
+    elsif (map_type == "QuizResponseMap")
+      if (scorehash[:quiz])
+        @p_score = scorehash[:quiz][:scores][:avg]
+        @p_min = scorehash[:quiz][:scores][:min]
+        @p_max = scorehash[:quiz][:scores][:max]
       end
     end 
     @scoreset = Hash.new

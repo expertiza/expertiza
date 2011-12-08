@@ -103,16 +103,17 @@ class AssignmentController < ApplicationController
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
-    @drop_topic_deadline = deadline.id
+    #Get Drop topic Deadline
+    @Drop_topic_deadline = deadline.id
+    #Get Quiz Deadline
     deadline = DeadlineType.find_by_name("quiz")
-    @quiz_deadline = deadline.id
+    @Quiz_deadline = deadline.id
     
     if @assignment.save 
       set_questionnaires   
       set_limits_and_weights
       
       max_round = 1
-      
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
         due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
@@ -121,8 +122,8 @@ class AssignmentController < ApplicationController
         due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
         raise "Please enter a valid Review deadline" if !due_date
         max_round = 2;
-        
-        due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
+
+        due_date = DueDate::set_duedate(params[:drop_topic_deadline],@Drop_topic_deadline, @assignment.id, 0)
         raise "Please enter a valid Drop-Topic deadline" if !due_date
 
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
@@ -149,8 +150,11 @@ class AssignmentController < ApplicationController
           end
         }
 
-        due_date = DueDate::set_duedate(params[:quiz_deadline],@quiz_deadline, @assignment.id, 0) #ccc
-        raise "Please enter a valid Quiz deadline" if !due_date                                   #ccc
+        #Store quiz deadline if quiz option it is enabled
+        if(@assignment.require_quiz)
+          due_date = DueDate::set_duedate(params[:quiz_deadline],@Quiz_deadline, @assignment.id, 0) #ccc
+          raise "Please enter a valid Quiz deadline" if !due_date                                   #ccc
+        end
                
         # Create submission directory for this assignment
         # If assignment is a Wiki Assignment (or has no directory)

@@ -65,7 +65,7 @@ class Team < ActiveRecord::Base
    members.each{
      | member |
      t_user = TeamsUser.create(:team_id => new_team.id, :user_id => member.user_id)
-     parent = TeamNode.find_by_node_object_id(self.id)   
+     parent = Object.const_get(self.get_parent_model).find(self.parent_id)
      TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
    }   
  end

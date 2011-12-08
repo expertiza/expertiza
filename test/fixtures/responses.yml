@@ -22,3 +22,7 @@ response4:
 response5:
  map_id: <%= Fixtures.identify(:response_maps5)%>
  additional_comment: "review5"
+
+quiz_response:
+ map_id: <%= Fixtures.identify(:quiz_response_map)%>
+ additional_comment: "quiz response"

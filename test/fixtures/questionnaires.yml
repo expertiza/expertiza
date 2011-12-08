@@ -70,3 +70,32 @@ global_survey_questionnaire:
  max_question_score: 5
  type: "GlobalSurveyQuestionnaire"
  display_type: "GlobalSurvey"
+
+quiz_questionnaire1:
+  name: quiz_qnare1
+  instructor_id: <%= Fixtures.identify(:quiz_par1) %>
+  private: 0
+  min_question_score: 0
+  max_question_score: 1
+  type: "QuizQuestionnaire"
+  display_type: "Quiz"
+
+
+quiz_questionnaire2:
+  name: quiz_qnare2
+  instructor_id: <%= Fixtures.identify(:quiz_par2) %>
+  private: 0
+  min_question_score: 0
+  max_question_score: 1
+  type: "QuizQuestionnaire"
+  display_type: "Quiz"
+
+
+quiz_questionnaire3:
+  name: quiz_qnare3
+  instructor_id: <%= Fixtures.identify(:quiz_par3) %>
+  private: 0
+  min_question_score: 0
+  max_question_score: 1
+  type: "QuizQuestionnaire"
+  display_type: "Quiz"

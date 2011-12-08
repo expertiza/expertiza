@@ -155,3 +155,30 @@ par15:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par15"
+
+quiz_par1:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student1) %>
+  parent_id: <%= Fixtures.identify(:assignment_quiz) %>
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "quiz_par1"
+
+quiz_par2:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student2) %>
+  parent_id: <%= Fixtures.identify(:assignment_quiz) %>
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "quiz_par2"
+
+quiz_par3:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student3) %>
+  parent_id: <%= Fixtures.identify(:assignment_quiz) %>
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "quiz_par3"

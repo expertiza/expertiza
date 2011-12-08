@@ -7,6 +7,7 @@
 <% dline_type_list << Fixtures.identify(:deadline_type_resubmission) %>
 <% dline_type_list << Fixtures.identify(:deadline_type_rereview) %>
 <% dline_type_list << Fixtures.identify(:deadline_type_metareview) %>
+<% dline_type_list << Fixtures.identify(:deadline_type_quiz) %>
 <% offset = [] %>
 <% offset << -5 %>
 <% offset << -4 %>
@@ -126,4 +127,15 @@ due_date_metareview_Assignment<%= j %>:
   round: 2
   flag: 0
   threshold: 1
+<%end%>
+
+# deadlines for quiz_assignment
+# 6 deadlines
+<% for j in 0..5 %>
+due_date<%= i*5+j %>:
+  due_at: <%= (Time.now + i*100000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: <%= dline_type_list[j] %>
+  assignment_id: <%= Fixtures.identify("assignment"+i.to_s) %>
+  late_policy_id: <%= Fixtures.identify("late_policy"+i.to_s) %>
+  round: 1
 <%end%>

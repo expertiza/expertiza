@@ -104,3 +104,70 @@ advice20:
  question_id: <%= Fixtures.identify(:question6)%>
  score: 5
  advice: Team member always completed his/her work on time
+
+# quiz 1 - question 1 advices (options)
+quiz1_q1_advice1:
+ question_id: <%= Fixtures.identify(:quiz1_question1)%>
+ score: 0
+ advice: Wrong Answer for Q1
+
+quiz1_q1_advice2:
+ question_id: <%= Fixtures.identify(:quiz1_question1)%>
+ score: 1
+ advice: Correct Answer for Q1
+
+# quiz 1 - question 2 advices (options)
+quiz1_q2_advice1:
+ question_id: <%= Fixtures.identify(:quiz1_question2)%>
+ score: 1
+ advice: Correct Answer for Q2
+
+quiz1_q2_advice2:
+ question_id: <%= Fixtures.identify(:quiz1_question2)%>
+ score: 0
+ advice: Wrong Answer for Q2
+
+# quiz 2 - question 1 advices (options)
+quiz2_q1_advice1:
+ question_id: <%= Fixtures.identify(:quiz2_question1)%>
+ score: 0
+ advice: Wrong Answer for Q1
+
+quiz2_q1_advice2:
+ question_id: <%= Fixtures.identify(:quiz2_question1)%>
+ score: 1
+ advice: Correct Answer for Q1
+
+# quiz 2 - question 2 advices (options)
+quiz2_q2_advice1:
+ question_id: <%= Fixtures.identify(:quiz2_question2)%>
+ score: 1
+ advice: Correct Answer for Q2
+
+quiz2_q2_advice2:
+ question_id: <%= Fixtures.identify(:quiz2_question2)%>
+ score: 0
+ advice: Wrong Answer for Q2
+
+# quiz 3 - question 1 advices (options)
+quiz3_q1_advice1:
+ question_id: <%= Fixtures.identify(:quiz3_question1)%>
+ score: 0
+ advice: Wrong Answer for Q1
+
+quiz3_q1_advice2:
+ question_id: <%= Fixtures.identify(:quiz3_question1)%>
+ score: 1
+ advice: Correct Answer for Q1
+
+# quiz 3 - question 2 advices (options)
+quiz3_q2_advice1:
+ question_id: <%= Fixtures.identify(:quiz3_question2)%>
+ score: 1
+ advice: Correct Answer for Q2
+
+quiz3_q2_advice2:
+ question_id: <%= Fixtures.identify(:quiz3_question2)%>
+ score: 0
+ advice: Wrong Answer for Q2
+

@@ -52,3 +52,40 @@ question7:
 # true_false: true
 # questionnaire_id: <%= Fixtures.identify(:questionnaire3) %>
 # weight: 5
+
+quiz1_question1:
+ txt: This is quiz 1 - question 1?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:quiz_questionnaire1) %>
+ weight: 1
+
+quiz1_question2:
+ txt: This is quiz 1 - question 2?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:quiz_questionnaire1) %>
+ weight: 1
+
+quiz2_question1:
+ txt: This is quiz 2 - question 1?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:quiz_questionnaire2) %>
+ weight: 1
+
+quiz2_question2:
+ txt: This is quiz 2 - question 2?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:quiz_questionnaire2) %>
+ weight: 1
+
+quiz3_question1:
+ txt: This is quiz 3 - question 1?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:quiz_questionnaire3) %>
+ weight: 1
+
+quiz3_question2:
+ txt: This is quiz 3 - question 2?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:quiz_questionnaire3) %>
+ weight: 1
+

@@ -56,4 +56,10 @@ response_map8:
   reviewer_id: <%= Fixtures.identify(:par15) %>
   reviewed_object_id: <%= Fixtures.identify(:response_maps5) %>
   type: "MetareviewResponseMap"
-  
+
+
+quiz_response_map:
+  reviewee_id: <%= Fixtures.identify(:quiz_par2) %>
+  reviewer_id: <%= Fixtures.identify(:quiz_par3) %>
+  reviewed_object_id: <%= Fixtures.identify(:quiz_questionnaire2) %>
+  type: "QuizResponseMap"

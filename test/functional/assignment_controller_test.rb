@@ -53,6 +53,26 @@ class AssignmentControllerTest < ActionController::TestCase
     assert assignment.save
   end
 
+  def test_new_assignment_with_quiz_required
+    questionnaire_id = Questionnaire.first.id
+    instructorid = Instructor.first.id
+    courseid = Course.first.id
+    # create a new assignment
+    assignment = Assignment.new( :name => "quiz_valid_test",
+      :course_id => 1,
+      :directory_path => "quiz_valid_test",
+      :review_questionnaire_id    => questionnaire_id,
+      :review_of_review_questionnaire_id => questionnaire_id,
+      :author_feedback_questionnaire_id  => questionnaire_id,
+      :instructor_id => instructorid,
+      :course_id => courseid,
+      :require_quiz => 1,
+      :num_quiz_questions => 2
+    )
+
+    assert assignment.save
+  end
+
   # Test Case 1102
   # edit an assignment, change should be
   # reflected in DB

@@ -1,12 +1,6 @@
 class Score < ActiveRecord::Base
   belongs_to :question
 
-  QUESTIONNAIRE_TYPE_CACHE_MAP_TYPE = {
-      "ReviewQuestionnaire" => "ParticipantReviewResponseMap",
-      "MetareviewQuestionnaire" => "MetareviewResponseMap",
-      "AuthorFeedbackQuestionnaire" => "FeedbackResponseMap",
-      "TeammateReviewQuestionnaire" => "TeammateReviewResponseMap"
-  }
 
   # Same as compute_scores(assessments, questions) but it first checks if the score is available in the ScoreCache.
   # If the score is in the cache it'll get it from the cache, otherwise it'll call compute_scores(assessments, questions)

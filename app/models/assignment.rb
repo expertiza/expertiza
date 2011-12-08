@@ -224,11 +224,7 @@ class Assignment < ActiveRecord::Base
         | questionnaire |
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
-        #cache_map_type = Score.get_cache_map_type(questionnaire.type)
-        cache_map_type = Score::QUESTIONNAIRE_TYPE_CACHE_MAP_TYPE[questionnaire.type]
-
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.get_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])
-        #scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])
       }
       scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
     }        

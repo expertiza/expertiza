@@ -198,20 +198,19 @@ class AssignmentTeam < Team
   end
  
   # return a hash of scores that the team has received for the questions
-
-
-
-
-
-  def get_scores(questions)
+  def get_scores(questions,skipcache=false)
     scores = Hash.new
     scores[:team] = self # This doesn't appear to be used anywhere
     assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = Response.all(:joins => :map,
         :conditions => {:response_maps => {:reviewee_id => self.id, :type => 'TeamReviewResponseMap'}})
-      scores[questionnaire.symbol][:scores] = Score.get_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol], self.id, "TeamReviewResponseMap")
-      #scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+
+      if skipcache
+        scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      else
+        scores[questionnaire.symbol][:scores] = Score.get_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      end
     end
     scores[:total_score] = assignment.compute_total_score(scores)
     return scores

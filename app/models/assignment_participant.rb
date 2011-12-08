@@ -49,17 +49,19 @@ class AssignmentParticipant < Participant
   end
 
   # Return scores that this participant has given
-  def get_scores(questions)
+  def get_scores(questions, skipcache=false)
     scores = Hash.new
     scores[:participant] = self # This doesn't appear to be used anywhere
     assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
       #cache_map_type = Score.get_cache_map_type(questionnaire.type)
-      cache_map_type = Score::QUESTIONNAIRE_TYPE_CACHE_MAP_TYPE[questionnaire.type]
+      if skipcache
+         scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      else
+         scores[questionnaire.symbol][:scores] = Score.get_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
 
-      scores[questionnaire.symbol][:scores] = Score.get_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol], self.id, cache_map_type)
-      #scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      end
     end
     scores[:total_score] = assignment.compute_total_score(scores)
     return scores

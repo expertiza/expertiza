@@ -1,0 +1,71 @@
+<% tot_contributions = Hash.new %>
+
+<% tot_contributions[:review] = 0 %>
+<% tot_contributions[:review_given] = 0 %>
+<% tot_contributions[:metareview] = 0 %>
+<% tot_contributions[:metareview_given] = 0 %>
+<% tot_contributions[:feedback] = 0 %>
+<% tot_contributions[:feedback_given] = 0 %>
+<% tot_contributions[:teammate] = 0 %>
+<% tot_contributions[:teammate_given] = 0 %>
+
+<% if @contriuser_participants.size == 0 %>
+    <H1><%= @contriuser.fullname %> has not contributed anything so far.</H1>
+<% else %>
+    <H1>Contribution by <%= @contriuser.fullname %></H1>
+    <TABLE class="grades" cellpadding="1">
+      <%# questions = Hash.new %>
+      <%= render :partial => 'users/participant_title', :locals => {:prefix => nil} %>
+      <% @contriuser_participants.each do |i| %>
+          <% assignment = i.assignment %>
+          <% questions = Hash.new %>
+          <% questionnaires = assignment.questionnaires %>
+          <% questionnaires.each do |questionnaire| %>
+            <% questions[questionnaire.symbol] = questionnaire.questions %>
+              <%# flash[:error] = questionnaire.symbol%>
+          <% end %>
+          <%= render :partial => 'users/participant',
+                           :locals => {:prefix => 'user',
+                                       :team => false,
+                                       :pscore => i.get_all_scores(questions),
+                                       :assignment => assignment,
+                                       :participant => i,
+                                       :questions => questions,
+                                       :tot_contributions => tot_contributions} %>
+      <% end %>
+
+    </TABLE>
+    <BR/>
+<% end %>
+
+<h4>Overall contributions by <%= @contriuser.fullname %> : </h4>
+<table class="grades">
+<% if tot_contributions[:review] %>
+<tr><td>Total Number of reviews received by <%= @contriuser.fullname %>:</td><td><b><%= tot_contributions[:review] %></b></td></tr>
+<% end %>
+<% if tot_contributions[:review_given] %>
+<tr><td>Total Number of reviews given by <%= @contriuser.fullname %>:</td><td><b><%= tot_contributions[:review_given] %></b></td></tr>
+<% end %>
+<% if tot_contributions[:metareview] %>
+<tr><td>Total Number of metareviews received by <%= @contriuser.fullname %>:</td><td><b><%= tot_contributions[:metareview] %></b></td></tr>
+<% end %>
+<% if tot_contributions[:metareview_given] %>
+<tr><td>Total Number of metareviews given by <%= @contriuser.fullname %>:</td><td><b><%= tot_contributions[:metareview_given] %></b></td></tr>
+<% end %>
+<% if tot_contributions[:feedback] %>
+<tr><td>Total Number of Author Feedback received by <%= @contriuser.fullname %>:</td><td><b><%= tot_contributions[:feedback] %></b></td></tr>
+<% end %>
+<% if tot_contributions[:feedback_given] %>
+<tr><td>Total Number of Author Feedback given by <%= @contriuser.fullname %>:</td><td><b><%= tot_contributions[:feedback_given] %></b></td></tr>
+<% end %>
+<% if tot_contributions[:teammate] %>
+<tr><td>Total Number of Teammate Reviews received by <%= @contriuser.fullname %>:</td><td><b><%= tot_contributions[:teammate] %></b></td></tr>
+<% end %>
+<% if tot_contributions[:teammate_given] %>
+<tr><td>Total Number of Teammate Reviews given by <%= @contriuser.fullname %>:</td><td><b><%= tot_contributions[:teammate_given] %></b></td></tr>
+<% end %>
+</table>
+<br/><hr/>
+
+<a href="javascript:window.history.back()">Back</a>
+

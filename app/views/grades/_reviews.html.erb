@@ -18,7 +18,7 @@
     <% count = count + 1 %>
 		
 		<% file_url = nil
-       if (participant.assignment.instructor_id == User.find_by_name("jkidd").id)
+       if (participant.assignment.instructor_id == User.find_by_name("harry").id)
             @current_folder = DisplayOption.new
             @current_folder.name = ""
             @participant = Participant.find(review.map.reviewer_id)

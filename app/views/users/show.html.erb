@@ -15,12 +15,18 @@
         :action => 'show', :id => @role.id %></td>
 </tr>
 
+<% if @role.id == 1 %>
+<tr> <th>View <%= @user.fullname %>'s </th>
+  <td> <%= link_to "Contributions", :action => 'contributions_new', :id => @user %> </td>
+</tr>
+<% end %>
+
 </table>
 
 <hr/>
 <p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
 <%= link_to 'Delete', {:action => 'destroy', :id => @user}, 
-    :confirm => 'Delete this user?', :method => :post %> 
+    :confirm => 'Delete this user?', :method => :post %>   `
 	</p>
 
 <p><%= link_to 'Back', :action => 'list' %> to Users list</p>

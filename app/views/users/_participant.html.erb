@@ -1,0 +1,140 @@
+<!-- PARTICIPANT -->
+<%
+  participant = pscore[:participant]
+  if pscore[:review]
+  	s_avg = pscore[:review][:scores][:avg]
+    tot_contributions[:review] += pscore[:review][:assessments].size
+  end
+  if pscore[:metareview]
+  	r_avg = pscore[:metareview][:scores][:avg]
+    tot_contributions[:metareview] += pscore[:metareview][:assessments].size
+  end 
+  if pscore[:feedback]
+  	f_avg = pscore[:feedback][:scores][:avg]
+    tot_contributions[:feedback] += pscore[:feedback][:assessments].size
+  end
+  if pscore[:review_given]
+  	sg_avg = pscore[:review_given][:scores][:avg]
+    tot_contributions[:review_given] += pscore[:review_given][:assessments].size
+  end
+  if pscore[:metareview_given]
+  	rg_avg = pscore[:metareview_given][:scores][:avg]
+    tot_contributions[:metareview_given] += pscore[:metareview_given][:assessments].size
+  end
+  if pscore[:feedback_given]
+  	fg_avg = pscore[:feedback_given][:scores][:avg]
+    tot_contributions[:feedback_given] += pscore[:feedback_given][:assessments].size
+  end
+  if pscore[:teammate]
+  	tr_avg = pscore[:teammate][:scores][:avg]
+    tot_contributions[:teammate] += pscore[:teammate][:assessments].size
+  end
+  if pscore[:teammate_given]
+  	trg_avg = pscore[:teammate_given][:scores][:avg]
+    tot_contributions[:teammate_given] += pscore[:teammate_given][:assessments].size
+  end
+%>
+
+<TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
+    <TD><%= link_to assignment.name, :controller => 'users', :action => 'contributions', :participant => participant %>
+	<% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
+	</FONT>  	
+    </TD>
+    
+    <% if s_avg %>
+  	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%
+  	</TD>
+   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%d",pscore[:review][:assessments].size) %>
+   	</TD>
+    <% else %>
+   	<TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+    <% if sg_avg %>
+  	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",sg_avg) %>%
+  	</TD>
+   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%d",pscore[:review_given][:assessments].size) %>
+   	</TD>
+    <% else %>
+   	<TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+    <% if r_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",r_avg) %>%
+    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)</FONT>
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%d",pscore[:metareview][:assessments].size) %>
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+    <% if rg_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",rg_avg) %>%
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%d",pscore[:metareview_given][:assessments].size) %>
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+    
+    <% if f_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",f_avg) %>%
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%d",pscore[:feedback][:assessments].size) %>
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+    <% if fg_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",fg_avg) %>%
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%d",pscore[:feedback_given][:assessments].size) %>
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+    <% if tr_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",tr_avg) %>%
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%d",pscore[:teammate][:assessments].size) %>
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>    
+
+    <% if trg_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",trg_avg) %>%
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%d",pscore[:teammate_given][:assessments].size) %>
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+    <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
+    	<TD ALIGN="CENTER">
+    	<% if stage == "Complete" %>      
+      	  <% if participant.grade
+      	    total_score = participant.grade
+      	    title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
+      	   else
+      	    total_score = pscore[:total_score] 
+      	    title = nil
+      	   end %>
+      	  <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %>%</div>
+    	<% else %>
+      	  <FONT SIZE="-1">(in <%= stage %>)</FONT>
+    	<% end %>      
+    	</TD>
+</TR>

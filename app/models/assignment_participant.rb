@@ -61,6 +61,35 @@ class AssignmentParticipant < Participant
     return scores
   end
 
+  def get_all_scores(questions)
+    scores = get_scores(questions)
+    #scores[:participant] = self # This doesn't appear to be used anywhere
+    assignment.questionnaires.each do |questionnaire|
+      if (questionnaire.symbol == :review)
+        scores[:review_given] = Hash.new
+        scores[:review_given][:assessments] = questionnaire.get_assessments_for_given(self, "given")
+        scores[:review_given][:scores] = Score.compute_scores(scores[:review_given][:assessments], questions[questionnaire.symbol])
+      end
+      if (questionnaire.symbol == :metareview)
+        scores[:metareview_given] = Hash.new
+        scores[:metareview_given][:assessments] = questionnaire.get_assessments_for_given(self, "given")
+        scores[:metareview_given][:scores] = Score.compute_scores(scores[:metareview_given][:assessments], questions[questionnaire.symbol])
+      end
+      if (questionnaire.symbol == :feedback)
+        scores[:feedback_given] = Hash.new
+        scores[:feedback_given][:assessments] = questionnaire.get_assessments_for_given(self, "given")
+        scores[:feedback_given][:scores] = Score.compute_scores(scores[:feedback_given][:assessments], questions[questionnaire.symbol])
+      end
+      if (questionnaire.symbol == :teammate)
+        scores[:teammate_given] = Hash.new
+        scores[:teammate_given][:assessments] = questionnaire.get_assessments_for_given(self, "given")
+        scores[:teammate_given][:scores] = Score.compute_scores(scores[:teammate_given][:assessments], questions[questionnaire.symbol])
+      end
+    end
+    scores[:total_score] = assignment.compute_total_score(scores)
+    return scores
+  end
+
   # Appends the hyperlink to a list that is stored in YAML format in the DB
   # @exception  If is hyperlink was already there
   #             If it is an invalid URL
@@ -148,6 +177,26 @@ class AssignmentParticipant < Participant
   
   def get_teammate_reviews
     TeammateReviewResponseMap.get_assessments_for(self)
+  end
+
+  def get_reviews_given
+    if self.assignment.team_assignment
+      return TeamReviewResponseMap.get_assessments_for_given(self.team)
+    else
+      return ParticipantReviewResponseMap.get_assessments_for_given(self)
+    end
+  end
+
+  def get_metareviews_given
+    MetareviewResponseMap.get_assessments_for_given(self)
+  end
+
+  def get_feedback_given
+    return FeedbackResponseMap.get_assessments_for_given(self)
+  end
+
+  def get_teammate_reviews_given
+    TeammateReviewResponseMap.get_assessments_for_given(self)
   end
 
   def get_submitted_files()

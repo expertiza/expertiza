@@ -1,0 +1,185 @@
+<%# E320 - Collecting Student Information at one place. %>
+<%# This partial finds and calculates information pertaining to a particular assignment done by a particular student.
+    Also, it displays, in tabular format, the individual scores received/awarded by the student.
+%>
+
+<% i = @contri_participant %>
+<% this_assignment = Assignment.find_by_id(i.parent_id)%>
+<% this_questions = Hash.new %>
+<% this_questionnaires = this_assignment.questionnaires %>
+<% this_questionnaires.each do |this_questionnaire| %>
+            <% this_questions[this_questionnaire.symbol] = this_questionnaire.questions %>
+<% end %>
+<% this_pscore = i.get_all_scores(this_questions) %>
+
+<h4>Student Name:<% username = User.find_by_id(i.user_id) %> <%= username.name %></h4>
+<h4>Assignment Name:<% assname = Assignment.find_by_id(i.parent_id)%> <%= assname.name %> </h4>
+<hr/>
+
+<table class="grades">
+<% if this_pscore[:review] %>
+<tr><td>Number of reviews received for this assignment:</td><td><b><%= this_pscore[:review][:assessments].size %></b></td></tr>
+<% end %>
+<% if this_pscore[:review_given] %>
+<tr><td>Number of reviews given for this assignment:</td><td><b><%= this_pscore[:review_given][:assessments].size %></b></td></tr>
+<% end %>
+<% if this_pscore[:metareview] %>
+<tr><td>Number of metareviews received for this assignment:</td><td><b><%= this_pscore[:metareview][:assessments].size %></b></td></tr>
+<% end %>
+<% if this_pscore[:metareview_given] %>
+<tr><td>Number of metareviews given for this assignment:</td><td><b><%= this_pscore[:metareview_given][:assessments].size %></b></td></tr>
+<% end %>
+<% if this_pscore[:feedback] %>
+<tr><td>Number of Author Feedback received for this assignment:</td><td><b><%= this_pscore[:feedback][:assessments].size %></b></td></tr>
+<% end %>
+<% if this_pscore[:feedback_given] %>
+<tr><td>Number of Author Feedback given for this assignment:</td><td><b><%= this_pscore[:feedback_given][:assessments].size %></b></td></tr>
+<% end %>
+<% if this_pscore[:teammate] %>
+<tr><td>Number of Teammate Reviews received for this assignment:</td><td><b><%= this_pscore[:teammate][:assessments].size %></b></td></tr>
+<% end %>
+<% if this_pscore[:teammate_given] %>
+<tr><td>Number of Teammate Reviews given for this assignment:</td><td><b><%= this_pscore[:teammate_given][:assessments].size %></b></td></tr>
+<% end %>
+</table>
+<br/><hr/>
+
+<% if this_pscore[:review] %>
+<% if this_pscore[:review][:assessments].size > 0 %>
+<h4>Reviews Received - Details</h4>
+<table class="grades" cellpadding="4">
+<tr class="head"><td align="right"><b>Individual scores Received</b></td>
+<% for calc_review in this_pscore[:review][:assessments] %>
+    <% calc_score = Score.get_total_score(calc_review, this_questions["review".to_sym]) %>
+    <td align="center">
+    <%= calc_score %>%
+    </td>
+<% end %>
+</table>
+<br/>
+<hr/>
+<% end %>
+<% end %>
+
+<% if this_pscore[:review_given] %>
+<% if this_pscore[:review_given][:assessments].size > 0 %>
+<h4>Reviews Given - Details</h4>
+<table class="grades" cellpadding="4">
+<tr class="head"><td align="right"><b>Individual scores Awarded</b></td>
+<% for calc_review in this_pscore[:review_given][:assessments] %>
+    <% calc_score = Score.get_total_score(calc_review, this_questions["review".to_sym]) %>
+    <td align="center">
+    <%= calc_score %>%
+    </td>
+<% end %>
+</table>
+<br/>
+<hr/>
+<% end %>
+<% end %>
+
+<% if this_pscore[:metareview] %>
+<% if this_pscore[:metareview][:assessments].size > 0 %>
+<h4>MetaReviews Received - Details</h4>
+<table class="grades" cellpadding="4">
+<tr class="head"><td align="right"><b>Individual scores Received</b></td>
+<% for calc_review in this_pscore[:metareview][:assessments] %>
+    <% calc_score = Score.get_total_score(calc_review, this_questions["metareview".to_sym]) %>
+    <td align="center">
+    <%= calc_score %>%
+    </td>
+<% end %>
+</table>
+<br/>
+<hr/>
+<% end %>
+<% end %>
+
+<% if this_pscore[:metareview_given] %>
+<% if this_pscore[:metareview_given][:assessments].size > 0 %>
+<h4>MetaReviews Given - Details</h4>
+<table class="grades" cellpadding="4">
+<tr class="head"><td align="right"><b>Individual scores Awarded</b></td>
+<% for calc_review in this_pscore[:metareview_given][:assessments] %>
+    <% calc_score = Score.get_total_score(calc_review, this_questions["metareview".to_sym]) %>
+    <td align="center">
+    <%= calc_score %>%
+    </td>
+<% end %>
+</table>
+<br/>
+<hr/>
+<% end %>
+<% end %>
+
+<% if this_pscore[:feedback] %>
+<% if this_pscore[:feedback][:assessments].size > 0 %>
+<h4>Author Feedback Received - Details</h4>
+<table class="grades" cellpadding="4">
+<tr class="head"><td align="right"><b>Individual scores Received</b></td>
+<% for calc_review in this_pscore[:feedback][:assessments] %>
+    <% calc_score = Score.get_total_score(calc_review, this_questions["feedback".to_sym]) %>
+    <td align="center">
+    <%= calc_score %>%
+    </td>
+<% end %>
+</table>
+<br/>
+<hr/>
+<% end %>
+<% end %>
+
+<% if this_pscore[:feedback_given] %>
+<% if this_pscore[:feedback_given][:assessments].size > 0 %>
+<h4>Author Feedback Given - Details</h4>
+<table class="grades" cellpadding="4">
+<tr class="head"><td align="right"><b>Individual scores Awarded</b></td>
+<% for calc_review in this_pscore[:feedback_given][:assessments] %>
+    <% calc_score = Score.get_total_score(calc_review, this_questions["feedback".to_sym]) %>
+    <td align="center">
+    <%= calc_score %>%
+    </td>
+<% end %>
+</table>
+<br/>
+<hr/>
+<% end %>
+<% end %>
+
+<% if this_pscore[:teammate] %>
+<% if this_pscore[:teammate][:assessments].size > 0 %>
+<h4>Teammate Reviews Received - Details</h4>
+<table class="grades" cellpadding="4">
+<tr class="head"><td align="right"><b>Individual scores Received</b></td>
+<% for calc_review in this_pscore[:teammate][:assessments] %>
+    <% calc_score = Score.get_total_score(calc_review, this_questions["teammate".to_sym]) %>
+    <td align="center">
+    <%= calc_score %>%
+    </td>
+<% end %>
+</table>
+<br/>
+<hr/>
+<% end %>
+<% end %>
+
+<% if this_pscore[:teammate_given] %>
+<% if this_pscore[:teammate_given][:assessments].size > 0 %>
+<h4>Teammate Reviews Given - Details</h4>
+<table class="grades" cellpadding="4">
+<tr class="head"><td align="right"><b>Individual scores Awarded</b></td>
+<% for calc_review in this_pscore[:teammate_given][:assessments] %>
+    <% calc_score = Score.get_total_score(calc_review, this_questions["teammate".to_sym]) %>
+    <td align="center">
+    <%= calc_score %>%
+    </td>
+<% end %>
+</table>
+<br/>
+<hr/>
+<% end %>
+<% end %>
+
+<a href="javascript:window.history.back()">Back</a>
+
+

@@ -19,7 +19,23 @@ class ResponseMap < ActiveRecord::Base
     end
     return responses    
   end 
-  
+
+  def self.get_assessments_for_given(participant)
+    responses = Array.new
+
+    if participant
+      maps = find(:all, :conditions => ['reviewer_id = ? and type = ?',participant.id,self.to_s])
+      maps.each{ |map|
+        if map.response
+          responses << map.response
+        end
+      }
+      #responses = Response.find(:all, :include => :map, :conditions => ['reviewee_id = ? and type = ?',participant.id, self.to_s])
+      #responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
+    end
+    return responses
+  end
+
   def delete(force = nil)
     if self.response != nil and !force
       raise "A response exists for this mapping."

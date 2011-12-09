@@ -7,7 +7,7 @@
 
 <% if false %>[start erb comment] Changes to accommodate Jen's custom rubric [end erb comment]<% end %>
 <% file_url = nil
-   if @assignment.instructor_id == User.find_by_name("jkidd").id
+   if @assignment.instructor_id == User.find_by_name("harry").id
       @current_folder = DisplayOption.new
       @current_folder.name = ""
       @participant = Participant.find(@map.reviewer_id)

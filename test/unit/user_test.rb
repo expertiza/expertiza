@@ -48,13 +48,13 @@ class UserTest < ActiveSupport::TestCase
   end
   # 202 edit a user name to an invalid name (e.g. blank)
   def test_update_user_with_invalid_name
-    user = User.find_by_login('student1')
+    user = User.find_by_login('student1@foo.edu')
     user.name = "";
     assert !user.valid?
   end
   # 203 Change a user name to an existing name.
   def test_update_user_with_existing_name
-    user = User.find_by_login('student1')
+    user = User.find_by_login('student1@foo.edu')
     user.name = "student2"
     assert !user.valid?
   end  
@@ -94,7 +94,7 @@ class UserTest < ActiveSupport::TestCase
   def test_get_available_users
     # student1 should be available to instructor1 based on their roles
     avail_users_like_student1 = users(:instructor1).get_available_users('student1')
-    assert_equal 1, avail_users_like_student1.size
+    assert_equal 2, avail_users_like_student1.size
     assert_equal "student1", avail_users_like_student1.first.name
   end
   

@@ -38,7 +38,7 @@
       <% if questionnaire = Questionnaire.find(:first, :conditions => ["instructor_id = ?", uid]) %>
       <%= link_to 'View quiz', :controller => :questionnaire, :action => :view_quiz, :id => questionnaire.id, :pid => participant.id %>
       <br/><br/>
-      <% if stage != "Complete" %>
+      <% if @assignment.submission_allowed(participant.topic_id) %>
         <%= link_to 'Edit quiz', :controller => :questionnaire, :action => :edit_quiz, :id => questionnaire.id, :pid => participant.id %>
         <br/><br/>
       <% end %>

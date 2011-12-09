@@ -25,6 +25,16 @@ class GradesController < ApplicationController
 
     @assignment = @participant.assignment
 
+    # ============= yxue4,xfang2,hsun6===============
+# codes added to update score everytime when the user checks
+# ============= yxue4,xfang2,hsun6================  %>
+ if res_map = ResponseMap.find(:first, :conditions => ["reviewed_object_id = ? and reviewee_id = ?", @assignment.id, @participant.id])
+       if res = Response.find(:first, :conditions => ["map_id = ?", res_map.id])
+           ScoreCache.update_cache(res.id)
+       end
+   end
+ #########################end#################################
+
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {

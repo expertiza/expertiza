@@ -1,21 +1,52 @@
 <h1>New Assignment</h1>
 
 <% form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();', :onload => 'addElement();')do %>
-  <%= render :partial => 'content' %>
-  <hr/>
-  <%= render :partial => 'rubrics' %>
-  <%= render :partial => 'review_strategy'  %>
-  <hr/>
-  <%= render :partial => 'due_dates' %>
-  <% if @course != nil %>
-  	<%= hidden_field_tag('assignment[course_id]', @course.id) %>
-  <% else %>
-    <%= hidden_field_tag('assignment[course_id]', nil) %>
-  <% end %>
-  <%= hidden_field_tag('assignment[private]',@private) %>
-  &nbsp;&nbsp;<%= submit_tag "Save assignment", :name=>"save" %>
+    <%= render :partial => 'content' %>
+    <hr/>
+    <%= render :partial => 'rubrics' %>
+    <%= render :partial => 'review_strategy'  %>
+    <hr/>
+
+<%# ============= yxue4,xfang2,hsun6===============
+# table for inputting parameters for score redistribution
+# ============= yxue4,xfang2,hsun6================ %>
+
+    <TABLE>
+      <% form_tag :action => 'update' do %>
+
+          <tr>
+            <td>Offset:  default: 20</td>
+            <td><%= text_field :assigned, :thresh, :size=>10 %></td>
+          </tr>
+          <tr>
+            <td>Redistribution Factor:  default: 1.0 </td>
+            <td><%= text_field :assigned, :rfactor, :size=>10 %></td>
+          </tr>
+          <tr>
+            <td>Maximum Deductable Points: default: 100(no maximum) </td>
+            <td> <%= text_field :assigned, :mpd, :size=>10 %></td>
+          </tr>
+          <tr>
+            <td>use class average score as hardline?</td>
+            <td><%= check_box :assigned, :ifclass, {}, true, false %></td>
+          </tr>
+          <tr>
+            <td>Hardline:  default: 85 </td>
+            <td><%= text_field :assigned, :hardline, :size=>10 %></td>
+          </tr>
+      <% end %>
+    </TABLE>
+    <% ########################end########################## %>
+    <%= render :partial => 'due_dates' %>
+    <% if @course != nil %>
+        <%= hidden_field_tag('assignment[course_id]', @course.id) %>
+    <% else %>
+        <%= hidden_field_tag('assignment[course_id]', nil) %>
+    <% end %>
+    <%= hidden_field_tag('assignment[private]',@private) %>
+    &nbsp;&nbsp;<%= submit_tag "Save assignment", :name=>"save" %>
 <% end %>
 <br />
 <div style="padding: 15px">
-<%= render :partial => '/shared_scripts/back' %>
+  <%= render :partial => '/shared_scripts/back' %>
 </div>

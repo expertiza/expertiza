@@ -85,7 +85,7 @@ class Assessment360Controller < ApplicationController
   end
 
   def all_assignments_all_students
-    @course = Course.find_by_id(params[:course_id]);
+    @course = Course.find_by_id(params[:course_id])
     @assignments = Assignment.find_all_by_course_id(@course)
   end
 

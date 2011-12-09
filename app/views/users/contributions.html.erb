@@ -1,3 +1,8 @@
+<%# E320 - Collecting Student Information at one place. %>
+<%# This partial finds and calculates information pertaining to a particular assignment done by a particular student.
+    Also, it displays, in tabular format, the individual scores received/awarded by the student.
+%>
+
 <% i = @contri_participant %>
 <% this_assignment = Assignment.find_by_id(i.parent_id)%>
 <% this_questions = Hash.new %>

@@ -141,14 +141,18 @@ class UsersController < ApplicationController
   end
   
   def contributions
-   #@contriuser = User.find(params[:id])
-
-   #@contriuser_assignments = Participant.find_all_by_user_id(@contriuser.id)
-
+    # E320 - Collecting Student Information at one place.
+    # This function gets called from the _participant partial view.
+    # The corresponding view of this function displays out the contributions done by
+    # a student for a particular assignment.
     @contri_participant = Participant.find_by_id(params[:participant])
   end
 
   def contributions_new
+    # E320 - Collecting Student Information at one place.
+    # This function gets called from users#show
+    # The user which is being currently viewed by the administrator/TA/Instructor will be passed as an argument.
+    # This function extracts out all the assignments done by this particular Student.
     @contriuser = User.find(params[:id])
 
     @contriuser_participants = AssignmentParticipant.find_all_by_user_id(@contriuser.id)

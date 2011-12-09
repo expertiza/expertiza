@@ -1,3 +1,14 @@
+<%# E320 - Collecting Student Information at one place. %>
+<%# This is the main view file which constructs and correspondingly populates all the required data structures %>
+<%# required for displaying the contributions done by a student.%>
+<%# Similar to the code found on grades_controller, we create a hash that is keyed by type of assessment which may be
+    review, metareview, teamm-matereview etc.
+    We construct the hash in the below lines and thn use a partial "_participant" to which each extracted out assignment
+    done by this particular user is passed. The partial in turn will gather all the information pertaining to that assignment -
+    which involves the scores received/awarded by the user as well as the number of reviews given/awarded.
+    The "tot_contributions" hash used below (again keyed on the type of assessment) is passed during every call to partial
+    "_participant" and it gathers the total number of reviews etc. and displays it in a consolidated manner. %>
+
 <% tot_contributions = Hash.new %>
 
 <% tot_contributions[:review] = 0 %>

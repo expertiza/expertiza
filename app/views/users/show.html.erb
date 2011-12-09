@@ -15,6 +15,7 @@
         :action => 'show', :id => @role.id %></td>
 </tr>
 
+<%# The 'Contributions' link will only be made available for those users whose role is 'Student' %>
 <% if @role.id == 1 %>
 <tr> <th>View <%= @user.fullname %>'s </th>
   <td> <%= link_to "Contributions", :action => 'contributions_new', :id => @user %> </td>

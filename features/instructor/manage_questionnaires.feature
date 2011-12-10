@@ -5,11 +5,11 @@ Feature: Manage the questionnaires in Expertiza
     
   @instructor
   @manage_questionnaires
-  Scenario: Expertiza will allow an instructor to create a Public Metareview
+  Scenario: Expertiza will allow an instructor to create Public Metareview
     Given an instructor named "instructor1"
       And I am logged in as "instructor1"
     When I follow the "Manage..." link as an "instructor"
-      And I follow "Create a Public Metareview"
+      And I follow "Create Public Metareview"
       And I fill in "Metareview1" for "Name"
       And I fill in "Question1" for "Question"
       And I press "Create Metareview"
@@ -17,11 +17,11 @@ Feature: Manage the questionnaires in Expertiza
     
   @instructor
   @manage_questionnaires
-  Scenario: Expertiza will allow an instructor to create a Public Author Feedback Review
+  Scenario: Expertiza will allow an instructor to create Public Author Feedback Review
     Given an instructor named "instructor1"
       And I am logged in as "instructor1"
     When I follow the "Manage..." link as an "instructor"
-      And I follow "Create a Public Author Feedback"
+      And I follow "Create Public Author Feedback"
       And I fill in "AuthorFeedback1" for "Name"
       And I fill in "Question1" for "Question"
       And I press "Create author feedback"
@@ -29,11 +29,11 @@ Feature: Manage the questionnaires in Expertiza
 
   @instructor
   @manage_questionnaires
-  Scenario: Expertiza will allow an instructor to create a Public Review Rubric
+  Scenario: Expertiza will allow an instructor to create Public Review Rubric
     Given an instructor named "instructor1"
       And I am logged in as "instructor1"
     When I follow the "Manage..." link as an "instructor"
-      And I follow "Create a Public Review"
+      And I follow "Create Public Review"
       And I fill in "Metareview1" for "Name"
       And I fill in "Question1" for "Question"
       And I press "Create review"
@@ -41,11 +41,11 @@ Feature: Manage the questionnaires in Expertiza
 
   @instructor
   @manage_questionnaires
-  Scenario: Expertiza will allow an instructor to create a Public Teammate Review
+  Scenario: Expertiza will allow an instructor to create Public Teammate Review
     Given an instructor named "instructor1"
       And I am logged in as "instructor1"
     When I follow the "Manage..." link as an "instructor"
-      And I follow "Create a Public Teammate Review"
+      And I follow "Create Public Teammate Review"
       And I fill in "TeammateReview1" for "Name"
       And I fill in "Question1" for "Question"
       And I press "Create teammate review"

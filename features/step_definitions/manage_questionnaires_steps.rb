@@ -1,6 +1,6 @@
-When /^I follow the "Manage..." link as an "([^"]*)"$/ do |role| 
-  visit "/menu/manage%20#{role}%20content"
-end
+#When /^I follow the "Manage..." link as an "([^"]+)"/ do |role| 
+#  visit "/menu/manage%20#{role}%20content"
+#end
 
 Given /^I follow the "Manage..." link$/ do
   visit "/menu/manage%20instructor%20content"

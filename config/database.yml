@@ -14,8 +14,8 @@ development:
   adapter: mysql
   database: pg_development
   username: root
-  password:
-  host: localhost
+  password: sahana
+  host: 127.0.0.1
 
 # Warning: The database defined as 'test' will be erased and
 # re-generated from your development database when you run 'rake'.
@@ -24,15 +24,15 @@ test: &test
   adapter: mysql
   database: pg_test
   username: root
-  password:
-  host: localhost
+  password: sahana
+  host: 127.0.0.1
 
 production:
   adapter: mysql
   database: pg_development
   username: root
-  password: 
-  host: localhost
+  password: sahana
+  host: 127.0.0.1
 
 cucumber:
   <<: *test

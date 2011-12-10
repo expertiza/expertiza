@@ -41,6 +41,7 @@ Given /I am logged in as "([^"]*)"/ do |username|
   Then "I should be logged in as \"#{username}\""
 end
 
+
 # Create any type of user provided a Full Name and Username
 Given /an? (super-administrator|admin|instructor|teaching assistant|student) named "([^"]*)"( created by "([^"]+)")?/i do |user_type,name,garbage,parent|
   user_type = user_type.downcase
@@ -58,3 +59,14 @@ Given /an? (super-administrator|admin|instructor|teaching assistant|student) nam
     :is_new_user => false
   })
 end
+
+When /I log in as "([^"]*)"/ do |username|
+  When "I go to the login page"
+
+  fill_in 'login_name', :with => username
+  fill_in 'login_password', :with => 'password'
+  click_button 'Login'
+
+  Then "I should be logged in as \"#{username}\""
+end
+

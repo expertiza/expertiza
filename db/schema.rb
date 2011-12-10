@@ -52,8 +52,6 @@ ActiveRecord::Schema.define(:version => 20111201222103) do
     t.string   "review_assignment_strategy"
     t.integer  "max_reviews_per_submission"
     t.integer  "review_topic_threshold",            :default => 0
-    t.boolean  "copy_flag",                         :default => false
-    t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "availability_flag"
   end
 

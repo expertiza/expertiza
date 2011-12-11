@@ -3,6 +3,23 @@
 
 class Penalty < ActiveRecord::Base
 
+    validates_presence_of :user_id
+    validates_presence_of :assignment_id
+    validates_uniqueness_of :user_id, :scope => :assignment_id
+    validates_presence_of :reviewee1_id, :if => (:reviewed1_at?)
+    validates_presence_of :reviewee2_id, :if => (:reviewed2_at?)
+    validates_presence_of :reviewed1_at, :if => (:reviewed2_at?)
+    validates_presence_of :metareviewed1_at, :if =>(:metareviewed2_at?)
+    validates_presence_of :metareviewee1_id, :if => (:metareviewed1_at?)
+    validates_presence_of :metareviewee2_id, :if => (:metareviewed2_at?)
+    validates_numericality_of :assignment_id
+    validates_numericality_of :penalty_mins_accumulated, :greater_than_or_equal_to => 0
+    validates_numericality_of :penalty_score, :less_than_or_equal_to => 100, :greater_than_or_equal_to => 0
+
+  #def validate
+   # errors.add(:penalty_score, "Exceeding a max penalty of 100") if penalty_score.nil? || penalty_score > 100
+  #end
+
 # Store the time at which the assignment was submitted by a participant into the Penalties table
 
 def update_submit_times(participant_id)

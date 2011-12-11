@@ -1,6 +1,3 @@
-<% if flash[:notice] %>
-    <div class="flash_note"><%= flash[:notice] %></div>
-<% end %>
 <h3>Create a new Interaction</h3>
 <%= link_to 'Have you helped someone?', :controller => 'interaction', :action => 'new' ,:id => @participant.id , :type=> 'helper', :assignment_id=>@assignment%> <BR/>
 <%= link_to 'Have you been helped by someone?', :controller => 'interaction', :action => 'new' , :id => @participant.id ,:type=>'helpee', :assignment_id=>@assignment %>

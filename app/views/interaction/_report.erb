@@ -1,16 +1,16 @@
-
-
-
 <div class="ss-item  ss-text"><div class="ss-form-entry">
-  <label class="ss-q-title" for="entry_0">The project number on which help was given:
+  <label class="ss-q-title" for="entry_0">The Team that was helped:
   </label><br>
   <td style="padding:50px">
-    <% selected = Team.find_by_parent_id(assignment_id) %>
+          <% if interaction.team_id %>
+                  <% selected = Team.find(interaction.team_id) %>
+                  <%end %>
     <select style="width:250px" name="teams">
-      <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
-      <% Team.find(:all, :conditions => ['parent_id = ?',assignment_id],:order => "name").each{| team | %>
-          <option value="<%=team.name%>" <% if selected != nil and team.name == selected.name%>selected="yes"<%end%>><%=team.name %></option>
-      <% } %>
+            <% Team.find(:all, :conditions => ['parent_id = ?',assignment_id],:order => "name").each do | team | %>
+                    <% if team.id != @my_team_id %>
+                            <option value="<%=team.name%>" <% if selected != nil and team.name == selected.name%>selected="yes"<%end%>><%=team.name %></option>
+                    <% end %>
+            <% end %>
     </select>
   </td>
   <br><br>
@@ -32,7 +32,7 @@
   <label class="ss-q-title" for="entry_2">Describe what you worked on, and the results of your interaction:
   </label>
   <br>
-  <%= text_area'interactions', 'comments'%>
+  <%= text_area 'interactions', 'comments', :value => interaction.comments%>
   <br><br>
 </div></div>
 
@@ -40,7 +40,7 @@
   <label class="ss-q-title" for="entry_3">Date and time you worked together:
   </label>
   <br>
-  <input id='interaction_id' name='interaction_date'>
+  <input id='interaction_id' name='interaction_date' value = <% @interaction.interaction_datetime%>>
   <img src="/images/cal.gif" onClick="NewCal('interaction_id','YYYYMMDD',true,24); return false;"/>
   <br><br>
 </div></div>
@@ -50,7 +50,7 @@
   </label>
   <label class="ss-q-help" for="entry_5">(Approx. number of minutes)
   </label><br>
-  <%= text_field 'interactions', 'number_of_minutes' %>
+  <%= text_field 'interactions', 'number_of_minutes', :value => @interaction.number_of_minutes %>
   <br><br>
 </div></div>
 
@@ -59,8 +59,14 @@
       <label class="ss-q-title" for="entry_6">Score:
       </label><br>
       <select id='score' style="width:250px" name="score">
-        <% @advices.each do|advice| %>
-            <option value=<%=advice.score%>><%=advice.score%></option>
+        <%if @advices.size > 0%>
+            <% @advices.each do|advice| %>
+                <option value=<%=advice.score%>><%=advice.score%></option>
+            <%end%>
+        <%else%>
+            <%for i in 1..5 %>
+                <option value=<%=i%>><%=i%></option>
+            <%end%>
         <%end%>
       </select>
       <%if @advices.size > 0%>

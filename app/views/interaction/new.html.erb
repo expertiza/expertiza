@@ -1,4 +1,6 @@
-<% error_messages_for 'interaction' %>
+<% if @errors != NIL %>
+        <% error_messages_for 'interaction' %>
+<% end %>
 
 <% if flash[:notice] %>
 	<div class="flash_note"><%= flash[:notice] %></div>
@@ -12,11 +14,11 @@
 
 
 
-    <%=   render :partial => 'report',:locals=>{:assignment_id=>@assignment} ,:id=>@id%>
+    <%=   render :partial => 'report',:locals=>{:assignment_id=>@assignment, :interaction => @interaction} ,:id=>@id %>
     <p>
       <%= submit_tag 'Submit'%>
     </p>
 <%end%>
 
-<%= link_to 'Back', :controller => 'interaction', :action => 'view' %>
+<%= link_to 'Back', :controller => 'interaction', :action => 'view', :id => @participant_id, :assignment => @assignment %>
 

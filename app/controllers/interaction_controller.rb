@@ -38,11 +38,12 @@ class InteractionController < ApplicationController
     @curr_participant=session[:participant_id]
     p "part id"
     p session[:participant_id]
+    p params[:type]
     if(params[:type]=="helpee")
       @user = User.find_by_name(params[:helper])
       if !@user
         flash[:notice] = "\"#{params[:helper].strip}\" does not exist."
-        redirect_to :controller=>'interaction', :action=>'new', :assignment_id=>params[:assign], :type=>params[:type]
+        redirect_to :controller=>'interaction', :action=>'new', :assignment_id=>params[:assign], :type=>params[:type], :id => @curr_participant
 
       else
         @helper_user=@user.id
@@ -69,7 +70,7 @@ class InteractionController < ApplicationController
             end
 
           else
-            redirect_to :action => 'new' , :assignment_id=>params[:assign], :type=>params[:type]
+            redirect_to :action => 'new' , :assignment_id=>params[:assign], :type=>params[:type], :errors=>@interaction.errors
           end
         else
           flash[:notice] =" Interaction already reported."
@@ -79,26 +80,42 @@ class InteractionController < ApplicationController
     elsif (params[:type]=="helper")
 
       @selected_team=Team.first(:conditions => ['parent_id=? and name=?',params[:assign],params[:teams]])
+      p "--------------->"
+      p params[:assign]
+      p params[:teams]
       @helper_record1 = HelperInteraction.first(:conditions => ["participant_id = ? AND team_id = ?",session[:participant_id],@selected_team.id ])
 
-      if !@helper_record1
+      if @helper_record1 
+        flash[:alert] =" Interaction already reported.."
+            redirect_to :action => 'new' , :assignment_id=>params[:assign], :type=>params[:type], :id=>session[:participant_id]
+      else
 
         @interaction = HelperInteraction.new(params[:interactions])
         @interaction.participant_id=session[:participant_id]
         @interaction.interaction_datetime=params[:interaction_date]
         @interaction.team_id=@selected_team.id
         @interaction.status='Not Confirmed'
-        @interaction.save
+        if @interaction.save
 
-        @helpee_record2 = HelpeeInteraction.first(:conditions => ["participant_id = ? AND team_id = ?",@interaction.participant_id,@interaction.team_id ])
-        if @helpee_record2
-          @helpee_record2.update_attribute('status','Confirmed')
-          @helper_record2=HelperInteraction.first(:conditions => ["participant_id = ? AND team_id = ?",@interaction.participant_id,@interaction.team_id ])
-          @helper_record2.update_attribute('status','Confirmed')
+                @helpee_record2 = HelpeeInteraction.first(:conditions => ["participant_id = ? AND team_id = ?",@interaction.participant_id,@interaction.team_id ])
+                if @helpee_record2
+                  @helpee_record2.update_attribute('status','Confirmed')
+                  @helper_record2=HelperInteraction.first(:conditions => ["participant_id = ? AND team_id = ?",@interaction.participant_id,@interaction.team_id ])
+                  @helper_record2.update_attribute('status','Confirmed')
+                end
+            flash[:note] =" Interaction created successfully."
+            redirect_to :controller=>'interaction', :action=>'view',:assignment=>params[:assign], :id=>session[:participant_id]
+        else 
+            @error = ""
+            @interaction.errors.each { |err| @error += err[1]  + "</br>"}
+            flash[:alert] = @error
+            @assignment = params[:assign]
+            @type = params[:type]
+            @id = session[:participant_id]
+            @participant_id = session[:participant_id]
+            render :action => 'new' , :assignment_id=>params[:assign], :type=>params[:type], :id=>session[:participant_id], :interaction => @interaction
+
         end
-      else
-        flash[:notice] =" Interaction already reported."
-        redirect_to :controller=>'interaction', :action=>'view', :id=>session[:participant_id]
       end
       #  @interaction = Interaction.find(participant_id)
       #  @helper_record = HelperInteraction.first(:conditions => ["participant_id = ? AND team_id = ?", @interaction.participant_id,@interaction.team_id ])
@@ -116,14 +133,20 @@ class InteractionController < ApplicationController
 
   def new
 
-
     @assignment=params[:assignment_id]
+    @participant_id = params[:id]
+    @my_team_id = Participant.find(@participant_id).team.id
+    @interaction = params[:interaction]
     if(params[:type]=='helper')
-      @interaction=HelperInteraction.new
+            if !@interaction 
+              @interaction=HelperInteraction.new
+            end
       session[:participant_id] = params[:id]
 
     elsif(params[:type]=='helpee')
-      @interaction=HelpeeInteraction.new
+            if !@interaction
+              @interaction=HelpeeInteraction.new
+            end
       session[:participant_id] = params[:id]
 
     end
@@ -134,8 +157,6 @@ class InteractionController < ApplicationController
     #@max = 5
     @advices = InteractionAdvice.find_all_by_assignment_id(params[:assignment_id])
     @advices = @advices.sort{|x,y|x.score<=>y.score}
-    p params[:assignment_id]
-    p @advices
 
     #@question_advices[0] = "It was not helpful and waste of time"
     #@question_advices[1] = "Time spent was not that much worth"

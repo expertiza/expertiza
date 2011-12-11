@@ -10,6 +10,7 @@ Feature: Manage the users in Expertiza
       And a student named "charlie_chevy" created by "ed_gehringer"
     
   @instructor
+  @manage_users
   Scenario: View the list of users
     Given I am logged in as "ed_gehringer"
     When I follow "Users"
@@ -17,6 +18,7 @@ Feature: Manage the users in Expertiza
       And I should not see "Permission Denied"
     
   @instructor
+  @manage_users
   Scenario: View user using username search
     Given I am logged in as "ed_gehringer"
       And I follow "Users"
@@ -25,6 +27,7 @@ Feature: Manage the users in Expertiza
       And I should not see "tommy_tonka does not exist."
     
   @instructor
+  @manage_users
   Scenario: Search the user list by name
     Given I am logged in as "ed_gehringer"
       And I follow "Users"
@@ -33,6 +36,7 @@ Feature: Manage the users in Expertiza
       And I should not see "tommy_tonka"
     
   @instructor
+  @manage_users
   Scenario: Create a new student or TA
     Given I am logged in as "ed_gehringer"
       And I follow "Users"
@@ -42,6 +46,7 @@ Feature: Manage the users in Expertiza
       And I should not see "prohibited this user from being saved"
   
   @instructor
+  @manage_users
   Scenario: Import a delimited list of users
     Given I am logged in as "ed_gehringer"
       And I follow "Users"
@@ -52,6 +57,7 @@ Feature: Manage the users in Expertiza
       And I should not see "zelly_zinger does not exist."
       
   @instructor
+  @manage_users
   Scenario: Import an invalid delimited list of users
     Given I am logged in as "ed_gehringer"
       And I follow "Users"
@@ -62,6 +68,7 @@ Feature: Manage the users in Expertiza
       And I should see "Not enough items" 
       
   @instructor
+  @manage_users
   Scenario: Edit an existing user
     Given I am logged in as "ed_gehringer"
       And I follow "Users"
@@ -73,6 +80,7 @@ Feature: Manage the users in Expertiza
       And I should not see "prohibited this user from being saved"
       
   @instructor
+  @manage_users
   Scenario: Delete a user
     Given I am logged in as "ed_gehringer"
       And I follow "Users"

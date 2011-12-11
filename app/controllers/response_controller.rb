@@ -28,12 +28,12 @@ class ResponseController < ApplicationController
     @next_action = "update"
     @return = params[:return]
     @map=ResponseMap.find(params[:id])
-     #array_not_empty=0
+
      @sorted_array=Array.new
      @prev=Response.all
      for element in @prev
        if(element.map_id==@map.id)
-          #array_not_empty=1
+
           @sorted_array<<element
         end
       end
@@ -181,12 +181,12 @@ class ResponseController < ApplicationController
     begin
 
       #get all previous versions of responses for the response map.
-      #array_not_empty=0
+
       @sorted_array=Array.new
       @prev=Response.all
       for element in @prev
         if(element.map_id==@map.id)
-       #   array_not_empty=1
+
           @sorted_array<<element
         end
       end

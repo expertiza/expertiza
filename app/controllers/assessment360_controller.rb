@@ -1,6 +1,5 @@
 #SNVP:::Controller has been modified for the E317-Assessment 360 project.
 class Assessment360Controller < ApplicationController
-
   def index
     @courses = Course.find_all_by_instructor_id(session[:user].id)
   end
@@ -8,8 +7,39 @@ class Assessment360Controller < ApplicationController
   def one_assignment_statistics
     @choice = params[:choice]
     @assignment = Assignment.find(params[:assignment_id])
-    @participants = @assignment.get_participants
-    @types = {'Metareview' => 'MetareviewResponseMap','Feedback' => 'FeedbackResponseMap','Teammate Reviews' => 'TeammateReviewResponseMap','Participant Review' => 'ParticipantReviewResponseMap','Team Review' => 'TeamReviewResponseMap'}
+    @allParticipants = @assignment.get_participants
+
+    @participants = Array.new
+    @types = {'Participantreview' => 'ParticipantReviewResponseMap', 'Feedback' => 'FeedbackResponseMap','Teammatereview' => 'TeammateReviewResponseMap', 'Metareview' => 'MetareviewResponseMap', 'Teamreview' => 'TeamReviewResponseMap'}
+    @flag = params[:flag]
+
+    if(@flag != 'all')
+      @allParticipants.each do |participant|
+        if(@flag == 'submittedAll')
+          if(@assignment.user_review_assignment(participant.id, 'Metareview') == "true" &&
+              @assignment.user_review_assignment(participant.id, 'Feedback') == "true" &&
+              @assignment.user_review_assignment(participant.id, 'Teammatereview') == "true" &&
+              @assignment.user_review_assignment(participant.id, 'Participantreview') == "true" &&
+              @assignment.user_review_assignment(participant.id, 'Teamreview') == "true")
+             @participants << participant
+          end
+        elsif(@flag == 'submittedNone')
+           if((@assignment.user_review_assignment(participant.id, 'Metareview') == "false") &&
+              (@assignment.user_review_assignment(participant.id, 'Feedback') == "false") &&
+              (@assignment.user_review_assignment(participant.id, 'Teammatereview') == "false") &&
+              (@assignment.user_review_assignment(participant.id, 'Participantreview') == "false") &&
+              (@assignment.user_review_assignment(participant.id, 'Teamreview') == "false"))
+             @participants << participant
+           end
+        else
+          if(@assignment.user_review_assignment(participant.id, @flag) == 'true')
+            @participants << participant
+          end
+        end
+      end
+    else
+      @participants = @allParticipants
+    end
 
   end
 
@@ -18,7 +48,7 @@ class Assessment360Controller < ApplicationController
     @course = Course.find(course_id)
     @assignments = Assignment.find_all_by_course_id(@course)
 
-    @types = {'Metareview' => 'MetareviewResponseMap','Feedback' => 'FeedbackResponseMap','Teammate Reviews' => 'TeammateReviewResponseMap','Participant Review' => 'ParticipantReviewResponseMap','Team Review' => 'TeamReviewResponseMap'}
+    @types = {'Participantreview' => 'ParticipantReviewResponseMap', 'Feedback' => 'FeedbackResponseMap','Teammatereview' => 'TeammateReviewResponseMap', 'Metareview' => 'MetareviewResponseMap', 'Teamreview' => 'TeamReviewResponseMap'}
   end
 
   def show_student_list
@@ -110,15 +140,17 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-
   def one_course_all_students
-    @REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap","TeamReviewResponseMap"]
-    @course=Course.find_by_id(params[:course_id]);
-    @course_assigned_reviews_count=0
+    @REVIEW_TYPES = ["MetareviewResponseMap", "ParticipantReviewResponseMap", "TeamReviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap"]
+    @course=Course.find_by_id(params[:course_id])
     @unique_users=@course.get_course_participants
+    #@participants=Participant.find_all_by_user_id(params[:user_id])
+    @course_assigned_reviews_count=0
 
        @unique_users.each do |user|
-          @course_assigned_reviews_count+=user.get_total_reviews_assigned
+          p "fullname : #{user.fullname}"
+          @course_assigned_reviews_count += user.get_total_reviews_assigned(params[:course_id])
+          p "fullname : #{user.fullname}"
        end
     @course
     @unique_users
@@ -129,23 +161,48 @@ class Assessment360Controller < ApplicationController
    @REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap","TeamReviewResponseMap"]
    @user=User.find(params[:user_id])
    @participants=Participant.find_all_by_user_id(params[:user_id])
-    bar_1_data = @user.get_total_reviews_completed
-    bar_2_data = params[:count]
-    @contribution = (((bar_1_data).to_f)/((bar_2_data).to_f))*100
+   @finalParticipants = Array.new
+
+   @course = Course.find_by_id(params[:course_id])
+   @assignments = Assignment.find_all_by_course_id(@course)
+
+   @participants.each do |participant|
+     @assignments.each do |assignment|
+        if((participant.parent_id == assignment.id) && (participant.type == 'AssignmentParticipant'))
+           if(!@finalParticipants.include?(participant))
+              puts "participant id : " + participant.id.to_s
+              @finalParticipants << participant
+           end
+        end
+     end
+   end
+
+   @unique_users=@course.get_course_participants
+
+   puts("unique users", @unique_users.count)
+
+    @bar_1_data = @user.get_total_reviews_completed(@course.id)
+    @bar_2_data = params[:count]
+    @bar_3_data = (@bar_2_data.to_f)/(@unique_users.count)
+    @contribution = (((@bar_1_data).to_f)/((@bar_2_data).to_f))*100
+    @contribution_2 = (((@bar_1_data).to_f)/((@bar_3_data).to_f))*100
     puts("--contribution", @contribution.to_f)
     color_1 = 'c53711'
     color_2 = '0000ff'
+    color_3 = '0000ff'
     min=0
     max=100
-    puts(bar_1_data)
-    puts(bar_2_data)
-    puts (bar_1_data).is_a? Integer
-    puts (bar_2_data).is_a? Integer
+    puts(@bar_1_data)
+    puts(@bar_2_data)
+    puts(@bar_3_data)
+    puts (@bar_1_data).is_a? Integer
+    puts (@bar_2_data).is_a? Integer
+    puts (@bar_3_data).is_a? Integer
 
     abc=GoogleChart::BarChart.new("800x100", "Bar Chart", :horizontal, false)
     abc.data " ", [100], 'ffffff'
-    abc.data "Total no. of reviews completed by student", [bar_1_data], color_1
-    abc.data "Total no. of reviews completed by class", [bar_2_data.to_i], color_2
+    abc.data "Total no. of reviews completed by student", [@bar_1_data], color_1
+    abc.data "Total no. of reviews completed by class", [@bar_2_data.to_i], color_2
     abc.axis :x, :range => [min,max]
     abc.show_legend = true
     abc.stacked = false
@@ -154,13 +211,24 @@ class Assessment360Controller < ApplicationController
     @abc=abc.to_url
     #puts abc.to_url({:chm => "000000,0,0.1,0.11"})
     #abc.process_data()
+
+    bc=GoogleChart::BarChart.new("800x100", "Bar Chart", :horizontal, false)
+    bc.data " ", [100], 'ffffff'
+    bc.data "Total no. of reviews completed by student", [@bar_1_data], color_1
+    bc.data "Average no. of reviews completed by class", [@bar_3_data.to_f], color_2
+    bc.axis :x, :range => [min,max]
+    bc.show_legend = true
+    bc.stacked = false
+    bc.data_encoding = :extended
+    puts bc
+    @bc=bc.to_url
     end
 
 
  def all_assignments_all_students
     @course = Course.find_by_id(params[:course_id])
     @assignments = Assignment.find_all_by_course_id(@course)
-    @types = {'Metareview' => 'MetareviewResponseMap','Feedback' => 'FeedbackResponseMap','Teammate Reviews' => 'TeammateReviewResponseMap','Participant Review' => 'ParticipantReviewResponseMap','Team Review' => 'TeamReviewResponseMap'}
+    @types = {'Participantreview' => 'ParticipantReviewResponseMap', 'Feedback' => 'FeedbackResponseMap','Teammatereview' => 'TeammateReviewResponseMap', 'Metareview' => 'MetareviewResponseMap', 'Teamreview' => 'TeamReviewResponseMap'}
   end
 
   def one_assignment_all_students

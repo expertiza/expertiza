@@ -76,13 +76,14 @@ class Course < ActiveRecord::Base
       @unique_users=Array.new
       @assignments.each do |assignment|
         assignment.participants.each do |participant|
-            unique_user = User.find(participant.user.id)
-            if(!@unique_users.include?(unique_user))
-                   @unique_users.push(unique_user)
+            unique_user = User.find(:all, :conditions => ['id = ? and role_id = ?',participant.user.id, 1])
+            unique_user.each do |u|
+                if(!@unique_users.include?(u))
+                  @unique_users.push(u)
+                end
             end
         end
       end
       return @unique_users
   end
-
 end

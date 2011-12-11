@@ -681,13 +681,11 @@ end
   def get_total_reviews_completed_by_type(type)
     # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
     # self.responses.size
-
     response_count = 0
     self.response_maps.each do |response_map|
       response_count = response_count + 1 if !response_map.response.nil? and response_map.type == type
     end
-
-    response_count
+     response_count
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
@@ -815,16 +813,23 @@ end
 
   #SNVP
   def user_review_assignment(user_id, choice)
-    @types = {'Metareview' => 'MetareviewResponseMap','Feedback' => 'FeedbackResponseMap','Teammate Reviews' => 'TeammateReviewResponseMap','Participant Review' => 'ParticipantReviewResponseMap','Team Review' => 'TeamReviewResponseMap'}
-
-    self.response_maps.each do |response_map|
-        if((response_map.type.to_s == @types[choice]) && (response_map.reviewer.user.id == user_id))
+    @types = {'Participantreview' => 'ParticipantReviewResponseMap', 'Feedback' => 'FeedbackResponseMap','Teammatereview' => 'TeammateReviewResponseMap', 'Metareview' => 'MetareviewResponseMap', 'Teamreview' => 'TeamReviewResponseMap'}
+    participant = Participant.find(:first, :conditions => ['user_id = ? and type = ? and parent_id = ?', user_id, 'AssignmentParticipant', self.id])
+    if(participant.nil?)
+      return "nil1"
+    else
+      responseMaps = ResponseMap.find(:all, :conditions => ['type = ? and reviewer_id = ? and reviewed_object_id= ?', @types[choice], participant.id, self.id ])
+      if(responseMaps.length == 0)
+        return "nil2"
+      elsif(responseMaps.length > 0)
+        responseMaps.each do |response_map|
           if(!response_map.response.nil?)
-            return true
+              return "true"
           end
         end
+        return "false"
+      end
     end
-    return false
   end
 
   #SNVP

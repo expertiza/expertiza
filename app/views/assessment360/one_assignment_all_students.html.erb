@@ -1,7 +1,9 @@
 <div>
-  <h1> <%= @assignment.name %> </h1> <%= link_to "See statistics", :action => "one_assignment_statistics", :assignment_id => @assignment.id, :flag => 'all' %>
-
+  <h1> <%= @assignment.name %> </h1> <%= link_to "See submission details by users", :action => "one_assignment_statistics", :assignment_id => @assignment.id, :flag => 'all' %>
+  <br>
   <div>
+    <br>
+    Filters:
     <%= link_to "All", :action => 'one_assignment_all_students', :assignment_id => @assignment.id, :flag => 'all' %> |
     <%= link_to "Only Submitted", :action => 'one_assignment_all_students', :assignment_id => @assignment.id, :flag => 'onlySubmitted' %> |
     <%= link_to "Only Not Submitted", :action => 'one_assignment_all_students', :assignment_id => @assignment.id, :flag => 'onlyNotSubmitted' %>
@@ -13,6 +15,9 @@
         No data.
       </div>
   <% else %>
+      <%= link_to 'Back to All Assignments', :action => 'all_assignments_all_students', :course_id => @assignment.course_id %>
+      <br>
+      <br>
       <table class="listing" cellpadding=2 border:1px>
         <tr>
           <th>Student name</th>

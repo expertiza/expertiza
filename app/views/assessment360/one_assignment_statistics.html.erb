@@ -1,35 +1,74 @@
-Statistics for <b><%= @assignment.name %></b> assignment.
+Submission details for <b><%= @assignment.name %></b> assignment. <%= link_to 'Show statistics', :action => 'one_course_all_students', :course_id => @assignment.course_id %>
 <br>
-<table class="listing" cellpadding=2 border="1">
-  <tr>
-      <th>
+<br>
+<div>
+    <br>
+    Filters:
+    <%= link_to "All", :action => 'one_assignment_statistics', :assignment_id => @assignment.id, :flag => 'all' %> |
+    <%= link_to "Submitted All", :action => 'one_assignment_statistics', :assignment_id => @assignment.id, :flag => 'submittedAll' %> |
+    <%= link_to "Submitted None", :action => 'one_assignment_statistics', :assignment_id => @assignment.id, :flag => 'submittedNone' %>
+</div>
+<br>
+<% if(@participants.length == 0) %>
+    <p style="color: red">
+      No participants.
+    </p>
+<% else %>
+ <TABLE BORDER:1 WIDTH="1250">
+  <TR>
+   <TD WIDTH=750>
+    <table class="listing">
+      <tr>
+          <th>
+          </th>
+          <% @types.keys.each do |key| %>
+            <th>
+              <%= link_to key, :action => 'one_assignment_statistics', :assignment_id => @assignment.id, :flag => key %>
+            </th>
+          <% end %>
+      </tr>
 
-      </th>
-      <% @types.keys.each do |key| %>
-        <th>
-          <%= key %>
-        </th>
+      <% @participants.each do |participant| %>
+        <tr align="center">
+          <td>
+            <%= participant.fullname %>
+          </td>
+          <% @types.keys.each do |key| reviewResult = @assignment.user_review_assignment(participant.id, key)%>
+            <% if(reviewResult == "true") %>
+                  <td>
+                    <img src="/images/greenCircle.png">
+                  </td>
+            <% elsif(reviewResult == "false")%>
+                <td>
+                  <img src="/images/redCircle.png">
+                </td>
+            <% else %>
+                <td>
+                   <img src="/images/none.png">
+                </td>
+            <% end %>
+          <% end %>
+        </tr>
       <% end %>
-  </tr>
-  <% @participants.each do |participant| %>
-    <tr>
-      <td>
-        <%= participant.name %>
-      </td>
-      <% @types.keys.each do |key| %>
-        <% if(@assignment.user_review_assignment(participant.id, key)) %>
-            <td style="background-color: green;">
-            </td>
-        <% else %>
-            <td style="background-color: red;">
-            </td>
-        <% end %>
-
-      <% end %>
+    </table>
+   </TD>
+  <TD WIDTH="500">
+  <table border:1>
+   <tr>
+   <td align="center"><b>Index</b></td>
     </tr>
-  <% end %>
-
+    <tr>
+    <td><img src="/images/greenCircle.png"> <b> Participated and contributed</b></td>
+    </tr>
+    <tr>
+    <td> <img src="/images/RedCircle.png"><b>Participated but not contributed</b></td>
+    </tr>
+     <tr>
+    <td> <img src="/images/none.png"><b>Not participated</b></td>
+    </tr>
 </table>
-
+ </td>
+</table>
+<% end %>
 <br>
 <%= link_to "Back", :action => 'one_assignment_all_students', :assignment_id => @assignment.id, :flag => 'all' %>

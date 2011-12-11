@@ -8,10 +8,17 @@
   <% if course.name != nil then %>
   <table>
     <tr>
-    <td>
-      <%= link_to course.name, :action => 'all_assignments_all_students', :course_id => course.id%> ( <%= link_to "Summary Dashboard", :action => 'one_course_all_assignments', :course_id => course%> ) ( <%= link_to "Student Summary Dashboard", :action => 'one_course_all_students', :course_id => course%> )
-    </td>
+        <td>
+          <%= link_to course.name, :action => 'all_assignments_all_students', :course_id => course.id %> &nbsp;
+        </td>
+        <td>
+          (<%= link_to "Course Summary Dashboard", :action => 'one_course_all_assignments', :course_id => course %>) &nbsp;
+        </td>
+        <td>
+          (<%= link_to "Student Summary Dashboard", :action => 'one_course_all_students', :course_id => course %>) &nbsp;
+        </td>
     </tr>
+    <br>
   </table>
   <% end %>
 <% end %>

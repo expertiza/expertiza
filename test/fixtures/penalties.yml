@@ -1,0 +1,36 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  id: 1
+  assignment_id: <%= Fixtures.identify(:assignment0) %>
+  submitted_at: 2011-12-03 22:45:00
+  reviewed1_at: 2011-12-05 22:45:00
+  reviewed2_at: 2011-12-05 21:45:00
+  reviewee1_id: 1
+  reviewee2_id: 3
+  metareviewed1_at: 2011-12-07 22:45:00
+  metareviewed2_at: 2011-12-07 22:45:00
+  metareviewee1_id: 4
+  metareviewee2_id: 1
+  teammate_review_at: 2011-12-08 22:45:00
+  author_feedback_at: 2011-12-08 22:45:00
+  user_id: <%= Fixtures.identify(:student2) %>
+  Penalty_mins_accumulated: 55
+  penalty_score: 100
+  participant_id: 2
+
+two:
+  id:  2
+  assignment_id: <%= Fixtures.identify(:assignment0) %>
+  submitted_at: 2011-12-04 22:45:00
+  reviewed1_at: 2011-12-05 22:45:00
+  reviewed2_at: 2011-12-06 22:45:00
+  reviewee1_id: 4
+  reviewee2_id: 3
+  metareviewed1_at: 2011-12-08 22:45:00
+  metareviewed2_at: 2011-12-08 22:45:00
+  metareviewee1_id: 5
+  metareviewee2_id: 6
+  teammate_review_at: 2011-12-08 22:45:00
+  author_feedback_at: 2011-12-08 22:45:00
+  user_id: <%= Fixtures.identify(:student3) %>

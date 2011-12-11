@@ -50,26 +50,11 @@ class Score < ActiveRecord::Base
   def self.get_total_score(response, questions)
     weighted_score = 0
     sum_of_weights = 0
-     @invalid=0
+
+      check_validity(response)
+     #@invalid=0
     #Check for invalid reviews.
     #Check if the latest review done by the reviewer falls into the latest review stage
-    map=ResponseMap.find(response.map_id)
-    due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", map.reviewed_object_id])
-
-    if due_dates.size!=0
-      @sorted_deadlines=Array.new
-      @sorted_deadlines=due_dates.sort {|m1,m2|(m1.due_at and m2.due_at) ? m2.due_at <=> m1.due_at : (m1.due_at ? -1 : 1)}
-      flag=0
-      for deadline in @sorted_deadlines
-         next_ele=deadline
-         if(flag==1)
-            break
-         end
-         if(deadline.deadline_type_id == 4 ||deadline.deadline_type_id == 2)
-           flag=1
-         end
-       end
-    end
 
     questions.each{
       | question |
@@ -79,14 +64,41 @@ class Score < ActiveRecord::Base
       end      
       sum_of_weights += question.weight
     }
-     if due_dates.size!=0
+
+    return (weighted_score.to_f / (sum_of_weights.to_f * questions.first.questionnaire.max_question_score.to_f)) * 100
+
+  end
+
+  def self.check_validity(response)
+
+    @invalid=0
+    map=ResponseMap.find(response.map_id)
+       due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", map.reviewed_object_id])
+
+       if due_dates.size!=0
+         @sorted_deadlines=Array.new
+         @sorted_deadlines=due_dates.sort {|m1,m2|(m1.due_at and m2.due_at) ? m2.due_at <=> m1.due_at : (m1.due_at ? -1 : 1)}
+         flag=0
+         for deadline in @sorted_deadlines
+            next_ele=deadline
+            if(flag==1)
+               break
+            end
+            if(deadline.deadline_type_id == 4 ||deadline.deadline_type_id == 2)
+              flag=1
+            end
+          end
+       end
+         if due_dates.size!=0
     if(response.created_at > next_ele.due_at)
       @invalid=0
     else
       @invalid = 1
     end
     end
-    return (weighted_score.to_f / (sum_of_weights.to_f * questions.first.questionnaire.max_question_score.to_f)) * 100
+
 
   end
+
+
 end

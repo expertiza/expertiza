@@ -28,19 +28,20 @@ class ResponseController < ApplicationController
     @next_action = "update"
     @return = params[:return]
     @map=ResponseMap.find(params[:id])
-     array_not_empty=0
+     #array_not_empty=0
      @sorted_array=Array.new
      @prev=Response.all
      for element in @prev
        if(element.map_id==@map.id)
-          array_not_empty=1
+          #array_not_empty=1
           @sorted_array<<element
         end
       end
 
-     if array_not_empty==1
-      @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
-      @largest_version_num=@sorted[0]
+     if !@sorted_array.empty?
+
+       @largest_version_num= @sorted_array.max{|a,b| a.version_num <=> b.version_num}
+
      end
     @response = Response.find_by_map_id_and_version_num(params[:id],@largest_version_num.version_num)
     return if redirect_when_disallowed(@response)
@@ -180,20 +181,20 @@ class ResponseController < ApplicationController
     begin
 
       #get all previous versions of responses for the response map.
-      array_not_empty=0
+      #array_not_empty=0
       @sorted_array=Array.new
       @prev=Response.all
       for element in @prev
         if(element.map_id==@map.id)
-          array_not_empty=1
+       #   array_not_empty=1
           @sorted_array<<element
         end
       end
 
       #if previous responses exist increment the version number.
-      if array_not_empty==1
-         @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
-         @largest_version_num=@sorted[0]
+      if !@sorted_array.empty?
+         @largest_version_num= @sorted_array.max{|a,b| a.version_num <=> b.version_num}
+
          if(@largest_version_num.version_num==nil)
             @version=1
          else
@@ -249,8 +250,6 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.notification_accepted = false;
-    puts("saving for me ")
-    puts(params[:id]);
     @map.save
     
     redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]

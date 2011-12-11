@@ -197,9 +197,9 @@ function updateDropDownMenu(advice,question,min){
 	document.getElementById(id).selectedIndex = advice - min
 }
 
- function updateInteractionScore(advice,min){
+ function updateInteractionScore(selection_index){
 	var id = 'score'
-	document.getElementById(id).selectedIndex = advice - min
+	document.getElementById(id).selectedIndex = selection_index
 }
 
 

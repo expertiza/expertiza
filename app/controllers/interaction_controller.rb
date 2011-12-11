@@ -18,8 +18,8 @@ class InteractionController < ApplicationController
       @participant_helped += HelperInteraction.find_all_by_team_id(team.id)
       @team_helped += HelpeeInteraction.find_all_by_team_id(team.id)
     end
-     p @participant_helped
-     p @team_helped
+    p @participant_helped
+    p @team_helped
     render  'instructor_view', :id=>params[:id],:locals => {:id=>params[:id],:expanded => (params[:expanded])}
 
   end
@@ -100,16 +100,16 @@ class InteractionController < ApplicationController
         flash[:notice] =" Interaction already reported."
         redirect_to :controller=>'interaction', :action=>'view', :id=>session[:participant_id]
       end
-    #  @interaction = Interaction.find(participant_id)
-    #  @helper_record = HelperInteraction.first(:conditions => ["participant_id = ? AND team_id = ?", @interaction.participant_id,@interaction.team_id ])
-    #  @helpee_record = HelpeeInteraction.first(:conditions => ["participant_id = ? AND team_id = ?",@interaction.participant_id,@interaction.team_id ])
-    #  if @helper_record
-    #    @helpee_record.update_attribute('status','Confirmed')
-    #  end
+      #  @interaction = Interaction.find(participant_id)
+      #  @helper_record = HelperInteraction.first(:conditions => ["participant_id = ? AND team_id = ?", @interaction.participant_id,@interaction.team_id ])
+      #  @helpee_record = HelpeeInteraction.first(:conditions => ["participant_id = ? AND team_id = ?",@interaction.participant_id,@interaction.team_id ])
+      #  if @helper_record
+      #    @helpee_record.update_attribute('status','Confirmed')
+      #  end
 
-    #  if @helpee_record
-    #    @helper_record.update_attribute('status','Confirmed')
-    #  end
+      #  if @helpee_record
+      #    @helper_record.update_attribute('status','Confirmed')
+      #  end
     end
   end
 
@@ -130,14 +130,18 @@ class InteractionController < ApplicationController
     @type = params[:type]
     @id=params[:id]
 
-    @min = 1
-    @max = 5
-    @question_advices = Array.new
-    @question_advices[0] = "It was not helpful and waste of time"
-    @question_advices[1] = "Time spent was not that much worth"
-    @question_advices[2] = "It helped us but did not solve all the problems"
-    @question_advices[3] = "Some of the discussions helped to solve bottlenecks in our project"
-    @question_advices[4] = "It was really helpful and helped to solve our doubts "
+    #@min = 1
+    #@max = 5
+    @advices = InteractionAdvice.find_all_by_assignment_id(params[:assignment_id])
+    @advices = @advices.sort{|x,y|x.score<=>y.score}
+    p params[:assignment_id]
+    p @advices
+
+    #@question_advices[0] = "It was not helpful and waste of time"
+    #@question_advices[1] = "Time spent was not that much worth"
+    #@question_advices[2] = "It helped us but did not solve all the problems"
+    #@question_advices[3] = "Some of the discussions helped to solve bottlenecks in our project"
+    #@question_advices[4] = "It was really helpful and helped to solve our doubts "
 
 
 
@@ -178,5 +182,28 @@ class InteractionController < ApplicationController
 
     render :partial => 'interaction', :locals => {:interaction => @interaction , :type=>params[:type] , :expanded => (params[:expanded])}
   end
+
+
+  def edit_advice
+    @advices = InteractionAdvice.find_all_by_assignment_id(params[:id])
+    @id = params[:id]
+
+
+
+  end
+
+  def update_advice
+
+    flash[:notice] = InteractionAdvice.update_advice(params[:advices],params[:assign])
+
+    if !flash[:notice].nil?
+      redirect_to :controller => :interaction , :action => :edit_advice ,:id => params[:assign]
+    else
+      flash[:notice] = "Advice added sucessfully"
+      redirect_to :controller => :assignment , :action => :edit ,:id => params[:assign]
+    end
+  end
+
+
 
 end

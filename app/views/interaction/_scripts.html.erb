@@ -1,0 +1,48 @@
+<script type="text/javascript">
+num_advices = <%= [@advices.length,1].max %>;
+
+function deleteQuestions(){
+	var checkedObjArray = new Array();
+	var deleteCount = 0;
+	var tbl = document.getElementById("advice_table");
+	var numChecks = 0;
+	for(i=0; i<document.forms[0].elements.length; i++){
+		if(document.forms[0].elements[i].type=="checkbox" &&
+		   document.forms[0].elements[i].id.substring(0,10)=="advice_chk"){
+			numChecks++;
+			if(document.forms[0].elements[i].checked==true){
+				tbl.deleteRow(numChecks);
+				numChecks = 0;
+				deleteQuestions();
+			}
+		}
+	}
+}
+
+function addQuestions(){
+	numAdvicesToAdd = parseInt(document.getElementById("numAdviceToAdd").value);
+	for(i=0; i<numAdvicesToAdd; i++){
+		addQuestion();
+	}
+}
+
+function addQuestion(){
+	table = document.getElementById("advice_table");
+	var row = table.insertRow(-1);
+
+	id = num_advices;
+	column = document.createElement("td");
+	column.innerHTML = "<input type=checkbox id='advice_chk" + id + "'>";
+	row.appendChild(column);
+
+	column = document.createElement("td");
+	column.innerHTML = "<input id=advices_" + id + "_score name = advices[" + id + "][score] size=5 type=text />";
+	row.appendChild(column);
+
+	column = document.createElement("td");
+	column.innerHTML = "<input id=advices_" + id + "_advice name = advices[" + id + "][advice] size=25 type=text />";
+	row.appendChild(column);
+
+	num_advices = num_advices + 1;
+}
+</script>

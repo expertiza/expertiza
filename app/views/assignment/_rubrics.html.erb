@@ -93,6 +93,9 @@
     <td style="padding: 15px;">
          <input id="weights_interaction" name="weights[interaction]" size="5" type="text" value="<%= @weights[:interaction] %>"/>%
      </td>
+    <td >
+      <%= link_to "Add Advice",{:controller => 'interaction' ,:action => 'edit_advice', :id => @assignment.id} %>
+    </td>
     </tr>
 
 </table>

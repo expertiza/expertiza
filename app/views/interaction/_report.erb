@@ -59,14 +59,12 @@
       <label class="ss-q-title" for="entry_6">Score:
       </label><br>
       <select id='score' style="width:250px" name="score">
-        <option value=1>1</option>
-        <option value=2>2</option>
-        <option value=3>3</option>
-        <option value=4>4</option>
-        <option value=5>5</option>
+        <% @advices.each do|advice| %>
+            <option value=<%=advice.score%>><%=advice.score%></option>
+        <%end%>
       </select>
-      <%if @question_advices.size > 0%>
-          <%= render :partial => 'interaction/advice', :locals => {:i => "interaction", :advice_list => @question_advices} %>
+      <%if @advices.size > 0%>
+          <%= render :partial => 'interaction/advice', :locals => {:i => "interaction", :advice_list => @advices} %>
       <% else %>
           <br/>
       <% end %>

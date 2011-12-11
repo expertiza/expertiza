@@ -48,6 +48,7 @@ Feature: Manage the assignments in Expertiza
 	
   @instructor
   @manage_assignments
+  @too_many
   Scenario: Adding too many students to a team for an assignment should fail.
     Given an instructor named "instructor1"
 	  And a student named "student1"
@@ -69,7 +70,7 @@ Feature: Manage the assignments in Expertiza
 	  And I press "Logout"
 	  And I log in as "student3"
 	  And I join a team named "team1" for the assignment "Assignment4"
-	Then I should see "Assignment4"
+	Then I should not see "Leave Team"
 	
 	
 	

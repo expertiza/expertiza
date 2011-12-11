@@ -328,3 +328,10 @@ DeadlineType.create(:name => 'resubmission')
 DeadlineType.create(:name => 'rereview')
 DeadlineType.create(:name => 'metareview')
 DeadlineType.create(:name => 'drop_topic')
+
+
+###### Deadline Rights - necessary because there is no configuration from the UI.
+DeadlineRight.create(:name => 'No')
+DeadlineRight.create(:name => 'Late')
+DeadlineRight.create(:name => 'OK')
+

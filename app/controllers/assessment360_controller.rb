@@ -1,4 +1,4 @@
-#SNVP:::Controller has been modified for the E317-Assessment 360 project.
+
 class Assessment360Controller < ApplicationController
   def index
     @courses = Course.find_all_by_instructor_id(session[:user].id)
@@ -57,8 +57,36 @@ class Assessment360Controller < ApplicationController
     @assignments = Assignment.find_all_by_course_id(@course)
 
     flag = params[:flag]
-
     @allUsers = @course.get_course_participants
+    @users = Array.new
+
+    if(flag == "all")
+      @users = @allUsers
+    elsif(flag == "participated")
+      @allUsers.each do |user|
+        reviewFlag = false
+        @assignments.each do |assignment|
+          if(assignment.user_review_assignment(user.id, @choice) == "true")
+            reviewFlag = true
+          end
+        end
+        if(reviewFlag == true)
+          @users << user
+        end
+      end
+    elsif(flag == "notParticipated")
+      @allUsers.each do |user|
+        reviewFlag = false
+        @assignments.each do |assignment|
+          if(assignment.user_review_assignment(user.id, @choice) == "false")
+            reviewFlag = true
+          end
+        end
+        if(reviewFlag == true)
+          @users << user
+        end
+      end
+    end
   end
 
   def one_course_all_assignments
@@ -124,8 +152,8 @@ class Assessment360Controller < ApplicationController
       color_2 = '4D89F9'
       min = 0
       max = 100
-       p '======================='
-      p bar_2_data
+      # p '======================='
+      #p bar_2_data
       GoogleChart::BarChart.new("130x100", " ", :vertical, false) do |bc|
         bc.data "Review", bar_2_data, color_2
         bc.axis :y, :positions => [0, bar_2_data.max], :range => [0, bar_2_data.max]
@@ -144,13 +172,14 @@ class Assessment360Controller < ApplicationController
     @REVIEW_TYPES = ["MetareviewResponseMap", "ParticipantReviewResponseMap", "TeamReviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap"]
     @course=Course.find_by_id(params[:course_id])
     @unique_users=@course.get_course_participants
+    #@unique_users=@course.users
     #@participants=Participant.find_all_by_user_id(params[:user_id])
     @course_assigned_reviews_count=0
 
        @unique_users.each do |user|
-          p "fullname : #{user.fullname}"
+          #p "fullname : #{user.fullname}"
           @course_assigned_reviews_count += user.get_total_reviews_assigned(params[:course_id])
-          p "fullname : #{user.fullname}"
+          #p "fullname : #{user.fullname}"
        end
     @course
     @unique_users
@@ -170,7 +199,7 @@ class Assessment360Controller < ApplicationController
      @assignments.each do |assignment|
         if((participant.parent_id == assignment.id) && (participant.type == 'AssignmentParticipant'))
            if(!@finalParticipants.include?(participant))
-              puts "participant id : " + participant.id.to_s
+              #puts "participant id : " + participant.id.to_s
               @finalParticipants << participant
            end
         end
@@ -178,26 +207,27 @@ class Assessment360Controller < ApplicationController
    end
 
    @unique_users=@course.get_course_participants
+   #@unique_users=@course.users
 
-   puts("unique users", @unique_users.count)
+   #puts("unique users", @unique_users.count)
 
     @bar_1_data = @user.get_total_reviews_completed(@course.id)
     @bar_2_data = params[:count]
     @bar_3_data = (@bar_2_data.to_f)/(@unique_users.count)
     @contribution = (((@bar_1_data).to_f)/((@bar_2_data).to_f))*100
     @contribution_2 = (((@bar_1_data).to_f)/((@bar_3_data).to_f))*100
-    puts("--contribution", @contribution.to_f)
+    #puts("--contribution", @contribution.to_f)
     color_1 = 'c53711'
     color_2 = '0000ff'
     color_3 = '0000ff'
     min=0
     max=100
-    puts(@bar_1_data)
-    puts(@bar_2_data)
-    puts(@bar_3_data)
-    puts (@bar_1_data).is_a? Integer
-    puts (@bar_2_data).is_a? Integer
-    puts (@bar_3_data).is_a? Integer
+    #puts(@bar_1_data)
+    #puts(@bar_2_data)
+    #puts(@bar_3_data)
+    #puts (@bar_1_data).is_a? Integer
+    #puts (@bar_2_data).is_a? Integer
+    #puts (@bar_3_data).is_a? Integer
 
     abc=GoogleChart::BarChart.new("800x100", "Bar Chart", :horizontal, false)
     abc.data " ", [100], 'ffffff'
@@ -207,7 +237,7 @@ class Assessment360Controller < ApplicationController
     abc.show_legend = true
     abc.stacked = false
     abc.data_encoding = :extended
-    puts abc
+    #puts abc
     @abc=abc.to_url
     #puts abc.to_url({:chm => "000000,0,0.1,0.11"})
     #abc.process_data()
@@ -234,7 +264,26 @@ class Assessment360Controller < ApplicationController
   def one_assignment_all_students
     @assignment = Assignment.find_by_id(params[:assignment_id])
     @participants = @assignment.participants
-    
+    @final_participants = Array.new
+
+    @flag = params[:flag]
+
+    if(@flag == "all")
+      @final_participants = @participants
+    elsif(@flag == "onlyNotSubmitted")
+      @participants.each do |participant|
+        if(participant.responses.nil?)
+          @final_participants = @participants
+        end
+      end
+    elsif(@flag == "onlySubmitted")
+      @participants.each do |participant|
+        if(!participant.responses.nil?)
+          @final_participants = @participants
+        end
+      end
+    end
+
     @bc = Hash.new
     @participants.each do |participant|
       @questionnaires = @assignment.questionnaires

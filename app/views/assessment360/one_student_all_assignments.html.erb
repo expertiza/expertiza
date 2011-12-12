@@ -5,9 +5,9 @@
   <p><img src="<%= @bc %>" ></p>
   <% std_dev = Math.sqrt(((@bar_1_data.to_f-(@bar_2_data.to_f/@unique_users.count))**2)/(@unique_users.count)).round(3) %>
       <p> Standard deviation from class average = <b> <%=std_dev.round(3) %></b></p>
-  <TABLE BORDER:1 WIDTH="1250">
-  <TR>
-   <TD WIDTH=1000>
+  <table width="1250">
+  <tr>
+   <td width="1000"g>
      <table class="assignment_reviews" cellpadding="10" style= border:1px>
           <tr>
             <th>Assignment</th>

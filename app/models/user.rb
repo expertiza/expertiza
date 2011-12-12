@@ -209,7 +209,7 @@ class User < ActiveRecord::Base
     @email_on_review_of_review = true
   end
 
-   # SNVP - Returns the number of reviewes assigned to a this participant
+   #Returns the number of reviewes assigned to a this participant
   def get_total_reviews_assigned_by_type(type, course_id)
     total_count=0
     @participants=Participant.find_all_by_user_id(self.id)
@@ -229,7 +229,7 @@ class User < ActiveRecord::Base
     total_count
   end
 
-#  # SNVP - Returns the number of reviews completed by this participant
+  #Returns the number of reviews completed by this participant
  # Returns the number of reviews completed for a particular assignment by type of review
   # Param: type - String (ParticipantReviewResponseMap, etc.)
   def  get_total_reviews_completed_by_type(type, course_id)
@@ -251,7 +251,7 @@ class User < ActiveRecord::Base
     total_count
   end
 
- # SNVP Returns the percentage of reviews completed as an integer (0-100)
+ #Returns the percentage of reviews completed as an integer (0-100)
   def get_percentage_reviews_completed_by_type(type, course_id)
     reviews = get_total_reviews_assigned_by_type(type, course_id)
     if reviews == 0 then 0
@@ -259,7 +259,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  # SNVP Returns the number of reviewers assigned to a particular assignment
+  #Returns the number of reviewers assigned to a particular assignment
   def get_total_reviews_assigned(course_id)
     total_count=0
     @participants=Participant.find_all_by_user_id(self.id)

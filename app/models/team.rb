@@ -76,7 +76,6 @@ class Team < ActiveRecord::Base
    Object.const_get(self.get_node_type).create(:parent_id => parent.id, :node_object_id => self.id)
  end
 
- #SNVP:::
    def to_submit?(assignment_id)
     p "assignment id : #{assignment_id}"
     teams_users = self.teams_users

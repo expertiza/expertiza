@@ -641,7 +641,6 @@ end
   end
 
 
-  #SNVP:::: Returns the percentage of reviews completed as an integer (0-100)
   def get_percentage_reviews_completed_by_type(type)
     reviews = get_total_reviews_assigned_by_type(type)
     if reviews == 0 then 0
@@ -707,14 +706,14 @@ end
     response_count
   end
 
-  #SNVP:::: Returns the percentage of reviews completed as an integer (0-100)
+ # Returns the percentage of reviews completed as an integer (0-100)
   def get_percentage_reviews_completed
     if get_total_reviews_assigned == 0 then 0
     else ((get_total_reviews_completed().to_f / get_total_reviews_assigned.to_f) * 100).to_i
     end
   end
 
-  # SNVP:::Returns the average of all responses for this assignment as an integer (0-100)
+  #Returns the average of all responses for this assignment as an integer (0-100)
   def get_average_score
     return 0 if get_total_reviews_assigned == 0
     
@@ -777,7 +776,7 @@ end
     end
   end
 
-  #SNVP::: method to find the total submissions.
+  #method to find the total submissions.
   def get_total_submissions
     if(self.team_assignment?)
       teams = self.teams
@@ -794,7 +793,6 @@ end
     end
   end
 
-  #SNVP
   def get_submitted_submissions
     if(self.team_assignment?)
       teams = self.teams
@@ -811,7 +809,7 @@ end
     end
   end
 
-  #SNVP
+
   def user_review_assignment(user_id, choice)
     @types = {'Participantreview' => 'ParticipantReviewResponseMap', 'Feedback' => 'FeedbackResponseMap','Teammatereview' => 'TeammateReviewResponseMap', 'Metareview' => 'MetareviewResponseMap', 'Teamreview' => 'TeamReviewResponseMap'}
     participant = Participant.find(:first, :conditions => ['user_id = ? and type = ? and parent_id = ?', user_id, 'AssignmentParticipant', self.id])
@@ -832,10 +830,9 @@ end
     end
   end
 
-  #SNVP
+
   def get_participants
       @unique_users=Array.new
-
       self.participants.each do |participant|
           unique_user = User.find(participant.user.id)
           if(!@unique_users.include?(unique_user))

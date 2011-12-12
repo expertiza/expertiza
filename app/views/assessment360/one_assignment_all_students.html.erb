@@ -10,26 +10,25 @@
   </div>
   <br>
   <br>
-  <% if(@participants.size == 0) %>
-      <div style="color: red">
-        No data.
-      </div>
-  <% else %>
-      <%= link_to 'Back to All Assignments', :action => 'all_assignments_all_students', :course_id => @assignment.course_id %>
-      <br>
-      <br>
-      <table class="listing" cellpadding=2 border:1px>
+
+  <%= link_to 'Back to All Assignments', :action => 'all_assignments_all_students', :course_id => @assignment.course_id %>
+  <br>
+  <br>
+    <% if(@final_participants.length == 0) %>
+        <div style= "color:red">
+        No participants
+        </div>
+    <% else %>
+        <table class="listing" cellpadding=2 border:1px>
         <tr>
           <th>Student name</th>
           <th colspan = 2>Score</th>
         </tr>
-        <% @participants.each do |participant| %>
+        <% @final_participants.each do |participant| %>
         <tr>
             <% if(participant.responses.nil?) %>
-               <%= p "red" %>
                 <td style="background-color: red;">
             <% else %>
-              <%= p "green" %>
                 <td style="background-color: #adff2f;">
             <% end %>
             <%= link_to participant.user.fullname , :action => 'one_assignment_one_student', :assignment_id => params[:assignment_id] ,:user_id => participant.user.id %>
@@ -42,8 +41,13 @@
           </td>
         </tr>
         <% end %>
-      </table>
+    <% end %>
+  </table>
+  <br>
+  <% if @final_participants.length >0 %>
+    <b>Total results: <%= @final_participants.length %></b>
   <% end %>
+  <br>
   <div style="margin-top: 25px;">
     <%= link_to 'Back to All Assignments', :action => 'all_assignments_all_students', :course_id => @assignment.course_id %>
   </div>

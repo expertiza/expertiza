@@ -1,77 +1,87 @@
 Class contributions for <b><%= @choice %></b> in Course <b><%= @course.name %></b>
 <br>
 <br>
-  <div>
-    Filters :
-    <%= link_to "All", :action => 'show_student_list', :choice => @choice, :course_id => @course.id, :flag => 'all' %> |
-    <%= link_to "Only Submitted", :action => 'show_student_list', :choice => @choice, :course_id => @course.id, :flag => 'onlySubmitted' %> |
-    <%= link_to "Only Not Submitted", :action => 'show_student_list', :choice => @choice, :course_id => @course.id, :flag => 'onlyNotSubmitted' %>
-  </div>
+<div>
+Filters :
+<%= link_to "All", :action => 'show_student_list', :choice => @choice, :course_id => @course.id, :flag => 'all' %> |
+<%= link_to image_tag("/images/greenCircle.png"), :action => 'show_student_list', :choice => @choice, :course_id => @course.id, :flag => 'participated' %> |
+<%= link_to image_tag("/images/redCircle.png"), :action => 'show_student_list', :choice => @choice, :course_id => @course.id, :flag => 'notParticipated' %>
+</div>
 <br>
-<TABLE BORDER:1 WIDTH="1250">
-  <TR>
- <TD WIDTH=750>
-<table>
-  <tr>
-        <th>
-        </th>
-        <% @assignments.each do |assignment| %>
+<% if(@users.length == 0) %>
+    <div style="color: red">
+      No participants
+    </div>
+<% else %>
+    <table width="1250">
+        <tr>
+        <td width="750">
+        <table>
+        <tr>
             <th>
-              <%= assignment.name %>
             </th>
-            <th>
-            </th>
-        <% end %>
-  </tr>
-  <% @allUsers.each do |user| %>
-    <tr>
-      <td align="center">
-        <%= user.fullname %>
-      </td>
-      <% @assignments.each do |assignment| review = assignment.user_review_assignment(user.id, @choice)%>
-          <% if(review == "nil1") %>
-            <td align="center">
-              <img src="/images/whiteCircle.png">
-            </td>
-          <% elsif(review == "nil2") %>
-            <td align="center">
-              <img src="/images/none.png">
-            </td>
-          <% elsif(review == "true") %>
-            <td align="center">
-              <img src="/images/greenCircle.png">
-            </td>
-          <% elsif(review == "false") %>
-            <td align="center">
-              <img src="/images/redCircle.png">
-            </td>
+            <% @assignments.each do |assignment| %>
+                <th>
+                  <%= assignment.name %>
+                </th>
+                <th>
+                </th>
+            <% end %>
+        </tr>
+        <% @users.each do |user| %>
+        <tr>
+          <td align="center">
+            <%= user.fullname %>
+          </td>
+          <% @assignments.each do |assignment| review = assignment.user_review_assignment(user.id, @choice)%>
+              <% if(review == "nil1") %>
+                <td align="center">
+                  <img src="/images/whiteCircle.png">
+                </td>
+              <% elsif(review == "nil2") %>
+                <td align="center">
+                  <img src="/images/none.png">
+                </td>
+              <% elsif(review == "true") %>
+                <td align="center">
+                  <img src="/images/greenCircle.png">
+                </td>
+              <% elsif(review == "false") %>
+                <td align="center">
+                  <img src="/images/redCircle.png">
+                </td>
+              <% end %>
+              <td></td>
           <% end %>
-          <td></td>
-      <% end %>
-    </tr>
-
-  <% end %>
-</table>
-  </TD>
-  <TD WIDTH="500">
-  <table border:1>
-   <tr>
-   <td align="center"><b>Index</b></td>
-    </tr>
-    <tr>
-    <td><img src="/images/greenCircle.png"> <b>Participated and contributed</b></td>
-    </tr>
-    <tr>
-    <td> <img src="/images/RedCircle.png"><b>Participated but not contributed</b></td>
-    </tr>
-     <tr>
-    <td> <img src="/images/none.png"><b>Not participated in the review</b></td>
-    </tr>
-    <tr>
-    <td><img src="/images/whiteCircle.png"><b>Not participated in the assignment </b></td>
-    </tr>
-</table>
- </td>
-</table>
+        </tr>
+        <% end %>
+    </table>
+      </td>
+      <td width="500">
+      <table>
+       <tr>
+       <td align="center"><b>Index</b></td>
+        </tr>
+        <tr>
+        <td><img src="/images/greenCircle.png"> <b>Participated and contributed</b></td>
+        </tr>
+        <tr>
+        <td> <img src="/images/RedCircle.png"><b>Participated but not contributed</b></td>
+        </tr>
+         <tr>
+        <td> <img src="/images/none.png"><b>Not participated in the review</b></td>
+        </tr>
+        <tr>
+        <td><img src="/images/whiteCircle.png"><b>Not participated in the assignment </b></td>
+        </tr>
+    </table>
+     </td>
+    </table>
+<% end %>
+<br>
+<% if(@users.length > 0) %>
+    <b>Total Results:<%= @users.length %></b>
+<% end %>
+<br>
 <br>
 <%= link_to 'Back', :action => 'one_course_statistics', :course_id => @course.id %>

@@ -4,6 +4,8 @@ class Course < ActiveRecord::Base
   has_many :assignments
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :participants, :class_name => 'CourseParticipant', :foreign_key => 'parent_id'
+  has_many :assignment_participants
+  has_many :users, :through => :assignment_participants
   
   # Return any predefined teams associated with this course
   # Author: ajbudlon
@@ -60,7 +62,7 @@ class Course < ActiveRecord::Base
     end                   
   end
   
-   def create_node()
+ def create_node()
       folder = TreeFolder.find_by_name('Courses')
       parent = FolderNode.find_by_node_object_id(folder.id)
       node = CourseNode.create(:node_object_id => self.id)
@@ -68,11 +70,10 @@ class Course < ActiveRecord::Base
         node.parent_id = parent.id       
       end
       node.save   
-   end
+  end
 
   def get_course_participants()
       @assignments = Assignment.find_all_by_course_id(self)
-
       @unique_users=Array.new
       @assignments.each do |assignment|
         assignment.participants.each do |participant|
@@ -86,4 +87,5 @@ class Course < ActiveRecord::Base
       end
       return @unique_users
   end
+
 end

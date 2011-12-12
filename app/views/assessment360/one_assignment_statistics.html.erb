@@ -14,9 +14,9 @@ Submission details for <b><%= @assignment.name %></b> assignment. <%= link_to 'S
       No participants.
     </p>
 <% else %>
- <TABLE BORDER:1 WIDTH="1250">
-  <TR>
-   <TD WIDTH=750>
+ <table width="1250">
+  <tr>
+   <td width=750>
     <table class="listing">
       <tr>
           <th>
@@ -51,8 +51,8 @@ Submission details for <b><%= @assignment.name %></b> assignment. <%= link_to 'S
         </tr>
       <% end %>
     </table>
-   </TD>
-  <TD WIDTH="500">
+   </td>
+  <td width="500">
   <table border:1>
    <tr>
    <td align="center"><b>Index</b></td>
@@ -69,6 +69,10 @@ Submission details for <b><%= @assignment.name %></b> assignment. <%= link_to 'S
 </table>
  </td>
 </table>
+    <% if(@participants.length >0) %>
+       <b>Total results:<%= @participants.length %></b>
+    <% end %>
 <% end %>
+<br>
 <br>
 <%= link_to "Back", :action => 'one_assignment_all_students', :assignment_id => @assignment.id, :flag => 'all' %>

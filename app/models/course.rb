@@ -23,6 +23,10 @@ class Course < ActiveRecord::Base
   def get_participants
     CourseParticipant.find_all_by_parent_id(self.id)
   end
+
+  def get_participant (user_id)
+    CourseParticipant.find_all_by_parent_id_and_user_id(self.id, user_id)
+  end
   
   def add_participant(user_name)
     user = User.find_by_name(user_name)

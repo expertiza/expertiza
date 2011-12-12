@@ -23,7 +23,8 @@ end
 group :test do
   gem 'cucumber', '0.9.4', :require => false
   gem 'cucumber-rails', '0.3.2', :require => false
+  gem 'gherkin', '~> 2.2.9'
   gem 'capybara', '0.3.9'
-  gem 'database_cleaner', '>=0.5.0', :require => false
+  gem 'database_cleaner', '>= 0.5.0', :require => false
   gem 'launchy', '0.4.0'
 end

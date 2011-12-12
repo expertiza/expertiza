@@ -1,3 +1,4 @@
+=begin
 Given /^I am participating on a team assignment$/ do
   should have_link "Assignments"
   click_link 'Assignments'
@@ -12,3 +13,4 @@ Given /^I am participating on a team assignment$/ do
   click_link "Your team"
 
 end
+=end

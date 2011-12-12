@@ -1,0 +1,18 @@
+
+<h1><%= @instructor.name %>'s List of Courses</h1>
+  <table >
+    <tr>
+      <th>Click on a course to view details</th>
+    </tr>
+  </table>
+<% @courses.each do |course| %>
+  <% if course.name != nil then %>
+  <table >
+    <tr>
+    <td>
+      <%= link_to course.name, :action => 'all_assignments_all_students', :course_id => course.id%> (<%= link_to "Summary Dashboard", :action => 'one_course_all_assignments', :course_id => course%>, <%= link_to "Students", :action => 'all_students_all_reviews', :course_id => course%>)
+    </td>
+    </tr>
+  </table>
+  <% end %>
+<% end %>

@@ -3,22 +3,14 @@
 <% form_for(@join_team_request) do |f| %>
   <%= f.error_messages %>
 
-  <p>
-    <%= f.label :participant_id %><br />
-    <%= f.text_field :participant_id %>
-  </p>
-  <p>
-    <%= f.label :team_id %><br />
-    <%= f.text_field :team_id %>
-  </p>
+    <%= f.hidden_field :participant_id %>
+    <%= f.hidden_field :team_id %>
+    <%= f.hidden_field :status %>
   <p>
     <%= f.label :comments %><br />
     <%= f.text_area :comments %>
   </p>
-  <p>
-    <%= f.label :status %><br />
-    <%= f.text_field :status %>
-  </p>
+
   <p>
     <%= f.submit 'Update' %>
   </p>

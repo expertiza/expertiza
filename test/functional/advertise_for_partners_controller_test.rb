@@ -26,6 +26,15 @@ class JoinTeamRequestsControllerTest < ActionController::TestCase
     @team_advertisement_for_partner.save
     assert_response :success
   end
+  def test_remove
+    @team_advertisement_for_partner = Team.new(
+      :id => 32, :name => "test team", :parent_id => 2, :type => "AssignmentTeam", :comments_for_advertisement => "Hi test!!!", :advertise_for_partner=>true
+    )
+    @team_advertisement_for_partner.save
+    assert_not_nil(@team_advertisement_for_partner)
+    @team_advertisement_for_partner.advertise_for_partner=false
+    assert_equal(@team_advertisement_for_partner.advertise_for_partner?,false,'Advertisement removed')
+  end
 
 
 end

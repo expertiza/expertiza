@@ -37,6 +37,7 @@ class JoinTeamRequestsController < ApplicationController
 
   # POST /join_team_requests
   # POST /join_team_requests.xml
+  #create a new join team request entry for join_team_request table and add it to the table
   def create
     @join_team_request = JoinTeamRequest.new
     @join_team_request.comments = params[:comments][0]
@@ -57,9 +58,9 @@ class JoinTeamRequestsController < ApplicationController
 
   # PUT /join_team_requests/1
   # PUT /join_team_requests/1.xml
+  #update join team request entry for join_team_request table and add it to the table
   def update
     @join_team_request = JoinTeamRequest.find(params[:id])
-
     respond_to do |format|
       if @join_team_request.update_attributes(params[:join_team_request])
         format.html { redirect_to(@join_team_request, :notice => 'JoinTeamRequest was successfully updated.') }
@@ -73,6 +74,7 @@ class JoinTeamRequestsController < ApplicationController
 
   # DELETE /join_team_requests/1
   # DELETE /join_team_requests/1.xml
+
   def destroy
     @join_team_request = JoinTeamRequest.find(params[:id])
     @join_team_request.destroy
@@ -82,6 +84,7 @@ class JoinTeamRequestsController < ApplicationController
       format.xml  { head :ok }
     end
   end
+  #decline request to join the team...
   def decline
     @join_team_request = JoinTeamRequest.find(params[:id])
     @join_team_request.status = 'D'

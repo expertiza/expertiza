@@ -55,13 +55,15 @@
             <td align=center><input type=checkbox id="question_chk<%= i %>"></td>
             <td><%= text_field "question[]", 'txt', :size=>70 %></td>
             <% if (@questionnaire.section == "Custom") %>
-              <% if @q.q_type == "Numeric"  %>
+              <% if @q.q_type == "Checkbox"  %>
                 <% selected_value = 0 %>
-              <% elsif @q.q_type == "True/False"%>
+              <% elsif @q.q_type == "TextField"%>
                 <% selected_value = 1 %>
-              <% elsif @q.q_type == "Checkbox"%>
+              <% elsif @q.q_type == "TextArea"%>
                 <% selected_value = 2 %>
-              <% else selected_value = 3 %>
+              <% elsif @q.q_type == "Rating"%>
+                <% selected_value = 3 %>
+              <% else selected_value = 4 %>
               <% end %>
                 <td><%= select("q[]", :q_type, Question::GRADING_TYPES_CUSTOM, :selected => selected_value)%></td>
                 <td><%= text_field "q[]",  'parameters', :size=>30 %></td>

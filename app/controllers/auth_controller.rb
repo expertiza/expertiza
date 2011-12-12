@@ -53,7 +53,7 @@ class AuthController < ApplicationController
   end
 
   def self.authorised?(session, params)
-     authorised = false  # default
+    authorised = false  # default
     check_controller = false
 
     if params[:controller] == 'content_pages' and

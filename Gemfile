@@ -3,7 +3,6 @@ source 'http://rubygems.org'
 gem 'capistrano'
 gem 'expertiza-authlogic', '~> 2.1.6.1', :require => 'authlogic'
 gem 'fastercsv'
-gem 'gchartrb', :require => 'google_chart'
 gem 'gdata', :require => false
 gem 'hoptoad_notifier'
 gem 'mysql'
@@ -14,7 +13,7 @@ gem 'rake'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rubyzip', :require => 'zip/zip'
 gem 'rdoc'
-gem 'rspec-rails', '1.3.2'
+gem "rspec-rails", "1.3.2"
 
 group :development do
   gem 'mongrel'

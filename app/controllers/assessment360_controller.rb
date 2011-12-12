@@ -18,7 +18,7 @@ class Assessment360Controller < ApplicationController
     @assignment_bar_charts = Hash.new
     @assignment_distribution  = Hash.new
 
-    @assignments.each do |assignment|     
+    @assignments.each do |assignment|
       # Pie Chart Data .....................................
       reviewed = assignment.get_percentage_reviews_completed()
       pending = 100 - reviewed

@@ -48,8 +48,12 @@
                 <%= request.created_at %>
               </td>
             </tr>
-
         <% end %>
+    <% else %>
+                <tr>
+                  <td colspan ='4' > You didn't send any request yet</td>
+                </tr>
+
     <% end %>
   </table>
 

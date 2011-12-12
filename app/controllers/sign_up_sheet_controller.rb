@@ -622,7 +622,7 @@ class SignUpSheetController < ApplicationController
     }
 
   end
-
+  #gets team_details to show it on team_details view for a given assignment
   def team_details
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
       @results =get_team_details(assignment.id, topic.id)
@@ -648,15 +648,15 @@ class SignUpSheetController < ApplicationController
       #@team_members = find_team_members(topic)  
     end
   end
-  
+  #searches and returns team members for a given team_id
   def find_team_members(team_id)
   TeamsUser.find_all_by_team_id(team_id).each{|teamuser|
        team_members+=User.find(teamuser.user_id).handle+" "
     }
   end
-  
-  
 
+  #get the team details to display them in team_details view when assignment-participant
+  #clicks for seeing the advertisement related to
   def get_team_details(assignment_id, topic_id)
     query = "select t.name, t.comments_for_advertisement, p.handle,t.id as team_id, p.id as participant_id, p.topic_id as topic_id, p.parent_id as assignment_id"
     query = query + " from teams t, teams_users tu, participants p"

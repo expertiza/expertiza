@@ -4,6 +4,7 @@ gem 'capistrano'
 gem 'expertiza-authlogic', '~> 2.1.6.1', :require => 'authlogic'
 gem 'fastercsv'
 gem 'gdata', :require => false
+gem 'gchartrb', :require => 'google_chart'
 gem 'hoptoad_notifier'
 gem 'mysql'
 gem 'rdoc'

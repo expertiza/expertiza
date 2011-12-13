@@ -19,10 +19,10 @@ class Question < ActiveRecord::Base
     CHECKBOX = 'Checkbox' # Display string for NUMERIC questions
     TEXT_FIELD = 'TextField'
     TEXTAREA = 'TextArea' # Display string for TRUE_FALSE questions
-    RATING = 'Rating'
+    DROPDOWN = 'DropDown'
     UPLOAD_FILE = 'UploadFile'
 
-    GRADING_TYPES_CUSTOM = [[CHECKBOX,0],[TEXT_FIELD,1],[TEXTAREA,2],[RATING,3],[UPLOAD_FILE, 4]]
+    GRADING_TYPES_CUSTOM = [[CHECKBOX,0],[TEXT_FIELD,1],[TEXTAREA,2],[DROPDOWN,3],[UPLOAD_FILE, 4]]
     WEIGHTS = [['1',1],['2',2],['3',3],['4',4],['5',5]]
     
     attr_accessor :checked

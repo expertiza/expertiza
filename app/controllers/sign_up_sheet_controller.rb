@@ -337,7 +337,7 @@ class SignUpSheetController < ApplicationController
       if assignment.team_formation_required && users_team && (users_team.size < assignment.minimum_team_count || users_team.size > assignment.team_count)
         current_due_date = assignment.get_current_due_date
         if current_due_date && current_due_date.deadline_type_id == DeadlineType.find_by_name("team_formation").id
-          flash[:error] = "Teams for this assignment need to have between #{assignment.minimum_team_count} and #{assignment.team_count} members (inclusive) <b>before</b> the formation deadline -- your team has #{users_team.size} member(s)"    
+          flash[:error] = "You need to have between #{assignment.minimum_team_count} and #{assignment.team_count} members in your team to sign up for a topic at this time. However, your team currently has #{users_team.size} member(s)."    
           redirect_to :action => 'signup_topics', :id => params[:assignment_id]
           return
         end

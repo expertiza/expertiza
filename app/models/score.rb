@@ -1,10 +1,11 @@
 class Score < ActiveRecord::Base
   belongs_to :question
-
+  belongs_to :response
+  after_save :score_changed
+  after_destroy :update_or_delete_from_cache
 
   # Same as compute_scores(assessments, questions) but it first checks if the score is available in the ScoreCache.
   # If the score is in the cache it'll get it from the cache, otherwise it'll call compute_scores(assessments, questions)
-  # The parameters reviewee_id and object_type are used to look for the score in the cache.
   def self.get_scores(assessments, questions)
     scores = Hash.new
     sc = nil
@@ -79,29 +80,9 @@ class Score < ActiveRecord::Base
     return (weighted_score.to_f / (sum_of_weights.to_f * questions.first.questionnaire.max_question_score.to_f)) * 100   
   end
 
-  def self.get_total_score_from_cache(response, questions)
-    reviewee_id = response.map.reviewee_id
-    cache_map_type = response.map.type
-    sc = nil
-    if questions.length > 0
-      sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", reviewee_id, cache_map_type])
-    end
-    if sc == nil
-      ScoreCache.update_cache(response.id)
-      sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", reviewee_id, cache_map_type])
-    end
-    return sc.score
-  end
-
-  #Override ActiveRecord::Base's update_attribute and create methods so that ScoreCache is updated simultaneously
-  def update_attribute(name, value)
-    super(name,value)
+  #Updates the cache when a score is created or edited (called by callback function after_save)
+  def score_changed
     ScoreCache.update_cache(response_id)
   end
 
-  def create
-    s = super
-    ScoreCache.update_cache(attributes["response_id"])
-    return s
-  end
 end

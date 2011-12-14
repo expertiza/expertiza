@@ -14,6 +14,50 @@ class ScoreTest < ActiveSupport::TestCase
     TeamsUser.create(:team_id => @newTeam_id, :user_id => @user_id)
   end
 
+
+
+  # this is actually in response, testing here to use the setup
+  # when the response is deleted and others exist for the reviewee/type combination, the scorceache should be updated
+  def test_response_deleted_updates_cache
+    map = TeamReviewResponseMap.create(
+                             :reviewed_object_id => @assignment_id,
+                             :reviewer_id => @existingParticipant_id,
+                             :reviewee_id => @existingTeam_id)
+    response = Response.create(:map_id => map.id)
+    question = Question.find_by_questionnaire_id(@reviewQuestionnaire_id)
+    score = Score.create(:question_id=>question.id, :response_id => response.id,:score => 500)
+    sc = ScoreCache.find(:first, :conditions => {:reviewee_id => @existingTeam_id, :object_type => map.type})
+    oldscore = sc.score
+    #for some reason cascading delete doesn't work in this environment
+    score.delete
+    response.delete
+    map.delete
+    sc = ScoreCache.find(:first, :conditions => {:reviewee_id => @existingTeam_id, :object_type => map.type})
+    assert (sc.score && sc.score < oldscore)
+
+
+  end
+
+  #this is actually in response, testing here temporarily to use the setup
+  # when the response is deleted and others don't exist for the reviewee/type combination, the scorecache should deleted
+  def test_response_deleted_deletes_cache
+    map = TeamReviewResponseMap.create(
+                             :reviewed_object_id => @assignment_id,
+                             :reviewer_id => @existingParticipant_id,
+                             :reviewee_id => @newTeam_id)
+    response = Response.create(:map_id => map.id)
+    question = Question.find_by_questionnaire_id(@reviewQuestionnaire_id)
+    score = Score.create(:question_id=>question.id, :response_id => response.id,:score => 500)
+    assert ScoreCache.find(:first, :conditions => {:reviewee_id => @newTeam_id, :object_type => map.type})
+    #for some reason cascading delete doesn't work in this environment
+    #map.delete
+    score.delete
+    response.delete
+    map.delete
+    assert !ScoreCache.find(:first, :conditions => {:reviewee_id => @newTeam_id, :object_type => map.type})
+
+  end
+
   # Call to get_scores with no assessments should return nils.
   def test_get_scores_nils
     assessments_empty = Array.new
@@ -65,9 +109,8 @@ class ScoreTest < ActiveSupport::TestCase
     assert a.score == 4
   end
 
-  # test that update_cache is being called in update_attribute, so we know the overridden method
-  # is being called
-  def test_update_attribute_updates_cache
+  # test that update_cache is being called by the callback function after_save for edited responses
+  def test_edited_responses_updates_cache
     map = TeamReviewResponseMap.create(
                              :reviewed_object_id => @assignment_id,
                              :reviewer_id => @existingParticipant_id,
@@ -83,9 +126,8 @@ class ScoreTest < ActiveSupport::TestCase
     assert sc.score > oldscore
   end
 
-  # test that update_cache is being called in Score.create, so we know the overridden method
-  # is being called
-  def test_create_updates_cache
+  # test that update_cache is being called by the callback function after_save for new responses
+  def test_new_responses_updates_cache
     map = TeamReviewResponseMap.create(:reviewed_object_id => @assignment_id,
                              :reviewer_id => @existingParticipant_id,
                              :reviewee_id => @newTeam_id)
@@ -99,8 +141,7 @@ class ScoreTest < ActiveSupport::TestCase
     assert ScoreCache.count == oldcount + 1
   end
 
-  # Test whether the overridden Score.create creates scores. Also, verify that all
-  # the information is retained because it seems strange no arguments are needed
+  # Test whether the Score.create creates scores.
   def test_create_creates_score
 
     map = TeamReviewResponseMap.create(:reviewed_object_id => @assignment_id,
@@ -116,4 +157,4 @@ class ScoreTest < ActiveSupport::TestCase
   end
 
 
-  end
+end

@@ -1,7 +1,22 @@
 class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
-  
+  after_destroy :response_deleted
+
+  #after a response is destroyed,update the cache, or if it's the last response
+  #for a reviewee/object combination, delete the scorecache.   # Updates the cache when a score is deleted. If it is the last score, the scorecache is removed
+  def response_deleted
+    rm = self.map
+    #check whether this is the last response
+    otherrm = ResponseMap.first(:conditions => ["id <> ? and reviewee_id = ? and  type = ? ", rm.id, rm.reviewee_id, rm.type])
+    if otherrm
+      ScoreCache.update_cache(otherrm.response.id)
+    else
+      ScoreCache.delete_all(:reviewee_id => rm.reviewee_id, :object_type=>rm.type)
+    end
+  end
+
+
   def display_as_html(prefix = nil, count = nil, file_url = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying

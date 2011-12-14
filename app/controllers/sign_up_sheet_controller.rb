@@ -276,11 +276,11 @@ class SignUpSheetController < ApplicationController
         confby = first_waitlisted_user.confirm_by.days.from_now.to_date
         tnow = Time.now.to_date
       
-		if assignment.staggered_deadline ==1
-		  topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic_id, 1)
-		else
-		  topic_deadline_subm = DueDate.find_by_assignment_id_and_deadline_type_id(assignment.id,1)
-		end
+        if assignment.staggered_deadline ==1
+          topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic_id, 1)
+        else
+          topic_deadline_subm = DueDate.find_by_assignment_id_and_deadline_type_id(assignment.id,1)
+        end
     
         if topic_deadline_subm.due_at < confby
           check = 0
@@ -332,18 +332,18 @@ class SignUpSheetController < ApplicationController
 
       #check whether the user already has a team for this assignment
       users_team = SignedUpUser.find_teammates(params[:assignment_id],(session[:user].id))
-	  
-	  # make sure the team is an appropriate size after the team_formation deadline
-	  if assignment.team_formation_required && users_team && (users_team.size < assignment.minimum_team_count || users_team.size > assignment.team_count)
-	    current_due_date = assignment.get_current_due_date
-	    if current_due_date && current_due_date.deadline_type_id == DeadlineType.find_by_name("team_formation").id
-	      flash[:error] = "Teams for this assignment need to have between #{assignment.minimum_team_count} and #{assignment.team_count} members (inclusive) <b>before</b> the formation deadline -- your team has #{users_team.size} member(s)"		
-		  redirect_to :action => 'signup_topics', :id => params[:assignment_id]
-		  return
-		end
-	  end
-	  
-	  if users_team.size == 0
+    
+      # make sure the team is an appropriate size after the team_formation deadline
+      if assignment.team_formation_required && users_team && (users_team.size < assignment.minimum_team_count || users_team.size > assignment.team_count)
+        current_due_date = assignment.get_current_due_date
+        if current_due_date && current_due_date.deadline_type_id == DeadlineType.find_by_name("team_formation").id
+          flash[:error] = "Teams for this assignment need to have between #{assignment.minimum_team_count} and #{assignment.team_count} members (inclusive) <b>before</b> the formation deadline -- your team has #{users_team.size} member(s)"    
+          redirect_to :action => 'signup_topics', :id => params[:assignment_id]
+          return
+        end
+      end
+    
+      if users_team.size == 0
         #if team is not yet created, create new team.
         team = create_team(params[:assignment_id])
         user = User.find(session[:user].id)
@@ -356,6 +356,7 @@ class SignUpSheetController < ApplicationController
     else
       confirmationStatus = confirmTopic(session[:user].id, params[:id], params[:assignment_id],val)
     end
+
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
@@ -380,8 +381,8 @@ class SignUpSheetController < ApplicationController
     result = false
 
     sign_up.confirm_by = val
-	user_signup = [] if !user_signup
-	
+    user_signup = [] if !user_signup
+  
     if user_signup.size < asgnmt.max_topic_count
       #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
       if slotAvailable?(topic_id)
@@ -404,7 +405,7 @@ class SignUpSheetController < ApplicationController
             result = true
           end
         end
-	  end
+    end
     else
       #If all the topics choosen by the user are waitlisted,
       for user_signup_topic in user_signup
@@ -413,7 +414,7 @@ class SignUpSheetController < ApplicationController
           return false
         end
       end
-	  
+    
       #check whether user is clicking on a topic which is not going to place him in the waitlist
       if !slotAvailable?(topic_id)
         sign_up.is_waitlisted = true

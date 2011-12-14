@@ -110,7 +110,7 @@ class Assignment < ActiveRecord::Base
       # .last assumes the database returns rows in the order they were created.
       # Added unit tests to ensure these conditions are both true with the current database.
       contributor_set.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id }
-  end
+    end
 
     # Choose a contributor at random (.sample) from the remaining contributors.
     # Actually, we SHOULD pick the contributor who was least recently picked.  But sample
@@ -201,15 +201,15 @@ class Assignment < ActiveRecord::Base
   end
   
   def metareview_mappings
-     mappings = Array.new
-     self.review_mappings.each{
-       | map |
-       mmap = MetareviewResponseMap.find_by_reviewed_object_id(map.id)
-       if mmap != nil
-         mappings << mmap
-       end
-     }
-     return mappings     
+    mappings = Array.new
+    self.review_mappings.each{
+      | map |
+      mmap = MetareviewResponseMap.find_by_reviewed_object_id(map.id)
+      if mmap != nil
+        mappings << mmap
+      end
+    }
+    return mappings     
   end
   
   def get_scores(questions)
@@ -442,13 +442,13 @@ class Assignment < ActiveRecord::Base
     return review_num
   end
  
- # It appears that this method is not used at present!
- def is_wiki_assignment
-   return (self.wiki_type_id > 1)
- end
+  # It appears that this method is not used at present!
+  def is_wiki_assignment
+    return (self.wiki_type_id > 1)
+  end
  
- #
- def self.is_submission_possible (assignment)
+  #
+  def self.is_submission_possible (assignment)
     # Is it possible to upload a file?
     # Check whether the directory text box is nil
     if assignment.directory_path != nil && assignment.wiki_type == 1      
@@ -466,38 +466,38 @@ class Assignment < ActiveRecord::Base
     end
  end
  
- def is_google_doc
-   # This is its own method so that it can be refactored later.
-   # Google Document code should never directly check the wiki_type_id
-   # and should instead always call is_google_doc.
-   self.wiki_type_id == 4
- end
- 
-#add a new participant to this assignment
-#manual addition
-# user_name - the user account name of the participant to add
-def add_participant(user_name)
-  user = User.find_by_name(user_name)
-  if (user == nil) 
-    raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."
+  def is_google_doc
+    # This is its own method so that it can be refactored later.
+    # Google Document code should never directly check the wiki_type_id
+    # and should instead always call is_google_doc.
+    self.wiki_type_id == 4
   end
-  participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
-  if !participant
-    newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)      
-    newpart.set_handle()         
-  else
-    raise "The user \""+user.name+"\" is already a participant."
-  end
- end
  
- def create_node()
-      parent = CourseNode.find_by_node_object_id(self.course_id)      
-      node = AssignmentNode.create(:node_object_id => self.id)
-      if parent != nil
-        node.parent_id = parent.id       
-      end
-      node.save   
- end
+  #add a new participant to this assignment
+  #manual addition
+  # user_name - the user account name of the participant to add
+  def add_participant(user_name)
+    user = User.find_by_name(user_name)
+    if (user == nil) 
+      raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."
+    end
+    participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
+    if !participant
+      newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)      
+      newpart.set_handle()         
+    else
+      raise "The user \""+user.name+"\" is already a participant."
+    end
+  end
+ 
+  def create_node()
+    parent = CourseNode.find_by_node_object_id(self.course_id)      
+    node = AssignmentNode.create(:node_object_id => self.id)
+    if parent != nil
+      node.parent_id = parent.id       
+    end
+    node.save   
+  end
 
 
   def get_current_stage(topic_id=nil)
@@ -516,11 +516,11 @@ def add_participant(user_name)
 
 
   def get_stage_deadline(topic_id=nil)
-     if self.staggered_deadline?
-        if topic_id.nil?
-          return "Unknown"
-        end
-     end
+    if self.staggered_deadline?
+       if topic_id.nil?
+         return "Unknown"
+       end
+    end
 
     due_date = find_current_stage(topic_id)
     if due_date == nil or due_date == COMPLETE
@@ -530,7 +530,7 @@ def add_participant(user_name)
     end
   end
 
-   def get_review_rounds
+  def get_review_rounds
     due_dates = DueDate.find_all_by_assignment_id(self.id)
     rounds = 0
     for i in (0 .. due_dates.length-1)
@@ -571,22 +571,22 @@ def add_participant(user_name)
     end
   end  
   
- def assign_reviewers(mapping_strategy)  
-      if (team_assignment)      
-          #defined in DynamicReviewMapping module
-          assign_reviewers_for_team(mapping_strategy)
-      else          
-          #defined in DynamicReviewMapping module
-          assign_individual_reviewer(mapping_strategy) 
-      end  
+  def assign_reviewers(mapping_strategy)  
+    if (team_assignment)      
+      #defined in DynamicReviewMapping module
+      assign_reviewers_for_team(mapping_strategy)
+    else          
+      #defined in DynamicReviewMapping module
+      assign_individual_reviewer(mapping_strategy) 
+    end  
   end  
 
-#this is for staggered deadline assignments or assignments with signup sheet
-def assign_reviewers_staggered(num_reviews,num_review_of_reviews)
+  #this is for staggered deadline assignments or assignments with signup sheet
+  def assign_reviewers_staggered(num_reviews,num_review_of_reviews)
     #defined in DynamicReviewMapping module
     message = assign_reviewers_automatically(num_reviews,num_review_of_reviews)
     return message
-end
+  end
 
   def get_current_due_date()
     #puts "~~~~~~~~~~Enter get_current_due_date()\n"
@@ -662,16 +662,16 @@ end
     end
   end
   
-    def signed_up_topic(contributor)
-      # The purpose is to return the topic that the contributor has signed up to do for this assignment.
-      # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
-      # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
-      contributors_topic = SignedUpUser.find_by_creator_id(contributor.id)
-      if !contributors_topic.nil?
-        contributors_signup_topic = SignUpTopic.find_by_id(contributors_topic.topic_id)
-        #returns the topic
-        return contributors_signup_topic
-      end
+  def signed_up_topic(contributor)
+    # The purpose is to return the topic that the contributor has signed up to do for this assignment.
+    # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
+    # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
+    contributors_topic = SignedUpUser.find_by_creator_id(contributor.id)
+    if !contributors_topic.nil?
+      contributors_signup_topic = SignUpTopic.find_by_id(contributors_topic.topic_id)
+      #returns the topic
+      return contributors_signup_topic
+    end
   end
   
   # function that will get invoked either manually or by a polling mechanism
@@ -679,16 +679,16 @@ end
     # make sure the assignment needs enforcing
   
     # get a list of signed up AND not waitlisted teams
-	
-	# run through the list and drop each team that does not meet minimum requirements
-	#  meanwhile, push e-mails onto a delivery stack
-	
-	# get a list of the topics
-	
-	# run through the topic list and get a list of preference-sorted teams
-	#  run through team list and add them to topic until topic is full
-	#   meanwhile, pop the added teams from waitlist stack
-	#   meanwhile, push e-mails onto a delivery stack
+  
+  # run through the list and drop each team that does not meet minimum requirements
+  #  meanwhile, push e-mails onto a delivery stack
+  
+  # get a list of the topics
+  
+  # run through the topic list and get a list of preference-sorted teams
+  #  run through team list and add them to topic until topic is full
+  #   meanwhile, pop the added teams from waitlist stack
+  #   meanwhile, push e-mails onto a delivery stack
   end
   
 end

@@ -1,7 +1,7 @@
 class AssignmentController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
-  
+
   def copy
     Assignment.record_timestamps = false
     #creating a copy of an assignment; along with the dates and submission directory too

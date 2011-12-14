@@ -3,8 +3,8 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'graph/graphviz_dot'
   require 'rgl/topsort'
-
-
+  
+  
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :list }

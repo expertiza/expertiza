@@ -27,3 +27,13 @@ team5:
   name: team6
   parent_id: <%= Fixtures.identify(:assignment2) %>
   type: AssignmentTeam
+
+full_team:
+  name: full_team
+  parent_id: <%= Fixtures.identify(:assignment_team_formation) %>
+  type: AssignmentTeam
+
+single_team:
+  name: single_team
+  parent_id: <%= Fixtures.identify(:assignment_team_formation) %>
+  type: AssignmentTeam

@@ -30,4 +30,15 @@ teams_users6:
 teams_users7:
   team_id: <%= Fixtures.identify(:team5) %>
   user_id: <%= Fixtures.identify(:student5) %>
-  
+
+teams_users8:
+  team_id: <%= Fixtures.identify(:full_team) %>
+  user_id: <%= Fixtures.identify(:student_team_formation1) %>
+
+teams_users9:
+  team_id: <%= Fixtures.identify(:full_team) %>
+  user_id: <%= Fixtures.identify(:student_team_formation2) %>
+
+teams_users10:
+  team_id: <%= Fixtures.identify(:single_team) %>
+  user_id: <%= Fixtures.identify(:student_team_formation3) %>

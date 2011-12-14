@@ -48,3 +48,15 @@ due_date_review<%= j %>:
   review_of_review_allowed_id: 1
   round: 2
 <%end%>
+
+due_date_team_formation:
+  due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: <%= Fixtures.identify(:deadline_type_team_formation) %>
+  assignment_id: <%= Fixtures.identify(:assignment_team_formation) %>
+  late_policy_id: <%= Fixtures.identify("late_policy0") %>
+  submission_allowed_id: 2
+  review_allowed_id: 2
+  resubmission_allowed_id: 2
+  rereview_allowed_id: 2
+  review_of_review_allowed_id: 1
+  round: 2

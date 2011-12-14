@@ -12,9 +12,17 @@ course<%= i %>:
   info: CSC<%= i/5+1%>1<%= i%5 %> Programming Class
   private: <%= i%2 %>
 <% end %>
+
 course_e_commerce:
   name: E-Commerce
   instructor_id: <%= instructor_list[0] %>
+  directory_path: csc511
+  info: E Commerce Class
+  private: 0
+
+course_team_formation:
+  name: Team Formation
+  instructor_id:  <%= Fixtures.identify(:instructor_team_formation) %>
   directory_path: csc511
   info: E Commerce Class
   private: 0

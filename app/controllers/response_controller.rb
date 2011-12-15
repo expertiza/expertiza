@@ -6,9 +6,15 @@ class ResponseController < ApplicationController
   def view
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
-
     @map = @response.map
     get_content
+    @review_scores = Array.new
+    @question_type = Array.new
+    @questions.each{
+      | question |
+      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+      @question_type << QuestionType.find_by_question_id(question.id)
+    }
   end
   
   def delete
@@ -40,8 +46,7 @@ class ResponseController < ApplicationController
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
       @next_action = "custom_update"
-      render :action => 'custom_response_Dynamic'
-     end
+      render :action => 'custom_response'
     else
       # end of special code (except for the end below, to match the if above)
       #**********************
@@ -97,7 +102,6 @@ class ResponseController < ApplicationController
       @map = @response.map
       @response.update_attribute('additional_comment',"")
 
-
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions
 
@@ -138,6 +142,11 @@ class ResponseController < ApplicationController
     #**********************
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
+      @question_type = Array.new
+      @questions.each{
+        | question |
+        @question_type << QuestionType.find_by_question_id(question.id)
+      }
       if !@map.contributor.nil?
         if @map.assignment.team_assignment?
           team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
@@ -150,7 +159,7 @@ class ResponseController < ApplicationController
         @signedUpTopic = @SignUpTopic.find(@topic_id).topic_name
       end
       @next_action = "custom_create"
-      render :action => 'custom_response_dynamic'
+      render :action => 'custom_response'
     else
     render :action => 'response'
     end

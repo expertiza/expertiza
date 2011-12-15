@@ -2,5 +2,5 @@ first_topic:
   id: 1
   topic_name: first_topic
   assignment_id: <%= Fixtures.identify(:assignment_team_formation) %>
-  max_chooser: 1
+  max_choosers: 1
   category: Category 1

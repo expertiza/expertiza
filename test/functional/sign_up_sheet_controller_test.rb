@@ -5,83 +5,82 @@ require 'sign_up_sheet_controller'
 class SignUpSheetController; def rescue_action(e) raise e end; end
 
 class SignUpSheetControllerTest < ActionController::TestCase
+  # use dynamic fixtures to populate users table
+  # for the use of testing
+  fixtures :users
+  fixtures :assignments
+  fixtures :courses
+  fixtures :deadline_types
+  fixtures :due_dates
+  fixtures :participants
+  fixtures :sign_up_topics
+  set_fixture_class :system_settings => 'SystemSettings'
+  fixtures :system_settings
+  fixtures :teams
+  fixtures :teams_users
+  fixtures :content_pages
+  @settings = SystemSettings.find(:first)
 
-  def test_add_signup_topics_staggered
+  def setup
+    @controller = AssignmentController.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+
+    # Initialize the user to student team formation 1 by default
+    @request.session[:user] = User.find(users(:student_team_formation1).id )
+    roleid = User.find(users(:student_team_formation1).id).role_id
+    Role.rebuild_cache
+
+    Role.find(roleid).cache[:credentials]
+    @request.session[:credentials] = Role.find(roleid).cache[:credentials]
+    # Work around a bug that causes session[:credentials] to become a YAML Object
+    @request.session[:credentials] = nil if @request.session[:credentials].is_a? YAML::Object
+    @settings = SystemSettings.find(:first)
+    AuthController.set_current_role(roleid,@request.session)
+    #   @request.session[:user] = User.find_by_name("suadmin")
   end
-  
-  def test_add_signup_topics
+
+  # Test Case student can sign up for topic
+  def test_successful_sign_up
+    topicid = sign_up_topics(:first_topic).id
+
+    # Setup the session
+    session[:user] = users(:student_team_formation1)
+    
+    #call the sign_up_topic controller to sign up the user for topic.
+    #SignUpSheetController.signup
+    get(:signup, {'assignment_id' => assignments(:assignment_team_formation).id}, {'confirm_by' => 0}, {'id' => topicid}) 
+    
+    #This should pass fine as the student is paired with student_team_formation2 and max required
+    #students for topic is 2
+    #Check for no error message
+    assert_equal flash[:error], nil
+    
+    #assert_response :redirect
+    #assert_equal Assignment.count, number_of_assignment
+    #assert Assignment.find(:all, :conditions => "name = 'updatedAssignment9'")
   end
-  
-  def test_view_publishing_rights
+
+  # Test Case student can't sign up for topic
+  def test_unsuccessful_sign_up
+    topicid = sign_up_topics(:first_topic).id
+
+    # Setup the session
+    session[:user] = users(:student_team_formation3)
+    
+    #call the sign_up_topic controller to sign up the user for topic.
+    get(:signup, {'assignment_id' => assignments(:assignment_team_formation).id}, {'confirm_by' => 0}, {'id' => topicid}) 
+    
+    #This should fail as the student is not teamed up with anyone else and the max students for topic is 2
+    #Check for error message
+    #assert_equal flash[:error], "You need to have between 2 and 3 members in your team to sign up for a topic at this time. However, your team currently has 1 member(s)."
   end
-  
-  def test_load_add_signup_topics
-  end
-  
-  def test_create
-  end
-  
-  def test_redirect_to_sign_up
-  end
-  
-  def test_delete
-  end
-  
-  def test_edit
-  end
-  
-  def test_update
-  end
-  
-  def test_signup_topics
-  end
-  
-  def test_delete_signup
-  end
-  
-  def test_delete_signup_for_topic
-  end
-  
-  def test_signup
-  end
-  
-  def test_slotAvailable?
-  end
-  
-  def test_otherConfirmedTopicforUser
-  end
-  
-  def test_confirmTopic
-  end
-  
-  def test_create_team
-  end
-  
-  def test_generate_team_name
-  end
-  
-  def test_create_team_users
-  end
-  
-  def test_has_user
-  end
-  
-  def test_save_topic_dependencies
-  end
-  
-  def test_save_topic_deadlines
-  end
-  
-  def test_build_dependency_graph
-  end
-  
-  def test_create_common_start_time_topics
-  end
-  
-  def test_create_topic_deadline
-  end
-  
-  def test_set_start_due_date
-  end
-  
+
+
 end
+
+
+
+
+
+

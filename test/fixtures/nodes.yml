@@ -114,3 +114,18 @@ node22:
  type: TeamUserNode
  type: TeamUser
 
+
+node_tf_course:
+ parent_id: 1
+ node_object_id: <%= Fixtures.identify(:course_team_formation) %>
+ type: CourseNode
+
+node_tf_assignment:
+ parent_id: <%= Fixtures.identify(:node_tf_course) %>
+ node_object_id: <%= Fixtures.identify(:assignment_team_formation) %>
+ type: AssignmentNode
+ 
+node_tf_1:
+ parent_id: <%= Fixtures.identify(:node_tf_assignment) %>
+ node_object_id: <%= Fixtures.identify(:full_team) %>
+ type: TeamNode

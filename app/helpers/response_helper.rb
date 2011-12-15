@@ -48,94 +48,176 @@ module ResponseHelper
      end
   end
 
-  def self.label(object_name, method, label)
+  def label(object_name, method, label)
     content_tag(:label, h(label), :for => "#{object_name}_#{method}")
   end
 
-  def self.get_accordion_title(last_topic, new_topic)
+  def get_accordion_title(last_topic, new_topic)
     if last_topic.eql? nil
       #this is the first accordion
-      render :partial => "accordion", :locals => {:title => new_topic, :is_first => true}
+      render :partial => "response/accordion", :locals => {:title => new_topic, :is_first => true}
     elsif !new_topic.eql? last_topic
       #render new accordion
-      render :partial => "accordion", :locals => {:title => new_topic, :is_first => false}
+      render :partial => "response/accordion", :locals => {:title => new_topic, :is_first => false}
     end
   end
 
-  def update_question_count(q_num, question_type)
-    if question_type.q_type.eql? "Rating"
-      para_array = question_type.parameter.split("::")
-      if para_array[2].length > 0
-        q_num += 3
-      else
-        q_num += 2
+  def construct_table(parameters)
+    table_hash = {"table_title" => nil, "table_headers" => nil, "start_table" => false, "start_col" => false, "end_col" => false, "end_table" => false}
+
+    #we need to check if these parameters use tables
+    if !parameters.split("::")[4].nil?
+      parameters = parameters.last(3)
+      current_ques = parameters[2].split("|")[0]
+      total_col_ques = parameters[2].split("|")[1]
+      current_col = parameters[2].split("|")[2]
+      total_col = parameters[2].split("|")[3]
+
+      #since it's first item in a column we need to start a new column
+      if current_ques.to_i == 1
+        table_hash["start_col"] = true
+        #if it's the first column we need to send the title and headers
+        if current_col.to_i == 1
+          if parameters[0].length > 0
+            table_hash["table_title"] = parameters[0]
+          end
+          table_hash["start_table"] = true
+          if parameters[1].length > 0
+            table_hash["table_headers"] = parameters[1]
+          end
+        end
       end
-    else
-      q_num += 1
+      #end of column, we need to close column
+      if current_ques == total_col_ques
+        table_hash["end_col"] = true
+        #end of table we need to close table
+        if total_col == current_col
+          table_hash["end_table"] = true
+        end
+      end
     end
+    table_hash
   end
 
-  def self.find_question_type(question, q_type, q_number)
-    default_checkbox = ""
-    default_textfield = "3"
-    default_textarea = "40x5"
-    default_textfield_inline = "3"
+  def find_question_type(question, ques_type, q_number, is_view, file_url)
+    default_textfield_size = "3"
+    default_textarea_size = "40x5"
+    default_dropdown = ["Edit Rubric", "No Values"]
 
-    case q_type.type
+    case ques_type.q_type
       when "Checkbox"
-        q_parameter = default_checkbox
-        if !q_type.parameter.nil?
-          q_parameter = q_type.parameter
-        end
-        render :partial => "checkbox", :locals => {:ques_num => q_number, :ques_text => question.txt}
-      when "Text Field"
-        q_parameter = default_textfield
-        if !q_type.parameter.nil?
-          q_parameter = q_type.parameter
-        end
-        render :partial => "textfield", :locals => {:ques_num => q_number, :field_size => q_parameter, :ques_text => question.txt}
-      when "Text Area"
-        q_parameter = default_textarea
-        if !q_type.parameter.nil?
-          q_parameter = q_type.parameter
-        end
-        render :partial => "textarea", :locals => {:ques_num => q_number, :area_size => q_parameter, :ques_text => question.txt}
-      when "Text Field Inline"
-        q_parameter = default_textfield_inline
-        if !q_type.parameter.nil?
-          q_parameter = q_type.parameter
-        end
-        render :partial => "textfield_inline", :locals => {:ques_num => q_number, :field_size => q_parameter}
-      when "Rating"
-        if !q_type.parameter.nil?
-          para_array = q_type.parameter.split("::")
+        #Parameters
+        #section::tableTitle::tableHeader1|tableHeader2::curr_col_ques|total_col_ques|curr_col|max_cols
 
-          size = para_array[1]
-          dd2 = para_array[3]
-          dd2_array = dd2.split("|")
-          dd2_title = dd2_array[0]
-          dd2_values = Array.new
-          for y in 1..dd2_array.length
-              dd2_values << dd2_array[y]
+        #look for table parameters
+        table_hash = construct_table(ques_type.parameters.split("::"))
+
+        #check to see if rendering view
+        view_output = nil
+        if is_view
+          view_output = "<img src=\"/images/delete_icon.png\">" + question.txt + "<br/>"
+          if @review_scores[q_number].comments == "1"
+            view_output = "<img src=\"/images/Check-icon.png\">" + question.txt + "<br/>"
           end
-          #check if there is a drop down one present
-          if para_array[2].length > 0
-            dd1 = para_array[2]
-            dd1_array = dd1.split("|")
-            dd1_title = dd1_array[0]
-            dd1_values = Array.new
-            #add all selections to the dropdown
-            for y in 1..dd1_array.length
-              dd1_values << dd1_array[y]
-            end
-            render :partial => "rating", :locals => {:ques_num => q_number, :size => size, :dropdown1_title => dd1_title, :selections => dd1_values, :dropdown2_title => dd2_title, :grades => dd2_values}
-          else
-            render :partial => "rating", :locals => {:ques_num => q_number, :size => size, :dropdown1_title => nil, :dropdown2_title => dd2_title, :grades => dd2_values}
-          end
-        else
-          dd2_values = ["Value1", "Value2"]
-          render :partial => "rating", :locals => {:ques_num => q_number, :size => "60x5", :dropdown1_title => nil, :dropdown2_title => "CheckParameters", :grades => dd2_values}
         end
+
+        render :partial => "response/checkbox", :locals => {:ques_num => q_number, :ques_text => question.txt, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+      when "TextField"
+        #Parameters
+        #section::size::separator1|separator2::curr_ques|max_ques
+        q_parameter =  ques_type.parameters.split("::")
+
+        #look for size parameters
+        size = default_textfield_size
+        if !q_parameter[1].nil? && q_parameter[1].length > 0
+          size = q_parameter[1]
+        end
+
+        #look for inline and separator parameters
+        separator = nil
+        is_first = false
+        is_last = false
+        if !q_parameter[2].nil?
+          separator = q_parameter[2].split("|")[q_parameter[3].split("|")[0].to_i - 1]
+          if q_parameter[3].split("|")[0].to_i == 1
+            is_first = true
+          elsif q_parameter[3].split("|")[0] == q_parameter[3].split("|")[1]
+            is_last = true
+          end
+        end
+
+        #check to see if rendering view
+        view_output = nil
+        if is_view
+          view_output = "No Response"
+          if !@review_scores[q_number].comments.nil?
+            view_output = @review_scores[q_number].comments
+          end
+        end
+
+        render :partial => "response/textfield", :locals => {:ques_num => q_number, :field_size => size, :ques_text => question.txt, :separator => separator, :isFirst => is_first, :isLast => is_last, :view => view_output}
+      when "TextArea"
+        #Parameters
+        #section::size::tableTitle::tableHeader1|tableHeader2::curr_col_ques|total_col_ques|curr_col|max_cols
+        q_parameter =  ques_type.parameters.split("::")
+
+        #look for size parameters
+        size = default_textarea_size
+        if !q_parameter[1].nil? && q_parameter[1].length > 0
+          size = q_parameter[1]
+        end
+
+        #look for table parameters
+        table_hash = construct_table(q_parameter)
+
+        #check to see if rendering view
+        view_output = nil
+        if is_view
+          view_output = "No Response"
+          if !@review_scores[q_number].comments.nil?
+            view_output = @review_scores[q_number].comments
+          end
+        end
+
+        render :partial => "response/textarea", :locals => {:ques_num => q_number, :area_size => size, :ques_text => question.txt, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+      when "UploadFile"
+        #Parameters
+        #section
+
+        #check to see if rendering view
+        view_output = nil
+        if is_view
+          view_output = "File has not been uploaded"
+          if !file_url.nil?
+            view_output = file_url.to_s
+          end
+        end
+
+        render :partial => "response/fileUpload", :locals => {:ques_num => q_number, :ques_text => question.txt, :view => view_output}
+      when "DropDown"
+        #Parameters
+        #section::ddValue1|ddValue2::tableTitle::tableHeader1|tableHeader2::curr_col_ques|total_col_ques|curr_col|max_cols
+        q_parameter =  ques_type.parameters.split("::")
+
+        #look for dropdown values
+        dd_values = default_dropdown
+        if !q_parameter[1].nil? && q_parameter[1].length > 0
+          dd_values = q_parameter[1].split("|")
+        end
+
+        #look for table parameters
+        table_hash = construct_table(q_parameter)
+
+        #check to see if rendering view
+        view_output = nil
+        if is_view
+          view_output = "No Response"
+          if !@review_scores[q_number].comments.nil?
+            view_output = @review_scores[q_number].comments
+          end
+        end
+
+        render :partial => "response/dropdown", :locals => {:ques_num => q_number, :ques_text => question.txt, :options => dd_values, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
       end
-    end
+  end
 end

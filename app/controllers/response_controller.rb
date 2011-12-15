@@ -21,6 +21,7 @@ class ResponseController < ApplicationController
   end
   
   def edit
+
     @header = "Edit"
     @next_action = "update"
     @return = params[:return]
@@ -37,19 +38,24 @@ class ResponseController < ApplicationController
     }
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
-    if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
-      if @assignment.id < 469
-         @next_action = "custom_update"
-         render :action => 'custom_response'
-     else
-         @next_action = "custom_update"
-         render :action => 'custom_response_2011'
-     end
+    if User.find_by_name("jkidd")
+      if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
+        if @assignment.id < 469
+          @next_action = "custom_update"
+          render :action => 'custom_response'
+        else
+          @next_action = "custom_update"
+          render :action => 'custom_response_2011'
+        end
+      else
+        # end of special code (except for the end below, to match the if above)
+        #**********************
+        render :action => 'response'
+      end
     else
-      # end of special code (except for the end below, to match the if above)
-      #**********************
-      render :action => 'response'
+        render :action => 'response'
     end
+
   end  
   
   def update
@@ -57,7 +63,7 @@ class ResponseController < ApplicationController
     return if redirect_when_disallowed(@response)
     @myid = @response.id
     msg = ""
-    begin 
+    begin
       @myid = @response.id
       @map = @response.map
       @response.update_attribute('additional_comment',params[:review][:comments])
@@ -67,21 +73,23 @@ class ResponseController < ApplicationController
      
      
       params[:responses].each_pair do |k,v|
-      
+=begin
         score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
           if(score == nil)
            score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
           end
         score.update_attribute('score',v[:score])
         score.update_attribute('comments',v[:comment])
-     end    
+=end
+     end
+
     rescue
       msg = "Your response was not saved. Cause: "+ $!
     end
 
     begin
-       ResponseHelper.compare_scores(@response, @questionnaire)
-       ScoreCache.update_cache(@response.id)
+      # ResponseHelper.compare_scores(@response, @questionnaire)
+      # ScoreCache.update_cache(@response.id)
     
       msg = "Your response was successfully saved."
     rescue
@@ -162,26 +170,30 @@ class ResponseController < ApplicationController
     @res = 0
     msg = ""
     error_msg = ""
+    puts "Check if the map is null"
+    puts @map
     begin      
       @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
       @res = @response.id
       @questionnaire = @map.questionnaire
+      puts "Check questionnaire"
+      puts @questionnaire
       questions = @questionnaire.questions     
       params[:responses].each_pair do |k,v|
         score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
       end  
     rescue
-      error_msg = "Your response was not saved. Cause: " + $!
+      error_msg = "Your response was not saved. Cause1: " + $!
     end
     
     begin
-      ResponseHelper.compare_scores(@response, @questionnaire)
-      ScoreCache.update_cache(@res)
+      #ResponseHelper.compare_scores(@response, @questionnaire)
+      #ScoreCache.update_cache(@res)
       @map.save
       msg = "Your response was successfully saved."
     rescue
       @response.delete
-      error_msg = "Your response was not saved. Cause: " + $!
+      error_msg = "Your response was not saved. Cause2: " + $!
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg
   end      

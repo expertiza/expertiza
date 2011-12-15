@@ -18,12 +18,12 @@
     <orderEntry type="library" scope="PROVIDED" name="rbx-require-relative (v0.0.5, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="json (v1.4.6, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rake (v0.9.2, ruby-1.8.7-p352) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="bundler (v1.0.21, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="columnize (v0.3.3, ruby-1.8.7-p352) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="bundler (v1.0.21, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="fastercsv (v1.5.4, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rdoc (v3.11, ruby-1.8.7-p352) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="activerecord (v2.3.14, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby-debug-base (v0.10.4, ruby-1.8.7-p352) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="activerecord (v2.3.14, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="nokogiri (v1.5.0, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="gdata (v1.1.2, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="childprocess (v0.2.2, ruby-1.8.7-p352) [gem]" level="application" />
@@ -58,8 +58,8 @@
     <orderEntry type="library" scope="PROVIDED" name="capybara (v0.3.9, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="database_cleaner (v0.6.7, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="highline (v1.6.2, ruby-1.8.7-p352) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="selenium-webdriver (v2.7.0, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rack-test (v0.6.1, ruby-1.8.7-p352) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="selenium-webdriver (v2.7.0, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mongrel (v1.1.5, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="expertiza-authlogic (v2.1.6.1, ruby-1.8.7-p352) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="json_pure (v1.6.1, ruby-1.8.7-p352) [gem]" level="application" />

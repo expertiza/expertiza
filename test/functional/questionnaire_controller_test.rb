@@ -24,7 +24,7 @@ class QuestionnaireControllerTest < ActionController::TestCase
     @request.session[:credentials] = Role.find(roleid).cache[:credentials]
     AuthController.set_current_role(roleid,@request.session)
   end
-  #901 edit an questionnaire’s data
+  #901 edit an questionnaireï¿½s data
   def test_edit_questionnaire
     post :edit, {:id => @Questionnaire, :save => true, 
                        :questionnaire => {:name => "test edit name", 
@@ -34,7 +34,43 @@ class QuestionnaireControllerTest < ActionController::TestCase
     assert_response(:success)
     assert_not_nil(Questionnaire.find(:first, :conditions => ["name = ?", "test edit name"]))
   end
-  
+
+  def test_add_checkbox_option
+    post :create_questionnaire, { :questionnaire => {:name => "test create name",
+                                   :type => "ReviewQuestionnaire",
+                                   :instructor_id => users(:instructor1).id ,
+                                   :private => 0,
+                                   :min_question_score => 1,
+                                   :max_question_score => 3,
+                                   :display_type => "Review" },
+                                   :new_question => { 1 => {:txt => "This is the question", :true_false => "checkbox"} },
+
+                                   :checkbox_option => {1 => {0 => {:option_text => "Checkbox option test create" } ,
+                                                             1 => {:option_text => "Checkbox option 2"} }
+                                                       }
+                                }
+    assert_redirected_to(:controller => "tree_display",:action => "list")
+    assert_not_nil(QuestionOption.find(:first, :conditions => ["option_text = ?", "Checkbox option test create"]))
+  end
+
+  def test_add_radio_option
+    post :create_questionnaire, { :questionnaire => {:name => "test create name",
+                                   :type => "ReviewQuestionnaire",
+                                   :instructor_id => users(:instructor1).id ,
+                                   :private => 0,
+                                   :min_question_score => 1,
+                                   :max_question_score => 3,
+                                   :display_type => "Review" },
+                                   :new_question => { 1 => {:txt => "This is the question", :true_false => "radio"} },
+
+                                   :radio_option => {1 => {0 => {:option_text => "Radio option test create" } ,
+                                                             1 => {:option_text => "Radio option 2"} }
+                                                       }
+                                }
+    assert_redirected_to(:controller => "tree_display",:action => "list")
+    assert_not_nil(QuestionOption.find(:first, :conditions => ["option_text = ?", "Radio option test create"]))
+  end
+
   # 901
   def test_edit_Questionnaire_with_existing_name
    # It will raise an error while execute render method in controller

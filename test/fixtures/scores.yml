@@ -1,8 +1,9 @@
 score0:
-  instance_id: <%= Fixtures.identify(:review0) %>
+
   question_id: <%= Fixtures.identify(:question1) %>
   comments: "testing this stuff - q1"
+
 score1:
-  instance_id: <%= Fixtures.identify(:review0) %>
+
   question_id: <%= Fixtures.identify(:question3) %>
   comments: "testing this stuff - q3"

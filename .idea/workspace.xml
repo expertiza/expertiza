@@ -5,16 +5,12 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.ids" afterPath="$PROJECT_DIR$/.idea/dataSources.ids" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/expertiza.iml" afterPath="$PROJECT_DIR$/.idea/expertiza.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/questionnaire_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/questionnaire_controller.rb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/response_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/response_controller.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/question.rb" afterPath="$PROJECT_DIR$/app/models/question.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/questionnaire/_questionnaire.html.erb" afterPath="$PROJECT_DIR$/app/views/questionnaire/_questionnaire.html.erb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/questionnaire/_scripts.html.erb" afterPath="$PROJECT_DIR$/app/views/questionnaire/_scripts.html.erb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/questionnaire/view.html.erb" afterPath="$PROJECT_DIR$/app/views/questionnaire/view.html.erb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/response/response.html.erb" afterPath="$PROJECT_DIR$/app/views/response/response.html.erb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/routes.rb" afterPath="$PROJECT_DIR$/config/routes.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/migrate/015_create_questions.rb" afterPath="$PROJECT_DIR$/db/migrate/015_create_questions.rb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/schema.rb" afterPath="$PROJECT_DIR$/db/schema.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/fixtures/question_options.yml" afterPath="$PROJECT_DIR$/test/fixtures/question_options.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/fixtures/questions.yml" afterPath="$PROJECT_DIR$/test/fixtures/questions.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/fixtures/scores.yml" afterPath="$PROJECT_DIR$/test/fixtures/scores.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/functional/questionnaire_controller_test.rb" afterPath="$PROJECT_DIR$/test/functional/questionnaire_controller_test.rb" />
     </list>
     <ignored path="expertiza.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -44,43 +40,34 @@
       <file leaf-file-name="_scripts.html.erb" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/views/questionnaire/_scripts.html.erb">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="166" column="51" selection-start="6943" selection-end="6943" vertical-scroll-proportion="0.0">
+            <state line="12" column="31" selection-start="502" selection-end="502" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="edit.html.erb" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/views/questionnaire/edit.html.erb">
+      <file leaf-file-name="questionnaires.yml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/fixtures/questionnaires.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="0" selection-start="778" selection-end="778" vertical-scroll-proportion="0.0">
+            <state line="7" column="19" selection-start="194" selection-end="194" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="response.html.erb" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="response.html.erb" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/views/response/response.html.erb">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="39" column="21" selection-start="1780" selection-end="1780" vertical-scroll-proportion="-10.461538">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="view.html.erb" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/views/questionnaire/view.html.erb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="0" selection-start="78" selection-end="78" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="response_controller.rb" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="response_controller.rb" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/controllers/response_controller.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="183" column="0" selection-start="5936" selection-end="5936" vertical-scroll-proportion="2.3032258">
+            <state line="91" column="7" selection-start="2696" selection-end="2696" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -88,31 +75,6 @@
       </file>
       <file leaf-file-name="pg_development..responses" pinned="false" current="false" current-in-tab="false">
         <entry file="dbDummy://dbElement:/ca8d21c3/ef662621-996f-48d8-9883-a6c316ad647e/pg_development..responses">
-          <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="_questionnaire.html.erb" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/views/questionnaire/_questionnaire.html.erb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="53" column="66" selection-start="1969" selection-end="1969" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="questionnaire_controller.rb" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/controllers/questionnaire_controller.rb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="282" column="31" selection-start="10058" selection-end="10058" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pg_development..questionnaires" pinned="false" current="false" current-in-tab="false">
-        <entry file="dbDummy://dbElement:/ca8d21c3/ef662621-996f-48d8-9883-a6c316ad647e/pg_development..questionnaires">
           <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
             <state />
           </provider>
@@ -135,11 +97,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/config/database.yml" />
-        <option value="$PROJECT_DIR$/vendor/plugins/craken/lib/craken.rb" />
-        <option value="$PROJECT_DIR$/Rakefile" />
-        <option value="$PROJECT_DIR$/Gemfile" />
-        <option value="$PROJECT_DIR$/app/models/assignment.rb" />
         <option value="$PROJECT_DIR$/db/migrate/015_create_questions.rb" />
         <option value="$PROJECT_DIR$/db/migrate/20111129193300_create_question_options.rb" />
         <option value="$PROJECT_DIR$/app/views/questionnaire/new.html.erb" />
@@ -149,8 +106,13 @@
         <option value="$PROJECT_DIR$/app/controllers/questionnaire_controller.rb" />
         <option value="$PROJECT_DIR$/app/views/questionnaire/view.html.erb" />
         <option value="/Rails expertiza: development" />
-        <option value="$PROJECT_DIR$/app/controllers/response_controller.rb" />
         <option value="$PROJECT_DIR$/app/views/response/response.html.erb" />
+        <option value="$PROJECT_DIR$/app/controllers/questions_controller.rb" />
+        <option value="$PROJECT_DIR$/test/fixtures/questions.yml" />
+        <option value="$PROJECT_DIR$/test/fixtures/question_options.yml" />
+        <option value="$PROJECT_DIR$/test/fixtures/scores.yml" />
+        <option value="$PROJECT_DIR$/test/functional/questionnaire_controller_test.rb" />
+        <option value="$PROJECT_DIR$/app/controllers/response_controller.rb" />
       </list>
     </option>
   </component>
@@ -187,9 +149,7 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Favorites" />
       <pane id="Scope" />
-      <pane id="RailsProjectView" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -205,6 +165,46 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="expertiza" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="expertiza" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="expertiza" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="views" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="expertiza" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="expertiza" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="views" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="response" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -242,6 +242,8 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="RailsProjectView" />
+      <pane id="Favorites" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -251,8 +253,8 @@
     <property name="RailsGeneratorsPopup.hiddenIncluded" value="false" />
     <property name="dynamic.classpath" value="false" />
   </component>
-  <component name="RunManager" selected="Rails.Development: expertiza">
-    <configuration default="false" name="db:migrate" type="RakeRunConfigurationType" factoryName="Rake" temporary="true">
+  <component name="RunManager" selected="Query Language Console.Default">
+    <configuration default="false" name="db:fixtures:load" type="RakeRunConfigurationType" factoryName="Rake" temporary="true">
       <module name="expertiza" />
       <RAKE_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
       <RAKE_RUN_CONFIG_SETTINGS_ID NAME="WORK DIR" VALUE="$PROJECT_DIR$" />
@@ -260,11 +262,11 @@
       <RAKE_RUN_CONFIG_SETTINGS_ID NAME="ALTERN_SDK_NAME" VALUE="" />
       <RAKE_RUN_CONFIG_SETTINGS_ID NAME="myPassParentEnvs" VALUE="true" />
       <envs>
-        <env name="RAILS_ENV" value="development" />
+        <env name="RAILS_ENV" value="test" />
       </envs>
       <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="false" />
       <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" track_test_folders="true" runner="rcov" />
-      <RAKE_RUN_CONFIG_SETTINGS_ID NAME="RAKE_TASK_NAME" VALUE="db:migrate" />
+      <RAKE_RUN_CONFIG_SETTINGS_ID NAME="RAKE_TASK_NAME" VALUE="db:fixtures:load" />
       <RAKE_RUN_CONFIG_SETTINGS_ID NAME="RAKE_TASK_ARGS" VALUE="" />
       <RAKE_RUN_CONFIG_SETTINGS_ID NAME="RAKE_TASK_ATTACHED_TEST_FRAMEWORKS" VALUE="" />
       <RAKE_RUN_CONFIG_SETTINGS_ID NAME="RAKE_TASK_OPTION_TRACE" VALUE="false" />
@@ -274,12 +276,88 @@
       <ConfigurationWrapper RunnerId="RubyRunner" />
       <method />
     </configuration>
+    <configuration default="false" name="test_add_checkbox_option" type="TestUnitRunConfigurationType" factoryName="Test::Unit/Shoulda" temporary="true">
+      <predefined_log_file id="RUBY_TESTUNIT" enabled="true" />
+      <module name="expertiza" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift) -Itest" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="WORK DIR" VALUE="$PROJECT_DIR$" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="SHOULD_USE_SDK" VALUE="false" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="ALTERN_SDK_NAME" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="myPassParentEnvs" VALUE="true" />
+      <envs>
+        <env name="RAILS_ENV" value="test" />
+        <env name="JRUBY_OPTS" value="-X+O" />
+      </envs>
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="true" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" track_test_folders="true" runner="rcov" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TESTS_FOLDER_PATH" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_SCRIPT_PATH" VALUE="$PROJECT_DIR$/test/functional/questionnaire_controller_test.rb" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_CLASS_NAME" VALUE="QuestionnaireControllerTest" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_FILE_MASK" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_METHOD_NAME" VALUE="test_add_checkbox_option" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_TEST_TYPE" VALUE="TEST_METHOD" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="INHERITANCE_CHECK_DISABLED" VALUE="false" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="DRB" VALUE="false" />
+      <RunnerSettings RunnerId="RubyRunner" />
+      <ConfigurationWrapper RunnerId="RubyRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="test_add_radio_option" type="TestUnitRunConfigurationType" factoryName="Test::Unit/Shoulda" temporary="true">
+      <predefined_log_file id="RUBY_TESTUNIT" enabled="true" />
+      <module name="expertiza" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift) -Itest" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="WORK DIR" VALUE="$PROJECT_DIR$" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="SHOULD_USE_SDK" VALUE="false" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="ALTERN_SDK_NAME" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="myPassParentEnvs" VALUE="true" />
+      <envs>
+        <env name="RAILS_ENV" value="test" />
+        <env name="JRUBY_OPTS" value="-X+O" />
+      </envs>
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="true" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" track_test_folders="true" runner="rcov" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TESTS_FOLDER_PATH" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_SCRIPT_PATH" VALUE="$PROJECT_DIR$/test/functional/questionnaire_controller_test.rb" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_CLASS_NAME" VALUE="QuestionnaireControllerTest" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_FILE_MASK" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_METHOD_NAME" VALUE="test_add_radio_option" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_TEST_TYPE" VALUE="TEST_METHOD" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="INHERITANCE_CHECK_DISABLED" VALUE="false" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="DRB" VALUE="false" />
+      <RunnerSettings RunnerId="RubyRunner" />
+      <ConfigurationWrapper RunnerId="RubyRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="questionnaire_controller_test" type="TestUnitRunConfigurationType" factoryName="Test::Unit/Shoulda" temporary="true">
+      <predefined_log_file id="RUBY_TESTUNIT" enabled="true" />
+      <module name="expertiza" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift) -Itest" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="WORK DIR" VALUE="$PROJECT_DIR$" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="SHOULD_USE_SDK" VALUE="false" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="ALTERN_SDK_NAME" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="myPassParentEnvs" VALUE="true" />
+      <envs>
+        <env name="RAILS_ENV" value="test" />
+        <env name="JRUBY_OPTS" value="-X+O" />
+      </envs>
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="true" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" track_test_folders="true" runner="rcov" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TESTS_FOLDER_PATH" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_SCRIPT_PATH" VALUE="$PROJECT_DIR$/test/functional/questionnaire_controller_test.rb" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_CLASS_NAME" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_FILE_MASK" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_METHOD_NAME" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_TEST_TYPE" VALUE="TEST_SCRIPT" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="INHERITANCE_CHECK_DISABLED" VALUE="false" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="DRB" VALUE="false" />
+      <RunnerSettings RunnerId="RubyRunner" />
+      <ConfigurationWrapper RunnerId="RubyRunner" />
+      <method />
+    </configuration>
     <configuration default="false" name="Default" type="com.intellij.persistence.run.ConsoleRunConfigurationType" factoryName="Query Language Console" temporary="true">
       <option name="VM_PARAMETERS" value="" />
       <option name="USER_CFG_CLASS" />
       <option name="CONTEXT_PROVIDER" />
-      <RunnerSettings RunnerId="Basic" />
-      <ConfigurationWrapper RunnerId="Basic" />
       <method />
     </configuration>
     <configuration default="true" type="RakeRunConfigurationType" factoryName="Rake">
@@ -498,13 +576,16 @@
       <RAKE_RUN_CONFIG_SETTINGS_ID NAME="RAKE_TASK_OPTION_PREREQS" VALUE="false" />
       <method />
     </configuration>
-    <list size="6">
+    <list size="9">
       <item index="0" class="java.lang.String" itemvalue="Rails.Development: expertiza" />
       <item index="1" class="java.lang.String" itemvalue="Rails.Production: expertiza" />
       <item index="2" class="java.lang.String" itemvalue="Rake.spec" />
       <item index="3" class="java.lang.String" itemvalue="Rake.test" />
-      <item index="4" class="java.lang.String" itemvalue="Rake.db:migrate" />
-      <item index="5" class="java.lang.String" itemvalue="Query Language Console.Default" />
+      <item index="4" class="java.lang.String" itemvalue="Rake.db:fixtures:load" />
+      <item index="5" class="java.lang.String" itemvalue="Test::Unit/Shoulda.test_add_checkbox_option" />
+      <item index="6" class="java.lang.String" itemvalue="Test::Unit/Shoulda.test_add_radio_option" />
+      <item index="7" class="java.lang.String" itemvalue="Test::Unit/Shoulda.questionnaire_controller_test" />
+      <item index="8" class="java.lang.String" itemvalue="Query Language Console.Default" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
@@ -558,14 +639,14 @@
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3297953" sideWeight="0.40487805" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26666668" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19029568" sideWeight="0.8552846" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33333334" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3284553" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22137983" sideWeight="0.21626016" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22592874" sideWeight="0.40487805" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19560273" sideWeight="0.8552846" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.595122" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.14471544" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3398374" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -621,96 +702,88 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/models/assignment.rb">
+    <entry file="file://$PROJECT_DIR$/app/controllers/questions_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+        <state line="9" column="15" selection-start="274" selection-end="274" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/rubystubs18/module.rb">
+    <entry file="file://$PROJECT_DIR$/test/fixtures/questions.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="505" column="6" selection-start="12661" selection-end="12661" vertical-scroll-proportion="0.046195652" />
+        <state line="2" column="6" selection-start="90" selection-end="90" vertical-scroll-proportion="0.06910569" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/question.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="77" selection-start="1014" selection-end="1014" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/questionnaire/list.html.erb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="0" selection-start="294" selection-end="294" vertical-scroll-proportion="-0.65384614" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/questionnaire/list_questionnaires.html.erb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/questionnaire/new.html.erb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/response/view.html.erb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/questionnaire/_scripts.html.erb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="166" column="51" selection-start="6943" selection-end="6943" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/questionnaire/edit.html.erb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="0" selection-start="778" selection-end="778" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/questionnaire/view.html.erb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="0" selection-start="78" selection-end="78" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="dbDummy://dbElement:/ca8d21c3/ef662621-996f-48d8-9883-a6c316ad647e/pg_development..responses">
+    <entry file="dbDummy://dbElement:/ca8d21c3/0aea55d7-4a54-4310-9343-d0f8c93ae6e5/pg_test..questions">
       <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/questionnaire/_questionnaire.html.erb">
+    <entry file="dbDummy://dbElement:/ca8d21c3/0aea55d7-4a54-4310-9343-d0f8c93ae6e5/pg_test..question_options">
+      <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/functional/questionnaire_controller_test.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="66" selection-start="1969" selection-end="1969" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="59" column="30" selection-start="2836" selection-end="2836" vertical-scroll-proportion="0.9085873" />
+      </provider>
+    </entry>
+    <entry file="dbDummy://dbElement:/ca8d21c3/0aea55d7-4a54-4310-9343-d0f8c93ae6e5/pg_test..questionnaires">
+      <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/fixtures/users.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="dbDummy://dbElement:/ca8d21c3/0aea55d7-4a54-4310-9343-d0f8c93ae6e5/pg_test..scores">
+      <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/fixtures/question_options.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="42" selection-start="351" selection-end="351" vertical-scroll-proportion="0.28911564" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/questionnaire_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="282" column="31" selection-start="10058" selection-end="10058" vertical-scroll-proportion="0.0" />
+        <state line="208" column="49" selection-start="7478" selection-end="7478" vertical-scroll-proportion="0.97115386" />
       </provider>
     </entry>
-    <entry file="dbDummy://dbElement:/ca8d21c3/ef662621-996f-48d8-9883-a6c316ad647e/pg_development..questionnaires">
-      <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
-        <state />
+    <entry file="file://$PROJECT_DIR$/app/views/response/view.html.erb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="34" selection-start="1009" selection-end="1009" vertical-scroll-proportion="0.9230769" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/questionnaire/_scripts.html.erb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="31" selection-start="502" selection-end="502" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/fixtures/questionnaires.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="19" selection-start="194" selection-end="194" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/response/response.html.erb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="21" selection-start="1780" selection-end="1780" vertical-scroll-proportion="-10.461538">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/response_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="183" column="0" selection-start="5936" selection-end="5936" vertical-scroll-proportion="2.3032258">
-          <folding />
-        </state>
+        <state line="91" column="7" selection-start="2696" selection-end="2696" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="dbDummy://dbElement:/ca8d21c3/ef662621-996f-48d8-9883-a6c316ad647e/pg_development..responses">
+      <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
+        <state />
       </provider>
     </entry>
   </component>

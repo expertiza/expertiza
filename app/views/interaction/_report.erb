@@ -1,20 +1,28 @@
+<!--input for team for which help was given -->
 <div class="ss-item  ss-text"><div class="ss-form-entry">
-  <label class="ss-q-title" for="entry_0">The Team that was helped:
+  <label class="ss-q-title" for="entry_0">The project number on which help was given:
   </label><br>
   <td style="padding:50px">
-          <% if interaction.team_id %>
-                  <% selected = Team.find(interaction.team_id) %>
-                  <%end %>
-    <select style="width:250px" name="teams">
-            <% Team.find(:all, :conditions => ['parent_id = ?',assignment_id],:order => "name").each do | team | %>
-                    <% if team.id != @my_team_id %>
-                            <option value="<%=team.name%>" <% if selected != nil and team.name == selected.name%>selected="yes"<%end%>><%=team.name %></option>
-                    <% end %>
-            <% end %>
-    </select>
-  </td>
-  <br><br>
-</div></div>
+    <% if (@type=='helper')%>
+        <!--if helper then display drop down box for selection of team for which help was given-->
+
+        <% selected = Team.find_by_parent_id(assignment_id) %>
+        <select style="width:250px" name="teams">
+          <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
+          <% Team.find(:all, :conditions => ['parent_id = ?',assignment_id],:order => "name").each{| team | %>
+              <option value="<%=team.name%>" <% if selected != nil and team.name == selected.name%>selected="yes"<%end%>><%=team.name %></option>
+          <% } %>
+        </select>
+        </div></div>
+    <% elsif (@type=='helpee') %>
+        <!--if helpee then display the team-->
+        <% user =Participant.first(:conditions => ['parent_id = ? AND id = ?',assignment_id,id])%>
+        <input type="text" name="helpeeTeam" disabled="disabled" maxlength=10 value=<%=user.team.name%>>
+        <br><br>
+        </div></div>
+    <%end%>
+    </td>
+
 
 <% if(@type=='helpee') %>
     <div class="ss-item  ss-text"><div class="ss-form-entry">

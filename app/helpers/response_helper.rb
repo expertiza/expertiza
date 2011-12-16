@@ -66,7 +66,7 @@ module ResponseHelper
     table_hash = {"table_title" => nil, "table_headers" => nil, "start_table" => false, "start_col" => false, "end_col" => false, "end_table" => false}
 
     #we need to check if these parameters use tables
-    if !parameters.last.include? "\d*|\d*|\d*|\d*"
+    #if !parameters.last.include? "\d*|\d*|\d*|\d*"
       parameters = parameters.last(3)
       current_ques = parameters[2].split("|")[0]
       total_col_ques = parameters[2].split("|")[1]
@@ -95,7 +95,7 @@ module ResponseHelper
           table_hash["end_table"] = true
         end
       end
-    end
+    #end
     table_hash
   end
 
@@ -110,7 +110,9 @@ module ResponseHelper
         #section::tableTitle::tableHeader1|tableHeader2::curr_col_ques|total_col_ques|curr_col|max_cols
 
         #look for table parameters
-        table_hash = construct_table(ques_type.parameters.split("::"))
+        if ques_type.parameters.split("::")[3]
+          table_hash = construct_table(ques_type.parameters.split("::"))
+        end
 
         #check to see if rendering view
         view_output = nil
@@ -168,7 +170,9 @@ module ResponseHelper
         end
 
         #look for table parameters
-        table_hash = construct_table(q_parameter)
+        if ques_type.parameters.split("::")[4]
+          table_hash = construct_table(q_parameter)
+        end
 
         #check to see if rendering view
         view_output = nil
@@ -206,7 +210,9 @@ module ResponseHelper
         end
 
         #look for table parameters
-        table_hash = construct_table(q_parameter)
+        if ques_type.parameters.split("::")[4]
+          table_hash = construct_table(q_parameter)
+        end
 
         #check to see if rendering view
         view_output = nil

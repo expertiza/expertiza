@@ -1,0 +1,19 @@
+HelperInteraction1:
+  participant_id: <%= Fixtures.identify(:par0) %>
+  team_id: <%= Fixtures.identify(:team3) %>
+  comments: deploying project
+  interaction_datetime: Time.new
+  number_of_minutes: 30
+  status: Not Confirmed
+  type: HelperInteraction
+
+HelpeeInteraction1:
+  participant_id: <%= Fixtures.identify(:par0) %>
+  team_id: <%= Fixtures.identify(:team2) %>
+  comments: deploying project
+  score: 4
+  interaction_datetime: Time.new
+  number_of_minutes: 30
+  status: Not Confirmed
+  type: HelpeeInteraction
+

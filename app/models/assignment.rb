@@ -651,6 +651,16 @@ class Assignment < ActiveRecord::Base
     self.questionnaires.each do |questionnaire|
       total += questionnaire.get_weighted_score(self, scores)
     end
+
+    if(scores[:interactions])
+      if scores[:interactions][:scores][:achieved] >  scores[:interactions][:scores][:max]
+          total +=  scores[:interactions][:scores][:weightage]
+      else
+          total += scores[:interactions][:scores][:achieved] * scores[:interactions][:scores][:weightage]/scores[:interactions][:scores][:max]
+
+      end
+    end
+
     return total
   end
 

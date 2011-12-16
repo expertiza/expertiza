@@ -4,8 +4,6 @@ class InteractionController < ApplicationController
   def instructor_view
 
     @teams=Team.find_all_by_parent_id(params[:id])    # get all teams in curent assignment
-    p params[:id]
-    p @teams
     @interactions=Array.new
     @participant_helped=Array.new
     @team_helped=Array.new
@@ -14,8 +12,6 @@ class InteractionController < ApplicationController
       @participant_helped += HelperInteraction.find_all_by_team_id(team.id)
       @team_helped += HelpeeInteraction.find_all_by_team_id(team.id)
     end
-    p @participant_helped
-    p @team_helped
     render  'instructor_view', :id=>params[:id],:locals => {:id=>params[:id],:expanded => (params[:expanded])}
   end
 
@@ -61,12 +57,6 @@ class InteractionController < ApplicationController
                           @helper_participant=Participant.first(:conditions => ['parent_id = ? and user_id = ?',params[:assign],@helper_user])
                           @selected_team=Team.find(Participant.find(session[:participant_id]).team.id)
                           @helpee_record = HelpeeInteraction.first(:conditions => ["participant_id = ? AND team_id = ?", @helper_participant, @selected_team.id])
-                          p "!!!!!!!!!!"
-                          p @helper_user
-                          p @selected_team
-                          #Make sure that the helper is not in the same team ;)
-                          @team_user = TeamsUser.first(:conditions => ['team_id = ? and user_id = ?', @selected_team.id, @helper_user])
-                          p @team_user
                           if !TeamsUser.first(:conditions => ['team_id = ? and user_id = ?', @selected_team.id, @helper_user])
 
                                   # check if current helpee interaction already exists
@@ -176,7 +166,6 @@ class InteractionController < ApplicationController
     @participant_id = params[:id]
     @my_team_id = Participant.find(@participant_id).team.id
     @my_team = Team.find(@my_team_id)
-    p @my_team.name
     @interaction = params[:interaction]
     if(params[:type]=='helper')
             if !@interaction 

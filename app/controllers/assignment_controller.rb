@@ -247,6 +247,10 @@ class AssignmentController < ApplicationController
       @limits[questionnaire.symbol] = aq.notification_limit
       @weights[questionnaire.symbol] = aq.questionnaire_weight
     }
+    if InteractionWeight.find_by_assignment_id(@assignment.id)
+      @weights[:interaction]=InteractionWeight.find_by_assignment_id(@assignment.id).weight
+      @limits[:interaction]=InteractionWeight.find_by_assignment_id(@assignment.id).max_score
+    end
   end
 
   def set_limits_and_weights

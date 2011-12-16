@@ -223,11 +223,12 @@ class InteractionController < ApplicationController
   end
 
   def update_advice
-    flash[:notice] = InteractionAdvice.update_advice(params[:advices],params[:assign])
-    if !flash[:notice].nil?
+    flash[:alert] = InteractionAdvice.update_advice(params[:advices],params[:assign])
+    p'abcd'
+    if !flash[:alert].nil?
       redirect_to :controller => :interaction , :action => :edit_advice ,:id => params[:assign]
     else
-      flash[:notice] = "Advice added sucessfully"
+      flash[:note] = "Advice added sucessfully"
       redirect_to :controller => :assignment , :action => :edit ,:id => params[:assign]
     end
   end

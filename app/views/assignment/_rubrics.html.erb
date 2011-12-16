@@ -88,10 +88,10 @@
   <tr id="interaction_review" <%if !@assignment.team_assignment %>style="display:none"<% end %>>
    <td>Interaction Review:</td>
    <td style="padding: 15px;">
-       Maximum Score:  <input id="limits_interaction" name="limits[interaction]" size="5" type="text" value="<%= @limits[:interaction] %>"/>%
+       Maximum Score:  <input id="limits_interaction" name="limits[interaction]" size="5" type="text" value="<%= @limits[:interaction] %>"/>
      </td>
     <td style="padding: 15px;">
-         <input id="weights_interaction" name="weights[interaction]" size="5" type="text" value="<%= @weights[:interaction] %>"/>%
+       Weight:  <input id="weights_interaction" name="weights[interaction]" size="5" type="text" value="<%= @weights[:interaction] %>"/>%
      </td>
     <td >
       <%= link_to "Add Advice",{:controller => 'interaction' ,:action => 'edit_advice', :id => @assignment.id} %>

@@ -1,7 +1,7 @@
 <%= render :partial => 'scripts' %>
 
-<% if flash[:notice] %>
-    <div class="flash_note"><%= flash[:notice] %></div>
+<% if flash[:alert] %>
+    <div class="flash_note"><%= flash[:alert] %></div>
 <% end %>
 <h1>Edit advice for Interaction</h1>
 <% form_tag :action => 'update_advice'  do %>

@@ -66,7 +66,7 @@ module ResponseHelper
     table_hash = {"table_title" => nil, "table_headers" => nil, "start_table" => false, "start_col" => false, "end_col" => false, "end_table" => false}
 
     #we need to check if these parameters use tables
-    if !parameters.split("::")[4].nil?
+    if !parameters.last.include? "\d*|\d*|\d*|\d*"
       parameters = parameters.last(3)
       current_ques = parameters[2].split("|")[0]
       total_col_ques = parameters[2].split("|")[1]

@@ -61,48 +61,70 @@ class InteractionController < ApplicationController
                           @helper_participant=Participant.first(:conditions => ['parent_id = ? and user_id = ?',params[:assign],@helper_user])
                           @selected_team=Team.find(Participant.find(session[:participant_id]).team.id)
                           @helpee_record = HelpeeInteraction.first(:conditions => ["participant_id = ? AND team_id = ?", @helper_participant, @selected_team.id])
-       
+                          p "!!!!!!!!!!"
+                          p @helper_user
+                          p @selected_team
+                          #Make sure that the helper is not in the same team ;)
+                          @team_user = TeamsUser.first(:conditions => ['team_id = ? and user_id = ?', @selected_team.id, @helper_user])
+                          p @team_user
+                          if !TeamsUser.first(:conditions => ['team_id = ? and user_id = ?', @selected_team.id, @helper_user])
 
-                          # check if current helpee interaction already exists
-                          if !@helpee_record
-                                  @interaction = HelpeeInteraction.new(params[:interactions])
-                                  @interaction.interaction_datetime = params[:interaction_date]
-                                  @interaction.team_id = @selected_team.id
-                                  @interaction.score = params[:score]
-                                  @interaction.participant_id=@helper_participant.id
-                                  @interaction.status='Not Confirmed'
-                                  
-                                  # on save check if helper has already filled the form.If yes then set status of helper and helpee to 'Confirmed'
-                                  if @interaction.save
-                                          @helper_record = HelperInteraction.first(:conditions => ["participant_id = ? AND team_id = ?", 
-                                                                                   @interaction.participant_id,@interaction.team_id ])
-                                          if @helper_record
-                                                  @helpee_record=HelpeeInteraction.first(:conditions => ["participant_id = ? AND team_id = ?", 
-                                                                                         @interaction.participant_id,@interaction.team_id ])
-                                                  @helpee_record.update_attribute('status','Confirmed')
-                                                  @helper_record.update_attribute('status','Confirmed')
+                                  # check if current helpee interaction already exists
+                                  if !@helpee_record
+                                          @interaction = HelpeeInteraction.new(params[:interactions])
+                                          @interaction.interaction_datetime = params[:interaction_date]
+                                          @interaction.team_id = @selected_team.id
+                                          @interaction.score = params[:score]
+                                          @interaction.participant_id=@helper_participant.id
+                                          @interaction.status='Not Confirmed'
+                                          
+                                          # on save check if helper has already filled the form.If yes then set status of helper and helpee to 'Confirmed'
+                                          if @interaction.save
+                                                  @helper_record = HelperInteraction.first(:conditions => ["participant_id = ? AND team_id = ?", 
+                                                                                           @interaction.participant_id,@interaction.team_id ])
+                                                  if @helper_record
+                                                          @helpee_record=HelpeeInteraction.first(:conditions => ["participant_id = ? AND team_id = ?", 
+                                                                                                 @interaction.participant_id,@interaction.team_id ])
+                                                          @helpee_record.update_attribute('status','Confirmed')
+                                                          @helper_record.update_attribute('status','Confirmed')
+                                                  end
+                                          flash[:note] =" Interaction created successfully."
+                                          redirect_to :controller=>'interaction', :action=>'view',:assignment=>params[:assign], :id=>session[:participant_id]
+                                          else
+                                                  @error = ""
+                                                  @assignment = params[:assign]
+                                                  @user_name = params[:helper].to_s
+                                                  @type = params[:type]
+                                                  @id = session[:participant_id]
+                                                  @participant_id = session[:participant_id]
+                                                  @my_team_id = Participant.find(@participant_id).team.id
+                                                  @my_team = Team.find(@my_team_id)
+                                                  @advices = InteractionAdvice.find_all_by_assignment_id(params[:assignment_id])
+                                                  @advices = @advices.sort{|x,y|x.score<=>y.score}
+                                                  @interaction.errors.each { |err| @error += err[1]  + "</br>"}
+                                                  flash[:alert] = @error
+                                                  render :action => 'new' , 
+                                                          :assignment_id=>params[:assign], 
+                                                          :type=>params[:type], :id=>session[:participant_id], :interaction => @interaction
                                           end
-                                  flash[:note] =" Interaction created successfully."
-                                  redirect_to :controller=>'interaction', :action=>'view',:assignment=>params[:assign], :id=>session[:participant_id]
                                   else
-                                          @error = ""
-                                          @assignment = params[:assign]
-                                          @user_name = params[:helper].to_s
-                                          @type = params[:type]
-                                          @id = session[:participant_id]
-                                          @participant_id = session[:participant_id]
-                                          @my_team_id = Participant.find(@participant_id).team.id
-                                          @my_team = Team.find(@my_team_id)
-                                          @advices = InteractionAdvice.find_all_by_assignment_id(params[:assignment_id])
-                                          @advices = @advices.sort{|x,y|x.score<=>y.score}
-                                          @interaction.errors.each { |err| @error += err[1]  + "</br>"}
-                                          flash[:alert] = @error
-                                          render :action => 'new' , 
-                                                  :assignment_id=>params[:assign], :type=>params[:type], :id=>session[:participant_id], :interaction => @interaction
+                                          flash[:alert] = "Interaction already reported."
+                                          redirect_to :controller=>'interaction', :action=>'view', :id=>session[:participant_id]
                                   end
                           else
-                                  flash[:alert] = "Interaction already reported."
-                                  redirect_to :controller=>'interaction', :action=>'view', :id=>session[:participant_id]
+                                  @user_name = params[:helper].to_s
+                                  @assignment = params[:assign]
+                                  @type = params[:type]
+                                  @id = session[:participant_id]
+                                  @participant_id = session[:participant_id]
+                                  @my_team_id = Participant.find(@participant_id).team.id
+                                  @my_team = Team.find(@my_team_id)
+                                  @interaction = HelpeeInteraction.new(params[:interactions])
+                                  @advices = InteractionAdvice.find_all_by_assignment_id(params[:assignment_id])
+                                  @advices = @advices.sort{|x,y|x.score<=>y.score}
+                                  flash[:alert] = "Dont act smart. User cant belong to the same team!"
+                                  render :action => 'new' , 
+                                          :assignment_id=>params[:assign], :type=>params[:type], :id=>session[:participant_id], :interaction => @interaction
                           end
                   end
                   

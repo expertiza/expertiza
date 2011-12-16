@@ -1,6 +1,9 @@
 require File.dirname(__FILE__) + '/../test_helper'
 # Testing the Questionaire
 
+class QuestionaireTest < ActiveSupport::TestCase
+fixtures :questionnaires, :assignments
+
 def test_scores_view
   questionnaire1 = Array.new
   questionnaire1<<questionnaires(:questionnaire0)

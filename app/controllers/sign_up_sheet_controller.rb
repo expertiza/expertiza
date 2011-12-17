@@ -622,36 +622,33 @@ class SignUpSheetController < ApplicationController
     }
 
   end
+
   #gets team_details to show it on team_details view for a given assignment
   def team_details
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
       @results =get_team_details(assignment.id, topic.id)
       @results.each do |result|
-      result.attributes().each do |attr|
-        if attr[0].equal? "name"
-          @current_team_name = attr[1]
-          
+        result.attributes().each do |attr|
+          if attr[0].equal? "name"
+            @current_team_name = attr[1]
+          end
         end
-         
-          
       end
-        
-      end
-      @results.each {|result|
-                 @team_members = ""
-                 TeamsUser.find_all_by_team_id(result[:team_id]).each{|teamuser|
-                    puts 'Userblaahsdb asd' +User.find(teamuser.user_id).to_json
-                   @team_members+=User.find(teamuser.user_id).name+" "
-                   }
-
+      @results.each { |result|
+        @team_members = ""
+        TeamsUser.find_all_by_team_id(result[:team_id]).each { |teamuser|
+          puts 'Userblaahsdb asd' +User.find(teamuser.user_id).to_json
+          @team_members+=User.find(teamuser.user_id).name+" "
+        }
       }
       #@team_members = find_team_members(topic)  
     end
   end
+
   #searches and returns team members for a given team_id
   def find_team_members(team_id)
-  TeamsUser.find_all_by_team_id(team_id).each{|teamuser|
-       team_members+=User.find(teamuser.user_id).handle+" "
+    TeamsUser.find_all_by_team_id(team_id).each { |teamuser|
+      team_members+=User.find(teamuser.user_id).handle+" "
     }
   end
 
@@ -669,8 +666,4 @@ class SignUpSheetController < ApplicationController
     query = query + " group by t.name;"
     SignUpTopic.find_by_sql(query)
   end
-
-  end
-
-
-
+end

@@ -24,8 +24,5 @@ class JoinTeamRequestTest < ActiveSupport::TestCase
     assert_equal "Computer science", @join_team_requests.comments
   end
 
-  test "the truth" do
-    assert true
-  end
 end
 

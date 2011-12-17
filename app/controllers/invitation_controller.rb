@@ -7,10 +7,8 @@ class InvitationController < ApplicationController
     user = User.find_by_name(params[:user][:name].strip)
     team = AssignmentTeam.find_by_id(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
-    puts 'student' + user.to_json
     participant = Participant.find_by_user_id(user.id)
     @join_team_request = JoinTeamRequest.find_by_participant_id(participant.id)
-    puts 'Join team request::::::++>>'+@join_team_request.to_json
     @join_team_request.status = 'A'
     @join_team_request.save
     return unless current_user_id?(student.user_id)

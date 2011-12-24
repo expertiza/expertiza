@@ -48,7 +48,8 @@ GEM
       activesupport
     fastercsv (1.5.4)
     fastthread (1.0.7)
-    ffi (1.0.11)
+    ffi (1.0.9)
+    gchartrb (0.8)
     gdata (1.1.2)
     gem_plugin (0.2.3)
     gherkin (2.2.9)
@@ -143,6 +144,7 @@ DEPENDENCIES
   database_cleaner (>= 0.5.0)
   expertiza-authlogic (~> 2.1.6.1)
   fastercsv
+  gchartrb
   gdata
   gherkin (~> 2.2.9)
   hoptoad_notifier

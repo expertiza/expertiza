@@ -34,7 +34,7 @@ assignment<%= i %>:
   require_signup: <%= i==5 %>
   num_reviewers: <%= i%5+1 %>
   spec_location:
-  team_assignment: <%= i > 5 %>
+  team_assignment: <%= i > 7 %>
   wiki_type_id: 1
   team_count: <%= 2*i %>
   

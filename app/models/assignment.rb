@@ -603,7 +603,56 @@ end
     end
     
   end
-  
+
+
+  # Returns hash review_scores[reviewer_id][reviewee_id] = score
+  def compute_reviews_hash
+    review_questionnaire_id = get_review_questionnaire_id()
+    @questions = Question.find(:all, :conditions =>["questionnaire_id = ?", review_questionnaire_id])
+    @review_scores = Hash.new
+    if (self.team_assignment)
+      @response_type = "TeamReviewResponseMap"
+    else
+      @response_type = "ParticipantReviewResponseMap"
+    end
+
+
+    @myreviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", self.id, @type] )
+
+    @response_maps=ResponseMap.find(:all, :conditions =>["reviewed_object_id = ? and type = ?", self.id, @response_type])
+    for response_map in @response_maps
+      # Check if response is there
+      @corresponding_response = Response.find(:first, :conditions =>["map_id = ?", response_map.id])
+      @respective_scores = Hash.new
+      if (@review_scores[response_map.reviewer_id] != nil)
+        @respective_scores = @review_scores[response_map.reviewer_id]
+      end
+      if (@corresponding_response != nil)
+        @this_review_score_raw = Score.get_total_score(@corresponding_response, @questions)
+        @this_review_score = ((@this_review_score_raw*100).round/100.0)
+      else
+        @this_review_score = 0.0
+      end
+      @respective_scores[response_map.reviewee_id] = @this_review_score
+      @review_scores[response_map.reviewer_id] = @respective_scores
+    end
+    return @review_scores
+  end
+
+  def get_review_questionnaire_id()
+    @revqids = []
+
+    @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",self.id])
+    @revqids.each do |rqid|
+      rtype = Questionnaire.find(rqid.questionnaire_id).type
+      if( rtype == "ReviewQuestionnaire")
+        @review_questionnaire_id = rqid.questionnaire_id
+      end
+
+    end
+    return @review_questionnaire_id
+  end
+
   def get_next_due_date()
     due_date = self.find_next_stage()
     

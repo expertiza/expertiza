@@ -25,13 +25,13 @@ class ReviewMappingControllerTest < ActionController::TestCase
     AuthController.set_current_role(roleid,@request.session)
   end
 
-   def test_delete_reviewer
+  def test_delete_reviewer
     mapping = ResponseMap.find(Fixtures.identify(:response_maps0))
     post :delete_reviewer, {:id => mapping.id} , session_for(users(:admin))
 
     assert_redirected_to :action => 'list_mappings', :id => mapping.assignment.id
     assert_raise(ActiveRecord::RecordNotFound){ ResponseMap.find(:id) }
-   end
+  end
 
   def test_add_reviewer
     number_of_responses = ResponseMap.count

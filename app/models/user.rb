@@ -232,4 +232,18 @@ class User < ActiveRecord::Base
     end
     return fields
   end
+
+  def self.from_params(params)
+      if params[:user_id]
+        user = User.find(params[:user_id])
+      else
+        user = User.find_by_name(params[:user][:name])
+      end
+      if user.nil?
+         newuser = url_for :controller => 'users', :action => 'new'
+         raise "Please <a href='#{newuser}'>create an account</a> for this user to continue."
+      end
+      return user
+  end
+
 end

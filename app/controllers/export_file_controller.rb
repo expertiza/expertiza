@@ -5,14 +5,29 @@ class ExportFileController < ApplicationController
     @model = params[:model]
     if(@model == 'Assignment')
       @title = 'Grades'
+    elsif(@model == 'CourseParticipant')
+      @title = 'Course Participants'
     end
     @id = params[:id]
-
   end
 
   def export
-    filename = "out.csv"
-    csv_data = FasterCSV.generate do |csv|
+    @delim_type = params[:delim_type]
+
+    if(@delim_type == "comma")
+      filename = "out.csv"
+      delimiter = ","
+    elsif(@delim_type == "space")
+      filename = "out.csv"
+      delimiter = " "
+    elsif(@delim_type == "tab")
+      filename = "out.tsv"
+      delimiter = "\t"
+    elsif(@delim_type == "other")
+      filename = "out.txt"
+      delimiter = other_char
+    end
+    csv_data = FasterCSV.generate(:col_sep => delimiter) do |csv|
       csv << Object.const_get(params[:model]).get_export_fields(params[:options])
 
       Object.const_get(params[:model]).export(csv, params[:id],params[:options])

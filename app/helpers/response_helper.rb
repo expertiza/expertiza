@@ -66,36 +66,34 @@ module ResponseHelper
     table_hash = {"table_title" => nil, "table_headers" => nil, "start_table" => false, "start_col" => false, "end_col" => false, "end_table" => false}
 
     #we need to check if these parameters use tables
-    #if !parameters.last.include? "\d*|\d*|\d*|\d*"
-      parameters = parameters.last(3)
-      current_ques = parameters[2].split("|")[0]
-      total_col_ques = parameters[2].split("|")[1]
-      current_col = parameters[2].split("|")[2]
-      total_col = parameters[2].split("|")[3]
+    parameters = parameters.last(3)
+    current_ques = parameters[2].split("|")[0]
+    total_col_ques = parameters[2].split("|")[1]
+    current_col = parameters[2].split("|")[2]
+    total_col = parameters[2].split("|")[3]
 
-      #since it's first item in a column we need to start a new column
-      if current_ques.to_i == 1
-        table_hash["start_col"] = true
-        #if it's the first column we need to send the title and headers
-        if current_col.to_i == 1
-          if parameters[0].length > 0
-            table_hash["table_title"] = parameters[0]
-          end
-          table_hash["start_table"] = true
-          if parameters[1].length > 0
-            table_hash["table_headers"] = parameters[1]
-          end
+    #since it's first item in a column we need to start a new column
+    if current_ques.to_i == 1
+      table_hash["start_col"] = true
+      #if it's the first column we need to send the title and headers
+      if current_col.to_i == 1
+        if parameters[0].length > 0
+          table_hash["table_title"] = parameters[0]
+        end
+        table_hash["start_table"] = true
+        if parameters[1].length > 0
+          table_hash["table_headers"] = parameters[1]
         end
       end
-      #end of column, we need to close column
-      if current_ques == total_col_ques
-        table_hash["end_col"] = true
-        #end of table we need to close table
-        if total_col == current_col
-          table_hash["end_table"] = true
-        end
+    end
+    #end of column, we need to close column
+    if current_ques == total_col_ques
+      table_hash["end_col"] = true
+      #end of table we need to close table
+      if total_col == current_col
+        table_hash["end_table"] = true
       end
-    #end
+    end
     table_hash
   end
 

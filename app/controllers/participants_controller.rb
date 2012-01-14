@@ -13,7 +13,7 @@ class ParticipantsController < ApplicationController
     begin
       curr_object.add_participant(params[:user][:name])
     rescue
-      flash[:error] = $!
+      flash[:error] = 'Cannot add user.'
     end
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
   end

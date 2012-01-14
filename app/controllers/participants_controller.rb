@@ -13,7 +13,7 @@ class ParticipantsController < ApplicationController
     begin
       curr_object.add_participant(params[:user][:name])
     rescue
-      flash[:error] = "User #{params[:user][:name]} does not exist. Would you like to " + link_to 'create this user?', :controller => 'users', :action => 'new'}
+      flash[:error] = "User #{params[:user][:name]} does not exist. Would you like to " + link_to('create this user?', :controller => 'users', :action => 'new')
     end
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
   end

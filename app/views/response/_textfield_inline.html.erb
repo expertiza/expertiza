@@ -1,6 +1,0 @@
-  <% if controller.action_name == 'new' %>
-    <%=text_field "custom_response", ques_num , :label => "", :size => field_size %>
-  <% else %>
-    <%=text_field "custom_response", ques_num , :label => "", :size => field_size, :value => @review_scores[ques_num].comments.gsub(/\"/,'&quot;')%>
-  <% end %>
-

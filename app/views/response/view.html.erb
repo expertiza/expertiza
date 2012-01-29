@@ -7,8 +7,7 @@
 
 <% if false %>[start erb comment] Changes to accommodate Jen's custom rubric [end erb comment]<% end %>
 <% file_url = nil
-   jkidd = User.find_by_name("jkidd")
-   if jkidd && jkidd.id == @assignment.instructor_id
+   if @map.questionnaire.section.eql? "Custom"
       @current_folder = DisplayOption.new
       @current_folder.name = ""
       @participant = Participant.find(@map.reviewer_id)
@@ -36,6 +35,23 @@
 
 <HR>
 <%= @response.display_as_html(nil,nil,file_url) %>
+<% if @map.questionnaire.section.eql? "Custom" %>
+    <%
+  i = 0
+  current_topic = nil
+  questions = @questionnaire.questions
+  questions.each {
+    | question | %>
+    <%= get_accordion_title(current_topic, @question_type[i].parameters.split("::")[0]) %>
+    <%= find_question_type(question, @question_type[i], i, true, file_url) %>
+    <% current_topic = @question_type[i].parameters.split("::")[0]
+    i += 1
+  } %>
+<% end %>
+</p>
+</div>
+</div>
+<br/>
 
 <%= @map.show_feedback() %>
 <br/>

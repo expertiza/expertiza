@@ -18,11 +18,11 @@
     <% count = count + 1 %>
 		
 		<% file_url = nil
-			 jkidd = User.find_by_name("jkidd")
-			 if jkidd && jkidd.id == participant.assignment.instructor_id
-						@current_folder = DisplayOption.new
-						@current_folder.name = ""
-						@participant = Participant.find(review.map.reviewer_id)
+       questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
+       if questionnaire.section.eql? "Custom"
+            @current_folder = DisplayOption.new
+            @current_folder.name = ""
+            @participant = Participant.find(review.map.reviewer_id)
 						files_list = Dir[@participant.assignment.get_path.to_s + "/" + review.map.id.to_s + @current_folder.name + "/*"]
 						files = Array.new
 						for file in files_list

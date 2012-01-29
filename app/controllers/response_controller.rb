@@ -6,9 +6,15 @@ class ResponseController < ApplicationController
   def view
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
-
     @map = @response.map
     get_content
+    @review_scores = Array.new
+    @question_type = Array.new
+    @questions.each{
+      | question |
+      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+      @question_type << QuestionType.find_by_question_id(question.id)
+    }
   end
   
   def delete
@@ -31,23 +37,19 @@ class ResponseController < ApplicationController
     @map = @response.map           
     get_content    
     @review_scores = Array.new
+    @question_type = Array.new
     @questions.each{
       | question |
       @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+      @question_type << QuestionType.find_by_question_id(question.id)
     }
-    #**********************
-    # Check whether this is Jen's assgt. & if so, use her rubric
-    jkidd = User.find_by_name("jkidd")
-    if jkidd && jkidd.id == @assignment.instructor_id && @title == "Review"
-      if @assignment.id < 469
-        @next_action = "custom_update"
-        render :action => 'custom_response'
-      else
-        @next_action = "custom_update"
-        render :action => 'custom_response_2011'
-      end
-    #**********************
+    # Check whether this is a custom rubric
+    if @map.questionnaire.section.eql? "Custom"
+      @next_action = "custom_update"
+      render :action => 'custom_response'
     else
+      # end of special code (except for the end below, to match the if above)
+      #**********************
       render :action => 'response'
     end
   end
@@ -100,7 +102,6 @@ class ResponseController < ApplicationController
       @map = @response.map
       @response.update_attribute('additional_comment',"")
 
-
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions
 
@@ -139,19 +140,28 @@ class ResponseController < ApplicationController
     @modified_object = @map.id
     get_content  
     #**********************
-    # Check whether this is Jen's assgt. & if so, use her rubric
-    jkidd = User.find_by_name("jkidd")
-    if jkidd && jkidd.id == @assignment.instructor_id && @title == "Review"
-      if @assignment.id < 469
-        @next_action = "custom_create"
-        render :action => 'custom_response'
-      else
-        @next_action = "custom_create"
-        render :action => 'custom_response_2011'
+    # Check whether this is a custom rubric
+    if @map.questionnaire.section.eql? "Custom"
+      @question_type = Array.new
+      @questions.each{
+        | question |
+        @question_type << QuestionType.find_by_question_id(question.id)
+      }
+      if !@map.contributor.nil?
+        if @map.assignment.team_assignment?
+          team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
+          @topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
+        else
+          @topic_id = Participant.find(@map.contributor).topic_id
+        end
       end
-    #**********************
+      if !@topic_id.nil?
+        @signedUpTopic = @SignUpTopic.find(@topic_id).topic_name
+      end
+      @next_action = "custom_create"
+      render :action => 'custom_response'
     else
-      render :action => 'response'
+    render :action => 'response'
     end
   end
   

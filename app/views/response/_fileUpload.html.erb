@@ -1,0 +1,35 @@
+<% if !view.nil? %>
+    <p><i><%= ques_text %> </i> <%= view %> </p></br>
+<% else %>
+    <p><b><font color='red' size ="4">WARNING!!</font> You must save your review
+    <font size="3"><u>BEFORE</u></font> you upload a file. Any text that has not been saved
+    <font size="3"><u>WILL BE LOST</u></font> when you click on the Upload File link.
+    </b>To save your review, click Save Review at the bottom of this page.
+    <font size="2"><i>(If you forget to save before uploading a file, you should be able to recover your text by hitting the back button twice.)</i></font></p>
+    <b><%=label("custom_response", ques_num, ques_text)%></b>
+    <% @current_folder = DisplayOption.new
+    @current_folder.name = ""
+    files_list = Dir[@participant.assignment.get_path.to_s+ "/" +@map.id.to_s + @current_folder.name + "/*"]
+    files = Array.new
+    for file in files_list
+        if File.directory?(file) then
+            dir_files = get_files(file)
+            dir_files.each{|f| files << f}
+        end
+        files << file
+    end
+    file = files[0]
+    if !file.nil?
+    parentFolder = File.dirname(file)
+    location = parentFolder + File.basename(file)%>
+    <u><i><%=link_to File.basename(file), :controller => 'submitted_content', :action => 'download', :download => File.basename(file), "current_folder[name]" =>  File.dirname(file)%></i></u>
+    <% end %>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp
+    <%if @map.response.nil?
+        return_to = "new"
+    else
+        return_to ="edit"
+    end
+    %>
+    <%=link_to('Upload File', :action=>'upload', :participant_id => @participant.id, :map => @map.id, :id=>params[:id], :return_to => return_to)%>
+    </br></br>
+<% end %>

@@ -49,7 +49,7 @@ class User < ActiveRecord::Base
 
   def can_impersonate?(other_user)
     return true if other_user == self # can impersonate self
-    return true if self.is_teaching_assistant_of? other_user #TAs can impersonate their students
+    return true if self.is_teaching_assistant_for? other_user #TAs can impersonate their students
     return false if other_user == other_user.parent # no one can impersonate a top-level parent (usually superadmin)
     return other_user.parent == self || can_impersonate?(other_user.parent) # recursive
   end
@@ -247,7 +247,7 @@ class User < ActiveRecord::Base
       return user
   end
 
-  def is_teaching_assistant_of?(student)
+  def is_teaching_assistant_for?(student)
     return false if self.role.name != 'Teaching Assistant'
     return false if student.role.name != 'Student'
     Course.all.each do |c|

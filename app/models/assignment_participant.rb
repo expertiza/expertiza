@@ -52,7 +52,7 @@ class AssignmentParticipant < Participant
   def get_scores(questions)
     scores = Hash.new
     scores[:participant] = self # This doesn't appear to be used anywhere
-    assignment.questionnaires.each do |questionnaire|
+    self.assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
       scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        

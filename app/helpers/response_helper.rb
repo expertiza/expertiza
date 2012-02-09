@@ -67,6 +67,9 @@ module ResponseHelper
 
     #we need to check if these parameters use tables
     parameters = parameters.last(3)
+    if parameters[2].nil?
+      return table_hash
+    end
     current_ques = parameters[2].split("|")[0]
     total_col_ques = parameters[2].split("|")[1]
     current_col = parameters[2].split("|")[2]
@@ -108,9 +111,7 @@ module ResponseHelper
         #section::tableTitle::tableHeader1|tableHeader2::curr_col_ques|total_col_ques|curr_col|max_cols
 
         #look for table parameters
-        if ques_type.parameters.split("::")[3]
-          table_hash = construct_table(ques_type.parameters.split("::"))
-        end
+        table_hash = construct_table(ques_type.parameters.split("::"))
 
         #check to see if rendering view
         view_output = nil
@@ -168,9 +169,7 @@ module ResponseHelper
         end
 
         #look for table parameters
-        if ques_type.parameters.split("::")[4]
-          table_hash = construct_table(q_parameter)
-        end
+        table_hash = construct_table(q_parameter)
 
         #check to see if rendering view
         view_output = nil
@@ -208,9 +207,7 @@ module ResponseHelper
         end
 
         #look for table parameters
-        if ques_type.parameters.split("::")[4]
-          table_hash = construct_table(q_parameter)
-        end
+        table_hash = construct_table(q_parameter)
 
         #check to see if rendering view
         view_output = nil

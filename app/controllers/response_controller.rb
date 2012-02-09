@@ -156,7 +156,7 @@ class ResponseController < ApplicationController
         end
       end
       if !@topic_id.nil?
-        @signedUpTopic = @SignUpTopic.find(@topic_id).topic_name
+        @signedUpTopic = SignUpTopic.find(@topic_id).topic_name
       end
       @next_action = "custom_create"
       render :action => 'custom_response'

@@ -55,10 +55,12 @@
                 | question |
                 i = 0
                 score = Score.find_by_response_id_and_question_id(review.id, question.id)
-                ques_type = QuestionType.find_all_by_question_id(question.id)%>
-                <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
-                <%= find_question_type(question, ques_type[0], i, true, file_url, score) %>
-                <% current_topic = ques_type[0].parameters.split("::")[0]
+                if !score.nil?
+                    ques_type = QuestionType.find_all_by_question_id(question.id)%>
+                    <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+                    <%= find_question_type(question, ques_type[0], i, true, file_url, score) %>
+                    <% current_topic = ques_type[0].parameters.split("::")[0]
+                end
                 i += 1
             } %>
         <% end %>

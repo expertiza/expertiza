@@ -28,7 +28,7 @@ class GradesController < ApplicationController
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
-            |questionnaire|
+      |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 

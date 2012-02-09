@@ -18,7 +18,7 @@
     <% count = count + 1 %>
 		
 		<% file_url = nil
-       questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
+       questionnaire = Questionnaire.find(@assignment.questionnaires[0].id)
        if questionnaire.section.eql? "Custom"
             @current_folder = DisplayOption.new
             @current_folder.name = ""
@@ -47,9 +47,40 @@
 
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
+        <% if questionnaire.section.eql? "Custom" %>
+            <%
+            current_topic = nil
+            questions = Question.find_all_by_questionnaire_id(questionnaire.id)
+            questions.each {
+                | question |
+                i = 0
+                score = Score.find_by_response_id_and_question_id(review.id, question.id)
+                ques_type = QuestionType.find_all_by_question_id(question.id)%>
+                <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+                <%= find_question_type(question, ques_type[0], i, true, file_url, score) %>
+                <% current_topic = ques_type[0].parameters.split("::")[0]
+                i += 1
+            } %>
+        <% end %>
     <% else %>
+
       <% review_feedback = nil %>
       <%= review.display_as_html(nil,count, file_url) %><BR/><BR/>
+        <% if questionnaire.section.eql? "Custom" %>
+            <%
+            current_topic = nil
+            questions = Question.find_all_by_questionnaire_id(questionnaire.id)
+            questions.each {
+                | question |
+                i = 0
+                score = Score.find_by_response_id_and_question_id(review.id, question.id)
+                ques_type = QuestionType.find_all_by_question_id(question.id)%>
+                <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+                <%= find_question_type(question, ques_type[0], i, true, file_url, score) %>
+                <% current_topic = ques_type[0].parameters.split("::")[0]
+                i += 1
+            } %>
+        <% end %>
       <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)         
          if map
                 review_feedback = map.response         

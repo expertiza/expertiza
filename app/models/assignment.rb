@@ -813,7 +813,11 @@ end
     # The purpose is to return the topic that the contributor has signed up to do for this assignment.
     # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
     # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
-    contributors_topic = SignedUpUser.find_by_creator_id(contributor.id)
+    if !Team.find_by_name_and_id(contributor.name, contributor.id).nil?
+      contributors_topic = SignedUpUser.find_by_creator_id(contributor.id)
+    else
+      contributors_topic = SignedUpUser.find_by_creator_id(contributor.user_id)
+    end
     if !contributors_topic.nil?
       contributors_signup_topic = SignUpTopic.find_by_id(contributors_topic.topic_id)
       #returns the topic

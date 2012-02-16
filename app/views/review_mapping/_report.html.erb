@@ -72,7 +72,7 @@
 
                 <% (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id, @type])).each do |ri| %>
                     <% if (Response.find_by_map_id(ri.id)) %>
-                        <%if @assignment.team_assignment %>
+                        <%if @assignment.team_assignment && Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0 %>
                             <%@team = Team.find(ri.reviewee_id) %>
                             <% @teamid = @team.id%>
                                 <% if (@l%2) == 0 %>
@@ -119,7 +119,7 @@
                         <%end %>
 
                     <% else %>
-                        <%if @assignment.team_assignment %>
+                        <%if @assignment.team_assignment && Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0 %>
                             <% if (@l%2) == 0 %>
                                 <td id = "red" bgcolor="#ffffff" style ="color:#DD3300" align = 'center' colspan=1>
                             <%else %>

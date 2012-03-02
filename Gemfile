@@ -9,12 +9,8 @@ gem 'hoptoad_notifier'
 gem 'mysql'
 gem 'rdoc'
 gem 'rails', '~> 2.3.14'
-<<<<<<< HEAD
 gem 'RedCloth'
 gem 'rake'
-=======
-gem 'RedCloth', '4.2.7'
->>>>>>> first commit review versioning
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rubyzip', :require => 'zip/zip'
 gem 'rdoc'

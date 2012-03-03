@@ -25,12 +25,31 @@ class ResponseController < ApplicationController
     @response.delete
     redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
   end
-  
+
+
+
+
   def edit
     @header = "Edit"
     @next_action = "update"
     @return = params[:return]
-    @response = Response.find(params[:id]) 
+    @map=ResponseMap.find(params[:id])
+
+     @sorted_array=Array.new
+     @prev=Response.all
+     for element in @prev
+       if(element.map_id==@map.id)
+
+          @sorted_array<<element
+        end
+      end
+
+     if !@sorted_array.empty?
+
+       @largest_version_num= @sorted_array.max{|a,b| a.version_num <=> b.version_num}
+
+     end
+    @response = Response.find_by_map_id_and_version_num(params[:id],@largest_version_num.version_num)
     return if redirect_when_disallowed(@response)
 
     @modified_object = @response.id
@@ -50,7 +69,9 @@ class ResponseController < ApplicationController
     else
       # end of special code (except for the end below, to match the if above)
       #**********************
+
       render :action => 'response'
+
     end
   end
   
@@ -96,7 +117,6 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     @myid = @response.id
     msg = ""
-    
     begin
       @myid = @response.id
       @map = @response.map
@@ -132,6 +152,7 @@ class ResponseController < ApplicationController
   end
   
   def new
+
     @header = "New"
     @next_action = "create"    
     @feedback = params[:feedback]
@@ -156,22 +177,48 @@ class ResponseController < ApplicationController
         end
       end
       if !@topic_id.nil?
-        @signedUpTopic = @SignUpTopic.find(@topic_id).topic_name
+        @signedUpTopic = SignUpTopic.find(@topic_id).topic_name
       end
       @next_action = "custom_create"
       render :action => 'custom_response'
-    else
+  else
     render :action => 'response'
     end
-  end
+   end
   
   def create     
     @map = ResponseMap.find(params[:id])
     @res = 0
     msg = ""
     error_msg = ""
-    begin      
-      @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
+    begin
+
+      #get all previous versions of responses for the response map.
+
+      @sorted_array=Array.new
+      @prev=Response.all
+      for element in @prev
+        if(element.map_id==@map.id)
+
+          @sorted_array<<element
+        end
+      end
+
+      #if previous responses exist increment the version number.
+      if !@sorted_array.empty?
+         @largest_version_num= @sorted_array.max{|a,b| a.version_num <=> b.version_num}
+
+         if(@largest_version_num.version_num==nil)
+            @version=1
+         else
+            @version=@largest_version_num.version_num+1
+         end
+
+        #if no previous version is available then initial version number is 1
+      else
+          @version=1
+      end
+      @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:version_num=>@version)
       @res = @response.id
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions     

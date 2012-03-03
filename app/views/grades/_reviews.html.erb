@@ -15,10 +15,11 @@
   <HR/> 
   <% count = 0 %>
   <% for review in rscore[:assessments] %>
+
     <% count = count + 1 %>
 		
 		<% file_url = nil
-       questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
+       questionnaire = Questionnaire.find(@assignment.questionnaires[0].id)
        if questionnaire.section.eql? "Custom"
             @current_folder = DisplayOption.new
             @current_folder.name = ""
@@ -47,9 +48,68 @@
 
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
+        <% if questionnaire.section.eql? "Custom" %>
+            <%
+            current_topic = nil
+            questions = Question.find_all_by_questionnaire_id(questionnaire.id)
+            questions.each {
+                | question |
+                i = 0
+                score = Score.find_by_response_id_and_question_id(review.id, question.id)
+                if !score.nil?
+                    ques_type = QuestionType.find_all_by_question_id(question.id)%>
+                    <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+                    <%= find_question_type(question, ques_type[0], i, true, file_url, score) %>
+                    <% current_topic = ques_type[0].parameters.split("::")[0]
+                end
+                i += 1
+            } %>
+        <% end %>
     <% else %>
+
       <% review_feedback = nil %>
-      <%= review.display_as_html(nil,count, file_url) %><BR/><BR/>
+      <h2>Review <%= count %></h2>
+      <!-- Display the latest review first -->
+      <%= review.display_as_html(nil,review.version_num, file_url) %><BR/><BR/>
+
+            <!-- get all previous versions -->
+                    <% @sorted_array=Array.new %>
+  <% @prev=Response.all   %>
+
+   <%for element in @prev     %>
+     <%if(element.map_id==review.map.id)%>
+       <%array_not_empty=1          %>
+       <% @sorted_array<<element       %>
+     <% end %>
+   <% end %>
+            <% @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
+            <% if(@sorted.size>1) %>
+          <% for i in 1..@sorted.size-1 %>
+
+                  <%  @str = @sorted[i].id.to_s    %>
+             <!-- display previous versions in descending order -->
+            <%= @sorted[i].display_as_html(nil,@sorted[i].version_num, file_url) %>
+                <br/>
+                    <script>
+                    toggleElement('reviews_<%=@str%>','review');
+                    </script>
+                    <% end %>
+
+
+                <!-- keep only latest version open -->
+
+                <% for i in 1..@sorted.size-1 %>
+
+                  <%  @str = @sorted[i].id.to_s    %>
+
+                    <script>
+                   toggleElement('review_<%=@str%>','review')
+                    </script>
+                    <% end %>
+
+
+
+                <% end %>
       <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)         
          if map
                 review_feedback = map.response         

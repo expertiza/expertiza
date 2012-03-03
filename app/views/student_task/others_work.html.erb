@@ -21,7 +21,7 @@
       <li><%= @assignment.name %> Review <%= review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
       <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
      	<%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %></li>
-      <% end %>	
+      <% end %>
     <% else %>    
   	  <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
 		<li><%= @assignment.name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id, :assignment => @assignment.id} %></li>

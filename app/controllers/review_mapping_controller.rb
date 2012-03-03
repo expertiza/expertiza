@@ -73,7 +73,6 @@ class ReviewMappingController < ApplicationController
       flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
       redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
     else
-      msg = String.new
   
       begin
         if assignment.team_assignment
@@ -83,11 +82,11 @@ class ReviewMappingController < ApplicationController
           contributor = AssignmentParticipant.find_by_id_and_parent_id(submission_id, assignment_id)
           ParticipantReviewResponseMap.add_reviewer(contributor.id, reviewer.id, assignment.id)
         end
+        redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
       rescue
-        msg = $!
+        redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :msg => $!
       end
   
-      redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :msg => msg
     end
   end 
 
@@ -144,8 +143,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def add_metareviewer    
-    mapping = ResponseMap.find(params[:id])  
-    msg = String.new
+    mapping = ResponseMap.find(params[:id])
     begin
       user = User.from_params(params)
 

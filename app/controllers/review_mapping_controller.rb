@@ -26,7 +26,7 @@ class ReviewMappingController < ApplicationController
   
   def add_reviewer 
     assignment = Assignment.find(params[:id])  
-    msg = String.new
+    #msg = String.new
     begin
 
       user = User.from_params(params)
@@ -45,10 +45,10 @@ class ReviewMappingController < ApplicationController
         ParticipantReviewResponseMap.add_reviewer(params[:contributor_id], reviewer.id, assignment.id)
       end
 
+      redirect_to :action => 'list_mappings', :id => assignment.id
     rescue
-       msg = $!
-    end    
-    redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg    
+      redirect_to :action => 'list_mappings', :id => assignment.id, :msg => $!
+    end
   end
 
   # Get all the available submissions
@@ -157,10 +157,10 @@ class ReviewMappingController < ApplicationController
       MetareviewResponseMap.create(:reviewed_object_id => mapping.id,
                                    :reviewer_id => reviewer.id,
                                    :reviewee_id => mapping.reviewer.id)                         
+      redirect_to :action => 'list_mappings', :id => mapping.assignment.id
     rescue  
-      msg = $!
-    end
-    redirect_to :action => 'list_mappings', :id => mapping.assignment.id, :msg => msg                                  
+      redirect_to :action => 'list_mappings', :id => mapping.assignment.id, :msg => $!
+    end                                 
   end
 
   def get_reviewer(user,assignment,reg_url)

@@ -14,21 +14,17 @@ class GradesController < ApplicationController
             |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-
     @scores = @assignment.get_scores(@questions)
   end
 
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
-
     return if redirect_when_disallowed
-
     @assignment = @participant.assignment
-
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
-            |questionnaire|
+      |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 

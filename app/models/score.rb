@@ -11,18 +11,30 @@ class Score < ActiveRecord::Base
       scores[:max] = -999999999
       scores[:min] = 999999999
       total_score = 0
+      length_of_assessments=assessments.length.to_f
       assessments.each {
         | assessment | 
-        curr_score = get_total_score(assessment, questions)       
+        curr_score = get_total_score(assessment, questions)
+
         if curr_score > scores[:max]
           scores[:max] = curr_score
         end
         if curr_score < scores[:min]
           scores[:min] = curr_score
-        end        
+        end
+
+        # Check if the review is invalid. If is not valid do not include in score calculation
+        if  @invalid==1
+          length_of_assessments=length_of_assessments-1
+          curr_score=0
+        end
         total_score += curr_score       
       }
-      scores[:avg] = total_score.to_f / assessments.length.to_f
+      if(length_of_assessments!=0)
+      scores[:avg] = total_score.to_f / length_of_assessments
+      else
+        scores[:avg]=0
+        end
     else 
       scores[:max] = nil
       scores[:min] = nil
@@ -38,6 +50,12 @@ class Score < ActiveRecord::Base
   def self.get_total_score(response, questions)
     weighted_score = 0
     sum_of_weights = 0
+
+      check_validity(response)
+     #@invalid=0
+    #Check for invalid reviews.
+    #Check if the latest review done by the reviewer falls into the latest review stage
+
     questions.each{
       | question |
       item = Score.find_by_response_id_and_question_id(response.id, question.id)
@@ -46,6 +64,41 @@ class Score < ActiveRecord::Base
       end      
       sum_of_weights += question.weight
     }
-    return (weighted_score.to_f / (sum_of_weights.to_f * questions.first.questionnaire.max_question_score.to_f)) * 100   
+
+    return (weighted_score.to_f / (sum_of_weights.to_f * questions.first.questionnaire.max_question_score.to_f)) * 100
+
   end
+
+  def self.check_validity(response)
+
+    @invalid=0
+    map=ResponseMap.find(response.map_id)
+       due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", map.reviewed_object_id])
+
+       if due_dates.size!=0
+         @sorted_deadlines=Array.new
+         @sorted_deadlines=due_dates.sort {|m1,m2|(m1.due_at and m2.due_at) ? m2.due_at <=> m1.due_at : (m1.due_at ? -1 : 1)}
+         flag=0
+         for deadline in @sorted_deadlines
+            next_ele=deadline
+            if(flag==1)
+               break
+            end
+            if(deadline.deadline_type_id == 4 ||deadline.deadline_type_id == 2)
+              flag=1
+            end
+          end
+       end
+         if due_dates.size!=0
+    if(response.created_at > next_ele.due_at)
+      @invalid=0
+    else
+      @invalid = 1
+    end
+    end
+
+
+  end
+
+
 end

@@ -3,9 +3,8 @@
 <TABLE>
 <TR>
 <% form_tag :action => 'impersonate' do %>
-<TD>Enter user account: <%= text_field_with_auto_complete :user, :name, {:size => 41} %></TD>
+<TD>Enter user account: <%= text_field :user, :name, {:size => 41, :autocomplete => "off"} %></TD>
 <TD><input type='submit' value='Impersonate'/></TD>
 <% end %>
 </TR>
 </TABLE>
-<BR/>

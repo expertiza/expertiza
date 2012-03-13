@@ -1,6 +1,7 @@
 class ImpersonateController < ApplicationController
   #auto_complete_for :user, :name
   
+  # auto complete is turned off right now: check the start.html.erb file 
   def auto_complete_for_user_name     
      @users = session[:user].get_available_users(params[:user][:name])
      render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false

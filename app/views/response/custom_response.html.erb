@@ -28,7 +28,13 @@
     <%= get_accordion_title(current_topic, @question_type[i].parameters.split("::")[0]) %>
     <%= find_question_type(question, @question_type[i], i, false, nil) %>
     <% current_topic = @question_type[i].parameters.split("::")[0]
-    i += 1
+
+    advices = QuestionAdvice.find_all_by_question_id(question.id)
+    if advices.length > 0  %>
+        <%= render :partial => 'custom_advice', :locals => {:i => i, :advice_list => advices} %>
+    <% end
+
+   i += 1
   } %>
 
   </p>

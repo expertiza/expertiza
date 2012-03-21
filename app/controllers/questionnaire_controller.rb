@@ -234,16 +234,26 @@ class QuestionnaireController < ApplicationController
       for question_key in params[:new_question].keys
         q = Question.new(params[:new_question][question_key])
         q.questionnaire_id = questionnaire_id
+        if q.true_false == ''
+          q.true_false = false
+        end
         if !q.txt.strip.empty?
           q.save
-          if (Questionnaire.find_by_id(questionnaire_id).section == "Custom")
+          questionnaire = Questionnaire.find_by_id(questionnaire_id)
+          if (questionnaire.section == "Custom")
+            for i in (questionnaire.min_question_score .. questionnaire.max_question_score)
+              a = QuestionAdvice.new(:score => i, :advice => nil)
+              a.question_id = q.id
+              a.save
+            end
             save_new_question_parameters(q.id, question_key)
           end
+
         end
       end
     end
   end
-  
+
   # delete questions from a questionnaire
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire

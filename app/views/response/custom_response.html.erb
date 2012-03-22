@@ -30,7 +30,8 @@
     <% current_topic = @question_type[i].parameters.split("::")[0]
 
     advices = QuestionAdvice.find_all_by_question_id(question.id)
-    if advices.length > 0  %>
+    advices = remove_empty_advice(advices)
+    if advices.length > 0 %>
         <%= render :partial => 'custom_advice', :locals => {:i => i, :advice_list => advices} %>
     <% end
 

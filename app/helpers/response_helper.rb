@@ -52,6 +52,16 @@ module ResponseHelper
     content_tag(:label, h(label), :for => "#{object_name}_#{method}")
   end
 
+  def remove_empty_advice(advices)
+    filtered_advices = Array.new
+    advices.each { | advice |
+      if advice.advice.to_s != ""
+        filtered_advices << advice
+      end
+    }
+    filtered_advices
+  end
+
   def get_accordion_title(last_topic, new_topic)
     if last_topic.eql? nil
       #this is the first accordion

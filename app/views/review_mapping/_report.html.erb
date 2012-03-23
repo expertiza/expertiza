@@ -93,7 +93,7 @@
                                </td>
                         <tr/>
 
-                        <%else %>
+                        <% elsif !@assignment.team_assignment %>
                             <% @participantid = (Participant.find(ri.reviewee_id)).user_id %>
                             <% @myuser = 0%>
                             <% @myuser = ri.reviewee_id%>

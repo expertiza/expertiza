@@ -56,11 +56,6 @@
           <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
             <!-- show the link as edit when latest review is done in current phase -->
             <!-- show link as update when latest review is done in different phase than current phase -->
-            </br></br> ----------------------
-            <%= deadline_version.due_at %>
-            </br></br> ----------------------
-            <%= deadline_time.due_at %>
-            </br></br> ----------------------
             <% if (deadline_version.due_at == deadline_time.due_at) %>
               <td><%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => map.id} %></td>
             <% else %>

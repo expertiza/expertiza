@@ -5,6 +5,7 @@ set :default_stage, "staging"
 require 'capistrano/ext/multistage'
 
 set :application, "expertiza"
+set :scm, :git
 set :repository,  "git://github.com/expertiza/expertiza.git"
 set :user, "rails"
 set :group, "rails"

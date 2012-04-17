@@ -18,8 +18,11 @@
     <% end %>
 
     <% if participant %>
-      <tr><td><b><%= "#{title} #{review_no}." %></b>
-        <%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %></td>
+      <tr>
+        <td>
+          <b><%= "#{title} #{review_no}." %></b>
+          <%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %>
+        </td>
 	      <td>&nbsp;</td>
         <% if map.response %>            
           <% array_not_empty = 0 %>
@@ -52,7 +55,10 @@
               <% end %>
             <% end %>
           <% end %>
-          <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => @sorted[0].id} %></td>
+          
+          <td>
+            <%= link_to "View",{:controller => 'response', :action => 'view', :id => @sorted[0].id} %>
+          </td>
           <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
             <!-- show the link as edit when latest review is done in current phase -->
             <!-- show link as update when latest review is done in different phase than current phase -->
@@ -62,7 +68,6 @@
               <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.id} %></td>
             <% end %>
           <% end %>     
-        
         <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
           <% if @assignment.staggered_deadline? %>
             <% if map.type.to_s == "MetareviewResponseMap" %>
@@ -97,12 +102,12 @@
               <% end %>
             </td>
           <% end %>
-        
         <% else %><% # Deadline has passed, and the work was not submitted %>
       	  <td>Begin</td><td> (Work has not yet been submitted)</td>
-        <% end %>       
-      </tr>  
+        <% end %>         
       <% review_no += 1 %>
+      </tr>
+      </br>
     <% end %>
         
     <% if map.type.to_s != "MetareviewResponseMap" %>

@@ -1,8 +1,7 @@
-set :deploy_to, "/local/rails/expertiza_test"
+set :deploy_to, "/local/rails/expertiza_staging"
 
-set :runner, "www-data"
 set :branch do
-  default_branch = 'test'
+  default_branch = 'staging'
   branch = Capistrano::CLI.ui.ask "Branch to deploy (make sure to push first) [#{default_branch}]: "
   branch = default_branch if branch.empty?
   branch

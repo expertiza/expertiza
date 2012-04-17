@@ -1,9 +1,8 @@
-require 'bundler/capistrano'
-require 'bundler/capistrano/ext/multistage'
-
 #Use `cap my_stage TASK` such as `cap production deploy`
-set :stages, %w(production test)
-set :default_stage, "test"
+set :stages, %w(production staging)
+set :default_stage, "staging"
+
+require 'capistrano/ext/multistage'
 
 set :application, "expertiza"
 set :repository,  "git://github.com/expertiza/expertiza.git"

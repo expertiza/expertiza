@@ -39,7 +39,7 @@ class ResponseController < ApplicationController
       for element in @prev
         if(element.map_id==@map.id)
           array_not_empty=1
-          @sorted_array<<element
+          @sorted_array << element
         end
       end
 
@@ -146,7 +146,7 @@ class ResponseController < ApplicationController
      for element in @prev
        if(element.map_id==@map.id)
           array_not_empty=1
-          @sorted_array<<element
+          @sorted_array << element
         end
       end
 

@@ -16,14 +16,6 @@
   <!-- display all versions available for a response in meta review -->
 <% @responses_versions=Array.new %>
 <% @responses_versions= @map.show_review() %>
-    <% if @responses_versions!=nil %>
-<%  for resp in @responses_versions %>
-
-    <%= resp.display_as_html() %>
-      <br>
-    <% end %>
-    <% end %>
-
 
 <% form_tag :action => @next_action, :id => @modified_object do %>
 <% i = 0

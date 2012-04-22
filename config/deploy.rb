@@ -18,4 +18,4 @@ set :deploy_via, :remote_cache
 role :web, "expertiza.csc.ncsu.edu"
 role :app, "expertiza.csc.ncsu.edu"
 role :cron, "expertiza.csc.ncsu.edu"
-role :db,  "expertiza.ncsu.edu", :primary => true # This is where Rails migrations will run
+role :db,  "expertiza.csc.ncsu.edu", :primary => true # This is where Rails migrations will run

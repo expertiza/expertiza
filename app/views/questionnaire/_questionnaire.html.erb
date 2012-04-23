@@ -63,7 +63,9 @@
                 <% selected_value = 2 %>
               <% elsif @q.q_type == "DropDown"%>
                 <% selected_value = 3 %>
-              <% else selected_value = 4 %>
+              <% elsif @q.q_type == "UploadFile"%>
+                <% selected_value = 4 %>
+              <% else selected_value = 5 %>
               <% end %>
                 <td><%= select("q[]", :q_type, Question::GRADING_TYPES_CUSTOM, :selected => selected_value)%></td>
                 <td><%= text_field "q[]",  'parameters', :size=>30 %></td>

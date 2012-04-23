@@ -296,8 +296,10 @@ class QuestionnaireController < ApplicationController
       this_q.q_type =  Question::GRADING_TYPES_CUSTOM[2][0]
     elsif (params[:q][question_type_key][:q_type] == "3")
       this_q.q_type =  Question::GRADING_TYPES_CUSTOM[3][0]
-    else
+    elsif (params[:q][question_type_key][:q_type] == "4")
       this_q.q_type =  Question::GRADING_TYPES_CUSTOM[4][0]
+    else
+      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[5][0]
     end
     if !this_q.nil?
          this_q.save

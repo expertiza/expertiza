@@ -26,7 +26,7 @@
   questions.each {
     | question | %>
     <%= get_accordion_title(current_topic, @question_type[i].parameters.split("::")[0]) %>
-    <%= find_question_type(question, @question_type[i], i, false, nil) %>
+    <%= find_question_type(question, @question_type[i], i, false, nil, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
     <% current_topic = @question_type[i].parameters.split("::")[0]
 
     advices = QuestionAdvice.find_all_by_question_id(question.id)

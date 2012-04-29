@@ -1,21 +1,7 @@
 class ResponseController < ApplicationController
   helper :wiki
   helper :submitted_content
-  helper :file
-  
-  def view
-    @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
-    @map = @response.map
-    get_content
-    @review_scores = Array.new
-    @question_type = Array.new
-    @questions.each{
-      | question |
-      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
-      @question_type << QuestionType.find_by_question_id(question.id)
-    }
-  end
+  helper :file  
   
   def delete
     @response = Response.find(params[:id])
@@ -133,32 +119,44 @@ class ResponseController < ApplicationController
           end
 
        end
-      end
+  end
 
+  def view
+    @response = Response.find(params[:id])
+    return if redirect_when_disallowed(@response)
+    @map = @response.map
+    get_content
+    @review_scores = Array.new
+    @question_type = Array.new
+    @questions.each{
+      | question |
+      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+      @question_type << QuestionType.find_by_question_id(question.id)
+    }
+  end
+  
   def edit
     @header = "Edit"
     @next_action = "update"
     @return = params[:return]
-    @map=ResponseMap.find(params[:id])
-     array_not_empty=0
-     @sorted_array=Array.new
-     @prev=Response.all
-     for element in @prev
-       if(element.map_id==@map.id)
-          array_not_empty=1
-          @sorted_array << element
-        end
+    @response = Response.find(params[:id]) 
+    return if redirect_when_disallowed(@response)
+    @map = @response.map 
+    array_not_empty=0
+    @sorted_array=Array.new
+    @prev=Response.all
+    for element in @prev
+      if(element.map_id==@map.id)
+        array_not_empty=1
+        @sorted_array << element
       end
-
-     if array_not_empty==1
+    end
+    if array_not_empty==1
       @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
       @largest_version_num=@sorted[0]
-     end
-    @response = Response.find_by_map_id_and_version_num(params[:id],@largest_version_num.version_num)
-    return if redirect_when_disallowed(@response)
-
-    @modified_object = @response.id
-    @map = @response.map           
+    end
+    @response = Response.find_by_map_id_and_version_num(@map.id,@largest_version_num.version_num)
+    @modified_object = @response.id          
     get_content    
     @review_scores = Array.new
     @question_type = Array.new
@@ -174,10 +172,23 @@ class ResponseController < ApplicationController
     else
       # end of special code (except for the end below, to match the if above)
       #**********************
-
       render :action => 'response'
-
     end
+  end
+  
+  def redirect_when_disallowed(response)
+    # For author feedback, participants need to be able to read feedback submitted by other teammates.
+    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment
+      team = response.map.reviewer.team
+      unless team.has_user session[:user]
+        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+        return true
+      end
+    else
+      return true unless current_user_id?(response.map.reviewer.user_id)
+    end
+    return false
   end
   
   def update
@@ -305,7 +316,7 @@ class ResponseController < ApplicationController
       for element in @prev
         if(element.map_id==@map.id)
           array_not_empty=1
-          @sorted_array<<element
+          @sorted_array << element
         end
       end
 
@@ -416,7 +427,6 @@ class ResponseController < ApplicationController
     else
       return true unless current_user_id?(response.map.reviewer.user_id)
     end
-    
     return false
   end
 end

@@ -1,16 +1,6 @@
 <% if rscore and rscore[:assessments].length > 0 %>
     <BR/>
-    <%= render :partial => 'grades/review_table',
-        :locals => {
-        :ctrl => 'review',
-        :caction => 'view_review',
-        :symbol => "review".to_sym,
-        :prefix => prefix,
-        :assignment => participant.assignment,
-        :reviews => rscore[:assessments],
-        :collabel => "Review",
-        :rowlabel => "Reviewer"
-    }%>
+    <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
     <BR/>
     <HR/>
     <% count = 0 %>
@@ -91,7 +81,7 @@
             <%for element in @prev     %>
                 <%if(element.map_id==review.map.id)%>
                     <%array_not_empty=1 %>
-                    <% @sorted_array<<element %>
+                    <% @sorted_array << element %>
                 <% end %>
             <% end %>
             <% @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
@@ -150,7 +140,7 @@
             <%for element in @prev     %>
                 <%if(element.map_id==review.map.id)%>
                     <%array_not_empty=1 %>
-                    <% @sorted_array<<element %>
+                    <% @sorted_array << element %>
                 <% end %>
             <% end %>
             <% @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>

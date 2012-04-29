@@ -19,7 +19,7 @@ class ResponseMap < ActiveRecord::Base
              @all_resp=Response.all
           for element in @all_resp
             if(element.map_id==map.id)
-                @array_sort<<element
+                @array_sort << element
             end
           end
              #sort all versions in descending order and get the latest one.

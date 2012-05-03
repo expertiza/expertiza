@@ -14,8 +14,17 @@
   <hr/>
 <% end %>
   <!-- display all versions available for a response in meta review -->
-<% @responses_versions=Array.new %>
-<% @responses_versions= @map.show_review() %>
+<% @responses_versions = Array.new %>
+<% @responses_versions = @map.get_all_versions() %>
+
+<% if @responses_versions.empty? %>
+  "<I>No review was performed.</I><br/><hr/><br/>"
+<% else %>
+  <% @responses_versions.each do |response| %>
+    <%= response.display_as_html()+"<br/><hr/><br/>" %>
+  <% end %>
+<% end %>
+
 
 <% form_tag :action => @next_action, :id => @modified_object do %>
 <% i = 0

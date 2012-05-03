@@ -120,20 +120,6 @@ class ResponseController < ApplicationController
 
        end
   end
-
-  def view
-    @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
-    @map = @response.map
-    get_content
-    @review_scores = Array.new
-    @question_type = Array.new
-    @questions.each{
-      | question |
-      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
-      @question_type << QuestionType.find_by_question_id(question.id)
-    }
-  end
   
   def edit
     @header = "Edit"
@@ -267,8 +253,21 @@ class ResponseController < ApplicationController
     end
   end
   
+  def view
+    @response = Response.find(params[:id])
+    return if redirect_when_disallowed(@response)
+    @map = @response.map
+    get_content
+    @review_scores = Array.new
+    @question_type = Array.new
+    @questions.each{
+      | question |
+      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+      @question_type << QuestionType.find_by_question_id(question.id)
+    }
+  end
+  
   def new
-
     @header = "New"
     @next_action = "create"    
     @feedback = params[:feedback]
@@ -298,7 +297,7 @@ class ResponseController < ApplicationController
       @next_action = "custom_create"
       render :action => 'custom_response'
     else
-    render :action => 'response'
+      render :action => 'response'
     end
    end
   

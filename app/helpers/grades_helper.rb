@@ -51,7 +51,7 @@ module GradesHelper
     table_hash
   end
 
-  def find_question_type(question, ques_type, q_number, is_view, file_url, score, scoreRange)
+  def find_question_type(question, ques_type, q_number, is_view, file_url, score, score_range)
     default_textfield_size = "3"
     default_textarea_size = "40x5"
     default_dropdown = ["Edit Rubric", "No Values"]
@@ -172,7 +172,7 @@ module GradesHelper
         render :partial => "response/dropdown", :locals => {:ques_num => q_number, :ques_text => question.txt, :options => dd_values, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
       when "Rating"
         #Parameters
-        #section::currQues|2
+        #section::curr_ques|2
 
         q_parameter =  ques_type.parameters.split("::")
 
@@ -181,21 +181,24 @@ module GradesHelper
           curr_ques = q_parameter[1].split("|")[0]
         end
 
+        #look for table parameters
+        table_hash = construct_table(q_parameter)
+
         #check to see if rendering view
         view_output = nil
-        if curr_ques == 1
+        if curr_ques == 2
           if is_view
-            view_output = "<img src=\"/images/delete_icon.png\">" + question.txt + "<br/>"
-            if @review_scores[q_number].comments == "1"
-              view_output = "<img src=\"/images/Check-icon.png\">" + question.txt + "<br/>"
+            view_output = "No Response"
+            if !score.comments.nil?
+              view_output = score.comments
             end
           end
-          render :partial => "response/checkbox", :locals => {:ques_num => q_number, :ques_text => question.txt, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+          render :partial => "response/textarea", :locals => {:ques_num => q_number, :area_size => default_textarea_size, :ques_text => question.txt, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
         else
           if is_view
             view_output = "No Response"
-            if !@review_scores[q_number].comments.nil?
-              view_output = @review_scores[q_number].comments
+            if !score.comments.nil?
+              view_output = score.comments
             end
           end
           render :partial => "response/dropdown", :locals => {:ques_num => q_number, :ques_text => question.txt, :options => score_range, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}

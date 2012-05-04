@@ -26,16 +26,17 @@
              <% @sort_to=Array.new %>
              <% @all_resp=Response.all  %>
 
-     <% for element in @all_resp      %>
-       <%  if(element.map_id==review.map_id) %>
-            <% @array_sort<<element %>
-       <% end %>
-     <% end %>
+             <% for element in @all_resp      %>
+               <%  if(element.map_id==review.map_id) %>
+                    <% @array_sort<<element %>
+               <% end %>
+             <% end %>
              <% @sort_to=@array_sort.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
-                <% score = Score.get_total_score(@sort_to[0], @questions[symbol]) %>
-		       <% if controller.action_name != "view_my_scores" %>
-		       	<input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>"%>
-		       <% end %>   
+
+             <% score = Score.get_total_score(:response => @sort_to[0], :questions => @questions[symbol], :q_types => Array.new) %>
+		     <% if controller.action_name != "view_my_scores" %>
+		        <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>"%>
+		     <% end %>
 	  	       <%= sprintf("%.2f",score) %>% &nbsp;
 	  	   </td>
 	    <% end %>

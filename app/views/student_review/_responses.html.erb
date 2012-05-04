@@ -63,9 +63,9 @@
             <!-- show the link as edit when latest review is done in current phase -->
             <!-- show link as update when latest review is done in different phase than current phase -->
             <% if (deadline_version.due_at == deadline_time.due_at) %>
-              <td><%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => map.id} %></td>
+              <td><%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @sorted[0].id} %></td>
             <% else %>
-              <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+              <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => @sorted[0].id} %></td>
             <% end %>
           <% end %>     
         <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
@@ -103,7 +103,7 @@
             </td>
           <% end %>
         <% else %><% # Deadline has passed, and the work was not submitted %>
-      	  <td>Begin</td><td> (Work has not yet been submitted)</td>
+      	  <td>Begin</td><td> (Work has not yet been submitted)</td>for
         <% end %>         
       <% review_no += 1 %>
       </tr>

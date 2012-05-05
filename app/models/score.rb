@@ -86,7 +86,7 @@ class Score < ActiveRecord::Base
     @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
     x = 0
-    if @questionnaire.section == "Custom" z
+    if @questionnaire.section == "Custom" 
       @questions.each{
         | question |
         item = Score.find_by_response_id_and_question_id(@response.id, question.id)

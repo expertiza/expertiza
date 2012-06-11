@@ -3,7 +3,7 @@ class ResponseMap < ActiveRecord::Base
   has_one :response, :class_name => 'Response', :foreign_key => 'map_id'
   has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id'
   has_many :metareview_responses, :source => :responses, :finder_sql => 'SELECT meta.* FROM responses r, response_maps meta, response_maps rev WHERE r.map_id = m.id AND m.type = \'MetaeviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
-
+  
   # return latest versions of the responses
   def self.get_assessments_for(participant)
     responses = Array.new   

@@ -13,7 +13,7 @@
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
   <hr/>
 <% end %>
-  <!-- display all versions available for a response in meta review -->
+<!-- display all versions available for a response in meta review -->
 <% @responses_versions = Array.new %>
 <% @responses_versions = @map.get_all_versions() %>
 

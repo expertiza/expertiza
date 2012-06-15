@@ -35,6 +35,11 @@ class ResponseMap < ActiveRecord::Base
     return responses    
   end 
   
+  # Placeholder method, override in derived classes if required.
+  def get_all_versions()
+    return []
+  end
+  
   def delete(force = nil)
     if self.response != nil and !force
       raise "A response exists for this mapping."

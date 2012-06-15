@@ -13,12 +13,12 @@
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
   <hr/>
 <% end %>
-<!-- display all versions available for a response in meta review -->
+<!-- display all versions available -->
 <% @responses_versions = Array.new %>
 <% @responses_versions = @map.get_all_versions() %>
 
 <% if @responses_versions.empty? %>
-  "<I>No review was performed.</I><br/><hr/><br/>"
+  "<I>No previous review was performed.</I><br/><hr/><br/>"
 <% else %>
   <% @responses_versions.each do |response| %>
     <% rm = ResponseMap.find(response.map_id) %>

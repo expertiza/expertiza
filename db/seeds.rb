@@ -283,6 +283,21 @@ tu.parent_id = tu.id
 tu.save!
 
 
+puts "Creating normal user with password 'admin'"
+User.create!(:name => 'normaluser',
+             :email => 'anything2@mailinator.com',
+             :clear_password => 'admin',
+             :clear_password_confirmation => 'admin',
+             :role_id => Role.find_by_name('Student').id,
+             :email_on_review => true,
+             :email_on_submission => true,
+             :email_on_review_of_review => true,
+             :is_new_user => false,
+             :master_permission_granted => false)
+tu = User.find_by_name('normaluser')
+tu.parent_id = tu.id
+tu.save!
+
 ###########################################################################
 # Display tables
 ###########################################################################

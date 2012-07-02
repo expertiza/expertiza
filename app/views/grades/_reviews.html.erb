@@ -51,7 +51,7 @@ questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
 %>
       <TR>
         <!-- First column shows the question text -->
-        <TD STYLE="padding:0.5em 0;max-width:30em;border-top:1px solid #DDD">
+        <TD STYLE="padding:0.5em 0;max-width:60em;border-top:1px solid #DDD">
           <%= question.txt %><br />
         </TD>
 <%
@@ -95,7 +95,7 @@ questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
         end
     end
     %>
-          <TD STYLE="width:6em;text-align:center;border-top:1px solid #DDD"><%= score.score %>
+          <TD STYLE="width:15em;text-align:center;border-top:1px solid #DDD"><%= score.score %>
           <hr>
 
                            <% review_feedback = nil %>
@@ -105,7 +105,7 @@ questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
             <%= render :partial => 'grades/show_single_review', :locals => {:prefix => prefix, :review => review ,:question =>question_num}%>
 
 
-            <BR/><BR/>
+
             <!-- get all previous versions -->
             <% @sorted_array=Array.new %>
             <% @prev=Response.all %>
@@ -120,7 +120,9 @@ questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
                 <% for i in 1..@sorted.size-1 %>
                     <% @str = @sorted[i].id.to_s %>
                     <!-- display previous versions in descending order -->
-                    <%= @sorted[i].additional_comment %>
+
+                    <%= render :partial => 'grades/show_single_review', :locals => {:prefix => prefix, :review => @sorted[i] ,:question =>question_num}%>
+
                     <br/>
                     <script>
                         toggleElement('reviews_<%=@str%>','review');
@@ -144,7 +146,7 @@ questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
             <% else %>
                 <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
             <% end %>
-            <BR/><HR/><BR/>
+            <HR/><BR/>
 
 
 

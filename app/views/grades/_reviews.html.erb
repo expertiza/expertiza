@@ -3,6 +3,75 @@
     <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
     <BR/>
     <HR/>
+
+
+
+<!-- ************************************************************** -->
+<!-- Start changes for CSC517 Summer 2012 Programming assignment #2 -->
+<!-- ************************************************************** -->
+<!-- Show a summary of the score for each question -->
+<H1>SCORE SUMMARY</H1>
+<TABLE STYLE="border-collapse:collapse">
+<THEAD>
+<TR>
+<TH STYLE="text-align:left">Question</TH>
+<%
+# Go through all the reviews and create a table header column for each one
+rscore[:assessments].each_with_index {|review,review_num|
+%>
+<TH>Review <%= review_num+1 %></TH>
+<% } %>
+<TH>Average</TH>
+<TH>Range</TH>
+</TR>
+</THEAD>
+
+<TBODY>
+<%
+@questionnaire = Questionnaire.find(@assignment.questionnaires[0].id)
+# Go through each of the questions on this questionnaire and output a table row
+questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
+  questions.each_with_index { |question, question_num|
+    if question
+      # Get the max possible score for this question, we'll use it later to compute min/max/avg %
+      max_possible = question.questionnaire.max_question_score
+%>
+      <TR>
+        <!-- First column shows the question text -->
+        <TD STYLE="padding:0.5em 0;max-width:30em;border-top:1px solid #DDD">
+          <%= question.txt %><br />
+        </TD>
+<%
+        # Initialize min/max/avg statistics for this question
+        total = 0
+        min = 5
+        max = 0
+        # Go through each review, accumulate statistics, and output a table column with the score
+        for review in rscore[:assessments]
+          score = Score.find_by_response_id_and_question_id(review.id, question.id)
+          total += score.score
+          min = [min,score.score].min
+          max = [max,score.score].max
+%>
+          <TD STYLE="width:6em;text-align:center;border-top:1px solid #DDD"><%= score.score %></TD>
+        <% end %>
+        <% avg = total/rscore[:assessments].count %>
+        <!-- Average and Range columns -->
+        <TD STYLE="text-align:center;border-top:1px solid #DDD"><%= 100*avg/max_possible %>%</TD>
+        <TD STYLE="text-align:center;border-top:1px solid #DDD"><%= 100*min/max_possible %>%&nbsp;-&nbsp;<%= 100*max/max_possible %>%
+      </TR>
+    <% end %>
+<% } %>
+</TBODY>
+</TABLE>
+<!-- ************************************************************ -->
+<!-- End changes for CSC517 Summer 2012 Programming assignment #2 -->
+<!-- ************************************************************ -->
+
+
+
+
+
     <% count = 0 %>
     <% for review in rscore[:assessments] %>
 
@@ -57,7 +126,7 @@
         <% end %>
     <% else %>
         <% if @questionnaire.section.eql? "Custom" %>
-            <h2>Review <%= count %></h2>
+            <h2>Review CUSTOM here<%= count %></h2>
             <!-- Display the latest review first -->
             <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a>
             <%= review.display_as_html(prefix) %>

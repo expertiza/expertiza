@@ -1,0 +1,55 @@
+<% identifier = ""
+    # The following three lines print out the type of rubric before displaying
+    # feedback.  Currently this is only done if the rubric is Author Feedback.
+    # It doesn't seem necessary to print out the rubric type in the case of
+    # a ReviewResponseMap.  Also, I'm not sure if that would have to be
+    # TeamResponseMap for a team assignment.  Someone who understands the
+    # situation better could add to the code later.
+    if review.map.type.to_s == 'FeedbackResponseMap'
+      identifier += "<H2>Feedback from author</H2>"
+    end
+    if prefix
+      identifier += "<B>Reviewer:</B> "+review.map.reviewer.fullname
+      str = prefix+"_"+review.id.to_s
+    else
+      identifier += '<B>'+review.map.get_title+'</B> '+count.to_s+'</B>'
+      str = review.id.to_s
+    end
+    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">hide review</a><BR/>'
+    code += "<B>Last reviewed:</B> "
+    if review.updated_at.nil?
+      code += "Not available"
+    else
+      code += review.updated_at.strftime('%A %B %d %Y, %I:%M%p')
+    end
+    code += '<div id="review_'+str+'" style=""><BR/><BR/>'
+
+    # Test for whether custom rubric needs to be used
+    if ((review.map.questionnaire.section.eql? "Custom") && (review.map.type.to_s != 'FeedbackResponseMap'))
+      #return top of view
+      return code
+    end
+    # End of custom code
+    count = 0
+
+    #Only show for one score
+    reviewScore = review.scores[question]
+      count += 1
+
+
+      if reviewScore.comments != nil
+        code +=  reviewScore.comments.gsub("<","&lt;").gsub(">","&gt;").gsub(/\n/,'<BR/>')
+      end
+      code += '<BR/>'
+
+  # print this to end of row
+  #  if review.additional_comment != nil
+  #    comment = review.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')
+  #  else
+  #    comment = ''
+  #  end
+  #  code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
+   #
+
+  %>
+    <%= code  %>

@@ -166,3 +166,7 @@ site_controller_survey_response:
   name: survey_response
   permission_id: <%= Fixtures.identify(:permission_public_actions_execute) %>
   builtin: "0"
+site_controller_signup:
+  name: signup
+  permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+  builtin: "0"

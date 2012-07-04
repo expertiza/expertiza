@@ -1,0 +1,14 @@
+
+topic1:
+      assignment_id: <%= Fixtures.identify(:assignment2) %>
+      category: topic1
+      max_choosers: 100
+      topic_identifier: t1
+      topic_name: t1
+
+topic2:
+      assignment_id: <%= Fixtures.identify(:assignment1) %>
+      category: topic2
+      max_choosers: 100
+      topic_identifier: t2
+      topic_name: t2

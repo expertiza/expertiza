@@ -17,7 +17,7 @@ class Assignment < ActiveRecord::Base
   has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaires', :foreign_key => 'assignment_id'
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
-  has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy  
+  has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
 
   validates_presence_of :name
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]

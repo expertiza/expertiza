@@ -283,3 +283,8 @@ controller_action_survey_response_submit:
   url_to_use:
   permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
   site_controller_id: <%= Fixtures.identify(:site_controller_survey_response) %>
+controller_action_signup_topics:
+  name: signup_topics
+  url_to_use:
+  permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+  site_controller_id: <%= Fixtures.identify(:site_controller_signup) %>

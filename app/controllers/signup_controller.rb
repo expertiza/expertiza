@@ -17,7 +17,7 @@
 
     #end
 
-    if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
+    if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(DeadlineType.find_by_name("submission").id).due_at < Time.now
       @show_actions = false
     end
 

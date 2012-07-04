@@ -7,7 +7,7 @@ class SignupControllerTest < ActionController::TestCase
   # Replace this with your real tests.
   fixtures :sign_up_topics, :assignments, :signed_up_users, :users, :roles, :due_dates
   fixtures :site_controllers, :content_pages, :roles_permissions, :participants
-  fixtures :controller_actions, :permissions, :system_settings, :menu_items
+  fixtures :controller_actions, :permissions, :system_settings, :menu_items, :deadline_types
 
   def setup
     @controller = SignupController.new

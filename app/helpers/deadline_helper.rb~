@@ -1,5 +1,3 @@
-#This helper contains methods to manipulate due dates of topics in an assignment. This helper if used by 
-#sign_up_controller
 module DeadlineHelper
 
 #Creates a new topic deadline for topic specified by topic_id.

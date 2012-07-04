@@ -282,7 +282,7 @@ class SignUpSheetController < ApplicationController
 
 #If the instructor needs to explicitly change the start/due dates of the topics 
 #This is true in case of a staggered deadline type assignment. Individual deadlines can 
-# be set on a per topic  and per round basis
+# be set on a per topic per round basis
   def save_topic_deadlines
 
     due_dates = params[:due_date]

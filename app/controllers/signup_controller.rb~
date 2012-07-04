@@ -72,7 +72,7 @@
   def slotAvailable?(topic_id)
     SignUpTopic.slotAvailable?(topic_id)
   end
-#checks for other topics a user may have already signed up for. These include both confirmed as well as waitlisted topics
+
   def otherConfirmedTopicforUser(assignment_id, creator_id)
     user_signup = SignedUpUser.find_user_signup_topics(assignment_id,creator_id)
     user_signup

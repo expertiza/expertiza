@@ -40,3 +40,5 @@ rp_admin_public_view:
 rp_inst_public_view:
     permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
     role_id: <%= Fixtures.identify(:Instructor_role) %>
+
+

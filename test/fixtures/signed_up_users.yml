@@ -1,0 +1,4 @@
+user_signup1:
+  creator_id: <%= Fixtures.identify(:student5) %>
+  is_waitlisted: 0
+  topic_id: <%= Fixtures.identify(:topic1) %>

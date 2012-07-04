@@ -22,14 +22,14 @@
 <% for j in 0..4 %>
 due_date<%= i*5+j %>:
   due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
-  deadline_type_id: <%= dline_type_list[j] %>
+  deadline_type_id: <%= j %>
   assignment_id: <%= Fixtures.identify("assignment"+i.to_s) %>
   late_policy_id: <%= Fixtures.identify("late_policy"+i.to_s) %>
   round: 1
 <% team_num = i*5+j+ 25 %>
 due_date<%= team_num %>:
   due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
-  deadline_type_id: <%= dline_type_list[j] %>
+  deadline_type_id: <%= dline_type_list[j].to_i %>
   assignment_id: <%= Fixtures.identify("assignment"+team_num.to_s) %>
   late_policy_id: <%= Fixtures.identify("late_policy"+i.to_s) %>
 <%end%>

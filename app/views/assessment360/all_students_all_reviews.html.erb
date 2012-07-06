@@ -15,18 +15,30 @@
       <% end %>
     </tr>
    <br>
+   <% meta_hash = Hash.new %>
+   <% meta_count_hash = Hash.new %>
+   <% teammate_hash = Hash.new %>
+   <% teammate_count_hash = Hash.new %>
+   <% @assignments.each do |assignment|   %>
+   <% teammate_hash[assignment.name.to_s] = 0 %>
+   <% teammate_count_hash[assignment.name.to_s] = 0 %>
+   <% meta_hash[assignment.name.to_s] = 0 %>
+   <% meta_count_hash[assignment.name.to_s] = 0 %>
+   <% end %>
    <% overall_teammate_average = 0; overall_teammate_count=0 %>
    <% overall_meta_average = 0; overall_meta_count=0 %>
+
    <% @students.each do |student| %>
      <tr>
-      <td align="center"><%= link_to student.fullname.to_s, :action => 'one_student_all_reviews' , :student_id => student.id, :course_id => @course.id  %> </td>
+      <td align="center"><%= link_to student.fullname.to_s, :action => 'one_student_all_reviews' , :student_id => student.id, :course_id => @course.id %> </td>
        <% teammate_aggregate = 0;meta_aggregate=0; teammate_count =0;meta_count=0 %>
        <% @assignments.each do |assignment| %>
          <% assignment_participant = assignment.participants.find_by_user_id(student.user_id) %>
          <% if assignment_participant.nil? %>
            <td></td><td></td>
          <% else %>
-         <% teammate_reviews = assignment_participant.get_teammate_reviews() ; meta_reviews = assignment_participant.get_metareviews() %>
+         <% teammate_reviews = assignment_participant.get_teammate_reviews() %>
+         <% meta_reviews = assignment_participant.get_metareviews() %>
          <% if !teammate_reviews.nil? %>
           <% teammate_average = 0 %>
           <% teammate_reviews.each do |teammate_review| %>
@@ -34,12 +46,14 @@
          <% end %>
          <% if teammate_reviews.count.to_i > 0.to_i %>
           <% teammate_average = (teammate_average.to_f/teammate_reviews.count.to_f).to_f.round(3) %>
+          <% teammate_count_hash[assignment.name.to_s] = teammate_count_hash[assignment.name.to_s] + 1 %>
          <% end %>
        <% end %>
        <% if teammate_average.to_f > 0.to_f %>
         <% teammate_aggregate = teammate_aggregate + teammate_average %>
         <% teammate_count = teammate_count+1 %>
        <% end %>
+
        <% meta_average = 0.to_i %>
         <% if !meta_reviews.nil? %>
          <% meta_reviews.each do |meta_review| %>
@@ -47,18 +61,21 @@
         <% end %>
         <% if meta_reviews.count > 0 %>
          <% meta_average = (meta_average.to_f/meta_reviews.count.to_f).to_f.round(3) %>
+         <% meta_count_hash[assignment.name.to_s] = meta_count_hash[assignment.name.to_s] + 1 %>
         <% end end %>
         <% if meta_average > 0 %>
          <% meta_aggregate = meta_aggregate + meta_average %>
          <% meta_count = meta_count+1 %>
         <% end %>
-        <td align="center" width="150"> <%= meta_average  %> </td> <td align="center" width="150"><%= teammate_average %></td>
+        <% teammate_hash[assignment.name.to_s] = teammate_hash[assignment.name.to_s] + teammate_average %>
+        <% meta_hash[assignment.name.to_s] = meta_hash[assignment.name.to_s] + meta_average %>
+        <td align="center" width="150"> <%= meta_average %> </td> <td align="center" width="150"><%= teammate_average %></td>
         <% end %>
       <% end %>
     
     <td align="center" width="150"> <% if meta_count.to_i > 0 %>
                           <%= (meta_aggregate/meta_count).to_f.round(2) %>
-                          <% overall_meta_average =  overall_meta_average + (meta_aggregate/meta_count)%>
+                          <% overall_meta_average = overall_meta_average + (meta_aggregate/meta_count)%>
                           <% overall_meta_count=overall_meta_count+1%>
                           <% end %> </td>
     <td align="center" width="150"> <% if teammate_count.to_i > 0 %>
@@ -70,20 +87,35 @@
     <% end %>
     <tr>
         <td><b>Class Average</b></td>
-	<% 1.upto @assignments.count do %>
-        <td border="0"></td><td border="0"></td>
+	    <% @assignments.each do |assignment| %>
+            <% if meta_count_hash[assignment.name.to_s] > 0 %>
+                <td border="0"><b><%= (meta_hash[assignment.name.to_s]/meta_count_hash[assignment.name.to_s]).to_f.round(2)%></b></td>
+            <% else %>
+                <td border="0"></td>
+            <% end %>
+            <% if teammate_count_hash[assignment.name.to_s] > 0 %>
+                <td border="0"><b><%= (teammate_hash[assignment.name.to_s]/teammate_count_hash[assignment.name.to_s]).to_f.round(2) %></b></td>
+            <% else %>
+                <td border="0"></td>
+            <% end %>
         <% end %>
-        <% if overall_meta_count > 0 %>   
-	<td><center><%= (overall_meta_average/overall_meta_count).to_f.round(2) %></center></td>
+        <% if overall_meta_count > 0 %>
+          <td><center><b><%= (overall_meta_average/overall_meta_count).to_f.round(2) %></center></b></td>
         <% else %>
-        <td></td>
-        <% end %> 
-        <% if overall_teammate_count > 0 %>   
-	<td><center><%= (overall_teammate_average/overall_teammate_count).to_f.round(2) %></center></td>
+          <td></td>
+        <% end %>
+        <% if overall_teammate_count > 0 %>
+          <td><b><center><%= (overall_teammate_average/overall_teammate_count).to_f.round(2) %></center></b></td>
         <% else %>
         <td></td>
         <% end %>
     </tr>
 
    </table>
+
+    <div style="margin-top: 25px;">
+    <%= link_to 'Back to All Courses', :action => 'index' %>
+    | <%= render :partial => '/shared_scripts/back' %>
+  </div>
+
 </div>

@@ -11,5 +11,3 @@ deadline_type_metareview:
   name: metareview
 deadline_type_drop_topic:
   name: drop_topic
-deadline_type_team_formation:
-  name: team_formation

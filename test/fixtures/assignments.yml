@@ -34,7 +34,7 @@ assignment<%= i %>:
   require_signup: <%= i==5 %>
   num_reviewers: <%= i%5+1 %>
   spec_location:
-  team_assignment: <%= i > 5 %>
+  team_assignment: <%= i > 7 %>
   wiki_type_id: 1
   team_count: <%= 2*i %>
   
@@ -84,31 +84,70 @@ assignment_review0:
   team_count: 2
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %> 
 
-
-assignment_team_formation:
-  name: Assignment Team Formation
-  directory_path: assignment331_dir
-  submitter_count: 1
-  course: <%= Fixtures.identify(:course_team_formation) %>
-  instructor_id: <%= Fixtures.identify(:instructor_team_formation) %>
+#Assignments for course_object_oriented for instructor 1
+assignment_project1:
+  name: Assignment_Project1
+  directory_path: CSC517_instructor1/Assignment1
+  submitter_count: 0
+  course:  <%= Fixtures.identify(:course_object_oriented) %>
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
   private: 0
   num_reviews: 1
   num_review_of_reviews: 1
-  num_review_of_reviewers: 1
-  review_questionnaire_id:
-  review_of_review_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
-  author_feedback_questionnaire_id:
-  teammate_review_questionnaire_id:
-  reviews_visible_to_all: <%= 1 %>
-  require_signup: <%= 1 %>
-  num_reviewers: <%= 2 %>
+  num_review_of_reviewers: 3
+  review_questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+  review_of_review_questionnaire_id: <%= Fixtures.identify(:questionnaire2) %>
+  author_feedback_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
+  teammate_review_questionnaire_id: <%= Fixtures.identify(:teammate_review_questionnaire) %>
+  reviews_visible_to_all: <%= 0 %>
+  require_signup: <%= 0 %>
+  num_reviewers: <%= 3 %>
   spec_location:
   team_assignment: <%= 1 %>
-  wiki_type_id: <%= Fixtures.identify(:MediaWiki) %>
-  team_count: 3
-  staggered_deadline: <%= 0 %>
-  team_formation_required: <%= 1 %>
-  max_topic_count: 1
-  minimum_team_count: 2
+  team_count: 2
+  wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>
 
 
+assignment_project2:
+  name: Assignment_Project2
+  directory_path: CSC517_instructor1/Assignment2
+  submitter_count: 0
+  course:  <%= Fixtures.identify(:course_object_oriented) %>
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
+  private: 0
+  num_reviews: 1
+  num_review_of_reviews: 1
+  num_review_of_reviewers: 3
+  review_questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+  review_of_review_questionnaire_id: <%= Fixtures.identify(:questionnaire2) %>
+  author_feedback_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
+  teammate_review_questionnaire_id: <%= Fixtures.identify(:teammate_review_questionnaire) %>
+  reviews_visible_to_all: <%= 0 %>
+  require_signup: <%= 0 %>
+  num_reviewers: <%= 3 %>
+  spec_location:
+  team_assignment: <%= 1 %>
+  team_count: 2
+  wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>
+
+assignment_project3:
+  name: Assignment_Project3
+  directory_path: CSC517_instructor1/Assignment3
+  submitter_count: 0
+  course:  <%= Fixtures.identify(:course_object_oriented) %>
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
+  private: 0
+  num_reviews: 1
+  num_review_of_reviews: 1
+  num_review_of_reviewers: 3
+  review_questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+  review_of_review_questionnaire_id: <%= Fixtures.identify(:questionnaire2) %>
+  author_feedback_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
+  teammate_review_questionnaire_id: <%= Fixtures.identify(:teammate_review_questionnaire) %>
+  reviews_visible_to_all: <%= 0 %>
+  require_signup: <%= 0 %>
+  num_reviewers: <%= 3 %>
+  spec_location:
+  team_assignment: <%= 0 %>
+  team_count: 1
+  wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>

@@ -52,9 +52,12 @@ class AssignmentParticipant < Participant
   def get_scores(questions)
     scores = Hash.new
     scores[:participant] = self # This doesn't appear to be used anywhere
-    assignment.questionnaires.each do |questionnaire|
+    self.assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
+
+
+
       scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
     end
     scores[:total_score] = assignment.compute_total_score(scores)
@@ -227,7 +230,7 @@ class AssignmentParticipant < Participant
   end  
   
   # provide export functionality for Assignment Participants
-  def self.export(csv,parent_id)
+  def self.export(csv,parent_id,options)
      find_all_by_parent_id(parent_id).each{
           |part|
           user = part.user
@@ -245,7 +248,7 @@ class AssignmentParticipant < Participant
       } 
   end
   
-  def self.get_export_fields
+  def self.get_export_fields(options)
     fields = ["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"]
     return fields            
   end
@@ -364,7 +367,7 @@ class AssignmentParticipant < Participant
         }
       end
     end
-  end   
+  end
 
 private
 

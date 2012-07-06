@@ -34,3 +34,16 @@ accept_invitation_with_team_and_no_members:
   to_id: <%= Fixtures.identify(:student9) %>
   assignment_id: <%= Fixtures.identify(:assignment0) %>
   reply_status: 'A'
+  
+#Invitations for course_object_oriented and instructor1
+invitation1:
+  assignment_id: <%= Fixtures.identify(:assignment_project1) %>
+  from_id: <%= Fixtures.identify(:student1) %>
+  to_id: <%= Fixtures.identify(:student2) %>
+  reply_status: A
+
+invitation2:
+  assignment_id: <%= Fixtures.identify(:assignment_project2) %>
+  from_id: <%= Fixtures.identify(:student3) %>
+  to_id: <%= Fixtures.identify(:student1) %>
+  reply_status: A

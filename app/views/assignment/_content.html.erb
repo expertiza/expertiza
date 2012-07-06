@@ -43,21 +43,6 @@ function onChangeWikiType(){
 	}
 }
 
-// This function gets invoked when someone toggles the
-// "Enforce formation deadline?" check box and basically
-// just toggles its visibility
-function onChangeFormationEnforcement(e)
-{
-	setFormationRow();
-	formation_datetime.style.display = (e.checked ? "" : "none");
-}
-
-// Necessary "global" variable for keeping track of the formation deadline
-var formation_datetime;
-function setFormationRow()
-{
-	if(typeof(formation_datetime) === 'undefined') formation_datetime = document.getElementById("team_formation_row");
-}
 
 </script>
 
@@ -121,13 +106,6 @@ function setFormationRow()
 		<td colspan="2"><label for="team_count">Maximum number of participants per team:</label></td>
 		<td>&nbsp;</td>
 		<td colspan="2"><%= text_field 'assignment', 'team_count', :size => 5 %></td>
-	</tr>
-	<tr>
-		<td colspan="2"><label for="team_count">Minimum participants for team formation deadline:</label></td>
-		<td>&nbsp;</td>
-		<td colspan="2">
-			<%= text_field 'assignment', 'minimum_team_count', :size => 5 %>
-		</td>
 	</tr>
 	<tr>
 		<td colspan="2"><label for="max_topic_count">Maximum number of topics user can choose:</label></td>

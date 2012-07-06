@@ -1,0 +1,20 @@
+<h1>Editing join_team_request</h1>
+
+<% form_for(@join_team_request) do |f| %>
+  <%= f.error_messages %>
+
+    <%= f.hidden_field :participant_id %>
+    <%= f.hidden_field :team_id %>
+    <%= f.hidden_field :status %>
+  <p>
+    <%= f.label :comments %><br />
+    <%= f.text_area :comments %>
+  </p>
+
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @join_team_request %> |
+<%= link_to 'Back', join_team_requests_path %>

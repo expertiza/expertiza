@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  review_file_id: 1
+  comment_content: CommentOne
+  reviewer_participant_id: 1
+  file_offset: 1
+
+two:
+  review_file_id: 1
+  comment_content: CommentTwo
+  reviewer_participant_id: 1
+  file_offset: 10

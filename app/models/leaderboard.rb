@@ -40,7 +40,7 @@ class Leaderboard < ActiveRecord::Base
      assignmentList = getAssignmentsInCourses(courseArray)
      independantAssignments = getIndependantAssignments(user_id)
     for iA in independantAssignments
-         assignmentList <<iA
+         assignmentList << iA
     end
      questionnaireHash = getParticipantEntriesInAssignmentList(assignmentList)
   end
@@ -75,7 +75,7 @@ class Leaderboard < ActiveRecord::Base
         end
         @revqids = []
         differentQuestionnaires = Hash.new
-        @revqids = AssignmentQuestionnaires.find(:all, :conditions => ["assignment_id = ?",assgt.id])
+        @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",assgt.id])
         @revqids.each do |rqid|
             rtype = Questionnaire.find(rqid.questionnaire_id).type
             if( rtype == 'ReviewQuestionnaire')

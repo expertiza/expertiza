@@ -1,0 +1,48 @@
+<div>
+  <h1> <%= @participant.fullname %> </h1>
+  <p><img src="<%= @bc %>" >  </p>
+  <table class="listing" cellpadding=2 border="1">
+    <tr>
+      <td>
+        <font style="font-weight:bold">Class Average</font>
+      </td>
+      <td>
+        <%= @assignment.get_average_score %>%
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <font style="font-weight:bold"><%= @participant.fullname %> Average</font>
+      </td>
+      <td>
+        <%= @participant.get_average_score %>%
+      </td>
+    </tr>
+  </table>
+  <% @questionnaires.each do |questionnaire|  %>
+    <p> <%= questionnaire.name %> Questionnaire </p>
+    <table class="listing" cellpadding=2 border="1">
+      <tr>
+        <th>
+          Average Score
+        </th>
+        <th>
+          Question
+        </th>
+      </tr>
+      <% questionnaire.questions.each do |question|  %>
+        <tr>
+          <td>
+            <%= @participant.get_average_question_score(question) %>
+          </td>
+          <td>
+            <%= question.txt %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  <%end%>
+  <div style="margin-top: 25px;">
+    <%= link_to 'Back to All Students', :action => 'one_assignment_all_students', :assignment_id => @assignment.id %>
+  </div>
+</div>

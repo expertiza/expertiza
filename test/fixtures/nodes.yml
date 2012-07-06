@@ -1,17 +1,63 @@
-node0:
- parent_id: 1
- node_object_id: <%= Fixtures.identify(:questionnaire0) %>
- type: FolderNode
- 
-node1:
- parent_id: 1
- node_object_id: <%= Fixtures.identify(:questionnaire1) %>
- type: FolderNode
- 
-node2:
- parent_id: 1
- node_object_id: <%= Fixtures.identify(:questionnaire2) %>
- type: FolderNode
+############
+# Define all of the folder nodes first.
+node_questionnaires:
+  parent_id: 
+  node_object_id: <%= Fixtures.identify(:tree_folder_questionnaires) %>
+  type: FolderNode
+node_courses:
+  parent_id: 
+  node_object_id: <%= Fixtures.identify(:tree_folder_courses) %>
+  type: FolderNode
+node_assignments:
+  parent_id: 
+  node_object_id: <%= Fixtures.identify(:tree_folder_assignments) %>
+  type: FolderNode
+node_review:
+  parent_id: <%= Fixtures.identify(:node_questionnaires) %>
+  node_object_id: <%= Fixtures.identify(:tree_folder_review) %>
+  type: FolderNode
+node_metareview:
+  parent_id: <%= Fixtures.identify(:node_questionnaires) %>
+  node_object_id: <%= Fixtures.identify(:tree_folder_metareview) %>
+  type: FolderNode
+node_author_feedback:
+  parent_id: <%= Fixtures.identify(:node_questionnaires) %>
+  node_object_id: <%= Fixtures.identify(:tree_folder_author_feedback) %>
+  type: FolderNode
+node_teammate_review:
+  parent_id: <%= Fixtures.identify(:node_questionnaires) %>
+  node_object_id: <%= Fixtures.identify(:tree_folder_teammate_review) %>
+  type: FolderNode
+node_survey:
+  parent_id: <%= Fixtures.identify(:node_questionnaires) %>
+  node_object_id: <%= Fixtures.identify(:tree_folder_survey) %>
+  type: FolderNode
+node_global_survey:
+  parent_id: <%= Fixtures.identify(:node_questionnaires) %>
+  node_object_id: <%= Fixtures.identify(:tree_folder_global_survey) %>
+  type: FolderNode
+node_course_evaluation:
+  parent_id: <%= Fixtures.identify(:node_questionnaires) %>
+  node_object_id: <%= Fixtures.identify(:tree_folder_course_evaluation) %>
+  type: FolderNode
+
+
+
+
+# node0:
+ # parent_id: 1
+ # node_object_id: <%= Fixtures.identify(:questionnaire0) %>
+ # type: FolderNode
+#  
+# node1:
+ # parent_id: 1
+ # node_object_id: <%= Fixtures.identify(:questionnaire1) %>
+ # type: FolderNode
+#  
+# node2:
+ # parent_id: 1
+ # node_object_id: <%= Fixtures.identify(:questionnaire2) %>
+ # type: FolderNode
  
 
 node3:
@@ -75,17 +121,17 @@ node14:
  node_object_id: <%= Fixtures.identify(:team2) %>
  type: TeamNode
    
-node15:
-  node_object_id: <%= Fixtures.identify(:tree_folder_questionnaires) %>
-  type: FolderNode
-
-node16:
-  node_object_id: <%= Fixtures.identify(:tree_folder_courses) %>
-  type: FolderNode
-
-node17:
-  node_object_id: <%= Fixtures.identify(:tree_folder_assignments) %>
-  type: FolderNode
+# node15:
+  # node_object_id: <%= Fixtures.identify(:tree_folder_questionnaires) %>
+  # type: FolderNode
+# 
+# node16:
+  # node_object_id: <%= Fixtures.identify(:tree_folder_courses) %>
+  # type: FolderNode
+# 
+# node17:
+  # node_object_id: <%= Fixtures.identify(:tree_folder_assignments) %>
+  # type: FolderNode
 
 node18:
  parent_id: <%= Fixtures.identify(:team0) %>
@@ -114,18 +160,7 @@ node22:
  type: TeamUserNode
  type: TeamUser
 
-
-node_tf_course:
- parent_id: 1
- node_object_id: <%= Fixtures.identify(:course_team_formation) %>
- type: CourseNode
-
-node_tf_assignment:
- parent_id: <%= Fixtures.identify(:node_tf_course) %>
- node_object_id: <%= Fixtures.identify(:assignment_team_formation) %>
- type: AssignmentNode
- 
-node_tf_1:
- parent_id: <%= Fixtures.identify(:node_tf_assignment) %>
- node_object_id: <%= Fixtures.identify(:full_team) %>
- type: TeamNode
+node23:
+  parent_id: <%= Fixtures.identify(:instructor3) %>
+  node_object_id: <%= Fixtures.identify(:course0) %>
+  type: CourseNode

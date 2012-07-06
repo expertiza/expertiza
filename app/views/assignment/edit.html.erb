@@ -9,9 +9,6 @@
 <hr/>
 <div style="font-size:large;"><b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b></div>  
   <table>
-	<tr><td colspan="2"><%= check_box 'assignment', 'team_formation_required', :onClick => 'javascript:onChangeFormationEnforcement(this)', :onBlur => 'javascript:onChangeFormationEnforcement(this)', :onFocus => 'javascript:onChangeFormationEnforcement(this)' %>
-			Enforce formation deadline?
-	</td></tr>
     <tr style="font-size:12px;padding:15px">
         <th style="padding:10px">Deadline type</th>
         <th style="padding:10px">Date &amp; time</th>
@@ -24,16 +21,15 @@
     </tr>
     <% 	i = 0;
         duedates = @assignment.due_dates
-		found_formation = false		
 		
         duedates.sort! {|a,b| a.due_at <=> b.due_at}
 		
 		for @due_date in duedates %>
 	        <% heading = @due_date.deadline_type.name.titleize + " deadline" %>
-			<tr<% if @due_date.deadline_type_id == 7%> id="team_formation_row"<% found_formation = true %><% end %>>
+			<tr>
 				<td align ="center"><%= heading%></td>
 				<td align ="center"><%= text_field 'due_date[]', 'due_at', :size=>30%></td>
-			<% if @due_date.deadline_type_id != 6 && @due_date.deadline_type_id != 7 %>
+			<% if @due_date.deadline_type_id != 6  %>
 				<td align ="center"><%= select('due_date[]', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 				<td align ="center"><%= select('due_date[]', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
 				<td align ="center"><%= select('due_date[]', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
@@ -46,13 +42,6 @@
 			<% i += 1 %>
 		<% end %>
 		
-		<% if !found_formation
-			%>
-			<tr id="team_formation_row" style="display:none">
-				<td align ="center">Team formation deadline</td>
-				<td align ="center"><input name="formation_deadline" id="formation_deadline" size="30" type="text" /></td>
-			</tr>
-		<% end %>
     </table>
 <br/>
 <div id="days_between_chapters" style="position:relative">

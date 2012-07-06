@@ -25,26 +25,7 @@ class DueDate < ActiveRecord::Base
       new_due_date.save       
     }    
   end
-  
-  # This was pulled out to its own function because there was an issue with key stringifying with the set_duedate helper
-  def self.set_team_formation_deadline(assignment_id, due_at)
-    submit_duedate = DueDate.new
-    submit_duedate.deadline_type_id = DeadlineType.find_by_name("team_formation").id
-    submit_duedate.assignment_id = assignment_id
-    submit_duedate.due_at = due_at
-  
-    # Nothing can be done before teams are formed (set explicitly)
-    no_deadline_right = DeadlineRight.find_by_name("No")
-    submit_duedate.submission_allowed_id = no_deadline_right.id
-    submit_duedate.review_allowed_id = no_deadline_right.id
-    submit_duedate.resubmission_allowed_id = no_deadline_right.id
-    submit_duedate.rereview_allowed_id = no_deadline_right.id
-    submit_duedate.review_of_review_allowed_id = no_deadline_right.id
-    submit_duedate.round = 0
-  
-    submit_duedate.save!
-  end
-  
+    
   def self.set_duedate (duedate,deadline, assign_id, max_round)
     submit_duedate=DueDate.new(duedate)
     submit_duedate.deadline_type_id = deadline

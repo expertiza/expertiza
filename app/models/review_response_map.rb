@@ -1,6 +1,6 @@
 class ReviewResponseMap < ResponseMap
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'reviewed_object_id'
- 
+  
   def questionnaire
     self.assignment.questionnaires.find_by_type('ReviewQuestionnaire')
   end 
@@ -22,12 +22,12 @@ class ReviewResponseMap < ResponseMap
     self.destroy
   end  
 
-  def self.get_export_fields
+  def self.get_export_fields(options)
     fields = ["contributor","reviewed by"]
     return fields            
   end   
   
-  def self.export(csv,parent_id)
+  def self.export(csv,parent_id,options)
     mappings = find(:all, :conditions => ['reviewed_object_id=?',parent_id])
     mappings.sort!{|a,b| a.reviewee.name <=> b.reviewee.name} 
     mappings.each{
@@ -95,4 +95,16 @@ class ReviewResponseMap < ResponseMap
       return nil
     end
   end
+
+  # This method adds a new entry in the ResponseMap
+  def self.add_reviewer(contributor_id, reviewer_id, assignment_id)
+    if find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor_id, reviewer_id]).nil?
+      create(:reviewee_id => contributor_id,
+             :reviewer_id => reviewer_id,
+             :reviewed_object_id => assignment_id)
+    else
+      raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+    end
+  end
+
 end

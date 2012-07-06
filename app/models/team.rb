@@ -1,7 +1,8 @@
 class Team < ActiveRecord::Base
   has_many :teams_users
   has_many :users, :through => :teams_users
-  
+  has_many :join_team_requests
+
   def delete
     for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", self.id])       
        teamsuser.delete
@@ -12,7 +13,7 @@ class Team < ActiveRecord::Base
     end
     self.destroy
   end
-  
+
   def get_node_type
     "TeamNode"
   end
@@ -65,7 +66,7 @@ class Team < ActiveRecord::Base
    members.each{
      | member |
      t_user = TeamsUser.create(:team_id => new_team.id, :user_id => member.user_id)
-     parent = TeamNode.find_by_node_object_id(self.id)   
+     parent = Object.const_get(self.get_parent_model).find(self.parent_id)
      TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
    }   
  end
@@ -74,5 +75,49 @@ class Team < ActiveRecord::Base
    create(:name => name, :parent_id => parent_id)
    parent = Object.const_get(self.get_parent_model).find(parent_id)
    Object.const_get(self.get_node_type).create(:parent_id => parent.id, :node_object_id => self.id)
- end 
+ end
+
+ def self.check_for_existing(parent, name, team_type)
+   list = Object.const_get(team_type + 'Team').find(:all, :conditions => ['parent_id = ? and name = ?', parent.id, name])
+   if list.length > 0
+     raise TeamExistsError, 'Team name, "' + name + '", is already in use.'
+   end
+ end
+
+  def self.delete_all_by_parent(parent)
+    teams = Team.find(:all, :conditions => ["parent_id=?", parent.id])
+
+    for team in teams
+      team.delete
+    end
+  end
+
+# @param parent [Object]
+# @param team_type [Object]
+# @param team_size [Object]
+  def self.randomize_all_by_parent(parent, team_type, team_size)
+    participants = Participant.find(:all, :conditions => ["parent_id = ? AND type = ?", parent.id, parent.class.to_s + "Participant"])
+    participants = participants.sort{rand(3) - 1}
+    users = participants.map{|p| User.find_by_id(p.user_id)}
+    #users = users.uniq
+
+    Team.delete_all_by_parent(parent)
+
+    no_of_teams = users.length.fdiv(team_size).ceil
+    nextTeamMemberIndex = 0
+
+    for i in 1..no_of_teams
+      team = Object.const_get(team_type + 'Team').create(:name => "Team #{i}", :parent_id => parent.id)
+      TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
+
+      team_size.times do
+        break if nextTeamMemberIndex >= users.length
+
+        user = users[nextTeamMemberIndex]
+        team.add_member(user)
+
+        nextTeamMemberIndex += 1
+      end
+    end
+  end
 end

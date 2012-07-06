@@ -34,13 +34,15 @@
         <% @reviewers.each do |r| %>
 		<% @this_reviewer = r.reviewer_id %>
             <% @count = 0 %>
+            <% @rspan = 0 %>
             <%@l = @l+1 %>
-            
-		    <% @rspan = (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id, @type])).length %>
             <% (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id,@type])).each do |ri| %>
                 <% if (Response.find_by_map_id(ri.id)) %>
                     <% @count = @count + 1 %>
-                <%end %>
+                <% end %>
+                <% if (Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0) %>
+                    <% @rspan = @rspan + 1 %>
+                <% end %>
             <%end %>
             <%if r.reviewer_id != -1 %>
 		        <% parid = Participant.find(r.reviewer_id).user_id%>
@@ -62,17 +64,17 @@
 
                 <%if (@count == (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
                     <td align = "center" rowspan= <%= @rspan%>>
-                        <%= @count %>/<%= (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length %>
+                        <%= @count %>/<%= @rspan %>
                     </td>
                 <%else %>
                     <td align = "center" rowspan= <%= @rspan%> style = "color:#DD3300">
-                        <%= @count %>/<%= (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length %>
+                        <%= @count %>/<%= @rspan %>
                     </td>
                 <%end %>
 
                 <% (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id, @type])).each do |ri| %>
                     <% if (Response.find_by_map_id(ri.id)) %>
-                        <%if @assignment.team_assignment %>
+                        <%if @assignment.team_assignment && Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0 %>
                             <%@team = Team.find(ri.reviewee_id) %>
                             <% @teamid = @team.id%>
                                 <% if (@l%2) == 0 %>
@@ -93,7 +95,7 @@
                                </td>
                         <tr/>
 
-                        <%else %>
+                        <% elsif !@assignment.team_assignment %>
                             <% @participantid = (Participant.find(ri.reviewee_id)).user_id %>
                             <% @myuser = 0%>
                             <% @myuser = ri.reviewee_id%>
@@ -119,7 +121,7 @@
                         <%end %>
 
                     <% else %>
-                        <%if @assignment.team_assignment %>
+                        <%if @assignment.team_assignment && Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0 %>
                             <% if (@l%2) == 0 %>
                                 <td id = "red" bgcolor="#ffffff" style ="color:#DD3300" align = 'center' colspan=1>
                             <%else %>
@@ -138,7 +140,7 @@
                             No
                             </td>
                             <tr/>
-                        <%else %>
+                        <% elsif !@assignment.team_assignment %>
                             <% @participantid = Participant.find(ri.reviewee_id).user_id %>
                             <% @myuser = 0%>
                             <% @myuser = ri.reviewee_id%>

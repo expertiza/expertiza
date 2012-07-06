@@ -19,16 +19,15 @@ class AssignmentController < ApplicationController
     if new_assign.save 
       Assignment.record_timestamps = true
 
-      old_assign.assignment_questionnaires.each{
-        | aq |
-        AssignmentQuestionnaires.create(
+      old_assign.assignment_questionnaires.each do |aq|
+        AssignmentQuestionnaire.create(
           :assignment_id => new_assign.id,
           :questionnaire_id => aq.questionnaire_id,
           :user_id => session[:user].id,
           :notification_limit => aq.notification_limit,
           :questionnaire_weight => aq.questionnaire_weight
         )
-      }      
+      end
       
       DueDate.copy(old_assign.id, new_assign.id)           
       new_assign.create_node()
@@ -104,33 +103,31 @@ class AssignmentController < ApplicationController
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
-    deadline = DeadlineType.find_by_name("team_formation")
-    @team_formation_deadline = deadline.id
     
-    if @assignment.save 
+    check_flag = @assignment.availability_flag
+
+    if(check_flag == true && params[:submit_deadline].nil?)
+      raise "Please enter a valid Submission deadline!!"
+      render :action => 'create'
+    elsif (@assignment.save)
       set_questionnaires   
       set_limits_and_weights
-      
       max_round = 1
-      
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
         due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
-        raise "Please enter a valid Submission deadline" if !due_date
-        
+        # raise error if check_flag is true and if due_date is not set
+        if check_flag == true
+            raise "Please enter a valid Submission deadline" if !due_date
+        end
+
         due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
-        raise "Please enter a valid Review deadline" if !due_date
+#        raise "Please enter a valid Review deadline" if !due_date
         max_round = 2;
         
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
-        raise "Please enter a valid drop topic deadline" if !due_date
-    
-        if @assignment.team_formation_required
-          due_date = DueDate::set_team_formation_deadline(@assignment.id,params[:team_formation_deadline]['due_at'])
-          #due_date = DueDate::set_duedate(params[:team_formation_deadline],@team_formation_deadline, @assignment.id, 0)
-          raise "Please enter a valid team formation deadline" if !due_date
-        end
-        
+ #       raise "Please enter a valid Drop-Topic deadline" if !due_date
+            
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys
             #setting the Due Dates with a helper function written in DueDate.rb
@@ -232,7 +229,7 @@ class AssignmentController < ApplicationController
       user_id = session[:user].id
     end
     
-    default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)   
+    default = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)
 
     if default.nil?
       default_limit_value = 15
@@ -252,7 +249,7 @@ class AssignmentController < ApplicationController
     
     @assignment.questionnaires.each{
       | questionnaire |
-      aq = AssignmentQuestionnaires.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
+      aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
       @limits[questionnaire.symbol] = aq.notification_limit   
       @weights[questionnaire.symbol] = aq.questionnaire_weight
     }             
@@ -265,11 +262,11 @@ class AssignmentController < ApplicationController
       user_id = session[:user].id
     end
     
-    default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil) 
+    default = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)
     
     @assignment.questionnaires.each{
       | questionnaire |
-      aq = AssignmentQuestionnaires.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
+      aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
       if params[:limits][questionnaire.symbol].length > 0
         aq.update_attribute('notification_limit',params[:limits][questionnaire.symbol])
       else
@@ -328,33 +325,13 @@ class AssignmentController < ApplicationController
       end
       
       begin
-        found_formation = false
-    
         # Iterate over due_dates, from due_date[0] to the maximum due_date
         if params[:due_date]
           for due_date_key in params[:due_date].keys
             due_date_temp = DueDate.find(due_date_key)
             due_date_temp.update_attributes(params[:due_date][due_date_key])
-      
-            # Raise a flag if the team formation deadline was found for this assignment
-            found_formation = true if due_date_temp.deadline_type_id == 7
-      
-            # Only validate the date if we "care" about it
-            if due_date_temp.deadline_type_id != 7 || (@assignment.team_formation_required && due_date_temp.deadline_type_id == 7)
-              raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
-            end
-      
-            # If we find that we don't need the team formation deadline, delete it
-            due_date_temp.delete if due_date_temp.deadline_type_id == 7 && !@assignment.team_formation_required
-      
+            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
           end
-        end
-    
-        # set user options for deadline formation if it's being newly added
-        if !found_formation && @assignment.team_formation_required && params[:formation_deadline]
-          # try to insert the team formation deadline
-          formation_due_date = DueDate::set_team_formation_deadline(@assignment.id,params[:formation_deadline])
-          raise "Please enter a valid date & time for the team formation deadline" if !formation_due_date
         end
      
         flash[:notice] = 'Assignment was successfully updated.'

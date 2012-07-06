@@ -19,10 +19,11 @@ course_e_commerce:
   directory_path: csc511
   info: E Commerce Class
   private: 0
-
-course_team_formation:
-  name: Team Formation
-  instructor_id:  <%= Fixtures.identify(:instructor_team_formation) %>
-  directory_path: csc511
-  info: E Commerce Class
+  
+course_object_oriented:
+  name: Object_Oriented_Programming
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
+  directory_path: CSC517_instructor1
+  info: Test CSC517 class Object Oriented Programming
   private: 0
+

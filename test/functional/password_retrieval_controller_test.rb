@@ -18,7 +18,7 @@ class PasswordRetrievalControllerTest < ActionController::TestCase
     original_password = user.password
     
     assert_emails 1 do # should have sent one reminder email
-      post :send_password, :user => {:email => user.email}
+      post :reset_password, :user => {:email => user.email}
     end
     user = User.find_by_email user.email
     

@@ -271,71 +271,71 @@ class SignUpSheetController < ApplicationController
         #find the first wait listed user if exists
         first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
 
-      # 
-      # E309 feature: allows user to choose when a waitlisted topic is acceptable
-      # based on how many days are left before submission deadline.
-      # For example, if a user chooses "confirm by 5 days", then the waitlisted
-      # topic will become the user's signed up topic when the topic becomes 
-      # availabel AND there are 5 or more days left before submission deadline
-      # 
-      # We couldn't test this feature when "team formation deadline" is not
-      # enforced without seeing errors. "Team formation deadline" requires there 
-      # to be a certain number of team members before a team can sign up for a slot.
-      # Team formation code is to be removed. 
-      #
-      if !first_waitlisted_user.nil?
-        confby = first_waitlisted_user.confirm_by.days.from_now.to_date
-        tnow = Time.now.to_date
-      
-        if assignment.staggered_deadline ==1
-          topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic_id, 1)
-        else
-          topic_deadline_subm = DueDate.find_by_assignment_id_and_deadline_type_id(assignment.id,1)
-        end
-    
-        # If the submission deadline comes before "confirm by" days for that topic,
-        # that waitlisted topic should be dropped. 
-        if topic_deadline_subm.due_at < confby
-          check = 0
-        else
-          check = 1
-        end
-      end
-      
-      if !first_waitlisted_user.nil?
-        if check == 1
-          # When waitlisted topic "confirm by" days come before submission deadline
-          # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-          first_waitlisted_user.is_waitlisted = false
-          first_waitlisted_user.save
+        # E309 feature: allows user to choose when a waitlisted topic is acceptable
+        # based on how many days are left before submission deadline.
+        # For example, if a user chooses "confirm by 5 days", then the waitlisted
+        # topic will become the user's signed up topic when the topic becomes
+        # availabel AND there are 5 or more days left before submission deadline
 
-          #update the participants details
-          if assignment.team_assignment?
-            user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-            participant = Participant.find_by_user_id_and_parent_id(user_id, assignment.id)
+        # We couldn't test this feature when "team formation deadline" is not
+        # enforced without seeing errors. "Team formation deadline" requires there
+        # to be a certain number of team members before a team can sign up for a slot.
+        # Team formation code is to be removed.
+
+        if !first_waitlisted_user.nil?
+          confby = first_waitlisted_user.confirm_by.days.from_now.to_date
+          tnow = Time.now.to_date
+      
+          if assignment.staggered_deadline ==1
+            topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic_id, 1)
           else
-            participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
+            topic_deadline_subm = DueDate.find_by_assignment_id_and_deadline_type_id(assignment.id,1)
           end
-  
-          participant.update_topic_id(topic_id)
-
-          SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
-        else
-          # When submission deadline comes before the waitlisted topic's "confirm by" days
-          first_waitlisted_user.destroy
-          SignUpTopic.cancel_one_waitlist(first_waitlisted_user.creator_id,assignment_id,topic_id)
-
+    
+          # If the submission deadline comes before "confirm by" days for that topic,
+          # that waitlisted topic should be dropped.
+          if topic_deadline_subm.due_at < confby
+            check = 0
+          else
+            check = 1
+          end
         end
-      end
+      
+        if !first_waitlisted_user.nil?
+          if check == 1
+            # When waitlisted topic "confirm by" days come before submission deadline
+            # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+            first_waitlisted_user.is_waitlisted = false
+            first_waitlisted_user.save
 
-      if !signup_record.nil?
-        participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-        #update participant's topic id to nil
-        participant.update_topic_id(nil)
-        signup_record.destroy
-      end
-    end #end condition for 'drop deadline' check
+            #update the participants details
+            if assignment.team_assignment?
+              user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+              participant = Participant.find_by_user_id_and_parent_id(user_id, assignment.id)
+            else
+              participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
+           end
+  
+           participant.update_topic_id(topic_id)
+
+           SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
+          else
+            # When submission deadline comes before the waitlisted topic's "confirm by" days
+            first_waitlisted_user.destroy
+            SignUpTopic.cancel_one_waitlist(first_waitlisted_user.creator_id,assignment_id,topic_id)
+          end
+       end
+
+       if !signup_record.nil?
+         participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+         #update participant's topic id to nil
+         participant.update_topic_id(nil)
+         signup_record.destroy
+       end
+      end #end condition for  'waitlisted signup record'
+    end   #end condition for 'drop date' check
   end
+
 
   def signup
     #find the assignment to which user is signing up

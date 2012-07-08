@@ -1,5 +1,4 @@
-#require File.dirname(__FILE__) + '/../test_helper'
-require 'test_helper'
+require File.dirname(__FILE__) + '/../test_helper'
 #require 'join_team_requests_controller'
 
 class JoinTeamRequestsControllerTest < ActionController::TestCase

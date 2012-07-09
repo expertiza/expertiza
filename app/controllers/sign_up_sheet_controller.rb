@@ -275,7 +275,7 @@ class SignUpSheetController < ApplicationController
         # based on how many days are left before submission deadline.
         # For example, if a user chooses "confirm by 5 days", then the waitlisted
         # topic will become the user's signed up topic when the topic becomes
-        # availabel AND there are 5 or more days left before submission deadline
+        # available AND there are 5 or more days left before submission deadline
 
         # We couldn't test this feature when "team formation deadline" is not
         # enforced without seeing errors. "Team formation deadline" requires there

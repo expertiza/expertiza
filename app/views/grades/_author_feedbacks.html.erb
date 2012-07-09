@@ -20,15 +20,7 @@
   <%= render :partial => 'grades/review_score_summary', :locals => { :symbol => "feedback".to_sym,:prefix => prefix, :rscore => rscore, :has_feedback_support => has_feedback_support}%>
     <p>TEST END</p>
   <HR/> 
-  <% count = 0 %>
-  <% for feedback in rscore[:assessments] %>
-    <% count = count + 1 %>
-    <% if controller.action_name != "view_my_scores" %>
-      <a name="<%=prefix+"_"+feedback.map.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
-    <% else %>
-      <%= feedback.display_as_html(nil,count) %><BR/><BR/>
-    <% end %>      
-  <% end %>
+
 <% else %>
   <i>No author feedback has been provided for this user's reviews.</i>
 <% end %>

@@ -102,12 +102,16 @@ function onChangeWikiType(){
 			</select>
 		</td>
 	</tr>
-	<tr>
-		<td colspan="2"><label for="team_count">Maximum number of participants per team:</label></td>
+    <tr id="team_count1" style="display:none">
+        <td colspan="2"><label for="team_count">Maximum number of participants per team:</label></td>
 		<td>&nbsp;</td>
 		<td colspan="2"><%= text_field 'assignment', 'team_count', :size => 5 %></td>
 	</tr>
-	<tr>
+    <tr id="team_count2">
+        <td colspan="2" height="50">&nbsp;</td>
+    </tr>
+
+  <tr>
 		<td colspan="2"><label for="max_topic_count">Maximum number of topics user can choose:</label></td>
 		<td>&nbsp;</td>
 		<td colspan="2"><%= text_field 'assignment','max_topic_count', :size => 5 %></td>

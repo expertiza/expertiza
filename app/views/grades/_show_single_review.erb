@@ -1,0 +1,52 @@
+<% identifier = ""
+    # The following three lines print out the type of rubric before displaying
+    # feedback.  Currently this is only done if the rubric is Author Feedback.
+    # It doesn't seem necessary to print out the rubric type in the case of
+    # a ReviewResponseMap.  Also, I'm not sure if that would have to be
+    # TeamResponseMap for a team assignment.  Someone who understands the
+    # situation better could add to the code later.
+    if review.map.type.to_s == 'FeedbackResponseMap'
+      identifier += "<H2>Feedback from author</H2>"
+    end
+    if prefix
+      identifier += "<B>Reviewer:</B> "
+      str = prefix+"_"+review.id.to_s
+    else
+      identifier += '<B>'+review.map.get_title+'</B> '+count.to_s+'</B>'
+      str = review.id.to_s
+    end
+    showtxt = "hide review"
+    if show  == false
+      showtxt = "show review"
+    end
+    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">'+showtxt+'</a><BR/>'
+    code += "<B>Last reviewed:</B> "
+    %>
+<%= code %>
+
+   <% if review.updated_at.nil? %>
+      <%= "Not available"   %>
+    <% else %>
+      <%= review.updated_at.strftime('%A %B %d %Y, %I:%M%p')   %>
+   <% end %>
+   <% if show  == false %>
+    <div id="review_<%= str %>" style="display: none;">
+   <% else %>
+    <div id="review_<%= str %>" style="">
+   <% end %>
+      <BR/><BR/>
+
+
+     <%
+    #Only show for one score
+    reviewScore = review.scores[question]
+
+
+
+    if  reviewScore && reviewScore.comments != nil
+       %>
+          <%=  reviewScore.comments.gsub("<","&lt;").gsub(">","&gt;").gsub(/\n/,'<BR/>') %>
+    <% end  %>
+    <BR/>
+
+    </div>

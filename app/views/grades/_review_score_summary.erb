@@ -1,0 +1,157 @@
+
+
+
+<H1>SCORE SUMMARY</H1>
+<TABLE STYLE="border-collapse:collapse">
+<THEAD>
+<TR>
+<TH STYLE="text-align:left">Question</TH>
+<%
+# Go through all the reviews and create a table header column for each one
+rscore[:assessments].each_with_index {|review,review_num|
+%>
+<TH>Review <%= review_num+1 %></TH>
+<% } %>
+<TH>Average</TH>
+<TH>Range</TH>
+</TR>
+</THEAD>
+
+<TBODY>
+<tr>
+   <TD STYLE="padding:0.5em 0;max-width:30em;border-top:1px solid #DDD">
+          Overall comments:<br />
+        </TD>
+   <%
+# Go through all the reviews and show adiditional coment at top
+rscore[:assessments].each_with_index {|review,review_num|
+%>
+<TD> <%= review.additional_comment %></TD>
+<% } %>
+  <td></td>
+  <td></td>
+  </tr>
+<%
+@questionnaire = Questionnaire.find(@assignment.questionnaires[0].id)
+# Go through each of the questions on this questionnaire and output a table row
+questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
+  questions.each_with_index { |question, question_num|
+    if question
+      # Get the max possible score for this question, we'll use it later to compute min/max/avg %
+      max_possible = question.questionnaire.max_question_score
+%>
+      <TR>
+        <!-- First column shows the question text -->
+        <TD STYLE="padding:0.5em 0;max-width:60em;border-top:1px solid #DDD">
+          <%= question.txt %><br />
+        </TD>
+<%
+        # Initialize min/max/avg statistics for this question
+        total = 0
+        min = 5
+        max = 0
+        count = 0
+        # Go through each review, accumulate statistics, and output a table column with the score
+        for review in rscore[:assessments]
+          count = count+1
+          score = Score.find_by_response_id_and_question_id(review.id, question.id)
+          currentscore = 0
+          if score
+            currentscore = score.score
+          end
+          total += currentscore
+          min = [min,currentscore].min
+          max = [max,currentscore].max
+%>
+          <% file_url = nil
+    @questionnaire = Questionnaire.find(@assignment.questionnaires[0].id)
+    if @questionnaire.section.eql? "Custom"
+        @current_folder = DisplayOption.new
+        @current_folder.name = ""
+        @participant = Participant.find(review.map.reviewer_id)
+        files_list = Dir[@participant.assignment.get_path.to_s + "/" + review.map.id.to_s + @current_folder.name + "/*"]
+        files = Array.new
+        for file in files_list
+            if File.directory?(file) then
+                dir_files = get_files(file)
+                dir_files.each{|f| files << f}
+            end
+            files << file
+        end
+        file = files[0]
+        file_url = ""
+        if !file.nil?
+            # parentFolder = File.dirname(file)
+            # location = parentFolder + File.basename(file)
+            file_url = ""
+            file_url = "<u><i> "
+            file_url += link_to File.basename(file), :controller=>'submitted_content', :action=>'download', :download=>File.basename(file), 'current_folder[name]'=>File.dirname(file)
+            file_url += " </i></u><br/>"
+        end
+    end
+    %>
+          <TD STYLE="width:15em;text-align:center;border-top:1px solid #DDD">
+
+          <span class="scoreshow"> <%= currentscore %></span>
+          <hr>
+
+            <% review_feedback = nil %>
+
+            <!-- Display the latest review first -->
+            <%= render :partial => 'grades/show_single_review', :locals => {:prefix => prefix, :review => review ,:question =>question_num}%>
+            <!-- get all previous versions -->
+            <% @sorted_array=Array.new %>
+            <% @prev=Response.all %>
+            <%for element in @prev     %>
+                <%if(element.map_id==review.map.id)%>
+                    <%array_not_empty=1 %>
+                    <% @sorted_array << element %>
+                <% end %>
+            <% end %>
+            <% @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
+            <% if(@sorted.size>1) %>
+                <% for i in 1..@sorted.size-1 %>
+                    <% @str = @sorted[i].id.to_s %>
+                    <!-- display previous versions in descending order -->
+                    <% score = Score.find_by_response_id_and_question_id(review.id, question.id) %>
+
+                    <p>PREVIOUS REVIEW SCORE: <%= score.score %></p>
+                    <%= render :partial => 'grades/show_single_review', :locals => {:prefix => prefix, :review => @sorted[i] ,:question =>question_num}%>
+
+                    <br/>
+                    <script>
+                        toggleElement('reviews_<%=@str%>','review');
+                    </script>
+                <% end %>
+                <!-- keep only latest version open -->
+                <% for i in 1..@sorted.size-1 %>
+                    <% @str = @sorted[i].id.to_s %>
+                    <script>
+                        toggleElement('review_<%=@str%>','review')
+                    </script>
+                <% end %>
+            <% end %>
+            <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
+            if map
+                review_feedback = map.response
+            end %>
+            <% if has_feedback_support %>
+                <% if review_feedback %>
+                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
+                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>
+                <% else %>
+                    <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+                <% end %>
+            <% end %>
+            <HR/><BR/>
+          </TD>
+        <% end %>
+        <% avg = total/rscore[:assessments].count %>
+        <!-- Average and Range columns -->
+        <TD STYLE="text-align:center;border-top:1px solid #DDD"><%= 100*avg/max_possible %>%</TD>
+        <TD STYLE="text-align:center;border-top:1px solid #DDD"><%= 100*min/max_possible %>%&nbsp;-&nbsp;<%= 100*max/max_possible %>%
+      </TR>
+    <% end %>
+<% } %>
+</TBODY>
+</TABLE>

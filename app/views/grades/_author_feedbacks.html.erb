@@ -12,7 +12,13 @@
            :collabel => "Feedback",
            :rowlabel => "Author"
            }%>
-  <BR/>         
+  <BR/>
+    <p>Test</p>
+
+  <!-- Normal reviews may have feedback reviews -->
+  <% has_feedback_support = 0%>
+  <%= render :partial => 'grades/review_score_summary', :locals => { :prefix => prefix, :rscore => rscore, :has_feedback_support => has_feedback_support}%>
+    <p>TEST END</p>
   <HR/> 
   <% count = 0 %>
   <% for feedback in rscore[:assessments] %>

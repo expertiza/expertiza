@@ -9,7 +9,7 @@
       identifier += "<H2>Feedback from author</H2>"
     end
     if prefix
-      identifier += "<B>Reviewer:</B> "+review.map.reviewer.fullname
+      identifier += "<B>Reviewer:</B> "
       str = prefix+"_"+review.id.to_s
     else
       identifier += '<B>'+review.map.get_title+'</B> '+count.to_s+'</B>'
@@ -33,10 +33,11 @@
     reviewScore = review.scores[question]
 
 
-      if reviewScore.comments != nil
+
+    if  reviewScore && reviewScore.comments != nil
        %>
           <%=  reviewScore.comments.gsub("<","&lt;").gsub(">","&gt;").gsub(/\n/,'<BR/>') %>
-     <% end          %>
-       <BR/>
+    <% end  %>
+    <BR/>
 
-        </div>
+    </div>

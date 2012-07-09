@@ -17,7 +17,7 @@
 
   <!-- Normal reviews may have feedback reviews -->
   <% has_feedback_support = 0%>
-  <%= render :partial => 'grades/review_score_summary', :locals => { :prefix => prefix, :rscore => rscore, :has_feedback_support => has_feedback_support}%>
+  <%= render :partial => 'grades/review_score_summary', :locals => { :symbol => "feedback".to_sym,:prefix => prefix, :rscore => rscore, :has_feedback_support => has_feedback_support}%>
     <p>TEST END</p>
   <HR/> 
   <% count = 0 %>

@@ -18,7 +18,7 @@
 <!-- Show a summary of the score for each question -->
 <!-- Normal reviews may have feedback reviews -->
 <% has_feedback_support = 1 %>
-<%= render :partial => 'grades/review_score_summary', :locals => { :prefix => prefix, :rscore => rscore, :has_feedback_support => has_feedback_support}%>
+<%= render :partial => 'grades/review_score_summary', :locals => { :symbol => "review".to_sym,:prefix => prefix, :rscore => rscore, :has_feedback_support => has_feedback_support}%>
     <!-- ************************************************************ -->
 <!-- End changes for CSC517 Summer 2012 Programming assignment #2 -->
 <!-- ************************************************************ -->

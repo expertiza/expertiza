@@ -15,7 +15,11 @@
       identifier += '<B>'+review.map.get_title+'</B> '+count.to_s+'</B>'
       str = review.id.to_s
     end
-    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">hide review</a><BR/>'
+    showtxt = "hide review"
+    if show  == false
+      showtxt = "show review"
+    end
+    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">'+showtxt+'</a><BR/>'
     code += "<B>Last reviewed:</B> "
     %>
 <%= code %>
@@ -25,7 +29,12 @@
     <% else %>
       <%= review.updated_at.strftime('%A %B %d %Y, %I:%M%p')   %>
    <% end %>
-    <div id="review_<%= str %>" style=""><BR/><BR/>
+   <% if show  == false %>
+    <div id="review_<%= str %>" style="display: none;">
+   <% else %>
+    <div id="review_<%= str %>" style="">
+   <% end %>
+      <BR/><BR/>
 
 
      <%

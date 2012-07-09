@@ -34,7 +34,8 @@ rscore[:assessments].each_with_index {|review,review_num|
 <%
 @questionnaire = Questionnaire.find(@assignment.questionnaires[0].id)
 # Go through each of the questions on this questionnaire and output a table row
-questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
+questions = @questions[symbol]
+#questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
   questions.each_with_index { |question, question_num|
     if question
       # Get the max possible score for this question, we'll use it later to compute min/max/avg %
@@ -98,7 +99,7 @@ questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
             <% review_feedback = nil %>
 
             <!-- Display the latest review first -->
-            <%= render :partial => 'grades/show_single_review', :locals => {:prefix => prefix, :review => review ,:question =>question_num}%>
+            <%= render :partial => 'grades/show_single_review', :locals => {:prefix => prefix, :review => review ,:question =>question_num, :show =>true}%>
             <!-- get all previous versions -->
             <% @sorted_array=Array.new %>
             <% @prev=Response.all %>
@@ -116,7 +117,7 @@ questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
                     <% score = Score.find_by_response_id_and_question_id(review.id, question.id) %>
 
                     <p>PREVIOUS REVIEW SCORE: <%= score.score %></p>
-                    <%= render :partial => 'grades/show_single_review', :locals => {:prefix => prefix, :review => @sorted[i] ,:question =>question_num}%>
+                    <%= render :partial => 'grades/show_single_review', :locals => {:prefix => prefix, :review => @sorted[i] ,:question =>question_num, :show =>false}%>
 
                     <br/>
                     <script>
@@ -124,12 +125,8 @@ questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
                     </script>
                 <% end %>
                 <!-- keep only latest version open -->
-                <% for i in 1..@sorted.size-1 %>
-                    <% @str = @sorted[i].id.to_s %>
-                    <script>
-                        toggleElement('review_<%=@str%>','review')
-                    </script>
-                <% end %>
+
+
             <% end %>
             <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
             if map

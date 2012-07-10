@@ -68,6 +68,18 @@ class SignUpTopic < ActiveRecord::Base
 
   end
 
+  def self.cancel_one_waitlist(creator_id, assignment_id, topic_id)
+    waitlisted_topics = SignUpTopic.find_waitlisted_topics(assignment_id,creator_id)
+    if !waitlisted_topics.nil?
+      for waitlisted_topic in waitlisted_topics
+        entry = SignedUpUser.find(waitlisted_topic.id)
+        if(waitlisted_topic.id == topic_id)
+        entry.destroy
+        end
+      end
+    end
+  end
+
   def update_waitlisted_users(max_choosers)
     num_of_users_promotable = max_choosers.to_i - self.max_choosers.to_i
 

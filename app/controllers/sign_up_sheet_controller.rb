@@ -3,8 +3,8 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'graph/graphviz_dot'
   require 'rgl/topsort'
-
-
+  
+  
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [:destroy, :create, :update],
          :redirect_to => {:action => :list}
@@ -256,6 +256,7 @@ class SignUpSheetController < ApplicationController
     if (!dropDate.nil? && dropDate.due_at < Time.now)
       flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
+
       #if team assignment find the creator id from teamusers table and teams
       if assignment.team_assignment == true
         #users_team will contain the team id of the team to which the user belongs
@@ -270,56 +271,97 @@ class SignUpSheetController < ApplicationController
         #find the first wait listed user if exists
         first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
 
+        # E309 feature: allows user to choose when a waitlisted topic is acceptable
+        # based on how many days are left before submission deadline.
+        # For example, if a user chooses "confirm by 5 days", then the waitlisted
+        # topic will become the user's signed up topic when the topic becomes
+        # available AND there are 5 or more days left before submission deadline
+
+        # We couldn't test this feature when "team formation deadline" is not
+        # enforced without seeing errors. "Team formation deadline" requires there
+        # to be a certain number of team members before a team can sign up for a slot.
+        # Team formation code is to be removed.
+
         if !first_waitlisted_user.nil?
-          # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-          ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
-          first_waitlisted_user.is_waitlisted = false
-          first_waitlisted_user.save
-
-          #update the participants details
-          if assignment.team_assignment?
-            user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-            participant = Participant.find_by_user_id_and_parent_id(user_id, assignment.id)
+          confby = first_waitlisted_user.confirm_by.days.from_now.to_date
+          tnow = Time.now.to_date
+      
+          if assignment.staggered_deadline ==1
+            topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic_id, 1)
           else
-            participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
+            topic_deadline_subm = DueDate.find_by_assignment_id_and_deadline_type_id(assignment.id,1)
           end
-          participant.update_topic_id(topic_id)
-
-          SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
+    
+          # If the submission deadline comes before "confirm by" days for that topic,
+          # that waitlisted topic should be dropped.
+          if topic_deadline_subm.due_at < confby
+            check = 0
+          else
+            check = 1
+          end
         end
-      end
+      
+        if !first_waitlisted_user.nil?
+          if check == 1
+            # When waitlisted topic "confirm by" days come before submission deadline
+            # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+            first_waitlisted_user.is_waitlisted = false
+            first_waitlisted_user.save
 
-      if !signup_record.nil?
-        participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-        #update participant's topic id to nil
-        participant.update_topic_id(nil)
-        signup_record.destroy
-      end
-    end #end condition for 'drop deadline' check
+            #update the participants details
+            if assignment.team_assignment?
+              user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+              participant = Participant.find_by_user_id_and_parent_id(user_id, assignment.id)
+            else
+              participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
+           end
+  
+           participant.update_topic_id(topic_id)
+
+           SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
+          else
+            # When submission deadline comes before the waitlisted topic's "confirm by" days
+            first_waitlisted_user.destroy
+            SignUpTopic.cancel_one_waitlist(first_waitlisted_user.creator_id,assignment_id,topic_id)
+          end
+       end
+
+       if !signup_record.nil?
+         participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+         #update participant's topic id to nil
+         participant.update_topic_id(nil)
+         signup_record.destroy
+       end
+      end #end condition for  'waitlisted signup record'
+    end   #end condition for 'drop date' check
   end
+
 
   def signup
     #find the assignment to which user is signing up
     assignment = Assignment.find(params[:assignment_id])
+    val = params[:confirm_by]
 
     #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
     if assignment.team_assignment == true
 
       #check whether the user already has a team for this assignment
       users_team = SignedUpUser.find_team_users(params[:assignment_id], (session[:user].id))
-
+      
       if users_team.size == 0
         #if team is not yet created, create new team.
         team = create_team(params[:assignment_id])
         user = User.find(session[:user].id)
         teamuser = create_team_users(user, team.id)
-        confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id])
+       
+        confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id],val)
       else
-        confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id])
+        confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id],val)
       end
     else
-      confirmationStatus = confirmTopic(session[:user].id, params[:id], params[:assignment_id])
+      confirmationStatus = confirmTopic(session[:user].id, params[:id], params[:assignment_id],val)
     end
+
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
@@ -333,32 +375,40 @@ class SignUpSheetController < ApplicationController
     user_signup
   end
 
-  def confirmTopic(creator_id, topic_id, assignment_id)
+  def confirmTopic(creator_id, topic_id, assignment_id,val)
     #check whether user has signed up already
     user_signup = otherConfirmedTopicforUser(assignment_id, creator_id)
-
+    asgnmt = Assignment.find(assignment_id)
     sign_up = SignedUpUser.new
     sign_up.topic_id = params[:id]
     sign_up.creator_id = creator_id
 
     result = false
-    if user_signup.size == 0
 
-      # Using a DB transaction to ensure atomic inserts
-      ActiveRecord::Base.transaction do
-        #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-        if slotAvailable?(topic_id)
-          sign_up.is_waitlisted = false
+    sign_up.confirm_by = val
+    user_signup = [] if !user_signup
+  
+    if user_signup.size < asgnmt.max_topic_count
+      #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
+      if slotAvailable?(topic_id)
+        sign_up.is_waitlisted = false
 
-          #Update topic_id in participant table with the topic_id
-          participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+        # Using a DB transaction to ensure atomic inserts
+        ActiveRecord::Base.transaction do
+          #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
+          if slotAvailable?(topic_id)
+            sign_up.is_waitlisted = false
+  
+            #Update topic_id in participant table with the topic_id
+            participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
 
-          participant.update_topic_id(topic_id)
-        else
-          sign_up.is_waitlisted = true
-        end
-        if sign_up.save
-          result = true
+            participant.update_topic_id(topic_id)
+          else
+            sign_up.is_waitlisted = true
+          end
+          if sign_up.save
+            result = true
+          end
         end
       end
     else
@@ -369,12 +419,13 @@ class SignUpSheetController < ApplicationController
           return false
         end
       end
-
+    
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         #check whether user is clicking on a topic which is not going to place him in the waitlist
         if !slotAvailable?(topic_id)
           sign_up.is_waitlisted = true
+        
           if sign_up.save
             result = true
           end
@@ -389,7 +440,7 @@ class SignUpSheetController < ApplicationController
           result = true
         end
       end
-    end
+   end
 
     result
   end
@@ -667,3 +718,4 @@ class SignUpSheetController < ApplicationController
     SignUpTopic.find_by_sql(query)
   end
 end
+

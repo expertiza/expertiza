@@ -12,6 +12,7 @@ course<%= i %>:
   info: CSC<%= i/5+1%>1<%= i%5 %> Programming Class
   private: <%= i%2 %>
 <% end %>
+
 course_e_commerce:
   name: E-Commerce
   instructor_id: <%= instructor_list[0] %>
@@ -25,3 +26,4 @@ course_object_oriented:
   directory_path: CSC517_instructor1
   info: Test CSC517 class Object Oriented Programming
   private: 0
+

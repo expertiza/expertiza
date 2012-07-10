@@ -9,6 +9,10 @@ class DueDate < ActiveRecord::Base
 
 
   def due_at_is_valid_datetime
+    #ignore unnecessary(?) datetime format validation
+  #^> They are necessary because null dates yield an invalid comparison when sorting
+  
+  # puts "Trying to validate this datetime: #{due_at.to_s}..."
     errors.add(:due_at, 'must be a valid datetime') if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
   end
 
@@ -21,19 +25,20 @@ class DueDate < ActiveRecord::Base
       new_due_date.save       
     }    
   end
-  
+    
   def self.set_duedate (duedate,deadline, assign_id, max_round)
-    submit_duedate=DueDate.new(duedate);
-    submit_duedate.deadline_type_id = deadline;
+    submit_duedate=DueDate.new(duedate)
+    submit_duedate.deadline_type_id = deadline
     submit_duedate.assignment_id = assign_id
-    submit_duedate.round = max_round; 
-    submit_duedate.save;
+    submit_duedate.round = max_round
+  
+    submit_duedate.save!
   end
   
   def setFlag()
-     #puts"~~~~~~~~~enter setFlag"
-      self.flag = true
-      self.save
-     #puts"~~~~~~~~~#{self.flag.to_s}"
-    end
+    #puts"~~~~~~~~~enter setFlag"
+    self.flag = true
+    self.save
+    #puts"~~~~~~~~~#{self.flag.to_s}"
+  end
 end

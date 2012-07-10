@@ -79,7 +79,9 @@ function addElement() {
    //alert (numi.value);
   var limit=numReviews.value;
   var i;
-  ni.innerHTML = "";
+  
+  var build_table_html = "";
+  
   var submission_var='';
   var rereview_var='';
   if(limit==2)
@@ -98,7 +100,7 @@ function addElement() {
 		submission_var= 'Re-submission-'+j+' deadline '
 		rereview_var = 'Re-review-'+j+' deadline '
 	}
-  	ni.innerHTML = ni.innerHTML + 
+  	build_table_html = build_table_html + 
   	                    '<TR><TD ALIGN=LEFT WIDTH=20%> '+submission_var+' </TD>'+
   	                    '<TD ALIGN=CENTER WIDTH=20%><input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]"/>' +
                         ' <img src="/images/cal.gif" onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>'+
@@ -169,6 +171,9 @@ function addElement() {
 
 						'</TR>';
   }
+  
+  // TODO: Fix this for Internet Explorer per http://support.microsoft.com/kb/239832
+  ni.innerHTML = build_table_html;
 }
 
 function updateDropDownMenu(advice,question,min){			

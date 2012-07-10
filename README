@@ -1,0 +1,316 @@
+E403 - Merge project E309 - README
+
+--------------------------------------------------------------------------------
+TEAM
+--------------------------------------------------------------------------------
+Neelam Chitnis: ncchini@ncsu.edu
+Chetana Kethinedi: ckethin@ncsu.edu
+Rita Lui: wylui@ncsu.edu
+
+--------------------------------------------------------------------------------
+LINKS
+--------------------------------------------------------------------------------
+Link to our branch: https://github.com/ritalui/expertiza/
+
+Pull request link to expertiza project: 
+https://github.com/expertiza/expertiza/pull/206
+
+VCL session link: http://152.46.17.96:3000
+
+--------------------------------------------------------------------------------
+PROJECT GOALS
+--------------------------------------------------------------------------------
+The goal of this project is to merge the code on E309 development branch onto
+master. The requirements for this project are as follows:
+
+1. Make sure drop-topic deadline works correctly with staggered-deadline
+   assignments.
+2. The code for opening an assignment at a specific time needs to be tested
+   and better documented.
+3. Make sure metareviews work with staggered-deadline assignments.
+4. The merge-team functionality should be tested and made to work, if necessary.
+5. Make sure advertise-for-partners functionality works after code merge
+6. Take out the code that requires there to be a certain number of team members
+   before a team can sign up for a slot.
+7. The other E318 functionality has already been implemented. Make sure that it
+   works.
+
+--------------------------------------------------------------------------------
+MERGED RESULTS
+--------------------------------------------------------------------------------
+Per instructions from Edward Anderson, we created our development branch based 
+of a forked expertiza repository at git://github.com/ajdavis7/expertiza.git.
+
+We performed various tests on our development branch before merging expertiza
+master to our branch. To gauge the completeness of our merge, the functionality 
+specified in the project requirements was tested on three different branches:
+* current expertiza master (latest commit from 6/25/2012)
+* ajdavis7/E309 (the code we picked up before merge)
+* our E309 development branch (after merging master)
+
+Here are our findings/results with respect to project requirements:
+1. Drop-topic deadline should work correctly with staggered-deadline assignment
+   * The idea is to have a drop-topic deadline for each topic in a staggered-
+     deadline assignment. Currently, there is only one drop-topic deadline for 
+     the entire assignment.
+   * Based on our code inspection and test results, drop-topic deadline for 
+     staggered-deadline assignments was not implemented on ajdavis7 branch.
+   * We made sure the staggered-deadline assignments after our code merge work 
+     the same way as on master.
+
+2. Opening an assignment at a specific time 
+   * The idea is to make an assignment available to students at a specific time.
+     Before that time, if a student logs in, (s)he should not see that 
+     assignment; after that time, (s)he should see it.
+   * It was not implemented on adjavis7 branch.
+   * On master branch, there is "Available to student" checkbox when creating a 
+     new assignment. There is no text box to enter a specific date and time. 
+     Further testing on master branch showed that whether the checkbox is 
+     checked or not, students see the assignment anyway. This checkbox does not 
+     exist when editing an assignment.
+   * "Available to student" checkbox does not exist on ajdavis7 branch.
+   * We made sure that such checkbox from master is merged in and it works the
+     same way as master on our development branch.
+
+3. Make sure metareviews work with staggered-deadline assignment
+   * We created four different types of assignment to test metareviews:
+     - team, non staggered-deadline
+     - team, staggered-deadline
+     - non-team, non staggered-deadline
+     - non-team, staggered-deadline
+   * Our tests confirmed that metareviews work on all assignments.
+
+4. Merge-team functionality should be tested and made to work, if necessary
+   * Merge-team functionality allows users to merge their teams after drop-topic
+     deadline, provided that the merged team does not have more than maximum 
+     number of students allowed.
+   * Our tests on master showed that users were allowed to merge their teams
+     after drop-topic deadline. However, the maximum number of students allowed
+     was not enforced.
+   * Tests on ajdavis7 showed rails errors when a student tried to view an
+     assignment, so we could not verify the functionality.
+   * Tests on our development branch after merge showed the same merge-team
+     behavior as master. 
+
+5. Advertise-for-partners should work after code merge
+   * Advertise-for-partners is broken on master. 
+   * We could not verify that advertise-for-partners works after code merge
+
+6. Take out code that requires a team to have a certain number of members
+   before the team can sign up for a slot.
+   * This feature is called team formation enforcement.
+   * On ajdavis7, when creating an assignment, there was a checkbox for team
+     formation enforcement and a text field to enter minimum number of members
+     in team formation.
+   * Various functinal test cases were written to test team formation 
+     enforcement. These test cases were commented out. The test file was not
+     removed because it could be used for final project.
+
+7. Make sure the other E318 functionality works.
+   * E318 is advertise-for-partners. Since it is broken on master, we were
+     not able to verify that it worked on our development branch.
+
+
+--------------------------------------------------------------------------------
+ENHANCEMENTS TO EXISTING FUNCTIONALITY ON MASTER
+--------------------------------------------------------------------------------
+1. Code on ajdavis7 branch allows users to choose multiple topics at the same
+   time. We made sure the functionality was merged in and verified that it
+   worked after merging master. When creating/editing an assignment, there is 
+   a text field for "Maximum number of topics user can choose:" toward the
+   top of the form.
+
+2. Code on ajdavis7 has the infra-structure to allow students who are waitlisted
+   for a topic to be removed from the waitlist when it gets "too close" to the
+   submission due date, so they are not assigned a new topic at the last minute.
+
+   When a user wants to waitlist for a topic, (s)he is presented with 3 choices:
+   (a) confirm 9 days before, (b) confirm 7 days before, or (c) confirm 5 days
+   before submission deadline. In other words, the user agrees to accept 
+   assigned topic if there are at least x days before submission deadline when
+   the topic becomes available.
+
+   Based on the comments on Trello card, this feature supposedly worked at one 
+   point in time. However, our tests on ajdavis7 branch showed that it did not
+   work.
+
+   We merged the code in as required, but the functionality to waitlist a 
+   student with confirm_by choices does not work.
+
+3. Code on ajdavis7 displays submission deadline as a new column on topic sign 
+   up sheet. This was merged in and verified.
+
+4. Currently on master branch, when a user tries to sign up for a topic in a 
+   non-team assignment, a rails error results in 
+   sign_up_sheet_controller#signup. The bug fix was submitted on our development
+   branch.
+
+
+--------------------------------------------------------------------------------
+OVERALL SYSTEM TESTS
+--------------------------------------------------------------------------------
+We executed rake test and rake cucumber on the master branch and our
+development branch after code merge to ensure the integrity of the overall
+system.
+
+Our test results are as follows:
+
+1. rake test
+   * master branch: 104 tests, 200 assertions, 9 failures, 18 errors
+   * our development branch: 106 tests, 200 assertions, 9 failures, 18 errors
+
+2. rake cucumber
+   * master branch: 65 scenarios (37 failed, 1 undefined, 27 passed)
+                    477 steps (37 failed, 192 skipped, 8 undefined, 240 passed)
+   * our development branch:
+                    65 scenarios (37 failed, 1 undefined, 27 passed)
+                    477 steps (37 failed, 193 skipped, 8 undefined, 239 passed)
+
+
+--------------------------------------------------------------------------------
+TESTING
+--------------------------------------------------------------------------------
+1. To set up environment, at the project's root directory:
+
+   $ bundle install
+   $ rake db:drop         (optional step to drop all database tables)
+   $ rake db:create:all
+   $ rake db:migrate
+
+2. To bring up expertiza server:
+ 
+   $ ruby script/server
+
+3. Point the browser to http://0.0.0.0:3000
+
+4. The db:migrate task creates a single admin user with the following
+   credentials:
+
+   User Name: admin
+   Password: admin
+
+
+--------------------------------------------------------------------------------
+RUBRIC EVALUATION
+--------------------------------------------------------------------------------
+1. Is the required functionality present in this code? Or, if this is a 
+   refactoring project, does the code represent a clear improvement over the 
+   previous code? Or, if this is a merge project, can the features be used in 
+   an intuitive way, without raising error conditions?	
+
+   This is a merge project. The features that have been verified to work are
+   * user can sign up for multiple topics
+   * users can merge teams after drop-topic deadline
+   * metareviews for staggered-deadline assignments
+   
+   They can be used in a straight-forward way. Sample testing workflows are
+   included below.
+
+2. Does the code show evidence of following appropriate design patterns?	
+
+   This is a merge project. No new code was implemented. During merge, attempts
+   were made to clean up code that was removed per requirement.
+
+3. Are there adequate comments in the code?
+
+   Yes, comments were added where code was changed/removed.
+
+4. Is the code free of duplication (violations of the DRY principle)?	
+
+   As part of requirement, this project removed team-formation code. During
+   merge, where code needed to be changed, duplicate code was also removed
+   and comments were added.
+
+5. On a scale of 1 (worst) to 5 (best), how easy is it to understand the code 
+   (or, understand how the code was merged, if it is a merge project)?
+
+   This is a merge project. The existing code was not so easy to understand
+   as few comments were provided. Comments were added where code was changed. 
+
+
+--------------------------------------------------------------------------------
+GENERAL WORKFLOW TO CREATE ASSIGNMENT AND SIGN UP FOR TOPICS
+--------------------------------------------------------------------------------
+1. Login as admin and create an instructor and a few students: user1, user2, 
+   user3.
+   Manage... -> Users
+2. Login as an instructor, create a review template and metareview template.
+   Then create an assignment.
+   click Manage...
+   mouse over Review Actions and click on "Create Public Review"
+   mouse over Metareview Actions and click on "Create Public MetaReview"
+   mouse over Assignments Actions and click on "Create Public Assignment"
+3. Set the following:
+   Wiki Type: MediaWiki
+   Team Assignment: Yes/No depending on the test
+   Staggered deadline: Yes/No depending on the test
+   Review: choose review template created in step 2
+   Metareview: choose metareview template created in step 2
+   Drop-topic deadline should come first, then submission deadline, review
+   deadline and lastly metareview deadline.
+4. If the assignment being created has staggered deadlines, toward the bottom
+   of the form, specify the amount of time between successive chapters (topics).
+   If you set it to a week, you'll see later on when you create sign up topics
+   that the submission deadlines for each
+   chapter (topic) are 1 week apart and so are the review deadlines for each
+   chapter (topic).
+5. Click save assignment
+6. Click on the "+" sign to the left of Assignments, you'll see all the 
+   assignments you created. Then mouse over Actions and click "Create signup
+   sheet"
+7. Create new topics.
+8. If the assignment has staggered deadlines, it'll display a dependency column
+   and you can specify the dependency by clicking on the topic id.
+  
+   When all dependencies are specified, e.g. chapter 3 depends on chapter 2 and
+   chapter 2 depends on chapter 1, click save dependencies.
+   
+   Click show start/due dates to verify all deadlines conform to specified time.
+
+9. Mouse over Actions of your assignment and click add participants to add
+   students.
+10. Logout as instructor and login as student.
+11. You should see assignments assigned to you.
+12. Click on assignment, then Signup sheet to sign up for a topic. 
+
+
+--------------------------------------------------------------------------------
+WORKFLOW TO TEST USER SIGNING UP FOR MULTIPLE TOPICS
+--------------------------------------------------------------------------------
+-- When creating assignment, set “Maximum number of topics user can choose" to 2
+-- User1 selects both topics 1, 2
+-- User1 tries to select topic 3 and receives error message
+
+
+--------------------------------------------------------------------------------
+WORKFLOW TO TEST MERGE_TEAM FEATURE
+--------------------------------------------------------------------------------
+-- Create Assignment
+-- Add participants user1, user2, user3
+-- Add Signup sheet
+-- Create New topics topic 1, topic 2 and topic 3
+-- Set maximum chooser 2
+-- User1 signs up for topic 1
+-- User1 invites user2 to join his/her team
+-- User2 accepts invitation
+-- User3 signs up for topic 1
+-- Login as instructor and set assignment submission deadline to a date 
+   in the past
+-- User3 tries to drop topic and receives an error message
+-- User1 invites user3 to join his team
+-- User3 accepts invitation and are now merged with user1's team
+-- User1, User2 and User3 are now on same team
+
+
+--------------------------------------------------------------------------------
+WORKFLOW TO SEE CONFIRM_BY COLUMNS WHEN USER IS TO BE WAITLISTED
+--------------------------------------------------------------------------------
+-- Create Assignment
+-- Add participants user1 and user2
+-- Add Signup sheet
+-- Create New topics: topic 1, topic 2 and topic 3
+-- Set maximum chooser 1
+-- User1 selects topics 1
+-- User2 can see “Confirm by 9 days”, “Confirm by 7 days” , “Confirm by 5 days” 
+   columns for topic 1
+

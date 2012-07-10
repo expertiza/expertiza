@@ -2,10 +2,13 @@ class StudentTaskController < ApplicationController
   helper :submitted_content
 
   def list
-    if session[:user].is_new_user
+    if !session[:user]
+	  redirect_to :controller => 'menu', :action => 'home'
+    elsif session[:user].is_new_user
       redirect_to :controller => 'eula', :action => 'display'
     end
-    @participants = AssignmentParticipant.find_all_by_user_id(session[:user].id, :order => "parent_id DESC")
+	@participants = []
+    @participants = AssignmentParticipant.find_all_by_user_id(session[:user].id, :order => "parent_id DESC") if session[:user] && session[:user].id
 
      ########Tasks and Notifications##################
     @tasknotstarted = Array.new

@@ -1,7 +1,7 @@
 class AssignmentController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
-  
+
   def copy
     Assignment.record_timestamps = false
     #creating a copy of an assignment; along with the dates and submission directory too
@@ -103,7 +103,7 @@ class AssignmentController < ApplicationController
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
-
+    
     check_flag = @assignment.availability_flag
 
     if(check_flag == true && params[:submit_deadline].nil?)
@@ -115,19 +115,19 @@ class AssignmentController < ApplicationController
       max_round = 1
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
+        due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
+        # raise error if check_flag is true and if due_date is not set
         if check_flag == true
-            due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
             raise "Please enter a valid Submission deadline" if !due_date
-        else
-            due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
         end
+
         due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
 #        raise "Please enter a valid Review deadline" if !due_date
         max_round = 2;
         
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
  #       raise "Please enter a valid Drop-Topic deadline" if !due_date
-        
+            
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys
             #setting the Due Dates with a helper function written in DueDate.rb
@@ -143,6 +143,7 @@ class AssignmentController < ApplicationController
             max_round = max_round + 1
           end
         end
+
         #setting the Due Dates with a helper function written in DueDate.rb
         @assignment.questionnaires.each{
           |questionnaire|
@@ -318,6 +319,7 @@ class AssignmentController < ApplicationController
       rescue
         newpath = nil
       end
+
       if oldpath != nil and newpath != nil
         FileHelper.update_file_location(oldpath,newpath)
       end
@@ -327,7 +329,7 @@ class AssignmentController < ApplicationController
         if params[:due_date]
           for due_date_key in params[:due_date].keys
             due_date_temp = DueDate.find(due_date_key)
-            due_date_temp.update_attributes(params[:due_date][due_date_key])     
+            due_date_temp.update_attributes(params[:due_date][due_date_key])
             raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
           end
         end

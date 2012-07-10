@@ -213,7 +213,7 @@ RUBRIC EVALUATION
 
 3. Are there adequate comments in the code?
 
-   Yes, comments were added where code was removed.
+   Yes, comments were added where code was changed/removed.
 
 4. Is the code free of duplication (violations of the DRY principle)?	
 

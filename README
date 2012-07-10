@@ -191,6 +191,44 @@ TESTING
 
 
 --------------------------------------------------------------------------------
+RUBRIC EVALUATION
+--------------------------------------------------------------------------------
+1. Is the required functionality present in this code? Or, if this is a 
+   refactoring project, does the code represent a clear improvement over the 
+   previous code? Or, if this is a merge project, can the features be used in 
+   an intuitive way, without raising error conditions?	
+
+   This is a merge project. The features that have been verified to work are
+   * user can sign up for multiple topics
+   * users can merge teams after drop-topic deadline
+   * metareviews for staggered-deadline assignments
+   
+   They can be used in a straight-forward way. Sample testing workflows are
+   included below.
+
+2. Does the code show evidence of following appropriate design patterns?	
+
+   This is a merge project. No new code was implemented. During merge, attempts
+   were made to clean up code that was removed per requirement.
+
+3. Are there adequate comments in the code?
+
+   Yes, comments were added where code was removed.
+
+4. Is the code free of duplication (violations of the DRY principle)?	
+
+   As part of requirement, this project removed team-formation code. During
+   merge, where code needed to be changed, duplicate code was also removed
+   and comments were added.
+
+5. On a scale of 1 (worst) to 5 (best), how easy is it to understand the code 
+   (or, understand how the code was merged, if it is a merge project)?
+
+   This is a merge project. The existing code was not so easy to understand
+   as few comments were provided. Comments were added where code was changed. 
+
+
+--------------------------------------------------------------------------------
 GENERAL WORKFLOW TO CREATE ASSIGNMENT AND SIGN UP FOR TOPICS
 --------------------------------------------------------------------------------
 1. Login as admin and create an instructor and a few students: user1, user2, 
@@ -275,3 +313,4 @@ WORKFLOW TO SEE CONFIRM_BY COLUMNS WHEN USER IS TO BE WAITLISTED
 -- User1 selects topics 1
 -- User2 can see “Confirm by 9 days”, “Confirm by 7 days” , “Confirm by 5 days” 
    columns for topic 1
+

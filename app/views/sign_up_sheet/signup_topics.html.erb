@@ -27,9 +27,11 @@
   <% for topic in @sign_up_topics %>
       <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
           <% for selected_topic in @selected_topics %>
-              <% if selected_topic.topic_id == topic.id %>
+              <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted %>
                   <tr bgcolor="yellow">
-              <% else %>
+              <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
+                  <tr bgcolor="lightgray">
+               <% else %>
                   <tr>
               <% end %>
           <% end %>
@@ -57,8 +59,11 @@
           <% action_symbol_added = false %>
           <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
               <% for selected_topic in @selected_topics %>
-                  <% if selected_topic.topic_id == topic.id %>
+                  <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted%>
                       <td align="center" bgcolor="yellow"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+                      <% action_symbol_added = true %>
+                  <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
+                      <td align="center" bgcolor="lightgray"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
                       <% action_symbol_added = true %>
                   <% end %>
               <% end %>

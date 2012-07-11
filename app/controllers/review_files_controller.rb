@@ -256,7 +256,40 @@ class ReviewFilesController < ApplicationController
 
 
     # REFACTOR: Code Duplication
+    #begin refactor=============================================================
+    @parameters = Hash.new
+    @parameters['comments'] = older_version_comments
+    @parameters['offset'] = @first_offset
+    @parameters['line_num'] = @first_line_num
+    @highlight_cell_left_file = Hash.new
+    table_row_num = fill_in_hash(@parameters)
+    @highlight_cell_left_file[table_row_num] = true
 
+    @parameters['comments'] = newer_version_comments
+    @parameters['offset'] = @second_offset
+    @parameters['line_num'] = @second_line_num
+    @highlight_cell_right_file = Hash.new
+    table_row_num = fill_in_hash(@parameters)
+    @highlight_cell_right_file[table_row_num] = true
+  end
+
+
+  def fill_in_hash(received_arguments)
+    @received_arguments['comments'].each do |each_comment|
+      table_row_num = @received_arguments['offset'].index(each_comment.file_offset)
+      table_row_num = @received_arguments['offset'].length + 1 unless table_row_num
+
+      # Increment table_row_num until a non "" string is encountered in @first_line_num
+      while (@received_arguments['line_num'][table_row_num].nil? and
+          table_row_num < @received_arguments['line_num'].length)
+        table_row_num += 1
+      end
+
+      return (table_row_num)
+    end
+  end
+  #end refractor====================================================================================
+=begin
     @highlight_cell_left_file = Hash.new
     older_version_comments.each do |each_comment|
       table_row_num = @first_offset.index(each_comment.file_offset)
@@ -287,7 +320,7 @@ class ReviewFilesController < ApplicationController
     end
 
   end
-
+=end
 
 
   def submit_comment

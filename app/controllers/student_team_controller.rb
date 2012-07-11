@@ -1,44 +1,44 @@
 class StudentTeamController < ApplicationController
   auto_complete_for :user, :name
-   
+
   def view
     @student = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@student.user_id)
-    
+
     @send_invs = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', @student.user.id, @student.assignment.id])
     @received_invs = Invitation.find(:all, :conditions => ['to_id = ? and assignment_id = ? and reply_status = "W"', @student.user.id, @student.assignment.id])
   end
-   
+
   def create
     @student = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@student.user_id)
 
-    check = AssignmentTeam.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @student.parent_id])        
+    check = AssignmentTeam.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @student.parent_id])
     @team = AssignmentTeam.new(params[:team])
-    @team.parent_id = @student.parent_id    
+    @team.parent_id = @student.parent_id
     #check if the team name is in use
-    if (check.length == 0)      
+    if (check.length == 0)
       @team.save
       parent = AssignmentNode.find_by_node_object_id(@student.parent_id)
       TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
       user = User.find(@student.user_id)
-      @team.add_member(user)      
+      @team.add_member(user)
       redirect_to :controller => 'student_team', :action => 'view' , :id=> @student.id
     else
       flash[:notice] = 'Team name is already in use.'
       redirect_to :controller => 'student_team', :action => 'view' , :id=> @student.id
-    end 
+    end
   end
-  
-  def edit 
+
+  def edit
     @team = AssignmentTeam.find_by_id(params[:team_id])
     @student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(@student.user_id)
   end
-  
+
   def update
     @team = AssignmentTeam.find_by_id(params[:team_id])
-    check = AssignmentTeam.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @team.parent_id])    
+    check = AssignmentTeam.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @team.parent_id])
     if (check.length == 0)
        if @team.update_attributes(params[:team])
           redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
@@ -48,7 +48,7 @@ class StudentTeamController < ApplicationController
     else
       flash[:notice] = 'Team name is already in use.'
       redirect_to :controller =>'student_team', :action => 'edit', :team_id =>params[:team_id], :student_id => params[:student_id]
-    end 
+    end
   end
 
   def advertise_for_partners
@@ -68,13 +68,13 @@ class StudentTeamController < ApplicationController
   def leave
     @student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(@student.user_id)
-    
+
     #remove the entry from teams_users
     user = TeamsUser.find(:first, :conditions =>["team_id =? and user_id =?", params[:team_id], @student.user_id])
     if user
       user.destroy
     end
-    
+
     #if your old team does not have any members, delete the entry for the team
     other_members = TeamsUser.find(:all, :conditions => ['team_id = ?', params[:team_id]])
     if other_members.length == 0
@@ -83,6 +83,9 @@ class StudentTeamController < ApplicationController
         old_team.destroy
         #if assignment has signup sheet then the topic selected by the team has to go back to the pool
         #or to the first team in the waitlist
+        signup_remove(params,0)               #method in application_controller.rb
+
+=begin
         signups = SignedUpUser.find(:all, :conditions => {:creator_id => params[:team_id]})
         signups.each {|signup|
           first_waitlisted_user = SignedUpUser.find(:first, :conditions => {:topic_id => signup.topic_id, :is_waitlisted => true})
@@ -96,25 +99,27 @@ class StudentTeamController < ApplicationController
           end
           signup.destroy
         }
+=end
       end
+
     end
-    
+
     #remove all the sent invitations
     old_invs = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', @student.user_id, @student.parent_id])
     for old_inv in old_invs
       old_inv.destroy
     end
-    
+
     #reset the participants submission directory to nil
     #per EFG:
     #the participant is responsible for resubmitting their work
     #no restriction is placed on when a participant can leave
     @student.directory_num = nil
     @student.save
-    
+
     redirect_to :controller => 'student_team', :action => 'view' , :id => @student.id
   end
-  
+
   def review
     @assignment = Assignment.find_by_id(params[:assignment_id])
     redirect_to :controller =>'questionnaire', :action => 'view_questionnaire', :id => @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id

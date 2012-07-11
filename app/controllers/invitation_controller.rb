@@ -1,9 +1,9 @@
 class InvitationController < ApplicationController
-  def new 
+  def new
     @invitation = Invitation.new
   end
-  
-  def create    
+
+  def create
     user = User.find_by_name(params[:user][:name].strip)
     team = AssignmentTeam.find_by_id(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
@@ -39,25 +39,25 @@ class InvitationController < ApplicationController
     end
     redirect_to :controller => 'student_team', :action => 'view', :id=> student.id
   end
-  
+
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?    
+    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?
   end
- 
+
   def accept
     @inv = Invitation.find(params[:inv_id])
     @inv.reply_status = 'A'
     @inv.save
-    
+
     student = Participant.find(params[:student_id])
-    
+
     #if you are on a team and you accept another invitation, remove your previous entry in the teams_users table.
     old_entry = TeamsUser.find(:first, :conditions => ['user_id = ? and team_id = ?', student.user_id, params[:team_id]])
     if old_entry != nil
       old_entry.destroy
     end
-    
+
     #if you are on a team and you accept another invitation and if your old team does not have any members, delete the entry for the team
     other_members = TeamsUser.find(:all, :conditions => ['team_id = ?', params[:team_id]])
     if other_members.nil? || other_members.length == 0
@@ -67,6 +67,9 @@ class InvitationController < ApplicationController
       end
 
       #if a signup sheet exists then release all the topics selected by this team into the pool.
+      signup_remove(params,1)       #method in application_controller.rb
+
+=begin
       old_teams_signups = SignedUpUser.find_all_by_creator_id(params[:team_id])
       if !old_teams_signups.nil?
         for old_teams_signup in old_teams_signups
@@ -83,7 +86,7 @@ class InvitationController < ApplicationController
               user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_signup.creator_id}).user_id
               participant = Participant.find_by_user_id_and_parent_id(user_id,old_team.assignment.id)
               participant.update_topic_id(old_teams_signup.topic_id)
-               
+
               SignUpTopic.cancel_all_waitlists(first_waitlisted_signup.creator_id, SignUpTopic.find(old_teams_signup.topic_id)['assignment_id'])
             end # if !first_waitlisted_signup.nil
             # Remove the now-empty team from the slot it is occupying.
@@ -91,14 +94,15 @@ class InvitationController < ApplicationController
           old_teams_signup.destroy
         end
       end
+=end
     end
-    
+
     #if you change your team, remove all your invitations that you send to other people
     old_invs = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', @inv.to_id, student.parent_id])
     for old_inv in old_invs
       old_inv.destroy
     end
-    
+
     #create a new team_user entry for the accepted invitation
     @team_user = TeamsUser.new
     users_teams = TeamsUser.find(:all, :conditions => ['user_id = ?', @inv.from_id])
@@ -106,7 +110,7 @@ class InvitationController < ApplicationController
       current_team = AssignmentTeam.find(:first, :conditions => ['id = ? and parent_id = ?', team.team_id, student.parent_id])
       if current_team != nil
        #@team_user.team_id = current_team.id
-       current_team.add_member(User.find(@inv.to_id)) 
+       current_team.add_member(User.find(@inv.to_id))
       end
     end
 
@@ -115,10 +119,10 @@ class InvitationController < ApplicationController
     participant.update_topic_id(Participant.find_by_user_id_and_parent_id(@inv.from_id,student.parent_id).topic_id)
     #@team_user.user_id = @inv.to_id
     #@team_user.save
-    
+
     redirect_to :controller => 'student_team', :action => 'view', :id => student.id
   end
-  
+
   def decline
     @inv = Invitation.find(params[:inv_id])
     @inv.reply_status = 'D'

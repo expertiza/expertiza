@@ -121,6 +121,10 @@
 
       <td align="center">
       <% if !(participant = Participant.find_by_topic_id(topic.id)).nil? %>
+		  # Check if a participant has a team, earlier (both on E309 and master),
+		  # it would try to find the team id for a participant who did not have a team.
+		  # That used to result in rails error as it would try to find the id of nil
+		  # object, especially for a participant who selected a non-team assignment.		 
 		  <%if !participant.team.nil? %>
             <% if Team.find(participant.team.id).advertise_for_partner? %>
               <%= link_to image_tag("ad.png", :height => 25, :width => 25, :alt=>'Advertise for partners'), :controller => 'sign_up_sheet', :action => 'team_details', :assignment_id=>params[:id], :id=>topic.id %>

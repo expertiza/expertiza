@@ -102,6 +102,11 @@ function onChangeWikiType(){
 			</select>
 		</td>
 	</tr>
+	# E309 had team formation code, but had to remove that as there is different
+	# workaround for that in master branch. E309 displayed the maximum number of
+	# participants field while creating a new assignment, even when a non-team assignment
+	# was selected. To fix that, we have used the code present on the master, which
+	# would display the said field only when a team-assignment is selected.
     <tr id="team_count1" style="display:none">
         <td colspan="2"><label for="team_count">Maximum number of participants per team:</label></td>
 		<td>&nbsp;</td>

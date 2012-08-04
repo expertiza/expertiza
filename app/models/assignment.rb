@@ -919,4 +919,92 @@ end
 
     return fields
   end
+
+  def self.get_all_participant_scores(assignment_id)
+     #ActiveRecord::Base.connection.execute
+     Assignment.find_by_sql(
+         "SELECT participants.parent_id as 'assignment_id',participants.id as 'participant_id', users.fullname as 'reviewee',
+                 assignment.reviewer, assignment.response_id, assignment.response_map_id, assignment.txt,
+                 assignment.min_question_score, assignment.max_question_score, assignment.score,
+                 assignment.percent, assignment.avg, assignment.comments, assignment.additional_comment, assignment.map_type,
+                 assignment.qnr_type
+           FROM participants
+           LEFT JOIN (SELECT            p.id as 'participant_id',
+                                        reviewer_info.fullname as 'reviewer',
+                                        r.id as 'response_id',
+                                        m.id as 'response_map_id',
+                                        q.txt,
+                                        qnr.min_question_score,
+                                        qnr.max_question_score,
+                                        s.score,
+                                        s.score/qnr.max_question_score*100 as 'percent',
+                                        temp.avg,
+                                        s.comments,
+                                        r.additional_comment,
+                                        m.type as 'map_type',
+                                        qnr.type as 'qnr_type'
+                                FROM    responses r,
+                                        response_maps m,
+                                        participants p,
+                                        users u,
+                                        scores s,
+                                        questions q,
+                                        questionnaires qnr,
+                                          (
+                                            SELECT m.reviewed_object_id as 'course_id', r.id as 'response_id', m.reviewee_id as 'participant_id',
+                                                   avg(s.score)/qnr.max_question_score*100 as 'avg'
+                                            FROM responses r, response_maps m, participants p, users u, scores s, questions q, questionnaires qnr
+                                            WHERE       r.map_id = m.id
+                                                    AND m.reviewee_id = p.id AND reviewed_object_id = #{assignment_id}
+                                                    and p.user_id = u.id
+                                                    and s.response_id = r.id
+                                                    and s.question_id = q.id
+                                                    and q.questionnaire_id = qnr.id
+                                             group by m.reviewed_object_id, r.id, m.reviewee_id
+                                          ) temp,
+                                          (
+                                            SELECT distinct m.reviewer_id, u.fullname
+                                            FROM  response_maps m, participants p, users u
+                                            where   m.reviewed_object_id = #{assignment_id}
+                                                    and m.reviewer_id = p.id
+                                                    and p.user_id = u.id
+                                          ) reviewer_info,
+                                          (
+                                            SELECT m.reviewed_object_id as 'course_id', r.map_id, m.reviewee_id as 'participant_id', max(r.id) as 'latest_id'
+                                            FROM responses r, response_maps m, participants p, users u, scores s, questions q, questionnaires qnr
+                                            WHERE       r.map_id = m.id
+                                                    AND m.reviewee_id = p.id
+                                                    AND reviewed_object_id = #{assignment_id}
+                                                    and p.user_id = u.id
+                                                    and s.response_id = r.id
+                                                    and s.question_id = q.id
+                                                    and q.questionnaire_id = qnr.id
+                                            group by m.reviewed_object_id, r.map_id, m.reviewee_id
+                                          ) latest_response_ids
+                                WHERE        r.map_id = m.id
+                                          AND m.reviewee_id = p.id
+                                          AND reviewed_object_id = #{assignment_id}
+                                          and p.user_id = u.id
+                                          and s.response_id = r.id
+                                          and s.question_id = q.id
+                                          and q.questionnaire_id = qnr.id
+
+                                          and temp.course_id = m.reviewed_object_id
+                                          and temp.response_id = r.id
+                                          and temp.participant_id = m.reviewee_id
+
+                                          and reviewer_info.reviewer_id = m.reviewer_id
+
+                                          and latest_response_ids.course_id = m.reviewed_object_id
+                                          and latest_response_ids.participant_id = m.reviewee_id
+                                          and latest_response_ids.map_id = r.map_id
+                                          and latest_response_ids.latest_id = r.id
+                        ) assignment
+             ON (participants.id = assignment.participant_id)
+             LEFT JOIN users
+             ON participants.user_id = users.id
+             WHERE participants.parent_id = #{assignment_id};"
+     )
+   end
+
 end

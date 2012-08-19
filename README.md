@@ -20,7 +20,7 @@ If not:
  * [Set up git](http://help.github.com/set-up-git-redirect)
  * Install Ruby 1.8.7. (Some plugins/gems we use are not yet 1.9.2 compatible)
    On Linux/OSX, use [rvm](http://beginrescueend.com).
-   On Windows, use [RubyInstaller](http://rubyinstaller.org) and [RailsInstaller](http://railsinstaller.org).
+   On Windows, use [RailsInstaller](http://railsinstaller.org) version 1.3.0 with Ruby 1.8.7, not the latest version.
  * `gem install bundler` (see [issues on Windows](http://matt-hulse.com/articles/2010/01/30/from-zero-to-rails3-on-windows-in-600-seconds/))
 
 ### Dependencies

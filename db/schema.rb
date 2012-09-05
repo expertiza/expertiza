@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111228200632) do
+ActiveRecord::Schema.define(:version => 20111217162506) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -53,9 +53,6 @@ ActiveRecord::Schema.define(:version => 20111228200632) do
     t.integer  "max_reviews_per_submission"
     t.integer  "review_topic_threshold",            :default => 0
     t.boolean  "availability_flag"
-    t.boolean  "copy_flag",                         :default => false
-    t.integer  "rounds_of_reviews",                 :default => 1
-    t.boolean  "microtask",                         :default => false
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -242,9 +239,9 @@ ActiveRecord::Schema.define(:version => 20111228200632) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",                     :null => false
+    t.string  "q_type",      :default => "", :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1, :null => false
+    t.integer "question_id", :default => 1,  :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -288,6 +285,7 @@ ActiveRecord::Schema.define(:version => 20111228200632) do
     t.text     "additional_comment"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "version_num"
   end
 
   add_index "responses", ["map_id"], :name => "fk_response_response_map"
@@ -370,7 +368,6 @@ ActiveRecord::Schema.define(:version => 20111228200632) do
     t.integer "max_choosers",                   :default => 0, :null => false
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
-    t.integer "micropayment",                   :default => 0
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"

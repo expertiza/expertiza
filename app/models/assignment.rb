@@ -629,7 +629,9 @@ end
       end
       if (@corresponding_response != nil)
         @this_review_score_raw = Score.get_total_score(:response => @corresponding_response, :questions => @questions, :q_types => Array.new)
-        @this_review_score = ((@this_review_score_raw*100).round/100.0)
+        if(@this_review_score_raw >= 0.0)
+          @this_review_score = ((@this_review_score_raw*100).round/100.0)
+        end
       else
         @this_review_score = 0.0
       end
@@ -639,6 +641,7 @@ end
     return @review_scores
   end
 
+  
   def get_review_questionnaire_id()
     @revqids = []
 

@@ -212,9 +212,11 @@ class GradesController < ApplicationController
     
     if @participant.assignment.team_assignment
       team = @participant.team
-      unless team.has_user session[:user]
-        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
-        return true
+      if(!team.nil?)
+        unless team.has_user session[:user]
+          redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+          return true
+        end
       end
     else
       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @participant.assignment.id)

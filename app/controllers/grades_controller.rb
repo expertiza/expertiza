@@ -1,6 +1,7 @@
 class GradesController < ApplicationController
   helper :file
   helper :submitted_content
+  helper :penalty
 
   #the view grading report provides the instructor with an overall view of all the grades for
   #an assignment. It lists all participants of an assignment and all the reviews they recieved.

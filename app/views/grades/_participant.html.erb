@@ -39,7 +39,7 @@
   	<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a> (<%= pscore[:review][:assessments].size %>)</FONT>
   	</TD>    
    	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>%
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",penalties[:review]) %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if (@assignment.get_current_stage(@participant.topic_id) == "Complete") then sprintf("%.0f",penalties[:review]) else sprintf("---") end%>
    	<% if controller.action_name != "view_my_scores" %>
    	  <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
    	<% end %>  	 
@@ -55,7 +55,7 @@
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)</FONT>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",penalties[:metareview]) %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if @assignment.get_current_stage(@participant.topic_id) == "Complete" then sprintf("%.0f",penalties[:meta_review]) else sprintf("---") end %>
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review_of_review' %></FONT>
     <% end %>  	    
@@ -71,7 +71,7 @@
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedbacks</a> (<%= pscore[:feedback][:assessments].size %>)</FONT>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",penalties[:teammatereview]) %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if @assignment.get_current_stage(@participant.topic_id) == "Complete" then sprintf("%.0f",penalties[:author_feedback]) else sprintf("---") end%>
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'review_feedback' %></FONT>
     <% end %>  	    
@@ -90,7 +90,7 @@
     	<% end %>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min) %>% - <%= sprintf("%.0f",tr_max) %>%
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",penalties[:authorfeedback]) %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if @assignment.get_current_stage(@participant.topic_id) == "Complete" then sprintf("%.0f",penalties[:team_mate_feedback]) else sprintf("---") end%>
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'teammate_review' %></FONT>
     <% end %>  	    

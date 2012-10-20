@@ -51,7 +51,7 @@ class AssignmentController < ApplicationController
     @wiki_types = WikiType.find(:all)
     @private = params[:private] == true        
     #calling the defalut values mathods
-    get_limits_and_weights 
+    get_limits_and_weights
   end
   
   
@@ -227,12 +227,6 @@ class AssignmentController < ApplicationController
   #
   #  end
 
-
-
-
-
-
-
   def set_requirement
     #@required = Hash.new
     if params[:required][:review]
@@ -240,7 +234,7 @@ class AssignmentController < ApplicationController
     end
 
     if params[:required][:metareview]
-      @assignment.num_review_of_reviews = params[:required][:review]
+      @assignment.num_review_of_reviews = params[:required][:metareview]
     end
 
   end
@@ -333,6 +327,8 @@ class AssignmentController < ApplicationController
 
 
     @assignment.days_between_submissions = @days + (@weeks*7)
+
+    set_requirement
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])     

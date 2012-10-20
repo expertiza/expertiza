@@ -47,7 +47,7 @@
     <% else %>
    	<TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>
-    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if (@assignment.get_current_stage(@participant.topic_id) == "Complete") then sprintf("%.0f",penalties[:review]) else sprintf("---") end%></TD>
     <% end %>
     
     <% if r_avg %>
@@ -63,7 +63,7 @@
     <% else %>
     <TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>
-    <TD ALIGN="CENTER">---</TD>
+      <TD ALIGN="CENTER" VALIGN="TOP"><%= if @assignment.get_current_stage(@participant.topic_id) == "Complete" then sprintf("%.0f",penalties[:meta_review]) else sprintf("---") end %></TD>
     <% end %>
     
     <% if f_avg %>
@@ -71,7 +71,6 @@
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedbacks</a> (<%= pscore[:feedback][:assessments].size %>)</FONT>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= if @assignment.get_current_stage(@participant.topic_id) == "Complete" then sprintf("%.0f",penalties[:author_feedback]) else sprintf("---") end%>
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'review_feedback' %></FONT>
     <% end %>  	    
@@ -90,7 +89,6 @@
     	<% end %>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min) %>% - <%= sprintf("%.0f",tr_max) %>%
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= if @assignment.get_current_stage(@participant.topic_id) == "Complete" then sprintf("%.0f",penalties[:team_mate_feedback]) else sprintf("---") end%>
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'teammate_review' %></FONT>
     <% end %>  	    

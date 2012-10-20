@@ -20,7 +20,7 @@
    </td>
    <!-- taking no of reviews required as input -->
    <td style="padding: 15px;">
-     <input id="num_review" name="required[review]" size="5" type="text" value="<%= 0 %>"/>
+     <input id="num_review" name="required[review]" size="5" type="text" value="<%= @assignment.num_reviews %>"/>
    </td>
    <td style="padding: 15px;">
       <input id="weights_review" name="weights[review]" size="5" type="text" value="<%= @weights[:review] %>"/>%   
@@ -44,7 +44,7 @@
    </td>
   <!-- taking no of meta reviews required as input -->
   <td style="padding: 15px;">
-    <input id="num_metareview" name="required[metareview]" size="5" type="text" value="<%= 0 %>"/>
+    <input id="num_metareview" name="required[metareview]" size="5" type="text" value="<%= @assignment.num_review_of_reviews %>"/>
   </td>
    <td style="padding: 15px;">
        <input id="weights_metareview" name="weights[metareview]" size="5" type="text" value="<%= @weights[:metareview] %>"/>%   

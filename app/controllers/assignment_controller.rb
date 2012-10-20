@@ -103,7 +103,7 @@ class AssignmentController < ApplicationController
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
-
+    set_requirement
     check_flag = @assignment.availability_flag
 
     if(check_flag == true && params[:submit_deadline].nil?)
@@ -112,6 +112,7 @@ class AssignmentController < ApplicationController
     elsif (@assignment.save)
       set_questionnaires   
       set_limits_and_weights
+
       max_round = 1
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
@@ -216,13 +217,39 @@ class AssignmentController < ApplicationController
         @assignment.questionnaires << q
      end
     }     
-  end   
-  
+  end
+
+  #def get_requirement
+  #  @required = Hash.new
+  #
+  #  @required[:review] = @assignment.num_reviews
+  #  @required[:metareview] = @assignment.num_review_of_reviews
+  #
+  #  end
+
+
+
+
+
+
+
+  def set_requirement
+    #@required = Hash.new
+    if params[:required][:review]
+      @assignment.num_reviews = params[:required][:review]
+    end
+
+    if params[:required][:metareview]
+      @assignment.num_review_of_reviews = params[:required][:review]
+    end
+
+  end
+
   def get_limits_and_weights 
     @limits = Hash.new   
     @weights = Hash.new
-    
-    if session[:user].role.name == "Teaching Assistant"
+
+      if session[:user].role.name == "Teaching Assistant"
       user_id = Ta.get_my_instructor(session[:user]).id
     else
       user_id = session[:user].id
@@ -253,7 +280,8 @@ class AssignmentController < ApplicationController
       @weights[questionnaire.symbol] = aq.questionnaire_weight
     }             
   end
-  
+
+
   def set_limits_and_weights
     if session[:user].role.name == "Teaching Assistant"
       user_id = TA.get_my_instructor(session[:user]).id

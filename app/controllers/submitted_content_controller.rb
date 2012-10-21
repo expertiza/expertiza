@@ -30,7 +30,10 @@ class SubmittedContentController < ApplicationController
       participant.submmit_hyperlink(params['submission'])
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
-    end    
+    end
+    if flash[:error].nil?
+      participant.update_resubmit_times
+    end
     redirect_to :action => 'edit', :id => participant.id
   end    
 

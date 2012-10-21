@@ -1,0 +1,127 @@
+<h1> System Settings </h1>
+
+<table class="system_settings">
+<tr class="settings_row">
+<th>Site Name</th><td><%=h @system_settings.site_name %></td>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>The site name may be displayed by your template across the top of
+the page, or somewhere.</p>
+</div>
+</td></tr>
+
+<tr class="settings_row">
+<th>Site Subtitle</th><td><%=h @system_settings.site_subtitle %></td>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>Optional subheading for site, which may be displayed underneath the
+site name.</p>
+</div>
+</td></tr>
+
+<tr class="settings_row">
+<th>Footer Message</th><td><%=h @system_settings.footer_message %></td>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>Your credits message, displayed at the bottom of the page.</p>
+</div>
+</td></tr>
+
+<tr class="settings_row">
+<th>Public Role</th>
+<td><%= link_to h(@system_settings.public_role.name),
+	  :controller => 'roles', :action => 'show',
+	  :id => @system_settings.public_role_id %></td>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>This Role will be assigned to sessions that are not logged in.</p>
+</div>
+</td></tr>
+
+<tr class="settings_row">
+<th>Session Timeout (secs)</th>
+<td><%=h @system_settings.session_timeout %></td>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>After <strong>n</strong> seconds of inactivity a user's session will expire.</p>
+</div>
+</td></tr>
+
+<tr class="settings_row">
+<th>Default Markup Style</th>
+<td><%= if @system_settings.default_markup_style_id
+	  link_to h(@system_settings.default_markup_style.name),
+	    :controller => 'markup_styles', :action => 'show',
+	    :id => @system_settings.default_markup_style_id
+	else
+	  h(@system_settings.default_markup_style.name)
+	end%></td>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>This markup style will be used by default for newly created
+pages.</p>
+
+<p>See the <a href="#">Markdown</a> or <a href="#">Textile</a>
+websites for further details.</p>
+</div>
+</td></tr>
+
+<tr class="settings_row">
+<th>Default Page</th>
+<td><%= link_to h(@system_settings.site_default_page.title),
+	  :controller => 'content_pages', :action => 'show',
+	  :id => @system_settings.site_default_page_id %></td>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>Page displayed when the user browses to the root of this site.</p>
+</div>
+</td></tr>
+
+<tr class="settings_row">
+<th>Not Found Page</th>
+<td><%= link_to h(@system_settings.not_found_page.title),
+	  :controller => 'content_pages', :action => 'show',
+	  :id => @system_settings.not_found_page_id %></td>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>Page displayed when the user tries to browse to an unknown page
+(i.e. no such Content Page, and no such Controller Action).</p>
+</div>
+</td></tr>
+
+<tr class="settings_row">
+<th>Permission Denied Page</th>
+<td><%= link_to h(@system_settings.permission_denied_page.title),
+	  :controller => 'content_pages', :action => 'show',
+	  :id => @system_settings.permission_denied_page_id %></td>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>Page displayed when the user tries to browse to a page for which
+they have insufficient permission.</p>
+</div>
+</td></tr>
+
+<tr class="settings_row">
+<th>Session Expired Page</th>
+<td><%= link_to h(@system_settings.session_expired_page.title),
+	  :controller => 'content_pages', :action => 'show',
+	  :id => @system_settings.session_expired_page_id %></td>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>Page displayed when the user's session has expired (see Session
+Timeout, above).</p>
+</div>
+</td></tr>
+
+<tr class="settings_row">
+<th>Menu Depth</th><td><%=h @system_settings.menu_depth %></td>
+</table>
+<tr><td colspan=2>
+<div class="guidance_text">
+<p>The maximum top/side menu depth supported by the page template and
+stylesheet you have set up for the site.</p>
+</div>
+</td></tr>
+
+<hr/>
+<p><%= link_to 'Edit', :action => 'edit', :id => @system_settings %></p>

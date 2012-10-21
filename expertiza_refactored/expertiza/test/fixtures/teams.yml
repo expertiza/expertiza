@@ -1,0 +1,52 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+team0:
+  name: team1
+  parent_id: <%= Fixtures.identify(:assignment0) %>
+  type: AssignmentTeam
+team1:
+  name: team2
+  parent_id: <%= Fixtures.identify(:assignment0) %>
+  type: AssignmentTeam
+  
+team2:
+  name: team3
+  parent_id: <%= Fixtures.identify(:course0) %>
+  type: CourseTeam
+
+team3:
+  name: team4
+  parent_id: <%= Fixtures.identify(:assignment2) %>
+  type: AssignmentTeam
+
+team4:
+  name: team5
+  parent_id: <%= Fixtures.identify(:assignment2) %>
+  type: AssignmentTeam
+
+team5:
+  name: team6
+  parent_id: <%= Fixtures.identify(:assignment2) %>
+  type: AssignmentTeam
+
+
+#Teams for course_object_oriented and instructor 1
+Assignment_Project1_Team1:
+  name: Assignment1Team1
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  type: AssignmentTeam
+
+Assignment_Project1_Team2:
+  name: Assignment1Team2
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  type: AssignmentTeam
+
+Assignment_Project2_Team1:
+  name: Assignment2Team1
+  parent_id: <%= Fixtures.identify(:assignment_project2) %>
+  type: AssignmentTeam
+
+Assignment_Project2_Team2:
+  name: Assignment2Team2
+  parent_id: <%= Fixtures.identify(:assignment_project2) %>
+  type: AssignmentTeam
+  

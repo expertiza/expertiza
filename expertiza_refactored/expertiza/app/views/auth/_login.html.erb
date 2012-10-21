@@ -1,0 +1,51 @@
+<script type="text/javascript">
+  function UpdateButton(){
+    if (document.getElementById("impersonate_name").value.length > 0)
+        document.getElementById("revert_button").value = "Impersonate";
+    else
+        document.getElementById("revert_button").value = "Revert";
+  }
+</script>
+
+<% if session[:user] -%>
+<% unless session[:user] == "" %>
+  <table>
+  <tr><td>User:&nbsp;<%= h(session[:user].name) %></td></tr>
+  <% if session[:super_user] -%>
+    <% form_tag :controller => 'impersonate', :action => 'impersonate' do %>
+    <tr><td><input id="impersonate_name" name="impersonate[name]" size="12"
+                   title="Enter a user account to impersonate" type="text"
+                   onKeyUp="UpdateButton();" /></td></tr>
+    <tr><td><input name="commit" id="revert_button" type="submit" value="Revert" /></td></tr>
+    <% end %>
+  <% else %>
+    <% form_tag :controller => 'auth', :action => 'logout' do %>
+    <tr><td><%= submit_tag "Logout" %></td></tr>
+    <% end %>
+  <% end -%>
+  </table>
+<% else %>
+<p>(not logged in)
+<% form_tag :controller => 'auth', :action => 'logout' do %>
+  <%= submit_tag "Log in" %>
+<% end %>
+</p>
+<% end %>
+<% else -%>
+<h1>Login</h1>
+
+<% if flash[:notice] -%>
+   <div id="ErrorExplanation"><%= flash[:notice] %></div>
+<% end -%>
+
+<% form_tag :controller => 'auth', :action => 'login' do %>
+  <p><label for="login_name">User Name</label><br/>
+  <%= text_field 'login', 'name', :size => 12 %></p>
+
+  <p><label for="login_password">Password</label><br/>
+  <%= password_field 'login', 'password', :size => 12 %></p>
+
+  <%= submit_tag "Login" %>
+<% end %>
+<p><%= link_to "Forgotten your password?", :controller => 'password_retrieval', :action => 'forgotten' %></p>
+<% end %>

@@ -1,0 +1,57 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+teams_users0:
+  team_id: <%= Fixtures.identify(:team0) %>
+  user_id: <%= Fixtures.identify(:student1) %>
+
+teams_users1:
+  team_id: <%= Fixtures.identify(:team0) %>
+  user_id: <%= Fixtures.identify(:student2) %>
+  
+teams_users2:
+  team_id: <%= Fixtures.identify(:team1) %>
+  user_id: <%= Fixtures.identify(:student3) %>
+  
+teams_users3:
+  team_id: <%= Fixtures.identify(:team1) %>
+  user_id: <%= Fixtures.identify(:student5) %>
+  
+teams_users4:
+  team_id: <%= Fixtures.identify(:team2) %>
+  user_id: <%= Fixtures.identify(:student6) %>
+
+teams_users5:
+  team_id: <%= Fixtures.identify(:team3) %>
+  user_id: <%= Fixtures.identify(:student3) %>
+
+teams_users6:
+  team_id: <%= Fixtures.identify(:team4) %>
+  user_id: <%= Fixtures.identify(:student2) %>
+
+teams_users7:
+  team_id: <%= Fixtures.identify(:team5) %>
+  user_id: <%= Fixtures.identify(:student5) %>
+  
+#Team users for course_object_oriented and instructor1
+teams_usersA:
+  team_id: <%= Fixtures.identify(:Assignment_Project1_Team1) %>
+  user_id: <%= Fixtures.identify(:student1) %>
+
+teams_usersB:
+  team_id: <%= Fixtures.identify(:Assignment_Project1_Team1) %>
+  user_id: <%= Fixtures.identify(:student2) %>
+
+teams_usersC:
+  team_id: <%= Fixtures.identify(:Assignment_Project1_Team2) %>
+  user_id: <%= Fixtures.identify(:student3) %>
+
+teams_usersD:
+  team_id: <%= Fixtures.identify(:Assignment_Project2_Team1) %>
+  user_id: <%= Fixtures.identify(:student1) %>
+
+teams_usersE:
+  team_id: <%= Fixtures.identify(:Assignment_Project2_Team1) %>
+  user_id: <%= Fixtures.identify(:student2) %>
+
+teams_usersF:
+  team_id: <%= Fixtures.identify(:Assignment_Project2_Team2) %>
+  user_id: <%= Fixtures.identify(:student2) %>

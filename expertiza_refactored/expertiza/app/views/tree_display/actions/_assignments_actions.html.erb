@@ -1,0 +1,49 @@
+<% owner_id = Object.const_get('Assignment').find(node.node_object_id).instructor_id %>
+
+<TD WIDTH="15%">      
+<ul id="actionmenu"><li class="daddy">&nbsp;
+<ul>
+<%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Assignment', :controller => 'assignment', :node => node, :owner_id => owner_id} %>
+<% if is_available(session[:user],owner_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),owner_id))%>  
+<div>
+  <%= link_to image_tag('/images/tree_view/add-participant-24.png', :title => 'Add participants'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment'}, {:title => 'Add participants'}%>
+  <%@assignment = Assignment.find(node.node_object_id)%>
+  <% if @assignment.team_assignment %>
+    <%= link_to image_tag('/images/tree_view/create-teams-24.png', :title => 'Create teams'),:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Assignment' %>
+  <% end %>
+  <% signup_topic = SignUpTopic.find(:first, :conditions => ['assignment_id = ?',node.node_object_id]) %>
+  <% if signup_topic %>
+    <% if @assignment.staggered_deadline == true %>
+      <%= link_to image_tag('/images/tree_view/edit-signup-sheet-24.png', :title => 'Edit signup sheet'), :controller=>'sign_up_sheet', :action=>'add_signup_topics_staggered', :id => node.node_object_id %>
+    <% else %>
+      <%= link_to image_tag('/images/tree_view/edit-signup-sheet-24.png', :title => 'Edit signup sheet'), :controller=>'sign_up_sheet', :action=>'add_signup_topics', :id => node.node_object_id %>
+    <% end %>
+  <% else %>
+    <% if @assignment.staggered_deadline == true %>
+      <%= link_to image_tag('/images/tree_view/add-signup-sheet-24.png', :title => 'Add signup sheet'),:controller=>'sign_up_sheet', :action=>'add_signup_topics_staggered', :id => node.node_object_id %>
+    <% else %>
+      <%= link_to image_tag('/images/tree_view/add-signup-sheet-24.png', :title => 'Add signup sheet'),:controller=>'sign_up_sheet', :action=>'add_signup_topics', :id => node.node_object_id %>
+    <% end %>
+   <% end %>
+</div>
+<div>
+<% if Assignment.find(node.node_object_id).course_id %>
+    <%= link_to image_tag('/images/tree_view/remove-from-course-24.png', :title => 'Remove from course'), :controller => 'assignment', :action => 'remove_assignment_from_course', :id => node.node_object_id %>
+  <% else %>
+    <%= link_to image_tag('/images/tree_view/assign-course-blue-24.png', :title => 'Assign to course'), :controller => 'assignment', :action => 'associate_assignment_to_course', :id => node.node_object_id %>
+  <% end %> 
+  <%= link_to image_tag('/images/tree_view/assign-reviewers-24.png', :title => 'Assign reviewers'),:controller=>'review_mapping', :action=>'list_mappings', :id => node.node_object_id %>
+<%= link_to image_tag('/images/tree_view/assign-survey-24.png', :title => 'Assign surveys'),:controller=>'survey', :action=>'assign', :id => node.node_object_id %>
+</div>
+<div>
+  <%= link_to image_tag('/images/tree_view/view-scores-24.png', :title => 'View scores'),:controller=>'grades', :action=>'view', :id => node.node_object_id %>
+  <%= link_to image_tag('/images/tree_view/view-review-report-24.png', :title => 'View review report'), :controller=>'review_mapping', :action=>'review_report', :id => node.node_object_id %>
+  <%= link_to image_tag('/images/tree_view/view-survey-24.png', :title => 'View survey responses'),:controller=>'survey_response', :action=>'view_responses', :id => node.node_object_id %>
+  <%= link_to image_tag('/images/tree_view/view-suggestion-24.png', :title => 'View suggestions',:controller=>'suggestion', :action=>'list'), :id => node.node_object_id %>
+  <% if signup_topic %>
+    <%= link_to image_tag('/images/tree_view/view-publish-rights-24.png', :title => 'View publishing rights'),:controller=>'sign_up_sheet', :action=>'view_publishing_rights', :id => node.node_object_id %>
+  <% end %>
+</div>
+<% end %>
+</ul>
+</TD> 

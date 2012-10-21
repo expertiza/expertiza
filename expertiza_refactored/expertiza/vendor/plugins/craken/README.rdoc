@@ -1,0 +1,170 @@
+= Craken
+
+Craken is a rails plugin for managing and installing rake-centric crontab files 
+over Capistrano.
+
+What is a crontab?  A command list that cron will run at specified intervals.
+What is cron?  A daemon to execute scheduled commands.
+
+If you don't know these things already you should probably do a little research
+before using this tool :) Begin here: http://en.wikipedia.org/wiki/Cron
+
+Craken uses files called +raketab+s that are similar in every respect to crontab
+files except the commands are rake tasks instead of arbitrary unix commands.  The file
+goes in the craken directory inside config (i.e. #{RAILS_ROOT}/config/craken/raketab).
+
+Why not just let it run arbitrary commands instead of limiting it to rake tasks?
+The main issue this plugin attempts to alleviate is having to manage the 
+rails environment configuration for multiple deployments.  Craken will set up the
+crontab to change into the application's current directory and set rake to run in
+the correct environment.
+
+Raketab files can also handle ERB escaped text bound to the rake environment.
+
+A Capistrano file is also included to make it easy to install cron jobs on multiple 
+hosts.  A new :cron capistrano role is necessary to define which machines to install to.
+
+== Configuration
+
+Command line configuration options to the rake task (defaults are in parens):
+[+deploy_path+]        Where the application is deployed (RAILS_ROOT)
+[+crontab_exe+]        Where to find the crontab excutable (/usr/bin/crontab)
+[+rake_exe+]           The rake executable (/usr/bin/rake)
+[+raketab_rails_env+]  Rails environment mode to set the cron jobs to run in (RAILS_ENV)
+[+app_name+]           Name of the application (tries to figure it out from the deploy path)
+[+raketab_file+]       Where the raketab file is:
+
+  #{RAILS_ROOT}/config/craken/#{HOSTNAME}_raketab or 
+  #{RAILS_ROOT}/config/craken/raketab if the first is not found
+
+The +raketab_file+ can be a crontab file (no extension), a .yaml/.yml file or 
+an .rb file (see Other Formats below).
+
+== Example
+
+An example line from an example raketab file:
+
+  59 * * * * thing:to_do > /tmp/thing_to_do.log 2>&1
+
+This will run the rake task thing:to_do every 59th minute after every hour.
+The little redirect thing is added for effect; otherwise output will be mailed
+to the user who the crontab is installed on.
+
+When craken:install is run on the production box, the crontab will look like this:
+
+  ### foo raketab
+  59 * * * * cd /home/thatguy/u/apps/foo/current && /usr/bin/rake --silent RAILS_ENV=production thing:to_do > /tmp/thing_to_do.log 2>&1
+  ### foo raketab end
+
+The "magic" part of craken is the bit that crontab added:
+
+  cd /home/thatguy/u/apps/foo/current && /usr/bin/rake --silent RAILS_ENV=production
+
+=== Special crontab string support
+
+An example line to add a rake task to be executed after reboot:
+
+  @reboot thinking_sphinx:start > /tmp/ts_startup.log 2>&1
+
+All special strings and their effects:
+[<tt>@reboot</tt>]    execute after reboot
+[<tt>@yearly</tt>]    every year
+[<tt>@annually</tt>]  every year hipster version
+[<tt>@monthly</tt>]   every month, or better known as: <i>No roll in the hay for you this time honey!</i>
+[<tt>@weekly</tt>]    just like every month but weekly
+[<tt>@daily</tt>]     like brushing your teeth
+[<tt>@midnight</tt>]  when the ghosts come out
+[<tt>@hourly</tt>]    whenever the long hand of your watch is at 12
+
+Read more about crontab special strings here: http://unixhelp.ed.ac.uk/CGI/man-cgi?crontab+5
+== Other Formats
+
+You can also specify other types of files to describe +raketabs+.  You can have multiple formats and they 
+will be aggregated together.
+
+=== YAML 
+
+You can specify it in YAML.  For instance in a +config/craken/raketab.yml+:
+
+  my_command:
+    hour: 5
+    minute: 30
+    day: 1
+    month: September
+    command: thing:to_do > /tmp/thing_to_do.log 2>&1
+
+Here we've specified my_command to run at 5:30 AM on September 1st.  Aside from the command to run, 
+the timings have the following defaults: 0 minute, 0 hour, every day, every month, every weekday. So 
+you could specify in your raketab.yml:
+
+  my_other_command:
+    command: other:thing:to_do > /tmp/thing_to_do.log 2>&1
+    
+This will run at midnight of every day.  You can also specify weekday:
+
+  my_third_command:
+    weekday: thursday
+    command: third:thing:to_do > /tmp/thing_to_do.log 2>&1
+
+You can also specify the month number or weekday number as you would in a crontab.  Lastly, you can specify ranges or full match strings and they will be passed on to the crontab directly:
+
+  and_finally:
+    hour: *
+    weekday: 1-5
+    command: last:thing:to_do > /tmp/thing_to_do.log 2>&1
+
+Here, the command will run every hour from Monday to Friday.  Month and Weekday names are not supported when doing ranges in this fashion.
+
+=== Raketab DSL
+
+The other format is written in pure ruby using the +Raketab+ object.  In your +config/craken/raketab.rb+ file:
+
+  Raketab.new do |cron|
+    cron.schedule 'thing:to_do > /tmp/thing_to_do.log 2>&1', :every => :thursday
+  end
+
+The defaults are like those for the YAML file, so in this case, thing to do will run at midnight on thursdays.
+
+  Raketab.new do |cron|
+    cron.schedule 'thing:to_do > /tmp/thing_to_do.log 2>&1', :on => :september, :the => '1st', :at => '5:30'    
+  end
+  
+Here it will run only on the first of september at 5:30 AM.  Month and weekday names are also supported, and
+also the named units (hour, minute, month, day, weekday):
+
+  Raketab.new do |cron|
+    cron.schedule 'thing:to_do > /tmp/thing_to_do.log 2>&1', :on => september, :every => thursday
+  end
+
+Here it will run every Thursday in September.  Ranges (inclusive and exclusive), comma separated lists, in strings or using numbers or weekday and month names are also supported and their three letter abbreviations:
+
+  Raketab.new do |cron|
+    cron.schedule 'thing:to_do > /tmp/thing_to_do.log 2>&1',     :every => mon..fri
+    cron.schedule 'first:five:days > /tmp/thing_to_do.log 2>&1', :days => [1,2,3,4,5]
+    cron.schedule 'first:day:q1 > /tmp/thing_to_do.log 2>&1',    :the => '1st', :in => [jan,feb,mar]
+    cron.schedule 'first:day:q4 > /tmp/thing_to_do.log 2>&1',    :the => '1st', :months => 'October,November,December'
+  end
+
+You can find all the variants in the spec for Raketab and pick and choose which is most natural for you.
+
+= Running the Capistrano Script
+
+  cap craken:install
+
+Deploying to someplace other than production?  Rails environment is important so rake 
+is set in the right mode when the cron job runs:
+
+  cap -c rails_env=qa craken:install
+
+Different raketab files can be used to limit a subset of rake tasks to a particular 
+machine listed as a :cron role.  These files are prefixed with the name of the machine
+they need to be deployed to:
+
+  foo_raketab  # goes on the "foo" machine
+  bar_raketab  # goes on the "bar" machine
+  raketab      # goes on all machines except "foo" and "bar"
+
+Doug McInnes <doug.mcinnes@latimes.com>
+John Dewey <john.dewey@latimes.com>
+Reid MacDonald <reid.macdonald@latimes.com>
+Copyright (c) 2008 Los Angeles Times, released under the MIT license

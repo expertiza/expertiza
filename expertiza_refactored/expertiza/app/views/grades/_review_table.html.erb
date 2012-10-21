@@ -1,0 +1,37 @@
+<table class="grades">    
+	<tr><th>&nbsp;</th>
+		<% for i in 0...reviews.size%>
+			<th><%= collabel %>&nbsp;<%=i+1%></th>
+		<% end %>
+	</tr>
+	<% if controller.action_name != "view_my_scores" %>
+	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
+		<% for review in reviews %>
+           <td align="center">                       
+           <% if prefix %>         
+             <a href="#<%= prefix+"_"+review.map.reviewer.name %>"><%= review.map.reviewer.fullname %></a>&nbsp;<%=link_to '<img src="/images/delete_icon.png"/>', :controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor' %>     		   		     
+		   <% else %>
+		     <%= link_to review.map.reviewer.fullname, :controller=>ctrl, :action => caction, :id=> review.id%>
+		   <% end %>
+		   </td>	    
+	    <% end %>
+	</tr>
+	<% end %>
+	<tr class="head"><td align="right"><b>Average score</b></td>
+		<% for review in reviews %>
+		   <td align="center">
+
+             <!-- get the score latest version from all reviews available -->
+             <% all_resp=Response.find_all_by_map_id(review.map_id) %>
+             <% sort_to=all_resp.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
+
+             <% score = Score.get_total_score(:response => sort_to[0], :questions => @questions[symbol], :q_types => Array.new) %>
+             <% if controller.action_name != "view_my_scores" %>
+               <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>"%>
+             <% end %>
+             <%= sprintf("%.2f",score) %>% &nbsp;
+
+	  	   </td>
+	    <% end %>
+	</tr>
+</table>

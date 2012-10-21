@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<h1> Review report for <%= @assignment.name%> </h1>
+
+<div id="searchbox">
+
+  <div id="searchlink">
+  <p> <%= link_to_function("Search", "Element.show('searchform')") %>
+      | <%= link_to "Show all", :action => 'review_report', :id => @id %>
+      | <%= link_to "Distribution", :action => 'distribution', :id => @id%>
+      | <%= link_to 'Back', :controller=> 'tree_display', :action=>'list', :id => @userid%>
+
+  </p>
+  </div>
+
+
+  <div id="searchform" style = "display:none; border: solid; border-width: 1px; border-color: #986633;">
+
+  <div id="close">
+      <td align = "center"><b><%=link_to_function("X", "Element.hide('searchform');Element.show('searchlink')") %></b></td>
+  </div>
+
+  <% form_for :user, @user, :url => {:action => 'review_report', :id => @id} do |n| %>
+  <table>
+  <tr>
+      <th>Reviewer's Name</th>
+      <td><%= n.text_field:fullname %></td>
+      <td align = "right"><%= submit_tag "Search"%></td>
+  </tr>
+
+  </table>
+  <%end%>
+
+
+
+  </div>
+</div>

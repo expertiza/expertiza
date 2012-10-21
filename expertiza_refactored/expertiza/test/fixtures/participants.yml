@@ -1,0 +1,167 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+par0:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student1) %>
+  parent_id: <%= Fixtures.identify(:assignment0) %>
+  topic: Research EPA
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par0"
+  
+par1:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student1) %>
+  parent_id: <%= Fixtures.identify(:assignment1) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par1"
+  submitted_hyperlinks: "--- \n- http://www.ncsu.edu/\n- http://www.google.com/\n"
+
+par2:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student2) %>
+  parent_id: <%= Fixtures.identify(:assignment2) %>
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par2"
+  submitted_hyperlinks: "--- \n- http://www.ncsu.edu/\n- http://www.google.com/\n- http://www.csc.ncsu.edu/\n"
+  
+par3:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student3) %>
+  parent_id: <%= Fixtures.identify(:assignment2) %>
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par3"
+  submitted_hyperlinks: "--- \n- http://www.ncsu.edu/\n"
+  
+par4:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student5) %>
+  parent_id: <%= Fixtures.identify(:assignment2) %>
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par4"
+  
+par5:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student6) %>
+  parent_id: <%= Fixtures.identify(:course0) %>
+  penalty_accumulated: 0
+  type : CourseParticipant
+  handle: "par5"
+  
+par6:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student7) %>
+  parent_id: <%= Fixtures.identify(:course0) %>
+  penalty_accumulated: 0
+  type : CourseParticipant
+  handle: "par6"
+  
+par7:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student8) %>
+  parent_id: <%= Fixtures.identify(:course0) %>
+  penalty_accumulated: 0
+  type : CourseParticipant
+  handle: "par7"
+  
+par8:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student8) %>
+  parent_id: <%= Fixtures.identify(:course0) %>
+  penalty_accumulated: 0
+  type : CourseParticipant
+  handle: "par8"
+  
+par9:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student1) %>
+  parent_id: <%= Fixtures.identify(:assignment_review0) %>
+  topic: Research EPA
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par0"
+
+par10:
+  submit_allowed: 0
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student2) %>
+  parent_id: <%= Fixtures.identify(:assignment_review0) %>
+  topic: Research EPA
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par0"
+
+par11:
+  submit_allowed: 0
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student3) %>
+  parent_id: <%= Fixtures.identify(:assignment_review0) %>
+  topic: Research EPA
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par1"
+
+par12:
+  submit_allowed: 0
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student4) %>
+  parent_id: <%= Fixtures.identify(:assignment_review0) %>
+  topic: Research EPA
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par2"
+
+
+par13:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student1) %>
+  parent_id: <%= Fixtures.identify(:assignment7) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par13"
+
+par14:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student2) %>
+  parent_id: <%= Fixtures.identify(:assignment7) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par14"
+
+par15:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student3) %>
+  parent_id: <%= Fixtures.identify(:assignment7) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par15"
+
+par16:
+  submit_allowed: 1
+  review_allowed: 1
+  user_id: <%= Fixtures.identify(:student4) %>
+  parent_id: <%= Fixtures.identify(:assignment7) %>
+  topic: Research Communication
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par16"

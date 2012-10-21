@@ -1,0 +1,25 @@
+<%= error_messages_for 'content_page' %>
+
+<!--[form:content_page]-->
+
+<p><label for="content_page_name">Name</label><br/>
+<%= text_field 'content_page', 'name' %> Unique name, used as URL (can
+contain slashes)</p>
+
+
+<p><label for="content_page_title">Title</label><br/>
+<%= text_field 'content_page', 'title' %> Visible page title </p>
+
+<p><label for="content_page_permission_id">Permission
+Required</label><br/>
+<%= collection_select :content_page, :permission_id, 
+      @permissions, :id, :name %></p>
+
+<p><label for="content_page_markup_style_id">Markup Style </label><br/>
+<%= collection_select :content_page, :markup_style_id,
+      @markup_styles, :id, :name %></p>
+
+<p><label for="content_page_content">Content</label><br/>
+<%= text_area 'content_page', 'content', :cols => 70, :rows => 25 %></p>
+
+<!--[eoform:content_page]-->

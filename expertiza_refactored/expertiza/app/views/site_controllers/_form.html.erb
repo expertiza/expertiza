@@ -1,0 +1,15 @@
+<%= error_messages_for 'site_controller' %>
+
+<!--[form:site_controller]-->
+<p><label for="site_controller_name">Name</label><br/>
+<%= text_field 'site_controller', 'name' %></p>
+
+<p><label for="site_controller_permission_id">Permission</label><br/>
+<%= collection_select :site_controller, :permission_id, 
+    @permissions, :id, :name %></p>
+
+<p><label>Builtin</label><br/>
+<%= check_box :site_controller, :builtin %></p>
+
+<!--[eoform:site_controller]-->
+

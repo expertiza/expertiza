@@ -1,0 +1,27 @@
+<div id="rdetails">
+	
+	<h3> Reviewer details</h3>
+	
+	<table width="100%">
+		<tr>
+			<th align = "right" width="15%"> Full name:</th>
+			<td width="35%"> <%= @user.fullname %></td>
+			<td rowspan=4 width="50%" align="center"><%= image_tag "blank_profile_pic.jpg", :width=>"100px", :height=>"100px", :border=>1%></td>			
+		</tr>
+		<tr>
+			<th align = "right"> User id:</th>
+			<td> <%= @user.name %></td>			
+		</tr>
+		<tr>
+			<th align = "right"> email:</th>
+			<td> <%= @user.email %></td>			
+		</tr>
+		<tr>
+			<th align = "right"> Handle:</th>
+			<td> <%= @user.handle %></td>			
+		</tr>
+		
+		
+	</table>
+	
+</div>

@@ -1,0 +1,176 @@
+<h1>View team for <%= @student.assignment.name %></h1>
+
+<h2>Team members</h2>
+<% if @student.team == nil %>
+    You don't have a team yet!
+<% else %>
+
+    <b>Team Name: </b><%= @student.team.name %>
+
+    <%= link_to "Edit Name",
+                {:controller => 'student_team', :action => 'edit', :team_id => @student.team.id, :student_id => @student.id} %>
+    <table>
+      <tr>
+        <td><b>Username &nbsp</b></td>
+        <td><b>Full Name &nbsp</b></td>
+        <td><b>Email &nbsp</b></td>
+        <td></td>
+      </tr>
+      <% for member in @student.team.get_participants %>
+          <tr>
+            <td><%= member.user.name %></td>
+            <td><%= member.user.fullname %></td>
+            <td><%= member.user.email %></td>
+            <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
+
+                <% map = TeammateReviewResponseMap.find(:first, :conditions => ['reviewer_id = ? and reviewee_id = ?', @student.id, member.id])
+                   if map.nil?
+                       map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
+                   end
+                   review = map.response
+                   if review.nil? %>
+                    <td>
+                      <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.id, :return => "teammate"} %>
+                    </td>
+                <% else %>
+                    <td>
+                      <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
+                    </td>
+                    <td>
+                      <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+                    </td>
+                <% end %>
+            <% end %>
+          </tr>
+      <% end %>
+    </table>
+    <br>
+    <%= link_to "Leave Team",
+                {:controller => 'student_team', :action => 'leave', :student_id => @student.id, :team_id => @student.team.id} %>
+<% end %>
+
+<% if @student.team != nil %>
+<h2>Team Advertisement</h2>
+
+<% if @student.team.advertise_for_partner == true %>
+        <label><%= @student.team.comments_for_advertisement%></label>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <%= link_to 'edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
+    <%= link_to 'destroy', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
+<% else %>
+    <%= link_to 'new', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
+<% end %>
+<% end %>
+
+<%= render :partial => 'join_team_requests/list_sent',
+           :locals =>{:teams_user_id=>params[:id],
+                      :assignment_id => @student.assignment.id
+                     } %>
+
+<% if @student.team!=nil %>
+
+
+<%= render :partial => 'join_team_requests/list_received',
+           :locals =>{:team_id=>@student.team.id,
+                      :teams_user_id=>params[:id],
+                      :assignment_id => @student.assignment.id} %>
+<% end %>
+
+
+<table>
+  <h2>Sent Invitations</h2>
+  <tr>
+    <td><b>To &nbsp</b></td>
+    <td><b>Reply Status &nbsp</b></td>
+  </tr>
+  <% if @send_invs.length == 0 %>
+      <tr>
+        <td>--</td>
+        <td>--</td>
+      </tr>
+  <% else %>
+      <% for inv in @send_invs %>
+          <tr>
+            <td><%= inv.to_user.name %></td>
+            <% if inv.reply_status == 'A' %>
+                <td>Accepted</td>
+            <% elsif inv.reply_status == 'D' %>
+                <td>Declined</td>
+            <% else %>
+                <td>Waiting for reply</td>
+                <td><%= link_to "Retract",
+                                {:controller => 'invitation', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
+            <% end %>
+          </tr>
+      <% end %>
+  <% end %>
+</table>
+
+<table>
+  <h2>Received Invitations</h2>
+  <tr>
+    <td><b>From &nbsp</b></td>
+    <td><b>Team Name &nbsp</b></td>
+    <td><b>Reply &nbsp</b></td>
+  </tr>
+  <% if @received_invs.length == 0 %>
+      <tr>
+        <td>--</td>
+        <td>--</td>
+        <td>--</td>
+      </tr>
+  <% else %>
+      <% for inv in @received_invs %>
+          <!-->
+          <% if inv.reply_status == 'W' %>
+              <tr>
+                <td><%= inv.from_user.name %></td>
+                <td>
+                  <% teamsusers = TeamsParticipant.find(:all, :conditions => ['user_id = ?', inv.from_id]) %>
+                  <% for teamsuser in teamsusers %>
+                      <% current_team = Team.find(:first, :conditions => ['id = ? and parent_id = ?', teamsuser.team_id, @student.assignment.id]) %>
+                      <% if current_team != nil %>
+                          <%= Team.find(current_team.id).name %>
+                      <% end %>
+                  <% end %></td>
+                <td>
+                  <% if @student.team == nil
+                         @team_id = 0
+                     else
+                         @team_id = @student.team.id
+                     end
+                  %>
+                  <%= link_to "Accept",
+                              {:controller => 'invitation', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id} %>
+                  |
+                  <%= link_to "Decline",
+                              {:controller => 'invitation', :action => 'decline', :inv_id => inv.id, :student_id => @student.id} %>
+                </td>
+              </tr>
+              <!-->
+          <% end %>
+      <% end %>
+  <% end %>
+</table>
+
+<% if @student.team == nil %>
+    <h2>Create Team</h2>
+    <% form_tag :controller => 'student_team', :action => 'create' do %>
+        <%= hidden_field_tag 'id', @student.id %>
+        <label for="team_name">Team Name:</label>&nbsp;
+        <%= text_field 'team', 'name' %>
+        <%= submit_tag "Create Team" %>
+    <% end %>
+<% else %>
+    <h2>Invite people</h2>
+    <% form_tag :controller => 'invitation', :action => 'create' do %>
+        <%= hidden_field_tag 'team_id', @student.team.id %>
+        <%= hidden_field_tag 'student_id', @student.id %>
+        <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
+
+        Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+        <input type='submit' value='Invite'/>
+    <% end %>
+<% end %>
+<a href="javascript:window.history.back()">Back</a>
+

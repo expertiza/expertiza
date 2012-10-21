@@ -1,0 +1,48 @@
+<h1>Submit or Review work for <%= @assignment.name %></h1>
+<div class="flash_note">
+Next: Click the activity you wish to perform on the assignment titled: <%= @assignment.name %>
+</div>
+<% if @assignment.spec_location && @assignment.spec_location.length > 0 %>
+  <a href="<%= @assignment.spec_location %>" target="new">Assignment Description</a>
+<% end %>
+<ul>
+	<%if SignUpTopic.find_by_assignment_id(@assignment.id)%>
+		<li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'signup_topics', :id => @participant.parent_id%>
+		(Sign up for a topic)
+		</li>
+	<%end%>
+	<%if @assignment.team_assignment %>
+		<li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %> 
+		(View and manage your team)
+		</li>
+	<%end%>	
+	<li>
+	    <% if @assignment.submission_allowed(@participant.topic_id) %>
+	    	<%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>
+	    <% else %>
+	        <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %>
+        <% end %>	    		
+		(Submit and view your work)
+	</li>
+	<li>
+		<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
+			<%= link_to "Others' work",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
+		<% else %>
+			<font color="gray">Others' work</font>
+		<% end %> (Give feedback to others on their work)
+	</li>
+  <% puts(@participant.id) %>
+	<li><%= link_to "Your scores",{:controller => 'grades', :action => 'view_my_scores', :id => @participant.id} %> (View feedback on your work)</li>
+    <%if @can_provide_suggestions == true %>
+	<li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
+	<% end %>
+
+
+    <% if @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
+	<!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
+		<li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
+	<% end %>
+	<li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
+</ul>
+<br>
+<a href="javascript:window.history.back()">Back</a>

@@ -1,0 +1,76 @@
+<h1>Publishing Rights</h1>
+
+<table class="listing" cellpadding=2>
+<!-- if the user has a certificate then we wil display the options to grant, otherwise they will get a notice
+and have to follow a link to generate their private keys -->
+<% if @user.digital_certificate.nil?  %>
+<tr><td>
+	<div class="flash_note">
+		In order for your work to be published on our website, you need to grant us 
+		publishing rights for your work.  Before doing so you must generate a set of public and private keys so
+		you can digitally sign your granting action.
+    
+    <h3><%= link_to 'generate a key pair', {:controller => :users, :action => :keys, :id => @user.id} %></h3>
+
+
+	</div></td></tr>
+<% else %>
+	<tr>
+					
+		<td colspan=5>
+			<div class="flash_note">
+				In order for your work to be published on our website, you need to need to grant us 
+				publishing rights for your work. You may do this on a per assignment basis, or if
+				you wish you can grant or deny rights to all your past work.
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=4><h3>Past assignments</h3></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan=4><%= link_to 'Grant', :action =>'update_publish_permissions', :allow => 1 %> publishing rights to all my past work.</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan=4><%= link_to 'Deny', :action =>'update_publish_permissions', :allow => 0 %> publishing rights to all my past work.</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan=4></td>
+		<td></td>
+	</tr>
+  <tr>
+		<th></th>
+	  <th>Assignment</th>
+	  <th>Publishing Rights</th>
+	  <th>Digital Signature</th>
+		<td></td>
+  </tr>
+	
+<% @participants.each{
+    |participant| %>
+  <tr class="listingRow">
+		<td>&nbsp;</td>
+		<td><%= link_to participant.assignment.name, :controller => 'student_task', :action => 'view', :id => participant.id %></td>
+	  	<%if participant.permission_granted %>
+  	    <td align="center">granted</td>
+		<td align="center">
+			<% if (!participant.digital_signature.nil?) %>
+			  <%= (participant.verify_digital_signature(participant.digital_signature) ? "verified" : "invalid") %>
+		    <% end %>
+		  &nbsp;	  
+		</td>
+	  	<td><%= link_to 'Deny', :action =>'set_publish_permission', :id => participant.id, :allow => 0 %></td>
+	    <% else %>
+  	    <td align=center>denied</td>
+		<td>&nbsp;</td>
+		<td><%= link_to 'Grant', :action =>'grant', :id => participant.id %></td>
+		<% end %>
+		
+		<td width=30%>&nbsp;</td>
+	</tr>
+<% } %>
+<% end %>
+</table>

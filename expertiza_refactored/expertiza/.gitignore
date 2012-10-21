@@ -1,0 +1,12 @@
+log
+tmp
+*.swp
+pg_data
+pg_development.png
+.tmp*
+.project
+.loadpath
+.rvmrc
+.idea
+capybara-*html
+*~

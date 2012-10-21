@@ -1,0 +1,135 @@
+<!-- PARTICIPANT -->
+<% 
+  participant = pscore[:participant]
+  if pscore[:review]
+  	s_max = pscore[:review][:scores][:max]
+  	s_min = pscore[:review][:scores][:min] 
+  	s_avg = pscore[:review][:scores][:avg] 
+  end
+  if pscore[:metareview]
+    r_max = pscore[:metareview][:scores][:max]
+  	r_min = pscore[:metareview][:scores][:min] 
+  	r_avg = pscore[:metareview][:scores][:avg]
+  end 
+  if pscore[:feedback]
+  	f_max = pscore[:feedback][:scores][:max]
+  	f_min = pscore[:feedback][:scores][:min] 
+  	f_avg = pscore[:feedback][:scores][:avg]
+  end
+  if pscore[:teammate]
+  	tr_max = pscore[:teammate][:scores][:max]
+  	tr_min = pscore[:teammate][:scores][:min] 
+  	tr_avg = pscore[:teammate][:scores][:avg]   
+  end  	
+%>
+
+<TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
+    <TD><%= participant.fullname %>
+    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a>
+	<% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
+	</FONT>  	
+    </TD>
+    
+    <% if s_avg %>
+  	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%
+  	<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a> (<%= pscore[:review][:assessments].size %>)</FONT>
+  	</TD>    
+   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>% 
+   	<% if controller.action_name != "view_my_scores" %>
+   	  <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
+   	<% end %>  	 
+   	</TD>
+    <% else %>
+   	<TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+    
+    <% if r_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",r_avg) %>%
+    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)</FONT>
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
+    <% if controller.action_name != "view_my_scores" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review_of_review' %></FONT>
+    <% end %>  	    
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+    
+    <% if f_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",f_avg) %>%
+    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedbacks</a> (<%= pscore[:feedback][:assessments].size %>)</FONT>
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%
+    <% if controller.action_name != "view_my_scores" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'review_feedback' %></FONT>
+    <% end %>  	    
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+    <% if @assignment.team_assignment %>
+    <% if tr_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP">
+    	<%if controller.action_name != "view_my_scores"%>
+    		<%= sprintf("%.2f",tr_avg) %>
+    		<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a> (<%= pscore[:teammate][:assessments].size %>)</FONT>
+    	<% end %>
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min) %>% - <%= sprintf("%.0f",tr_max) %>%
+    <% if controller.action_name != "view_my_scores" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'teammate_review' %></FONT>
+    <% end %>  	    
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>    
+    <% end %>
+    <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
+    <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
+    	<TD ALIGN="CENTER">
+    	<% if stage == "Complete" %>      
+      	<% if participant.grade 
+      	    total_score = participant.grade
+      	    title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
+      	   else
+      	    total_score = pscore[:total_score]
+               #  total_score = 20
+      	    title = nil
+      	   end %>
+      	<div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %>%</div>       	    
+      	<% if controller.action_name != "view_my_scores" %> 
+      	  <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
+      	<% end %>
+    	<% else %>
+      	<FONT SIZE="-1">(in <%= stage %>)</FONT>
+    	<% end %>      
+    	</TD>
+   	<% else %>
+   	    <% if participant.grade %>   	        
+   	    	<TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10) %>% </TD>
+   	    <% else %>
+   	        <TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f", pscore[:total_score])) %>% </TD>	    	
+   	    <% end %>   	        
+   	<% end %>
+</TR>
+<TR  class="row" id="<%= prefix %>_files" style="display:none">
+	<TD COLSPAN="9"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
+</TR>
+<TR  class="row" id="<%= prefix %>_reviews" style="display:none">
+	<TD COLSPAN="9"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
+</TR>
+<TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
+	<TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
+</TR>
+<TR  class="row" id="<%= prefix %>_feedback" style="display:none">
+	<TD COLSPAN="9"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
+</TR>
+<TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
+	<TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
+</TR>
+<!-- END PARTICIPANT -->

@@ -1,0 +1,14 @@
+<TD WIDTH="15%">
+<ul id="actionmenu"><li class="daddy">&nbsp;
+<ul>
+<div>
+  <%= link_to image_tag('/images/tree_view/add-public-24.png'), 
+              { :controller=>'course', :action=>'new', :private => 0 },
+              { :title => 'Create Public Course' } %>
+  <%= link_to image_tag('/images/tree_view/add-private-24.png'),
+              { :controller=>'course', :action=>'new', :private => 1 }, 
+              { :title => 'Create Private Course' } %>
+</div>
+</ul>
+</li></ul> 
+</TD>

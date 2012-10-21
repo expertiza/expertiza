@@ -1,0 +1,125 @@
+<h1>Assignments</h1>
+<br/>
+<div class="flash_note">Select an assignment from the list
+  or set <strong><%= link_to 'publishing rights', :controller => 'publishing', :action => 'view' %></strong> for your work.
+</div>
+<br/>
+
+
+<div style="width: 1024px">
+  <div class="taskbox">
+    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
+
+    <% for participant in @tasknotstarted
+        stage = participant.assignment.get_current_stage(participant.topic_id)
+        duedate = participant.assignment.get_stage_deadline(participant.topic_id)
+        id = participant.id
+        controller = ""
+        action = ""
+        @paramj=Team
+        if stage == "submission"
+            controller = "submitted_content"
+            action = "edit"
+            # check if the assignment has a sign-up sheet
+	        if SignUpTopic.find_by_assignment_id(participant.assignment.id)
+                selected_topics = nil
+  	    	    if participant.assignment.team_assignment == true
+                    # get the user's team and check if they have signed up for a topic yet
+  		            users_team = SignedUpUser.find_team_participants(participant.assignment.id,participant.user.id)
+                    if users_team.size > 0
+                        selected_topics = SignedUpUser.find_user_signup_topics(participant.assignment.id,users_team[0].t_id)
+                    end
+                else
+                    # check if the user has signed up for a topic yet
+                    selected_topics = SignedUpUser.find_user_signup_topics(participant.assignment.id,participant.user.id)
+                end
+
+                if selected_topics.nil? || selected_topics.length == 0
+                    # there is a signup sheet and user/team hasn't signed up yet, produce a link to do so
+                    controller = "sign_up_sheet"
+                    action = "signup_topics"
+                    id = participant.parent_id
+                    stage = "signup"
+                end
+            end
+        elsif stage == "resubmission"
+            controller = "submitted_content"
+            action = "edit"
+        elsif stage == "review" or stage == "rereview" or stage == "metareview"
+            controller = "student_review"
+            action = "list"
+        end
+    %>
+
+     <span>&nbsp; &raquo; <%= link_to participant.assignment.name + " " +
+             stage, :controller => controller, :action => action, :id => id %> (<%=
+         time_ago_in_words(duedate) %> left) </span><br/>
+
+    <% end %>
+
+    <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
+    <% for participant in @taskrevisions
+        stage = participant.assignment.get_current_stage(participant.topic_id)
+        duedate = participant.assignment.get_stage_deadline(participant.topic_id)
+        controller = ""
+        action = ""
+        if stage == "submission" or stage == "resubmission"
+            controller = "submitted_content"
+            action = "edit"
+        elsif stage == "review" or stage == "rereview" or stage == "metareview"
+            controller = "student_review"
+            action = "list"
+        end
+    %>
+
+     <span>&nbsp; &raquo; <%= link_to participant.assignment.name + " " +
+             stage, :controller => controller, :action => action, :id => participant.id %> (<%=
+         time_ago_in_words(duedate) %> left) </span><br/>
+
+    <% end %>
+    <br/>
+
+    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @notifications.size.to_s %>&nbsp;</span> Notifications<br></strong><br>
+
+    <% for participant in @notifications
+        stage = participant.assignment.get_current_stage(participant.topic_id) %>
+
+     <span class="notification">&nbsp; &raquo; <%= link_to participant.assignment.name + ": " +
+             stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => participant.id %></span><br/>
+
+    <% end %>
+
+  </div>
+
+  <div class="topictable">
+    <table class="listing" cellpadding="2">
+      <tr class="taskheader">
+        <th>&nbsp;</th>
+        <th>Assignment</th>
+        <th>Course</th>
+        <th>Topic</th>
+        <th>Current Stage</th>
+        <th>Stage Deadline</th>
+        <th>Publishing Rights</th>
+      </tr>
+
+      <% for participant in @participants %>
+          <% if participant.assignment != nil %>
+              <tr class="listingRow">
+                <td>&nbsp;</td>
+                <td><b><%= link_to participant.assignment.name, :action => 'view', :id => participant %></b></td>
+                <td>
+                  <% participant.get_course_string %></td>
+                <td><%= participant.get_topic_string %></td>
+                <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
+                <td><%= participant.assignment.get_stage_deadline(participant.topic_id) %></td>
+                <td align=center>
+                  <% if participant.permission_granted %>granted
+                  <% else %>denied
+                  <% end %></td>
+              </tr>
+          <% end %>
+      <% end %>
+    </table>
+  </div>
+</div>

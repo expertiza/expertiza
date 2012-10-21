@@ -1,0 +1,35 @@
+<h1><%= @model %> Participants</h1>
+<h2><%= @parent.name %></h2>
+<br/>
+<%= render :partial => '/shared_scripts/user_list',
+           :locals => {:controller => 'participants', 
+                       :user_list => @participants} %>
+<br/>
+<%= 
+	render :partial => '/shared_scripts/add_individual',
+		   :locals => {:form_action => "add",
+					   :obj_type => "id", 
+					   :obj_id => @parent.id,
+					   :model => @model} 
+%>
+<br/>
+<% session[:return_to] = request.request_uri %>
+<% if params[:model] == 'Assignment' and @parent.course_id and  @parent.course_id > 0 %>
+  <%= link_to 'Copy participants from course', :action => 'inherit', :id => @root_node.node_object_id %>  |
+  <%= link_to 'Copy participants to course', :action => 'bequeath_all', :id => @root_node.node_object_id %><BR/>
+<% end %>
+<%= link_to 'Import '+@model+' Participants', 
+            :controller=>'import_file', 
+            :action=>'start', 
+            :model => @model+'Participant', 
+            :title => @model+' Participants',
+            :expected_fields => 'username, full name (first[ middle] last), e-mail address, password',
+            :id => @parent.id %> | 
+<%= link_to 'Export '+@model+' Participants',
+            :controller=>'export_file',
+            :action=>'start',
+            :model=>@model+'Participant',
+            :id=>@parent.id %> |
+<%= render :partial => '/shared_scripts/back' %>
+<hr/>
+

@@ -1,0 +1,11 @@
+<h3>New suggestion</h3>
+
+<% form_tag :action => 'create' do %>
+  <%= render :partial => 'form' %>
+  <p>
+  	<%= submit_tag "Submit" %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', :controller => 'student_task', :action => 'list' %>
+

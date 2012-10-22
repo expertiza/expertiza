@@ -1,0 +1,72 @@
+questionnaire0:
+ name: questionnaire0
+ instructor_id: <%= Fixtures.identify(:instructor1) %>
+ private: 0
+ min_question_score: 0
+ max_question_score: 5
+ type: "ReviewQuestionnaire"
+ display_type:
+
+questionnaire1:
+ name: questionnaire1
+ instructor_id: <%= Fixtures.identify(:instructor1) %>
+ private: 0
+ min_question_score: 0
+ max_question_score: 5
+ type: "ReviewQuestionnaire"
+ display_type: "Review"
+ 
+questionnaire2:
+ name: questionnaire2
+ instructor_id: <%= Fixtures.identify(:instructor2) %>
+ private: 0
+ min_question_score: 0
+ max_question_score: 5
+ type: "MetareviewQuestionnaire"
+ display_type: "Metareview"
+
+
+questionnaire3:
+ name: questionnaire3
+ instructor_id: <%= Fixtures.identify(:instructor2) %>
+ private: 0
+ min_question_score: 0
+ max_question_score: 5
+ type: "CourseEvaluationQuestionnaire"
+ display_type: "CourseEvaluation"
+
+questionnaire4:
+ name: questionnaire4
+ instructor_id: <%= Fixtures.identify(:instructor3) %>
+ private: 0
+ min_question_score: 0
+ max_question_score: 5
+ type: "SurveyQuestionnaire"
+ display_type: "Survey"
+ 
+peer_review_questionnaire:
+ name: questionnaire5
+ instructor_id: <%= Fixtures.identify(:instructor3) %>
+ private: 0
+ min_question_score: 0
+ max_question_score: 5
+ type: "AuthorFeedbackQuestionnaire"
+ display_type: "AuthorFeedback"
+
+teammate_review_questionnaire:
+ name: questionnaire6
+ instructor_id: <%= Fixtures.identify(:instructor3) %>
+ private: 0
+ min_question_score: 0
+ max_question_score: 5
+ type: "TeammateReviewQuestionnaire"
+ display_type: "TeammateReview"
+
+global_survey_questionnaire:
+ name: questionnaire7
+ instructor_id: <%= Fixtures.identify(:instructor3) %>
+ private: 0
+ min_question_score: 0
+ max_question_score: 5
+ type: "GlobalSurveyQuestionnaire"
+ display_type: "GlobalSurvey"

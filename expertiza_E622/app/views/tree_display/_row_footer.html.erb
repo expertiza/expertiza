@@ -1,0 +1,15 @@
+</TR>
+<% 
+   if child_nodes 
+   index = 1 
+   for node in child_nodes
+%>
+
+<!-- Start Listing -->
+<%= render :partial=> '/tree_display/entry', :locals => {:node => node, :prefix => prefix+"_"+index.to_s, :depth => depth + 1, :rowtype => rowtype } %>
+<!-- End Listing -->
+<% 
+   index+=1   
+   end 
+%>
+<% end %>

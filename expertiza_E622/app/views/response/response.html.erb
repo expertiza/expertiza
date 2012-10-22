@@ -1,0 +1,129 @@
+<h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
+
+<% if !@map.contributor.nil?%>
+  <%if @map.assignment.team_assignment?
+        team_member = TeamsParticipant.find_by_team_id(@map.contributor).user_id
+        topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
+    else%>
+        <% topic_id = Participant.find(@map.contributor).topic_id%>
+  <%end%>  
+  <%if !topic_id.nil?%>
+    <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
+  <%end%>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
+  <hr/>
+<% end %>
+<!-- display all versions available -->
+<% @responses_versions = Array.new %>
+<% @responses_versions = @map.get_all_versions() %>
+
+<% if @responses_versions.empty? %>
+  "<I>No previous review was performed.</I><br/><hr/><br/>"
+<% else %>
+  <% @responses_versions.each do |response| %>
+    <% rm = ResponseMap.find(response.map_id) %>
+    <% as = Assignment.find(rm.reviewed_object_id) %>
+    <% questionnaire = Questionnaire.find(as.questionnaires[0].id) %>
+    <% if questionnaire.section.eql? "Custom" %>
+      <% file_url = nil
+        @current_folder = DisplayOption.new
+        @current_folder.name = ""
+        @participant = Participant.find(response.map.reviewer_id)
+        files_list = Dir[@participant.assignment.get_path.to_s + "/" + response.map.id.to_s + @current_folder.name + "/*"]
+        files = Array.new
+        for file in files_list
+            if File.directory?(file) then
+                dir_files = get_files(file)
+                dir_files.each{|f| files << f}
+            end
+            files << file
+        end
+        file = files[0]
+        file_url = ""
+        if !file.nil?
+            # parentFolder = File.dirname(file)
+            # location = parentFolder + File.basename(file)
+            file_url = ""
+            file_url = "<u><i> "
+            file_url += link_to File.basename(file), :controller=>'submitted_content', :action=>'download', :download=>File.basename(file), 'current_folder[name]'=>File.dirname(file)
+            file_url += " </i></u><br/>"
+        end
+      %>
+      <%
+      current_topic = nil
+      questions = Question.find_all_by_questionnaire_id(questionnaire.id)
+      rs_temp = @review_scores
+      @review_scores = Array.new
+      questions.each{ | question |
+        @review_scores << Score.find_by_response_id_and_question_id(response.id, question.id)
+      }
+      i = 0
+      questions.each { | question |
+        ques_type = QuestionType.find_all_by_question_id(question.id)%>
+        <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+        <%= find_question_type(question, ques_type[0], i, true, file_url, (questionnaire.min_question_score..questionnaire.max_question_score).to_a) %>
+        <% current_topic = ques_type[0].parameters.split("::")[0]
+        i += 1
+    } %>
+    <% @review_scores = rs_temp %>
+    <% else %>
+      <%= response.display_as_html()+"<br/><hr/><br/>" %>
+    <% end %>
+  <% end %>
+<% end %>
+
+
+<% form_tag :action => @next_action, :id => @modified_object do %>
+<% i = 0
+   @questions.each{
+    | question | %>
+    <%= question.txt %><BR/>
+    <% if controller.action_name != 'new' and @review_scores[i] != nil and @review_scores[i].comments != nil %>
+	    <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
+	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
+    <% else %>
+	    <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>
+    <% end %>
+    <% if question.true_false? %>
+      <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+         <%if controller.action_name != 'new' %>
+           <option value="<%=@min%>" <%if @min==@review_scores[i].score%>selected="selected"<%end%> ><%=@min%></option>
+           <option value="<%=@max%>" <%if @max==@review_scores[i].score%>selected="selected"<%end%> ><%=@max%></option>    
+         <%else%>
+           <option value="<%=@min%>"><%=@min%></option>
+           <option value="<%=@max%>"><%=@max%></option> 
+         <%end%> 
+      </select>  
+  <% else %>
+      <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+          <% for j in @min..@max %>
+	         <%if controller.action_name != 'new'and @review_scores[i] != nil %>
+            	<option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
+             <%else%>
+		        <option value="<%=j%>" ><%=j%></option>
+	        <% end %>
+          <% end %>
+      </select>     
+  <% end %> 
+  <%if question.question_advices.size > 0%>
+      <%= render :partial => 'advice', :locals => {:i => i, :advice_list => question.question_advices} %>
+  <% else %>
+      <br/>
+  <% end %>      
+  <BR/><BR/>
+  <% i+=1 
+   } %>
+
+       
+<p>
+	<label for="review_comments">Additional Comments</label><BR/>
+	<textarea cols="70" rows="1" id="review_comments" name="review[comments]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><% if controller.action_name != 'new' and @response.additional_comment != nil %><%=@response.additional_comment.strip%><% end %></textarea>
+</p>
+
+<br/>
+<%= submit_tag "Save "+@title, :name=>"save" %>
+<%= hidden_field_tag('return', @return) %>
+<% end %>
+
+<%= @map.show_feedback() %>
+<a href="javascript:window.history.back()">Back</a>

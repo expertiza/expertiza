@@ -1,0 +1,46 @@
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    $("#accordion").accordion({ autoHeight: false });
+  });
+</script>
+<h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
+<% if !@map.contributor.nil?   %>
+  <% if !@topic_id.nil? %>
+    <h2>You are reviewing <%= @signedUpTopic %></h2>
+  <% end %>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
+<% end %>
+
+<%= @map.show_review() %>
+
+<%= form_tag :action => @next_action, :id => @modified_object %>
+
+  <%
+  i = 0
+  current_topic = nil
+  questions = @questionnaire.questions
+  questions.each {
+    | question | %>
+    <%= get_accordion_title(current_topic, @question_type[i].parameters.split("::")[0]) %>
+    <%= find_question_type(question, @question_type[i], i, false, nil, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
+    <% current_topic = @question_type[i].parameters.split("::")[0]
+
+    advices = QuestionAdvice.find_all_by_question_id(question.id)
+    advices = remove_empty_advice(advices)
+    if advices.length > 0 %>
+        <%= render :partial => 'custom_advice', :locals => {:i => i, :advice_list => advices} %>
+    <% end
+
+   i += 1
+  } %>
+
+  </p>
+  </div>
+  </div>
+  <br/>
+  <%= submit_tag "Save "+@title, :name=>"save" %>
+</form>

@@ -1,0 +1,21 @@
+<h1>Create or Change Handle for Current Assignment</h1>
+
+<% form_tag({:action => 'change_handle', :id =>  @participant}) do %>
+  <p>Your <strong>handle</strong> is the way you will be known to your reviewers.</p>
+  <p>For example, if you are writing on a wiki, you might not want to use your Expertiza user-ID to show up on the
+     wiki, because then your reviewers would know who they are reviewing. So, you are allowed to set up a handle instead.
+	 If you have a handle, then your wiki account is named after your handle, and your reviewers see your handle,
+	 but not your user-ID.</p>
+  <p>If you do not have a handle, your user-ID will be used instead.</p>
+  <p>You can set up a handle in two ways:
+  <ol><li>You can set up a handle for <em>only this assignment</em> by entering a handle below.</li>
+      <li>You can set up a "default" handle by editing your <%= link_to "Profile", :controller=> 'profile', :action => 'edit' %> </li></ol>
+  Note that if you change your handle by editing your <%= link_to "profile", :controller=> 'profile', :action => 'edit' %>, your new handle will be used for all <em>future</em> assignments;
+  if you want the change to apply to this assignment too, you must also change it below.
+  </p>
+  <p>Change handle <em>for current assignment</em>:
+  <%= text_field 'participant','handle' %>
+
+  <p><em>Warning:</em> You must have a wiki account named after your handle.  If you do not, please e-mail your instructor or the course staff.</p>
+  <%= submit_tag 'Save' %>
+<% end %>

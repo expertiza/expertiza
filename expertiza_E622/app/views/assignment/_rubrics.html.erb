@@ -1,0 +1,98 @@
+<% if session[:user].role.name == "Teaching Assistant"
+      user_id = Ta.get_my_instructor(session[:user].id)
+   else
+      user_id = session[:user].id
+   end %>
+
+<table>
+ <tr><th width="20%">&nbsp;</th><th>Selected questionnaire</th><th>Weight</th><th>Notify when scores differ by more than <img src="/images/info.png" title="If two reviews differ by more than this amount, the instructor will be notified by e-mail."></th></tr>
+ <tr>
+   <td>Review:</td>
+   <td style="padding: 15px;">
+      <% selected = @assignment.questionnaires.find_by_type('ReviewQuestionnaire') %>
+      <select style="width:250px" name="questionnaires[review]">
+        <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
+        <% ReviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
+             | questionnaire | %>
+             <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
+        <% } %>
+      </select>
+   </td>
+   <td style="padding: 15px;">
+      <input id="weights_review" name="weights[review]" size="5" type="text" value="<%= @weights[:review] %>"/>%   
+   </td>   
+   <td style="padding: 15px;">
+       <input id="limits_review" name="limits[review]" size="5" type="text" value="<%= @limits[:review] %>"/>%                         
+   </td>
+ </tr>
+
+<tr>
+   <td>Metareview:</td>
+   <td style="padding: 15px;">
+      <% selected = @assignment.questionnaires.find_by_type('MetareviewQuestionnaire') %>
+      <select style="width:250px" name="questionnaires[metareview]">
+        <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>        
+        <% MetareviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
+             | questionnaire | %>
+             <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
+        <% } %>
+      </select>
+   </td>
+   <td style="padding: 15px;">
+       <input id="weights_metareview" name="weights[metareview]" size="5" type="text" value="<%= @weights[:metareview] %>"/>%   
+   </td>
+   <td style="padding: 15px;">
+       <input id="limits_metareview" name="limits[metareview]" size="5" type="text" value="<%= @limits[:metareview] %>"/>%                         
+   </td></tr> 
+ <tr>
+   <td>Feedback:</td>
+   <td style="padding: 15px;">
+      <% selected = @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire') %>
+      <select style="width:250px" name="questionnaires[feedback]">
+        <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>       
+        <% AuthorFeedbackQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
+             | questionnaire | %>
+             <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
+        <% } %>
+      </select>
+   </td>
+   <td style="padding: 15px;">
+   	   <input id="weights_feedback" name="weights[feedback]" size="5" type="text" value="<%= @weights[:feedback] %>"/>% 
+   </td>
+   <td style="padding: 15px;">
+       <input id="limits_feedback" name="limits[feedback]" size="5" type="text" value="<%= @limits[:feedback] %>"/>%                         
+   </td></tr>
+ <tr id="teammate_review" <%if !@assignment.team_assignment %>style="display:none"<% end %>>  
+   <td>Teammate Review:</td>
+   <td style="padding: 15px;">        
+      <% selected = @assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') %>       
+      <select style="width:250px" name="questionnaires[teammate]">
+        <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>              
+        <% TeammateReviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
+             | questionnaire | %>
+             <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
+        <% } %>
+      </select>
+   </td>
+   <td style="padding: 15px;">
+   	   <input id="weights_teammate" name="weights[teammate]" size="5" type="text" value="<%= @weights[:teammate] %>"/>%     
+   </td>
+   <td style="padding: 15px;">
+       <input id="limits_teammate" name="limits[teammate]" size="5" type="text" value="<%= @limits[:teammate] %>"/>%                         
+   </td>
+  </tr>     
+</table>
+<br/>
+  
+<table>
+ <tr>
+  <td><label for="reviews_visible_to_all">Reviews should be visible to all other reviewers</label></td>
+  <td><%= check_box 'assignment', 'reviews_visible_to_all', {}, true, false %></td>
+ </tr>
+ 
+ <tr>
+  <td><label for="allow_suggestions">Students can suggest topics for this assignment</label></td>
+  <td><%= check_box 'assignment', 'allow_suggestions', {}, true, false %></td>
+ </tr>
+
+</table>

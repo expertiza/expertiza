@@ -1,0 +1,29 @@
+<H1>Teams for <%= @root_node.get_name %></H1>
+ 
+<%= render :partial => '/tree_display/page_footer' %> 
+
+
+<% 
+  session[:return_to] = request.request_uri    
+%>
+<BR/>
+<%= link_to 'Create Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>
+<% if @root_node.class == AssignmentNode %>
+  <% modelType = 'AssignmentTeam' %>
+<% else %>
+  <% modelType = 'CourseTeam' %>
+<% end %>
+| <%= link_to 'Import Teams', 
+            :controller=>'import_file', 
+            :action=>'start', 
+            :model => modelType, 
+            :title => 'Teams',
+            :expected_fields =>  "&lt;Team Name - optional, &gt; Team Member1, Team Member2, ... , Team Member3",
+            :id => @root_node.node_object_id %>
+|<%= link_to 'Export Teams',
+            :controller=>'export_file',
+            :action=>'start',
+            :model=> modelType,
+            :id=>@root_node.node_object_id %>
+|<%= link_to 'Delete All Teams', :action => 'delete_all', :id=> @root_node.node_object_id, :model => @model %>
+|<%= render :partial => '/shared_scripts/back' %>

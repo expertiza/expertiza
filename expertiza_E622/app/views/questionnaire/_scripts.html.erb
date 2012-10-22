@@ -1,0 +1,76 @@
+<script type="text/javascript">
+num_questions = <%= [@questionnaire.questions.length,1].max %>;
+
+function deleteQuestions(){
+	var checkedObjArray = new Array();
+	var deleteCount = 0;
+	var tbl = document.getElementById("questions_table");
+	var numChecks = 0;
+	for(i=0; i<document.forms[0].elements.length; i++){
+		if(document.forms[0].elements[i].type=="checkbox" &&
+		   document.forms[0].elements[i].id.substring(0,12)=="question_chk"){
+			numChecks++;
+			if(document.forms[0].elements[i].checked==true){
+				tbl.deleteRow(numChecks+1);
+				numChecks = 0;
+				deleteQuestions();
+			}
+		}
+	}
+}
+
+function addQuestions(){
+	numQuestionsToAdd = parseInt(document.getElementById("numQuestionsToAdd").value);
+	for(i=0; i<numQuestionsToAdd; i++){
+		addQuestion();
+	}
+}
+
+function addQuestion(){
+    qtype =  document.getElementById("section").value;
+	table = document.getElementById("questions_table");
+	var row = table.insertRow(-1);
+	id = num_questions;
+	column = document.createElement("td");
+	column.innerHTML = "<center><input type=checkbox id='question_chk" + num_questions + "'></center>";
+	row.appendChild(column);
+	
+	column = document.createElement("td");
+	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][txt] size=70 type=text/>";
+	row.appendChild(column);
+	
+	column = document.createElement("td");
+
+     if (qtype == "Custom"){
+         gradingTypes = "<select id=question_" + id + "_true_false name=question_type["+id+"][type]>";
+
+        <% for type in Question::GRADING_TYPES_CUSTOM %>
+            <%= "gradingTypes += '<option value=" + type[0].to_s + ">" + type[0].to_s + "</option>';"%>
+        <% end %>
+     }else{
+        gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
+        <% for type in Question::GRADING_TYPES %>
+            <%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
+        <% end %>
+     }
+    gradingTypes += "</select>"
+	column.innerHTML = gradingTypes;
+	row.appendChild(column);
+
+    if (qtype == "Custom"){
+        column = document.createElement("td");
+	    column.innerHTML = "<input id=new_question" + id + "_txt name=question_type["+id+"][parameters] size=30 type=text/>";
+	    row.appendChild(column);
+    }
+	
+	column = document.createElement("td");
+	weights = "<select id=new_question_" + id + "_weight name=new_question[" + id +"][weight]>";
+	<% for weight in Question::WEIGHTS %>
+		<%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+	<% end %>
+	weights = weights + "</select>";
+	column.innerHTML = weights;
+	row.appendChild(column);
+	num_questions = num_questions + 1;
+}
+</script>

@@ -1,0 +1,32 @@
+<h1>Teaching assistants</h1>
+<h2>Course: <%= @course.name %></h2>
+ <% if @course.ta_mappings != nil && @course.ta_mappings.size > 0 %>
+<table class="listing" cellpadding=2>
+  <tr>
+        <th>Teaching Assistant Name</th>
+        <th></th>
+        <th></th> 
+  </tr>
+  <% for ta in @course.ta_mappings %>
+  <tr class="listingRow">
+	<td><%= User.find(ta.ta_id).name %></td>
+	<td><%= link_to "Edit", {:action => 'show', :controller =>'users', :id => ta.ta_id} %></td>
+        <td><%= link_to "Delete", {:action => 'remove_ta', :controller =>'course', :id => ta.id, :course_id => ta.course_id }, :confirm=> "Do you want delete" %></td>
+  </tr>
+ <%end%>
+</table>
+<%end%>
+<%= 
+	render :partial => 'add_individual', 
+		:locals => {:form_action => "add_ta",
+					:obj_type => "course_id", 
+					:obj_id => @course.id} 
+%>
+<% 
+  session[:return_to] = request.request_uri  
+  session[:expected_fields] = 'username, full name (first[ middle] last), e-mail address, password'
+  session[:course_id] = @course.id 
+%>
+
+<hr/>
+

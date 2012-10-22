@@ -1,0 +1,59 @@
+<% @join_team_requests = JoinTeamRequest.find_all_by_team_id(team_id) %>
+<h2>Received Requests</h2>
+<table>
+  <tr>
+    <th>
+      Name
+    </th>
+    <th>
+      Comments
+    </th>
+    <th>Action</th>
+    <th>
+      Sent at
+    </th>
+  </tr>
+
+  <% if @join_team_requests != nil %>
+
+      <% @join_team_requests.each do |@join_team_request| %>
+          <% if @join_team_request.status=='P' %>
+              <tr>
+
+                <td>
+                  <%= User.find(Participant.find(@join_team_request.participant_id).user_id).name %>
+                </td>
+                <td>
+                  <%= @join_team_request.comments %>
+                </td>
+                <td>
+                  <table>
+                    <tr>
+                      <td>
+                        <% form_tag :controller => 'invitation', :action => 'create' do %>
+                            <%= hidden_field_tag 'team_id', team_id %>
+                            <%= hidden_field_tag 'student_id', teams_user_id %>
+                            <%= hidden_field_tag 'session[:dummy][:assignment_id]', Participant.find(@join_team_request.participant_id).parent_id %>
+                            <%= hidden_field_tag 'user[name]', User.find(Participant.find(@join_team_request.participant_id).user_id).name %>
+                            <input type='submit' value='Invite'/>
+                        <% end %>
+                      </td>
+                      <td>
+                        <%= button_to 'Decline', :controller => 'join_team_requests', :action => 'decline', :id=>@join_team_request.id, :teams_user_id=>teams_user_id %>
+                      </td>
+                    </tr>
+                  </table>
+
+                </td>
+                <td>
+                  <%= @join_team_request.created_at %>
+                </td>
+              </tr>
+          <% end %>
+
+      <% end %>
+  <% else %>
+      You Dont have any requests
+
+  <% end %>
+</table>

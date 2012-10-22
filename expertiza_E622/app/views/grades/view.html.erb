@@ -1,0 +1,25 @@
+<h1>Summary report for <%= @assignment.name %></h1>
+<BR/>
+<% if @scores[:teams] %>
+	<a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
+    <BR/><BR/>
+<% end %>
+<TABLE class="grades" width="100%">
+<% if @assignment.team_assignment && @scores[:teams].length > 0 %>
+  <%= render :partial => 'teams' %>
+<% elsif !@assignment.team_assignment && @scores[:participants].length > 0 %>
+  <%= render :partial => 'participants' %>
+<% else %>
+  <TR><TD>No <%if @assignment.team_assignment%>teams<%else%>participants<%end%> are defined for this assignment</TD></TR>
+<% end %>
+</TABLE>
+<BR/><BR/>
+<%= link_to 'Export '+'Grades',
+            :controller=>'export_file',
+            :action=>'start',
+            :model=>'Assignment',
+            :id=>@assignment.id %> <BR/><BR/>
+<a href="javascript:window.history.back()">Back</a>
+
+
+

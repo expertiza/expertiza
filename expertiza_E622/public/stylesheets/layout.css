@@ -1,0 +1,513 @@
+body {
+  background: #6d7a73 ;
+  font: 85% Verdana,Tahoma,Arial,sans-serif ;
+  padding: 6px ;
+}
+
+a {
+  color: #986633 ;
+  background-color: transparent ;
+  text-decoration: none ;
+  margin: 0 ;
+  padding: 0 1px 2px 1px ;
+}
+
+
+img 
+{ 
+  border-style: none; 
+  text-decoration: none; 
+} 
+
+a:hover {
+  color: #6D7A73 ;
+  text-decoration: underline ;
+}
+
+.wrapper {
+ background: white url('/images/column_200_1.png') repeat-y right ;
+}
+
+.header * {
+  margin: 0 ;
+  padding: 0 ;
+}
+
+.header {
+  height: 90px ;
+  color: #fafaea ;
+  background: #9A0000 ;
+}
+
+.header img {
+  position: relative ;
+  float: right ;
+  height: 90px ;
+}
+
+.header h1 {
+  font-size: 2em ;
+  padding: 15px 0 0 20px ;
+}
+
+.header h2 {
+  font-size: .75em ;
+  padding: 6px 0 0 20px ;
+}
+
+.navbar {
+  height: 2em ;
+  background-color: #000000 ;
+}
+
+#suckerfish * {
+  font-family: "Trebuchet MS" ; 
+  margin: 0 ;
+  padding: 0 ;
+}
+
+#suckerfish, #suckerfish ul {
+  padding: 0 ;
+  margin: 0 ;
+  width: 100% ;
+  list-style: none ;
+  line-height: 2em ;
+  z-index: 999 ;
+}
+
+#suckerfish a {
+  color: white ;
+  display: block ;
+}
+
+#suckerfish a:hover {
+  color: #f4ec7d ;
+  text-decoration: none ;
+}
+
+#suckerfish li:hover, #suckerfish li.over { 
+  position: static;
+}
+
+#suckerfish li {
+  padding: 0 .75em 0 .75em ;
+  float: left ;
+}
+
+#suckerfish li ul li a {
+  margin-left: .25em ;
+  width: 10.75em ;
+}
+
+#suckerfish li ul li a.daddy {
+  background-image: url("/images/daddy_rightarrow.gif") ;
+  background-position: right center ;
+  background-repeat: no-repeat ;
+}
+
+#suckerfish li ul li {
+  padding: 0 ;
+  width: 11em ;
+  border-bottom: .075em solid white ;
+  border-right: .075em solid white ;
+}
+
+#suckerfish li ul {
+  position: absolute ;
+  background: #6d7a73 ;
+  width: 11em ;
+  left: -999em ;
+}
+
+#suckerfish li ul ul {
+  margin: -2em 0 0 11.075em ;
+}
+
+#suckerfish li:hover ul ul, #suckerfish li.sfhover ul ul {
+  left: -999em ;
+}
+
+#suckerfish li:hover ul, #suckerfish li li:hover ul, #suckerfish li.sfhover ul, #suckerfish li li.sfhover ul {
+  left: auto ;
+}
+
+#actionmenu * { 
+  margin: 0 ;
+  padding: 0 ;
+}
+
+#actionmenu, #actionmenu ul {
+  padding: 0 ;
+  margin: 0.5em ;
+  width: 80% ;
+  list-style: none ;
+  z-index: 999 ;
+}
+
+#actionmenu a {
+  color: white ;
+  margin: 0.3em ;
+  border: 0;
+}
+
+#actionmenu div {
+  display: block ;
+  margin: 0.4em ;
+}
+
+#actionmenu a:hover {    
+  color: #f4ec7d ;
+  text-decoration: none ;
+}
+
+#actionmenu a:link {    
+  border: 0px ;
+}
+
+#actionmenu li {
+  float: left ;
+}
+
+#actionmenu li ul li a {  
+  width: 17em ;
+  text-align: left ;
+  line-height: 2em ;
+  width: 17em ;
+  border-bottom: .075em solid white ;
+  border-right: .075em solid white ;
+}
+#actionmenu li.daddy {  
+  width: 9em;
+  background-image: url("/images/action_img.png") ;
+  background-position: center center;
+  background-repeat: no-repeat ;
+}
+
+#actionmenu li ul {  
+  background: #6d7a73 ;  
+  position: absolute ;
+  width: 17em ;
+  left: -999em ;
+  margin: -1.5em 0 0 8em ;
+}
+
+#actionmenu li:hover ul ul, #actionmenu li.acthover ul ul {
+  left: -999em ;
+}
+
+#actionmenu li:hover, #actionmenu li.over {
+  left: -999em ;
+  position: static;
+}
+
+#actionmenu li:hover ul, #actionmenu li li:hover ul, #actionmenu li.acthover ul, #actionmenu li li.acthover ul {
+  left: auto ;
+}
+
+.container {
+  width: 100%;
+  background: white url('/images/column_200_1.png') repeat-y right ;
+  float: left ;
+  margin-right: -200px ;
+}
+
+.main {
+  background: white ;  
+  width: 85%
+}
+
+.breadcrumbs {
+  font-size: .75em ;
+  background: #fafaea;
+  border-top: 1px solid #986633 ;
+  border-bottom: 1px solid #986633 ;
+  margin-bottom: 8px ;
+}
+
+.sidebar {
+  width: 15% ;
+  float: right ;
+}
+
+.content {
+  margin: 16px ;
+}
+
+.sidecontent { 
+  margin: 16px ;
+}
+
+.footer {
+  color: white ;
+  padding: 8px ;
+}
+
+.footer a {
+  color: #F4EC7D ;
+  text-decoration: none ;
+}
+
+.footer a:hover {
+  color: white ;
+  text-decoration: underline ;
+}
+
+h1 {
+  margin-top: 0 ;
+}
+
+.last {
+  margin-bottom: 0 ;
+}
+
+.clearing {
+  height: 0 ;
+  clear: both ;
+}
+
+#email_request{
+	width: 45em;
+}
+
+tr.graphRow td {
+	padding: 0;
+	margin: 0;
+}
+
+td.graphFill {
+	background: green;
+}
+
+td.darkGraphFill {
+	background: #00FF00;
+}
+
+.noBottom{
+	margin-bottom: 0;
+}
+
+p.noBottom{
+	margin-left: 1em;
+}
+
+td.graphEmpty {
+	background: white;
+}
+
+table.graph {
+	margin: 0 auto;
+}
+
+th.graphScore {
+	text-align: center;
+}
+
+td.countPrint {
+	width: .5em;
+}
+
+table.boldTable td{
+	font-weight: bold;
+}
+
+.inline {
+	display:inline;
+}
+
+.noTop {
+	margin-top: 0;
+}
+
+ul.floatleft {
+	float:left;
+}
+
+img.floatleft {
+	float:left;
+	clear:left;
+}
+
+p.responseDisplay {
+	clear: both;
+}
+
+span.separator {
+	margin: 0 2.5em;
+}
+
+div.survey_wrapper {
+	clear:both;
+}
+
+div.empty_question_wrapper, div.question_wrapper {
+	float: left;
+	padding: 0 .5em;
+}
+
+div.question_wrapper {
+	border: .1em solid #DADADA;
+	width: 450px;
+	height: 200px;
+}
+
+p.clearBoth{
+	clear:both;
+}
+
+table.centered {
+	margin: 0 auto;
+}
+
+h1.restrictLength{
+	max-width: 92%;
+	margin-bottom: 0;
+}
+
+tr.center {
+	text-align: center;
+}	
+
+p.left_inline {
+	clear:both;
+	display:inline;
+}
+
+select.float_right {
+	float: right;
+}
+
+#student_survey_wrapper {
+	width: 32.5em;
+}
+
+textarea.clear_both{
+	clear:both;
+	margin-top: .5em;
+}
+
+img.barchart {
+	padding: 1em;
+	background: #dddddd;
+}
+
+.odd {
+  background-color: white;
+}
+
+.even {
+  background-color: #FAFAEA;
+}
+
+table{}
+.grades{ 
+color: Black;
+background-color: #EAEAEA;
+text-decoration: none;
+}
+
+.row {
+  padding:5px;
+  margin:0px;
+  color: black;
+  background-color: white;
+}
+
+.team {
+  padding:5px;
+  margin:0px;
+  color: black;
+  background-color: #EAEADA;
+}
+
+table.general {
+    border: 1px solid #999999;
+    border-collapse: collapse;
+}
+
+table.general th {
+    background-color: #cccccc;
+    border: 1px solid #999999;
+    padding: 3px;
+}
+
+table.general td {
+    border: 1px solid #999999;
+    padding: 3px;
+}
+/*
+
+Styles for the leaderboard table
+These styles adapted from http://robertdenton.org/reference/css-tables-tutorial.html
+
+*/
+
+td.helpHed
+{ border-bottom: 2px solid #6699CC;
+border-left: 1px solid #6699CC;
+background-color: #BEC8D1;
+text-align: center;
+font-family: Verdana, sans-serif, Arial;
+font-weight: bold;
+font-size: 11px;
+color: #404040; }
+
+td.selfRef
+{ border-left: 1px solid #6699CC;
+border-bottom: 1px solid #6699CC;
+background-color: #990000;
+text-align: center;
+font-family: Verdana, sans-serif, Arial;
+font-weight: bold;
+font-size: 11px;
+color: #FFFFFF; }
+
+td.noSelfRef
+{ border-left: 1px solid #6699CC;
+border-bottom: 1px solid #6699CC;
+background-color: #fafafa;
+text-align: center;
+font-family: Verdana, sans-serif, Arial;
+font-weight: normal;
+font-size: 11px;
+color: #404040; }
+
+table.sofT
+{ text-align: center;
+font-family: Verdana;
+font-weight: normal;
+font-size: 11px;
+color: #404040;
+width: 275px;
+background-color: #fafafa;
+border: 1px #6699CC solid;
+border-collapse: collapse;
+border-spacing: 0px; } 
+
+/* end leaderboard styles */
+
+.tasknum {
+  color: #FFFFFF;
+  background-color: #B73204;
+}
+
+.revnum {
+  color: #FFFFFF;
+  background-color: #999999;
+}
+
+.taskheader {
+  font-family: verdana; font-size: 13px; text-align:left;
+}
+
+.notification a {
+  color:#0066CC
+}
+.topictable {
+  float: left; margin-left: 0; font-size: 11px; width: 743px;
+}
+.taskbox {
+  font: 11px tahoma; padding: 5px; margin-bottom: 39px; border: 1px dashed rgb(153, 153, 153);
+  float: left; width: 230px; margin-left: 16px; background: none repeat scroll 0pt 0pt rgb(250, 250, 234);
+}
+
+

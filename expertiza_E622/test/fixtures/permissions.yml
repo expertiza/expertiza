@@ -1,0 +1,16 @@
+permission_administer_goldberg:
+  name: 'administer goldberg'
+permission_public_pages_view:
+  name: 'public pages - view'
+permission_public_actions_execute:
+  name: 'public actions - execute'
+permission_administer_pg:
+  name: 'administer pg'
+permission_administer_assignments:
+  name: 'administer assignments'
+permission_do_assignments:
+  name: 'do assignments'
+permission_administer_instructors:
+  name: 'administer instructors'
+permission_administer_courses:
+  name: 'administer courses'

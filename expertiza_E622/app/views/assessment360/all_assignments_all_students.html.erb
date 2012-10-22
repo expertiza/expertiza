@@ -1,0 +1,24 @@
+<div>
+  <h1> <%= @course.name  %> </h1>
+  <table class="listing" cellpadding=2 border="1" >
+      <tr >
+	      <th>Assignment</th>
+	      <th>Class Average</th>
+	      <th>Reviews submitted</th>
+	      <th>Total Number of Reviews</th>
+	      <th>Reviews completed (%)</th>
+      </tr>
+    <% @assignments.each do |assignment| %>
+      <tr class="listingRow" align="justify">
+	      <td align="justify"><%= link_to assignment.name, :action => 'one_assignment_all_students', :assignment_id => assignment.id%></td>
+	      <td align="justify"><%= assignment.get_average_score().to_s + "%" %></td>
+	      <td align="justify"><%= assignment.get_total_reviews_completed() %></td>
+	      <td align="justify"><%= assignment.get_total_reviews_assigned() %></td>
+	      <td align="justify"><%= assignment.get_percentage_reviews_completed().to_s + "%" %></td>
+      </tr>
+    <% end %>
+  </table>
+  <div style="margin-top: 25px;">
+    <%= link_to 'Back to All Courses', :action => 'index' %>
+  </div>
+</div>

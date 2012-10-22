@@ -1,0 +1,181 @@
+<% if rscore and rscore[:assessments].length > 0 %>
+    <BR/>
+    <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
+    <BR/>
+    <HR/>
+    <% count = 0 %>
+    <% for review in rscore[:assessments] %>
+
+    <% count = count + 1 %>
+
+    <% file_url = nil
+    @questionnaire = Questionnaire.find(@assignment.questionnaires[0].id)
+    if @questionnaire.section.eql? "Custom"
+        @current_folder = DisplayOption.new
+        @current_folder.name = ""
+        @participant = Participant.find(review.map.reviewer_id)
+        files_list = Dir[@participant.assignment.get_path.to_s + "/" + review.map.id.to_s + @current_folder.name + "/*"]
+        files = Array.new
+        for file in files_list
+            if File.directory?(file) then
+                dir_files = get_files(file)
+                dir_files.each{|f| files << f}
+            end
+            files << file
+        end
+        file = files[0]
+        file_url = ""
+        if !file.nil?
+            # parentFolder = File.dirname(file)
+            # location = parentFolder + File.basename(file)
+            file_url = ""
+            file_url = "<u><i> "
+            file_url += link_to File.basename(file), :controller=>'submitted_content', :action=>'download', :download=>File.basename(file), 'current_folder[name]'=>File.dirname(file)
+            file_url += " </i></u><br/>"
+        end
+    end
+    %>
+
+    <% if controller.action_name != "view_my_scores" %>
+        <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %>
+        <% if @questionnaire.section.eql? "Custom" %>
+            <%
+            current_topic = nil
+            questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
+            questions.each {
+            | question |
+                i = 0
+                score = Score.find_by_response_id_and_question_id(review.id, question.id)
+                if !score.nil?
+                    ques_type = QuestionType.find_all_by_question_id(question.id)%>
+                    <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+                    <%= find_question_type(question, ques_type[0], i, true, file_url, score, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
+                    <% current_topic = ques_type[0].parameters.split("::")[0]
+                end
+                i += 1
+            } %>
+        <% end %>
+    <% else %>
+        <% if @questionnaire.section.eql? "Custom" %>
+            <h2>Review <%= count %></h2>
+            <!-- Display the latest review first -->
+            <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a>
+            <%= review.display_as_html(prefix) %>
+            <%
+            current_topic = nil
+            questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
+            questions.each { | question |
+                i = 0
+                score = Score.find_by_response_id_and_question_id(review.id, question.id)
+                if !score.nil?
+                    ques_type = QuestionType.find_all_by_question_id(question.id)%>
+                    <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+                    <%= find_question_type(question, ques_type[0], i, true, file_url, score, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
+                    <% current_topic = ques_type[0].parameters.split("::")[0]
+                end
+                i += 1
+            } %>
+            <!-- get all previous versions -->
+            <% @sorted_array=Array.new %>
+            <% @prev=Response.all %>
+            <%for element in @prev     %>
+                <%if(element.map_id==review.map.id)%>
+                    <%array_not_empty=1 %>
+                    <% @sorted_array << element %>
+                <% end %>
+            <% end %>
+            <% @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
+            <% if(@sorted.size>1) %>
+                <% for i in 1..@sorted.size-1 %>
+                    <% @str = @sorted[i].id.to_s %>
+                    <!-- display previous versions in descending order -->
+                    <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a>
+                    <%= @sorted[i].display_as_html(prefix) %>
+                    <%
+                    current_topic = nil
+                    questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
+                    questions.each { | question |
+                        i = 0
+                        score = Score.find_by_response_id_and_question_id(review.id, question.id)
+                        if !score.nil?
+                            ques_type = QuestionType.find_all_by_question_id(question.id)%>
+                            <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+                            <%= find_question_type(question, ques_type[0], i, true, file_url, score, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
+                            <% current_topic = ques_type[0].parameters.split("::")[0]
+                        end
+                        i += 1
+                    } %>
+                    <br/>
+                    <script>
+                        toggleElement('reviews_<%=@str%>','review');
+                    </script>
+                <% end %>
+                <!-- keep only latest version open -->
+                <% for i in 1..@sorted.size-1 %>
+                    <% @str = @sorted[i].id.to_s %>
+                    <script>
+                        toggleElement('review_<%=@str%>','review')
+                    </script>
+                <% end %>
+            <% end %>
+            <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
+            if map
+                review_feedback = map.response
+            end %>
+            <% if review_feedback %>
+                <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
+                <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>
+            <% else %>
+                <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+            <% end %>
+            <BR/><HR/><BR/>
+        <% else %>
+            <% review_feedback = nil %>
+            <h2>Review <%= count %></h2>
+            <!-- Display the latest review first -->
+            <%= review.display_as_html(nil,review.version_num, file_url) %><BR/><BR/>
+            <!-- get all previous versions -->
+            <% @sorted_array=Array.new %>
+            <% @prev=Response.all %>
+            <%for element in @prev     %>
+                <%if(element.map_id==review.map.id)%>
+                    <%array_not_empty=1 %>
+                    <% @sorted_array << element %>
+                <% end %>
+            <% end %>
+            <% @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
+            <% if(@sorted.size>1) %>
+                <% for i in 1..@sorted.size-1 %>
+                    <% @str = @sorted[i].id.to_s %>
+                    <!-- display previous versions in descending order -->
+                    <%= @sorted[i].display_as_html(nil,@sorted[i].version_num, file_url) %>
+                    <br/>
+                    <script>
+                        toggleElement('reviews_<%=@str%>','review');
+                    </script>
+                <% end %>
+                <!-- keep only latest version open -->
+                <% for i in 1..@sorted.size-1 %>
+                    <% @str = @sorted[i].id.to_s %>
+                    <script>
+                        toggleElement('review_<%=@str%>','review')
+                    </script>
+                <% end %>
+            <% end %>
+            <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
+            if map
+                review_feedback = map.response
+            end %>
+            <% if review_feedback %>
+                <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
+                <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>
+            <% else %>
+                <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+            <% end %>
+            <BR/><HR/><BR/>
+        <% end %>
+    <% end %>
+    <% end %>
+<% else %>
+    <i>No reviews have been completed for this user's submissions.</i>
+<% end %>

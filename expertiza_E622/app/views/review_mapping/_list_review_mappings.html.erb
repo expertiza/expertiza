@@ -1,0 +1,180 @@
+<table width="100%" cellpadding="10">
+  <tr CLASS="head" >
+    <% has_signup_sheet = !(SignUpTopic.find(:first, :conditions => ['assignment_id = ?', assignment.id])).nil? %>
+    <% if has_signup_sheet %>
+        <th width="20%">Topic selected</th>
+    <%end%>
+
+    <th width="30%">Contributor</th>
+    <th width="30%">Reviewed By</th>
+    <th width="30%">Metareviewed By</th>
+  </tr>
+  
+  <% index1 = 0 
+     index2 = 0
+     index3 = 0
+
+     items.each{
+       | contributor |
+       index1+=1 
+       if index1 % 2 == 0
+          bgcolor1 = "#FAFAE8"
+       else 
+          bgcolor1 = "#E8E8D1"
+       end %>
+       
+      <tr style="background-color:<%=bgcolor1%>">
+      <% if has_signup_sheet %>
+            <%
+              @topics = nil
+              if contributor.type.to_s == "AssignmentTeam"
+                  @contributor = contributor.id
+              elsif contributor.type.to_s == "AssignmentParticipant"
+                  @contributor = contributor.user_id
+              else
+                @topics = nil
+              end
+              %>
+
+              <%if !@contributor.nil?
+                topics = SignedUpUser.find_user_signup_topics(assignment.id, @contributor)
+
+                if !topics.nil?
+                    @topics = ""
+                    topics.each do |topic|
+                        if topic.is_waitlisted?
+                            @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name} <font color='red'>(waitlisted)</font> <br/>"
+                        else
+                            @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name}<br/>"
+                        end
+                    end
+                else
+                    @topics = nil
+                end
+              end
+             %>
+
+            <%if @topics.blank? %>
+                </tr><%index1-=1%>
+                <%next%>                
+            <%else%>
+                <td><%=@topics%></td>
+            <%end%>
+        <%end%>
+
+      <td style="vertical-align:top;"><%= contributor.name %><br/>
+        <% if !assignment.team_assignment %>          
+           (<%= contributor.fullname %>)
+        <%else%>
+            <%team_members = TeamsParticipant.find_all_by_team_id(contributor.id)%>
+            <%team_members.each{|team_member|
+                %><font size="1"><%=User.find(team_member['user_id']).fullname%>(<%=User.find(team_member['user_id']).name%>)</font><br/><%
+            }%>
+        <% end %>
+
+          <div style="text-align:right">
+          <% if !assignment.team_assignment %>
+            <%= link_to 'delete', :controller=> 'participants', :action => 'delete_assignment_participant', :id => contributor.id %><br/>
+          <% end %>
+          <%= link_to 'add reviewer', :action => 'select_reviewer', :id => assignment.id, :contributor_id => contributor.id %><br/>
+          <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id %>
+          </div>
+
+       </td>
+    <td colspan="2">
+    <table width="100%" cellpadding="10">
+    <% mappings = contributor.review_mappings
+    
+       if mappings.length > 0
+       	 mappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}
+       end      
+       mappings.each{
+         | map |
+         if map
+           index2 += 1 
+           if index2 % 2 == 0
+              bgcolor2 = "#FAFAD1"
+           else 
+              bgcolor2 = "#E8E8BA"
+           end
+           %>           
+           <tr style="background-color:<%=bgcolor2%>">            
+             <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
+               <div style="text-align:right">
+                 <%= link_to 'delete', :action => 'delete_reviewer', :id => map.id %><br/>
+                 <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.id %><br/>               
+                 <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.id %>
+               </div>
+             </td>
+
+             <td width="50%">
+               <table width="100%">
+               <% rmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(map.id) 
+                  rmappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname } %>
+               <% rmappings.each{
+                  | rmap |
+                  if rmap 
+                    index3+=1 
+                    if index3 % 2 == 0
+                      bgcolor3 = "#FFFFFF"
+                    else 
+                      bgcolor3 = "#DDDDDD"
+                    end %>
+              
+                   <tr style="background-color:<%=bgcolor3%>">
+                     <td><%= rmap.reviewer.name %> (<%= rmap.reviewer.fullname %>)
+                       <div style="text-align:right">
+                         <%= link_to 'delete', :action => 'delete_metareviewer', :id => rmap.id %><br/>
+                       </div>
+                     </td>
+                   </tr>
+               <% end
+                } %>
+               </table>
+             </td>
+           </tr>
+           <%
+         end
+       }
+    %>       
+    </table>
+    </td>
+    </tr>    
+   <% } %>   
+</table>
+<% 
+  session[:return_to] = request.request_uri    
+%>
+
+<% if !assignment.is_using_dynamic_reviewer_assignment? %>
+
+<%= link_to 'Assign reviewers automatically', :action => 'select_mapping', :id => assignment.id %>
+| <%= link_to 'Import reviewer mappings', 
+            :controller=>'import_file', 
+            :action=>'start', 
+            :model => 'ReviewResponseMap', 
+            :title => 'Reviewer Mappings',
+            :expected_fields =>  "Contributor, Reviewer1, Reviewer2, ... , ReviewerN",
+            :id => assignment.id %> 
+| <%= link_to 'Import metareviewer mappings', 
+            :controller=>'import_file', 
+            :action=>'start', 
+            :model => 'MetareviewResponseMap', 
+            :title => 'Metareviewer Mappings',
+            :expected_fields => 'Contributor, Reviewer, Metareviewer1, Metareviewer2, ... MetareviewerN',
+            :id => assignment.id %>
+<BR/>
+<% end %>
+
+<%= link_to 'Export review mappings',
+            :controller=>'export_file',
+            :action=>'start',
+            :model=> 'ReviewResponseMap',
+            :id=>assignment.id %>
+| <%= link_to 'Export metareview mappings',
+            :controller=>'export_file',
+            :action=>'start',
+            :model=> 'MetareviewResponseMap',
+            :id=>assignment.id %>            
+| <%= link_to 'Delete all reviewers and metareviewers', :action => 'delete_all_reviewers_and_metareviewers',
+                                                        :id => assignment.id %> | 

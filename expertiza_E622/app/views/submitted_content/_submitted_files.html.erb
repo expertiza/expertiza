@@ -1,0 +1,33 @@
+<% current_folder = DisplayOption.new 
+   current_folder.name = "" %>
+<% files = participant.get_files(participant.get_path + current_folder.name) %>
+or<br/><br/>
+<b>Submit a file:</b><BR/>
+<% if files.length > 0 or stage != "Complete"  %>
+  <% if stage != "Complete" %>
+    <% form_tag({:action=>'submit_file',:id => participant.id},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
+    	<br/><input type="checkbox" name="unzip" value=""/> Unzip submission
+    	<br/><input type="file" id="uploaded_file" name="uploaded_file" size=40 />
+    	<%= submit_tag 'Upload file' %>
+    	<br>
+    <% end %>
+  <% end %>
+  <% form_tag({:action=>'folder_action', :id => participant.id},{:multipart => true})do %>
+  <% if files.length > 0 and participant.directory_num != nil and participant.directory_num >= 0 %>
+	<% if stage != "Complete" %>
+		<div style="background-color:#EEEEEE; padding-bottom:0.6em"><strong>File and folder actions</strong><br>
+		<input type="button" onclick="createNewFolder()"     value="Create new folder"    />
+		<input type="button" onclick="copySelectedFile()"    value="Copy selected file"   />
+		<input type="button" onclick="moveSelectedFile()"    value="Move selected file"   />
+		<input type="button" onclick="renameFile()"          value="Rename selected file" />
+		<input type="button" onclick="deleteSelectedFile();" value="Delete selected file" />
+		<input type="reset" value="Reset"></div><br>
+	<% end %>
+    <table>
+	  <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, false) %> </div></td></tr>
+    </table>
+  <% end %>		
+  <% end %>
+<% else %>
+No files have been submitted.
+<% end %>

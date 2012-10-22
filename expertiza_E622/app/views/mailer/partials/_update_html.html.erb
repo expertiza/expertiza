@@ -1,0 +1,13 @@
+Hi <%= @first_name %>,</br>
+<p>
+One of the <%=@type%>s you are reviewing for the "<%= @obj_name %>" assignment has
+just been entered or revised. You may log into Expertiza and review the work now.
+</p>
+<br/>
+<% if @review_scores != nil %>
+<%= render :partial => '../review/scores' %> 
+<% end %>
+
+<% if @ror_review_scores != nil %>
+<%= render :partial => '../review_of_review/scores' %> 
+<% end %>

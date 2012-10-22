@@ -1,0 +1,100 @@
+<h1>Survey for all students</h1>
+<%
+  if params[:course_eval] #Check if its a course evaluation
+    action = 'submit'
+  else
+    action = 'create'
+  end
+%>
+<% form_tag(:action => action, :survey_id => @survey.id) do %>
+
+<% @min= @survey.min_question_score %>
+<% @max= @survey.max_question_score %>
+<p>
+<div id="student_survey_wrapper">
+<% for question in @questions %>
+  <p class="left_inline"><%= question.txt %> &nbsp;     
+  <% @box_values = []
+	 @box_labels = []
+     if question.true_false?
+       @box_values << @min
+	   @box_labels << "False"
+	   @box_values << @max
+	   @box_labels << "True"
+     else
+  	   for j in @min..@max 
+    	 @box_values << j
+		 @box_labels << j.to_s
+       end  
+     end -%>
+	 <select class="float_right"id="score_<%= question.id %>" name="score[<%= question.id %>]">
+	 	<option value="" selected="selected"></option>
+		<% 
+			i=0
+			for value in @box_values
+		%>	
+			<option value="<%= value %>"><%= @box_labels[i] %></option>
+		<% i += 1
+			end
+		%>
+	 </select>
+	 </p>
+	 <br />
+	 <textarea class="clear_both" name="comments[<%= question.id %>]" cols="80" rows="3"></textarea>
+  <br />
+  <br />
+<% end %>
+
+<% if @course_eval %>
+<input name="survey_deployment_id" value=<%= params[:id] %> type=hidden />
+<input name="assignment_id" value=0 type=hidden />
+<% end %>
+
+<br />
+</div>
+</p>
+<input name="id" value=<%= params[:id] %> type=hidden />
+<input name="survey_id" value=<%= @survey.id %> type=hidden />
+<input name="count" value=<%= params[:count].to_i+1 %> type=hidden />
+
+<% if params[:email] && params[:email] != ""%>
+<input name="email" value=<%= params[:email] %> type=hidden />
+<% end %>
+
+<% percent = 100*params[:count].to_i/@assigned_surveys.length %>
+
+<table class="graph">
+	<tr class="center"><td colspan="100">Progress: <%= percent %>%</td></tr>
+	<tr class="graphRow">
+	<td></td>
+    <% j = 0 %>
+    <% while j < percent %>
+      <% if (j+1) % 25 == 0 %>
+        <td class="darkGraphFill">&nbsp;</td>
+      <% else %>	
+        <td class="graphFill">&nbsp;</td>
+      <% end %>
+    <% j += 1 %>
+    <% end %>
+    <% while j < 100 %>	
+      <td class="graphEmpty">&nbsp;</td>
+      <% j += 1 %>
+    <% end %>
+	<td></td>
+	</tr>
+	<tr>
+		<td>0</td>
+		<td colspan="23"></td>
+		<td colspan="5">25</td>
+		<td colspan="20"></td>
+		<td colspan="5">50</td>
+		<td colspan="20"></td>
+		<td colspan="5">75</td>
+		<td colspan="20"></td>
+		<td colspan="5">100</td>
+	</tr>
+</table>
+<br />
+<%= submit_tag "Submit Answers", :name=>"submit" %>
+
+<% end %>

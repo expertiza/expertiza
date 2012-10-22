@@ -1,0 +1,19 @@
+<div id="Selection">
+<table><tr>
+       <td>Select Questionnaire Type</td>
+       <td>
+        <% form_tag :action => 'select_questionnaire_type'  do %>
+        <%= hidden_field 'questionnaire', 'id' %>
+        <%= hidden_field 'questionnaire', 'private' %>
+        <%= hidden_field 'questionnaire', 'type' %>
+        <%= hidden_field 'questionnaire', 'display_type' %>
+        <%= hidden_field 'questionnaire', 'min_question_score' %>
+        <%= hidden_field 'questionnaire', 'max_question_score' %>
+        <%= select 'questionnaire' , 'section' ,
+                   [['Regular',"Regular"], ['Extra Credit', "Extra"],['Custom Rubric', "Custom"]] %>
+         <%= submit_tag "Select", :name=>"select_questionnaire_type" %>
+       <% end %>
+       </td>
+ </tr>
+</table>
+</div>

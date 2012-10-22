@@ -1,0 +1,127 @@
+<table>
+  <% review_no = 1 %>
+  <% mappings.each do |map| %> 
+    <% if @assignment.team_assignment? %>
+      <% if map.type.to_s == "MetareviewResponseMap" %>
+        <%review_mapping = ResponseMap.find(map.reviewed_object_id)%>
+        <% participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id) %>
+      <% else %>
+        <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
+      <% end %>
+    <% else %>
+      <% if map.type.to_s == "MetareviewResponseMap" %>
+        <% review_mapping = ResponseMap.find(map.reviewed_object_id) %>
+        <% participant = review_mapping.reviewee %>
+      <% else %>
+        <% participant = map.reviewee %>
+      <% end %>
+    <% end %>
+
+    <% if participant %>
+      <tr>
+        <td>
+          <b><%= "#{title} #{review_no}." %></b>
+          <%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %>
+        </td>
+	      <td>&nbsp;</td>
+        <% if map.response %>            
+          <% array_not_empty = 0 %>
+          <% @sorted_array = Array.new %>
+          <% @prev = Response.all %>
+          <% for element in @prev %>
+            <% if(element.map_id == map.id) %>
+              <% array_not_empty = 1 %>
+              <% @sorted_array << element %>
+            <% end %>
+          <% end %>
+          
+          <% if (array_not_empty == 1) %>
+            <% @sorted = @sorted_array.sort { |m1,m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
+            <% @largest_version_num = @sorted[0] %>
+            <% @latest_phase = @largest_version_num.created_at %>
+            <% due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id])  %>
+            <% @sorted_deadlines = Array.new %>
+            <% @sorted_deadlines = due_dates.sort {|m1,m2|(m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1)} %>
+            <% current_time = Time.new.getutc %>
+            <% next_due_date = @sorted_deadlines[0] %>
+            <% for deadline_version in @sorted_deadlines %>
+              <% if(@largest_version_num.created_at < deadline_version.due_at) %>
+                <% break %>
+              <% end %>
+            <% end %>
+            <% for deadline_time in @sorted_deadlines %>
+              <% if (current_time < deadline_time.due_at) %>
+                 <% break %>
+              <% end %>
+            <% end %>
+          <% end %>
+          
+          <td>
+            <%= link_to "View",{:controller => 'response', :action => 'view', :id => @sorted[0].id} %>
+          </td>
+          <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
+            <!-- show the link as edit when latest review is done in current phase -->
+            <!-- show link as update when latest review is done in different phase than current phase -->
+            <% if (deadline_version.due_at == deadline_time.due_at) %>
+              <td><%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @sorted[0].id} %></td>
+            <% else %>
+              <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+            <% end %>
+          <% end %>     
+        <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
+          <% if @assignment.staggered_deadline? %>
+            <% if map.type.to_s == "MetareviewResponseMap" %>
+              <% if @assignment.get_current_stage(participant.topic_id) == 'metareview' %>
+                <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
+              <% else %>
+                <td>Begin</td><td> (Work has not yet been submitted)</td>
+              <% end %>
+            <% else %>
+              <% if @assignment.get_current_stage(participant.topic_id) != 'submission' %>
+                <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <td>&nbsp;&nbsp;</td>
+                <!-- Display link for code review if 'any' code review files -->
+                <!-- have been uploaded i.e. files present in code review dir-->
+                <td>&nbsp;&nbsp;&nbsp;&nbsp;
+                  <% if participant.get_files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
+                    <%= link_to "Review Code", { :controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
+                  <% end %>
+                </td>
+              <% else %>
+                <td>Begin</td><td> (Work has not yet been submitted)</td>
+              <% end %>
+            <% end %>
+          <% else %>
+            <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+            <td>&nbsp;&nbsp;</td>
+            <!-- Display link for code review if 'any' code review files -->
+            <!-- have been uploaded i.e. files present in code review dir-->
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;
+              <% if participant.get_files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
+                <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
+              <% end %>
+            </td>
+          <% end %>
+        <% else %><% # Deadline has passed, and the work was not submitted %>
+      	  <td>Begin</td><td> (Work has not yet been submitted)</td>for
+        <% end %>         
+      <% review_no += 1 %>
+      </tr>
+      </br>
+    <% end %>
+        
+    <% if map.type.to_s != "MetareviewResponseMap" %>
+      <% if @sorted !=nil %>
+        <TABLE class="grades" style=" font-style: italic; margin-left: 90px;">
+          <% if (@sorted.size > 1) %>
+            <% for i in 1..@sorted.size-1 %>
+              <tr><td colspan="10"><%= link_to "Review done at --#{@sorted[i].created_at}" ,{:controller => 'response', :action => 'view', :id => @sorted[i].id} %></td></tr>
+            <% end %>
+          <% else %>
+            <tr><td><br> <font color="gray" style="font-style: italic;">No Previous Versions available</font></td></tr>
+            <% end %>
+          <% end %>
+        </TABLE>
+    <% end %>
+  <% end %>
+</table>

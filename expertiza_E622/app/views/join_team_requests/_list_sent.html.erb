@@ -1,0 +1,59 @@
+<h2>Sent Requests </h2>
+
+  <table cellpadding="5">
+    <tr>
+      <th>
+        Topic
+      </th>
+      <th>
+        Team
+      </th>
+      <th>
+        Comments
+      </th>
+      <th>Status</th>
+      <th>Sent at</th>
+    </tr>
+
+    <% participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+       requests=JoinTeamRequest.find_all_by_participant_id(participant.id) %>
+    <% if requests != nil %>
+
+        <% requests.each do |request| %>
+
+            <tr>
+
+              <td>
+                <% teams_user_id=TeamsParticipant.find_by_team_id(request.team_id).user_id
+                    topic_name=SignUpTopic.find(Participant.find_by_user_id_and_parent_id(teams_user_id,assignment_id).topic_id).topic_name
+                     puts "topic:"+topic_name%>
+                <%= topic_name %>
+              </td>
+              <td>
+                <%= Team.find(request.team_id).name %>
+              </td>
+              <td>
+                <%= request.comments %>
+              </td>
+              <td>
+                <% if request.status == 'P' %>
+                    <%= "Pending" %>
+                <% elsif request.status == 'A' %>
+                     <%= "Accepted" %>
+                <% else %>
+                   <%= "Declined"  %>
+                <% end %>
+              </td>
+              <td>
+                <%= request.created_at %>
+              </td>
+            </tr>
+        <% end %>
+    <% else %>
+                <tr>
+                  <td colspan ='4' > You didn't send any request yet</td>
+                </tr>
+
+    <% end %>
+  </table>
+

@@ -1,0 +1,29 @@
+<!-- METAREVIEWS --> 
+<% if rscore and rscore[:assessments].length > 0 %>
+  <BR/>
+  <%= render :partial => 'grades/review_table',
+           :locals => {
+           :ctrl => 'review_of_review',
+           :caction => 'view',
+           :symbol => "metareview".to_sym,
+           :prefix => prefix,
+           :assignment => participant.assignment,
+           :reviews => rscore[:assessments],
+           :collabel => "Metareview",
+           :rowlabel => "Metareviewer",                      
+           }%>
+  <BR/>         
+  <HR/> 
+  <% count = 0 %>
+  <% for metareview in rscore[:assessments] %>
+    <% count = count + 1 %>
+    <% if controller.action_name != "view_my_scores" %>
+      <a name="<%=prefix+"_"+metareview.map.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/> 
+    <% else %>
+      <%= metareview.display_as_html(nil,count) %><BR/><BR/>
+    <% end %>        
+  <% end %>
+<% else %>
+  <i>No metareviews have been completed for this user's reviews.</i>
+<% end %>
+<!-- END METAREVIEWS -->

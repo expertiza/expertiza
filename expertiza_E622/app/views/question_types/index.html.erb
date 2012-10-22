@@ -1,0 +1,18 @@
+<h1>Listing question_types</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @question_types.each do |question_type| %>
+  <tr>
+    <td><%= link_to 'Show', question_type %></td>
+    <td><%= link_to 'Edit', edit_question_type_path(question_type) %></td>
+    <td><%= link_to 'Destroy', question_type, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New question_type', new_question_type_path %>

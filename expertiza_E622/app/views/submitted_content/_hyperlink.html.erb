@@ -1,0 +1,9 @@
+<b>Hyperlinks</b>&nbsp;&nbsp;&nbsp;<a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
+  <div id="url" style="">  
+   <ul>
+    <% participant.get_hyperlinks.each{
+       | link | %>      
+        <li><a href="<%= link %>" target="new"><%= link %></a></li>
+  <% } %>
+  </ul> 
+</div>

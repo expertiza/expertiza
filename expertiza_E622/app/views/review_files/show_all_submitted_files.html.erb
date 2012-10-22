@@ -1,0 +1,75 @@
+<% if @file_version_map and @latest_version_number > 0 %>
+<h2>List of <i>all</i> files submitted so far</h2>
+    <p>Click on Filename to view Latest Version</p>
+    <table class="general">
+      <tr>
+        <th rowspan="2" align="center">Filename</th>
+        <th colspan="<%= @latest_version_number %>" align="center">Versions</th>
+      </tr>
+      <tr>
+        <% for i in 1..@latest_version_number %>
+            <th align="center"><%= i %></th>
+        <% end %>
+      </tr>
+      <% @file_version_map.sort.each do |filename, versions| %>
+          <tr>
+            <td><b>
+              <%= link_to filename,
+                          :controller  => 'review_files',
+                          :action      => 'show_code_file',
+                          :review_file_id => @file_id_map[filename],
+                          :participant_id => @participant.id,
+                          :versions => versions %>
+            </b></td>
+            <% for i in 1..@latest_version_number %>
+                <td align="center">
+                  <% if versions.include?(i) %>
+                      <img src="/images/signup.png" alt="Icon">
+                  <% else %>
+                      <img src="/images/delete.png" alt="Icon">
+                  <% end %>
+                </td>
+            <% end %>
+          </tr>
+      <% end %>
+    </table>
+    <br/>
+    <table>
+      <tr style="font-size: smaller;">
+        <td><img src="/images/signup.png" alt="Icon"></td>
+        <td>indicates file is present in the Version.</td>
+      </tr>
+      <tr style="font-size: smaller;">
+        <td align="center"><img src="/images/delete.png" alt="Icon"></td>
+        <td>indicates file is absent in the Version.</td>
+      </tr>
+    </table>
+    <br/><br/>
+<% end %>
+
+<% if session[:user].id == @participant.user_id and @stage != "Complete" %>
+    <% if @latest_version_number.equal?(0) %>
+        <h2>Upload first version of Code Files</h2>
+    <% else %>
+        <h2>Upload next version of Code Files</h2>
+    <% end %>
+
+    <% form_tag({:controller => 'review_files' , :action=>'submit_review_file',
+                 :participant_id => @participant.id},
+                {:method => 'post', :enctype => "multipart/form-data",
+                 :onSubmit => "return checkIfFileExists(uploaded_review_file.value,1);"}) do %>
+        Please Upload a Zip file containing <i>all</i> files for Code Review.<br/>
+        <br/><input type="file" id="uploaded_review_file" name="uploaded_review_file" size=40 />
+        <%= submit_tag 'Upload Zip' %>
+        <font style="font-size: smaller;"><br/><br/><br/>**Please submit Zip files only.
+          No plain files, rar or tar.gz accepted.</font>
+    <% end %>
+
+    <br/><br/>
+
+    <% link_to "Show_all_submitted_files", :controller => 'review_files',
+               :action => 'show_all_submitted_files',
+               :participant_id => @participant.id %>
+
+<% end %>
+<a href="javascript:window.history.back()">Back</a>

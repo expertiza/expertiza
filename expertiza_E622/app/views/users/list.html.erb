@@ -1,0 +1,57 @@
+<h1>Manage users</h1>
+
+<br/>
+<% form_tag :action => 'show_selection' do %>
+View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+<input type='submit' value='Edit'/>
+<% end %>
+
+<% form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
+    Search users: <%= text_field_tag(:letter,params[:letter]) %>
+    <%= select_tag(:search_by, options_for_select([['Username', 1], ['Full name', 2], ['Email', 3]])) %>
+    <%= submit_tag("Search") %>
+<% end %>
+  
+<div>
+  <%= render :partial => 'shared_scripts/letters' %>
+</div>
+
+<%= render :partial => 'users/pagination' %>
+
+<div class="exp">
+<table>
+  <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
+  <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Metareview</th></tr>
+
+<% for user in @users %>
+  <tr class="exp">
+    <td><%= link_to user.name, :action => 'show', :id => user.id %></td>
+    <td><%= user.fullname %></td>
+    <td><%= user.email %></td>
+    <td><%= link_to user.role.name, :controller => 'roles', :action => 'show', :id => user.role.id %></td>
+    <td align="center"><%= (User.find_by_id(user.parent_id)).name %></td>
+    <td><%= User.yesorno(user.email_on_review) %></td>
+    <td><%= User.yesorno(user.email_on_submission) %></td>
+    <td><%= User.yesorno(user.email_on_review_of_review) %></td>
+    <td><%= User.yesorno(user.leaderboard_privacy) %></td>
+  </tr>
+<% end -%>
+</table>
+</div>
+<hr/>
+<%= render :partial => 'users/pagination' %>
+<hr/>
+<%= render :partial => 'shared_scripts/pages' %>
+
+<%= render :partial => 'shared_scripts/letters' %>
+
+<p>
+<%
+  session[:return_to] = request.request_uri
+%>
+
+<%= link_to 'New User', :action => 'new' %> |
+<%= link_to 'Import Users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username, full name (first[ middle] last), e-mail address, password' %>|
+<%= link_to 'Export Users', :controller=>'export_file',:action=>'start',:model=> 'User',:id=> 1 %>
+
+</p>

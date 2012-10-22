@@ -1,0 +1,37 @@
+<H1>Create Teams for <%= @parent.name %></H1>
+
+<H2> Randomly </H2>
+
+<p> Uses, insofar as possible, the number of members specified when the
+assignment was created.</p>
+
+<% form_tag :action => 'create_teams'do %>
+Team Size:<%= text_field 'team', 'size' %>
+<%= hidden_field_tag 'id', @parent.id %>
+
+<%= submit_tag "Create Teams" %>
+<% end %>
+
+
+<BR/>
+
+<H2> Manually </H2>
+<p>Specify Team name, then add members to team, one by one. </p>
+<% form_tag :action => 'create'do %>
+<%= hidden_field_tag 'id', @parent.id %>
+<%= render :partial => 'form' %>
+<% end %>
+
+<BR/>
+<H2> Inherit Teams From Course </H2>
+<p> Use the teams that are currently defined for the course.</p>
+<% form_tag :action => 'inherit'do %>
+<%= hidden_field_tag 'id', @parent.id %>
+
+<%= submit_tag "Inherit" %>
+<% end %>
+
+<BR/>
+<%= link_to 'Back', :controller => 'team', :action => 'list', :id => @parent.id  %>
+
+

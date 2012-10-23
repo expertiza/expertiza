@@ -1,0 +1,26 @@
+<h1>Course Participants</h1>
+<h2>Course: <%= @course.title %></h2>
+<br/>
+<%= render :partial => '/shared_scripts/user_list',
+           :locals => {:controller => 'courses_users', 
+                       :user_list => @course_users} %>
+<br/>
+<%= 
+	render :partial => '/shared_scripts/add_individual', 
+		   :locals => {:form_action => "add",
+					   :obj_type => "course_id", 
+					   :obj_id => @course.id} 
+%>
+<br/>
+
+<% 
+  session[:return_to] = request.request_uri
+%>
+<%= link_to 'Import Course Participants', 
+            :controller=>'import_file', 
+            :action=>'start', 
+            :model => 'CoursesUsers', 
+            :title => 'Course Participants',
+            :expected_fields => 'username, full name (first[ middle] last), e-mail address, password',
+            :id => @course.id %>
+| <%= render :partial => '/shared_scripts/back' %>

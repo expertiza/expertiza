@@ -1,0 +1,76 @@
+<% if !view.nil? %>
+    <% if !separator.nil? || isLast %>
+        <% if isFirst %>
+            <p>
+                <i><%= label("custom_response", ques_num, ques_text) %></i>
+                <%= view %> <%= separator %>
+        <% elsif isLast %>
+                <%= view %>
+            </p>
+        <% else %>
+                <%= view %> <%= separator %>
+        <% end %>
+    <% else %>
+        <p>
+            <i><%= label("custom_response", ques_num, ques_text) %></i>
+            <%= view %>
+        </p>
+    <% end %>
+<% elsif controller.action_name == 'new' %>
+    <% if !separator.nil? || isLast %>
+        <% if isFirst %>
+            <p>
+                <%= label("custom_response", ques_num, ques_text) %>
+                <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size %>
+                <%= separator %>
+        <% elsif isLast %>
+                <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size %>
+            </p>
+        <% else %>
+                <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size %>
+                <%= separator %>
+        <% end %>
+    <% else %>
+        <p>
+            <%= label("custom_response", ques_num, ques_text) %>
+            <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size %>
+        </p>
+    <% end %>
+<% else %>
+    <% if !separator.nil? || isLast %>
+        <% if isFirst %>
+            <p>
+                <%= label("custom_response", ques_num, ques_text) %>
+                <% if @review_scores[ques_num].comments.nil?%>
+                    <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size, :value => @review_scores[ques_num].comments%>
+                <% else %>
+                    <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size, :value => @review_scores[ques_num].comments.gsub(/\"/,'&quot;')%>
+                <% end %>
+                <%= separator %>
+        <% elsif isLast %>
+                <% if @review_scores[ques_num].comments.nil?%>
+                    <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size, :value => @review_scores[ques_num].comments%>
+                <% else %>
+                    <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size, :value => @review_scores[ques_num].comments.gsub(/\"/,'&quot;')%>
+                <% end %>
+            </p>
+        <% else %>
+                <% if @review_scores[ques_num].comments.nil?%>
+                    <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size, :value => @review_scores[ques_num].comments%>
+                <% else %>
+                    <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size, :value => @review_scores[ques_num].comments.gsub(/\"/,'&quot;')%>
+                <% end %>
+                <%= separator %>
+        <% end %>
+    <% else %>
+        <p>
+            <i><%= label("custom_response", ques_num, ques_text) %></i>
+            <% if @review_scores[ques_num].comments.nil?%>
+                <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size, :value => @review_scores[ques_num].comments%>
+            <% else %>
+                <%=text_field "custom_response", ques_num , :label => ques_text, :size => field_size, :value => @review_scores[ques_num].comments.gsub(/\"/,'&quot;')%>
+            <% end %>
+        </p>
+    <% end %>
+<% end %>
+

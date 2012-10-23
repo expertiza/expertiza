@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-AU">
+<head>
+<title>
+Survey Deployment
+</title>
+<script type="text/javascript" src="/javascripts/datetimepicker.js"></script>
+<script type="text/javascript" src="/javascripts/CalendarPopup.js"></script>
+</head>
+<body>
+<h1> List of Deployments </h1>
+
+<table border=0>
+<% if @survey_deployments.size > 0 %>
+<tr>
+<th> Survey Name&nbsp;&nbsp;</th>
+<th> Start Date&nbsp;&nbsp;</th>
+<th> End Date&nbsp;&nbsp;</th> 
+<th> Number of Students&nbsp;&nbsp;</th> 
+<th> Actions&nbsp;&nbsp;</th>
+</tr>
+<% end %>
+<% @survey_deployments.each do |survey_deployment| %>
+<tr>
+<td align=center><%= @surveys[survey_deployment.id] %></td>
+<td align=center><%= survey_deployment.start_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
+<td align=center><%= survey_deployment.end_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
+<td align=center><%= survey_deployment.num_of_students %></td>
+<td align=center><%= link_to "View Responses", {:controller=>'survey_response',:action=>'view_responses',:id=>survey_deployment.id , :course_eval=>"1"} %> <%= link_to "Delete", {:action=>"delete", :id=>survey_deployment.id}, :confirm=>"Are You Sure?", :method=>"post" %>
+</td>
+</tr>
+<% end %>
+</table> 
+
+
+<p>
+<p>
+
+<%= link_to "Add New Deployment", :action=>"new" %><p>
+
+<% if session[:user].role_id==4 %><% # only super admin can start/restart thread for now %>
+<%= link_to "Reminder thread status", :action=>"reminder_thread" %>
+<% end %>
+</body>
+</html>

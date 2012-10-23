@@ -1,0 +1,68 @@
+<% session[:return_to] = request.request_uri %>
+<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+<div class="flash_error">
+	<%= flash[:notice] %>
+</div>
+<% end %>
+<h3>Reviews for <%= @assignment.name %></h3>
+
+<table class="listing" cellpadding=2 width =100%>
+<tr><ul>
+  <%review_no = 1%>
+  <%for review_map in @review_mappings %>
+  <% if @assignment.team_assignment
+       author = AssignmentTeam.find(review_map.team_id)
+     else 
+       author = AssignmentParticipant.find_by_user_id_and_parent_id(review_map.author_id,@assignment.id)
+     end 
+     if author != nil %>
+    <% @review = Review.find_by_review_mapping_id(review_map.id) %>
+    <% if (@review)%>
+      <li><%= @assignment.name %> Review <%= review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
+      <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
+     	<%= link_to "Edit",{:controller => 'review', :action => 'edit_review', :id => @review.id} %></li>
+      <% end %>
+    <% else %>    
+  	  <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
+		<li><%= @assignment.name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id, :assignment => @assignment.id} %></li>
+  	  <% else %>
+   		<li><%= @assignment.name %> Review <%=review_no%> &nbsp;Begin</li>
+  	  <% end 
+     end   	
+    review_no += 1   
+   end 
+  end %></ul>
+ </tr>
+ <% if @can_view_metareview == true && @review_of_review_mappings.size > 0 %>
+   <h3>Metareviews for <%= @assignment.name %></h3>
+   <tr><ul>
+     <%ror_no = 1%>
+     <%for ror_map in @review_of_review_mappings %>
+        <%@ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id)%>
+        <% if (@ror)%>
+          <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Metareview
+              <%= ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view', :id => @ror.id} %> &nbsp;
+          <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
+              <%= link_to "Edit",{:controller => 'review_of_review', :action => 'edit', :id => @ror.id} %></li>
+          <% end %>
+          </li>
+        <% elsif Review.find_by_review_mapping_id(ror_map.review_mapping_id) != nil %>
+              <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
+                 <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Metareview
+                     <%= ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new',
+                                         :id => ror_map.id, :assignment => @assignment.id} %>
+                </li>
+              <%else%>
+                <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Metareview <%=ror_no%> &nbsp;Begin</li>
+              <%end%>
+        <% else
+            ror_no -= 1
+           end %>
+
+        <%ror_no += 1
+     end %></ul>
+   </tr>
+  <%end%> 
+</table>
+<BR/>
+<%= link_to "Back", :controller=>'student_task', :action => 'view', :id => @participant.id %>

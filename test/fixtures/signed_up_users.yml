@@ -1,0 +1,34 @@
+SignedUpUser1:
+  topic_id: <%= Fixtures.identify(:Assignment_Project1_Team1) %>
+  is_waitlisted: 0
+  creator_id: 1
+
+SignedUpUser2:
+  topic_id: <%= Fixtures.identify(:Assignment_Project1_Team2) %>
+  is_waitlisted: 0
+  creator_id: 1
+
+SignedUpUser3:
+  topic_id: <%= Fixtures.identify(:Assignment_Project2_Team1) %>
+  is_waitlisted: 0
+  creator_id: 1
+
+SignedUpUser4:
+  topic_id: <%= Fixtures.identify(:Assignment_Project2_Team2) %>
+  is_waitlisted: 0
+  creator_id: 1
+
+SignedUpUser5:
+  topic_id: <%= Fixtures.identify(:student1) %>
+  is_waitlisted: 0
+  creator_id: 1
+
+SignedUpUser6:
+  topic_id: <%= Fixtures.identify(:student2) %>
+  is_waitlisted: 0
+  creator_id: 1
+
+SignedUpUser7:
+  topic_id: <%= Fixtures.identify(:student3) %>
+  is_waitlisted: 0
+  creator_id: 1

@@ -1,0 +1,28 @@
+<h1>User: <%=h @user.name %></h1>
+
+<table>
+
+<tr><th>Full Name:</th>
+<td><%= @user.fullname %></td>
+</tr>
+
+<tr><th>Email Address:</th>
+<td><%= @user.email %></td>
+</tr>
+
+<tr><th>Role:</th>
+<td><%= link_to @role.name, :controller => 'roles',
+        :action => 'show', :id => @role.id %></td>
+</tr>
+
+</table>
+
+<% unless current_user_role? == "Student" %>
+  <hr/>
+  <p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
+  <%= link_to 'Delete', {:action => 'destroy', :id => @user}, 
+      :confirm => 'Delete this user?', :method => :post %> 
+	  </p>
+
+  <p><%= link_to 'Back', :action => 'list' %> to Users list</p>
+<% end %>

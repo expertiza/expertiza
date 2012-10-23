@@ -1,0 +1,49 @@
+<h1>Surveys for Assignment: <%= @assignment.name %></h1>
+<% form_tag(:action=>'assign_survey') do %>
+<select name="subset" onchange="document.forms[0].submit()">
+	<option value="assigned" 
+		<% if params[:subset] == "assigned" -%>
+			selected 
+		<% end -%>
+	>Currently assigned surveys</option>
+	<option value="mine"
+		<% if params[:subset] == "mine" -%>
+			selected 
+		<% end -%>
+	>My surveys</option>
+	<option value="public"
+		<% if params[:subset] == "public" -%>
+			selected 
+		<% end -%>
+	>All public surveys</option>
+</select>
+<% end %>
+<% if @surveys.length != 0 -%>
+	<% form_tag(:action=>'assign_survey')do %>
+		<br />
+		<table id="surveys_table">
+		<tr>
+			<th>&nbsp; Assigned &nbsp;</th>
+			<th align="left">Survey Name</th>
+		</tr>
+		<% for survey in @surveys %>
+			<tr>
+				<td align=center><input type=checkbox name="surveys[]" value="<%= survey.id %>"
+				<% if @assigned_surveys.include?(survey) -%>
+					checked="checked"
+				<% end -%>
+				></td>
+			 	<td><%= survey.name %></td>
+			</tr>
+		<% end %>
+		</table>
+		<br />
+		<%= submit_tag "Assign Survey", :name=>"update" %>
+		<input type="hidden" name="submit_subset" value="<%= params[:subset] %>" />
+		<input type="hidden" name="subset" value="assigned" />
+	<% end %>
+<br />
+<% else -%>
+	<p>No surveys match the selected criteria.</p>
+<% end -%>	
+<%= render :partial => '/shared_scripts/back' %>

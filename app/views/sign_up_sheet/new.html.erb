@@ -1,0 +1,11 @@
+<h1>New topic</h1>
+
+<% form_tag :action => 'create'do %>
+  
+
+  <%= render :partial => 'topic' %>
+  <%= hidden_field_tag('id', @id) %>
+  <%= submit_tag "Create"%>
+<% end %>
+
+<%= link_to 'Back', :action => 'add_signup_topics', :id => params[:id]%>

@@ -1,0 +1,26 @@
+<table class="table_as_list">
+  <tr>
+    <th>Name</th>
+    <th>Permission</th>
+  </tr>
+  
+<% for site_controller in site_controllers %>
+  <tr class="depth0">
+    <td><%= link_to site_controller.name, :action => 'show',
+          :id => site_controller %></td>
+    <td><%= site_controller.permission.name %></td>
+  </tr>
+  <% actions = site_controller.actions 
+     if actions.length -%>
+    <% for action in actions %>
+      <tr class="depth1"><td><div class="menu_title"><%= link_to action.name, :controller => 'controller_actions',
+        :action => 'show', :id => action.id %></div></td>
+      <td><%= if action.permission_id
+	        action.permission.name
+	      else
+	        ""
+	      end %></td></tr>
+    <% end -%>
+  <% end -%>
+<% end %>
+</table>

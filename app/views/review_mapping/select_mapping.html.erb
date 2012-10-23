@@ -1,0 +1,47 @@
+<h1>Mapping Strategies for <%= @assignment.name %></h1>
+
+<% if !(SignUpTopic.find(:first, :conditions => ['assignment_id = ?',@assignment.id])).nil?%>
+    <% mapping_type = 'automatic_reviewer_mapping' %>
+<% else %>
+    <% mapping_type = 'generate_reviewer_mapping' %>
+<% end %>
+
+<% form_tag(:action => mapping_type, :method => 'post') do %>
+
+Number of reviews done by a student: <%= text_field 'assignment', 'num_reviews', "size" => 1 %><br/> <br/>
+Number of metareviews done by a student: <%= text_field 'assignment', 'num_metareviews', "size" => 1 %>
+
+<%due_date = DueDate.find(:all,:conditions => ["assignment_id = ?",@assignment.id], :order => "round DESC", :limit =>1)
+@round = 1
+if (due_date[0] && !due_date[0].round.nil?)
+   
+    @round = due_date[0].round - 1
+else
+    @round = 1
+end%>
+
+<p>Reviewer assignments vary for different rounds
+<%= check_box('assign_reviewers','different_mapping',{:onclick =>
+"Element.toggle('temp_bar'); "}, 1, nil)%>
+
+<div id="temp_bar" style="display:none;">
+
+<%for i in 1..@round%>
+    <p><b>Round<%=i%> </b>
+    <p>Review strategy:
+    <%= select("selection", "r_#{i}", @review_strategies.collect {|r| [r.name, r.id ] }) %>
+    &nbsp;&nbsp;
+    Mapping strategy:
+    <%= select("selection", "m_#{i}", @mapping_strategies.collect {|m| [m.name, m.id ] }) %>
+    &nbsp;&nbsp;
+<%end%>
+
+</div>
+
+</p>
+<%= hidden_field_tag 'id', @assignment.id %>
+<input type='submit' value= 'Save' />
+<% end %>
+<br/><br/>
+
+<%= link_to 'Back', :action => 'list_mappings', :id => @assignment.id %>

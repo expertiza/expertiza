@@ -1,0 +1,15 @@
+Feature: Create a Team as a User for an Assignment and add Members
+  In order to work on an assignment as a team
+  As an expertiza user
+  I want to create a team and add other expertiza members
+
+Scenario:  Log into Expertiza, create a team and add members
+  Given a browser is open to Expertiza with logging create_a_team-log.txt
+  And I am logged into Expertiza as CREATE_TEAM_USER_LOGIN with password CREATE_TEAM_USER_PASSWORD
+  And I open assignment CREATE_TEAM_ASSIGNMENT
+  And there are other members of expertiza
+  When I go to edit my team
+  And create a team name and name it CREATE_TEAM_TEAM_NAME
+  And invite some members CREATE_TEAM_USERS
+  Then I should see that the members CREATE_TEAM_USERS are pending
+  And I close the browser

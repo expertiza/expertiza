@@ -1,0 +1,10 @@
+<h1>Editing menu_item</h1>
+
+<% form_tag :action => 'update', :id => @menu_item do %>
+  <%= render :partial => 'form' %>
+  <%= submit_tag 'Edit' %>
+<% end %>
+
+<hr/>
+<%= link_to 'Show', :action => 'show', :id => @menu_item %> |
+<%= link_to 'Back', :action => 'list' %>

@@ -1,0 +1,59 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+response_maps0:
+ reviewee_id: <%= Fixtures.identify(:team3) %>
+ reviewer_id: <%= Fixtures.identify(:par2) %>
+ reviewed_object_id: <%= Fixtures.identify(:assignment2) %>
+ type: "TeamReviewResponseMap"
+ 
+
+response_maps1:
+ reviewee_id: <%= Fixtures.identify(:team4) %>
+ reviewer_id: <%= Fixtures.identify(:par3) %>
+ reviewed_object_id: <%= Fixtures.identify(:assignment1) %>
+ type: "TeamReviewResponseMap"
+
+response_maps2:
+ reviewee_id: <%= Fixtures.identify(:team5) %>
+ reviewer_id: <%= Fixtures.identify(:par2) %>
+ reviewed_object_id: <%= Fixtures.identify(:assignment1) %>
+ type: "TeamReviewResponseMap"
+
+ 
+response_maps3:
+ reviewee_id: <%= Fixtures.identify(:par13) %>
+ reviewer_id: <%= Fixtures.identify(:par14) %>
+ reviewed_object_id: <%= Fixtures.identify(:assignment7) %>
+ type: "ParticipantReviewResponseMap"
+
+response_maps4:
+ reviewee_id: <%= Fixtures.identify(:par14) %>
+ reviewer_id: <%= Fixtures.identify(:par13) %>
+ reviewed_object_id: <%= Fixtures.identify(:assignment7) %>
+ type: "ParticipantReviewResponseMap"
+
+response_maps5:
+ reviewee_id: <%= Fixtures.identify(:par13) %>
+ reviewer_id: <%= Fixtures.identify(:par14) %>
+ reviewed_object_id: <%= Fixtures.identify(:assignment7) %>
+ type: "TeammateReviewResponseMap"
+
+response_maps6:
+ reviewee_id: <%= Fixtures.identify(:par14) %>
+ reviewer_id: <%= Fixtures.identify(:par13) %>
+ reviewed_object_id: <%= Fixtures.identify(:assignment7) %>
+ type: "TeammateReviewResponseMap"
+
+
+response_map7:
+ reviewee_id: <%= Fixtures.identify(:par14) %>
+ reviewer_id: <%= Fixtures.identify(:par13) %>
+ reviewed_object_id: <%= Fixtures.identify(:response_maps3) %>
+ type: "FeedbackResponseMap"
+ 
+
+response_map8:
+  reviewee_id: <%= Fixtures.identify(:par14) %>
+  reviewer_id: <%= Fixtures.identify(:par15) %>
+  reviewed_object_id: <%= Fixtures.identify(:response_maps3) %>
+  type: "MetareviewResponseMap"
+  

@@ -1,0 +1,30 @@
+<% tableCount = 0 %>
+<table cellspacing="12">
+	<%@achievementLeaderBoards.each do |achieveBoard|%>
+  <% if tableCount % 3 == 0 %>
+    <tr>
+  <% end %>
+      <td>
+      <table class="sofT" cellspacing='0'>
+      	<tr>
+	       <td colspan="3" class="helpHed">Achievements of <%=@user.fullname%> <br/>in <%=achieveBoard[:courseName]%></td>
+        </tr>
+      	<% achieveBoard[:accompList].each do |accomp|%>
+		<tr>
+			<td class="noSelfRef"><%= accomp[:accomp]%></td>
+			<td class="noSelfRef"><%= accomp[:score]%></td>
+			<td class="noSelfRef"><%= accomp[:rankStr]%></td>
+		</tr>
+      	<% end %>
+      </table>
+	  	 </td>
+  <% tableCount = tableCount + 1 %>
+  <% if tableCount % 3 == 0 %>
+    </tr>
+  <% end %>
+<% end %>
+
+<% if tableCount % 2 != 0 %>
+   </tr>
+<% end %>
+</table>

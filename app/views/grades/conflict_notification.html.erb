@@ -1,0 +1,52 @@
+<h1>Email <%= @rowlabel %>s</h1>
+<% session[:return_to] = request.request_uri %>
+
+<% if flash[:notice] %>
+	<div class="flash_note"><%= flash[:notice] %></div>
+<% end %>
+
+<h2>Grades</h2>
+<% form_for :mailer, :url => { :action => 'send_grading_conflict_email' } do |form| %>
+
+<%= render :partial => 'review_table',
+           :locals => {
+           :ctrl => @submission,
+           :caction => @caction,
+           :symbol => @symbol.to_sym,
+		   :prefix => @prefix,
+           :assignment => @assignment,
+           :reviews => @reviews,
+           :collabel => @collabel,
+           :rowlabel => @rowlabel
+           }%>             
+
+<br/>
+	<table>
+		<tr>	
+			<th>To:</th>
+			<td>
+				<%= form.select(:recipients, @reviewers_email_hash.sort, @reviewers_email_hash) %>
+			</td>
+		</tr>
+		<tr>	
+			<th>From:</th>
+			<td><%= @instructor.email %><%= form.hidden_field :from, :size => 90, :value => (@instructor.email) %></td>
+		</tr>
+		<tr>	
+			<th>Subject:</th>
+			<td><%= form.text_field :subject, :size => 90, :value => @subject %></td>
+		</tr>
+		<tr>
+			<td colspan=2 style='font-size: x-small; color: red;'>Note: please do not remove the text between the ##[ ] delimiters. They are used to fill in variables when the email is sent.</td>
+		</tr>
+		<tr width=100%>	
+			<td colspan=2><%= form.text_area :body_text, 'cols' => 100, 'rows' => 20, :value => (@body) %></td>
+		</tr>
+	</table>
+	<br/>
+	<%= form.hidden_field :assignment, :value => @assignment.id %>
+	<%= form.hidden_field :author, :value => @participant.id %>	
+    <%= submit_tag "Send Email" %> | 
+	<%= link_to 'Back', :action=>'view', :id => @assignment.id %>
+<% end %>
+

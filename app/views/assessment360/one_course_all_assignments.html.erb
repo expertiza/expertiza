@@ -1,0 +1,26 @@
+<div>
+  <h1> <%= @course.name %> Dashboard </h1>
+  <table class="listing" cellpadding=2 border="1" >
+      <tr>
+      <th>Assignment</th>
+      <th>Grade Distribution</th>
+      <th>Review Progress</th>
+      <th>Review Progress By Date</th>
+      </tr>
+    <% @assignments.each do |assignment| %>
+      <tr class="listingRow" align="justify">
+        <td align="justify">
+          <%= link_to assignment.name, :action => 'one_assignment_all_students', :assignment_id => assignment.id%>
+        </td>
+        <td align="center"><%= assignment.get_average_score().to_s + "%" %>
+        <img src="<%= @assignment_distribution[assignment] %>" ></td>
+        <td> <img src="<%= @assignment_pie_charts[assignment] %>" > </td>
+        <td> <img src="<%= @assignment_bar_charts[assignment] %>" > </td>
+      </tr>
+    <% end %>
+  </table>
+
+  <div style="margin-top: 25px;">
+    <%= link_to 'Back to All Courses', :action => 'index' %>
+  </div>
+</div>

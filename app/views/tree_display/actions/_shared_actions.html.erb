@@ -1,0 +1,22 @@
+<div>
+<% if is_available(session[:user],owner_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),owner_id))%>  
+  <%= link_to image_tag('/images/tree_view/edit-icon-24.png', :title => 'Edit ' + model.downcase), 
+              { :controller => controller, :action=>'edit', :id => node.node_object_id},
+              { :title => 'Edit ' + model.downcase } %>
+  <%= link_to image_tag('/images/tree_view/delete-icon-24.png', :title => 'Delete ' + model.downcase),  
+              { :controller => controller, :action=>'delete', :id => node.node_object_id },
+              { :title => 'Delete ' + model.downcase } %>   
+  <% if Object.const_get(model).find(node.node_object_id).private %>  
+    <%= link_to image_tag('/images/tree_view/lock-off-disabled-icon-24.png', :title => 'Make public'),  
+                { :controller => controller, :action=>'toggle_access', :id => node.node_object_id },
+                { :title => 'Make public' } %>
+  <% else %>
+    <%= link_to image_tag('/images/tree_view/lock-disabled-icon-24.png', :title => 'Make private'), 
+                { :controller => controller, :action=>'toggle_access', :id => node.node_object_id},
+                { :title => 'Make private' } %>
+  <% end %>
+<% end %>
+<%= link_to image_tag('/images/tree_view/Copy-icon-24.png', :title => 'Copy ' + model.downcase), 
+            { :controller => controller, :action=>'copy', :id => node.node_object_id },
+            { :title => 'Copy ' + model.downcase } %>
+</div>

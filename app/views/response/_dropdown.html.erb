@@ -1,0 +1,108 @@
+<p>
+    <% if !view.nil? %>
+        <% if !table_title.nil? %>
+            <p><b> <%= table_title %> </b></p>
+            <hr>
+        <% end %>
+        <% if start_table %>
+            <table class='general'>
+            <% if !table_headers.nil? %>
+                <tr>
+                    <% table_headers.split("|").each { |header| %>
+                    <th cellspacing="20%"><%= header %></th>
+                    <% } %>
+                </tr>
+                <tr>
+            <% end %>
+        <% end %>
+        <% if start_col %>
+                    <td>
+                        <ul>
+        <% end %>
+                            <li>
+                                <p>
+                                    <i><%= ques_text %></i> <%= view %>
+                                </p>
+                            </li>
+        <% if end_col %>
+                        </ul>
+                    </td>
+        <% end %>
+        <% if end_table %>
+                </tr>
+            </table>
+        <% end %>
+    <% elsif controller.action_name == 'new' %>
+        <% if !table_title.nil? %>
+            <p><b> <%= table_title %> </b></p>
+            <hr>
+        <% end %>
+        <% if start_table %>
+            <table class='general'>
+            <% if !table_headers.nil? %>
+                <tr>
+                    <% table_headers.split("|").each { |header| %>
+                    <th cellspacing="20%"><%= header %></th>
+                    <% } %>
+                </tr>
+                <tr>
+            <% end %>
+        <% end %>
+        <% if start_col %>
+                    <td>
+                        <ul>
+        <% end %>
+                            <li>
+                                <p>
+                                    <%=label("custom_response", ques_num, ques_text)%>
+                                    <%= select_tag "custom_response[#{ques_num}]", options_for_select(options, nil)%>
+                                </p>
+                            </li>
+        <% if end_col %>
+                        </ul>
+                    </td>
+        <% end %>
+        <% if end_table %>
+                </tr>
+            </table>
+        <% end %>
+    <% else %>
+        <% if !table_title.nil? %>
+            <p><b> <%= table_title %> </b></p>
+            <hr>
+        <% end %>
+        <% if start_table %>
+            <table class='general'>
+            <% if !table_headers.nil? %>
+                <tr>
+                    <% table_headers.split("|").each { |header| %>
+                    <th cellspacing="20%"><%= header %></th>
+                    <% } %>
+                </tr>
+                <tr>
+            <% end %>
+        <% end %>
+        <% if start_col %>
+                    <td>
+                        <ul>
+        <% end %>
+                            <li>
+                                <p>
+                                    <%=label("custom_response", ques_num, ques_text)%>
+                                    <% if @review_scores[ques_num].comments.nil?%>
+                                        <%= select_tag "custom_response[#{ques_num}]", options_for_select(options, @review_scores[ques_num].comments.to_i)%>
+                                    <% else %>
+                                        <%= select_tag "custom_response[#{ques_num}]", options_for_select(options, @review_scores[ques_num].comments.gsub(/\"/,'&quot;'))%>
+                                    <% end %>
+                                </p>
+                            </li>
+        <% if end_col %>
+                        </ul>
+                    </td>
+        <% end %>
+        <% if end_table %>
+                </tr>
+            </table>
+        <% end %>
+    <% end %>
+</p>

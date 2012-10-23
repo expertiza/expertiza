@@ -1,0 +1,38 @@
+<h1> Controller: <%= @site_controller.name %></h1>
+
+<table>
+<tr><th>Permission:</th><td><%= @site_controller.permission.name
+%></td></tr>
+<tr><th>Builtin:</th><td><%= if @site_controller.builtin == 1 then
+"True" else "False" end %></td></tr>
+</table>
+
+<hr />
+<h2> Actions </h2>
+
+<% if @actions.length > 0 -%>
+
+<table>
+<tr><th> Name </th><th> Permission </th></tr>
+<% for action in @actions -%>
+<tr>
+<td> <%= link_to action.name, :controller => 'controller_actions',
+                 :action => 'show', :id => action.id %> </td>
+<td> <%= action.permission.name %> </td> 
+<% end -%>
+</table>
+<% else -%>
+<p> (No Actions for this Controller) </p>
+<% end -%>
+
+<br/>
+<p> <%= link_to image_tag("/images/add.png") + ' Add New Action', {:controller => 'controller_actions',
+    :action => 'new_for', :id => @site_controller.id } %> 
+    for this Controller </p>
+
+<hr/>
+<p><%= link_to 'Edit', :action => 'edit', :id => @site_controller %> |
+<%= link_to 'Delete', {:action => 'destroy', :id => @site_controller}, 
+    :confirm => 'Are you sure?', :method => :post %> </p>
+
+<p><%= link_to 'Back', :action => 'list' %> to Controllers list</p>

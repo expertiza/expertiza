@@ -1,0 +1,11 @@
+<h1>New Course</h1>
+
+<% form_tag :action => 'create' do %>
+   <%= render :partial => 'course' %>
+   <%= submit_tag "Create" %>
+   <%= hidden_field_tag 'course[private]', @private %>
+   
+<% end %>
+       
+<br/>
+<%= render :partial => '/shared_scripts/back' %>

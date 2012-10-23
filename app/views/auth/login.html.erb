@@ -1,0 +1,12 @@
+<h1>Login</h1>
+
+<% if flash[:notice] -%>
+   <div id="ErrorExplanation"><%= flash[:notice] %></div>
+<% end -%>
+
+<% form_tag :action => 'login' do %>
+  <%= render :partial => 'form' %>
+  <%= submit_tag "Login" %>
+<% end %>
+
+<%= link_to 'Back', :action => 'list' %>

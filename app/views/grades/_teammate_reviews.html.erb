@@ -1,0 +1,29 @@
+<!-- TeammateReviewS --> 
+<% if rscore and rscore[:assessments].length > 0 %>
+  <BR/>
+  <%= render :partial => 'grades/review_table',
+           :locals => {
+           :ctrl => 'teammate_review',
+           :caction => 'view',
+           :symbol => "teammate".to_sym,
+           :prefix => prefix,
+           :assignment => participant.assignment,
+           :reviews => rscore[:assessments],
+           :collabel => "Feedback",
+           :rowlabel => "Author"
+           }%>
+  <BR/>         
+  <HR/> 
+  <% count = 0 %>
+  <% for review in rscore[:assessments] %>
+    <% count = count + 1 %>
+    <% if controller.action_name != "view_my_scores" %>
+      <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
+    <% else %>
+      <%= review.display_as_html(nil,count) %><BR/><BR/>
+    <% end %>    
+  <% end %>
+<% else %>
+  <i>No author feedback has been provided for this user's reviews.</i>
+<% end %>
+<!-- END TeammateReviews -->

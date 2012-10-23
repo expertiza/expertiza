@@ -1,0 +1,7 @@
+<b>Wiki pages</b>&nbsp;&nbsp;&nbsp;<a href="#" id="links<%= participant.id%>Link" name="links<%= participant.id%>Link" onClick="toggleElement('links<%= participant.id%>','links');return false;">show links</a><br/>
+  <div id="links<%= participant.id%>" style="display:none">
+  <% wiki_type = WikiType.find(participant.assignment.wiki_type_id) %>
+  <%= render :partial => 'submitted_content/'+wiki_type.name.downcase, :locals => {:participant => participant} %>
+  </div>
+
+

@@ -1,0 +1,45 @@
+<% @assignment = Assignment.find(params[:id]) %>
+<h1>Signup sheet for <%= @assignment.name %> assignment</h1>
+
+<% if flash[:notice] %>
+    <div class="flash_note"><%= flash[:notice] %></div>
+<% end %>
+
+
+<% if @sign_up_topics.size != 0 %>
+
+    <table class="general">
+
+      <tr><%= render :partial => 'table_header' %></tr>
+
+      <% i=1 %>
+      <% for topic in @sign_up_topics %>
+          <tr>
+            <td><%= topic.topic_identifier %></td>
+
+            <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
+
+            <td align="center"><%= topic.max_choosers %></td>
+
+            <%= render :partial => 'num_of_choosers', :locals => {:topic=>topic} %>
+
+            <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
+
+            <td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>
+          </tr>
+          <% i=i+1 %>
+      <% end %>
+
+    </table>
+
+<% else %>
+    <div class="flash_note">
+      <%= "Signup topics have not yet been created." %>
+    </div>
+<% end %>
+
+
+<% session[:return_to] = request.request_uri %>
+<br/><br/>
+
+<%= render :partial => 'add_topics' %>

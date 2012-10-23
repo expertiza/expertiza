@@ -1,0 +1,9 @@
+<!-- TEAMS --> 
+<% index = 0 %>
+<%= render :partial => 'team_title', :locals => {:prefix => nil}  %>
+<% for index in 0 .. @scores[:teams].length - 1 %>   
+     <%= render :partial => 'grades/team',
+                :locals => {:prefix => 'team'+index.to_s,
+                            :tscore => @scores[:teams][index.to_s.to_sym]} %>     
+  <% end %> 
+<!-- END TEAMS --> 

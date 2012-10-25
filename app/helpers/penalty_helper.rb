@@ -146,8 +146,8 @@ module PenaltyHelper
 
     # Calculate the number of reviews that the user has completed so far.
      review_mappings.each do |map|
-      created_at = Response.find_by_map_id(map.id).created_at
       if map.response
+        created_at = Response.find_by_map_id(map.id).created_at
         review_map_created_at_list <<  created_at
       end
     end
@@ -160,9 +160,9 @@ module PenaltyHelper
           penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/60
           penalty_for_this_review = penalty_minutes * @penalty_per_unit
           if (penalty_for_this_review > @max_penalty_for_no_submission)
-            penalty += penalty_for_this_review
-          else
             penalty += @max_penalty_for_no_submission
+          else
+            penalty += penalty_for_this_review
           end
         end
       elsif

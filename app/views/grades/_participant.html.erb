@@ -105,6 +105,24 @@
       <TD ALIGN="CENTER" VALIGN="TOP">
         <%= if stage == "Complete" then sprintf("%.0f", total_penalty ) else sprintf("---") end %>
       <TD ALIGN="CENTER">
+        <% if stage == "Complete" %>
+            <% if participant.grade
+                 total_score = participant.grade
+                 title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
+               else
+                 total_score = pscore[:total_score]
+                 #  total_score = 20
+                 title = nil
+               end %>
+            <div
+            <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %>%</div>
+            <% if controller.action_name != "view_my_scores" %>       	  <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
+            <% end %>
+        <% else %>
+            <FONT SIZE="-1">(in <%= stage %>)</FONT>
+        <% end %>
+      </TD>
+      <TD ALIGN="CENTER">
     	<% if stage == "Complete" %>      
       	<% if participant.grade 
       	    total_score = participant.grade

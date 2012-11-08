@@ -1,11 +1,14 @@
 <h1>New penalty_policy</h1>
 
-<% form_for(@penalty_policy) do |f| %>
-  <%= f.error_messages %>
+<% form_for(@late_policy) do |f| %>
+    <%= f.error_messages %>
 
-  <p>
-    <%= f.submit 'Create' %>
-  </p>
+    <p>
+      <%= f.label :Policy_Name %><br />
+      <%= f.text_area :name %>
+    </p>
+
+    <p>
+      <%= f.submit 'Create' %>
+    </p>
 <% end %>
-
-<%= link_to 'Back', late_policies_path %>

@@ -24,11 +24,11 @@ class LatePoliciesController < ApplicationController
   # GET /late_policies/new
   # GET /late_policies/new.xml
   def new
-    @penalty_policy = LatePolicy.new
+    @late_policy = LatePolicy.new
 
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render :xml => @penalty_policy }
+      format.xml  { render :xml => @late_policy }
     end
   end
 

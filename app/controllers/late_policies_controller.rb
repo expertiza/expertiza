@@ -2,7 +2,7 @@ class LatePoliciesController < ApplicationController
   # GET /late_policies
   # GET /late_policies.xml
   def index
-    @penalty_policies = PenaltyPolicy.all
+    @penalty_policies = LatePolicy.all
 
     respond_to do |format|
       format.html # index.html.erb
@@ -13,7 +13,7 @@ class LatePoliciesController < ApplicationController
   # GET /late_policies/1
   # GET /late_policies/1.xml
   def show
-    @penalty_policy = PenaltyPolicy.find(params[:id])
+    @penalty_policy = LatePolicy.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -24,7 +24,7 @@ class LatePoliciesController < ApplicationController
   # GET /late_policies/new
   # GET /late_policies/new.xml
   def new
-    @penalty_policy = PenaltyPolicy.new
+    @penalty_policy = LatePolicy.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -34,13 +34,13 @@ class LatePoliciesController < ApplicationController
 
   # GET /late_policies/1/edit
   def edit
-    @penalty_policy = PenaltyPolicy.find(params[:id])
+    @penalty_policy = LatePolicy.find(params[:id])
   end
 
   # POST /late_policies
   # POST /late_policies.xml
   def create
-    @penalty_policy = PenaltyPolicy.new(params[:penalty_policy])
+    @penalty_policy = LatePolicy.new(params[:penalty_policy])
 
     respond_to do |format|
       if @penalty_policy.save
@@ -56,7 +56,7 @@ class LatePoliciesController < ApplicationController
   # PUT /late_policies/1
   # PUT /late_policies/1.xml
   def update
-    @penalty_policy = PenaltyPolicy.find(params[:id])
+    @penalty_policy = LatePolicy.find(params[:id])
 
     respond_to do |format|
       if @penalty_policy.update_attributes(params[:penalty_policy])
@@ -72,7 +72,7 @@ class LatePoliciesController < ApplicationController
   # DELETE /late_policies/1
   # DELETE /late_policies/1.xml
   def destroy
-    @penalty_policy = PenaltyPolicy.find(params[:id])
+    @penalty_policy = LatePolicy.find(params[:id])
     @penalty_policy.destroy
 
     respond_to do |format|

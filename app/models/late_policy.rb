@@ -1,3 +1,5 @@
 class LatePolicy < ActiveRecord::Base
-  belongs_to :due_date
+  belongs_to :user
+
+  has_many :assignments
 end

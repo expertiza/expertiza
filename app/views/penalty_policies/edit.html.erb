@@ -1,0 +1,12 @@
+<h1>Editing penalty_policy</h1>
+
+<% form_for(@penalty_policy) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @penalty_policy %> |
+<%= link_to 'Back', penalty_policies_path %>

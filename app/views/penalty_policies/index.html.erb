@@ -1,0 +1,18 @@
+<h1>Listing penalty_policies</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @penalty_policies.each do |penalty_policy| %>
+  <tr>
+    <td><%= link_to 'Show', penalty_policy %></td>
+    <td><%= link_to 'Edit', edit_penalty_policy_path(penalty_policy) %></td>
+    <td><%= link_to 'Destroy', penalty_policy, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New penalty_policy', new_penalty_policy_path %>

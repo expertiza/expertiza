@@ -534,4 +534,8 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.string "name", :default => "", :null => false
   end
 
+  create_table "bids", :force => true do |t|
+    t.integer "team_id", :null => false
+    t.integer "topic_id", :null => false
+  end
 end

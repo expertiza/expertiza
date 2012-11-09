@@ -1,0 +1,9 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  sign_up_topic_id: 
+  assignment_team_id: 
+
+two:
+  sign_up_topic_id: 
+  assignment_team_id: 

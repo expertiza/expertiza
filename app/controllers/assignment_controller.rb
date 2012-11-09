@@ -398,5 +398,10 @@ class AssignmentController < ApplicationController
     newpath = assignment.get_path rescue nil
     FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
-  end  
+  end
+
+  # Enable lottery topic selection for an assignment
+  def enable_lottery
+    # Should get assignment_id as a parameter
+  end
 end

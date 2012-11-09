@@ -666,4 +666,14 @@ class SignUpSheetController < ApplicationController
     query = query + " group by t.name;"
     SignUpTopic.find_by_sql(query)
   end
+
+  # Submit a bid for a team and a specific topic
+  def submit_bid
+    # Should get team_id and sign_up_topic_id as parameters
+  end
+
+  # Delete a bid for a team and a specific topic
+  def delete_bid
+    # Should get team_id and sign_up_topic_id as parameters
+  end
 end

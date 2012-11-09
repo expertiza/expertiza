@@ -2,6 +2,7 @@ class Team < ActiveRecord::Base
   has_many :teams_users
   has_many :users, :through => :teams_users
   has_many :join_team_requests
+  has_many :bids, :dependent => :destroy
 
   def delete
     for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", self.id])       

@@ -1,4 +1,5 @@
 class LatePoliciesController < ApplicationController
+
   # GET /late_policies
   # GET /late_policies.xml
   def index
@@ -40,16 +41,39 @@ class LatePoliciesController < ApplicationController
   # POST /late_policies
   # POST /late_policies.xml
   def create
-    @penalty_policy = LatePolicy.new(params[:penalty_policy])
 
-    respond_to do |format|
-      if @penalty_policy.save
-        format.html { redirect_to(@penalty_policy, :notice => 'PenaltyPolicy was successfully created.') }
-        format.xml  { render :xml => @penalty_policy, :status => :created, :location => @penalty_policy }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @penalty_policy.errors, :status => :unprocessable_entity }
+    is_number = true
+
+    if session[:user].role.name == "Teaching Assistant"
+      user_id = TA.get_my_instructor(session[:user]).id
+    else
+      user_id = session[:user].id
+    end
+
+    if(!is_numeric?(params[:late_policy][:penalty_per_unit]))
+      flash[:error] = "Penalty points per unit should be a numeric value"
+      is_number = false
+    else
+      if(!is_numeric?(params[:late_policy][:max_penalty]))
+        flash[:error] = "Maximum penalty points should be a numeric value"
+        is_number = false
       end
+    end
+
+    if (is_number)
+      @late_policy = LatePolicy.new(params[:late_policy])
+      @late_policy.instructor_id = user_id
+
+      begin
+        @late_policy.save!
+        flash[:notice] = "Penalty policy was successfully created."
+        redirect_to :action => 'index'
+      rescue
+        flash[:error] = "The following error occurred while saving the penalty policy: "+$!
+        redirect_to :action => 'new'
+      end
+    else
+      redirect_to :action => 'new'
     end
   end
 
@@ -57,15 +81,13 @@ class LatePoliciesController < ApplicationController
   # PUT /late_policies/1.xml
   def update
     @penalty_policy = LatePolicy.find(params[:id])
-
-    respond_to do |format|
-      if @penalty_policy.update_attributes(params[:penalty_policy])
-        format.html { redirect_to(@penalty_policy, :notice => 'PenaltyPolicy was successfully updated.') }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @penalty_policy.errors, :status => :unprocessable_entity }
-      end
+    begin
+      @penalty_policy.update_attributes(params[:late_policy])
+      flash[:notice] = "Late policy was successfully updated."
+      redirect_to :action => 'index'
+    rescue
+      flash[:error] = "The following error occurred while updating the penalty policy: "+$!
+      redirect_to :action => 'edit'
     end
   end
 
@@ -73,11 +95,16 @@ class LatePoliciesController < ApplicationController
   # DELETE /late_policies/1.xml
   def destroy
     @penalty_policy = LatePolicy.find(params[:id])
-    @penalty_policy.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(penalty_policies_url) }
-      format.xml  { head :ok }
+    begin
+      @penalty_policy.destroy
+    rescue
+      flash[:error] = $!
     end
+    redirect_to :action => 'index'
+  end
+
+  :private
+  def is_numeric?(obj)
+    obj.to_s.match(/\A[+-]?\d*?(\.\d+)?\Z/) == nil ? false : true
   end
 end

@@ -1,12 +1,12 @@
-<h1>Listing penalty_policies</h1>
+<h1>Listing late policies</h1>
 
 <table>
-  <thead>
-    <td>Penalty Name</td>
-    <td>Penalty Points Per Unit</td>
-    <td>Maximum Penalty</td>
-    <td>Instructor Id</td>
-  </thead>
+  <tr>
+    <th>Penalty Name</th>
+    <th>Penalty Per Unit</th>
+    <th>Maximum Penalty</th>
+    <th>Instructor Id</th>
+  </tr>
 
 <% @penalty_policies.each do |penalty_policy| %>
   <tr>
@@ -14,10 +14,12 @@
     <td><%= penalty_policy.penalty_per_unit %></td>
     <td><%= penalty_policy.max_penalty %></td>
     <td><%= penalty_policy.instructor_id %></td>
+    <td><%= link_to 'Edit', :action => 'edit', :id => penalty_policy %></td>
+    <td><%= link_to 'Delete', { :action => 'destroy', :id => penalty_policy }, :confirm => 'Are you sure?' %></td>
   </tr>
 <% end %>
 </table>
 
 <br />
 
-<%= link_to 'New penalty_policy', :action => 'new'%>
+<%= link_to 'New late policy', :action => 'new'%>

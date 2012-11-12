@@ -1,14 +1,21 @@
-<h1>New penalty_policy</h1>
+<h1>New late policy</h1>
 
-<% form_for(@late_policy) do |f| %>
-    <%= f.error_messages %>
-
+<% form_for :late_policy, @late_policy, :url => { :action => "create" } do |f| %>
     <p>
-      <%= f.label :Policy_Name %><br />
-      <%= f.text_area :name %>
+      <label for="late_policy_name">Late policy Name:</label><br/>
+      <%= text_field 'late_policy', 'policy_name'  %>
     </p>
-
     <p>
-      <%= f.submit 'Create' %>
+      <label for="late_policy_penalty_points_per_unit">Penalty Points Per Unit:</label><br/>
+      <%= text_field 'late_policy', 'penalty_per_unit' %>
     </p>
+    <p>
+      <label for="late_policy_penalty_maximum">Maximum Penalty:</label><br/>
+      <%= text_field 'late_policy', 'max_penalty' %>
+    </p>
+    <%= f.submit 'Create' %>
 <% end %>
+
+<br>
+<br>
+<%= link_to 'Back', :action => 'index' %>

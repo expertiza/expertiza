@@ -361,6 +361,17 @@ student = User.create!(:name => 'student',
                        :email_on_review_of_review => false,
                        :is_new_user => false,
                        :master_permission_granted => false)
+student2 = User.create!(:name => 'student2',
+                       :email => 'anything@mailinator.com',
+                       :clear_password => 'password',
+                       :clear_password_confirmation => 'password',
+                       :role_id => Role.find_by_name('Student').id,
+                       :parent_id => tu.id,
+                       :email_on_review => false,
+                       :email_on_submission => false,
+                       :email_on_review_of_review => false,
+                       :is_new_user => false,
+                       :master_permission_granted => false)
 # Create a course
 course = Course.create!(:name => 'Course 1',
                         :instructor_id =>instructor.id,
@@ -368,7 +379,7 @@ course = Course.create!(:name => 'Course 1',
                         :private => 0)
 course.create_node
 # Create an assignment
-assignment = Assignment.create!(:name => 'Assignment1',
+assignment = Assignment.create!(:name => 'Lottery Assignment',
                                 :directory_path => 'assignment1_dir',
                                 :course_id => course.id,
                                 :instructor_id => instructor.id,
@@ -376,9 +387,10 @@ assignment = Assignment.create!(:name => 'Assignment1',
                                 :num_reviews => 2,
                                 :num_review_of_reviews => 2,
                                 :num_review_of_reviewers => 2,
-                                :require_signup => 0,
-                                :team_assignment => 0,
-                                :wiki_type_id => 1)
+                                :require_signup => 1,
+                                :team_assignment => 1,
+                                :wiki_type_id => 1,
+                                :is_lottery => 1)
 assignment.create_node
 DueDate.create(:due_at => Date.today+30,
                :deadline_type_id => DeadlineType.find_by_name('submission').id,

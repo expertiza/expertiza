@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111217162506) do
+ActiveRecord::Schema.define(:version => 20121109194357) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -53,6 +53,7 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer  "max_reviews_per_submission"
     t.integer  "review_topic_threshold",            :default => 0
     t.boolean  "availability_flag"
+    t.boolean  "is_lottery"
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -60,6 +61,11 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
+
+  create_table "bids", :force => true do |t|
+    t.integer "topic_id"
+    t.integer "team_id"
+  end
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -239,9 +245,9 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",      :default => "", :null => false
+    t.string  "q_type",                     :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1,  :null => false
+    t.integer "question_id", :default => 1, :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -257,8 +263,8 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.text     "instruction_loc"
     t.string   "section"
+    t.text     "instruction_loc"
   end
 
   create_table "questions", :force => true do |t|
@@ -534,8 +540,4 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.string "name", :default => "", :null => false
   end
 
-  create_table "bids", :force => true do |t|
-    t.integer "team_id", :null => false
-    t.integer "topic_id", :null => false
-  end
 end

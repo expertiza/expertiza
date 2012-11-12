@@ -335,3 +335,73 @@ DeadlineRight.create(:name => 'No')
 DeadlineRight.create(:name => 'Late')
 DeadlineRight.create(:name => 'OK')
 
+#### Expertiza setup
+# Create an instructor and student
+puts "Creating instructor user with password 'password'"
+instructor = User.create!(:name => 'instructor',
+                          :email => 'anything@mailinator.com',
+                          :clear_password => 'password',
+                          :clear_password_confirmation => 'password',
+                          :role_id => Role.find_by_name('Instructor').id,
+                          :parent_id => tu.id,
+                          :email_on_review => false,
+                          :email_on_submission => false,
+                          :email_on_review_of_review => false,
+                          :is_new_user => false,
+                          :master_permission_granted => false)
+puts "Creating student user with password 'password'"
+student = User.create!(:name => 'student',
+                       :email => 'anything@mailinator.com',
+                       :clear_password => 'password',
+                       :clear_password_confirmation => 'password',
+                       :role_id => Role.find_by_name('Student').id,
+                       :parent_id => tu.id,
+                       :email_on_review => false,
+                       :email_on_submission => false,
+                       :email_on_review_of_review => false,
+                       :is_new_user => false,
+                       :master_permission_granted => false)
+# Create a course
+course = Course.create!(:name => 'Course 1',
+                        :instructor_id =>instructor.id,
+                        :directory_path => 'course1',
+                        :private => 0)
+course.create_node
+# Create an assignment
+assignment = Assignment.create!(:name => 'Assignment1',
+                                :directory_path => 'assignment1_dir',
+                                :course_id => course.id,
+                                :instructor_id => instructor.id,
+                                :private => 0,
+                                :num_reviews => 2,
+                                :num_review_of_reviews => 2,
+                                :num_review_of_reviewers => 2,
+                                :require_signup => 0,
+                                :team_assignment => 0,
+                                :wiki_type_id => 1)
+assignment.create_node
+DueDate.create(:due_at => Date.today+30,
+               :deadline_type_id => DeadlineType.find_by_name('submission').id,
+               :assignment_id => assignment.id,
+               :round => 1,
+               :submission_allowed_id => DeadlineRight.find_by_name('OK').id,
+               :review_allowed_id => DeadlineRight.find_by_name('OK').id,
+               :rereview_allowed_id => DeadlineRight.find_by_name('OK').id,
+               :review_of_review_allowed_id => DeadlineRight.find_by_name('OK').id)
+DueDate.create(:due_at => Date.today+40,
+               :deadline_type_id => DeadlineType.find_by_name('review'),
+               :assignment_id => assignment.id,
+               :round => 1,
+               :submission_allowed_id => DeadlineRight.find_by_name('OK').id,
+               :review_allowed_id => DeadlineRight.find_by_name('OK').id,
+               :rereview_allowed_id => DeadlineRight.find_by_name('OK').id,
+               :review_of_review_allowed_id => DeadlineRight.find_by_name('OK').id)
+# Add the student to the course and assignment as a participant
+CourseParticipant.create!(:user_id => student.id,
+                          :parent_id => assignment.id,
+                          :handle => 'student',
+                          :permission_granted => 1)
+AssignmentParticipant.create!(:user_id => student.id,
+                              :parent_id => assignment.id,
+                              :handle => 'student',
+                              :permission_granted => 1)

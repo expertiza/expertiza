@@ -8,6 +8,7 @@
     <th width="5%">Waitlist</th>
     <% if @show_actions %>
         <th width="5%">Action</th>
+        <th width="5%">Bid</th>
     <% end %>
     <th width="5%">Advertisement(s)</th>
   </tr>
@@ -70,7 +71,8 @@
           <% end %>
           <% if action_symbol_added == false %>
               <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
-          <% end %>
+              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'submit_bid', :id => topic.id, :assignment_id => params[:id] %></td>
+<% end %>
       <% end %>
       <td align="center">
       <% if !(participant = Participant.find_by_topic_id(topic.id)).nil? %>

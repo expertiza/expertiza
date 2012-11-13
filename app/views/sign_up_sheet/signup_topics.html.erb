@@ -71,7 +71,7 @@
           <% end %>
           <% if action_symbol_added == false %>
               <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
-              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'submit_bid', :id => topic.id, :assignment_id => params[:id] %></td>
+              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Bid', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'submit_bid', :id => topic.id, :assignment_id => params[:id] %></td>
 <% end %>
       <% end %>
       <td align="center">

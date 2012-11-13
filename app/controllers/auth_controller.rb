@@ -53,6 +53,7 @@ class AuthController < ApplicationController
   end
 
   def self.authorised?(session, params)
+
     authorised = false  # default
     check_controller = false
 

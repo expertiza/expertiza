@@ -676,8 +676,7 @@ class SignUpSheetController < ApplicationController
     topic_id = params[:id]
     assignment_id = params[:assignment_id]
     puts "team id is #{team_id} and topic id is #{topic_id} on assignment id #{assignment_id}"
-
-    bid = Bid.create(:team => team_id, :topic => topic_id, :assignment =>assignment_id)
+    Bid.new(:team_id => team_id, :topic_id => topic_id)
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 

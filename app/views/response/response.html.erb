@@ -121,6 +121,13 @@
 </p>
 
 <br/>
+<%if @map.assignment.id == 561 %>
+	<%= label_tag 'save_option_label', "Select how you would like to save your reviews:" %> <br>
+	<%= radio_button_tag :save_options,'WithMeta', true %>With Metareview <br/>
+	<%= radio_button_tag :save_options,'WithoutMeta' %>Without Metareview <br/>
+<!-- 	<%= radio_button_tag :save_options,'EmailMeta' %>Email Metareview <br/>	 -->
+<%end%> 
+<br>
 <%= submit_tag "Save "+@title, :name=>"save" %>
 <%= hidden_field_tag('return', @return) %>
 <% end %>

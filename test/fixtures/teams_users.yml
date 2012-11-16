@@ -55,3 +55,20 @@ teams_usersE:
 teams_usersF:
   team_id: <%= Fixtures.identify(:Assignment_Project2_Team2) %>
   user_id: <%= Fixtures.identify(:student2) %>
+
+# Teams users for lottery assignment
+lottery_teams_users1:
+  team_id: <%= Fixtures.identify(:lottery_team1) %>
+  user_id: <%= Fixtures.identify(:student1) %>
+
+lottery_teams_users2:
+  team_id: <%= Fixtures.identify(:lottery_team1) %>
+  user_id: <%= Fixtures.identify(:student2) %>
+
+lottery_teams_users3:
+  team_id: <%= Fixtures.identify(:lottery_team2) %>
+  user_id: <%= Fixtures.identify(:student3) %>
+
+lottery_teams_users4:
+  team_id: <%= Fixtures.identify(:lottery_team3) %>
+  user_id: <%= Fixtures.identify(:student4) %>

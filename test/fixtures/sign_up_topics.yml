@@ -4,6 +4,12 @@ Topic1:
   max_choosers: 2
   topic_identifier: A101
 
+Topic1-2:
+  topic_name: Topic1-2
+  assignment_id: <%= Fixtures.identify(:assignment_project1) %>
+  max_choosers: 2
+  topic_identifier: A101
+
 Topic2:
   topic_name: Topic1
   assignment_id: <%= Fixtures.identify(:assignment_project2) %>
@@ -15,3 +21,15 @@ Topic3:
   assignment_id: <%= Fixtures.identify(:assignment_project3) %>
   max_choosers: 3
   topic_identifier: A103
+
+LotteryTopic1:
+  topic_name: LoteryTopic1
+  assignment_id: <%= Fixtures.identify(:lottery_assignment) %>
+  max_choosers: 1
+  topic_identifier: A101
+
+LotteryTopic2:
+  topic_name: LoteryTopic2
+  assignment_id: <%= Fixtures.identify(:lottery_assignment) %>
+  max_choosers: 1
+  topic_identifier: A102

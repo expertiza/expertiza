@@ -49,4 +49,19 @@ Assignment_Project2_Team2:
   name: Assignment2Team2
   parent_id: <%= Fixtures.identify(:assignment_project2) %>
   type: AssignmentTeam
-  
+
+# Teams for the lottery assignment
+lottery_team1:
+  name: LotteryTeam1
+  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+  type: AssignmentTeam
+
+lottery_team2:
+  name: LotteryTeam2
+  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+  type: AssignmentTeam
+
+lottery_team3:
+  name: LotteryTeam3
+  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+  type: AssignmentTeam

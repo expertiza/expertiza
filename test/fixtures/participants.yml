@@ -165,3 +165,43 @@ par16:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par16"
+
+par17:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student1) %>
+  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+  topic: Research EPA
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par17"
+
+par18:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student2) %>
+  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+  topic: Research EPA
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par18"
+
+par19:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student3) %>
+  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+  topic: Research EPA
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par19"
+
+par20:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student4) %>
+  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+  topic: Research EPA
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par20"

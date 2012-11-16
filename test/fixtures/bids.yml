@@ -1,9 +1,13 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  sign_up_topic_id: 
-  assignment_team_id: 
+bid1:
+  topic_id: <%= Fixtures.identify(:LotteryTopic1) %>
+  team_id: <%= Fixtures.identify(:lottery_team1) %>
 
-two:
-  sign_up_topic_id: 
-  assignment_team_id: 
+bid2:
+  topic_id: <%= Fixtures.identify(:LotteryTopic1) %>
+  team_id: <%= Fixtures.identify(:lottery_team2) %>
+
+bid3:
+  topic_id: <%= Fixtures.identify(:LotteryTopic2) %>
+  team_id: <%= Fixtures.identify(:lottery_team3) %>

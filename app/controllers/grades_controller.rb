@@ -50,11 +50,6 @@ class GradesController < ApplicationController
     end
   end
   
-  def view_my_reputation
-    @participant = AssignmentParticipant.find(params[:id])
-    @assignment = @participant.assignment
-  end
-
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment

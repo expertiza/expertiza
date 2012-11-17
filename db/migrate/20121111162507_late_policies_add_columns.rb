@@ -24,7 +24,7 @@ class LatePoliciesAddColumns < ActiveRecord::Migration
 
     add_index "late_policies", ["penalty_period_in_minutes"], :name => "penalty_period_length_unit"
 
-    execute "ALTER TABLE late_policies DROP CONSTRAINT `fk_instructor_id`;"
+    execute "ALTER TABLE late_policies DROP FOREIGN KEY `fk_instructor_id`;"
 
     remove_column :late_policies, :times_used
     remove_column :late_policies, :instructor_id

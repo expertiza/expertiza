@@ -67,11 +67,11 @@ class AssignmentController < ApplicationController
   def create
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.    
-    @assignment = Assignment.new(params[:assignment])    
+    @assignment = Assignment.new(params[:assignment])
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(@assignment) 
-    @assignment.submitter_count = 0    
+    @assignment.submitter_count = 0
     ## feedback added
     ##
     
@@ -102,13 +102,32 @@ class AssignmentController < ApplicationController
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
-    @drop_topic_deadline = deadline.id
+    @Drop_topic_deadline = deadline.id
     set_requirement
     check_flag = @assignment.availability_flag
 
-    if(check_flag == true && params[:submit_deadline].nil?)
-      raise "Please enter a valid Submission deadline!!"
-      render :action => 'create'
+    late_policy_set = true
+    if(@assignment.calculate_penalty)
+      if(@assignment.late_policy_id < 0)
+        late_policy_set = false
+      end
+    end
+
+    if(@assignment.late_policy_id < 0)
+      @assignment.late_policy_id = nil
+    end
+
+    if(check_flag == true && params[:submit_deadline].nil? || !late_policy_set)
+      if(check_flag == true && params[:submit_deadline].nil?)
+        raise "Please enter a valid Submission deadline!!"
+        render :action => 'create'
+      elsif(!late_policy_set)
+        flash[:error] = "Please select a valid late policy!!"
+        @wiki_types = WikiType.find(:all)
+        get_limits_and_weights
+        @private = params[:private] == true
+        render :action => 'new'
+      end
     elsif (@assignment.save)
       set_questionnaires   
       set_limits_and_weights

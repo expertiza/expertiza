@@ -33,7 +33,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 	</li>
   <% puts(@participant.id) %>
 	<li><%= link_to "Your scores",{:controller => 'grades', :action => 'view_my_scores', :id => @participant.id} %> (View feedback on your work)</li>
-    <%if @can_provide_suggestions == true %>
+  <%if @can_provide_suggestions == true %>
 	<li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
 	<% end %>
 

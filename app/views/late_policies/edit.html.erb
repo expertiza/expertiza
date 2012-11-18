@@ -1,18 +1,7 @@
 <h1>Editing late policy</h1>
 
 <% form_tag :action => 'update', :id => @penalty_policy do %>
-    <p>
-      <label for="late_policy_name">Late policy Name:</label><br/>
-      <%= text_field 'late_policy', 'policy_name'  %>
-    </p>
-    <p>
-      <label for="late_policy_penalty_points_per_unit">Penalty Points Per Unit:</label><br/>
-      <%= text_field 'late_policy', 'penalty_per_unit' %>
-    </p>
-    <p>
-      <label for="late_policy_penalty_maximum">Maximum Penalty:</label><br/>
-      <%= text_field 'late_policy', 'max_penalty' %>
-    </p>
+    <%= render :partial => 'form' %>
     <%= submit_tag 'Edit' %>
 <% end %>
 

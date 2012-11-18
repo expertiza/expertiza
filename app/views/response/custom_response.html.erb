@@ -25,7 +25,7 @@
   questions = @questionnaire.questions
   questions.each {
     | question | %>
-    <%= get_accordion_title(current_topic, @question_type[i].parameters.split("::")[0]) %>
+x    <%= get_accordion_title(current_topic, @question_type[i].parameters.split("::")[0]) %>
     <%= find_question_type(question, @question_type[i], i, false, nil, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
     <% current_topic = @question_type[i].parameters.split("::")[0]
 

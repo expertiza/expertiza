@@ -14,7 +14,7 @@ development:
   adapter: mysql
   database: pg_development
   username: root
-  password: 
+  password: mysqladmin
   host: localhost
 
 # Warning: The database defined as 'test' will be erased and
@@ -24,7 +24,7 @@ test: &test
   adapter: mysql
   database: pg_test
   username: root
-  password:
+  password: mysqladmin
   host: localhost
 
 production:

@@ -47,6 +47,9 @@
   <input type="text" id="weeks" name ="weeks" maxlength="2" size="3" value="<%=@weeks%>"/> week(s) &nbsp;
   <input type="text" id="days" name ="days" maxLength="2" size="3" value="<%=@days%>"/> day(s)          
 </div>
+
+<%= render :partial => 'late_policy' %>
+
 <br/>
   &nbsp;&nbsp;<%= submit_tag "Save assignment" %>
 <% end %>

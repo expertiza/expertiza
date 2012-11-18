@@ -106,16 +106,7 @@ class AssignmentController < ApplicationController
     set_requirement
     check_flag = @assignment.availability_flag
 
-    late_policy_set = true
-    if(@assignment.calculate_penalty)
-      if(@assignment.late_policy_id < 0)
-        late_policy_set = false
-      end
-    end
-
-    if(@assignment.late_policy_id < 0)
-      @assignment.late_policy_id = nil
-    end
+    late_policy_set = set_late_policy()
 
     if(check_flag == true && params[:submit_deadline].nil? || !late_policy_set)
       if(check_flag == true && params[:submit_deadline].nil?)
@@ -349,6 +340,16 @@ class AssignmentController < ApplicationController
 
     set_requirement
 
+    late_policy_set = set_late_policy()
+
+    if(!late_policy_set)
+      flash[:error] = "Please select a valid late policy!!"
+      @wiki_types = WikiType.find(:all)
+      get_limits_and_weights
+      @private = params[:private] == true
+      render :action => 'new'
+    end
+
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])     
       if params[:questionnaires] and params[:limits] and params[:weights]
@@ -441,5 +442,20 @@ class AssignmentController < ApplicationController
     newpath = assignment.get_path rescue nil
     FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
-  end  
+  end
+
+  :private
+  def set_late_policy
+    late_policy_set = true
+    if(@assignment.calculate_penalty)
+      if(@assignment.late_policy_id < 0)
+        late_policy_set = false
+      end
+    end
+
+    if(@assignment.late_policy_id < 0)
+      @assignment.late_policy_id = nil
+    end
+    return late_policy_set
+  end
 end

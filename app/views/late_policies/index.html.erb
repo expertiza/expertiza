@@ -1,22 +1,29 @@
 <h1>Listing late policies</h1>
-
+<% user_role = session[:user].role.name
+   is_admin = (user_role == "Administrator" || user_role == "Super-Administrator") %>
 <table>
   <tr>
     <th>Penalty Name</th>
     <th>Penalty Per Unit</th>
     <th>Maximum Penalty</th>
-    <th>Instructor Id</th>
+    <% if is_admin %>
+        <th>Instructor Id</th>
+    <% end %>
   </tr>
 
 <% @penalty_policies.each do |penalty_policy| %>
+  <% if session[:user].id == penalty_policy.instructor_id || is_admin %>
   <tr>
     <td><%= penalty_policy.policy_name %></td>
     <td><%= penalty_policy.penalty_per_unit %></td>
     <td><%= penalty_policy.max_penalty %></td>
-    <td><%= penalty_policy.instructor_id %></td>
+    <% if is_admin %>
+        <td><%= User.find_by_id(penalty_policy.instructor_id).name %></td>
+    <% end %>
     <td><%= link_to 'Edit', :action => 'edit', :id => penalty_policy %></td>
     <td><%= link_to 'Delete', { :action => 'destroy', :id => penalty_policy }, :confirm => 'Are you sure?' %></td>
   </tr>
+  <% end %>
 <% end %>
 </table>
 

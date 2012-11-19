@@ -232,9 +232,12 @@ class SignUpSheetController < ApplicationController
 
       if users_team.size == 0
         @selected_topics = nil
+        @bid_topics = nil
       else
         #TODO: fix this; cant use 0
         @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
+        @bid_topics = Bid.find_all_by_team_id(users_team[0].t_id)
+        puts users_team[0].t_id
       end
     else
       @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)
@@ -694,4 +697,5 @@ class SignUpSheetController < ApplicationController
     bid.delete
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
+
 end

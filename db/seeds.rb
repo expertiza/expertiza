@@ -391,6 +391,7 @@ assignment = Assignment.create!(:name => 'Lottery Assignment',
                                 :num_review_of_reviewers => 2,
                                 :require_signup => 1,
                                 :team_assignment => 1,
+                                :team_count => 2,
                                 :wiki_type_id => 1,
                                 :is_lottery => 1)
 assignment.create_node

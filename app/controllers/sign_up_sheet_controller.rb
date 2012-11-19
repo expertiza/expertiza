@@ -670,15 +670,17 @@ class SignUpSheetController < ApplicationController
   # Submit a bid for a team and a specific topic
   def submit_bid
     # Should get team_id and sign_up_topic_id as parameters
-
     team = SignedUpUser.find_team_users(params[:assignment_id], (session[:user].id))
     team_id = team[0].t_id
     topic_id = params[:id]
     assignment_id = params[:assignment_id]
     puts "team id is #{team_id} and topic id is #{topic_id} on assignment id #{assignment_id}"
     @bid = Bid.new(:team_id => team_id, :topic_id => topic_id)
-    @bid.save
-    redirect_to :action => 'signup_topics', :id => params[:assignment_id]
+    if @bid.save!
+      puts "new bid #{@bid.id}"
+    end
+
+    redirect_to :action => 'signup_topics', :id => assignment_id
   end
 
   # Delete a bid for a team and a specific topic

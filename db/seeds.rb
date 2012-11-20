@@ -429,23 +429,35 @@ AssignmentParticipant.create!(:user_id => student2.id,
                               :handle => 'student2',
                               :permission_granted => 1)
 # Create multiple topics for lottery assignment
-SignUpTopic.create!(:assignment_id => 1,
+topic1 = SignUpTopic.create!(:assignment_id => 1,
                     :category => 'Category',
                     :max_choosers => 1,
                     :topic_identifier => 1,
                     :topic_name => 'Topic 1')
-SignUpTopic.create!(:assignment_id => 1,
+topic2 = SignUpTopic.create!(:assignment_id => 1,
                     :category => 'Category',
                     :max_choosers => 1,
                     :topic_identifier => 2,
                     :topic_name => 'Topic 2')
-SignUpTopic.create!(:assignment_id => 1,
+topic3 = SignUpTopic.create!(:assignment_id => 1,
                     :category => 'Category',
                     :max_choosers => 1,
                     :topic_identifier => 3,
                     :topic_name => 'Topic 3')
-SignUpTopic.create!(:assignment_id => 1,
+topic4 = SignUpTopic.create!(:assignment_id => 1,
                     :category => 'Category',
                     :max_choosers => 1,
                     :topic_identifier => 4,
                     :topic_name => 'Topic 4')
+
+team = Team.create!(:name => 'Team 1',
+                    :parent_id =>assignment.id,
+                    :type =>'AssignmentTeam')
+TeamsUser.create!(:team_id => team.id,
+                    :user_id => student.id)
+TeamsUser.create!(:team_id => team.id,
+                  :user_id => student2.id)
+
+Bid.create!(:team_id => team.id, :topic_id => topic4.id)
+Bid.create!(:team_id => team.id, :topic_id => topic3.id)
+Bid.create!(:team_id => team.id, :topic_id => topic1.id)

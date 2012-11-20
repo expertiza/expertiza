@@ -383,12 +383,13 @@ course.create_node
 # Create an assignment
 assignment = Assignment.create!(:name => 'Lottery Assignment',
                                 :directory_path => 'assignment1_dir',
+                                :submitter_count => 0,
                                 :course_id => course.id,
                                 :instructor_id => instructor.id,
                                 :private => 0,
-                                :num_reviews => 2,
-                                :num_review_of_reviews => 2,
-                                :num_review_of_reviewers => 2,
+                                :num_reviews => 1,
+                                :num_review_of_reviews => 1,
+                                :num_review_of_reviewers => 3,
                                 :require_signup => 1,
                                 :team_assignment => 1,
                                 :team_count => 2,
@@ -428,36 +429,40 @@ AssignmentParticipant.create!(:user_id => student2.id,
                               :parent_id => assignment.id,
                               :handle => 'student2',
                               :permission_granted => 1)
+
 # Create multiple topics for lottery assignment
-topic1 = SignUpTopic.create!(:assignment_id => 1,
+topic1 = SignUpTopic.create!(:assignment_id => assignment.id,
                     :category => 'Category',
                     :max_choosers => 1,
                     :topic_identifier => 1,
                     :topic_name => 'Topic 1')
-topic2 = SignUpTopic.create!(:assignment_id => 1,
+topic2 = SignUpTopic.create!(:assignment_id => assignment.id,
                     :category => 'Category',
                     :max_choosers => 1,
                     :topic_identifier => 2,
                     :topic_name => 'Topic 2')
-topic3 = SignUpTopic.create!(:assignment_id => 1,
+topic3 = SignUpTopic.create!(:assignment_id => assignment.id,
                     :category => 'Category',
                     :max_choosers => 1,
                     :topic_identifier => 3,
                     :topic_name => 'Topic 3')
-topic4 = SignUpTopic.create!(:assignment_id => 1,
+topic4 = SignUpTopic.create!(:assignment_id => assignment.id,
                     :category => 'Category',
                     :max_choosers => 1,
                     :topic_identifier => 4,
                     :topic_name => 'Topic 4')
 
-team = Team.create!(:name => 'Team 1',
-                    :parent_id =>assignment.id,
+#team = Team.create!(:name => 'Team 1',
+#                    :parent_id => assignment.id,
+#                    :type =>'AssignmentTeam')
+team = AssignmentTeam.create!(:name => 'Team 1',
+                    :parent_id => assignment.id,
                     :type =>'AssignmentTeam')
+
 TeamsUser.create!(:team_id => team.id,
-                    :user_id => student.id)
+                  :user_id => student.id)
 TeamsUser.create!(:team_id => team.id,
                   :user_id => student2.id)
 
 Bid.create!(:team_id => team.id, :topic_id => topic4.id)
 Bid.create!(:team_id => team.id, :topic_id => topic3.id)
-Bid.create!(:team_id => team.id, :topic_id => topic1.id)

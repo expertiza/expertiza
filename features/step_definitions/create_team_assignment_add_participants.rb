@@ -36,7 +36,7 @@ end
 =end
 
 Given /^I am participating on a "(\S+)"$/ do |assignment|
-  And "an assignment named \"#{assignment}\" exists"
+  And "a team assignment named \"#{assignment}\" exists"
   And 'a student with the username "student1" exists'
   And 'a student with the username "student2" exists'
   Then "add \"student1\" to this \"#{assignment}\""
@@ -47,7 +47,7 @@ end
   1. Create a team assignment with the name "team_assignment"
   2. And add "student1" and "student2" to this assignment
 =end
-Given /^an assignment named "(\S+)" exists$/ do |assignment|
+Given /^a team assignment named "(\S+)" exists$/ do |assignment|
 
   And 'I am logged in as admin'
 

@@ -681,22 +681,27 @@ class SignUpSheetController < ApplicationController
 
   # Submit a bid for a team and a specific topic
   def submit_bid
+
     # Should get team_id and sign_up_topic_id as parameters
     team = SignedUpUser.find_team_users(params[:assignment_id], (session[:user].id))
     team_id = team[0].t_id
     topic_id = params[:id]
     assignment_id = params[:assignment_id]
-    puts "team id is #{team_id} and topic id is #{topic_id} on assignment id #{assignment_id}"
-    @bid = Bid.find_by_team_id_and_topic_id(team_id, topic_id)
-    if @bid.nil?
-      @bid = Bid.new(:team_id => team_id, :topic_id => topic_id)
-      if @bid.save!
-        puts "new bid #{@bid.id}"
-      end
-    else
-      flash[:notice] = "Your team has already bid for topic #{SignUpTopic.find(topic_id).topic_name}"
-    end
 
+    if Bid.count(:all, :conditions => {:team_id => team_id}) >= 3
+      flash[:notice] = "Your team has bid the maximum amount of bids"
+    else
+      puts "team id is #{team_id} and topic id is #{topic_id} on assignment id #{assignment_id}"
+      @bid = Bid.find_by_team_id_and_topic_id(team_id, topic_id)
+      if @bid.nil?
+        @bid = Bid.new(:team_id => team_id, :topic_id => topic_id)
+        if @bid.save!
+          puts "new bid #{@bid.id}"
+        end
+      else
+        flash[:notice] = "Your team has already bid for topic #{SignUpTopic.find(topic_id).topic_name}"
+      end
+    end
     redirect_to :action => 'bid_topics', :team_id => team_id, :assignment_id => assignment_id
   end
 

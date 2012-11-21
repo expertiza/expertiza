@@ -21,12 +21,17 @@
               <font color='red'>(waitlisted)</font>
           <% end %>
       <% end %>
+  <% end %>
+  <br/>
+
+  <% if !@bid_topics.nil? && @bid_topics.size !=0 %>
       <b>Your team bid(s):</b>
       <% for bid_topic in @bid_topics %>
           <br/><%= SignUpTopic.find(bid_topic.topic_id).topic_name %>
       <% end %>
   <% end %>
-  <br/><br/>
+
+  <br/>
 
   <% i=1 %>
   <% for topic in @sign_up_topics %>

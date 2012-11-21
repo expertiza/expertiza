@@ -232,12 +232,9 @@ class SignUpSheetController < ApplicationController
 
       if users_team.size == 0
         @selected_topics = nil
-        @bid_topics = nil
       else
         #TODO: fix this; cant use 0
         @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
-        @bid_topics = Bid.find_all_by_team_id(users_team[0].t_id)
-        puts users_team[0].t_id
       end
     else
       @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)
@@ -670,6 +667,11 @@ class SignUpSheetController < ApplicationController
     SignUpTopic.find_by_sql(query)
   end
 
+  def bid_topics
+    @bid_topics = Bid.find_all_by_team_id(params[:team_id])
+    puts "Bid topic display for team #{params[:team_id]}"
+  end
+
   # Submit a bid for a team and a specific topic
   def submit_bid
     # Should get team_id and sign_up_topic_id as parameters
@@ -683,7 +685,7 @@ class SignUpSheetController < ApplicationController
       puts "new bid #{@bid.id}"
     end
 
-    redirect_to :action => 'signup_topics', :id => assignment_id
+    redirect_to :action => 'bid_topics', :team_id => team_id
   end
 
   # Delete a bid for a team and a specific topic
@@ -695,7 +697,7 @@ class SignUpSheetController < ApplicationController
 
     bid = Bid.find_by_topic_id_and_team_id(team_id, topic_id)
     bid.delete
-    redirect_to :action => 'signup_topics', :id => params[:assignment_id]
+    redirect_to :action => 'bid_topics', :team_id => team_id
   end
 
 end

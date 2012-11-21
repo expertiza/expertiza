@@ -160,6 +160,7 @@ ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'delete_signup', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'submit_bid', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'delete_bid', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'bid_topics', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('suggestion').id, :name => 'create', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('suggestion').id, :name => 'new', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('leaderboard').id, :name => 'index', :permission_id => nil, :url_to_use => '')

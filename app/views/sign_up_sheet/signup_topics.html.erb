@@ -1,4 +1,7 @@
 <h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
+<% if flash[:notice] %>
+    <div class="flash_error"><%= flash[:notice] %></div>
+<% end %>
 <table class="general">
   <tr>
     <th width="5%">Topic #</th>
@@ -26,8 +29,8 @@
 
   <% if !@bid_topics.nil? && @bid_topics.size !=0 %>
       <b>Your team bid(s):</b>
-      <% for bid_topic in @bid_topics %>
-          <br/><%= SignUpTopic.find(bid_topic.topic_id).topic_name %>
+      <% for bid in @bid_topics %>
+          <br/><%= SignUpTopic.find(bid.topic_id).topic_name %>
       <% end %>
   <% end %>
 

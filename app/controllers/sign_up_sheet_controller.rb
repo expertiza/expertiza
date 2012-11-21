@@ -669,7 +669,14 @@ class SignUpSheetController < ApplicationController
 
   def bid_topics
     @bid_topics = Bid.find_all_by_team_id(params[:team_id])
-    puts "Bid topic display for team #{params[:team_id]}"
+    @show_actions = true
+
+
+    puts "#{@bid_topics.size} bid topics for team #{params[:team_id]}"
+    @bid_topics.each do |b|
+      puts "bid #{b.id} on topic #{SignUpTopic.find(b.topic_id).topic_name}"
+    end
+    redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
   # Submit a bid for a team and a specific topic
@@ -680,12 +687,17 @@ class SignUpSheetController < ApplicationController
     topic_id = params[:id]
     assignment_id = params[:assignment_id]
     puts "team id is #{team_id} and topic id is #{topic_id} on assignment id #{assignment_id}"
-    @bid = Bid.new(:team_id => team_id, :topic_id => topic_id)
-    if @bid.save!
-      puts "new bid #{@bid.id}"
+    @bid = Bid.find_by_team_id_and_topic_id(team_id, topic_id)
+    if @bid.nil?
+      @bid = Bid.new(:team_id => team_id, :topic_id => topic_id)
+      if @bid.save!
+        puts "new bid #{@bid.id}"
+      end
+    else
+      flash[:notice] = "Your team has already bid for topic #{SignUpTopic.find(topic_id).topic_name}"
     end
 
-    redirect_to :action => 'bid_topics', :team_id => team_id
+    redirect_to :action => 'bid_topics', :team_id => team_id, :assignment_id => assignment_id
   end
 
   # Delete a bid for a team and a specific topic

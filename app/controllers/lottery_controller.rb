@@ -17,6 +17,10 @@ class LotteryController < ApplicationController
 
     # TODO: Alert if we have a situation where # of topics < # of teams, ideally provide the teams that were not assigned topics.
     flash[:notice] = 'Lottery assignment completed successfully.'
+
+    # Turn lottery topic selection off for this assignment now that the lottery has run
+    assignment.is_lottery = false
+    assignment.save
   end
 
   def choose_winner_for_topic(topic)
@@ -48,7 +52,7 @@ class LotteryController < ApplicationController
 
     # We only need to give confirmTopic a single user
     # TODO maybe this should be the signed in user?
-    confirmTopic(bid.team.id, bid.topic.id, bid.topic.assignment.id, bid.team.users[0])
+    confirmTopic(bid.team.id, bid.topic.id, bid.topic.assignment.id, bid.team.users[0].id)
   end
 
   # TODO this logic copied from SignUpSheetController
@@ -81,7 +85,7 @@ class LotteryController < ApplicationController
           sign_up.is_waitlisted = false
 
           #Update topic_id in participant table with the topic_id
-          participant = Participant.find_by_user_id_and_parent_id(user_id, assignment_id)
+          participant = AssignmentParticipant.find_by_user_id_and_parent_id(user_id, assignment_id)
 
           participant.update_topic_id(topic_id)
         else

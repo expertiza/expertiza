@@ -103,6 +103,16 @@ function onChangeWikiType(){
   </td>  
 </tr>
 
+<tr>
+  <td><label for="lottery_topic_selection">Lottery Topic Selection:</label></td>
+  <td>
+    <select id="lotteryselect" name="assignment[is_lottery]">
+      <option value=false style="width:75px">No</option>
+      <option value=true style="width:75px" <% if @assignment.is_lottery %>SELECTED<%end%>>Yes</option>
+    </select>
+  </td>
+</tr>
+
  <tr><td><label for="staggered">Staggered deadline?</label></td>
 
  <td>

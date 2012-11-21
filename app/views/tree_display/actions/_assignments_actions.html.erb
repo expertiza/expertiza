@@ -18,6 +18,9 @@
     <% else %>
       <%= link_to image_tag('/images/tree_view/edit-signup-sheet-24.png', :title => 'Edit signup sheet'), :controller=>'sign_up_sheet', :action=>'add_signup_topics', :id => node.node_object_id %>
     <% end %>
+    <% if @assignment.is_lottery %>
+      <%= link_to image_tag('/images/tree_view/run-lottery.png', :title => 'Run Lottery'), :controller => 'lottery', :action => 'run_lottery', :id => @assignment.id %>
+    <% end %>
   <% else %>
     <% if @assignment.staggered_deadline == true %>
       <%= link_to image_tag('/images/tree_view/add-signup-sheet-24.png', :title => 'Add signup sheet'),:controller=>'sign_up_sheet', :action=>'add_signup_topics_staggered', :id => node.node_object_id %>
@@ -46,4 +49,5 @@
 </div>
 <% end %>
 </ul>
-</TD> 
+</ul>
+</TD>

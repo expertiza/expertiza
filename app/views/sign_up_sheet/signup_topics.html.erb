@@ -87,7 +87,7 @@
 <% end %>
       <% end %>
       <td align="center">
-      <% if !(participant = Participant.find_by_topic_id(topic.id)).nil? %>
+      <% if !(participant = AssignmentParticipant.find_by_topic_id(topic.id)).nil? %>
           <% if Team.find(participant.team.id).advertise_for_partner? %>
               <%= link_to image_tag("ad.png", :height => 25, :width => 25, :alt=>'Advertise for partners'), :controller => 'sign_up_sheet', :action => 'team_details', :assignment_id=>params[:id], :id=>topic.id %>
           <% end %>

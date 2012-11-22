@@ -676,21 +676,6 @@ class SignUpSheetController < ApplicationController
     SignUpTopic.find_by_sql(query)
   end
 
-  def bid_topics
-    team_id = params[:team_id]
-    if !team_id.nil?
-      @bid_topics = Bid.find_all_by_team_id(params[:team_id])
-      @show_actions = true
-      puts "#{@bid_topics.size} bid topics for team #{params[:team_id]}"
-      @bid_topics.each do |b|
-        puts "bid #{b.id} on topic #{SignUpTopic.find(b.topic_id).topic_name}"
-      end
-
-    end
-
-    redirect_to :action => 'signup_topics', :id => params[:assignment_id]
-  end
-
   # Submit a bid for a team and a specific topic
   def submit_bid
     # Should get team_id and sign_up_topic_id as parameters

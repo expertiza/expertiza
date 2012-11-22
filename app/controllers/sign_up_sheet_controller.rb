@@ -216,6 +216,7 @@ class SignUpSheetController < ApplicationController
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
 
+
     #find whether assignment is team assignment
     assignment = Assignment.find(params[:id])
 
@@ -235,6 +236,14 @@ class SignUpSheetController < ApplicationController
       else
         #TODO: fix this; cant use 0
         @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
+      end
+
+      if assignment.is_lottery?
+        @bid_topics = Bid.find_all_by_team_id(users_team[0].t_id)
+        puts "#{@bid_topics.size} bid topics for team #{params[:team_id]}"
+        @bid_topics.each do |b|
+          puts "bid #{b.id} on topic #{SignUpTopic.find(b.topic_id).topic_name}"
+        end
       end
     else
       @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)
@@ -668,20 +677,22 @@ class SignUpSheetController < ApplicationController
   end
 
   def bid_topics
-    @bid_topics = Bid.find_all_by_team_id(params[:team_id])
-    @show_actions = true
+    team_id = params[:team_id]
+    if !team_id.nil?
+      @bid_topics = Bid.find_all_by_team_id(params[:team_id])
+      @show_actions = true
+      puts "#{@bid_topics.size} bid topics for team #{params[:team_id]}"
+      @bid_topics.each do |b|
+        puts "bid #{b.id} on topic #{SignUpTopic.find(b.topic_id).topic_name}"
+      end
 
-
-    puts "#{@bid_topics.size} bid topics for team #{params[:team_id]}"
-    @bid_topics.each do |b|
-      puts "bid #{b.id} on topic #{SignUpTopic.find(b.topic_id).topic_name}"
     end
+
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
   # Submit a bid for a team and a specific topic
   def submit_bid
-
     # Should get team_id and sign_up_topic_id as parameters
     team = SignedUpUser.find_team_users(params[:assignment_id], (session[:user].id))
     team_id = team[0].t_id
@@ -702,7 +713,9 @@ class SignUpSheetController < ApplicationController
         flash[:notice] = "Your team has already bid for topic #{SignUpTopic.find(topic_id).topic_name}"
       end
     end
-    redirect_to :action => 'bid_topics', :team_id => team_id, :assignment_id => assignment_id
+
+    #redirect_to :action => 'bid_topics', :team_id => team_id, :assignment_id => assignment_id
+    redirect_to :action => 'signup_topics', :id => assignment_id
   end
 
   # Delete a bid for a team and a specific topic
@@ -714,7 +727,8 @@ class SignUpSheetController < ApplicationController
 
     bid = Bid.find_by_topic_id_and_team_id(team_id, topic_id)
     bid.delete
-    redirect_to :action => 'bid_topics', :team_id => team_id
+    #redirect_to :action => 'bid_topics', :team_id => team_id, :assignment_id => assignment_id
+    redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
 end

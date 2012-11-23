@@ -242,9 +242,9 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",      :default => "", :null => false
+    t.string  "q_type",                     :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1,  :null => false
+    t.integer "question_id", :default => 1, :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -260,8 +260,8 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.text     "instruction_loc"
     t.string   "section"
+    t.text     "instruction_loc"
   end
 
   create_table "questions", :force => true do |t|
@@ -288,7 +288,6 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.string   "additional_comment"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version_num"
   end
 
   add_index "responses", ["map_id"], :name => "fk_response_response_map"
@@ -338,10 +337,6 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
 
-  create_table "schema_info", :id => false, :force => true do |t|
-    t.integer "version"
-  end
-
   create_table "score_caches", :force => true do |t|
     t.integer "reviewee_id", :default => 0,   :null => false
     t.float   "score",       :default => 0.0, :null => false
@@ -370,9 +365,9 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "sign_up_topics", :force => true do |t|
-    t.text    "topic_name",                     :null => false
-    t.integer "assignment_id",                  :null => false
-    t.integer "max_choosers",                   :null => false
+    t.text    "topic_name",                                    :null => false
+    t.integer "assignment_id",                                 :null => false
+    t.integer "max_choosers",                                  :null => false
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
     t.integer "micropayment",                   :default => 0
@@ -471,7 +466,7 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
 
   create_table "teams", :force => true do |t|
     t.string  "name"
-    t.integer "parent_id", :default => 0, :null => false
+    t.integer "parent_id",                  :default => 0, :null => false
     t.string  "type"
     t.text    "comments_for_advertisement"
     t.boolean "advertise_for_partner"

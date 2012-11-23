@@ -240,10 +240,10 @@ class SignUpSheetController < ApplicationController
 
       if assignment.is_lottery?
         @bid_topics = Bid.find_all_by_team_id(users_team[0].t_id)
-        puts "#{@bid_topics.size} bid topics for team #{params[:team_id]}"
-        @bid_topics.each do |b|
-          puts "bid #{b.id} on topic #{SignUpTopic.find(b.topic_id).topic_name}"
-        end
+        #puts "#{@bid_topics.size} bid topics for team #{params[:team_id]}"
+        #@bid_topics.each do |b|
+          #puts "bid #{b.id} on topic #{SignUpTopic.find(b.topic_id).topic_name}"
+        #end
       end
     else
       @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)
@@ -706,12 +706,12 @@ class SignUpSheetController < ApplicationController
   # Delete a bid for a team and a specific topic
   def delete_bid
     # Should get team_id and sign_up_topic_id as parameters
-    team = SignedUpUser.find_team_users(params[:assignment_id], (session[:user].id))
-    team_id = team[0].t_id
-    topic_id = params[:id]
 
-    bid = Bid.find_by_topic_id_and_team_id(team_id, topic_id)
-    bid.delete
+    @bid = Bid.find(params[:id])
+    if @bid.delete
+      flash[:notice] = "Your bid for topic #{SignUpTopic.find(@bid.topic_id).topic_name} has been deleted"
+    end
+
     #redirect_to :action => 'bid_topics', :team_id => team_id, :assignment_id => assignment_id
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end

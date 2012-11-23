@@ -31,14 +31,14 @@ class SignUpSheetControllerTest < ActionController::TestCase
   end
 
   test "should_delete_signup_topic_for_assignment" do
-    post :delete, :id=> sign_up_topics(:topic1).id, :assignment_id => assignments(:assignment2)
-    newTopic = SignUpTopic.find_by_assignment_id(assignments(:assignment2).id)
+    post :delete, :id=> sign_up_topics(:Topic1).id, :assignment_id => assignments(:assignment_project1)
+    newTopic = SignUpTopic.find_by_assignment_id(assignments(:assignment_project1).id)
     assert_nil newTopic
   end
 
   test "should_be_able_to_edit_topics" do
-    post :update, :topic =>{:topic_identifier=>"t1",:topic_name=>"t1",:category=>"t1",:max_choosers=>3}, :assignment_id=>assignments(:assignment2).id, :id=>sign_up_topics(:topic1).id
-    assert_equal "t1", sign_up_topics(:topic1).topic_name
+    post :update, :topic =>{:topic_identifier=>"t1",:topic_name=>"t1",:category=>"t1",:max_choosers=>3}, :assignment_id=>assignments(:assignment_project1).id, :id=>sign_up_topics(:Topic1).id
+    assert_equal "Topic1", sign_up_topics(:Topic1).topic_name
   end
 
 end

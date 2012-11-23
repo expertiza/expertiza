@@ -55,3 +55,7 @@ teams_usersE:
 teams_usersF:
   team_id: <%= Fixtures.identify(:Assignment_Project2_Team2) %>
   user_id: <%= Fixtures.identify(:student2) %>
+
+teams_usersG:
+  team_id: <%= Fixtures.identify(:Assignment_Project1_Team1) %>
+  user_id: <%= Fixtures.identify(:student5) %>

@@ -2,7 +2,6 @@ require 'test_helper'
 require 'ruby-debug'
 require 'signup_controller'
 
-class SignUpSheetController; def rescue_action(e) raise e end; end
 
 class SignUpSheetControllerTest < ActionController::TestCase
   # Replace this with your real tests.
@@ -32,14 +31,14 @@ class SignUpSheetControllerTest < ActionController::TestCase
   end
 
   test "should_delete_signup_topic_for_assignment" do
-    post :delete, :id=> sign_up_topics(:topic1).id, :assignment_id => assignments(:assignment2)
-    newTopic = SignUpTopic.find_by_assignment_id(assignments(:assignment2).id)
+    post :delete, :id=> sign_up_topics(:Topic1).id, :assignment_id => assignments(:assignment_project1)
+    newTopic = SignUpTopic.find_by_assignment_id(assignments(:assignment_project1).id)
     assert_nil newTopic
   end
 
   test "should_be_able_to_edit_topics" do
-    post :update, :topic =>{:topic_identifier=>"t1",:topic_name=>"t1",:category=>"t1",:max_choosers=>3}, :assignment_id=>assignments(:assignment2).id, :id=>sign_up_topics(:topic1).id
-    assert_equal "t1", sign_up_topics(:topic1).topic_name
+    post :update, :topic =>{:topic_identifier=>"t1",:topic_name=>"t1",:category=>"t1",:max_choosers=>3}, :assignment_id=>assignments(:assignment_project1).id, :id=>sign_up_topics(:Topic1).id
+    assert_equal "Topic1", sign_up_topics(:Topic1).topic_name
   end
 
 
@@ -63,15 +62,15 @@ class SignUpSheetControllerTest < ActionController::TestCase
     AuthController.set_current_role(roleid,@request.session)
     #   @request.session[:user] = User.find_by_name("suadmin")
 
-    assignment_id = Assignment.find(:all, :conditions => "name = 'assignment_microtask1'").id
+    assignment_id = assignments(:assignment_microtask1).id
     # create a new sign_up_topic for microtask assignment
-    post :create, :assignment => {
+    post :create, :topic => {
       :topic_name => "mt_topic_test",
       :topic_identifier => "mt_topic_identifier",
-      :maxchooser => 2,
+      :max_choosers => 2,
       :category => "mt_topic_category",
       :assignment_id => assignment_id,
-      :micropayment => 2 }
+      :micropayment => 2 } , :id => assignment_id
 
     assert_response :redirect
     assert SignUpTopic.find(:all, :conditions => ["topic_name = 'mt_topic_test' AND micropayment = 2"])

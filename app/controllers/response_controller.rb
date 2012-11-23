@@ -176,7 +176,7 @@ class ResponseController < ApplicationController
     end
     return false
   end
-  
+
   def update
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
@@ -300,7 +300,7 @@ class ResponseController < ApplicationController
       render :action => 'response'
     end
    end
-  
+
   def create     
     @map = ResponseMap.find(params[:id])
     @res = 0

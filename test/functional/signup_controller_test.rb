@@ -24,16 +24,16 @@ class SignupControllerTest < ActionController::TestCase
   end
 
   test "should_be_able_to_signup_for_topic" do
-    get :delete_signup, {:id => sign_up_topics(:topic1).id,:assignment_id => assignments(:assignment2).id }
+    get :delete_signup, {:id => sign_up_topics(:Topic1).id,:assignment_id => assignments(:assignment_project1).id }
     assert_response :redirect
-    get :signup, {:id => sign_up_topics(:topic1).id,:assignment_id => assignments(:assignment2).id }
-    assert_equal(sign_up_topics(:topic1).id, participants(:par4).topic_id)
-    assert_redirected_to :action => "signup_topics", :id =>  assignments(:assignment2).id
+    get :signup, {:id => sign_up_topics(:Topic1).id,:assignment_id => assignments(:assignment_project1).id }
+    assert_equal(sign_up_topics(:Topic1).id, participants(:par17).topic_id)
+    assert_redirected_to :action => "signup_topics", :id =>  assignments(:assignment_project1).id
   end
 
   test "should_be_able_to_drop_topic" do
-    get :delete_signup, {:id => sign_up_topics(:topic1).id,:assignment_id => assignments(:assignment2).id }
-    assert_redirected_to :action => "signup_topics", :id =>  assignments(:assignment2).id
+    get :delete_signup, {:id => sign_up_topics(:Topic1).id,:assignment_id => assignments(:assignment_project1).id }
+    assert_redirected_to :action => "signup_topics", :id =>  assignments(:assignment_project1).id
   end
 
 end

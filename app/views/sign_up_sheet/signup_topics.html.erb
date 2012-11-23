@@ -78,8 +78,13 @@
                   <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
                       <td align="center" bgcolor="lightgray"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
                       <% action_symbol_added = true %>
-                  <% elsif selected_topic.topic_id == topic.id and selected_topic.has_bid%>
-                      <td align="center" bgcolor="lightgray"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Delete Bid', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_bid', :id => topic.id, :assignment_id => params[:id] %></td>
+                  <% end %>
+              <% end %>
+          <% end %>
+          <% if !@bid_topics.nil? && @bid_topics.size != 0 %>
+              <% for bid_topic in @bid_topics %>
+                  <% if bid_topic.topic_id == topic.id%>
+                      <td align="center" bgcolor="yellow"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Delete Bid', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_bid', :id => bid_topic.id, :assignment_id => params[:id] %></td>
                       <% action_symbol_added = true %>
                   <% end %>
               <% end %>
@@ -87,7 +92,8 @@
           <% if action_symbol_added == false %>
               <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
               <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Bid', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'submit_bid', :id => topic.id, :assignment_id => params[:id] %></td>
-<% end %>
+          <% end %>
+
       <% end %>
       <td align="center">
       <% if !(participant = AssignmentParticipant.find_by_topic_id(topic.id)).nil? %>

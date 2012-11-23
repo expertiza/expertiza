@@ -40,18 +40,60 @@ class AssignmentControllerTest < ActionController::TestCase
     instructorid = Instructor.first.id
     courseid = Course.first.id
     # create a new assignment
-    assignment = Assignment.new( :name                => "2_valid_test",
+    assignment = Assignment.new( :name => "2_valid_test",
       :course_id           => 1,
       :directory_path      => "2_valid_test",
       :review_questionnaire_id    => questionnaire_id,
       :review_of_review_questionnaire_id => questionnaire_id,
       :author_feedback_questionnaire_id  => questionnaire_id,
       :instructor_id => instructorid,
-      :course_id => courseid
+      :course_id => courseid,
+      :wiki_type_id => 1
     )
+
     #p flash[:notice].to_s
     assert assignment.save
   end
+
+    # Test Case 1101-A
+  def test_copy
+    # copy an assignment
+
+    @assignment = Assignment.first
+    assignment_id = @assignment.id
+    assignment_name = @assignment.name
+    post :copy, :id => assignment_id
+    assert_response :redirect
+    assert Assignment.find( :all, :conditions => ['name = ?', "Copy of " + assignment_name] )
+    copied = Assignment.find( :first, :conditions => ['name = ?', "Copy of " + assignment_name] )
+    dir = copied.directory_path
+    assert Dir[dir].empty?
+  end
+
+# Test Case 1101B
+  def test_new_microtask
+    questionnaire_id = Questionnaire.first.id
+    instructorid = Instructor.first.id
+    courseid = Course.first.id
+    number_of_topics = SignUpTopic.count
+    # create a new assignment
+    post :create, :assignment => { :name => "mt_valid_test",
+      :course_id           => 1,
+      :directory_path      => "mt_valid_test",
+      :review_questionnaire_id    => questionnaire_id,
+      :review_of_review_questionnaire_id => questionnaire_id,
+      :author_feedback_questionnaire_id  => questionnaire_id,
+      :instructor_id => instructorid,
+      :course_id => courseid,
+      :wiki_type_id => 1,
+      :microtask => true  }
+
+    assert_response :redirect
+    assert Assignment.find(:all, :conditions => "name = 'mt_valid_test'")
+
+
+  end
+
 
   # Test Case 1102
   # edit an assignment, change should be
@@ -118,9 +160,3 @@ class AssignmentControllerTest < ActionController::TestCase
 
   end
 end
-
-
-
-
-
-

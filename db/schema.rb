@@ -53,6 +53,9 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer  "max_reviews_per_submission"
     t.integer  "review_topic_threshold",            :default => 0
     t.boolean  "availability_flag"
+    t.boolean  "copy_flag",                         :default => false
+    t.integer  "rounds_of_reviews",                 :default => 1
+    t.boolean  "microtask",                         :default => false
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -335,6 +338,10 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
   add_index "roles_permissions", ["permission_id"], :name => "fk_roles_permission_permission_id"
   add_index "roles_permissions", ["role_id"], :name => "fk_roles_permission_role_id"
 
+  create_table "schema_info", :id => false, :force => true do |t|
+    t.integer "version"
+  end
+
   create_table "score_caches", :force => true do |t|
     t.integer "reviewee_id", :default => 0,   :null => false
     t.float   "score",       :default => 0.0, :null => false
@@ -368,6 +375,7 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer "max_choosers",                   :null => false
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
+    t.integer "micropayment",                   :default => 0
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"

@@ -215,7 +215,7 @@ class SignUpSheetController < ApplicationController
     @slots_filled = SignUpTopic.find_slots_filled(params[:id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
-
+    @show_bid_actions = false
 
     #find whether assignment is team assignment
     assignment = Assignment.find(params[:id])
@@ -239,11 +239,9 @@ class SignUpSheetController < ApplicationController
       end
 
       if assignment.is_lottery?
+        @show_actions = false
+        @show_bid_actions = true
         @bid_topics = Bid.find_all_by_team_id(users_team[0].t_id)
-        #puts "#{@bid_topics.size} bid topics for team #{params[:team_id]}"
-        #@bid_topics.each do |b|
-          #puts "bid #{b.id} on topic #{SignUpTopic.find(b.topic_id).topic_name}"
-        #end
       end
     else
       @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)

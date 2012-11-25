@@ -11,6 +11,8 @@
     <th width="5%">Waitlist</th>
     <% if @show_actions %>
         <th width="5%">Action</th>
+    <% end %>
+    <% if @show_bid_actions %>
         <th width="5%">Bid</th>
     <% end %>
     <th width="5%">Advertisement(s)</th>
@@ -34,7 +36,7 @@
       <% end %>
   <% end %>
 
-  <br/>
+  <br/><br/>
 
   <% i=1 %>
   <% for topic in @sign_up_topics %>
@@ -81,6 +83,14 @@
                   <% end %>
               <% end %>
           <% end %>
+
+          <% if action_symbol_added == false %>
+              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
+          <% end %>
+      <% end %>
+      <% if @show_bid_actions %>
+          <% action_symbol_added = false %>
+
           <% if !@bid_topics.nil? && @bid_topics.size != 0 %>
               <% for bid_topic in @bid_topics %>
                   <% if bid_topic.topic_id == topic.id%>
@@ -90,11 +100,10 @@
               <% end %>
           <% end %>
           <% if action_symbol_added == false %>
-              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
               <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Bid', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'submit_bid', :id => topic.id, :assignment_id => params[:id] %></td>
           <% end %>
-
       <% end %>
+
       <td align="center">
       <% if !(participant = AssignmentParticipant.find_by_topic_id(topic.id)).nil? %>
           <% if Team.find(participant.team.id).advertise_for_partner? %>

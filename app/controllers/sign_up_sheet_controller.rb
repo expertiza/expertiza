@@ -682,18 +682,36 @@ class SignUpSheetController < ApplicationController
     topic_id = params[:id]
     assignment_id = params[:assignment_id]
 
-    if Bid.count(:all, :conditions => {:team_id => team_id}) >= 3
-      flash[:notice] = "Your team has bid the maximum amount of bids"
+    #check whether the user already has a team for this assignment
+
+    if team.size == 0
+      #if team is not yet created, create new team.
+      team = create_team(assignment_id)
+      user = User.find(session[:user].id)
+      teamuser = create_team_users(user, team.id)
+      team_signup = otherConfirmedTopicforUser(assignment_id, team.id)
     else
-      puts "team id is #{team_id} and topic id is #{topic_id} on assignment id #{assignment_id}"
-      @bid = Bid.find_by_team_id_and_topic_id(team_id, topic_id)
-      if @bid.nil?
-        @bid = Bid.new(:team_id => team_id, :topic_id => topic_id)
-        if @bid.save!
-          puts "new bid #{@bid.id}"
-        end
+      team_signup = otherConfirmedTopicforUser(assignment_id, team_id)
+    end
+
+    team_waitlist = team_signup.map(&:is_waitlisted)
+    team_signup_ids = team_signup.map(&:topic_id)
+
+    if !team_signup.nil? && team_waitlist.include?(false)
+      flash[:notice] = "Your team has already signed up for a topic."
+    else
+      if Bid.count(:all, :conditions => {:team_id => team_id}) >= 3
+        flash[:notice] = "Your team has bid the maximum amount of bids"
       else
-        flash[:notice] = "Your team has already bid for topic #{SignUpTopic.find(topic_id).topic_name}"
+        @bid = Bid.find_by_team_id_and_topic_id(team_id, topic_id)
+        if @bid.nil?
+          @bid = Bid.new(:team_id => team_id, :topic_id => topic_id)
+          if @bid.save!
+            puts "new bid #{@bid.id}"
+          end
+        else
+          flash[:notice] = "Your team has already bid for topic #{SignUpTopic.find(topic_id).topic_name}"
+        end
       end
     end
 

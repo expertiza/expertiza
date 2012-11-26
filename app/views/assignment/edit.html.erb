@@ -23,6 +23,7 @@
         duedates = @assignment.due_dates
 		 
         duedates.sort! {|a,b| a.due_at <=> b.due_at}
+
 		for @due_date in duedates %>
 	        <% heading = @due_date.deadline_type.name.titleize + " deadline" %>
 			<tr>

@@ -8,6 +8,13 @@ class LatePoliciesAddColumns < ActiveRecord::Migration
     add_column :late_policies, :instructor_id, :integer, :null => false
     add_column :late_policies, :policy_name, :string, :null => false
 
+    index = 1
+    LatePolicy.find(:all).each do |f|
+      f.update_attribute :instructor_id, 2
+      f.update_attribute :policy_name, 'Default Policy ' + index.to_s
+      index += 1
+    end
+
     execute "ALTER TABLE late_policies ADD CONSTRAINT `fk_instructor_id` FOREIGN KEY (instructor_id) REFERENCES users(id);"
 
     remove_index "late_policies", :column => "penalty_period_in_minutes"

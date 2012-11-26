@@ -39,7 +39,7 @@ class AssignmentParticipant < Participant
   # all the participants in this assignment reviewed by this person
   def get_reviewees
     reviewees = []
-    if self.assignment.team_assignment == true
+    if self.assignment.team_assignment == true 
       rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'TeamReviewResponseMap'"])
       rmaps.each do |rm|
         reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants)
@@ -56,7 +56,7 @@ class AssignmentParticipant < Participant
   # all the participants in this assignment who have reviewed this person
   def get_reviewers
     reviewers = []
-    if self.assignment.team_assignment == true
+    if self.assignment.team_assignment == true && self.team
       rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
     else
       rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])      
@@ -67,12 +67,17 @@ class AssignmentParticipant < Participant
     return reviewers  
   end  
   
+  # Cycle data structure
+  # Each edge of the cycle stores a participant and the score given by to the participant by the reviewer.
+  # Consider a 3 node cycle: A --> B --> C --> A (A reviewed B; B reviewed C and C reviewed A)
+  # For the above cycle, the data structure would be: [[A, SCA], [B, SAB], [C, SCB]], where SCA is the score given by C to A.
+ 
   def get_two_node_cycles
     cycles = []
     self.get_reviewers.each do |ap|
-      if ap.get_reviewers.include?(self)
-        s01 = self.get_reviews_by_reviewer(ap).get_total_score
-        s10 = ap.get_reviews_by_reviewer(self).get_total_score
+      if ap.get_reviewers.include?(self) 
+        self.get_reviews_by_reviewer(ap).nil? ? next : s01 = self.get_reviews_by_reviewer(ap).get_total_score
+        ap.get_reviews_by_reviewer(self).nil? ? next : s10 = ap.get_reviews_by_reviewer(self).get_total_score
         cycles.push([[self, s01], [ap, s10]])
       end
     end
@@ -83,10 +88,10 @@ class AssignmentParticipant < Participant
     cycles = []
     self.get_reviewers.each do |ap1|
       ap1.get_reviewers.each do |ap2|
-        if ap2.get_reviewers.include?(self)
-          s01 = self.get_reviews_by_reviewer(ap1).get_total_score   
-          s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score   
-          s20 = ap2.get_reviews_by_reviewer(self).get_total_score   
+        if ap2.get_reviewers.include?(self)  
+          self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score   
+          ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score   
+          ap2.get_reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score   
           cycles.push([[self, s01], [ap1, s12], [ap2, s20]])
         end
       end
@@ -99,11 +104,11 @@ class AssignmentParticipant < Participant
     self.get_reviewers.each do |ap1|
       ap1.get_reviewers.each do |ap2|
         ap2.get_reviewers.each do |ap3|
-          if ap3.get_reviewers.include?(self)
-            s01 = self.get_reviews_by_reviewer(ap1).get_total_score   
-            s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score   
-            s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score  
-            s30 = ap3.get_reviews_by_reviewer(self).get_total_score   
+          if ap3.get_reviewers.include?(self)  
+            self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score   
+            ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score   
+            ap2.get_reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score  
+            ap3.get_reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score   
             cycles.push([[self, s01], [ap1, s12], [ap2, s23], [ap3, s30]])
           end 
         end

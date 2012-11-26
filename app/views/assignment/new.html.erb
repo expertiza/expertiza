@@ -7,6 +7,8 @@
   <%= render :partial => 'review_strategy'  %>
   <hr/>
   <%= render :partial => 'due_dates' %>
+  <%= render :partial => 'late_policy' %>
+    <br/>
   <% if @course != nil %>
   	<%= hidden_field_tag('assignment[course_id]', @course.id) %>
   <% else %>

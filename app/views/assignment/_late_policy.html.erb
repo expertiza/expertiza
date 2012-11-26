@@ -9,14 +9,16 @@
     <td><label for="penalty_flag">Apply Penalty Policy:</label></td>
     <td><%= check_box 'assignment', 'calculate_penalty', {}, true, false %></td>
     <td>
+      <% selected = @assignment.late_policy_id %>
       <select name="assignment[late_policy_id]">
-        <option value="-1">--None--</option>
+        <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
         <% LatePolicy.find(:all, :conditions => ['instructor_id = ?', user_id], :order => "times_used").each{| late_policy | %>
-            <option value="<%=late_policy.id%>">
+            <option value="<%=late_policy.id%>" <% if selected != nil && selected == late_policy.id %>selected="yes"<%end%>>
                     <%=late_policy.policy_name %>
             </option>
         <% } %>
       </select>
     </td>
+    <td><%= link_to 'New late policy', :controller => 'late_policies', :action => 'new' %></td>
   </tr>
 </table>

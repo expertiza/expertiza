@@ -106,7 +106,7 @@ class AssignmentController < ApplicationController
     set_requirement
     check_flag = @assignment.availability_flag
 
-    late_policy_set = set_late_policy()
+    late_policy_set = set_late_policy(params)
 
     if(check_flag == true && params[:submit_deadline].nil? || !late_policy_set)
       if(check_flag == true && params[:submit_deadline].nil?)
@@ -340,54 +340,51 @@ class AssignmentController < ApplicationController
 
     set_requirement
 
-    late_policy_set = set_late_policy()
+    late_policy_set = set_late_policy(params)
 
     if(!late_policy_set)
       flash[:error] = "Please select a valid late policy!!"
-      @wiki_types = WikiType.find(:all)
-      get_limits_and_weights
-      @private = params[:private] == true
-      render :action => 'new'
-    end
-
-    # The update call below updates only the assignment table. The due dates must be updated separately.
-    if @assignment.update_attributes(params[:assignment])     
+      prepare_to_edit
+      @assignment.calculate_penalty = true
+      render :action => 'edit'
+    elsif @assignment.update_attributes(params[:assignment])
+      # The update call below updates only the assignment table. The due dates must be updated separately.
       if params[:questionnaires] and params[:limits] and params[:weights]
-        set_questionnaires
-        set_limits_and_weights
+          set_questionnaires
+          set_limits_and_weights
       end
 
       begin
-        newpath = @assignment.get_path        
+          newpath = @assignment.get_path
       rescue
-        newpath = nil
+          newpath = nil
       end
       if oldpath != nil and newpath != nil
-        FileHelper.update_file_location(oldpath,newpath)
+          FileHelper.update_file_location(oldpath,newpath)
       end
       
       begin
-        # Iterate over due_dates, from due_date[0] to the maximum due_date
-        if params[:due_date]
-          for due_date_key in params[:due_date].keys
-            due_date_temp = DueDate.find(due_date_key)
-            due_date_temp.update_attributes(params[:due_date][due_date_key])     
-            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+          # Iterate over due_dates, from due_date[0] to the maximum due_date
+          if params[:due_date]
+            for due_date_key in params[:due_date].keys
+              due_date_temp = DueDate.find(due_date_key)
+              due_date_temp.update_attributes(params[:due_date][due_date_key])
+              raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+            end
           end
-        end
      
-        flash[:notice] = 'Assignment was successfully updated.'
-        redirect_to :action => 'show', :id => @assignment                  
+          flash[:notice] = 'Assignment was successfully updated.'
+          redirect_to :action => 'show', :id => @assignment
      
       rescue
-        flash[:error] = $!
-        prepare_to_edit
-        render :action => 'edit', :id => @assignment
+          flash[:error] = $!
+          prepare_to_edit
+          render :action => 'edit', :id => @assignment
       end
     else # Simply refresh the page
-      @wiki_types = WikiType.find(:all)
-      render :action => 'edit'
-    end    
+        @wiki_types = WikiType.find(:all)
+        render :action => 'edit'
+    end
   end
   
   def show
@@ -445,16 +442,17 @@ class AssignmentController < ApplicationController
   end
 
   :private
-  def set_late_policy
+  def set_late_policy(params)
     late_policy_set = true
-    if(@assignment.calculate_penalty)
-      if(@assignment.late_policy_id < 0)
+    if(params[:assignment][:calculate_penalty] == "true")
+      if(params[:assignment][:late_policy_id ].to_i == 0)
         late_policy_set = false
       end
     end
 
-    if(@assignment.late_policy_id < 0)
+    if(params[:assignment][:late_policy_id].to_i == 0)
       @assignment.late_policy_id = nil
+      params[:assignment][:late_policy_id ] = nil
     end
     return late_policy_set
   end

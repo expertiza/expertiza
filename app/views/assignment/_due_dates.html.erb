@@ -141,25 +141,6 @@
     </div>
 <br/>
 
-<table>
-  <tr>
-    <td><label for="penalty_flag">Apply Penalty Policy:</label></td>
-    <td><%= check_box 'assignment', 'calculate_penalty', {}, true, false %></td>
-    <td>
-      <select name="assignment[late_policy_id]">
-        <option value="-1">--None--</option>
-        <% LatePolicy.find(:all, :conditions => ['instructor_id = ?', user_id], :order => "times_used").each{| late_policy | %>
-            <option value="<%=late_policy.id%>">
-                    <%=late_policy.policy_name %>
-            </option>
-        <% } %>
-      </select>
-    </td>
-  </tr>
-</table>
-
-<%= render :partial => 'late_policy' %>
-
 <div id="days_between_chapters" style="position:relative">
   <label>Number of {weeks, days} between submission of successive chapters:</label>
   <input type="text" id="weeks" name ="weeks" maxlength="2" size="3"/> week(s) &nbsp;

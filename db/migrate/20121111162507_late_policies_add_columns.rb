@@ -10,7 +10,7 @@ class LatePoliciesAddColumns < ActiveRecord::Migration
 
     execute "ALTER TABLE late_policies ADD CONSTRAINT `fk_instructor_id` FOREIGN KEY (instructor_id) REFERENCES users(id);"
 
-    remove_index "late_policies"
+    remove_index "late_policies", :column => "penalty_period_in_minutes"
 
     remove_column :late_policies, :expressed_as_percentage
     remove_column :late_policies, :penalty_period_in_minutes

@@ -58,6 +58,7 @@ class LotteryController < ApplicationController
         team = current_set.sample
         merge_teams(winning_team, team)
         current_set -= team.to_a
+        remaining_spots -= key
       end
     end
   end

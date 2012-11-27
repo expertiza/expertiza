@@ -9,9 +9,44 @@ class LotteryController < ApplicationController
     # Acquire the assignment from the passed parameter
     # TODO: Add error handling if the passed ID is blank
     assignment = Assignment.find(params[:id]) unless params[:id].blank?
+    max_team_size = assignment.team_count
+    allow_multi_topic = false
 
-    assignment.sign_up_topics.each do |topic|
-      choose_winner_for_topic(topic, assignment.team_count) if topic.bids.size > 0
+    if allow_multi_topic
+      # Since this is multiple teams per topic, we need to loop on the topics per assignment and then ensure the
+      # topic has topic.max_choosers # of teams assigned
+      assignment.sign_up_topics.each do |topic|
+        if topic.bids.size > 0 #If no bids for the topic, we can skip processing for this topic
+          #Step 1, get the teams already assigned to the topic and iterate over each team to see if the team is full
+          assigned_teams = get_teams_for_topic(topic)
+          assigned_teams.each do |team|
+            if current_team.teams_users.size < max_team_size
+              fill_team(current_team, topic.bids, max_team_size)
+            end
+          end
+          #Step 2, choose a winner for any remaining teams that have bids
+          if topic.bids.size > 0  #Added this check here to make sure that we still have bids for the topic after filling teams
+            remaining_slots = topic.max_choosers - assigned_teams.size
+            remaining_slots.times do
+              choose_winner_for_topic(topic, max_team_size)
+            end
+          end
+        end
+      end
+    else #Original implementation that works (mostly) this requires only a single team per topic
+      assignment.sign_up_topics.each do |topic|
+        # Decide if we need to assign a team to a topic - Criteria, no team assigned & # of bids > 0
+        current_team = TeamsUser.find_by_user_id(Participant.find_by_topic_id(topic.id).user_id).team
+        if topic.bids.size > 0
+          if topic.slotAvailable?
+            choose_winner_for_topic(topic, max_team_size)
+            # If not, check to see if the team is full.  Fill if not, otherwise proceed to the next assignment
+          elsif current_team.teams_users.size < max_team_size
+            #Assumption here is that if a team has been assigned a topic they no longer have bids
+            fill_team(current_team, topic.bids, max_team_size)
+          end
+        end
+      end
     end
 
     # hillClimber (assignment)
@@ -24,6 +59,19 @@ class LotteryController < ApplicationController
     assignment.save
   end
 
+  def get_teams_for_topic(topic)
+    # This could perhaps be put in a different controller, in the interest of time I'm keeping it here
+    # First, we need to gather all of the Participants for a topic
+    # Once we have this, we can pull the teams off of each individual and build an array of teams to return
+    teams_to_return = Array.new
+    all_participants = Participant.find_all_by_topic_id(topic.id)
+    all_participants.each do |participant|
+      teams_to_return += TeamsUser.find_by_user_id(participant.user_id).team
+    end
+    #Return only the unique team elements
+    teams_to_return.uniq
+  end
+
   def choose_winner_for_topic(topic, max_team_size)
     puts "In random selection method"
     weighted_bids = make_weighted_bid_array(topic)
@@ -32,11 +80,15 @@ class LotteryController < ApplicationController
     fill_team(winning_bid.team, remaining_bids, max_team_size) if winning_bid.team.teams_users.size < max_team_size
 
     # Since we have a winner, assign this topic to that team
-    puts "Selected a winning bid: " +  winning_bid.inspect + "(#{winning_bid.team.name})"
+    puts "Selected a winning bid: " + winning_bid.inspect + "(#{winning_bid.team.name})"
     assign_team_topic (winning_bid)
 
     # Find and delete all the bids for this team or this topic
     Bid.delete_all("team_id=#{winning_bid.team.id} OR topic_id=#{winning_bid.topic.id}")
+
+    puts "Daniel's debug section for figuring out how all this is connected"
+    #puts Participant.find_by_topic_id(topic.id).inspect
+    #puts TeamsUser.find_by_user_id(Participant.find_by_topic_id(topic.id).user_id).team.id
   end
 
   def fill_team (winning_team, team_bids, max_team_size)

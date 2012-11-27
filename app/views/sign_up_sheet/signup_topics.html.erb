@@ -72,7 +72,7 @@
 
       <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
       <% if @show_actions %>
-          <% action_symbol_added = false %>
+          <% action_symbol_added = @action_symbol_added %>
           <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
               <% for selected_topic in @selected_topics %>
                   <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted%>
@@ -81,6 +81,8 @@
                   <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
                       <td align="center" bgcolor="lightgray"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
                       <% action_symbol_added = true %>
+                  <% else %>
+                      <td align="center"></td>
                   <% end %>
               <% end %>
           <% end %>
@@ -91,12 +93,13 @@
       <% end %>
       <% if @show_bid_actions %>
           <% action_symbol_added = false %>
-
           <% if !@bid_topics.nil? && @bid_topics.size != 0 %>
               <% for bid_topic in @bid_topics %>
                   <% if bid_topic.topic_id == topic.id %>
                       <td align="center" bgcolor="yellow"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Delete Bid', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_bid', :id => bid_topic.id, :assignment_id => params[:id] %></td>
                       <% action_symbol_added = true %>
+                  <% else %>
+                      <td align="center"></td>
                   <% end %>
               <% end %>
           <% end %>

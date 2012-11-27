@@ -36,6 +36,7 @@ class LatePoliciesController < ApplicationController
   # GET /late_policies/1/edit
   def edit
     @penalty_policy = LatePolicy.find(params[:id])
+
   end
 
   # POST /late_policies
@@ -50,14 +51,20 @@ class LatePoliciesController < ApplicationController
       user_id = session[:user].id
     end
 
-    if(!is_numeric?(params[:late_policy][:penalty_per_unit]))
-      flash[:error] = "Penalty points per unit should be a numeric value"
+    #if(!is_numeric?(params[:late_policy][:penalty_per_unit]))
+    #  flash[:error] = "Penalty points per unit should be a numeric value"
+    #  is_number = false
+    #elsif (params[:late_policy][:penalty_per_unit].to_i < 0)
+    #  flash[:error] = "Penalty points per unit cannot be negative"
+    #  is_number = false
+    #elsif(!is_numeric?(params[:late_policy][:max_penalty]))
+    #    flash[:error] = "Maximum penalty points should be a numeric value"
+    #    is_number = false
+    #end
+
+    if (params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i)
+      flash[:error] = "Max penalty cannot be less than penalty per unit."
       is_number = false
-    else
-      if(!is_numeric?(params[:late_policy][:max_penalty]))
-        flash[:error] = "Maximum penalty points should be a numeric value"
-        is_number = false
-      end
     end
 
     if (is_number)
@@ -81,14 +88,16 @@ class LatePoliciesController < ApplicationController
   # PUT /late_policies/1.xml
   def update
     @penalty_policy = LatePolicy.find(params[:id])
+
     begin
-      @penalty_policy.update_attributes(params[:late_policy])
-      flash[:notice] = "Late policy was successfully updated."
-      redirect_to :action => 'index'
-    rescue
-      flash[:error] = "The following error occurred while updating the penalty policy: "+$!
-      redirect_to :action => 'edit'
-    end
+        @penalty_policy.update_attributes(params[:late_policy])
+        flash[:notice] = "Late policy was successfully updated."
+        redirect_to :action => 'index'
+      rescue
+        flash[:error] = "The following error occurred while updating the penalty policy: "+$!
+        redirect_to :action => 'edit'
+      end
+
   end
 
   # DELETE /late_policies/1

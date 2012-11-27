@@ -9,4 +9,8 @@ class LatePolicy < ActiveRecord::Base
   validates_presence_of :max_penalty
   validates_presence_of :penalty_per_unit
 
+  validates_numericality_of :max_penalty, :greater_than => 0
+  validates_numericality_of :max_penalty, :less_than => 50
+  validates_numericality_of :penalty_per_unit, :greater_than => 0
+
 end

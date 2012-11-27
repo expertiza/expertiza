@@ -11,8 +11,9 @@ class LotteryController < ApplicationController
     assignment = Assignment.find(params[:id]) unless params[:id].blank?
 
     assignment.sign_up_topics.each do |topic|
-      choose_winner_for_topic(topic) if topic.bids.size > 0
+      choose_winner_for_topic(topic, assignment.team_count) if topic.bids.size > 0
     end
+
     # hillClimber (assignment)
 
     # TODO: Alert if we have a situation where # of topics < # of teams, ideally provide the teams that were not assigned topics.
@@ -23,10 +24,12 @@ class LotteryController < ApplicationController
     assignment.save
   end
 
-  def choose_winner_for_topic(topic)
+  def choose_winner_for_topic(topic, max_team_size)
     puts "In random selection method"
     weighted_bids = make_weighted_bid_array(topic)
     winning_bid = weighted_bids.sample
+    remaining_bids = topic.bids.to_a - winning_bid.to_a
+    fill_team(winning_bid.team, remaining_bids, max_team_size) if winning_bid.team.teams_users.size < max_team_size
 
     # Since we have a winner, assign this topic to that team
     puts "Selected a winning bid: " +  winning_bid.inspect + "(#{winning_bid.team.name})"
@@ -34,6 +37,35 @@ class LotteryController < ApplicationController
 
     # Find and delete all the bids for this team or this topic
     Bid.delete_all("team_id=#{winning_bid.team.id} OR topic_id=#{winning_bid.topic.id}")
+  end
+
+  def fill_team (winning_team, team_bids, max_team_size)
+    # Build up an object to hold the remaining teams keyed off of the team size
+    remaining_spots = max_team_size - winning_team.teams_users.size
+
+    teams_to_add = Hash.new []
+    team_bids.each do |bid|
+      key = bid.team.teams_users.size
+      teams_to_add[key] += bid.team.to_a if key <= remaining_spots
+    end
+
+    # Start iterating through starting at the largest team size that can fit
+    # Continue adding teams of that size until we can't fit any more of that size
+    # Loop through the keys adding all possible teams
+    teams_to_add.keys.sort.reverse.each do |key|
+      current_set = teams_to_add[key].to_a
+      while (remaining_spots - key >= 0 && current_set.size > 0)
+        team = current_set.sample
+        merge_teams(winning_team, team)
+        current_set -= team.to_a
+      end
+    end
+  end
+
+  def merge_teams(team_a, team_b)
+    # This method is intended to take team B and merge its members into team A
+    team_b.copy_members(team_a)
+    team_b.delete
   end
 
   def make_weighted_bid_array(topic)

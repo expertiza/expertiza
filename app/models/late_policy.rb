@@ -6,5 +6,7 @@ class LatePolicy < ActiveRecord::Base
 
   validates_presence_of :policy_name
   validates_presence_of :instructor_id
+  validates_presence_of :max_penalty
+  validates_presence_of :penalty_per_unit
 
 end

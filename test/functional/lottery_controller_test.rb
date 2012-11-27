@@ -60,7 +60,7 @@ class LotteryControllerTest < ActionController::TestCase
     assert_equal 2, Bid.find_all_by_topic_id(topic.id).size, "there should be one bid for the topic"
 
     # Assign the topic to a random team
-    @controller.choose_winner_for_topic(topic)
+    @controller.choose_winner_for_topic(topic, 5)
 
     # Make sure that one team was given the topic and the other team wasn't
     winning_team_id = nil
@@ -81,5 +81,20 @@ class LotteryControllerTest < ActionController::TestCase
     # Make sure all bids were deleted for the winning team and for the topic
     assert_equal 0, Bid.find(:all, :conditions => "team_id=#{winning_team_id} OR topic_id=#{topic.id}").size,
                  "there should be no bids for the topic"
+  end
+
+  test "merge team A with team B" do
+    team1 = teams(:lottery_team1)
+    team1_size = team1.users.size
+    team2 = teams(:lottery_team2)
+    team2_size = team2.users.size
+
+    @controller.merge_teams(team1, team2)
+
+    assert_equal 0, team2.users.size,
+                 "The second team should no longer have users"
+
+    assert_equal team1.users.size, (team2_size+team1_size),
+                 "The users of the second team should have been added to the first team"
   end
 end

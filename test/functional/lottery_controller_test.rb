@@ -53,6 +53,7 @@ class LotteryControllerTest < ActionController::TestCase
     team2 = teams(:lottery_team2)
     team2_student = team2.users[0]
     topic = sign_up_topics(:LotteryTopic1)
+    assignment = assignments(:lottery_assignment)
 
     # Make sure that no team currently has the topic
     assert_nil Participant.find_by_topic_id(topic.id), "there shouldn't be any participants with the topic"
@@ -60,7 +61,7 @@ class LotteryControllerTest < ActionController::TestCase
     assert_equal 2, Bid.find_all_by_topic_id(topic.id).size, "there should be one bid for the topic"
 
     # Assign the topic to a random team
-    @controller.choose_winner_for_topic(topic, 5)
+    @controller.choose_winner_for_topic(topic, assignment.team_count)
 
     # Make sure that one team was given the topic and the other team wasn't
     winning_team_id = nil

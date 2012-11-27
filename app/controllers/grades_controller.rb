@@ -2,7 +2,7 @@ class GradesController < ApplicationController
   helper :file
   helper :submitted_content
   helper :penalty
-
+   include PenaltyHelper
   #the view grading report provides the instructor with an overall view of all the grades for
   #an assignment. It lists all participants of an assignment and all the reviews they recieved.
   #It also gives a final score which is an average of all the reviews and greatest difference
@@ -50,7 +50,10 @@ class GradesController < ApplicationController
       end
     end
 
-
+    #@penalties = calculate_penalty(@participant.id)
+    penalty_attr = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => 10}
+    #@pencalc = PenaltiesCalculated.new()
+    CalculatedPenalty.create(penalty_attr)
   end
 
   def edit

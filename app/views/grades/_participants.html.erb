@@ -14,7 +14,7 @@
                 }
     %>
     <%
-        penalties = calculate_penalty(participant.id)
+        #penalties = calculate_penalty(participant.id)
         total_penalty = (penalties[:submission]+penalties[:review]+penalties[:meta_review])
         index += 1
         if(max_penalty < total_penalty)

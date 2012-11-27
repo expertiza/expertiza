@@ -19,4 +19,3 @@ class QuestionaireTest < ActiveSupport::TestCase
     end
   end
 end
-

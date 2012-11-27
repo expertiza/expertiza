@@ -2,15 +2,15 @@ module PenaltyHelper
 
   def calculate_penalty(participant_id)
 
-    @max_penalty_for_no_submission = 3
-
     @submission_deadline_type_id = 1
     @review_deadline_type_id = 2
     @meta_review_deadline_type_id = 5
 
-    @penalty_per_unit = 0.01
+
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = @participant.assignment
+    @penalty_per_unit = LatePolicy.find_by_id(@assignment.late_policy_id).penalty_per_unit
+    @max_penalty_for_no_submission = LatePolicy.find_by_id(@assignment.late_policy_id).max_penalty
 
     #set_penalty_policy()
 

@@ -231,6 +231,13 @@ class SignUpSheetController < ApplicationController
     if assignment.team_assignment == true
       users_team = SignedUpUser.find_team_users(params[:id], (session[:user].id))
 
+      if (users_team[0] == nil)
+        flash[:notice] = "You must be in a team to bid for topics, even if it is just yourself."
+        @show_actions = false
+        @show_bid_actions = false
+        return
+      end
+
       if users_team.size == 0
         @selected_topics = nil
       else

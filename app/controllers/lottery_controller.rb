@@ -36,14 +36,14 @@ class LotteryController < ApplicationController
     else #Original implementation that works (mostly) this requires only a single team per topic
       assignment.sign_up_topics.each do |topic|
         # Decide if we need to assign a team to a topic - Criteria, no team assigned & # of bids > 0
-        current_team = TeamsUser.find_by_user_id(Participant.find_by_topic_id(topic.id).user_id).team
         if topic.bids.size > 0
           if topic.slotAvailable?
             choose_winner_for_topic(topic, max_team_size)
             # If not, check to see if the team is full.  Fill if not, otherwise proceed to the next assignment
-          elsif current_team.teams_users.size < max_team_size
+          else
+            current_team = TeamsUser.find_by_user_id(Participant.find_by_topic_id(topic.id).user_id).team
             #Assumption here is that if a team has been assigned a topic they no longer have bids
-            fill_team(current_team, topic.bids, max_team_size)
+            fill_team(current_team, topic.bids, max_team_size) if current_team.teams_users.size < max_team_size
           end
         end
       end
@@ -57,6 +57,8 @@ class LotteryController < ApplicationController
     # Turn lottery topic selection off for this assignment now that the lottery has run
     assignment.is_lottery = false
     assignment.save
+
+    redirect_to session[:return_to] || request.referer
   end
 
   def get_teams_for_topic(topic)

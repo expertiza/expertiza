@@ -215,7 +215,6 @@ class SignUpSheetController < ApplicationController
     @slots_filled = SignUpTopic.find_slots_filled(params[:id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
-    @action_symbol_added = false
     @show_bid_actions = false
 
     #find whether assignment is team assignment
@@ -253,7 +252,6 @@ class SignUpSheetController < ApplicationController
       else
         @show_actions = true
         @show_bid_actions = false
-        @action_symbol_added = true
       end
     else
       @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)

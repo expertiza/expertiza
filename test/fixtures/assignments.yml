@@ -171,5 +171,5 @@ lottery_assignment:
   num_reviewers: <%= 3 %>
   spec_location:
   team_assignment: <%= 1 %>
-  team_count: 10
+  team_count: 2
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>

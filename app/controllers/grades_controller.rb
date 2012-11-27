@@ -50,9 +50,15 @@ class GradesController < ApplicationController
       end
     end
 
-    #@penalties = calculate_penalty(@participant.id)
-    penalty_attr = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => 10}
-    #@pencalc = PenaltiesCalculated.new()
+    @penalties = calculate_penalty(@participant.id)
+    @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+    penalty_attr = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => @penalties[:submission]}
+    CalculatedPenalty.create(penalty_attr)
+
+    penalty_attr = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => @penalties[:review]}
+    CalculatedPenalty.create(penalty_attr)
+
+    penalty_attr = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => @penalties[:meta_review]}
     CalculatedPenalty.create(penalty_attr)
   end
 

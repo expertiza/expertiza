@@ -20,7 +20,6 @@ class User < ActiveRecord::Base
   has_many :teams_users, :dependent => :destroy
   has_many :teams, :through => :teams_users
   has_many :late_policies
-  has_many :penalties_calculated
 
   validates_presence_of :name
   validates_presence_of :email, :message => "can't be blank; use anything@mailinator.com for test users"

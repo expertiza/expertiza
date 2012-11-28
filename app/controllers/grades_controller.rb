@@ -51,15 +51,20 @@ class GradesController < ApplicationController
     end
 
     @penalties = calculate_penalty(@participant.id)
-    @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
-    penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => @penalties[:submission]}
-    CalculatedPenalty.create(penalty_attr1)
+    if(@penalties[:submission] != 0 || @penalties[:review] != 0 || @penalties[:meta_review] != 0)
+      @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+      if @assignment.is_penalty_calculated == false
+        penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => @penalties[:submission]}
+        CalculatedPenalty.create(penalty_attr1)
 
-    penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => @penalties[:review]}
-    CalculatedPenalty.create(penalty_attr2)
+        penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => @penalties[:review]}
+        CalculatedPenalty.create(penalty_attr2)
 
-    penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => @penalties[:meta_review]}
-    CalculatedPenalty.create(penalty_attr3)
+        penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => @penalties[:meta_review]}
+        CalculatedPenalty.create(penalty_attr3)
+        @assignment.update_attribute(:is_penalty_calculated, true)
+      end
+    end
   end
 
   def edit

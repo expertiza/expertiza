@@ -1,5 +1,6 @@
 class LatePoliciesController < ApplicationController
-
+  helper :penalty
+  include PenaltyHelper
   # GET /late_policies
   # GET /late_policies.xml
   def index
@@ -90,7 +91,28 @@ class LatePoliciesController < ApplicationController
     @penalty_policy = LatePolicy.find(params[:id])
 
     begin
-        @penalty_policy.update_attributes(params[:late_policy])
+      @penalty_policy.update_attributes(params[:late_policy])
+      @penaltyObjs = CalculatedPenalty.all
+      @penaltyObjs.each do |pen|
+        @participant = AssignmentParticipant.find(pen.participant_id)
+        @assignment = @participant.assignment
+        if @assignment.late_policy_id == @penalty_policy.id
+          @penalties = calculate_penalty(pen.participant_id)
+          @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+          if pen.deadline_type_id.to_i == 1
+            penalty_attr1 = {:penalty_points => @penalties[:submission]}
+            pen.update_attribute(:penalty_points, @penalties[:submission])
+          elsif pen.deadline_type_id.to_i == 2
+            penalty_attr2 = {:penalty_points => @penalties[:review]}
+            pen.update_attribute(:penalty_points, @penalties[:review])
+          elsif pen.deadline_type_id.to_i == 5
+            penalty_attr3 = {:penalty_points => @penalties[:meta_review]}
+            pen.update_attribute(:penalty_points, @penalties[:meta_review])
+          end
+        end
+      end
+
+
         flash[:notice] = "Late policy was successfully updated."
         redirect_to :action => 'index'
       rescue

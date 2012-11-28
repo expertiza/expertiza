@@ -1,7 +1,9 @@
 class AssignmentController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
-  
+  helper :penalty
+  include PenaltyHelper
+
   def copy
     Assignment.record_timestamps = false
     #creating a copy of an assignment; along with the dates and submission directory too
@@ -342,13 +344,68 @@ class AssignmentController < ApplicationController
 
     late_policy_set = set_late_policy(params)
 
+    if @assignment.calculate_penalty == true && params[:assignment][:calculate_penalty] == "false"
+      # delete corresponding rows from Calculated_penalties
+      @penaltyObjs = CalculatedPenalty.all
+
+      @penaltyObjs.each do |pen|
+        @participant = Participant.find_by_id(pen.participant_id)
+        if @participant.parent_id == @assignment.id
+          #@penalties = calculate_penalty(pen.participant_id)
+          #@total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+          pen.delete
+        end
+
+      end
+      @assignment.update_attribute(:is_penalty_calculated, false)
+    elsif @assignment.calculate_penalty == false && params[:assignment][:calculate_penalty] == "true"
+      # add rows in calculated_penalties
+      participants = AssignmentParticipant.find_all_by_parent_id(@assignment.id)
+      participants.each do |p|
+        @penalties = calculate_penalty(p.id)
+        if(@penalties[:submission] != 0 || @penalties[:review] != 0 || @penalties[:meta_review] != 0)
+          @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+          penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => @penalties[:submission]}
+          CalculatedPenalty.create(penalty_attr1)
+
+          penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => @penalties[:review]}
+          CalculatedPenalty.create(penalty_attr2)
+
+          penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => @penalties[:meta_review]}
+          CalculatedPenalty.create(penalty_attr3)
+        end
+      end
+      @assignment.update_attribute(:is_penalty_calculated, true)
+    end
+
     if(!late_policy_set)
       flash[:error] = "Please select a valid late policy!!"
       prepare_to_edit
       @assignment.calculate_penalty = true
       render :action => 'edit'
     elsif @assignment.update_attributes(params[:assignment])
+
+      # Update the penalties in calculated_penalties table.
+      if @assignment.late_policy_id != params[:assignment][:late_policy_id]
+        @penaltyObjs = CalculatedPenalty.all
+
+        @penaltyObjs.each do |pen|
+          @participant = Participant.find_by_id(pen.participant_id)
+          if @participant.parent_id == @assignment.id
+            @penalties = calculate_penalty(pen.participant_id)
+            @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+            if pen.deadline_type_id.to_i == 1
+              pen.update_attribute(:penalty_points, @penalties[:submission])
+            elsif pen.deadline_type_id.to_i == 2
+              pen.update_attribute(:penalty_points, @penalties[:review])
+            elsif pen.deadline_type_id.to_i == 5
+              pen.update_attribute(:penalty_points, @penalties[:meta_review])
+            end
+          end
+        end
+      end
       # The update call below updates only the assignment table. The due dates must be updated separately.
+
       if params[:questionnaires] and params[:limits] and params[:weights]
           set_questionnaires
           set_limits_and_weights

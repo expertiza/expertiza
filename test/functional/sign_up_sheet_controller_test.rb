@@ -6,40 +6,28 @@ class SignUpSheetControllerTest < ActionController::TestCase
 
   def setup
     @controller = SignUpSheetController.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+    @student = users(:student1)
+    @request.session[:user] = @student
+
+    @team = teams(:team0)
+    @assignment = assignments(:assignment0)
+    @topic = sign_up_topics(:LotteryTopic1)
     #go to the topic view
-    @controller.signup_topics
+    post :sign_up_topics, {:id => @assignment.id}
+
   end
 
   test "submit valid bid" do
-    student = users(:student1)
-    team = teams(:team0)
-    assignment = assignments(:assignment0)
+    puts "Submit bid by current user #{@student.name}"
+    puts "on assignment #{@assignment.name}, #{@assignment.id}"
+    puts "for topic #{@topic.topic_name}, #{@topic.id}"
 
-    assert @controller.submit_bid, "submit_bid returned true"
-    #assert_equal Bid.find_by_team_id_and_topic_id(team.id, topic.id)
+    post :submit_bid, {:assignment_id => @assignment.id, :id => @topic.id }
 
-
+    #assert @controller.submit_bid, "submit_bid returned true"
+    assert_not_nil Bid.find_by_team_id_and_topic_id(@team.id, @topic.id)
   end
 
-  test "submit invalid bid" do
-
-  end
-
-  test "delete bid" do
-
-  end
-
-
-  # Called after every test method runs. Can be used to tear
-  # down fixture information.
-  def teardown
-    # Do nothing
-  end
-
-  # Fake test
-  def test_fail
-
-    # To change this template use File | Settings | File Templates.
-    fail("Not implemented")
-  end
 end

@@ -37,7 +37,7 @@ class LotteryController < ApplicationController
       assignment.sign_up_topics.each do |topic|
         # Decide if we need to assign a team to a topic - Criteria, no team assigned & # of bids > 0
         if topic.bids.size > 0
-          if topic.slotAvailable?
+          if slotAvailable?(topic.id)
             choose_winner_for_topic(topic, max_team_size)
             # If not, check to see if the team is full.  Fill if not, otherwise proceed to the next assignment
           else

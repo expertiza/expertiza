@@ -25,9 +25,22 @@ class SignUpSheetControllerTest < ActionController::TestCase
     puts "for topic #{@topic.topic_name}, #{@topic.id}"
 
     post :submit_bid, {:assignment_id => @assignment.id, :id => @topic.id }
-
-    #assert @controller.submit_bid, "submit_bid returned true"
     assert_not_nil Bid.find_by_team_id_and_topic_id(@team.id, @topic.id)
   end
 
+  test "delete my bid" do
+
+  end
+
+  test "delete a teammates bid" do
+
+  end
+
+  test "submit more than 3 bids" do
+
+  end
+
+  test "submit more than 3 bids as other teammate" do
+
+  end
 end

@@ -122,6 +122,9 @@ class AssignmentController < ApplicationController
         render :action => 'new'
       end
     elsif (@assignment.save)
+      # increment times_used for setting default policy while display. (in late_policies table)
+      @late_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+      @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
       set_questionnaires   
       set_limits_and_weights
 
@@ -345,6 +348,9 @@ class AssignmentController < ApplicationController
     late_policy_set = set_late_policy(params)
 
     if @assignment.calculate_penalty == true && params[:assignment][:calculate_penalty] == "false"
+      @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+      @late_policy.update_attribute(:times_used, @late_policy.times_used - 1)
+
       # delete corresponding rows from Calculated_penalties
       @penaltyObjs = CalculatedPenalty.all
 
@@ -360,6 +366,9 @@ class AssignmentController < ApplicationController
       @assignment.update_attribute(:is_penalty_calculated, false)
     elsif @assignment.calculate_penalty == false && params[:assignment][:calculate_penalty] == "true"
       # add rows in calculated_penalties
+      @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+      @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
+
       participants = AssignmentParticipant.find_all_by_parent_id(@assignment.id)
       participants.each do |p|
         @penalties = calculate_penalty(p.id)
@@ -377,6 +386,34 @@ class AssignmentController < ApplicationController
       end
       @assignment.update_attribute(:is_penalty_calculated, true)
     end
+    # Update the penalties in calculated_penalties table.
+    if @assignment.late_policy_id != params[:assignment][:late_policy_id]
+      #policy changed so we change the times used field for proper ordering of policies in the dropdown
+      @late_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+      if (@late_policy.times_used.to_i > 0)
+        @late_policy.update_attribute(:times_used, @late_policy.times_used - 1)
+      end
+
+      @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+      @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
+
+      @penaltyObjs = CalculatedPenalty.all
+
+      @penaltyObjs.each do |pen|
+        @participant = Participant.find_by_id(pen.participant_id)
+        if @participant.parent_id == @assignment.id
+          @penalties = calculate_penalty(pen.participant_id)
+          @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+          if pen.deadline_type_id.to_i == 1
+            pen.update_attribute(:penalty_points, @penalties[:submission])
+          elsif pen.deadline_type_id.to_i == 2
+            pen.update_attribute(:penalty_points, @penalties[:review])
+          elsif pen.deadline_type_id.to_i == 5
+            pen.update_attribute(:penalty_points, @penalties[:meta_review])
+          end
+        end
+      end
+    end
 
     if(!late_policy_set)
       flash[:error] = "Please select a valid late policy!!"
@@ -385,25 +422,6 @@ class AssignmentController < ApplicationController
       render :action => 'edit'
     elsif @assignment.update_attributes(params[:assignment])
 
-      # Update the penalties in calculated_penalties table.
-      if @assignment.late_policy_id != params[:assignment][:late_policy_id]
-        @penaltyObjs = CalculatedPenalty.all
-
-        @penaltyObjs.each do |pen|
-          @participant = Participant.find_by_id(pen.participant_id)
-          if @participant.parent_id == @assignment.id
-            @penalties = calculate_penalty(pen.participant_id)
-            @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
-            if pen.deadline_type_id.to_i == 1
-              pen.update_attribute(:penalty_points, @penalties[:submission])
-            elsif pen.deadline_type_id.to_i == 2
-              pen.update_attribute(:penalty_points, @penalties[:review])
-            elsif pen.deadline_type_id.to_i == 5
-              pen.update_attribute(:penalty_points, @penalties[:meta_review])
-            end
-          end
-        end
-      end
       # The update call below updates only the assignment table. The due dates must be updated separately.
 
       if params[:questionnaires] and params[:limits] and params[:weights]

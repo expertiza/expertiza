@@ -12,7 +12,7 @@
       <% selected = @assignment.late_policy_id %>
       <select name="assignment[late_policy_id]">
         <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
-        <% LatePolicy.find(:all, :conditions => ['instructor_id = ?', user_id], :order => "times_used").each{| late_policy | %>
+        <% LatePolicy.find(:all, :conditions => ['instructor_id = ?', user_id], :order => "times_used DESC").each{| late_policy | %>
             <option value="<%=late_policy.id%>" <% if selected != nil && selected == late_policy.id %>selected="yes"<%end%>>
                     <%=late_policy.policy_name %>
             </option>

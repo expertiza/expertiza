@@ -379,7 +379,7 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @map.notification_accepted = false
     @map.save
-    if(@map.assignment.id == 561) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
+    if(@map.assignment.id == 561 or @map.assignment.id == 559) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
       # puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
       #calling the automated metareviewer controller, which calls its corresponding model/view
       if(params[:save_options] == "WithMeta")

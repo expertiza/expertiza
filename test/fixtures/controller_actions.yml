@@ -328,7 +328,17 @@ controller_action_delete_signup:
   name: 'delete_signup' 
   permission_id: <%= Fixtures.identify(:permission_do_assignments) %> 
   url_to_use: ''
-controller_action_suggestion_create: 
+controller_action_submit_bid:
+  site_controller_id: <%= Fixtures.identify(:site_controller_sign_up_sheet) %>
+  name: 'submit_bid'
+  permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+  url_to_use: ''
+controller_action_delete_bid:
+  site_controller_id: <%= Fixtures.identify(:site_controller_sign_up_sheet) %>
+  name: 'delete_bid'
+  permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+  url_to_use: ''
+controller_action_suggestion_create:
   site_controller_id: <%= Fixtures.identify(:site_controller_suggestion) %> 
   name: 'create' 
   permission_id: <%= Fixtures.identify(:permission_do_assignments) %> 

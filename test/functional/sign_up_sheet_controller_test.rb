@@ -6,10 +6,18 @@ class SignUpSheetControllerTest < ActionController::TestCase
 
   def setup
     @controller = SignUpSheetController.new
+    #go to the topic view
+    @controller.signup_topics
   end
 
   test "submit valid bid" do
     student = users(:student1)
+    team = teams(:team0)
+    assignment = assignments(:assignment0)
+
+    assert @controller.submit_bid, "submit_bid returned true"
+    #assert_equal Bid.find_by_team_id_and_topic_id(team.id, topic.id)
+
 
   end
 

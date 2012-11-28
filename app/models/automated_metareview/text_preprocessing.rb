@@ -31,9 +31,20 @@ class TextPreprocessing
     subm_array = Array.new
     reviewee_id = ResponseMap.find(:first, :conditions => ["id = ?", map_id]).reviewee_id
     url = Participant.find(:first, :conditions => ["id = ?", reviewee_id]).submitted_hyperlinks
+    if(url.nil?)#in case of team assignments  
+      teams_users = TeamsUser.find(:all, :conditions => ["team_id = ?", reviewee_id])
+      teams_users.each{
+        |team_user|
+        url = Participant.find(:first, :conditions => ["user_id = ?", team_user.user_id]).submitted_hyperlinks
+        if(!url.nil?)#break out when you find the url
+          break
+        end
+      }
+    end
+    # puts "***url #{url} #{url.class}"  
     #fetching the url submitted by the reviewee
     url = url[url.rindex("http")..url.length-2] #use "rindex" to fetch last occurrence of the substring - useful if there are multiple urls
-    puts "***url #{url} #{url.class}"
+    puts "***url #{url} #{url.class}" 
     page = Nokogiri::HTML(open(url))
     #fetching the paragraph texts from the specified url
     if(page.css('p').count != 0)

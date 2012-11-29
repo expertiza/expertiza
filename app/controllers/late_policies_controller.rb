@@ -68,6 +68,12 @@ class LatePoliciesController < ApplicationController
       is_number = false
     end
 
+    @policy = LatePolicy.find_all_by_policy_name(params[:late_policy][:policy_name])
+    if(@policy != nil)
+      flash[:error] = "A policy with same name already exists"
+      is_number = false
+    end
+
     if (is_number)
       @late_policy = LatePolicy.new(params[:late_policy])
       @late_policy.instructor_id = user_id
@@ -88,6 +94,7 @@ class LatePoliciesController < ApplicationController
   # PUT /late_policies/1
   # PUT /late_policies/1.xml
   def update
+
     @penalty_policy = LatePolicy.find(params[:id])
 
     begin
@@ -118,7 +125,7 @@ class LatePoliciesController < ApplicationController
       rescue
         flash[:error] = "The following error occurred while updating the penalty policy: "+$!
         redirect_to :action => 'edit'
-      end
+    end
 
   end
 

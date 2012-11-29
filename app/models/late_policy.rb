@@ -13,4 +13,6 @@ class LatePolicy < ActiveRecord::Base
   validates_numericality_of :max_penalty, :less_than => 50
   validates_numericality_of :penalty_per_unit, :greater_than => 0
 
+  validates_format_of :policy_name, :with => /^[a-z0-9][a-z0-9'._-]+$/i
+
 end

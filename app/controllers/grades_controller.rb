@@ -16,6 +16,8 @@ class GradesController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     }
     @scores = @assignment.get_scores(@questions)
+
+    calculate_all_penalties(@assignment.id)
   end
 
   def view_my_scores
@@ -50,21 +52,8 @@ class GradesController < ApplicationController
       end
     end
 
-    @penalties = calculate_penalty(@participant.id)
-    if(@penalties[:submission] != 0 || @penalties[:review] != 0 || @penalties[:meta_review] != 0)
-      @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
-      if @assignment.is_penalty_calculated == false
-        penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => @penalties[:submission]}
-        CalculatedPenalty.create(penalty_attr1)
+    calculate_all_penalties(@assignment.id)
 
-        penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => @penalties[:review]}
-        CalculatedPenalty.create(penalty_attr2)
-
-        penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => @penalties[:meta_review]}
-        CalculatedPenalty.create(penalty_attr3)
-        @assignment.update_attribute(:is_penalty_calculated, true)
-      end
-    end
   end
 
   def edit
@@ -253,5 +242,30 @@ def get_body_text(submission)
 You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+". 
     
 The Expertiza system has brought this to my attention."
+end
+
+  def calculate_all_penalties(assignment_id)
+    @all_penalties = Hash.new
+    Participant.find_all_by_parent_id(assignment_id).each do |participant|
+      @penalties = calculate_penalty(participant.id)
+      if(@penalties[:submission] != 0 || @penalties[:review] != 0 || @penalties[:meta_review] != 0)
+        @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+        if @assignment.is_penalty_calculated == false
+          penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => @penalties[:submission]}
+          CalculatedPenalty.create(penalty_attr1)
+
+          penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => @penalties[:review]}
+          CalculatedPenalty.create(penalty_attr2)
+
+          penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => @penalties[:meta_review]}
+          CalculatedPenalty.create(penalty_attr3)
+          @assignment.update_attribute(:is_penalty_calculated, true)
+        end
+      end
+      @all_penalties[participant.id] = Hash.new
+      @all_penalties[participant.id][:submission] = @penalties[:submission]
+      @all_penalties[participant.id][:review] = @penalties[:review]
+      @all_penalties[participant.id][:meta_review] = @penalties[:meta_review]
+    end
   end
 end

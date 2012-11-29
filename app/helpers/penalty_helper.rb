@@ -6,7 +6,6 @@ module PenaltyHelper
     @review_deadline_type_id = 2
     @meta_review_deadline_type_id = 5
 
-
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = @participant.assignment
     @penalty_per_unit = LatePolicy.find_by_id(@assignment.late_policy_id).penalty_per_unit

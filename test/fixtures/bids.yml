@@ -1,13 +1,16 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 bid1:
+  id: 1
   topic_id: <%= Fixtures.identify(:LotteryTopic1) %>
   team_id: <%= Fixtures.identify(:lottery_team1) %>
 
 bid2:
+  id: 2
   topic_id: <%= Fixtures.identify(:LotteryTopic1) %>
   team_id: <%= Fixtures.identify(:lottery_team2) %>
 
 bid3:
+  id: 3
   topic_id: <%= Fixtures.identify(:LotteryTopic2) %>
   team_id: <%= Fixtures.identify(:lottery_team3) %>

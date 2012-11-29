@@ -24,14 +24,13 @@ due_date<%= i*5+j %>:
   due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= dline_type_list[j] %>
   assignment_id: <%= Fixtures.identify("assignment"+i.to_s) %>
-  late_policy_id: <%= Fixtures.identify("late_policy"+i.to_s) %>
   round: 1
 <% team_num = i*5+j+ 25 %>
 due_date<%= team_num %>:
   due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= dline_type_list[j] %>
   assignment_id: <%= Fixtures.identify("assignment"+team_num.to_s) %>
-  late_policy_id: <%= Fixtures.identify("late_policy"+i.to_s) %>
+
 <%end%>
 <%end%>
 
@@ -40,7 +39,6 @@ due_date_review<%= j %>:
   due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= dline_type_list[j] %>
   assignment_id: <%= Fixtures.identify("assignment_review0") %>
-  late_policy_id: <%= Fixtures.identify("late_policy0") %>
   submission_allowed_id: 2
   review_allowed_id: 2
   resubmission_allowed_id: 2
@@ -65,7 +63,6 @@ due_date_submission_Assignment<%= j %>:
   due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= Fixtures.identify("deadline_type_submission") %>
   assignment_id: <%= assignment_list[j] %>
-  late_policy_id: <%= Fixtures.identify("late_policy5") %>
   submission_allowed_id: 3
   review_allowed_id: 1
   resubmission_allowed_id: 1
@@ -78,7 +75,6 @@ due_date_review_Assignment<%= j %>:
   due_at: <%= (Time.now + 500000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= Fixtures.identify("deadline_type_review") %>
   assignment_id: <%= assignment_list[j] %>
-  late_policy_id: <%= Fixtures.identify("late_policy1") %>
   submission_allowed_id: 2
   review_allowed_id: 3
   resubmission_allowed_id: 1
@@ -91,7 +87,6 @@ due_date_resubmission_Assignment<%= j %>:
   due_at: <%= (Time.now + 700000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= Fixtures.identify("deadline_type_resubmission") %>
   assignment_id: <%= assignment_list[j] %>
-  late_policy_id: <%= Fixtures.identify("late_policy5") %>
   submission_allowed_id: 2
   review_allowed_id: 2
   resubmission_allowed_id: 3
@@ -104,7 +99,6 @@ due_date_rereview_Assignment<%= j %>:
   due_at: <%= (Time.now + 800000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= Fixtures.identify("deadline_type_rereview") %>
   assignment_id: <%= assignment_list[j] %>
-  late_policy_id: <%= Fixtures.identify("late_policy5") %>
   submission_allowed_id: 2
   review_allowed_id: 2
   resubmission_allowed_id: 2
@@ -117,7 +111,6 @@ due_date_metareview_Assignment<%= j %>:
   due_at: <%= (Time.now + 1000000).strftime("%Y-%m-%d %H:%M:%S") %>
   deadline_type_id: <%= Fixtures.identify("deadline_type_metareview") %>
   assignment_id: <%= assignment_list[j] %>
-  late_policy_id: <%= Fixtures.identify("late_policy5") %>
   submission_allowed_id: 2
   review_allowed_id: 2
   resubmission_allowed_id: 2

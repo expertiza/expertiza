@@ -48,7 +48,8 @@ class AssignmentControllerTest < ActionController::TestCase
       :author_feedback_questionnaire_id  => questionnaire_id,
       :instructor_id => instructorid,
       :course_id => courseid,
-      :wiki_type_id => 1
+      :wiki_type_id => 1,
+      :team_assignment => "No"
     )
 
     #p flash[:notice].to_s
@@ -77,17 +78,69 @@ class AssignmentControllerTest < ActionController::TestCase
     courseid = Course.first.id
     number_of_topics = SignUpTopic.count
     # create a new assignment
-    post :create, :assignment => { :name => "mt_valid_test",
-      :course_id           => 1,
-      :directory_path      => "mt_valid_test",
-      :review_questionnaire_id    => questionnaire_id,
-      :review_of_review_questionnaire_id => questionnaire_id,
-      :author_feedback_questionnaire_id  => questionnaire_id,
-      :instructor_id => instructorid,
-      :course_id => courseid,
-      :wiki_type_id => 1,
-      :microtask => true  }
-
+    post :create, :assignment=>
+        {:availability_flag=>false,
+         :microtask=>true,
+         :team_assignment=>false,
+         :review_topic_threshold=>0,
+         :private=>false,
+         :review_assignment_strategy=>"Instructor-Selected",
+         :reviews_visible_to_all=>false,
+         :rounds_of_reviews=>1,
+         :spec_location=> "",
+         :team_count=>0,
+         :name=>"mt_valid_test",
+         :course_id=> "",
+         :allow_suggestions=>false,
+         :staggered_deadline=>false,
+         :wiki_type_id=>1,
+         :directory_path=> "bankai"},
+        :save=>"Save assignment",
+        :drop_topic_deadline=>{:review_allowed_id=>1,
+                               :due_at=>"",
+                               :id=> "",
+                               :submission_allowed_id=>3,
+                               :threshold=>8,
+                               :review_of_review_allowed_id=>1,
+                               :resubmission_allowed_id=>1,
+                               :rereview_allowed_id=>1},
+        :days=> "",
+        :weights=>{:feedback=>0,
+                   :metareview=>0,
+                   :review=>100,
+                   :teammate=>0},
+        :controller=>"assignment",
+        :questionnaires=>[],
+        :limits=>{:feedback=>15,
+                  :metareview=>15,
+                  :review=>15,
+                  :teammate=>15},
+        :submit_deadline=>{:review_allowed_id=>1,
+                           :due_at=>"2012-11-30 17:48:20",
+                           :id=> "",
+                           :submission_allowed_id=>3,
+                           :threshold=>8,
+                           :review_of_review_allowed_id=>1,
+                           :resubmission_allowed_id=>1,
+                           :rereview_allowed_id=>1},
+        :reviewofreview_deadline=>{:review_allowed_id=>2,
+                                   :due_at=>"2012-11-30 17:48:20",
+                                   :id=> "",
+                                   :submission_allowed_id=>2,
+                                   :threshold=>8,
+                                   :review_of_review_allowed_id=>3,
+                                   :resubmission_allowed_id=>2,
+                                   :rereview_allowed_id=>2},
+        :weeks=> "",
+        :review_deadline=>{:review_allowed_id=>3,
+                           :due_at=>"2012-11-30 17:48:20",
+                           :id=> "",
+                           :submission_allowed_id=>2,
+                           :threshold=>8,
+                           :review_of_review_allowed_id=>1,
+                           :resubmission_allowed_id=>1,
+                           :rereview_allowed_id=>1},
+        :action=>"create"
     assert_response :redirect
     assert Assignment.find(:all, :conditions => "name = 'mt_valid_test'")
 
@@ -99,7 +152,7 @@ class AssignmentControllerTest < ActionController::TestCase
   # edit an assignment, change should be
   # reflected in DB
   def test_legal_edit_assignment
-    @assignment = Assignment.first
+    @assignment = Assignment.find(Fixtures.identify(:assignment1))
     id = Assignment.first.id
     number_of_assignment = Assignment.count
     questionnaire_id = Questionnaire.first.id

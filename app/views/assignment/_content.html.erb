@@ -98,7 +98,8 @@ function onChangeWikiType(){
   <td>
   		<select id="teamselect" name="assignment[team_assignment]" onchange="onChange();">
   		 <option value=false style="width:75px">No</option>
-         <option value=true style="width:75px" <% if @assignment.team_assignment %>SELECTED<%end%>>Yes</option>      
+         <!--ACS We need to have this logic in place to display the proper value in the drop down-->
+         <option value=true style="width:75px" <% if @assignment.team_assignment %>SELECTED<%end%>>Yes</option>
         </select>
   </td>  
 </tr>

@@ -81,8 +81,20 @@ class AssignmentController < ApplicationController
     @user = session[:user]
     @user.set_instructor(@assignment)
     @assignment.submitter_count = 0
+
+    ## feedback added
+    ##
+
+    # ACS added code to handle all assignments as team assignments. we set team count to 1 if
+    # the team assignment option was selected as NO while adding a new assignment
+    # and further use this variable to check what type of assignment we are dealing with
+    if params[:team_assignment] == false
+      @assignment.team_count = 1
+    end
+
     if (@assignment.microtask)
        @assignment.name = "MICROTASK - " + @assignment.name
+
     end
     set_days_between_submissions
 
@@ -110,7 +122,7 @@ class AssignmentController < ApplicationController
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
  #       raise "Please enter a valid Drop-Topic deadline" if !due_date
         
-        if params[:assignment_helper][:no_of_reviews].to_i >= 2
+        if params[:rounds_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys
             #setting the Due Dates with a helper function written in DueDate.rb
             due_date = DueDate::set_duedate(params[:additional_submit_deadline][resubmit_duedate_key],@Resubmission_deadline, @assignment.id, max_round )
@@ -370,6 +382,7 @@ class AssignmentController < ApplicationController
   #  return the file location if there is any for the assignment
   #--------------------------------------------------------------------------------------------------------------------
   def get_path
+    puts "path = #{ @assignment.get_path}"
     begin
       file_path = @assignment.get_path
     rescue
@@ -409,6 +422,15 @@ class AssignmentController < ApplicationController
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])
+      # ACS added code to handle all assignments as team assignments. we set team count to 1 if
+      # the team assignment option was selected as NO while editing an existing assignment
+      # and further use this variable to check what type of assignment we are dealing with
+      if @assignment.team_assignment == false
+        @assignment.team_count = 1
+        @assignment.save
+      end
+
+
       if params[:questionnaires] and params[:limits] and params[:weights]
         set_questionnaires
         set_limits_and_weights

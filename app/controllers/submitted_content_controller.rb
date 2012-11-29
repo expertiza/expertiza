@@ -8,8 +8,10 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(@participant.user_id)
     
     @assignment = @participant.assignment
-    
-    if @assignment.team_assignment && @participant.team.nil?
+
+    #ACS We have to check if the number of members on the team is more than 1(group assignment)
+    #hence use team count for the check
+    if @assignment.team_count > 1 && @participant.team.nil?
       flash[:alert] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_team/view/#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
       redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
     end

@@ -42,3 +42,8 @@ SignedUpUser9:
   creator_id: <%= Fixtures.identify(:student5) %>
   topic_id: <%= Fixtures.identify(:Topic1) %>
   is_waitlisted: 0
+
+SignedUpUser10:
+  creator_id: <%= Fixtures.identify(:team6) %>
+  topic_id: <%= Fixtures.identify(:Topic1) %>
+  is_waitlisted: 0

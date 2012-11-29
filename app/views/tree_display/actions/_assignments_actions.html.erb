@@ -8,7 +8,9 @@
 <div>
   <%= link_to image_tag('/images/tree_view/add-participant-24.png', :title => 'Add participants'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment'}, {:title => 'Add participants'}%>
   <%@assignment = Assignment.find(node.node_object_id)%>
-  <% if @assignment.team_assignment %>
+  <!--ACS Show the create team option in the assignment for the instructor only if
+   the assignment allows teams to be formed with more than 1 participant-->
+  <% if @assignment.team_count > 1 %>
     <%= link_to image_tag('/images/tree_view/create-teams-24.png', :title => 'Create teams'),:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Assignment' %>
   <% end %>
   <% signup_topic = SignUpTopic.find(:first, :conditions => ['assignment_id = ?',node.node_object_id]) %>

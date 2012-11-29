@@ -124,11 +124,13 @@ class Assignment < ActiveRecord::Base
   end
 
   def contributors
-    @contributors ||= team_assignment ? teams : participants
+    #ACS Contributors are just teams, so removed check to see if it is a team assignment
+    @contributors ||= teams #ACS
   end
 
   def review_mappings
-    @review_mappings ||= team_assignment ? team_review_mappings : participant_review_mappings
+    #ACS Reviews must be mapped just for teams, so removed check to see if it is a team assignment
+    @review_mappings ||= team_review_mappings #ACS
   end
 
   def assign_metareviewer_dynamically(metareviewer)
@@ -196,11 +198,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def review_mappings
-    if team_assignment
-      TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
-    else
-      ParticipantReviewResponseMap.find_all_by_reviewed_object_id(self.id)
-    end
+    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # to treat all assignments as team assignments
+    TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
   end
   
   def metareview_mappings
@@ -223,8 +223,8 @@ class Assignment < ActiveRecord::Base
       | participant |
       scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
     }
-    
-    if self.team_assignment
+    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # to treat all assignments as team assignments
       scores[:teams] = Hash.new
       index = 0
       self.teams.each{
@@ -236,7 +236,6 @@ class Assignment < ActiveRecord::Base
         #... = ScoreCache.get_participant_score(team, id, questionnaire.display_type)
         index += 1
       }
-    end
     return scores
   end
   
@@ -393,11 +392,9 @@ class Assignment < ActiveRecord::Base
   
     # Get all review mappings for this assignment & author
     participant = AssignmentParticipant.find(author_id)
-    if team_assignment
-      author = participant.team
-    else
-      author = participant
-    end
+    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # to treat all assignments as team assignments
+    author = participant.team
     
     for mapping in author.review_mappings
 
@@ -573,14 +570,11 @@ def add_participant(user_name)
     end
  end  
   
- def assign_reviewers(mapping_strategy)  
-      if (team_assignment)      
-          #defined in DynamicReviewMapping module
-          assign_reviewers_for_team(mapping_strategy)
-      else          
-          #defined in DynamicReviewMapping module
-          assign_individual_reviewer(mapping_strategy) 
-      end  
+ def assign_reviewers(mapping_strategy)
+   #ACS Always assign reviewers for a team
+   #removed check to see if it is a team assignment
+   #defined in DynamicReviewMapping module
+   assign_reviewers_for_team(mapping_strategy)
   end  
 
 #this is for staggered deadline assignments or assignments with signup sheet
@@ -606,11 +600,9 @@ end
     review_questionnaire_id = get_review_questionnaire_id()
     @questions = Question.find(:all, :conditions =>["questionnaire_id = ?", review_questionnaire_id])
     @review_scores = Hash.new
-    if (self.team_assignment)
-      @response_type = "TeamReviewResponseMap"
-    else
-      @response_type = "ParticipantReviewResponseMap"
-    end
+    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # to treat all assignments as team assignments
+    @response_type = "TeamReviewResponseMap"
 
 
     @myreviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", self.id, @type] )

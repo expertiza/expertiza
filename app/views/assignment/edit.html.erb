@@ -1,58 +1,90 @@
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet"
+      type="text/css" xmlns="http://www.w3.org/1999/html"/>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $("#tabs").tabs({ selected: 0, event: "click"});
+        $("#tabs1").tabs({ selected: 1, event: "click"});
+        $("#tabs2").tabs({ selected: 1, event: "click"});
+        var dropdownIndex = document.getElementById('teamselect').selectedIndex;
+        var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
+        if(dropdownValue != "true"){
+            $('#Teams').hide();
+        }
+    });
+
+</script>
+
 <h1>Editing assignment</h1>
 
-<% form_tag({:action => 'update', :id => @assignment, :review_limit => @limits[:review], :metareview_limit => @limits[:metareview], :teammate_limit => @limits[:teammate], :feedback_limit => @limits[:feedback]},:onsubmit => 'return checkForm();') do %>
-  <%= render :partial => 'content' %>
-    <hr/>
-  <%= render :partial => 'rubrics' %>
-  <%= render :partial => 'review_strategy' %>
-<br/>
-<hr/>
-<div style="font-size:large;"><b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b></div>  
-  <table>
-    <tr style="font-size:12px;padding:15px">
-        <th style="padding:10px">Deadline type</th>
-        <th style="padding:10px">Date &amp; time</th>
-        <th style="padding:10px">Submission allowed</th>
-        <th style="padding:10px">Review allowed</th>
-        <th style="padding:10px">Resubmission allowed</th>
-        <th style="padding:10px">Re-review allowed</th>
-        <th style="padding:10px">Metareview allowed</th>
-		<th style="padding:10px">Reminder (hrs)</th>
-    </tr>
-    <% 	i = 0;
-        duedates = @assignment.due_dates
-		 
-        duedates.sort! {|a,b| a.due_at <=> b.due_at}
-		for @due_date in duedates %>
-	        <% heading = @due_date.deadline_type.name.titleize + " deadline" %>
-			<tr>
-				<td align ="center"><%= heading%></td>
-				<td align ="center"><%= text_field 'due_date[]', 'due_at', :size=>30%></td>
-			<% if @due_date.deadline_type_id != 6 %>
-				<td align ="center"><%= select('due_date[]', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96]])%></td>
-				<td align ="center"><%= hidden_field('due_date[]', 'flag', 'value' => 0)%></td>
-			<% end %>
-			</tr>
-			<% i += 1 %>
-		<% end %>
-    </table>
-<br/>
-<div id="days_between_chapters" style="position:relative">
-  <label>Number of {weeks, days} between submission of successive chapters:</label>
-  <input type="text" id="weeks" name ="weeks" maxlength="2" size="3" value="<%=@weeks%>"/> week(s) &nbsp;
-  <input type="text" id="days" name ="days" maxLength="2" size="3" value="<%=@days%>"/> day(s)          
-</div>
-<br/>
-  &nbsp;&nbsp;<%= submit_tag "Save assignment" %>
+<% form_tag({:action => 'update', :id => @assignment, :review_limit => @limits[:review], :metareview_limit => @limits[:metareview], :teammate_limit => @limits[:teammate], :feedback_limit => @limits[:feedback]}, {:method => 'post', :multipart => true, :onsubmit => 'return checkForm();'}) do %>
+
+    <%
+       session[:return_to] = request.request_uri
+    %>
+
+    <% tabs = TabsRenderer.new(self) %>
+    <% tabs.create('General', 'General') do %>
+        <%= render :partial => 'content' %>
+    <% end %>
+    <% tabs.create('Rubrics', 'Rubrics') do %>
+        <%= render :partial => 'rubrics' %>
+    <% end %>
+    <% tabs.create('Review_Strategy', 'Review Strategy') do %>
+        <%= render :partial => 'review_strategy' %>
+    <% end %>
+    <% tabs.create('Deadlines', 'Deadlines') do %>
+        <%= render :partial => 'deadlines' %>
+    <% end %>
+    <% tabs.create('Participants', 'Participants') do %>
+        <div id="tabs1">
+          <ul>
+            <li><a href="#subtab1"> Existing Participants</a></li>
+            <li><a href="#subtab2"> Add Participants</a></li>
+            <li><a href="#subtab3"> Import Participants</a></li>
+          </ul>
+          <div id="subtab1">
+            <%= render :partial => '/shared_scripts/user_list',
+                       :locals => {:controller => 'participants',
+                                   :user_list => @participants}%>
+            <br/>
+          </div>
+          <div id="subtab2">
+            <%= render :partial => 'add_participants' %>
+          </div>
+          <div id="subtab3">
+            <%= render :partial => 'import_participants' %>
+          </div>
+        </div>
+    <% end %>
+
+        <% tabs.create('Teams', 'Teams') do %>
+            <div id="tabs2">
+              <ul>
+                <li><a href="#subtab4"> Existing Teams </a></li>
+                <li><a href="#subtab5"> Create Teams </a></li>
+                <li><a href="#subtab6"> Import Teams</a></li>
+              </ul>
+              <div id="subtab4">
+                <%= render :partial => 'tree_display/page_footer' %>
+              </div>
+              <div id="subtab5">
+                <%= render :partial => 'create_random_teams' %>
+              </div>
+              <div id="subtab6">
+                <%= render :partial => 'import_teams' %>
+              </div>
+            </div>
+        <% end %>
+
+
+    <%= tabs.render %>
+
+    &nbsp;&nbsp;<%= submit_tag "Save assignment" %>
 <% end %>
 <br/>
 <div style="padding: 15px">
-<%= render :partial => '/shared_scripts/back' %>
+  <%= render :partial => '/shared_scripts/back' %>
 </div>
-
-<script>get_assignment_startdate();</script>

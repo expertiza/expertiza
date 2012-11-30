@@ -231,24 +231,25 @@ class AssignmentController < ApplicationController
 
     #Build array for other deadlines
     rows, cols = 5,2
-    param_deadline = Array.new(rows) { Array.new(cols) }
+    param_deadline = Hash.new
 
     param_deadline[DeadlineType.find_by_name("submission").id] = [:submit_deadline, 1]
     param_deadline[DeadlineType.find_by_name("review").id] = [:review_deadline,1]
     param_deadline[DeadlineType.find_by_name("drop_topic").id] = [:drop_topic_deadline,0]
     param_deadline[DeadlineType.find_by_name("metareview").id] = [:reviewofreview_deadline, max_round]
 
-    puts param_deadline
+
+
     #Update/Create all deadlines
     param_deadline.each_with_index do |type, index|
-      if (!type[0].nil?)
-        type_name = DeadlineType.find_by_id(index).name.capitalize
-        if (!params["#{type[0]}"][:id].blank?)
-          due_date_temp = DueDate.find_by_id(params["#{type[0]}"][:id])
-          due_date_temp.update_attributes(params["#{type[0]}"])
+      if (!index[0].nil?)
+        type_name = DeadlineType.find_by_id(type).name.capitalize
+        if ( params["#{index[0]}"] && !params["#{index[0]}"][:id].blank?)
+          due_date_temp = DueDate.find_by_id(params["#{index[0]}"][:id])
+          due_date_temp.update_attributes(params["#{index[0]}"])
           (return_string += "Please enter a valid #{type_name} deadline </br>") if due_date_temp.errors.length > 0
-        elsif (!params["#{type[0]}"][:due_at].blank?)
-          due_date = DueDate::set_duedate(params["#{type[0]}"],index, @assignment.id, type[1] )
+        elsif (params["#{index[0]}"] && !params["#{index[0]}"][:due_at].blank?)
+          due_date = DueDate::set_duedate(params["#{index[0]}"],type, @assignment.id, index[1] )
           return_string += "Please enter a valid #{type_name} deadline </br>" if !due_date
         end
       end
@@ -382,7 +383,6 @@ class AssignmentController < ApplicationController
   #  return the file location if there is any for the assignment
   #--------------------------------------------------------------------------------------------------------------------
   def get_path
-    puts "path = #{ @assignment.get_path}"
     begin
       file_path = @assignment.get_path
     rescue
@@ -452,7 +452,7 @@ class AssignmentController < ApplicationController
         session[:copy_flag] = false
       end
       #update due dates
-      begin
+      #begin
 
         update = set_due_dates
         raise update if (update != "")
@@ -476,11 +476,11 @@ class AssignmentController < ApplicationController
           redirect_to :action => 'show', :id => @assignment
         end
 
-      rescue
-        flash[:error] = $!
-        prepare_to_edit
-        render :action => 'edit', :id => @assignment
-      end
+      #rescue
+      #  flash[:error] = $!
+      #  prepare_to_edit
+      #  render :action => 'edit', :id => @assignment
+      #end
     else # Simply refresh the page
       @wiki_types = WikiType.find(:all)
       render :action => 'edit'

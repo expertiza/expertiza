@@ -1,19 +1,13 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 deadline_type_submission:
   name: submission
-  id: 0
 deadline_type_review:
   name: review
-  id: 1
 deadline_type_resubmission:
   name: resubmission
-  id: 2
 deadline_type_rereview:
   name: rereview
-  id: 3
 deadline_type_metareview:
   name: metareview
-  id: 4
 deadline_type_drop_topic:
   name: drop_topic
-  id: 5

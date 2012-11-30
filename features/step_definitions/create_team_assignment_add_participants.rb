@@ -55,6 +55,8 @@ Given /^a team assignment named "(\S+)" exists$/ do |assignment|
   newAssignment.allow_suggestions= true
   newAssignment.directory_path = 'test'
   newAssignment.spec_location= 'http://'
+  newAssignment.availability_flag=true
+  newAssignment.team_assignment=true
   newAssignment.save
 
   submitDate = DueDate.new
@@ -104,7 +106,10 @@ Given /^add "(\S+)" to this "(\S+)"$/ do |username, assignment_name|
 
   participant = Participant.new
   participant.user_id= user.id
-  participant.assignment= assignment
+  participant.parent_id= assignment.id
+  participant.submit_allowed= true
+  participant.type= "AssignmentParticipant"
+  participant.save!
 
 =begin
   find(:xpath, "//a[contains(.,'Assignments')]").click

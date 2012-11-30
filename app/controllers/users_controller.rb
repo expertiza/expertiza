@@ -5,12 +5,8 @@ class UsersController < ApplicationController
          :redirect_to => { :action => :list }
 
   def index
-    if (current_user_role? == "Student") 
-      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user])) 
-    else
-      list
-      render :action => 'list'
-    end
+    list
+    render :action => 'list'
   end
   
   def self.participants_in(assignment_id)
@@ -88,12 +84,8 @@ class UsersController < ApplicationController
   end
   
   def show
-    if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
-      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user])) 
-    else
-      @user = User.find(params[:id])
-      get_role
-    end
+    @user = User.find(params[:id])
+    get_role
   end
   
   def new
@@ -164,12 +156,8 @@ class UsersController < ApplicationController
   end
   
   def keys
-    if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
-      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user])) 
-    else     
-      @user = User.find(params[:id])
-      @private_key = @user.generate_keys
-    end
+    @user = User.find(params[:id])
+    @private_key = @user.generate_keys
   end
   
   protected

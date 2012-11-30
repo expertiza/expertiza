@@ -13,7 +13,6 @@
     <%= hidden_field_tag('assignment[course_id]', nil) %>
   <% end %>
   <%= hidden_field_tag('assignment[private]',@private) %>
-   <%= render :partial => 'availability_flag' %>
   &nbsp;&nbsp;<%= submit_tag "Save assignment", :name=>"save" %>
 <% end %>
 <br />

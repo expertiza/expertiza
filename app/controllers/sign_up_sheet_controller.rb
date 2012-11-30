@@ -6,8 +6,8 @@ class SignUpSheetController < ApplicationController
 
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [:destroy, :create, :update],
-         :redirect_to => {:action => :list}
+  verify :method => :post, :only => [ :destroy, :create, :update ],
+         :redirect_to => { :action => :list }
 
   def add_signup_topics_staggered
     load_add_signup_topics(params[:id])
@@ -17,10 +17,10 @@ class SignUpSheetController < ApplicationController
 
     #Use this until you figure out how to initialize this array
     @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
-
+    
     if !@topics.nil?
       i=0
-      @topics.each { |topic|
+      @topics.each {|topic|
 
         @duedates[i]['t_id'] = topic.id
         @duedates[i]['topic_identifier'] = topic.topic_identifier
@@ -28,11 +28,11 @@ class SignUpSheetController < ApplicationController
 
         for j in 1..@review_rounds
           if j == 1
-            duedate_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('submission').id)
-            duedate_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('review').id)
+            duedate_subm  = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('submission').id)
+            duedate_rev   = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('review').id)
           else
-            duedate_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(topic.id, DeadlineType.find_by_name('resubmission').id, j)
-            duedate_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(topic.id, DeadlineType.find_by_name('rereview').id, j)
+            duedate_subm  = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(topic.id, DeadlineType.find_by_name('resubmission').id, j)
+            duedate_rev   = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(topic.id, DeadlineType.find_by_name('rereview').id, j)
           end
           if !duedate_subm.nil? && !duedate_rev.nil?
             @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
@@ -40,18 +40,18 @@ class SignUpSheetController < ApplicationController
           else
             #the topic is new. so copy deadlines from assignment
             set_of_due_dates = DueDate.find_all_by_assignment_id(params[:id])
-            set_of_due_dates.each { |due_date|
+            set_of_due_dates.each {|due_date|
               create_topic_deadline(due_date, 0, topic.id)
             }
             # code execution would have hit the else part during review_round one. So we'll do only round one
-            duedate_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('submission').id)
-            duedate_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('review').id)
+            duedate_subm  = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('submission').id)
+            duedate_rev   = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('review').id)
             @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
             @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
           end
 
         end
-        duedate_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('metareview').id)
+        duedate_subm  = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('metareview').id)
         if !duedate_subm.nil?
           @duedates[i]['submission_'+ (@review_rounds+1).to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
         else
@@ -81,7 +81,7 @@ class SignUpSheetController < ApplicationController
       @participants = SignedUpUser.find_participants(assignment_id)
     else
       @participants = SignedUpUser.find_team_participants(assignment_id)
-    end
+    end    
   end
 
   def new
@@ -168,7 +168,7 @@ class SignUpSheetController < ApplicationController
     if Assignment.find(params[:assignment_id])['staggered_deadline'] == true
       dependencies = TopicDependency.find_all_by_topic_id(params[:id])
       if !dependencies.nil?
-        dependencies.each { |dependency| dependency.destroy }
+        dependencies.each {|dependency| dependency.destroy}
       end
     end
     redirect_to_sign_up(params[:assignment_id])
@@ -198,7 +198,7 @@ class SignUpSheetController < ApplicationController
         else
           flash[:error] = 'Value of maximum choosers can only be increased! No change has been made to max choosers.'
         end
-      end
+      end               
 
       topic.category = params[:topic][:category]
       topic.topic_name = params[:topic][:topic_name]
@@ -212,7 +212,7 @@ class SignUpSheetController < ApplicationController
   def signup_topics
     @assignment_id = params[:id]
     @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', params[:id]])
-    @slots_filled = SignUpTopic.find_slots_filled(params[:id])
+    @slots_filled =  SignUpTopic.find_slots_filled(params[:id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
 
@@ -223,12 +223,12 @@ class SignUpSheetController < ApplicationController
     if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
       @show_actions = false
     end
-
+    
     #Find whether the user has signed up for any topics; if so the user won't be able to
     #sign up again unless the former was a waitlisted topic
     #if team assignment, then team id needs to be passed as parameter else the user's id
     if assignment.team_assignment == true
-      users_team = SignedUpUser.find_team_users(params[:id], (session[:user].id))
+      users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
 
       if users_team.size == 0
         @selected_topics = nil
@@ -243,23 +243,23 @@ class SignUpSheetController < ApplicationController
 
   #this function is used to delete a previous signup
   def delete_signup
-    delete_signup_for_topic(params[:assignment_id], params[:id])
+    delete_signup_for_topic(params[:assignment_id],params[:id])    
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
-  def delete_signup_for_topic(assignment_id, topic_id)
+  def delete_signup_for_topic(assignment_id,topic_id)
     #find whether assignment is team assignment
     assignment = Assignment.find(assignment_id)
 
     #making sure that the drop date deadline hasn't passed
     dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})
-    if (!dropDate.nil? && dropDate.due_at < Time.now)
+    if(!dropDate.nil? && dropDate.due_at < Time.now)
       flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
       #if team assignment find the creator id from teamusers table and teams
       if assignment.team_assignment == true
         #users_team will contain the team id of the team to which the user belongs
-        users_team = SignedUpUser.find_team_users(assignment_id, (session[:user].id))
+        users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
         signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
       else
         signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, session[:user].id)
@@ -269,26 +269,26 @@ class SignUpSheetController < ApplicationController
       if signup_record.is_waitlisted == false
         #find the first wait listed user if exists
         first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
-
+  
         if !first_waitlisted_user.nil?
           # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
           ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
           first_waitlisted_user.is_waitlisted = false
           first_waitlisted_user.save
-
+  
           #update the participants details
           if assignment.team_assignment?
             user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-            participant = Participant.find_by_user_id_and_parent_id(user_id, assignment.id)
+            participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
           else
             participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
           end
           participant.update_topic_id(topic_id)
-
-          SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
+  
+          SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
         end
       end
-
+  
       if !signup_record.nil?
         participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
         #update participant's topic id to nil
@@ -306,7 +306,7 @@ class SignUpSheetController < ApplicationController
     if assignment.team_assignment == true
 
       #check whether the user already has a team for this assignment
-      users_team = SignedUpUser.find_team_users(params[:assignment_id], (session[:user].id))
+      users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
 
       if users_team.size == 0
         #if team is not yet created, create new team.
@@ -329,7 +329,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def otherConfirmedTopicforUser(assignment_id, creator_id)
-    user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
+    user_signup = SignedUpUser.find_user_signup_topics(assignment_id,creator_id)
     user_signup
   end
 
@@ -340,7 +340,7 @@ class SignUpSheetController < ApplicationController
     sign_up = SignedUpUser.new
     sign_up.topic_id = params[:id]
     sign_up.creator_id = creator_id
-
+    
     result = false
     if user_signup.size == 0
 
@@ -349,10 +349,10 @@ class SignUpSheetController < ApplicationController
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
         if slotAvailable?(topic_id)
           sign_up.is_waitlisted = false
-
+  
           #Update topic_id in participant table with the topic_id
           participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-
+          
           participant.update_topic_id(topic_id)
         else
           sign_up.is_waitlisted = true
@@ -383,14 +383,14 @@ class SignUpSheetController < ApplicationController
           SignUpTopic.cancel_all_waitlists(creator_id, assignment_id)
           sign_up.is_waitlisted = false
           sign_up.save
-
+  
           participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
           participant.update_topic_id(topic_id)
           result = true
         end
       end
     end
-
+    
     result
   end
 
@@ -422,7 +422,7 @@ class SignUpSheetController < ApplicationController
     end
     team = Team.find(team_id)
     team.add_member(user)
-  end
+  end  
 
   def has_user(user, team_id)
     if TeamsUser.find_by_team_id_and_user_id(team_id, user.id)
@@ -437,7 +437,7 @@ class SignUpSheetController < ApplicationController
     params[:assignment_id] = params[:assignment_id].to_i.to_s
 
     topics = SignUpTopic.find_all_by_assignment_id(params[:assignment_id])
-    topics = topics.collect { |topic|
+    topics = topics.collect {|topic|
       #if there is no dependency for a topic then there wont be a post for that tag.
       #if this happens store the dependency as "0"
       if !params['topic_dependencies_' + topic.id.to_s].nil?
@@ -449,15 +449,15 @@ class SignUpSheetController < ApplicationController
 
 
     # Save the dependency in the topic dependency table
-    TopicDependency.save_dependency(topics)
+    TopicDependency.save_dependency(topics)    
 
     node = 'id'
-    dg = build_dependency_graph(topics, node)
+    dg = build_dependency_graph(topics,node)
 
     if dg.acyclic?
       #This method produces sets of vertexes which should have common start time/deadlines
       set_of_topics = create_common_start_time_topics(dg)
-      set_start_due_date(params[:assignment_id], set_of_topics)
+      set_start_due_date(params[:assignment_id],set_of_topics)
       @top_sort = dg.topsort_iterator.to_a
     else
       flash[:error] = "There may be one or more cycles in the dependencies. Please correct them"
@@ -465,7 +465,7 @@ class SignUpSheetController < ApplicationController
 
 
     node = 'topic_name'
-    dg = build_dependency_graph(topics, node) # rebuild with new node name
+    dg = build_dependency_graph(topics,node) # rebuild with new node name
 
     graph_output_path = 'public/images/staggered_deadline_assignment_graph'
     FileUtils::mkdir_p graph_output_path
@@ -483,9 +483,9 @@ class SignUpSheetController < ApplicationController
   def save_topic_deadlines
 
     due_dates = params[:due_date]
-
+    
     review_rounds = Assignment.find(params[:assignment_id]).get_review_rounds
-    due_dates.each { |due_date|
+    due_dates.each {|due_date|
       for i in 1..review_rounds
         if i == 1
           topic_deadline_type_subm = DeadlineType.find_by_name('submission').id
@@ -495,11 +495,11 @@ class SignUpSheetController < ApplicationController
           topic_deadline_type_rev = DeadlineType.find_by_name('rereview').id
         end
 
-        topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_subm, i)
+        topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_subm,i)
         topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + i.to_s]})
         flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
-
-        topic_deadline_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_rev, i)
+        
+        topic_deadline_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_rev,i)
         topic_deadline_rev.update_attributes({'due_at' => due_date['review_' + i.to_s]})
         flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
       end
@@ -509,16 +509,16 @@ class SignUpSheetController < ApplicationController
       flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
     }
 
-    redirect_to_sign_up(params[:assignment_id])
+    redirect_to_sign_up(params[:assignment_id])    
   end
 
-  def build_dependency_graph(topics, node)
+  def build_dependency_graph(topics,node)
     dg = RGL::DirectedAdjacencyGraph.new
 
     #create a graph of the assignment with appropriate dependency
-    topics.collect { |topic|
-      topic[1].each { |dependent_node|
-        edge = Array.new
+    topics.collect {|topic|
+      topic[1].each {|dependent_node|
+        edge  = Array.new
         #if a topic is not dependent on any other topic
         dependent_node = dependent_node.to_i
         if dependent_node == 0
@@ -573,7 +573,7 @@ class SignUpSheetController < ApplicationController
     topic_deadline.save
   end
 
-  def set_start_due_date(assignment_id, set_of_topics)
+  def set_start_due_date(assignment_id,set_of_topics)
 
     #Remember, in create_common_start_time_topics function we reversed the graph so reverse it back
     set_of_topics = set_of_topics.reverse
@@ -590,18 +590,18 @@ class SignUpSheetController < ApplicationController
       else
         set_of_due_dates = TopicDeadline.find_all_by_topic_id(set_of_topics[i-1][0])
 
-        set_of_due_dates.sort! { |a, b| a.due_at <=> b.due_at }
+        set_of_due_dates.sort! {|a,b| a.due_at <=> b.due_at}
 
-        offset = days_between_submissions
+        offset = days_between_submissions 
       end
 
       set_of_topic.each { |topic_id|
         #if the due dates have already been created and the save dependency is being clicked,
         #then delete existing n create again
         prev_saved_due_dates = TopicDeadline.find_all_by_topic_id(topic_id)
-
+        
         #Only if there is a dependency for the topic
-        if !prev_saved_due_dates.nil?
+        if !prev_saved_due_dates.nil?    
           num_due_dates = prev_saved_due_dates.length
           #for each due date in the current topic he want to compare it to the previous due date
           for x in 0..num_due_dates - 1
@@ -614,7 +614,7 @@ class SignUpSheetController < ApplicationController
           end
         end
 
-        set_of_due_dates.each { |due_date|
+        set_of_due_dates.each {|due_date|
           create_topic_deadline(due_date, offset, topic_id)
         }
       }
@@ -623,47 +623,4 @@ class SignUpSheetController < ApplicationController
 
   end
 
-  #gets team_details to show it on team_details view for a given assignment
-  def team_details
-    if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
-      @results =get_team_details(assignment.id, topic.id)
-      @results.each do |result|
-        result.attributes().each do |attr|
-          if attr[0].equal? "name"
-            @current_team_name = attr[1]
-          end
-        end
-      end
-      @results.each { |result|
-        @team_members = ""
-        TeamsUser.find_all_by_team_id(result[:team_id]).each { |teamuser|
-          puts 'Userblaahsdb asd' +User.find(teamuser.user_id).to_json
-          @team_members+=User.find(teamuser.user_id).name+" "
-        }
-      }
-      #@team_members = find_team_members(topic)  
-    end
-  end
-
-  #searches and returns team members for a given team_id
-  def find_team_members(team_id)
-    TeamsUser.find_all_by_team_id(team_id).each { |teamuser|
-      team_members+=User.find(teamuser.user_id).handle+" "
-    }
-  end
-
-  #get the team details to display them in team_details view when assignment-participant
-  #clicks for seeing the advertisement related to
-  def get_team_details(assignment_id, topic_id)
-    query = "select t.name, t.comments_for_advertisement, p.handle,t.id as team_id, p.id as participant_id, p.topic_id as topic_id, p.parent_id as assignment_id"
-    query = query + " from teams t, teams_users tu, participants p"
-    query = query + " where"
-    query = query + " p.parent_id = '#{assignment_id}' and"
-    query = query + " p.topic_id = '#{topic_id}'  and"
-    query = query + " t.parent_id = p.parent_id and"
-    query = query + " tu.user_id = p.user_id and"
-    query = query + " t.id = tu.team_id"
-    query = query + " group by t.name;"
-    SignUpTopic.find_by_sql(query)
-  end
 end

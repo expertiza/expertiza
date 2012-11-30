@@ -297,6 +297,7 @@ TreeFolder.create(:name => 'Teammate Review', :child_type => 'QuestionnaireNode'
 TreeFolder.create(:name => 'Survey', :child_type => 'QuestionnaireNode')
 TreeFolder.create(:name => 'Global Survey', :child_type => 'QuestionnaireNode')
 TreeFolder.create(:name => 'Course Evaluation', :child_type => 'QuestionnaireNode')
+TreeFolder.create(:name => 'Interaction Review', :child_type => 'QuestionnaireNode')
 
 ###### nodes
 n1 = Node.create!(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Questionnaires').id)
@@ -309,6 +310,7 @@ Node.create(:parent_id => n1.id, :node_object_id => TreeFolder.find_by_name('Tea
 Node.create(:parent_id => n1.id, :node_object_id => TreeFolder.find_by_name('Survey').id)
 Node.create(:parent_id => n1.id, :node_object_id => TreeFolder.find_by_name('Global Survey').id)
 Node.create(:parent_id => n1.id, :node_object_id => TreeFolder.find_by_name('Course Evaluation').id)
+Node.create(:parent_id => n1.id, :node_object_id => TreeFolder.find_by_name('Interaction Review').id)
 # For some odd reason, setting :type => 'FolderNode' does not work in the create statements. So each
 # of the node entries is manually getting its type set.
 Node.all.each do |n|
@@ -328,10 +330,3 @@ DeadlineType.create(:name => 'resubmission')
 DeadlineType.create(:name => 'rereview')
 DeadlineType.create(:name => 'metareview')
 DeadlineType.create(:name => 'drop_topic')
-
-
-###### Deadline Rights - necessary because there is no configuration from the UI.
-DeadlineRight.create(:name => 'No')
-DeadlineRight.create(:name => 'Late')
-DeadlineRight.create(:name => 'OK')
-

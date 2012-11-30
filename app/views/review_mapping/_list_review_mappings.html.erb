@@ -74,7 +74,7 @@
 
           <div style="text-align:right">
           <% if !assignment.team_assignment %>
-            <%= link_to 'delete', :controller=> 'participants', :action => 'delete_assignment_participant', :id => contributor.id %><br/>
+            <%= link_to 'delete', :action => 'delete_participant', :id => contributor.id %><br/>
           <% end %>
           <%= link_to 'add reviewer', :action => 'select_reviewer', :id => assignment.id, :contributor_id => contributor.id %><br/>
           <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id %>

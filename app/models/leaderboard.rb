@@ -12,37 +12,37 @@ class Leaderboard < ActiveRecord::Base
   # with a specific course. 
   
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
-  def self.get_independent_assignments(user_id)
-        user_assignments = AssignmentParticipant.find(:all, :conditions =>["user_id = ? ", user_id])
-        no_course_assignments = Array.new
-        for user_assignment in user_assignments
-            no_course_assignment = Assignment.find(:first, :conditions =>["id = ? and course_id is NULL", user_assignment.parent_id])
-            if no_course_assignment != nil
-               no_course_assignments<< no_course_assignment
+  def self.getIndependantAssignments(user_id)
+        userAssignments = AssignmentParticipant.find(:all, :conditions =>["user_id = ? ", user_id])
+        noCourseAssignments = Array.new
+        for ua in userAssignments
+            noCA = Assignment.find(:first, :conditions =>["id = ? and course_id is NULL", ua.parent_id])
+            if noCA != nil
+               noCourseAssignments<< noCA
             end
         end
-      return no_course_assignments
+      return noCourseAssignments
     end
   
   
-  def self.get_assignments_in_courses(course_array)
-    assignment_list = Assignment.find(:all,
-                                     :conditions => ["course_id in (?)", course_array])
+  def self.getAssignmentsInCourses(courseArray)
+    assignmentList = Assignment.find(:all, 
+                                     :conditions => ["course_id in (?)", courseArray])
   end
   
   # This method gets all tuples in the Participants table associated
-  # with a course in the course_array and puts them into a hash structure
+  # with a course in the courseArray and puts them into a hash structure
   # hierarchy (qtype => course => user => score)
   
   
   
-  def self.get_participant_entries_in_courses(courseArray, user_id)
-     assignment_list = get_assignments_in_courses(courseArray)
-     independent_assignments = get_independent_assignments(user_id)
-    for independent_assignment in independent_assignments
-         assignment_list << independent_assignment
+  def self.getParticipantEntriesInCourses(courseArray, user_id)
+     assignmentList = getAssignmentsInCourses(courseArray)
+     independantAssignments = getIndependantAssignments(user_id)
+    for iA in independantAssignments
+         assignmentList << iA
     end
-     questionnaire_hash = get_participant_entries_in_assignment_list(assignment_list)
+     questionnaireHash = getParticipantEntriesInAssignmentList(assignmentList)
   end
   
   # This method gets all tuples in the Participants table associated
@@ -50,86 +50,118 @@ class Leaderboard < ActiveRecord::Base
   # hierarchy (qtype => course => user => score).
   
   
-  def self.get_participant_entries_in_assignment(assignment_id)
-    assignment_list = Array.new
-    assignment_list << Assignment.find(assignment_id)
-    questionnaire_hash = get_participant_entries_in_assignment_list(assignment_list)
+  def self.getParticipantEntriesInAssignment(assignmentID)
+    assignmentList = Array.new
+    assignmentList << Assignment.find(assignmentID)
+    questionnaireHash = getParticipantEntriesInAssignmentList(assignmentList)
   end
   
   # This method gets all tuples in the Participants table associated
-  # with an assignment in the assignment_list and puts them into a hash
+  # with an assignment in the assignmentList and puts them into a hash 
   # structure hierarchy (qtype => course => user => score).
-  def self.get_participant_entries_in_assignment_list(assignment_list)
+  def self.getParticipantEntriesInAssignmentList(assignmentList)
 
     #Creating an assignment id to course id hash
-    ass_course_hash = Hash.new
-    ass_team_hash = Hash.new
-    ass_questionnaires = Hash.new
+    assCourseHash = Hash.new 
+    assTeamHash = Hash.new
+    assQuestionnaires = Hash.new
   
-    for assgt in assignment_list
+    for assgt in assignmentList
         
         if assgt.course_id != nil
-             ass_course_hash[assgt.id] = assgt.course_id
+             assCourseHash[assgt.id] = assgt.course_id
         else
-             ass_course_hash[assgt.id] = 0
+             assCourseHash[assgt.id] = 0
         end
-
-        ass_questionnaires[assgt.id] = get_different_questionnaires(assgt)
+        @revqids = []
+        differentQuestionnaires = Hash.new
+        @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",assgt.id])
+        @revqids.each do |rqid|
+            rtype = Questionnaire.find(rqid.questionnaire_id).type
+            if( rtype == 'ReviewQuestionnaire')
+            
+                
+                differentQuestionnaires["Review"] = rqid.questionnaire_id
+          
+            elsif( rtype == 'MetareviewQuestionnaire')
+              
+                differentQuestionnaires["Metareview"] = rqid.questionnaire_id
+            elsif( rtype == 'AuthorFeedbackQuestionnaire')
+                differentQuestionnaires["AuthorFeedback"] = rqid.questionnaire_id
+               
+            elsif( rtype == 'TeammateReviewQuestionnaire')
+                differentQuestionnaires["Teamreview"] = rqid.questionnaire_id
+            end # end of elsif block
+        end # end of each.do block
+         
+        assQuestionnaires[assgt.id] = differentQuestionnaires
         
         if (assgt.team_assignment)
-          ass_team_hash[assgt.id] = "team"
+          assTeamHash[assgt.id] = "team"
         else
-           ass_team_hash[assgt.id] = "indie"
+           assTeamHash[assgt.id] = "indie"
         end
     end
     # end of first for
     
    
-    participant_list = AssignmentParticipant.find(:all,
+    participantList = AssignmentParticipant.find(:all,
                                              :select => "id, user_id, parent_id",
-                                             :conditions => ["parent_id in (?)", assignment_list])
+                                             :conditions => ["parent_id in (?)", assignmentList])
     #Creating an participant id to [user id, Assignment id] hash
-    part_ass_hash = Hash.new
-    for participant in participant_list
-      part_ass_hash[participant.id] = [participant.user_id, participant.parent_id]
+    partAssHash = Hash.new
+    for part in participantList
+      partAssHash[part.id] = [part.user_id, part.parent_id]
     end
-   # cs_entries = ComputedScore.find(:all,
-    #                             :conditions => ["participant_id in (?)", participant_list])
+   # csEntries = ComputedScore.find(:all,
+    #                             :conditions => ["participant_id in (?)", participantList])
                                  
    
-             cs_entries = Array.new
-    #####Computation of cs_entries
+             csEntries = Array.new               
+    #####Computation of csEntries
     
     
-    ##The next part of the program expects cs_entries to be a array of [participant_id, questionnaire_id, total_score] values
-    ## The adaptor class given generates the expected cs_entries values using the score_cache table
+    ##The next part of the program expects csEntries to be a array of [participant_id, questionnaire_id, total_score] values
+    ## The adaptor class given generates the expected csEntries values using the score_cache table
     ## for all assignments, hadling ,metareviews, feedbacks and teammate reviews, participant_id is the same as reviewee_id, questionnaire_id is the one used for this assignment, and total_score is same as score in the score_cache table
-    ## for team assignments, we look up team numbers from the score_cache table, find the participants within the team, for each team member make a new cs_entry with the respective participant_id, questionnaire_id, and total_score
+    ## for team assignments, we look up team numbers from the score_cache table, find the participants within the team, for each team member make a new csEntry with the respective participant_id, questionnaire_id, and total_score
     ## code :Abhishek
 
     
-   arg_list = ['MetareviewResponseMap', 'FeedbackResponseMap','TeammateReviewResponseMap']
+   argList = ['MetareviewResponseMap', 'FeedbackResponseMap','TeammateReviewResponseMap']
   
-   for assgt in assignment_list
+   for assgt in assignmentList
             
             
             
-      participants_for_assgt = AssignmentParticipant.find(:all,
-                                                       :conditions =>["parent_id = ? and type =?", assgt.id, 'AssignmentParticipant'])
-
-      cs_entries = cs_entries + add_cs_entries_from_fmt_entries(arg_list, ass_questionnaires, assgt, participants_for_assgt)
-
+            participants_for_assgt = AssignmentParticipant.find(:all, 
+                                                             :conditions =>["parent_id = ? and type =?", assgt.id, 'AssignmentParticipant'])
+            fMTEntries = ScoreCache.find(:all, 
+                                          :conditions =>["reviewee_id in (?) and object_type in (?)", participants_for_assgt, argList])
+	    for fMTEntry in fMTEntries
+	        csEntry = CsEntriesAdaptor.new
+	        csEntry.participant_id = fMTEntry.reviewee_id
+	        if (fMTEntry.object_type == 'FeedbackResponseMap')
+	              csEntry.questionnaire_id = assQuestionnaires[assgt.id]["AuthorFeedback"]
+	        elsif (fMTEntry.object_type == 'MetareviewResponseMap')
+	              csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Metareview"]
+	        elsif (fMTEntry.object_type == 'TeammateReviewResponseMap')
+                      csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Teamreview"]
+                end
+                csEntry.total_score = fMTEntry.score
+                csEntries << csEntry
+   	    end
    	######## done with metareviews and feedbacksfor this assgt##############
    	##########now putting stuff in reviews based on if the assignment is a team assignment or not###################
-   	    if ass_team_hash[assgt.id] == "indie"
+   	    if assTeamHash[assgt.id] == "indie"
                    participant_entries = ScoreCache.find(:all, 
                                                     :conditions =>["reviewee_id in (?) and object_type = ?", participants_for_assgt, 'ParticipantReviewResponseMap' ]) 
                    for participant_entry in participant_entries
-                  	    cs_entry = CsEntriesAdaptor.new
-                 	    cs_entry.participant_id = participant_entry.reviewee_id
-                	    cs_entry.questionnaire_id = ass_questionnaires[assgt.id]["Review"]
-                	    cs_entry.total_score = participant_entry.score
-                	    cs_entries << cs_entry
+                  	    csEntry = CsEntriesAdaptor.new
+                 	    csEntry.participant_id = participant_entry.reviewee_id
+                	    csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
+                	    csEntry.total_score = participant_entry.score
+                	    csEntries << csEntry
                    end
             else
                   assignment_teams = Team.find(:all, 
@@ -143,215 +175,177 @@ class Leaderboard < ActiveRecord::Base
                             for team_user in team_users
                                    team_participant = AssignmentParticipant.find(:first, 
                                                                                     :conditions =>["user_id = ? and parent_id = ?", team_user.user_id, assgt.id])
-                                   cs_entry = CsEntriesAdaptor.new
-                                   cs_entry.participant_id = team_participant.id
-                                   cs_entry.questionnaire_id = ass_questionnaires[assgt.id]["Review"]
-              	                   cs_entry.total_score = team_entry.score
+                                   csEntry = CsEntriesAdaptor.new
+                                   csEntry.participant_id = team_participant.id        	     
+                                   csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
+              	                   csEntry.total_score = team_entry.score
               	                 
-              	                   cs_entries << cs_entry
+              	                   csEntries << csEntry
                             end
              
                    end
    	    end
     end
-    #puts "************looking at all the cs_entries elements***********"
-    #for cs_entry in cs_entries
-    #puts "cs_entry -> #{cs_entry.participant_id} , #{cs_entry.questionnaire_id}, #{cs_entry.total_score}"
+    #puts "************looking at all the csEntries elements***********"
+    #for csEntry in csEntries
+    #puts "csEntry -> #{csEntry.participant_id} , #{csEntry.questionnaire_id}, #{csEntry.total_score}"
     #end
     ####################### end of Code Abhishek #############
     #qtype => course => user => score
     
-    qtype_hash = Hash.new
+    qtypeHash = Hash.new
     
 
-    for cs_entry in cs_entries
+    for csEntry in csEntries  
     
-      qtype = Questionnaire.find(cs_entry.questionnaire_id).type.to_s
-      course_id = ass_course_hash[part_ass_hash[cs_entry.participant_id][1]]
-      user_id = part_ass_hash[cs_entry.participant_id][0]
+      qtype = Questionnaire.find(csEntry.questionnaire_id).type.to_s
+      courseid = assCourseHash[partAssHash[csEntry.participant_id][1]]
+      userid = partAssHash[csEntry.participant_id][0]
       
-      add_entry_to_cs_hash(qtype_hash, qtype, user_id, cs_entry, course_id)
+      addEntryToCSHash(qtypeHash, qtype, userid, csEntry, courseid)        
     end 
  
-   qtype_hash
+   qtypeHash
   end
-
-  def self.add_cs_entries_from_fmt_entries(arg_list, ass_questionnaires, assgt, participants_for_assgt)
-    cs_entries = []
-    fmt_entries = ScoreCache.find(:all,
-                                  :conditions => ["reviewee_id in (?) and object_type in (?)", participants_for_assgt, arg_list])
-    for fmt_entry in fmt_entries
-      cs_entry = CsEntriesAdaptor.new
-      cs_entry.participant_id = fmt_entry.reviewee_id
-      if (fmt_entry.object_type == 'FeedbackResponseMap')
-        cs_entry.questionnaire_id = ass_questionnaires[assgt.id]["AuthorFeedback"]
-      elsif (fmt_entry.object_type == 'MetareviewResponseMap')
-        cs_entry.questionnaire_id = ass_questionnaires[assgt.id]["Metareview"]
-      elsif (fmt_entry.object_type == 'TeammateReviewResponseMap')
-        cs_entry.questionnaire_id = ass_questionnaires[assgt.id]["Teamreview"]
-      end
-      cs_entry.total_score = fmt_entry.score
-      cs_entries << cs_entry
-    end
-    cs_entries
-  end
-
-  def self.get_different_questionnaires(assgt)
-    @review_ques_ids = []
-    different_questionnaires = Hash.new
-    @review_ques_ids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?", assgt.id])
-    @review_ques_ids.each do |review_ques_id|
-      rtype = Questionnaire.find(review_ques_id.questionnaire_id).type
-      if (rtype == 'ReviewQuestionnaire')
-
-        different_questionnaires["Review"] = review_ques_id.questionnaire_id
-
-      elsif (rtype == 'MetareviewQuestionnaire')
-
-        different_questionnaires["Metareview"] = review_ques_id.questionnaire_id
-      elsif (rtype == 'AuthorFeedbackQuestionnaire')
-        different_questionnaires["AuthorFeedback"] = review_ques_id.questionnaire_id
-
-      elsif (rtype == 'TeammateReviewQuestionnaire')
-        different_questionnaires["Teamreview"] = review_ques_id.questionnaire_id
-      end # end of elsif block
-    end
-    different_questionnaires
-  end
-
+  
   # This method adds an entry from the Computed_Scores table into a hash
   # structure that is used to in creating the leaderboards.
-  def self.add_entry_to_cs_hash(qtype_hash, qtype, userid, cs_entry, courseid)
+  def self.addEntryToCSHash(qtypeHash, qtype, userid, csEntry, courseid)
     #If there IS NOT any course for the particular course type
-    if qtype_hash[qtype] == nil
-      part_hash = Hash.new
-      part_hash[userid] = [cs_entry.total_score, 1]
-      course_hash = Hash.new
-      course_hash[courseid] = part_hash
-      qtype_hash[qtype] = course_hash
+    if qtypeHash[qtype] == nil
+      partHash = Hash.new
+      partHash[userid] = [csEntry.total_score, 1]
+      courseHash = Hash.new
+      courseHash[courseid] = partHash
+      qtypeHash[qtype] = courseHash
     else
       #There IS at least one course under the particular qtype
       #If the particular course IS NOT present in existing course hash
-      if qtype_hash[qtype][courseid] == nil
-        course_hash = qtype_hash[qtype]
-        part_hash = Hash.new
-        part_hash[userid] = [cs_entry.total_score, 1]
-        course_hash[courseid] = part_hash
-        qtype_hash[qtype] = course_hash
+      if qtypeHash[qtype][courseid] == nil
+        courseHash = qtypeHash[qtype]
+        partHash = Hash.new
+        partHash[userid] = [csEntry.total_score, 1]
+        courseHash[courseid] = partHash
+        qtypeHash[qtype] = courseHash
       else
         #The particular course is present  
         #If the particular user IS NOT present in the existing user hash
-        if qtype_hash[qtype][courseid][userid] == nil
-          part_hash = qtype_hash[qtype][courseid]
-          part_hash[userid] = [cs_entry.total_score, 1]
-          qtype_hash[qtype][courseid] = part_hash
+        if qtypeHash[qtype][courseid][userid] == nil
+          partHash = qtypeHash[qtype][courseid]
+          partHash[userid] = [csEntry.total_score, 1]
+          qtypeHash[qtype][courseid] = partHash
         else
           #User is present, update score
-          current_score = qtype_hash[qtype][courseid][userid][0]
-          count = qtype_hash[qtype][courseid][userid][1]
-          final_score = ((current_score * count) + cs_entry.total_score) / (count + 1)
+          current_score = qtypeHash[qtype][courseid][userid][0]
+          count = qtypeHash[qtype][courseid][userid][1]
+          final_score = ((current_score * count) + csEntry.total_score) / (count + 1)
           count +=(1)
-          qtype_hash[qtype][courseid][userid] = [final_score, count]
+          qtypeHash[qtype][courseid][userid] = [final_score, count]
         end
       end
     end
-    if qtype_hash[qtype][courseid][userid] == nil
-      part_hash[userid] = [cs_entry.total_score, 1]
-      course_hash[courseid] = part_hash
-      qtype_hash[qtype] = course_hash
+    if qtypeHash[qtype][courseid][userid] == nil
+      partHash[userid] = [csEntry.total_score, 1]
+      courseHash[courseid] = partHash
+      qtypeHash[qtype] = courseHash
     end
   end
   
   # This method does a destructive sort on the computed scores hash so
   # that it can be mined for personal achievement information
-  def self.sort_hash(qtype_hash)
-    qtype_hash.each { |qtype, course_hash|
-       course_hash.each { |course, user_score_hash|
-          user_score_sort_array = user_score_hash.sort { |a, b| b[1][0] <=> a[1][0]}
-          qtype_hash[qtype][course] = user_score_sort_array
+  def self.sortHash(qtypeHash)
+    qtypeHash.each { |qtype, courseHash|
+       courseHash.each { |course, userScoreHash|
+          userScoreSortArray = userScoreHash.sort { |a, b| b[1][0] <=> a[1][0]}
+          qtypeHash[qtype][course] = userScoreSortArray
        }       
     }
-    qtype_hash
+    qtypeHash
   end
   
-
+  
+  
+  
+  
+  
+  
+  
   # This method takes the sorted computed score hash structure and mines
   # it for personal achievement information.
-  def self.extract_personal_achievements(cs_hash, course_list, user_ID)
+  def self.extractPersonalAchievements(csHash, courseList, userID)
     # Get all the possible accomplishments from Leaderboard table
     
-    accomp_list = Leaderboard.find(:all,
+    accompList = Leaderboard.find(:all,
                                   :select => 'qtype')
     # New hash for courses and accomplishments
-    course_acc_hash = Hash.new
+    courseAccHash = Hash.new
     # Go through each course-accomplishment combo
-    course_list.each { |course_ID|
-       accomp_list.each { |accomp|
-       qtype_id = accomp.qtype
+    courseList.each { |courseID|
+       accompList.each { |accomp| 
+       qtypeid = accomp.qtype
        # Make sure there are no nils in the chain
    
-       if cs_hash[qtype_id]
+       if csHash[qtypeid]
 
-          if cs_hash[qtype_id][course_ID]
+          if csHash[qtypeid][courseID]
              
      
-             if cs_hash[qtype_id][course_ID][user_ID]
+             if csHash[qtypeid][courseID][userID]
                # We found a combo for accomplishment, course, and user
  
-                if course_acc_hash[course_ID] == nil
-                   course_acc_hash[course_ID] = Array.new
+                if courseAccHash[courseID] == nil
+                   courseAccHash[courseID] = Array.new
                 end
-                #puts cs_hash[qtype_id][course_ID][user_ID].join(",")
+                #puts csHash[qtypeid][courseID][userID].join(",")
                 # Add an array with accomplishment and score
-                course_acc_hash[course_ID] << [qtype_id, cs_hash[qtype_id][course_ID][user_ID]]
+                courseAccHash[courseID] << [qtypeid, csHash[qtypeid][courseID][userID]]
            	
                 
-                pp cs_hash[qtype_id][course_ID][user_ID]
+                pp csHash[qtypeid][courseID][userID]
              end
           end
        end
        }
     }
 
-    # Next part is to extract ranking from cs_hash
+    # Next part is to extract ranking from csHash
     
     # Sort the hash (which changes the structure slightly)
-    # NOTE: This changes the original cs_hash
-    cs_sort_hash= Leaderboard.sort_hash(cs_hash)
+    # NOTE: This changes the original csHash
+    csSortHash= Leaderboard.sortHash(csHash)
     
-    course_accomp = Hash.new
-    course_acc_hash.each { |course_ID, accomp_score_array|
-      # puts "Processing course #{course_ID}"
-       accomp_score_array.each { |accomp_score_array_entry|
-        #  pp accomp_score_array_entry
+    courseAccomp = Hash.new
+    courseAccHash.each { |courseID, accompScoreArray|
+      # puts "Processing course #{courseID}"
+       accompScoreArray.each { |accompScoreArrayEntry|
+        #  pp accompScoreArrayEntry
           
-         # puts accomp_score_array_entry[course_ID][idx]
-            score = accomp_score_array_entry[1][0]
+         # puts accompScoreArrayEntry[courseID][idx]
+            score = accompScoreArrayEntry[1][0]
             #let me know if you can't understand this part.
-            accomp = accomp_score_array_entry[0]
-            user_score_array = accomp_score_array_entry[1]
-            rank = cs_sort_hash[accomp][course_ID].index([user_ID, user_score_array])+ 1
-            total = cs_sort_hash[accomp][course_ID].length
-            if course_accomp[course_ID] == nil
-               course_accomp[course_ID] = Array.new
+            accomp = accompScoreArrayEntry[0]
+            userScoreArray = accompScoreArrayEntry[1]
+            rank = csSortHash[accomp][courseID].index([userID, userScoreArray])+ 1
+            total = csSortHash[accomp][courseID].length
+            if courseAccomp[courseID] == nil
+               courseAccomp[courseID] = Array.new
             end
-            course_accomp[course_ID] << { :accomp => Leaderboard.find_by_qtype(accomp).name,
+            courseAccomp[courseID] << { :accomp => Leaderboard.find_by_qtype(accomp).name,
                                         :score => score,
                                         :rankStr => "#{rank} of #{total}"}
             }
            }
        
    
-    course_accomp
+    courseAccomp
   
   end
-
-  # Currently no usage in the project
+  
   # Returns string for Top N Leaderboard Heading or accomplishments entry
-  def self.leaderboard_heading(qtypeid)
-    lt_entry = Leaderboard.find_by_qtype(qtypeid)
-    if lt_entry
-      lt_entry.name
+  def self.leaderboardHeading(qtypeid)
+    ltEntry = Leaderboard.find_by_qtype(qtypeid)
+    if ltEntry
+      ltEntry.name
     else
       "No Entry"
     end

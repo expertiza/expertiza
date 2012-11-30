@@ -1,0 +1,101 @@
+<%
+   @questionnaire = Questionnaire.find_by_name ('Helper Review')
+   @questions = @questionnaire.questions
+%>
+<%
+   #Responses from helper
+   if(!helper.nil?)
+     helpermap = ResponseMap.first(:conditions => ['reviewer_id = ? and reviewee_id = ? and type="InteractionResponseMap"',helper.participant_id,helper.team_id])
+     helperresponse = Response.find_by_map_id(helpermap.id)
+     helperscores = Score.find_all_by_response_id(helperresponse.id)
+   end
+%>
+<%
+   #Responses from helpee
+   if(!helpee.nil?)
+     helpeemap = ResponseMap.last(:conditions => ['reviewer_id = ? and reviewee_id = ? and type="InteractionResponseMap"',helpee.participant_id,helpee.team_id])
+     helpeeresponse = Response.find_by_map_id(helpeemap)
+     helpeescores = Score.find_all_by_response_id(helpeeresponse.id)
+   end
+%>
+<TABLE border="0" cellspacing="0" align="center">
+  <TR>
+    <TH class="interactions">&nbsp;</TH>
+    <TH class="interactions">Helper</TH>
+    <TH class="interactions">Helpee</TH>
+  </TR>
+  <TR>
+    <TD class="interactions" >Name</TD>
+    <% if !helper.nil? %>
+        <TD class="interactions"><%=Participant.find(helper.participant_id).user.name%></TD>
+    <%else%>
+        <TD class="interactions">--</TD>
+    <%end%>
+
+    <% if !helpee.nil? %>
+        <TD class="interactions"><%=helpee.team.name%></TD>
+    <%else%>
+        <TD class="interactions">--</TD>
+    <%end%>
+
+  </TR>
+
+
+
+  <%
+     i=0
+     @questions.each { |question|
+  %>
+  <tr>
+    <td class="interactions"><%= question.txt %></td>
+
+    <% if(!helperscores.nil?) %>
+        <% if question.txt == "Score" %>
+            <TD class="interactions"><%=helperscores[i].score %></TD>
+        <% else %>
+            <TD class="interactions"><%=helperscores[i].comments %></TD>
+        <% end %>
+    <% else %>
+        <TD class="interactions">--</TD>
+    <% end %>
+
+    <% if(!helpeescores.nil?) %>
+        <% if question.txt == "Score" %>
+            <TD class="interactions"><%=helpeescores[i].score %></TD>
+        <% else %>
+            <TD class="interactions"><%=helpeescores[i].comments %></TD>
+        <% end %>
+    <% else %>
+        <TD class="interactions">--</TD>
+    <% end %>
+  </tr>
+  <%
+     i+=1
+     }
+  %>
+  <tr>
+      <td class="interactions">Additional Comments</td>
+    <% if(!helper.nil?) %>
+        <TD class="interactions"><%= helperresponse.additional_comment %></TD>
+    <% else %>
+        <TD class="interactions">--</TD>
+    <% end %>
+
+    <% if(!helpee.nil?) %>
+        <TD class="interactions"><%= helpeeresponse.additional_comment %></TD>
+    <% else %>
+        <TD class="interactions">--</TD>
+    <% end %>
+  </tr>
+
+  <TR>
+    <TD class="interactions">Status</TD>
+
+    <% if !helpee.nil? %>
+        <TD class="interactions" colspan="2"><%=helpee.status%></TD>
+    <%else%>
+        <TD class="interactions" colspan="2">--</TD>
+    <%end%>
+  </TR>
+
+</TABLE>

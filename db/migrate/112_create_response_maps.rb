@@ -20,8 +20,7 @@ class CreateResponseMaps < ActiveRecord::Migration
       t.column :created_at, :datetime, :null => true
       t.column :updated_at, :datetime, :null => true
     end
-
-
+    
     execute 'ALTER TABLE `responses`
              ADD CONSTRAINT fk_response_response_map
              FOREIGN KEY (map_id) REFERENCES response_maps(id)'    

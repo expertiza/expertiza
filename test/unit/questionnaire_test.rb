@@ -31,6 +31,10 @@ class RubricTest < ActiveSupport::TestCase
     assert_equal "questionnaire1 new name", @questionnaire1.name
   end
   
+#  def test_destroy
+#    @questionnaire1.destroy
+#    assert_raise(ActiveRecord::RecordNotFound) { questionnaire.find(@questionnaire1.id) }
+#  end
   
   def test_validate_no_numbers
     @questionnaire1.min_question_score = "akajfsd"
@@ -59,10 +63,17 @@ class RubricTest < ActiveSupport::TestCase
   end
   
   def test_true_false_question
+    #assert !@questionnaire1.true_false_questions?
+    #q = Question.new
+    #q.questionnaire_id = @questionnaire1.id
+    #q.true_false = false
+    #q.txt = "1"
     q2 = Question.new
     q2.questionnaire_id = @questionnaire1.id
     q2.true_false = true
     q2.txt = "2"
+    #@questionnaire1.questions << q
+    #assert !@questionnaire1.true_false_questions?
     @questionnaire1.questions << q2
     assert @questionnaire1.true_false_questions?
   end
@@ -72,6 +83,8 @@ class RubricTest < ActiveSupport::TestCase
     questionnaire1<<questionnaires(:questionnaire0)
     questionnaire1<<questionnaires(:questionnaire1)
     questionnaire1<<questionnaires(:questionnaire2)
+    #questionnaire1<<questionnaires(:questionnaire3)
+    #questionnaire1<<questionnaires(:questionnaire4)
     questionnaire1<<questionnaires(:peer_review_questionnaire)
 
     scores = Hash.new

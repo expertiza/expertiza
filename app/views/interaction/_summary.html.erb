@@ -1,0 +1,26 @@
+<% namecolwidth = 18 %>
+<% colwidth = 7  %>
+
+
+
+<TABLE align="center">
+  <TR align="center" >
+    <% if type == 'helpee' %>
+        <TH class="interactions" class="grades">Helped By</TH>
+    <%end%>
+    <% if type == 'helper' %>
+        <TH class="interactions" class="grades">Team Helped</TH>
+    <%end%>
+    <TH class="interactions" class="grades">Score</TH>
+    <TH class="interactions" class="grades">Status</TH>
+    <TH class="interactions"></TH>
+    <TH class="interactions"></TH>
+  </TR>
+</TABLE>
+<% for interaction in interactions %>
+
+    <%= render :partial => 'interaction', :locals => {:interaction => interaction[1] , :type=>type , :expanded => "false" } %>
+
+<% end %>
+
+</TABLE>

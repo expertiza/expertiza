@@ -1,0 +1,81 @@
+<% if(@type=='helper')
+     @questionnaire = Questionnaire.find_by_name ('Helper Review')
+   else
+     @questionnaire = Questionnaire.find_by_name ('Helper Review')
+   end
+
+   @questions = @questionnaire.questions
+   @min = @questionnaire.min_question_score
+   @max = @questionnaire.max_question_score
+%>
+
+
+<!--input for team for which help was given -->
+<div class="ss-item  ss-text"><div class="ss-form-entry">
+  <label class="ss-q-title" for="entry_0">The Team to which help was given:
+  </label>
+  <td style="padding:50px">
+    <% if (@type=='helper')%>
+        <br/>
+        <!--if helper then display drop down box for selection of team for which help was given-->
+        <% if interaction.team_id %>
+            <% selected = Team.find(interaction.team_id) %>
+        <%end %>
+        <select style="width:250px" name="teams">
+          <% Team.find(:all, :conditions => ['parent_id = ?',assignment_id],:order => "name").each do | team | %>
+              <% if team.id != @my_team_id %>
+                  <option value="<%=team.name%>" <% if selected != nil and team.name == selected.name%>selected="yes"<%end%>><%=team.name %></option>
+              <% end %>
+          <% end %>
+        </select>
+
+        </div></div>
+    <% elsif (@type=='helpee') %>
+        <!--if helpee then display the team-->
+        <%=@my_team.name%>
+        </div></div>
+    <%end%>
+    </td>
+    <br>
+
+
+    <% if(@type=='helpee') %>
+        <div class="ss-item  ss-text"><div class="ss-form-entry">
+          <label class="ss-q-title" for="entry_1">Enter the user name of the helper:
+          </label>
+          <br>
+          <input type="text" name="helper" value=<% @user_name %>>
+          <br><br>
+        </div></div>
+    <%end%>
+
+    <% i = 0
+       @questions.each{
+               | question | %>
+        <%= question.txt %><BR/>
+        <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>
+
+        <% if question.true_false? %>
+            <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+              <option value="<%=@min%>"><%=@min%></option>
+              <option value="<%=@max%>"><%=@max%></option>
+            </select>
+        <% else %>
+            <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+              <% for j in @min..@max %>
+                  <option value="<%=j%>" ><%=j%></option>
+              <% end %>
+            </select>
+        <% end %>
+          <br/>
+        <%if question.txt == "Score" and question.question_advices.size > 0%>
+            <%= render :partial => 'advice', :locals => {:i => i, :advice_list => question.question_advices} %>
+        <% end %>
+        <BR/><br/>
+    <% i+=1
+       } %>
+    <label for="review_comments">Additional Comments</label><BR/>
+    <textarea cols="70" rows="1" id="review_comments" name="review[comments]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><% if controller.action_name != 'new' and @response.additional_comment != nil %><%=@response.additional_comment.strip%><% end %></textarea>
+    <%= hidden_field_tag('questionnaire_id', @questionnaire.id) %>
+    <br/><br/>
+

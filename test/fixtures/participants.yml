@@ -155,13 +155,3 @@ par15:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par15"
-
-par16:
-  submit_allowed: 1
-  review_allowed: 1
-  user_id: <%= Fixtures.identify(:student4) %>
-  parent_id: <%= Fixtures.identify(:assignment7) %>
-  topic: Research Communication
-  penalty_accumulated: 0
-  type : AssignmentParticipant
-  handle: "par16"

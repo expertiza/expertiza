@@ -1,0 +1,51 @@
+
+<h3>Past Interactions</h3>
+
+<% namecolwidth = 18 %>
+<% colwidth = 7  %>
+
+
+<% colwidth = 7  %>
+
+<TABLE width="100%" cellspacing="0" cellpadding="2" border="0">
+  <tr bgcolor="#CCCCCC">
+  <TH width="100">Helper</TH>
+  <TH width="100">Helpee</TH>
+  <TH width="100">Score</TH>
+  <TH width="100">Status</TH>
+  <TH width="100">View Details</TH>
+  <TH width="100">Approve</TH>
+  </tr>
+  </TABLE>
+     <% interactions = Array.new %>
+
+   <% for helpee in @team_helped%>
+      <%if helpee.status=="Confirmed"%>
+          <%interactions<<helpee%>
+          <%end%>
+      <%end%>
+  <% for helpee in @team_helped%>
+
+      <%if helpee.status=="Approved"%>
+           <%interactions<<helpee%>
+           <%end%>
+       <%end%>
+
+  <% for helpee in @team_helped%>
+       <%if helpee.status=="Not Confirmed"%>
+           <%interactions<<helpee%>
+           <%end%>
+       <%end%>
+
+  <% for helper in @participant_helped%>
+       <%if helper.status=="Not Confirmed"%>
+           <%interactions<<helper%>
+           <%end%>
+       <%end%>
+
+    <% for interaction in interactions%>
+      <div id="interaction_<%=interaction.id%>">
+       <%= render :partial => 'instructor_view', :locals => {:interaction => interaction , :expanded => "false" } %>
+
+</div>
+<% end %>

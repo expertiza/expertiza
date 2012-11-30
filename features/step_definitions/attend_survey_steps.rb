@@ -22,15 +22,6 @@ And /^I fill in my email address$/ do
   fill_in 'email', :with => 'test@gamil.com'
 end
 
-And /^I fill in my name$/ do
-   fill_in 'login_name', :with => 'mmythri'
-end
-
-And /^I fill in my password$/ do
-   fill_in 'login_password', :with => 'password'
-end
-
-
 And /^I click the "([^"]*)" button$/ do |button|
   should have_button button
   click_button button

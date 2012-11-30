@@ -13,13 +13,5 @@
   <TR><TD>No <%if @assignment.team_assignment%>teams<%else%>participants<%end%> are defined for this assignment</TD></TR>
 <% end %>
 </TABLE>
-<BR/><BR/>
-<%= link_to 'Export '+'Grades',
-            :controller=>'export_file',
-            :action=>'start',
-            :model=>'Assignment',
-            :id=>@assignment.id %> <BR/><BR/>
 <a href="javascript:window.history.back()">Back</a>
-
-
 

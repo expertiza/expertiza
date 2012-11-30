@@ -19,11 +19,6 @@
             :model => modelType, 
             :title => 'Teams',
             :expected_fields =>  "&lt;Team Name - optional, &gt; Team Member1, Team Member2, ... , Team Member3",
-            :id => @root_node.node_object_id %>
-|<%= link_to 'Export Teams',
-            :controller=>'export_file',
-            :action=>'start',
-            :model=> modelType,
-            :id=>@root_node.node_object_id %>
+            :id => @root_node.node_object_id %> 
 |<%= link_to 'Delete All Teams', :action => 'delete_all', :id=> @root_node.node_object_id, :model => @model %>
 |<%= render :partial => '/shared_scripts/back' %>

@@ -10,6 +10,7 @@ class AssignmentParticipant < Participant
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
   has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
   has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
+  has_many    :interaction, :class_name => 'Interaction', :foreign_key => 'participant_id'
   belongs_to  :user
 
   validates_presence_of :handle
@@ -52,15 +53,32 @@ class AssignmentParticipant < Participant
   def get_scores(questions)
     scores = Hash.new
     scores[:participant] = self # This doesn't appear to be used anywhere
-    self.assignment.questionnaires.each do |questionnaire|
+    assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-
-
-
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
+
+
+
+
+    interaction_weight = InteractionWeight.find_by_assignment_id(assignment)
+    if( interaction_weight )
+      scores[:interactions] = Hash.new
+      scores[:interactions][:scores] = Hash.new
+
+      scores[:interactions][:scores][:max] = interaction_weight.max_score
+      scores[:interactions][:scores][:weightage] =  interaction_weight.weight
+      scores[:interactions][:scores][:achieved]  =  HelpeeInteraction.total_score(self) < interaction_weight.max_score ?   HelpeeInteraction.total_score(self) :  interaction_weight.max_score
+
+      scores[:interactions][:details] = HelpeeInteraction.all(:conditions => ["participant_id = :participant_id AND status = 'Approved'",{:participant_id => self}])  # where status = Approved
+
+    end
+
     scores[:total_score] = assignment.compute_total_score(scores)
+
+
+
     return scores
   end
 
@@ -230,7 +248,7 @@ class AssignmentParticipant < Participant
   end  
   
   # provide export functionality for Assignment Participants
-  def self.export(csv,parent_id,options)
+  def self.export(csv,parent_id)
      find_all_by_parent_id(parent_id).each{
           |part|
           user = part.user
@@ -248,7 +266,7 @@ class AssignmentParticipant < Participant
       } 
   end
   
-  def self.get_export_fields(options)
+  def self.get_export_fields
     fields = ["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"]
     return fields            
   end
@@ -367,7 +385,7 @@ class AssignmentParticipant < Participant
         }
       end
     end
-  end
+  end   
 
 private
 

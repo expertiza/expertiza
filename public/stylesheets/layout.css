@@ -12,7 +12,6 @@ a {
   padding: 0 1px 2px 1px ;
 }
 
-
 img 
 { 
   border-style: none; 
@@ -405,6 +404,30 @@ background-color: #EAEAEA;
 text-decoration: none;
 }
 
+
+
+th.interactions{
+    color: Black;
+    background-color: #EAEAEA;
+    text-decoration: none;
+    width: 7%;
+}
+
+td.interactions{
+    color: Black;
+    width: 7%;
+    text-align: center;
+
+}
+
+table.interaction_report{
+    border-style: inset;
+    text-align: center ;
+
+
+}
+
+
 .row {
   padding:5px;
   margin:0px;
@@ -509,5 +532,4 @@ border-spacing: 0px; }
   font: 11px tahoma; padding: 5px; margin-bottom: 39px; border: 1px dashed rgb(153, 153, 153);
   float: left; width: 230px; margin-left: 16px; background: none repeat scroll 0pt 0pt rgb(250, 250, 234);
 }
-
 

@@ -1,7 +1,7 @@
 class Team < ActiveRecord::Base
   has_many :teams_users
   has_many :users, :through => :teams_users
-  has_many :join_team_requests
+  has_many :interaction, :class_name => 'Interaction', :foreign_key => 'team_id' , :dependent => :destroy
 
   def delete
     for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", self.id])       
@@ -13,7 +13,7 @@ class Team < ActiveRecord::Base
     end
     self.destroy
   end
-
+  
   def get_node_type
     "TeamNode"
   end
@@ -66,7 +66,7 @@ class Team < ActiveRecord::Base
    members.each{
      | member |
      t_user = TeamsUser.create(:team_id => new_team.id, :user_id => member.user_id)
-     parent = Object.const_get(self.get_parent_model).find(self.parent_id)
+     parent = TeamNode.find_by_node_object_id(self.id)   
      TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
    }   
  end

@@ -27,9 +27,9 @@ function addQuestions(){
 }
 
 function addQuestion(){
-    qtype =  document.getElementById("section").value;
 	table = document.getElementById("questions_table");
 	var row = table.insertRow(-1);
+	
 	id = num_questions;
 	column = document.createElement("td");
 	column.innerHTML = "<center><input type=checkbox id='question_chk" + num_questions + "'></center>";
@@ -40,31 +40,16 @@ function addQuestion(){
 	row.appendChild(column);
 	
 	column = document.createElement("td");
-
-     if (qtype == "Custom"){
-         gradingTypes = "<select id=question_" + id + "_true_false name=question_type["+id+"][type]>";
-
-        <% for type in Question::GRADING_TYPES_CUSTOM %>
-            <%= "gradingTypes += '<option value=" + type[0].to_s + ">" + type[0].to_s + "</option>';"%>
-        <% end %>
-     }else{
-        gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
-        <% for type in Question::GRADING_TYPES %>
-            <%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
-        <% end %>
-     }
-    gradingTypes += "</select>"
+	gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
+	<% for type in Question::GRADING_TYPES %>
+		<%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
+	<% end %>
+	gradingTypes += "</select>"
 	column.innerHTML = gradingTypes;
 	row.appendChild(column);
-
-    if (qtype == "Custom"){
-        column = document.createElement("td");
-	    column.innerHTML = "<input id=new_question" + id + "_txt name=question_type["+id+"][parameters] size=30 type=text/>";
-	    row.appendChild(column);
-    }
 	
 	column = document.createElement("td");
-	weights = "<select id=new_question_" + id + "_weight name=new_question[" + id +"][weight]>";
+	weights = "<select id=new_question_" + id + "_weight name=new_question[" + id + 		"][weight]>";
 	<% for weight in Question::WEIGHTS %>
 		<%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
 	<% end %>

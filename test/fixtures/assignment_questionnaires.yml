@@ -1,28 +1,32 @@
 first:
-  assignment_id: <%= Fixtures.identify(:assignment0) %>
-  questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
-  user_id: <%= Fixtures.identify(:student3) %>
+  id: 1
+  assignment_id: 1
+  questionnaire_id: 1
+  user_id: 3
   notification_limit: 15
   questionnaire_weight: 100
 
 second:
-  assignment_id: <%= Fixtures.identify(:assignment2) %>
-  questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
-  user_id: <%= Fixtures.identify(:student3) %>
+  id: 2
+  assignment_id: 3
+  questionnaire_id: 2
+  user_id: 3
   notification_limit: 15
   questionnaire_weight: 100
 
 third:
-  assignment_id: <%= Fixtures.identify(:assignment1) %>
-  questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
-  user_id: <%= Fixtures.identify(:student3) %>
+  id: 3
+  assignment_id: 2
+  questionnaire_id: 1
+  user_id: 3
   notification_limit: 15
   questionnaire_weight: 100
 
 fourth:
-  assignment_id: <%= Fixtures.identify(:assignment4) %>
-  questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
-  user_id: <%= Fixtures.identify(:student3) %>
+  id: 4
+  assignment_id: 5
+  questionnaire_id: 2
+  user_id: 3
   notification_limit: 15
   questionnaire_weight: 100
 

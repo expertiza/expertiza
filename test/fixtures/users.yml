@@ -59,58 +59,16 @@ instructor3:
 ta1:
   name: ta1
   parent_id: <%= Fixtures.identify(:instructor1) %>
-  fullname: teaching_assistant1
+  fullname: teaching_assistance1_fullname
   password: <%= Digest::SHA1.hexdigest("ta1") %>
   password_salt:
-  email: ta1@mailinator.com
+  email: student1@mailinator.com
   role_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
   master_permission_granted: 1
-  handle: ta1
-
-ta2:
-  name: ta2
-  parent_id: <%= Fixtures.identify(:instructor2) %>
-  fullname: teaching_assistant2
-  password: <%= Digest::SHA1.hexdigest("ta2") %>
-  password_salt:
-  email: ta2@mailinator.com
-  role_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
-  email_on_review: 1
-  email_on_submission: 1
-  email_on_review: 1
-  master_permission_granted: 1
-  handle: ta2
-
-ta3:
-  name: ta3
-  parent_id: <%= Fixtures.identify(:instructor3) %>
-  fullname: teaching_assistant3
-  password: <%= Digest::SHA1.hexdigest("ta3") %>
-  password_salt:
-  email: ta3@mailinator.com
-  role_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
-  email_on_review: 1
-  email_on_submission: 1
-  email_on_review: 1
-  master_permission_granted: 1
-  handle: ta3
-
-ta4:
-  name: ta4
-  parent_id: <%= Fixtures.identify(:instructor1) %>
-  fullname: teaching_assistant4
-  password: <%= Digest::SHA1.hexdigest("ta4") %>
-  password_salt:
-  email: ta4@mailinator.com
-  role_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
-  email_on_review: 1
-  email_on_submission: 1
-  email_on_review: 1
-  master_permission_granted: 1
-  handle: ta3
+  handle: stu1
 
 
 student1:

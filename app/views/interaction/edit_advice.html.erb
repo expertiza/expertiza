@@ -1,0 +1,50 @@
+<%= render :partial => 'scripts' %>
+
+<% if flash[:alert] %>
+    <div class="flash_note"><%= flash[:alert] %></div>
+<% end %>
+<h1>Edit advice for Interaction</h1>
+<% form_tag :action => 'update_advice'  do %>
+    <%= hidden_field_tag(:assign ,@id ) %>
+    <TABLE id="advice_table" width="100" >
+  <tr>
+    <th>Column number</th>
+    <th>Score</th>
+    <th>Advice</th>
+  </tr>
+
+
+
+
+      <% i=0
+         for advice in @advices %>
+          <%if !advice.score.nil?%>
+          <tr>
+            <td><input type=checkbox id="advice_chk<%= i %>"></td>
+            <td><%= text_field "advices["+i.to_s+"]", 'score', :size=>5 ,:value=>advice.score%></td>
+            <td><%= text_field  "advices["+i.to_s+"]", 'advice', :size=>25 %></td>
+          </tr>
+          <% i+=1
+             end%>
+
+        <% end %>
+      </TABLE>
+      <TABLE>
+
+
+        <tr>
+
+          <td align="center"><%= submit_tag "Save Advice", :name=>"save"  %></td>
+          <td align="center"><input type="button" value="Delete selected questions" onclick="deleteQuestions()"></td>
+          <td align="center">
+            <input type="button" value="Add" onclick="addQuestions()">
+            <input id="numAdviceToAdd" type="text" value="1" size=1>
+            more question(s)</td>
+
+
+        </tr>
+      </TABLE>
+  <%end%>
+
+  <br />
+  <a href="javascript:window.history.back()">Back</a>

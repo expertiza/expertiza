@@ -223,33 +223,5 @@ class AssignmentTeam < Team
     }
     team  
   end
-
-  def self.export(csv, parent_id, options)
-    currentAssignment = Assignment.find(parent_id)
-    currentAssignment.teams.each { |team|
-      tcsv = Array.new
-      teamUsers = Array.new
-      tcsv.push(team.name)
-      if (options["team_name"] == "false")
-        teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
-        teamMembers.each do |user|
-          teamUsers.push(user.name)
-          teamUsers.push(" ")
-        end
-        tcsv.push(teamUsers)
-      end
-      tcsv.push(currentAssignment.name)
-      csv << tcsv
-    }
-  end
-
-  def self.get_export_fields(options)
-    fields = Array.new
-    fields.push("Team Name")
-    if (options["team_name"] == "false")
-      fields.push("Team members")
-    end
-    fields.push("Assignment Name")
-  end
 end  
 

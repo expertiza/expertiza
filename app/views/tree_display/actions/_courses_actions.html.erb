@@ -9,7 +9,6 @@
   <%= link_to image_tag('/images/tree_view/add-assignment-24.png', :title => 'Create assignment'),:controller=>'assignment', :action=>'new', :parent_id => node.node_object_id %>
   <%= link_to image_tag('/images/tree_view/add-participant-24.png', :title => 'Add participants'),:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Course'%>
   <%= link_to image_tag('/images/tree_view/create-teams-24.png', :title => 'Create teams'),:controller=>'team', :action=>'list', :id => node.node_object_id, :type => 'Course' %>  
-  <%= link_to image_tag('/images/tree_view/360-dashboard-24.png', :title => '360 degree assessment dashboard'),:controller=>'assessment360', :action=>'one_course_all_assignments', :course_id => node.node_object_id %>  
 </div>
 <% end %>
 </ul>

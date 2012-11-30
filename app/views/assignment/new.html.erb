@@ -15,24 +15,24 @@
       <% form_tag :action => 'update' do %>
 
           <tr>
-            <td>Offset:  default: 20</td>
-            <td><%= text_field :assigned, :thresh, :size=>10 %></td>
+            <td>Offset: </td>
+            <td><%= text_field :assigned, :thresh, :size=>10, :value=>20 %></td>
           </tr>
           <tr>
-            <td>Redistribution Factor:  default: 1.0 </td>
-            <td><%= text_field :assigned, :rfactor, :size=>10 %></td>
+            <td>Redistribution Factor: </td>
+            <td><%= text_field :assigned, :rfactor, :size=>10, :value=>1.0 %></td>
           </tr>
           <tr>
-            <td>Maximum Deductable Points: default: 20 </td>
-            <td> <%= text_field :assigned, :mpd, :size=>10 %></td>
+            <td>Maximum Deductable Points:  </td>
+            <td> <%= text_field :assigned, :mpd, :size=>10, :value=>20 %></td>
           </tr>
           <tr>
             <td>use class average score as hardline?</td>
             <td><%= check_box :assigned, :ifclass, {}, true, false %></td>
           </tr>
           <tr>
-            <td>Hardline:  default: 85 </td>
-            <td><%= text_field :assigned, :hardline, :size=>10 %></td>
+            <td>Hardline: </td>
+            <td><%= text_field :assigned, :hardline, :size=>10, :value=>85 %></td>
           </tr>
       <% end %>
     </TABLE>

@@ -1,4 +1,6 @@
 require 'test_helper'
+require 'lottery_controller'
+
 
 class LotteryControllerTest < ActionController::TestCase
   fixtures :users, :roles, :teams, :assignments, :nodes, :system_settings, :content_pages, :permissions, :participants
@@ -6,6 +8,22 @@ class LotteryControllerTest < ActionController::TestCase
 
   def setup
     @controller = LotteryController.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+
+    @request.session[:user] = User.find(users(:superadmin).id )
+    roleid = User.find(users(:superadmin).id).role_id
+    Role.rebuild_cache
+
+    Role.find(roleid).cache[:credentials]
+    @request.session[:credentials] = Role.find(roleid).cache[:credentials]
+    # Work around a bug that causes session[:credentials] to become a YAML Object
+    @request.session[:credentials] = nil if @request.session[:credentials].is_a? YAML::Object
+    @settings = SystemSettings.find(:first)
+    AuthController.set_current_role(roleid,@request.session)
+
+    @testUser = users(:student1).id
+
   end
 
   test "assign topic to team" do
@@ -147,9 +165,9 @@ class LotteryControllerTest < ActionController::TestCase
   end
 
   test "run lottery" do
-    assignments(:lottery_assignment)
+    post :run_lottery, :id => :lottery_assignment
+    assert_response :success
 
-    get :run_lottery, :id => :lottery_assignment
     a = 0
     [sign_up_topics(:LotteryTopic1),sign_up_topics(:LotteryTopic2),sign_up_topics(:LotteryTopic5)] .each do |topic|
       assigned_teams = @controller.get_teams_for_topic(topic)
@@ -157,7 +175,8 @@ class LotteryControllerTest < ActionController::TestCase
        a = a+1
       end
     end
-    #assert_not_equal a, 0
+
+    assert_not_equal a, 0
     assert_equal bids.size, 0
   end
 end

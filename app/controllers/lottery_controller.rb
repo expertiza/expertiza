@@ -98,11 +98,11 @@ class LotteryController < ApplicationController
 
   def fill_team (winning_team, team_bids, max_team_size)
     # Build up an object to hold the remaining teams keyed off of the team size
-    remaining_spots = max_team_size - winning_team.users.size
+    remaining_spots = max_team_size - winning_team.teams_users.size
 
     teams_to_add = Hash.new []
     team_bids.each do |bid|
-      key = bid.team.users.size
+      key = bid.team.teams_users.size
       teams_to_add[key] += bid.team.to_a if key <= remaining_spots
     end
 

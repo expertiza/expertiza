@@ -9,7 +9,9 @@ class BidSignUpTest < ActionDispatch::IntegrationTest
   # And I should see the topic in my teams bids
   # And I should see a delete icon for that topic
   # Replace this with your real tests.
-
+  test "the truth" do
+    assert true
+  end
   # Given I am on the sign up topics page
   # And my team has 3 bids
   # Then I should see the 3 topics my team has bid on

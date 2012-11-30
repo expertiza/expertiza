@@ -32,7 +32,12 @@ class ParticipantsController < ApplicationController
       url_no  = url_for :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
       flash[:error] = "A delete action failed: At least one (1) review mapping or team membership exist for this participant. <br/><a href='#{url_yes}'>Delete this participant</a>&nbsp;|&nbsp;<a href='#{url_show}'>Show me the associated items</a>|&nbsp;<a href='#{url_no}'>Do nothing</a><BR/>"                  
     end
-    redirect_to :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
+    if session[:return_to]
+      session[:deleted] = true
+      redirect_to session[:return_to]
+    elsif
+      redirect_to :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
+    end
   end  
   
   def delete_display

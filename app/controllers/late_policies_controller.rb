@@ -69,7 +69,7 @@ class LatePoliciesController < ApplicationController
     end
 
     @policy = LatePolicy.find_all_by_policy_name(params[:late_policy][:policy_name])
-    if(@policy != nil)
+    if(@policy != nil && !@policy.empty?)
       flash[:error] = "A policy with same name already exists"
       is_number = false
     end

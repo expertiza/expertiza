@@ -159,7 +159,6 @@ class AssignmentController < ApplicationController
         @assignment.create_node()
         flash[:alert] = "There is already an assignment named \"#{@assignment.name}\". &nbsp;<a style='color: blue;' href='../../assignment/edit/#{@assignment.id}'>Edit assignment</a>" if @assignment.duplicate_name?
         importParticipants(params, @assignment.id)
-        addTeams(params, @assignment.id)
         flash[:note] = 'Assignment was successfully created.'
         redirect_to :action => 'list', :controller => 'tree_display'
       rescue
@@ -188,6 +187,10 @@ class AssignmentController < ApplicationController
       elsif
         @child_nodes[@child_nodes.length] = tn
       end
+    end
+
+    if @child_nodes.nil?
+      @child_nodes = [];
     end
   end
   
@@ -300,9 +303,6 @@ class AssignmentController < ApplicationController
       oldpath = nil
     end
 
-    importParticipants(params, @assignment.id)
-    addTeams(params, @assignment.id)
-
     if params[:days].nil? && params[:weeks].nil?
       @days = 0
       @weeks = 0
@@ -344,6 +344,11 @@ class AssignmentController < ApplicationController
           end
         end
 
+        importParticipants(params, @assignment.id)
+        if @assignment.team_assignment?
+          addTeams(params, @assignment.id)
+        end
+
         flash[:notice] = 'Assignment was successfully updated.'
         redirect_to :action => 'show', :id => @assignment
      
@@ -360,13 +365,11 @@ class AssignmentController < ApplicationController
 
   def addTeams(params, assignment_id)
     assignment = Assignment.find(assignment_id)
-    if params['teamsize'] &&    params['teamsize']['value']!=''
-      if params['teamsize']['value'] != nil && params['teamsize']['value'].to_i > 0
-        Team.randomize_all_by_parent(assignment, "Assignment"  , params[:teamsize][:value].to_i)
-      end
-   # end
+    if params['teamsize'] && params['teamsize']['value'] != nil && params['teamsize']['value'].to_i > 0
+      Team.randomize_all_by_parent(assignment, "Assignment"  , params[:teamsize][:value].to_i)
+    end
 
-    elsif params[:file] && params[:file] != ''
+    if params[:file] && params[:file] != ''
       file = params[:file]
       file.each_line do |line|
         line.chomp!
@@ -375,24 +378,8 @@ class AssignmentController < ApplicationController
           options = Hash.new
           options[:has_column_names] = "true"
           options[:handle_dups] = "ignore"
-
           AssignmentTeam.import(team_options,session,assignment_id,options)
         end
-
-      end
-
-    elsif params[:team][:name]
-      if params[:team][:name] != nil && params[:team][:name] != ''
-      parent = Object.const_get(session[:team_type]).find(assignment_id)
-      begin
-        Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-        team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => assignment_id)
-        TeamNode.create(:parent_id => assignment_id, :node_object_id => team.id)
-       # redirect_to :action => 'list', :id => assignment_id
-      rescue TeamExistsError
-        flash[:error] = $!
-        #redirect_to :action => 'new', :id => assignment_id
-      end
       end
     end
   end

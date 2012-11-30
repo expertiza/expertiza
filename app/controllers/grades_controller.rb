@@ -246,11 +246,16 @@ end
 
   def calculate_all_penalties(assignment_id)
     @all_penalties = Hash.new
+    participant_count = 0
+    calculate_for_participant = false
+    if @assignment.is_penalty_calculated == false
+       calculate_for_participants = true
+    end
     Participant.find_all_by_parent_id(assignment_id).each do |participant|
       @penalties = calculate_penalty(participant.id)
       if(@penalties[:submission] != 0 || @penalties[:review] != 0 || @penalties[:meta_review] != 0)
         @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
-        if @assignment.is_penalty_calculated == false
+        if calculate_for_participants == true
           penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => @penalties[:submission]}
           CalculatedPenalty.create(penalty_attr1)
 
@@ -259,13 +264,15 @@ end
 
           penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => @penalties[:meta_review]}
           CalculatedPenalty.create(penalty_attr3)
-          @assignment.update_attribute(:is_penalty_calculated, true)
         end
       end
       @all_penalties[participant.id] = Hash.new
       @all_penalties[participant.id][:submission] = @penalties[:submission]
       @all_penalties[participant.id][:review] = @penalties[:review]
       @all_penalties[participant.id][:meta_review] = @penalties[:meta_review]
+    end
+    if @assignment.is_penalty_calculated == false
+      @assignment.update_attribute(:is_penalty_calculated, true)
     end
   end
 end

@@ -44,8 +44,8 @@
           <% teammate_reviews.each do |teammate_review| %>
           <% teammate_average = teammate_average + teammate_review.get_average_score %>
          <% end %>
-         <% if teammate_reviews.count.to_i > 0.to_i %>
-          <% teammate_average = (teammate_average.to_f/teammate_reviews.count.to_f).to_f.round(3) %>
+                       <% if teammate_reviews.count.to_i > 0.to_i %>
+          <% teammate_average = (teammate_average.to_f/teammate_reviews.count.to_f).to_f.round() %>
           <% teammate_count_hash[assignment.name.to_s] = teammate_count_hash[assignment.name.to_s] + 1 %>
          <% end %>
        <% end %>
@@ -60,7 +60,7 @@
          <% meta_average = meta_average + meta_review.get_average_score %>
         <% end %>
         <% if meta_reviews.count > 0 %>
-         <% meta_average = (meta_average.to_f/meta_reviews.count.to_f).to_f.round(3) %>
+         <% meta_average = (meta_average.to_f/meta_reviews.count.to_f).to_f.round() %>
          <% meta_count_hash[assignment.name.to_s] = meta_count_hash[assignment.name.to_s] + 1 %>
         <% end end %>
         <% if meta_average > 0 %>

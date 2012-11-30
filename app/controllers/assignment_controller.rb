@@ -103,7 +103,7 @@ class AssignmentController < ApplicationController
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
-    set_requirement
+
     check_flag = @assignment.availability_flag
 
     if(check_flag == true && params[:submit_deadline].nil?)
@@ -243,8 +243,8 @@ class AssignmentController < ApplicationController
     @limits = Hash.new   
     @weights = Hash.new
 
-      if session[:user].role.name == "Teaching Assistant"
-      user_id = Ta.get_my_instructor(session[:user]).id
+    if session[:user].role.name == "Teaching Assistant"
+      user_id = TA.get_my_instructor(session[:user]).id
     else
       user_id = session[:user].id
     end

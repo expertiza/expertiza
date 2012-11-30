@@ -31,9 +31,6 @@ class SubmittedContentController < ApplicationController
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end
-    if flash[:error].nil?
-      participant.update_resubmit_times
-    end
     redirect_to :action => 'edit', :id => participant.id
   end    
 

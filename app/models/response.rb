@@ -99,4 +99,35 @@ class Response < ActiveRecord::Base
     self.scores.each {|score| score.destroy}
     self.destroy
   end
+
+  # pulled the below 3 methods from E303
+  # get_alternative_total_score(), get_maximum_score(), get_average_score()
+
+  # Returns the total score from this response
+  def get_alternative_total_score()
+    # TODO The method get_total_score() above does not seem correct.  Replace with this method.
+    total_score = 0
+
+    self.scores.each  {|score| total_score = total_score + score.score }
+
+    total_score
+  end
+
+  # Returns the maximum possible score for this response
+  def get_maximum_score()
+    max_score = 0
+
+    self.scores.each  {|score| max_score = max_score + score.question.questionnaire.max_question_score }
+
+    max_score
+  end
+
+  # Returns the average score for this response as an integer (0-100)
+  def get_average_score()
+    if get_maximum_score != 0 then
+      ((get_alternative_total_score.to_f / get_maximum_score.to_f) * 100).to_i
+    else
+      0
+    end
+  end
 end

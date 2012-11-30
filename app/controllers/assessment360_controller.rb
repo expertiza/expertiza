@@ -164,8 +164,8 @@ class Assessment360Controller < ApplicationController
        if !teammate_scores.nil?
          teammate_scores.each do |teammate_score|
             average = average +   teammate_score.get_average_score
-            bc.data assignment.name.to_s + ", Scores: " + teammate_score.get_average_score.to_s, [teammate_score.get_average_score], colors[i]
-            j = j + 1
+            bc.data assignment.name.to_s + "" + j.to_s +  ", Score: " + teammate_score.get_average_score.to_s, [teammate_score.get_average_score], colors[i]
+              j = j + 1
          end
          if( (j-1).to_i > 0)
             average = average.to_i / (j-1).to_i

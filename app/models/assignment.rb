@@ -641,7 +641,6 @@ end
     return @review_scores
   end
 
-  
   def get_review_questionnaire_id()
     @revqids = []
 

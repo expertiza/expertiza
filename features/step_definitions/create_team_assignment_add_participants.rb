@@ -108,6 +108,7 @@ Given /^add "(\S+)" to this "(\S+)"$/ do |username, assignment_name|
   participant.user_id= user.id
   participant.parent_id= assignment.id
   participant.submit_allowed= true
+  participant.review_allowed= true
   participant.type= "AssignmentParticipant"
   participant.save!
 

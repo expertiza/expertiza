@@ -14,3 +14,19 @@ bid3:
   id: 3
   topic_id: <%= Fixtures.identify(:LotteryTopic2) %>
   team_id: <%= Fixtures.identify(:lottery_team3) %>
+
+bid4:
+    id: 4
+    topic_id: <%= Fixtures.identify(:LotteryTopic5) %>
+    team_id: <%= Fixtures.identify(:lottery_team2) %>
+
+bid5:
+  id: 5
+  topic_id: <%= Fixtures.identify(:LotteryTopic5) %>
+  team_id: <%= Fixtures.identify(:lottery_team3) %>
+
+bid6:
+  id: 6
+  topic_id: <%= Fixtures.identify(:LotteryTopic5) %>
+  team_id: <%= Fixtures.identify(:lottery_team1) %>
+

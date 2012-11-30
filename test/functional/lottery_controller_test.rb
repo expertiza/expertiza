@@ -22,6 +22,28 @@ class LotteryControllerTest < ActionController::TestCase
                      bid.topic.id, "the user should be signed up for the topic"
   end
 
+  test "get teams for topic" do
+    topic = sign_up_topics(:LotteryTopic5)
+    assert_not_nil topic
+
+    # There should be no teams on the topic right now
+    assigned_teams = @controller.get_teams_for_topic(topic)
+    assert_equal assigned_teams.length, 0
+    # Give the topic to a team
+    assert @controller.assign_team_topic(bids(:bid4)), "assign_team_topic returned true"
+    # test that the team is found by get_teams
+    assigned_teams = @controller.get_teams_for_topic(topic)
+    assert_equal assigned_teams[0], teams(:lottery_team2)
+    assert_equal assigned_teams.length, 1
+    # Give the topic to another team
+    assert @controller.assign_team_topic(bids(:bid5)), "assign_team_topic returned true"
+
+    assigned_teams = @controller.get_teams_for_topic(topic)
+    assert_equal assigned_teams[0], teams(:lottery_team3)
+    assert_equal assigned_teams[1], teams(:lottery_team2)
+    assert_equal assigned_teams.length, 2
+  end
+
   test "make weighted bids array" do
     topic = sign_up_topics(:LotteryTopic1)
     bids = [bids(:bid1), bids(:bid2)]
@@ -84,6 +106,32 @@ class LotteryControllerTest < ActionController::TestCase
                  "there should be no bids for the topic"
   end
 
+  test "fill team" do
+    team2 = teams(:lottery_team2)
+    team1 = teams(:lottery_team1)
+    team1_size = team1.users.size
+    team2_size = team2.users.size
+
+    topic = sign_up_topics(:LotteryTopic5)
+    assert_not_nil topic
+    assert @controller.assign_team_topic(bids(:bid4)), "assign_team_topic returned true"
+    assigned_teams = @controller.get_teams_for_topic(topic)
+    assert_equal assigned_teams[0], team2
+    assert_equal team2.users.size, team2_size
+    assert_equal team1.users.size, team1_size
+
+    @controller.fill_team(team2, [bids(:bid6)], team1_size+team2_size)
+    assert_equal 0, team1.users.size,
+                   "The second team should no longer have users"
+
+    assert_equal team2.users.size, (team2_size+team1_size),
+                   "The users of the second team should have been added to the first team"
+    assert_equal team2.users[0], users(:student3)
+    assert_equal team2.users[1], users(:student1)
+    assert_equal team2.users[2], users(:student2)
+
+  end
+
   test "merge team A with team B" do
     team1 = teams(:lottery_team1)
     team1_size = team1.users.size
@@ -94,8 +142,22 @@ class LotteryControllerTest < ActionController::TestCase
 
     assert_equal 0, team2.users.size,
                  "The second team should no longer have users"
-
     assert_equal team1.users.size, (team2_size+team1_size),
                  "The users of the second team should have been added to the first team"
+  end
+
+  test "run lottery" do
+    assignments(:lottery_assignment)
+
+    get :run_lottery, :id => :lottery_assignment
+    a = 0
+    [sign_up_topics(:LotteryTopic1),sign_up_topics(:LotteryTopic2),sign_up_topics(:LotteryTopic5)] .each do |topic|
+      assigned_teams = @controller.get_teams_for_topic(topic)
+      if assigned_teams.length > 0
+       a = a+1
+      end
+    end
+    #assert_not_equal a, 0
+    assert_equal bids.size, 0
   end
 end

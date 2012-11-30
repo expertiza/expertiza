@@ -5,7 +5,6 @@ class LotteryController < ApplicationController
   # but we want to encapsulate the logic here
   def run_lottery
     # Should get an assignment_id as a parameter
-
     # Acquire the assignment from the passed parameter
     # TODO: Add error handling if the passed ID is blank
     assignment = Assignment.find(params[:id]) unless params[:id].blank?
@@ -20,8 +19,8 @@ class LotteryController < ApplicationController
           #Step 1, get the teams already assigned to the topic and iterate over each team to see if the team is full
           assigned_teams = get_teams_for_topic(topic)
           assigned_teams.each do |team|
-            if current_team.teams_users.size < max_team_size
-              fill_team(current_team, topic.bids, max_team_size)
+            if team.teams_users.size < max_team_size
+              fill_team(team, topic.bids, max_team_size)
             end
           end
           #Step 2, choose a winner for any remaining teams that have bids
@@ -68,7 +67,11 @@ class LotteryController < ApplicationController
     teams_to_return = Array.new
     all_participants = Participant.find_all_by_topic_id(topic.id)
     all_participants.each do |participant|
-      teams_to_return += TeamsUser.find_by_user_id(participant.user_id).team
+      TeamsUser.find_all_by_user_id(participant.user_id).each do |team_user|
+        if team_user.team.parent_id == topic.assignment_id
+          teams_to_return += [team_user.team]
+        end
+      end
     end
     #Return only the unique team elements
     teams_to_return.uniq
@@ -95,13 +98,14 @@ class LotteryController < ApplicationController
 
   def fill_team (winning_team, team_bids, max_team_size)
     # Build up an object to hold the remaining teams keyed off of the team size
-    remaining_spots = max_team_size - winning_team.teams_users.size
+    remaining_spots = max_team_size - winning_team.users.size
 
     teams_to_add = Hash.new []
     team_bids.each do |bid|
-      key = bid.team.teams_users.size
+      key = bid.team.users.size
       teams_to_add[key] += bid.team.to_a if key <= remaining_spots
     end
+
 
     # Start iterating through starting at the largest team size that can fit
     # Continue adding teams of that size until we can't fit any more of that size
@@ -109,6 +113,7 @@ class LotteryController < ApplicationController
     teams_to_add.keys.sort.reverse.each do |key|
       current_set = teams_to_add[key].to_a
       while (remaining_spots - key >= 0 && current_set.size > 0)
+
         team = current_set.sample
         merge_teams(winning_team, team)
         current_set -= team.to_a

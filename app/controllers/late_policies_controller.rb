@@ -101,37 +101,66 @@ class LatePoliciesController < ApplicationController
   def update
 
     @penalty_policy = LatePolicy.find(params[:id])
-
-    begin
-      @penalty_policy.update_attributes(params[:late_policy])
-      @penaltyObjs = CalculatedPenalty.all
-      @penaltyObjs.each do |pen|
-        @participant = AssignmentParticipant.find(pen.participant_id)
-        @assignment = @participant.assignment
-        if @assignment.late_policy_id == @penalty_policy.id
-          @penalties = calculate_penalty(pen.participant_id)
-          @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
-          if pen.deadline_type_id.to_i == 1
-            penalty_attr1 = {:penalty_points => @penalties[:submission]}
-            pen.update_attribute(:penalty_points, @penalties[:submission])
-          elsif pen.deadline_type_id.to_i == 2
-            penalty_attr2 = {:penalty_points => @penalties[:review]}
-            pen.update_attribute(:penalty_points, @penalties[:review])
-          elsif pen.deadline_type_id.to_i == 5
-            penalty_attr3 = {:penalty_points => @penalties[:meta_review]}
-            pen.update_attribute(:penalty_points, @penalties[:meta_review])
+    if session[:user].role.name == "Teaching Assistant"
+      user_id = TA.get_my_instructor(session[:user]).id
+    else
+      user_id = session[:user].id
+    end
+    issue_number = false
+    if (params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i)
+      flash[:error] = "Max penalty cannot be less than penalty per unit."
+      issue_number = true
+    end
+    issue_name = false
+    #if name has changed then only check for this
+    if params[:late_policy][:policy_name] != @penalty_policy.policy_name
+        @policy = LatePolicy.find_all_by_policy_name(params[:late_policy][:policy_name])
+        if(@policy != nil && !@policy.empty?)
+          @policy.each do |p|
+            if p.instructor_id == user_id
+              flash[:error] = "Cannot edit the policy. A policy with same name already exists"
+              issue_name = true
+              break
+            end
           end
         end
-      end
-
-
+    end
+    if (issue_name == false && issue_number == false)
+      begin
+        @penalty_policy.update_attributes(params[:late_policy])
+        @penalty_policy.save!
+        @penaltyObjs = CalculatedPenalty.all
+        @penaltyObjs.each do |pen|
+          @participant = AssignmentParticipant.find(pen.participant_id)
+          @assignment = @participant.assignment
+          if @assignment.late_policy_id == @penalty_policy.id
+            @penalties = calculate_penalty(pen.participant_id)
+            @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+            if pen.deadline_type_id.to_i == 1
+              penalty_attr1 = {:penalty_points => @penalties[:submission]}
+              pen.update_attribute(:penalty_points, @penalties[:submission])
+            elsif pen.deadline_type_id.to_i == 2
+              penalty_attr2 = {:penalty_points => @penalties[:review]}
+              pen.update_attribute(:penalty_points, @penalties[:review])
+            elsif pen.deadline_type_id.to_i == 5
+              penalty_attr3 = {:penalty_points => @penalties[:meta_review]}
+              pen.update_attribute(:penalty_points, @penalties[:meta_review])
+            end
+          end
+        end
         flash[:notice] = "Late policy was successfully updated."
         redirect_to :action => 'index'
       rescue
         flash[:error] = "The following error occurred while updating the penalty policy: "+$!
-        redirect_to :action => 'edit'
+        redirect_to :action => 'edit', :id => params[:id]
+      end
+    elsif issue_number == true
+      flash[:error] = "Cannot edit the policy. Maximum penalty cannot be less than penalty per unit."
+      redirect_to :action => 'edit', :id => params[:id]
+    elsif issue_name == true
+      flash[:error] = "Cannot edit the policy. A policy with same name " + params[:late_policy][:policy_name] + " already exists"
+      redirect_to :action => 'edit', :id => params[:id]
     end
-
   end
 
   # DELETE /late_policies/1
@@ -141,7 +170,7 @@ class LatePoliciesController < ApplicationController
     begin
       @penalty_policy.destroy
     rescue
-      flash[:error] = $!
+      flash[:error] = "This policy is in use and hence cannot be deleted."
     end
     redirect_to :action => 'index'
   end

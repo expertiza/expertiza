@@ -6,7 +6,7 @@
 	 <b>Submit a hyperlink:</b><BR/>
    <input type="text" name="submission" size=40 value="http://"><input type="submit" name="upload_link" value="Upload link"/>
 	<% end %>
-<% end %>	
+<% end %>
 
 <% if participant.assignment.wiki_type_id == 1%>
   <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>

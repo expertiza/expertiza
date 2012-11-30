@@ -51,7 +51,7 @@
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)</FONT>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
-     <% if controller.action_name != "view_my_scores" %>
+    <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review_of_review' %></FONT>
     <% end %>  	    
     </TD>
@@ -93,14 +93,13 @@
     <% end %>
     <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
-       <TD ALIGN="CENTER">
-        <% if stage == "Complete" %>
-            <% if participant.grade
-                 total_score = participant.grade
-                 title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
-               else
-                 total_score = pscore[:total_score]
-           #  total_score = 20
+    	<TD ALIGN="CENTER">
+    	<% if stage == "Complete" %>
+      	<% if participant.grade
+      	    total_score = participant.grade
+      	    title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
+      	   else
+      	    total_score = pscore[:total_score]
       	    title = nil
       	   end %>
       	<div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %>%</div>       	    

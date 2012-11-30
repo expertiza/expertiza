@@ -1,7 +1,7 @@
 class AssignmentController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
-  
+
   def copy
     Assignment.record_timestamps = false
     #creating a copy of an assignment; along with the dates and submission directory too
@@ -10,22 +10,22 @@ class AssignmentController < ApplicationController
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(new_assign)
-    new_assign.update_attribute('name','Copy of '+new_assign.name)     
+    new_assign.update_attribute('name','Copy of '+new_assign.name)
     new_assign.update_attribute('created_at',Time.now)
     new_assign.update_attribute('updated_at',Time.now)
-    
 
-    
-    if new_assign.save 
+
+
+    if new_assign.save
       Assignment.record_timestamps = true
 
       old_assign.assignment_questionnaires.each do |aq|
         AssignmentQuestionnaire.create(
-          :assignment_id => new_assign.id,
-          :questionnaire_id => aq.questionnaire_id,
-          :user_id => session[:user].id,
-          :notification_limit => aq.notification_limit,
-          :questionnaire_weight => aq.questionnaire_weight
+            :assignment_id => new_assign.id,
+            :questionnaire_id => aq.questionnaire_id,
+            :user_id => session[:user].id,
+            :notification_limit => aq.notification_limit,
+            :questionnaire_weight => aq.questionnaire_weight
         )
       end
       
@@ -74,7 +74,6 @@ class AssignmentController < ApplicationController
     @assignment.submitter_count = 0    
     ## feedback added
     ##
-    
     if params[:days].nil? && params[:weeks].nil?
       @days = 0
       @weeks = 0
@@ -104,16 +103,12 @@ class AssignmentController < ApplicationController
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
 
-    check_flag = @assignment.availability_flag
-
-    if(check_flag == true && params[:submit_deadline].nil?)
-      raise "Please enter a valid Submission deadline!!"
-      render :action => 'create'
-    elsif (@assignment.save)
+    if @assignment.save
       set_questionnaires   
       set_limits_and_weights
 
       max_round = 1
+
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
         if check_flag == true
@@ -227,17 +222,17 @@ class AssignmentController < ApplicationController
   #
   #  end
 
-  def set_requirement
+  #def set_requirement
     #@required = Hash.new
-    if params[:required][:review]
-      @assignment.num_reviews = params[:required][:review]
-    end
+   # if params[:required][:review]
+    #  @assignment.num_reviews = params[:required][:review]
+    #end
 
-    if params[:required][:metareview]
-      @assignment.num_review_of_reviews = params[:required][:metareview]
-    end
+   # if params[:required][:metareview]
+    #  @assignment.num_review_of_reviews = params[:required][:metareview]
+    #end
 
-  end
+ # end
 
   def get_limits_and_weights 
     @limits = Hash.new   
@@ -274,7 +269,6 @@ class AssignmentController < ApplicationController
       @weights[questionnaire.symbol] = aq.questionnaire_weight
     }             
   end
-
 
   def set_limits_and_weights
     if session[:user].role.name == "Teaching Assistant"
@@ -328,7 +322,7 @@ class AssignmentController < ApplicationController
 
     @assignment.days_between_submissions = @days + (@weeks*7)
 
-    set_requirement
+   # set_requirement
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])     

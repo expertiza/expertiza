@@ -25,17 +25,17 @@ function onReviewTypeChange(){
         <% else %>
           <option value="<%= strategy %>"><%= strategy %></option>
         <% end %>
-<% end %>
-</select>
-<img src="/images/info.png" title="- Instructor-Selected: Instructor decides who reviews whom
+      <% end %>
+    </select>
+    <img src="/images/info.png" title="- Instructor-Selected: Instructor decides who reviews whom
 - Student-Selected: Students choose from a list of assignments or topics to review.
 - Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.">
-</td>
-</tr>
-<tr id="review_topic_threshold_row">
-  <td style="width:250px"><label for="review_topic_threshold">Review topic threshold (<em>k</em>):</label></td>
-  <td><%= text_field 'assignment', 'review_topic_threshold', :size => 5 %> <img src="/images/info.png" title="A topic is reviewable if the minimum number of reviews already done for the submissions on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic." >
   </td>
-</tr>
+ </tr>
+ <tr id="review_topic_threshold_row">
+   <td style="width:250px"><label for="review_topic_threshold">Review topic threshold (<em>k</em>):</label></td>
+   <td><%= text_field 'assignment', 'review_topic_threshold', :size => 5 %> <img src="/images/info.png" title="A topic is reviewable if the minimum number of reviews already done for the submissions on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic." >
+   </td>
+ </tr>
 
 </table>

@@ -1,20 +1,28 @@
-<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+ <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+ <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 
-<script>
+  <script>
   $(document).ready(function() {
     $("#accordion").accordion({ autoHeight: false });
   });
-</script>
-<h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
-<% if !@map.contributor.nil?   %>
-  <% if !@topic_id.nil? %>
-    <h2>You are reviewing <%= @signedUpTopic %></h2>
-  <% end %>
-  <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
-<% end %>
+  </script>
+ <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
+<% if !@map.contributor.nil?%>
+  <%if @map.assignment.team_assignment?
+        team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
+        topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
+  else%>
+        <% topic_id = Participant.find(@map.contributor).topic_id%>
+  <%end%>
+
+  <%if !topic_id.nil?%>
+    <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
+  <%end%>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
+  <hr/>
+<% end %>
 <%= @map.show_review() %>
 
 <%= form_tag :action => @next_action, :id => @modified_object %>

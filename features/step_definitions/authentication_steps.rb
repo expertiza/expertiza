@@ -73,3 +73,17 @@ When /I log in as "([^"]*)"/ do |username|
 
   Then "I should be logged in as \"#{username}\""
 end
+
+Given 'I am not logged in' do
+  if(find_button('Logout').nil?)
+    puts "not Logged in"
+  else
+    click_link('Logout')
+  end
+end
+
+When /^I log in as a "([^\"]*)" with password "([^\"]*)"$/ do |username, password|
+  fill_in 'login_name', :with => username
+  fill_in 'login_password', :with => password
+  click_button 'Login'
+end

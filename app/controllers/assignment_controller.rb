@@ -13,10 +13,8 @@ class AssignmentController < ApplicationController
     new_assign.update_attribute('name','Copy of '+new_assign.name)     
     new_assign.update_attribute('created_at',Time.now)
     new_assign.update_attribute('updated_at',Time.now)
-    
 
-    
-    if new_assign.save 
+    if new_assign.save
       Assignment.record_timestamps = true
 
       old_assign.assignment_questionnaires.each do |aq|
@@ -159,8 +157,9 @@ class AssignmentController < ApplicationController
         
         # Creating node information for assignment display
         @assignment.create_node()
-        
         flash[:alert] = "There is already an assignment named \"#{@assignment.name}\". &nbsp;<a style='color: blue;' href='../../assignment/edit/#{@assignment.id}'>Edit assignment</a>" if @assignment.duplicate_name?
+        importParticipants(params, @assignment.id)
+        addTeams(params, @assignment.id)
         flash[:note] = 'Assignment was successfully created.'
         redirect_to :action => 'list', :controller => 'tree_display'
       rescue
@@ -180,6 +179,16 @@ class AssignmentController < ApplicationController
   def edit
     @assignment = Assignment.find(params[:id])
     prepare_to_edit
+    @participants = @assignment.participants
+    assignment_teams = AssignmentTeam.find_all_by_parent_id(params[:id])
+    for at in assignment_teams
+      tn = TeamNode.find_by_node_object_id(at.id)
+      if @child_nodes.nil?
+        @child_nodes = [tn]
+      elsif
+        @child_nodes[@child_nodes.length] = tn
+      end
+    end
   end
   
   def prepare_to_edit
@@ -194,7 +203,7 @@ class AssignmentController < ApplicationController
     get_limits_and_weights    
     @wiki_types = WikiType.find(:all)
   end
-  
+
   def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
     existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
     if existing.nil?
@@ -285,11 +294,14 @@ class AssignmentController < ApplicationController
       end
     end
     @assignment = Assignment.find(params[:id])
-    begin 
+    begin
       oldpath = @assignment.get_path
     rescue
       oldpath = nil
     end
+
+    importParticipants(params, @assignment.id)
+    addTeams(params, @assignment.id)
 
     if params[:days].nil? && params[:weeks].nil?
       @days = 0
@@ -331,9 +343,9 @@ class AssignmentController < ApplicationController
             raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
           end
         end
-     
+
         flash[:notice] = 'Assignment was successfully updated.'
-        redirect_to :action => 'show', :id => @assignment                  
+        redirect_to :action => 'show', :id => @assignment
      
       rescue
         flash[:error] = $!
@@ -345,7 +357,102 @@ class AssignmentController < ApplicationController
       render :action => 'edit'
     end    
   end
-  
+
+  def addTeams(params, assignment_id)
+    assignment = Assignment.find(assignment_id)
+    if params['teamsize'] &&    params['teamsize']['value']!=''
+      if params['teamsize']['value'] != nil && params['teamsize']['value'].to_i > 0
+        Team.randomize_all_by_parent(assignment, "Assignment"  , params[:teamsize][:value].to_i)
+      end
+   # end
+
+    elsif params[:file] && params[:file] != ''
+      file = params[:file]
+      file.each_line do |line|
+        line.chomp!
+        unless line.empty?
+          team_options = line.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/)
+          options = Hash.new
+          options[:has_column_names] = "true"
+          options[:handle_dups] = "ignore"
+
+          AssignmentTeam.import(team_options,session,assignment_id,options)
+        end
+
+      end
+
+    elsif params[:team][:name]
+      if params[:team][:name] != nil && params[:team][:name] != ''
+      parent = Object.const_get(session[:team_type]).find(assignment_id)
+      begin
+        Team.check_for_existing(parent, params[:team][:name], session[:team_type])
+        team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => assignment_id)
+        TeamNode.create(:parent_id => assignment_id, :node_object_id => team.id)
+       # redirect_to :action => 'list', :id => assignment_id
+      rescue TeamExistsError
+        flash[:error] = $!
+        #redirect_to :action => 'new', :id => assignment_id
+      end
+      end
+    end
+  end
+
+  def importParticipants(params, assignment_id)
+
+    assignment = Assignment.find(assignment_id)
+
+    if params['usernames']['value']
+      names = params['usernames']['value']
+      items = names.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/)
+      for item in items
+        assignment.add_participant(item)
+      end
+    end
+
+    if params[:participants_file]
+      file = params[:participants_file]
+      file.each_line do |line|
+        line.chomp!
+        unless line.empty?
+          user = User.find_by_name(line)
+          if !user
+            user_params = line.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/);
+            if !User.find_all_by_name(user_params[0])
+              user = User.new
+              user.clear_password = user_params[3].strip
+              user.email = user_params[2].strip
+              user.fullname = user_params[1].strip
+              user.name = user_params[0]
+              user.save
+            end
+            assignment.add_participant(user_params[0])
+          elsif
+            assignment.add_participant(line)
+          end
+        end
+      end
+    end
+  end
+
+  def inherit
+
+    if @assignment.course_id >= 0
+      course = Course.find(@assignment.course_id)
+      teams = course.get_teams
+      if teams.length > 0
+        teams.each{
+            |team|
+          team.copy(@assignment.id)
+        }
+      else
+        flash[:note] = "No teams were found to inherit."
+      end
+    else
+      flash[:error] = "No course was found for this assignment."
+    end
+    redirect_to :controller => 'team', :action => 'list', :id => @assignment.id
+  end
+
   def show
     @assignment = Assignment.find(params[:id])
   end

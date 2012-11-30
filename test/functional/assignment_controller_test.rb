@@ -141,7 +141,6 @@ class AssignmentControllerTest < ActionController::TestCase
                            :resubmission_allowed_id=>1,
                            :rereview_allowed_id=>1},
         :action=>"create"
-    assert_response :redirect
     assert Assignment.find(:all, :conditions => "name = 'mt_valid_test'")
 
 
@@ -152,14 +151,29 @@ class AssignmentControllerTest < ActionController::TestCase
   # edit an assignment, change should be
   # reflected in DB
   def test_legal_edit_assignment
-    @assignment = Assignment.find(Fixtures.identify(:assignment1))
-    id = Assignment.first.id
+    #assignment = Assignment.find(Fixtures.identify(:assignment1))
+    #id = assignment.id
+    #number_of_assignment = Assignment.count
+    #questionnaire_id = Questionnaire.first.id
+    #post :update, :id => id, :assignment=> { :name => 'updatedAssignment9',
+    #  :review_questionnaire_id => questionnaire_id,
+    #  :review_of_review_questionnaire_id => questionnaire_id,
+    #  :author_feedback_questionnaire_id  => questionnaire_id
+    #}
+    #
+    #assert_equal flash[:notice], 'Assignment was successfully updated.'
+    #
+    #assert_response :redirect
+    #assert_equal Assignment.count, number_of_assignment
+    #assert Assignment.find(:all, :conditions => "name = 'updatedAssignment9'")
+    assignment = assignments(:assignment7)
+    id = assignment.id
     number_of_assignment = Assignment.count
     questionnaire_id = Questionnaire.first.id
     post :update, :id => id, :assignment=> { :name => 'updatedAssignment9',
-      :review_questionnaire_id => questionnaire_id,
-      :review_of_review_questionnaire_id => questionnaire_id,
-      :author_feedback_questionnaire_id  => questionnaire_id
+                                             :review_questionnaire_id => questionnaire_id,
+                                             :review_of_review_questionnaire_id => questionnaire_id,
+                                             :author_feedback_questionnaire_id  => questionnaire_id
     }
 
     assert_equal flash[:notice], 'Assignment was successfully updated.'
@@ -175,8 +189,8 @@ class AssignmentControllerTest < ActionController::TestCase
   # assignment name, should not be allowed to changed DB data
   def test_illegal_edit_assignment
 
-    id = Assignment.first.id
-    @assignment = Assignment.first
+    id = assignments(:assignment1).id
+    @assignment = assignments(:assignment1)
     original_assignment_name = @assignment.name
     number_of_assignment = Assignment.count
     # It will raise an error while execute render method in controller
@@ -197,7 +211,7 @@ class AssignmentControllerTest < ActionController::TestCase
       }
     }
     assert_template 'assignment/edit'
-    assert_equal original_assignment_name, Assignment.first.name
+    assert_equal original_assignment_name, assignments(:assignment1).name
   end
 
   # 1201 Delete a assignment

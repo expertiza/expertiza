@@ -1,0 +1,126 @@
+Loaded suite /home/shoubhik/.rvm/gems/ruby-1.8.7-p370/gems/rake-10.0.2/lib/rake/rake_test_loader
+Started
+EEEEEE...can't convert nil into String
+E.E....................................join_team:{"updated_at":"2012/11/30 00:53:25 +0000","participant_id":29,"created_at":"2012/11/30 00:53:25 +0000","team_id":15,"comments":"MyText","status":"P","id":11}
+.join_team:{"updated_at":"2012/11/30 00:53:25 +0000","participant_id":29,"created_at":"2012/11/30 00:53:25 +0000","team_id":15,"comments":"MyText","status":"P","id":11}
+.join_team:{"updated_at":"2012/11/30 00:53:25 +0000","participant_id":29,"created_at":"2012/11/30 00:53:25 +0000","team_id":15,"comments":"MyText","status":"P","id":11}
+.join_team:{"updated_at":"2012/11/30 00:53:25 +0000","participant_id":29,"created_at":"2012/11/30 00:53:25 +0000","team_id":15,"comments":"MyText","status":"P","id":11}
+Fjoin_team:{"updated_at":"2012/11/30 00:53:25 +0000","participant_id":29,"created_at":"2012/11/30 00:53:25 +0000","team_id":15,"comments":"MyText","status":"P","id":11}
+.join_team:{"updated_at":"2012/11/30 00:53:25 +0000","participant_id":29,"created_at":"2012/11/30 00:53:25 +0000","team_id":15,"comments":"MyText","status":"P","id":11}
+........FEEFFEEFFFFFF.........827400667
+................................
+Finished in 108.502928 seconds.
+
+  1) Error:
+test_list_admin_invalid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb528b3b4>
+    
+
+  2) Error:
+test_list_admin_valid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb5287f0c>
+    
+
+  3) Error:
+test_list_instr_invalid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb52844d8>
+    
+
+  4) Error:
+test_list_instr_valid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb5280f54>
+    
+
+  5) Error:
+test_list_superadmin_invalid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb527b400>
+    
+
+  6) Error:
+test_list_superadmin_valid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb52714f0>
+    
+
+  7) Error:
+test_legal_edit_assignment(AssignmentControllerTest):
+RuntimeError: An error was encountered while creating this directory: can't convert nil into String
+    app/helpers/file_helper.rb:88:in `create_directory_from_path'
+    app/controllers/assignment_controller.rb:429:in `update'
+    test/functional/assignment_controller_test.rb:106:in `test_legal_edit_assignment'
+
+  8) Error:
+test_new_microtask(AssignmentControllerTest):
+NoMethodError: You have a nil object when you didn't expect it!
+You might have expected an instance of Array.
+The error occurred while evaluating nil.each
+    app/controllers/assignment_controller.rb:304:in `set_questionnaires'
+    app/controllers/assignment_controller.rb:95:in `create'
+    test/functional/assignment_controller_test.rb:80:in `test_new_microtask'
+
+  9) Failure:
+test_should_destroy_join_team_request(JoinTeamRequestsControllerTest) [test/functional/join_team_requests_controller_test.rb:26]:
+"JoinTeamRequest.count" didn't change by -1.
+<1> expected but was
+<2>.
+
+ 10) Failure:
+test_create_question_type(QuestionTypesControllerTest) [test/functional/question_types_controller_test.rb:19]:
+"QuestionType.count" didn't change by 1.
+<1> expected but was
+<0>.
+
+ 11) Error:
+test_destroy_question_type(QuestionTypesControllerTest):
+NoMethodError: undefined method `question_types' for #<QuestionTypesControllerTest:0xb51e4500>
+    test/functional/question_types_controller_test.rb:43:in `test_destroy_question_type'
+    test/functional/question_types_controller_test.rb:42:in `test_destroy_question_type'
+
+ 12) Error:
+test_edit(QuestionTypesControllerTest):
+NoMethodError: undefined method `question_types' for #<QuestionTypesControllerTest:0xb51e44d8>
+    test/functional/question_types_controller_test.rb:32:in `test_edit'
+
+ 13) Failure:
+test_index(QuestionTypesControllerTest) [test/functional/question_types_controller_test.rb:9]:
+Expected response to be a <:success>, but was <302>
+
+ 14) Failure:
+test_new(QuestionTypesControllerTest) [test/functional/question_types_controller_test.rb:15]:
+Expected response to be a <:success>, but was <302>
+
+ 15) Error:
+test_show_question_type(QuestionTypesControllerTest):
+NoMethodError: undefined method `question_types' for #<QuestionTypesControllerTest:0xb51e43ac>
+    test/functional/question_types_controller_test.rb:27:in `test_show_question_type'
+
+ 16) Error:
+test_update_question_type(QuestionTypesControllerTest):
+NoMethodError: undefined method `question_types' for #<QuestionTypesControllerTest:0xb51e4348>
+    test/functional/question_types_controller_test.rb:37:in `test_update_question_type'
+
+ 17) Failure:
+test_Questionnaire_edit_for_existing_name(QuestionnaireControllerTest) [test/functional/questionnaire_controller_test.rb:44]:
+<ActionView::TemplateError> exception expected but none was thrown.
+
+ 18) Failure:
+test_advice_to_be_saved(QuestionnaireControllerTest) [test/functional/questionnaire_controller_test.rb:61]:
+<"The  Question advice in Questionnaire has been  saved"> expected but was
+<nil>.
+
+ 19) Failure:
+test_edit_questionnaire_instruction_url(QuestionnaireControllerTest) [test/functional/questionnaire_controller_test.rb:72]:
+Expected response to be a <:success>, but was <302>
+
+ 20) Failure:
+test_edit_questionnaire_when_name_not_valid(QuestionnaireControllerTest) [test/functional/questionnaire_controller_test.rb:52]:
+<ActionView::TemplateError> exception expected but none was thrown.
+
+ 21) Failure:
+test_questionnaire_edit(QuestionnaireControllerTest) [test/functional/questionnaire_controller_test.rb:35]:
+Expected response to be a <:success>, but was <302>
+
+ 22) Failure:
+test_add_metareviewer(ReviewMappingControllerTest) [test/functional/review_mapping_controller_test.rb:59]:
+Expected response to be a redirect to <http://test.host/review_mapping/list_mappings/20698453?msg=> but was a redirect to <http://test.host/review_mapping/list_mappings/20698453>.
+
+115 tests, 234 assertions, 10 failures, 12 errors

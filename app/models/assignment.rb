@@ -275,6 +275,8 @@ class Assignment < ActiveRecord::Base
   end
     
   def get_path
+    puts self.wiki_type_id
+    puts self.id
     if self.course_id == nil and self.instructor_id == nil
       raise "Path can not be created. The assignment must be associated with either a course or an instructor."
     end

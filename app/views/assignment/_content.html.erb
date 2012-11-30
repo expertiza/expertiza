@@ -5,15 +5,17 @@ function onChange(){
 	document.poppedLayer3 = eval('document.getElementById("teammate_review")');
 	var dropdownIndex = document.getElementById('teamselect').selectedIndex;
 	var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
-	if(dropdownValue == "true"){
+    if(dropdownValue == "true"){
 		count.style.display = "";
 		hidden.style.display = "none";
 		document.poppedLayer3.style.display = "";
+        $('#Teams').show();
 	}else{
 		count.style.display = "none";
 		hidden.style.display  = "";
 		document.poppedLayer3.style.display = "none";
-	}
+        $('#Teams').hide();
+    }
 }
 
 function get_assignment_startdate() {

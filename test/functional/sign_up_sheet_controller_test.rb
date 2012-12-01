@@ -70,9 +70,6 @@ class SignUpSheetControllerTest < ActionController::TestCase
 
     assert_equal "Your team has bid the maximum amount of bids", flash[:notice]
     assert_redirected_to :action =>  :signup_topics, :id => @assignment.id
-
-
-
   end
 
   test "should not have 3 bids as other teammate" do

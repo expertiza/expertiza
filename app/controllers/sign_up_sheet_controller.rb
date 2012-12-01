@@ -686,16 +686,15 @@ class SignUpSheetController < ApplicationController
 
   # Submit a bid for a team and a specific topic
   def submit_bid
-    # Should get team_id and sign_up_topic_id as parameters
     team = SignedUpUser.find_team_users(params[:assignment_id], (session[:user].id))
     team_id = team[0].t_id
     topic_id = params[:id]
     assignment_id = params[:assignment_id]
 
-    #check whether the user already has a team for this assignment
+    # check whether the user already has a team for this assignment
 
     if team.size == 0
-      #if team is not yet created, create new team.
+      # if team is not yet created, create new team.
       team = create_team(assignment_id)
       user = User.find(session[:user].id)
       teamuser = create_team_users(user, team.id)
@@ -725,20 +724,16 @@ class SignUpSheetController < ApplicationController
       end
     end
 
-    #redirect_to :action => 'bid_topics', :team_id => team_id, :assignment_id => assignment_id
     redirect_to :action => 'signup_topics', :id => assignment_id
   end
 
   # Delete a bid for a team and a specific topic
   def delete_bid
-    # Should get team_id and sign_up_topic_id as parameters
-
     @bid = Bid.find(params[:id])
     if @bid.delete
       flash[:notice] = "Your bid for topic #{SignUpTopic.find(@bid.topic_id).topic_name} has been deleted"
     end
 
-    #redirect_to :action => 'bid_topics', :team_id => team_id, :assignment_id => assignment_id
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 

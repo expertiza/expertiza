@@ -24,12 +24,12 @@ class BidSignupsTest < ActionController::IntegrationTest
   # And I should see the topic in my teams bids
   # And I should see a delete icon for that topic
   test "sign up for bid" do
-    get :controller=>'sign_up_sheet', :action => :signup_topics, :id => @assignment.id
+    get :controller=>'sign_up_sheet', :action => :sign_up_topics, :id => @assignment.id
     assert_response :success
     @bid = Bid.find_by_team_id_and_topic_id(@team.id, @topic.id)
     assert_nil @bid
     post  :controller=>'sign_up_sheet', :action => 'submit_bid', :id => :LotteryTopic3, :assignment_id => :lottery_assignment
-    assert_redirected_to :action => :signup_topics, :id=>assignment_id
+    assert_redirected_to :action => :sign_up_topics, :id=>assignment_id
     @bid = Bid.find_by_team_id_and_topic_id(@team.id, @topic.id)
     assert_not_nil @bid
 
@@ -44,7 +44,7 @@ class BidSignupsTest < ActionController::IntegrationTest
     @bid = Bid.find_by_team_id_and_topic_id(@team.id, @topic.id)
     assert_nil @bid
     post  :controller=>'sign_up_sheet', :action => 'submit_bid', :id => :LotteryTopic3, :assignment_id => :lottery_assignment
-    assert_redirected_to :action => :signup_topics, :id=>assignment_id
+    assert_redirected_to :action => :sign_up_topics, :id=>@assignment.id
     @bid = Bid.find_by_team_id_and_topic_id(@team.id, @topic.id)
     assert_not_nil @bid
 
@@ -62,7 +62,7 @@ class BidSignupsTest < ActionController::IntegrationTest
     @bid = Bid.find_by_team_id_and_topic_id(@team.id, @topic.id)
     assert_nil @bid
     post  :controller=>'sign_up_sheet', :action => 'submit_bid', :id => :LotteryTopic3, :assignment_id => :lottery_assignment
-    assert_redirected_to :action => :signup_topics, :id=>assignment_id
+    assert_redirected_to :action => :sign_up_topics, :id=>@assignment.id
     @bid = Bid.find_by_team_id_and_topic_id(@team.id, @topic.id)
     assert_not_nil @bid
 

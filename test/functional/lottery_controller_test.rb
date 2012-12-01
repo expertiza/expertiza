@@ -165,8 +165,8 @@ class LotteryControllerTest < ActionController::TestCase
   end
 
   test "run lottery" do
-    post :run_lottery, :id => :lottery_assignment
-    assert_response :success
+    session[:return_to] = "/sign_up_sheet/signup_topics"
+    post :run_lottery, :id => assignments(:lottery_assignment).id, :referer => "/sign_up_sheet/signup_topics"
 
     a = 0
     [sign_up_topics(:LotteryTopic1),sign_up_topics(:LotteryTopic2),sign_up_topics(:LotteryTopic5)] .each do |topic|
@@ -176,7 +176,7 @@ class LotteryControllerTest < ActionController::TestCase
       end
     end
 
-    assert_not_equal a, 0
+    assert a > 1
     assert_equal bids.size, 0
   end
 end

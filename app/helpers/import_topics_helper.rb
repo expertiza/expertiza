@@ -14,8 +14,8 @@ module ImportTopicsHelper
   def self.create_new_sign_up_topic(attributes, session)
     sign_up_topic = SignUpTopic.new(attributes)
     sign_up_topic.assignment_id = session[:assignment_id]
-    sign_up_topic.save   
-    #sign_up_topic 
+    sign_up_topic.save
+    #sign_up_topic
   end
 end
 

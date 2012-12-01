@@ -50,18 +50,16 @@ class ScoreCache < ActiveRecord::Base
       team = Team.find(@contributor_id)
       @allscores = team.get_scores( @questions)
 
-
-# ============= yxue4,xfang2,hsun6================
       tm_id = @contributor_id
       ##############end###################
     else
-# ============= yxue4,xfang2,hsun6===============
-# get team_id from participant_id
-# ============= yxue4,xfang2,hsun6================
+
+  # get team_id from participant_id
+
       part = Participant.find(:first, :conditions => ["id = ?", @rm.reviewee_id])
       tm_user = TeamsUser.find(:first, :conditions => ["user_id = ?", part.user_id])
       tm_id = tm_user.team_id
-      #################end#########################
+  #################end#########################
       @allscores = @participant1.get_scores( @questions)
     end
     
@@ -81,26 +79,13 @@ class ScoreCache < ActiveRecord::Base
       # sc.assignment_id = @ass_id
       
       range_string = ((@p_min*100).round/100.0).to_s + "-" + ((@p_max*100).round/100.0).to_s
-      
-      
-      
+
       sc.range =    range_string
       sc.score = (@p_score*100).round/100.0
       
-      sc.object_type = @map_type                        
-      # ============= yxue4,xfang2,hsun6===============
-      #sc.team_id = tm_id
-
+      sc.object_type = @map_type
       sc.save
-      # make another new tuple for new score
     else
-      # ============= yxue4,xfang2,hsun6===============
-
-      #sc.team_id = tm_id if sc.team_id == nil
-
-      ####################end#####################
-
-
       range_string = ((@p_min*100).round/100.0).to_s + "-" + ((@p_max*100).round/100.0).to_s
       
       sc.range =    range_string
@@ -109,11 +94,10 @@ class ScoreCache < ActiveRecord::Base
       sc.save
       #look for a consolidated score and change
     end               
-# ============= yxue4,xfang2,hsun6===============
+
 # From here on to the end of this method is the algorithm of
 # score redistribution, for detailed algorithm, please check
 # the project documentation
-# ============= yxue4,xfang2,hsun6================
     tm_user_ct = TeamsUser.count(:all, :conditions => ["team_id = ?", tm_id])
     tm_rv_ct = ScoreCache.count(:all, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "TeammateReviewResponseMap"])
     sc_proj = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "TeamReviewResponseMap"])
@@ -145,8 +129,8 @@ class ScoreCache < ActiveRecord::Base
       threshold = avg_tm  # the line of score to determine if a student needs to be punished or rewarded
       hardline = 85 # when the average of the whole team's teammate review is lower than the hardline but some of the students' teammate reviews are higher than hardline, hardline is used as threshold
       offset = 20 # determines how much points below the line begins the punishment
-      rate = 1 # each point below threshold - offset will deduct the team review score of the student by 'rate'
-      max_deduct = 20 # maximum deducted score a student could have
+      rate = 0.5 # each point below threshold - offset will deduct the team review score of the student by 'rate'
+      max_deduct = 10 # maximum deducted score a student could have
       use_cls = 0  # if the class average of teammate review score is used as the hardline
       if sc_th = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"HardLine"])
         hardline = sc_th.score
@@ -232,7 +216,6 @@ class ScoreCache < ActiveRecord::Base
     end
 
     score_all = ScoreCache.find(:all, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "ModifiedAssignmentScore"])
-    score_all.each {|item| puts item.score}
     ##################end###########################
 
   end

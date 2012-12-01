@@ -328,8 +328,6 @@ class Assignment < ActiveRecord::Base
     right_id = next_due_date.send column
 
     right = DeadlineRight.find(right_id)
-    #puts "DEBUG RIGHT_ID = " + right_id.to_s
-    #puts "DEBUG RIGHT = " + right.name
     return (right and (right.name == "OK" or right.name == "Late"))    
   end
     

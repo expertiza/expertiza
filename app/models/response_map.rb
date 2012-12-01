@@ -50,7 +50,6 @@ class ResponseMap < ActiveRecord::Base
       #responses = Response.find(:all, :include => :map, :conditions => ['reviewee_id = ? and type = ?',participant.id, self.to_s])
       responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
-    puts "get_assessments_for time ; #{(Time.now - stime).to_s} seconds "
 
     return responses
     end

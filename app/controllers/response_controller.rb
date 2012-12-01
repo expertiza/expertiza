@@ -378,8 +378,6 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.notification_accepted = false;
-    puts("saving for me ")
-    puts(params[:id]);
     @map.save
     
     redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]

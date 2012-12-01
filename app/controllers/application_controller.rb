@@ -2,7 +2,7 @@
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
 
-  helper_method :current_user_session, :current_user, :current_user_role?
+  helper_method :current_user_session, :current_user
   protect_from_forgery unless Rails.env.test?
   filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
 
@@ -11,10 +11,6 @@ class ApplicationController < ActionController::Base
       flash[:notice] = "Please log in."
       redirect_to(:controller => 'user_sessions', :action => 'new')
     end
-  end
-  
-  def current_user_role?
-    session[:user].role.name
   end
 
   private

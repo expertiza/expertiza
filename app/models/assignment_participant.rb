@@ -56,30 +56,11 @@ class AssignmentParticipant < Participant
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
       scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
-
     end
-                                # ============= yxue4,xfang2,hsun6===============
-                                # from here on, the codes were modified to calculate total
-                                # score based on modified team review scores
-                                # ============= yxue4,xfang2,hsun6================
 
-
-    #score_comp = Marshal.load(Marshal.dump(scores))
-   # if score_mod = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", self.id, "ModifiedAssignmentScore"])
-     # new_sc = Hash.new
-     # new_sc[:avg] = score_mod.score
-      #new_sc[:min] = score_mod.score
-      #new_sc[:max] = score_mod.score
-     # score_comp[:review][:scores] = new_sc
-    #end
-  #  assignment_id = AssignmentParticipant.find_by_parent_id(self.id)
-  #  assignment = Assignment.find(assignment_id)
+    # from here on, the codes were modified to calculate total
+    # score based on modified team review scores
     scores[:total_score] = self.assignment.compute_total_score(scores)
-    #puts "totototototototototototo"
-    #puts score_comp
-   # puts scores[:total_score]
-   # puts scores[:review][:scores]
-                                ##############################end###############################
     return scores
   end
 

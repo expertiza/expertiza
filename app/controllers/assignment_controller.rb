@@ -73,8 +73,6 @@ class AssignmentController < ApplicationController
     @user.set_instructor(@assignment)
     @assignment.submitter_count = 0
     ## feedback added
-    ##
-
     if params[:days].nil? && params[:weeks].nil?
       @days = 0
       @weeks = 0
@@ -112,11 +110,10 @@ class AssignmentController < ApplicationController
     elsif (@assignment.save)
       set_questionnaires
       set_limits_and_weights
-# ============= yxue4,xfang2,hsun6===============
-# method invoked
-# ============= yxue4,xfang2,hsun6================
+      # ============= yxue4,xfang2,hsun6===============
+      # method invoked
+      # ============= yxue4,xfang2,hsun6================
       load_redis
-#######################end##############
       max_round = 1
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
@@ -127,11 +124,11 @@ class AssignmentController < ApplicationController
           due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
         end
         due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
-#        raise "Please enter a valid Review deadline" if !due_date
+        #raise "Please enter a valid Review deadline" if !due_date
         max_round = 2;
 
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
-#       raise "Please enter a valid Drop-Topic deadline" if !due_date
+       #raise "Please enter a valid Drop-Topic deadline" if !due_date
 
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys
@@ -148,7 +145,7 @@ class AssignmentController < ApplicationController
             max_round = max_round + 1
           end
         end
-#setting the Due Dates with a helper function written in DueDate.rb
+        #setting the Due Dates with a helper function written in DueDate.rb
         @assignment.questionnaires.each{
             |questionnaire|
           if questionnaire.instance_of? MetareviewQuestionnaire
@@ -186,9 +183,8 @@ class AssignmentController < ApplicationController
     @assignment = Assignment.find(params[:id])
     prepare_to_edit
   end
-  # ============= yxue4,xfang2,hsun6===============
+
   # method added to upload the parameters to database
-  # ============= yxue4,xfang2,hsun6================
   def load_redis
     rf1 = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", params[:id], "Threshold"])
     if rf1 == nil
@@ -302,26 +298,6 @@ class AssignmentController < ApplicationController
     }
   end
 
-  #def get_requirement
-  #  @required = Hash.new
-  #
-  #  @required[:review] = @assignment.num_reviews
-  #  @required[:metareview] = @assignment.num_review_of_reviews
-  #
-  #  end
-
-  #def set_requirement
-    #@required = Hash.new
-  #  if params[:required][:review]
-  #    @assignment.num_reviews = params[:required][:review]
-  #  end
-
-  #  if params[:required][:metareview]
-  #    @assignment.num_review_of_reviews = params[:required][:metareview]
-  #  end
-
- # end
-
   def get_limits_and_weights
     @limits = Hash.new
     @weights = Hash.new
@@ -415,8 +391,6 @@ class AssignmentController < ApplicationController
 
 
     @assignment.days_between_submissions = @days + (@weeks*7)
-
-    #set_requirement
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])

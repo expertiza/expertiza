@@ -44,7 +44,6 @@ class ReviewFile < ActiveRecord::Base
         max_version_num = max_member_version if max_member_version > max_version_num
       }
     end
-    puts max_version_num
     return max_version_num
   end
 

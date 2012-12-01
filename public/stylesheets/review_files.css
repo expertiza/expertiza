@@ -1,0 +1,139 @@
+
+    .parentDisable {
+    position:absolute;
+    width:250px;
+    /*height:500px;*/
+    top:350px;    left:250px;
+    display:none;
+    padding: 6px;
+    z-index:3;
+    color: black;
+    background-color: rgba(228, 235, 233, 1);
+    border:1px solid black;
+    border-radius:5px;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+
+
+
+
+}
+
+a.line_number:link {
+    COLOR: black;
+    text-decoration: underline;
+}
+a.line_number:visited {
+    COLOR: black;
+    text-decoration: underline;
+}
+a.line_number:active {
+    COLOR: black;
+    text-decoration: underline;
+}
+
+a.line_number_hover :hover {
+    background-color: black;
+    COLOR: white;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.curved {
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    behavior:url(border-radius.htc);
+}
+
+td{ font-color: black; }
+
+pre{ margin: 0; }
+
+.margin{ margin: 0; }
+
+#code_review_frame_div{
+    border:1;
+    width:100%;
+    height:440px;
+}
+
+
+#version_header{
+    border:1;
+    width:100%;
+    height:28px;
+    vertical-align: middle;
+}
+
+tr.highlight :hover { font-weight: bold;  }
+
+td.version_number {
+    background-color: white;
+    color: black;
+    border-left: thin solid gray;
+    border-right: thin solid gray;
+    border-top: thin solid gray;
+    border-bottom: thin solid gray;
+}
+
+
+td.version_number :hover {
+    font-weight: bold;
+    color: blue;
+}
+
+td.current_version {
+    background-color: rgb(255, 0, 28);
+    color: black;
+    font-weight: bold;
+    border-left: thin solid black;
+    border-right: thin solid black;
+    border-top: thin solid black;
+    border-bottom: thin solid black;
+}
+
+td.top_header {
+    border-bottom: thin brown;
+}
+
+.overlay
+{
+    background-color: #000;
+    opacity: .92;
+    filter: alpha(opacity=70);
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 200%;
+    z-index: 10;
+}
+
+.dashboard_header_css {
+    border-bottom: none;
+    border-left: thin solid black;
+    border-right: thin solid black;
+    border-top: thin solid black;
+    border-width: 1px;
+    color: white;
+    background-color: rgb(150, 0, 4);
+}
+
+.dashboard_content_css{
+    border: thin solid;
+    border-width: 1px;
+    background-color: rgba(250, 3, 0, 0.12);
+}
+
+.version_diff_header {
+    border-bottom: none;
+    border-left: thin solid black;
+    border-right:thin solid black;
+    border-top: thin solid black;
+    border-width: 1px;
+    background-color: rgb(150, 0, 4);
+    color: white;
+}
+
+a.version_link {
+    color: black;
+}
+
+

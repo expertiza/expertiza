@@ -60,4 +60,6 @@ Rails::Initializer.run do |config|
       :domain => "localhost"
     }
   end
+  
+  ENV['JAVA_HOME'] = "/usr/lib/jvm/java-1.6.0-sun-1.6.0.31"
 end

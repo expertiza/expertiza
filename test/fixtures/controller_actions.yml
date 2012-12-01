@@ -333,6 +333,16 @@ controller_action_submit_bid:
   name: 'submit_bid'
   permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
   url_to_use: ''
+controller_action_run_lottery:
+    site_controller_id: <%= Fixtures.identify(:site_controller_lottery) %>
+    name: 'run_lottery'
+    permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+    url_to_use: ''
+controller_action_signup_topics:
+    site_controller_id: <%= Fixtures.identify(:site_controller_sign_up_sheet) %>
+    name: 'signup_topics'
+    permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+    url_to_use: ''
 controller_action_delete_bid:
   site_controller_id: <%= Fixtures.identify(:site_controller_sign_up_sheet) %>
   name: 'delete_bid'

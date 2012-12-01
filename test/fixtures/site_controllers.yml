@@ -122,6 +122,10 @@ site_controller_statistics:
   name: 'statistics' 
   builtin: 0 
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+site_controller_lottery:
+    name: 'lottery'
+    builtin: 0
+    permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
 site_controller_tree_display:  
   name: 'tree_display' 
   builtin: 0 

@@ -99,4 +99,43 @@ class Response < ActiveRecord::Base
     self.scores.each {|score| score.destroy}
     self.destroy
   end
+
+  # Function which considers a given assignment
+  # and checks if a given review is still valid for score calculation
+  # The basic rule is that
+  # "A review is INVALID if there was new submission for the assignment
+  #  before the most recent review deadline AND THE review happened before that
+  #  submission"
+  # response - the response whose validity is being checked
+  # resubmission_times - submission times of the assignment is descending order
+  # latest_review_phase_start_time
+  # The function returns true if a review is valid for score calculation
+  # and false otherwise
+  def is_valid_for_score_calculation(resubmission_times, latest_review_phase_start_time)
+    is_valid = true
+
+    # if there was not submission then the response is valid
+    if resubmission_times.nil? || latest_review_phase_start_time.nil?
+      return is_valid
+    end
+
+    resubmission_times.each do | resubmission_time |
+      # if the response is after a resubmission that is
+      # before the latest_review_phase_start_time (check second condition below)
+      # then we are good - the response is valid and we can break
+      if (self.updated_at > resubmission_time.resubmitted_at)
+        break
+      end
+
+      # this means there was a re-submission before the
+      # latest_review_phase_start_time and we dont have a response after that
+      # so the response is invalid
+      if (resubmission_time.resubmitted_at < latest_review_phase_start_time)
+        is_valid = false
+        break
+      end
+    end
+
+    is_valid
+  end
 end

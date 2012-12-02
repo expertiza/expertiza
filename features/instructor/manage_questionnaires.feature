@@ -2,7 +2,7 @@ Feature: Manage the questionnaires in Expertiza
   In order for Expertiza to function
   An instructor
   Should be able to manage questionnaires.
-
+   # unable to read new_question_1_txt on page due to javascript and capybara text usage
   @instructor
   @manage_questionnaires
   Scenario: Expertiza will allow an instructor to create Public Metareview
@@ -25,7 +25,7 @@ Feature: Manage the questionnaires in Expertiza
     And I follow "Create Public Author Feedback"
     And I press "Select"
     And I fill in "questionnaire_name" with "AuthorFeedback1"
-    And I fill in "Question1" for "Question"
+    And I fill in "Question1" for "new_question_1_txt"
     And I press "Create author feedback"
     Then I should see "AuthorFeedback1"
 
@@ -38,7 +38,7 @@ Feature: Manage the questionnaires in Expertiza
     And I follow "Create Public Review"
     And I press "Select"
     And I fill in "questionnaire_name" with "Metareview1"
-    And I fill in "Question1" for "new_question[1_txt]"
+    And I fill in "Question1" for "new_question_1_txt"
     And I press "Create review"
     Then I should see "Review1"
 
@@ -51,6 +51,6 @@ Feature: Manage the questionnaires in Expertiza
     And I follow "Create Public Teammate Review"
     And I press "Select"
     And I fill in "questionnaire_name" with "TeammateReview1"
-    And I fill in "Question1" for "Question"
+    And I fill in "Question1" for "new_question_1_txt"
     And I press "Create teammate review"
     Then I should see "TeammateReview1"

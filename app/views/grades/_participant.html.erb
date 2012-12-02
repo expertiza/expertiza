@@ -20,12 +20,17 @@
   	tr_max = pscore[:teammate][:scores][:max]
   	tr_min = pscore[:teammate][:scores][:min] 
   	tr_avg = pscore[:teammate][:scores][:avg]   
-  end  	
+  end
+
+  #penalties = calculate_penalty(participant.id)
+  total_penalty = @all_penalties[participant.id][:total_penalty]
 %>
 
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
     <TD><%= participant.fullname %>
-    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a>
+    <BR/>
+    <FONT SIZE="-1">
+      <a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a>
 	<% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
 	</FONT>  	
     </TD>
@@ -34,7 +39,8 @@
   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%
   	<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a> (<%= pscore[:review][:assessments].size %>)</FONT>
   	</TD>    
-   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>% 
+   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if (@assignment.get_current_stage(participant.topic_id) == "Complete") then sprintf("%.0f",@all_penalties[participant.id][:submission]) else sprintf("---") end%>
    	<% if controller.action_name != "view_my_scores" %>
    	  <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
    	<% end %>  	 
@@ -42,6 +48,7 @@
     <% else %>
    	<TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if (@assignment.get_current_stage(participant.topic_id) == "Complete") then sprintf("%.0f",@all_penalties[participant.id][:submission]) else sprintf("---") end%></TD>
     <% end %>
     
     <% if r_avg %>
@@ -49,6 +56,8 @@
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)</FONT>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if @assignment.get_current_stage(participant.topic_id) == "Complete" then sprintf("%.0f",@all_penalties[participant.id][:review]) else sprintf("---") end %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if @assignment.get_current_stage(participant.topic_id) == "Complete" then sprintf("%.0f",@all_penalties[participant.id][:meta_review]) else sprintf("---") end %>
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review_of_review' %></FONT>
     <% end %>  	    
@@ -56,6 +65,8 @@
     <% else %>
     <TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if @assignment.get_current_stage(participant.topic_id) == "Complete" then sprintf("%.0f",@all_penalties[participant.id][:review]) else sprintf("---") end %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= if @assignment.get_current_stage(participant.topic_id) == "Complete" then sprintf("%.0f",@all_penalties[participant.id][:meta_review]) else sprintf("---") end %></TD>
     <% end %>
     
     <% if f_avg %>
@@ -87,18 +98,42 @@
     <% else %>
     <TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>
-    <% end %>    
+    <% end %>
     <% end %>
     <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
-    	<TD ALIGN="CENTER">
+      <TD ALIGN="CENTER" VALIGN="TOP">
+        <%= if stage == "Complete" then sprintf("%.0f", total_penalty ) else sprintf("---") end %>
+      <TD ALIGN="CENTER">
+        <% if stage == "Complete" %>
+            <% if participant.grade
+                 total_score = participant.grade
+                 title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
+               else
+                 total_score = pscore[:total_score]
+                 #  total_score = 20
+                 title = nil
+               end %>
+            <div
+            <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %>%</div>
+            <% if controller.action_name != "view_my_scores" %>       	  <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
+            <% end %>
+        <% else %>
+            <FONT SIZE="-1">(in <%= stage %>)</FONT>
+        <% end %>
+      </TD>
+      <TD ALIGN="CENTER">
     	<% if stage == "Complete" %>      
       	<% if participant.grade 
       	    total_score = participant.grade
       	    title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
       	   else
-      	    total_score = pscore[:total_score]
-               #  total_score = 20
+      	    if ((pscore[:total_score] - total_penalty) < 0)
+                total_score = 0
+            else
+                total_score = pscore[:total_score] - total_penalty
+            end
+              #  total_score = 20
       	    title = nil
       	   end %>
       	<div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %>%</div>       	    
@@ -107,7 +142,7 @@
       	<% end %>
     	<% else %>
       	<FONT SIZE="-1">(in <%= stage %>)</FONT>
-    	<% end %>      
+    	<% end %>
     	</TD>
    	<% else %>
    	    <% if participant.grade %>   	        

@@ -19,7 +19,8 @@ class User < ActiveRecord::Base
   
   has_many :teams_users, :dependent => :destroy
   has_many :teams, :through => :teams_users
-  
+  has_many :late_policies
+
   validates_presence_of :name
   validates_presence_of :email, :message => "can't be blank; use anything@mailinator.com for test users"
   validates_format_of :email, :with => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, :allow_blank => true

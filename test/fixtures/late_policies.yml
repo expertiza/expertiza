@@ -1,31 +1,37 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 late_policy0:
-  penalty_period_in_minutes: 0
-  penalty_per_unit: 0
-  expressed_as_percentage: 0
-  max_penalty: 0
+  policy_name: Default Policy 0
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
+  penalty_per_unit: 1
+  times_used: 0
+  max_penalty: 10
 late_policy1:
-  penalty_period_in_minutes: 30
+  policy_name: Default Policy 1
+  instructor_id: <%= Fixtures.identify(:instructor2) %>
   penalty_per_unit: 5
-  expressed_as_percentage: 0
+  times_used: 0
   max_penalty: 20
 late_policy2:
-  penalty_period_in_minutes: 30
+  policy_name: Default Policy 2
+  instructor_id: <%= Fixtures.identify(:instructor2) %>
   penalty_per_unit: 4
-  expressed_as_percentage: 1
+  times_used: 0
   max_penalty: 20
 late_policy3:
-  penalty_period_in_minutes: 60
+  policy_name: Default Policy 3
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
   penalty_per_unit: 2
-  expressed_as_percentage: 1
+  times_used: 0
   max_penalty: 40
 late_policy4:
-  penalty_period_in_minutes: 60
+  policy_name: Default Policy 4
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
   penalty_per_unit: 2
-  expressed_as_percentage: 0
+  times_used: 0
   max_penalty: 40
 late_policy5:
-  penalty_period_in_minutes: 120
+  policy_name: Default Policy 5
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
   penalty_per_unit: 2
-  expressed_as_percentage: 0
+  times_used: 0
   max_penalty: 50

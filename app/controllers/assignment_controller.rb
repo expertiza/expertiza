@@ -1,7 +1,9 @@
 class AssignmentController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
-  
+  helper :penalty
+  include PenaltyHelper
+
   def copy
     Assignment.record_timestamps = false
     #creating a copy of an assignment; along with the dates and submission directory too
@@ -51,7 +53,7 @@ class AssignmentController < ApplicationController
     @wiki_types = WikiType.find(:all)
     @private = params[:private] == true        
     #calling the defalut values mathods
-    get_limits_and_weights 
+    get_limits_and_weights
   end
   
   
@@ -67,11 +69,11 @@ class AssignmentController < ApplicationController
   def create
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.    
-    @assignment = Assignment.new(params[:assignment])    
+    @assignment = Assignment.new(params[:assignment])
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(@assignment) 
-    @assignment.submitter_count = 0    
+    @assignment.submitter_count = 0
     ## feedback added
     ##
     
@@ -102,16 +104,30 @@ class AssignmentController < ApplicationController
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
-    @drop_topic_deadline = deadline.id
-
+    @Drop_topic_deadline = deadline.id
+    set_requirement
     check_flag = @assignment.availability_flag
 
-    if(check_flag == true && params[:submit_deadline].nil?)
-      raise "Please enter a valid Submission deadline!!"
-      render :action => 'create'
+    late_policy_set = set_late_policy(params)
+
+    if(check_flag == true && params[:submit_deadline].nil? || !late_policy_set)
+      if(check_flag == true && params[:submit_deadline].nil?)
+        raise "Please enter a valid Submission deadline!!"
+        render :action => 'create'
+      elsif(!late_policy_set)
+        flash[:error] = "Please select a valid late policy!!"
+        @wiki_types = WikiType.find(:all)
+        get_limits_and_weights
+        @private = params[:private] == true
+        render :action => 'new'
+      end
     elsif (@assignment.save)
+      # increment times_used for setting default policy while display. (in late_policies table)
+      @late_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+      @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
       set_questionnaires   
       set_limits_and_weights
+
       max_round = 1
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
@@ -125,7 +141,7 @@ class AssignmentController < ApplicationController
 #        raise "Please enter a valid Review deadline" if !due_date
         max_round = 2;
         
-        due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
+        due_date = DueDate::set_duedate(params[:drop_topic_deadline],@Drop_topic_deadline, @assignment.id, 0)
  #       raise "Please enter a valid Drop-Topic deadline" if !due_date
         
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
@@ -216,13 +232,33 @@ class AssignmentController < ApplicationController
         @assignment.questionnaires << q
      end
     }     
-  end   
-  
+  end
+
+  #def get_requirement
+  #  @required = Hash.new
+  #
+  #  @required[:review] = @assignment.num_reviews
+  #  @required[:metareview] = @assignment.num_review_of_reviews
+  #
+  #  end
+
+  def set_requirement
+    #@required = Hash.new
+    if params[:required][:review]
+      @assignment.num_reviews = params[:required][:review]
+    end
+
+    if params[:required][:metareview]
+      @assignment.num_review_of_reviews = params[:required][:metareview]
+    end
+
+  end
+
   def get_limits_and_weights 
     @limits = Hash.new   
     @weights = Hash.new
-    
-    if session[:user].role.name == "Teaching Assistant"
+
+      if session[:user].role.name == "Teaching Assistant"
       user_id = Ta.get_my_instructor(session[:user]).id
     else
       user_id = session[:user].id
@@ -253,7 +289,8 @@ class AssignmentController < ApplicationController
       @weights[questionnaire.symbol] = aq.questionnaire_weight
     }             
   end
-  
+
+
   def set_limits_and_weights
     if session[:user].role.name == "Teaching Assistant"
       user_id = TA.get_my_instructor(session[:user]).id
@@ -306,44 +343,126 @@ class AssignmentController < ApplicationController
 
     @assignment.days_between_submissions = @days + (@weeks*7)
 
-    # The update call below updates only the assignment table. The due dates must be updated separately.
-    if @assignment.update_attributes(params[:assignment])     
+    set_requirement
+
+    late_policy_set = set_late_policy(params)
+
+    if @assignment.calculate_penalty == true && params[:assignment][:calculate_penalty] == "false"
+      @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+      @late_policy.update_attribute(:times_used, @late_policy.times_used - 1)
+
+      # delete corresponding rows from Calculated_penalties
+      @penaltyObjs = CalculatedPenalty.all
+
+      @penaltyObjs.each do |pen|
+        @participant = Participant.find_by_id(pen.participant_id)
+        if @participant.parent_id == @assignment.id
+          #@penalties = calculate_penalty(pen.participant_id)
+          #@total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+          pen.delete
+        end
+
+      end
+      @assignment.update_attribute(:is_penalty_calculated, false)
+    elsif @assignment.calculate_penalty == false && params[:assignment][:calculate_penalty] == "true"
+      # add rows in calculated_penalties
+      @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+      @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
+
+      participants = AssignmentParticipant.find_all_by_parent_id(@assignment.id)
+      participants.each do |p|
+        @penalties = calculate_penalty(p.id)
+        if(@penalties[:submission] != 0 || @penalties[:review] != 0 || @penalties[:meta_review] != 0)
+          @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+          penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => @penalties[:submission]}
+          CalculatedPenalty.create(penalty_attr1)
+
+          penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => @penalties[:review]}
+          CalculatedPenalty.create(penalty_attr2)
+
+          penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => @penalties[:meta_review]}
+          CalculatedPenalty.create(penalty_attr3)
+        end
+      end
+      @assignment.update_attribute(:is_penalty_calculated, true)
+    end
+    # Update the penalties in calculated_penalties table.
+    if @assignment.late_policy_id != params[:assignment][:late_policy_id]
+      #policy changed so we change the times used field for proper ordering of policies in the dropdown
+      @late_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+      if (@late_policy.times_used.to_i > 0)
+        @late_policy.update_attribute(:times_used, @late_policy.times_used - 1)
+      end
+
+      @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+      @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
+
+      @penaltyObjs = CalculatedPenalty.all
+
+      @penaltyObjs.each do |pen|
+        @participant = Participant.find_by_id(pen.participant_id)
+        if @participant.parent_id == @assignment.id
+          @penalties = calculate_penalty(pen.participant_id)
+          @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+          if pen.deadline_type_id.to_i == 1
+            pen.update_attribute(:penalty_points, @penalties[:submission])
+          elsif pen.deadline_type_id.to_i == 2
+            pen.update_attribute(:penalty_points, @penalties[:review])
+          elsif pen.deadline_type_id.to_i == 5
+            pen.update_attribute(:penalty_points, @penalties[:meta_review])
+          end
+        end
+      end
+    end
+
+    if @assignment.calculate_penalty == true && params[:assignment][:calculate_penalty] == "false"
+      params[:assignment][:late_policy_id] = nil
+    end
+    if(!late_policy_set)
+      flash[:error] = "Please select a valid late policy!!"
+      prepare_to_edit
+      @assignment.calculate_penalty = true
+      render :action => 'edit'
+    elsif @assignment.update_attributes(params[:assignment])
+
+      # The update call below updates only the assignment table. The due dates must be updated separately.
+
       if params[:questionnaires] and params[:limits] and params[:weights]
-        set_questionnaires
-        set_limits_and_weights
+          set_questionnaires
+          set_limits_and_weights
       end
 
       begin
-        newpath = @assignment.get_path        
+          newpath = @assignment.get_path
       rescue
-        newpath = nil
+          newpath = nil
       end
       if oldpath != nil and newpath != nil
-        FileHelper.update_file_location(oldpath,newpath)
+          FileHelper.update_file_location(oldpath,newpath)
       end
       
       begin
-        # Iterate over due_dates, from due_date[0] to the maximum due_date
-        if params[:due_date]
-          for due_date_key in params[:due_date].keys
-            due_date_temp = DueDate.find(due_date_key)
-            due_date_temp.update_attributes(params[:due_date][due_date_key])     
-            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+          # Iterate over due_dates, from due_date[0] to the maximum due_date
+          if params[:due_date]
+            for due_date_key in params[:due_date].keys
+              due_date_temp = DueDate.find(due_date_key)
+              due_date_temp.update_attributes(params[:due_date][due_date_key])
+              raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+            end
           end
-        end
      
-        flash[:notice] = 'Assignment was successfully updated.'
-        redirect_to :action => 'show', :id => @assignment                  
+          flash[:notice] = 'Assignment was successfully updated.'
+          redirect_to :action => 'show', :id => @assignment
      
       rescue
-        flash[:error] = $!
-        prepare_to_edit
-        render :action => 'edit', :id => @assignment
+          flash[:error] = $!
+          prepare_to_edit
+          render :action => 'edit', :id => @assignment
       end
     else # Simply refresh the page
-      @wiki_types = WikiType.find(:all)
-      render :action => 'edit'
-    end    
+        @wiki_types = WikiType.find(:all)
+        render :action => 'edit'
+    end
   end
   
   def show
@@ -398,5 +517,21 @@ class AssignmentController < ApplicationController
     newpath = assignment.get_path rescue nil
     FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
-  end  
+  end
+
+  :private
+  def set_late_policy(params)
+    late_policy_set = true
+    if(params[:assignment][:calculate_penalty] == "true")
+      if(params[:assignment][:late_policy_id ].to_i == 0)
+        late_policy_set = false
+      end
+    end
+
+    if(params[:assignment][:late_policy_id].to_i == 0)
+      @assignment.late_policy_id = nil
+      params[:assignment][:late_policy_id ] = nil
+    end
+    return late_policy_set
+  end
 end

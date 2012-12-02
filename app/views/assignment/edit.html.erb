@@ -23,6 +23,7 @@
         duedates = @assignment.due_dates
 		 
         duedates.sort! {|a,b| a.due_at <=> b.due_at}
+
 		for @due_date in duedates %>
 	        <% heading = @due_date.deadline_type.name.titleize + " deadline" %>
 			<tr>
@@ -47,6 +48,9 @@
   <input type="text" id="weeks" name ="weeks" maxlength="2" size="3" value="<%=@weeks%>"/> week(s) &nbsp;
   <input type="text" id="days" name ="days" maxLength="2" size="3" value="<%=@days%>"/> day(s)          
 </div>
+
+<%= render :partial => 'late_policy' %>
+
 <br/>
   &nbsp;&nbsp;<%= submit_tag "Save assignment" %>
 <% end %>

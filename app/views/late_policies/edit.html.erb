@@ -1,0 +1,10 @@
+<h1>Editing late policy</h1>
+
+<% form_tag :action => 'update', :id => @penalty_policy do %>
+    <%= render :partial => 'form' %>
+    <%= submit_tag 'Edit' %>
+<% end %>
+
+<br>
+<br>
+<%= link_to 'Back', :action => 'index' %>

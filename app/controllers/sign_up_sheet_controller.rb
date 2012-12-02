@@ -563,7 +563,7 @@ class SignUpSheetController < ApplicationController
     topic_deadline.topic_id = topic_id
     topic_deadline.due_at = DateTime.parse(due_date.due_at.to_s) + offset.to_i
     topic_deadline.deadline_type_id = due_date.deadline_type_id
-    topic_deadline.late_policy_id = due_date.late_policy_id
+    #topic_deadline.late_policy_id = due_date.late_policy_id
     topic_deadline.submission_allowed_id = due_date.submission_allowed_id
     topic_deadline.review_allowed_id = due_date.review_allowed_id
     topic_deadline.resubmission_allowed_id = due_date.resubmission_allowed_id

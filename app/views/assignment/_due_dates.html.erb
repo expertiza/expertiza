@@ -1,3 +1,9 @@
+<% if session[:user].role.name == "Teaching Assistant"
+     user_id = Ta.get_my_instructor(session[:user].id)
+   else
+     user_id = session[:user].id
+   end %>
+
 <div>
  <div style="font-size:large;"><b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b></div><br/>
     <div style="padding: 5px">Number of rounds of review:

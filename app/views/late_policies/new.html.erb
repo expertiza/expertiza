@@ -1,0 +1,27 @@
+<h1>New late policy</h1>
+
+<% form_for :late_policy, @late_policy, :url => { :action => "create" } do |f| %>
+    <%= error_messages_for 'late_policies' %>
+
+    <!--[form:late_policies]-->
+    <p>
+      <label for="late_policy_name">Late policy Name:</label><label style="color: #ff0000;">*</label><br/>
+      <%= text_field 'late_policy', 'policy_name' %>
+    </p>
+    <p>
+      <label for="late_policy_penalty_points_per_unit">Penalty Points Per Unit:</label><label style="color: #ff0000;">*</label><br/>
+      <%= text_field 'late_policy', 'penalty_per_unit' %>
+    </p>
+    <p>
+      <label for="late_policy_penalty_maximum">Maximum Penalty:</label><label style="color: #ff0000;">*</label><br/>
+      <%= text_field 'late_policy', 'max_penalty' %>
+    </p>
+    <!--[eoform:late_policies]-->
+
+
+    <%= f.submit 'Create' %>
+<% end %>
+
+<br>
+<br>
+<%= link_to 'Back', :action => 'index' %>

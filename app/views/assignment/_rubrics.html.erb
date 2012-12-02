@@ -5,7 +5,7 @@
    end %>
 
 <table>
- <tr><th width="20%">&nbsp;</th><th>Selected questionnaire</th><th>Weight</th><th>Notify when scores differ by more than <img src="/images/info.png" title="If two reviews differ by more than this amount, the instructor will be notified by e-mail."></th></tr>
+ <tr><th width="20%">&nbsp;</th><th>Selected questionnaire</th><th>Requirement</th><th>Weight</th><th>Notify when scores differ by more than <img src="/images/info.png" title="If two reviews differ by more than this amount, the instructor will be notified by e-mail."></th></tr>
  <tr>
    <td>Review:</td>
    <td style="padding: 15px;">
@@ -17,6 +17,10 @@
              <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
         <% } %>
       </select>
+   </td>
+   <!-- taking no of reviews required as input -->
+   <td style="padding: 15px;">
+     <input id="num_review" name="required[review]" size="5" type="text" value="<%= @assignment.num_reviews %>"/>
    </td>
    <td style="padding: 15px;">
       <input id="weights_review" name="weights[review]" size="5" type="text" value="<%= @weights[:review] %>"/>%   
@@ -38,6 +42,10 @@
         <% } %>
       </select>
    </td>
+  <!-- taking no of meta reviews required as input -->
+  <td style="padding: 15px;">
+    <input id="num_metareview" name="required[metareview]" size="5" type="text" value="<%= @assignment.num_review_of_reviews %>"/>
+  </td>
    <td style="padding: 15px;">
        <input id="weights_metareview" name="weights[metareview]" size="5" type="text" value="<%= @weights[:metareview] %>"/>%   
    </td>
@@ -56,6 +64,10 @@
         <% } %>
       </select>
    </td>
+   <!-- taking no of reviews required as input -->
+   <td style="padding: 15px;">
+    ---------
+   </td>
    <td style="padding: 15px;">
    	   <input id="weights_feedback" name="weights[feedback]" size="5" type="text" value="<%= @weights[:feedback] %>"/>% 
    </td>
@@ -73,6 +85,10 @@
              <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
         <% } %>
       </select>
+   </td>
+   <!-- taking no of reviews required as input -->
+   <td style="padding: 15px;">
+     ---------
    </td>
    <td style="padding: 15px;">
    	   <input id="weights_teammate" name="weights[teammate]" size="5" type="text" value="<%= @weights[:teammate] %>"/>%     

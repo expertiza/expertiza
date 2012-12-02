@@ -1,7 +1,6 @@
 Given 'I am logged in as a student' do
-  And 'a student with the username "student" exists'
-  When 'I go to the login page'
-  
+
+
   fill_in 'login_name', :with => 'student'
   fill_in 'login_password', :with => 'password'
   click_button 'Login'
@@ -70,4 +69,19 @@ When /I log in as "([^"]*)"/ do |username|
   click_button 'Login'
 
   Then "I should be logged in as \"#{username}\""
+end
+
+## append
+Given 'I am not logged in' do
+  if(find_button('Logout').nil?)
+    puts "not Logged in"
+  else
+    click_link('Logout')
+  end
+end
+
+When /^I log in as a "([^\"]*)" with password "([^\"]*)"$/ do |username, password|
+  fill_in 'login_name', :with => username
+  fill_in 'login_password', :with => password
+  click_button 'Login'
 end

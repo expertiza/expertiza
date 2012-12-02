@@ -11,7 +11,7 @@ Feature: Manage the assignments in Expertiza
       And I have a public review named "test_review"	  
 	When I follow the "Manage..." link as an "instructor"
 	  And I follow "Create Public Assignment"
-	  And I fill in "Assignment1" for "Assignment name: "
+	  And I fill in "Assignment1" for "assignment_name"
 	  And I fill in "2020-01-01 00:00:00" for "submit_deadline[due_at]"
 	  And I fill in "2020-01-02 00:00:00" for "review_deadline[due_at]"
 	  And I select "test_review" from "questionnaires[review]"

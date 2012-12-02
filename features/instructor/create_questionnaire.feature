@@ -5,5 +5,6 @@ Feature: Create a questionnaire
 
 Scenario: Create a questionnaire
   Given I am logged in as admin
-  And I create a review questionnaire called "test_review_questionnaire"
+  When I create a review questionnaire called "test_review_questionnaire"
+  And I should see "Manage content"
   Then I should see "test_review_questionnaire" under list of questionnaires

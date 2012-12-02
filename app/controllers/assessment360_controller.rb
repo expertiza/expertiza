@@ -1,5 +1,5 @@
 class Assessment360Controller < ApplicationController
-  # Added the @instructor to display the instrucor name in the home page of the 360 degree assessment
+  # Added the @instructor to display the instructor name in the home page of the 360 degree assessment
   def index
     @courses = Course.find_all_by_instructor_id(session[:user].id)
     @instructor_id = session[:user].id
@@ -25,16 +25,7 @@ class Assessment360Controller < ApplicationController
       reviewed_msg = reviewed.to_s + "% reviewed"
       pending_msg = pending.to_s + "% pending"
 
-      GoogleChart::PieChart.new('160x100'," ",false) do |pc|
-        pc.data_encoding = :extended
-        pc.data reviewed_msg, reviewed, '228b22' # want to write '20' responed
-        pc.data pending_msg, pending, 'ff0000' # rest of the class
-
-        # Pie Chart with labels
-        pc.show_labels = false
-        pc.show_legend = true
-        @assignment_pie_charts[assignment] = (pc.to_url)
-      end
+      pie_chart_data(assignment, pending, pending_msg, reviewed, reviewed_msg)
 
       # bar chart data ................................
       bar_1_data = Array.new
@@ -53,17 +44,11 @@ class Assessment360Controller < ApplicationController
       color_1 = 'c53711'
       min=0
       max= assignment.get_total_reviews_assigned
-
-      GoogleChart::BarChart.new("600x80", " ", :vertical, false) do |bc|
-        bc.data "Review", bar_1_data, color_1
-        bc.axis :y, :positions => [min, max], :range => [min,max]
-        bc.axis :x, :labels => dates
-        bc.show_legend = false
-        bc.stacked = false
-        bc.data_encoding = :extended
-        bc.params.merge!({:chl => "Nov"})
-        @assignment_bar_charts[assignment] = (bc.to_url)
-      end
+      bar_data=bar_1_data
+      color=color_1
+      spacing=0
+      bar_size="600x80"
+      bar_chart(assignment, bar_data, color, dates, max, min, spacing, bar_size)
       
       # Histogram score distribution .......................
       bar_2_data = assignment.get_score_distribution
@@ -71,19 +56,47 @@ class Assessment360Controller < ApplicationController
       min = 0
       max = 100
 
-      p '======================='
+       p '======================='
       p bar_2_data
-      GoogleChart::BarChart.new("130x100", " ", :vertical, false) do |bc|
-        bc.data "Review", bar_2_data, color_2
-        bc.axis :y, :positions => [0, bar_2_data.max], :range => [0, bar_2_data.max]
+      bar_data=bar_2_data
+      color=color_2
+      spacing=1
+      bar_size="130x100"
+      bar_chart(assignment, bar_data, color, dates, max, min, spacing, bar_size)
+
+
+    end
+  end
+
+  def bar_chart(assignment, bar_data, color, dates, max, min,spacing,bar_size)
+    GoogleChart::BarChart.new(bar_size, " ", :vertical, false) do |bc|
+      bc.data "Review", bar_data, color
+      if spacing == 0
+        bc.axis :y, :positions => [min, max], :range => [min, max]
+        bc.axis :x, :labels => dates
+      elsif spacing == 1
+        bc.axis :y, :positions => [0, bar_data.max], :range => [0, bar_data.max]
         bc.axis :x, :positions => [min, max], :range => [min,max]
         bc.width_spacing_options :bar_width => 1, :bar_spacing => 0, :group_spacing => 0
-        bc.show_legend = false
-        bc.stacked = false
-        bc.data_encoding = :extended
-        bc.params.merge!({:chl => "Nov"})
-        @assignment_distribution[assignment] = (bc.to_url)
       end
+      bc.show_legend = false
+      bc.stacked = false
+      bc.data_encoding = :extended
+      bc.params.merge!({:chl => "Nov"})
+      @assignment_bar_charts[assignment] = (bc.to_url)
+    end
+  end
+
+  def pie_chart_data(assignment, pending, pending_msg, reviewed, reviewed_msg)
+    GoogleChart::PieChart.new('160x100', " ", false) do |pc|
+      pc.data_encoding = :extended
+      pc.data reviewed_msg, reviewed, '228b22' # want to write '20' responed
+      pc.data pending_msg, pending, 'ff0000' # rest of the class
+
+      # Pie Chart with labels
+      pc.show_labels = false
+      pc.show_legend = true
+      @assignment_pie_charts[assignment] = (pc.to_url)
     end
   end
 

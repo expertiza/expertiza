@@ -8,6 +8,9 @@ Scenario: Edit an instructor
   When I open instructors management page
   And I create a new instructor named "test_instructor"
   And I should be able to see "test_instructor" under the list of instructors
+  And I open users management page
+  When I click on "test_instructor" starting with "t"
 #the step below does not work on expertiza. This is a bug. There is no view that maps to edit.
   And I edit "test_instructor" to have the name "test_instructor_edit"
+  And I open instructors management page
   Then I should be able to see "test_instructor_edit" under the list of instructors

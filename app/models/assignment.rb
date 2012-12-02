@@ -739,7 +739,7 @@ end
   # Param: type - String (ParticipantReviewResponseMap, etc.)
   # Param: date - Filter reviews that were not created on this date
   def get_total_reviews_completed_by_type_and_date(type, date)
-    # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+    # A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
     # self.responses.size
 
     response_count = 0
@@ -769,7 +769,7 @@ end
 
     self.response_maps.each do |response_map|
       if !response_map.response.nil? then
-        sum_of_scores = sum_of_scores + response_map.response.get_average_score
+        sum_of_scores = sum_of_scores + response_map.response.get_total_score
       end
     end
 
@@ -781,7 +781,7 @@ end
     
     self.response_maps.each do |response_map|
       if !response_map.response.nil? then
-        score = response_map.response.get_average_score.to_i
+        score = response_map.response.get_total_score.to_i
         distribution[score] += 1 if score >= 0 and score <= 100
       end
     end

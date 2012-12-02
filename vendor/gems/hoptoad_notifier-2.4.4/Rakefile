@@ -183,7 +183,7 @@ end
 
 Cucumber::Rake::Task.new(:cucumber) do |t|
   t.fork = true
-  t.cucumber_opts = ['--format', (ENV['CUCUMBER_FORMAT'] || 'progress')]
+  t.cucumber_opts = ['--format', "Teamcity::Cucumber:Formatter", "--expand"]
 end
 
 task :cucumber => [:gemspec, :vendor_test_gems]

@@ -14,7 +14,8 @@ And /^I create a review questionnaire called "(\S+)"$/ do |questionnaire|
       :max_question_score => 5,
       :type => 'ReviewQuestionnaire',
       :display_type => 'Review',
-      :instructor_id => admin.id
+      :instructor_id => admin.id,
+      :section => 'Regular'
                        })
   questionnaires = Questionnaire.find_by_name('test_review_questionnaire')
   questionnaires.save!
@@ -29,6 +30,10 @@ And /^I create a review questionnaire called "(\S+)"$/ do |questionnaire|
 end
 
 Then /^I should see "(\S+)" under list of questionnaires$/ do |questionnaire|
-#  find(:xpath, "//a[contains(.,'Review rubrics')]").click
+  find(:xpath, "//a[contains(.,'Review')]").click
+#  http://localhost:3000/menu/manage/questionnaires/review%20rubrics
+ # click_link "Review rubrics"
+  should have_content "Review"
   should have_content questionnaire
+
 end

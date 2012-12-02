@@ -42,8 +42,8 @@ When /^I fill in "([^"]*)" with "([^"]*)"(?: within "([^"]*)")?$/ do |field, val
   end
 end
 
-When /^I fill in "([^"]*)" for "([^"]*)"(?: within "([^"]*)")?$/ do |value, field, selector|
-  with_scope(selector) do
+When /^I fill in "([^"]*)" for "([^"]*)"$/ do |value, field|
+  within(:xpath, "//td//tr//tbody//table[@class='.content']")  do
     fill_in(field, :with => value)
   end
 end

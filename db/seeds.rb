@@ -282,6 +282,39 @@ tu = User.find_by_name('admin')
 tu.parent_id = tu.id
 tu.save!
 
+###### users
+# Default instructors
+puts "Creating instructor user with password 'password'"
+User.create!(:name => 'instructor1',
+             :email => 'anything@mailinator.com',
+             :clear_password => 'password',
+             :clear_password_confirmation => 'password',
+             :role_id => Role.find_by_name('Instructor').id,
+             :email_on_review => true,
+             :email_on_submission => true,
+             :email_on_review_of_review => true,
+             :is_new_user => false,
+             :master_permission_granted => false)
+tu = User.find_by_name('instructor1')
+tu.parent_id = tu.id
+tu.save!
+
+# Default student
+puts "Creating student user with password 'password'"
+User.create!(:name => 'student',
+             :email => 'anything@mailinator.com',
+             :clear_password => 'password',
+             :clear_password_confirmation => 'password',
+             :role_id => Role.find_by_name('Student').id,
+             :email_on_review => true,
+             :email_on_submission => true,
+             :email_on_review_of_review => true,
+             :is_new_user => false,
+             :master_permission_granted => false)
+tu = User.find_by_name('student')
+tu.parent_id = tu.id
+tu.save!
+
 
 ###########################################################################
 # Display tables

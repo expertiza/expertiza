@@ -1,6 +1,13 @@
 <h1>Listing late policies</h1>
 <% user_role = session[:user].role.name
-   is_admin = (user_role == "Administrator" || user_role == "Super-Administrator") %>
+   is_admin = (user_role == "Administrator" || user_role == "Super-Administrator")
+
+   if session[:user].role.name == "Teaching Assistant"
+     instructor_id = Ta.get_my_instructor(session[:user].id)
+   else
+     instructor_id = session[:user].id
+   end
+%>
 <table>
   <tr>
     <th>Penalty Name</th>
@@ -12,7 +19,7 @@
   </tr>
 
 <% @penalty_policies.each do |penalty_policy| %>
-  <% if session[:user].id == penalty_policy.instructor_id || is_admin %>
+  <% if instructor_id == penalty_policy.instructor_id || is_admin %>
   <tr>
     <td><%= penalty_policy.policy_name %></td>
     <td><%= penalty_policy.penalty_per_unit %></td>

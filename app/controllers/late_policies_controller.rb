@@ -47,7 +47,7 @@ class LatePoliciesController < ApplicationController
     is_number = true
 
     if session[:user].role.name == "Teaching Assistant"
-      user_id = TA.get_my_instructor(session[:user]).id
+      user_id = Ta.get_my_instructor(session[:user].id)
     else
       user_id = session[:user].id
     end

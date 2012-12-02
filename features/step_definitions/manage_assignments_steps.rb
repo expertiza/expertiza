@@ -46,7 +46,7 @@ When /^I create a (public|private) assignment named "([^"]*)" with max team size
     And "I press \"Save assignment\""
   Then "I should see \"#{assignment_name}\""
 end	
-
+        # Accept not being found on the page steps need to be canged
 When /^I (create|join) a team named "([^"]*)" for the assignment "([^"]*)"$/ do |create_join, team_name,assignment_name|
   When "I follow \"Student_task\""
     And "I follow \"#{assignment_name}\""

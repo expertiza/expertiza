@@ -416,7 +416,7 @@ class AssignmentController < ApplicationController
     end
 
     if @assignment.calculate_penalty == true && params[:assignment][:calculate_penalty] == "false"
-      @assignment.update_attribute(:late_policy_id, nil)
+      params[:assignment][:late_policy_id] = nil
     end
     if(!late_policy_set)
       flash[:error] = "Please select a valid late policy!!"

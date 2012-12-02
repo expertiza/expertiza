@@ -1,4 +1,4 @@
-require 'zip/zip'
+frequire 'zip/zip'
 
 class SubmittedContentController < ApplicationController
   helper :wiki
@@ -28,6 +28,7 @@ class SubmittedContentController < ApplicationController
 
     begin
       participant.submmit_hyperlink(params['submission'])
+      participant.update_resubmit_times
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end    
@@ -40,7 +41,7 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(participant.user_id)
 
     begin
-      participant.remove_hyperlink(params['index'].to_i)
+      participant.remove_hyperlink(params['chk_links'].to_i)
     rescue 
       flash[:error] = $!
     end    

@@ -35,6 +35,10 @@
 
               <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
 
+              <% if topic.assignment.is_microtask? %>
+                <td><%= topic.micropayment %></td>
+              <% end %>
+
               <td align="center"><%= topic.max_choosers %></td>
 
               <%= render :partial => 'num_of_choosers', :locals => {:topic=>topic} %>

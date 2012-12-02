@@ -3,7 +3,7 @@ class SignUpTopic < ActiveRecord::Base
   has_many :topic_dependencies, :foreign_key => 'topic_id', :dependent => :destroy
   has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy 
   has_many :assignment_participants, :foreign_key => 'topic_id'
-
+  has_one :assignment_weight, :foreign_key => 'topic_id', :dependent => :destroy
   belongs_to :assignment
 
   def get_team_id_from_topic_id(user_id)

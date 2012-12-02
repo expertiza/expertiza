@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111217162506) do
+ActiveRecord::Schema.define(:version => 20121126000023) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -22,6 +22,26 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
   add_index "assignment_questionnaires", ["assignment_id"], :name => "fk_aq_assignments_id"
   add_index "assignment_questionnaires", ["questionnaire_id"], :name => "fk_aq_questionnaire_id"
   add_index "assignment_questionnaires", ["user_id"], :name => "fk_aq_user_id"
+
+  create_table "assignment_review_weights", :force => true do |t|
+    t.integer  "assignment_id"
+    t.float    "review_weight"
+    t.float    "metareview_weight"
+    t.integer  "review_points"
+    t.integer  "metareview_points"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "min_num_of_reviews"
+    t.integer  "min_num_of_metareviews"
+  end
+
+  create_table "assignment_weights", :force => true do |t|
+    t.integer  "assignment_id"
+    t.integer  "topic_id"
+    t.float    "weight"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "assignments", :force => true do |t|
     t.datetime "created_at"
@@ -53,6 +73,9 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer  "max_reviews_per_submission"
     t.integer  "review_topic_threshold",            :default => 0
     t.boolean  "availability_flag"
+    t.boolean  "copy_flag",                         :default => false
+    t.integer  "rounds_of_reviews",                 :default => 1
+    t.boolean  "microtask",                         :default => false
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -60,6 +83,24 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
+
+  create_table "automated_metareviews", :force => true do |t|
+    t.float    "relevance"
+    t.float    "content_summative"
+    t.float    "content_problem"
+    t.float    "content_advisory"
+    t.float    "tone_positive"
+    t.float    "tone_negative"
+    t.float    "tone_neutral"
+    t.integer  "quantity"
+    t.integer  "plagiarism"
+    t.integer  "version_num"
+    t.integer  "response_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "automated_metareviews", ["response_id"], :name => "fk_automated_metareviews_responses_id"
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -239,9 +280,9 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",      :default => "", :null => false
+    t.string  "q_type",                     :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1,  :null => false
+    t.integer "question_id", :default => 1, :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -257,8 +298,8 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.text     "instruction_loc"
     t.string   "section"
+    t.text     "instruction_loc"
   end
 
   create_table "questions", :force => true do |t|
@@ -368,6 +409,7 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer "max_choosers",                   :default => 0, :null => false
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
+    t.integer "micropayment",                   :default => 0
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"

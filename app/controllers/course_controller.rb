@@ -127,4 +127,12 @@ class CourseController < ApplicationController
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end
 
+  def calculate_credit_for_voluntary_work
+    @voluntary_work = VoluntaryWork.new(params[:id])
+    if !@voluntary_work.success
+      flash[:notice] = "Set extra review weight and minimum count for assignment #{@voluntary_work.failure_assignment}"
+      redirect_to :controller => 'tree_display', :action => 'list'
+    end
+  end
+
 end

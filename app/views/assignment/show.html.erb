@@ -6,6 +6,11 @@
   <b><%= column.human_name %>:</b> <%=h @assignment.send(column.name) %>
 </p>
 <% end %>
+<% column = AssignmentWeight.content_columns %>
+    <p>
+      <b><%= column.first.human_name %>:</b> <%=h @assignment_weight.send(column.first.name) %>
+    </p>
+
 
 <%= link_to 'Edit', :action => 'edit', :id => @assignment %> |
 <%= render :partial => '/shared_scripts/back' %>

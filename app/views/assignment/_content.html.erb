@@ -1,4 +1,5 @@
 <script type="text/javascript">
+
 function onChange(){
 	count = document.getElementById("team_count1");
 	hidden = document.getElementById("team_count2");
@@ -114,6 +115,26 @@ function onChangeWikiType(){
 
  </tr>
 
+  <tr><td><label>Microtask Assignment?</label></td>
+
+ <td>
+  		<select id="microtask" name="assignment[microtask]" >
+  		 <option value=false style="width:75px">No</option>
+         <option value=true style="width:75px" <% if @assignment.microtask %>SELECTED<%end%>>Yes</option>
+        </select>
+  </td>
+
+ </tr>
+  <tr id="assignmentWeight">
+    <td><label>Assignment Weight</label></td>
+    <% if @assignment_weight %>
+        <td><%=text_field_tag :assignment_weight, params[:assignment_weight], :value => @assignment_weight%> </td>
+    <% else %>
+        <td><%=text_field_tag :assignment_weight, params[:assignment_weight], :value => 0 %> </td>
+    <% end %>
+
+  </tr>
+
 <tr id="team_count1" style="display:none">  
   <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>   
   <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5%></td>  
@@ -130,6 +151,7 @@ function onChangeWikiType(){
 <p>
 </p>
 <script type="text/javascript">onChangeWikiType();</script>
+<script type="text/javascript">onChange();</script>
 
 <!--[eoform:assignment]-->
 

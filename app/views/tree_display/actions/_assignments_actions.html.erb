@@ -43,7 +43,10 @@
   <% if signup_topic %>
     <%= link_to image_tag('/images/tree_view/view-publish-rights-24.png', :title => 'View publishing rights'),:controller=>'sign_up_sheet', :action=>'view_publishing_rights', :id => node.node_object_id %>
   <% end %>
+  <%= link_to image_tag('/images/tree_view/360-dashboard-24.png',:title => 'Assign weight for extra reviews'),:controller =>'assignment',:action=>'assign_review_weights',:id=>node.node_object_id %>
 </div>
 <% end %>
 </ul>
+</ul>
+
 </TD> 

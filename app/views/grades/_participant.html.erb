@@ -23,7 +23,7 @@
   end
 
   #penalties = calculate_penalty(participant.id)
-  total_penalty = @all_penalties[participant.id][:submission] + @all_penalties[participant.id][:review] + @all_penalties[participant.id][:meta_review]
+  total_penalty = @all_penalties[participant.id][:total_penalty]
 %>
 
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>

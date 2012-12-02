@@ -15,7 +15,7 @@ module PenaltyHelper
 
     penalties = Hash.new(0)
 
-    calculate_penalty = true
+    calculate_penalty = @assignment.calculate_penalty
     if (calculate_penalty == true)             # TODO add calculate_penalty column to the assignment table and use its value to check if the penalty is to be calculated for the assignment or not
       stage = @assignment.get_current_stage(@participant.topic_id)
       if (stage == "Complete")
@@ -159,13 +159,13 @@ module PenaltyHelper
           penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/60
           penalty_for_this_review = penalty_minutes * @penalty_per_unit
           if (penalty_for_this_review > @max_penalty_for_no_submission)
-            penalty += @max_penalty_for_no_submission
+            penalty = @max_penalty_for_no_submission
           else
             penalty += penalty_for_this_review
           end
         end
       elsif
-          penalty += @max_penalty_for_no_submission
+          penalty = @max_penalty_for_no_submission
       end
     end
     penalty

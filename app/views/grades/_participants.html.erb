@@ -14,14 +14,7 @@
                 }
     %>
     <%
-
-        total_penalty = 0
-        @penalties = CalculatedPenalty.find_all_by_participant_id(participant.id)
-        @penalties.each do |p|
-          total_penalty += p.penalty_points
-        end
-
-
+        total_penalty = @all_penalties[participant.id][:total_penalty]
         if(max_penalty < total_penalty)
             max_penalty = total_penalty
         end

@@ -14,12 +14,12 @@
   <% @voluntary_work.participants.each do |participant|%>
       <tr style="background-color: <%= index%2 != 0 ? 'white' : '#FAFAEA' %>;" >
         <td><%= participant.user.name%></td>
-        <td><%= @voluntary_work.extra_reviews[participant.id] %></td>
-        <td><%= @voluntary_work.extra_metareviews[participant.id] %></td>
+        <td><%= @voluntary_work.extra_reviews[participant.id].to_s + '%' %></td>
+        <td><%= @voluntary_work.extra_metareviews[participant.id].to_s + '%' %></td>
         <td><%= @voluntary_work.extra_reviews_exp[participant.id] %></td>
         <td><%= @voluntary_work.extra_metareviews_exp[participant.id] %></td>
 
-        <td><%= @voluntary_work.microtask_scores[participant.id] %></td>
+        <td><%= @voluntary_work.microtask_scores[participant.id].to_s + '%' %></td>
         <td><%= @voluntary_work.microtask_scores_exp[participant.id] %></td>
 
        </tr>

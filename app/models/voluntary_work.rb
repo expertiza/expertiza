@@ -41,10 +41,10 @@ class VoluntaryWork
           if !@min_rev.nil?
             cnt = cnt - @min_rev.min_num_of_reviews
             meta_cnt = meta_cnt - @min_rev.min_num_of_metareviews
-            review_credit += cnt*@min_rev.review_weight
-            review_exp_pts += cnt*@min_rev.review_points
-            metareview_credit += (meta_cnt*@min_rev.metareview_weight)
-            metareview_exp_pts += meta_cnt*@min_rev.metareview_points
+            review_credit += cnt > 0 ? cnt*@min_rev.review_weight : 0
+            review_exp_pts += cnt > 0 ? cnt * @min_rev.review_points : 0
+            metareview_credit += meta_cnt > 0 ? meta_cnt*@min_rev.metareview_weight : 0
+            metareview_exp_pts += meta_cnt > 0 ? meta_cnt*@min_rev.metareview_points : 0
           else
             @failure_assignment = assignment.name
             return false

@@ -134,7 +134,7 @@ class Score < ActiveRecord::Base
 
       resubmission_times = ResubmissionTime.find(:all, :conditions => ["participant_id = ?", map.reviewee_id], :order => "resubmitted_at DESC")
 
-      if @response.is_valid_for_score_calculation(resubmission_times, latest_review_phase_start_time)
+      if @response.is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)
         @invalid = 0
       else
         @invalid = 1

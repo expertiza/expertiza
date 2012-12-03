@@ -111,7 +111,7 @@ class Response < ActiveRecord::Base
   # latest_review_phase_start_time
   # The function returns true if a review is valid for score calculation
   # and false otherwise
-  def is_valid_for_score_calculation(resubmission_times, latest_review_phase_start_time)
+  def is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)
     is_valid = true
 
     # if there was not submission then the response is valid

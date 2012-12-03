@@ -15,3 +15,10 @@ Topic3:
   assignment_id: <%= Fixtures.identify(:assignment_project3) %>
   max_choosers: 3
   topic_identifier: A103
+
+Topic4:
+  topic_name: mt_topic_test
+  assignment_id: <%= Fixtures.identify(:assignment_microtask1) %>
+  max_choosers: 3
+  topic_identifier: A104
+  micropayment: 2

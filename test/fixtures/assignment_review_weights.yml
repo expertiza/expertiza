@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  assignment_id: 1
+  review_weight: 1.5
+  metareview_weight: 1.5
+  review_points: 1
+  metareview_points: 1
+
+two:
+  assignment_id: 1
+  review_weight: 1.5
+  metareview_weight: 1.5
+  review_points: 1
+  metareview_points: 1

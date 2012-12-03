@@ -1,3 +1,4 @@
+
 <div>
  <div style="font-size:large;"><b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b></div><br/>
     <div style="padding: 5px">Number of rounds of review:
@@ -150,12 +151,11 @@
                <TD ALIGN=LEFT WIDTH=20%>
                    <%=hidden_field 'drop_topic_deadline', 'id' %>Drop-topic deadline
                </TD>
-               <TD ALIGN="CENTER">
-             <TD><%=text_field 'drop_topic_deadline', 'due_at', :size => 20, id => "reviewofreview_deadline_due_at"  %></TD>
-             <TD><img src="/images/cal.gif" onClick="NewCal('drop_topic_deadline_due_at','YYYYMMDD',true,24); return false;"/></TD>
-
-                  <!--<input type="text" id="drop_topic_due_at" name ="drop_topic_deadline[due_at]"/>-->
-                  <!--<img src="/images/cal.gif" onClick="NewCal('drop_topic_due_at','YYYYMMDD',true,24); return false;"/>-->
+               <TD ALIGN="CENTER" WIDTH=20%>
+                    <table><tr>
+                     <TD><%=text_field 'drop_topic_deadline', 'due_at', :size => 20, id => "reviewofreview_deadline_due_at"  %></TD>
+                     <TD><img src="/images/cal.gif" onClick="NewCal('drop_topic_deadline_due_at','YYYYMMDD',true,24); return false;"/></TD>
+                    </tr></table>
                </TD>
                <TD ALIGN=CENTER WIDTH=10%>
                    <%= select('drop_topic_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>3 )%>

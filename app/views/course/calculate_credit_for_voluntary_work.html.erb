@@ -1,17 +1,18 @@
 
 <table>
-  <tr>
+  <tr align="left" style="background-color: #FAFAEA;">
     <th>Participant Name</th>
-    <th>Credit For Reviews</th>
-    <th>Credit For Meta Reviews</th>
-    <th>Experience points Reviews</th>
-    <th>Experience points Meta Reviews</th>
+    <th>Extra Credit for Reviews</th>
+    <th>Extra Credit for Metareviews</th>
+    <th>Experience points for Reviews</th>
+    <th>Experience points for Metareviews</th>
     <th>Credit for Microtasks</th>
     <th>Experience Points for Microtasks</th>
 
   </tr>
+  <% index = 1 %>
   <% @voluntary_work.participants.each do |participant|%>
-      <tr>
+      <tr style="background-color: <%= index%2 != 0 ? 'white' : '#FAFAEA' %>;" >
         <td><%= participant.user.name%></td>
         <td><%= @voluntary_work.extra_reviews[participant.id] %></td>
         <td><%= @voluntary_work.extra_metareviews[participant.id] %></td>
@@ -22,7 +23,7 @@
         <td><%= @voluntary_work.microtask_scores_exp[participant.id] %></td>
 
        </tr>
-
+            <% index += 1 %>
 <% end%>
 </table>
 <%= link_to 'Export '+'Grades',

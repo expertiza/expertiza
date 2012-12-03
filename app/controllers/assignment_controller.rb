@@ -643,6 +643,7 @@ class AssignmentController < ApplicationController
 
   def assign_review_weights
     @assignment = Assignment.find(params[:id])
+    @assignment_review = AssignmentReviewWeight.find_by_assignment_id(@assignment.id)
   end
 
   def submit_review_weights

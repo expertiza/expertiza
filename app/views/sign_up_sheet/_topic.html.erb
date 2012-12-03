@@ -18,6 +18,17 @@
 <p><label for="max_choosers">Maximum choosers</label><br/>
   <%= text_field 'topic', 'max_choosers' %></p>
 
+<% if topic.assignment.is_microtask? %>  
+<p><label for="micropayment">Micropayment</label><br/>
+    <%= text_field 'topic', 'micropayment' %></p>
+
+    <p><label for="micropayment">Weight</label><br/>
+      <% if @weight %>
+        <%= text_field_tag :topic_weight, params[:topic_weight], :value => @weight %></p>
+      <% else %>
+          <%= text_field_tag :topic_weight, params[:topic_weight], :value => 0 %></p>
+      <% end %>
+<% end %>
 
 <!--[eoform:topic]-->
 <br/>

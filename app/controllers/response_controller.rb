@@ -175,7 +175,24 @@ class ResponseController < ApplicationController
       return true unless current_user_id?(response.map.reviewer.user_id)
     end
     return false
-  end
+  #end
+    # KHH: Commenting this out because it's broken
+    #**********************
+    # Check whether this is Jen's assgt. & if so, use her rubric
+    #if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
+    #  if @assignment.id < 469
+    #     @next_action = "custom_update"
+    #     render :action => 'custom_response'
+    # else
+    #     @next_action = "custom_update"
+    #     render :action => 'custom_response_2011'
+    # end
+    #else
+      # end of special code (except for the end below, to match the if above)
+      #**********************
+      render :action => 'response'
+    #end
+  end  
   
   def update
     @response = Response.find(params[:id])
@@ -299,7 +316,23 @@ class ResponseController < ApplicationController
     else
       render :action => 'response'
     end
-   end
+   #end
+    # Check whether this is Jen's assgt. & if so, use her rubric
+    # KHH: Comment this breakage out
+    #if (@assignment.instructor_id == User.find_by_name("jkidd").id) && @title == "Review"
+    #  if @assignment.id < 469
+    #     @next_action = "custom_create"
+    #     render :action => 'custom_response'
+    # else
+    #     @next_action = "custom_create"
+    #     render :action => 'custom_response_2011'
+    # end
+    #else
+      # end of special code (except for the end below, to match the if above)
+      #**********************
+    #render :action => 'response'
+    #end
+  end
   
   def create     
     @map = ResponseMap.find(params[:id])
@@ -379,7 +412,7 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @map.notification_accepted = false
     @map.save
-    if(@map.assignment.id == 561 or @map.assignment.id == 559) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
+    if(@map.assignment.id == 561) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
       # puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
       #calling the automated metareviewer controller, which calls its corresponding model/view
       if(params[:save_options] == "WithMeta")

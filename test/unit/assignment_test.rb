@@ -36,4 +36,44 @@ class AssignmentTest < ActiveSupport::TestCase
     end
   end
 
+  # Tests added wrt E702 for micro tasks
+  # This method is used to assignvarious properties to the assignment
+  def new_micro_task_assignment(attributes={})
+    questionnaire_id = Questionnaire.first.id
+    instructorid = Instructor.first.id
+    courseid = Course.first.id
+    number_of_topics = SignUpTopic.count
+
+
+    attributes[:name] ||=  "mt_valid_test"
+    attributes[:course_id] ||= 1
+    attributes[:directory_path] ||= "mt_valid_test"
+    attributes[:review_questionnaire_id] ||= questionnaire_id
+    attributes[:review_of_review_questionnaire_id] ||= questionnaire_id
+    attributes[:author_feedback_questionnaire_id]  ||= questionnaire_id
+    attributes[:instructor_id] ||= instructorid
+    attributes[:course_id] ||= courseid
+    attributes[:wiki_type_id] ||= 1
+    attributes[:microtask] ||= true
+
+    assignment = Assignment.new(attributes)
+    assignment
+  end
+
+    #This test creates a valid assignment and thus checks that there arrises no errors
+  def test_valid_mktask_assignment
+    new_assignment = new_micro_task_assignment
+    assert new_assignment.valid?
+  end
+
+    #This test creates a Invalid assignment and thus infers that such an assignment is not created
+  def test_invalid_mktask_assignment
+    new_assignment = new_micro_task_assignment(:microtask => '')
+    if new_assignment == nil
+      assert TRUE
+    end
+  end
+
+
+
 end

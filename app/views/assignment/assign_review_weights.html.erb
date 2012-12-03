@@ -1,0 +1,42 @@
+<h1>Assign Weights For Extra Reviews for Assignment</h1>
+<%if @assignment%>
+    <%- form_tag(:controller => 'assignment', :action => 'submit_review_weights') do %>
+        <%= hidden_field_tag(:assignment_id, @assignment.id) %>
+        <table style="width: 100%;margin-top: 20px;">
+          <tr>
+            <th style="width: 40%;"></th>
+          <th style="word-wrap: break-word;">Minimum Reviews</th>
+          <th style="word-wrap: break-word;">Minimum Metareviews</th>
+          <th style="word-wrap: break-word;">Extra Review Weight</th>
+          <th style="word-wrap: break-word;">Extra Meta Review Weight</th>
+          <th style="word-wrap: break-word;">Extra Review Experience Points</th>
+          <th style="word-wrap: break-word;">Extra Meta Review Experience Points</th>
+
+          </tr>
+          <tr>
+            <td style="width: 40%;"><%= @assignment.name %></td>
+            <% if !@assignment_review.nil? %>
+                <td><%= text_field_tag :min_reviews, params[:min_reviews], :value => @assignment_review.min_num_of_reviews %> </td>
+                <td><%= text_field_tag :min_metareviews, params[:min_metareviews], :value => @assignment_review.min_num_of_metareviews %> </td>
+                <td><%= text_field_tag :review_weight, params[:review_weight], :value =>@assignment_review.review_weight %> </td>
+                <td><%= text_field_tag :metareview_weight, params[:metareview_weight], :value =>@assignment_review.metareview_weight %> </td>
+                <td><%= text_field_tag :review_exp, params[:review_exp], :value =>@assignment_review.review_points %> </td>
+                <td><%= text_field_tag :metareview_exp, params[:metareview_exp], :value =>@assignment_review.metareview_points %> </td>
+            <% else %>
+                <td><%= text_field_tag :min_reviews, params[:min_reviews], :value => 0 %> </td>
+                <td><%= text_field_tag :min_metareviews, params[:min_metareviews] , :value => 0%> </td>
+                <td><%= text_field_tag :review_weight, params[:review_weight], :value => 0 %> </td>
+                <td><%= text_field_tag :metareview_weight, params[:metareview_weight], :value => 0 %> </td>
+                <td><%= text_field_tag :review_exp, params[:review_exp], :value => 0 %> </td>
+                <td><%= text_field_tag :metareview_exp, params[:metareview_exp], :value => 0 %> </td>
+            <%end%>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <%= submit_tag "Submit" %>
+            </td>
+          </tr>
+        </table>
+
+    <%end%>
+<%end%>

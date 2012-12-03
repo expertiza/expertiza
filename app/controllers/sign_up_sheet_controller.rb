@@ -87,6 +87,8 @@ class SignUpSheetController < ApplicationController
   def new
     @id = params[:id]
     @sign_up_topic = SignUpTopic.new
+    @sign_up_topic.assignment = Assignment.find(params[:id])
+    @topic = @sign_up_topic
   end
 
   #This method is used to create signup topics
@@ -126,8 +128,11 @@ class SignUpSheetController < ApplicationController
       @sign_up_topic.max_choosers = params[:topic][:max_choosers]
       @sign_up_topic.category = params[:topic][:category]
       @sign_up_topic.assignment_id = params[:id]
-
       @assignment = Assignment.find(params[:id])
+
+      if @assignment.is_microtask?
+        @sign_up_topic.micropayment = params[:topic][:micropayment]
+      end
 
       if @assignment.staggered_deadline?
         topic_set = Array.new
@@ -137,6 +142,13 @@ class SignUpSheetController < ApplicationController
 
       if @sign_up_topic.save
         #NotificationLimit.create(:topic_id => @sign_up_topic.id)
+        if @assignment.is_microtask?
+          @assignment_weight = AssignmentWeight.new
+          @assignment_weight.assignment_id = @assignment.id
+          @assignment_weight.topic_id = @sign_up_topic.id
+          @assignment_weight.weight = params[:topic_weight]
+          @assignment_weight.save!
+        end
         flash[:notice] = 'Topic was successfully created.'
         redirect_to_sign_up(params[:id])
       else
@@ -177,6 +189,8 @@ class SignUpSheetController < ApplicationController
   def edit
     @topic = SignUpTopic.find(params[:id])
     @assignment_id = params[:assignment_id]
+    @weight_tuple = AssignmentWeight.find_by_topic_id(@topic.id)
+    @weight = @weight_tuple.weight
   end
 
   def update
@@ -202,6 +216,7 @@ class SignUpSheetController < ApplicationController
 
       topic.category = params[:topic][:category]
       topic.topic_name = params[:topic][:topic_name]
+      topic.micropayment = params[:topic][:micropayment]
       topic.save
     else
       flash[:error] = "Topic could not be updated"
@@ -665,5 +680,44 @@ class SignUpSheetController < ApplicationController
     query = query + " t.id = tu.team_id"
     query = query + " group by t.name;"
     SignUpTopic.find_by_sql(query)
+    end
+  def create_default_for_microtask
+    assignment_id = params[:id]
+    @sign_up_topic = SignUpTopic.new
+    @sign_up_topic.topic_identifier = 'MT1'
+    @sign_up_topic.topic_name = 'Microtask Topic'
+    @sign_up_topic.max_choosers = '0'
+    @sign_up_topic.micropayment = 0
+    @sign_up_topic.assignment_id = assignment_id
+
+    @assignment = Assignment.find(params[:id])
+
+    if @assignment.staggered_deadline?
+      topic_set = Array.new
+      topic = @sign_up_topic.id
+
+    end
+
+    if @sign_up_topic.save
+      @assignment_weight = AssignmentWeight.new
+      @assignment_weight.assignment_id = @assignment.id
+      @assignment_weight.topic_id = @sign_up_topic.id
+      @assignment_weight.weight = params[:assignment_weight];
+      @assignment_weight.save!
+      flash[:notice] = 'Default Microtask topic was created - please update.'
+      redirect_to_sign_up(assignment_id)
+    else
+      render :action => 'new', :id => assignment_id
+    end
   end
-end
+
+
+  def redirect_to_sign_up(assignment_id)
+    assignment = Assignment.find(assignment_id)
+    if assignment.staggered_deadline == true
+      redirect_to :action => 'add_signup_topics_staggered', :id => assignment_id
+    else
+      redirect_to :action => 'add_signup_topics', :id => assignment_id
+    end
+  end
+  end

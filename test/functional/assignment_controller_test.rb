@@ -40,41 +40,70 @@ class AssignmentControllerTest < ActionController::TestCase
     instructorid = Instructor.first.id
     courseid = Course.first.id
     # create a new assignment
-    assignment = Assignment.new( :name                => "2_valid_test",
+    assignment = Assignment.new( :name => "2_valid_test",
       :course_id           => 1,
       :directory_path      => "2_valid_test",
       :review_questionnaire_id    => questionnaire_id,
       :review_of_review_questionnaire_id => questionnaire_id,
       :author_feedback_questionnaire_id  => questionnaire_id,
       :instructor_id => instructorid,
-      :course_id => courseid
+      :course_id => courseid,
+      :wiki_type_id => 1
     )
+
     #p flash[:notice].to_s
     assert assignment.save
   end
 
-  # Test Case 1102
-  # edit an assignment, change should be
-  # reflected in DB
-  def test_legal_edit_assignment
+    # Test Case 1101-A
+  def test_copy
+    # copy an assignment
+
     @assignment = Assignment.first
-    id = Assignment.first.id
-    number_of_assignment = Assignment.count
-    questionnaire_id = Questionnaire.first.id
-    post :update, :id => id, :assignment=> { :name => 'updatedAssignment9',
-      :review_questionnaire_id => questionnaire_id,
-      :review_of_review_questionnaire_id => questionnaire_id,
-      :author_feedback_questionnaire_id  => questionnaire_id
-    }
-
-    assert_equal flash[:notice], 'Assignment was successfully updated.'
-
+    assignment_id = @assignment.id
+    assignment_name = @assignment.name
+    post :copy, :id => assignment_id
     assert_response :redirect
-    assert_equal Assignment.count, number_of_assignment
-    assert Assignment.find(:all, :conditions => "name = 'updatedAssignment9'")
+    assert Assignment.find( :all, :conditions => ['name = ?', "Copy of " + assignment_name] )
+    copied = Assignment.find( :first, :conditions => ['name = ?', "Copy of " + assignment_name] )
+    dir = copied.directory_path
+    assert Dir[dir].empty?
   end
 
-  # Test Case 1103
+# Edited wrt E702
+# Test Case 1101B
+# This test creates a new assignment which is a microtask and submits it.
+  def test_new_microtask
+    #@assignment = assignments(:Assignment_Microtask1)
+    questionnaire_id = questionnaires(:questionnaire1).id
+    instructorid = users(:instructor1).id
+    courseid = courses(:course_object_oriented).id,
+    number_of_topics = SignUpTopic.count
+    # create a new assignment
+    post :new, :assignment => { :name => "Assignment_Microtask1",
+      :directory_path      => "CSC517_instructor1/Assignment_Microtask1",
+      :submitter_count => 0,
+      :course_id => courseid,
+      :instructor_id => instructorid,
+      :num_reviews => 1,
+      :num_review_of_reviews => 0,
+      :num_review_of_reviewers => 0,
+      :review_questionnaire_id => questionnaire_id,
+      :reviews_visible_to_all => 0,
+      :require_signup => 0,
+      :num_reviewers => 3,
+      :team_assignment => 0,
+      :team_count => 1,
+      :microtask => true }
+
+      assert_response 200
+      assert Assignment.find(:all, :conditions => "name = 'Assignment_Microtask1'")
+
+  end
+
+
+
+  # Test Case 1102
   # illegally edit an assignment, name the existing
   # assignment with an invalid name or another existing
   # assignment name, should not be allowed to changed DB data
@@ -118,9 +147,5 @@ class AssignmentControllerTest < ActionController::TestCase
 
   end
 end
-
-
-
-
 
 

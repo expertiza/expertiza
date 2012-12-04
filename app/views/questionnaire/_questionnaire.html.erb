@@ -1,9 +1,10 @@
 <%= error_messages_for 'questionnaire' %>
 
+<p>For helping creating a custom rubric: documentation <%= link_to "guide", "http://wikis.lib.ncsu.edu/index.php/Creating_Custom_Rubric" %> | <%= link_to "video", "http://www.youtube.com/watch?v=uUt1hMUMFbM" %>.</p>
 <!--[form:questionnaire]-->
 <table>
 	<tr>
-		<td valign="top"><label for="questionnaire_name">Name:</label>	</td>
+		<td valign="top"><label for="questionnaire_name">Name:</label>
 			<%= text_field 'questionnaire', 'name'  %>
 			<%= hidden_field 'questionnaire', 'id' %>
 			<%= hidden_field 'questionnaire', 'type' %>
@@ -27,7 +28,6 @@
 		</td>
 	</tr>
 </table>
-<p>For helping creating a custom rubric please visit this <%= link_to "guide", "http://wikis.lib.ncsu.edu/index.php/Creating_Custom_Rubric" %>.</p>
 <br/>
 <table id="questions_table">
 	<tr>
@@ -41,7 +41,7 @@
           <td colspan=2><input type="button" id="deleteQuestion" value="Delete selected questions" onclick="deleteQuestions()" disabled="true"></td>
       <% end %>
 	</tr>
-  <% if @questionnaire.questions.length > 0 %>
+  <%# if @questionnaire.questions.length > 0 %>
     <tr>
 		<td align=left width=30>Delete</td>
 		<td align=center width=300>Question</td>
@@ -51,7 +51,7 @@
          <%end%>
 		<td align=left>Weight</td>
 	</tr>
-   <% end %>
+   <% #end %>
 	<% 	i = 1   %>
     <% if params['import'] && @questionnaire.section == "Custom"%>
       <% for @question in @questions_from_import %>

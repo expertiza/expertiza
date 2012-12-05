@@ -16,7 +16,7 @@ gem 'rubyzip', :require => 'zip/zip'
 gem 'rdoc'
 gem "rspec-rails", "1.3.2"
 gem 'engtagger'
-gem 'stanford-core-nlp' 
+gem 'stanford-core-nlp'
 gem 'rwordnet'
 gem 'open-uri-cached'
 gem 'edavis10-ruby-web-search'

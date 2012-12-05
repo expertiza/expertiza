@@ -922,4 +922,241 @@ end
 
     return fields
   end
+
+  #returns a list of assignment objects that belong to a particular course
+  def self.get_assignments_for_course(course_id)
+    Assignment.find_all_by_course_id course_id
+  end
+
+  #returns the review comments for a given response type. the response type is given as an array input.
+  def get_review_comments(response_type)
+    review_comments = []
+    self.response_maps.each do |response_map|
+      if response_type.include?(response_map.type)
+        responses = Response.find(:all, :conditions =>["map_id = ?",response_map.id])
+        responses.each do |response|
+          comments = Score.find(:all, :conditions =>["response_id = ?", response.id])
+          comments.each do |comment|
+            review_comments << comment.comments
+          end
+        end
+      end
+    end
+    review_comments
+  end
+
+  #returns the average number of unique tokens in a set of comments passed as a parameter to this method
+  def average_tokens(comments)
+    count=0
+    cnt = comments.count
+    comments.each do |comment|
+      #regex to identify individual unique tokens in a comment text + uniq operation + count operation.
+      count += comment.gsub(/[^0-9A-Za-z ]/,'').downcase.split(" ").uniq.count
+    end
+
+    if cnt ==0
+      count
+    else
+      ((count/cnt.to_f)*100).round / 100.0
+    end
+  end
+
+  #returns the set of review questions given the questionnaire type
+  def get_review_questions(questionnaire_type)
+    review_questions = []
+    review_questionnaires = []
+    self.questionnaires.each do |q|
+      if q.type == questionnaire_type
+        review_questionnaires << q
+      end
+    end
+
+    #fetch the questions in a questionnaire given the questionnaire id
+    review_questionnaires.each do |questionnaire|
+      questions = Question.find_all_by_questionnaire_id(questionnaire.id)
+      questions.each do |question|
+        review_questions << question.txt
+      end
+    end
+    review_questions
+  end
+
+  #returns the number of questions as returned by the get_review_questions method
+  def count_questions(questionnaire_type)
+    get_review_questions(questionnaire_type).count
+  end
+
+  #returns the number of subquestions present in a questionnaire for an assignment.
+  def count_average_subquestions(questionnaire_type)
+    num_subques=0
+    questions = get_review_questions(questionnaire_type)
+
+    if questions
+      questions.each do |question|
+        if question
+          #count the questions from the strings obtained from applying the split function on the current question
+          #after the split strings are obtained, any empty strings are rejected and not counted as a subquestion.
+          result = question.split('?').reject {|s| s.empty?}
+          if result
+            num_subques = num_subques + result.count
+          end
+        end
+      end
+    end
+    if questions and questions.count!=0
+      (num_subques/questions.count).to_f
+    else
+      num_subques
+    end
+  end
+
+  #returns the number of reviewers for assignments of a given response type
+  def get_number_of_reviewers(response_type)
+    resultset = []
+    self.response_maps.each do |response_map|
+      #if a reviewer id is not already present in the list of reviewers for assignments of given response type, add the reviewer id to the list
+      if response_type.include?(response_map.type)
+        resultset << response_map.reviewer_id
+      end
+    end
+    if resultset
+      #return the count of number of unique reviewers
+      resultset.uniq.count
+    else
+      0
+    end
+  end
+
+  #return distinct reviews of type MetareviewResponseMap
+  def get_metareviews_of_type(type)
+    resultset = []
+    self.response_maps.each do |response_map|
+      #if a response_map id is not already present in the list of response map ids for assignments of given response type,
+      #add the response map id to the list
+      if type.include?(response_map.type)
+        resultset << response_map.id
+      end
+    end
+    if !resultset.empty?
+      #find the id of all reviews that are the object of review in the given metareviews as given by the response_map ids
+      metareviews = ResponseMap.find(:all, :conditions =>["reviewed_object_id in (?)", resultset])
+    else
+      []
+    end
+  end
+
+  #returns the number of reviewers for assignments of a given response type
+  def get_number_of_metareviewers(type)
+    reviewers = []
+    metareviews = get_metareviews_of_type(type)
+    metareviews.each do |metareview|
+      #add all reviewer ids in the list of reviewers for assignments of given response type
+      reviewers << metareview.reviewer_id
+    end
+    #count the distinct reviewer ids
+    reviewers.uniq.count
+  end
+
+  #returns the average number of metareviews
+  def get_average_num_of_metareviews(review_type)
+    metareviewers_count =get_number_of_metareviewers(review_type)
+    if metareviewers_count == 0
+      0
+    else
+      ((get_metareviews_of_type(review_type).count/ metareviewers_count.to_f )*100).round / 100.0
+    end
+  end
+
+  #returns the average number of reviews of given response type
+  def get_average_num_of_reviews(review_type)
+    reviewers_count =get_number_of_reviewers(review_type)
+    if reviewers_count == 0
+      0
+    else
+      total =0
+      review_type.each do |rt|
+        total = total + get_total_reviews_completed_by_type(rt)
+      end
+      ((total.to_f/reviewers_count)*100).round / 100.0
+
+    end
+  end
+
+  #returns rhe comments for reviews of response type MetareviewResponse
+  def get_average_metareview_comments_with_type(response_type)
+    metareview_responses = get_metareviews_of_type(response_type)
+
+    metareview_comments = []
+    metareview_responses.each do |response_map|
+      responses = Response.find(:all, :conditions =>["map_id = ?",response_map.id])
+      responses.each do |response|
+        scores = Score.find(:all, :conditions =>["response_id = ?", response.id])
+        scores.each do |score|
+          metareview_comments << score.comments
+        end
+      end
+    end
+
+    average_tokens(metareview_comments)
+  end
+
+  #returns the average score provided for the reviews of given response type for an assignment
+  def get_average_score_with_type(response_type)
+    review_questionnaire_id = get_review_questionnaire_id()
+    @questions = Question.find(:all, :conditions =>["questionnaire_id = ?", review_questionnaire_id])
+
+    return 0 if get_total_reviews_assigned == 0
+
+    sum_of_scores = 0
+
+    self.response_maps.each do |response_map|
+      if response_type.include?(response_map.type)
+        if !response_map.response.nil? then
+          sum_of_scores = sum_of_scores + Score.get_total_score(:response => response_map.response, :questions =>@questions, :q_types => Array.new)
+        end
+      end
+    end
+
+    (((sum_of_scores / get_total_reviews_completed).to_f )*100).round / 100.0
+
+  end
+
+  #returns the average score provided for the reviews of MetareviewResponse type for an assignment
+  def get_average_metareview_score_with_type(response_type)
+    metareview_questionnaire_id = get_metareview_questionnaire_id()
+    @questions = Question.find(:all, :conditions =>["questionnaire_id = ?", metareview_questionnaire_id])
+
+    sum_of_scores = 0
+    total_responses =0
+
+    metareview_responses = get_metareviews_of_type(response_type)
+
+    metareview_responses.each do |response_map|
+      responses = Response.find(:all, :conditions =>["map_id = ?",response_map.id])
+      total_responses = total_responses + responses.count
+      responses.each do |response|
+        sum_of_scores = sum_of_scores + Score.get_total_score(:response => response, :questions =>@questions, :q_types => Array.new)
+      end
+    end
+
+    if total_responses==0
+      0
+    else
+      (((sum_of_scores / total_responses).to_f )*100).round / 100.0
+    end
+  end
+
+  #fetches the questionnaire of a given questionnaire id
+  def get_metareview_questionnaire_id()
+    revqids = []
+    metareview_questionnaire_id = ""
+    revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",self.id])
+    revqids.each do |rqid|
+      rtype = Questionnaire.find(rqid.questionnaire_id).type
+      if( rtype == "MetareviewQuestionnaire")
+        metareview_questionnaire_id = rqid.questionnaire_id
+      end
+    end
+    metareview_questionnaire_id
+  end
 end

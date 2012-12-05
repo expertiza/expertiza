@@ -1,0 +1,134 @@
+<h1>Mine Review Data</h1>
+
+
+<div>
+  <table align="left">
+    <tr>
+      <td style="width: 40px;">
+        <% form_tag({:action => 'review_word_count',:course_list=>@course_list}) do %>
+            Select Graph :
+            <br/>
+            <select name='display[graph_type]' style="width: 15em">
+              <% @review_graphs.each do |graph| %>
+                  <% if @selected_graph==graph %>
+                      <option value='<%= graph %>' selected="selected"><%= graph %></option>
+                  <% else %>
+                      <option value='<%= graph %>' ><%= graph %></option>
+                  <% end %>
+              <% end %>
+            </select>
+            <br/>
+            <br/>
+            Select Course:
+            <br/>
+            <select name='display[course]' style="width: 15em">
+              <% @courses.sort_by {|x| x.name}.each do |course| %>
+                  <% if @selected_course.to_s==course.id.to_s %>
+                      <option value='<%= course.id%>' selected="selected"><%= course.name %></option>
+                  <% else %>
+                      <option value='<%= course.id%>' ><%= course.name %></option>
+                  <% end %>
+              <% end %>
+            </select>
+            <br/>
+            <%= submit_tag "Add course" %>
+        <% end %>
+      </td>
+      <td>
+        <div>
+          <% if @assignments and !@assignments.empty? %>
+              <table>
+                <% form_tag({:action => 'review_word_count',:course_list=>@course_list, :course_id=>@selected_course, :graph_type=>@selected_graph}) do %>
+                    <% index=0 %>
+                    <% @assignments.each do |course, assignments| %>
+                        <% if course and !course.empty? %>
+                            <tr>
+                              <td style="width:10em"><%= @controller.get_course_name(course) %></td>
+                              <td><a id="<%= index %>Link" name="<%= index %>Link" href="#" <% if assignments.length > 0  %>onclick="toggleList('<%= index %>',<%= assignments.length ==0? 0:1 %>);alternate('theTable');return false;"><img src="/images/expand.png"><% else %>onclick="return false;"><img src="/images/noaction.png"><% end %></a></td>
+
+                              <td id="<%= index %>_1" name="<%= index %>_1"  style="display: none;">
+                                <table><tr>
+                                  <% assignments.each_with_index do |assignment, index| %>
+                                      <% if index%4 ==0 %>
+                                          </tr><tr><td>
+                                      <%else %>
+                                          <td>
+                                      <%end %>
+                                      <% if @selected_assignments.include?(assignment) %>
+                                          <%= check_box_tag 'assignment_ids[]', assignment.id, true%>
+                                          <%= assignment.name %>
+
+                                      <% else %>
+                                          <%= check_box_tag 'assignment_ids[]', assignment.id, false%>
+                                          <%= assignment.name %>
+
+                                      <% end %>
+
+                                      </td>
+                                  <% end %>
+                                  </tr></table>
+                              </td>
+                            </tr>
+                        <% end %>
+                        <% index=index+1 %>
+                    <%end %>
+                    <tr><td><%= submit_tag "Update Graph" %></td></tr>
+                <% end %>
+              </table>
+          <% end %>
+        </div>
+
+      </td>
+    </tr>
+    <tr>
+      <td>
+
+        <% if @dataset_names %>
+            <div class ="taskbox" float="left">
+              Y-axis Legend:<br/>
+              <% @dataset_names.each do |ds| %>
+                  <span style="background-color:<%=ds[1]%>;color=<%=ds[1]%>;"> . </span> <%=ds[0]%><br/>
+              <% end %>
+            </div>
+        <% end %>
+        <% if @xaxis_legend %>
+            <div class ="taskbox" float="left">
+              X-axis Legend (Review Strategy):<br/>
+              <% @xaxis_legend.each_with_index do |x, index| %>
+                  <span class="tasknum" style="background-color:black"> <%= index+1 %> </span>
+                  <%= x %>
+                  <br/>
+              <% end %>
+            </div>
+        <% elsif @selected_assignments %>
+            <div class ="taskbox" float="left">
+              X-axis Legend (Assignments):<br/>
+              <% @selected_assignments.each_with_index do |assignment, index| %>
+                  <span class="tasknum" style="background-color:black"> <%= index+1 %> </span>
+                  <%= @controller.get_course_name(assignment.course_id) %>:<%=assignment.name %>
+                  <br/>
+              <% end %>
+            </div>
+        <% end %>
+      </td>
+      <td>
+        <br/>
+        <div align="left">
+          <% if @chart1 %>
+              <div align="left"><%= @selected_graph %></div>
+              <img src= "<%= @chart1.to_url %>"/>
+          <% end %>
+
+        </div>
+
+      </td>
+    </tr>
+    <tr><td colspan="2">
+      <% if @table %>
+          <div> Table:<br/>
+            <%= @table %>
+          </div><% end %>
+    </td></tr>
+  </table>
+
+</div>

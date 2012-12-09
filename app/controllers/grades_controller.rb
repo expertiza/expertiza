@@ -48,10 +48,8 @@ class GradesController < ApplicationController
         end
       end
     end
-
-
   end
-
+    
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment

@@ -64,6 +64,45 @@ class AssignmentController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
   
+  # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
+  # from the current time and returns this difference in minutes
+  def find_min_from_now(due_at)
+
+		curr_time=DateTime.now.to_s(:db)
+		puts curr_time
+		curr_time=Time.parse(curr_time)
+		puts curr_time
+		time_in_min=((due_at - curr_time).to_i/60)
+		puts "inside find minutes"
+		puts time_in_min
+		return time_in_min
+  end
+  # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
+  def delete_from_delayed_queue (delayed_job_id)
+    dj=Delayed::Job.find(delayed_job_id)
+    if (dj != nil && dj.id != nil)
+      dj.delete
+    end
+  end
+
+  # this function finds all the due_dates for a given assignment and calculates the time when the reminder for these deadlines needs to be sent. Enqueues them in the delayed_jobs table
+  def add_to_delayed_queue
+		duedates = DueDate::find_all_by_assignment_id(@assignment.id)
+		for i in (0 .. duedates.length-1)
+			deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
+			due_at = duedates[i].due_at.to_datetime.to_s(:db)
+			Time.parse(due_at)
+			due_at= Time.parse(due_at)
+			mi=find_min_from_now(due_at)
+      			diff = mi-(duedates[i].threshold)*60
+      			#puts diff
+	 	        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)) , 1, diff.minutes.from_now)
+      #duedates[i].update_attribute(:delayed_job_id, dj.id)
+		end
+  end
+
+
+
   def create
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.    
@@ -103,7 +142,10 @@ class AssignmentController < ApplicationController
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
-
+    deadline = DeadlineType.find_by_name("signup")
+    @signup_deadline = deadline.id
+    deadline = DeadlineType.find_by_name("team_formation")
+    @team_formation_deadline = deadline.id
     check_flag = @assignment.availability_flag
 
     if(check_flag == true && params[:submit_deadline].nil?)
@@ -174,7 +216,8 @@ class AssignmentController < ApplicationController
       @wiki_types = WikiType.find(:all)
       render :action => 'new'
     end
-    
+    # function that facilitates sending of email reminders
+    add_to_delayed_queue
   end
   
   def edit
@@ -323,13 +366,20 @@ class AssignmentController < ApplicationController
       end
       
       begin
-        # Iterate over due_dates, from due_date[0] to the maximum due_date
+         # Iterate over due_dates, from due_date[0] to the maximum due_date
         if params[:due_date]
           for due_date_key in params[:due_date].keys
             due_date_temp = DueDate.find(due_date_key)
-            due_date_temp.update_attributes(params[:due_date][due_date_key])     
-            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+            # delete the previous jobs from the delayed_jobs table
+            djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', @assignment.id])
+            for dj in djobs
+              delete_from_delayed_queue(dj.id)
+            end
+            due_date_temp.update_attributes(params[:due_date][due_date_key])              
+            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0						
           end
+	  # add to the delayed_jobs queue according to the updated due_dates
+          add_to_delayed_queue
         end
      
         flash[:notice] = 'Assignment was successfully updated.'
@@ -356,6 +406,11 @@ class AssignmentController < ApplicationController
     # If the assignment is already deleted, go back to the list of assignments
     if assignment 
       begin
+	#delete from delayed_jobs queue
+        djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', assignment.id])
+        for dj in djobs
+          delete_from_delayed_queue(dj.id)
+        end
         @user = session[:user]
         id = @user.get_instructor
         if(id != assignment.instructor_id)

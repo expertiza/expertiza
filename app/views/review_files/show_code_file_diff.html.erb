@@ -16,11 +16,128 @@
     var highlight_cell_id = -1;
     var noCommentsHtml = "<br/><font style=\"color: #7a7a7a;\">No Comments yet</font>";
 
+    //------------------------------------new------------------
+
+    isMinSelected = false;
+
+
+    var participant_id = <%= @participant.id %>;
+
+    var multipleSelection=false;
+
+    var mintd;
+    var maxtd;
+    var minoffset;
+    var maxoffset;
+    var oldcolorhash= new Array();
+    var omintd;
+    var omaxtd;
+    var selectedfile;
+
+
+    //-------------------------------------------------
     /**
      * Sends the comment content corresponding to the file offset indicated by
      * global variable 'comment_offset' to the controller submit_comment which
      * inserts the comment in the database.
      */
+
+
+    //-----------------------------------------------------------------------
+
+    function constructAuthorCloseWindowLink() {
+        return "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' " +
+                "onclick='hideAuthorCommentWindow()'><img float='right' class='close_button'" +
+                "src='/images/tree_view/delete-icon-16.png' alt='Icon'></a><br>";
+    }
+    function createButton(i,initial,final){
+
+        $("#authorComment").fadeIn()
+
+        var commentForm1 = document.getElementById('comment_window1').innerHTML;
+        var commentWindowDom1 = document.getElementById('authorComment');
+        var commentWindowHtml = constructAuthorCloseWindowLink()+commentForm1;
+        commentWindowHtml = commentWindowHtml.replace("forminput1","forminput_3");
+        commentWindowDom1.innerHTML = commentWindowHtml;
+        omintd=mintd;
+        omaxtd=maxtd;
+        mintd = initial;
+        maxtd=final;
+    }
+    function hideAuthorCommentWindow(){
+        mintd=omintd;
+        maxtd=omaxtd;
+        $("#authorComment").fadeOut();
+    }
+    function checkMouseDown(event,id,offset) {
+         var id2 = id.split("_");
+
+        var id1 = id2[id2.length - 1];
+
+        // var tdElement = document.getElementById(id);
+        // tdElement.setAttribute('bgcolor','purple');
+        if(!isMinSelected)
+        {
+            isMinSelected = true;
+            selectedfile = id2[1];
+            var tdElement = document.getElementById(id);
+            mintd = id1;
+
+            oldcolorhash[mintd]= tdElement.bgColor;
+            tdElement.setAttribute('bgcolor','purple');
+
+            minoffset = offset
+
+            //select this cell--initial
+            return false;
+        }
+        else
+        {
+            if(id2[1]!=selectedfile){
+                alert("Please select lines of either the new or the old version");
+                return false;
+            }
+            maxtd = id1;
+            maxtd = parseInt(maxtd);
+            mintd = parseInt(mintd);
+
+            maxoffset=offset
+            //select this cell--initial
+            isMinSelected = false;
+
+            if (mintd != maxtd)
+            {
+            var tdElement = document.getElementById("td_"+ id2[1] + "_" + maxtd);
+
+            oldcolorhash[maxtd]= tdElement.bgColor;
+            tdElement.setAttribute('bgcolor','purple');
+            if(parseInt(maxtd)<parseInt(mintd))
+            {
+                temp = maxtd;
+                maxtd = mintd;
+                mintd = temp;
+
+            }
+
+            for (var i = mintd+1;i<maxtd;i++){
+                var tdElement = document.getElementById("td_"+ id2[1] + "_" + i);
+                if((tdElement != null || tdElement != undefined))
+                {
+                    if(oldcolorhash[i]!="")
+                        oldcolorhash[i]=tdElement.bgColor;
+                    tdElement.setAttribute('bgcolor','purple');
+
+                }
+            }
+            }
+            expandWindow();
+            return true;
+        }
+
+
+    }
+
+    //------------------------------------------------------------------------
     function ajaxSubmitComment() {
         var commentText = document.getElementById('forminput_2');
 
@@ -33,22 +150,89 @@
                 parameters: {
                     file_id :file_id,
                     file_offset :comment_offset,
-                    comment_content :commentText.value
+                    comment_content :commentText.value,
+                    participant_id: participant_id,
+                    first_line: mintd,
+                    last_line: maxtd
                 }
             });
             // Highlight the table cell (containing the line number) just clicked
             var lineNumCellDom = document.getElementById(highlight_cell_id);
             lineNumCellDom.style.fontWeight="900";
             lineNumCellDom.bgColor = "cyan";
+
+            //-------------------------------------change in code @nimitt to color range of lines----------------------------
+            for (var i = mintd;i<=maxtd;i++){
+                var tdElement = document.getElementById("td_new_"+i);
+                if(tdElement != null || tdElement != undefined )
+                {
+                    tdElement.style.fontWeight="900";//setAttribute('bgcolor','purple');
+                    tdElement.bgColor = "cyan";
+                }
+            }
+
+            createComments(highlight_cell_id, line_number, comment_offset, file_id);
         }
-        createComments(highlight_cell_id, line_number, comment_offset, file_id);
+        //---------------------------------------------@nimitt-----------------------------------------------------
+
+
+        //createComments(highlight_cell_id, line_number, comment_offset, file_id);
     }
 
+    function ajaxSubmitComment1() {
+        var commentText = document.getElementById('forminput_3');
+
+        if(!commentText.value) {
+            alert('Cannot save an empty Comment');
+            return;
+        }
+
+        new Ajax.Request('/review_files/submit_comment', {
+            method:'get',
+            parameters: {
+                file_id :file_id,
+                file_offset :comment_offset,
+                comment_content :commentText.value,
+                participant_id: participant_id,
+                first_line: mintd,
+                last_line: maxtd
+            }
+        });
+        // Highlight the table cell (containing the line number) just clicked
+        // var lineNumCellDom = document.getElementById(highlight_cell_id);
+        // lineNumCellDom.style.fontWeight="900";
+        // lineNumCellDom.bgColor = "cyan";
+        $("#authorComment").fadeOut();
+        $('#comment_window_outline').fadeOut();
+
+        mintd=omintd;
+        maxtd=omaxtd;
+        viewComments(maxtd, comment_offset, file_id);
+    }
     /** HELPER METHOD
      * Hides the comment Window.
      */
     function hideCommentWindow() {
-        $("#myDiv2").fadeOut();
+        for (var i = mintd;i<=maxtd;i++){
+            var tdElement = document.getElementById('td_'+selectedfile+"_" + i);
+            if((tdElement != null || tdElement != undefined) && (tdElement.bgColor == "purple") )
+            {
+                tdElement.bgColor=oldcolorhash[i];
+            }
+        }
+
+        $("#comment_window_outline").fadeOut();
+        restore();
+    }
+
+    function restore() {
+
+        $('#overlay').fadeOut();
+    }
+
+    function expandWindow() {
+
+        $('#overlay').fadeIn();
     }
 
     /** HELPER METHOD
@@ -83,13 +267,18 @@
     function viewComments(line_number, offset, fileId) {
         if(!line_number) { return; }
 
-        var commentWindowDom = document.getElementById('myDiv2');
-
+        var commentWindowDom = document.getElementById('comment_window_outline');
+        file_id = fileId
         new Ajax.Request('/review_files/get_comments', {
             method: 'get',
             parameters: {
                 file_id: fileId,
-                file_offset: offset
+                file_offset: offset,
+                line_number: line_number,
+                participant_id: participant_id,
+                initial_line_number: mintd,
+                final_line_number: maxtd  ,
+                selectedFile : selectedfile
             },
             onSuccess: function(return_value) {
                 var all_comments = return_value.responseText ?
@@ -97,7 +286,8 @@
 
                 commentWindowDom.innerHTML = constructWindowHeader(line_number) +
                         "<br>" + all_comments;
-                $('#myDiv2').fadeIn();
+                $('#comment_window_outline').fadeIn();
+                comment_offset = offset;
             },
             onFailure: function() { alert("Failed to retrieve comments for this Line") }
         });
@@ -129,13 +319,16 @@
 
         // Dom corr to the comment Window. This dom will be populated with
         // (a) existing comments and (b) form to submit a new comment
-        var commentWindowDom = document.getElementById('myDiv2');
+        var commentWindowDom = document.getElementById('comment_window_outline');
 
         new Ajax.Request('/review_files/get_comments', {
             method: 'get',
             parameters: {
                 file_id: fileId,
-                file_offset: offset
+                file_offset: offset,
+                participant_id: participant_id,
+                initial_line_number: mintd,
+                final_line_number: maxtd
             },
             onSuccess: function(return_value) {
                 var all_comments = return_value.responseText ?
@@ -147,7 +340,7 @@
                 // To avoid div id contention, change name of div ids.
                 commentWindowHtml = commentWindowHtml.replace("forminput","forminput_2");
                 commentWindowDom.innerHTML = commentWindowHtml;
-                $('#myDiv2').fadeIn();
+                $('#comment_window_outline').fadeIn();
             },
             onFailure: function(){ alert("Failed to retrieve comments for this Line") }
         });
@@ -155,131 +348,6 @@
 
 
 </script>
-
-<style >
-    .parentDisable {
-        position:absolute;
-        width:250px;
-        /*height:200px;*/
-        top:350px;    left:250px;
-        display:none;
-        padding: 6px;
-        z-index:3;
-        color: black;
-        background-color: rgba(221, 227, 226, 0.93);
-        border:1px solid black;
-        border-radius:5px;
-        -moz-border-radius:5px;
-        -webkit-border-radius:5px;
-    }
-
-    a.line_number:link {
-        COLOR: black;
-        text-decoration: underline;
-    }
-    a.line_number:visited {
-        COLOR: black;
-        text-decoration: underline;
-    }
-    a.line_number:active {
-        COLOR: black;
-        text-decoration: underline;
-    }
-
-    a.line_number_hover :hover {
-        background-color: black;
-        COLOR: white;
-        text-decoration: underline;
-        font-weight: bold;
-    }
-
-    .curved {
-        -moz-border-radius:10px;
-        -webkit-border-radius:10px;
-        behavior:url(border-radius.htc);
-    }
-
-    td{ font-color: black; }
-
-    pre{ margin: 0px; }
-
-    .margin{ margin: 0cm; }
-
-    #code_review_frame_div{
-        border:1;
-        width:100%;
-        height:440px;
-    }
-
-    #version_header{
-        border:1;
-        width:100%;
-        height:28px;
-        vertical-align: middle;
-    }
-
-    tr.highlight :hover { font-weight: bold;  }
-
-    td.version_number {
-        background-color: white;
-        color: black;
-        border-left: thin solid gray;
-        border-right: thin solid gray;
-        border-top: thin solid gray;
-        border-bottom: thin solid gray;
-    }
-
-
-    td.version_number :hover {
-        font-weight: bold;
-        color: blue;
-    }
-
-    td.current_version {
-        background-color: rgb(255, 0, 28);
-        color: black;
-        font-weight: bold;
-        border-left: thin solid black;
-        border-right: thin solid black;
-        border-top: thin solid black;
-        border-bottom: thin solid black;
-    }
-
-    td.top_header {
-        border-bottom: thin brown;
-    }
-
-    .dashboard_header_css {
-        border-bottom: none;
-        border-left: thin solid black;
-        border-right: thin solid black;
-        border-top: thin solid black;
-        border-width: 1px;
-        color: white;
-        background-color: rgb(150, 0, 4);
-    }
-
-    .dashboard_content_css{
-        border: thin solid;
-        border-width: 1px;
-        background-color: rgba(250, 3, 0, 0.12);
-    }
-
-    .version_diff_header {
-        border-bottom: none;
-        border-left: thin solid black;
-        border-right:thin solid black;
-        border-top: thin solid black;
-        border-width: 1px;
-        background-color: rgb(150, 0, 4);
-        color: white;
-    }
-
-    a.version_link {
-        color: black;
-    }
-
-</style>
 
 </head>
 
@@ -289,80 +357,23 @@
 <script>
     $(document).ready (
         function() {
-            $("#myDiv2").draggable();
+            $("#comment_window_outline").draggable();
             $("#comment_window").fadeOut(0);
+
+            $("#authorComment").draggable();
+            $("#comment_window1").fadeOut(0);
+            $("#overlay").fadeOut(0);
         }
     );
 </script>
 
 </br>
 
-<div id="dashboard_header" class="dashboard_header_css" >
-  <table  cellpadding='3' cellspacing='4'  >
-    <tr ><td class="top_header"><b style="font-size: large;"><%= File.basename(@current_review_file.filepath) %> </b><b style="font-size: smaller;">(Version <%= @current_review_file.version_number %>)</b></td></tr>
-  </table>
-</div>
+<%= render :partial => 'show_code_file_partial_1'%>
+
 
 <div id="dashboard_header_content" class = "dashboard_content_css" >
-  <table  cellpadding='5px' cellspacing='4' >
-    <tr>
-      <td align="right">View Version:</td>
-      <!-- Prepare the 'versions' array from the @version_fileId_map -->
-      <% file_versions = [] %>
-      <% @version_fileId_map.sort.each do |version, review_file_id| %>
-          <% file_versions << version.to_i %>
-      <% end %>
-
-      <!-- Iterate over all hashes and display the version and link -->
-      <!-- corresponding to each hash -->
-      <% @version_fileId_map.sort.each do |each_version, review_file_id| %>
-          <% if each_version.to_s == @current_review_file.version_number.to_s %>
-              <td class="version_number current_version" >
-                <%= link_to each_version,
-                            {:controller => 'review_files',
-                             :action => 'show_code_file',
-                             :review_file_id => review_file_id,
-                             :participant_id => @participant.id,
-                             :versions => file_versions}, :class =>"version_link" %>
-              </td>
-          <% else %>
-              <td class="version_number" >
-                <%= link_to each_version,
-                            {:controller => 'review_files',
-                             :action => 'show_code_file',
-                             :review_file_id => review_file_id,
-                             :participant_id => @participant.id,
-                             :versions => file_versions}, :class =>"version_link" %>
-              </td>
-          <% end %>
-
-      <% end %>
-    </tr>
-
-    <tr>
-      <td align="right">View Diff with:</td>
-      <!-- Iterate over all hashes and display the version and link -->
-      <!-- corresponding to each hash -->
-      <% @version_fileId_map.sort.each do |each_version, review_file_id| %>
-          <% if each_version.to_s == @current_review_file.version_number.to_s %>
-              <td style="color: black">
-                <%= each_version %>
-              </td>
-          <% else %>
-              <td class="version_number" >
-                <%= link_to each_version, {:controller => 'review_files',
-                                           :action => 'show_code_file_diff',
-                                           :participant_id => @participant.id,
-                                           :versions => file_versions,
-                                           :diff_with_file_id => review_file_id,
-                                           :current_version_id => @current_review_file.id},
-                            :class =>"version_link" %>
-              </td>
-          <% end %>
-
-      <% end %>
-    </tr>
-  </table>
+  <%= render :partial => 'show_code_file_partial_2'%>
 </div>
 
 <br/>
@@ -386,6 +397,12 @@
 <!--  THE DIV OF THE TABLE -->
 <div  id="code_review_frame_div" class="margin" style= "border: thin solid;  overflow: auto; border-width: 1px;" >
   <table width="100%" cellpadding='0' cellspacing='0' style="table-layout: fixed; word-wrap: break-word;" >
+
+    <% file_versions = [] %>
+    <% @version_fileId_map.sort.each do |version, review_file_id| %>
+        <% file_versions << version.to_i %>
+    <% end %>
+
 
     <% for i in 0..@shareObj['linearray1'].size %>
 
@@ -422,9 +439,13 @@
 
 
           <!-- LINE NUMBER 1   -->
-          <td width="4%" id="td_old_<%=i%>" bgcolor="<%=line1color%>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="viewComments('<%= @shareObj['linenumarray1'][i] %>', '<%=@shareObj['offsetarray1'][i]%>', '<%=@file_on_left.id %>' )"><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
+          <% if ! @shareObj['linearray1'][i].blank? %>
+          <td width="4%" id="td_old_<%=i%>" bgcolor="<%=line1color%>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;" onclick="if(checkMouseDown(event,id,'<%=@shareObj['offsetarray2'][i]%>')) viewComments('<%= @shareObj['linenumarray1'][i] %>', '<%=@shareObj['offsetarray1'][i]%>', '<%=@file_on_left.id %>' )"><a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" ><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
           <td width="1%"></td>
-
+          <% else %>
+              <td width="4%" id="td_old_<%=i%>" bgcolor="<%=line1color%>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;" ><a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" ><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
+              <td width="1%"></td>
+          <% end %>
           <!-- THE ACTUAL DATA LINE -->
           <td width="45%" style="vertical-align: middle;"><pre><%=@shareObj['linearray1'][i]%></pre></td>
 
@@ -442,11 +463,11 @@
               <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;">
                 <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" ><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
           <% elsif @current_review_file.version_number.to_i >= file_versions.sort[-2] and session[:user].id != @participant.user_id %>
-              <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;">
-                <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="createComments('td_new_<%= i %>', '<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@file_on_right.id %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
+              <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;" onclick="if(checkMouseDown(event,id,'<%=@shareObj['offsetarray2'][i]%>')) createComments('td_new_<%= i %>', '<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@file_on_right.id %>')" >
+                <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" ><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
           <% else %>
-              <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;">
-                <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="viewComments('<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@file_on_right.id %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
+              <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;" onclick="if(checkMouseDown(event,id,'<%=@shareObj['offsetarray2'][i]%>')) viewComments('<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@file_on_right.id %>') " >
+                <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" ><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
           <% end %>
 
           <td width="1%"></td>
@@ -465,9 +486,9 @@
 <table width="100%">
   <tr>
     <td valign="top">
-      <%= link_to "<< Back to File Listing", :controller => 'review_files',
-                  :action => 'show_all_submitted_files',
-                  :participant_id => @participant.id %>
+
+      <%=  render :partial => 'show_code_file_partial_4' %>
+
     </td>
 
     <td valign="top" align="right">
@@ -481,6 +502,7 @@
             <td bgcolor="pink" width='20%'>Deleted</td>
             <td bgcolor="palegreen" width='20%'>Added</td>
             <td bgcolor="cyan" width='20%'>Contains<br/>Comment(s)</td>
+            <td width="20%" bgcolor="purple">Current Selection</td>
           </tr>
         </table>
       </div>
@@ -488,14 +510,9 @@
   </tr>
 </table>
 
-<!--   The popup which pops up as one intends to click or view comments -->
-<div id="myDiv2" class="parentDisable" onLoad="assign()"></div>
-<div id="comment_window">
-  <textarea id="forminput" cols=28 rows=5></textarea> <br>
-  <button onclick="ajaxSubmitComment()"><b>Save Comment</b></button>
-</div>
+<%= render :partial => 'show_code_file_partial_3' %>
+
+
 </font>
-
-
 
 

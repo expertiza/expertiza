@@ -13,7 +13,7 @@ class WordnetBasedSimilarity
     reviewState = reviewVertex.state
     submState = submVertex.state
     
-    puts("@@@@@@@@@ Comparing Vertices:: #{review} and #{submission} :: RevState:: #{reviewState} and SubmState:: #{submState}");
+    # puts("@@@@@@@@@ Comparing Vertices:: #{review} and #{submission} :: RevState:: #{reviewState} and SubmState:: #{submState}");
     @match = 0
     @count = 0
     
@@ -180,12 +180,12 @@ class WordnetBasedSimilarity
     end #end of the for loop for review tokens
     
     if(@count > 0)
-      puts ("Match: #{@match} Count:: #{@count}")
+      # puts ("Match: #{@match} Count:: #{@count}")
       result = (@match.to_f/@count.to_f).round
-      puts("@@@@@@@@@ Returning Value: #{result}")
+      # puts("@@@@@@@@@ Returning Value: #{result}")
       return result #an average of the matches found
     end
-    puts("@@@@@@@@@ Returning NOMATCH")
+    # puts("@@@@@@@@@ Returning NOMATCH")
     return NOMATCH
     
   end #end of compareStrings method
@@ -327,7 +327,7 @@ def check_match(rev_token, subm_token, rev_arr, subm_arr, rev_stem, subm_stem, r
   # puts "subm_arr #{subm_arr}"
   if((!rev_arr.nil? and (rev_arr.include?(subm_token) or rev_arr.include?(subm_stem))) or 
     (!subm_arr.nil? and (subm_arr.include?(rev_token) or subm_arr.include?(rev_stem))))          
-    puts("Match found between: #{rev_token} & #{subm_token}")
+    # puts("Match found between: #{rev_token} & #{subm_token}")
     flag = 1 #setting the flag to indicate that a match was found
     if(rev_state == subm_state)
       @match = @match + match_type
@@ -435,8 +435,8 @@ def overlap(def1, def2, speller)
   instance = WordnetBasedSimilarity.new
   numOverlap = 0
   #only overlaps across the ALL definitions
-  puts "def1 #{def1}"
-  puts "def2 #{def2}"
+  # puts "def1 #{def1}"
+  # puts "def2 #{def2}"
   
   #iterating through def1's definitions
   for i in 0..def1.length-1

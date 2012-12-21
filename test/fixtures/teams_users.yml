@@ -31,6 +31,12 @@ teams_users7:
   team_id: <%= Fixtures.identify(:team5) %>
   user_id: <%= Fixtures.identify(:student5) %>
   
+teams_users8:
+  team_id: <%= Fixtures.identify(:team6) %>
+  user_id: <%= Fixtures.identify(:student4) %>
+
+
+  
 #Team users for course_object_oriented and instructor1
 teams_usersA:
   team_id: <%= Fixtures.identify(:Assignment_Project1_Team1) %>

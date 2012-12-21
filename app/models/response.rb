@@ -99,4 +99,92 @@ class Response < ActiveRecord::Base
     self.scores.each {|score| score.destroy}
     self.destroy
   end
+
+  # Returns the percentage of reviews completed as an integer (0-100)
+  # for the given review_object_id
+  def self.get_percentage_reviews_completed(id)
+    if get_total_reviews_assigned(id) == 0 then 0
+    else ((get_total_reviews_completed(id).to_f / get_total_reviews_assigned(id).to_f) * 100).to_i
+    end
+  end
+
+  # Returns the number of reviewers assigned
+  # for the given review_object_id
+  def self.get_total_reviews_assigned(id)
+    ResponseMap.find_all_by_reviewed_object_id(id).count
+  end
+
+  # get_total_reviews_assigned_by_type()
+  # Returns the number of reviewers assigned to a particular review object by the type of review
+  # Param: id - String (assignment_id etc)
+  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  def self.get_total_reviews_assigned_by_type(id, type)
+    count = 0
+    response_maps =  ResponseMap.find_all_by_reviewed_object_id(id)
+    response_maps.each { |x| count = count + 1 if x.type == type}
+    count
+  end
+
+  # Returns the number of reviews completed for a particular review object
+  # Param: id - String (assignment_id etc)
+  def self.get_total_reviews_completed(id)
+
+    response_count = 0
+    response_maps =  ResponseMap.find_all_by_reviewed_object_id(id)
+    response_maps.each do |response_map|
+      response_count = response_count + 1 unless response_map.response.nil?
+    end
+
+    response_count
+  end
+
+  # Returns the number of reviews completed for a particular review object by type of review
+  # Param: id - String (assignment_id etc)
+  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  # Param: date - Filter reviews that were not created on this date
+  def self.get_total_reviews_completed_by_type_and_date(id, type, date)
+    response_count = 0
+    response_maps =  ResponseMap.find_all_by_reviewed_object_id(id)
+    response_maps.each do |response_map|
+      if !response_map.response.nil? and response_map.type == type
+        if (response_map.response.created_at.to_datetime.to_date <=> date) == 0 then
+          response_count = response_count + 1
+        end
+      end
+    end
+
+    response_count
+  end
+
+  # Returns the average of all responses for this review object as an integer (0-100)
+  # Param: id - String (assignment_id etc)
+  def self.get_average_score(id)
+    return 0 if get_total_reviews_assigned(id) == 0
+
+    sum_of_scores = 0
+    response_maps =  ResponseMap.find_all_by_reviewed_object_id(id)
+
+    response_maps.each do |response_map|
+      if !response_map.response.nil? then
+        sum_of_scores = sum_of_scores + response_map.response.get_total_score
+      end
+    end
+
+    (sum_of_scores / get_total_reviews_completed(id)).to_i
+  end
+
+  # Param: id - String (assignment_id etc)
+  def self.get_score_distribution(id)
+    distribution = Array.new(101, 0)
+
+    response_maps =  ResponseMap.find_all_by_reviewed_object_id(id)
+    response_maps.each do |response_map|
+      if !response_map.response.nil? then
+        score = response_map.response.get_total_score.to_i
+        distribution[score] += 1 if score >= 0 and score <= 100
+      end
+    end
+
+    distribution
+  end
 end

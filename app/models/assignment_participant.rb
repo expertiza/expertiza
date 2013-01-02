@@ -169,7 +169,7 @@ class AssignmentParticipant < Participant
     self.assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+      scores[questionnaire.symbol][:scores] = Score.compute_scores_statistics(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)
     return scores
@@ -207,15 +207,20 @@ class AssignmentParticipant < Participant
     self.save
   end
 
-  # TODO:REFACTOR: This shouldn't be handled using an if statement, but using 
-  # polymorphism for individual and team participants
-  def get_hyperlinks         
-    if self.team     
-      links = self.team.get_hyperlinks     
+  def get_members
+    if self.team.nil?
+      [self]
     else        
-      links = get_hyperlinks_array
+      self.team.get_participants
     end
+  end
 
+
+  def get_hyperlinks
+    links = Array.new
+    for team_member in self.get_members
+      links.concat(team_member.get_hyperlinks_array)
+    end
     return links
   end
 

@@ -1,8 +1,88 @@
 score0:
-  response_id: <%= Fixtures.identify(:review0) %>
+  response_id: <%= Fixtures.identify(:response0) %>
   question_id: <%= Fixtures.identify(:question1) %>
   comments: "testing this stuff - q1"
+  score: 4
+
+score2:
+  response_id: <%= Fixtures.identify(:response0) %>
+  question_id: <%= Fixtures.identify(:question8) %>
+  comments: "testing this stuff - q8"
+  score: 5
+
+score3:
+  response_id: <%= Fixtures.identify(:response0) %>
+  question_id: <%= Fixtures.identify(:question9) %>
+  comments: "testing this stuff - q9"
+  score: 5
+
+score4:
+  response_id: <%= Fixtures.identify(:response6) %>
+  question_id: <%= Fixtures.identify(:question1) %>
+  comments: "testing this stuff - q1"
+  score: 5
+
+score5:
+  response_id: <%= Fixtures.identify(:response6) %>
+  question_id: <%= Fixtures.identify(:question8) %>
+  comments: "testing this stuff - q8"
+  score: 5
+
+score6:
+  response_id: <%= Fixtures.identify(:response6) %>
+  question_id: <%= Fixtures.identify(:question9) %>
+  comments: "testing this stuff - q9"
+  score: 5
+
+score7:
+  response_id: <%= Fixtures.identify(:response7) %>
+  question_id: <%= Fixtures.identify(:question1) %>
+  comments: "testing this stuff - q1"
+  score: 0
+
+score8:
+  response_id: <%= Fixtures.identify(:response7) %>
+  question_id: <%= Fixtures.identify(:question8) %>
+  comments: "testing this stuff - q8"
+  score: 5
+
+score9:
+  response_id: <%= Fixtures.identify(:response7) %>
+  question_id: <%= Fixtures.identify(:question9) %>
+  comments: "testing this stuff - q9"
+  score: 5
+
+score10:
+  response_id: <%= Fixtures.identify(:response8) %>
+  question_id: <%= Fixtures.identify(:question1) %>
+  comments: "testing this stuff - q1"
+  score: 3
+
+score11:
+  response_id: <%= Fixtures.identify(:response8) %>
+  question_id: <%= Fixtures.identify(:question8) %>
+  comments: "testing this stuff - q8"
+  score: 4
+
+score12:
+  response_id: <%= Fixtures.identify(:response8) %>
+  question_id: <%= Fixtures.identify(:question9) %>
+  comments: "testing this stuff - q9"
+  score: 4
+
 score1:
   response_id: <%= Fixtures.identify(:review0) %>
   question_id: <%= Fixtures.identify(:question3) %>
   comments: "testing this stuff - q3"
+  score: 3
+
+score_c0:
+  response_id: <%= Fixtures.identify(:response_c0) %>
+  question_id: <%= Fixtures.identify(:question_c1) %>
+  comments: "4"
+
+score_c1:
+  response_id: <%= Fixtures.identify(:response_c0) %>
+  question_id: <%= Fixtures.identify(:question_c1) %>
+  comments: "5"
+  score: 5

@@ -50,7 +50,7 @@ task :load_production_data, :roles => :db, :only => { :primary => true } do
   filename = "dump.#{Time.now.strftime '%Y-%m-%d_%H:%M:%S'}.sql.gz"
  
   on_rollback { delete "/tmp/#{filename}" }
-  run "mysqldump -u #{database['production']['username']} --password=#{database['production']['password']} #{database['production']['database']} --add-drop-table | gzip > /tmp/#{filename}" do |channel, stream, data|
+  run "mysqldump -u #{database['production']['username']} #{database['production']['database']} --add-drop-table | gzip > /tmp/#{filename}" do |channel, stream, data|
     puts data
   end
 

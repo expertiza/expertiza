@@ -20,13 +20,17 @@ class ContentPagesController < ApplicationController
   end
 
   def view
-    @content_page = ContentPage.find_by_name(params[:page_name])
-    if not @content_page
-      if @settings
-        @content_page = ContentPage.find(@settings.not_found_page_id)
-      else
-        @content_page = ContentPage.new(:id => nil, 
-                                        :content => '(no such page)')
+    if params[:page_name] = 'wiki'
+      redirect_to 'http://wiki.expertiza.ncsu.edu'
+    else
+      @content_page = ContentPage.find_by_name(params[:page_name])
+      if not @content_page
+        if @settings
+          @content_page = ContentPage.find(@settings.not_found_page_id)
+        else
+          @content_page = ContentPage.new(:id => nil, 
+                                          :content => '(no such page)')
+        end
       end
     end
   end

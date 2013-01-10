@@ -61,5 +61,5 @@ Rails::Initializer.run do |config|
     }
   end
   #old path /usr/lib/jvm/java-1.6.0-sun-1.6.0.31
-  ENV['JAVA_HOME'] = "/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64"
+  ENV['JAVA_HOME'] = "/etc/alternatives/java_sdk/"
 end

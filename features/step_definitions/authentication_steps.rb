@@ -10,17 +10,19 @@ Given 'I am logged in as a student' do
 end
 
 Given /^a student with the username "(\S+)" exists$/ do |username|
-  if(find_button('Logout').nil?)
-     And 'I am logged in as admin'
+  user = User.find_by_name(username)
+
+  if(user.nil?)
+    User.create({
+                    :name => username,
+                    :fullname => username,
+                    :clear_password => 'password',
+                    :clear_password_confirmation => 'password',
+                    :role => Role.find_by_name!('student'),
+                    :email => "#{username}@mailinator.com",
+                    :is_new_user => false
+                })
   end
-  find(:xpath, "//a[contains(.,'Users')]").click
-  click_link 'New User'
-  fill_in 'user_name', :with => username
-  fill_in 'user_fullname', :with => username
-  fill_in 'user_email', :with => "#{username}@mailinator.com"
-  fill_in 'user_clear_password', :with => 'password'
-  fill_in 'user_clear_password_confirmation', :with => 'password'
-  click_button 'Create'
 end
 
 Then /I should be logged in as "(\S+)"/ do |username|
@@ -70,4 +72,18 @@ When /I log in as "([^"]*)"/ do |username|
   click_button 'Login'
 
   Then "I should be logged in as \"#{username}\""
+end
+
+Given 'I am not logged in' do
+  if(find_button('Logout').nil?)
+    puts "not Logged in"
+  else
+    click_link('Logout')
+  end
+end
+
+When /^I log in as a "([^\"]*)" with password "([^\"]*)"$/ do |username, password|
+  fill_in 'login_name', :with => username
+  fill_in 'login_password', :with => password
+  click_button 'Login'
 end

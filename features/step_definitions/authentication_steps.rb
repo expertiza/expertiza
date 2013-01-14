@@ -1,12 +1,12 @@
 Given 'I am logged in as a student' do
-  And 'a student with the username "student" exists'
-  When 'I go to the login page'
+  step 'a student with the username "student" exists'
+  step 'I go to the login page'
   
   fill_in 'login_name', :with => 'student'
   fill_in 'login_password', :with => 'password'
   click_button 'Login'
   
-  Then 'I should be logged in as "student"'
+  step 'I should be logged in as "student"'
 end
 
 Given /^a student with the username "(\S+)" exists$/ do |username|
@@ -36,13 +36,13 @@ Then /I should be logged in as "(\S+)"/ do |username|
 end
 
 Given /I am logged in as "([^"]*)"/ do |username|
-  When "I go to the login page"
+  step "I go to the login page"
   
   fill_in 'login_name', :with => username
   fill_in 'login_password', :with => 'password'
   click_button 'Login'
   
-  Then "I should be logged in as \"#{username}\""
+  step "I should be logged in as \"#{username}\""
 end
 
 
@@ -65,13 +65,13 @@ Given /an? (super-administrator|admin|instructor|teaching assistant|student) nam
 end
 
 When /I log in as "([^"]*)"/ do |username|
-  When "I go to the login page"
+  step "I go to the login page"
 
   fill_in 'login_name', :with => username
   fill_in 'login_password', :with => 'password'
   click_button 'Login'
 
-  Then "I should be logged in as \"#{username}\""
+  step "I should be logged in as \"#{username}\""
 end
 
 Given 'I am not logged in' do

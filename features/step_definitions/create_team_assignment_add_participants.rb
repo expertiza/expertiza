@@ -11,7 +11,7 @@ Given /^I am logged in as a "(\S+)"$/ do |username|
   if(!find_button('Logout').nil?)
     click_button 'Logout'
   end
-  When 'I go to the login page'
+  step 'I go to the login page'
 
   fill_in 'login_name', :with => username
   fill_in 'login_password', :with => 'password'
@@ -21,7 +21,7 @@ Given /^I am logged in as a "(\S+)"$/ do |username|
     click_link 'Accept'
   end
 
-  Then "I should be logged in as \"#{username}\""
+  step "I should be logged in as \"#{username}\""
 end
 
 =begin
@@ -36,12 +36,12 @@ end
 =end
 
 Given /^I am participating on a "(\S+)"$/ do |assignment|
-  And "a team assignment named \"#{assignment}\" exists"
-  And "I am on the home page"
-  And 'a student with the username "student1" exists'
-  And 'a student with the username "student2" exists'
-  Then "add \"student1\" to this \"#{assignment}\""
-  And "add \"student2\" to this \"#{assignment}\""
+  step "a team assignment named \"#{assignment}\" exists"
+  step "I am on the home page"
+  step 'a student with the username "student1" exists'
+  step 'a student with the username "student2" exists'
+  step "add \"student1\" to this \"#{assignment}\""
+  step "add \"student2\" to this \"#{assignment}\""
 end
 
 =begin
@@ -77,13 +77,13 @@ end
 
 
 Given 'I am logged in as admin' do
-  When 'I go to the login page'
+  step 'I go to the login page'
 
   fill_in 'login_name', :with => 'admin'
   fill_in 'login_password', :with => 'admin'
   click_button 'Login'
 
-  Then 'I should be logged in as "admin"'
+  step 'I should be logged in as "admin"'
 end
 
 

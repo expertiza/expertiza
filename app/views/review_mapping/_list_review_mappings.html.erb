@@ -63,7 +63,8 @@
         <%end%>
 
       <td style="vertical-align:top;"><%= contributor.name %><br/>
-        <% if !assignment.team_assignment %>          
+        <!--removed code that handles team and individual assignments differently-->
+        <% if assignment.team_count < 2 %>
            (<%= contributor.fullname %>)
         <%else%>
             <%team_members = TeamsUser.find_all_by_team_id(contributor.id)%>
@@ -73,7 +74,8 @@
         <% end %>
 
           <div style="text-align:right">
-          <% if !assignment.team_assignment %>
+          <!-- ACS removed check to see if it is a team assignment-->
+          <% if assignment.team_count < 2 %>
             <%= link_to 'delete', :controller=> 'participants', :action => 'delete_assignment_participant', :id => contributor.id %><br/>
           <% end %>
           <%= link_to 'add reviewer', :action => 'select_reviewer', :id => assignment.id, :contributor_id => contributor.id %><br/>

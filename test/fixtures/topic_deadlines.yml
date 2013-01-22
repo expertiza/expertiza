@@ -64,3 +64,16 @@ topic_deadline_metareview<%= j %>:
   review_of_review_allowed_id: 3
   round: 2
 <%end%>
+
+topic_deadline333:
+    id: 33314337
+    due_at: 2012-10-20 23:31:27
+    deadline_type_id: 2
+    topic_id: 545653410
+
+topic_deadline331:
+    id: 33714337
+    due_at: 2012-10-20 23:31:27
+    deadline_type_id: 1
+    topic_id: 545653410
+    review_allowed_id: 1

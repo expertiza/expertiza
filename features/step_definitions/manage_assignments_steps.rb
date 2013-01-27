@@ -2,23 +2,28 @@ When /^I create a (public|private) assignment named "([^"]*)" using (no due date
   use_review = false
   review_name = ""
   if review_setting =~ /^no due date$/
+    puts "Creating assignment with no due date"
     use_review = false
   else
     use_review = true
     ((review_name,),) = review_setting.scan(/^review named \"([^"]*)\"$/)
+    puts "I have a public review named \"#{review_name}\""
     step "I have a public review named \"#{review_name}\""
   end
 
   step "I follow the \"Manage...\" link as an \"instructor\""
     step "I follow \"Create Public Assignment\""
-	step "I fill in \"#{assignment_name}\" for \"Assignment name: \""
-    if use_review
-      step "I fill in \"2020-01-01 00:00:00\" for \"submit_deadline[due_at]\""
-      step "I fill in \"2020-01-02 00:00:00\" for \"review_deadline[due_at]\""
+	step "I fill in \"#{assignment_name}\" for \"Assignment name\""
+	
+  if use_review
+    puts "Creating assignment with review and due date" 
+    step "I fill in \"2020-01-01 00:00:00\" for \"submit_deadline[due_at]\""
+    step "I fill in \"2020-01-02 00:00:00\" for \"review_deadline[due_at]\""
 	  step "I select \"#{review_name}\" from \"questionnaires[review]\""
+	  
+  	step "I press \"Save assignment\""
   end
-	step "I press \"Save assignment\""
-  step "I should see \"#{assignment_name}\""
+
 end
 
 When /^I add user "([^"]*)" as a participant to assignment "([^"]*)"$/ do |user_name, assignment_name|  

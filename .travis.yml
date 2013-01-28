@@ -1,8 +1,8 @@
 language: ruby
 before_install:
-    
+    - gem install raspell
 rvm:
-  - 1.8.7
+    - 1.8.7
 
 notifications:
 email:

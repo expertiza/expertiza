@@ -1,5 +1,5 @@
 language: ruby
-before_script:  
+before_install:  
   - sudo apt-get install aspell libaspell-dev aspell-en
   - gem install raspell
   - bundle config build.raspell --with-opt-dir=

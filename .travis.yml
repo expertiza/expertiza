@@ -1,8 +1,8 @@
 language: ruby
-before_script:
-  - sudo apt-get install aspell libaspell-dev aspell-en aspell-de
-  - which aspell
-  - bundle config build.raspell --with-opt-dir= && bundle install
+before_script:  
+  - sudo apt-get install aspell libaspell-dev aspell-en
+  - gem install raspell
+  - bundle config build.raspell --with-opt-dir=
 rvm:
     - 1.8.7
 

@@ -10,6 +10,7 @@ before_script:
     - "export DISPLAY=:99.0"
     - "sh -e /etc/init.d/xvfb start"
     - mysql -u root < db/grant_expertiza.sql     
+    - bundle exec rake db:migrate
     - bundle exec rake db:test:prepare
 script:
     - "export DISPLAY=:99.0 && RAILS_ENV=test bundle exec rake db:migrate"

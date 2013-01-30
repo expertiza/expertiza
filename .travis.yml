@@ -1,0 +1,24 @@
+language: ruby
+rvm:
+    - 1.8.7
+before_install:  
+    - sudo apt-get install aspell libaspell-dev aspell-en
+    - gem install raspell
+    - bundle config build.raspell --with-opt-dir=
+before_script:
+    - bundle install
+    - "export DISPLAY=:99.0"
+    - "sh -e /etc/init.d/xvfb start"
+    - mysql -u root < db/grant_expertiza.sql     
+    - bundle exec rake db:migrate
+    - bundle exec rake db:test:prepare
+script:
+    - "export DISPLAY=:99.0 && RAILS_ENV=test bundle exec rake db:migrate"
+    - "export DISPLAY=:99.0 && bundle exec cucumber"
+    # - "export DISPLAY=:99.0 && bundle exec rspec spec/"
+notifications:
+    email:
+      recipients:
+        - pamela.ocampo@gmail.com
+      on_success: change
+      on_failure: change

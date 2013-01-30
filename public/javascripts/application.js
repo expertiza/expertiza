@@ -99,26 +99,24 @@ function addElement() {
 		rereview_var = 'Re-review-'+j+' deadline '
 	}
 
-    if (document.getElementById('add_submit_due_at_'+i) != null){
-        var submit_due = document.getElementById('add_submit_due_at_'+i).value;
-        var submit_id = document.getElementById('add_submit_id_'+i).value;
+  if (document.getElementById('add_submit_due_at_'+i) != null){
+      var submit_due = document.getElementById('add_submit_due_at_'+i).value;
+      var submit_id = document.getElementById('add_submit_id_'+i).value;
 
-    }else{
-        var submit_due = " " ;
-        var submit_id = " ";
+  }else{
+      var submit_due = " " ;
+      var submit_id = " ";
 
-    }
+  }
 
+  if (document.getElementById('add_review_due_at_'+i) != null){
+    var review_due = document.getElementById('add_review_due_at_'+i).value;
+    var review_id = document.getElementById('add_review_id_'+i).value;
 
-
-      if (document.getElementById('add_review_due_at_'+i) != null){
-        var review_due = document.getElementById('add_review_due_at_'+i).value;
-        var review_id = document.getElementById('add_review_id_'+i).value;
-
-      } else {
-          var review_due = " ";
-          var review_id = " ";
-      }
+  } else {
+      var review_due = " ";
+      var review_id = " ";
+  }
 
     ni.innerHTML = ni.innerHTML +
   	                    '<table class="exp">'+

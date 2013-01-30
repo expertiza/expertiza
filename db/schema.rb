@@ -132,6 +132,21 @@ ActiveRecord::Schema.define(:version => 20121019201555) do
     t.string "name", :limit => 32
   end
 
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0
+    t.integer  "attempts",   :default => 0
+    t.text     "handler"
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
+
   create_table "due_dates", :force => true do |t|
     t.datetime "due_at"
     t.integer  "deadline_type_id"
@@ -145,6 +160,7 @@ ActiveRecord::Schema.define(:version => 20121019201555) do
     t.integer  "round"
     t.boolean  "flag",                        :default => false
     t.integer  "threshold",                   :default => 1
+    t.integer  "delayed_job_id"
   end
 
   add_index "due_dates", ["assignment_id"], :name => "fk_due_dates_assignments"

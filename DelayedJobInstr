@@ -1,0 +1,9 @@
+To install delayed_job as a plugin:
+Run:
+>script/plugin install git://github.com/collectiveidea/delayed_job.git -r v2.0
+
+Back-end: delayed job uses table delayed_job. so create one.
+$ script/generate delayed_job
+$ rake db:migrate
+
+

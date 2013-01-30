@@ -10,7 +10,7 @@ response6:
 response7:
  map_id: <%= Fixtures.identify(:response_maps10)%>
  additional_comment: "review7"
-
+ 
 response1:
  map_id: <%= Fixtures.identify(:response_maps1)%>
  additional_comment: "review1"
@@ -35,9 +35,6 @@ response8:
  map_id: <%= Fixtures.identify(:response_maps11)%>
  additional_comment: "review8"
 
-
-
 response_c0:
  map_id: <%= Fixtures.identify(:response_maps_c0)%>
  additional_comment: "review_c0"
-

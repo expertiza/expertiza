@@ -55,6 +55,7 @@ class AssignmentParticipantTest < ActiveSupport::TestCase
     assert user.errors.invalid?(:name)
     #assert user.errors.invalid?(:password)
   end
+  
   def test_import
     row = Array.new
     row[0] = "student1"
@@ -191,6 +192,7 @@ class AssignmentParticipantTest < ActiveSupport::TestCase
       participant.submmit_hyperlink ""
     end
   end
+
   def test_add_course_participant()
     participant = CourseParticipant.new
 

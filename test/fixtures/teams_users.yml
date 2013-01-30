@@ -38,8 +38,6 @@ teams_users8:
 teams_users8:
   team_id: <%= Fixtures.identify(:team6) %>
   user_id: <%= Fixtures.identify(:student4) %>
-
-
   
 #Team users for course_object_oriented and instructor1
 teams_usersA:

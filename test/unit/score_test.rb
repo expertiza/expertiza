@@ -254,4 +254,17 @@ class ScoreTest < ActiveSupport::TestCase
     is_one_expected = true
     assert_equal(is_one_expected, is_one_actual)
   end
+  
+  #e611
+  def test_check_min_max_score
+    @questionnaire1.min_question_score = "ThisIsMinScore"
+    @questionnaire1.max_question_score = "ThisIsMaxScore"
+    assert !@questionnaire1.save
+  end
+
+  #e611
+  def test_checkfor_positive_score
+    @questionnaire1.max_question_score = -1
+    assert !@questionnaire1.save
+  end
 end

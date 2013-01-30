@@ -60,10 +60,10 @@ class ReviewMappingControllerTest < ActionController::TestCase
   end
 
   def test_delete_all_reviewers
-    assign_id = Fixtures.identify(:assignment2)
+    assign_id = Fixtures.identify(:assignment7)
     contributor = Participant.first(:conditions => {:parent_id => assign_id})
     contributor_id = contributor.id
-    puts  contributor.name
+    # puts  contributor.name
     number_of_responses = ResponseMap.count
     deleted_count = ParticipantReviewResponseMap.find(:all, :conditions => {:reviewed_object_id => assign_id, :reviewee_id => contributor_id}).count
 
@@ -99,7 +99,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
   end
 
   def test_review_report
-    assign_id = Fixtures.identify(:assignment_project1)
+    assign_id = Fixtures.identify(:assignment1)
     user = Participant.first(:conditions => {:parent_id => assign_id})
 
     post :review_report, {:id => assign_id}, session_for(users(:admin))
@@ -108,7 +108,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
   end
 
   def test_search_by_reviewer
-    assign_id = Fixtures.identify(:assignment_project1)
+    assign_id = Fixtures.identify(:assignment1)
     user = Participant.first(:conditions => {:parent_id => assign_id})
 
     post :review_report, {:id => assign_id, :user => {:fullname => user.fullname}}, session_for(users(:admin))

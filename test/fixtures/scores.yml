@@ -69,7 +69,7 @@ score12:
   question_id: <%= Fixtures.identify(:question9) %>
   comments: "testing this stuff - q9"
   score: 4
-
+  
 score1:
   response_id: <%= Fixtures.identify(:review0) %>
   question_id: <%= Fixtures.identify(:question3) %>

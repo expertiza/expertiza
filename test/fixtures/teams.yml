@@ -33,7 +33,6 @@ team6:
   parent_id: <%= Fixtures.identify(:assignment2) %>
   type: AssignmentTeam
 
-
 #Teams for course_object_oriented and instructor 1
 Assignment_Project1_Team1:
   name: Assignment1Team1

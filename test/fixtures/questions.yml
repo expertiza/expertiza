@@ -16,7 +16,7 @@ question9:
  true_false: false
  questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
  weight: 3
-  
+ 
 question2:
  txt: Was the assignment graded fairly?
  true_false: false

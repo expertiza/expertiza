@@ -51,12 +51,11 @@ class AssignmentControllerTest < ActionController::TestCase
       :wiki_type_id => 1,
       :team_assignment => "No"
     )
-
     #p flash[:notice].to_s
     assert assignment.save
   end
-
-    # Test Case 1101-A
+  
+  # Test Case 1101-A
   def test_copy
     # copy an assignment
 
@@ -145,8 +144,6 @@ class AssignmentControllerTest < ActionController::TestCase
 
 
   end
-
-
   # Test Case 1102
   # edit an assignment, change should be
   # reflected in DB
@@ -166,7 +163,7 @@ class AssignmentControllerTest < ActionController::TestCase
     #assert_response :redirect
     #assert_equal Assignment.count, number_of_assignment
     #assert Assignment.find(:all, :conditions => "name = 'updatedAssignment9'")
-    assignment = assignments(:assignment7)
+    @assignment = Assignment.first
     id = assignment.id
     number_of_assignment = Assignment.count
     questionnaire_id = Questionnaire.first.id
@@ -188,9 +185,8 @@ class AssignmentControllerTest < ActionController::TestCase
   # assignment with an invalid name or another existing
   # assignment name, should not be allowed to changed DB data
   def test_illegal_edit_assignment
-
-    id = assignments(:assignment1).id
-    @assignment = assignments(:assignment1)
+    id = Assignment.first.id
+    @assignment = Assignment.first
     original_assignment_name = @assignment.name
     number_of_assignment = Assignment.count
     # It will raise an error while execute render method in controller
@@ -211,7 +207,7 @@ class AssignmentControllerTest < ActionController::TestCase
       }
     }
     assert_template 'assignment/edit'
-    assert_equal original_assignment_name, assignments(:assignment1).name
+    assert_equal original_assignment_name, Assignment.first.name
   end
 
   # 1201 Delete a assignment

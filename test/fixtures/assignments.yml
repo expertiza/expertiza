@@ -196,3 +196,21 @@ assignment_microtask2:
   team_count: 1
   microtask: true
   staggered_deadline: true
+
+suggest_topic_assignment:
+    name: SuggestTopicAssignment
+    directory_path: cukes/SuggestTopicAssignment
+    submitter_count: 0
+    course:  <%= Fixtures.identify(:course_object_oriented) %>
+    instructor_id: <%= Fixtures.identify(:instructor1) %>
+    private: 0
+    num_reviews: 1
+    num_review_of_reviews: 0
+    num_review_of_reviewers: 0
+    review_questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+    reviews_visible_to_all: <%= 0 %>
+    require_signup: <%= 0 %>
+    num_reviewers: <%= 3 %>
+    team_assignment: <%= 0 %>
+    team_count: 1
+    staggered_deadline: true

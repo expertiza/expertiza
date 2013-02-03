@@ -35,7 +35,7 @@
 
       <%
            team_members = ""
-           TeamsParticipant.find_all_by_team_id(result[:team_id]).each{|teamuser|
+           TeamsUser.find_all_by_team_id(result[:team_id]).each{|teamuser|
                 puts 'teamuser' + teamuser.to_json
                 team_members+=User.find(teamuser.user_id).name+" "
              }

@@ -1,0 +1,161 @@
+Loaded suite /home/shoubhik/.rvm/gems/ruby-1.8.7-p370/gems/rake-10.0.2/lib/rake/rake_test_loader
+Started
+EEEEEE..FE.E....................................join_team:{"comments":"MyText","participant_id":29,"created_at":"2012/11/30 02:20:40 +0000","id":11,"team_id":15,"updated_at":"2012/11/30 02:20:40 +0000","status":"P"}
+.join_team:{"comments":"MyText","participant_id":29,"created_at":"2012/11/30 02:20:40 +0000","id":11,"team_id":15,"updated_at":"2012/11/30 02:20:40 +0000","status":"P"}
+.join_team:{"comments":"MyText","participant_id":29,"created_at":"2012/11/30 02:20:40 +0000","id":11,"team_id":15,"updated_at":"2012/11/30 02:20:40 +0000","status":"P"}
+.join_team:{"comments":"MyText","participant_id":29,"created_at":"2012/11/30 02:20:40 +0000","id":11,"team_id":15,"updated_at":"2012/11/30 02:20:40 +0000","status":"P"}
+Fjoin_team:{"comments":"MyText","participant_id":29,"created_at":"2012/11/30 02:20:40 +0000","id":11,"team_id":15,"updated_at":"2012/11/30 02:20:40 +0000","status":"P"}
+.join_team:{"comments":"MyText","participant_id":29,"created_at":"2012/11/30 02:20:40 +0000","id":11,"team_id":15,"updated_at":"2012/11/30 02:20:40 +0000","status":"P"}
+........FEEFFEEFFFFF...student2
+Assignment 2
+.......827400667
+.....
+...........................
+Finished in 114.81714 seconds.
+
+  1) Error:
+test_list_admin_invalid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb51a43c4>
+    
+
+  2) Error:
+test_list_admin_valid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb51a1098>
+    
+
+  3) Error:
+test_list_instr_invalid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb519de20>
+    
+
+  4) Error:
+test_list_instr_valid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb519aba8>
+    
+
+  5) Error:
+test_list_superadmin_invalid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb5194848>
+    
+
+  6) Error:
+test_list_superadmin_valid(AdminControllerTest):
+NoMethodError: undefined method `request=' for #<AdminController:0xb51913c8>
+    
+
+  7) Failure:
+test_illegal_edit_assignment(AssignmentControllerTest) [test/functional/assignment_controller_test.rb:197]:
+<ActionView::TemplateError> exception expected but was
+Class: <PathError>
+Message: <"No path needed">
+---Backtrace---
+app/models/assignment.rb:282:in `get_path'
+app/controllers/assignment_controller.rb:385:in `get_path'
+app/controllers/assignment_controller.rb:418:in `update'
+test/functional/assignment_controller_test.rb:184:in `test_illegal_edit_assignment'
+test/functional/assignment_controller_test.rb:197:in `test_illegal_edit_assignment'
+---------------
+
+  8) Error:
+test_legal_edit_assignment(AssignmentControllerTest):
+PathError: No path needed
+    app/models/assignment.rb:282:in `get_path'
+    app/controllers/assignment_controller.rb:385:in `get_path'
+    app/controllers/assignment_controller.rb:418:in `update'
+    test/functional/assignment_controller_test.rb:158:in `test_legal_edit_assignment'
+
+  9) Error:
+test_new_microtask(AssignmentControllerTest):
+ActionView::TemplateError: Called id for nil, which would mistakenly be 4 -- if you really wanted the id of nil, use object_id
+    On line #27 of app/views/assignment/_due_dates.html.erb
+    
+        24: 
+        25: 
+        26:            <TR>
+        27:                <%@submit_deadline = @assignment.due_dates.find_by_deadline_type_id(DeadlineType.find_by_name("submission").id) %>
+        28:                <TD ALIGN=LEFT WIDTH=20%>
+        29:                    <%=hidden_field 'submit_deadline', 'id' %>Submission deadline
+        30:                </TD>
+    
+        app/views/assignment/_due_dates.html.erb:27
+        app/views/assignment/edit.html.erb:10
+        app/views/assignment/edit.html.erb:3
+        app/controllers/assignment_controller.rb:176:in `create'
+        test/functional/assignment_controller_test.rb:81:in `test_new_microtask'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/testsuite.rb:34:in `run'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/testsuite.rb:33:in `each'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/testsuite.rb:33:in `run'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/testsuite.rb:34:in `run'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/testsuite.rb:33:in `each'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/testsuite.rb:33:in `run'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/ui/testrunnermediator.rb:46:in `run_suite'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/ui/console/testrunner.rb:67:in `start_mediator'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/ui/console/testrunner.rb:41:in `start'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/ui/testrunnerutilities.rb:29:in `run'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/autorunner.rb:216:in `run'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit/autorunner.rb:12:in `run'
+        /home/shoubhik/.rvm/rubies/ruby-1.8.7-p370/lib/ruby/1.8/test/unit.rb:279
+
+ 10) Failure:
+test_should_destroy_join_team_request(JoinTeamRequestsControllerTest) [test/functional/join_team_requests_controller_test.rb:26]:
+"JoinTeamRequest.count" didn't change by -1.
+<1> expected but was
+<2>.
+
+ 11) Failure:
+test_create_question_type(QuestionTypesControllerTest) [test/functional/question_types_controller_test.rb:19]:
+"QuestionType.count" didn't change by 1.
+<1> expected but was
+<0>.
+
+ 12) Error:
+test_destroy_question_type(QuestionTypesControllerTest):
+NoMethodError: undefined method `question_types' for #<QuestionTypesControllerTest:0xb50f4f28>
+    test/functional/question_types_controller_test.rb:43:in `test_destroy_question_type'
+    test/functional/question_types_controller_test.rb:42:in `test_destroy_question_type'
+
+ 13) Error:
+test_edit(QuestionTypesControllerTest):
+NoMethodError: undefined method `question_types' for #<QuestionTypesControllerTest:0xb50f4f00>
+    test/functional/question_types_controller_test.rb:32:in `test_edit'
+
+ 14) Failure:
+test_index(QuestionTypesControllerTest) [test/functional/question_types_controller_test.rb:9]:
+Expected response to be a <:success>, but was <302>
+
+ 15) Failure:
+test_new(QuestionTypesControllerTest) [test/functional/question_types_controller_test.rb:15]:
+Expected response to be a <:success>, but was <302>
+
+ 16) Error:
+test_show_question_type(QuestionTypesControllerTest):
+NoMethodError: undefined method `question_types' for #<QuestionTypesControllerTest:0xb50f4dc0>
+    test/functional/question_types_controller_test.rb:27:in `test_show_question_type'
+
+ 17) Error:
+test_update_question_type(QuestionTypesControllerTest):
+NoMethodError: undefined method `question_types' for #<QuestionTypesControllerTest:0xb50f4d48>
+    test/functional/question_types_controller_test.rb:37:in `test_update_question_type'
+
+ 18) Failure:
+test_Questionnaire_edit_for_existing_name(QuestionnaireControllerTest) [test/functional/questionnaire_controller_test.rb:44]:
+<ActionView::TemplateError> exception expected but none was thrown.
+
+ 19) Failure:
+test_advice_to_be_saved(QuestionnaireControllerTest) [test/functional/questionnaire_controller_test.rb:61]:
+<"The  Question advice in Questionnaire has been  saved"> expected but was
+<nil>.
+
+ 20) Failure:
+test_edit_questionnaire_instruction_url(QuestionnaireControllerTest) [test/functional/questionnaire_controller_test.rb:72]:
+Expected response to be a <:success>, but was <302>
+
+ 21) Failure:
+test_edit_questionnaire_when_name_not_valid(QuestionnaireControllerTest) [test/functional/questionnaire_controller_test.rb:52]:
+<ActionView::TemplateError> exception expected but none was thrown.
+
+ 22) Failure:
+test_questionnaire_edit(QuestionnaireControllerTest) [test/functional/questionnaire_controller_test.rb:35]:
+Expected response to be a <:success>, but was <302>
+
+115 tests, 230 assertions, 10 failures, 12 errors

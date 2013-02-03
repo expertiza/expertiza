@@ -44,10 +44,10 @@ class Participant < ActiveRecord::Base
     end
     
     if self.team
-      if self.team.teams_participants.length == 1
+      if self.team.teams_users.length == 1
         self.team.delete
       else
-        self.team.teams_participants.each{ |tuser|
+        self.team.teams_users.each{ |tuser| 
           if tuser.user_id == self.id
             tuser.delete
           end
@@ -103,21 +103,19 @@ class Participant < ActiveRecord::Base
   def update_topic_id(topic_id)
     assignment = Assignment.find(self.parent_id)
 
-    if assignment.team_assignment?
-      team = Team.find_by_sql("SELECT u.team_id as team_id
-                                  FROM teams as t,teams_participants as u
-                                  WHERE t.parent_id = " + assignment.id.to_s + " and t.id = u.team_id and u.user_id = " + self.user_id.to_s )
+    #ACS Call the select method for all the teams(single or group)
+    #removed check to see if it is a team assignment
+    team = Team.find_by_sql("SELECT u.team_id as team_id
+                                FROM teams as t,teams_users as u
+                                WHERE t.parent_id = " + assignment.id.to_s + " and t.id = u.team_id and u.user_id = " + self.user_id.to_s )
 
-      team_id = team[0]["team_id"]
-      team_members = TeamsParticipant.find_all_by_team_id(team_id)
-      
-      team_members.each { |team_member|
-        participant = Participant.find_by_user_id_and_parent_id(team_member.user_id,assignment.id)
-        participant.update_attribute(:topic_id, topic_id)
-      }
-    else
-      self.update_attribute(:topic_id, topic_id)
-    end
+    team_id = team[0]["team_id"]
+    team_members = TeamsUser.find_all_by_team_id(team_id)
+
+    team_members.each { |team_member|
+      participant = Participant.find_by_user_id_and_parent_id(team_member.user_id,assignment.id)
+      participant.update_attribute(:topic_id, topic_id)
+    }
   end
 
   # Returns the average score of all reviews for this user on this assignment (Which assignment ??? )
@@ -171,4 +169,17 @@ class Participant < ActiveRecord::Base
     (((sum_of_scores.to_f / number_of_scores.to_f) * 100).to_i) / 100.0
   end
 
+  # Return scores that this participant for the given questions
+  def get_scores(questions)
+    scores = Hash.new
+    scores[:participant] = self
+    self.assignment.questionnaires.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
+
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+    end
+    scores[:total_score] = assignment.compute_total_score(scores)
+    return scores
+  end
 end

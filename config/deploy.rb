@@ -35,12 +35,12 @@ namespace :deploy do
 
   desc "Symlink shared files into the current deploy directory."
   task :symlink_shared do
-    run "ln -s #{shared_path}/pg_data #{current_path}"
-    run "ln -sf #{shared_path}/database.yml #{current_path}/config/database.yml"
+    run "ln -s #{shared_path}/pg_data #{release_path}"
+    run "ln -sf #{shared_path}/database.yml #{release_path}/config/database.yml"
   end
 end
 
-after "deploy:symlink", "deploy:symlink_shared"
+after "deploy:update_code", "deploy:symlink_shared"
 
 desc "Load production data into the local development database."
 task :load_production_data, :roles => :db, :only => { :primary => true } do
@@ -50,7 +50,7 @@ task :load_production_data, :roles => :db, :only => { :primary => true } do
   filename = "dump.#{Time.now.strftime '%Y-%m-%d_%H:%M:%S'}.sql.gz"
  
   on_rollback { delete "/tmp/#{filename}" }
-  run "mysqldump -u #{database['production']['username']} --password=#{database['production']['password']} #{database['production']['database']} --add-drop-table | gzip > /tmp/#{filename}" do |channel, stream, data|
+  run "mysqldump -u #{database['production']['username']} #{database['production']['database']} --add-drop-table | gzip > /tmp/#{filename}" do |channel, stream, data|
     puts data
   end
 

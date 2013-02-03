@@ -1,14 +1,32 @@
+#contains all functions related to management of the signup sheet for an assignment
+#functions to add new topics to an assignment, edit properties of a particular topic, delete a topic, etc
+#are included here
+
+#A point to be taken into consideration is that :id(except when explicitly stated) here means topic id and not assignment id
+#( this is referenced as :assignment id in the params has)
+#The way it works is that assignments have their own id's, so do topics. A topic has a foreign key dependecy on the assignment_id
+#Hence each topic has a field called assignment_id which points which can be used to identify the assignment that this topic belongs
+#to
+
 class SignUpSheetController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'graph/graphviz_dot'
   require 'rgl/topsort'
 
+#Includes functions for team management. Refer /app/helpers/ManageTeamHelper
+  include ManageTeamHelper
+#Includes functions for Dead line management. Refer /app/helpers/DeadLineHelper
+  include DeadlineHelper
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [:destroy, :create, :update],
          :redirect_to => {:action => :list}
 
+#This displays a page that lists all the available topics for an assignment.
+#Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
+#Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics
+#can have different deadlines.
   def add_signup_topics_staggered
     load_add_signup_topics(params[:id])
 
@@ -62,14 +80,19 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+#similar to the above function except that all the topics and review/submission rounds have the similar deadlines
   def add_signup_topics
     load_add_signup_topics(params[:id])
   end
 
+#Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like 
+#the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
   def view_publishing_rights
     load_add_signup_topics(params[:id])
   end
 
+#retrieves all the data associated with the given assignment. Includes all topics, 
+#participants(people who are doing this assignment) and signed up users (people who have chosen a topic (confirmed or waitlisted)
   def load_add_signup_topics(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', assignment_id])
@@ -77,16 +100,17 @@ class SignUpSheetController < ApplicationController
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 
     @assignment = Assignment.find(assignment_id)
-    if !@assignment.team_assignment
-      @participants = SignedUpUser.find_participants(assignment_id)
-    else
-      @participants = SignedUpUser.find_team_participants(assignment_id)
-    end
+    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # to treat all assignments as team assignments
+    @participants = SignedUpUser.find_team_participants(assignment_id)
   end
 
+# Prepares the form for adding a new topic. Used in conjuntion with create
   def new
     @id = params[:id]
     @sign_up_topic = SignUpTopic.new
+    @sign_up_topic.assignment = Assignment.find(params[:id])
+    @topic = @sign_up_topic
   end
 
   #This method is used to create signup topics
@@ -120,14 +144,18 @@ class SignUpSheetController < ApplicationController
       topic.save
       redirect_to_sign_up(params[:id])
     else
+#set the values for the new topic and commit to database
       @sign_up_topic = SignUpTopic.new
       @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
       @sign_up_topic.topic_name = params[:topic][:topic_name]
       @sign_up_topic.max_choosers = params[:topic][:max_choosers]
       @sign_up_topic.category = params[:topic][:category]
       @sign_up_topic.assignment_id = params[:id]
-
       @assignment = Assignment.find(params[:id])
+
+      if @assignment.is_microtask?
+        @sign_up_topic.micropayment = params[:topic][:micropayment]
+      end
 
       if @assignment.staggered_deadline?
         topic_set = Array.new
@@ -145,6 +173,8 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+#simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
+#staggered means that different topics can have different deadlines.
   def redirect_to_sign_up(assignment_id)
     assignment = Assignment.find(assignment_id)
     if assignment.staggered_deadline == true
@@ -173,12 +203,13 @@ class SignUpSheetController < ApplicationController
     end
     redirect_to_sign_up(params[:assignment_id])
   end
-
+#prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
   def edit
     @topic = SignUpTopic.find(params[:id])
     @assignment_id = params[:assignment_id]
   end
 
+#updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
   def update
     topic = SignUpTopic.find(params[:id])
 
@@ -199,9 +230,10 @@ class SignUpSheetController < ApplicationController
           flash[:error] = 'Value of maximum choosers can only be increased! No change has been made to max choosers.'
         end
       end
-
+#update tables
       topic.category = params[:topic][:category]
       topic.topic_name = params[:topic][:topic_name]
+      topic.micropayment = params[:topic][:micropayment]
       topic.save
     else
       flash[:error] = "Topic could not be updated"
@@ -224,20 +256,15 @@ class SignUpSheetController < ApplicationController
       @show_actions = false
     end
 
-    #Find whether the user has signed up for any topics; if so the user won't be able to
-    #sign up again unless the former was a waitlisted topic
-    #if team assignment, then team id needs to be passed as parameter else the user's id
-    if assignment.team_assignment == true
-      users_team = SignedUpUser.find_team_participants(params[:id], (session[:user].id))
+    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # to treat all assignments as team assignments
+    users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
 
-      if users_team.size == 0
-        @selected_topics = nil
-      else
-        #TODO: fix this; cant use 0
-        @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
-      end
+    if users_team.size == 0
+      @selected_topics = nil
     else
-      @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)
+      #TODO: fix this; cant use 0
+      @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
     end
   end
 
@@ -257,13 +284,11 @@ class SignUpSheetController < ApplicationController
       flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
       #if team assignment find the creator id from teamusers table and teams
-      if assignment.team_assignment == true
-        #users_team will contain the team id of the team to which the user belongs
-        users_team = SignedUpUser.find_team_participants(assignment_id, (session[:user].id))
-        signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
-      else
-        signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, session[:user].id)
-      end
+      #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # to treat all assignments as team assignments
+      #users_team will contain the team id of the team to which the user belongs
+      users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
+      signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
 
       #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
       if signup_record.is_waitlisted == false
@@ -277,12 +302,12 @@ class SignUpSheetController < ApplicationController
           first_waitlisted_user.save
 
           #update the participants details
-          if assignment.team_assignment?
-            user_id = TeamsParticipant.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-            participant = Participant.find_by_user_id_and_parent_id(user_id, assignment.id)
-          else
-            participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
-          end
+          #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+          # to treat all assignments as team assignments
+
+          user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+          participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
+
           participant.update_topic_id(topic_id)
 
           SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
@@ -303,22 +328,19 @@ class SignUpSheetController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
 
     #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
-    if assignment.team_assignment == true
+    #Always use team_id ACS
 
-      #check whether the user already has a team for this assignment
-      users_team = SignedUpUser.find_team_participants(params[:assignment_id], (session[:user].id))
+    #check whether the user already has a team for this assignment
+    users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
 
-      if users_team.size == 0
-        #if team is not yet created, create new team.
-        team = create_team(params[:assignment_id])
-        user = User.find(session[:user].id)
-        teamuser = create_team_users(user, team.id)
-        confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id])
-      else
-        confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id])
-      end
+    if users_team.size == 0
+      #if team is not yet created, create new team.
+      team = create_team(params[:assignment_id])
+      user = User.find(session[:user].id)
+      teamuser = create_team_users(user, team.id)
+      confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id])
     else
-      confirmationStatus = confirmTopic(session[:user].id, params[:id], params[:assignment_id])
+      confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id])
     end
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
@@ -425,13 +447,14 @@ class SignUpSheetController < ApplicationController
   end
 
   def has_user(user, team_id)
-    if TeamsParticipant.find_by_team_id_and_user_id(team_id, user.id)
+    if TeamsUser.find_by_team_id_and_user_id(team_id, user.id)
       return true
     else
       return false
     end
   end
 
+#this function is used to prevent injection attacks. Do not know how this works.
   def save_topic_dependencies
     # Prevent injection attacks - we're using this in a system() call later
     params[:assignment_id] = params[:assignment_id].to_i.to_s
@@ -447,8 +470,7 @@ class SignUpSheetController < ApplicationController
       end
     }
 
-
-    # Save the dependency in the topic dependency table
+   # Save the dependency in the topic dependency table
     TopicDependency.save_dependency(topics)
 
     node = 'id'
@@ -474,12 +496,10 @@ class SignUpSheetController < ApplicationController
     redirect_to_sign_up(params[:assignment_id])
   end
 
-  def stringtodate(date)
-    DateTime.parse(date)
-  end
 
-
-  #If the instructor needs to explicitly change the start/due dates of the topics
+#If the instructor needs to explicitly change the start/due dates of the topics 
+#This is true in case of a staggered deadline type assignment. Individual deadlines can 
+# be set on a per topic  and per round basis
   def save_topic_deadlines
 
     due_dates = params[:due_date]
@@ -499,7 +519,7 @@ class SignUpSheetController < ApplicationController
         topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + i.to_s]})
         flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
 
-        topic_deadline_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_rev, i)
+        topic_deadline_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_rev,i)
         topic_deadline_rev.update_attributes({'due_at' => due_date['review_' + i.to_s]})
         flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
       end
@@ -512,7 +532,8 @@ class SignUpSheetController < ApplicationController
     redirect_to_sign_up(params[:assignment_id])
   end
 
-  def build_dependency_graph(topics, node)
+#used by save_topic_dependencies. Do not know how this works
+  def build_dependency_graph(topics,node)
     dg = RGL::DirectedAdjacencyGraph.new
 
     #create a graph of the assignment with appropriate dependency
@@ -535,7 +556,7 @@ class SignUpSheetController < ApplicationController
     dg.remove_vertex("fake")
     dg
   end
-
+#used by save_topic_dependencies. Do not know how this works
   def create_common_start_time_topics(dg)
     dg_reverse = dg.clone.reverse()
     set_of_topics = Array.new
@@ -636,7 +657,7 @@ class SignUpSheetController < ApplicationController
       end
       @results.each { |result|
         @team_members = ""
-        TeamsParticipant.find_all_by_team_id(result[:team_id]).each { |teamuser|
+        TeamsUser.find_all_by_team_id(result[:team_id]).each { |teamuser|
           puts 'Userblaahsdb asd' +User.find(teamuser.user_id).to_json
           @team_members+=User.find(teamuser.user_id).name+" "
         }
@@ -647,7 +668,7 @@ class SignUpSheetController < ApplicationController
 
   #searches and returns team members for a given team_id
   def find_team_members(team_id)
-    TeamsParticipant.find_all_by_team_id(team_id).each { |teamuser|
+    TeamsUser.find_all_by_team_id(team_id).each { |teamuser|
       team_members+=User.find(teamuser.user_id).handle+" "
     }
   end
@@ -656,7 +677,7 @@ class SignUpSheetController < ApplicationController
   #clicks for seeing the advertisement related to
   def get_team_details(assignment_id, topic_id)
     query = "select t.name, t.comments_for_advertisement, p.handle,t.id as team_id, p.id as participant_id, p.topic_id as topic_id, p.parent_id as assignment_id"
-    query = query + " from teams t, teams_participants tu, participants p"
+    query = query + " from teams t, teams_users tu, participants p"
     query = query + " where"
     query = query + " p.parent_id = '#{assignment_id}' and"
     query = query + " p.topic_id = '#{topic_id}'  and"
@@ -666,4 +687,32 @@ class SignUpSheetController < ApplicationController
     query = query + " group by t.name;"
     SignUpTopic.find_by_sql(query)
   end
+
+  def create_default_for_microtask
+    assignment_id = params[:id]
+    @sign_up_topic = SignUpTopic.new
+    @sign_up_topic.topic_identifier = 'MT1'
+    @sign_up_topic.topic_name = 'Microtask Topic'
+    @sign_up_topic.max_choosers = '0'
+    @sign_up_topic.micropayment = 0
+    @sign_up_topic.assignment_id = assignment_id
+
+    @assignment = Assignment.find(params[:id])
+
+    if @assignment.staggered_deadline?
+      topic_set = Array.new
+      topic = @sign_up_topic.id
+
+    end
+
+    if @sign_up_topic.save
+
+      flash[:notice] = 'Default Microtask topic was created - please update.'
+      redirect_to_sign_up(assignment_id)
+    else
+      render :action => 'new', :id => assignment_id
+    end
+  end
+
+
 end

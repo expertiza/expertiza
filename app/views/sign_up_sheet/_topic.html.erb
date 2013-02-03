@@ -18,6 +18,10 @@
 <p><label for="max_choosers">Maximum choosers</label><br/>
   <%= text_field 'topic', 'max_choosers' %></p>
 
+<% if topic.assignment.is_microtask? %>  
+<p><label for="micropayment">Micropayment</label><br/>
+    <%= text_field 'topic', 'micropayment' %></p>
+<% end %>
 
 <!--[eoform:topic]-->
 <br/>

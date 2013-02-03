@@ -1,10 +1,10 @@
 class TeamUserNode < Node
   def self.table
-    "teams_participants"
+    "teams_users"
   end  
   
   def get_name
-    TeamsParticipant.find(self.node_object_id).name
+    TeamsUser.find(self.node_object_id).name    
   end  
   
   def self.get(parent_id)

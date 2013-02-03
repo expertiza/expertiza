@@ -95,12 +95,10 @@ class Leaderboard < ActiveRecord::Base
         end # end of each.do block
          
         assQuestionnaires[assgt.id] = differentQuestionnaires
-        
-        if (assgt.team_assignment)
-          assTeamHash[assgt.id] = "team"
-        else
-           assTeamHash[assgt.id] = "indie"
-        end
+
+        #ACS Everything is a team now
+        #removed check to see if it is a team assignment
+        assTeamHash[assgt.id] = "team"
     end
     # end of first for
     
@@ -169,7 +167,7 @@ class Leaderboard < ActiveRecord::Base
                   team_entries = ScoreCache.find(:all, 
                                               :conditions =>["reviewee_id in (?) and object_type = ?", assignment_teams, 'TeamReviewResponseMap'])
                   for team_entry in team_entries
-                            team_users = TeamsParticipant.find(:all,
+                            team_users = TeamsUser.find(:all, 
                                                 :conditions => ["team_id = ?",team_entry.reviewee_id])
                            
                             for team_user in team_users

@@ -76,7 +76,7 @@ class InitializeCustom < ActiveRecord::Migration
   execute "INSERT INTO `site_controllers` VALUES (26,'profile',8,0)"
   execute "INSERT INTO `site_controllers` VALUES (27,'survey_response',4,0)"
   execute "INSERT INTO `site_controllers` VALUES (28,'team',7,0)"
-  execute "INSERT INTO `site_controllers` VALUES (29,'teams_participants',7,0)"
+  execute "INSERT INTO `site_controllers` VALUES (29,'teams_users',7,0)"
  
   create_table "controller_actions", :force => true do |t|
     t.column "site_controller_id", :integer, :default => 0, :null => false

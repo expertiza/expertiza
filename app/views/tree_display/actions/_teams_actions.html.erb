@@ -1,5 +1,5 @@
 <TD WIDTH="15%" align = "center">
-<%= link_to image_tag("plus.png", :border=>0,:alt => "Add Team Member", :title => "Add Team Member" ), :controller=> 'teams_participants', :action=>'new', :id => node.node_object_id %>
+<%= link_to image_tag("plus.png", :border=>0,:alt => "Add Team Member", :title => "Add Team Member" ), :controller=>'teams_users', :action=>'new', :id => node.node_object_id %>
 <%= link_to image_tag("delete_icon.png", :border=>0, :alt => "Delete Team", :title => "Delete Team"), :controller=>'team', :action=>'delete', :id => node.node_object_id %>
 <%= link_to image_tag("edit_icon.png", :border=>0, :alt => "Edit Team Name", :title => "Edit Team Name"), :controller=>'team', :action=>'edit', :id => node.node_object_id %>
 

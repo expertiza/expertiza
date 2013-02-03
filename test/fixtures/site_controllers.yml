@@ -87,7 +87,7 @@ site_controller_team:
   builtin: 0 
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
 site_controller_teams_users:  
-  name: 'teams_participants'
+  name: 'teams_users' 
   builtin: 0 
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
 site_controller_impersonate:  
@@ -142,7 +142,7 @@ site_controller_password_retrieval:
   name: 'password_retrieval' 
   builtin: 0 
   permission_id: <%= Fixtures.identify(:permission_public_actions_execute) %>
-site_controller_submitted_content:  
+site_controller_submitted_content:
   name: 'submitted_content' 
   builtin: 0 
   permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
@@ -182,3 +182,7 @@ site_controller_delete_object:
   name: 'delete_object' 
   builtin: 0 
   permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+site_controller_signup:
+  name: signup
+  permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+  builtin: "0"

@@ -19,7 +19,7 @@ module TeamHelper
           currTeam = nil
         end
         if options[:handle_dups] == "replace" && teams.first != nil        
-            for teamsuser in TeamsParticipant.find(:all, :conditions => ["team_id =?", currTeam.id])
+            for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", currTeam.id])
               teamsuser.destroy
             end    
             currTeam.destroy
@@ -37,10 +37,10 @@ module TeamHelper
        while(pos < split_line.length) 
           user = User.find_by_name(split_line[pos].strip)
           if user && !(options[:handle_dups] == "ignore" && teams.length > 0)            
-            teamusers = TeamsParticipant.find(:all, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])
+            teamusers = TeamsUser.find(:all, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])
             currUser = teamusers.first
             if teamusers.length == 0 || currUser == nil
-              currUser = TeamsParticipant.new
+              currUser = TeamsUser.new
               currUser.team_id = currTeam.id
               currUser.user_id = user.id
               currUser.save   

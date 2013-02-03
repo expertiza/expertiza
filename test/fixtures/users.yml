@@ -114,7 +114,6 @@ ta4:
 
 
 student1:
-  id: 9
   name: student1
   parent_id: <%= Fixtures.identify(:instructor1) %>
   fullname: student1_fullname
@@ -127,9 +126,9 @@ student1:
   email_on_review: 1
   master_permission_granted: 1
   handle: stu1
+  is_new_user: 0
   
 student2:
-  id: 10
   parent_id: <%= Fixtures.identify(:instructor1) %>
   name: student2
   fullname: student2_fullname
@@ -142,6 +141,7 @@ student2:
   email_on_review: 1
   master_permission_granted: 1
   handle: stu2
+  is_new_user: 1
 
 student3:
   name: student3

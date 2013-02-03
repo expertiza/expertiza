@@ -43,7 +43,7 @@ class ParticipantsController < ApplicationController
   def delete_items
     participant = Participant.find(params[:id])
     maps = params[:ResponseMap]
-    teamsusers = params[:TeamsParticipant]
+    teamsusers = params[:TeamsUser]      
     
     if !maps.nil?
       maps.each{
@@ -59,7 +59,7 @@ class ParticipantsController < ApplicationController
       teamsusers.each{
         |tuser_id|
         begin
-          TeamsParticipant.find(tuser_id[0].to_i).delete
+          TeamsUser.find(tuser_id[0].to_i).delete
         rescue
         end 
       }

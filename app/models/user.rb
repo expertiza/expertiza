@@ -17,8 +17,8 @@ class User < ActiveRecord::Base
   belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
   belongs_to :role
   
-  has_many :teams_participants, :dependent => :destroy
-  has_many :teams, :through => :teams_participants
+  has_many :teams_users, :dependent => :destroy
+  has_many :teams, :through => :teams_users
   
   validates_presence_of :name
   validates_presence_of :email, :message => "can't be blank; use anything@mailinator.com for test users"

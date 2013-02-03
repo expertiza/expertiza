@@ -153,7 +153,7 @@ class UsersController < ApplicationController
     begin
        user = User.find(params[:id])
        AssignmentParticipant.find_all_by_user_id(user.id).each{|participant| participant.delete}
-       TeamsParticipant.find_all_by_user_id(user.id).each{|teamuser| teamuser.delete}
+       TeamsUser.find_all_by_user_id(user.id).each{|teamuser| teamuser.delete}
        AssignmentQuestionnaire.find_all_by_user_id(user.id).each{|aq| aq.destroy}
        user.destroy
     rescue

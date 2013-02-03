@@ -1,6 +1,6 @@
 And /^the assignment "(\S+)" allows me to suggest topics$/ do |assignment|
-  When "I open the assignment #{assignment}"
-  And 'I click on the link to Suggest a topic'
+  step "I open the assignment #{assignment}"
+  step 'I click on the link to Suggest a topic'
 end
 
 When /^I open the assignment (\S+)$/ do |assignment|

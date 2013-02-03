@@ -126,7 +126,7 @@
               <tr>
                 <td><%= inv.from_user.name %></td>
                 <td>
-                  <% teamsusers = TeamsParticipant.find(:all, :conditions => ['user_id = ?', inv.from_id]) %>
+                  <% teamsusers = TeamsUser.find(:all, :conditions => ['user_id = ?', inv.from_id]) %>
                   <% for teamsuser in teamsusers %>
                       <% current_team = Team.find(:first, :conditions => ['id = ? and parent_id = ?', teamsuser.team_id, @student.assignment.id]) %>
                       <% if current_team != nil %>

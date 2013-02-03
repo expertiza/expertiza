@@ -13,8 +13,8 @@
 development:
   adapter: mysql
   database: pg_development
-  username: root
-  password: i8grapes!
+  username: expertiza
+  password: 
   host: localhost
 
 # Warning: The database defined as 'test' will be erased and
@@ -23,15 +23,15 @@ development:
 test: &test
   adapter: mysql
   database: pg_test
-  username: root
-  password: i8grapes!
+  username: expertiza
+  password:
   host: localhost
 
 production:
   adapter: mysql
   database: pg_development
-  username: root
-  password: i8grapes!
+  username: expertiza
+  password:
   host: localhost
 
 cucumber:

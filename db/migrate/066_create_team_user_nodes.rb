@@ -1,11 +1,11 @@
 class CreateTeamUserNodes < ActiveRecord::Migration
   def self.up
     begin
-      remove_column :teams_participants, :assignment_id
+      remove_column :teams_users, :assignment_id
     rescue
     end
     
-    teamsusers = TeamsParticipant.find(:all)
+    teamsusers = TeamsUser.find(:all)
     teamsusers.each{
       | user |
       parent = TeamNode.find_by_node_object_id(user.team_id)
@@ -16,12 +16,12 @@ class CreateTeamUserNodes < ActiveRecord::Migration
   end
 
   def self.down
-    teamsusers = TeamsParticipant.find(:all)
+    teamsusers = TeamsUser.find(:all)
     teamsusers.each{
        |user|
        user.destroy
     }
     
-    add_column :teams_participants, :assignment_id, :integer
+    add_column :teams_users, :assignment_id, :integer
   end
 end

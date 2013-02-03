@@ -12,3 +12,7 @@ end
 Then /^I see "(\S+)" in the list of roles$/ do |rolename|
   should have_content rolename
 end
+
+When /^a role "(\S+)" exists$/ do |role|
+  Role.create!(:name => role, :description => role)
+end

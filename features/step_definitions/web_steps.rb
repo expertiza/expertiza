@@ -97,6 +97,10 @@ When /^I attach the file "([^"]*)" to "([^"]*)"(?: within "([^"]*)")?$/ do |path
   end
 end
 
+When /^I click the menu link "([^"]*)"$/ do |link|
+  find(:xpath, "//a[contains(.,'#{link}')]").click
+end
+
 Then /^I should see JSON:$/ do |expected_json|
   require 'json'
   expected = JSON.pretty_generate(JSON.parse(expected_json))

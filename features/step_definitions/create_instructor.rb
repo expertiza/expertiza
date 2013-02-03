@@ -21,10 +21,6 @@ Then /^I should be able to see "(\S+)" under the list of instructors$/ do |instr
   should have_content instructor
 end
 
-When /^I click on "(\S+)"$/ do |name|
-  click_link name
-end
-
 When /^I click on "(\S+)" starting with "(\S+)"$/ do |name, alphabet|
   click_link alphabet
   click_link name

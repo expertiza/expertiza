@@ -47,10 +47,9 @@ end
 
 
 # Create any type of user provided a Full Name and Username
-Given /an? (super-administrator|admin|instructor|teaching assistant|student) named "([^"]*)"( created by "([^"]+)")?/i do |user_type,name,garbage,parent|
-  user_type = user_type.downcase
-  # Set the parent_id for the new user.
-  parent_id = (parent) ? User.find_by_name(parent).id : User.find_by_name('admin').id
+Given /an? (Student|Teaching Assistant|Instructor|Administrator|Super-Administrator) named "([^"]*)"( created by "([^"]+)")?/i do |user_type,name,garbage,parent|
+   # Set the parent_id for the new user.
+   parent_id = (parent) ? User.find_by_name(parent).id : User.find_by_name('admin').id
     
   User.create({
     :name => name,

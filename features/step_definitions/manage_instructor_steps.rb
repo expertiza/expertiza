@@ -25,3 +25,18 @@ When /^I click on "(\S+)" starting with "(\S+)"$/ do |name, alphabet|
   click_link alphabet
   click_link name
 end
+
+And /^I edit "(\S+)" to have the name "(\S+)"$/ do |old_name,new_name|
+  click_link 'Edit'
+  fill_in 'user_name', :with => new_name
+  click_button 'Edit'
+end
+
+And /^I delete the instructor "(\S+)"/ do |instructor|
+  click_link instructor
+  click_link 'Delete'
+end
+
+Then /^I should not be able to see "(\S+)" under the list of instructors$/ do |instructor|
+  should have_no_content instructor
+end

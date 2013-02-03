@@ -8,6 +8,15 @@ And /^I add permission "(\S+)" to this role$/ do |perm_name|
   click_button 'Create'
 end
 
-Then /^I see "(\S+)" in the permissions$/ do |perm_name|
-  should have_content perm_name
+When /^I rename the permission "(\S+)" to "(\S+)"$/ do |arg1, arg2|
+  
+  step("I open the permissions management link")
+  click_link arg1
+  step('I click on "Edit"')
+  fill_in("Name", :with => arg2)
+  step('I press "Edit"')
+end
+
+Given /^a permission "(\S+)" exists$/ do |permission|
+  Permission.create!(:name => permission)
 end

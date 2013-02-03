@@ -1,0 +1,7 @@
+<ul class="team_members">
+<% for user in @users do -%>
+  <li class="team_members">
+    <div class="name"><%= user.name.strip %></div>
+  </li>
+<% end -%>
+</ul>

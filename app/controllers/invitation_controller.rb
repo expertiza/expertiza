@@ -11,22 +11,17 @@ class InvitationController < ApplicationController
 
     #check if the invited user is valid
     if !user
-      flash[:alert] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
+      flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
     else
       participant = AssignmentParticipant.find(:first, :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
       if !participant
-        flash[:alert] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
+        flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
       else
-        team_member = TeamsParticipant.find(:all, :conditions => ['team_id =? and user_id =?', team.id, user.id])
+        team_member = TeamsUser.find(:all, :conditions => ['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
         if (team_member.size > 0)
-          flash[:alert] = "\"#{user.name}\" is already a member of team."
+          flash[:notice] = "\"#{user.name}\" is already a member of team."
         else
-          invite=Invitation.find (:all,:conditions => ['from_id=? and to_id=? and assignment_id=? and reply_status="W"', user.id,student.user_id,student.parent_id])
-          if (invite.size>0)
-            flash[:alert]= " You can’t invite \"#{user.name}\" to join your team, because \"#{user.name}\" has already invited you to join his/her team."
-          else
-
           sent_invitation = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.parent_id])
           #check if the invited user is already invited (i.e. awaiting reply)
           if sent_invitation.length == 0
@@ -37,9 +32,8 @@ class InvitationController < ApplicationController
             @invitation.reply_status = 'W'
             @invitation.save
           else
-            flash[:alert] = "You have already sent an invitation to \"#{user.name}\"."
+            flash[:notice] = "You have already sent an invitation to \"#{user.name}\"."
           end
-         end
         end
       end
     end
@@ -58,14 +52,14 @@ class InvitationController < ApplicationController
     
     student = Participant.find(params[:student_id])
     
-    #if you are on a team and you accept another invitation, remove your previous entry in the teams_participants table.
-    old_entry = TeamsParticipant.find(:first, :conditions => ['user_id = ? and team_id = ?', student.user_id, params[:team_id]])
+    #if you are on a team and you accept another invitation, remove your previous entry in the teams_users table.
+    old_entry = TeamsUser.find(:first, :conditions => ['user_id = ? and team_id = ?', student.user_id, params[:team_id]])
     if old_entry != nil
       old_entry.destroy
     end
     
     #if you are on a team and you accept another invitation and if your old team does not have any members, delete the entry for the team
-    other_members = TeamsParticipant.find(:all, :conditions => ['team_id = ?', params[:team_id]])
+    other_members = TeamsUser.find(:all, :conditions => ['team_id = ?', params[:team_id]])
     if other_members.nil? || other_members.length == 0
       old_team = AssignmentTeam.find(:first, :conditions => ['id = ?', params[:team_id]])
       if old_team != nil
@@ -86,7 +80,7 @@ class InvitationController < ApplicationController
               #Also update the participant table. But first_waitlisted_signup.creator_id is the team id
               #so find one of the users on the team because the update_topic_id function in participant
               #will take care of updating all the participants on the team
-              user_id = TeamsParticipant.find(:first, :conditions => {:team_id => first_waitlisted_signup.creator_id}).user_id
+              user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_signup.creator_id}).user_id
               participant = Participant.find_by_user_id_and_parent_id(user_id,old_team.assignment.id)
               participant.update_topic_id(old_teams_signup.topic_id)
                
@@ -106,8 +100,8 @@ class InvitationController < ApplicationController
     end
     
     #create a new team_user entry for the accepted invitation
-    @team_user = TeamsParticipant.new
-    users_teams = TeamsParticipant.find(:all, :conditions => ['user_id = ?', @inv.from_id])
+    @team_user = TeamsUser.new
+    users_teams = TeamsUser.find(:all, :conditions => ['user_id = ?', @inv.from_id])
     for team in users_teams
       current_team = AssignmentTeam.find(:first, :conditions => ['id = ? and parent_id = ?', team.team_id, student.parent_id])
       if current_team != nil

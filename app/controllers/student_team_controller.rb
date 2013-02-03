@@ -69,15 +69,14 @@ class StudentTeamController < ApplicationController
     @student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(@student.user_id)
     
-    #remove the entry from teams_participants
-
-    user = TeamsParticipant.find(:first, :conditions =>["team_id =? and user_id =?", params[:team_id], @student.user_id])
+    #remove the entry from teams_users
+    user = TeamsUser.find(:first, :conditions =>["team_id =? and user_id =?", params[:team_id], @student.user_id])
     if user
       user.destroy
     end
     
     #if your old team does not have any members, delete the entry for the team
-    other_members = TeamsParticipant.find(:all, :conditions => ['team_id = ?', params[:team_id]])
+    other_members = TeamsUser.find(:all, :conditions => ['team_id = ?', params[:team_id]])
     if other_members.length == 0
       old_team = AssignmentTeam.find(:first, :conditions => ['id = ?', params[:team_id]])
       if old_team != nil
@@ -105,9 +104,9 @@ class StudentTeamController < ApplicationController
               first_waitlisted_user.is_waitlisted = false
               first_waitlisted_user.save
 
-              waitlisted_team_user = TeamsParticipant.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id})
+              waitlisted_team_user = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id})
               #waitlisted_team_user could be nil since the team the student left could have been the one waitlisted on the topic
-              #and teams_participants for the team has been deleted in one of the earlier lines of code
+              #and teams_users for the team has been deleted in one of the earlier lines of code
               
              if !waitlisted_team_user.nil?
                 user_id = waitlisted_team_user.user_id

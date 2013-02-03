@@ -1,0 +1,78 @@
+<h3>Review Responses</h3>
+<img src="<%= @graph %>" alt="Metareview graph" style="float:right;margin:0 5px 0 0;" title = "Comparing your metareview metrics with average metareviews scores from other Expertiza reviewers"/>
+<% for i in 0..@automated_metareview.responses.scores.length - 1 %>
+	<b> [<%=i+1%>] <%= Question.find_by_sql(["Select * from questions where id = ?", @automated_metareview.responses.scores[i].question_id])[0].txt %> </b> <br>
+	<%= @automated_metareview.responses.scores[i].comments.to_s %> <br>
+<% end %>
+<h3>Metareview Feedback for Review</h3>
+<!-- Degree of Relevance -->
+<%if !@automated_metareview.relevance.nil? %>
+	<b> Relevance - <%= (@automated_metareview.relevance * 10000).round.to_f/10000 %> </b>
+<%else %>
+	<b> Relevance - 0 </b>
+<%end %>
+	<!-- The 'i' values are hard-coded - to be passed to the partial 'details' -->  
+	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Relevance"} %><img src="/images/info.png"> <br>
+<!-- Quantity -->
+<b> Quantity - <%= @automated_metareview.quantity %> </b>
+	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Quantity"} %> <img src="/images/info.png"><br>
+	
+<!-- Plagiarism -->
+<b> Plagiarised - </b>
+	<%if @automated_metareview.plagiarism == true %>
+		<b><font color="#FF0000"><%= @automated_metareview.plagiarism%></font> </b>
+	<%else %>
+		<b><%= @automated_metareview.plagiarism%></b>
+	<% end %>
+	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Plagiarism"} %><img src="/images/info.png"> <br>
+<!-- Review Content -->
+<br>
+<b> Content Type </b>
+	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Content"} %><img src="/images/info.png"> <br>
+<ol>
+<%if !@automated_metareview.content_summative.nil? %>
+<li>Summative Content - <b><%= (@automated_metareview.content_summative * 10000).round.to_f/10000 %> </b>
+<%else %>  
+<li>Summative Content - <b> 0 </b>
+<%end %>
+	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Summative Content"} %><img src="/images/info.png"> <br> </li>
+<%if !@automated_metareview.content_problem.nil? %>	
+<li>Problem Content - <b><%= (@automated_metareview.content_problem * 10000).round.to_f/10000 %> </b>
+<%else%>
+<li>Problem Content - <b>0 </b>
+<%end%>
+	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Problem Content"} %><img src="/images/info.png"> <br> </li> </li>
+<%if !@automated_metareview.content_advisory.nil? %>	
+<li>Advisory Content -  <b><%= (@automated_metareview.content_advisory * 10000).round.to_f/10000 %> </b>
+<%else%>
+<li>Advisory Content -  <b>0 </b>
+<%end%>
+	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Advisory Content"} %><img src="/images/info.png"> <br> </li> </li>
+</ol>
+<!-- Review Tone -->
+<b> Tone Type</b>
+<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Tone"} %><img src="/images/info.png"> <br> </li>
+<ol>
+<%if !@automated_metareview.tone_positive.nil? %>
+<li>Positive Tone -  <b><%= (@automated_metareview.tone_positive * 10000).round.to_f/10000 %> </b>
+<%else%> 
+<li>Positive Tone -  <b>0</b>
+<%end%>
+	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Positive Tone"} %><img src="/images/info.png"> <br> </li> </li>
+<%if !@automated_metareview.tone_negative.nil? %>
+<li>Negative Tone - <b> <%= (@automated_metareview.tone_negative * 10000).round.to_f/10000 %> </b>
+<%else%>
+<li>Negative Tone - <b> 0 </b>
+<%end%>
+	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Negative Tone"} %><img src="/images/info.png"> <br> </li> </li>
+<%if !@automated_metareview.tone_neutral.nil? %>
+<li>Neutral Tone - <b> <%= (@automated_metareview.tone_neutral * 10000).round.to_f/10000 %> </b>
+<%else%>
+<li>Neutral Tone - <b> 0 </b>
+<%end%>
+	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Neutral Tone"} %><img src="/images/info.png"> <br> </li> </li>
+</ol>
+<!--<img src="<%= @graph %>"/>-->
+<a href="javascript:window.history.back()"><%= button_to 'Edit Review Again'%></a>
+<%= link_to 'Back to Reviews List', :controller => 'student_review', :action =>'list', :id => ResponseMap.find(@automated_metareview.responses.map_id).reviewer_id %>
+<% puts "@participant.id #{ResponseMap.find(@automated_metareview.responses.map_id).reviewer_id}"%> 

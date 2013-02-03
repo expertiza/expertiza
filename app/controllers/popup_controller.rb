@@ -9,7 +9,7 @@ class PopupController < ApplicationController
   @assignment = Assignment.find(@team.parent_id)
   @assignment_id = @assignment.id
 #  @teamname = Team.find(params[:id]).name
-  @teamusers = TeamsParticipant.find_all_by_team_id(params[:id])
+  @teamusers = TeamsUser.find_all_by_team_id(params[:id])
   
   if(params[:id2] == nil)
 #  if(@reviewid == nil)

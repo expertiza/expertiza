@@ -198,7 +198,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
      # if the user was found, create a team based on the user
      if user != nil
          team = AssignmentTeam.create(:name => 'Team'+mapping["author_id"].to_s, :parent_id => mapping["reviewed_object_id"])
-         TeamsParticipant.create(:team_id => team.id, :user_id => mapping["author_id"])
+         TeamsUser.create(:team_id => team.id, :user_id => mapping["author_id"])         
      end    
      return team
   end

@@ -40,7 +40,7 @@ SiteController.create(:name => 'student_task', :builtin => false, :permission_id
 SiteController.create(:name => 'profile', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
 SiteController.create(:name => 'survey_response', :builtin => false, :permission_id => Permission.find_by_name('public actions - execute').id)
 SiteController.create(:name => 'team', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
-SiteController.create(:name => 'teams_participants', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
+SiteController.create(:name => 'teams_users', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'impersonate', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'import_file', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'review_mapping', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
@@ -130,7 +130,7 @@ ControllerAction.create(:site_controller_id => SiteController.find_by_name('surv
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('survey_response').id, :name => 'submit', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('team').id, :name => 'list', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('team').id, :name => 'list_assignments', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('teams_participants').id, :name => 'list', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('teams_users').id, :name => 'list', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('impersonate').id, :name => 'start', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('impersonate').id, :name => 'impersonate', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'list', :permission_id => nil, :url_to_use => '')
@@ -328,7 +328,8 @@ DeadlineType.create(:name => 'resubmission')
 DeadlineType.create(:name => 'rereview')
 DeadlineType.create(:name => 'metareview')
 DeadlineType.create(:name => 'drop_topic')
-
+DeadlineType.create(:name => 'signup')
+DeadlineType.create(:name => 'team_formation')
 
 ###### Deadline Rights - necessary because there is no configuration from the UI.
 DeadlineRight.create(:name => 'No')

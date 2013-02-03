@@ -6,9 +6,14 @@ class SignUpTopic < ActiveRecord::Base
 
   belongs_to :assignment
 
-  def get_team_id_from_topic_id(user_id)
-    return find_by_sql("select t.id from teams t,teams_participants u where t.id=u.team_id and u.user_id = 5");
-  end
+  #the below relations have been added to make it consistent with the database schema
+  validates_presence_of :topic_name, :assignment_id, :max_choosers
+  validates_length_of :topic_identifier, :maximum => 10
+
+  #This method is not used anywhere
+  #def get_team_id_from_topic_id(user_id)
+  #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
+  #end
 
   def self.import(row,session,id = nil)
 
@@ -30,15 +35,18 @@ class SignUpTopic < ActiveRecord::Base
   end
 
   def self.find_slots_filled(assignment_id)
-    SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")    
+    #SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")
+    SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = false GROUP BY t.id", assignment_id])
   end
 
   def self.find_slots_waitlisted(assignment_id)
-    SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id +  " and u.is_waitlisted = true GROUP BY t.id")
+    #SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id +  " and u.is_waitlisted = true GROUP BY t.id")
+    SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id", assignment_id])
   end
 
   def self.find_waitlisted_topics(assignment_id,creator_id)
-    SignedUpUser.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.creator_id = " + creator_id.to_s)
+    #SignedUpUser.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.creator_id = " + creator_id.to_s)
+    SignedUpUser.find_by_sql(["SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.creator_id = ?", assignment_id.to_s, creator_id.to_s])
   end
 
   def self.slotAvailable?(topic_id)
@@ -79,13 +87,14 @@ class SignUpTopic < ActiveRecord::Base
 
         #update participants
         assignment = Assignment.find(self.assignment_id)
-
+        
         if assignment.team_assignment?
-          user_id = TeamsParticipant.find(:first, :conditions => {:team_id => next_wait_listed_user.creator_id}).user_id
+          user_id = TeamsUser.find(:first, :conditions => {:team_id => next_wait_listed_user.creator_id}).user_id
           participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
         else
           participant = Participant.find_by_user_id_and_parent_id(next_wait_listed_user.creator_id,assignment.id)
         end
+        
         participant.update_topic_id(self.id)
       end
     }

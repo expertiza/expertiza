@@ -68,7 +68,7 @@ class AssignmentTeam < Team
     participant = nil
     begin
       team = Team.find(team_id)
-      user_id = team.teams_participants.first.user_id
+      user_id = team.teams_users.first.user_id
       participant = Participant.find_by_user_id_and_parent_id(user_id,team.parent_id)
     rescue NoMethodError => e
       puts "Ignoring error: #{e}"
@@ -126,7 +126,7 @@ class AssignmentTeam < Team
        currTeam = nil
     end
     if options[:handle_dups] == "replace" && teams.first != nil        
-       for teamsuser in TeamsParticipant.find(:all, :conditions => ["team_id =?", currTeam.id])
+       for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", currTeam.id])
            teamsuser.destroy
        end    
        currTeam.destroy
@@ -144,7 +144,7 @@ class AssignmentTeam < Team
         if user == nil
           raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"                           
         elsif currTeam != nil         
-          currUser = TeamsParticipant.find(:first, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])
+          currUser = TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])          
           if currUser == nil
             currTeam.add_member(user)            
           end                      
@@ -205,7 +205,7 @@ class AssignmentTeam < Team
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = Response.all(:joins => :map,
         :conditions => {:response_maps => {:reviewee_id => self.id, :type => 'TeamReviewResponseMap'}})
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+      scores[questionnaire.symbol][:scores] = Score.compute_scores_statistics(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)
     return scores
@@ -213,7 +213,7 @@ class AssignmentTeam < Team
   
   def self.get_team(participant)
     team = nil
-    teams_users = TeamsParticipant.find_all_by_user_id(participant.user_id)
+    teams_users = TeamsUser.find_all_by_user_id(participant.user_id)
     teams_users.each {
       | tuser |
       fteam = Team.find(:first, :conditions => ['parent_id = ? and id = ?',participant.parent_id,tuser.team_id])
@@ -231,7 +231,7 @@ class AssignmentTeam < Team
       teamUsers = Array.new
       tcsv.push(team.name)
       if (options["team_name"] == "false")
-        teamMembers = TeamsParticipant.find(:all, :conditions => ['team_id = ?', team.id])
+        teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
         teamMembers.each do |user|
           teamUsers.push(user.name)
           teamUsers.push(" ")

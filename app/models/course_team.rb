@@ -29,7 +29,7 @@ class CourseTeam < Team
        currTeam = nil
     end
     if options[:handle_dups] == "replace" && teams.first != nil        
-       for teamsuser in TeamsParticipant.find(:all, :conditions => ["team_id =?", currTeam.id])
+       for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", currTeam.id])
            teamsuser.destroy
        end    
        currTeam.destroy
@@ -50,7 +50,7 @@ class CourseTeam < Team
         if user == nil
           raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"                           
         elsif currTeam != nil         
-          currUser = TeamsParticipant.find(:first, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])
+          currUser = TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])          
           if currUser == nil
             currTeam.add_member(user)            
           end                      
@@ -90,7 +90,7 @@ class CourseTeam < Team
         teamUsers = Array.new
         tcsv.push(team.name)
         if (options["team_name"] == "true")
-          teamMembers = TeamsParticipant.find(:all, :conditions => ['team_id = ?', team.id])
+          teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
           teamMembers.each do |user|
             teamUsers.push(user.name)
             teamUsers.push(" ")

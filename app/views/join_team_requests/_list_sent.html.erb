@@ -24,7 +24,7 @@
             <tr>
 
               <td>
-                <% teams_user_id=TeamsParticipant.find_by_team_id(request.team_id).user_id
+                <% teams_user_id=TeamsUser.find_by_team_id(request.team_id).user_id
                     topic_name=SignUpTopic.find(Participant.find_by_user_id_and_parent_id(teams_user_id,assignment_id).topic_id).topic_name
                      puts "topic:"+topic_name%>
                 <%= topic_name %>

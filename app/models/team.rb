@@ -1,10 +1,10 @@
 class Team < ActiveRecord::Base
-  has_many :teams_participants
-  has_many :users, :through => :teams_participants
+  has_many :teams_users
+  has_many :users, :through => :teams_users
   has_many :join_team_requests
 
   def delete
-    for teamsuser in TeamsParticipant.find(:all, :conditions => ["team_id =?", self.id])
+    for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", self.id])       
        teamsuser.delete
     end    
     node = TeamNode.find_by_node_object_id(self.id)
@@ -44,7 +44,7 @@ class Team < ActiveRecord::Base
  end
  
  def has_user(user)
-   if TeamsParticipant.find_by_team_id_and_user_id(self.id, user.id)
+   if TeamsUser.find_by_team_id_and_user_id(self.id, user.id) 
      return true
    else
      return false
@@ -55,17 +55,17 @@ class Team < ActiveRecord::Base
    if has_user(user)
      raise "\""+user.name+"\" is already a member of the team, \""+self.name+"\""
    end
-   t_user = TeamsParticipant.create(:user_id => user.id, :team_id => self.id)
+   t_user = TeamsUser.create(:user_id => user.id, :team_id => self.id) 
    parent = TeamNode.find_by_node_object_id(self.id)
    TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
    add_participant(self.parent_id, user)  
  end  
  
  def copy_members(new_team)
-   members = TeamsParticipant.find_all_by_team_id(self.id)
+   members = TeamsUser.find_all_by_team_id(self.id)
    members.each{
      | member |
-     t_user = TeamsParticipant.create(:team_id => new_team.id, :user_id => member.user_id)
+     t_user = TeamsUser.create(:team_id => new_team.id, :user_id => member.user_id)
      parent = Object.const_get(self.get_parent_model).find(self.parent_id)
      TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
    }   

@@ -16,11 +16,13 @@ gem 'rubyzip', :require => 'zip/zip'
 gem 'rdoc'
 gem "rspec-rails", "1.3.2"
 gem 'engtagger'
-gem 'stanford-core-nlp' 
+gem 'stanford-core-nlp', "0.3.0"
+gem 'rjb', "1.4.3"
+gem 'bind-it', "0.2.0"
 gem 'rwordnet'
 gem 'open-uri-cached'
 gem 'edavis10-ruby-web-search'
-gem 'stemmer'
+#gem 'stemmer'
 gem 'raspell'
 gem 'nokogiri'
 gem 'seer'

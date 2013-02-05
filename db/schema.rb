@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111217162506) do
+ActiveRecord::Schema.define(:version => 20121019201555) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -53,6 +53,9 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer  "max_reviews_per_submission"
     t.integer  "review_topic_threshold",            :default => 0
     t.boolean  "availability_flag"
+    t.boolean  "copy_flag",                         :default => false
+    t.integer  "rounds_of_reviews",                 :default => 1
+    t.boolean  "microtask",                         :default => false
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -60,6 +63,24 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
+
+  create_table "automated_metareviews", :force => true do |t|
+    t.float    "relevance"
+    t.float    "content_summative"
+    t.float    "content_problem"
+    t.float    "content_advisory"
+    t.float    "tone_positive"
+    t.float    "tone_negative"
+    t.float    "tone_neutral"
+    t.integer  "quantity"
+    t.integer  "plagiarism"
+    t.integer  "version_num"
+    t.integer  "response_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "automated_metareviews", ["response_id"], :name => "fk_automated_metareviews_responses_id"
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -111,6 +132,21 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.string "name", :limit => 32
   end
 
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0
+    t.integer  "attempts",   :default => 0
+    t.text     "handler"
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
+
   create_table "due_dates", :force => true do |t|
     t.datetime "due_at"
     t.integer  "deadline_type_id"
@@ -124,6 +160,7 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer  "round"
     t.boolean  "flag",                        :default => false
     t.integer  "threshold",                   :default => 1
+    t.integer  "delayed_job_id"
   end
 
   add_index "due_dates", ["assignment_id"], :name => "fk_due_dates_assignments"
@@ -368,6 +405,7 @@ ActiveRecord::Schema.define(:version => 20111217162506) do
     t.integer "max_choosers",                   :default => 0, :null => false
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
+    t.integer "micropayment",                   :default => 0
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"

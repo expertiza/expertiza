@@ -169,9 +169,20 @@ class AssignmentParticipant < Participant
     self.assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)
+    
+    # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
+    # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
+    if assignment.is_microtask?
+      topic = SignUpTopic.find_by_assignment_id(assignment.id)
+      if !topic.nil?
+        scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
+        scores[:max_pts_available] = topic.micropayment
+      end
+    end
+
     return scores
   end
 
@@ -207,15 +218,20 @@ class AssignmentParticipant < Participant
     self.save
   end
 
-  # TODO:REFACTOR: This shouldn't be handled using an if statement, but using 
-  # polymorphism for individual and team participants
-  def get_hyperlinks         
-    if self.team     
-      links = self.team.get_hyperlinks     
+  def get_members
+    if self.team.nil?
+      [self]
     else        
-      links = get_hyperlinks_array
+      self.team.get_participants
     end
+  end
 
+
+  def get_hyperlinks
+    links = Array.new
+    for team_member in self.get_members
+      links.concat(team_member.get_hyperlinks_array)
+    end
     return links
   end
 
@@ -249,11 +265,9 @@ class AssignmentParticipant < Participant
   end
   
   def get_reviews
-    if self.assignment.team_assignment
-      return TeamReviewResponseMap.get_assessments_for(self.team)          
-    else
-      return ParticipantReviewResponseMap.get_assessments_for(self)
-    end
+    #ACS Always get assessments for a team
+    #removed check to see if it is a team assignment
+    return TeamReviewResponseMap.get_assessments_for(self.team)
   end
   
   def get_reviews_by_reviewer(reviewer)
@@ -295,8 +309,9 @@ class AssignmentParticipant < Participant
   
   def get_wiki_submissions
     currenttime = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
- 
-    if self.assignment.team_assignment and self.assignment.wiki_type.name == "MediaWiki"
+
+    #ACS Check if the team count is greater than one(team assignment)
+    if self.assignment.team_count > 1 and self.assignment.wiki_type.name == "MediaWiki"
        submissions = Array.new
        if self.team
         self.team.get_participants.each {
@@ -476,7 +491,8 @@ class AssignmentParticipant < Participant
         dirnum = 0
       end
       self.update_attribute('directory_num',dirnum)
-      if self.assignment.team_assignment
+      #ACS Get participants irrespective of the number of participants in the team
+      #removed check to see if it is a team assignment
         self.team.get_participants.each{
             | member |
             if member.directory_num == nil or member.directory_num < 0
@@ -484,7 +500,6 @@ class AssignmentParticipant < Participant
               member.save
             end
         }
-      end
     end
   end
 

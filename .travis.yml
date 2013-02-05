@@ -14,8 +14,8 @@ before_install:
     - sudo apt-get install libmysql-ruby libmysqlclient-dev 
     - gem install mysql
 before_script:
-    - bundle install
     - mysql -u root < db/grant_expertiza.sql     
+    - bundle install
     - bundle exec rake db:create:all
     - bundle exec rake db:migrate
     - bundle exec rake db:test:prepare

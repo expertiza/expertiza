@@ -14,8 +14,9 @@ And /^I create a review questionnaire called "(\S+)"$/ do |questionnaire|
       :max_question_score => 5,
       :type => 'ReviewQuestionnaire',
       :display_type => 'Review',
-      :instructor_id => admin.id
-                       })
+      :instructor_id => admin.id,
+      :section => 'test section'
+})
   questionnaires = Questionnaire.find_by_name('test_review_questionnaire')
   questionnaires.save!
   puts questionnaires

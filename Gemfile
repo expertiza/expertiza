@@ -8,7 +8,7 @@ gem 'gchartrb', :require => 'google_chart'
 gem 'hoptoad_notifier'
 gem 'mysql'
 gem 'rdoc'
-gem 'rails', '~> 2.3.15'
+gem 'rails', '2.3.15'
 gem 'RedCloth'
 gem 'rake'
 gem 'rgl', :require => 'rgl/adjacency'
@@ -34,7 +34,7 @@ end
 
 group :test do
   gem 'cucumber', '1.1.4', :require => false
-  gem 'cucumber-rails', '0.3.2', :require => false
+  gem 'cucumber-rails'
   gem 'gherkin', '~> 2.7.6'
   gem 'capybara', '0.3.9'
   gem 'database_cleaner', '>= 0.5.0', :require => false

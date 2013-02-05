@@ -10,8 +10,8 @@ before_install:
     - gem install ruby-debug -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - bundle config build.raspell --with-opt-dir=
-    - sudo apt-get install libmysqlclient-dev
-    - gem install mysql
+    - sudo apt-get install libmysql-ruby libmysqlclient-dev
+    - gem install mysql2
 before_script:
     - bundle install
     - mysql -u root < db/grant_expertiza.sql     

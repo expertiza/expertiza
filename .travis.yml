@@ -7,11 +7,11 @@ rvm:
     - 1.8.7
 before_install:  
     - sudo apt-get install aspell libaspell-dev aspell-en
-    - sudo apt-get install libmysqlclient-dev
-    - gem install mysql
     - gem install ruby-debug -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - bundle config build.raspell --with-opt-dir=
+    - sudo apt-get install libmysqlclient-dev
+    - gem install mysql
 before_script:
     - bundle install
     - mysql -u root < db/grant_expertiza.sql     

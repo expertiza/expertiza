@@ -1,5 +1,5 @@
-create database pg_development;
-create database pg_test;
+create database if not exists pg_development;
+create database if not exists pg_test;
 
 create user expertiza@localhost;
 

@@ -1,20 +1,24 @@
+language: ruby
+rvm:
+    - 1.8.7
 branches:
   only:
     - master
     - production
-language: ruby
-rvm:
-    - 1.8.7
-before_install:  
+before_install:
+    - uname -a
+    - lsb_release -a
+    - sudo apt-get update
     - sudo apt-get install aspell libaspell-dev aspell-en
     - gem install ruby-debug -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - bundle config build.raspell --with-opt-dir=
-    - sudo apt-get install libmysql-ruby libmysqlclient-dev
-    - gem install mysql2
+    - sudo apt-get install mysql-server mysql-client libmysqlclient-dev
+    - sudo apt-get install libmysql-ruby 
+    - gem install mysql
 before_script:
-    - bundle install
     - mysql -u root < db/grant_expertiza.sql     
+    - bundle install
     - bundle exec rake db:create:all
     - bundle exec rake db:migrate
     - bundle exec rake db:test:prepare

@@ -7,12 +7,13 @@ branches:
     - production
 before_install:
     - sudo apt-get update
-    - sudo apt-get install aspell libaspell-dev aspell-en
+    - sudo apt-get purge libmysqlclient-dev
+    - sudo apt-get autoremove
+    - sudo apt-get install aptitude aspell libaspell-dev aspell-en
     - gem install ruby-debug -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - bundle config build.raspell --with-opt-dir=
     - sudo apt-get install mysql-server mysql-client
-    - sudo apt-get purge libmysqlclient-dev aptitude
     - aptitude install libmysqlclient15-dev
     - sudo apt-get install libmysql-ruby 
     - gem install mysql

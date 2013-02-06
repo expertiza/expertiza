@@ -12,7 +12,7 @@ before_install:
     - bundle config build.raspell --with-opt-dir=
     - sudo apt-get install mysql-server mysql-client
     - sudo apt-get install libmysql-ruby libmysqlclient-dev 
-    - gem install mysql
+    - gem install mysql –platform=ruby —–with-mysq-dir=/usr/local/mysql 
 before_script:
     - mysql -u root < db/grant_expertiza.sql     
     - bundle install

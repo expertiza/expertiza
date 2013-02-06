@@ -362,16 +362,16 @@ class ResponseController < ApplicationController
     @res = @response.id
     @questionnaire = @map.questionnaire
     questions = @questionnaire.questions
-    
     for i in 0..questions.size-1
         # Local variable score is unused; can it be removed?
         score = Score.create(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
-          
+         
 
     end
     msg = "#{@map.get_title} was successfully saved."
     
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
+    saving
+    #redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
   end
   
   def saving   
@@ -379,11 +379,15 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @map.notification_accepted = false
     @map.save
-    if(@map.assignment.id == 561 or @map.assignment.id == 559) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
-      # puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
+    #@map.assignment.id == 561 or @map.assignment.id == 559 or 
+    if(@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
+      #puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
+      if(params["save_options"].nil? or params["save_options"].empty?)#default it to with metareviews
+        params["save_options"] = "WithMeta"
+      end
       #calling the automated metareviewer controller, which calls its corresponding model/view
       if(params[:save_options] == "WithMeta")
-        puts "WithMeta"
+        # puts "WithMeta"
         redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.id
       elsif(params[:save_options] == "EmailMeta")
         redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
@@ -395,13 +399,12 @@ class ResponseController < ApplicationController
         #send email to the reviewer with the metareview details
         @automated_metareview.send_metareview_metrics_email(@response, params[:id])
       elsif(params[:save_options] == "WithoutMeta")
-        puts "WithoutMeta"
+        # puts "WithoutMeta"
         redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
     else
       redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
     end
-    #end of call
   end
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?

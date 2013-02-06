@@ -1,0 +1,33 @@
+language: ruby
+rvm:
+    - 1.8.7
+branches:
+  only:
+    - master
+    - production
+before_install:  
+    - sudo apt-get install aspell libaspell-dev aspell-en
+    - gem install ruby-debug -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
+    - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
+    - bundle config build.raspell --with-opt-dir=
+    - sudo apt-get install mysql-server mysql-client
+    - sudo apt-get install libmysql-ruby libmysqlclient-dev 
+    - gem install mysql –platform=ruby —–with-mysq-dir=/usr/local/mysql 
+before_script:
+    - mysql -u root < db/grant_expertiza.sql     
+    - bundle install
+    - bundle exec rake db:create:all
+    - bundle exec rake db:migrate
+    - bundle exec rake db:test:prepare
+    - "export DISPLAY=:99.0"
+    - "sh -e /etc/init.d/xvfb start"
+script:
+    - "export DISPLAY=:99.0 && RAILS_ENV=test bundle exec rake db:migrate"
+    - "export DISPLAY=:99.0 && bundle exec cucumber"
+    # - "export DISPLAY=:99.0 && bundle exec rspec spec/"
+notifications:
+    email:
+      recipients:
+        - pamela.ocampo@gmail.com
+      on_success: change
+      on_failure: change

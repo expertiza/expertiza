@@ -50,7 +50,7 @@ task :load_production_data, :roles => :db, :only => { :primary => true } do
   filename = "dump.#{Time.now.strftime '%Y-%m-%d_%H:%M:%S'}.sql.gz"
  
   on_rollback { delete "/tmp/#{filename}" }
-  run "mysqldump -u #{database['production']['username']} --password=#{database['production']['password']} #{database['production']['database']} --add-drop-table | gzip > /tmp/#{filename}" do |channel, stream, data|
+  run "mysqldump -u #{database['production']['username']} #{database['production']['database']} --add-drop-table | gzip > /tmp/#{filename}" do |channel, stream, data|
     puts data
   end
 
@@ -63,3 +63,6 @@ task :load_production_data, :roles => :db, :only => { :primary => true } do
   logger.info 'Importing production database into local development database'
   system "gunzip -c #{filename} | mysql -u #{database['development']['username']} --password=#{database['development']['password']} #{database['development']['database']} && rm -f #{filename}"
 end
+
+set :default_environment, 'JAVA_HOME' => "/etc/alternatives/java_sdk/"
+# set :default_environment, 'JAVA_HOME' => "/usr/lib/jvm/java-6-openjdk/"

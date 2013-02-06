@@ -63,7 +63,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
     assign_id = Fixtures.identify(:assignment7)
     contributor = Participant.first(:conditions => {:parent_id => assign_id})
     contributor_id = contributor.id
-
+    # puts  contributor.name
     number_of_responses = ResponseMap.count
     deleted_count = ParticipantReviewResponseMap.find(:all, :conditions => {:reviewed_object_id => assign_id, :reviewee_id => contributor_id}).count
 

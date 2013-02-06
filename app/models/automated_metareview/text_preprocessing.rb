@@ -9,11 +9,11 @@ class TextPreprocessing
 =end  
   def fetch_review_data(auto_metareview, map_id)
     reviews = Array.new
-    responses = Response.find(:first, :conditions => ["map_id = ?", map_id], :order => "version_num DESC")
+    responses = Response.find(:first, :conditions => ["map_id = ?", map_id], :order => "updated_at DESC")
     auto_metareview.responses = responses
     auto_metareview.response_id = responses.id
     # puts "auto_metareview.response_id #{auto_metareview.response_id}"
-    # puts "responses version number #{responses.version_num}"
+    # puts "responses updated_at #{responses.updated_at}"
     responses.scores.each{
       | review_score |
       if(review_score.comments != nil and !review_score.comments.rstrip.empty?)
@@ -29,11 +29,24 @@ class TextPreprocessing
 =end
   def fetch_submission_data(map_id)
     subm_array = Array.new
-    reviewee_id = ResponseMap.find(:first, :conditions => ["id = ?", map_id]).reviewee_id
+    response_map = ResponseMap.find(:first, :conditions => ["id = ?", map_id])
+    reviewee_id = response_map.reviewee_id
+    reviewed_object = response_map.reviewed_object_id
     url = Participant.find(:first, :conditions => ["id = ?", reviewee_id]).submitted_hyperlinks
+    if(url.nil?)#in case of team assignments  
+      teams_users = TeamsUser.find(:all, :conditions => ["team_id = ?", reviewee_id])
+      teams_users.each{
+        |team_user|
+        url = Participant.find(:first, :conditions => ["user_id = ? and parent_id = ?", team_user.user_id, reviewed_object]).submitted_hyperlinks
+        if(!url.nil?)#break out when you find the url
+          break
+        end
+      }
+    end
+    # puts "***url #{url} #{url}"  
     #fetching the url submitted by the reviewee
     url = url[url.rindex("http")..url.length-2] #use "rindex" to fetch last occurrence of the substring - useful if there are multiple urls
-    puts "***url #{url} #{url.class}"
+    # puts "***url #{url} #{url.class}" 
     page = Nokogiri::HTML(open(url))
     #fetching the paragraph texts from the specified url
     if(page.css('p').count != 0)
@@ -222,10 +235,10 @@ end
 Check for plagiarism after removing text within quotes for reviews
 =end
 def remove_text_within_quotes(review_text)
-  puts "Inside removeTextWithinQuotes:: "
+  # puts "Inside removeTextWithinQuotes:: "
   reviews = Array.new
   review_text.each{ |row|
-    puts "row #{row}"
+    # puts "row #{row}"
     text = row 
     #text = text[1..text.length-2] #since the first and last characters are quotes
     #puts "text #{text}"
@@ -241,12 +254,12 @@ def remove_text_within_quotes(review_text)
         # puts "text[start_index..start_index + replace_text[0].to_s.length+1] .. #{text[start_index.. start_index + replace_text[0].to_s.length+1]}"
         #replacing the text segment within the quotes (including the quotes) with an empty string
         text.gsub!(text[start_index..start_index + replace_text[0].to_s.length+1], "")
-        puts "text .. #{text}"
+        # puts "text .. #{text}"
       end #end of the while loop
     end
     reviews << text #set the text after all quoted segments have been removed.
   } #end of the loop for "text" array
-  puts "returning reviews length .. #{reviews.length}"
+  # puts "returning reviews length .. #{reviews.length}"
   return reviews #return only the first array element - a string!
 end
 #------------------------------------------#------------------------------------------#------------------------------------------   

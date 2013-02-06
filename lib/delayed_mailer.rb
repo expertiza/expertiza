@@ -147,7 +147,6 @@ class DelayedMailer
       uid=participant.user_id
       user=User.find(uid)
       emails << user.email
-      #puts user.email
     end
     email_reminder(emails, self.deadline_type)
   end

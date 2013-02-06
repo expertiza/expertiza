@@ -9,23 +9,25 @@ before_install:
     - uname -a
     - lsb_release -a
     - sudo apt-get update
-    - sudo apt-get install aspell libaspell-dev aspell-en
+    - sudo apt-get -y --no-install-recommends install bash curl git patch bzip2
+    - sudo apt-get -y --no-install-recommends install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev libgdbm-dev ncurses-dev automake libtool bison subversion pkg-config libffi-dev
+    - sudo apt-get -y install aspell libaspell-dev aspell-en
     - gem install ruby-debug -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - bundle config build.raspell --with-opt-dir=
-    - sudo apt-get install mysql-server mysql-client libmysqlclient-dev
-    - sudo apt-get install libmysql-ruby 
-    - gem install mysql
+    - sudo apt-get -y install mysql-server mysql-client libmysqlclient-dev
+    - sudo apt-get -y install libmysql-ruby
+    - sudo apt-get -y install openjdk-6-source openjdk-6-jre-headless
 before_script:
-    - mysql -u root < db/grant_expertiza.sql     
+    - mysql -u root < db/grant_expertiza.sql
+    - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64 
     - bundle install
-    - bundle exec rake db:create:all
     - bundle exec rake db:migrate
     - bundle exec rake db:test:prepare
     - "export DISPLAY=:99.0"
     - "sh -e /etc/init.d/xvfb start"
 script:
-    - "export DISPLAY=:99.0 && RAILS_ENV=test bundle exec rake db:migrate"
+    - export RAILS_ENV=test
     - "export DISPLAY=:99.0 && bundle exec cucumber"
     # - "export DISPLAY=:99.0 && bundle exec rspec spec/"
 notifications:

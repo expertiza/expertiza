@@ -107,9 +107,9 @@ class AutomatedMetareview < ActiveRecord::Base
       #content
       beginning_time = Time.now
       content_instance = PredictClass.new
-      pattern_files_array = ["app/models/Automated_Metareview/patterns-assess.csv",
-        "app/models/Automated_Metareview/patterns-prob-detect.csv",
-        "app/models/Automated_Metareview/patterns-suggest.csv"]
+      pattern_files_array = ["app/models/automated_metareview/patterns-assess.csv",
+        "app/models/automated_metareview/patterns-prob-detect.csv",
+        "app/models/automated_metareview/patterns-suggest.csv"]
       #predcting class - last parameter is the number of classes
       content_probs = content_instance.predict_classes(pos_tagger, core_NLP_tagger, review_text, review_graph, pattern_files_array, pattern_files_array.length)
       #self.content = "SUMMATIVE - #{(content_probs[0] * 10000).round.to_f/10000}, PROBLEM - #{(content_probs[1] * 10000).round.to_f/10000}, SUGGESTION - #{(content_probs[2] * 10000).round.to_f/10000}"

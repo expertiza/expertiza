@@ -9,7 +9,7 @@
     <% count = count + 1 %>
 
     <% file_url = nil
-    @questionnaire = Questionnaire.find(@assignment.questionnaires[0].id)
+    @questionnaire = Questionnaire.find(@assignment.questionnaires.find_by_type("ReviewQuestionnaire"))
     if @questionnaire.section.eql? "Custom"
         @current_folder = DisplayOption.new
         @current_folder.name = ""

@@ -13,8 +13,7 @@ class Response < ActiveRecord::Base
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<H2>Feedback from author</H2>"
     end
-    # Temporary fix to hid reviewer name when the user is of type student
-    if prefix && !User.find(Participant.find(self.map.reviewer.id).user_id).role_id = Role.find_by_name("Student").id
+    if prefix
       identifier += "<B>Reviewer:</B> "+self.map.reviewer.fullname
       str = prefix+"_"+self.id.to_s
     else

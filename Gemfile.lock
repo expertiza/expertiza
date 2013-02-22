@@ -17,7 +17,7 @@ GEM
     bind-it (0.2.0)
       rjb
     builder (3.1.4)
-    capistrano (2.14.0)
+    capistrano (2.14.2)
       highline
       net-scp (>= 1.0.0)
       net-sftp (>= 2.0.0)
@@ -89,13 +89,13 @@ GEM
     multi_json (1.5.0)
     mysql (2.9.0)
     mysql (2.9.0-x86-mingw32)
-    net-scp (1.0.4)
-      net-ssh (>= 1.99.1)
-    net-sftp (2.0.5)
-      net-ssh (>= 2.0.9)
-    net-ssh (2.6.2)
-    net-ssh-gateway (1.1.0)
-      net-ssh (>= 1.99.1)
+    net-scp (1.1.0)
+      net-ssh (>= 2.6.5)
+    net-sftp (2.1.1)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.6.5)
+    net-ssh-gateway (1.2.0)
+      net-ssh (>= 2.6.5)
     nokogiri (1.5.6)
     nokogiri (1.5.6-x86-mingw32)
     open-uri-cached (0.0.5)
@@ -155,7 +155,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   bind-it (= 0.2.0)
-  capistrano
+  capistrano (~> 2.14.2)
   capybara (= 0.3.9)
   cucumber (= 1.1.4)
   cucumber-rails (= 0.3.2)

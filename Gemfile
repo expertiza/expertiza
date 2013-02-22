@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'capistrano'
+gem 'capistrano', '~> 2.14.2'
 gem 'expertiza-authlogic', '~> 2.1.6.1', :require => 'authlogic'
 gem 'fastercsv'
 gem 'gdata', :require => false

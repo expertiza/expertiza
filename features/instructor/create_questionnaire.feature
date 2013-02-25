@@ -8,4 +8,3 @@ Scenario: Create a questionnaire
   And I create a review questionnaire called "test_review_questionnaire"
   And I follow "Manage Questionnaires Review Rubrics"
   Then I should see "test_review_questionnaire" under list of questionnaires
-  Then show me the page

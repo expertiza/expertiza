@@ -5,14 +5,14 @@ Feature: Team invitations
 
 Scenario: Invite a student to join my team
   Given I am logged in as a student
-  And I am participating on a team assignment
+  And I am participating on a "team_assignment"
   When I go to manage my team
   And I invite another student to join my team
   Then I should see that student in my sent invitations list
 
 Scenario: Accept an invitation
   Given I am logged in as a student
-  And I am participating on a team assignment
+  And I am participating on a "team_assignment"
   And another student has invited me to their team
   When I go to manage my team
   Then I should see that I have an invite pending

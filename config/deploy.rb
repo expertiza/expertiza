@@ -13,7 +13,12 @@ set :bundle_without,  [:development, :test]
 set :deploy_to, "/local/rails/expertiza"
 set :runner, "www-data"
 set :branch do
-  default_branch = 'production'
+  if ENV['DEPLOY'] == 'STAGING'
+    default_branch = 'staging'
+  else
+    default_branch = 'production'
+  end
+  
   branch = Capistrano::CLI.ui.ask "Branch to deploy (make sure to push first) [#{default_branch}]: "
   branch = default_branch if branch.empty?
   branch

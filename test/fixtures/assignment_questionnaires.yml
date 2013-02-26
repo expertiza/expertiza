@@ -7,7 +7,7 @@ first:
 
 second:
   assignment_id: <%= Fixtures.identify(:assignment2) %>
-  questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
+  questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
   user_id: <%= Fixtures.identify(:student3) %>
   notification_limit: 15
   questionnaire_weight: 100

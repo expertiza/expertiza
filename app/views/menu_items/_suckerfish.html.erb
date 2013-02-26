@@ -4,7 +4,7 @@
      long_name = item.name.split(/\W/).collect{|word| word.capitalize}.join(' ')
      -%>
 <li>
-  <a href=<%= URI.encode("/menu/#{item.name}") %> <%= if item.children
+  <a href="/menu/<%= item.name %>"<%= if item.children
     ' class="daddy"'
     end %>title='<%= long_name %>'><%= item.label %></a>
   <% if item.children -%>

@@ -36,10 +36,6 @@ When /^I follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
   end
 end
 
-When /^I click on "(\S+)"$/ do |name|
-  click_link name
-end
-
 When /^I fill in "([^"]*)" with "([^"]*)"(?: within "([^"]*)")?$/ do |field, value, selector|
   with_scope(selector) do
     fill_in(field, :with => value)
@@ -99,10 +95,6 @@ When /^I attach the file "([^"]*)" to "([^"]*)"(?: within "([^"]*)")?$/ do |path
   with_scope(selector) do
     attach_file(field, path)
   end
-end
-
-When /^I click the menu link "([^"]*)"$/ do |link|
-  find(:xpath, "//a[contains(.,'#{link}')]").click
 end
 
 Then /^I should see JSON:$/ do |expected_json|
@@ -224,8 +216,4 @@ end
 
 Then /^show me the page$/ do
   save_and_open_page
-end
-
-Given /^I wait for (\d+) seconds?$/ do |n|
-      sleep(n.to_i)
 end

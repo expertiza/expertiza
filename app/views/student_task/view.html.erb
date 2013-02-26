@@ -11,9 +11,7 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 		(Sign up for a topic)
 		</li>
 	<%end%>
-  <!--ACS Here we need to know the size of the team to decide whether or not
-      to display the label "Your team" in the student assignment tasks-->
-	<%if @assignment.team_count > 1 %>
+	<%if @assignment.team_assignment %>
 		<li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %> 
 		(View and manage your team)
 		</li>

@@ -9,8 +9,7 @@
     <% count = count + 1 %>
 
     <% file_url = nil
-    review_questionnaire = @assignment.questionnaires.select {|x| x.display_type == 'Review'}
-    @questionnaire = Questionnaire.find(review_questionnaire.first.id)
+    @questionnaire = Questionnaire.find(@assignment.questionnaires.find_by_type("ReviewQuestionnaire"))
     if @questionnaire.section.eql? "Custom"
         @current_folder = DisplayOption.new
         @current_folder.name = ""
@@ -40,7 +39,21 @@
     <% if controller.action_name != "view_my_scores" %>
         <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %>
         <% if @questionnaire.section.eql? "Custom" %>
-                <%= render :partial => 'questionnaire', :locals => {:file_url => file_url, :review => review} %>
+            <%
+            current_topic = nil
+            questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
+            questions.each {
+            | question |
+                i = 0
+                score = Score.find_by_response_id_and_question_id(review.id, question.id)
+                if !score.nil?
+                    ques_type = QuestionType.find_all_by_question_id(question.id)%>
+                    <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+                    <%= find_question_type(question, ques_type[0], i, true, file_url, score, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
+                    <% current_topic = ques_type[0].parameters.split("::")[0]
+                end
+                i += 1
+            } %>
         <% end %>
     <% else %>
         <% if @questionnaire.section.eql? "Custom" %>
@@ -48,7 +61,20 @@
             <!-- Display the latest review first -->
             <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a>
             <%= review.display_as_html(prefix) %>
-                <%= render :partial => 'questionnaire', :locals => {:file_url => file_url, :review => review} %>
+            <%
+            current_topic = nil
+            questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
+            questions.each { | question |
+                i = 0
+                score = Score.find_by_response_id_and_question_id(review.id, question.id)
+                if !score.nil?
+                    ques_type = QuestionType.find_all_by_question_id(question.id)%>
+                    <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+                    <%= find_question_type(question, ques_type[0], i, true, file_url, score, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
+                    <% current_topic = ques_type[0].parameters.split("::")[0]
+                end
+                i += 1
+            } %>
             <!-- get all previous versions -->
             <% @sorted_array=Array.new %>
             <% @prev=Response.all %>
@@ -65,7 +91,20 @@
                     <!-- display previous versions in descending order -->
                     <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a>
                     <%= @sorted[i].display_as_html(prefix) %>
-                    <%= render :partial => 'questionnaire', :locals => {:file_url => file_url, :review => review} %>
+                    <%
+                    current_topic = nil
+                    questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
+                    questions.each { | question |
+                        i = 0
+                        score = Score.find_by_response_id_and_question_id(review.id, question.id)
+                        if !score.nil?
+                            ques_type = QuestionType.find_all_by_question_id(question.id)%>
+                            <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
+                            <%= find_question_type(question, ques_type[0], i, true, file_url, score, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
+                            <% current_topic = ques_type[0].parameters.split("::")[0]
+                        end
+                        i += 1
+                    } %>
                     <br/>
                     <script>
                         toggleElement('reviews_<%=@str%>','review');

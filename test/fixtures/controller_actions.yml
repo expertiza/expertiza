@@ -1,4 +1,4 @@
-controller_action_view_default:
+controller_action_view_default: 
   site_controller_id: <%= Fixtures.identify(:site_controller_content_pages) %> 
   name: 'view_default' 
   permission_id: <%= Fixtures.identify(:permission_public_pages_view) %> 

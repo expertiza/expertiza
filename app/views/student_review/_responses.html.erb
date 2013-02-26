@@ -1,14 +1,21 @@
 <table>
   <% review_no = 1 %>
-  <% mappings.each do |map| %>
-      <!-- ACS Have metareviews done for all teams-->
-      <!--% removed code that handles team and individual assignments differently-->
-      <%if map.type.to_s == "MetareviewResponseMap"%>
-          <%review_mapping = ResponseMap.find(map.reviewed_object_id)%>
-          <% participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id) %>
-      <%else%>
-          <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
-      <%end%>
+  <% mappings.each do |map| %> 
+    <% if @assignment.team_assignment? %>
+      <% if map.type.to_s == "MetareviewResponseMap" %>
+        <%review_mapping = ResponseMap.find(map.reviewed_object_id)%>
+        <% participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id) %>
+      <% else %>
+        <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
+      <% end %>
+    <% else %>
+      <% if map.type.to_s == "MetareviewResponseMap" %>
+        <% review_mapping = ResponseMap.find(map.reviewed_object_id) %>
+        <% participant = review_mapping.reviewee %>
+      <% else %>
+        <% participant = map.reviewee %>
+      <% end %>
+    <% end %>
 
     <% if participant %>
       <tr>

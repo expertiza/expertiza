@@ -98,201 +98,76 @@ function addElement() {
 		submission_var= 'Re-submission-'+j+' deadline '
 		rereview_var = 'Re-review-'+j+' deadline '
 	}
-
-  if (document.getElementById('add_submit_due_at_'+i) != null){
-      var submit_due = document.getElementById('add_submit_due_at_'+i).value;
-      var submit_id = document.getElementById('add_submit_id_'+i).value;
-
-  }else{
-      var submit_due = " " ;
-      var submit_id = " ";
-
-  }
-
-  if (document.getElementById('add_review_due_at_'+i) != null){
-    var review_due = document.getElementById('add_review_due_at_'+i).value;
-    var review_id = document.getElementById('add_review_id_'+i).value;
-
-  } else {
-      var review_due = " ";
-      var review_id = " ";
-  }
-
-    ni.innerHTML = ni.innerHTML +
-  	                    '<table class="exp">'+
-                        '<TR> <input type="hidden" id="additional_submit_deadline_'+j+'_id" name ="additional_submit_deadline['+j+'][id]" value='+submit_id+' >' +
-                        '<TD ALIGN=LEFT WIDTH=20%> '+submission_var+' </TD>'+
-  	                    '<TD ALIGN=CENTER WIDTH=20%>' +
-                        '<table><tr>' +
-                        '<TD><input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]" value='+submit_due+' ></TD>' +
-                        '<TD><img src="/images/cal.gif" onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>' +
-                        '</TR></table>' +
-                        '</TD>'+
+  	ni.innerHTML = ni.innerHTML + 
+  	                    '<TR><TD ALIGN=LEFT WIDTH=20%> '+submission_var+' </TD>'+
+  	                    '<TD ALIGN=CENTER WIDTH=20%><input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]"/>' +
+                        ' <img src="/images/cal.gif" onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>'+
 
 
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_submission_allowed_id" name ="additional_submit_deadline['+j+'][submission_allowed_id]">'+
-						'<option id="sub_sa_select2_'+i+'" value=2>Late</option>' +
-                        '<option id="sub_sa_select1_'+i+'" value=1>No</option>'+
-                        '<option id="sub_sa_select3_'+i+'" value=3>OK</option>'+
+						'<option value=2 SELECTED>Late</option><option value=1>No</option>'+
+                        '<option value=3>OK</option>'+
 						'</select></TD>'+
 						
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_review_allowed_id" name ="additional_submit_deadline['+j+'][review_allowed_id]">'+
-						'<option id="sub_ra_select2_'+i+'" value=2>Late</option>' +
-                        '<option id="sub_ra_select1_'+i+'" value=1>No</option>' +
-                        '<option id="sub_ra_select3_'+i+'" value=3>OK</option>'+
+						'<option value=2 SELECTED>Late</option><option value=1>No</option><option value=3>OK</option>'+
 						'</select></TD>'+
 						
-						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_resubmission_allowed_id" name ="additional_submit_deadline['+j+'][resubmission_allowed_id]">' +
-                        '<option id="sub_rsa_select2_'+i+'" value=2>Late</option>'+
-						'<option id="sub_rsa_select1_'+i+'" value=1>No</option>' +
-                        '<option id="sub_rsa_select3_'+i+'" value=3>OK</option>'+
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_resubmission_allowed_id" name ="additional_submit_deadline['+j+'][resubmission_allowed_id]"><option value=2>Late</option>'+
+						'<option value=1>No</option><option value=3 SELECTED>OK</option>'+
 						'</select></TD>'+
 						
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_rereview_allowed_id" name ="additional_submit_deadline['+j+'][rereview_allowed_id]">'+
-						'<option id="sub_rra_select2_'+i+'" value=2>Late</option>' +
-                        '<option id="sub_rra_select1_'+i+'" value=1>No</option>'+
-						'<option id="sub_rra_select3_'+i+'" value=3>OK</option>'+
+						'<option value=2>Late</option><option value=1 SELECTED >No</option>'+
+						'<option value=3>OK</option>'+
 						'</select></TD>'+
-
+						
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_review_of_review_allowed_id" name ="additional_submit_deadline['+j+'][review_of_review_allowed_id]">'+
-						'<option id="sub_ror_select2_'+i+'" value=2>Late</option>' +
-                        '<option id="sub_ror_select1_'+i+'" value=1>No</option>' +
-                        '<option id="sub_ror_select3_'+i+'" value=3>OK</option>'+
+						'<option value=2>Late</option><option value=1 SELECTED>No</option><option value=3>OK</option>'+
 						'</select></TD>'+
 
                         '<TD ALIGN=CENTER WIDTH=10%><select id="additional_submit_deadline_'+j+'_threshold" name ="additional_submit_deadline['+j+'][threshold]">'+
-						'<option id="sub_th_select1_'+i+'" value="1">1</option>' +
-                        '<option id="sub_th_select2_'+i+'" value="2">2</option>' +
-                        '<option id="sub_th_select3_'+i+'" value="3">3</option>' +
-                        '<option id="sub_th_select4_'+i+'" value="4">4</option>' +
-                        '<option id="sub_th_select5_'+i+'" value="5">5</option>' +
-                        '<option id="sub_th_select6_'+i+'" value="6">6</option>' +
-                        '<option id="sub_th_select7_'+i+'" value="7">7</option>' +
-                        '<option id="sub_th_select8_'+i+'" value="8">8</option>' +
-                        '<option id="sub_th_select9_'+i+'" value="9">9</option>' +
-                        '<option id="sub_th_select10_'+i+'" value="10">10</option>' +
-                        '<option id="sub_th_select11_'+i+'" value="11">11</option>' +
-                        '<option id="sub_th_select12_'+i+'" value="12">12</option></select>'+
+						'<option value="1" selected="selected">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>'+
 						'</select></TD>'+                     
 
 						'</TR>'+
-
-
-						'<TR> <input type="hidden" id="additional_review_deadline_'+j+'_id" name ="additional_review_deadline['+j+'][id]" value='+review_id+' >' +
-                        '<TD ALIGN=LEFT WIDTH=20%>'+rereview_var+'</TD>'+
+						
+						'<TR><TD ALIGN=LEFT WIDTH=20%>'+rereview_var+'</TD>'+
 						
 						//'<TD ALIGN=CENTER WIDTH=5%><input type="text" id="additional_review_deadline_'+j+'_due_at" name ="additional_review_deadline['+j+'][due_at]" onClick="NewCal(\'additional_review_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"/></TD>'+
-                        '<TD ALIGN=CENTER WIDTH=20%><input type="text" id="additional_review_deadline_'+j+'_due_at" name ="additional_review_deadline['+j+'][due_at]" value='+review_due+'>' +
+                        '<TD ALIGN=CENTER WIDTH=20%><input type="text" id="additional_review_deadline_'+j+'_due_at" name ="additional_review_deadline['+j+'][due_at]">' +
                         ' <img src="/images/cal.gif" onClick=\"NewCal(\'additional_review_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>'+
 						
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_submission_allowed_id" name ="additional_review_deadline['+j+'][submission_allowed_id]">'+
-						'<option id="rev_sa_select2_'+i+'" value=2>Late</option>' +
-                        '<option id="rev_sa_select1_'+i+'" value=1>No</option>'+
-                        '<option id="rev_sa_select3_'+i+'" value=3>OK</option>'+
+						'<option value=2 SELECTED >Late</option><option value=1>No</option>'+
+                        '<option value=3>OK</option>'+
 						'</select></TD>'+
 						
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_review_allowed_id" name ="additional_review_deadline['+j+'][review_allowed_id]">'+
-						'<option id="rev_ra_select2_'+i+'" value=2>Late</option>' +
-                        '<option id="rev_ra_select1_'+i+'" value=1>No</option>' +
-                        '<option id="rev_ra_select3_'+i+'" value=3>OK</option>'+
+						'<option value=2 SELECTED	>Late</option><option value=1>No</option><option value=3 	>OK</option>'+
 						'</select></TD>'+
 						
-						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_resubmission_allowed_id" name ="additional_review_deadline['+j+'][resubmission_allowed_id]">'+
-						'<option id="rev_rsa_select2_'+i+'" value=2>Late</option>'+
-						'<option id="rev_rsa_select1_'+i+'" value=1>No</option>' +
-                        '<option id="rev_rsa_select3_'+i+'" value=3>OK</option>'+
+						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_resubmission_allowed_id" name ="additional_review_deadline['+j+'][resubmission_allowed_id]"><option value=2 SELECTED>Late</option>'+
+						'<option value=1>No</option><option value=3>OK</option>'+
 						'</select></TD>'+
 						
 						'<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_rereview_allowed_id" name ="additional_review_deadline['+j+'][rereview_allowed_id]">'+
-						'<option id="rev_rra_select2_'+i+'" value=2>Late</option>' +
-                        '<option id="rev_rra_select1_'+i+'" value=1>No</option>'+
-						'<option id="rev_rra_select3_'+i+'" value=3>OK</option>'+
+						'<option value=2 >Late</option><option value=1 >No</option>'+
+						'<option value=3 SELECTED>OK</option>'+
 						'</select></TD>'+
 						
 						'<TD ALIGN=CENTER WIDTH=10%>'+
 						'<select id="additional_review_deadline_'+j+'_review_of_review_allowed_id" name ="additional_review_deadline['+j+'][review_of_review_allowed_id]">'+
-						'<option id="rev_ror_select2_'+i+'" value=2>Late</option>' +
-                        '<option id="rev_ror_select1_'+i+'" value=1>No</option>' +
-                        '<option id="rev_ror_select3_'+i+'" value=3>OK</option>'+
+						'<option value=2>Late</option><option value=1 SELECTED>No</option><option value=3>OK</option>'+
 						'</select></TD>'+
 
                         '<TD ALIGN=CENTER WIDTH=10%>'+
 						'<select id="additional_review_deadline_'+j+'_threshold" name ="additional_review_deadline['+j+'][threshold]">'+
-						'<option id="rev_th_select1_'+i+'" value="1">1</option>' +
-                        '<option id="rev_th_select2_'+i+'" value="2">2</option>' +
-                        '<option id="rev_th_select3_'+i+'" value="3">3</option>' +
-                        '<option id="rev_th_select4_'+i+'" value="4">4</option>' +
-                        '<option id="rev_th_select5_'+i+'" value="5">5</option>' +
-                        '<option id="rev_th_select6_'+i+'" value="6">6</option>' +
-                        '<option id="rev_th_select7_'+i+'" value="7">7</option>' +
-                        '<option id="rev_th_select8_'+i+'" value="8">8</option>' +
-                        '<option id="rev_th_select9_'+i+'" value="9">9</option>' +
-                        '<option id="rev_th_select10_'+i+'" value="10">10</option>' +
-                        '<option id="rev_th_select11_'+i+'" value="11">11</option>' +
-                        '<option id="rev_th_select12_'+i+'" value="12">12</option></select>'+
-                        '</select></TD>'+
+						'<option value="1" selected="selected">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>'+
+						'</select></TD>'+
 
 
-						'</TR>'+
-                        '</table>';
-
-      if (document.getElementById('add_submit_due_at_'+i) != null){
-          var submit_submit_allowed =  document.getElementById('add_submit_submit_allowed_id_'+i).value;
-          document.getElementById('sub_sa_select'+submit_submit_allowed+'_'+i).selected = true;
-
-          var submit_review_allowed =  document.getElementById('add_submit_review_allowed_id_'+i).value;
-          document.getElementById('sub_ra_select'+submit_review_allowed+'_'+i).selected = true;
-
-          var submit_resubmit_allowed =  document.getElementById('add_submit_resubmit_allowed_id_'+i).value;
-          document.getElementById('sub_rsa_select'+submit_resubmit_allowed+'_'+i).selected = true;
-
-          var submit_rereview_allowed =  document.getElementById('add_submit_rereview_allowed_id_'+i).value;
-          document.getElementById('sub_rra_select'+submit_rereview_allowed+'_'+i).selected = true;
-
-          var submit_review_of_review_allowed =  document.getElementById('add_submit_review_of_review_allowed_id_'+i).value;
-          document.getElementById('sub_ror_select'+submit_review_of_review_allowed+'_'+i).selected = true;
-
-          var submit_threshold =  document.getElementById('add_submit_threshold_'+i).value;
-          document.getElementById('sub_th_select'+submit_threshold+'_'+i).selected = true;
-
-      }else{
-
-          document.getElementById('sub_sa_select2_'+i).selected = true;
-          document.getElementById('sub_ra_select2_'+i).selected = true;
-          document.getElementById('sub_rsa_select3_'+i).selected = true;
-          document.getElementById('sub_rra_select1_'+i).selected = true;
-          document.getElementById('sub_ror_select1_'+i).selected = true;
-          document.getElementById('sub_th_select1_'+i).selected = true;
-      }
-
-      if (document.getElementById('add_review_due_at_'+i) != null){
-          var review_submit_allowed =  document.getElementById('add_review_submit_allowed_id_'+i).value;
-          document.getElementById('rev_sa_select'+review_submit_allowed+'_'+i).selected = true;
-
-          var review_review_allowed =  document.getElementById('add_review_review_allowed_id_'+i).value;
-          document.getElementById('rev_ra_select'+review_review_allowed+'_'+i).selected = true;
-
-          var review_resubmit_allowed =  document.getElementById('add_review_resubmit_allowed_id_'+i).value;
-          document.getElementById('rev_rsa_select'+review_resubmit_allowed+'_'+i).selected = true;
-
-          var review_rereview_allowed =  document.getElementById('add_review_rereview_allowed_id_'+i).value;
-          document.getElementById('rev_rra_select'+review_rereview_allowed+'_'+i).selected = true;
-
-          var review_review_of_review_allowed =  document.getElementById('add_review_review_of_review_allowed_id_'+i).value;
-          document.getElementById('rev_ror_select'+review_review_of_review_allowed+'_'+i).selected = true;
-
-          var review_threshold =  document.getElementById('add_review_threshold_'+i).value;
-          document.getElementById('rev_th_select'+review_threshold+'_'+i).selected = true;
-
-      }else{
-
-          document.getElementById('rev_sa_select1_'+i).selected = true;
-          document.getElementById('rev_ra_select2_'+i).selected = true;
-          document.getElementById('rev_rsa_select2_'+i).selected = true;
-          document.getElementById('rev_rra_select3_'+i).selected = true;
-          document.getElementById('rev_ror_select1_'+i).selected = true;
-          document.getElementById('rev_th_select1_'+i).selected = true;
-      }
+						'</TR>';
   }
 }
 

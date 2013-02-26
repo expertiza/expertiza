@@ -207,9 +207,8 @@ class GradesController < ApplicationController
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
     # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
     ## This following code was cloned from response_controller.
-
-    #ACS Check if team count is more than 1 instead of checking if it is a team assignment
-    if @participant.assignment.team_count > 1
+    
+    if @participant.assignment.team_assignment
       team = @participant.team
       if(!team.nil?)
         unless team.has_user session[:user]

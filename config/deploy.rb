@@ -1,4 +1,3 @@
-puts "You gave me DEPLOY=#{ENV['DEPLOY']}"
 require 'bundler/capistrano'
 
 set :application, "expertiza"
@@ -13,31 +12,33 @@ set :bundle_without,  [:development, :test]
 
 set :deploy_to, "/local/rails/expertiza"
 set :runner, "www-data"
+
 set :branch do
-  if ENV['DEPLOY'].to_s.downcase == 'staging'
-    default_branch = 'staging'
-  else
-    default_branch = 'production'
-  end
+  default_branch = 'production'
   
   branch = Capistrano::CLI.ui.ask "Branch to deploy (make sure to push first) [#{default_branch}]: "
   branch = default_branch if branch.empty?
   branch
 end
 
-if ENV['DEPLOY'].to_s.downcase == 'staging'
+desc "Run tasks in staging enviroment."
+task :staging do
   puts "*** Deploying to the \033[1;42m  STAGING  \033[0m server!"
   role :web, "test.expertiza.csc.ncsu.edu"
   role :app, "test.expertiza.csc.ncsu.edu"
   role :cron, "test.expertiza.csc.ncsu.edu"
   role :db,  "test.expertiza.csc.ncsu.edu", :primary => true # This is where Rails migrations will run
-else #production
+end
+
+desc "Run tasks in staging enviroment."
+task :production do
   puts "*** Deploying to the \033[1;41m  PRODUCTION  \033[0m servers!"
   role :web, "expertiza.ncsu.edu"
   role :app, "expertiza.ncsu.edu"
   role :cron, "expertiza.ncsu.edu"
   role :db,  "expertiza.ncsu.edu", :primary => true # This is where Rails migrations will run
 end
+
 
 namespace :deploy do
   task :stop do; end

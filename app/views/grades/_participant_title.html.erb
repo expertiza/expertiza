@@ -18,9 +18,8 @@
 <TH WIDTH="<%= colwidth %>%">Average</TH>
 <TH WIDTH="<%= colwidth %>%">Range </TH>
 <TH WIDTH="<%= colwidth %>%">Average</TH>
-<TH WIDTH="<%= colwidth %>%">Range </TH>
-  <!--ACS Display teammate review ratings only for teams with size greater than 1-->
-  <% if @assignment.team_count > 1 %>
+<TH WIDTH="<%= colwidth %>%">Range </TH> 
+<% if @assignment.team_assignment %>
   <TH WIDTH="<%= colwidth %>%">Average</TH>
   <TH WIDTH="<%= colwidth %>%">Range </TH>
 <% end %>   

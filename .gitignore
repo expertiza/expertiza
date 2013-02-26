@@ -10,4 +10,3 @@ pg_development.png
 .idea
 capybara-*html
 *~
-db/schema.rb

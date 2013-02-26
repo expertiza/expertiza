@@ -5,8 +5,15 @@
     Make a generic review_wiki function, with a parameter specifying wiki type.  The review_wiki function
     then makes callbacks to the various wiki classes, depending on what kind of a wiki it is working on.
     This allows wiki-specific behavior to be kept in the wiki classes. -->
-<!--ACS removed code that handles individual and team assignments differently-->
-
-<%  for team_member in participant.team.get_participants %>
-    <%= WikiHelper::review_mediawiki participant.assignment.directory_path, nil, team_member.handle  %>
-<%end%>
+    <%if participant.instance_of? AssignmentTeam
+        team = participant
+      else
+        team = participant.team
+      end %>
+    <%if @assignment.team_assignment and team != nil # The lookup of all team members should be put in a wiki helper
+        for team_member in team.get_participants %>
+	     <%= WikiHelper::review_mediawiki participant.assignment.directory_path, nil, team_member.handle  %>
+	   <%end%>
+    <%else%>
+	    <%= WikiHelper::review_mediawiki participant.assignment.directory_path, nil, participant.handle  %>
+    <%end%>

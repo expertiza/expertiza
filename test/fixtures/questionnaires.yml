@@ -70,13 +70,3 @@ global_survey_questionnaire:
  max_question_score: 5
  type: "GlobalSurveyQuestionnaire"
  display_type: "GlobalSurvey"
-
-questionnaire_c0:
- name: questionnaire_c0
- instructor_id: <%= Fixtures.identify(:instructor1) %>
- private: 0
- min_question_score: 0
- max_question_score: 5
- type: "ReviewQuestionnaire"
- display_type:
- section: "Custom"

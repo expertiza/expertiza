@@ -57,16 +57,29 @@ class ReviewResponseMap < ResponseMap
       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,assignment.id)
       if reviewer == nil
         raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
-      end
-      #ACS the reviewee is always a team member
-      #removed code that treated individual and team assignments differently
-      reviewee = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, assignment.id)
-      if reviewee == nil
-        raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
-      end
-      existing = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
-      if existing.nil?
-        TeamReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
+      end           
+      if assignment.team_assignment
+         reviewee = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, assignment.id)
+         if reviewee == nil
+           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"                   
+         end
+         existing = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id) 
+         if existing.nil?
+           TeamReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
+         end
+      else
+         puser = User.find_by_name(row[0].to_s.strip)
+         if user == nil
+           raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
+         end
+         reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(puser.id, assignment.id)
+         if reviewee == nil
+           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"                   
+         end  
+         existing = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id) 
+         if existing.nil?
+           ParticipantReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
+         end         
       end
       index += 1
     end 

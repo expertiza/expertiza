@@ -10,9 +10,11 @@
 <tr><ul>
   <%review_no = 1%>
   <%for review_map in @review_mappings %>
-      <!--ACS Find the team id for the team-->
-      <!--% removed code that handles team and individual assignments differently -->
-  <% author = AssignmentTeam.find(review_map.team_id)
+  <% if @assignment.team_assignment
+       author = AssignmentTeam.find(review_map.team_id)
+     else 
+       author = AssignmentParticipant.find_by_user_id_and_parent_id(review_map.author_id,@assignment.id)
+     end 
      if author != nil %>
     <% @review = Review.find_by_review_mapping_id(review_map.id) %>
     <% if (@review)%>

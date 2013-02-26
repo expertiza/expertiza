@@ -205,7 +205,7 @@ class AssignmentTeam < Team
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = Response.all(:joins => :map,
         :conditions => {:response_maps => {:reviewee_id => self.id, :type => 'TeamReviewResponseMap'}})
-      scores[questionnaire.symbol][:scores] = Score.compute_scores_statistics(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
     end
     scores[:total_score] = assignment.compute_total_score(scores)
     return scores

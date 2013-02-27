@@ -60,7 +60,7 @@
             <h2>Review <%= count %></h2>
             <!-- Display the latest review first -->
             <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a>
-            <%= review.display_as_html(prefix) %>
+            <%= review.display_as_html((nil if User.find(Participant.find(review.map.reviewer_id).user_id).role.id == Role.find_by_name("Student").id), count) %>
             <%
             current_topic = nil
             questions = Question.find_all_by_questionnaire_id(@questionnaire.id)

@@ -380,7 +380,7 @@ class ResponseController < ApplicationController
     @map.notification_accepted = false
     @map.save
     #@map.assignment.id == 561 or @map.assignment.id == 559 or 
-    if(@map.assignment.id == 562 or @map.assignment.id == 592) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
+    if(@map.assignment.id == 562 or @map.assignment.id == 592 or @map.assignment.id == 598) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
       #puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
       if(params["save_options"].nil? or params["save_options"].empty?)#default it to with metareviews
         params["save_options"] = "WithMeta"

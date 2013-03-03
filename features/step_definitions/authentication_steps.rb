@@ -45,6 +45,15 @@ Given /I am logged in as "([^"]*)"/ do |username|
   step "I should be logged in as \"#{username}\""
 end
 
+Given 'I am logged in as admin' do
+  step 'I go to the login page'
+
+  fill_in 'login_name', :with => 'admin'
+  fill_in 'login_password', :with => 'admin'
+  click_button 'Login'
+
+  step 'I should be logged in as "admin"'
+end
 
 # Create any type of user provided a Full Name and Username
 Given /an? (Student|Teaching Assistant|Instructor|Administrator|Super-Administrator) named "([^"]*)"( created by "([^"]+)")?/i do |user_type,name,garbage,parent|

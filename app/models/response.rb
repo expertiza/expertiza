@@ -14,7 +14,7 @@ class Response < ActiveRecord::Base
       identifier += "<H2>Feedback from author</H2>"
     end
     if prefix
-      identifier += "<B>Reviewer:</B> "+self.map.reviewer.fullname
+      identifier += "<br/> <B>Reviewer:</B> "+self.map.reviewer.fullname
       str = prefix+"_"+self.id.to_s
     else
       identifier += '<B>'+self.map.get_title+'</B> '+count.to_s+'</B>'
@@ -25,16 +25,15 @@ class Response < ActiveRecord::Base
     if self.updated_at.nil?
       code += "Not available"
     else
-      code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
+      code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p') + "<br />"
     end
-    code += '<div id="review_'+str+'" style=""><BR/><BR/>'
-    
     # Test for whether custom rubric needs to be used
     if ((self.map.questionnaire.section.eql? "Custom") && (self.map.type.to_s != 'FeedbackResponseMap'))
       #return top of view
-      return code
+      return code += '<div id="review_'+str+'" style="">'
     end
     # End of custom code
+    code += '<div id="review_'+str+'" style=""><BR/><BR/>'
     count = 0
     self.scores.each{
       | reviewScore |

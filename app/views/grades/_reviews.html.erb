@@ -75,6 +75,9 @@
                 end
                 i += 1
             } %>
+</div>
+</div>
+</div>
             <!-- get all previous versions -->
             <% @sorted_array=Array.new %>
             <% @prev=Response.all %>
@@ -106,6 +109,9 @@
                         i += 1
                     } %>
                     <br/>
+				</div>
+				</div>
+				</div>
                     <script>
                         toggleElement('reviews_<%=@str%>','review');
                     </script>
@@ -128,7 +134,8 @@
             <% else %>
                 <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
             <% end %>
-            <BR/><HR/><BR/>
+
+        <BR/><HR/><BR/>
         <% else %>
             <% review_feedback = nil %>
             <h2>Review <%= count %></h2>
@@ -172,7 +179,8 @@
             <% else %>
                 <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
             <% end %>
-            <BR/><HR/><BR/>
+<BR/><HR/><BR/>
+
         <% end %>
     <% end %>
     <% end %>

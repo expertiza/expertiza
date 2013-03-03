@@ -36,7 +36,7 @@ When /^I follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
   end
 end
 
-When /^I click on "(\S+)"$/ do |name|
+When /^I click on "([^"]*)"$/ do |name|
   click_link name
 end
 

@@ -50,7 +50,7 @@ class CourseController < ApplicationController
     new_course.name = 'Copy of '+orig_course.name
     begin
       new_course.save!
-      new_course.create_node
+      new_course.create_course_node
       flash[:note] = 'The course is currently associated with an existing location. This could cause errors for furture submissions.'
       redirect_to :controller => 'course', :action => 'edit', :id => new_course.id
     rescue
@@ -65,7 +65,7 @@ class CourseController < ApplicationController
     course.instructor_id = session[:user].id
     begin
       course.save!
-      course.create_node
+      course.create_course_node
       FileHelper.create_directory(course)
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue

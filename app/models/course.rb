@@ -64,7 +64,7 @@ class Course < ActiveRecord::Base
     end                   
   end
   
-   def create_node()
+   def create_course_node()
       folder = TreeFolder.find_by_name('Courses')
       parent = FolderNode.find_by_node_object_id(folder.id)
       node = CourseNode.create(:node_object_id => self.id)

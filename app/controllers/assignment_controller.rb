@@ -35,7 +35,7 @@ class AssignmentController < ApplicationController
       end
       
       DueDate.copy(old_assign.id, new_assign.id)           
-      new_assign.create_node()
+      new_assign.create_course_node()
       
       flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
 

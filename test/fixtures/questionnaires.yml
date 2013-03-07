@@ -15,6 +15,7 @@ questionnaire1:
  max_question_score: 5
  type: "ReviewQuestionnaire"
  display_type: "Review"
+ section: "Regular"
  
 questionnaire2:
  name: questionnaire2

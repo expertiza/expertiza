@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class CourseTest < ActiveSupport::TestCase
-  fixtures :courses,:teams,:users,:participants
+  fixtures :courses,:teams,:users,:participants,:assignments,:nodes,:tree_folders
 
   def setup
     @course = courses(:course1)
@@ -57,5 +57,35 @@ class CourseTest < ActiveSupport::TestCase
   end
 
 
-  
+  # test method get_participant
+  def test_get_participant
+    @participant = @course0.get_participant(users(:student6).id)
+    assert_equal 'student6',@participant.first.name
+  end
+
+  # test method add_participant
+  def test_add_participant
+    assert_difference('@course0.get_participants.count') do
+      @course0.add_participant(users(:ta1).name)
+    end
+
+    assert_difference('@course0.get_participants.count',0) do
+      @course0.add_participant(users(:student6).name)
+    end
+  end
+
+  # test method copy_participants
+  def test_copy_participants
+    assert_difference('@course0.get_participants.count', +3) do
+      @course0.copy_participants(assignments(:assignment2).id)
+    end
+  end
+
+  # test method create_course_node
+  def test_create_course_node
+    assert_difference('CourseNode.count') do
+      @course0.create_course_node
+      assert_equal Fixtures.identify(:node_courses), CourseNode.last.parent_id
+    end
+  end
 end

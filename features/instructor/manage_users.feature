@@ -4,12 +4,14 @@ Feature: Manage the users in Expertiza
   Should be able to manage students and TAs.
 
   Background: 
-    Given an instructor named "ed_gehringer"
-      And a teaching assistant named "sarah_stihl" created by "ed_gehringer"
-      And a student named "tommy_tonka" created by "ed_gehringer"
-      And a student named "charlie_chevy" created by "ed_gehringer"
-      And I am logged in as "ed_gehringer"
-    When I follow "Users"
+    Given these Users:
+        | name | type | parent |
+        | "ed_gehringer" | Instructor | "admin" |
+        | "sarah_stihl" | Teaching Assistant | "ed_gehringer" |
+        | "charlie_chevy" | Student | "ed_gehringer" |
+        | "tommy_tonka" | Student | "ed_gehringer" |
+    When I am logged in as "ed_gehringer"
+        And I follow "Users"
     
   @instructor
   @manage_users

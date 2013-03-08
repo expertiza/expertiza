@@ -72,6 +72,14 @@ Given /an? (Student|Teaching Assistant|Instructor|Administrator|Super-Administra
   })
 end
 
+Given /^these Users:$/ do |table|
+# table is a Cucumber::Ast::Table
+    @users = table.hashes
+    @users.each do |user|
+        step "a #{user[:type]} named #{user[:name]} created by #{user[:parent]}"
+    end
+end
+
 When /I log in as "([^"]*)"/ do |username|
   step "I go to the login page"
 

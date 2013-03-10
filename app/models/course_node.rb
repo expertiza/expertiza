@@ -20,11 +20,11 @@ class CourseNode < Node
   # returns: list of CourseNodes based on query
   # the get method will return all courses meeting the criteria, but the method name is necessary due to polymorphism
   def self.get(sortvar = 'name',sortorder ='ASC',user_id = nil,show = nil, parent_id = nil)
-    find(:all, :include => :course, :conditions => [getCourseQueryConditions(show, user_id), getCoursesManagedByUser(user_id)], :order => "courses.#{sortvar} #{sortorder}")
+    find(:all, :include => :course, :conditions => [get_course_query_conditions(show, user_id), get_courses_managed_by_user(user_id)], :order => "courses.#{sortvar} #{sortorder}")
   end
 
   #get the query conditions for a public course
-  def self.getCourseQueryConditions(show = nil, user_id = nil)
+  def self.get_course_query_conditions(show = nil, user_id = nil)
     this_user = User.find(user_id)
 
     if show
@@ -45,7 +45,7 @@ class CourseNode < Node
   end
 
   #get the courses managed by the user
-  def self.getCoursesManagedByUser(user_id = nil)
+  def self.get_courses_managed_by_user(user_id = nil)
     this_user = User.find(user_id)
 
     if this_user.is_teaching_assistant? == false

@@ -1,14 +1,64 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class CourseTest < ActiveSupport::TestCase
-  fixtures :nodes
+  fixtures :nodes, :users
 
   def setup
     @course_node = nodes(:node23)
   end
 
-  def test_get_children
-    assert(@course_node.get_children('name', 'ASC', 'admin', true) != nil, 'Should be true')
+  def test_get_children_with_show_true_and_non_TA_and_ascending_order_by_name
+    @results = @course_node.get_children('name', 'ASC', User.find_by_login('instructor3'), true)
+    assert(@results != nil, 'Should be true')
+    assert_equal(1, @results.count)
+  end
+
+  def test_get_children_with_show_true_and_non_TA_and_descending_order_by_name
+    @results = @course_node.get_children('name', 'DESC', User.find_by_login('instructor3'), true)
+    assert(@results != nil, 'Should be true')
+    assert_equal(1, @results.count)
+  end
+
+  def test_get_children_with_show_true_and_TA_and_ascending_order_by_name
+    @results = @course_node.get_children('name', 'ASC', User.find_by_login('ta1'), true)
+    assert(@results != nil, 'Should be true')
+    assert_equal(0, @results.count)
+  end
+
+  def test_get_children_with_show_true_and_TA_and_descending_order_by_name
+    @results = @course_node.get_children('name', 'DESC', User.find_by_login('ta1'), true)
+    assert(@results != nil, 'Should be true')
+    assert_equal(0, @results.count)
+  end
+
+  def test_get_children_with_show_false_and_non_TA_and_ascending_order_by_name
+    @results = @course_node.get_children('name', 'ASC', User.find_by_login('instructor3'), false)
+    assert(@results != nil, 'Should be true')
+    assert_equal(1, @results.count)
+  end
+
+  def test_get_children_with_show_false_and_non_TA_and_descending_order_by_name
+    @results = @course_node.get_children('name', 'DESC', User.find_by_login('instructor3'), false)
+    assert(@results != nil, 'Should be true')
+    assert_equal(1, @results.count)
+  end
+
+  def test_get_children_with_show_false_and_TA_and_ascending_order_by_name
+    @results = @course_node.get_children('name', 'ASC', User.find_by_login('ta1'), false)
+    assert(@results != nil, 'Should be true')
+    assert_equal(1, @results.count)
+  end
+
+  def test_get_children_with_show_false_and_TA_and_descending_order_by_name
+    @results = @course_node.get_children('name', 'DESC', User.find_by_login('ta1'), false)
+    assert(@results != nil, 'Should be true')
+    assert_equal(1, @results.count)
+  end
+
+  def test_get_children_with_show_false_and_non_TA_and_nil_order_by_nil
+    @results = @course_node.get_children(nil, nil, User.find_by_login('instructor3'), false)
+    assert(@results != nil, 'Should be true')
+    assert_equal(1, @results.count)
   end
 
   def test_get_name

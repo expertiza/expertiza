@@ -87,8 +87,5 @@ class CourseNode < Node
   def get_teams
     TeamNode.get(self.node_object_id)
   end
-  def get_survey_distribution_id
-    Course.find(self.node_object_id).survey_distribution_id
-  end
 
 end

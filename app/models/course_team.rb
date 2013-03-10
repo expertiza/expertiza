@@ -1,62 +1,81 @@
 class CourseTeam < Team
-  
-  def self.import(row,session,id,options)
+  belongs_to  :course, :class_name => 'Course', :foreign_key => 'parent_id'
+
+#NOTE: inconsistency in naming of users that's in the team
+#   currently they are being called: member, participant, user, etc...
+#   suggestion: refactor all to participant
+
+  #TODO: import_participants should belong to team class
+  def import_participants(starting_index, row)
+    index = starting_index
+    while(index < row.length)
+      user = User.find_by_name(row[index].to_s.strip)
+      if user.nil?
+        raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"
+      else
+        if TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", id, user.id]).nil?
+          add_member(user)
+        end
+      end
+      index = index + 1
+    end
+  end
+
+
+  def self.handle_duplicate(name, course_id, handle_dups)
+    team = find(:first, :conditions => ["name =? and parent_id =?", name, course_id])
+
+    #no duplicate
+    if team.nil?
+      return name
+    end
+
+    #ignore: not create the new team
+    if handle_dups == "ignore"
+      return nil
+    end
+
+    #rename: rename new team
+    if handle_dups == "rename"
+      return generate_team_name
+    end
+
+    #replace: delete old team
+    if handle_dups == "replace"
+      team.delete
+      return name
+    end
+
+  end
+
+  def self.import(row,session,course_id,options)
     if row.length < 2
        raise ArgumentError, "Not enough items" 
     end
     
-    course = Course.find(id)
+    course = Course.find(course_id)
     if course == nil
-      raise ImportError, "The course with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+      raise ImportError, "The course with id \""+course_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
-    
+
     if options[:has_column_names] == "true"
         name = row[0].to_s.strip
+        name = handle_duplicate(name, course_id, options[:handle_dups])
         index = 1
     else
-        name = generate_team_name()
+        name = generate_team_name
         index = 0
-    end 
-    
-    currTeam = CourseTeam.find(:first, :conditions => ["name =? and parent_id =?",name,course.id])
-    
-    if options[:handle_dups] == "ignore" && currTeam != nil
+    end
+
+    if name.nil?
       return
     end
-    
-    if currTeam != nil && options[:handle_dups] == "rename"
-       name = generate_team_name()
-       currTeam = nil
-    end
-    if options[:handle_dups] == "replace" && teams.first != nil        
-       for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", currTeam.id])
-           teamsuser.destroy
-       end    
-       currTeam.destroy
-       currTeam = nil
-    end     
-    
-    if currTeam == nil
-       currTeam = CourseTeam.new
-       currTeam.name = name
-       currTeam.parent_id = course.id
-       currTeam.save
-       parent = CourseNode.find_by_node_object_id(course.id)
-       TeamNode.create(:parent_id => parent.id, :node_object_id => currTeam.id)
-    end
-      
-    while(index < row.length) 
-        user = User.find_by_name(row[index].to_s.strip)
-        if user == nil
-          raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"                           
-        elsif currTeam != nil         
-          currUser = TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])          
-          if currUser == nil
-            currTeam.add_member(user)            
-          end                      
-        end
-        index = index+1      
-    end                
+
+    team = CourseTeam.create(:name => name, :parent_id => course_id)
+    course_node = CourseNode.find_by_node_object_id(id)
+    TeamNode.create(:parent_id => course_node.id, :node_object_id => team.id)
+
+    team.import_participants(index, row)
   end  
   
   def get_participant_type
@@ -81,6 +100,7 @@ class CourseTeam < Team
      CourseParticipant.create(:parent_id => course_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
    end    
  end
+
   def self.export(csv, parent_id, options)
     course = Course.find(parent_id)
     assignmentList = Assignment.find_all_by_course_id(parent_id)

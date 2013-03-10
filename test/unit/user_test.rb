@@ -130,4 +130,14 @@ class UserTest < ActiveSupport::TestCase
 
   end
 
+  def test_user_is_teaching_assistant
+    user = Ta.new
+    assert(user.is_teaching_assistant?, 'Should be true')
+  end
+
+  def test_user_is_NOT_teaching_assistant
+    user = User.new
+    assert(!(user.is_teaching_assistant?), 'Should be false')
+  end
+
 end

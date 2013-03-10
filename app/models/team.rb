@@ -1,3 +1,10 @@
+#NOTE: many occurrence of unnecessary use of self. and Team.
+#NOTE: no way in hell create_node_object method can work
+#NOTE: both assignment_team and course_team should use the delete method in when replacing duplicate team
+#NOTE: inconsistency in naming of users that's in the team
+#NOTE: delete_all_by_parent method should not exist at all, the functionality should belong to the delete function in the parent class
+#NOTE: similar functions in course_team.rb and assignment_team.rb should be extracted to team.rb
+
 class Team < ActiveRecord::Base
   has_many :teams_users
   has_many :users, :through => :teams_users
@@ -8,11 +15,12 @@ class Team < ActiveRecord::Base
        teamsuser.delete
     end    
     node = TeamNode.find_by_node_object_id(self.id)
-    if node
+    if node != nil
       node.destroy
     end
     self.destroy
   end
+
 
   def get_node_type
     "TeamNode"

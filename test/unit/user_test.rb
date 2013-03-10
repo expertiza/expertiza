@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  fixtures :users
+  fixtures :users, :roles
   
   def test_random_password_generation_for_new_users
     u = User.new(:email => "new@guy.co", :name => 'newguy')

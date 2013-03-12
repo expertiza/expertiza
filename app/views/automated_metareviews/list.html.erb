@@ -19,10 +19,10 @@
 	
 <!-- Plagiarism -->
 <b> Plagiarised - </b>
-	<%if @automated_metareview.plagiarism == true %>
-		<b><font color="#FF0000"><%= @automated_metareview.plagiarism%></font> </b>
+	<%if @automated_metareview.plagiarism == 1 %>
+		<b><font color="#FF0000"><%= "TRUE"%></font> </b>
 	<%else %>
-		<b><%= @automated_metareview.plagiarism%></b>
+		<b><%= "FALSE"%></b>
 	<% end %>
 	<%= link_to_remote_redbox "info", :url => {:controller => 'popup', :action => 'automated_metareview_details_popup', :type => "Plagiarism"} %><img src="/images/info.png"> <br>
 <!-- Review Content -->

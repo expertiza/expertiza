@@ -77,6 +77,7 @@ class CourseTeam < Team
     if team_name_only == "false"
       output.push(self.export_participants)
     end
+    return output
   end
 
   def export_participants

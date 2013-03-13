@@ -36,7 +36,7 @@ class CourseTeam < Team
     end
 
     if Course.find(course_id) == nil
-      raise ImportError, "The course with id \""+course_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+      raise ImportError, "The course with id \""+course_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this course?"
     end
 
     if options[:has_column_names] == "true"
@@ -61,19 +61,21 @@ class CourseTeam < Team
 
   def self.export(csv, parent_id, options)
     course = Course.find(parent_id)
+    if course.nil?
+      raise ImportError, "The course with id \""+course_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this course?"
+    end
 
     teams = CourseTeam.find_all_by_parent_id(parent_id)
-
     teams.each do |team|
-      tcsv = Array.new
-      teamUsers = Array.new
-      tcsv.push(team.export_name(options["team_name"]))
-      tcsv.push(team.export_participants)
-      tcsv.push(course.name)
-      if (options["team_name"] == "false")
-        tcsv.push(export_participants)
-      end
-      csv << tcsv
+      csv << team.export(options["team_name"])
+    end
+  end
+
+  def export(team_name_only)
+    output = Array.new
+    output.push(self.name)
+    if team_name_only == "false"
+      output.push(self.export_participants)
     end
   end
 

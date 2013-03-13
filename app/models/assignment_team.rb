@@ -7,6 +7,7 @@ class AssignmentTeam < Team
 # START of contributor methods, shared with AssignmentParticipant
 
   # Whether this team includes a given participant or not
+  #TODO: should belong in team class, and team class have simular functionality already
   def includes?(participant)
     return participants.include?(participant)
   end
@@ -96,61 +97,6 @@ class AssignmentTeam < Team
   
   def get_review_map_type
     return 'TeamReviewResponseMap'
-  end  
-  
-  def self.import(row,session,id,options)
-    if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
-       raise ArgumentError, "Not enough items" 
-    end
-        
-    if Assignment.find(id) == nil
-      raise ImportError, "The assignment with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
-    end
-    
-    if options[:has_column_names] == "true"
-        name = row[0].to_s.strip
-        index = 1
-    else
-        name = generate_team_name()
-        index = 0
-    end 
-    
-    currTeam = AssignmentTeam.find(:first, :conditions => ["name =? and parent_id =?",name,id])
-    
-    if options[:handle_dups] == "ignore" && currTeam != nil
-      return
-    end
-    
-    if currTeam != nil && options[:handle_dups] == "rename"
-       name = generate_team_name()
-       currTeam = nil
-    end
-    if options[:handle_dups] == "replace" && teams.first != nil        
-       for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", currTeam.id])
-           teamsuser.destroy
-       end    
-       currTeam.destroy
-       currTeam = nil
-    end     
-    
-    if currTeam == nil
-       currTeam = AssignmentTeam.create(:name => name, :parent_id => id)
-       parent = AssignmentNode.find_by_node_object_id(id)
-       TeamNode.create(:parent_id => parent.id, :node_object_id => currTeam.id)
-    end
-      
-    while(index < row.length) 
-        user = User.find_by_name(row[index].to_s.strip)
-        if user == nil
-          raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"                           
-        elsif currTeam != nil         
-          currUser = TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])          
-          if currUser == nil
-            currTeam.add_member(user)            
-          end                      
-        end
-        index = index+1      
-    end                
   end
 
   def email
@@ -186,11 +132,12 @@ class AssignmentTeam < Team
    new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})    
    copy_members(new_team)
   end
- 
+
+  #depricated: this function belongs to course not course team
   def add_participant(assignment_id, user)
-   if AssignmentParticipant.find_by_parent_id_and_user_id(assignment_id, user.id) == nil
-     AssignmentParticipant.create(:parent_id => assignment_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
-   end    
+    if AssignmentParticipant.find_by_parent_id_and_user_id(assignment_id, user.id) == nil
+       AssignmentParticipant.create(:parent_id => assignment_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
+    end
   end
  
   def assignment
@@ -224,23 +171,66 @@ class AssignmentTeam < Team
     team  
   end
 
+  #TODO: unused variable session
+  def self.import(row,session,assignment_id,options)
+    if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
+      raise ArgumentError, "Not enough items"
+    end
+
+    if Assignment.find(assignment_id) == nil
+      raise ImportError, "The assignment with id \""+assignment_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+    end
+
+    if options[:has_column_names] == "true"
+      name = row[0].to_s.strip
+      name = handle_duplicate(name, assignment_id, options[:handle_dups])
+      index = 1
+    else
+      name = generate_team_name
+      index = 0
+    end
+
+    if options[:handle_dups] == "ignore" && currTeam != nil
+      return
+    end
+
+    if name == nil
+      return
+    end
+
+    team = AssignmentTeam.create(:name => name, :parent_id => assignment_id)
+    assignment_node = AssignmentNode.find_by_node_object_id(assignment_id)
+    TeamNode.create(:parent_id => assignment_node.id, :node_object_id => team.id)
+
+    team.import_participants(index, row)
+  end
+
   def self.export(csv, parent_id, options)
     currentAssignment = Assignment.find(parent_id)
-    currentAssignment.teams.each { |team|
+    currentAssignment.teams.each do |team|
       tcsv = Array.new
-      teamUsers = Array.new
-      tcsv.push(team.name)
-      if (options["team_name"] == "false")
-        teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
-        teamMembers.each do |user|
-          teamUsers.push(user.name)
-          teamUsers.push(" ")
-        end
-        tcsv.push(teamUsers)
-      end
+
+      tcsv.push(team.export_name(options["team_name"]))
+      tcsv.push(team.export_participants)
       tcsv.push(currentAssignment.name)
+
       csv << tcsv
-    }
+    end
+  end
+
+  def export_name
+
+  end
+
+  def export_participants
+    teamUsers = Array.new
+
+    teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', id])
+    teamMembers.each do |user|
+      teamUsers.push(user.name)
+      teamUsers.push(" ")
+    end
+    return teamUsers
   end
 
   def self.get_export_fields(options)

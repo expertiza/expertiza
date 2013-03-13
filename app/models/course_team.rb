@@ -132,23 +132,4 @@ class CourseTeam < Team
     fields.push("Course Name")
   end
 
-  def self.export(csv, parent_id, options)
-    currentCourse = Course.find(parent_id)
-    currentCourse.get_teams.each { |team|
-      tcsv = Array.new
-      teamUsers = Array.new
-      tcsv.push(team.name)
-      if (options["team_name"] == "false")
-        teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
-        teamMembers.each do |user|
-          teamUsers.push(user.name)
-          teamUsers.push(" ")
-        end
-        tcsv.push(teamUsers)
-      end
-      tcsv.push(currentCourse.name)
-      csv << tcsv
-    }
-  end
-
 end

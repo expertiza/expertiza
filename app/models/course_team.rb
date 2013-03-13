@@ -29,6 +29,57 @@ class CourseTeam < Team
     end
   end
 
+  def import_participants(starting_index, row)
+    index = starting_index
+    while(index < row.length)
+      user = User.find_by_name(row[index].to_s.strip)
+      if user.nil?
+        raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"
+      else
+        if TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", id, user.id]).nil?
+          add_member(user)
+        end
+      end
+      index = index + 1
+    end
+  end
+
+  def export_participants
+    userNames = Array.new
+    participants = TeamsUser.find(:all, :conditions => ['team_id = ?', self.id])
+    participants.each do |participant|
+      userNames.push(participant.name)
+      userNames.push(" ")
+    end
+    return userNames
+  end
+
+  def export(team_name_only)
+    output = Array.new
+    output.push(self.name)
+    if team_name_only == "false"
+      output.push(self.export_participants)
+    end
+    return output
+  end
+
+  def self.handle_duplicate(name, course_id, handle_dups)
+    team = find(:first, :conditions => ["name =? and parent_id =?", name, course_id])
+    if team.nil? #no duplicate
+      return name
+    end
+    if handle_dups == "ignore" #ignore: not create the new team
+      return nil
+    end
+    if handle_dups == "rename" #rename: rename new team
+      return generate_team_name
+    end
+    if handle_dups == "replace" #replace: delete old team
+      team.delete
+      return name
+    end
+  end
+
   #TODO: unused variable session
   def self.import(row,session,course_id,options)
     if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
@@ -70,26 +121,6 @@ class CourseTeam < Team
       csv << team.export(options["team_name"])
     end
   end
-
-  def export(team_name_only)
-    output = Array.new
-    output.push(self.name)
-    if team_name_only == "false"
-      output.push(self.export_participants)
-    end
-    return output
-  end
-
-  def export_participants
-    userNames = Array.new
-    participants = TeamsUser.find(:all, :conditions => ['team_id = ?', self.id])
-    participants.each do |participant|
-      userNames.push(participant.name)
-      userNames.push(" ")
-    end
-    return userNames
-  end
-
 
   def self.get_export_fields(options)
     fields = Array.new

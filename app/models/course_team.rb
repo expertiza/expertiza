@@ -59,13 +59,26 @@ class CourseTeam < Team
     team.import_participants(index, row)
   end
 
-  #should belong in course as export_teams method
   def self.export(csv, parent_id, options)
     course = Course.find(parent_id)
-    assignmentList = Assignment.find_all_by_course_id(parent_id)
 
-    assignmentList.each do |currentAssignment|
-      AssignmentTeam.export(csv, currentAssignment.id, options)
+    teams = CourseTeam.find_all_by_parent_id(parent_id)
+
+    teams.each do |team|
+      tcsv = Array.new
+      teamUsers = Array.new
+      tcsv.push(team.export_name(options["team_name"]))
+      tcsv.push(team.export_participants)
+      tcsv.push(course.name)
+      if (options["team_name"] == "false")
+        teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
+        teamMembers.each do |user|
+          teamUsers.push(user.name)
+          teamUsers.push(" ")
+        end
+        tcsv.push(teamUsers)
+      end
+      csv << tcsv
     end
   end
 

@@ -71,16 +71,22 @@ class CourseTeam < Team
       tcsv.push(team.export_participants)
       tcsv.push(course.name)
       if (options["team_name"] == "false")
-        teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
-        teamMembers.each do |user|
-          teamUsers.push(user.name)
-          teamUsers.push(" ")
-        end
-        tcsv.push(teamUsers)
+        tcsv.push(export_participants)
       end
       csv << tcsv
     end
   end
+
+  def export_participants
+    userNames = Array.new
+    participants = TeamsUser.find(:all, :conditions => ['team_id = ?', self.id])
+    participants.each do |participant|
+      userNames.push(participant.name)
+      userNames.push(" ")
+    end
+    return userNames
+  end
+
 
   def self.get_export_fields(options)
     fields = Array.new

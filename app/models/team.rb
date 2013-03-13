@@ -66,7 +66,9 @@ class Team < ActiveRecord::Base
    t_user = TeamsUser.create(:user_id => user.id, :team_id => self.id) 
    parent = TeamNode.find_by_node_object_id(self.id)
    TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
-   add_participant(self.parent_id, user)  
+
+   Course.find(parent_id).add_participant(user.name)
+   #Course.add_participant(self.parent_id, user)
  end  
  
  def copy_members(new_team)
@@ -78,7 +80,8 @@ class Team < ActiveRecord::Base
      TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
    }   
  end
- 
+
+  #TODO: this method is broken
  def self.create_node_object(name, parent_id)
    create(:name => name, :parent_id => parent_id)
    parent = Object.const_get(self.get_parent_model).find(parent_id)
@@ -128,4 +131,37 @@ class Team < ActiveRecord::Base
       end
     end
   end
+
+  def import_participants(starting_index, row)
+    index = starting_index
+    while(index < row.length)
+      user = User.find_by_name(row[index].to_s.strip)
+      if user.nil?
+        raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"
+      else
+        if TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", id, user.id]).nil?
+          add_member(user)
+        end
+      end
+      index = index + 1
+    end
+  end
+
+  def self.handle_duplicate(name, course_id, handle_dups)
+    team = find(:first, :conditions => ["name =? and parent_id =?", name, course_id])
+    if team.nil? #no duplicate
+      return name
+    end
+    if handle_dups == "ignore" #ignore: not create the new team
+      return nil
+    end
+    if handle_dups == "rename" #rename: rename new team
+      return generate_team_name
+    end
+    if handle_dups == "replace" #replace: delete old team
+      team.delete
+      return name
+    end
+  end
+
 end

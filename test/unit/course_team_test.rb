@@ -1,7 +1,8 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class CourseTeam < ActiveSupport::TestCase
-  fixtures :courses,:teams,:users,:participants,:assignments,:nodes,:tree_folders
+class CourseTeamTest < ActiveSupport::TestCase
+  fixtures :courses,:teams,:users,:participants,:assignments,:nodes,:tree_folders,:teams_users
+
 
   def setup
     @course = courses(:course1)
@@ -23,10 +24,10 @@ class CourseTeam < ActiveSupport::TestCase
 
   def test_import_participants
     row = ["instructor1", "student1", "student2"]
-    teams(:team8).import_participants(0, row)
-    assert_equal teams(:team8).has_user(users(:instructor1)), true
-    assert_equal teams(:team8).has_user(users(:student1)), true
-    assert_equal teams(:team8).has_user(users(:student2)), true
+    teams(:team2).import_participants(0, row)
+    assert_equal teams(:team2).has_user(users(:instructor1)), true
+    assert_equal teams(:team2).has_user(users(:student1)), true
+    assert_equal teams(:team2).has_user(users(:student2)), true
   end
 
   def test_export_participants
@@ -37,13 +38,13 @@ class CourseTeam < ActiveSupport::TestCase
 
   def test_instance_export
     team_name_only = "false"
-    output = teams(:team3).export(team_name_only)
-    assert_equal output[0], teams(:team3).name
-    assert_equal output[1], users(:student3).name
+    output = teams(:team2).export(team_name_only)
+    assert_equal output[0], teams(:team2).name
+    assert_equal output[1][0], users(:student6).name
 
     team_name_only = "true"
-    output = teams(:team3).export(team_name_only)
-    assert_equal output[0], teams(:team3).name
+    output = teams(:team2).export(team_name_only)
+    assert_equal output[0], teams(:team2).name
     assert_equal output[1], nil
   end
 
@@ -102,17 +103,18 @@ class CourseTeam < ActiveSupport::TestCase
   def test_class_export
     course = courses(:course0)
     course_team0 = teams(:team2)
-    course_team1 = teams(:team8)
+    course_team1 = teams(:team7)
     team0_student0 = users(:student6)
 
     output = Array.new
     options = {:team_name => "true"}
     CourseTeam.export(output, course.id, options)
     assert_equal output[0][0], course_team0.name
-    assert_equal output[0][1][0], nil
+    assert_equal output[0][1], nil
     assert_equal output[1][0], course_team1.name
-    assert_equal output[1][1][0], nil
+    assert_equal output[1][1], nil
 
+    output = Array.new
     options[:team_name] = "false"
     CourseTeam.export(output, course.id, options)
     assert_equal output[0][0], course_team0.name
@@ -122,27 +124,27 @@ class CourseTeam < ActiveSupport::TestCase
     assert_equal output[1][1][0], nil
   end
 
-  #def test_get_export_fields
-  #   options["team_name"] = "false"
-  #   output = CourseTeam.get_export_fields(options)
-  #   assert_equal output[0], "Team Name"
-  #   assert_equal output[1], "Team members"
-  #   assert_equal output[2], "Assignment Name"
+  ##def test_get_export_fields
+  ##   options["team_name"] = "false"
+  ##   output = CourseTeam.get_export_fields(options)
+  ##   assert_equal output[0], "Team Name"
+  ##   assert_equal output[1], "Team members"
+  ##   assert_equal output[2], "Assignment Name"
+  ##
+  ##   options["team_name"] = "true"
+  ##   output = CourseTeam.get_export_fields(options)
+  ##   assert_equal output[0], "Team Name"
+  ##   assert_equal output[1], "Assignment Name"
+  ##end
   #
-  #   options["team_name"] = "true"
-  #   output = CourseTeam.get_export_fields(options)
-  #   assert_equal output[0], "Team Name"
-  #   assert_equal output[1], "Assignment Name"
-  #end
-
-  #def test_copy
-  #  @assignment_team = @course_team.copy(0)
-  #  assert_kind_of AssignmentTeam, @assignment_team
-  #  assert_equal @assignment_team.users.count, @course_team.users.count
-  #end
-
-  ## test method get_path
-  #def test_add_participant
-  #  assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110/',@course0.get_path
-  #end
+  ##def test_copy
+  ##  @assignment_team = @course_team.copy(0)
+  ##  assert_kind_of AssignmentTeam, @assignment_team
+  ##  assert_equal @assignment_team.users.count, @course_team.users.count
+  ##end
+  #
+  ### test method get_path
+  ##def test_add_participant
+  ##  assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110/',@course0.get_path
+  ##end
 end

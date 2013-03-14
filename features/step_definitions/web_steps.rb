@@ -229,3 +229,9 @@ end
 Given /^I wait for (\d+) seconds?$/ do |n|
       sleep(n.to_i)
 end
+Given /^I fill in the form fields:$/ do |table|
+    @form = table.hashes
+    table.hashes.each do |f|
+        step "I fill in #{f['field']} with #{f['data']}"
+    end
+end

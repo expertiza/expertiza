@@ -105,7 +105,7 @@ class CourseTeam < Team
     end
 
     team = CourseTeam.create(:name => name, :parent_id => course_id)
-    course_node = CourseNode.find_by_node_object_id(id)
+    course_node = CourseNode.find_by_node_object_id(course_id)
     TeamNode.create(:parent_id => course_node.id, :node_object_id => team.id)
 
     team.import_participants(index, row)

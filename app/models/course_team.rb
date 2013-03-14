@@ -16,7 +16,8 @@ class CourseTeam < Team
   def get_node_type
     "TeamNode"
   end
- 
+
+  #depricated: dead and bugged code, not used
  def copy(assignment_id)
    new_team = AssignmentTeam.create_node_object(self.name, assignment_id)
    copy_members(new_team)
@@ -118,14 +119,17 @@ class CourseTeam < Team
 
     teams = CourseTeam.find_all_by_parent_id(parent_id)
     teams.each do |team|
-      csv << team.export(options["team_name"])
+      csv << team.export(options[:team_name])
     end
   end
 
+  #note: the option team_name is ambiguous and here it does means
+  #      the opposite of what it does in class method export
+  #TODO: clarify the team_name option and fix either export or get_export_fields
   def self.get_export_fields(options)
     fields = Array.new
     fields.push("Team Name")
-    if (options["team_name"] == "true")
+    if (options[:team_name] == "true")
       fields.push("Team members")
     end
     fields.push("Assignment Name")

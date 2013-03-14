@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class CourseTeamTest < ActiveSupport::TestCase
-  fixtures :courses,:teams,:users,:participants,:assignments,:nodes,:tree_folders,:teams_users
+  fixtures :courses,:teams,:users,:participants,:assignments,:nodes,:tree_folders,:teams_users, :roles
 
 
   def setup

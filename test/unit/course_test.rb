@@ -56,13 +56,6 @@ class CourseTest < ActiveSupport::TestCase
     assert_equal 'student6',@participant.first.name
   end
 
-
-  # test method get_participant
-  def test_get_participant
-    @participant = @course0.get_participant(users(:student6).id)
-    assert_equal 'student6',@participant.first.name
-  end
-
   # test method add_participant
   def test_add_participant
     assert_difference('@course0.get_participants.count') do

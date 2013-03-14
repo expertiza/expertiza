@@ -91,7 +91,6 @@ class QuestionnaireController < ApplicationController
   # Edit a questionnaire
   def edit
 
-
     begin
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to :action => 'list' if @questionnaire == nil
@@ -101,13 +100,9 @@ class QuestionnaireController < ApplicationController
       save
     end
 
-    if params['export']
-      export
-    end
+    export if params['export']
 
-    if params['import']
-      import
-    end
+    import if params['import']
 
     if params['view_advice']
         flash[:id] = params[:id]
@@ -189,6 +184,7 @@ class QuestionnaireController < ApplicationController
   def save_advice
     redirect_to :controller => 'advice', :action => 'save_advice'
   end
+
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
     questionnaire = Questionnaire.find(params[:id])

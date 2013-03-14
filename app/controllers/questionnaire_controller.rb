@@ -39,7 +39,7 @@ class QuestionnaireController < ApplicationController
 
         if @questionnaire.section == "Custom"
           old_question_type = QuestionType.find_by_question_id(question.id)
-          if !(old_question_type.nil?)
+          unless old_question_type.nil?
             new_question_type = old_question_type.clone
             new_question_type.question_id = newquestion.id
             new_question_type.save
@@ -90,6 +90,8 @@ class QuestionnaireController < ApplicationController
 
   # Edit a questionnaire
   def edit
+
+
     begin
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to :action => 'list' if @questionnaire == nil
@@ -108,7 +110,8 @@ class QuestionnaireController < ApplicationController
     end
 
     if params['view_advice']
-        redirect_to :action => 'edit_advice', :id => params[:questionnaire][:id]
+        flash[:id] = params[:id]
+        redirect_to :action => 'edit_advice'
     end
     rescue
       flash[:error] = $!
@@ -116,7 +119,6 @@ class QuestionnaireController < ApplicationController
   end
 
   def export
-
     @questionnaire = Questionnaire.find(params[:id])
 
     csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
@@ -129,7 +131,6 @@ class QuestionnaireController < ApplicationController
 
 
   def import
-
     @questionnaire = Questionnaire.find(params[:id])
 
     file = params['csv']
@@ -181,42 +182,13 @@ class QuestionnaireController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
-  # Modify the advice associated with a questionnaire
   def edit_advice
-    @questionnaire = get(Questionnaire, params[:id])
-
-    for question in @questionnaire.questions
-      if question.true_false
-        num_questions = 2
-      else
-        num_questions = @questionnaire.max_question_score - @questionnaire.min_question_score
-      end
-
-      sorted_advice = question.question_advices.sort {|x,y| y.score <=> x.score }
-      if question.question_advices.length != num_questions or
-         sorted_advice[0].score != @questionnaire.min_question_score or
-         sorted_advice[sorted_advice.length-1] != @questionnaire.max_question_score
-        #  The number of advices for this question has changed.
-        QuestionnaireHelper::adjust_advice_size(@questionnaire, question)
-      end
-    end
-    @questionnaire = get(Questionnaire, params[:id])
+    redirect_to :controller => 'advice', :action => 'edit_advice'
   end
 
-  # save the advice for a questionnaire
   def save_advice
-    begin
-      for advice_key in params[:advice].keys
-        QuestionAdvice.update(advice_key, params[:advice][advice_key])
-      end
-      flash[:notice] = "The questionnaire's question advice was successfully saved"
-      redirect_to :action => 'list'
-
-    rescue ActiveRecord::RecordNotFound
-      render :action => 'edit_advice'
-    end
+    redirect_to :controller => 'advice', :action => 'save_advice'
   end
-
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
     questionnaire = Questionnaire.find(params[:id])
@@ -301,8 +273,6 @@ class QuestionnaireController < ApplicationController
             question_type.destroy
         end
         question.destroy
-
-
       end
     end
   end

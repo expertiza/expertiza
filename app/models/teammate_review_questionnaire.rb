@@ -11,7 +11,5 @@ class TeammateReviewQuestionnaire < Questionnaire
     participant.get_teammate_reviews()  
   end  
   
-  def get_weighted_score(assignment, scores)
-    return compute_weighted_score(self.symbol, assignment, scores)
-  end   
+
 end

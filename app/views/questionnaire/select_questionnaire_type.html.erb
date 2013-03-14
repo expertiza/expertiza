@@ -1,5 +1,5 @@
 <%= render :partial => 'scripts' %>
-<% form_tag :action => 'create_questionnaire' do %>
+<% form_tag :action => 'create' do %>
     <%= render :partial => 'questionnaire' %>
   	<%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
     <script>

@@ -96,32 +96,15 @@ class QuestionnaireController < ApplicationController
 
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
-      save_questionnaire
+      save
     end
     
     if params['export']
-      csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
-
-      send_data csv_data, 
-        :type => 'text/csv; charset=iso-8859-1; header=present',
-        :disposition => "attachment; filename=questionnaires.csv"
+      export
     end
     
     if params['import']
-      file = params['csv']
-      questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
-      
-      if questions != nil and questions.length > 0
-
-        # delete the existing questions if no scores have been recorded yet
-        @questionnaire.questions.each {
-          | question |
-            raise "Cannot import new questions, scores exist" if Score.find_by_question_id(question.id)
-            question.delete        
-        }
-        
-        @questionnaire.questions = questions
-      end
+      import
     end
     
     if params['view_advice']
@@ -131,7 +114,43 @@ class QuestionnaireController < ApplicationController
       flash[:error] = $!
     end
   end
-    
+
+  def export
+
+    @questionnaire = Questionnaire.find(params[:id])
+
+    csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
+
+    send_data csv_data,
+              :type => 'text/csv; charset=iso-8859-1; header=present',
+              :disposition => "attachment; filename=questionnaires.csv"
+
+
+  end
+
+
+
+  def import
+
+    @questionnaire = Questionnaire.find(params[:id])
+
+    file = params['csv']
+    questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
+
+    if questions != nil and questions.length > 0
+
+      # delete the existing questions if no scores have been recorded yet
+      @questionnaire.questions.each {
+          | question |
+        raise "Cannot import new questions, scores exist" if Score.find_by_question_id(question.id)
+        question.delete
+      }
+
+      @questionnaire.questions = questions
+    end
+  end
+
+
   # Define a new questionnaire
   def new
     @questionnaire = Object.const_get(params[:model]).new
@@ -153,14 +172,14 @@ class QuestionnaireController < ApplicationController
   end
 
   # Save the new questionnaire to the database
-  def create_questionnaire
+  def create
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
     if (session[:user]).role.name == "Teaching Assistant"
       @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
     else
       @questionnaire.instructor_id = session[:user].id
     end
-    save_questionnaire
+    save
     redirect_to :controller => 'tree_display', :action => 'list'
   end
   
@@ -211,7 +230,7 @@ class QuestionnaireController < ApplicationController
   
   private
   #save questionnaire object after create or edit
-  def save_questionnaire
+  def save
     begin
       @questionnaire.save!
       save_questions @questionnaire.id if @questionnaire.id != nil and @questionnaire.id > 0
@@ -279,7 +298,8 @@ class QuestionnaireController < ApplicationController
           advice.destroy
         end
         if (Questionnaire.find_by_id(questionnaire_id).section == "Custom")
-            delete_question_type(question.id)
+            question_type = QuestionType.find_by_question_id(question.id)
+            question_type.destroy
         end
         question.destroy
 
@@ -288,11 +308,6 @@ class QuestionnaireController < ApplicationController
     end
   end
 
-  #Deletes question type parameters corresponding to the question being deleted
-  def delete_question_type(q_id)
-    question_type = QuestionType.find_by_question_id(q_id)
-    question_type.destroy
-  end
 
   def update_question_type (question_type_key)
     this_q = QuestionType.find(question_type_key)

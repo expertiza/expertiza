@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class AuthorFeedbackQuestionnaireTest < ActiveSupport::TestCase
+class MetareviewQuestionnaireTest < ActiveSupport::TestCase
   #fixtures :author_feedback_questionnaires
-   #TODO verify fixture
-  fixtures :assignment_questionnaires, :questionnaires, :assignments, :participants, :scores
+  #TODO verify fixture
+  fixtures :questionnaires, :assignments, :participants, :scores
 
   # Replace this with your real tests.
   #def test_truth
@@ -20,10 +20,10 @@ class AuthorFeedbackQuestionnaireTest < ActiveSupport::TestCase
     average = 95
 
     scores = Hash.new
-    scores[:feedback] = {:scores => {:avg => average}}
+    scores[:metareview] = {:scores => {:avg => average}}
 
-    q = AuthorFeedbackQuestionnaire.new(:name => "My Questionnaire",
-                                        :type => "AuthorFeedbackQuestionnaire",
+    q = MetareviewQuestionnaire.new(:name => "My Questionnaire",
+                                        :type => "MetareviewQuestionnaire",
                                         :min_question_score => 1,
                                         :max_question_score => 5,
                                         :section => "Regular" )
@@ -39,4 +39,6 @@ class AuthorFeedbackQuestionnaireTest < ActiveSupport::TestCase
     assert_equal q.get_weighted_score (assignment, scores), average * questionnaire_weight/100.to_f
 
   end
+
+
 end

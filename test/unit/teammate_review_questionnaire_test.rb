@@ -1,8 +1,8 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class AuthorFeedbackQuestionnaireTest < ActiveSupport::TestCase
+class TeammateReviewQuestionnaireTest < ActiveSupport::TestCase
   #fixtures :author_feedback_questionnaires
-   #TODO verify fixture
+  #TODO verify fixture
   fixtures :assignment_questionnaires, :questionnaires, :assignments, :participants, :scores
 
   # Replace this with your real tests.
@@ -17,13 +17,13 @@ class AuthorFeedbackQuestionnaireTest < ActiveSupport::TestCase
   def test_get_weighted_score
     assignment = assignments(:assignment1)
     questionnaire_weight = 50
-    average = 95
+    average = 4
 
     scores = Hash.new
-    scores[:feedback] = {:scores => {:avg => average}}
+    scores[:teammate] = {:scores => {:avg => average}}
 
-    q = AuthorFeedbackQuestionnaire.new(:name => "My Questionnaire",
-                                        :type => "AuthorFeedbackQuestionnaire",
+    q = TeammateReviewQuestionnaire.new(:name => "My Questionnaire",
+                                        :type => "TeammateReviewQuestionnaire",
                                         :min_question_score => 1,
                                         :max_question_score => 5,
                                         :section => "Regular" )

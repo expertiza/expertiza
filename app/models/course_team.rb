@@ -123,6 +123,7 @@ class CourseTeam < Team
     end
   end
 
+
   #note: the option team_name is ambiguous and here it does means
   #      the opposite of what it does in class method export
   #TODO: clarify the team_name option and fix either export or get_export_fields

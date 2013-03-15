@@ -7,9 +7,9 @@ class QuestionnaireController < ApplicationController
 
 
 
-    def getInstructorId
-      (session[:user]).role.name != 'Teaching Assistant' ? session[:user].id : Ta.get_my_instructor((session[:user]).id)
-    end
+  def getInstructorId
+    (session[:user]).role.name != 'Teaching Assistant' ? session[:user].id : Ta.get_my_instructor((session[:user]).id)
+  end
 
 
 
@@ -19,20 +19,10 @@ class QuestionnaireController < ApplicationController
     orig_questionnaire = Questionnaire.find(params[:id])
     questions = Question.find_all_by_questionnaire_id(params[:id])
     @questionnaire = orig_questionnaire.clone
-
-  #  if (session[:user]).role.name != "Teaching Assistant"
-  #    @questionnaire.instructor_id = session[:user].id
-  #  else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-  #    @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-  #  end
-
     @questionnaire.instructor_id = getInstructorId
-
-
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
 
     begin
-
       @questionnaire.save!
       @questionnaire.update_attribute('created_at',Time.now)
 

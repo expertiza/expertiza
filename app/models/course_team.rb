@@ -61,6 +61,8 @@ class CourseTeam < Team
     if team_name_only == "false"
       output.push(self.export_participants)
     end
+    course = Course.find(self.parent_id)
+    output.push(course.name)
     return output
   end
 
@@ -123,18 +125,38 @@ class CourseTeam < Team
     end
   end
 
-
-  #note: the option team_name is ambiguous and here it does means
-  #      the opposite of what it does in class method export
-  #TODO: clarify the team_name option and fix either export or get_export_fields
   def self.get_export_fields(options)
     fields = Array.new
     fields.push("Team Name")
-    if (options[:team_name] == "true")
+    if (options[:team_name] == "false")
       fields.push("Team members")
     end
-    fields.push("Assignment Name")
     fields.push("Course Name")
   end
 
+  #deprecated: this is the original self.export function
+  #      if this is a desired export behavior than
+  #      it should either belong to course class or assignment team class
+  def self.export_all_assignment_team_related_to_course(csv, parent_id, options)
+    course = Course.find(parent_id)
+    assignmentList = Assignment.find_all_by_course_id(parent_id)
+    assignmentList.each do |currentAssignment|
+      currentAssignment.teams.each { |team|
+        tcsv = Array.new
+        teamUsers = Array.new
+        tcsv.push(team.name)
+        if (options["team_name"] == "true")
+          teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
+          teamMembers.each do |user|
+            teamUsers.push(user.name)
+            teamUsers.push(" ")
+          end
+          tcsv.push(teamUsers)
+        end
+        tcsv.push(currentAssignment.name)
+        tcsv.push(course.name)
+        csv << tcsv
+      }
+    end
+  end
 end

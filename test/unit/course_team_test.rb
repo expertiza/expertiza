@@ -37,15 +37,16 @@ class CourseTeamTest < ActiveSupport::TestCase
   end
 
   def test_instance_export
+    course = courses(:course0)
     team_name_only = "false"
     output = teams(:team2).export(team_name_only)
     assert_equal output[0], teams(:team2).name
     assert_equal output[1][0], users(:student6).name
-
+    assert_equal output[2], course.name
     team_name_only = "true"
     output = teams(:team2).export(team_name_only)
     assert_equal output[0], teams(:team2).name
-    assert_equal output[1], nil
+    assert_equal output[1], course.name
   end
 
   def test_handle_duplicate
@@ -109,10 +110,11 @@ class CourseTeamTest < ActiveSupport::TestCase
     output = Array.new
     options = {:team_name => "true"}
     CourseTeam.export(output, course.id, options)
+    #assert_equal '',output
     assert_equal output[0][0], course_team0.name
-    assert_equal output[0][1], nil
+    assert_equal output[0][1], course.name
     assert_equal output[1][0], course_team1.name
-    assert_equal output[1][1], nil
+    assert_equal output[1][1], course.name
 
     output = Array.new
     options[:team_name] = "false"
@@ -120,8 +122,10 @@ class CourseTeamTest < ActiveSupport::TestCase
     assert_equal output[0][0], course_team0.name
     assert_equal output[0][1][0], team0_student0.name
     assert_equal output[0][1][1], " "
+    assert_equal output[0][2], course.name
     assert_equal output[1][0], course_team1.name
     assert_equal output[1][1][0], nil
+    assert_equal output[1][2], course.name
   end
 
   ##def test_get_export_fields

@@ -6,7 +6,8 @@ class QuestionnaireController < ApplicationController
   before_filter :authorize
 
 
-
+  # determines whether the user is a ta or instructor
+  # returns the instructors id, or the id of the ta's instructor
   def getInstructorId
     (session[:user]).role.name != 'Teaching Assistant' ? session[:user].id : Ta.get_my_instructor((session[:user]).id)
   end
@@ -22,11 +23,17 @@ class QuestionnaireController < ApplicationController
     @questionnaire.instructor_id = getInstructorId
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
 
+    cloneQuestionnaireDetails(questions)
+  end
+
+
+  # clones the contents of a questionnaire, including the questions and associated advice
+  def cloneQuestionnaireDetails(questions)
     begin
       @questionnaire.save!
-      @questionnaire.update_attribute('created_at',Time.now)
+      @questionnaire.update_attribute('created_at', Time.now)
 
-      questions.each{ | question |
+      questions.each { |question|
 
         newquestion = question.clone
         newquestion.questionnaire_id = @questionnaire.id
@@ -50,7 +57,7 @@ class QuestionnaireController < ApplicationController
       }
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
-      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
+      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id, @questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
       end
       redirect_to :controller => 'questionnaire', :action => 'view', :id => @questionnaire.id

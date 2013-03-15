@@ -7,11 +7,9 @@ class MetareviewQuestionnaire < Questionnaire
     return "metareview".to_sym
   end
   
-  def get_assessments_for(participant)
+  def get_metareviews_for(participant)
     participant.get_metareviews()  
   end  
   
-  def get_weighted_score(assignment, scores)
-    return compute_weighted_score(self.symbol, assignment, scores)
-  end 
+
 end

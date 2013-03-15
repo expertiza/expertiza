@@ -13,8 +13,8 @@
 development:
   adapter: mysql
   database: pg_development
-  username: expertiza
-  password: 
+  username: root
+  password: root
 
 # Warning: The database defined as 'test' will be erased and
 # re-generated from your development database when you run 'rake'.
@@ -22,14 +22,14 @@ development:
 test: &test
   adapter: mysql
   database: pg_test
-  username: expertiza
-  password:
+  username: root
+  password: root
 
 production:
   adapter: mysql
   database: pg_development
-  username: expertiza
-  password:
+  username: root
+  password: root
 
 cucumber:
   <<: *test

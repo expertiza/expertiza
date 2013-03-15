@@ -5,6 +5,14 @@ class QuestionnaireController < ApplicationController
   # Generally a questionnaire is associated with an assignment (Assignment)  
   before_filter :authorize
 
+
+
+    def getInstructorId
+      (session[:user]).role.name != 'Teaching Assistant' ? session[:user].id : Ta.get_my_instructor((session[:user]).id)
+    end
+
+
+
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
   def copy
@@ -12,11 +20,15 @@ class QuestionnaireController < ApplicationController
     questions = Question.find_all_by_questionnaire_id(params[:id])
     @questionnaire = orig_questionnaire.clone
 
-    if (session[:user]).role.name != "Teaching Assistant"
-      @questionnaire.instructor_id = session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    end
+  #  if (session[:user]).role.name != "Teaching Assistant"
+  #    @questionnaire.instructor_id = session[:user].id
+  #  else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+  #    @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+  #  end
+
+    @questionnaire.instructor_id = getInstructorId
+
+
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
 
     begin

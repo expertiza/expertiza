@@ -53,7 +53,7 @@ questionnaire5:
   max_question_score: 5
   type: "ReviewQuestionnaire"
   display_type: "Review"
-  section: "Custom"
+  section: "Random"
   instruction_loc: Questionnaire::DEFAULT_QUESTIONNAIRE_URL
 
 peer_review_questionnaire:

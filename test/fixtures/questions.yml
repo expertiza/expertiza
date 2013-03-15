@@ -65,6 +65,12 @@ question_c2:
  questionnaire_id: <%= Fixtures.identify(:questionnaire_c0) %>
  weight: 5
 
+question_fun:
+  txt: What future changes should be implemented on back channel?
+  true_false: false
+  questionnaire_id: <%= Fixtures.identify(:questionnaire5) %>
+  weight: 5
+
 #question8:
 # txt: This is test question 1?
 # true_false: true

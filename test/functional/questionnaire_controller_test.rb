@@ -2,7 +2,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 require 'questionnaire_controller'
 
- class QuestionnaireController;
+class QuestionnaireController;
   def rescue_action(a) raise a end;
 end
 
@@ -21,8 +21,14 @@ class QuestionnaireControllerTest < ActionController::TestCase
     @response = ActionController::TestResponse.new
     @Questionnaire = questionnaires(:questionnaire5).id
 
-    @request.session[:user] = User.find(users(:admin).id )
-    roleid = User.find(users(:admin).id).role_id
+    login_user(:admin)
+  end
+
+
+  # Helper method for logging in as user
+  def login_user(userType)
+    @request.session[:user] = User.find(users(userType).id )
+    roleid = User.find(users(userType).id).role_id
     Role.rebuild_cache
 
     Role.find(roleid).cache[:credentials]
@@ -32,6 +38,7 @@ class QuestionnaireControllerTest < ActionController::TestCase
     @settings = SystemSettings.find(:first)
     AuthController.set_current_role(roleid,@request.session)
   end
+
 
   # Tests to see if the questionnaire was edited properly. The questionnaires name is changed
   def test_questionnaire_edit
@@ -54,7 +61,7 @@ class QuestionnaireControllerTest < ActionController::TestCase
   end
   
   def test_edit_questionnaire_when_name_not_valid
-   
+
     assert_raise (ActionView::TemplateError){
       post :edit_questionnaire, :id => @Questionnaire, :save => true,:questionnaire => {:name => ""}
     }
@@ -81,6 +88,95 @@ class QuestionnaireControllerTest < ActionController::TestCase
                                     :instruction_loc => "http://www.expertiza.ncsu.edu"}}
     assert_response(:success)
     assert_not_nil(Questionnaire.find(:first, :conditions => ["name = ?", "test edit name"]))
+  end
+
+
+
+  # Test the creation of questionnaire with student
+  # A student should not be able to create a questionnaire
+  def test_create_questionnaire_with_student
+    login_user(:student1)
+    post :create_questionnaire,{:questionnaire => {
+        :name => "test valid questionnaire",
+        :type => "ReviewQuestionnaire",
+        :min_question_score => 1,
+        :max_question_score => 5,
+        :section => "Review" }}
+
+    # Should be nil because it wasn't saved correct
+    assert_redirected_to 'denied'
+    assert_nil (Questionnaire.find_by_name("test valid questionnaire"))
+  end
+
+
+  # Test the creation of a valid questionnaire
+  def test_create_valid_questionnaire
+    post :create_questionnaire,{:questionnaire => {
+        :name => "test valid questionnaire",
+        :type => "ReviewQuestionnaire",
+        :min_question_score => 1,
+        :max_question_score => 5,
+        :section => "Review" }}
+
+    # Should be nil because it wasn't saved correct
+    assert_not_nil (Questionnaire.find_by_name("test valid questionnaire"))
+  end
+
+
+  # Test the creation of a invalid questionnaire based on an invalid max question score
+  def test_create_questionnaire_with_non_numerical_max_question_score
+    post :create_questionnaire,{    :questionnaire => {:name => "test invalid questionnaire",
+                                                       :type => "ReviewQuestionnaire",
+                                                       :min_question_score => 1,
+                                                       :max_question_score => "a string",
+                                                       :section => "Review" }}
+
+    # Should be nil because it wasn't saved correct
+    assert_nil (Questionnaire.find_by_name("test invalid questionnaire"))
+
+    # Should get a flash error
+    assert @response.flash[:error]
+  end
+
+  # Test the creation of a invalid questionnaire based on missing "section" field
+  def test_create_questionnaire_with_no_section_column
+    post :create_questionnaire,{:questionnaire => {
+        :name => "test invalid questionnaire again",
+        :type => "ReviewQuestionnaire",
+        :min_question_score => 1,
+        :max_question_score => "a string"}}
+
+    # Should be nil because it wasn't saved correct
+    assert_nil (Questionnaire.find_by_name("test invalid questionnaire again"))
+
+    # Should get a flash error
+    assert @response.flash[:error]
+  end
+
+  # Test the creation of a invalid questionnaire based on an invalid max question score
+  def test_create_questionnaire_with_invalid_type
+    assert_raise(NameError){
+      post :create_questionnaire,{:questionnaire => {
+          :name => "test invalid name questionnaire",
+          :type => "InvalidTYpe",
+          :min_question_score => 1,
+          :max_question_score => "a string",
+          :section => "Review" }}
+    }
+    # Should be nil because it wasn't saved correct
+    assert_nil (Questionnaire.find_by_name("test invalid name questionnaire"))
+  end
+
+  def test_edit_questionnaire_with_lower_max_score_than_min
+    post :edit, {:id => @Questionnaire, :save => true,
+                 :questionnaire => {:name => "test edit name",
+                                    :type => "MetareviewQuestionnaire",
+                                    :min_question_score => 5,
+                                    :max_question_score => 2,
+                                    :instruction_loc => "http://www.expertiza.ncsu.edu"}}
+
+    # Should get a flash error
+    assert @response.flash[:error]
   end
 
   # Copies the questionnaire and tests whether the questionnaire was copied
@@ -143,14 +239,11 @@ class QuestionnaireControllerTest < ActionController::TestCase
   # Test the toggle access action
   def test_toggle_access
 
-    # Get questionnaire1's access and put it in "old_access"
     questionnaire1 = Questionnaire.find_by_id(questionnaires(:questionnaire1).id)
     old_access = questionnaire1.private
 
-    # call controller method
     post :toggle_access, :id => questionnaire1.id
 
-    # Get its access again and put it in new_access
     questionnaire1 = Questionnaire.find_by_id(questionnaires(:questionnaire1).id)
     new_access = questionnaire1.private
 
@@ -181,46 +274,4 @@ class QuestionnaireControllerTest < ActionController::TestCase
     }
   end
 
-
-  # Test the creation of a valid questionnaire
-  def test_create_valid_questionnaire
-    post :create_questionnaire,{    :questionnaire => {:name => "test valid questionnaire",
-                                                       :type => "ReviewQuestionnaire",
-                                                       :min_question_score => 1,
-                                                       :max_question_score => 5,
-                                                       :section => "Review" }}
-
-    # Should be nil because it wasn't saved correct
-    assert_not_nil (Questionnaire.find_by_name("test valid questionnaire"))
-  end
-
-
-  # Test the creation of a invalid questionnaire based on an invalid max question score
-  def test_create_questionnaire_with_non_numerical_max_question_score
-    post :create_questionnaire,{    :questionnaire => {:name => "test invalid questionnaire",
-                                    :type => "ReviewQuestionnaire",
-                                    :min_question_score => 1,
-                                    :max_question_score => "a string",
-                                    :section => "Review" }}
-
-    # Should be nil because it wasn't saved correct
-    assert_nil (Questionnaire.find_by_name("test invalid questionnaire"))
-
-    # Should get a flash error
-    assert @response.flash[:error]
-  end
-
-  # Test the creation of a invalid questionnaire based on missing "section" field
-  def test_create_questionnaire_with_no_section_column
-    post :create_questionnaire,{    :questionnaire => {:name => "test invalid questionnaire again",
-                                                       :type => "ReviewQuestionnaire",
-                                                       :min_question_score => 1,
-                                                       :max_question_score => "a string"}}
-
-    # Should be nil because it wasn't saved correct
-    assert_nil (Questionnaire.find_by_name("test invalid questionnaire again"))
-
-    # Should get a flash error
-    assert @response.flash[:error]
-  end
 end

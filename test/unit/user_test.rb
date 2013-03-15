@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  fixtures :users
+  fixtures :users, :roles
   
   def test_random_password_generation_for_new_users
     u = User.new(:email => "new@guy.co", :name => 'newguy')
@@ -128,6 +128,16 @@ class UserTest < ActiveSupport::TestCase
     assert_equal [user.email], email.to                  # Checks if the mail is being sent to proper user
     assert_equal "Test Email", email.subject             # Checks if the mail subject is the same
 
+  end
+
+  def test_user_is_teaching_assistant
+    user = Ta.new
+    assert(user.is_teaching_assistant?, 'Should be true')
+  end
+
+  def test_user_is_NOT_teaching_assistant
+    user = User.new
+    assert(!(user.is_teaching_assistant?), 'Should be false')
   end
 
 end

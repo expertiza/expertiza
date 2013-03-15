@@ -1,5 +1,5 @@
 class QuestionnaireController < ApplicationController
-  # Controller for Questionnaire objects
+include ToggleAccess # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
   # Generally a questionnaire is associated with an assignment (Assignment)  
@@ -194,14 +194,6 @@ class QuestionnaireController < ApplicationController
     redirect_to :controller => 'advice', :action => 'save_advice'
   end
 
-  # Toggle the access permission for this assignment from public to private, or vice versa
-  def toggle_access
-    questionnaire = Questionnaire.find(params[:id])
-    questionnaire.private = !questionnaire.private
-    questionnaire.save
-
-    redirect_to :controller => 'tree_display', :action => 'list'
-  end
 
   private
   #save questionnaire object after create or edit

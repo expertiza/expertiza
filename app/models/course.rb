@@ -1,7 +1,7 @@
 class Course < ActiveRecord::Base
   has_many :ta_mappings
   validates_presence_of :name
-  has_many :assignments
+  has_many :assignments,:dependent => :destroy
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :participants, :class_name => 'CourseParticipant', :foreign_key => 'parent_id'
   
@@ -64,7 +64,7 @@ class Course < ActiveRecord::Base
     end                   
   end
   
-   def create_node()
+   def create_course_node()
       folder = TreeFolder.find_by_name('Courses')
       parent = FolderNode.find_by_node_object_id(folder.id)
       node = CourseNode.create(:node_object_id => self.id)

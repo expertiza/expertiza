@@ -7,7 +7,7 @@ class ReviewQuestionnaire < Questionnaire
     return "review".to_sym
   end
   
-  def get_assessments_for(participant)
+  def get_reviews_for(participant)
     participant.get_reviews()  
   end  
   

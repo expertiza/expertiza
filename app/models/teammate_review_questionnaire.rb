@@ -7,7 +7,7 @@ class TeammateReviewQuestionnaire < Questionnaire
     return "teammate".to_sym
   end  
   
-  def get_assessments_for(participant)
+  def get_teammate_reviews_for(participant)
     participant.get_teammate_reviews()  
   end  
   

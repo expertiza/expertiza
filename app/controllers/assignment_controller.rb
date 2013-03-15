@@ -80,12 +80,8 @@ class AssignmentController < ApplicationController
   def find_min_from_now(due_at)
 
 		curr_time=DateTime.now.to_s(:db)
-		puts curr_time
 		curr_time=Time.parse(curr_time)
-		puts curr_time
 		time_in_min=((due_at - curr_time).to_i/60)
-		puts "inside find minutes"
-		puts time_in_min
 		return time_in_min
   end
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
@@ -106,7 +102,6 @@ class AssignmentController < ApplicationController
 			due_at= Time.parse(due_at)
 			mi=find_min_from_now(due_at)
       			diff = mi-(duedates[i].threshold)*60
-      			#puts diff
 	 	        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)) , 1, diff.minutes.from_now)
       #duedates[i].update_attribute(:delayed_job_id, dj.id)
 		end
@@ -356,14 +351,10 @@ class AssignmentController < ApplicationController
   # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
   # from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
-
 		curr_time=DateTime.now(:db).to_s
-		puts curr_time
 		curr_time=Time.parse(curr_time)
-		puts curr_time
 		time_in_min=((due_at - curr_time).to_i/60)
-		puts "inside find minutes"
-		puts time_in_min
+		
 		return time_in_min
   end
   #--------------------------------------------------------------------------------------------------------------------

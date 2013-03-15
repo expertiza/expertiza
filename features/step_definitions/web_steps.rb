@@ -36,7 +36,7 @@ When /^I follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
   end
 end
 
-When /^I click on "(\S+)"$/ do |name|
+When /^I click on "([^"]*)"$/ do |name|
   click_link name
 end
 
@@ -224,4 +224,14 @@ end
 
 Then /^show me the page$/ do
   save_and_open_page
+end
+
+Given /^I wait for (\d+) seconds?$/ do |n|
+      sleep(n.to_i)
+end
+Given /^I fill in the form fields:$/ do |table|
+    @form = table.hashes
+    table.hashes.each do |f|
+        step "I fill in #{f['field']} with #{f['data']}"
+    end
 end

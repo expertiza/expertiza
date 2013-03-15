@@ -75,18 +75,6 @@ Given /^a team assignment named "(\S+)" exists$/ do |assignment|
   dropDeadline.due_at= '2012-12-30 23:09:15'
 end
 
-
-Given 'I am logged in as admin' do
-  step 'I go to the login page'
-
-  fill_in 'login_name', :with => 'admin'
-  fill_in 'login_password', :with => 'admin'
-  click_button 'Login'
-
-  step 'I should be logged in as "admin"'
-end
-
-
 Then /^I should see "(\S+)" in the list$/ do |assignment|
    node =  find('.theTable td').node().content()
   if(node.include? assignment)

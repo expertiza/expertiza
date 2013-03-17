@@ -2,6 +2,7 @@ Feature: View Leaderboard
   View the leaderboard statistics
   As a student
 
+@wip
 Scenario: View the leaderboard
 
   Given a team assignment named "test_assignment" exists

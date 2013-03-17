@@ -3,6 +3,7 @@ Feature: Submit a review as a student
   As a student and participant of a team assignment
   I want to fill out the review online and submit it
 
+@wip
 Scenario: Submit review for an assignment
   Given I am logged in as a student
   And I move to the "Assignments" page

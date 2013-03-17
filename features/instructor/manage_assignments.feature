@@ -43,24 +43,5 @@ Feature: Manage the assignments in Expertiza
   @instructor
   @manage_assignments
   @too_many
+  @wip
   Scenario: Adding too many students to a team for an assignment should fail.
-	  Given a student named "student1"
-	  And a student named "student2"
-	  And a student named "student3"
-	  And I am logged in as "instructor1"   
-	When I create a public assignment named "Assignment4" with max team size 2
-	  And I add user "student1" as a participant to assignment "Assignment4"
-	  And I add user "student2" as a participant to assignment "Assignment4"
-	  And I add user "student3" as a participant to assignment "Assignment4"
-	  And I press "Logout"
-	  And I log in as "student1"
-	  And I create a team named "team1" for the assignment "Assignment4"
-	  And I invite the user "student2" to my team for the assignment "Assignment4"
-	  And I invite the user "student3" to my team for the assignment "Assignment4"
-	  And I press "Logout"
-	  And I log in as "student2"
-	  And I join a team named "team1" for the assignment "Assignment4"
-	  And I press "Logout"
-	  And I log in as "student3"
-	  And I join a team named "team1" for the assignment "Assignment4"
-	Then I should not see "Leave Team"	

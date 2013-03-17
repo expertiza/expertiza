@@ -7,11 +7,12 @@ Feature: Manage the review as a student
         And I move to the "Assignments" page
         And I click the "test_Metareview" link
         Then I click the "Others' work" link
-
+@wip
     Scenario: View an submitted review
         When I click the "View" link
         Then I should see the details of submitted review
 
+@wip
     Scenario: Edit an submitted review
         When I click the "Edit" link
         And I fill in the review

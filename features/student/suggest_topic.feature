@@ -2,6 +2,7 @@ Feature: Suggest a topic
   In order to suggest a topic for assignment
   As a student
 
+@wip
 Scenario: Suggest a topic for assignment
   Given I am logged in as a student
 	And an assignment that allows me to suggest topics exists

@@ -3,7 +3,7 @@ Feature: Edit the team name
   As a student and
   As a member of the team
   I want to edit the team name and save the change
-
+@wip
 Scenario: Edit the name of my team
   Given I am logged in as a student
    And I move to the "Assignments" page

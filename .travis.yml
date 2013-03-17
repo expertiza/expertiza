@@ -27,7 +27,7 @@ before_script:
     - "export DISPLAY=:99.0"
     - "sh -e /etc/init.d/xvfb start"
 script:
-    - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake cucumber --profile travis"
+    - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake cucumber -p travis"
     # - "export DISPLAY=:99.0 && bundle exec rspec spec/"
 notifications:
     email:

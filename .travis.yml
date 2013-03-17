@@ -1,7 +1,6 @@
 language: ruby
 rvm:
     - 1.8.7
-    - rubygems 1.6.2
 branches:
   only:
     - master
@@ -16,6 +15,7 @@ before_install:
     - sudo apt-get install libmysqlclient-dev
     - sudo apt-get install graphviz
     - unset RAILS_ENV
+    - rvm rubygems 1.6.2
     - gem install ruby-debug -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.8.7-head/
     - bundle config build.raspell --with-opt-dir=

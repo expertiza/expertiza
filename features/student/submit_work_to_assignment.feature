@@ -3,6 +3,7 @@ Feature: Submit Work to an Assignment as a User
   As a user of an assignment in Expertiza
   I want to submit a link to the assignment for a wiki assignment
 
+@wip
 Scenario:  Log into Expertiza, Submit a link to an assignment
   Given I am logged in as a student
   And I move to the "Assignments" page

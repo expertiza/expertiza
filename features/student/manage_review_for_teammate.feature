@@ -7,10 +7,12 @@ Feature: Manage the review for teammates as a student
         And I move to the "Assignments" page
         And I click the "test_Metareview" link
         Then I click the "Your team" link
+@wip
     Scenario: View an submitted review for a teammate
         Given I click the "View" link
         Then I should see the details of submitted teammate review
 
+@wip
     Scenario: Edit an submitted review for a teammate
         Given I click the "Edit" link
         And I fill in the review

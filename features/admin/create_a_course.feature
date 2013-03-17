@@ -11,5 +11,4 @@ Scenario: Create Course
   		And I fill in "course_directory_path" with "course_directory_path 1"
   		And I fill in "course_info" with "course_info 1"
   		And I click the "Create" button
-		Then show me the page
   	Then I should see "course_name 1"

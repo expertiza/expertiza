@@ -36,9 +36,9 @@ Feature: Review another student's work as a student
 #    And I fill in the review
 #    And I click the "Save Review" button
 #  Then I should see "Your response was successfully saved."
-
+@wip
 Scenario: Successfully save a review
-  Given I am assigned as a reviewer for an assignment
-   And I open that particular assignment and begin review
-#  And I click the "Save Review" button
-#  Then I should see "Your response was successfully saved"
+Given I am assigned as a reviewer for an assignment
+And I open that particular assignment and begin review
+And I click the "Save Review" button
+Then I should see "Your response was successfully saved"

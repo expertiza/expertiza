@@ -213,7 +213,6 @@ class ReviewMappingController < ApplicationController
   
   def delete_all_reviewers      
     assignment = Assignment.find(params[:id])
-    puts assignment.name
     contributor = assignment.get_contributor(params[:contributor_id])
     mappings = contributor.review_mappings
 

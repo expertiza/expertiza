@@ -19,7 +19,6 @@
     #find whether assignment is team assignment
     assignment = Assignment.find(params[:id])
     #end
-    puts
 
     if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(DeadlineType.find_by_name("submission").id).due_at < Time.now
       @show_actions = false
@@ -133,7 +132,6 @@
 
           participant.update_topic_id(topic_id)
           participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-          puts participant.topic_id
           result = true
         end
       end

@@ -106,10 +106,6 @@ class StudentTaskController < ApplicationController
 
   def view
     @participant = AssignmentParticipant.find(params[:id])
-    puts "participant details #{@participant.topic_id}"
-	
-    puts params[:id]
-    puts "participant - #{@participant}"
     return unless current_user_id?(@participant.user_id)
     
     @assignment = @participant.assignment    

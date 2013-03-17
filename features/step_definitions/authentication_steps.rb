@@ -92,7 +92,6 @@ end
 
 Given 'I am not logged in' do
   if(find_button('Logout').nil?)
-    puts "not Logged in"
   else
     click_link('Logout')
   end

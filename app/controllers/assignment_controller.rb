@@ -334,7 +334,6 @@ class AssignmentController < ApplicationController
 			due_at= Time.parse(due_at)
 			mi=find_min_from_now(due_at)
       diff = mi-(duedates[i].threshold)*60
-      puts diff
       dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at(:db).to_s) , 1, diff.minutes.from_now)
       duedates[i].update_attribute(:delayed_job_id, dj.id)
 		end

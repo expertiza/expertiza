@@ -24,11 +24,10 @@ before_script:
     - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64 
     - bundle install
     - bundle exec rake db:migrate
-    - bundle exec rake db:test:prepare
     - "export DISPLAY=:99.0"
     - "sh -e /etc/init.d/xvfb start"
 script:
-    - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake cucumber --trace"
+    - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake cucumber travis"
     # - "export DISPLAY=:99.0 && bundle exec rspec spec/"
 notifications:
     email:

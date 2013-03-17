@@ -6,4 +6,4 @@ std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} --strict --require fe
 default: <%= std_opts %> features
 wip: --tags @wip:3 --wip features
 rerun: <%= rerun_opts %> --format rerun --out rerun.txt --strict --tags ~@wip
-travis: --format progress features
+travis: --format progress --tags ~@wip --require features

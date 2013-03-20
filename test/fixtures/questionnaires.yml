@@ -56,6 +56,17 @@ questionnaire5:
   section: "Random"
   instruction_loc: Questionnaire::DEFAULT_QUESTIONNAIRE_URL
 
+questionnaire6:
+  name: questionnaire6
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
+  private: 0
+  min_question_score: 0
+  max_question_score: 5
+  type: "MetareviewQuestionnaire"
+  display_type: "Review"
+  section: "Random"
+  instruction_loc: Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+
 peer_review_questionnaire:
  name: questionnaire5
  instructor_id: <%= Fixtures.identify(:instructor3) %>

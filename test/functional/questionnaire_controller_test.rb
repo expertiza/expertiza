@@ -13,6 +13,7 @@ class QuestionnaireControllerTest < ActionController::TestCase
   fixtures :questions
   fixtures :roles
   fixtures :question_types
+  fixtures :assignments
   fixtures :assignment_questionnaires
 
   def setup
@@ -190,12 +191,13 @@ class QuestionnaireControllerTest < ActionController::TestCase
   # Asserts that the questionnaire is there and then tests for deletion. Also tests that it
   # user is redirected with the correct questionnaire deletion message
   def test_delete
+    questionnaire6 = questionnaires(:questionnaire6)
     assert_not_nil(Questionnaire.find(@Questionnaire))
     assert_difference ('Questionnaire.count', difference = -1)  do
-      post :delete, :id => @Questionnaire
+      post :delete, :id => questionnaire6.id
 
       assert_nil flash[:error]
-      assert_equal "Questionnaire <B>questionnaire5</B> was deleted.", flash[:note]
+      assert_equal "Questionnaire <B>questionnaire6</B> was deleted.", flash[:note]
       assert_redirected_to :controller => 'tree_display', :action => :list
     end
   end

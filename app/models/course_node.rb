@@ -56,6 +56,17 @@ class CourseNode < Node
 
     return values
   end
+
+  # get parent id
+  def self.get_parent_id
+    folder = TreeFolder.find_by_name('Courses')
+    parent = FolderNode.find_by_node_object_id(folder.id)
+    if parent
+      return parent.id
+    else
+      return nil
+    end
+  end
   
   # Gets any children associated with this object
   # the get_children method will return assignments belonging to a course, but the method name is necessary due to polymorphism

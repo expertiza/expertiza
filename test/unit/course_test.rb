@@ -73,5 +73,4 @@ class CourseTest < ActiveSupport::TestCase
       @course0.copy_participants(assignments(:assignment2).id)
     end
   end
-
 end

@@ -81,4 +81,8 @@ class CourseTest < ActiveSupport::TestCase
     assert(@course_node.get_teams != nil, 'Should be true')
   end
 
+  def test_get_parent_id
+    assert_equal nodes(:node_courses).id,CourseNode.get_parent_id
+  end
+
 end

@@ -63,14 +63,4 @@ class Course < ActiveRecord::Base
       raise error_msg
     end                   
   end
-  
-   def create_course_node()
-      folder = TreeFolder.find_by_name('Courses')
-      parent = FolderNode.find_by_node_object_id(folder.id)
-      node = CourseNode.create(:node_object_id => self.id)
-      if parent != nil
-        node.parent_id = parent.id       
-      end
-      node.save   
-   end  
 end

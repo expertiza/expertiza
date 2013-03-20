@@ -50,7 +50,13 @@ class CourseController < ApplicationController
     new_course.name = 'Copy of '+orig_course.name
     begin
       new_course.save!
-      new_course.create_course_node
+      parent_id = CourseNode.get_parent_id
+      if parent_id
+        CourseNode.create(:node_object_id => new_course.id, :parent_id => parent_id)
+      else
+        CourseNode.create(:node_object_id => new_course.id)
+      end
+
       flash[:note] = 'The course is currently associated with an existing location. This could cause errors for furture submissions.'
       redirect_to :controller => 'course', :action => 'edit', :id => new_course.id
     rescue
@@ -62,10 +68,16 @@ class CourseController < ApplicationController
   # create a course
   def create
     course = Course.new(params[:course])
+
     course.instructor_id = session[:user].id
     begin
       course.save!
-      course.create_course_node
+      parent_id = CourseNode.get_parent_id
+      if parent_id
+        CourseNode.create(:node_object_id => course.id, :parent_id => parent_id)
+      else
+        CourseNode.create(:node_object_id => course.id)
+      end
       FileHelper.create_directory(course)
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue

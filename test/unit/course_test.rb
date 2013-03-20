@@ -73,12 +73,4 @@ class CourseTest < ActiveSupport::TestCase
       @course0.copy_participants(assignments(:assignment2).id)
     end
   end
-
-  # test method create_course_node
-  def test_create_course_node
-    assert_difference('CourseNode.count') do
-      @course0.create_course_node
-      assert_equal Fixtures.identify(:node_courses), CourseNode.last.parent_id
-    end
-  end
 end

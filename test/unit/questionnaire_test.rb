@@ -1,15 +1,16 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class RubricTest < ActiveSupport::TestCase
-  fixtures :questionnaires, :assignments
+  fixtures :questionnaires, :assignments, :assignment_questionnaires
 
   def setup
     # Database was initialized with (at least) 3 questionnaires.
     @questionnaire1 = Questionnaire.find(questionnaires(:questionnaire1).id)
     @questionnaire2 = Questionnaire.find(questionnaires(:questionnaire2).id)
     @questionnaire3 = Questionnaire.find(questionnaires(:questionnaire3).id)
+    @questionnaire5 = Questionnaire.find(questionnaires(:questionnaire5).id)
   end
-  
+
   def test_create
     assert_kind_of Questionnaire, @questionnaire1
     assert_equal questionnaires(:questionnaire1).name, @questionnaire1.name
@@ -82,5 +83,24 @@ class RubricTest < ActiveSupport::TestCase
 
       assert_not_equal(scores[questionnaire.symbol][:assessments],0)
     end
+  end
+
+
+  # Testing compute_weighted_score here so no need to separately test
+  # from the subclasses (e.g. review_questionnaire, author_feedback_questionnaire, etc.)
+  def test_compute_weighted_score
+    assignment = assignments(:assignment1)
+    assignment_questionnaire = assignment_questionnaires(:fifth)
+    questionnaire_weight = assignment_questionnaire.questionnaire_weight
+
+    arbitrary_average = 95
+    arbitrary_symbol = :feedback
+    scores = Hash.new
+    scores[arbitrary_symbol] = {:scores => {:avg => arbitrary_average}}
+
+    weighted_score = @questionnaire5.compute_weighted_score (arbitrary_symbol, assignment, scores)
+
+    assert_not_nil (weighted_score)
+    assert_equal (weighted_score, arbitrary_average * questionnaire_weight/100.to_f)
   end
 end

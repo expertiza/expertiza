@@ -7,3 +7,7 @@ pg_development.png
 .project
 .loadpath
 .rvmrc
+.idea
+capybara-*html
+*~
+db/schema.rb

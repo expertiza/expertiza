@@ -17,10 +17,12 @@
 
 </table>
 
-<hr/>
-<p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
-<%= link_to 'Delete', {:action => 'destroy', :id => @user}, 
-    :confirm => 'Delete this user?', :method => :post %> 
-	</p>
+<% unless current_user_role? == "Student" %>
+  <hr/>
+  <p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
+  <%= link_to 'Delete', {:action => 'destroy', :id => @user}, 
+      :confirm => 'Delete this user?', :method => :post %> 
+	  </p>
 
-<p><%= link_to 'Back', :action => 'list' %> to Users list</p>
+  <p><%= link_to 'Back', :action => 'list' %> to Users list</p>
+<% end %>

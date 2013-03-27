@@ -1,6 +1,9 @@
 Expertiza
 =========
 
+[![Build Status](https://travis-ci.org/expertiza/expertiza.png?branch=master)](https://travis-ci.org/expertiza/expertiza)
+[![Code Climate](https://codeclimate.com/github/expertiza/expertiza.png)](https://codeclimate.com/github/expertiza/expertiza)
+
 #### Peer review system
 
 Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.
@@ -12,23 +15,20 @@ Setup
 
 The expertiza environment is already set up in [NC State's VCL](https://vcl.ncsu.edu) image "Ruby on Rails".
 If you have access, this is quickest way to get a development environment running for Expertiza.
+See the Expertiza wiki on [developing Expertiza on the VCL](http://wikis.lib.ncsu.edu/index.php/Developing_Expertiza_on_the_VCL).
 
-If not:
+Using the VCL is the quickest way to get started, but you may find it awkward developing on a remote machine
+with network lag and having to reinstall gems every time you connect. Installing locally can be a pain though too.
+Life is full of tradeoffs. :-) The good news is that you can start on one environment, push your work to git,
+and switch to another environment if you don't like the one you started with.
 
-### Tools
+### Installing locally
 
- * [Set up git](http://help.github.com/set-up-git-redirect)
- * Install Ruby 1.8.7. (Ruby 1.9.2 may work but hasn't been tested)
-   Use [rvm](http://beginrescueend.com) on Linux/OSX, or [RailsInstaller](http://railsinstaller.org) on Windows
- * `gem install bundler` (see [issues on Windows](http://matt-hulse.com/articles/2010/01/30/from-zero-to-rails3-on-windows-in-600-seconds/))
+See the Expertiza wiki for setup instructions. Please update the wiki with corrections or additional helpful information.
 
-### Dependencies
-
- * libxslt development libraries [OSX: (already installed?) Ubuntu: `sudo apt-get install libxslt-dev` Fedora: `yum install libxslt-devel` Windows: ?]
- * (optional) [graphviz](http://www.graphviz.org)
- * bundled gems: `bundle install`
- 
- If anything is missing here, please report it in an issue or fix it in a pull request. Thanks!
+ * [OSX](http://wikis.lib.ncsu.edu/index.php/Creating_a_Mac_OS_X_Development_Environment_for_the_Expertiza_Application)
+ * [Linux](http://wikis.lib.ncsu.edu/index.php/Creating_a_Linux_Development_Environment_for_the_Expertiza_Application)
+ * [Windows](http://wikis.lib.ncsu.edu/index.php/Creating_a_Windows_Development_Environment_for_the_Expertiza_Application)
 
 Contributing
 ------------
@@ -48,7 +48,7 @@ All new files/contributions should:
 
  * Use unix line endings (Windows users: configure git to use [autocrlf](http://help.github.com/line-endings))
  * Indent with 2 spaces (no tabs; configure your editor) both in ruby and erb
- * Follow the [Ruby Style Guide](http://batsov.com/Programming/Ruby/2011/09/12/ruby-style-guide.html) style for syntax, formatting, and naming
+ * Follow the [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide) style for syntax, formatting, and naming
 
 When editing existing files:
 

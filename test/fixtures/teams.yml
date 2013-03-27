@@ -27,3 +27,35 @@ team5:
   name: team6
   parent_id: <%= Fixtures.identify(:assignment2) %>
   type: AssignmentTeam
+
+team6:
+  name: team7
+  parent_id: <%= Fixtures.identify(:assignment2) %>
+  type: AssignmentTeam
+
+team7:
+  name: team8
+  parent_id: <%= Fixtures.identify(:course0) %>
+  type: CourseTeam
+
+#Teams for course_object_oriented and instructor 1
+Assignment_Project1_Team1:
+  name: Assignment1Team1
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  type: AssignmentTeam
+
+Assignment_Project1_Team2:
+  name: Assignment1Team2
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  type: AssignmentTeam
+
+Assignment_Project2_Team1:
+  name: Assignment2Team1
+  parent_id: <%= Fixtures.identify(:assignment_project2) %>
+  type: AssignmentTeam
+
+Assignment_Project2_Team2:
+  name: Assignment2Team2
+  parent_id: <%= Fixtures.identify(:assignment_project2) %>
+  type: AssignmentTeam
+  

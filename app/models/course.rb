@@ -1,7 +1,7 @@
 class Course < ActiveRecord::Base
   has_many :ta_mappings
   validates_presence_of :name
-  has_many :assignments
+  has_many :assignments,:dependent => :destroy
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :participants, :class_name => 'CourseParticipant', :foreign_key => 'parent_id'
   
@@ -11,7 +11,7 @@ class Course < ActiveRecord::Base
   def get_teams
     return CourseTeam.find_all_by_parent_id(self.id)        
   end
-  
+
   #Returns this object's submission directory
   def get_path
     if self.instructor_id == nil
@@ -22,6 +22,10 @@ class Course < ActiveRecord::Base
   
   def get_participants
     CourseParticipant.find_all_by_parent_id(self.id)
+  end
+
+  def get_participant (user_id)
+    CourseParticipant.find_all_by_parent_id_and_user_id(self.id, user_id)
   end
   
   def add_participant(user_name)
@@ -59,14 +63,4 @@ class Course < ActiveRecord::Base
       raise error_msg
     end                   
   end
-  
-   def create_node()
-      folder = TreeFolder.find_by_name('Courses')
-      parent = FolderNode.find_by_node_object_id(folder.id)
-      node = CourseNode.create(:node_object_id => self.id)
-      if parent != nil
-        node.parent_id = parent.id       
-      end
-      node.save   
-   end  
 end

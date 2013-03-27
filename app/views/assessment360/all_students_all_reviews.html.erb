@@ -1,0 +1,89 @@
+<div>
+  <table cellpadding=2 border="1" frame="below" cellspacing="0" style="border-style:1px solid black;">
+    <tr>
+      <th rowspan=2>Students</th>
+      <% count = 0%>
+      <% @assignments.each do |assignment| %>
+        <% count = count +1 %>
+        <th colspan=2 width="300"> <%= assignment.name.to_s %> </th>
+      <% end %>
+      <th colspan="2" width="300">Aggregate Score</th>
+    </tr>
+    <tr>
+      <% 1.upto @assignments.count + 1 do %>
+       <td><b>Metareviews</b></td><td><b>Teammate Reviews</b></td>
+      <% end %>
+    </tr>
+   <br>
+   <% overall_teammate_average = 0; overall_teammate_count=0 %>
+   <% overall_meta_average = 0; overall_meta_count=0 %>
+   <% @students.each do |student| %>
+     <tr>
+      <td align="center"><%= link_to student.fullname.to_s, :action => 'one_student_all_reviews' , :student_id => student.id, :course_id => @course.id  %> </td>
+       <% teammate_aggregate = 0;meta_aggregate=0; teammate_count =0;meta_count=0 %>
+       <% @assignments.each do |assignment| %>
+         <% assignment_participant = assignment.participants.find_by_user_id(student.user_id) %>
+         <% if assignment_participant.nil? %>
+           <td></td><td></td>
+         <% else %>
+         <% teammate_reviews = assignment_participant.get_teammate_reviews() ; meta_reviews = assignment_participant.get_metareviews() %>
+         <% if !teammate_reviews.nil? %>
+          <% teammate_average = 0 %>
+          <% teammate_reviews.each do |teammate_review| %>
+          <% teammate_average = teammate_average + teammate_review.get_average_score %>
+         <% end %>
+         <% if teammate_reviews.count.to_i > 0.to_i %>
+          <% teammate_average = (teammate_average.to_f/teammate_reviews.count.to_f).to_f.round(3) %>
+         <% end %>
+       <% end %>
+       <% if teammate_average.to_f > 0.to_f %>
+        <% teammate_aggregate = teammate_aggregate + teammate_average %>
+        <% teammate_count = teammate_count+1 %>
+       <% end %>
+       <% meta_average = 0.to_i %>
+        <% if !meta_reviews.nil? %>
+         <% meta_reviews.each do |meta_review| %>
+         <% meta_average = meta_average + meta_review.get_average_score %>
+        <% end %>
+        <% if meta_reviews.count > 0 %>
+         <% meta_average = (meta_average.to_f/meta_reviews.count.to_f).to_f.round(3) %>
+        <% end end %>
+        <% if meta_average > 0 %>
+         <% meta_aggregate = meta_aggregate + meta_average %>
+         <% meta_count = meta_count+1 %>
+        <% end %>
+        <td align="center" width="150"> <%= meta_average  %> </td> <td align="center" width="150"><%= teammate_average %></td>
+        <% end %>
+      <% end %>
+    
+    <td align="center" width="150"> <% if meta_count.to_i > 0 %>
+                          <%= (meta_aggregate/meta_count).to_f.round(2) %>
+                          <% overall_meta_average =  overall_meta_average + (meta_aggregate/meta_count)%>
+                          <% overall_meta_count=overall_meta_count+1%>
+                          <% end %> </td>
+    <td align="center" width="150"> <% if teammate_count.to_i > 0 %>
+                          <%= (teammate_aggregate/teammate_count).to_f.round(2) %>
+                          <% overall_teammate_average =  overall_teammate_average + (teammate_aggregate/teammate_count)%>
+                          <% overall_teammate_count=overall_teammate_count+1%>
+                          <% end %></td>
+     </tr>
+    <% end %>
+    <tr>
+        <td><b>Class Average</b></td>
+	<% 1.upto @assignments.count do %>
+        <td border="0"></td><td border="0"></td>
+        <% end %>
+        <% if overall_meta_count > 0 %>   
+	<td><center><%= (overall_meta_average/overall_meta_count).to_f.round(2) %></center></td>
+        <% else %>
+        <td></td>
+        <% end %> 
+        <% if overall_teammate_count > 0 %>   
+	<td><center><%= (overall_teammate_average/overall_teammate_count).to_f.round(2) %></center></td>
+        <% else %>
+        <td></td>
+        <% end %>
+    </tr>
+
+   </table>
+</div>

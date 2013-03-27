@@ -8,32 +8,32 @@ class InvitationController < ApplicationController
     team = AssignmentTeam.find_by_id(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(student.user_id)
-    
+
     #check if the invited user is valid
     if !user
-      flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct." 
+      flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
     else
       participant = AssignmentParticipant.find(:first, :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
       if !participant
-        flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment." 
+        flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
       else
-        check = TeamsUser.find(:all, :conditions => ['team_id =? and user_id =?', team.id, user.id])
+        team_member = TeamsUser.find(:all, :conditions => ['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
-        if (check.size > 0)
+        if (team_member.size > 0)
           flash[:notice] = "\"#{user.name}\" is already a member of team."
         else
-          current_invs = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.parent_id])
+          sent_invitation = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.parent_id])
           #check if the invited user is already invited (i.e. awaiting reply)
-          if current_invs.length == 0
+          if sent_invitation.length == 0
             @invitation = Invitation.new
             @invitation.to_id = user.id
             @invitation.from_id = student.user_id
             @invitation.assignment_id = student.parent_id
-            @invitation.reply_status = 'W' 
+            @invitation.reply_status = 'W'
             @invitation.save
           else
             flash[:notice] = "You have already sent an invitation to \"#{user.name}\"."
-          end   
+          end
         end
       end
     end

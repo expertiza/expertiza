@@ -1,6 +1,7 @@
 class AssignmentController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
+  
   #-------------------------------------------------------------------------------------------------------------------
   # COPY
   # Creates a copy of an assignment along with dates and submission directory
@@ -12,12 +13,14 @@ class AssignmentController < ApplicationController
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(new_assign)
-    new_assign.update_attribute('name','Copy of '+ new_assign.name)
-    new_assign.update_attribute('created_at',Time.now)
-    new_assign.update_attribute('updated_at',Time.now)
+    new_assign.update_attribute('name','Copy of ' + new_assign.name)
+    new_assign.update_attribute('created_at', Time.now)
+    new_assign.update_attribute('updated_at', Time.now)
+    
     if new_assign.directory_path.present?
-      new_assign.update_attribute('directory_path',new_assign.directory_path+'_copy')
+      new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy')
     end
+    
     session[:copy_flag] = true
     new_assign.copy_flag = true
 
@@ -57,7 +60,8 @@ class AssignmentController < ApplicationController
     @wiki_types = WikiType.find(:all)
     @private = params[:private] == true        
     #calling the defalut values mathods
-    get_limits_and_weights 
+    get_limits_and_weights
+    
     if (session[:user].role.name == "Administrator") or (session[:user].role.name == "Super-Administrator")
       flash[:note] = "Note: The Submission Directory field to be filled in is the path relative to the instructor\'s
       home directory (named after his user.name). However, when an administrator creates an assignment,
@@ -106,7 +110,7 @@ class AssignmentController < ApplicationController
       #duedates[i].update_attribute(:delayed_job_id, dj.id)
 		end
   end
-
+  
   def create
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.    
@@ -135,20 +139,28 @@ class AssignmentController < ApplicationController
     # Deadline types used in the deadline_types DB table
     deadline = DeadlineType.find_by_name("submission")
     @Submission_deadline = deadline.id
+    
     deadline = DeadlineType.find_by_name("review")
     @Review_deadline = deadline.id
+    
     deadline = DeadlineType.find_by_name("resubmission")
     @Resubmission_deadline = deadline.id
+    
     deadline = DeadlineType.find_by_name("rereview")
     @Rereview_deadline = deadline.id
+    
     deadline = DeadlineType.find_by_name("metareview")
     @Review_of_review_deadline = deadline.id
+    
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
+    
     deadline = DeadlineType.find_by_name("signup")
     @signup_deadline = deadline.id
+    
     deadline = DeadlineType.find_by_name("team_formation")
     @team_formation_deadline = deadline.id
+    
     check_flag = @assignment.availability_flag
 
     if(check_flag == true && params[:submit_deadline].nil?)
@@ -157,7 +169,9 @@ class AssignmentController < ApplicationController
     elsif (@assignment.save)
       set_questionnaires   
       set_limits_and_weights
+      
       max_round = 1
+      
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
         if check_flag == true
@@ -199,12 +213,12 @@ class AssignmentController < ApplicationController
             raise "Please enter a valid Metareview deadline" if !due_date
           end
         }
-
+        
         # Create submission directory for this assignment
         # If assignment is a Wiki Assignment (or has no directory)
         # the helper will not create a path
-        FileHelper.create_directory(@assignment)      
-
+        FileHelper.create_directory(@assignment) 
+        
         # Creating node information for assignment display
         @assignment.create_node()
         
@@ -217,7 +231,6 @@ class AssignmentController < ApplicationController
         @wiki_types = WikiType.find(:all)
         render :action => 'new'
       end
-
     else
       @wiki_types = WikiType.find(:all)
       render :action => 'new'
@@ -231,7 +244,6 @@ class AssignmentController < ApplicationController
   #   Creates and sets review deadlines using a helper function written in DueDate.rb
   #   If :id is not blank - update due date in database, else if :due_at is not blank - create due date in database
   #---------------------------------------------------------------------------------------------------------------------
-
   def set_due_dates
 
     return_string = ""
@@ -356,16 +368,16 @@ class AssignmentController < ApplicationController
 		
 		return time_in_min
   end
+  
   #--------------------------------------------------------------------------------------------------------------------
   # EDIT
   # Edit existing assignment
   #--------------------------------------------------------------------------------------------------------------------
-  
   def edit
     @assignment = Assignment.find(params[:id])
     prepare_to_edit
   end
-
+  
   #--------------------------------------------------------------------------------------------------------------------
   # PREPARE_TO_EDIT  (Helper function for CREATE, EDIT and UPDATE)
   # Prepare to edit existing assignment
@@ -556,7 +568,7 @@ class AssignmentController < ApplicationController
             due_date_temp.update_attributes(params[:due_date][due_date_key])              
             raise "Please enter a valid date & time" if due_date_temp.errors.length > 0						
           end
-	  # add to the delayed_jobs queue according to the updated due_dates
+	        # add to the delayed_jobs queue according to the updated due_dates
           add_to_delayed_queue
         end
      
@@ -597,7 +609,7 @@ class AssignmentController < ApplicationController
         for dj in djobs
           delete_from_delayed_queue(dj.id)
         end
-
+        
         @user = session[:user]
         id = @user.get_instructor
         if(id != assignment.instructor_id)

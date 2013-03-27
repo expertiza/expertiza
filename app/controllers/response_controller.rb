@@ -1,7 +1,15 @@
 class ResponseController < ApplicationController
   helper :wiki
   helper :submitted_content
-  helper :file  
+  helper :file
+  
+  def view
+    @response = Response.find(params[:id])
+    return if redirect_when_disallowed(@response)
+
+    @map = @response.map
+    get_content
+  end
   
   def delete
     @response = Response.find(params[:id])
@@ -19,19 +27,19 @@ class ResponseController < ApplicationController
      @map=ResponseMap.find(params[:id])
      get_content
         array_not_empty=0
-      @sorted_array=Array.new
+      @review_scores=Array.new
       @prev=Response.all
          #get all versions and find the latest version
       for element in @prev
         if(element.map_id==@map.id)
           array_not_empty=1
-          @sorted_array << element
+          @review_scores << element
         end
       end
 
      #sort all the available versions in descending order.
       if array_not_empty==1
-         @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
+         @sorted=@review_scores.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
          @largest_version_num=@sorted[0]
          @latest_phase=@largest_version_num.created_at
          due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id])
@@ -127,18 +135,19 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @response = Response.find(params[:id]) 
     return if redirect_when_disallowed(@response)
+    
     @map = @response.map 
     array_not_empty=0
-    @sorted_array=Array.new
+    @review_scores=Array.new
     @prev=Response.all
     for element in @prev
       if(element.map_id==@map.id)
         array_not_empty=1
-        @sorted_array << element
+        @review_scores << element
       end
     end
     if array_not_empty==1
-      @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
+      @sorted=@review_scores.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
       @largest_version_num=@sorted[0]
     end
     @response = Response.find_by_map_id_and_version_num(@map.id,@largest_version_num.version_num)
@@ -190,7 +199,6 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions
      
-     
       params[:responses].each_pair do |k,v|
       
         score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
@@ -199,7 +207,7 @@ class ResponseController < ApplicationController
           end
         score.update_attribute('score',v[:score])
         score.update_attribute('comments',v[:comment])
-     end    
+     end
     rescue
       msg = "Your response was not saved. Cause: "+ $!
     end
@@ -275,7 +283,7 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @modified_object = @map.id
     get_content  
-    #**********************
+    
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
       @question_type = Array.new
@@ -306,22 +314,23 @@ class ResponseController < ApplicationController
     @res = 0
     msg = ""
     error_msg = ""
+    
     begin
 
       #get all previous versions of responses for the response map.
       array_not_empty=0
-      @sorted_array=Array.new
+      @review_scores=Array.new
       @prev=Response.all
       for element in @prev
         if(element.map_id==@map.id)
           array_not_empty=1
-          @sorted_array << element
+          @review_scores << element
         end
       end
 
       #if previous responses exist increment the version number.
       if array_not_empty==1
-         @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
+         @sorted=@review_scores.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
          @largest_version_num=@sorted[0]
          if(@largest_version_num.version_num==nil)
             @version=1
@@ -353,6 +362,7 @@ class ResponseController < ApplicationController
       @response.delete
       error_msg = "Your response was not saved. Cause: " + $!
     end
+    
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end      
   
@@ -365,13 +375,10 @@ class ResponseController < ApplicationController
     for i in 0..questions.size-1
         # Local variable score is unused; can it be removed?
         score = Score.create(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
-         
-
     end
     msg = "#{@map.get_title} was successfully saved."
     
     saving
-    #redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
   end
   
   def saving   
@@ -406,6 +413,7 @@ class ResponseController < ApplicationController
       redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
     end
   end
+  
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note]  = params[:msg] unless params[:msg] and params[:msg].empty?
@@ -444,9 +452,8 @@ class ResponseController < ApplicationController
         redirect_to '/denied?reason=You are not on the team that wrote this feedback'
         return true
       end
-    else
-      return true unless current_user_id?(response.map.reviewer.user_id)
     end
-    return false
+    
+    !current_user_id?(response.map.reviewer.user_id)
   end
 end

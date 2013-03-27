@@ -5,13 +5,22 @@
     <BR/><BR/>
 <% end %>
 <TABLE class="grades" width="100%">
-<% if @assignment.team_assignment && @scores[:teams].length > 0 %>
+  <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
+<% if @assignment.team_count > 1 && @scores[:teams].length > 0 %>
   <%= render :partial => 'teams' %>
-<% elsif !@assignment.team_assignment && @scores[:participants].length > 0 %>
+<% elsif @assignment.team_count == 1 && @scores[:participants].length > 0 %>
   <%= render :partial => 'participants' %>
 <% else %>
-  <TR><TD>No <%if @assignment.team_assignment%>teams<%else%>participants<%end%> are defined for this assignment</TD></TR>
+  <TR><TD>No <%if @assignment.team_count > 1%>teams<%else%>participants<%end%> are defined for this assignment</TD></TR>
 <% end %>
 </TABLE>
+<BR/><BR/>
+<%= link_to 'Export '+'Grades',
+            :controller=>'export_file',
+            :action=>'start',
+            :model=>'Assignment',
+            :id=>@assignment.id %> <BR/><BR/>
 <a href="javascript:window.history.back()">Back</a>
+
+
 

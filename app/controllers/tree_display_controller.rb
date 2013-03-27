@@ -73,28 +73,17 @@ class TreeDisplayController < ApplicationController
   
   # called when the display is requested
   # ajbudlon, July 3rd 2008
-  def list  
-    if session[:display]      
-      @sortvar = session[:display][:sortvar]
-      @sortorder = session[:display][:sortorder]
-      if session[:display][:check] == "1"
+  def list
+    display = params[:display] || session[:display]
+    if display
+      @sortvar = display[:sortvar]
+      @sortorder = display[:sortorder]
+      if display[:check] == "1"
         @show = nil
       else
         @show = true
       end
-    end
-    if params[:display]      
-      @sortvar = params[:display][:sortvar]
-      @sortorder = params[:display][:sortorder] 
-      if params[:display][:check] == "1"
-        @show = nil
-      else
-        @show = true
-      end
-      session[:display] = params[:display]      
-    end
-  
-    if session[:display].nil? and params[:display].nil?
+    else
       @show = true
     end
     

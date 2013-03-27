@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  fixtures :users
+  fixtures :users, :roles
   
   def test_random_password_generation_for_new_users
     u = User.new(:email => "new@guy.co", :name => 'newguy')
@@ -96,6 +96,48 @@ class UserTest < ActiveSupport::TestCase
     avail_users_like_student1 = users(:instructor1).get_available_users('student1')
     assert_equal 1, avail_users_like_student1.size
     assert_equal "student1", avail_users_like_student1.first.name
+  end
+  
+  def test_emails_must_be_valid
+    u = User.new(:email => "new@guy.co", :name => 'newguy')
+    assert u.valid?, "Should be valid with a valid email"
+    
+    u.email = "not@valid"
+    assert !u.valid?, "Should not be valid with an invalid email"
+  end
+  
+  def test_emails_need_not_be_unique
+    used_email = users(:admin).email
+    u = User.new(:email => used_email, :name => 'newguy')
+    assert u.valid?, "User should be valid with a duplicate email"
+  end
+
+  def test_check_email
+    user = User.new
+    user.name = "testStudent1"
+    user.fullname = "test_Student_1"
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
+    user.email = "testStudent1@foo.edu"
+    user.role_id = "1"
+    user.save! # an exception is thrown if the user is invalid
+
+    email = MailerHelper::send_mail_to_user(user,"Test Email","user_welcome",user.clear_password)
+    assert !ActionMailer::Base.deliveries.empty?         # Checks if the mail has been queued in the delivery queue
+
+    assert_equal [user.email], email.to                  # Checks if the mail is being sent to proper user
+    assert_equal "Test Email", email.subject             # Checks if the mail subject is the same
+
+  end
+
+  def test_user_is_teaching_assistant
+    user = Ta.new
+    assert(user.is_teaching_assistant?, 'Should be true')
+  end
+
+  def test_user_is_NOT_teaching_assistant
+    user = User.new
+    assert(!(user.is_teaching_assistant?), 'Should be false')
   end
 
 end

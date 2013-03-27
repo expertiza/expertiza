@@ -1,0 +1,12 @@
+<h1>Editing question_type</h1>
+
+<% form_for(@question_type) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @question_type %> |
+<%= link_to 'Back', question_types_path %>

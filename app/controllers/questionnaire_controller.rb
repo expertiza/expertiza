@@ -9,30 +9,43 @@ class QuestionnaireController < ApplicationController
   # questions. The name and creator are updated.
   def copy
     orig_questionnaire = Questionnaire.find(params[:id])
-    questions = Question.find_all_by_questionnaire_id(params[:id])               
+    questions = Question.find_all_by_questionnaire_id(params[:id])
     @questionnaire = orig_questionnaire.clone
-    
+
     if (session[:user]).role.name != "Teaching Assistant"
       @questionnaire.instructor_id = session[:user].id
     else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
       @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
     end
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
-    
+
     begin
-      @questionnaire.save! 
+
+      @questionnaire.save!
       @questionnaire.update_attribute('created_at',Time.now)
-      questions.each{
-        | question |
+
+      questions.each{ | question |
+
         newquestion = question.clone
         newquestion.questionnaire_id = @questionnaire.id
         newquestion.save        
         
         advice = QuestionAdvice.find_by_question_id(question.id)
-        newadvice = advice.clone
-        newadvice.question_id = newquestion.id
-        newadvice.save
-      }       
+        if !(advice.nil?)
+          newadvice = advice.clone
+          newadvice.question_id = newquestion.id
+          newadvice.save
+        end
+
+        if (@questionnaire.section == "Custom")
+          old_question_type = QuestionType.find_by_question_id(question.id)
+          if !(old_question_type.nil?)
+            new_question_type = old_question_type.clone
+            new_question_type.question_id = newquestion.id
+            new_question_type.save
+          end
+        end
+      }
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
@@ -47,12 +60,20 @@ class QuestionnaireController < ApplicationController
      
   # Remove a given questionnaire
   def delete
-    questionnaire = Questionnaire.find(params[:id])
+
+    @questionnaire = Questionnaire.find(params[:id])
     
-    if questionnaire
+    if @questionnaire
        begin
-          name = questionnaire.name
-          questionnaire.delete
+          name = @questionnaire.name
+
+          for question in @questionnaire.questions
+            current_q_type = QuestionType.find_by_question_id(question.id)
+            if !current_q_type.nil?
+             current_q_type.delete
+            end
+          end
+          @questionnaire.delete
           flash[:note] = "Questionnaire <B>#{name}</B> was deleted."
       rescue
           flash[:error] = $!
@@ -72,10 +93,10 @@ class QuestionnaireController < ApplicationController
     begin
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to :action => 'list' if @questionnaire == nil
-    
+
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
-      save_questionnaire  
+      save_questionnaire
     end
     
     if params['export']
@@ -114,21 +135,32 @@ class QuestionnaireController < ApplicationController
   # Define a new questionnaire
   def new
     @questionnaire = Object.const_get(params[:model]).new
-    @questionnaire.private = params[:private] 
+    @questionnaire.private = params[:private]
     @questionnaire.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
-    @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE    
+    @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE
+    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+    @questionnaire.section = "Regular"
+  end
+
+  def select_questionnaire_type
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
+    @questionnaire.private = params[:questionnaire][:private]
+    @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+    @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+    @questionnaire.section = params[:questionnaire][:section]
+    @questionnaire.id = params[:questionnaire][:id]
+    @questionnaire.display_type = params[:questionnaire][:display_type]
   end
 
   # Save the new questionnaire to the database
   def create_questionnaire
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
-
     if (session[:user]).role.name == "Teaching Assistant"
       @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
     else
       @questionnaire.instructor_id = session[:user].id
-    end       
-    save_questionnaire    
+    end
+    save_questionnaire
     redirect_to :controller => 'tree_display', :action => 'list'
   end
   
@@ -167,14 +199,22 @@ class QuestionnaireController < ApplicationController
       render :action => 'edit_advice'
     end
   end
+
+  # Toggle the access permission for this assignment from public to private, or vice versa
+  def toggle_access
+    questionnaire = Questionnaire.find(params[:id])
+    questionnaire.private = !questionnaire.private
+    questionnaire.save
+    
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end
   
-  private  
+  private
   #save questionnaire object after create or edit
-  def save_questionnaire     
+  def save_questionnaire
     begin
       @questionnaire.save!
       save_questions @questionnaire.id if @questionnaire.id != nil and @questionnaire.id > 0
-      
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
@@ -184,21 +224,45 @@ class QuestionnaireController < ApplicationController
       flash[:error] = $!
     end
   end
-  
-  
+
+  #save parameters for new questions
+  def save_new_question_parameters(qid, q_num)
+    q = QuestionType.new
+    q.q_type = params[:question_type][q_num][:type]
+    q.parameters = params[:question_type][q_num][:parameters]
+    q.question_id =  qid
+    q.save
+  end
+
   # save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id)
+
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
       for question_key in params[:new_question].keys
         q = Question.new(params[:new_question][question_key])
         q.questionnaire_id = questionnaire_id
-        q.save if !q.txt.strip.empty?
+        if q.true_false == ''
+          q.true_false = false
+        end
+        if !q.txt.strip.empty?
+          q.save
+          questionnaire = Questionnaire.find_by_id(questionnaire_id)
+          if (questionnaire.section == "Custom")
+            for i in (questionnaire.min_question_score .. questionnaire.max_question_score)
+              a = QuestionAdvice.new(:score => i, :advice => nil)
+              a.question_id = q.id
+              a.save
+            end
+            save_new_question_parameters(q.id, question_key)
+          end
+
+        end
       end
     end
   end
-  
+
   # delete questions from a questionnaire
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
@@ -210,13 +274,44 @@ class QuestionnaireController < ApplicationController
           should_delete = false
         end
       end
-      
       if should_delete == true
         for advice in question.question_advices
           advice.destroy
         end
+        if (Questionnaire.find_by_id(questionnaire_id).section == "Custom")
+            delete_question_type(question.id)
+        end
         question.destroy
+
+
       end
+    end
+  end
+
+  #Deletes question type parameters corresponding to the question being deleted
+  def delete_question_type(q_id)
+    question_type = QuestionType.find_by_question_id(q_id)
+    question_type.destroy
+  end
+
+  def update_question_type (question_type_key)
+    this_q = QuestionType.find(question_type_key)
+    this_q.parameters = params[:q][question_type_key][:parameters]
+    if (params[:q][question_type_key][:q_type] == "0")
+        this_q.q_type =  Question::GRADING_TYPES_CUSTOM[0][0]
+    elsif (params[:q][question_type_key][:q_type] == "1")
+      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[1][0]
+    elsif (params[:q][question_type_key][:q_type] == "2")
+      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[2][0]
+    elsif (params[:q][question_type_key][:q_type] == "3")
+      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[3][0]
+    elsif (params[:q][question_type_key][:q_type] == "4")
+      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[4][0]
+    else
+      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[5][0]
+    end
+    if !this_q.nil?
+         this_q.save
     end
   end
   
@@ -224,18 +319,26 @@ class QuestionnaireController < ApplicationController
   def save_questions(questionnaire_id)
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
-    
+
     if params[:question]
       for question_key in params[:question].keys
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
+            if (Questionnaire.find_by_id(questionnaire_id).section == "Custom")
+              QuestionType.find_by_question_id(question_key).delete
+            end
             Question.delete(question_key)
           else
             # Update existing question.
             Question.update(question_key, params[:question][question_key])
           end
         rescue ActiveRecord::RecordNotFound 
+        end
+      end
+      if (Questionnaire.find_by_id(questionnaire_id).section == "Custom")
+        for question_type_key in params[:q].keys
+          update_question_type(question_type_key)
         end
       end
     end

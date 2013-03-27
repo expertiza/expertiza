@@ -10,11 +10,21 @@ class Role < ActiveRecord::Base
 
   attr_reader :student,:ta,:instructor,:administrator,:superadministrator
 
-  STUDENT = 1
-  TA = 6
-  INSTRUCTOR = 2
-  ADMINISTRATOR = 3
-  SUPERADMINISTRATOR = 4
+  def self.student
+    @@student_role ||= find_by_name 'Student'
+  end
+  def self.ta
+    @@ta_role ||= find_by_name 'Teaching Assistant'
+  end
+  def self.instructor
+    @@instructor_role ||= find_by_name 'Instructor'
+  end
+  def self.administrator
+    @@administrator_role ||= find_by_name 'Administrator'
+  end
+  def self.superadministrator
+    @@superadministrator_role ||= find_by_name 'Super-Administrator'
+  end
   
   def Role.rebuild_cache
     roles = Role.find(:all)

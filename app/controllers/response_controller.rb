@@ -455,4 +455,5 @@ class ResponseController < ApplicationController
     end
     
     !current_user_id?(response.map.reviewer.user_id)
+  end
 end

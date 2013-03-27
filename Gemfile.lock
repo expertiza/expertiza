@@ -56,6 +56,8 @@ GEM
     fastthread (1.0.7)
     ffi (1.3.0)
     ffi (1.3.0-x86-mingw32)
+    ffi-aspell (0.0.3)
+      ffi (>= 1.0.11)
     gchart (1.0.0)
     gchartrb (0.8)
     gdata (1.1.2)
@@ -110,7 +112,6 @@ GEM
       activesupport (= 2.3.15)
       rake (>= 0.8.3)
     rake (10.0.3)
-    raspell (1.3)
     rbx-require-relative (0.0.9)
     rdoc (3.12)
       json (~> 1.4)
@@ -155,7 +156,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   bind-it (= 0.2.0)
-  capistrano (~> 2.14.2)
+  capistrano
   capybara (= 0.3.9)
   cucumber (= 1.1.4)
   cucumber-rails (= 0.3.2)
@@ -164,6 +165,7 @@ DEPENDENCIES
   engtagger
   expertiza-authlogic (~> 2.1.6.1)
   fastercsv
+  ffi-aspell
   gchart
   gchartrb
   gdata
@@ -174,9 +176,8 @@ DEPENDENCIES
   mysql
   nokogiri
   open-uri-cached
-  rails (~> 2.3.15)
+  rails (= 2.3.15)
   rake
-  raspell
   rdoc
   rgl
   rjb (= 1.4.3)

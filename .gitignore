@@ -1,3 +1,5 @@
+.bundle/
+.ruby-version
 log
 tmp
 *.swp

@@ -16,7 +16,7 @@ class AdminController < ApplicationController
   end
 
   def search_instructor
-    @results = search_users(Role.instructor.id)
+     @results = search_users(Role.instructor.id)
   end
 
   def new_instructor
@@ -80,7 +80,7 @@ class AdminController < ApplicationController
   end
 
   def list_administrators    
-    user_id = session[:user].id    
+    user_id = session[:user].id  
     @users = User.paginate(:page => params[:page], :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role.administrator.id], :per_page => 50)
   end
    

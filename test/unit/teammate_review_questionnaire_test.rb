@@ -1,7 +1,8 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class AuthorFeedbackQuestionnaireTest < ActiveSupport::TestCase
-   #TODO verify fixture
+class TeammateReviewQuestionnaireTest < ActiveSupport::TestCase
+  #fixtures :author_feedback_questionnaires
+  #TODO verify fixture
   fixtures :assignment_questionnaires, :questionnaires, :assignments, :participants, :scores
 
   def setup

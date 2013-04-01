@@ -26,5 +26,13 @@ fourth:
   notification_limit: 15
   questionnaire_weight: 100
 
+fifth:
+  assignment_id: <%= Fixtures.identify(:assignment1) %>
+  questionnaire_id: <%= Fixtures.identify(:questionnaire5) %>
+  user_id: <%= Fixtures.identify(:student3) %>
+  notification_limit: 15
+  questionnaire_weight: 75
+
+
 
 

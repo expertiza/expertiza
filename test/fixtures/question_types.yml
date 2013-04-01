@@ -37,3 +37,8 @@ questiontype5:
  q_type: DropDown
  parameters: 1
  question_id: <%= Fixtures.identify(:question1) %>
+
+questiontype_fun:
+ q_type: Checkbox
+ parameters: 1
+ question_id: <%= Fixtures.identify(:question_fun) %>

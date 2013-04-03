@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121208064006) do
+ActiveRecord::Schema.define(:version => 20130403182858) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -564,6 +564,7 @@ ActiveRecord::Schema.define(:version => 20121208064006) do
     t.boolean "leaderboard_privacy",                      :default => false
     t.text    "digital_certificate"
     t.string  "persistence_token"
+    t.string  "timezonepref"
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

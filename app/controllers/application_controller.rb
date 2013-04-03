@@ -5,6 +5,30 @@ class ApplicationController < ActionController::Base
   helper_method :current_user_session, :current_user, :current_user_role?
   protect_from_forgery unless Rails.env.test?
   filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
+  around_filter :set_time_zone
+  
+  def set_time_zone
+      old_time_zone = Time.zone
+      logger.debug !(session[:user].nil?)
+      if (!(session[:user].nil?)) 
+          logger.debug "set timezone debug"
+          current_user_id = session[:user].id
+          preferredtimezone = User.find_by_id(current_user_id).timezonepref
+          logger.debug preferredtimezone
+          Time.zone = preferredtimezone if logged_in?
+      end
+  ensure
+      yield
+      Time.zone = preferredtimezone
+  end
+  
+  def logged_in?
+      if(!(session[:user].nil?))
+          true
+      else
+          false
+      end
+  end
 
   def authorize 
     unless session[:user]

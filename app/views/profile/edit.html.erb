@@ -15,5 +15,8 @@
   <% if @user.role.parent_id != nil %>
     <%= render :partial => 'limit' %>
   <% end %>    
+  <p><label>Preferred Time Zone</label></p>
+  <%= :timezonepref %>
+  <% time_zone_select(:user, :timezonepref) %><br />
   <%= submit_tag 'Save' %>
 <% end %>

@@ -27,6 +27,7 @@ gem 'ffi-aspell'
 gem 'nokogiri'
 gem 'seer'
 gem 'gchart'
+gem 'paper_trail','~> 1'
 group :development do
   gem 'mongrel'
   gem 'ruby-debug'

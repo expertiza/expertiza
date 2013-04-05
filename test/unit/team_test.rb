@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class TeamTest < ActiveSupport::TestCase
   fixtures :users
-  fixtures :courses
+  fixtures :course
   fixtures :teams
   
   def test_add_team

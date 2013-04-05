@@ -4,6 +4,7 @@ class Course < ActiveRecord::Base
   has_many :assignments,:dependent => :destroy
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :participants, :class_name => 'CourseParticipant', :foreign_key => 'parent_id'
+  has_paper_trail
   
   # Return any predefined teams associated with this course
   # Author: ajbudlon

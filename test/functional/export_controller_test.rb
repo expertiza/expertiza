@@ -9,7 +9,7 @@ require 'export_file_controller'
 class ExportFileController; def rescue_action(e) raise e end; end
 
 class ExportFileControllerTest < ActionController::TestCase
-  fixtures :courses,:users, :roles, :system_settings, :content_pages, :permissions, :roles_permissions, :controller_actions, :site_controllers, :menu_items, :assignments, :participants
+  fixtures :course,:users, :roles, :system_settings, :content_pages, :permissions, :roles_permissions, :controller_actions, :site_controllers, :menu_items, :assignments, :participants
   set_fixture_class :system_settings => 'SystemSettings'
   fixtures :system_settings
   fixtures :content_pages

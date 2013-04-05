@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class ParticipantTest < ActiveSupport::TestCase
 	fixtures :participants
-	fixtures :courses
+	fixtures :course
 	fixtures :assignments
 	
 	def test_add_participant()

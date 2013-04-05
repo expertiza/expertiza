@@ -11,7 +11,7 @@
   <tr class="listingRow">
 	<td><%= User.find(ta.ta_id).name %></td>
 	<td><%= link_to "Edit", {:action => 'show', :controller =>'users', :id => ta.ta_id} %></td>
-        <td><%= link_to "Delete", {:action => 'remove_ta', :controller =>'course', :id => ta.id, :course_id => ta.course_id }, :confirm=> "Do you want delete" %></td>
+        <td><%= link_to "Delete", {:action => 'remove_ta', :controller => 'course', :id => ta.id, :course_id => ta.course_id }, :confirm=> "Do you want delete" %></td>
   </tr>
  <%end%>
 </table>

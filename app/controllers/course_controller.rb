@@ -25,10 +25,10 @@ class CourseController < ApplicationController
   end
 
   def update
-    course = Course.find(params[:id])
-    if params[:course][:directory_path] and course.directory_path != params[:course][:directory_path]
+    @course = Course.find(params[:id])
+    if params[:course][:directory_path] and @course.directory_path != params[:course][:directory_path]
       begin
-        FileHelper.delete_directory(course)
+        FileHelper.delete_directory(@course)
       rescue
         flash[:error] = $!
       end
@@ -39,7 +39,8 @@ class CourseController < ApplicationController
         flash[:error] = $!
       end
     end
-    course.update_attributes(params[:course])
+    @course.update_attributes(params[:course])
+    flash[:note] = "#{undo_link}"
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -67,18 +68,19 @@ class CourseController < ApplicationController
 
   # create a course
   def create
-    course = Course.new(params[:course])
+    @course = Course.new(params[:course])
 
-    course.instructor_id = session[:user].id
+    @course.instructor_id = session[:user].id
     begin
-      course.save!
+      @course.save!
       parent_id = CourseNode.get_parent_id
       if parent_id
-        CourseNode.create(:node_object_id => course.id, :parent_id => parent_id)
+        CourseNode.create(:node_object_id => @course.id, :parent_id => parent_id)
       else
-        CourseNode.create(:node_object_id => course.id)
+        CourseNode.create(:node_object_id => @course.id)
       end
-      FileHelper.create_directory(course)
+      FileHelper.create_directory(@course)
+      flash[:note] = "#{undo_link}"
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = "The following error occurred while saving the course: "+$!
@@ -88,18 +90,19 @@ class CourseController < ApplicationController
 
   # delete the course
   def delete
-    course = Course.find(params[:id])
+    @course = Course.find(params[:id])
     begin
-      FileHelper.delete_directory(course)
+      FileHelper.delete_directory(@course)
     rescue
       flash[:error] = $!
     end
-    CourseNode.find_by_node_object_id(course.id).destroy
-    course.ta_mappings.each{
+    CourseNode.find_by_node_object_id(@course.id).destroy
+    @course.ta_mappings.each{
       | map |
       map.destroy
     }
-    course.destroy
+    @course.destroy
+    flash[:note] = "#{undo_link}"
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -137,6 +140,10 @@ class CourseController < ApplicationController
     @ta_mapping = TaMapping.find(params[:id])
     @ta_mapping.destroy
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
+  end
+
+  def undo_link
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
   end
 
 end

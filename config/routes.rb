@@ -15,6 +15,9 @@ ActionController::Routing::Routes.draw do |map|
   # -- just remember to delete public/index.html.
   # map.connect '', :controller => "welcome"
 
+  # setup routes for paper_trail
+  # map.connect 'versions/revert',:controller => :versions,:action => :revert
+
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
 
   # Allow downloading Web Service WSDL as a file with an extension

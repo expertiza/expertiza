@@ -3,7 +3,7 @@ require 'yaml'
 require 'assignment_participant'
 
 class AssignmentParticipantTest < ActiveSupport::TestCase
-  fixtures :assignments, :users, :roles, :participants , :courses , :questionnaires
+  fixtures :assignments, :users, :roles, :participants , :course , :questionnaires
   
   def init
     @participant = AssignmentParticipant.new

@@ -8,7 +8,7 @@
                :child_nodes => child_nodes               
             } %>			
 <% if node.get_partial_name %>
-	<%if node.get_partial_name == 'courses_folder_actions' && session[:user].role_id == 6 %>           
+	<%if node.get_partial_name == 'courses_folder_actions' && session[:user].role_id == 6 %>
 	<%else%>
 		<%= render :partial => '/tree_display/actions/'+node.get_partial_name, 
            :locals => {:node => node} %>

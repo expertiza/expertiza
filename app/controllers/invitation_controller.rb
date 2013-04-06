@@ -8,32 +8,32 @@ class InvitationController < ApplicationController
     team = AssignmentTeam.find_by_id(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(student.user_id)
-    
+
     #check if the invited user is valid
     if !user
-      flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct." 
+      flash[:notice] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
     else
       participant = AssignmentParticipant.find(:first, :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
       if !participant
-        flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment." 
+        flash[:notice] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
       else
-        check = TeamsUser.find(:all, :conditions => ['team_id =? and user_id =?', team.id, user.id])
+        team_member = TeamsUser.find(:all, :conditions => ['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
-        if (check.size > 0)
+        if (team_member.size > 0)
           flash[:notice] = "\"#{user.name}\" is already a member of team."
         else
-          current_invs = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.parent_id])
+          sent_invitation = Invitation.find(:all, :conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.parent_id])
           #check if the invited user is already invited (i.e. awaiting reply)
-          if current_invs.length == 0
+          if sent_invitation.length == 0
             @invitation = Invitation.new
             @invitation.to_id = user.id
             @invitation.from_id = student.user_id
             @invitation.assignment_id = student.parent_id
-            @invitation.reply_status = 'W' 
+            @invitation.reply_status = 'W'
             @invitation.save
           else
             flash[:notice] = "You have already sent an invitation to \"#{user.name}\"."
-          end   
+          end
         end
       end
     end
@@ -52,7 +52,7 @@ class InvitationController < ApplicationController
     
     student = Participant.find(params[:student_id])
     
-    #if you are on a team and you accept another invitation, remove your previous entry
+    #if you are on a team and you accept another invitation, remove your previous entry in the teams_users table.
     old_entry = TeamsUser.find(:first, :conditions => ['user_id = ? and team_id = ?', student.user_id, params[:team_id]])
     if old_entry != nil
       old_entry.destroy
@@ -60,35 +60,35 @@ class InvitationController < ApplicationController
     
     #if you are on a team and you accept another invitation and if your old team does not have any members, delete the entry for the team
     other_members = TeamsUser.find(:all, :conditions => ['team_id = ?', params[:team_id]])
-    if !other_members.nil? && other_members.length == 0
+    if other_members.nil? || other_members.length == 0
       old_team = AssignmentTeam.find(:first, :conditions => ['id = ?', params[:team_id]])
       if old_team != nil
         old_team.destroy
       end
 
-
-      #if a sign_up sheet exists then release all the topics selected by this team into the pool.
-      selected_topics = SignedUpUser.find_all_by_creator_id(params[:team_id])
-      if !selected_topics.nil?
-        for selected_topic in selected_topics
-          if selected_topic.is_waitlisted == false
-            first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(selected_topic.topic_id, true)
-            if !first_waitlisted_user.nil?
+      #if a signup sheet exists then release all the topics selected by this team into the pool.
+      old_teams_signups = SignedUpUser.find_all_by_creator_id(params[:team_id])
+      if !old_teams_signups.nil?
+        for old_teams_signup in old_teams_signups
+          if old_teams_signup.is_waitlisted == false # i.e., if the old team was occupying a slot, & thus is releasing a slot ...
+            first_waitlisted_signup = SignedUpUser.find_by_topic_id_and_is_waitlisted(old_teams_signup.topic_id, true)
+            if !first_waitlisted_signup.nil?
               #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-              first_waitlisted_user.is_waitlisted = false
-              first_waitlisted_user.save
+              first_waitlisted_signup.is_waitlisted = false
+              first_waitlisted_signup.save
 
-               #Also update the participant table. But first_waitlisted_user.creator_id is the team id
-               #so find one of the user in the team because the update_topic_id function in participant
-               #will take care of updating all the participants in the team
-               user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-               participant = Participant.find_by_user_id_and_parent_id(user_id,old_team.assignment.id)
-               participant.update_topic_id(topic_id)
-
-              SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id, SignUpTopic.find(selected_topic.topic_id)['assignment_id'])
-            end
-          end
-          selected_topic.destroy
+              #Also update the participant table. But first_waitlisted_signup.creator_id is the team id
+              #so find one of the users on the team because the update_topic_id function in participant
+              #will take care of updating all the participants on the team
+              user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_signup.creator_id}).user_id
+              participant = Participant.find_by_user_id_and_parent_id(user_id,old_team.assignment.id)
+              participant.update_topic_id(old_teams_signup.topic_id)
+               
+              SignUpTopic.cancel_all_waitlists(first_waitlisted_signup.creator_id, SignUpTopic.find(old_teams_signup.topic_id)['assignment_id'])
+            end # if !first_waitlisted_signup.nil
+            # Remove the now-empty team from the slot it is occupying.
+          end # if old_teams_signup.is_waitlisted == false
+          old_teams_signup.destroy
         end
       end
     end

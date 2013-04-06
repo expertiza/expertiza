@@ -50,7 +50,21 @@ class StudentTeamController < ApplicationController
       redirect_to :controller =>'student_team', :action => 'edit', :team_id =>params[:team_id], :student_id => params[:student_id]
     end 
   end
-  
+
+  def advertise_for_partners
+      puts "team #{params[:team_id]}"
+      Team.update_all("advertise_for_partner=true",:id=>params[:team_id])
+      #respond_to do |format|
+      #  format.html #  index.html.erb
+      #format.xml  { render :xml => @log_entries }
+      #end
+      #redirect_to :controller => 'student_team', :action => 'advertise_for_partners' , :id => params[:team_id]
+  end
+  def remove
+    Team.update_all("advertise_for_partner=false",:id=>params[:team_id])
+    redirect_to :controller => 'student_team', :action => 'view' , :id => params[:team_id]
+  end
+
   def leave
     @student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(@student.user_id)
@@ -71,16 +85,39 @@ class StudentTeamController < ApplicationController
         #or to the first team in the waitlist
         signups = SignedUpUser.find(:all, :conditions => {:creator_id => params[:team_id]})
         signups.each {|signup|
-          first_waitlisted_user = SignedUpUser.find(:first, :conditions => {:topic_id => signup.topic_id, :is_waitlisted => true})
-          if !first_waitlisted_user.nil?
-            first_waitlisted_user.is_waitlisted = false
-            first_waitlisted_user.save
-
-            user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-            participant = Participant.find_by_user_id(user_id)
-            participant.update_topic_id(nil)
-          end
+          #get the topic_id
+          signup_topic_id = signup.topic_id
+          #destroy the signup
           signup.destroy
+          
+          #get the number of non-waitlisted users signed up for this topic
+          non_waitlisted_users = SignedUpUser.find(:all, :conditions => {:topic_id => signup_topic_id, :is_waitlisted => false})
+          #get the number of max-choosers for the topic
+          max_choosers = SignUpTopic.find(:first, :conditions => {:id => signup_topic_id}).max_choosers
+          
+          #check if this number is less than the max choosers
+          if non_waitlisted_users.length < max_choosers
+            first_waitlisted_user = SignedUpUser.find(:first, :conditions => {:topic_id => signup_topic_id, :is_waitlisted => true})
+  
+            #moving the waitlisted user into the confirmed signed up users list
+            if !first_waitlisted_user.nil?
+              first_waitlisted_user.is_waitlisted = false
+              first_waitlisted_user.save
+
+              waitlisted_team_user = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id})
+              #waitlisted_team_user could be nil since the team the student left could have been the one waitlisted on the topic
+              #and teams_users for the team has been deleted in one of the earlier lines of code
+              
+             if !waitlisted_team_user.nil?
+                user_id = waitlisted_team_user.user_id
+                if !user_id.nil?
+                  participant = Participant.find_by_user_id(user_id)
+                  participant.update_topic_id(nil)    
+                end
+             end
+            end      
+          end
+          #signup.destroy
         }
       end
     end

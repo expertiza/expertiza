@@ -1,0 +1,13 @@
+
+
+
+<h1>New Advertisement</h1>
+
+<% form_tag :action => 'add_advertise_comment',:id=>params[:team_id],:controller => 'advertise_for_partner' do %>
+  <p><label>Please add comment to your advertisement</label><br/>
+  <%= text_area(:comment,"") %>
+
+  <%#= render :partial => 'user', :locals => { :new_user => true } %>
+  <%= submit_tag "Advertise" %>
+<% end %>
+

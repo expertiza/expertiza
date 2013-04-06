@@ -4,11 +4,11 @@ require 'users_controller'
 # Re-raise errors caught by the controller.
 class UsersController; def rescue_action(e) raise e end; end
 
-class UsersControllerTest < Test::Unit::TestCase
+class UsersControllerTest < ActionController::TestCase
   fixtures :users, :participants, :assignments, :wiki_types, :response_maps
   fixtures :roles
 # --------------------------------------------------------------
-  set_fixture_class:system_settings => 'SystemSettings'    
+  set_fixture_class :system_settings => 'SystemSettings'    
   fixtures :system_settings
   fixtures :content_pages  
   @settings = SystemSettings.find(:first)
@@ -89,5 +89,63 @@ class UsersControllerTest < Test::Unit::TestCase
     assert_template 'users/keys'
     user = User.find(users(:student1).id)
     assert_not_nil user.digital_certificate
+  end
+
+  def test_should_get_data_and_index
+    get :list, :letter => 's', :page => 2, :num_users => 1
+
+    assert_response :success
+    assert assigns(:users)
+    assert_select 'div.pagination', true
+  end
+
+  def test_should_not_show_pagination_links_if_all_users_are_shown
+    get :list, :letter => 's', :num_users => 4
+
+    assert_response :success
+    assert assigns(:users)
+    assert_select 'div.pagination', false
+  end
+
+  def test_search_by_username
+    #search for something that is there
+    get :list, :letter => 'tud10', :num_users => 4, :search_by => 1
+    assert_response :success
+    assert assigns(:users)
+    assert_not_equal assigns(:users).size, 0
+
+    #search for something that is not there
+    get :list, :letter => 'tgdfgdfsdafa0', :num_users => 4, :search_by => 1
+    assert_response :success
+    assert assigns(:users)
+    assert_equal assigns(:users).size, 0
+  end
+
+  def test_search_by_fullname
+    #search for something that is there
+    get :list, :letter => '9_ful', :num_users => 4, :search_by => 2
+    assert_response :success
+    assert assigns(:users)
+    assert_not_equal assigns(:users).size, 0
+
+    #search for something that is not there
+    get :list, :letter => 'sdgfbfvrs', :num_users => 4, :search_by => 2
+    assert_response :success
+    assert assigns(:users)
+    assert_equal assigns(:users).size, 0
+  end
+
+  def test_search_by_email
+    #search for something that is there
+    get :list, :letter => '9@mailinator.com', :num_users => 4, :search_by => 3
+    assert_response :success
+    assert assigns(:users)
+    assert_not_equal assigns(:users).size, 0
+
+    #search for something that is not there
+    get :list, :letter => 'fsfgdfvxzcff', :num_users => 4, :search_by => 3
+    assert_response :success
+    assert assigns(:users)
+    assert_equal assigns(:users).size, 0
   end
 end

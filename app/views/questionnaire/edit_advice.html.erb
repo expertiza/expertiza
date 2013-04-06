@@ -16,7 +16,7 @@ function show_vertical_questions(question_id){
 	while(horz_questions.length > 0)
 	{
 		// Copy the value before deleting the horizontal question
-		vert_questions[i].value = horz_questions[0].value; 
+		vert_questions[i].value = horz_questions[0].value;
 		horz_questions[0].parentNode.removeChild(horz_questions[0]);
 		i++;
 	}
@@ -56,55 +56,16 @@ function show_horizontal_questions(question_id){
 	<% for question in @questionnaire.questions %>
 		<tr id="horizontal_questions_<%= question.id %>">
 			<td>
-				<a onclick="
-					if(display_vertical_<%=question.id%> == false){
-						// Vertical advice table should now be displayed
-						display_vertical_<%=question.id%> = true;
-						vertical_table = document.getElementById('vertical_questions_<%=question.id%>');
-						vertical_table.style.display='';
-						show_vertical_questions(<%=question.id%>);
-					}
-					else{
-						// Hide vertical advice table
-						display_vertical_<%=question.id%> = false;
-						vertical_table = document.getElementById('vertical_questions_<%=question.id%>');
-						vertical_table.style.display='none';
-						show_horizontal_questions(<%=question.id%>);
-					}
-					")>
+				<a onclick="">
 				<%= question.txt %></a>
 			</td>
 			<% i = 0; %>
 			<% for @advice in question.question_advices.sort {|x,y| y.score <=> x.score } %>
 			<td id="horizontal_question_<%=question.id%>_<%=i%>">
 				<% i = i + 1; %>
-				<%= text_field 'advice[]', 'advice', :size => 12, :id => "horizontal_"+@advice.id.to_s+"_advice" %>
+				<%= text_field 'advice[]', 'advice', :size => 12, :id => "horizontal_"+@advice.id.to_s+"_advice"%>
 			</td>
 			<% 	end %>
-		</tr>
-		<tr>
-			<td colspan=<%=@questionnaire.max_question_score-@questionnaire.min_question_score+2%>>
-			<table id="vertical_questions_<%= question.id %>" style="display:none">
-					<% for @advice in question.question_advices.sort {|x,y| y.score <=> x.score } %>
-					<tr>
-						<td>
-						  <% if question.true_false %>
-						      <% if @advice.score == 1 %>
-						      True
-						      <% else %>
-						      False
-						      <% end %>
-						  <% else %>
-							<%= @advice.score %>
-						  <% end %>
-						</td>
-						<td>
-							<%= text_field 'advice[]', 'advice', :size => 80, :id => "vertical_"+@advice.id.to_s+"_advice"%>
-						</td>
-					</tr>
-					<% 	end %>
-			</table>
-			</td>
 		</tr>
 	<% end %>
 </table>

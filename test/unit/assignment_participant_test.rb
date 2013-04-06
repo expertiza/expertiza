@@ -2,8 +2,59 @@ require File.dirname(__FILE__) + '/../test_helper'
 require 'yaml'
 require 'assignment_participant'
 
-class AssignmentParticipantTest < Test::Unit::TestCase
-  fixtures :assignments, :users, :roles, :participants
+class AssignmentParticipantTest < ActiveSupport::TestCase
+  fixtures :assignments, :users, :roles, :participants , :courses , :questionnaires
+  
+  def init
+    @participant = AssignmentParticipant.new
+  end
+
+  def test_add_new_participant()
+    participant = Participant.new
+
+    #TODO Should an empty Participant be allowed?
+    # assert !participant.valid?
+
+    assert participant.valid?
+
+  end
+
+  def test_add_course_participant()
+    participant = CourseParticipant.new
+
+    assert participant.valid?
+  end
+
+  def test_add_new_assignment_participant()
+    participant = AssignmentParticipant.new
+    assert !participant.valid?
+
+
+    participant.handle = 'test_handle'
+    assert participant.valid?
+  end
+
+  def test_participiant_actions
+    questionnaire1 = Array.new
+    questionnaire1<<questionnaires(:questionnaire0)
+    questionnaire1<<questionnaires(:questionnaire1)
+    questionnaire1<<questionnaires(:questionnaire2)
+    questionnaire1<<questionnaires(:peer_review_questionnaire)
+    scores = Hash.new
+    scores[:participant] = AssignmentParticipant.find_by_parent_id(assignments(:assignment0))
+    questionnaire1.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(AssignmentParticipant.find_by_parent_id(assignments(:assignment0)))
+      assert_not_equal(scores[questionnaire.symbol][:assessments],0)
+    end
+  end
+
+  def test_add_user_with_invalid_name
+    user = User.new
+    assert !user.valid?
+    assert user.errors.invalid?(:name)
+    #assert user.errors.invalid?(:password)
+  end
   
   def test_import
     row = Array.new
@@ -142,4 +193,9 @@ class AssignmentParticipantTest < Test::Unit::TestCase
     end
   end
 
+  def test_add_course_participant()
+    participant = CourseParticipant.new
+
+    assert participant.valid?
+  end
 end

@@ -9,3 +9,5 @@ deadline_type_rereview:
   name: rereview
 deadline_type_metareview:
   name: metareview
+deadline_type_drop_topic:
+  name: drop_topic

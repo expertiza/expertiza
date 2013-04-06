@@ -1,6 +1,15 @@
-require 'digest/sha1'
-
 class User < ActiveRecord::Base
+  
+  acts_as_authentic do |config|
+    config.validates_uniqueness_of_email_field_options = {:if => lambda { false }} # Don't validate email uniqueness
+    config.password_field = :clear_password
+    config.crypted_password_field = :password
+    config.crypto_provider = Authlogic::CryptoProviders::Sha1
+    config.salt_first = true
+    Authlogic::CryptoProviders::Sha1.join_token = ''
+    Authlogic::CryptoProviders::Sha1.stretches = 1
+  end
+
   has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id', :dependent => :destroy
   # FIXME:          :class_name should be AssignmentParticipant, probably. In most cases it's used that way. But all?
   has_many :assignments, :through => :participants
@@ -15,15 +24,10 @@ class User < ActiveRecord::Base
   validates_presence_of :email, :message => "can't be blank; use anything@mailinator.com for test users"
   validates_format_of :email, :with => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, :allow_blank => true
   validates_uniqueness_of :name
-  validates_confirmation_of :clear_password
 
   # happens in this order. see http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html
-  before_save :encrypt_password
-  before_create :assign_random_password
+  before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.clear_password.blank? } # AuthLogic
   after_create :email_welcome
-  after_save :erase_clear_password
-
-  attr_accessor :clear_password
 
   def list_mine(object_type, user_id)
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
@@ -45,76 +49,36 @@ class User < ActiveRecord::Base
 
   def can_impersonate?(other_user)
     return true if other_user == self # can impersonate self
+    return true if self.is_teaching_assistant_for? other_user #TAs can impersonate their students
     return false if other_user == other_user.parent # no one can impersonate a top-level parent (usually superadmin)
     return other_user.parent == self || can_impersonate?(other_user.parent) # recursive
   end
 
-  def encrypt_password
-    if self.clear_password  # Only update the password if it has been changed
-      self.password_salt = self.object_id.to_s + rand.to_s
-      self.password = Digest::SHA1.hexdigest(self.password_salt +
-                                             self.clear_password)
-    end
-  end
-
-  def erase_clear_password
-    self.clear_password = nil
-  end
-
   def assign_random_password
-    if self.clear_password.blank?
-      self.clear_password = random_pronouncable_password
-      self.encrypt_password # There's a before_save filter for this, but it has already run before the before_create filter that calls this
+    if self.password.blank?
+      self.password = self.random_password
     end
   end
 
+  # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
-    Mailer.deliver_message(
-        {:recipients => self.email,
-         :subject => "Your Expertiza account has been created",
-         :body => {
-           :user => self,
-           :password => clear_password,
-           :first_name => ApplicationHelper::get_user_first_name(self),
-           :partial_name => "user_welcome"
-         }
-        }
-    )
+    MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", clear_password)
   end
 
   def check_password(clear_password)
-    self.password == Digest::SHA1.hexdigest(self.password_salt.to_s +
-                                                 clear_password)
+    Authlogic::CryptoProviders::Sha1.stretches = 1
+    Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + clear_password])
   end
 
-  # Generate email to user with new password
-  def send_password(clear_password)
-    self.clear_password = clear_password
-    save # password is encrypted in before_save filter
-    
-    Mailer.deliver_message(
-        {:recipients => self.email,
-         :subject => "Your Expertiza password has been reset",
-         :body => {
-           :user => self,
-           :password => clear_password,
-           :first_name => ApplicationHelper::get_user_first_name(self),
-           :partial_name => "send_password"
-         }
-        }
-    )
+  # Resets the password to be mailed to the user
+  def reset_password
+    randomize_password
+    save
+    clear_password
   end
 
-  # credit: http://snippets.dzone.com/posts/show/2137
-  def random_pronouncable_password(size=4)
-    c = %w(b c d f g h j k l m n p qu r s t v w x z ch cr fr nd ng nk nt ph pr rd sh sl sp st th tr)
-    v = %w(a e i o u y)
-    f, r = true, ''
-    (size * 2).times do
-      r << (f ? c[rand * c.size] : v[rand * v.size])
-      f = !f
-    end
-    r
+  def self.random_password(size=8)
+    random_pronouncable_password((size/2).round) + rand.to_s[2,3]
   end
 
   def self.import(row,session,id = nil)
@@ -217,6 +181,85 @@ class User < ActiveRecord::Base
     
     # return the new private key
     new_private
-  end 
+  end
+
+  def initialize(attributes = nil)
+    super(attributes)
+    Authlogic::CryptoProviders::Sha1.stretches = 1
+    @email_on_review = true
+    @email_on_submission = true
+    @email_on_review_of_review = true
+  end
+
+  def self.export(csv, parent_id, options)
+    users = User.find(:all)
+    users.each {|user|
+      tcsv = Array.new
+      if (options["personal_details"] == "true")
+        tcsv.push(user.name, user.fullname, user.email)
+      end
+      if (options["role"] == "true")
+        tcsv.push(user.role.name)
+      end
+      if (options["parent"] == "true")
+        tcsv.push(user.parent.name)
+      end
+      if (options["email_options"] == "true")
+        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review)
+      end
+      if (options["handle"] == "true")
+        tcsv.push(user.handle)
+      end
+      csv << tcsv
+    }
+  end
+
+  def self.get_export_fields(options)
+    fields = Array.new
+    if (options["personal_details"] == "true")
+      fields.push("name", "full name", "email")
+    end
+    if (options["role"] == "true")
+      fields.push("role")
+    end
+    if (options["parent"] == "true")
+      fields.push("parent")
+    end
+    if (options["email_options"] == "true")
+      fields.push("email on submission", "email on review", "email on metareview")
+    end
+    if (options["handle"] == "true")
+      fields.push("handle")
+    end
+    return fields
+  end
+
+  def self.from_params(params)
+      if params[:user_id]
+        user = User.find(params[:user_id])
+      else
+        user = User.find_by_name(params[:user][:name])
+      end
+      if user.nil?
+         newuser = url_for :controller => 'users', :action => 'new'
+         raise "Please <a href='#{newuser}'>create an account</a> for this user to continue."
+      end
+      return user
+  end
+
+  def is_teaching_assistant_for?(student)
+    return false if self.role.name != 'Teaching Assistant'
+    return false if student.role.name != 'Student'
+    Course.all.each do |c|
+      return true if 
+        c.participants.all(:conditions => "user_id=#{student.id}").size > 0 &&
+        c.participants.all(:conditions => "user_id=#{id}").size > 0
+    end
+    false
+  end
+
+  def is_teaching_assistant?
+    return false
+  end
 
 end

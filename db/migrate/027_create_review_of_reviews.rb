@@ -7,6 +7,8 @@ class CreateReviewOfReviews < ActiveRecord::Migration
     t.column "review_num_for_reviewer", :integer
   end
 
+
+
   add_index "review_of_reviews", ["review_of_review_mapping_id"], :name => "fk_review_of_review_review_of_review_mappings"
 
   execute "alter table review_of_reviews

@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class RubricTest < Test::Unit::TestCase
+class RubricTest < ActiveSupport::TestCase
   fixtures :questionnaires, :assignments
 
   def setup
@@ -31,10 +31,6 @@ class RubricTest < Test::Unit::TestCase
     assert_equal "questionnaire1 new name", @questionnaire1.name
   end
   
-#  def test_destroy
-#    @questionnaire1.destroy
-#    assert_raise(ActiveRecord::RecordNotFound) { questionnaire.find(@questionnaire1.id) }
-#  end
   
   def test_validate_no_numbers
     @questionnaire1.min_question_score = "akajfsd"
@@ -63,41 +59,28 @@ class RubricTest < Test::Unit::TestCase
   end
   
   def test_true_false_question
-    #assert !@questionnaire1.true_false_questions?
-    #q = Question.new
-    #q.questionnaire_id = @questionnaire1.id
-    #q.true_false = false
-    #q.txt = "1"
     q2 = Question.new
     q2.questionnaire_id = @questionnaire1.id
     q2.true_false = true
     q2.txt = "2"
-    #@questionnaire1.questions << q
-    #assert !@questionnaire1.true_false_questions?
     @questionnaire1.questions << q2
     assert @questionnaire1.true_false_questions?
   end
 
   def test_get_assessment_for
-     questionnaire1 = Array.new
-     questionnaire1<<questionnaires(:questionnaire0)
-     questionnaire1<<questionnaires(:questionnaire1)
-     questionnaire1<<questionnaires(:questionnaire2)
-     #questionnaire1<<questionnaires(:questionnaire3)
-     #questionnaire1<<questionnaires(:questionnaire4)
-     questionnaire1<<questionnaires(:peer_review_questionnaire)
+    questionnaire1 = Array.new
+    questionnaire1<<questionnaires(:questionnaire0)
+    questionnaire1<<questionnaires(:questionnaire1)
+    questionnaire1<<questionnaires(:questionnaire2)
+    questionnaire1<<questionnaires(:peer_review_questionnaire)
 
-      
-      puts questionnaire1.size
+    scores = Hash.new
+    scores[:participant] = AssignmentParticipant.find_by_parent_id(assignments(:assignment0))
+    questionnaire1.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(AssignmentParticipant.find_by_parent_id(assignments(:assignment0)))
 
-      scores = Hash.new
-      scores[:participant] = AssignmentParticipant.find_by_parent_id(assignments(:assignment0))
-      questionnaire1.each{
-        | questionnaire |
-        scores[questionnaire.symbol] = Hash.new
-        scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(AssignmentParticipant.find_by_parent_id(assignments(:assignment0)))
-
-        assert_not_equal(scores[questionnaire.symbol][:assessments],0)
-        }
+      assert_not_equal(scores[questionnaire.symbol][:assessments],0)
+    end
   end
 end

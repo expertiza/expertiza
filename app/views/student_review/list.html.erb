@@ -1,17 +1,15 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
 
 <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@reviewee_topic_id) == "Complete" %> 
- 
   <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
-  
   <% if @assignment.is_using_dynamic_reviewer_assignment? %>
-	  <% if @num_reviews_in_progress == 0 %>
+	  <%# if @num_reviews_in_progress == 0 %>
 	    <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
 	        <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment} %>
 	    <% elsif @assignment.review_assignment_strategy == Assignment::RS_STUDENT_SELECTED %>
 	      <%= render :partial => 'set_self_review', :locals => {:assignment => @assignment} %>
 	    <% end %>
-	  <% end %>
+	  <% #end %>
  <% end %>
 <% else %>
   <p><em>Reviews cannot be performed at this time</em></p>

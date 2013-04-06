@@ -14,4 +14,14 @@ class TeamsUser < ActiveRecord::Base
       team.delete    
     end
   end
+
+  def hello
+    return "Hello"
+  end
+
+  def get_team_members(team_id)
+
+
+
+  end
 end

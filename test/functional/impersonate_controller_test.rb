@@ -8,11 +8,11 @@ require 'impersonate_controller'
 # Re-raise errors caught by the controller.
 class ImpersonateController; def rescue_action(e) raise e end; end
 
-class ImpersonateControllerTest < Test::Unit::TestCase
-  fixtures :users, :roles, :goldberg_system_settings
+class ImpersonateControllerTest < ActionController::TestCase
+  fixtures :users, :roles, :system_settings
 
   # puts "Now entering ImpersonateController Test...."
-  set_fixture_class:system_settings => 'SystemSettings'    
+  set_fixture_class :system_settings => 'SystemSettings'    
   fixtures :system_settings
   fixtures :content_pages  
   @settings = SystemSettings.find(:first)

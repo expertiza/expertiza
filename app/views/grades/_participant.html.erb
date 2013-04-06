@@ -26,7 +26,7 @@
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
     <TD><%= participant.fullname %>
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a>
-	<% if participant.topic_id %> (<%= participant.topic.topic_identifier %>)<% end %>
+	<% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
 	</FONT>  	
     </TD>
     
@@ -71,10 +71,14 @@
     <TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>
     <% end %>
-    <% if @assignment.team_assignment %>
+  <!--ACS Teammate review needs to be done only if there are more than one person in the team-->
+  <% if @assignment.team_count > 1 %>
     <% if tr_avg %>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",tr_avg) %>%
-    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a> (<%= pscore[:teammate][:assessments].size %>)</FONT>
+    <TD ALIGN="CENTER" VALIGN="TOP">
+    	<%if controller.action_name != "view_my_scores"%>
+    		<%= sprintf("%.2f",tr_avg) %>
+    		<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a> (<%= pscore[:teammate][:assessments].size %>)</FONT>
+    	<% end %>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min) %>% - <%= sprintf("%.0f",tr_max) %>%
     <% if controller.action_name != "view_my_scores" %>
@@ -86,31 +90,37 @@
     <TD ALIGN="CENTER">---</TD>
     <% end %>    
     <% end %>
+    <!-- If we have a total point value, display in "out of" format rather than percentage for total score -->
+    <% if pscore[:max_pts_available]
+      score_postfix = sprintf(" / %.2f",pscore[:max_pts_available])
+    else
+      score_postfix = "%"
+    end %>
     <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
     	<TD ALIGN="CENTER">
     	<% if stage == "Complete" %>      
-      	<% if participant.grade 
-      	    total_score = participant.grade
-      	    title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
-      	   else
-      	    total_score = pscore[:total_score] 
-      	    title = nil
-      	   end %>
-      	<div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %>%</div>       	    
-      	<% if controller.action_name != "view_my_scores" %> 
-      	  <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
-      	<% end %>
+        <% if participant.grade
+          total_score = participant.grade
+          title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
+        else
+          total_score = pscore[:total_score] 
+          title = nil
+        end %>
+        <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %><%= score_postfix %></div>
+        <% if controller.action_name != "view_my_scores" %> 
+          <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
+        <% end %>
     	<% else %>
       	<FONT SIZE="-1">(in <%= stage %>)</FONT>
     	<% end %>      
     	</TD>
    	<% else %>
-   	    <% if participant.grade %>   	        
-   	    	<TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10) %>% </TD>
-   	    <% else %>
-   	        <TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f", pscore[:total_score])) %>% </TD>	    	
-   	    <% end %>   	        
+      <% if participant.grade %>
+      <TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10) %><%= score_postfix %></TD>
+      <% else %>
+        <TD ALIGN="CENTER"><%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f", pscore[:total_score])) %><%= score_postfix %></TD>
+      <% end %>
    	<% end %>
 </TR>
 <TR  class="row" id="<%= prefix %>_files" style="display:none">

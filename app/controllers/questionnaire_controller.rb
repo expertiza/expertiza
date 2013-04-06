@@ -97,6 +97,7 @@ class QuestionnaireController < ApplicationController
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
       save_questionnaire
+      #redirect_to :action => 'list', :controller => 'tree_display'
     end
     
     if params['export']
@@ -109,18 +110,27 @@ class QuestionnaireController < ApplicationController
     
     if params['import']
       file = params['csv']
-      questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
-      
+      if @questionnaire.section=="Custom"
+        @questions_from_import = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
+      else
+        questions=QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
+
+
       if questions != nil and questions.length > 0
 
         # delete the existing questions if no scores have been recorded yet
         @questionnaire.questions.each {
           | question |
             raise "Cannot import new questions, scores exist" if Score.find_by_question_id(question.id)
-            question.delete        
+            if (Questionnaire.find_by_id(question.questionnaire_id).section == "Custom")
+              QuestionType.find_by_question_id(question.id).delete
+            end
+            question.delete
+
         }
         
         @questionnaire.questions = questions
+      end
       end
     end
     
@@ -193,8 +203,9 @@ class QuestionnaireController < ApplicationController
         QuestionAdvice.update(advice_key, params[:advice][advice_key])
       end
       flash[:notice] = "The questionnaire's question advice was successfully saved"
-      redirect_to :action => 'list'
-      
+      #redirect_to :action => 'list'
+      redirect_to :controller => 'tree_display', :action => 'list'
+
     rescue ActiveRecord::RecordNotFound
       render :action => 'edit_advice'
     end
@@ -260,9 +271,11 @@ class QuestionnaireController < ApplicationController
     questions = Question.find(:all, :conditions => "questionnaire_id = " + questionnaire_id.to_s)
     for question in questions
       should_delete = true
-      for question_key in params[:question].keys
-        if question_key.to_s === question.id.to_s
-          should_delete = false
+      if params[:question] != nil
+        for question_key in params[:question].keys
+          if question_key.to_s === question.id.to_s
+            should_delete = false
+          end
         end
       end
       if should_delete == true

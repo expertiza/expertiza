@@ -4,7 +4,6 @@
 <table>
 	<tr>
 		<td valign="top"><label for="questionnaire_name">Name:</label>	</td>
-		<td>
 			<%= text_field 'questionnaire', 'name'  %>
 			<%= hidden_field 'questionnaire', 'id' %>
 			<%= hidden_field 'questionnaire', 'type' %>
@@ -36,9 +35,14 @@
 		  <input style="margin-left: 50pt" type="button" value="Add" onclick="addQuestions()">
 		  <input id="numQuestionsToAdd" type="text" value="1" size=1> more question(s)
         </td>
-		<td colspan=2><input type="button" value="Delete selected questions" onclick="deleteQuestions()"></td>
+      <% if @questionnaire.questions.length > 0 %>
+          <td colspan=2><input type="button" id="deleteQuestion" value="Delete selected questions" onclick="deleteQuestions()"></td>
+      <% else %>
+          <td colspan=2><input type="button" id="deleteQuestion" value="Delete selected questions" onclick="deleteQuestions()" disabled="true"></td>
+      <% end %>
 	</tr>
-	<tr>
+  <% if @questionnaire.questions.length > 0 %>
+    <tr>
 		<td align=left width=30>Delete</td>
 		<td align=center width=300>Question</td>
 		<td align=center width=100>Scoring</td>
@@ -47,37 +51,56 @@
          <%end%>
 		<td align=left>Weight</td>
 	</tr>
-	
+   <% end %>
 	<% 	i = 1   %>
-    <% for @question in @questionnaire.questions %>
-      <% @q = QuestionType.find_by_question_id(@question.id) %>
-        <tr>
-            <td align=center><input type=checkbox id="question_chk<%= i %>"></td>
-            <td><%= text_field "question[]", 'txt', :size=>70 %></td>
-            <% if (@questionnaire.section == "Custom") %>
-              <% if @q.q_type == "Checkbox"  %>
-                <% selected_value = 0 %>
-              <% elsif @q.q_type == "TextField"%>
-                <% selected_value = 1 %>
-              <% elsif @q.q_type == "TextArea"%>
-                <% selected_value = 2 %>
-              <% elsif @q.q_type == "DropDown"%>
-                <% selected_value = 3 %>
-              <% elsif @q.q_type == "UploadFile"%>
-                <% selected_value = 4 %>
-              <% else selected_value = 5 %>
-              <% end %>
-                <td><%= select("q[]", :q_type, Question::GRADING_TYPES_CUSTOM, :selected => selected_value)%></td>
-                <td><%= text_field "q[]",  'parameters', :size=>30 %></td>
-            <%else%>
-                <td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
-            <% end%>
+    <% if params['import'] && @questionnaire.section == "Custom"%>
+      <% for @question in @questions_from_import %>
+        <% @question.to_json %>
+        <script type="text/javascript">
+            var txt = '<%= @question.txt %>';
+            addQuestion(txt,"", "");
+        </script>
+        <% 	i += 1 %>
+      <% end %>
+    <% else %>
+        <% for @question in @questionnaire.questions %>
+          <% @q = QuestionType.find_by_question_id(@question.id) if !params['import'] %>
+          <% if params['import']  %>
+            <% @q = QuestionType.new %>
+          <% end %>
+            <tr>
+                <td align=center><input type=checkbox id="question_chk<%= i %>"></td>
+                <td><%= text_field "question[]", 'txt', :size=>70, :onkeyup => "document.forms[0].submit()" %></td>
+                <% if (@questionnaire.section == "Custom") %>
+                  <% if params['import'] %>
+                    <% selected_value = 0 %>
+                  <% elsif @q.q_type == "Checkbox"  %>
+                    <% selected_value = 0 %>
+                  <% elsif @q.q_type == "TextField"%>
+                    <% selected_value = 1 %>
+                  <% elsif @q.q_type == "TextArea"%>
+                    <% selected_value = 2 %>
+                  <% elsif @q.q_type == "DropDown"%>
+                    <% selected_value = 3 %>
+                  <% elsif @q.q_type == "UploadFile"%>
+                    <% selected_value = 4 %>
+                  <% else selected_value = 5 %>
+                  <% end %>
 
-            <td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
-        </tr>
-	<% 	i += 1 %>
-	<% end %>
+                  <td><%= select("q[]", :q_type, Question::GRADING_TYPES_CUSTOM, :selected => selected_value)%></td>
+                  <td><%= text_field "q[]",  'parameters', :size=>30 %></td>
+
+                <%else%>
+                    <td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
+                <% end%>
+
+                <td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
+            </tr>
+        <% 	i += 1 %>
+        <% end %>
+        <% end %>
 </table>
+
 <BR/>
 <!--[eoform:course]-->
 

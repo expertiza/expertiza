@@ -4,9 +4,12 @@
 
 <% form_tag({:action=>'edit', :id=>@questionnaire.id}, :multipart => true) do %>
 	<%= render :partial => 'questionnaire' %>
-	
+
 	<%= submit_tag "Save #{@questionnaire.display_type.downcase}", :name=>"save" %>
-    <input style="margin-left:36em" type="submit" name="view_advice" value="View advice"/>	
+    <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice"/>
+
+
+    <%# if @questionnaire.section != "Custom" %>
 
   	<h4>Import/Export (from/to CSV format)</h4>
   	<input type="submit" name="import" value="Import questions"/>
@@ -14,6 +17,8 @@
   	<br />
 
   	<%= submit_tag "Export questions to CSV", :name=>"export" %>
+
+    <%# end %>
   	<br />
 <% end %>
 <br />

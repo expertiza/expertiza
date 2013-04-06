@@ -4,8 +4,14 @@
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: {}
+one:
+  q_type: "Checkbox"
+  parameters: nil
+  question_id: <%= Fixtures.identify(:question1) %>
 # column: value
 #
-two: {}
+two:
+  q_type: "Checkbox"
+  parameters: nil
+  question_id: <%= Fixtures.identify(:question2) %>
 #  column: value

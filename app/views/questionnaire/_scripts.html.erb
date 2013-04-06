@@ -1,5 +1,14 @@
 <script type="text/javascript">
 num_questions = <%= [@questionnaire.questions.length,1].max %>;
+var aMail = new Array();
+<% questionnaires = Questionnaire.find_all_by_type(@questionnaire.type) %>
+<% for que in questionnaires %>
+<% all_questions = Question.find_all_by_questionnaire_id(que.id).map {|n| n.txt} %>
+<% for q in all_questions %>
+aMail.push(<%= q.to_json %>);
+<% end %>
+<% end %>
+aMail.sort();
 
 function deleteQuestions(){
 	var checkedObjArray = new Array();
@@ -21,56 +30,112 @@ function deleteQuestions(){
 
 function addQuestions(){
 	numQuestionsToAdd = parseInt(document.getElementById("numQuestionsToAdd").value);
-	for(i=0; i<numQuestionsToAdd; i++){
-		addQuestion();
+    for(i=0; i<numQuestionsToAdd; i++){
+		addQuestion("",""," ");
 	}
 }
 
-function addQuestion(){
+function addQuestion(in_str, parameter_str, type_str){
     qtype =  document.getElementById("section").value;
-	table = document.getElementById("questions_table");
-	var row = table.insertRow(-1);
-	id = num_questions;
-	column = document.createElement("td");
-	column.innerHTML = "<center><input type=checkbox id='question_chk" + num_questions + "'></center>";
-	row.appendChild(column);
-	
-	column = document.createElement("td");
-	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][txt] size=70 type=text/>";
-	row.appendChild(column);
-	
-	column = document.createElement("td");
+    table = document.getElementById("questions_table");
+    var row = table.insertRow(-1);
+    id = num_questions;
+    column = document.createElement("td");
+    column.innerHTML = "<center><input type=checkbox id='question_chk" + num_questions + "'></center>";
+    row.appendChild(column);
 
-     if (qtype == "Custom"){
-         gradingTypes = "<select id=question_" + id + "_true_false name=question_type["+id+"][type]>";
+    column = document.createElement("td");
+    column.innerHTML = "<input  onkeyup='Complete(this, event)' id=new_question_" + id + "_txt name=new_question[" + id + "][txt] size=70 type=text value='" + in_str + "'>";
+    row.appendChild(column);
 
-        <% for type in Question::GRADING_TYPES_CUSTOM %>
-            <%= "gradingTypes += '<option value=" + type[0].to_s + ">" + type[0].to_s + "</option>';"%>
-        <% end %>
-     }else{
+    column = document.createElement("td");
+
+    if (qtype == "Custom"){
+        gradingTypes = "<select id=question_" + id + "_true_false name=question_type["+id+"][type]>"
+
+    <% for type in Question::GRADING_TYPES_CUSTOM %>
+    <%= "gradingTypes += '<option value=" + type[0].to_s + ">" + type[0].to_s + "</option>';"%>
+
+    <% end %>
+        //gradingTypes += "<option selected=selected value="+type_str+">"+type_str+"</option>";
+        //document.getElementById("question_" + id + "_true_false").defaultSelected("TextField");
+    }else{
         gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
-        <% for type in Question::GRADING_TYPES %>
-            <%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
-        <% end %>
-     }
+    <% for type in Question::GRADING_TYPES %>
+    <%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
+    <% end %>
+    }
     gradingTypes += "</select>"
-	column.innerHTML = gradingTypes;
-	row.appendChild(column);
+    column.innerHTML = gradingTypes;
+    row.appendChild(column);
 
     if (qtype == "Custom"){
         column = document.createElement("td");
-	    column.innerHTML = "<input id=new_question" + id + "_txt name=question_type["+id+"][parameters] size=30 type=text/>";
-	    row.appendChild(column);
+        column.innerHTML = "<input id=new_question" + id + "_txt name=question_type["+id+"][parameters] size=30 type=text value='"+parameter_str+"' />";
+        row.appendChild(column);
     }
-	
-	column = document.createElement("td");
-	weights = "<select id=new_question_" + id + "_weight name=new_question[" + id +"][weight]>";
-	<% for weight in Question::WEIGHTS %>
-		<%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
-	<% end %>
-	weights = weights + "</select>";
-	column.innerHTML = weights;
-	row.appendChild(column);
-	num_questions = num_questions + 1;
+
+    column = document.createElement("td");
+    weights = "<select id=new_question_" + id + "_weight name=new_question[" + id +"][weight]>";
+<% for weight in Question::WEIGHTS %>
+<%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+<% end %>
+    weights = weights + "</select>";
+    column.innerHTML = weights;
+    row.appendChild(column);
+    num_questions = num_questions + 1;
+}
+
+function Complete(obj, evt) {
+    if ((!obj) || (!evt) || (aMail.length == 0)) {
+        return;
+    }
+
+    if (obj.value.length == 0) {
+        return;
+    }
+
+    var elm = (obj.setSelectionRange) ? evt.which : evt.keyCode;
+
+    if ((elm < 32) || (elm >= 33 && elm <= 46) || (elm >= 112 && elm <= 123)) {
+        return;
+    }
+
+    var txt = obj.value;
+    elm = txt.split("?");
+    txt = elm.pop();
+    txt = txt.replace(/^\s*/, "");
+
+    if (txt.length == 0) {
+        return;
+    }
+
+    if (obj.createTextRange) {
+        var rng = document.selection.createRange();
+        if (rng.parentElement() == obj) {
+            elm = rng.text;
+            var ini = obj.value.lastIndexOf(elm);
+        }
+    } else if (obj.setSelectionRange) {
+        var ini = obj.selectionStart;
+    }
+
+    for (var i = 0; i < aMail.length; i++) {
+        elm = aMail[i].toString();
+
+        if (elm.toLowerCase().indexOf(txt.toLowerCase()) == 0) {
+            obj.value += elm.substring(txt.length, elm.length);
+            break;
+        }
+    }
+
+    if (obj.createTextRange) {
+        rng = obj.createTextRange();
+        rng.moveStart("character", ini);
+        rng.moveEnd("character", obj.value.length);
+        rng.select();
+    } else if (obj.setSelectionRange) {
+        obj.setSelectionRange(ini, obj.value.length);
+    }
 }
 </script>

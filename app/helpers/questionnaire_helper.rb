@@ -1,10 +1,12 @@
 require 'fastercsv'
+require 'csv'
 
 module QuestionnaireHelper
   
   CSV_QUESTION = 0
   CSV_TYPE = 1
   CSV_WEIGHT = 2
+  #CSV_PARAM = 3
 
   def self.create_questionnaire_csv(questionnaire, user_name)
    csv_data = FasterCSV.generate do |csv|
@@ -13,16 +15,27 @@ module QuestionnaireHelper
       # Question, question advice (from high score to low), type, weight
       row = Array.new
       row << question.txt
-      row << "True/False" if question.true_false
-      row << "Numeric" if !question.true_false
+      if questionnaire.section != "Custom"
+        row << "True/False" if question.true_false
+        row << "Numeric" if !question.true_false
+      else
+        row << QuestionType.find_by_question_id(question.id).q_type
+      end
+
       row << question.weight
-      
+
+      #if questionnaire.section == "Custom"
+      #  row << QuestionType.find_by_question_id(question.id).parameters
+      #else
+      #  row << ""
+      #end
+
       # loop through all the question advice from highest score to lowest score
       adjust_advice_size(questionnaire, question)
       for advice in question.question_advices.sort {|x,y| y.score <=> x.score }
         row << advice.advice
       end
-      
+
       csv << row
     end
    end
@@ -38,6 +51,11 @@ module QuestionnaireHelper
         i = 0
         score = questionnaire.max_question_score
         q = Question.new
+
+        #if questionnaire.section == "Custom"
+          #q_type = QuestionType.new
+        #  q_type.question_id = q.id
+        #end
         q.true_false = false
         
         for cell in row
@@ -45,26 +63,44 @@ module QuestionnaireHelper
             when CSV_QUESTION
               q.txt = cell.strip if cell != nil
             when CSV_TYPE
-              if cell != nil and cell.downcase.strip === Question::TRUE_FALSE.downcase
-                q.true_false = true
-              else
-                q.true_false = false
+              if cell != nil
+                if cell.downcase.strip === Question::TRUE_FALSE.downcase
+                  q.true_false = true
+                elsif cell.downcase.strip === Question::NUMERIC.downcase
+                  q.true_false = false
+                else
+                 # q_type.q_type = cell.strip
+                end
               end
             when CSV_WEIGHT
               q.weight = cell.strip.to_i if cell != nil
+            #when CSV_PARAM
+            #  if questionnaire.section != "Custom"
+            #    if score >= questionnaire.min_question_score and cell != nil
+            #      a = QuestionAdvice.new(:score => score, :advice => cell.strip) if !q.true_false
+            #    end
+            #  else
+            #      q_type.parameters = cell.strip
+            #  end
             else
-              if score >= questionnaire.min_question_score and cell != nil
-                a = QuestionAdvice.new(:score => score, :advice => cell.strip) if !q.true_false
-                a = QuestionAdvice.new(:score => 1, :advice => cell.strip) if q.true_false and i == 3
-                a = QuestionAdvice.new(:score => 0, :advice => cell.strip) if q.true_false and i == 4
-                score = score - 1
-                q.question_advices << a
-              end
+                if score >= questionnaire.min_question_score and cell != nil
+                  #if questionnaire.section == "Custom"
+                   a = QuestionAdvice.new(:score => score, :advice => cell.strip)
+                  #end
+                  a = QuestionAdvice.new(:score => 1, :advice => cell.strip) if q.true_false and i == 4
+                  a = QuestionAdvice.new(:score => 0, :advice => cell.strip) if q.true_false and i == 5
+                  score = score - 1
+                  q.question_advices << a
+                end
             end
-          i = i + 1 
+
+          i = i + 1
         end
-       
+
+        #q_type.save
+        #@q << q_type
         questions << q
+
       end
     end
   

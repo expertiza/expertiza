@@ -4,7 +4,7 @@ require 'auth_controller'
 # Re-raise errors caught by the controller.
 class AuthController; def rescue_action(e) raise e end; end
 
-class AuthControllerTest < Test::Unit::TestCase
+class AuthControllerTest < ActionController::TestCase
   fixtures :users
   
   def setup
@@ -34,13 +34,13 @@ class AuthControllerTest < Test::Unit::TestCase
   # Verify that invalid accounts are sent to login failed.
   def test_invalid_account
     post :login, :login => {:name => 'noname', :password => 'badpass'}
-    assert_redirected_to :controller => 'auth', :action => 'login_failed'
+    assert_redirected_to :controller => 'password_retrieval', :action => 'forgotten'
   end  
   
 # Verify that sign on attempts with incorrect passwords are sent to login failed.  
   def test_invalid_password
     post :login, :login => {:name => 'admin', :password => 'badpass'}
-    assert_redirected_to :controller => 'auth', :action => 'login_failed'
+    assert_redirected_to :controller => 'password_retrieval', :action => 'forgotten'
   end  
   
   # Logout should redirect to root location

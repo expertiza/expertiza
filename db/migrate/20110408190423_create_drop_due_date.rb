@@ -4,6 +4,6 @@ class CreateDropDueDate < ActiveRecord::Migration
   end
 
   def self.down
-    DeadlineType.find(:conditions => {:name => "drop topic"}).destroy
+    DeadlineType.find_by_name("drop topic").destroy
   end
 end

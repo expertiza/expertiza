@@ -1,4 +1,0 @@
-mapping_strategy_dynamic:
-  name: "Dynamic, fewest extant reviews"
-mapping_strategy_static:
-  name: static

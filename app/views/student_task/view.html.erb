@@ -11,7 +11,9 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 		(Sign up for a topic)
 		</li>
 	<%end%>
-	<%if @assignment.team_assignment %>
+  <!--ACS Here we need to know the size of the team to decide whether or not
+      to display the label "Your team" in the student assignment tasks-->
+	<%if @assignment.team_count > 1 %>
 		<li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %> 
 		(View and manage your team)
 		</li>
@@ -25,14 +27,15 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 		(Submit and view your work)
 	</li>
 	<li>
-		<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
+		<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
 			<%= link_to "Others' work",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
 		<% else %>
 			<font color="gray">Others' work</font>
 		<% end %> (Give feedback to others on their work)
 	</li>
+  <% puts(@participant.id) %>
 	<li><%= link_to "Your scores",{:controller => 'grades', :action => 'view_my_scores', :id => @participant.id} %> (View feedback on your work)</li>
-    <%if @can_provide_suggestions == true %>
+	<%if @can_provide_suggestions == true %>
 	<li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
 	<% end %>
 

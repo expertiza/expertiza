@@ -10,6 +10,7 @@ class CreateReviews < ActiveRecord::Migration
     t.column "created_at", :datetime
   end
 
+
   add_index "reviews", ["review_mapping_id"], :name => "fk_review_mappings"
 
   execute "alter table reviews

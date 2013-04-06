@@ -4,12 +4,10 @@ require 'grades_controller'
 # Re-raise errors caught by the controller.
 class GradesController; def rescue_action(e) raise e end; end
 
-class GradesControllerTest < Test::Unit::TestCase
-  fixtures :participants, :assignments, :roles
-  set_fixture_class:system_settings => 'SystemSettings'    
-  fixtures :system_settings
-  fixtures :content_pages
-  fixtures :users
+class GradesControllerTest < ActionController::TestCase
+  fixtures :participants, :deadline_types, :due_dates, :assignments, :roles
+  set_fixture_class :system_settings => 'SystemSettings'
+  fixtures :system_settings, :content_pages, :users, :due_dates
   @settings = SystemSettings.find(:first)
   
   def setup

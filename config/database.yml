@@ -13,23 +13,23 @@
 development:
   adapter: mysql
   database: pg_development
-  username: root
-  password:
-  host: localhost
+  username: expertiza
+  password: 
 
 # Warning: The database defined as 'test' will be erased and
 # re-generated from your development database when you run 'rake'.
 # Do not set this db to the same as development or production.
-test:
+test: &test
   adapter: mysql
   database: pg_test
-  username: root
+  username: expertiza
   password:
-  host: localhost
 
 production:
   adapter: mysql
   database: pg_development
-  username: root
-  password: 
-  host: localhost
+  username: expertiza
+  password:
+
+cucumber:
+  <<: *test

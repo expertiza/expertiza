@@ -14,8 +14,6 @@ class AssignmentParticipant < Participant
 
   validates_presence_of :handle
   
-# START of contributor methods, shared with AssignmentTeam
-
   def includes?(participant)
     return participant == self
   end
@@ -38,8 +36,124 @@ class AssignmentParticipant < Participant
             (get_hyperlinks_array.length > 0)) 
   end
 
-# END of contributor methods
+  # all the participants in this assignment reviewed by this person
+  def get_reviewees
+    reviewees = []
+    if self.assignment.team_assignment == true 
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'TeamReviewResponseMap'"])
+      rmaps.each do |rm|
+        reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants)
+      end
+    else
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      rmaps.each do |rm|
+        reviewees.push(AssignmentParticipant.find(rm.reviewee_id))
+      end
+    end
+   return reviewees
+  end
   
+  # all the participants in this assignment who have reviewed this person
+  def get_reviewers
+    reviewers = []
+    if self.assignment.team_assignment == true && self.team
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
+    else
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])      
+    end
+    rmaps.each do |rm|
+      reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
+    end
+    return reviewers  
+  end  
+  
+  # Cycle data structure
+  # Each edge of the cycle stores a participant and the score given by to the participant by the reviewer.
+  # Consider a 3 node cycle: A --> B --> C --> A (A reviewed B; B reviewed C and C reviewed A)
+  # For the above cycle, the data structure would be: [[A, SCA], [B, SAB], [C, SCB]], where SCA is the score given by C to A.
+ 
+  def get_two_node_cycles
+    cycles = []
+    self.get_reviewers.each do |ap|
+      if ap.get_reviewers.include?(self) 
+        self.get_reviews_by_reviewer(ap).nil? ? next : s01 = self.get_reviews_by_reviewer(ap).get_total_score
+        ap.get_reviews_by_reviewer(self).nil? ? next : s10 = ap.get_reviews_by_reviewer(self).get_total_score
+        cycles.push([[self, s01], [ap, s10]])
+      end
+    end
+    return cycles
+  end
+  
+  def get_three_node_cycles
+    cycles = []
+    self.get_reviewers.each do |ap1|
+      ap1.get_reviewers.each do |ap2|
+        if ap2.get_reviewers.include?(self)  
+          self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score   
+          ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score   
+          ap2.get_reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score   
+          cycles.push([[self, s01], [ap1, s12], [ap2, s20]])
+        end
+      end
+    end
+    return cycles
+  end
+  
+  def get_four_node_cycles
+    cycles = []
+    self.get_reviewers.each do |ap1|
+      ap1.get_reviewers.each do |ap2|
+        ap2.get_reviewers.each do |ap3|
+          if ap3.get_reviewers.include?(self)  
+            self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score   
+            ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score   
+            ap2.get_reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score  
+            ap3.get_reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score   
+            cycles.push([[self, s01], [ap1, s12], [ap2, s23], [ap3, s30]])
+          end 
+        end
+      end
+    end
+    return cycles
+  end
+  
+  # Per cycle
+  def get_cycle_similarity_score(cycle)
+    similarity_score = 0.0
+    count = 0.0
+    for pivot in 0 ... cycle.size-1 do 
+      pivot_score = cycle[pivot][1]
+      # puts "Pivot:" + cycle[pivot][1].to_s
+      for other in pivot+1 ... cycle.size do
+        # puts "Other:" + cycle[other][1].to_s
+        similarity_score = similarity_score + (pivot_score - cycle[other][1]).abs
+        count = count + 1.0
+      end
+    end
+    similarity_score = similarity_score / count unless count == 0.0
+    return similarity_score
+  end
+  
+  # Per cycle
+  def get_cycle_deviation_score(cycle)    
+    deviation_score = 0.0
+    count = 0.0
+    for member in 0 ... cycle.size do 
+      participant = AssignmentParticipant.find(cycle[member][0].id)
+      total_score = participant.get_review_score
+      deviation_score = deviation_score + (total_score - cycle[member][1]).abs
+      count = count + 1.0
+    end
+    deviation_score = deviation_score / count unless count == 0.0
+    return deviation_score
+  end
+
+  def get_review_score
+    review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
+    assessment = review_questionnaire.get_assessments_for(self)
+    return (Score.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f    
+  end
+    
   def fullname
     self.user.fullname
   end
@@ -48,16 +162,27 @@ class AssignmentParticipant < Participant
     self.user.name
   end
 
-  # Return scores that this participant has given
+  # Return scores that this participant has been given
   def get_scores(questions)
     scores = Hash.new
     scores[:participant] = self # This doesn't appear to be used anywhere
-    assignment.questionnaires.each do |questionnaire|
+    self.assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)
+    
+    # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
+    # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
+    if assignment.is_microtask?
+      topic = SignUpTopic.find_by_assignment_id(assignment.id)
+      if !topic.nil?
+        scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
+        scores[:max_pts_available] = topic.micropayment
+      end
+    end
+
     return scores
   end
 
@@ -93,15 +218,20 @@ class AssignmentParticipant < Participant
     self.save
   end
 
-  # TODO:REFACTOR: This shouldn't be handled using an if statement, but using 
-  # polymorphism for individual and team participants
-  def get_hyperlinks
-    if self.team     
-      links = self.team.get_hyperlinks     
+  def get_members
+    if self.team.nil?
+      [self]
     else        
-      links = get_hyperlinks_array
+      self.team.get_participants
     end
+  end
 
+
+  def get_hyperlinks
+    links = Array.new
+    for team_member in self.get_members
+      links.concat(team_member.get_hyperlinks_array)
+    end
     return links
   end
 
@@ -135,13 +265,19 @@ class AssignmentParticipant < Participant
   end
   
   def get_reviews
+    #ACS Always get assessments for a team
+    #removed check to see if it is a team assignment
+    return TeamReviewResponseMap.get_assessments_for(self.team)
+  end
+  
+  def get_reviews_by_reviewer(reviewer)
     if self.assignment.team_assignment
-      return TeamReviewResponseMap.get_assessments_for(self.team)          
+      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
     else
-      return ParticipantReviewResponseMap.get_assessments_for(self)
+      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
     end
   end
-   
+      
   def get_metareviews
     MetareviewResponseMap.get_assessments_for(self)  
   end
@@ -173,8 +309,9 @@ class AssignmentParticipant < Participant
   
   def get_wiki_submissions
     currenttime = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
- 
-    if self.assignment.team_assignment and self.assignment.wiki_type.name == "MediaWiki"
+
+    #ACS Check if the team count is greater than one(team assignment)
+    if self.assignment.team_count > 1 and self.assignment.wiki_type.name == "MediaWiki"
        submissions = Array.new
        if self.team
         self.team.get_participants.each {
@@ -227,7 +364,7 @@ class AssignmentParticipant < Participant
   end  
   
   # provide export functionality for Assignment Participants
-  def self.export(csv,parent_id)
+  def self.export(csv,parent_id,options)
      find_all_by_parent_id(parent_id).each{
           |part|
           user = part.user
@@ -245,7 +382,7 @@ class AssignmentParticipant < Participant
       } 
   end
   
-  def self.get_export_fields
+  def self.get_export_fields(options)
     fields = ["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"]
     return fields            
   end
@@ -354,7 +491,8 @@ class AssignmentParticipant < Participant
         dirnum = 0
       end
       self.update_attribute('directory_num',dirnum)
-      if self.assignment.team_assignment
+      #ACS Get participants irrespective of the number of participants in the team
+      #removed check to see if it is a team assignment
         self.team.get_participants.each{
             | member |
             if member.directory_num == nil or member.directory_num < 0
@@ -362,9 +500,8 @@ class AssignmentParticipant < Participant
               member.save
             end
         }
-      end
     end
-  end   
+  end
 
 private
 

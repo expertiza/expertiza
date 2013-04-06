@@ -8,8 +8,10 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(@participant.user_id)
     
     @assignment = @participant.assignment
-    
-    if @assignment.team_assignment && @participant.team.nil?
+
+    #ACS We have to check if the number of members on the team is more than 1(group assignment)
+    #hence use team count for the check
+    if @assignment.team_count > 1 && @participant.team.nil?
       flash[:alert] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_team/view/#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
       redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
     end
@@ -28,6 +30,7 @@ class SubmittedContentController < ApplicationController
 
     begin
       participant.submmit_hyperlink(params['submission'])
+      participant.update_resubmit_times
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end    
@@ -40,7 +43,7 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(participant.user_id)
 
     begin
-      participant.remove_hyperlink(params['index'].to_i)
+      participant.remove_hyperlink(params['chk_links'].to_i)
     rescue 
       flash[:error] = $!
     end    
@@ -119,17 +122,52 @@ class SubmittedContentController < ApplicationController
       else
         if !File.directory?(folder_name + "/" + file_name)
           file_ext = File.extname(file_name)[1..-1]
+          file_ext = 'bin' if file_ext.blank? # default to application/octet-stream
           send_file folder_name + "/" + file_name,
                     :disposition => 'inline',
                     :type => Mime::Type.lookup_by_extension(file_ext)
         else
-           Net::SFTP.start("http://pg-server.csc.ncsu.edu", "*****", "****") do |sftp|
-              sftp.download!(folder_name + "/" + file_name, "C:/expertiza", :recursive => true)
-           end
+          raise "Directory downloads are not supported"
         end
       end 
   end  
   
+  # This was written for a custom rubric used by Dr. Jennifer Kidd (ODU)
+  # Note that the file that is being uploaded here is a REVIEW, not submitted work. 
+  def custom_submit_file 
+
+    begin
+      file = params[:uploaded_file]
+      participant = Participant.find(params[:participant_id])
+
+      @current_folder = DisplayOption.new
+      @current_folder.name = "/"
+      if params[:current_folder]
+        @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
+      end
+
+      curr_directory = participant.assignment.get_path.to_s+ "/" +params[:map].to_s + @current_folder.name
+      if !File.exists? curr_directory
+         FileUtils.mkdir_p(curr_directory)
+      else
+         FileUtils.rm_rf(curr_directory)
+         FileUtils.mkdir_p(curr_directory)
+      end
+
+      safe_filename = file.original_filename.gsub(/\\/,"/")
+      safe_filename = FileHelper::sanitize_filename(safe_filename) # new code to sanitize file path before upload*
+      full_filename =  curr_directory + File.split(safe_filename).last.gsub(" ",'_') #safe_filename #curr_directory +
+      File.open(full_filename, "wb") { |f| f.write(file.read) }
+    rescue
+    end
+
+    if params[:return_to] == "edit"
+      redirect_to :controller=>'response', :action => params[:return_to], :id => params[:id]
+    else
+      redirect_to :controller=>'response', :action => params[:return_to], :id => params[:map]      
+    end
+  end
+
 private  
   
   def get_file_type file_name

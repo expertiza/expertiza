@@ -8,7 +8,7 @@ require 'course_controller'
 # Re-raise errors caught by the controller.
 class CourseController; def rescue_action(e) raise e end; end
 
-class CourseControllerTest < Test::Unit::TestCase
+class CourseControllerTest < ActionController::TestCase
   fixtures :users
   fixtures :courses, :roles, :tree_folders
   fixtures :system_settings, :permissions, :roles_permissions
@@ -52,8 +52,9 @@ class CourseControllerTest < Test::Unit::TestCase
   # redirect to new action 
   # has errors  
   def test_create_fail
+    original_count = Course.find(:all).length
     post :create, :course => {:info => 'Blah', :directory_path => 'abc321'}
-    assert_equal 31, Course.find(:all).length
+    assert_equal original_count, Course.find(:all).length
     assert_redirected_to :action => 'new'
     assert !flash.empty?
   end  
@@ -73,22 +74,24 @@ class CourseControllerTest < Test::Unit::TestCase
   # Verify successful copy (new object id) of course
   # redirect to user's home 
   def test_copy
+    original_count = Course.find(:all).length
     post :copy, :id => courses(:course1).id
-    assert_equal 32, Course.find(:all).length
+    assert_equal (original_count + 1), Course.find(:all).length
     new_course = Course.find(:all).last
     assert_not_equal courses(:course1).id, new_course.id
-    assert_redirected_to :action => 'edit'
+    assert_redirected_to :controller => 'course', :action => 'edit', :id => new_course.id
   end
  
   # Verify successful delete of course
   # redirect to user's home
   # no errors   
   def test_delete
+    original_count = Course.find(:all).length
     post :create, :course => {:name => 'Built Course', :info => 'Blah', :directory_path => 'abc321'}
     course = Course.find_by_name('Built Course')
-    assert_equal 32, Course.find(:all).length
+    assert_equal (original_count + 1), Course.find(:all).length
     post :delete, :id => course.id
-    assert_equal 31, Course.find(:all).length
+    assert_equal original_count, Course.find(:all).length
     assert Course.find_by_name('Built Course').nil?
 #    What we really want to test is to see if we got where get_home_controller says we should've gotten, but we are cheating for now
 #    assert_redirected_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])      

@@ -14,20 +14,17 @@ class GradesController < ApplicationController
             |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-
     @scores = @assignment.get_scores(@questions)
   end
 
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
-
+    return if redirect_when_disallowed
     @assignment = @participant.assignment
-
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
-            |questionnaire|
+      |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 
@@ -51,10 +48,8 @@ class GradesController < ApplicationController
         end
       end
     end
-
-
   end
-
+    
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
@@ -133,7 +128,7 @@ class GradesController < ApplicationController
                 :author => email_form[:author]
   end
 
-  # ther grading conflict email form provides the instructor a way of emailing
+  # the grading conflict email form provides the instructor a way of emailing
   # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.  
   def conflict_notification
     if session[:user].role_id !=6
@@ -193,6 +188,7 @@ class GradesController < ApplicationController
   end
 
   private
+  
   def process_response(collabel, rowlabel, responses, questionnaire_type)
     @collabel = collabel
     @rowlabel = rowlabel
@@ -207,7 +203,28 @@ class GradesController < ApplicationController
     @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
   end
 
-  def get_body_text(submission)
+  def redirect_when_disallowed
+    # For author feedback, participants need to be able to read feedback submitted by other teammates.
+    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+    ## This following code was cloned from response_controller.
+
+    #ACS Check if team count is more than 1 instead of checking if it is a team assignment
+    if @participant.assignment.team_count > 1
+      team = @participant.team
+      if(!team.nil?)
+        unless team.has_user session[:user]
+          redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+          return true
+        end
+      end
+    else
+      reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @participant.assignment.id)
+      return true unless current_user_id?(reviewer.user_id)
+    end
+    return false
+  end
+
+def get_body_text(submission)
     if submission
       role = "reviewer"
       item = "submission"

@@ -1,17 +1,52 @@
+require 'bundler/capistrano'
+
 set :application, "expertiza"
 set :repository,  "git://github.com/expertiza/expertiza.git"
 set :user, "rails"
+set :use_sudo, false
 
 set :scm, :git
 #set :git_enable_submodules, 1
 
+set :bundle_without,  [:development, :test]
+
 set :deploy_to, "/local/rails/expertiza"
 set :runner, "www-data"
-set :branch, "master"
 
-role :web, "expertiza.ncsu.edu"
-role :app, "expertiza.ncsu.edu"
-role :db,  "expertiza.ncsu.edu", :primary => true # This is where Rails migrations will run
+desc "Run tasks in staging enviroment."
+task :staging do
+  puts "*** Deploying to the \033[1;42m  STAGING  \033[0m server!"
+  role :web, "test.expertiza.csc.ncsu.edu"
+  role :app, "test.expertiza.csc.ncsu.edu"
+  role :cron, "test.expertiza.csc.ncsu.edu"
+  role :db,  "test.expertiza.csc.ncsu.edu", :primary => true # This is where Rails migrations will run
+  
+  set :branch do
+    default_branch = 'staging'
+    
+    branch = Capistrano::CLI.ui.ask "Branch to deploy (make sure to push first) [#{default_branch}]: "
+    branch = default_branch if branch.empty?
+    branch
+  end
+end
+
+desc "Run tasks in staging enviroment."
+task :production do
+  puts "*** Deploying to the \033[1;41m  PRODUCTION  \033[0m servers!"
+  role :web, "expertiza.ncsu.edu"
+  role :app, "expertiza.ncsu.edu"
+  role :cron, "expertiza.ncsu.edu"
+  role :db,  "expertiza.ncsu.edu", :primary => true # This is where Rails migrations will run
+  
+  set :branch do
+    default_branch = 'production'
+    
+    branch = Capistrano::CLI.ui.ask "Branch to deploy (make sure to push first) [#{default_branch}]: "
+    branch = default_branch if branch.empty?
+    branch
+  end
+end
+
 
 namespace :deploy do
   task :stop do; end
@@ -24,12 +59,12 @@ namespace :deploy do
 
   desc "Symlink shared files into the current deploy directory."
   task :symlink_shared do
-    run "ln -s #{shared_path}/pg_data #{current_path}"
-    run "ln -sf #{shared_path}/database.yml #{current_path}/config/database.yml"
+    run "ln -s #{shared_path}/pg_data #{release_path}"
+    run "ln -sf #{shared_path}/database.yml #{release_path}/config/database.yml"
   end
 end
 
-after "deploy:symlink", "deploy:symlink_shared"
+after "deploy:update_code", "deploy:symlink_shared"
 
 desc "Load production data into the local development database."
 task :load_production_data, :roles => :db, :only => { :primary => true } do
@@ -53,9 +88,5 @@ task :load_production_data, :roles => :db, :only => { :primary => true } do
   system "gunzip -c #{filename} | mysql -u #{database['development']['username']} --password=#{database['development']['password']} #{database['development']['database']} && rm -f #{filename}"
 end
 
-# Hoptoad deploy tracking only works with paid hoptoad accounts
-#Dir[File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'hoptoad_notifier-*')].each do |vendored_notifier|
-#  $: << File.join(vendored_notifier, 'lib')
-#end
-#
-#require 'hoptoad_notifier/capistrano'
+set :default_environment, 'JAVA_HOME' => "/etc/alternatives/java_sdk/"
+# set :default_environment, 'JAVA_HOME' => "/usr/lib/jvm/java-6-openjdk/"

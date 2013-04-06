@@ -1,42 +1,42 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class UserTest < Test::Unit::TestCase
-  fixtures :users
+class UserTest < ActiveSupport::TestCase
+  fixtures :users, :roles
   
-  # Test user retrieval by email
-  def test_find_by_login_email
-    user = User.find_by_login('student1@foo.edu')    
-    assert_equal 'student1', user.name
+  def test_random_password_generation_for_new_users
+    u = User.new(:email => "new@guy.co", :name => 'newguy')
+    u.save!
+    assert u.clear_password.present?
   end
   
-  # Test user retrieval by name
-  def test_find_by_login_name
-    user = User.find_by_login('student1')    
-    assert_equal 'student1', user.name
+  def test_no_random_password_generation_for_new_users_with_specified_password
+    u = User.new(:email => "new@guy.co", :name => 'newguy', :clear_password => 'mypass', :clear_password_confirmation => 'mypass')
+    u.save!
+    assert_equal "mypass", u.clear_password
   end
-
+  
   # 101 add a new user 
   def test_add_user
     user = User.new
     user.name = "testStudent1"
     user.fullname = "test_Student_1"
-    user.password = Digest::SHA1.hexdigest("testStudent1")
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
     user.email = "testStudent1@foo.edu"
     user.role_id = "1"
-    assert user.save
+    user.save! # an exception is thrown if the user is invalid
   end 
   
   # 102 Add a user with existing name 
   def test_add_user_with_exist_name
     user = User.new
     user.name = 'student1'
-    user.password = Digest::SHA1.hexdigest("student1")
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
     user.fullname = "student1_fullname",
     user.role_id = "3"
     assert !user.save
-
-    error_messages = I18n.translate('activerecord.errors.messages')
-    assert_equal error_messages[:taken], user.errors.on(:name)
+    assert_equal I18n.translate('activerecord.errors.messages')[:taken], user.errors.on(:name)
   end
   
   # 103 Check valid user name and password   
@@ -96,6 +96,48 @@ class UserTest < Test::Unit::TestCase
     avail_users_like_student1 = users(:instructor1).get_available_users('student1')
     assert_equal 1, avail_users_like_student1.size
     assert_equal "student1", avail_users_like_student1.first.name
+  end
+  
+  def test_emails_must_be_valid
+    u = User.new(:email => "new@guy.co", :name => 'newguy')
+    assert u.valid?, "Should be valid with a valid email"
+    
+    u.email = "not@valid"
+    assert !u.valid?, "Should not be valid with an invalid email"
+  end
+  
+  def test_emails_need_not_be_unique
+    used_email = users(:admin).email
+    u = User.new(:email => used_email, :name => 'newguy')
+    assert u.valid?, "User should be valid with a duplicate email"
+  end
+
+  def test_check_email
+    user = User.new
+    user.name = "testStudent1"
+    user.fullname = "test_Student_1"
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
+    user.email = "testStudent1@foo.edu"
+    user.role_id = "1"
+    user.save! # an exception is thrown if the user is invalid
+
+    email = MailerHelper::send_mail_to_user(user,"Test Email","user_welcome",user.clear_password)
+    assert !ActionMailer::Base.deliveries.empty?         # Checks if the mail has been queued in the delivery queue
+
+    assert_equal [user.email], email.to                  # Checks if the mail is being sent to proper user
+    assert_equal "Test Email", email.subject             # Checks if the mail subject is the same
+
+  end
+
+  def test_user_is_teaching_assistant
+    user = Ta.new
+    assert(user.is_teaching_assistant?, 'Should be true')
+  end
+
+  def test_user_is_NOT_teaching_assistant
+    user = User.new
+    assert(!(user.is_teaching_assistant?), 'Should be false')
   end
 
 end

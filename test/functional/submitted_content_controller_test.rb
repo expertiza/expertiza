@@ -1,18 +1,27 @@
 require File.dirname(__FILE__) + '/../test_helper'
-require 'submitted_content_controller'
 
-# Re-raise errors caught by the controller.
-class SubmittedContentController; def rescue_action(e) raise e end; end
+class SubmittedContentControllerTest < ActionController::TestCase
+  fixtures :participants
+  fixtures :users
 
-class SubmittedContentControllerTest < Test::Unit::TestCase
   def setup
-    @controller = SubmittedContentController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
+   @request.session[:user] = User.find(users(:student1).id)
   end
 
-  # Replace this with your real tests.
-  def test_truth
-    assert true
+  def test_remove_hp
+
+    participant = AssignmentParticipant.find(participants(:par1).id)
+    count1 = 0
+    participant.get_hyperlinks.each do
+      count1 += 1
+    end
+    post :remove_hyperlink, :id => participants(:par1).id, :chk_links => '1'
+
+    count2 = 0
+    participant = AssignmentParticipant.find((participants(:par1).id))
+    participant.get_hyperlinks.each do
+      count2 += 1
+    end
+    assert_equal count1 - 1, count2
   end
 end

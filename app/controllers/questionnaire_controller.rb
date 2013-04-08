@@ -97,6 +97,7 @@ class QuestionnaireController < ApplicationController
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
       save_questionnaire
+      redirect_to :action => 'view',:id => @questionnaire
     end
     
     if params['export']
@@ -202,10 +203,10 @@ class QuestionnaireController < ApplicationController
 
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
-    questionnaire = Questionnaire.find(params[:id])
-    questionnaire.private = !questionnaire.private
-    questionnaire.save
-    
+    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire.private = !@questionnaire.private
+    @questionnaire.save
+    flash[:note] = "#{undo_link}"
     redirect_to :controller => 'tree_display', :action => 'list'
   end
   
@@ -219,7 +220,8 @@ class QuestionnaireController < ApplicationController
       parent = FolderNode.find_by_node_object_id(pFolder.id)
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end      
+      end
+      flash[:note] = "#{undo_link}"
     rescue
       flash[:error] = $!
     end
@@ -267,6 +269,7 @@ class QuestionnaireController < ApplicationController
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
     questions = Question.find(:all, :conditions => "questionnaire_id = " + questionnaire_id.to_s)
+    @deleted_questions = []
     for question in questions
       should_delete = true
       for question_key in params[:question].keys
@@ -281,6 +284,8 @@ class QuestionnaireController < ApplicationController
         if (Questionnaire.find_by_id(questionnaire_id).section == "Custom")
             delete_question_type(question.id)
         end
+        # keep track of the deleted questions
+        @deleted_questions.push(question)
         question.destroy
 
 
@@ -342,5 +347,18 @@ class QuestionnaireController < ApplicationController
         end
       end
     end
+  end
+
+  # generate the undo link
+  def undo_link
+    # find out which item is updated last among the set of all questions in this questionnaire and the questionnaire itself
+    @list = []
+    @questionnaire.questions.each {|q| @list.push(q.versions.last)}
+    if @deleted_questions
+      @deleted_questions.each {|q| @list.push(q.versions.last)}
+    end
+    @list.push(@questionnaire.versions.last)
+    @latest_update = @list.max_by {|v| v.created_at}
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @latest_update.id)}>undo</a>"
   end
 end

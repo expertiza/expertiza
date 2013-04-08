@@ -8,6 +8,8 @@ class Question < ActiveRecord::Base
     validates_presence_of :txt # user must define text content for a question
     validates_presence_of :weight # user must specify a weight for a question
     validates_numericality_of :weight # the weight must be numeric
+
+    has_paper_trail
     
     # Class variables
     # Class variables

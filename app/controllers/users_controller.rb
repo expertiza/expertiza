@@ -140,7 +140,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])   
 
     if @user.update_attributes(params[:user])
-      flash[:notice] = 'User was successfully updated.'
+      flash[:note] = "User was successfully updated. #{undo_link}"
       redirect_to :action => 'show', :id => @user
     else
       foreign
@@ -220,5 +220,10 @@ class UsersController < ApplicationController
       users = User.paginate(:page => params[:page], :order => 'name', :per_page => paginate_options["#{@per_page}"], :conditions => [condition, role.get_available_roles, user_id, search_filter])
     end
     users
+  end
+
+  # generate the undo link
+  def undo_link
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @user.versions.last.id)}>undo</a>"
   end
 end

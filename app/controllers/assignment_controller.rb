@@ -560,8 +560,8 @@ class AssignmentController < ApplicationController
           add_to_delayed_queue
         end
      
-        flash[:notice] = 'Assignment was successfully updated.'
-        redirect_to :action => 'show', :id => @assignment                  
+        flash[:note] = "Assignment was successfully updated. #{undo_link}"
+        redirect_to :action => 'show', :id => @assignment
      
       rescue
         flash[:error] = $!
@@ -634,10 +634,10 @@ class AssignmentController < ApplicationController
   #  Toggle the access permission for this assignment from public to private, or vice versa
   #--------------------------------------------------------------------------------------------------------------------
   def toggle_access
-    assignment = Assignment.find(params[:id])
-    assignment.private = !assignment.private
-    assignment.save
-
+    @assignment = Assignment.find(params[:id])
+    @assignment.private = !@assignment.private
+    @assignment.save
+    flash[:note] = "#{undo_link}"
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -681,5 +681,11 @@ class AssignmentController < ApplicationController
     newpath = assignment.get_path rescue nil
     FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
+  end
+
+
+  # generate the undo link
+  def undo_link
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @assignment.versions.last.id)}>undo</a>"
   end
 end

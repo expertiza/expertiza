@@ -29,6 +29,8 @@ class User < ActiveRecord::Base
   before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.clear_password.blank? } # AuthLogic
   after_create :email_welcome
 
+  has_paper_trail
+
   def list_mine(object_type, user_id)
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end

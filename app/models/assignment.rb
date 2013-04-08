@@ -21,6 +21,7 @@ class Assignment < ActiveRecord::Base
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
   # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
   # has_many :responses, :through => :response_maps, :source => 'response'
+  has_paper_trail
 
   validates_presence_of :name
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]

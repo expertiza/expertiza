@@ -107,13 +107,14 @@ class CourseController < ApplicationController
   end
 
   def toggle_access
-    course = Course.find(params[:id])
-    course.private = !course.private
+    @course = Course.find(params[:id])
+    @course.private = !@course.private
     begin
-      course.save!
+      @course.save!
     rescue
       flash[:error] = $!
     end
+    flash[:note] = "#{undo_link}"
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -142,6 +143,7 @@ class CourseController < ApplicationController
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end
 
+# generate the undo link
   def undo_link
     "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
   end

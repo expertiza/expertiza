@@ -17,6 +17,10 @@ class ApplicationController < ActionController::Base
     session[:user].role.name
   end
 
+  def user_for_paper_trail
+    session[:user]
+  end
+
   private
   def current_user_session
     return @current_user_session if defined?(@current_user_session)

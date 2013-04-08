@@ -352,13 +352,13 @@ class QuestionnaireController < ApplicationController
   # generate the undo link
   def undo_link
     # find out which item is updated last among the set of all questions in this questionnaire and the questionnaire itself
-    @list = []
-    @questionnaire.questions.each {|q| @list.push(q.versions.last)}
+    @versions_list = []
+    @questionnaire.questions.each {|q| @versions_list.push(q.versions.last)}
     if @deleted_questions
-      @deleted_questions.each {|q| @list.push(q.versions.last)}
+      @deleted_questions.each {|q| @versions_list.push(q.versions.last)}
     end
-    @list.push(@questionnaire.versions.last)
-    @latest_update = @list.max_by {|v| v.created_at}
+    @versions_list.push(@questionnaire.versions.last)
+    @latest_update = @versions_list.max_by {|v| v.created_at}
     "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @latest_update.id)}>undo</a>"
   end
 end

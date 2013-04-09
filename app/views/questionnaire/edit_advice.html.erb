@@ -56,7 +56,8 @@ function show_horizontal_questions(question_id){
 	<% for question in @questionnaire.questions %>
 		<tr id="horizontal_questions_<%= question.id %>">
 			<td>
-				<%= question.txt %>
+				<a onclick="">
+				<%= question.txt %></a>
 			</td>
 			<% i = 0; %>
 			<% for @advice in question.question_advices.sort {|x,y| y.score <=> x.score } %>

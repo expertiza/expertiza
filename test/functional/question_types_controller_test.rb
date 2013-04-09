@@ -3,7 +3,6 @@ require File.dirname(__FILE__) + '/../test_helper'
 require 'question_types_controller'
 
 class QuestionTypesControllerTest < ActionController::TestCase
-  fixtures :question_types, :questions
 
   test "index" do
     get :index
@@ -18,7 +17,7 @@ class QuestionTypesControllerTest < ActionController::TestCase
 
   test "create question_type" do
     assert_difference('QuestionType.count') do
-      post :create, :question_type => :one
+      post :create, :question_type => { }
     end
 
     assert_redirected_to question_type_path(assigns(:question_type))
@@ -41,7 +40,7 @@ class QuestionTypesControllerTest < ActionController::TestCase
 
   test "destroy question_type" do
     assert_difference('QuestionType.count', -1) do
-      delete :destroy, :id => question_types(:two).to_param
+      delete :destroy, :id => question_types(:one).to_param
     end
 
     assert_redirected_to question_types_path

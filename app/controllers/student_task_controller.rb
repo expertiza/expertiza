@@ -12,6 +12,9 @@ class StudentTaskController < ApplicationController
     @taskrevisions = Array.new
     @notifications = Array.new
 
+    #Sorts assignments by due dates
+    @participants.sort! { |a, b| a.assignment.get_stage_deadline <=> b.assignment.get_stage_deadline}
+
      for participant in @participants
       stage = participant.assignment.get_current_stage(participant.topic_id)
       duedate = participant.assignment.get_stage_deadline(participant.topic_id)
@@ -45,11 +48,9 @@ class StudentTaskController < ApplicationController
           end
           ############
 
-          if participant.assignment.team_assignment
-            maps = TeamReviewResponseMap.find_all_by_reviewer_id(participant.id)
-          else
-            maps = ParticipantReviewResponseMap.find_all_by_reviewer_id(participant.id)
-          end
+          #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+          # to treat all assignments as team assignments
+          maps = TeamReviewResponseMap.find_all_by_reviewer_id(participant.id)
           rev = !(maps.size == 0)
           for map in maps
             if !map.response
@@ -112,18 +113,14 @@ class StudentTaskController < ApplicationController
     @reviewee_topic_id = nil
     #Even if one of the reviewee's work is ready for review "Other's work" link should be active
     if @assignment.staggered_deadline?
-      if @assignment.team_assignment
-        review_mappings = TeamReviewResponseMap.find_all_by_reviewer_id(@participant.id)
-      else
-        review_mappings = ParticipantReviewResponseMap.find_all_by_reviewer_id(@participant.id)
-      end
+      #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # to treat all assignments as team assignments
+      review_mappings = TeamReviewResponseMap.find_all_by_reviewer_id(@participant.id)
 
       review_mappings.each do |review_mapping|
-        if @assignment.team_assignment
-          participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
-        else
-          participant = review_mapping.reviewee
-        end
+        #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+        # to treat all assignments as team assignments
+        participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
 
         if !participant.nil? and !participant.topic_id.nil?
           review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id, 1)

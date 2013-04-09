@@ -4,6 +4,7 @@
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
+<<<<<<< HEAD
 one:
   q_type: "Checkbox"
   parameters: nil
@@ -15,3 +16,38 @@ two:
   parameters: nil
   question_id: <%= Fixtures.identify(:question2) %>
 #  column: value
+=======
+qt_1:
+  q_type: "Rating"
+  parameters: "section::1|2"
+  question_id: <%= Fixtures.identify(:question_c1) %>
+
+qt_2:
+  q_type: "Comment"
+  parameters: "section::1|2"
+  question_id: <%= Fixtures.identify(:question_c2) %>
+
+questiontype1:
+ q_type: Checkbox
+ parameters: 1
+ question_id: <%= Fixtures.identify(:question1) %>
+questiontype2:
+ q_type: TextArea
+ parameters: 1
+ question_id: <%= Fixtures.identify(:question3) %>
+
+questiontype3:
+ q_type: UploadFile
+ parameters: 1
+ question_id: <%= Fixtures.identify(:question2) %>
+
+questiontype4:
+ q_type: Rating
+ parameters: 1
+ question_id: <%= Fixtures.identify(:question4) %>
+
+questiontype5:
+ q_type: DropDown
+ parameters: 1
+ question_id: <%= Fixtures.identify(:question1) %>
+>>>>>>> master

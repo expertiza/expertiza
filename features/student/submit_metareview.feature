@@ -3,6 +3,7 @@ Feature: Submit Metareview as a Student
   As a student and participant of an assignment
   I want to fill out the metareview online and submit it
 
+@wip
 Scenario:  Submit Metareview for an assignment
   Given I am logged in as a student
   And I move to the "Assignments" page

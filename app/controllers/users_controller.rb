@@ -102,6 +102,7 @@ class UsersController < ApplicationController
   end
 
   def create
+    
     # if the user name already exists, register the user by email address
     check = User.find_by_name(params[:user][:name])
     if check != nil
@@ -111,6 +112,8 @@ class UsersController < ApplicationController
     @user = User.new(params[:user])
     # record the person who created this new user
     @user.parent_id = (session[:user]).id
+    # set the user's timezone to its parent's
+    @user.timezonepref = User.find(@user.parent_id).timezonepref
     
     if @user.save
       #Instructor and Administrator users need to have a default set for their notifications

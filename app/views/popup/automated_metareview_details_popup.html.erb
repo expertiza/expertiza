@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<div id="details">
+<h2> <%= params[:type]%> </h2>
+<table>
+<tr><td></td>
+	<td>
+	<% if params[:type] == "Relevance"%>		
+		<i>Relevance</i> identifies the degree of relevance between your review and the author's submission. <br>
+		The value is on a scale of [0 - 1], where <font color="#FF0000">0 indicates no traces of relevance</font> and <font color="#008000"> 1 indicates highest relevance.</font>
+	<% elsif params[:type] == "Content"%>		
+		<i>Content</i> identifies the extent to which your review contains praise, criticism, identifies problems or provides suggestions in the author's work. <br>
+		The value is on a scale of [0 - 1], where <font color="#FF0000"> 0 indicates no traces of the content type</font> and <font color="#008000"> 1 indicates maximum occurrence of the content type.</font>
+	<% elsif params[:type] == "Summative Content"%>				
+		<font color="#FFA500"> [Good!]</font> The <i> summative content </i> metric identifies how much of your review contains criticisms or a summary of the author's work.
+	<% elsif params[:type] == "Problem Content"%>				
+		<font color="#800080"> [Very useful to authors!]</font> The <i>problem content </i> metric identifies how much of your review identifies problems in the author's work.
+	<% elsif params[:type] == "Advisory Content"%>				
+		<font color="#800000"> [Highly recommended!] </font> The <i>advisory content </i> metric identifies how much of your review provides the author with suggestions for improvement. 
+	<% elsif params[:type] == "Tone"%>
+		<i>Tone</i> identifies the extent to which your review contains a positive, negative or a neutral tone. <br>
+		The value is on a scale of [0 - 1], where <font color="#FF0000">0 indicates no traces of the tone type</font> and <font color="#008000">1 indicates maximum occurrence of the tone type.</font>
+	<% elsif params[:type] == "Positive Tone"%>
+		<font color="#FFA500"> [Good!]</font> A <i> positive tone </i> indicates that your review text has a positive orientation i.e., it mostly contains positive words. 
+	<% elsif params[:type] == "Negative Tone"%>
+		<font color="#FF0000"> [Not recommended!]</font> A <i> negative tone </i> indicates that your review text has a negative orientation i.e., it mostly contains negative words.
+	<% elsif params[:type] == "Neutral Tone"%>
+		<font color="#800000"> [Best!] </font> A <i> neutral tone </i> indicates that your review text has neither positive or negative words, or has a mix of both types of words.
+	<% elsif params[:type] == "Quantity"%>
+		<font color="#800080"> [More the quantity, the better!] </font> <i>Quantity</i> indicates the amount of feedback provided in terms of the number of unique tokens in the review. 
+	<% elsif params[:type] == "Plagiarism"%>
+		<font color="#FF0000"> [Avoid it!] </font> <i>Plagiarism</i> identifies if any part of the review has been copied.
+	<% end %>
+	</td>			
+</tr>
+</table>										
+</div> 

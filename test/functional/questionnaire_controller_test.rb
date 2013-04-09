@@ -72,5 +72,4 @@ class QuestionnaireControllerTest < ActionController::TestCase
     assert_response(:success)
     assert_not_nil(Questionnaire.find(:first, :conditions => ["name = ?", "test edit name"]))
   end
-
 end

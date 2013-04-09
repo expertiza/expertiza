@@ -7,7 +7,7 @@
         <font style="font-weight:bold">Class Average</font>
       </td>
       <td>
-        <%= @assignment.get_average_score %>%
+        <%= Response.get_average_score(@assignment.id) %>%
       </td>
     </tr>
     <tr>

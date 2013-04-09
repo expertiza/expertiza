@@ -8,13 +8,25 @@ gem 'gchartrb', :require => 'google_chart'
 gem 'hoptoad_notifier'
 gem 'mysql'
 gem 'rdoc'
-gem 'rails', '~> 2.3.14'
+gem 'rails', '2.3.15'
 gem 'RedCloth'
 gem 'rake'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rubyzip', :require => 'zip/zip'
 gem 'rdoc'
 gem "rspec-rails", "1.3.2"
+gem 'engtagger'
+gem 'stanford-core-nlp', "0.3.0"
+gem 'rjb', "1.4.3"
+gem 'bind-it', "0.2.0"
+gem 'rwordnet'
+gem 'open-uri-cached'
+gem 'edavis10-ruby-web-search'
+#gem 'stemmer'
+gem 'ffi-aspell'
+gem 'nokogiri'
+gem 'seer'
+gem 'gchart'
 group :development do
   gem 'mongrel'
   gem 'ruby-debug'

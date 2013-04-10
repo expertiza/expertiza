@@ -2,7 +2,7 @@ Feature: Create a team
   In order to work on a team assignment
   As a student
   I want to be able to create a team so that I can invite others to join
-
+@wip
 Scenario: Create a team
   Given I am participating on a "team_assignment"
   And I am logged in as a "student1"

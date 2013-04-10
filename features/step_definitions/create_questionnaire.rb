@@ -7,28 +7,28 @@ And /^I create a review questionnaire called "(\S+)"$/ do |questionnaire|
 =end
 
   admin = User.find_by_name("admin")
-  puts "admin id = #{admin.id}"
   Questionnaire.create!({
       :name => 'test_review_questionnaire',
       :min_question_score => 2,
       :max_question_score => 5,
       :type => 'ReviewQuestionnaire',
       :display_type => 'Review',
-      :instructor_id => admin.id
-                       })
-  questionnaires = Questionnaire.find_by_name('test_review_questionnaire')
-  questionnaires.save!
-  puts questionnaires
-  puts "id = #{questionnaires.id}"
+      :instructor_id => admin.id,
+      :section => 'test section',
+      :private => true
+})
+  q = Questionnaire.find_by_name("test_review_questionnaire")
+  q.save!
+  QuestionnaireNode.create!({
+      :node_object_id => q.id
+  })
   Question.create!({
-      :questionnaire_id => questionnaires.id,
+      :questionnaire_id => q.id,
       :txt => 'question one',
       :weight => 1
                   })
-
 end
 
 Then /^I should see "(\S+)" under list of questionnaires$/ do |questionnaire|
-#  find(:xpath, "//a[contains(.,'Review rubrics')]").click
   should have_content questionnaire
 end

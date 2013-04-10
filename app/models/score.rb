@@ -66,22 +66,6 @@ class Score < ActiveRecord::Base
     #Check for invalid reviews.
     #Check if the latest review done by the reviewer falls into the latest review stage
     map=ResponseMap.find(@response.map_id)
-    due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", map.reviewed_object_id])
-
-    if due_dates.size!=0
-      @sorted_deadlines=Array.new
-      @sorted_deadlines=due_dates.sort {|m1,m2|(m1.due_at and m2.due_at) ? m2.due_at <=> m1.due_at : (m1.due_at ? -1 : 1)}
-      flag=0
-      for deadline in @sorted_deadlines
-         next_ele=deadline
-         if(flag==1)
-            break
-         end
-         if(deadline.deadline_type_id == 4 ||deadline.deadline_type_id == 2)
-           flag=1
-         end
-       end
-    end
 
     @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
@@ -97,8 +81,10 @@ class Score < ActiveRecord::Base
         if @q_types[x].q_type == "Rating"
           ratingPart = @q_types[x].parameters.split("::").last
           if ratingPart.split("|")[0] == "1"
-            weighted_score += item.comments.to_i * question.weight
-            sum_of_weights += question.weight
+            if(!item.nil?)
+              weighted_score += item.comments.to_i * question.weight
+              sum_of_weights += question.weight
+            end
           end
         end
         x = x + 1
@@ -114,14 +100,57 @@ class Score < ActiveRecord::Base
     }
     end
 
-     if due_dates.size!=0
-    if(@response.created_at < next_ele.due_at)
-      @invalid=0
-    else
-      @invalid = 1
-    end
-    end
-    return (weighted_score.to_f / (sum_of_weights.to_f * @questionnaire.max_question_score.to_f)) * 100
+    #assignment_participant = Participant.find(:all, :conditions => ["id = ?", map.reviewee_id])
 
+    due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", map.reviewed_object_id])
+
+    # to check the validity of the response
+    if due_dates.size!=0
+      @sorted_deadlines=Array.new
+      @sorted_deadlines=due_dates.sort {|m1,m2|(m1.due_at and m2.due_at) ? m2.due_at <=> m1.due_at : (m1.due_at ? -1 : 1)}
+
+      #find the latest review deadline
+      #less than current time
+      flag = 0
+      latest_review_phase_start_time = nil
+      current_time = Time.new
+      for deadline in @sorted_deadlines
+        # if flag is set then we saw a review deadline in the
+        # previous iteration - check if this deadline is a past
+        # deadline
+        if ((flag == 1) && (deadline.due_at <= current_time))
+          latest_review_phase_start_time = deadline.due_at
+          break
+        else
+          flag = 0
+        end
+
+        # we found a review or re-review deadline - examine the next deadline
+        # to check if it is past
+        if (deadline.deadline_type_id == 4 ||deadline.deadline_type_id == 2)
+          flag = 1
+        end
+      end
+
+      resubmission_times = ResubmissionTime.find(:all, :conditions => ["participant_id = ?", map.reviewee_id], :order => "resubmitted_at DESC")
+
+      if @response.is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)
+        @invalid = 0
+      else
+        @invalid = 1
+      end
+
+      #if(@response.created_at < next_ele.due_at)
+      # @invalid=0
+      #else
+      # @invalid = 1
+      #end
+    end
+
+    if(sum_of_weights > 0)
+      return (weighted_score.to_f / (sum_of_weights.to_f * @questionnaire.max_question_score.to_f)) * 100
+    else
+      return -1 #indicating no score
+    end
   end
 end

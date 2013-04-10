@@ -2,7 +2,7 @@ Feature: Invite another student to join my team
   In order to work on a team assignment
   As a student
   I want to be able to invite other students to join my team
-
+@wip
 Scenario: Invite another student to join my team
   Given I am participating on a "team_assignment"
   And I am logged in as a "student1"

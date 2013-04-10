@@ -77,5 +77,9 @@ class Ta < User
   def set_courses_to_assignment
     @courses = TaMapping.get_courses(self.id)    
   end
+
+  def is_teaching_assistant?
+    return true
+  end
   
 end

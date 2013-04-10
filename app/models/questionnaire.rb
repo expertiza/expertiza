@@ -4,7 +4,7 @@ class Questionnaire < ActiveRecord::Base
     has_many :questions # the collection of questions associated with this Questionnaire
     belongs_to :instructor, :class_name => "User", :foreign_key => "instructor_id" # the creator of this questionnaire
     
-    has_many :assignment_questionnaire, :class_name => 'AssignmentQuestionnaire', :foreign_key => 'questionnaire_id'
+    has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaire', :foreign_key => 'questionnaire_id'
     has_many :assignments, :through => :assignment_questionnaires
     
     validates_presence_of :name
@@ -19,7 +19,7 @@ class Questionnaire < ActiveRecord::Base
     has_paper_trail
     
 	def compute_weighted_score(symbol, assignment, scores)
-      aq = self.assignment_questionnaire.find_by_assignment_id(assignment.id)
+      aq = self.assignment_questionnaires.find_by_assignment_id(assignment.id)
       if scores[symbol][:scores][:avg]
         #dont bracket and to_f the whole thing - you get a 0 in the result.. what you do is just to_f the 100 part .. to get the fractions
        

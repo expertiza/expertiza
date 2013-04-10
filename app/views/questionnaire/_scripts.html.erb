@@ -20,7 +20,7 @@ function deleteQuestions(){
 		   document.forms[0].elements[i].id.substring(0,12)=="question_chk"){
 			numChecks++;
 			if(document.forms[0].elements[i].checked==true){
-				tbl.deleteRow(numChecks+1);
+				tbl.deleteRow(numChecks);
 				numChecks = 0;
 				deleteQuestions();
 			}

@@ -152,6 +152,7 @@ pip-log.txt
 # Unit test / coverage reports
 .coverage
 .tox
+capybara-*
 
 #Translations
 *.mo
@@ -162,5 +163,8 @@ pip-log.txt
 # Mac crap
 .DS_Store
 log/
+# rbenv
 .bundle/
 .ruby-version
+# Kaleidoscope
+*.orig

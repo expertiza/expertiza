@@ -25,24 +25,25 @@ class AssignmentTest < ActiveSupport::TestCase
   end
 
   def test_database_returns_review_mappings_in_order_of_creation_and_uses_sequential_ids
-    p = AssignmentParticipant.create :handle => 'assignment'
-    (1..5).each do |i|
-      map = ParticipantReviewResponseMap.create :reviewer_id => i, :reviewee_id => i, :reviewed_object_id => i # use reviewer_id to store the sequence
-      p.review_mappings << map
-    end
-    
-    # clear any association cache by redoing the find
-    p = AssignmentParticipant.find(p.id)
-    
-    latest_id = 0
-    lowest_sequence = 0
-    p.review_mappings.each do |map|
-      assert latest_id < map.id
-      assert lowest_sequence < map.reviewer_id
-      latest_id = map.id
-      lowest_sequence = map.reviewer_id
+      p = AssignmentParticipant.create :handle => 'assignment'
+      (1..5).each do |i|
+          map = ParticipantReviewResponseMap.create :reviewer_id => i, :reviewee_id => i, :reviewed_object_id => i # use reviewer_id to store the sequence
+          p.review_mappings << map
+      end
+
+      # clear any association cache by redoing the find
+      p = AssignmentParticipant.find(p.id)
+
+      latest_id = 0
+      lowest_sequence = 0
+      p.review_mappings.each do |map|
+          assert latest_id < map.id
+          assert lowest_sequence < map.reviewer_id
+          latest_id = map.id
+          lowest_sequence = map.reviewer_id
+      end
   end
-  
+
   def test_validate_name
 
     # Create a new assignment

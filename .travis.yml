@@ -33,6 +33,6 @@ script:
 notifications:
     email:
       recipients:
-        - pamela.ocampo@gmail.com
+        - expertiza-support@lists.ncsu.edu
       on_success: change
       on_failure: change

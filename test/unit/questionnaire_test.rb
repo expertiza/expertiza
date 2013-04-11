@@ -78,7 +78,7 @@ class RubricTest < ActiveSupport::TestCase
     scores[:participant] = AssignmentParticipant.find_by_parent_id(assignments(:assignment0))
     questionnaire1.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
-      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(AssignmentParticipant.find_by_parent_id(assignments(:assignment0)))
+      scores[questionnaire.symbol][:assessments] = questionnaire.get_metareviews_for(AssignmentParticipant.find_by_parent_id(assignments(:assignment0)))
 
       assert_not_equal(scores[questionnaire.symbol][:assessments],0)
     end

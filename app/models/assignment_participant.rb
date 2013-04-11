@@ -150,7 +150,7 @@ class AssignmentParticipant < Participant
 
   def get_review_score
     review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
-    assessment = review_questionnaire.get_assessments_for(self)
+    assessment = review_questionnaire.get_metareviews_for(self)
     return (Score.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f    
   end
     
@@ -168,7 +168,7 @@ class AssignmentParticipant < Participant
     scores[:participant] = self # This doesn't appear to be used anywhere
     self.assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
-      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
+      scores[questionnaire.symbol][:assessments] = questionnaire.get_metareviews_for(self)
       scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)

@@ -7,11 +7,9 @@ class ReviewQuestionnaire < Questionnaire
     return "review".to_sym
   end
   
-  def get_assessments_for(participant)
+  def get_reviews_for(participant)
     participant.get_reviews()  
   end  
   
-  def get_weighted_score(assignment, scores)
-    return compute_weighted_score(self.symbol, assignment, scores)
-  end  
+
 end

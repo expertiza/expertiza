@@ -7,7 +7,7 @@ module ResponseHelper
   # ajbudlon, nov 18, 2008
   def self.compare_scores(new_response, questionnaire) 
     map_class = new_response.map.class
-    existing_responses = map_class.get_assessments_for(new_response.map.reviewee)
+    existing_responses = map_class.get_metareviews_for(new_response.map.reviewee)
     total, count = get_total_scores(existing_responses,new_response)     
     if count > 0
       notify_instructor(new_response.map.assignment, new_response, questionnaire, total, count)

@@ -108,9 +108,11 @@ end
     end
     
     #setting @review_array as rev_array
-    auto_metareview.review_array = rev_array
+    if(count_copies > 0) #resetting review_array only when plagiarism was found
+       auto_metareview.review_array = rev_array
+    end
     
-    if(count_copies == scores.length)
+    if(count_copies > 0 and count_copies == scores.length)
       return ALL_RESPONSES_PLAGIARISED #plagiarism, with all other metrics 0
     elsif(count_copies > 0)
       return SOME_RESPONSES_PLAGIARISED #plagiarism, while evaluating other metrics

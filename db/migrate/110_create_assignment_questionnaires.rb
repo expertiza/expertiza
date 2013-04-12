@@ -40,7 +40,7 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
     l_records.each{
       |l|
       begin
-        association = AssignmentQuestionnaires.create(:user_id => l['user_id'], :notification_limit => l['limit'])
+        association = AssignmentQuestionnaire.create(:user_id => l['user_id'], :notification_limit => l['limit'])
       rescue
         puts $!
       end
@@ -53,7 +53,7 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
   def self.make_association(model, assignment, questionnaire_id)
       begin
         q = Object.const_get(model).find(questionnaire_id)
-        association = AssignmentQuestionnaires.create(:assignment_id => assignment.id, :questionnaire_id => q.id)
+        association = AssignmentQuestionnaire.create(:assignment_id => assignment.id, :questionnaire_id => q.id)
         l_records = ActiveRecord::Base.connection.select_all("select * from notification_limits where assignment_id = #{assignment.id} and questionnaire_id = #{q.id}")
         w_records = ActiveRecord::Base.connection.select_all("select * from questionnaire_weights where assignment_id = #{assignment.id} and questionnaire_id = #{q.id}")         
         

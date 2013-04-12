@@ -14,6 +14,7 @@ end
 def create_teams
   parent = Object.const_get(session[:team_type]).find(params[:id])
   Team.randomize_all_by_parent(parent, session[:team_type], params[:team][:size].to_i)
+  
   redirect_to :action => 'list', :id => parent.id
  end
 
@@ -21,6 +22,7 @@ def create_teams
    if params[:type]
     session[:team_type] = params[:type]
    end
+   
    @root_node = Object.const_get(session[:team_type] + "Node").find_by_node_object_id(params[:id])
    @child_nodes = @root_node.get_teams()
  end
@@ -32,7 +34,7 @@ def create_teams
  def create
    parent = Object.const_get(session[:team_type]).find(params[:id])
    begin
-    Team.check_for_existing(parent, params[:team][:name], session[:team_type])
+     Team.check_for_existing(parent, params[:team][:name], session[:team_type])
     team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => parent.id)
     TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
     redirect_to :action => 'list', :id => parent.id
@@ -47,6 +49,7 @@ def create_teams
    parent = Object.const_get(session[:team_type]).find(team.parent_id)
    begin
     Team.check_for_existing(parent, params[:team][:name], session[:team_type])
+    
     team.name = params[:team][:name]
     team.save
     redirect_to :action => 'list', :id => parent.id
@@ -102,5 +105,4 @@ def create_teams
    end      
    redirect_to :controller => 'team', :action => 'list', :id => assignment.id
  end
- 
 end

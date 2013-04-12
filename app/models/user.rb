@@ -258,4 +258,8 @@ class User < ActiveRecord::Base
     false
   end
 
+  def is_teaching_assistant?
+    return false
+  end
+
 end

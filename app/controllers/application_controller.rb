@@ -18,7 +18,11 @@ class ApplicationController < ActionController::Base
   end
 
   def user_for_paper_trail
-    session[:user]
+    if session[:user]
+      session[:user].id
+    else
+      nil
+    end
   end
 
   private

@@ -3,8 +3,9 @@
 <%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => participant.assignment.get_current_stage(participant.topic_id)} %>
 
 <% if controller.action_name != "view_my_scores" %>
-   <% reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @assignment.id) 
-      if reviewer != nil and participant.assignment.team_assignment
+   <% reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @assignment.id)
+      #ACS Map the reviewee to a team or an individual depending on wheater the team size is greater than or equal to 1
+      if reviewer != nil and participant.assignment.team_count > 1
          reviewee = participant.team  
          map = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)        
       elsif reviewer != nil

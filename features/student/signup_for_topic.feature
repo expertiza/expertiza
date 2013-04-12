@@ -3,6 +3,7 @@ Feature: Sign up for a topic as a user
   As an expertiza user
   I want to use the sign up sheet form in expertiza
 
+@wip
 Scenario: signup for a topic
   Given I am participating on a "test_assignment"
   And a topic exists under this assignment

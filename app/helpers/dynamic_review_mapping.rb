@@ -394,11 +394,9 @@ module DynamicReviewMapping
   #and all 3 functions work on more or less the same algo 
 
   def assign_reviewers_automatically(num_reviews, num_review_of_reviews)
-    if self.team_assignment?
-      review_message = assign_reviewers_team(num_reviews)
-    else
-      review_message = assign_reviewers_individual(num_reviews)
-    end
+    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # to treat all assignments as team assignments
+    review_message = assign_reviewers_team(num_reviews)
     metareview_message = assign_metareviewers(num_review_of_reviews, @assignment)
 
     return review_message.to_s + metareview_message.to_s
@@ -947,24 +945,19 @@ module DynamicReviewMapping
       if !participant.nil?
         contributors.each {|contributor|
           map = ResponseMap.find(contributor)
-          if @assignment.team_assignment?
-            team_members = TeamsUser.find_all_by_team_id(map.reviewee_id)
-            if !team_members.nil?
-              team_members.each{|team_member|
-                if team_member.user_id == user
-                  temp_contributors.delete(contributor)
-                end
-              }
-            end
-            #also check whether this user was not a reviewer
-            if map.reviewer_id == participant.id
-              temp_contributors.delete(contributor)
-            end
-          else
-            #check whether this user is not a reviewer nor the reviewee for this review
-            if map.reviewee_id == participant.id || map.reviewer_id == participant.id
-              temp_contributors.delete(contributor)
-            end
+          #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+          # to treat all assignments as team assignments
+          team_members = TeamsUser.find_all_by_team_id(map.reviewee_id)
+          if !team_members.nil?
+            team_members.each{|team_member|
+              if team_member.user_id == user
+                temp_contributors.delete(contributor)
+              end
+            }
+          end
+          #also check whether this user was not a reviewer
+          if map.reviewer_id == participant.id
+            temp_contributors.delete(contributor)
           end
         }
       end
@@ -972,14 +965,12 @@ module DynamicReviewMapping
       temp_contributors.each {|contributor|
         map = ResponseMap.find(contributor)
         #participant = Participant.find_all_by_user_id_and_parent_id(map.reviewee_id, @assignment.id)
-        if @assignment.team_assignment?
-          team_members = TeamsUser.find_all_by_team_id(map.reviewee_id)
-          if !team_members.nil?
-            participant = Participant.find_by_parent_id_and_user_id(@assignment.id, team_members[0].user_id)
-            topic_user_id[contributor] = participant.topic_id
-          end
-        else
-          participant = Participant.find(map.reviewee_id)
+        #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+        # to treat all assignments as team assignments
+        #We would have just one member for an individual assignment.
+        team_members = TeamsUser.find_all_by_team_id(map.reviewee_id)
+        if !team_members.nil?
+          participant = Participant.find_by_parent_id_and_user_id(@assignment.id, team_members[0].user_id)
           topic_user_id[contributor] = participant.topic_id
         end
       }
@@ -1074,21 +1065,17 @@ module DynamicReviewMapping
 
             map = ResponseMap.find(mapping[0])
 
-            if @assignment.team_assignment?
-              team_members = TeamsUser.find_all_by_team_id(map.reviewee_id)
+            #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+            # to treat all assignments as team assignments
+            team_members = TeamsUser.find_all_by_team_id(map.reviewee_id)
 
-              team_members.each {|team_member|
-                if team_member.user_id == users[random_index]
-                  user_can_review = false
-                end
-              }
-              if participant.id == map.reviewer_id
+            team_members.each {|team_member|
+              if team_member.user_id == users[random_index]
                 user_can_review = false
               end
-            else
-              if participant.id == map.reviewer_id || participant.id == map.reviewee_id
-                user_can_review = false
-              end
+            }
+            if participant.id == map.reviewer_id
+              user_can_review = false
             end
 
            if user_can_review == true && mapping[1].index(users[random_index]).nil?

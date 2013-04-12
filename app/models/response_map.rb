@@ -33,6 +33,12 @@ class ResponseMap < ActiveRecord::Base
       responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
       end
     return responses    
+  end
+  
+  # return latest versions of the response given by reviewer
+  def self.get_reviewer_assessments_for(participant, reviewer)        
+    map = ResponseMap.find(:all, :conditions => ['reviewee_id = ? and reviewer_id = ? and type = ?', participant.id, reviewer.id, self.to_s])
+    return Response.find_all_by_map_id(map).sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}[0]   
   end 
   
   # Placeholder method, override in derived classes if required.

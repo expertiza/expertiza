@@ -36,10 +36,6 @@ class CourseParticipant < Participant
       return "<center>&#8212;</center>"
     end
     return self.course.name
-  end  
-  
-  def get_parent_name
-    Course.find(self.parent_id).name
   end
   
   def get_path

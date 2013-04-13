@@ -1,7 +1,7 @@
 class Questionnaire < ActiveRecord::Base
     # for doc on why we do it this way, 
     # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
-    has_many :questions # the collection of questions associated with this Questionnaire
+    has_many :questions,:dependent => :destroy # the collection of questions associated with this Questionnaire
     belongs_to :instructor, :class_name => "User", :foreign_key => "instructor_id" # the creator of this questionnaire
     
     has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaire', :foreign_key => 'questionnaire_id'

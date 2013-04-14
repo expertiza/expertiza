@@ -1,7 +1,13 @@
 class ParticipantsController < ApplicationController
   auto_complete_for :user, :name
-  
-  def list
+
+ # generate the undo link
+  def undo_link
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @participant.versions.last.id)}>undo</a>"
+  end
+
+
+   def list
     @root_node = Object.const_get(params[:model]+"Node").find_by_node_object_id(params[:id])     
     @parent = Object.const_get(params[:model]).find(params[:id])
     @participants = @parent.participants  
@@ -9,13 +15,20 @@ class ParticipantsController < ApplicationController
   end
   
   def add   
-    curr_object = Object.const_get(params[:model]).find(params[:id])    
+    curr_object = Object.const_get(params[:model]).find(params[:id])
     begin
       curr_object.add_participant(params[:user][:name])
+
+      #@participant = curr_object.last
+
+      user = User.find_by_name(params[:user][:name])
+      @participant = curr_object.participants.find_by_user_id(user.id)
     rescue
       url_new_user = url_for :controller => 'users', :action => 'new'
       flash[:error] = "User #{params[:user][:name]} does not exist. Would you like to <a href = '#{url_new_user}'>create this user?</a>"
     end
+
+    flash[:note] = "#{params[:user][:name]} has been added as a participant. #{undo_link}"
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
   end
      
@@ -24,8 +37,9 @@ class ParticipantsController < ApplicationController
     name = participant.user.name
     parent_id = participant.parent_id    
     begin
+      @participant = participant
       participant.delete(params[:force])
-      flash[:note] = "#{name} has been removed as a participant."
+      flash[:note] = "#{name} has been removed as a participant. #{undo_link}"
     rescue      
       url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
       url_show = url_for :action => 'delete_display', :id => params[:id], :model => participant.class.to_s.gsub("Participant","")

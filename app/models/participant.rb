@@ -10,6 +10,8 @@ class Participant < ActiveRecord::Base
   has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id'
   # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
   #has_many :responses, :through => :response_maps
+
+  has_paper_trail
   
   validates_numericality_of :grade, :allow_nil => true
 

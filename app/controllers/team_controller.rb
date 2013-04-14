@@ -66,7 +66,8 @@ def create_teams
  def delete   
    @team = Team.find(params[:id])
    course = Object.const_get(session[:team_type]).find(@team.parent_id)
-   @team.delete
+   TeamNode.find_by_node_object_id(@team.id).destroy
+   @team.destroy
    flash[:note] = "#{undo_link}"
    redirect_to :action => 'list', :id => course.id
  end

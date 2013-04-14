@@ -15,7 +15,7 @@ class VersionsController < ApplicationController
   end
 
   def revert
-    @versions.uniq.each do |v|
+    @versions.each do |v|
       if v.reify
         v.reify.save!
       else

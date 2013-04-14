@@ -32,9 +32,10 @@ class TeamsUsersController < ApplicationController
   end
         
   def delete
-    teamuser = TeamsUser.find(params[:id])   
-    parent_id = Team.find(teamuser.team_id).parent_id
-    teamuser.destroy    
+    @teams_user = TeamsUser.find(params[:id])
+    parent_id = Team.find(@teams_user.team_id).parent_id
+    TeamUserNode.find_by_node_object_id(@teams_user.id).destroy
+    @teams_user.destroy
     redirect_to :controller => 'team', :action => 'list', :id => parent_id   
   end    
 

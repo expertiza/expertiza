@@ -1,4 +1,5 @@
 class Participant < ActiveRecord::Base
+  has_paper_trail
   belongs_to :user
   belongs_to :topic, :class_name => 'SignUpTopic'
   belongs_to :assignment, :foreign_key => 'parent_id'

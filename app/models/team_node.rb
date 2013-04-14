@@ -1,4 +1,5 @@
 class TeamNode < Node
+
   def self.table
     "teams"
   end

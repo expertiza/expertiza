@@ -1,5 +1,6 @@
 class CourseTeam < Team
   belongs_to  :course, :class_name => 'Course', :foreign_key => 'parent_id'
+  has_paper_trail
 
 #NOTE: inconsistency in naming of users that's in the team
 #   currently they are being called: member, participant, user, etc...

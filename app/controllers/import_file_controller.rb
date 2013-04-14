@@ -18,6 +18,7 @@ class ImportFileController < ApplicationController
     if errors.length > 0
       flash[:error] = err_msg
     end
+    flash[:note] = "#{undo_link}"
     redirect_to session[:return_to]    
   end
   
@@ -67,5 +68,9 @@ class ImportFileController < ApplicationController
       row = Array.new
       items.each { | value | row << value.sub("\"","").sub("\"","").strip }
       return row
+  end
+
+  def undo_link
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => Object.const_get(params[:model]).last.versions.last.id)}>undo</a>"
   end
 end

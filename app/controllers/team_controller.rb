@@ -6,8 +6,10 @@ def create_teams_view
 end
 
 def delete_all
-  parent = Object.const_get(session[:team_type]).find(params[:id])  
+  parent = Object.const_get(session[:team_type]).find(params[:id])
+  @team = Team.first
   Team.delete_all_by_parent(parent)
+  flash[:note] = "#{undo_link}"
   redirect_to :action => 'list', :id => parent.id
 end
 
@@ -43,16 +45,17 @@ def create_teams
  end
  
  def update  
-   team = Team.find(params[:id])
-   parent = Object.const_get(session[:team_type]).find(team.parent_id)
+   @team = Team.find(params[:id])
+   parent = Object.const_get(session[:team_type]).find(@team.parent_id)
    begin
     Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-    team.name = params[:team][:name]
-    team.save
+    @team.name = params[:team][:name]
+    @team.save
+    flash[:note] = "#{undo_link}"
     redirect_to :action => 'list', :id => parent.id
    rescue TeamExistsError
     flash[:error] = $! 
-    redirect_to :action => 'edit', :id => team.id
+    redirect_to :action => 'edit', :id => @team.id
    end   
  end
  
@@ -61,14 +64,15 @@ def create_teams
  end
  
  def delete   
-   team = Team.find(params[:id])
-   course = Object.const_get(session[:team_type]).find(team.parent_id)
-   team.delete
+   @team = Team.find(params[:id])
+   course = Object.const_get(session[:team_type]).find(@team.parent_id)
+   @team.delete
+   flash[:note] = "#{undo_link}"
    redirect_to :action => 'list', :id => course.id
  end
  
  # Copies existing teams from a course down to an assignment
- # The team and team members are all copied.  
+ # The team and team members are all copied.
  def inherit
    assignment = Assignment.find(params[:id])
    if assignment.course_id >= 0
@@ -101,6 +105,10 @@ def create_teams
       flash[:error] = "This assignment is not #{url_for(:controller => 'assignment', :action => 'assign', :id => assignment.id)} with a course."
    end      
    redirect_to :controller => 'team', :action => 'list', :id => assignment.id
+ end
+
+ def undo_link
+   "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @team.versions.last.id)}>undo</a>"
  end
  
 end

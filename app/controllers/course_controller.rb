@@ -133,13 +133,21 @@ class CourseController < ApplicationController
       redirect_to :action => 'view_teaching_assistants', :id => @course.id
     else
       @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
+
       redirect_to :action => 'view_teaching_assistants', :id => @course.id
+
+      @course = @ta_mapping
+      flash[:note] = "#{undo_link}"
     end
   end
 
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
     @ta_mapping.destroy
+
+    @course = @ta_mapping
+    flash[:note] = "#{undo_link}"
+
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end
 

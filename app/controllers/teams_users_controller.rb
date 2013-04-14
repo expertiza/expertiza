@@ -22,9 +22,12 @@ class TeamsUsersController < ApplicationController
       urlCreate = url_for :controller => 'users', :action => 'new'      
       flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."            
     end
-    team = Team.find_by_id(params[:id])    
+    team = Team.find_by_id(params[:id])
     
       team.add_member(user)
+
+    @teamuser = TeamsUser.last
+    flash[:note] = "#{undo_link}"
     
     #  flash[:error] = $!
     #end
@@ -32,9 +35,10 @@ class TeamsUsersController < ApplicationController
   end
         
   def delete
-    teamuser = TeamsUser.find(params[:id])   
-    parent_id = Team.find(teamuser.team_id).parent_id
-    teamuser.destroy    
+    @teamuser = TeamsUser.find(params[:id])
+    parent_id = Team.find(@teamuser.team_id).parent_id
+    @teamuser.destroy
+    flash[:note] = "#{undo_link}"
     redirect_to :controller => 'team', :action => 'list', :id => parent_id   
   end    
 
@@ -47,5 +51,11 @@ class TeamsUsersController < ApplicationController
     
     redirect_to :action => 'list', :id => params[:id]
   end
+
+  def undo_link
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @teamuser.versions.last.id)}>undo</a>"
+  end
+
+
   
 end

@@ -16,6 +16,8 @@ end
 def create_teams
   parent = Object.const_get(session[:team_type]).find(params[:id])
   Team.randomize_all_by_parent(parent, session[:team_type], params[:team][:size].to_i)
+  @team = Team.first
+  flash[:note] = "#{undo_link}"
   redirect_to :action => 'list', :id => parent.id
  end
 
@@ -37,6 +39,8 @@ def create_teams
     Team.check_for_existing(parent, params[:team][:name], session[:team_type])
     team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => parent.id)
     TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
+    @team = Team.last
+    flash[:note] = "#{undo_link}"
     redirect_to :action => 'list', :id => parent.id
    rescue TeamExistsError
     flash[:error] = $! 

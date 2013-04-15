@@ -3,6 +3,18 @@ class ResponseController < ApplicationController
   helper :submitted_content
   helper :file  
   
+  # "This is a diff. from E-730 F12"
+  def update_cycle
+    @response = Response.find(params[:id])
+    if @response.cycle==0 then
+      @response.cycle=1
+    else
+      @response.cycle=0
+    end
+    @response.save
+    redirect_to :controller => 'grades', :action => 'view', :id => params[:assignment_id]
+  end
+  
   def delete
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)

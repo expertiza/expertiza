@@ -14,7 +14,7 @@ class Response < ActiveRecord::Base
       identifier += "<H2>Feedback from author</H2>"
     end
     if prefix
-      identifier += "<br/> <B>Reviewer:</B> "+self.map.reviewer.fullname
+      identifier += "<B>Reviewer:</B> "+self.map.reviewer.fullname
       str = prefix+"_"+self.id.to_s
     else
       identifier += '<B>'+self.map.get_title+'</B> '+count.to_s+'</B>'
@@ -25,15 +25,16 @@ class Response < ActiveRecord::Base
     if self.updated_at.nil?
       code += "Not available"
     else
-      code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p') + "<br />"
+      code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end
+    code += '<div id="review_'+str+'" style=""><BR/><BR/>'
+    
     # Test for whether custom rubric needs to be used
     if ((self.map.questionnaire.section.eql? "Custom") && (self.map.type.to_s != 'FeedbackResponseMap'))
       #return top of view
-      return code += '<div id="review_'+str+'" style="">'
+      return code
     end
     # End of custom code
-    code += '<div id="review_'+str+'" style=""><BR/><BR/>'
     count = 0
     self.scores.each{
       | reviewScore |
@@ -57,6 +58,7 @@ class Response < ActiveRecord::Base
   
   # Computes the total score awarded for a review
   def get_total_score
+=begin
     total_score = 0
     
     self.map.questionnaire.questions.each{
@@ -66,7 +68,11 @@ class Response < ActiveRecord::Base
         total_score += item.score
       end
     }    
-    return total_score        
+    return total_score
+=end
+
+scores.map(&:score).sum
+
   end  
   
  #Generate an email to the instructor when a new review exceeds the allowed difference
@@ -97,72 +103,5 @@ class Response < ActiveRecord::Base
   def delete
     self.scores.each {|score| score.destroy}
     self.destroy
-  end
-  
-  # Returns the average score for this response as an integer (0-100)
-  def get_average_score()
-    if get_maximum_score != 0 then
-      ((get_alternative_total_score.to_f / get_maximum_score.to_f) * 100).to_i
-    else
-      0
-    end
-  end
-  
-  # Returns the maximum possible score for this response
-  def get_maximum_score()
-    max_score = 0
-
-    self.scores.each  {|score| max_score = max_score + score.question.questionnaire.max_question_score }
-
-    max_score
-  end
-  
-  # Returns the total score from this response
-  def get_alternative_total_score()
-    # TODO The method get_total_score() above does not seem correct.  Replace with this method.
-    total_score = 0
-
-    self.scores.each  {|score| total_score = total_score + score.score }
-
-    total_score
-  end
-  
-  # Function which considers a given assignment
-  # and checks if a given review is still valid for score calculation
-  # The basic rule is that
-  # "A review is INVALID if there was new submission for the assignment
-  #  before the most recent review deadline AND THE review happened before that
-  #  submission"
-  # response - the response whose validity is being checked
-  # resubmission_times - submission times of the assignment is descending order
-  # latest_review_phase_start_time
-  # The function returns true if a review is valid for score calculation
-  # and false otherwise
-  def is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)
-    is_valid = true
-
-    # if there was not submission then the response is valid
-    if resubmission_times.nil? || latest_review_phase_start_time.nil?
-      return is_valid
-    end
-
-    resubmission_times.each do | resubmission_time |
-      # if the response is after a resubmission that is
-      # before the latest_review_phase_start_time (check second condition below)
-      # then we are good - the response is valid and we can break
-      if (self.updated_at > resubmission_time.resubmitted_at)
-        break
-      end
-
-      # this means there was a re-submission before the
-      # latest_review_phase_start_time and we dont have a response after that
-      # so the response is invalid
-      if (resubmission_time.resubmitted_at < latest_review_phase_start_time)
-        is_valid = false
-        break
-      end
-    end
-
-    is_valid
   end
 end

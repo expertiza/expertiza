@@ -23,6 +23,7 @@
   end  	
 %>
 
+
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
     <TD><%= participant.fullname %>
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a>
@@ -39,6 +40,18 @@
    	  <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
    	<% end %>  	 
    	</TD>
+   	<!-- "This is a diff. from E-730 F12" -->
+   	<% if 1 == 1 %>       	
+       	<TD ALIGN="CENTER" VALIGN="TOP">
+          <% if @post_review_deadline %>
+              <%=sprintf("%.0f",(weighted_submission.weighted_score / participant.assignment.questionnaires.first.max_question_score) * 100) %>
+          <% else %>
+              --
+           <%end %>
+        </TD>
+   	<% end %>
+   	<!-- "Diff. ends" -->
+   	
     <% else %>
    	<TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>
@@ -132,4 +145,12 @@
 <TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
 	<TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
 </TR>
+<!-- "This is a diff. from E-730 F12" -->
+<% if 0 == 1 %>       	
+<TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
+    <TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
+</TR>
+<% end %>
+<!-- "Diff. ends" -->
+
 <!-- END PARTICIPANT -->

@@ -13,7 +13,7 @@
 development:
   adapter: mysql
   database: pg_development
-  username: expertiza
+  username: root
   password: 
   host: localhost
 

@@ -1,5 +1,7 @@
+
 class Assignment < ActiveRecord::Base
   include DynamicReviewMapping
+
 
   belongs_to :course
   belongs_to :wiki_type
@@ -127,6 +129,11 @@ class Assignment < ActiveRecord::Base
     @contributors ||= team_assignment ? teams : participants
   end
 
+  def set_instructor(user_id)
+    self.instructor_id = user_id
+  end
+
+
   def review_mappings
     @review_mappings ||= team_assignment ? team_review_mappings : participant_review_mappings
   end
@@ -249,6 +256,7 @@ class Assignment < ActiveRecord::Base
     return scores
   end
   
+=begin
   def compute_scores
     scores = Hash.new
     questionnaires = self.questionnaires
@@ -262,6 +270,7 @@ class Assignment < ActiveRecord::Base
       scores << pScore
     }
   end
+=end
   
   def get_contributor(contrib_id)
     if team_assignment

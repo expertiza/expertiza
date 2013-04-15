@@ -1,12 +1,17 @@
 <!-- PARTICIPANTS --> 
+<!-- 
+    "This is a diff. from E-730 F12" 
+    The weighted_submission part is not there in latest production
+-->
 <%= render :partial => 'participant_title', :locals => {:prefix => nil}  %>
 <% index = 0 %>
 <% @assignment.participants.each{
-    | participant | %>   
+    | participant | %>
      <%= render :partial => 'grades/participant',
                 :locals => {:prefix => 'user_'+index.to_s,
                             :team => false,
-                            :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>                                                                                   
+                            :pscore => @scores[:participants][participant.id.to_s.to_sym],
+                            :weighted_submission => @weighted_submissions[participant.id]} %>
 <% 
      index += 1
     } %> 

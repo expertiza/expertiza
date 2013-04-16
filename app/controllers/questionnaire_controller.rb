@@ -51,7 +51,8 @@ class QuestionnaireController < ApplicationController
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
       end
-      redirect_to :controller => 'questionnaire', :action => 'view', :id => @questionnaire.id
+      flash[:note] = "Copy of questionnaire #{orig_questionnaire.name} is created. #{undo_link}"
+      redirect_to :back
     rescue
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!      
       redirect_to :action => 'list', :controller => 'tree_display'
@@ -73,8 +74,12 @@ class QuestionnaireController < ApplicationController
              current_q_type.delete
             end
           end
-          @questionnaire.delete
-          flash[:note] = "Questionnaire <B>#{name}</B> was deleted."
+          @questionnaire.assignments.each{
+              | assignment |
+            raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+          }
+          @questionnaire.destroy
+          flash[:note] = "Questionnaire <B>#{name}</B> was deleted. #{undo_link}"
       rescue
           flash[:error] = $!
       end

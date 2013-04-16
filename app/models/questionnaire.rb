@@ -6,6 +6,8 @@ class Questionnaire < ActiveRecord::Base
     
     has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaire', :foreign_key => 'questionnaire_id'
     has_many :assignments, :through => :assignment_questionnaires
+
+    has_one :questionnaire_node,:foreign_key => :node_object_id,:dependent => :destroy
     
     validates_presence_of :name
     validates_numericality_of :max_question_score
@@ -45,17 +47,6 @@ class Questionnaire < ActiveRecord::Base
         | assignment |
         raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
       }
-      
-      self.questions.each{
-        | question |
-          question.delete        
-      }
-       
-     
-      node = QuestionnaireNode.find_by_node_object_id(self.id)
-      if node
-        node.destroy
-      end
                 
       self.destroy      
     end

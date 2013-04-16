@@ -26,7 +26,7 @@ class TeamsUsersController < ApplicationController
     
       team.add_member(user)
 
-    @teamuser = TeamsUser.last
+    @teams_user = TeamsUser.last
     flash[:note] = "#{undo_link}"
     
     #  flash[:error] = $!
@@ -37,7 +37,6 @@ class TeamsUsersController < ApplicationController
   def delete
     @teams_user = TeamsUser.find(params[:id])
     parent_id = Team.find(@teams_user.team_id).parent_id
-    TeamUserNode.find_by_node_object_id(@teams_user.id).destroy
     @teams_user.destroy
     flash[:note] = "#{undo_link}"
     redirect_to :controller => 'team', :action => 'list', :id => parent_id   
@@ -54,7 +53,7 @@ class TeamsUsersController < ApplicationController
   end
 
   def undo_link
-    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @teamuser.versions.last.id)}>undo</a>"
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @teams_user.versions.last.id)}>undo</a>"
   end
 
 

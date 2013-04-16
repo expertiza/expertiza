@@ -25,29 +25,31 @@ class SubmittedContentController < ApplicationController
   end  
   
   def submit_hyperlink
-    participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(participant.user_id)
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
 
     begin
-      participant.submmit_hyperlink(params['submission'])
-      participant.update_resubmit_times
+      @participant.submmit_hyperlink(params['submission'])
+      @participant.update_resubmit_times
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
-    end    
-    redirect_to :action => 'edit', :id => participant.id
+    end
+    flash[:note] = "#{undo_link}"
+    redirect_to :action => 'edit', :id => @participant.id
   end    
 
   # Note: This is not used yet in the view until we all decide to do so
   def remove_hyperlink
-    participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(participant.user_id)
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
 
     begin
-      participant.remove_hyperlink(params['chk_links'].to_i)
+      @participant.remove_hyperlink(params['chk_links'].to_i)
     rescue 
       flash[:error] = $!
-    end    
-    redirect_to :action => 'edit', :id => participant.id
+    end
+    flash[:note] = "#{undo_link}"
+    redirect_to :action => 'edit', :id => @participant.id
   end
   
   def submit_file
@@ -238,5 +240,9 @@ private
     rescue
       flash[:error] = $!
     end
+  end
+
+  def undo_link
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @participant.versions.last.id)}>undo</a>"
   end
 end

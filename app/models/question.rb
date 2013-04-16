@@ -2,7 +2,7 @@ class Question < ActiveRecord::Base
     belongs_to :questionnaire # each question belongs to a specific questionnaire
     belongs_to :review_score  # each review_score pertains to a particular question
     belongs_to :review_of_review_score  # ditto
-    has_many :question_advices, :order => 'score' # for each question, there is separate advice about each possible score
+    has_many :question_advices, :order => 'score', :dependent => :destroy # for each question, there is separate advice about each possible score
     has_many :signup_choices # ?? this may reference signup type questionnaires
     
     validates_presence_of :txt # user must define text content for a question

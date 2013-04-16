@@ -7,8 +7,12 @@ end
 
 def delete_all
   parent = Object.const_get(session[:team_type]).find(params[:id])
-  @team = Team.first
-  Team.delete_all_by_parent(parent)
+  @teams = Team.find_all_by_parent_id(parent.id)
+  @team = @teams.first
+  @teams.each do |t|
+    Node.find_by_node_object_id(t.id).destroy
+    t.destroy
+  end
   flash[:note] = "#{undo_link}"
   redirect_to :action => 'list', :id => parent.id
 end
@@ -70,7 +74,6 @@ def create_teams
  def delete   
    @team = Team.find(params[:id])
    course = Object.const_get(session[:team_type]).find(@team.parent_id)
-   TeamNode.find_by_node_object_id(@team.id).destroy
    @team.destroy
    flash[:note] = "#{undo_link}"
    redirect_to :action => 'list', :id => course.id

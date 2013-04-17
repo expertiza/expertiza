@@ -4,10 +4,11 @@ class CourseParticipant < Participant
   # Copy this participant to an assignment
   def copy(assignment_id)
     part = AssignmentParticipant.find_by_user_id_and_parent_id(self.user_id,assignment_id)    
-    if part.nil?       
-       newpart = AssignmentParticipant.create(:user_id => self.user_id, :parent_id => assignment_id)
-       newpart.set_handle()
+    if part.nil?
+       part = AssignmentParticipant.create(:user_id => self.user_id, :parent_id => assignment_id)
+       part.set_handle()
     end
+    return part
   end 
   
   # provide import functionality for Course Participants

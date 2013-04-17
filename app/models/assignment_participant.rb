@@ -243,8 +243,9 @@ class AssignmentParticipant < Participant
   def copy(course_id)
     part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
     if part.nil?
-       CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id)       
+       part = CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id)
     end
+    return part
   end  
   
   def get_course_string

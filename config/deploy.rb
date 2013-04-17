@@ -67,7 +67,7 @@ end
 after "deploy:update_code", "deploy:symlink_shared"
 
 desc "Load production data into the local development database."
-task :load_production_data, :roles => :db, :only => { :primary => true } do
+task :load_data, :roles => :db, :only => { :primary => true } do
   require 'yaml'
  
   database = YAML::load_file('config/database.yml')

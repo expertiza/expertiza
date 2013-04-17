@@ -1,12 +1,6 @@
 class ParticipantsController < ApplicationController
   auto_complete_for :user, :name
 
- # generate the undo link
-  def undo_link
-    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @participant.versions.last.id)}>undo</a>"
-  end
-
-
    def list
     @root_node = Object.const_get(params[:model]+"Node").find_by_node_object_id(params[:id])     
     @parent = Object.const_get(params[:model]).find(params[:id])
@@ -18,9 +12,6 @@ class ParticipantsController < ApplicationController
     curr_object = Object.const_get(params[:model]).find(params[:id])
     begin
       curr_object.add_participant(params[:user][:name])
-
-      #@participant = curr_object.last
-
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
     rescue
@@ -40,7 +31,8 @@ class ParticipantsController < ApplicationController
       @participant = participant
       participant.delete(params[:force])
       flash[:note] = "#{name} has been removed as a participant. #{undo_link}"
-    rescue      
+    rescue => error
+      # puts error.message
       url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
       url_show = url_for :action => 'delete_display', :id => params[:id], :model => participant.class.to_s.gsub("Participant","")
       url_no  = url_for :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
@@ -86,31 +78,39 @@ end
  def inherit
    assignment = Assignment.find(params[:id])    
    course = assignment.course
+   @copied_participants = []
    if course     
     participants = course.participants
     if participants.length > 0      
-      participants.each{|participant| participant.copy(params[:id])}
+      participants.each{|participant|
+        new_participant = participant.copy(params[:id])
+        @copied_participants.push new_participant
+      }
     else
       flash[:note] = "No participants were found to inherit."
     end
    else
      flash[:error] = "No course was found for this assignment."
    end
+   flash[:note] = "Participants from #{course.name} has been copied to this assignment #{undo_link}"
    redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment'   
  end
  
- def bequeath_all   
+ def bequeath_all
+   @copied_participants = []
    assignment = Assignment.find(params[:id])
    if assignment.course
       course = assignment.course
       assignment.participants.each{
         |participant|
-        participant.copy(course.id)
+        new_participant = participant.copy(course.id)
+        @copied_participants.push new_participant
       }
       flash[:note] = "All participants were successfully copied to \""+course.name+"\""
    else
       flash[:error] = "This assignment is not associated with a course."
    end
+   flash[:note] = "Participants from this assignment has been copied to #{course.name} #{undo_link}"
    redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment' 
  end    
   
@@ -143,6 +143,24 @@ end
       flash[:error] = "\"#{name}\" was not removed. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
     end
     redirect_to :controller => 'review_mapping', :action => 'list_mappings', :id => assignment_id
+  end
+
+
+  # Generate the undo link for modified participants
+  def undo_link
+    @versions_list = []
+
+    if @participant
+      @versions_list.push(@participant.versions.last)
+    end
+
+    if @copied_participants
+      @copied_participants.each {|p| @versions_list.push(p.versions.last)}
+    end
+
+    @latest_update = @versions_list.max_by {|v| v.created_at}
+
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @latest_update.id)}>undo</a>"
   end
 
 

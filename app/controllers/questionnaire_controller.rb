@@ -365,5 +365,6 @@ class QuestionnaireController < ApplicationController
     @versions_list.push(@questionnaire.versions.last)
     @latest_update = @versions_list.max_by {|v| v.created_at}
     "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @latest_update.id)}>undo</a>"
+    flash[:note] = "#{undo_link}"
   end
 end

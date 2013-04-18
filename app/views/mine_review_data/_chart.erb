@@ -1,0 +1,6 @@
+<% require 'json' %>
+<%if @subchart_on then
+subchart_id = ChartHelper.new.get_id%>
+    <div id='<%=subchart_id%>' class='_sub_chart_container'></div>
+<%end%>
+<div id='<%=ChartHelper.new.get_id%>' class='_chart_container'>{"type":"<%=@type%>","data":<%=@chart_data.to_json%>,"subchart":"<%=subchart_id%>"}</div>

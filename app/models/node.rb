@@ -5,10 +5,10 @@
 #Author: AJBUDLON
 #Date: 7/18/2008
 class Node < ActiveRecord::Base
+  has_paper_trail
   acts_as_nested_set
 
   belongs_to :parent, :class_name => 'Node', :foreign_key => 'parent_id'
-  has_paper_trail
 
   # Retrieves the nodes of this type
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil)       

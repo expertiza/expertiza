@@ -604,9 +604,6 @@ class AssignmentController < ApplicationController
           raise "Not authorised to delete this assignment"
         end
         assignment.delete(params[:force])
-        @a = Node.find(:first, :conditions => ['node_object_id = ? and type = ?',params[:id],'AssignmentNode'])
-
-        @a.destroy
         flash[:notice] = "The assignment is deleted"
       rescue
         url_yes = url_for :action => 'delete', :id => params[:id], :force => 1

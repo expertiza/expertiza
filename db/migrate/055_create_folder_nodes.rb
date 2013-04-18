@@ -3,7 +3,7 @@ class CreateFolderNodes < ActiveRecord::Migration
     folders = TreeFolder.find(:all)
     folders.each {
       |folder|
-      FolderNode.create(:node_object_id => folder.id, :parent_id => nil)       
+      FolderNode.create(:node_object_id => folder.id, :parent_id => nil)
     }
   end
 

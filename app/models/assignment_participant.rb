@@ -244,8 +244,10 @@ class AssignmentParticipant < Participant
     part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
     if part.nil?
        part = CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id)
+       return part
     end
-    return part
+  else
+      return nil # return nil so we can tell a copy is not made
   end  
   
   def get_course_string

@@ -79,20 +79,33 @@ end
    assignment = Assignment.find(params[:id])    
    course = assignment.course
    @copied_participants = []
+
    if course     
     participants = course.participants
     if participants.length > 0      
       participants.each{|participant|
         new_participant = participant.copy(params[:id])
-        @copied_participants.push new_participant
+
+        if new_participant
+          @copied_participants.push new_participant
+        end
       }
+
+      # Only display undo link if copies of participants are created
+      if @copied_participants.length > 0
+        flash[:note] = "Participants from #{course.name} has been copied to this assignment #{undo_link}"
+      else
+        flash[:note] = 'All course participants are already in this assignment'
+      end
+
     else
       flash[:note] = "No participants were found to inherit."
     end
    else
      flash[:error] = "No course was found for this assignment."
    end
-   flash[:note] = "Participants from #{course.name} has been copied to this assignment #{undo_link}"
+
+
    redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment'   
  end
  
@@ -101,16 +114,27 @@ end
    assignment = Assignment.find(params[:id])
    if assignment.course
       course = assignment.course
-      assignment.participants.each{
-        |participant|
+      assignment.participants.each{ |participant|
         new_participant = participant.copy(course.id)
-        @copied_participants.push new_participant
+
+        if new_participant
+          @copied_participants.push new_participant
+        end
       }
-      flash[:note] = "All participants were successfully copied to \""+course.name+"\""
+      # only display undo link if copies of participants are created
+      if @copied_participants.length > 0
+        flash[:note] = "All participants were successfully copied to #{course.name} #{undo_link}"
+      else
+        flash[:note] = 'All assignment participants are already part of the course'
+      end
+
+      #flash[:note] = "All participants were successfully copied to \""+course.name+"\""
    else
       flash[:error] = "This assignment is not associated with a course."
    end
-   flash[:note] = "Participants from this assignment has been copied to #{course.name} #{undo_link}"
+
+
+
    redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment' 
  end    
   

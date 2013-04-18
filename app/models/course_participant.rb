@@ -7,8 +7,10 @@ class CourseParticipant < Participant
     if part.nil?
        part = AssignmentParticipant.create(:user_id => self.user_id, :parent_id => assignment_id)
        part.set_handle()
+      return part
     end
-    return part
+  else
+      return nil # return nil so we can tell a copy is not made
   end 
   
   # provide import functionality for Course Participants

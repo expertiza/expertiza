@@ -1,11 +1,16 @@
 <h1>Mine Review Data</h1>
-
-
+<%
+   @type = "bar"
+   @chart_data = ChartHelper.testData()[:bar]
+   @subchart_on = true
+%>
+<%=render 'chart_header' %>
+<%=render 'chart' %>
 <div>
   <table align="left">
     <tr>
       <td style="width: 40px;">
-        <% form_tag({:action => 'review_word_count',:course_list=>@course_list}) do %>
+        <% form_tag({:course_list=>@course_list}) do %>
             Select Graph :
             <br/>
             <select name='display[graph_type]' style="width: 15em">

@@ -30,7 +30,7 @@ class VersionsController < ApplicationController
         end
       end
     end
-
+    flash[:note] = "#{undo_link}"
     begin
       redirect_to :back
     rescue

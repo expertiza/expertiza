@@ -1,70 +1,19 @@
+<% if Chart.include_header? then%>
 <script src='/javascripts/highcharts.js'></script>
 <script>
+<%= render 'static' %>
 jQuery(document).ready( function(){
     var charts = jQuery("div._chart_container");
     var i;
     for (i = 0; i < charts.length; i++) {
         var chart = charts[i];
-        var info = eval("(" + chart.innerHTML + ")");
-        var chart_obj;
-        switch (info.type) {
-            case "bar":
-                info.data.chart = {type:"column"};
-                info.data.plotOptions ={column:{events:{click:null}}};
-                info.data.plotOptions.column.events.click=function(e){
-                    console.log('#'+info.subchart   );
-                    console.log(jQuery('#'+info.subchart));
-                        jQuery('#'+info.subchart).highcharts({
-                            chart: {
-                                plotBackgroundColor: null,
-                                plotBorderWidth: null,
-                                plotShadow: false
-                            },
-                            title: {
-                                text: 'Go Back'
-                            },
-                            tooltip: {
-                                pointFormat: '{series.name}: <b>{point.x}</b>',
-                                percentageDecimals: 1
-                            },
-                            plotOptions: {
-                                pie: {
-                                    allowPointSelect: true,
-                                    cursor: 'pointer',
-                                    dataLabels: {
-                                        enabled: true,
-                                        color: '#000000',
-                                        connectorColor: '#000000',
-                                        formatter: function() {
-                                            return '<b>'+ this.point.name +'</b>: '+ Math.floor(this.percentage*100)/100 +' %';
-                                        }
-                                    }
-                                }
-                            },
-                            series: [{
-                                type: 'pie',
-                                name: 's1',
-                                data: [
-                                    ['9',   9.0],
-                                    ['8',       6.0],
-                                    ['7',       2.0],
-                                ]
-                            }]
-                        });
-                    jQuery('#'+chart.id).hide();
-                    jQuery("tspan:contains('Go Back')").click(function () {
-                        jQuery('#'+chart.id).show();
-                        jQuery('#'+info.subchart).hide();
-                    });
-                };
-                chart_obj = jQuery('#'+chart.id).highcharts(info.data);
-                break;
-            case "pie":
-                break;
-            case "scatter":
-                break;
-        }
+        var data = eval("(" + chart.innerHTML + ")");
+        console.log(data);
+        jQuery('#'+chart.id).highcharts(data);
     }
     jQuery("tspan:contains('Highcharts.com')").remove();
 } );
 </script>
+<%
+Chart.set_header
+end %>

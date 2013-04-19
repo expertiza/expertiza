@@ -115,8 +115,8 @@ def create_teams
    redirect_to :controller => 'team', :action => 'list', :id => assignment.id
  end
 
- def undo_link
-   "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @team.versions.last.id)}>undo</a>"
- end
+ #def undo_link
+ #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @team.versions.last.id)}>undo</a>"
+ #end
  
 end

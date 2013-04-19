@@ -70,7 +70,7 @@ class ImportFileController < ApplicationController
       return row
   end
 
-  def undo_link
-    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => Object.const_get(params[:model]).last.versions.last.id)}>undo</a>"
-  end
+  #def undo_link
+  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => Object.const_get(params[:model]).last.versions.last.id)}>undo</a>"
+  #end
 end

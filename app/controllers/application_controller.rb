@@ -25,6 +25,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def undo_link
+    @version = Version.find(:all,:conditions => ['whodunnit = ?',session[:user].id]).last
+    @link_name = params[:redo] == "true" ? "redo" : "undo"
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @version.id,:redo => !params[:redo])}>#{@link_name}</a>"
+  end
+
   private
   def current_user_session
     return @current_user_session if defined?(@current_user_session)

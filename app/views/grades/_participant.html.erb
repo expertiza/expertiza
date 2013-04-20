@@ -43,8 +43,8 @@
    	<!-- "This is a diff. from E-730 F12" -->
    	<% if 1 == 1 %>       	
        	<TD ALIGN="CENTER" VALIGN="TOP">
-          <% if @post_review_deadline %>
-              <%=sprintf("%.0f",(weighted_submission.weighted_score / participant.assignment.questionnaires.first.max_question_score) * 100) %>
+          <% if (@post_review_deadline) %>
+              <%=sprintf("%.0f",(weighted_submission.weighted_score / participant.assignment.questionnaires.first.max_question_score) * 100) unless (weighted_submission == nil) %>
           <% else %>
               --
            <%end %>

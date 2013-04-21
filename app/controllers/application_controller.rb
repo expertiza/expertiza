@@ -6,13 +6,13 @@ class ApplicationController < ActionController::Base
   protect_from_forgery unless Rails.env.test?
   filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
 
-  def authorize 
+  def authorize
     unless session[:user]
       flash[:notice] = "Please log in."
       redirect_to(:controller => 'user_sessions', :action => 'new')
     end
   end
-  
+
   def current_user_role?
     session[:user].role.name
   end
@@ -23,6 +23,11 @@ class ApplicationController < ActionController::Base
     else
       nil
     end
+  end
+
+  def undo_link
+    @version = Version.find(:all,:conditions => ['whodunnit = ?',session[:user].id]).last
+    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @version.id)}>undo</a>"
   end
 
   private
@@ -70,7 +75,7 @@ class ApplicationController < ActionController::Base
     if constraint == nil or constraint == ''
       constraint = 'list_mine'
     end
-    
+
     ApplicationHelper::get_user_role(session[:user]).send(constraint, object_type, session[:user].id)
   end
 
@@ -79,16 +84,16 @@ class ApplicationController < ActionController::Base
     # because it is private and belongs to someone else), so catch the exceptions.
     ApplicationHelper::get_user_role(session[:user]).get(object_type, id, session[:user].id)
   end
-  
+
   def set_up_display_options(object_type)
     # Create a set that will be used to populate the dropbox when a user lists a set of objects (assgts., questionnaires, etc.)
     # Get the Instructor::questionnaire constant
-    @display_options = eval ApplicationHelper::get_user_role(session[:user]).class.to_s+"::"+object_type 
+    @display_options = eval ApplicationHelper::get_user_role(session[:user]).class.to_s+"::"+object_type
     @display_option = DisplayOption.new
     @display_option.name = 'list_mine'
     @display_option.name = params[:display_option][:name] if params[:display_option]
   end
-  
+
   # Use this method to validate the current user in order to avoid allowing users
   # to see unauthorized data.
   # Ex: return unless current_user_id?(params[:user_id])

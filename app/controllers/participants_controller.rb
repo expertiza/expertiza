@@ -169,7 +169,7 @@ end
     redirect_to :controller => 'review_mapping', :action => 'list_mappings', :id => assignment_id
   end
 
-
+=begin
   # Generate the undo link for modified participants
   def undo_link
     @versions_list = []
@@ -186,6 +186,6 @@ end
 
     "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @latest_update.id)}>undo</a>"
   end
-
+=end
 
 end

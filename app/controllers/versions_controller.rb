@@ -15,13 +15,25 @@ class VersionsController < ApplicationController
   end
 
   def revert
-    @versions.each do |v|
-      if v.reify
-        v.reify.save!
-      else
-        v.item.destroy
+    while @versions.length != 0 do
+      @versions.each do |v|
+        if v.reify
+          begin
+            v.reify.save!
+          rescue
+          else
+            @versions.delete(v)
+          end
+        else
+          v.item.destroy
+          @versions.delete(v)
+        end
       end
     end
-    redirect_to :back
+    begin
+      redirect_to :back
+    rescue
+      redirect_to :controller => :tree_display,:action => :list
+    end
   end
 end

@@ -58,8 +58,11 @@ class CourseController < ApplicationController
         CourseNode.create(:node_object_id => new_course.id)
       end
 
-      flash[:note] = 'The course is currently associated with an existing location. This could cause errors for furture submissions.'
-      redirect_to :controller => 'course', :action => 'edit', :id => new_course.id
+
+      @course = new_course
+      flash[:note] = "The copy of the course is currently associated with an existing location from the original course. This could cause errors for future submissions and it is recommended that the copy be edited as needed.  It can be edited <a href = #{url_for(:controller => 'course', :action => 'edit', :id => new_course.id)}>here</a>.<br><br>#{undo_link}"
+
+      redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = 'The course was not able to be copied: '+$!
       redirect_to :controller => 'tree_display', :action => 'list'

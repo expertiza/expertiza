@@ -1,4 +1,4 @@
-require 'assignment_analytic'
+require 'helpers/analytic/assignment_analytic'
 module CourseAnalytic
   def students
     students = Array.new

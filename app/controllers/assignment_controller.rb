@@ -8,25 +8,25 @@ class AssignmentController < ApplicationController
   def copy
     Assignment.record_timestamps = false
     old_assign = Assignment.find(params[:id])
-    new_assign = old_assign.clone
+    @assignment = old_assign.clone
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
-    @user.set_instructor(new_assign)
-    new_assign.update_attribute('name','Copy of '+ new_assign.name)
-    new_assign.update_attribute('created_at',Time.now)
-    new_assign.update_attribute('updated_at',Time.now)
-    if new_assign.directory_path.present?
-      new_assign.update_attribute('directory_path',new_assign.directory_path+'_copy')
+    @user.set_instructor(@assignment)
+    @assignment.update_attribute('name','Copy of '+ @assignment.name)
+    @assignment.update_attribute('created_at',Time.now)
+    @assignment.update_attribute('updated_at',Time.now)
+    if @assignment.directory_path.present?
+      @assignment.update_attribute('directory_path',@assignment.directory_path+'_copy')
     end
     session[:copy_flag] = true
-    new_assign.copy_flag = true
+    @assignment.copy_flag = true
 
-    if new_assign.save
+    if @assignment.save
       Assignment.record_timestamps = true
 
       old_assign.assignment_questionnaires.each do |aq|
         AssignmentQuestionnaire.create(
-          :assignment_id => new_assign.id,
+          :assignment_id => @assignment.id,
           :questionnaire_id => aq.questionnaire_id,
           :user_id => session[:user].id,
           :notification_limit => aq.notification_limit,
@@ -34,12 +34,13 @@ class AssignmentController < ApplicationController
         )
       end
       
-      DueDate.copy(old_assign.id, new_assign.id)           
-      new_assign.create_node()
+      DueDate.copy(old_assign.id, @assignment.id)
+      @assignment.create_node()
       
-      flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
+      flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.undefined method."
 
-      redirect_to :action => 'edit', :id => new_assign.id
+      flash[:note] = "Copy of \"#{old_assign.name}\" was successfully created and named\"#{@assignment.name}\".#{undo_link}"
+      redirect_to :action => 'edit', :id => old_assign.id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
       redirect_to :action => 'list', :controller => 'tree_display'
@@ -203,13 +204,13 @@ class AssignmentController < ApplicationController
         # Create submission directory for this assignment
         # If assignment is a Wiki Assignment (or has no directory)
         # the helper will not create a path
-        FileHelper.create_directory(@assignment)      
+        FileHelper.create_directory(@assignment)
 
         # Creating node information for assignment display
         @assignment.create_node()
         
         flash[:alert] = "There is already an assignment named \"#{@assignment.name}\". &nbsp;<a style='color: blue;' href='../../assignment/edit/#{@assignment.id}'>Edit assignment</a>" if @assignment.duplicate_name?
-        flash[:note] = 'Assignment was successfully created.'
+        flash[:note] = "Assignment: \"#{@assignment.name}\" was successfully created.#{undo_link}"
         redirect_to :action => 'list', :controller => 'tree_display'
       rescue
         flash[:error] = $!
@@ -560,7 +561,7 @@ class AssignmentController < ApplicationController
           add_to_delayed_queue
         end
      
-        flash[:note] = "Assignment was successfully updated. #{undo_link}"
+        flash[:note] = "Assignment \"#{@assignment.name}\" was successfully updated. #{undo_link}"
         redirect_to :action => 'show', :id => @assignment
      
       rescue
@@ -587,23 +588,23 @@ class AssignmentController < ApplicationController
   #  delete assignment
   #--------------------------------------------------------------------------------------------------------------------
   def delete
-    assignment = Assignment.find(params[:id])
+    @assignment = Assignment.find(params[:id])
 
     # If the assignment is already deleted, go back to the list of assignments
-    if assignment
+    if @assignment
       begin
       	#delete from delayed_jobs queue
-        djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', assignment.id])
+        djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', @assignment.id])
         for dj in djobs
           delete_from_delayed_queue(dj.id)
         end
 
         @user = session[:user]
         id = @user.get_instructor
-        if(id != assignment.instructor_id)
+        if(id != @assignment.instructor_id)
           raise "Not authorised to delete this assignment"
         end
-        assignment.delete(params[:force])
+        @assignment.delete(params[:force])
         @a = Node.find(:first, :conditions => ['node_object_id = ? and type = ?',params[:id],'AssignmentNode'])
 
         @a.destroy
@@ -615,7 +616,7 @@ class AssignmentController < ApplicationController
         flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
       end
     end
-
+    flash[:note] = "Assignment: \"#{@assignment.name}\" was deleted. #{undo_link}"
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -637,7 +638,7 @@ class AssignmentController < ApplicationController
     @assignment = Assignment.find(params[:id])
     @assignment.private = !@assignment.private
     @assignment.save
-    flash[:note] = "#{undo_link}"
+    flash[:note] = "Assignment \"#{@assignment.name}\" was made private. #{undo_link}"
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -674,12 +675,13 @@ class AssignmentController < ApplicationController
   #  !!!NO usages found
   #--------------------------------------------------------------------------------------------------------------------
   def remove_assignment_from_course
-    assignment = Assignment.find(params[:id])
+    @assignment = Assignment.find(params[:id])
     oldpath = assignment.get_path rescue nil
-    assignment.course_id = nil
-    assignment.save
+    @assignment.course_id = nil
+    @assignment.save
     newpath = assignment.get_path rescue nil
     FileHelper.update_file_location(oldpath,newpath)
+    flash[:note] = "Assignment \"#{@assignment.name}\"was removed from course. #{undo_link}"
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 

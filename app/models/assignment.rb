@@ -1,6 +1,6 @@
 class Assignment < ActiveRecord::Base
   include DynamicReviewMapping
-
+  has_paper_trail
   belongs_to :course
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to
@@ -10,7 +10,7 @@ class Assignment < ActiveRecord::Base
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
   has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
-  has_many :due_dates
+  has_many :due_dates,   :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
@@ -21,7 +21,6 @@ class Assignment < ActiveRecord::Base
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
   # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
   # has_many :responses, :through => :response_maps, :source => 'response'
-  has_paper_trail
 
   validates_presence_of :name
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]

@@ -225,7 +225,7 @@ class Assignment < ActiveRecord::Base
   def get_scores(questions)
     scores = Hash.new
 
-    scores[:participants] = Hash.new    
+    scores[:participants] = Hash.new
     self.participants.each{
       | participant |
       scores[:participants][participant.id.to_s.to_sym] = Hash.new

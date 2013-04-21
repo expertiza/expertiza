@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121019201555) do
+ActiveRecord::Schema.define(:version => 20130420223439) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -257,9 +257,9 @@ ActiveRecord::Schema.define(:version => 20121019201555) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",      :default => "", :null => false
+    t.string  "q_type",                     :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1,  :null => false
+    t.integer "question_id", :default => 1, :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -275,8 +275,8 @@ ActiveRecord::Schema.define(:version => 20121019201555) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.text     "instruction_loc"
     t.string   "section"
+    t.text     "instruction_loc"
   end
 
   create_table "questions", :force => true do |t|
@@ -303,7 +303,7 @@ ActiveRecord::Schema.define(:version => 20121019201555) do
     t.text     "additional_comment"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version_num"
+    t.integer  "cycle",              :default => 0
   end
 
   add_index "responses", ["map_id"], :name => "fk_response_response_map"

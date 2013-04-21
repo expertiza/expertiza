@@ -41,15 +41,13 @@
    	<% end %>  	 
    	</TD>
    	<!-- "This is a diff. from E-730 F12" -->
-   	<% if 1 == 1 %>       	
-       	<TD ALIGN="CENTER" VALIGN="TOP">
-          <% if (@post_review_deadline) %>
-              <%=sprintf("%.0f",(weighted_submission.weighted_score / participant.assignment.questionnaires.first.max_question_score) * 100) unless (weighted_submission.nil?) %>
-          <% else %>
-              --
-           <%end %>
-        </TD>
-   	<% end %>
+   	<TD ALIGN="CENTER" VALIGN="TOP">
+      <% if(!(weighted_submission.nil?) && (@post_review_deadline))  %>
+          <%=sprintf("%.0f",(weighted_submission.weighted_score / participant.assignment.questionnaires.first.max_question_score) * 100) %>
+      <% else %>
+          --
+       <% end %>
+    </TD>
    	<!-- "Diff. ends" -->
    	
     <% else %>
@@ -145,12 +143,5 @@
 <TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
 	<TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
 </TR>
-<!-- "This is a diff. from E-730 F12" -->
-<% if 0 == 1 %>       	
-<TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
-    <TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
-</TR>
-<% end %>
-<!-- "Diff. ends" -->
 
 <!-- END PARTICIPANT -->

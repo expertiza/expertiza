@@ -18,7 +18,7 @@ class Questionnaire < ActiveRecord::Base
     DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517"
     
 	def compute_weighted_score(symbol, assignment, scores)
-      aq = AssignmentQuestionnaire.find_by_assignment_id(assignment.id)
+      aq = self.assignment_questionnaire.find_by_assignment_id(assignment.id)
       if scores[symbol][:scores][:avg]
         #dont bracket and to_f the whole thing - you get a 0 in the result.. what you do is just to_f the 100 part .. to get the fractions
        

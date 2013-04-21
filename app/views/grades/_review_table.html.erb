@@ -47,8 +47,8 @@
         </td>
     <% end %>
   </tr>
-
-
+  <!-- commenting out cycles while testing: start -->
+  <% if false %>  
   <tr class="head"> <td><b>2 Cycle Similarity <br> Score</b></td>
     <% for review in reviews %>
         <td>
@@ -74,6 +74,9 @@
             </td>
         <% end %>
       </tr>
+      <% end %>
+      <!-- commenting out cycles while testing: end -->
+      
       <%# We allow instructors, admins and TAs to drop a review %>
       <%if session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4 || session[:user].role_id == 6%>
           <tr> <td><b>Add / Drop <br> Review</b></td>

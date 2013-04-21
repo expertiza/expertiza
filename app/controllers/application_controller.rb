@@ -1,6 +1,7 @@
 # Filters added to this controller will be run for all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
+  rescue_from ActiveRecord::RecordNotFound, :with => :record_not_found
 
   helper_method :current_user_session, :current_user, :current_user_role?
   protect_from_forgery unless Rails.env.test?
@@ -108,5 +109,10 @@ class ApplicationController < ActionController::Base
       return true
     end
   end
+
+  private
+    def record_not_found
+      redirect_to :controller => :tree_display,:action => :list
+    end
 
 end

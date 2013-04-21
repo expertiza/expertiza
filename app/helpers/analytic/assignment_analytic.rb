@@ -1,4 +1,4 @@
-require 'assignment_team_analytic'
+require 'helpers/analytic/assignment_team_analytic'
 module AssignmentAnalytic
   #====== helper functions ========#
   #return students that are participating in the assignment

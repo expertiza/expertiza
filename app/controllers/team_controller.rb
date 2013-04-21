@@ -13,15 +13,15 @@ def delete_all
     Node.find_by_node_object_id(t.id).destroy
     t.destroy
   end
-  flash[:note] = "#{undo_link}"
+  undo_link("All teams have been removed successfully. ")
   redirect_to :action => 'list', :id => parent.id
 end
 
 def create_teams
   parent = Object.const_get(session[:team_type]).find(params[:id])
   Team.randomize_all_by_parent(parent, session[:team_type], params[:team][:size].to_i)
-  @team = Team.first
-  flash[:note] = "#{undo_link}"
+  #@team = Team.first
+  undo_link("Random teams have been created successfully. ")
   redirect_to :action => 'list', :id => parent.id
  end
 
@@ -41,10 +41,10 @@ def create_teams
    parent = Object.const_get(session[:team_type]).find(params[:id])
    begin
     Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-    team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => parent.id)
-    TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
-    @team = Team.last
-    flash[:note] = "#{undo_link}"
+    @team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => parent.id)
+    TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
+    #@team = Team.last
+    undo_link("Team \"#{@team.name}\" has been created successfully. ")
     redirect_to :action => 'list', :id => parent.id
    rescue TeamExistsError
     flash[:error] = $! 
@@ -59,7 +59,7 @@ def create_teams
     Team.check_for_existing(parent, params[:team][:name], session[:team_type])
     @team.name = params[:team][:name]
     @team.save
-    flash[:note] = "#{undo_link}"
+    undo_link("Team \"@team.name\" has been updated successfully. ")
     redirect_to :action => 'list', :id => parent.id
    rescue TeamExistsError
     flash[:error] = $! 
@@ -75,7 +75,7 @@ def create_teams
    @team = Team.find(params[:id])
    course = Object.const_get(session[:team_type]).find(@team.parent_id)
    @team.destroy
-   flash[:note] = "#{undo_link}"
+   undo_link("Team \"#{@team.name}\" has been deleted successfully. ")
    redirect_to :action => 'list', :id => course.id
  end
  

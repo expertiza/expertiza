@@ -39,7 +39,7 @@ class AssignmentController < ApplicationController
       
       flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.undefined method."
 
-      flash[:note] = "Copy of \"#{old_assign.name}\" was successfully created and named\"#{@assignment.name}\".#{undo_link}"
+      undo_link("Copy of \"#{old_assign.name}\" has been created successfully and named\"#{@assignment.name}\"")
       redirect_to :action => 'edit', :id => old_assign.id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
@@ -210,7 +210,7 @@ class AssignmentController < ApplicationController
         @assignment.create_node()
         
         flash[:alert] = "There is already an assignment named \"#{@assignment.name}\". &nbsp;<a style='color: blue;' href='../../assignment/edit/#{@assignment.id}'>Edit assignment</a>" if @assignment.duplicate_name?
-        flash[:note] = "Assignment: \"#{@assignment.name}\" was successfully created.#{undo_link}"
+        undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
         redirect_to :action => 'list', :controller => 'tree_display'
       rescue
         flash[:error] = $!
@@ -561,7 +561,7 @@ class AssignmentController < ApplicationController
           add_to_delayed_queue
         end
      
-        flash[:note] = "Assignment \"#{@assignment.name}\" was successfully updated. #{undo_link}"
+        undo_link("Assignment \"#{@assignment.name}\" was successfully updated. ")
         redirect_to :action => 'show', :id => @assignment
      
       rescue
@@ -616,7 +616,7 @@ class AssignmentController < ApplicationController
         flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
       end
     end
-    flash[:note] = "Assignment: \"#{@assignment.name}\" was deleted. #{undo_link}"
+    undo_link("Assignment: \"#{@assignment.name}\" has deleted successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -638,7 +638,7 @@ class AssignmentController < ApplicationController
     @assignment = Assignment.find(params[:id])
     @assignment.private = !@assignment.private
     @assignment.save
-    flash[:note] = "Assignment \"#{@assignment.name}\" was made private. #{undo_link}"
+    undo_link("Assignment \"#{@assignment.name}\" has been made private successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -681,7 +681,7 @@ class AssignmentController < ApplicationController
     @assignment.save
     newpath = assignment.get_path rescue nil
     FileHelper.update_file_location(oldpath,newpath)
-    flash[:note] = "Assignment \"#{@assignment.name}\"was removed from course. #{undo_link}"
+    undo_link("Assignment \"#{@assignment.name}\" has been removed from course successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 

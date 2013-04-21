@@ -40,7 +40,7 @@ class CourseController < ApplicationController
       end
     end
     @course.update_attributes(params[:course])
-    flash[:note] = "#{undo_link}"
+    undo_link("Course \"#{@course.name}\" has been updated successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -60,7 +60,7 @@ class CourseController < ApplicationController
 
 
       @course = new_course
-      flash[:note] = "The copy of the course is currently associated with an existing location from the original course. This could cause errors for future submissions and it is recommended that the copy be edited as needed.  It can be edited <a href = #{url_for(:controller => 'course', :action => 'edit', :id => new_course.id)}>here</a>.<br><br>#{undo_link}"
+      undo_link("Course \"#{orig_course.name}\" has been copied successfully. The copy is currently associated with an existing location from the original course. This could cause errors for future submissions and it is recommended that the copy be edited as needed. ")
 
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
@@ -83,7 +83,7 @@ class CourseController < ApplicationController
         CourseNode.create(:node_object_id => @course.id)
       end
       FileHelper.create_directory(@course)
-      flash[:note] = "#{undo_link}"
+      undo_link("Course \"@course.name\" has been created successfully. ")
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = "The following error occurred while saving the course: "+$!
@@ -104,7 +104,7 @@ class CourseController < ApplicationController
       map.destroy
     }
     @course.destroy
-    flash[:note] = "#{undo_link}"
+    undo_link("Course \"@course.name\" has bee deleted successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -116,7 +116,8 @@ class CourseController < ApplicationController
     rescue
       flash[:error] = $!
     end
-    flash[:note] = "#{undo_link}"
+    @access = @course.private == true ? "private" : "public"
+    undo_link("Course \"#{@course.name}\" has been made #{@access} successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -139,16 +140,17 @@ class CourseController < ApplicationController
       redirect_to :action => 'view_teaching_assistants', :id => @course.id
 
       @course = @ta_mapping
-      flash[:note] = "#{undo_link}"
+      undo_link("TA \"#{@user.name}\" has been added successfully. ")
     end
   end
 
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
+    @ta = User.find(@ta_mapping.ta_id)
     @ta_mapping.destroy
 
     @course = @ta_mapping
-    flash[:note] = "#{undo_link}"
+    undo_link("TA \"#{@ta.name}\" has been removed successfully. ")
 
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end

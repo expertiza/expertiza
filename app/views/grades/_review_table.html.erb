@@ -32,8 +32,9 @@
 	  	   </td>
 	    <% end %>
 	</tr>
+	
 	<!-- "This is a diff. from E-730 F12" -->
-    <% if !(weighted_submission) && (@post_review_deadline) %>
+    <% if(!(weighted_submission.nil?) && (@post_review_deadline))  %>
         <tr> <td><b>Reviewer Inaccuracy</b></td>
         <% for review in reviews %>
             <td>
@@ -45,8 +46,8 @@
             </td>
         <% end %>
       </tr>
-
-    
+      <!-- Ignore cycles for now -->
+      <% if false %>      
       <tr class="head"> <td><b>2 Cycle Similarity <br> Score</b></td>
         <% for review in reviews %>
             <td>
@@ -73,7 +74,7 @@
             </td>
         <% end %>
       </tr>
-      
+      <% end %>
       <%# We allow instructors, admins and TAs to drop a review %>
       <% if session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4 || session[:user].role_id == 6%>
           <tr> <td><b>Add / Drop <br> Review</b></td>

@@ -40,7 +40,7 @@ class AssignmentController < ApplicationController
       flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.undefined method."
 
       flash[:note] = "Copy of \"#{old_assign.name}\" was successfully created and named\"#{@assignment.name}\".#{undo_link}"
-      redirect_to :action => 'edit', :id => old_assign.id
+      redirect_to :action => 'edit', :id => @assignment.id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
       redirect_to :action => 'list', :controller => 'tree_display'

@@ -58,11 +58,9 @@ class CourseController < ApplicationController
         CourseNode.create(:node_object_id => new_course.id)
       end
 
+      flash[:note] = "The copied course is currently associated with an existing location. This could cause errors for future submissions.<br><br>#{undo_link}"
+      redirect_to :controller => 'course', :action => 'edit', :id => new_course.id
 
-      @course = new_course
-      flash[:note] = "The copy of the course is currently associated with an existing location from the original course. This could cause errors for future submissions and it is recommended that the copy be edited as needed.  It can be edited <a href = #{url_for(:controller => 'course', :action => 'edit', :id => new_course.id)}>here</a>.<br><br>#{undo_link}"
-
-      redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = 'The course was not able to be copied: '+$!
       redirect_to :controller => 'tree_display', :action => 'list'
@@ -152,10 +150,5 @@ class CourseController < ApplicationController
 
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end
-
-# generate the undo link
-  #def undo_link
-  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
-  #end
 
 end

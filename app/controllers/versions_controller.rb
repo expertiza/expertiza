@@ -30,7 +30,7 @@ class VersionsController < ApplicationController
         end
       end
     end
-    @message = params[:redo] == "true" ? "Undid successfully. " : "Redid successfully. "
+    @message = params[:redo] == "true" ? "Previous action has been undone successfully. " : "Previous action has been redone successfully. "
     undo_link(@message)
     begin
       redirect_to :back

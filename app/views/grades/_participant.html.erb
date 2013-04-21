@@ -25,7 +25,7 @@
 
 
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
-    <TD><%= participant.fullname %>
+    <TD><%= participant.fullname  %>
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a>
 	<% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
 	</FONT>  	
@@ -49,7 +49,7 @@
        <% end %>
     </TD>
    	<!-- "Diff. ends" -->
-   	
+
     <% else %>
    	<TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>

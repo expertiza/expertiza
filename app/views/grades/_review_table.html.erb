@@ -35,7 +35,7 @@
 	    <% end %>
 	</tr>
 	<!-- "This is a diff. from E-730 F12" -->
-    <% if @post_review_deadline %>
+    <% if @post_review_deadline && !(weighted_submission == nil)%>
     <tr> <td><b>Reviewer Inaccuracy</b></td>
     <% for review in reviews %>
         <td>

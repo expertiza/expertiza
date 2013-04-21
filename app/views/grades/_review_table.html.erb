@@ -5,12 +5,13 @@
 		<% end %>
 	</tr>
 	<% if controller.action_name != "view_my_scores" %>
-	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
+	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>
+
+      <% weighted_submission = params[:weighted_submission] %>
 		<% for review in reviews %>
-
-
-          <% if !@weighted_submission.nil? %>
-              <% for review_hamer in @weighted_submission.reviews %>
+         <% if !(weighted_submission.nil?) %>
+              <% puts "im not nil" %>
+              <% for review_hamer in weighted_submission.reviews %>
                   <%if review.id == review_hamer.id %>
                       <% thisReputation = review_hamer.reviewer.inaccuracy.to_s %>
                   <% end %>

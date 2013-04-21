@@ -3,9 +3,9 @@
 Production does not have the "weighted_submission" part in the 2nd render
 -->
 <H1>Score for <%= @assignment.name %></H1>
-   
+
 <TABLE class="grades" >
-<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
+<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil}, :weighted_submission => @weighted_submission %>
 <%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions), :weighted_submission => @weighted_submission} %>
 </TABLE>
 <BR/>

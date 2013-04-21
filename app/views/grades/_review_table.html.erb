@@ -20,7 +20,6 @@
 	<tr class="head"><td align="right"><b>Average score</b></td>
 		<% for review in reviews %>
 		   <td align="center">
-
              <!-- get the score latest version from all reviews available -->
              <% all_resp=Response.find_all_by_map_id(review.map_id) %>
              <% sort_to=all_resp.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
@@ -30,39 +29,37 @@
                <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>"%>
              <% end %>
              <%= sprintf("%.2f",score) %>% &nbsp;
-
 	  	   </td>
 	    <% end %>
 	</tr>
 	<!-- "This is a diff. from E-730 F12" -->
-    <% if @post_review_deadline %>
-    <tr> <td><b>Reviewer Inaccuracy</b></td>
-    <% for review in reviews %>
-        <td>
-        <% if weighted_submission %>
+    <% if !(weighted_submission) && (@post_review_deadline) %>
+        <tr> <td><b>Reviewer Inaccuracy</b></td>
+        <% for review in reviews %>
+            <td>
             <% for review_hamer in weighted_submission.reviews %>
                 <%if review.id == review_hamer.id %>
                     <%= review_hamer.reviewer.inaccuracy %>&nbsp;
                 <% end %>
             <% end %>
+            </td>
         <% end %>
-        </td>
-    <% end %>
-  </tr>
+      </tr>
 
     
-  <tr class="head"> <td><b>2 Cycle Similarity <br> Score</b></td>
-    <% for review in reviews %>
-        <td>
-        <% for similarity_cycle in weighted_submission.submission.get_two_node_cycles %>
-            <% if review.map.reviewer.user_id== similarity_cycle[1][0].user_id %>
-                <%= weighted_submission.submission.get_cycle_similarity_score(similarity_cycle) %>&nbsp;
-                <%break %>
+      <tr class="head"> <td><b>2 Cycle Similarity <br> Score</b></td>
+        <% for review in reviews %>
+            <td>
+            <% for similarity_cycle in weighted_submission.submission.get_two_node_cycles %>
+                <% if review.map.reviewer.user_id== similarity_cycle[1][0].user_id %>
+                    <%= weighted_submission.submission.get_cycle_similarity_score(similarity_cycle) %>&nbsp;
+                    <%break %>
+                <% end %>
             <% end %>
+            </td>
         <% end %>
-        </td>
-    <% end %>
-  </tr>
+      </tr>
+      
       <tr class="head"> <td><b>3 Cycle Similarity <br> Score</b></td>
         <% for review in reviews %>
             <td>
@@ -76,8 +73,9 @@
             </td>
         <% end %>
       </tr>
+      
       <%# We allow instructors, admins and TAs to drop a review %>
-      <%if session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4 || session[:user].role_id == 6%>
+      <% if session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4 || session[:user].role_id == 6%>
           <tr> <td><b>Add / Drop <br> Review</b></td>
             <% for review in reviews %>
                 <%= review.id %> <%= review.cycle %>
@@ -94,6 +92,7 @@
             <% end %>
           </tr>
       <% end  %>
+      
     <% end  %>
     <!-- "Diff. ends" -->
 </table>

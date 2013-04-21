@@ -18,23 +18,20 @@ class GradesController < ApplicationController
     }
     @scores = @assignment.get_scores(@questions)
     @due_dates= DueDate.find(:all, :conditions => ["assignment_id = ? and deadline_type_id = ? ", @assignment.id,2])
+
+    @weighted_submissions = nil    
+    @post_review_deadline = false
+    
     if (Time.new.to_datetime >  @due_dates[0].due_at.to_datetime)
       #call only after review deadline
-
       reviewers = get_reviewer_objects(@assignment.users)
       submissions = get_submission_objects(@assignment.participants)
-
       @weighted_submissions = Hamer.calculate_weighted_scores_and_reputation(submissions, reviewers)[:submissions]
-      @post_review_deadline=true
-    else
-      @post_review_deadline=false
+      @post_review_deadline = true
     end
-
   end
 
   def view_my_scores
-
-
     #Hamer.calculate_weighted_scores_and_reputation(Assignment.find(449).participants, Assignment.find(449).users)
     @participant = AssignmentParticipant.find(params[:id])
     return if redirect_when_disallowed
@@ -68,19 +65,19 @@ class GradesController < ApplicationController
         end
       end
     end
-
+    
+    @weighted_submissions = nil    
+    @post_review_deadline = false
+    
     if (Time.new.to_datetime >   @due_dates[0].due_at.to_datetime)
       #call only after review deadline
-
-    reviewers = get_reviewer_objects(@assignment.users)
-    submissions = get_submission_objects(@assignment.participants)
-
-    @weighted_submission = Hamer.calculate_weighted_scores_and_reputation_for_a_submission(submissions, reviewers, @participant)
-    @post_review_deadline=true
-    else
-      @post_review_deadline=false
+        reviewers = get_reviewer_objects(@assignment.users)
+        submissions = get_submission_objects(@assignment.participants)
+        @weighted_submission = Hamer.calculate_weighted_scores_and_reputation_for_a_submission(submissions, reviewers, @participant)
+        @post_review_deadline = true
     end
-   end
+  end
+   
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment

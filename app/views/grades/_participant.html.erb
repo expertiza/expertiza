@@ -41,13 +41,6 @@
    	<% end %>  	 
    	</TD>
    	<!-- "This is a diff. from E-730 F12" -->
-   	<TD ALIGN="CENTER" VALIGN="TOP">
-      <% if(!(weighted_submission.nil?) && (@post_review_deadline))  %>
-          <%=sprintf("%.0f",(weighted_submission.weighted_score / participant.assignment.questionnaires.first.max_question_score) * 100) %>
-      <% else %>
-          --
-       <% end %>
-    </TD>
    	<!-- "Diff. ends" -->
    	
     <% else %>

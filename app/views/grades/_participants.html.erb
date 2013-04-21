@@ -6,15 +6,17 @@
 <%= render :partial => 'participant_title', :locals => {:prefix => nil}  %> 
 <%
     index = 0 
-    @ws = @weighted_submissions.nil? : nil ? @weighted_submissions[participant.id]  
 %>    
 <% @assignment.participants.each do |participant| {
+    <%
+        ws = @weighted_submissions.nil? ? nil : @weighted_submissions[participant.id]  
+    %> 
     <%= render  :partial => 'grades/participant', 
                 :locals => {
                             :prefix => 'user_'+index.to_s, 
                             :team => false, 
                             :pscore => @scores[:participants][participant.id.to_s.to_sym], 
-                            :weighted_submission => @ws
+                            :weighted_submission => ws
                            }
     %>
     <%  index += 1 %> 

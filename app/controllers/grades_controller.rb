@@ -36,6 +36,10 @@ class GradesController < ApplicationController
 
     #this is where we calculate and display reputation per person
 
+
+    puts "-----------------------------------------------------------"
+    @weighted_submissions = Hamer.calculate_weighted_scores_and_reputation(submissions, reviewers)[:submissions]
+
     @thisReputation =  "ADD REPUTATION HERE"
   end
 

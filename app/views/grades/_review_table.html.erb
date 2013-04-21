@@ -7,10 +7,22 @@
 	<% if controller.action_name != "view_my_scores" %>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
+
+
+          <% if !@weighted_submission.nil? %>
+              <% for review_hamer in @weighted_submission.reviews %>
+                  <%if review.id == review_hamer.id %>
+                      <% thisReputation = review_hamer.reviewer.inaccuracy.to_s %>
+                  <% end %>
+              <% end %>
+          <% else %>
+              <% thisReputation = "NIL_OBJECT" %>
+          <% end %>
+
            <td align="center">                       
            <% if prefix %>
 
-             <a href="#<%= prefix+"_"+review.map.reviewer.name %>"><%= review.map.reviewer.fullname %></a>&nbsp;<%=link_to '<img src="/images/delete_icon.png"/>', :controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor' %> <img src="/images/info.png" title=<%=@thisReputation%>>
+             <a href="#<%= prefix+"_"+review.map.reviewer.name %>"><%= review.map.reviewer.fullname %></a>&nbsp;<%=link_to '<img src="/images/delete_icon.png"/>', :controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor' %> <img src="/images/info.png" title=<%=thisReputation%>>
 		   <% else %>
 		     <%= link_to review.map.reviewer.fullname, :controller=>ctrl, :action => caction, :id=> review.id%>
 		   <% end %>

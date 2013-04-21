@@ -140,7 +140,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])   
 
     if @user.update_attributes(params[:user])
-      flash[:note] = "User was successfully updated. #{undo_link}"
+      undo_link("User \"#{@user.name}\" was successfully updated. ")
       redirect_to :action => 'show', :id => @user
     else
       foreign
@@ -223,7 +223,7 @@ class UsersController < ApplicationController
   end
 
   # generate the undo link
-  def undo_link
-    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @user.versions.last.id)}>undo</a>"
-  end
+  #def undo_link
+  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @user.versions.last.id)}>undo</a>"
+  #end
 end

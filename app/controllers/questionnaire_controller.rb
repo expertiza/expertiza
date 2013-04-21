@@ -51,7 +51,7 @@ class QuestionnaireController < ApplicationController
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
       end
-      flash[:note] = "Copy of questionnaire #{orig_questionnaire.name} is created. #{undo_link}"
+      undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :back
     rescue
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!      
@@ -79,7 +79,7 @@ class QuestionnaireController < ApplicationController
             raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
           }
           @questionnaire.destroy
-          flash[:note] = "Questionnaire <B>#{name}</B> was deleted. #{undo_link}"
+          undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")
       rescue
           flash[:error] = $!
       end
@@ -211,7 +211,8 @@ class QuestionnaireController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
-    flash[:note] = "#{undo_link}"
+    @access = @questionnaire.private == true ? "private" : "public"
+    undo_link("Questionnaire \"#{@questionnaire.name}\" has been made #{@access} successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
   
@@ -226,7 +227,7 @@ class QuestionnaireController < ApplicationController
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
       end
-      flash[:note] = "#{undo_link}"
+      undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
     rescue
       flash[:error] = $!
     end

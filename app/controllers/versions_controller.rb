@@ -30,7 +30,8 @@ class VersionsController < ApplicationController
         end
       end
     end
-    flash[:note] = "#{undo_link}"
+    @message = params[:redo] == "true" ? "Undid successfully. " : "Redid successfully. "
+    undo_link(@message)
     begin
       redirect_to :back
     rescue

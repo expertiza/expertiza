@@ -19,7 +19,7 @@ class ParticipantsController < ApplicationController
       flash[:error] = "User #{params[:user][:name]} does not exist. Would you like to <a href = '#{url_new_user}'>create this user?</a>"
     end
 
-    flash[:note] = "#{params[:user][:name]} has been added as a participant. #{undo_link}"
+    undo_link("User \"#{params[:user][:name]}\" has been added as a participant successfully. ")
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
   end
      
@@ -30,7 +30,7 @@ class ParticipantsController < ApplicationController
     begin
       @participant = participant
       participant.delete(params[:force])
-      flash[:note] = "#{name} has been removed as a participant. #{undo_link}"
+      undo_link("User \"#{name}\" has been removed as a participant successfully. ")
     rescue => error
       # puts error.message
       url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
@@ -93,7 +93,7 @@ end
 
       # Only display undo link if copies of participants are created
       if @copied_participants.length > 0
-        flash[:note] = "Participants from #{course.name} has been copied to this assignment #{undo_link}"
+        undo_link("Participants from \"#{course.name}\" has been copied to this assignment successfully. ")
       else
         flash[:note] = 'All course participants are already in this assignment'
       end
@@ -123,7 +123,7 @@ end
       }
       # only display undo link if copies of participants are created
       if @copied_participants.length > 0
-        flash[:note] = "All participants were successfully copied to #{course.name} #{undo_link}"
+        undo_link("All participants were successfully copied to \"#{course.name}\". " )
       else
         flash[:note] = 'All assignment participants are already part of the course'
       end

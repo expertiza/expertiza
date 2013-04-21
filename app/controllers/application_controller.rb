@@ -112,7 +112,7 @@ class ApplicationController < ActionController::Base
 
   private
     def record_not_found
-      redirect_to :controller => :tree_display,:action => :list
+      gredirect_to :controller => :tree_display,:action => :list
     end
 
 end

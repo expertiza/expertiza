@@ -1,0 +1,3 @@
+class ReviewAnalyticController
+
+end

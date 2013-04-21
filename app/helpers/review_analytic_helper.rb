@@ -1,0 +1,3 @@
+module ReviewAnalyticHelper
+
+end

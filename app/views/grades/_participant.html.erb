@@ -44,7 +44,7 @@
    	<% if 1 == 1 %>       	
        	<TD ALIGN="CENTER" VALIGN="TOP">
           <% if (@post_review_deadline) %>
-              <%=sprintf("%.0f",(weighted_submission.weighted_score / participant.assignment.questionnaires.first.max_question_score) * 100) unless (weighted_submission == nil) %>
+              <%=sprintf("%.0f",(weighted_submission.weighted_score / participant.assignment.questionnaires.first.max_question_score) * 100) unless (weighted_submission.nil?) %>
           <% else %>
               --
            <%end %>
@@ -134,7 +134,7 @@
 	<TD COLSPAN="9"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_reviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
+	<TD COLSPAN="9"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review], :weighted_submission => weighted_submission} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
 	<TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>

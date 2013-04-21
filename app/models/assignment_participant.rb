@@ -12,6 +12,8 @@ class AssignmentParticipant < Participant
   has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   belongs_to  :user
 
+  has_paper_trail
+
   validates_presence_of :handle
   
   def includes?(participant)

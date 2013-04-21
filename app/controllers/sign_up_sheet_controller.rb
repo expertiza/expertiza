@@ -165,7 +165,7 @@ class SignUpSheetController < ApplicationController
 
       if @sign_up_topic.save
         #NotificationLimit.create(:topic_id => @sign_up_topic.id)
-        flash[:notice] = 'Topic was successfully created.'
+        flash[:note] = "Topic: \"#{@sign_up_topic.topic_name}\" was successfully created.#{undo_link}"
         redirect_to_sign_up(params[:id])
       else
         render :action => 'new', :id => params[:id]

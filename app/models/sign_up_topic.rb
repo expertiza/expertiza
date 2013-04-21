@@ -6,6 +6,8 @@ class SignUpTopic < ActiveRecord::Base
 
   belongs_to :assignment
 
+  has_paper_trail
+
   #the below relations have been added to make it consistent with the database schema
   validates_presence_of :topic_name, :assignment_id, :max_choosers
   validates_length_of :topic_identifier, :maximum => 10

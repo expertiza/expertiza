@@ -22,7 +22,10 @@ class StudentTeamController < ApplicationController
       parent = AssignmentNode.find_by_node_object_id(@student.parent_id)
       TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
       user = User.find(@student.user_id)
-      @team.add_member(user)      
+      @team.add_member(user)
+
+      flash[:note] = "#{undo_link}"
+
       redirect_to :controller => 'student_team', :action => 'view' , :id=> @student.id
     else
       flash[:notice] = 'Team name is already in use.'
@@ -41,9 +44,13 @@ class StudentTeamController < ApplicationController
     check = AssignmentTeam.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @team.parent_id])    
     if (check.length == 0)
        if @team.update_attributes(params[:team])
+         flash[:note] = "#{undo_link}"
+
           redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
        end
     elsif (check.length == 1 && (check[0].name <=> @team.name) == 0)
+      flash[:note] = "#{undo_link}"
+
       redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
     else
       flash[:notice] = 'Team name is already in use.'
@@ -59,9 +66,13 @@ class StudentTeamController < ApplicationController
       #format.xml  { render :xml => @log_entries }
       #end
       #redirect_to :controller => 'student_team', :action => 'advertise_for_partners' , :id => params[:team_id]
+      flash[:note] = "#{undo_link}"
   end
   def remove
     Team.update_all("advertise_for_partner=false",:id=>params[:team_id])
+
+    flash[:note] = "#{undo_link}"
+
     redirect_to :controller => 'student_team', :action => 'view' , :id => params[:team_id]
   end
 
@@ -73,6 +84,8 @@ class StudentTeamController < ApplicationController
     user = TeamsUser.find(:first, :conditions =>["team_id =? and user_id =?", params[:team_id], @student.user_id])
     if user
       user.destroy
+
+      flash[:note] = "#{undo_link}"
     end
     
     #if your old team does not have any members, delete the entry for the team

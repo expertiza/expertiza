@@ -15,7 +15,7 @@ module AssignmentTeamAnalytic
 
   #========== score ========#
   #return an array containing the score of all the reviews
-  def review_scores_list
+  def review_scores
     scores = Array.new
     self.responses.each do |response|
       scores << response.get_average_score
@@ -28,15 +28,15 @@ module AssignmentTeamAnalytic
   end
 
   def max_review_score
-    self.review_scores_list.max
+    self.review_scores.max
   end
 
   def min_review_score
-    self.review_scores_list.min
+    self.review_scores.min
   end
 
   #======= word count =======#
-  def review_word_count_list
+  def review_word_counts
     word_count_list = Array.new
     self.responses.each do |response|
       word_count_list << response.total_word_count
@@ -45,15 +45,15 @@ module AssignmentTeamAnalytic
   end
 
   def total_review_word_count
-    review_word_count_list.inject(:+)
+    review_word_counts.inject(:+)
   end
 
   def max_review_word_count
-    review_word_count_list.max
+    review_word_counts.max
   end
 
   def min_review_word_count
-    review_word_count_list.min
+    review_word_counts.min
   end
 
   def average_review_word_count
@@ -61,7 +61,7 @@ module AssignmentTeamAnalytic
   end
   
   #===== character count ====#
-  def review_character_count_list
+  def review_character_counts
     character_count_list = Array.new
     self.responses.each do |response|
       character_count_list << response.total_character_count
@@ -70,15 +70,15 @@ module AssignmentTeamAnalytic
   end
 
   def total_review_character_count
-    review_character_count_list.inject(:+)
+    review_character_counts.inject(:+)
   end
 
   def max_review_character_count
-    review_character_count_list.max
+    review_character_counts.max
   end
 
   def min_review_character_count
-    review_character_count_list.min
+    review_character_counts.min
   end
 
   def average_review_character_count
@@ -96,5 +96,4 @@ module AssignmentTeamAnalytic
     end
     students
   end
-
 end

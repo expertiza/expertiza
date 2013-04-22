@@ -14,7 +14,7 @@ module CourseAnalytic
   end
 
   #===== number of assignment teams ====#
-  def num_assignment_team_list
+  def assignment_team_counts
     list = Array.new
     self.assignments.each do |assignment|
       list << assignment.num_teams
@@ -23,7 +23,7 @@ module CourseAnalytic
   end
 
   def total_num_assignment_teams
-    num_assignment_team_list.inject(:+)
+    assignment_team_counts.inject(:+)
   end
 
   def average_num_assignment_teams
@@ -31,40 +31,52 @@ module CourseAnalytic
   end
 
   def max_num_assignment_teams
-    num_assignment_team_list.max
+    assignment_team_counts.max
   end
 
   def min_num_assignment_teams
-    num_assignment_team_list.min
+    assignment_team_counts.min
   end
 
   #===== assignment score =====#
-  def average_assignment_score
+  def assignment_average_scores
     list = Array.new
     self.assignments.each do |assignment|
       list << assignment.average_team_score
     end
-    list.inject(:+).to_f/num_assignments
+    list
   end
 
-  def max_assignment_score
+  def assignment_max_scores
     list = Array.new
     self.assignments.each do |assignment|
       list << assignment.max_team_score
     end
-    list.max
+    list
   end
 
-  def min_assignment_score
+  def assignment_min_scores
     list = Array.new
     self.assignments.each do |assignment|
       list << assignment.min_team_score
     end
-    list.min
+    list
+  end
+
+  def average_assignment_score
+    assignment_average_scores.inject(:+).to_f/num_assignments
+  end
+
+  def max_assignment_score
+    assignment_max_scores.max
+  end
+
+  def min_assignment_score
+    assignment_min_scores.min
   end
 
   #======= reviews =======#
-  def num_assignment_review_list
+  def assignment_review_counts
     list = Array.new
     self.assignments.each do |assignment|
       list << assignment.total_num_team_reviews
@@ -73,7 +85,7 @@ module CourseAnalytic
   end
 
   def total_num_assignment_reviews
-    num_assignment_review_list.inject(:+)
+    assignment_review_counts.inject(:+)
   end
 
   def average_num_assignment_reviews
@@ -81,11 +93,11 @@ module CourseAnalytic
   end
 
   def max_num_assignment_reviews
-    num_assignment_review_list.max
+    assignment_review_counts.max
   end
 
   def min_num_assignment_reviews
-    num_assignment_review_list.min
+    assignment_review_counts.min
   end
 
 

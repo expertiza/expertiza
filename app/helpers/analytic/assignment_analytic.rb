@@ -1,6 +1,125 @@
 require 'helpers/analytic/assignment_team_analytic'
 module AssignmentAnalytic
-  #====== helper functions ========#
+
+  #====== general statistics ======#
+  def num_participants
+    self.participants.count
+  end
+
+  def num_students
+    self.students.count
+  end
+
+  def num_teams
+    self.teams.count
+  end
+
+  def has_review_questionnaire?
+    questionnaire_types.include?("ReviewQuestionnaire")
+  end
+
+  def review_questionnaire
+    questionnaire_of_type("ReviewQuestionnaire")
+  end
+
+
+  #==== number of team reviews ====#
+  def team_review_count_list
+    list = Array.new
+    self.teams.each do |team|
+      list << team.num_reviews
+    end
+  end
+
+  def total_num_team_reviews
+    team_review_count_list.inject(:+)
+  end
+
+  def average_num_team_reviews
+    total_num_team_reviews/num_teams
+  end
+
+  def max_num_team_reviews
+    team_review_count_list.max
+  end
+
+  def min_num_team_reviews
+    team_review_count_list.min
+  end
+
+  #=========== score ==============#
+  def team_scores_list
+    list = Array.new
+    self.teams.each do |team|
+      list << team.average_review_score
+    end
+    list
+  end
+
+  def average_team_score
+    self.team_scores_list.inject(:+).to_f/num_teams
+  end
+
+  def max_team_score
+    self.team_scores_list.max
+  end
+
+  def min_team_score
+    self.team_scores_list.min
+  end
+
+  #========== word count ==========#
+  def review_word_count_list
+    list = Array.new
+    self.teams.each do |team|
+      list << team.total_word_count
+    end
+    list
+  end
+
+  def total_review_word_count
+    review_word_count_list.inject(:+)
+  end
+
+  def average_review_word_count
+    total_review_word_count.to_f/num_teams
+  end
+
+  def max_review_word_count
+    review_word_count_list.max
+  end
+
+  def min_review_word_count
+    review_word_count_list.min
+  end
+
+  #========== character count ==========#
+  def review_character_count_list
+    list = Array.new
+    self.teams.each do |team|
+      list << team.total_character_count
+    end
+    list
+  end
+
+  def total_review_character_count
+    review_character_count_list.inject(:+)
+  end
+
+  def average_review_character_count
+    total_review_character_count.to_f/num_teams
+  end
+
+  def max_review_character_count
+    review_character_count_list.max
+  end
+
+  def min_review_character_count
+    review_character_count_list.min
+  end
+
+
+  private
   #return students that are participating in the assignment
   #assumptions: all team_participant for all of the teams are in assignment participant
   def students
@@ -17,7 +136,7 @@ module AssignmentAnalytic
   def questionnaire_types
     questionnaire_type_list = Array.new
     self.questionnaires.each do |questionnaire|
-      if !questionnaires.include?(questionnaire.type)
+      if !self.questionnaires.include?(questionnaire.type)
         questionnaire_type_list << questionnaire.type
       end
     end
@@ -51,77 +170,6 @@ module AssignmentAnalytic
     end
     return true
   end
-
-
-
-
-
-  #====== general statistics ======#
-  def num_participants
-    self.participants.count
-  end
-
-  def num_students
-    self.students.count
-  end
-
-  def num_teams
-    self.teams.count
-  end
-
-  def num_team_reviews
-    sum = 0
-    self.teams.each do |team|
-      sum += team.num_reviews
-    end
-    sum
-  end
-
-  #===== questionnaire related methods ====#
-  def num_questions_in_questionnaire
-    if questionnaire_types.include?("ReviewQuestionnaire")
-      return questionnaire_of_type("ReviewQuestionnaire").questions.count
-    else
-      return 0
-    end
-  end
-
-  #======== score related methods =========#
-  def team_review_scores
-    scores = Array.new
-    self.teams.each do |team|
-      scores << (team.review_scores.inject(:+)/team.responses.count)
-    end
-    scores
-  end
-
-  def average_team_review_score
-    self.team_review_scores.inject(:+).to_f/num_teams
-  end
-
-  def max_review_score
-    self.team_review_scores.max
-  end
-
-  def min_review_score
-    self.team_review_scores.min
-  end
-
-  #===== total review word count related methods ====#
-  def average_review_word_count
-
-  end
-
-  def max_review_word_count
-
-  end
-
-  def min_review_word_count
-
-  end
-
-
-
 
 
 end

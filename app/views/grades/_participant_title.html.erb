@@ -3,9 +3,9 @@
 
 <TR <% if prefix %>id='<%= prefix %>_1' style="display:none"<% end %>>
 <TH WIDTH="<%= namecolwidth %>%">&nbsp;</TH>
-<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</TH>
-<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
-<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
+<TH COLSPAN="3" WIDTH="<%= colwidth*2 %>%" align="center">Submitted work</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%" align="center">Reviewing</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%" align="center">Author Feedback</TH>
 <% if @assignment.team_assignment %>
   <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
 <% end %>

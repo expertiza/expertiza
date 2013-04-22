@@ -34,7 +34,7 @@ class SubmittedContentController < ApplicationController
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end
-    flash[:note] = "#{undo_link}"
+    undo_link("Link has been submitted successfully. ")
     redirect_to :action => 'edit', :id => @participant.id
   end    
 
@@ -48,7 +48,7 @@ class SubmittedContentController < ApplicationController
     rescue 
       flash[:error] = $!
     end
-    flash[:note] = "#{undo_link}"
+    undo_link("Link has been removed successfully. ")
     redirect_to :action => 'edit', :id => @participant.id
   end
   
@@ -242,7 +242,7 @@ private
     end
   end
 
-  def undo_link
-    "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @participant.versions.last.id)}>undo</a>"
-  end
+  #def undo_link
+  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @participant.versions.last.id)}>undo</a>"
+  #end
 end

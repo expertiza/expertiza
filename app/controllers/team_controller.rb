@@ -8,9 +8,7 @@ end
 def delete_all
   parent = Object.const_get(session[:team_type]).find(params[:id])
   @teams = Team.find_all_by_parent_id(parent.id)
-  @team = @teams.first
   @teams.each do |t|
-    Node.find_by_node_object_id(t.id).destroy
     t.destroy
   end
   undo_link("All teams have been removed successfully. ")
@@ -20,7 +18,6 @@ end
 def create_teams
   parent = Object.const_get(session[:team_type]).find(params[:id])
   Team.randomize_all_by_parent(parent, session[:team_type], params[:team][:size].to_i)
-  #@team = Team.first
   undo_link("Random teams have been created successfully. ")
   redirect_to :action => 'list', :id => parent.id
  end

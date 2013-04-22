@@ -12,11 +12,11 @@ class AssignmentController < ApplicationController
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(@assignment)
-    @assignment.update_attribute('name','Copy of '+ @assignment.name)
-    @assignment.update_attribute('created_at',Time.now)
-    @assignment.update_attribute('updated_at',Time.now)
+    @assignment.name = 'Copy of ' + @assignment.name
+    @assignment.created_at = Time.now
+    @assignment.updated_at = Time.now
     if @assignment.directory_path.present?
-      @assignment.update_attribute('directory_path',@assignment.directory_path+'_copy')
+      @assignment.directory_path = @assignment.directory_path + '_copy'
     end
     session[:copy_flag] = true
     @assignment.copy_flag = true
@@ -36,10 +36,8 @@ class AssignmentController < ApplicationController
       
       DueDate.copy(old_assign.id, @assignment.id)
       @assignment.create_node()
-      
-      flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.undefined method."
 
-      undo_link("Copy of \"#{old_assign.name}\" has been created successfully and named\"#{@assignment.name}\"")
+      undo_link("Copy of \"#{old_assign.name}\" has been created successfully and named\"#{@assignment.name}\". Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment. ")
       redirect_to :action => 'edit', :id => @assignment.id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'

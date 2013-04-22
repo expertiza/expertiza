@@ -14,17 +14,8 @@ module AssignmentAnalytic
     self.teams.count
   end
 
-  def has_review_questionnaire?
-    questionnaire_types.include?("ReviewQuestionnaire")
-  end
-
-  def review_questionnaire
-    questionnaire_of_type("ReviewQuestionnaire")
-  end
-
-
   #==== number of team reviews ====#
-  def team_review_count_list
+  def team_review_counts
     list = Array.new
     self.teams.each do |team|
       list << team.num_reviews
@@ -32,7 +23,7 @@ module AssignmentAnalytic
   end
 
   def total_num_team_reviews
-    team_review_count_list.inject(:+)
+    team_review_counts.inject(:+)
   end
 
   def average_num_team_reviews
@@ -40,15 +31,15 @@ module AssignmentAnalytic
   end
 
   def max_num_team_reviews
-    team_review_count_list.max
+    team_review_counts.max
   end
 
   def min_num_team_reviews
-    team_review_count_list.min
+    team_review_counts.min
   end
 
   #=========== score ==============#
-  def team_scores_list
+  def team_scores
     list = Array.new
     self.teams.each do |team|
       list << team.average_review_score
@@ -57,65 +48,15 @@ module AssignmentAnalytic
   end
 
   def average_team_score
-    self.team_scores_list.inject(:+).to_f/num_teams
+    self.team_scores.inject(:+).to_f/num_teams
   end
 
   def max_team_score
-    self.team_scores_list.max
+    self.team_scores.max
   end
 
   def min_team_score
-    self.team_scores_list.min
-  end
-
-  #========== word count ==========#
-  def review_word_count_list
-    list = Array.new
-    self.teams.each do |team|
-      list << team.total_word_count
-    end
-    list
-  end
-
-  def total_review_word_count
-    review_word_count_list.inject(:+)
-  end
-
-  def average_review_word_count
-    total_review_word_count.to_f/num_teams
-  end
-
-  def max_review_word_count
-    review_word_count_list.max
-  end
-
-  def min_review_word_count
-    review_word_count_list.min
-  end
-
-  #========== character count ==========#
-  def review_character_count_list
-    list = Array.new
-    self.teams.each do |team|
-      list << team.total_character_count
-    end
-    list
-  end
-
-  def total_review_character_count
-    review_character_count_list.inject(:+)
-  end
-
-  def average_review_character_count
-    total_review_character_count.to_f/num_teams
-  end
-
-  def max_review_character_count
-    review_character_count_list.max
-  end
-
-  def min_review_character_count
-    review_character_count_list.min
+    self.team_scores.min
   end
 
 
@@ -171,5 +112,64 @@ module AssignmentAnalytic
     return true
   end
 
+  def has_review_questionnaire?
+    questionnaire_types.include?("ReviewQuestionnaire")
+  end
+
+  def review_questionnaire
+    questionnaire_of_type("ReviewQuestionnaire")
+  end
+
+
+  #====unused in version 1=========#
+  #========== word count ==========#
+  def review_word_counts
+    list = Array.new
+    self.teams.each do |team|
+      list << team.total_word_count
+    end
+    list
+  end
+
+  def total_review_word_count
+    review_word_counts.inject(:+)
+  end
+
+  def average_review_word_count
+    total_review_word_count.to_f/num_teams
+  end
+
+  def max_review_word_count
+    review_word_counts.max
+  end
+
+  def min_review_word_count
+    review_word_counts.min
+  end
+
+  #========== character count ==========#
+  def review_character_counts
+    list = Array.new
+    self.teams.each do |team|
+      list << team.total_character_count
+    end
+    list
+  end
+
+  def total_review_character_count
+    review_character_counts.inject(:+)
+  end
+
+  def average_review_character_count
+    total_review_character_count.to_f/num_teams
+  end
+
+  def max_review_character_count
+    review_character_counts.max
+  end
+
+  def min_review_character_count
+    review_character_counts.min
+  end
 
 end

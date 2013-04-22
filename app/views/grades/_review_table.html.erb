@@ -12,7 +12,7 @@
               <% puts "im not nil" %>
               <% for review_hamer in weighted_submission.reviews %>
                   <%if review.id == review_hamer.id %>
-                      <% thisReputation = review_hamer.reviewer.inaccuracy.to_s %>
+                      <% thisReputation = sprintf("%.2f",(1-review_hamer.reviewer.inaccuracy)*100) %>
                   <% end %>
               <% end %>
           <% else %>
@@ -49,12 +49,12 @@
 
 	<!-- "This is a diff. from E-730 F12" -->
     <% if(!(weighted_submission.nil?) && (@post_review_deadline))  %>
-        <tr> <td><b>Reviewer Inaccuracy</b></td>
+        <tr> <td><b>Reputation</b></td>
         <% for review in reviews %>
-            <td>
+            <td align="center">
             <% for review_hamer in weighted_submission.reviews %>
                 <%if review.id == review_hamer.id %>
-                    <%= review_hamer.reviewer.inaccuracy %>&nbsp;
+                    <%= sprintf("%.2f",(1-(review_hamer.reviewer.inaccuracy))*100) %>%&nbsp;
                 <% end %>
             <% end %>
             </td>

@@ -30,7 +30,7 @@ class Chart
   end
 
   def self.dataAdapter(type,data,optionalConf)
-      template = testData[type];
+      template = data_template[type];
       if (type == :pie) then
         data[:type] = 'pie';
         template[:series] = [data]
@@ -79,7 +79,7 @@ class Chart
   end
 
 
-  def self.testData()
+  def self.data_template()
      {
          :pie => {
              :chart => {
@@ -379,6 +379,14 @@ class Chart
                 [180.3, 83.2], [180.3, 83.2]]
      }]
      }
+    }
+  end
+  def self.test_data()
+    {
+        :course_list => [["course 1",1],["course 2",2],["course 3",3]],
+        :assignment_list => [["assignment 1",1],["assignment 2",2],["assignment",3]],
+        :team_list => [["team 1",1],["team 2",2],["team 3",3]],
+        :chart_obj => Chart.data_template()[:bar]
     }
   end
 end

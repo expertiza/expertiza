@@ -7,7 +7,6 @@
 	<% if controller.action_name != "view_my_scores" %>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>
 
-      <% weighted_submission = params[:weighted_submission] %>
 		<% for review in reviews %>
          <% if !(weighted_submission.nil?) %>
               <% puts "im not nil" %>
@@ -47,7 +46,6 @@
 	    <% end %>
 	</tr>
 
-	<% weighted_submission = params[:weighted_submission] %>
 
 	<!-- "This is a diff. from E-730 F12" -->
     <% if(!(weighted_submission.nil?) && (@post_review_deadline))  %>
@@ -63,52 +61,6 @@
         <% end %>
       </tr>
       <!-- Ignore cycles for now -->
-      <% if false %>      
-      <tr class="head"> <td><b>2 Cycle Similarity <br> Score</b></td>
-        <% for review in reviews %>
-            <td>
-            <% for similarity_cycle in weighted_submission.submission.get_two_node_cycles %>
-                <% if review.map.reviewer.user_id== similarity_cycle[1][0].user_id %>
-                    <%= weighted_submission.submission.get_cycle_similarity_score(similarity_cycle) %>&nbsp;
-                    <%break %>
-                <% end %>
-            <% end %>
-            </td>
-        <% end %>
-      </tr>
-      
-      <tr class="head"> <td><b>3 Cycle Similarity <br> Score</b></td>
-        <% for review in reviews %>
-            <td>
-            <% for similarity_cycle in weighted_submission.submission.get_three_node_cycles %>
-                <% if review.map.reviewer.user_id== similarity_cycle[1][0].user_id %>
-                    <%= weighted_submission.submission.get_cycle_similarity_score(similarity_cycle) %>&nbsp;<br>
-                <% elsif review.map.reviewer.user_id== similarity_cycle[2][0].user_id %>
-                    <%= weighted_submission.submission.get_cycle_similarity_score(similarity_cycle) %>&nbsp;<br>
-                <% end %>
-            <% end %>
-            </td>
-        <% end %>
-      </tr>
-      <% end %>
-      <%# We allow instructors, admins and TAs to drop a review %>
-      <% if session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4 || session[:user].role_id == 6%>
-          <tr> <td><b>Add / Drop <br> Review</b></td>
-            <% for review in reviews %>
-                <%= review.id %> <%= review.cycle %>
-                <%
-                   if review.cycle == 0
-                     drop_add_review = "Add"
-                   else
-                     drop_add_review = "Drop"
-                   end
-                %>
-                <td><%= button_to drop_add_review ,{:controller => 'response', :action => 'update_cycle', :id => review.id,:assignment_id => params[:id]} %> </td>
-
-
-            <% end %>
-          </tr>
-      <% end  %>
       
     <% end  %>
     <!-- "Diff. ends" -->

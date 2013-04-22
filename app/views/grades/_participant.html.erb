@@ -132,7 +132,7 @@
 	<TD COLSPAN="9"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_reviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
+	<TD COLSPAN="9"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review], :weighted_submission => @weighted_submissions[participant.id]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
 	<TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>

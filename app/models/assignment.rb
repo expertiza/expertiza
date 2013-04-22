@@ -10,11 +10,11 @@ class Assignment < ActiveRecord::Base
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
   has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
-  has_many :due_dates,   :dependent => :destroy
+  has_many :due_dates, :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
-  has_many :assignment_questionnaires
+  has_many :assignment_questionnaires,:dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
@@ -492,7 +492,7 @@ def add_participant(user_name)
  
  def create_node()
       parent = CourseNode.find_by_node_object_id(self.course_id)      
-      node = AssignmentNode.create(:node_object_id => self.id)
+      node = AssignmentNode.new(:node_object_id => self.id)
       if parent != nil
         node.parent_id = parent.id       
       end

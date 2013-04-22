@@ -18,7 +18,7 @@ class ImportFileController < ApplicationController
     if errors.length > 0
       flash[:error] = err_msg
     end
-    flash[:note] = "#{undo_link}"
+    undo_link("File has been imported successfully. ")
     redirect_to session[:return_to]    
   end
   

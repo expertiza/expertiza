@@ -81,7 +81,7 @@ class CourseController < ApplicationController
         CourseNode.create(:node_object_id => @course.id)
       end
       FileHelper.create_directory(@course)
-      undo_link("Course \"@course.name\" has been created successfully. ")
+      undo_link("Course \"#{@course.name}\" has been created successfully. ")
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = "The following error occurred while saving the course: "+$!
@@ -102,7 +102,7 @@ class CourseController < ApplicationController
       map.destroy
     }
     @course.destroy
-    undo_link("Course \"@course.name\" has bee deleted successfully. ")
+    undo_link("Course \"#{@course.name}\" has been deleted successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 

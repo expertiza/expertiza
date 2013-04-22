@@ -21,8 +21,8 @@ class QuestionnaireController < ApplicationController
 
     begin
 
+      @questionnaire.created_at = Time.now
       @questionnaire.save!
-      @questionnaire.update_attribute('created_at',Time.now)
 
       questions.each{ | question |
 

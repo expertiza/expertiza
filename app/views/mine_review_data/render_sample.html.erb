@@ -46,6 +46,6 @@ options3 = {
 <%=render :partial => 'chart', :locals => {:chart => Chart.new(:line,dataPoint)}%>
 <%=render :partial => 'chart', :locals => {:chart => Chart.new(:line, dataPoint, options1)}%>
 <%=render :partial => 'chart', :locals => {:chart => Chart.new(:bar, dataPoint, options2)}%>
-<%=render :partial => 'chart', :locals => {:chart => Chart.new(:pie, dataPointForPie1,options3, "450px")}%>
-<%=render :partial => 'chart', :locals => {:chart => Chart.new(:pie, dataPointForPie2,nil,"600px")}%>
-<%=render :partial => 'chart', :locals => {:chart => Chart.new(:scatter, dataPointForScatter, options1,"850px")}%>
+<%=render :partial => 'chart', :locals => {:chart => Chart.new(:pie, dataPointForPie1,options3, 450)}%>
+<%=render :partial => 'chart', :locals => {:chart => Chart.new(:pie, dataPointForPie2,nil,600)}%>
+<%=render :partial => 'chart', :locals => {:chart => Chart.new(:scatter, dataPointForScatter, options1, 850)}%>

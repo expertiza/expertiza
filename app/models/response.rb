@@ -91,10 +91,11 @@ class Response < ActiveRecord::Base
     self.destroy
   end
 
+  #bug fixed
   # Returns the average score for this response as an integer (0-100)
   def get_average_score()
     if get_maximum_score != 0 then
-      ((get_alternative_total_score.to_f / get_maximum_score.to_f) * 100).to_i
+      ((get_total_score.to_f / get_maximum_score.to_f) * 100).to_i
     else
       0
     end

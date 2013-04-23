@@ -1,3 +1,5 @@
+#TODO: rename to ChartDataPacket
+#TODO: find a fitting place for this file maybe in module
 class Chart
   @@chart_index = 0
   @@header = false

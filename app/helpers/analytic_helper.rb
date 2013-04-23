@@ -1,12 +1,49 @@
-module AnalyticHelper
+#these 4 helpers consist of the list of plot options that are available for the graph type
+module LineGraphHelper
+  #development note
+  # 1)method for generate the data packet has already been - completed: helpers/chart.rb
+  # 2)javascript for rendering the chart - partially completed
+  #   currently value x axis can not be independently set
+  # 3)data mining method for gathering data - partially completed
+  #   there's always more to add
+end
 
-  #def array_method_to_array_name(array)
-  #  output = Array.new
-  #  array.each do |element|
-  #    output << element.tr("_", " ")
-  #  end
-  #  output
-  #end
+module BarChartHelper
+
+end
+
+module PieChartHelper
+  #only for single object compaireson meaning
+  # 1)method for generate the data packet has already been - completed: helpers/chart.rb
+  # 2)javascript for rendering the chart - completed
+
+  # good for showing grade distributions
+  # methods needed to convert the data gathered to useful way of displaying
+end
+
+module ScatterPlotHelper
+  # 1)method for generate the data packet has already been - completed: helpers/chart.rb
+  # 2)javascript for rendering the chart - completed
+
+
+end
+
+module AnalyticHelper
+  #====== generating chart data ================#
+  def bar_chart_data(object_type, object_id_list, data_type_list)
+    data_point = Array.new
+    object_model = Object.const_get(object_type.capitalize)
+    object_id_list.each do |object_id|
+      object = object_model.find(object_id)
+      object_data = Hash.new
+      object_data[:name] = object.name
+      object_data[:data] = gather_data(object, data_type_list)
+      data_point << object_data
+    end
+    option = Hash.new
+    option[:x_axis_categories] =data_type_list
+    Chart.new(:bar, data_point, option).data
+  end
 
   def gather_data(object, data_type_array)
     data_array = Array.new
@@ -16,10 +53,13 @@ module AnalyticHelper
     data_array
   end
 
+  #======== sorting ============#
   def sort_by_name(array_of_arrays)
     array_of_arrays.sort {|x,y| x[0] <=> y[0]}
   end
 
+  #======= helper data formatting =====#
+  #TODO: implementing normalize for bar chart
   def normalize(array)
     normalized_array = Array.new
     max = array.max

@@ -5,59 +5,36 @@ module AssignmentTeamAnalytic
     self.participants.count
   end
 
-  def num_students
-    self.students.count
-  end
-
   def num_reviews
     self.responses.count
   end
 
   #========== score ========#
-  #return an array containing the score of all the reviews
-  def review_scores
-    list = Array.new
-    self.responses.each do |response|
-      list << response.get_average_score
-    end
-    if (list.empty?)
-      [0]
-    else
-      list
-    end
-
-  end
-
   def average_review_score
     if num_reviews == 0
       0
     end
-    self.review_scores.inject(:+).to_f/num_reviews
+    review_scores.inject(:+).to_f/num_reviews
   end
 
   def max_review_score
-    self.review_scores.max
+    review_scores.max
   end
 
   def min_review_score
-    self.review_scores.min
+    review_scores.min
   end
 
   #======= word count =======#
-  def review_word_counts
-    list = Array.new
-    self.responses.each do |response|
-      list << response.total_word_count
-    end
-    if (list.empty?)
-      [0]
-    else
-      list
-    end
-  end
-
   def total_review_word_count
     review_word_counts.inject(:+)
+  end
+
+  def average_review_word_count
+    if num_reviews == 0
+      0
+    end
+    total_review_word_count.to_f/num_reviews
   end
 
   def max_review_word_count
@@ -68,14 +45,30 @@ module AssignmentTeamAnalytic
     review_word_counts.min
   end
 
-  def average_review_word_count
+  #===== character count ====#
+  def total_review_character_count
+    review_character_counts.inject(:+)
+  end
+
+  def average_review_character_count
     if num_reviews == 0
       0
     end
-    total_review_word_count.to_f/num_reviews
+    total_review_character_count.to_f/num_reviews
   end
-  
-  #===== character count ====#
+
+  def max_review_character_count
+    review_character_counts.max
+  end
+
+  def min_review_character_count
+    review_character_counts.min
+  end
+
+
+
+
+  private
   def review_character_counts
     list = Array.new
     self.responses.each do |response|
@@ -88,34 +81,45 @@ module AssignmentTeamAnalytic
     end
   end
 
-  def total_review_character_count
-    review_character_counts.inject(:+)
-  end
-
-  def max_review_character_count
-    review_character_counts.max
-  end
-
-  def min_review_character_count
-    review_character_counts.min
-  end
-
-  def average_review_character_count
-    if num_reviews == 0
-      0
+  #return an array containing the score of all the reviews
+  def review_scores
+    list = Array.new
+    self.responses.each do |response|
+      list << response.get_average_score
     end
-    total_review_character_count.to_f/num_reviews
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
-  private
-  #return students in the participants
-  def student_list
-    students = Array.new
-    self.participants.each do |participant|
-      if participant.user.role_id == Role.student.id
-        students << participant
-      end
+  def review_word_counts
+    list = Array.new
+    self.responses.each do |response|
+      list << response.total_word_count
     end
-    students
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
+
+  #======= unused ============#
+  ##return students in the participants
+  #def student_list
+  #  students = Array.new
+  #  self.participants.each do |participant|
+  #    if participant.user.role_id == Role.student.id
+  #      students << participant
+  #    end
+  #  end
+  #  students
+  #end
+  #
+  #def num_students
+  #  self.students.count
+  #end
+
 end

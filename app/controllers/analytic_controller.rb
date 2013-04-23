@@ -7,32 +7,74 @@ class AnalyticController < ApplicationController
   def init
     #all internal not use by the page
     @available_scope_types = [:courses, :assignments, :teams]
-    @selected_scope_type = nil
-
     @available_graph_types = [:line, :bar, :pie, :scatter]
-    @selected_graph_type = nil
-
     @available_courses = associated_courses(session[:user])
-    @selected_courses = Array.new
 
-    @analytic_module = Hash.new
-    @analytic_module[:course] = CourseAnalytic
-    @analytic_module[:assignment] = AssignmentAnalytic
-    @analytic_module[:team] = AssignmentTeamAnalytic
+    #Hash of available method name of the data mining methods with different type of selection
+    @available_data_types = Hash.new
+    #data type by scope
+    @available_data_types[:course] = CourseAnalytic.instance_methods
+    @available_data_types[:assignment] = AssignmentAnalytic.instance_methods
+    @available_data_types[:team] = AssignmentTeamAnalytic.instance_methods
+    #data type by chart type
+    @available_data_types[:bar] = [
+        #general
+        "num_participants",
+        "num_assignments",
+        "num_teams",
+        "num_participants",
+        "num_reviews",
+        #assignment_teams
+        "total_num_assignment_teams",
+        "average_num_assignment_teams",
+        "max_num_assignment_teams",
+        "min_num_assignment_teams",
+        #assignment_scores
+        "average_assignment_score",
+        "max_assignment_score",
+        "min_assignment_score",
+        #assignment_reviews
+        "total_num_assignment_reviews",
+        "average_num_assignment_reviews",
+        "max_num_assignment_reviews",
+        "min_num_assignment_reviews",
+        #team_reviews
+        "total_num_team_reviews",
+        "average_num_team_reviews",
+        "max_num_team_reviews",
+        "min_num_team_reviews",
+        #team_scores
+        "average_team_score",
+        "max_team_score",
+        "min_team_score",
+        #review_score
+        "average_review_score",
+        "max_review_score",
+        "min_review_score",
+        #review_word_count
+        "total_review_word_count",
+        "average_review_word_count",
+        "max_review_word_count",
+        "min_review_word_count",
+        #character_count
+        "total_review_character_count",
+        "average_review_character_count",
+        "max_review_character_count",
+        "min_review_character_count"
+    ]
 
-    @selected_graph_data = Array.new
+    @available_data_types[:scatter] = [
 
-  end
-
-  def index
-
-
-
+    ]
+    @available_data_types[:line] = []
+    @available_data_types[:pie] = []
   end
 
   def graph_data_type_list
+    #cross checking @available_data_type[chart_type] with @available_data_type[scope]
+    data_type_list =  @available_data_types[params[:scope].to_sym] & @available_data_types[params[:type].to_sym]
     respond_to do |format|
-      format.json { render :json => @analytic_module[params[:scope].to_sym].instance_methods}
+      format.json { render :json => data_type_list}
     end
   end
 
@@ -46,6 +88,7 @@ class AnalyticController < ApplicationController
   #    :x_axis_categories => [ 'Problem1', 'Problem2', 'Problem3', 'Problem4', 'Problem5', 'Problem6', 'Problem7', 'Problem8', 'Problem9', 'Problem10', 'Problem11','Problem12']
   #}
   #Chart.new(:bar, dataPoint, options2)
+  #should be rename to graph_data_packet
   def get_graph_data_bundle
     if params[:id].nil? or params[:data_type].nil?
       respond_to do |format|
@@ -53,31 +96,24 @@ class AnalyticController < ApplicationController
       end
       return
     end
-    data_point = Array.new
-    params[:id].each do |object_id|
-      object = Object.const_get(params[:scope].capitalize).find(object_id)
-      object_data = Hash.new
-      object_data[:name] = object.name
-      object_data[:data] = gather_data(object, params[:data_type])
-      data_point << object_data
+
+    case params[:type]
+      when "line"
+        chart_data = line_graph_data(params[:scope], params[:id], params[:data_type])
+      when "bar"
+        chart_data = bar_chart_data(params[:scope], params[:id], params[:data_type])
+      when "scatter"
+        chart_data = scatter_plot_data(params[:scope], params[:id], params[:data_type])
+      when "pie"
+        chart_data = pie_chart_data(params[:scope], params[:id], params[:data_type])
     end
-    option = Hash.new
-    option[:x_axis_categories] = params[:data_type]
 
     respond_to do |format|
-      format.json { render :json => Chart.new(:bar, data_point, option).data }
+      format.json { render :json => chart_data }
     end
   end
 
 
-
-  def gather_data(object, data_type_array)
-    data_array = Array.new
-    data_type_array.each do |data_method|
-      data_array << object.send(data_method)
-    end
-    data_array
-  end
 
   def course_list
     courses = associated_courses(session[:user])

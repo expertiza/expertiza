@@ -54,27 +54,40 @@ module ResponseAnalytic
   private
   #return an array of strings containing the word count of al the comments
   def word_count_list
-    word_count_list = Array.new
+    list = Array.new
     self.scores.each do |score|
-      word_count_list << score.word_count
+      list << score.word_count
     end
-    word_count_list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def character_count_list
-    character_count_list = Array.new
+    list = Array.new
     self.scores.each do |score|
-      character_count_list << score.character_count
+      list << score.character_count
+    end
+    if (list.empty?)
+      [0]
+    else
+      list
     end
   end
 
   #return score for all of the questions in an array
   def question_score_list
-    question_scores = Array.new
+    list = Array.new
     self.scores.each do |score|
-      question_scores << score.score
+      list << score.score
     end
-    question_scores
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   #return an array of strings containing all of the comments

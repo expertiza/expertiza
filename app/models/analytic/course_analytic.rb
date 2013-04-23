@@ -5,27 +5,11 @@ module CourseAnalytic
     self.participants.count
   end
 
-  def num_students
-    self.students.count
-  end
-
   def num_assignments
     self.assignments.count
   end
 
   #===== number of assignment teams ====#
-  def assignment_team_counts
-    list = Array.new
-    self.assignments.each do |assignment|
-      list << assignment.num_teams
-    end
-    if (list.empty?)
-      [0]
-    else
-      list
-    end
-  end
-
   def total_num_assignment_teams
     assignment_team_counts.inject(:+)
   end
@@ -46,42 +30,6 @@ module CourseAnalytic
   end
 
   #===== assignment score =====#
-  def assignment_average_scores
-    list = Array.new
-    self.assignments.each do |assignment|
-      list << assignment.average_team_score
-    end
-    if (list.empty?)
-      [0]
-    else
-      list
-    end
-  end
-
-  def assignment_max_scores
-    list = Array.new
-    self.assignments.each do |assignment|
-      list << assignment.max_team_score
-    end
-    if (list.empty?)
-      [0]
-    else
-      list
-    end
-  end
-
-  def assignment_min_scores
-    list = Array.new
-    self.assignments.each do |assignment|
-      list << assignment.min_team_score
-    end
-    if (list.empty?)
-      [0]
-    else
-      list
-    end
-  end
-
   def average_assignment_score
     if num_assignments == 0
       0
@@ -128,13 +76,67 @@ module CourseAnalytic
 
 
   private
-  def students
-    students = Array.new
-    self.participants.each do |participant|
-      if participant.user.role_id == Role.student.id
-        students << participant
-      end
+  def assignment_team_counts
+    list = Array.new
+    self.assignments.each do |assignment|
+      list << assignment.num_teams
     end
-    student
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
+
+  def assignment_average_scores
+    list = Array.new
+    self.assignments.each do |assignment|
+      list << assignment.average_team_score
+    end
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
+  end
+
+  def assignment_max_scores
+    list = Array.new
+    self.assignments.each do |assignment|
+      list << assignment.max_team_score
+    end
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
+  end
+
+  def assignment_min_scores
+    list = Array.new
+    self.assignments.each do |assignment|
+      list << assignment.min_team_score
+    end
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
+  end
+
+
+  #=============== unused ============#
+  #def students
+  #  students = Array.new
+  #  self.participants.each do |participant|
+  #    if participant.user.role_id == Role.student.id
+  #      students << participant
+  #    end
+  #  end
+  #  student
+  #end
+  #
+  #def num_students
+  #  self.students.count
+  #end
 end

@@ -1137,6 +1137,6 @@ class Assignment < ActiveRecord::Base
     metareview_questionnaire_id
   end
 
-  require 'helpers/analytic/assignment_analytic'
+  require 'models/analytic/assignment_analytic'
   include AssignmentAnalytic
 end

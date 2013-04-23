@@ -33,6 +33,6 @@ class Question < ActiveRecord::Base
     self.destroy
   end
 
-  require 'helpers/analytic/question_analytic'
+  require 'models/analytic/question_analytic'
   include QuestionAnalytic
 end

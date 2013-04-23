@@ -1,4 +1,8 @@
 module AnalyticHelper
+  def sort_by_name(array_of_arrays)
+    array_of_arrays.sort {|x,y| x[0] <=> y[0]}
+  end
+
   def normalize(array)
     normalized_array = Array.new
     max = array.max

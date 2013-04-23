@@ -12,7 +12,7 @@ Rails::Initializer.run do |config|
   # -- all .rb files in that directory are automatically loaded.
 
   # Add additional load paths for your own custom dirs
-  config.load_paths += %W( #{RAILS_ROOT}/helpers/analytic )
+  #config.load_paths += %W( #{RAILS_ROOT}/helpers/analytic )
 
   if RAILS_ENV == 'production' and RUBY_PLATFORM !~ /mswin|mingw/ # Don't check on Windows, because there's no "which" command to check
     raise 'dot executable missing - install graphviz' if %x(which dot).to_s.empty?

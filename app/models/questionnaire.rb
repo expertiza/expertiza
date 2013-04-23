@@ -80,6 +80,6 @@ class Questionnaire < ActiveRecord::Base
     errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
   end
 
-  require 'helpers/analytic/questionnaire_analytic'
+  require 'models/analytic/questionnaire_analytic'
   include QuestionnaireAnalytic
 end

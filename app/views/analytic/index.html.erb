@@ -1,0 +1,167 @@
+<h1>Mine Review Data</h1>
+<script>
+    var remove_chart;
+    var add_chart;
+    var choose_compare_type;
+    var choose_course;
+    var choose_assignment;
+    var test_data = {
+        course_list : [["course 1",1],["course 2",2]],
+        assignment_list : [
+            [["assignment 1",1],["assignment 2",2]],
+            [["assignment 01",1],["assignment 02",2]]
+        ],
+        team_list : [
+            [["team 1",1],["team 2",2]],
+            [["T 1",1],["T 2",2]]
+        ],
+        graph_option_list : [
+                "bar chart","scatter plot"
+        ]
+    };
+    jQuery(document).ready(
+        function () {
+            var chart_max_id;
+            chart_max_id = 0;
+            remove_chart = function (id) {
+                jQuery("#chart_" + id).remove();
+            };
+            add_chart = function () {
+                var chart_element,chart_id;
+                chart_max_id ++;
+                chart_id = "chart_" + chart_max_id;
+                chart_element = jQuery("<table id='" + chart_id + "'><tr><td><table><tbody  class='options'><tr><td width='200px'>Graph Type:<br /><select name='graph_type' class='graph_type'><option selected disabled value='default'></option><option value='bar'>bar chart</option><option value='scatter'>scatter plot</option></select></td></tr><tbody></table></td><td class='chart'>chart</td></tr><tr><td></td><td align='right'><input type='button' value='Remove' onclick='remove_chart(" + chart_max_id + ");'></td></tr></table>");
+                jQuery("#draw_area").append(chart_element);
+                chart_element.find(".options").append(new_option(0, "Comparison Scope",
+                        "<select name='compare_type' class='compare_type' onchange='choose_compare_type(this);'><option value='default' disabled selected class='default_option'></option><option value='course'>course</option><option value='assignment'>assignment</option value='team'><option>team</option></select><br />"
+                    )
+                );
+            };
+            function new_option(level,text,obj,scrollable) {
+                var str;
+                if (scrollable === undefined || scrollable == false) {
+                    str = ""
+                } else {
+                    str = " style='OVERFLOW-Y:scroll; HEIGHT:150px'"
+                }
+                return jQuery("<tr class='tr_"+level+"'><td>" + text + ":<br /><div" + str + ">" + obj + "</div></td></tr>");
+            }
+            function get_this_level(obj) {
+                return parseInt(obj.parentElement.parentElement.parentElement.className.substring(3,4))
+            }
+            function remove_following_options(obj) {
+                var tbody,i,tr;
+                tbody = jQuery(obj.parentElement.parentElement.parentElement.parentElement);
+                for (i = get_this_level(obj) + 1; true; i++) {
+                    tr = tbody.find(".tr_" + i);
+                    if (tr.length == 0) {
+                        break;
+                    }
+                    tr.remove();
+                }
+            }
+            function show_graph_options(level,obj) {
+                /*
+                function call_back(json) {
+                    var str="";
+                    var i;
+                    str += "<select onchange='show_graph();'>";
+                    str += "<option value='default' disabled selectd></option>";
+                    for (i = 0; i < json.length; i++) {
+                        str += "<option value='" + json[i] + "' >" + json[i] + "</option>";
+                    }
+                    str+= "</select>";
+                    obj.append(new_option(level,"Graph Type",str));
+                }
+                call_back(test_data.graph_option_list);
+                */
+            }
+            function get_compare_type(obj) {
+                return jQuery(obj.parentElement.parentElement.parentElement.parentElement).find(".compare_type")[0].value;
+            }
+            choose_compare_type = function (obj) {
+                var tbody, level;
+                remove_following_options(obj);
+                tbody = jQuery(obj.parentElement.parentElement.parentElement.parentElement);
+                level = get_this_level(obj);
+                function course_list_load_call_back(json) {
+                    var i,new_op,show_go=false;
+                    switch(get_compare_type(obj)) {
+                        case "assignment":
+                        case "team":
+                            new_op = "<select class='select_course' name='select_course' onchange='choose_course(this)'><option value='default' disabled selected></option>";
+                            for (i = 0; i < json.length; i++) {
+                                new_op += "<option value='" + json[i][1] + "'>" + json[i][0] + "</option>";
+                            }
+                            new_op +="</select>";
+                            break;
+                        case "course":
+                            new_op = "";
+                            for (i = 0; i < json.length; i++) {
+                                new_op += json[i][0] + ":<input type='checkbox' name='" + json[i][1] + "'><br />";
+                            }
+                            show_go = true;
+                            break;
+                    }
+                    tbody.append(new_option(level + 1, "Course", new_op, show_go));
+                    if (show_go) {
+                        show_graph_options(level + 1,tbody);
+                    }
+                }
+                jQuery.get("/analytic/course_list",course_list_load_call_back);
+            };
+            choose_course = function (obj) {
+                var tbody, level;
+                remove_following_options(obj);
+                tbody = jQuery(obj.parentElement.parentElement.parentElement.parentElement);
+                level = get_this_level(obj);
+                function assignment_list_load_call_back(json) {
+                    var i,new_op,show_go;
+                    show_go = false;
+                    switch(get_compare_type(obj)) {
+                        case "team":
+                            new_op = "<select class='select_assignment' name='select_assignment' onchange='choose_assignment(this)'><option value='default' disabled selected></option>";
+                            for (i = 0; i < json.length; i++) {
+                                new_op += "<option value='" + json[i][1] + "'>" + json[i][0] + "</option>";
+                            }
+                            new_op +="</select>";
+                            break;
+                        case "assignment":
+                            new_op = "";
+                            for (i = 0; i < json.length; i++) {
+                                new_op += json[i][0] + ":<input type='checkbox' name='" + json[i][1] + "'><br />";
+                            }
+                            show_go = true;
+                            break;
+                    }
+                    tbody.append(new_option(level + 1, "Assignment", new_op, show_go));
+                    if (show_go) {
+                        show_graph_options(level + 1,tbody);
+                    }
+                }
+                jQuery.get("/analytic/assignment_list?course_id=" + obj.value, assignment_list_load_call_back);
+            };
+            choose_assignment = function (obj) {
+                var tbody, level;
+                remove_following_options(obj);
+                tbody = jQuery(obj.parentElement.parentElement.parentElement.parentElement);
+                level = get_this_level(obj);
+                function team_list_load_call_back(json) {
+                    var i,new_op;
+                    new_op = "";
+                    for (i = 0; i < json.length; i++) {
+                        new_op += json[i][0] + ":<input type='checkbox' name='" + json[i][1] + "'><br />";
+                    }
+                    tbody.append(new_option(level + 1, "Team", new_op, true));
+                    show_graph_options(level + 1,tbody);
+                }
+                jQuery.get("/analytic/team_list?assignment_id=" + obj.value,team_list_load_call_back);
+            };
+            add_chart();
+        }
+    );
+</script>
+<input type='button' value='Add New Chart' onclick='add_chart();'>
+<div id="draw_area">
+
+</div>

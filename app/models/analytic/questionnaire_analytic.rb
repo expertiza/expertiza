@@ -1,4 +1,4 @@
-require 'helpers/analytic/question_analytic'
+require 'models/analytic/question_analytic'
 module QuestionnaireAnalytic
   #return all possible questionnaire types
   def self.types

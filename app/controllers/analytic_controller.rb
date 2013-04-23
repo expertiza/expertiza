@@ -1,20 +1,9 @@
 class AnalyticController < ApplicationController
   include CourseHelper
-
-  before_filter :init
-  @available_scope_types
-  @selected_scope_type
-
-  @available_graph_types
-  @selected_graph_type
-
-  @available_courses
-  @selected_courses
-
-  @available_graph_data
-  @selected_graph_data
+  include AnalyticHelper
 
   def index
+    #all internal not use by the page
     @available_scope_types = [:courses, :assignments, :teams]
     @selected_scope_type = nil
 
@@ -29,6 +18,7 @@ class AnalyticController < ApplicationController
     @available_graph_data[:assignment] = AssignmentAnalytic.instance_methods
     @available_graph_data[:team] = AssignmentTeamAnalytic.instance_methods
     @selected_graph_data = Array.new
+
   end
 
 
@@ -42,25 +32,33 @@ class AnalyticController < ApplicationController
     courses.each do |course|
       course_list << [course.name, course.id]
     end
-    course_list
+    respond_to do |format|
+      format.json { render :json => sort_by_name(course_list) }
+    end
   end
 
-  def assignment_list(course)
+  def assignment_list
+    course = Course.find(params[:course_id])
     assignments = course.assignments
     assignment_list = Array.new
     assignments.each do |assignment|
       assignment_list << [assignment.name, assignment.id]
     end
-    assignment_list
+    respond_to do |format|
+      format.json { render :json => sort_by_name(assignment_list) }
+    end
   end
 
-  def team_list(assignment)
+  def team_list
+    assignment = Assignment.find(params[:assignment_id])
     teams = assignment.teams
     team_list = Array.new
     teams.each do |team|
       team_list << [team.name, team.id]
     end
-    team_list
+    respond_to do |format|
+      format.json { render :json => sort_by_name(team_list) }
+    end
   end
 
 

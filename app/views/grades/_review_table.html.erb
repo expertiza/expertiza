@@ -12,7 +12,7 @@
               <% puts "im not nil" %>
               <% for review_hamer in weighted_submission.reviews %>
                   <%if review.id == review_hamer.id %>
-                      <% thisReputation = (sprintf("%.2f%",(1-review_hamer.reviewer.inaccuracy)*100)) %>
+                      <% thisReputation = sprintf("%.2f",(review_hamer.reviewer.inaccuracy)) %>
                   <% end %>
               <% end %>
           <% else %>
@@ -54,7 +54,7 @@
             <td align="center">
             <% for review_hamer in weighted_submission.reviews %>
                 <%if review.id == review_hamer.id %>
-                    <%= sprintf("%.2f%",(1-(review_hamer.reviewer.inaccuracy))*100) %>&nbsp;
+                    <%= sprintf("%.2f",review_hamer.reviewer.inaccuracy) %>&nbsp;
                 <% end %>
             <% end %>
             </td>

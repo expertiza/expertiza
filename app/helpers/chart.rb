@@ -1,11 +1,9 @@
 class Chart
-
   @@chart_index = 0
   @@header = false
   attr :chart_id
   attr :width
   attr :data
-
 
   def initialize(type,data,option=nil,width = nil)
     @@chart_index = @@chart_index + 1

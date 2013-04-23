@@ -6,9 +6,9 @@ module AssignmentAnalytic
     self.participants.count
   end
 
-  def num_students
-    self.students.count
-  end
+  #def num_students
+  #  self.students.count
+  #end
 
   def num_teams
     self.teams.count
@@ -20,6 +20,13 @@ module AssignmentAnalytic
     self.teams.each do |team|
       list << team.num_reviews
     end
+
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
+
   end
 
   def total_num_team_reviews
@@ -27,7 +34,10 @@ module AssignmentAnalytic
   end
 
   def average_num_team_reviews
-    total_num_team_reviews/num_teams
+    if num_teams == 0
+      0
+    end
+    total_num_team_reviews.to_f/num_teams
   end
 
   def max_num_team_reviews
@@ -44,10 +54,17 @@ module AssignmentAnalytic
     self.teams.each do |team|
       list << team.average_review_score
     end
-    list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def average_team_score
+    if num_teams == 0
+      0
+    end
     self.team_scores.inject(:+).to_f/num_teams
   end
 
@@ -64,13 +81,13 @@ module AssignmentAnalytic
   #return students that are participating in the assignment
   #assumptions: all team_participant for all of the teams are in assignment participant
   def students
-    students = Array.new
+    list = Array.new
     self.participants.each do |participant|
       if participant.user.role_id == Role.student.id
-        students << participant
+        list << participant
       end
     end
-    student
+    list
   end
 
   #return all questionnaire types associated this assignment
@@ -128,7 +145,11 @@ module AssignmentAnalytic
     self.teams.each do |team|
       list << team.total_word_count
     end
-    list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def total_review_word_count
@@ -136,6 +157,9 @@ module AssignmentAnalytic
   end
 
   def average_review_word_count
+    if num_teams == 0
+      0
+    end
     total_review_word_count.to_f/num_teams
   end
 
@@ -153,7 +177,11 @@ module AssignmentAnalytic
     self.teams.each do |team|
       list << team.total_character_count
     end
-    list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def total_review_character_count
@@ -161,6 +189,9 @@ module AssignmentAnalytic
   end
 
   def average_review_character_count
+    if num_teams == 0
+      0
+    end
     total_review_character_count.to_f/num_teams
   end
 

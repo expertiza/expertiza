@@ -1,4 +1,21 @@
 module AnalyticHelper
+
+  #def array_method_to_array_name(array)
+  #  output = Array.new
+  #  array.each do |element|
+  #    output << element.tr("_", " ")
+  #  end
+  #  output
+  #end
+
+  def gather_data(object, data_type_array)
+    data_array = Array.new
+    data_type_array.each do |data_method|
+      data_array << object.send(data_method)
+    end
+    data_array
+  end
+
   def sort_by_name(array_of_arrays)
     array_of_arrays.sort {|x,y| x[0] <=> y[0]}
   end

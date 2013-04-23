@@ -16,15 +16,23 @@ module AssignmentTeamAnalytic
   #========== score ========#
   #return an array containing the score of all the reviews
   def review_scores
-    scores = Array.new
+    list = Array.new
     self.responses.each do |response|
-      scores << response.get_average_score
+      list << response.get_average_score
     end
-    scores
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
+
   end
 
   def average_review_score
-    self.review_scores.inject(:+)/num_reviews
+    if num_reviews == 0
+      0
+    end
+    self.review_scores.inject(:+).to_f/num_reviews
   end
 
   def max_review_score
@@ -37,11 +45,15 @@ module AssignmentTeamAnalytic
 
   #======= word count =======#
   def review_word_counts
-    word_count_list = Array.new
+    list = Array.new
     self.responses.each do |response|
-      word_count_list << response.total_word_count
+      list << response.total_word_count
     end
-    word_count_list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def total_review_word_count
@@ -57,16 +69,23 @@ module AssignmentTeamAnalytic
   end
 
   def average_review_word_count
+    if num_reviews == 0
+      0
+    end
     total_review_word_count.to_f/num_reviews
   end
   
   #===== character count ====#
   def review_character_counts
-    character_count_list = Array.new
+    list = Array.new
     self.responses.each do |response|
-      character_count_list << response.total_character_count
+      list << response.total_character_count
     end
-    character_count_list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def total_review_character_count
@@ -82,6 +101,9 @@ module AssignmentTeamAnalytic
   end
 
   def average_review_character_count
+    if num_reviews == 0
+      0
+    end
     total_review_character_count.to_f/num_reviews
   end
 

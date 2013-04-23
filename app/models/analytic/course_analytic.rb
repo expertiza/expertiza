@@ -19,7 +19,11 @@ module CourseAnalytic
     self.assignments.each do |assignment|
       list << assignment.num_teams
     end
-    list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def total_num_assignment_teams
@@ -27,7 +31,10 @@ module CourseAnalytic
   end
 
   def average_num_assignment_teams
-    total_num_assignment_teams/num_assignments
+    if num_assignments == 0
+      0
+    end
+    total_num_assignment_teams.to_f/num_assignments
   end
 
   def max_num_assignment_teams
@@ -44,7 +51,11 @@ module CourseAnalytic
     self.assignments.each do |assignment|
       list << assignment.average_team_score
     end
-    list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def assignment_max_scores
@@ -52,7 +63,11 @@ module CourseAnalytic
     self.assignments.each do |assignment|
       list << assignment.max_team_score
     end
-    list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def assignment_min_scores
@@ -60,10 +75,17 @@ module CourseAnalytic
     self.assignments.each do |assignment|
       list << assignment.min_team_score
     end
-    list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def average_assignment_score
+    if num_assignments == 0
+      0
+    end
     assignment_average_scores.inject(:+).to_f/num_assignments
   end
 
@@ -81,7 +103,11 @@ module CourseAnalytic
     self.assignments.each do |assignment|
       list << assignment.total_num_team_reviews
     end
-    list
+    if (list.empty?)
+      [0]
+    else
+      list
+    end
   end
 
   def total_num_assignment_reviews

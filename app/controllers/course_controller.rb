@@ -97,10 +97,12 @@ class CourseController < ApplicationController
     rescue
       flash[:error] = $!
     end
-    @course.ta_mappings.each{
-      | map |
-      map.destroy
-    }
+
+    # already taken care of in association declaration
+    #@course.ta_mappings.each{
+    #  | map |
+    #  map.destroy
+    #}
     @course.destroy
     undo_link("Course \"#{@course.name}\" has been deleted successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'

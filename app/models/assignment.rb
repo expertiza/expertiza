@@ -381,7 +381,8 @@ class Assignment < ActiveRecord::Base
         raise "Assignment directory is not empty"
       end
     end
-    
+
+    # already taken care of by association declaration
     self.assignment_questionnaires.each{|aq| aq.destroy}
     
     self.destroy

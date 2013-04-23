@@ -16,8 +16,9 @@ class VersionsController < ApplicationController
 
   def revert
     @version = Version.find_by_id(params[:id])
-    @versions = Version.find(:all,:conditions => ["whodunnit = ? AND created_at = ?", @version.whodunnit,@version.created_at])
-    while @versions.length != 0
+    @versions = Version.find(:all,:conditions => ["whodunnit = ? AND created_at BETWEEN ? AND ?", @version.whodunnit,@version.created_at-1.0,@version.created_at + 1.0])
+    @iteration = 0
+    while @versions.length != 0 and @iteration <= 5
       @versions_clone = @versions.clone
       @versions_clone.each do |v|
         if v.reify
@@ -34,6 +35,7 @@ class VersionsController < ApplicationController
           @versions.delete(v)
         end
       end
+      @iteration += 1
     end
     @message = params[:redo] == "true" ? "Previous action has been undone successfully. " : "Previous action has been redone successfully. "
     undo_link(@message)

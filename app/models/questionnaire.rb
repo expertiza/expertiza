@@ -4,7 +4,7 @@ class Questionnaire < ActiveRecord::Base
     has_many :questions,:dependent => :destroy # the collection of questions associated with this Questionnaire
     belongs_to :instructor, :class_name => "User", :foreign_key => "instructor_id" # the creator of this questionnaire
     
-    has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaire', :foreign_key => 'questionnaire_id'
+    has_many :assignment_questionnaires, :class_name => 'AssignmentQuestionnaire', :foreign_key => 'questionnaire_id',:dependent => :destroy
     has_many :assignments, :through => :assignment_questionnaires
 
     has_one :questionnaire_node,:foreign_key => :node_object_id,:dependent => :destroy

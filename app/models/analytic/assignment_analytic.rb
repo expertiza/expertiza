@@ -1,4 +1,4 @@
-require 'helpers/analytic/assignment_team_analytic'
+require 'models/analytic/assignment_team_analytic'
 module AssignmentAnalytic
 
   #====== general statistics ======#

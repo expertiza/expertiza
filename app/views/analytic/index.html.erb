@@ -1,4 +1,5 @@
 <h1>Mine Review Data</h1>
+<script src='/javascripts/highcharts.js'></script>
 <script>
     var remove_chart;
     var add_chart;
@@ -19,6 +20,26 @@
                 "bar chart","scatter plot"
         ]
     };
+    function draw(obj) {
+        var arg,ids,graph_options,i;
+        arg = "type=" + obj.find(".graph_type")[0].value;
+        arg += "&scope=" + obj.find(".compare_type")[0].value;
+        graph_options = obj.find(".graph_options_checkboxes").find("input[type='checkbox']:checked");
+
+        ids = obj.find("." + obj.find(".compare_type")[0].value + "_checkboxes").find("input[type='checkbox']:checked");
+        for (i = 0; i < ids.length; i++) {
+            arg += "&id[]=" +ids[i].value;
+        }
+        for (i = 0; i < graph_options.length; i++) {
+            arg += "&data_type[]=" +graph_options[i].value;
+        }
+
+        jQuery.get("/analytic/get_graph_data_bundle?" + arg, function (json) {
+            console.log(json);
+            obj.find(".chart").highcharts(json);
+            jQuery("tspan:contains('Highcharts.com')").remove();
+        });
+    }
     jQuery(document).ready(
         function () {
             var chart_max_id;
@@ -30,19 +51,27 @@
                 var chart_element,chart_id;
                 chart_max_id ++;
                 chart_id = "chart_" + chart_max_id;
-                chart_element = jQuery("<table id='" + chart_id + "'><tr><td><table><tbody  class='options'><tr><td width='200px'>Graph Type:<br /><select name='graph_type' class='graph_type'><option selected disabled value='default'></option><option value='bar'>bar chart</option><option value='scatter'>scatter plot</option></select></td></tr><tbody></table></td><td class='chart'>chart</td></tr><tr><td></td><td align='right'><input type='button' value='Remove' onclick='remove_chart(" + chart_max_id + ");'></td></tr></table>");
+                chart_element = jQuery("<table id='" + chart_id + "' width='100%'><tbody><tr><td><table><tbody  class='options'><tr><td>Graph Type:<br /><select name='graph_type' class='graph_type'><option selected disabled value='default'></option><option value='bar'>bar chart</option><option value='scatter'>scatter plot</option></select></td></tr><tbody></table></td><td class='chart'>chart</td></tr><tr><td></td><td align='right'><hr /><input type='button' value='Remove' onclick='remove_chart(" + chart_max_id + ");'></td></tr></tbody></table>");
                 jQuery("#draw_area").append(chart_element);
                 chart_element.find(".options").append(new_option(0, "Comparison Scope",
                         "<select name='compare_type' class='compare_type' onchange='choose_compare_type(this);'><option value='default' disabled selected class='default_option'></option><option value='course'>course</option><option value='assignment'>assignment</option value='team'><option>team</option></select><br />"
                     )
                 );
             };
-            function new_option(level,text,obj,scrollable) {
+            function get_tbody(obj) {
+                var cur;
+                cur = obj;
+                while (!/tbody/i.exec(cur.nodeName)) {
+                    cur = cur.parentElement;
+                }
+                return jQuery(cur);
+            }
+            function new_option(level,text,obj,scrollable,div_class) {
                 var str;
                 if (scrollable === undefined || scrollable == false) {
                     str = ""
                 } else {
-                    str = " style='OVERFLOW-Y:scroll; HEIGHT:150px'"
+                    str = " style='OVERFLOW-Y:scroll; HEIGHT:150px' class='" + div_class + "'";
                 }
                 return jQuery("<tr class='tr_"+level+"'><td>" + text + ":<br /><div" + str + ">" + obj + "</div></td></tr>");
             }
@@ -51,7 +80,7 @@
             }
             function remove_following_options(obj) {
                 var tbody,i,tr;
-                tbody = jQuery(obj.parentElement.parentElement.parentElement.parentElement);
+                tbody = get_tbody(obj);
                 for (i = get_this_level(obj) + 1; true; i++) {
                     tr = tbody.find(".tr_" + i);
                     if (tr.length == 0) {
@@ -60,7 +89,19 @@
                     tr.remove();
                 }
             }
-            function show_graph_options(level,obj) {
+            function show_graph_options(level,tbody) {
+                var scope,type;
+                type = tbody.find(".graph_type")[0].value;
+                scope = tbody.find(".compare_type")[0].value;
+                jQuery.get("/analytic/graph_data_type_list?scope=" + scope + "&type=" + type,function (json) {
+                    var check_box_list,i;
+                    check_box_list = "";
+                    for (i = 0; i < json.length; i++) {
+                        check_box_list += json[i].replace(/_/ig," ") + "<input type='checkbox' value='" + json[i] + "'><br />";
+                    }
+                    tbody.append(new_option(level + 1, "Data", check_box_list, true, "graph_options_checkboxes"));
+                    tbody.find("input[type='checkbox']").change(function() {draw(get_tbody(tbody[0].parentElement))});
+                });
                 /*
                 function call_back(json) {
                     var str="";
@@ -82,7 +123,7 @@
             choose_compare_type = function (obj) {
                 var tbody, level;
                 remove_following_options(obj);
-                tbody = jQuery(obj.parentElement.parentElement.parentElement.parentElement);
+                tbody = get_tbody(obj);
                 level = get_this_level(obj);
                 function course_list_load_call_back(json) {
                     var i,new_op,show_go=false;
@@ -98,12 +139,12 @@
                         case "course":
                             new_op = "";
                             for (i = 0; i < json.length; i++) {
-                                new_op += json[i][0] + ":<input type='checkbox' name='" + json[i][1] + "'><br />";
+                                new_op += json[i][0] + ":<input type='checkbox' value='" + json[i][1] + "'><br />";
                             }
                             show_go = true;
                             break;
                     }
-                    tbody.append(new_option(level + 1, "Course", new_op, show_go));
+                    tbody.append(new_option(level + 1, "Course", new_op, show_go, "course_checkboxes"));
                     if (show_go) {
                         show_graph_options(level + 1,tbody);
                     }
@@ -113,7 +154,7 @@
             choose_course = function (obj) {
                 var tbody, level;
                 remove_following_options(obj);
-                tbody = jQuery(obj.parentElement.parentElement.parentElement.parentElement);
+                tbody = get_tbody(obj);
                 level = get_this_level(obj);
                 function assignment_list_load_call_back(json) {
                     var i,new_op,show_go;
@@ -129,12 +170,12 @@
                         case "assignment":
                             new_op = "";
                             for (i = 0; i < json.length; i++) {
-                                new_op += json[i][0] + ":<input type='checkbox' name='" + json[i][1] + "'><br />";
+                                new_op += json[i][0] + ":<input type='checkbox' value='" + json[i][1] + "'><br />";
                             }
                             show_go = true;
                             break;
                     }
-                    tbody.append(new_option(level + 1, "Assignment", new_op, show_go));
+                    tbody.append(new_option(level + 1, "Assignment", new_op, show_go, "assignment_checkboxes"));
                     if (show_go) {
                         show_graph_options(level + 1,tbody);
                     }
@@ -144,15 +185,15 @@
             choose_assignment = function (obj) {
                 var tbody, level;
                 remove_following_options(obj);
-                tbody = jQuery(obj.parentElement.parentElement.parentElement.parentElement);
+                tbody = get_tbody(obj);
                 level = get_this_level(obj);
                 function team_list_load_call_back(json) {
                     var i,new_op;
                     new_op = "";
                     for (i = 0; i < json.length; i++) {
-                        new_op += json[i][0] + ":<input type='checkbox' name='" + json[i][1] + "'><br />";
+                        new_op += json[i][0] + ":<input type='checkbox' value='" + json[i][1] + "'><br />";
                     }
-                    tbody.append(new_option(level + 1, "Team", new_op, true));
+                    tbody.append(new_option(level + 1, "Team", new_op, true, "team_checkboxes"));
                     show_graph_options(level + 1,tbody);
                 }
                 jQuery.get("/analytic/team_list?assignment_id=" + obj.value,team_list_load_call_back);

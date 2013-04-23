@@ -154,8 +154,9 @@ class AssignmentController < ApplicationController
       raise "Please enter a valid Submission deadline!!"
       render :action => 'create'
     elsif (@assignment.save)
-      set_questionnaires   
-      set_limits_and_weights
+      #set_questionnaires
+      #set_limits_and_weights
+      set_assignment_questionnaires
       max_round = 1
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
@@ -461,9 +462,50 @@ class AssignmentController < ApplicationController
       end
       aq.update_attribute('questionnaire_weight',params[:weights][questionnaire.symbol])
       aq.update_attribute('user_id',user_id)
+      aq.save
     }
   end
+  # a method combines functionality of set_questionnaire and set_limits_and_weights, and it works better with paper_trail versioning
+  def set_assignment_questionnaires
+    if session[:user].role.name == "Teaching Assistant"
+      user_id = TA.get_my_instructor(session[:user]).id
+    else
+      user_id = session[:user].id
+    end
 
+    # update assignment questionnaires, if assignment questionnaire doesn't exist, create one
+    default = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)
+    params[:questionnaires].each do |key,value|
+      if value.to_i > 0 and (@q = Questionnaire.find_by_id(value))
+        if AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id,@q.id)
+          @aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id,@q.id)
+        else
+          @aq = AssignmentQuestionnaire.new(:assignment_id => @assignment.id,:questionnaire_id=> @q.id)
+        end
+        if params[:limits][@q.symbol].length > 0
+          @aq.notification_limit = params[:limits][@q.symbol]
+        else
+          @aq.notification_limit= default.notification_limit
+        end
+        @aq.questionnaire_weight= params[:weights][@q.symbol]
+        @aq.user_id=user_id
+        @aq.save!
+      end
+    end
+
+    @aqs = AssignmentQuestionnaire.find_all_by_assignment_id(@assignment.id)
+    for aq in @aqs
+      should_delete = true
+      params[:questionnaires].each do |key,value|
+        if aq.questionnaire_id.to_s == value.to_s
+          should_delete = false
+        end
+      end
+      if should_delete == true
+        aq.destroy
+      end
+    end
+  end
   #--------------------------------------------------------------------------------------------------------------------
   # GET_PATH (Helper function for CREATE and UPDATE)
   #  return the file location if there is any for the assignment
@@ -528,8 +570,9 @@ class AssignmentController < ApplicationController
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])     
       if params[:questionnaires] and params[:limits] and params[:weights]
-        set_questionnaires
-        set_limits_and_weights
+        #set_questionnaires
+        #set_limits_and_weights
+        set_assignment_questionnaires
       end
 
       begin

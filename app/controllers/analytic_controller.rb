@@ -47,6 +47,12 @@ class AnalyticController < ApplicationController
   #}
   #Chart.new(:bar, dataPoint, options2)
   def get_graph_data_bundle
+    if params[:id].nil? or params[:data_type].nil?
+      respond_to do |format|
+        format.json { render :json => nil }
+      end
+      return
+    end
     data_point = Array.new
     params[:id].each do |object_id|
       object = Object.const_get(params[:scope].capitalize).find(object_id)

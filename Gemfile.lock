@@ -2,6 +2,7 @@ GEM
   remote: http://rubygems.org/
   specs:
     RedCloth (4.2.9)
+    RedCloth (4.2.9-x86-mingw32)
     actionmailer (2.3.15)
       actionpack (= 2.3.15)
     actionpack (2.3.15)
@@ -53,6 +54,7 @@ GEM
     fastercsv (1.5.5)
     fastthread (1.0.7)
     ffi (1.7.0)
+    ffi (1.7.0-x86-mingw32)
     ffi-aspell (0.0.3)
       ffi (>= 1.0.11)
     gchart (1.0.0)
@@ -60,6 +62,8 @@ GEM
     gdata (1.1.2)
     gem_plugin (0.2.3)
     gherkin (2.7.7)
+      json (>= 1.4.6)
+    gherkin (2.7.7-x86-mingw32)
       json (>= 1.4.6)
     highline (1.6.16)
     hoptoad_notifier (2.4.11)
@@ -77,8 +81,12 @@ GEM
       daemons (>= 1.0.3)
       fastthread (>= 1.0.1)
       gem_plugin (>= 0.2.3)
+    mongrel (1.1.5-x86-mingw32)
+      cgi_multipart_eof_fix (>= 2.4)
+      gem_plugin (>= 0.2.3)
     multi_json (1.7.2)
     mysql (2.9.1)
+    mysql (2.9.1-x86-mingw32)
     net-scp (1.1.0)
       net-ssh (>= 2.6.5)
     net-sftp (2.1.1)
@@ -87,6 +95,7 @@ GEM
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
     nokogiri (1.5.9)
+    nokogiri (1.5.9-x86-mingw32)
     open-uri-cached (0.0.5)
     rack (1.1.6)
     rack-test (0.6.2)
@@ -138,6 +147,7 @@ GEM
 
 PLATFORMS
   ruby
+  x86-mingw32
 
 DEPENDENCIES
   RedCloth

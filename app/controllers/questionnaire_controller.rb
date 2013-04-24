@@ -3,16 +3,14 @@ class QuestionnaireController < ApplicationController
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
   # Generally a questionnaire is associated with an assignment (Assignment)  
-  before_filter :authorize
 
+  before_filter :authorize
 
   # determines whether the user is a ta or instructor
   # returns the instructors id, or the id of the ta's instructor
   def getInstructorId
     (session[:user]).role.name != 'Teaching Assistant' ? session[:user].id : Ta.get_my_instructor((session[:user]).id)
   end
-
-
 
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
@@ -21,11 +19,10 @@ class QuestionnaireController < ApplicationController
     questions = Question.find_all_by_questionnaire_id(params[:id])
     @questionnaire = orig_questionnaire.clone
     @questionnaire.instructor_id = getInstructorId
-    @questionnaire.name = 'Copy of '+orig_questionnaire.name
+    @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
     cloneQuestionnaireDetails(questions)
   end
-
 
   # clones the contents of a questionnaire, including the questions and associated advice
   def cloneQuestionnaireDetails(questions)
@@ -101,23 +98,23 @@ class QuestionnaireController < ApplicationController
   # Edit a questionnaire
   def edit
     begin
-        @questionnaire = Questionnaire.find(params[:id])
-        redirect_to :action => 'list' if @questionnaire == nil
+      @questionnaire = Questionnaire.find(params[:id])
+      redirect_to :action => 'list' if @questionnaire == nil
 
-        if params['save']
-            @questionnaire.update_attributes(params[:questionnaire])
-            save
-        end
-        
-        export if params['export']
-        import if params['import']
+      if params['save']
+        @questionnaire.update_attributes(params[:questionnaire])
+        save
+      end
+      
+      export if params['export']
+      import if params['import']
 
-        if params['view_advice']
-            flash[:id] = params[:id]
-            redirect_to :action => 'edit_advice', :id => params[:questionnaire][:id]
-        end
+      if params['view_advice']
+        flash[:id] = params[:id]
+        redirect_to :action => 'edit_advice', :id => params[:questionnaire][:id]
+      end
     rescue
-        flash[:error] = $!
+      flash[:error] = $!
     end
   end
 
@@ -127,29 +124,27 @@ class QuestionnaireController < ApplicationController
     csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
 
     send_data csv_data,
-              :type => 'text/csv; charset=iso-8859-1; header=present',
-              :disposition => "attachment; filename=questionnaires.csv"
+      :type => 'text/csv; charset=iso-8859-1; header=present',
+      :disposition => "attachment; filename=questionnaires.csv"
   end
 
   def import
-      @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find(params[:id])
 
-      file = params['csv']
-      questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
+    file = params['csv']
+    questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
 
-      if questions != nil and questions.length > 0
-
-          # delete the existing questions if no scores have been recorded yet
-          @questionnaire.questions.each {
-              | question |
-              raise "Cannot import new questions, scores exist" if Score.find_by_question_id(question.id)
-              if (Questionnaire.find_by_id(question.questionnaire_id).section == "Custom")
-                  QuestionType.find_by_question_id(question.id).delete
-              end
-              question.delete
-          }
-          @questionnaire.questions = questions
+    if questions != nil and questions.length > 0
+      # delete the existing questions if no scores have been recorded yet
+      @questionnaire.questions.each do |question|
+        raise "Cannot import new questions, scores exist" if Score.find_by_question_id(question.id)
+        if (Questionnaire.find_by_id(question.questionnaire_id).section == "Custom")
+            QuestionType.find_by_question_id(question.id).delete
+        end
+        question.delete
       end
+      @questionnaire.questions = questions
+    end
   end
 
   # Define a new questionnaire
@@ -189,14 +184,14 @@ class QuestionnaireController < ApplicationController
   end
 
   def save_advice
-      begin
-          for advice_key in params[:advice].keys
-              QuestionAdvice.update(advice_key, params[:advice][advice_key])
-          end
-          flash[:notice] = "The questionnaire's question advice was successfully saved"
-          #redirect_to :action => 'list'
-          redirect_to :controller => 'advice', :action => 'save_advice'
+    begin
+      for advice_key in params[:advice].keys
+        QuestionAdvice.update(advice_key, params[:advice][advice_key])
       end
+      flash[:notice] = "The questionnaire's question advice was successfully saved"
+      #redirect_to :action => 'list'
+      redirect_to :controller => 'advice', :action => 'save_advice'
+    end
   end
 
   # Toggle the access permission for this assignment from public to private, or vice versa
@@ -208,7 +203,7 @@ class QuestionnaireController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
-  private
+private
 
   #save questionnaire object after create or edit
   def save
@@ -236,56 +231,56 @@ class QuestionnaireController < ApplicationController
 
   # save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id)
-      if params[:new_question]
-          # The new_question array contains all the new questions
-          # that should be saved to the database
-          for question_key in params[:new_question].keys
-              q = Question.new(params[:new_question][question_key])
-              q.questionnaire_id = questionnaire_id
-              if q.true_false == ''
-                  q.true_false = false
-              end
-              unless q.txt.strip.empty?
-                  q.save
-                  questionnaire = Questionnaire.find_by_id(questionnaire_id)
-                  if questionnaire.section == "Custom"
-                      for i in (questionnaire.min_question_score .. questionnaire.max_question_score)
-                          a = QuestionAdvice.new(:score => i, :advice => nil)
-                          a.question_id = q.id
-                          a.save
-                      end
-                      save_new_question_parameters(q.id, question_key)
-                  end
-              end
+    if params[:new_question]
+      # The new_question array contains all the new questions
+      # that should be saved to the database
+      for question_key in params[:new_question].keys
+        q = Question.new(params[:new_question][question_key])
+        q.questionnaire_id = questionnaire_id
+        if q.true_false == ''
+          q.true_false = false
+        end
+        unless q.txt.strip.empty?
+          q.save
+          questionnaire = Questionnaire.find_by_id(questionnaire_id)
+          if questionnaire.section == "Custom"
+            for i in (questionnaire.min_question_score .. questionnaire.max_question_score)
+              a = QuestionAdvice.new(:score => i, :advice => nil)
+              a.question_id = q.id
+              a.save
+            end
+            save_new_question_parameters(q.id, question_key)
           end
+        end
       end
+    end
   end
 
   # delete questions from a questionnaire
   # @param [Object] questionnaire_id
   def delete_questions(questionnaire_id)
-      # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-      questions = Question.find(:all, :conditions => "questionnaire_id = " + questionnaire_id.to_s)
-      for question in questions
-          should_delete = true
-          if params[:question] != nil
-              for question_key in params[:question].keys
-                  if question_key.to_s === question.id.to_s
-                      should_delete = false
-                  end
-              end
+    # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
+    questions = Question.find(:all, :conditions => "questionnaire_id = " + questionnaire_id.to_s)
+    for question in questions
+      should_delete = true
+      if params[:question] != nil
+        for question_key in params[:question].keys
+          if question_key.to_s === question.id.to_s
+            should_delete = false
           end
-          if should_delete
-              for advice in question.question_advices
-                  advice.destroy
-              end
-              if Questionnaire.find_by_id(questionnaire_id).section == "Custom"
-                  question_type = QuestionType.find_by_question_id(question.id)
-                  question_type.destroy
-              end
-              question.destroy
-          end
+        end
       end
+      if should_delete
+        for advice in question.question_advices
+          advice.destroy
+        end
+        if Questionnaire.find_by_id(questionnaire_id).section == "Custom"
+          question_type = QuestionType.find_by_question_id(question.id)
+          question_type.destroy
+        end
+        question.destroy
+      end
+    end
   end
 
   # @param [Object] question_type_key
@@ -294,7 +289,7 @@ class QuestionnaireController < ApplicationController
     this_q.parameters = params[:q][question_type_key][:parameters]
 
     if params[:q][question_type_key][:q_type] == "0"
-        this_q.q_type =  Question::GRADING_TYPES_CUSTOM[0][0]
+      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[0][0]
     elsif params[:q][question_type_key][:q_type] == "1"
       this_q.q_type =  Question::GRADING_TYPES_CUSTOM[1][0]
     elsif params[:q][question_type_key][:q_type] == "2"

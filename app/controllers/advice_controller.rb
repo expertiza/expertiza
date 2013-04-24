@@ -40,6 +40,4 @@ class AdviceController < ApplicationController
       render :action => 'edit_advice'
     end
   end
-
-
 end

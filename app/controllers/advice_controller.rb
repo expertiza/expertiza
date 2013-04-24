@@ -12,7 +12,7 @@ class AdviceController < ApplicationController
         num_questions = @questionnaire.max_question_score - @questionnaire.min_question_score
       end
 
-      sorted_advice = question.question_advices.sort {|x,y| y.score <=> x.score }
+      sorted_advice = question.question_advices.sort_by { |x| -x.score }
       if question.question_advices.length != num_questions or
           sorted_advice[0].score != @questionnaire.min_question_score or
           sorted_advice[sorted_advice.length-1] != @questionnaire.max_question_score

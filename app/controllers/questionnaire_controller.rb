@@ -6,63 +6,16 @@ class QuestionnaireController < ApplicationController
 
   before_filter :authorize
 
-  # determines whether the user is a ta or instructor
-  # returns the instructors id, or the id of the ta's instructor
-  def getInstructorId
-    (session[:user]).role.name != 'Teaching Assistant' ? session[:user].id : Ta.get_my_instructor((session[:user]).id)
-  end
-
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
   def copy
     orig_questionnaire = Questionnaire.find(params[:id])
     questions = Question.find_all_by_questionnaire_id(params[:id])
     @questionnaire = orig_questionnaire.clone
-    @questionnaire.instructor_id = getInstructorId
+    @questionnaire.instructor_id = session[:user].instructor_id
     @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
-    cloneQuestionnaireDetails(questions)
-  end
-
-  # clones the contents of a questionnaire, including the questions and associated advice
-  def cloneQuestionnaireDetails(questions)
-    begin
-      @questionnaire.save!
-      @questionnaire.update_attribute('created_at', Time.now)
-
-      questions.each do |question|
-
-        newquestion = question.clone
-        newquestion.questionnaire_id = @questionnaire.id
-        newquestion.save
-
-        advice = QuestionAdvice.find_by_question_id(question.id)
-        unless advice.nil?
-          newadvice = advice.clone
-          newadvice.question_id = newquestion.id
-          newadvice.save
-        end
-
-        if @questionnaire.section == "Custom"
-          old_question_type = QuestionType.find_by_question_id(question.id)
-          unless old_question_type.nil?
-            new_question_type = old_question_type.clone
-            new_question_type.question_id = newquestion.id
-            new_question_type.save
-          end
-        end
-      end
-    
-      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
-      parent = FolderNode.find_by_node_object_id(pFolder.id)
-      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id, @questionnaire.id) == nil
-        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end
-      redirect_to :controller => 'questionnaire', :action => 'view', :id => @questionnaire.id
-    rescue
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
-      redirect_to :action => 'list', :controller => 'tree_display'
-    end
+    clone_questionnaire_details(questions)
   end
 
   # Remove a given questionnaire
@@ -115,35 +68,6 @@ class QuestionnaireController < ApplicationController
       end
     rescue
       flash[:error] = $!
-    end
-  end
-
-  def export
-    @questionnaire = Questionnaire.find(params[:id])
-
-    csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
-
-    send_data csv_data,
-      :type => 'text/csv; charset=iso-8859-1; header=present',
-      :disposition => "attachment; filename=questionnaires.csv"
-  end
-
-  def import
-    @questionnaire = Questionnaire.find(params[:id])
-
-    file = params['csv']
-    questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
-
-    if questions != nil and questions.length > 0
-      # delete the existing questions if no scores have been recorded yet
-      @questionnaire.questions.each do |question|
-        raise "Cannot import new questions, scores exist" if Score.find_by_question_id(question.id)
-        if (Questionnaire.find_by_id(question.questionnaire_id).section == "Custom")
-            QuestionType.find_by_question_id(question.id).delete
-        end
-        question.delete
-      end
-      @questionnaire.questions = questions
     end
   end
 
@@ -335,6 +259,79 @@ private
           update_question_type(question_type_key)
         end
       end
+    end
+  end
+
+private
+
+  # FIXME: These private methods belong in the Questionnaire model
+
+  def export
+    @questionnaire = Questionnaire.find(params[:id])
+
+    csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
+
+    send_data csv_data,
+      :type => 'text/csv; charset=iso-8859-1; header=present',
+      :disposition => "attachment; filename=questionnaires.csv"
+  end
+
+  def import
+    @questionnaire = Questionnaire.find(params[:id])
+
+    file = params['csv']
+    questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
+
+    if questions != nil and questions.length > 0
+      # delete the existing questions if no scores have been recorded yet
+      @questionnaire.questions.each do |question|
+        raise "Cannot import new questions, scores exist" if Score.find_by_question_id(question.id)
+        if (Questionnaire.find_by_id(question.questionnaire_id).section == "Custom")
+            QuestionType.find_by_question_id(question.id).delete
+        end
+        question.delete
+      end
+      @questionnaire.questions = questions
+    end
+  end
+
+  # clones the contents of a questionnaire, including the questions and associated advice
+  def clone_questionnaire_details(questions)
+    begin
+      @questionnaire.save!
+      @questionnaire.update_attribute('created_at', Time.now)
+
+      questions.each do |question|
+        newquestion = question.clone
+        newquestion.questionnaire_id = @questionnaire.id
+        newquestion.save
+
+        advice = QuestionAdvice.find_by_question_id(question.id)
+        unless advice.nil?
+          newadvice = advice.clone
+          newadvice.question_id = newquestion.id
+          newadvice.save
+        end
+
+        if @questionnaire.section == "Custom"
+          old_question_type = QuestionType.find_by_question_id(question.id)
+          unless old_question_type.nil?
+            new_question_type = old_question_type.clone
+            new_question_type.question_id = newquestion.id
+            new_question_type.save
+          end
+        end
+      end
+
+      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
+      parent = FolderNode.find_by_node_object_id(pFolder.id)
+      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id, @questionnaire.id) == nil
+        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+      end
+      redirect_to :controller => 'questionnaire', :action => 'view', :id => @questionnaire.id
+    rescue
+      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
+      redirect_to :action => 'list', :controller => 'tree_display'
     end
   end
 end

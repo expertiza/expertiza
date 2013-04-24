@@ -167,3 +167,6 @@ log/
 .bundle/
 # Kaleidoscope
 *.orig
+
+# RubyMine
+.idea

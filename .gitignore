@@ -9,4 +9,5 @@ pg_development.png
 .rvmrc
 .idea
 capybara-*html
+config/database.yml
 *~

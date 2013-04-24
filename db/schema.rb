@@ -52,10 +52,10 @@ ActiveRecord::Schema.define(:version => 20130403182858) do
     t.string   "review_assignment_strategy"
     t.integer  "max_reviews_per_submission"
     t.integer  "review_topic_threshold",            :default => 0
+    t.boolean  "availability_flag"
     t.boolean  "copy_flag",                         :default => false
     t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "microtask",                         :default => false
-    t.boolean  "availability_flag"
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -276,9 +276,9 @@ ActiveRecord::Schema.define(:version => 20130403182858) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",                     :null => false
+    t.string  "q_type",      :default => "", :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1, :null => false
+    t.integer "question_id", :default => 1,  :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -294,8 +294,8 @@ ActiveRecord::Schema.define(:version => 20130403182858) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.string   "section"
     t.text     "instruction_loc"
+    t.string   "section"
   end
 
   create_table "questions", :force => true do |t|
@@ -322,6 +322,7 @@ ActiveRecord::Schema.define(:version => 20130403182858) do
     t.text     "additional_comment"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "version_num"
   end
 
   add_index "responses", ["map_id"], :name => "fk_response_response_map"

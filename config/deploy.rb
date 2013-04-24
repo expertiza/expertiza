@@ -20,14 +20,15 @@ set :runner, "www-data"
 
 desc "Run tasks in staging enviroment."
 task :staging do
-  puts "*** Deploying to the \033[1;42m  STAGING  \033[0m server!"
+  puts "*** Using the \033[1;42m STAGING \033[0m server!"
   role :web, "test.expertiza.csc.ncsu.edu"
   role :app, "test.expertiza.csc.ncsu.edu"
   role :cron, "test.expertiza.csc.ncsu.edu"
   role :db,  "test.expertiza.csc.ncsu.edu", :primary => true # This is where Rails migrations will run
   
   set :user do
-    user = Capistrano::CLI.ui.ask "User to log in as: "
+    puts "\033[32mYou need to log in. This is generally your user ID.\033[0m"
+    user = Capistrano::CLI.ui.ask "Login: "
   end
   
   set :branch do
@@ -41,14 +42,15 @@ end
 
 desc "Run tasks in staging enviroment."
 task :production do
-  puts "*** Deploying to the \033[1;41m  PRODUCTION  \033[0m servers!"
+  puts "*** Using the \033[1;41m PRODUCTION \033[0m server!"
   role :web, "expertiza.ncsu.edu"
   role :app, "expertiza.ncsu.edu"
   role :cron, "expertiza.ncsu.edu"
   role :db,  "expertiza.ncsu.edu", :primary => true # This is where Rails migrations will run
   
   set :user do
-    user = Capistrano::CLI.ui.ask "User to log in as: "
+    puts "\033[32mYou need to log in. This is generally your user ID.\033[0m"
+    user = Capistrano::CLI.ui.ask "Login: "
   end
   
   set :branch do

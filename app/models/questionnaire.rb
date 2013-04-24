@@ -27,56 +27,60 @@ class Questionnaire < ActiveRecord::Base
         return 0
       end
     end
-    
-    # Does this questionnaire contain true/false questions?
-    def true_false_questions?
-      for question in questions
-        if question.true_false
-          return true
-        end
+  end
+
+  # Does this questionnaire contain true/false questions?
+  def true_false_questions?
+    for question in questions
+      if question.true_false
+        return true
       end
-      
-      return false
-    end
-    
-    def delete
-      self.assignments.each{
-        | assignment |
-        raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
-      }
-      
-      self.questions.each{
-        | question |
-          question.delete        
-      }
-       
-     
-      node = QuestionnaireNode.find_by_node_object_id(self.id)
-      if node
-        node.destroy
-      end
-                
-      self.destroy      
     end
 
-    
-    def max_possible_score
-      results = Questionnaire.find_by_sql("SELECT (SUM(q.weight)*rs.max_question_score) as max_score FROM  questions q, questionnaires rs WHERE q.questionnaire_id = rs.id AND rs.id = #{self.id}")
-      return results[0].max_score
+    return false
+  end
+
+  def delete
+    self.assignments.each {
+        |assignment|
+      raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+    }
+
+    self.questions.each {
+        |question|
+      question.delete
+    }
+
+
+    node = QuestionnaireNode.find_by_node_object_id(self.id)
+    if node
+      node.destroy
     end
-    
-    # validate the entries for this questionnaire
-    def validate  
-      if max_question_score < 1
-        errors.add(:max_question_score, "The maximum question score must be a positive integer.") 
-      end
-      if min_question_score >= max_question_score
-        errors.add(:min_question_score, "The minimum question score must be less than the maximum")
-      end
-      
-      results = Questionnaire.find(:all, 
-                            :conditions => ["id <> ? and name = ? and instructor_id = ?", 
-                            id, name, instructor_id])
-      errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
-  end    
+
+    self.destroy
+  end
+
+
+  def max_possible_score
+    results = Questionnaire.find_by_sql("SELECT (SUM(q.weight)*rs.max_question_score) as max_score FROM  questions q, questionnaires rs WHERE q.questionnaire_id = rs.id AND rs.id = #{self.id}")
+    return results[0].max_score
+  end
+
+  # validate the entries for this questionnaire
+  def validate
+    if max_question_score < 1
+      errors.add(:max_question_score, "The maximum question score must be a positive integer.")
+    end
+    if min_question_score >= max_question_score
+      errors.add(:min_question_score, "The minimum question score must be less than the maximum")
+    end
+
+    results = Questionnaire.find(:all,
+                                 :conditions => ["id <> ? and name = ? and instructor_id = ?",
+                                                 id, name, instructor_id])
+    errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
+  end
+
+  require 'models/analytic/questionnaire_analytic'
+  include QuestionnaireAnalytic
 end

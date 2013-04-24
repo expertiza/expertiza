@@ -251,4 +251,7 @@ class AssignmentTeam < Team
     end
     fields.push("Assignment Name")
   end
+
+  require 'models/analytic/assignment_team_analytic'
+  include AssignmentTeamAnalytic
 end  

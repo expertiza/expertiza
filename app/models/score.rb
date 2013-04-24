@@ -116,8 +116,6 @@ class Score < ActiveRecord::Base
     }
     end
 
-     #if due_dates.size!=0
-      #if(@response.created_at < next_ele.due_at and @response.cycle == 1)
       @invalid=0
     #else
      # @invalid =1

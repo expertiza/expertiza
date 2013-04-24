@@ -9,9 +9,6 @@ class GradesController < ApplicationController
   #It also gives a final score which is an average of all the reviews and greatest difference
   #in the scores of all the reviews.  
   def view
-
-
-
     @assignment = Assignment.find(params[:id])
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
@@ -32,27 +29,19 @@ class GradesController < ApplicationController
       @weighted_submissions = Hamer.calculate_weighted_scores_and_reputation(submissions, reviewers)[:submissions]
       @post_review_deadline = true
     end
-
-
     #this is where we calculate and display reputation per person
-
-
     #puts "-----------------------------------------------------------"
     #@weighted_submissions = Hamer.calculate_weighted_scores_and_reputation(submissions, reviewers)[:submissions]
-
     @thisReputation =  "ADD REPUTATION HERE"
   end
 
   def view_my_scores
-
-
     @thisReputation = "grades_controller/view_my_scores"
     #Hamer.calculate_weighted_scores_and_reputation(Assignment.find(449).participants, Assignment.find(449).users)
     @participant = AssignmentParticipant.find(params[:id])
     return if redirect_when_disallowed
     @assignment = @participant.assignment
     @due_dates= DueDate.find(:all, :conditions => ["assignment_id = ? and deadline_type_id = ? ", @assignment.id,2])
-
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {

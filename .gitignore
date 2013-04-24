@@ -165,6 +165,5 @@ capybara-*
 log/
 # rbenv
 .bundle/
-.ruby-version
 # Kaleidoscope
 *.orig

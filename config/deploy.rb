@@ -1,8 +1,13 @@
 require 'bundler/capistrano'
 
+task :alldos2unix do
+  `find ./*`.split("\n").each do |str|
+    `dos2unix #{str}`
+  end
+end
+
 set :application, "expertiza"
 set :repository,  "git://github.com/expertiza/expertiza.git"
-set :user, "rails"
 set :use_sudo, false
 
 set :scm, :git
@@ -21,6 +26,10 @@ task :staging do
   role :cron, "test.expertiza.csc.ncsu.edu"
   role :db,  "test.expertiza.csc.ncsu.edu", :primary => true # This is where Rails migrations will run
   
+  set :user do
+    user = Capistrano::CLI.ui.ask "User to log in as: "
+  end
+  
   set :branch do
     default_branch = 'staging'
     
@@ -37,6 +46,10 @@ task :production do
   role :app, "expertiza.ncsu.edu"
   role :cron, "expertiza.ncsu.edu"
   role :db,  "expertiza.ncsu.edu", :primary => true # This is where Rails migrations will run
+  
+  set :user do
+    user = Capistrano::CLI.ui.ask "User to log in as: "
+  end
   
   set :branch do
     default_branch = 'production'
@@ -66,15 +79,16 @@ end
 
 after "deploy:update_code", "deploy:symlink_shared"
 
-desc "Load production data into the local development database."
-task :load_production_data, :roles => :db, :only => { :primary => true } do
+desc "Load data into the local development database."
+task :load_data, :roles => :db, :only => { :primary => true } do
   require 'yaml'
  
   database = YAML::load_file('config/database.yml')
   filename = "dump.#{Time.now.strftime '%Y-%m-%d_%H:%M:%S'}.sql.gz"
+  command = "mysqldump -u #{database['production']['username']} --password=#{database['production']['password']} #{database['production']['database']} --add-drop-table | gzip > /tmp/#{filename}"
  
   on_rollback { delete "/tmp/#{filename}" }
-  run "mysqldump -u #{database['production']['username']} --password=#{database['production']['password']} #{database['production']['database']} --add-drop-table | gzip > /tmp/#{filename}" do |channel, stream, data|
+  run command do |channel, stream, data|
     puts data
   end
 

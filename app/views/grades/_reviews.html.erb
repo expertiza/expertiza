@@ -1,6 +1,6 @@
 <% if rscore and rscore[:assessments].length > 0 %>
     <BR/>
-    <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer"}%>
+    <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer", :weighted_submission => @weighted_submissions[participant.id]}%>
     <BR/>
     <HR/>
     <% count = 0 %>

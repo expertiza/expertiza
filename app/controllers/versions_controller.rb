@@ -7,7 +7,7 @@ class VersionsController < ApplicationController
     @versions.each do |v|
       if v.item
         if v.item.versions.last.whodunnit.to_i != session[:user].id
-          flash[:note] = "User #{User.find(v.item.versions.last.whodunnit).name} already edited this item."
+          flash[:note] = "User #{User.find(v.item.versions.last.whodunnit).name} edited this item since your last edit. "
           redirect_to :back
         end
       end

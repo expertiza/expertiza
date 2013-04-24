@@ -1,5 +1,10 @@
 class Questionnaire < ActiveRecord::Base
-    # for doc on why we do it this way, 
+
+  def get_weighted_score(assignment, scores)
+    return compute_weighted_score(self.symbol, assignment, scores)
+  end
+
+  # for doc on why we do it this way,
     # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
     has_many :questions # the collection of questions associated with this Questionnaire
     belongs_to :instructor, :class_name => "User", :foreign_key => "instructor_id" # the creator of this questionnaire

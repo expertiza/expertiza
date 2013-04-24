@@ -11,7 +11,5 @@ class MetareviewQuestionnaire < Questionnaire
     participant.get_metareviews()  
   end  
   
-  def get_weighted_score(assignment, scores)
-    return compute_weighted_score(self.symbol, assignment, scores)
-  end 
+
 end

@@ -23,13 +23,13 @@ test: &test
   adapter: mysql
   database: pg_test
   username: expertiza
-  password: 
+  password:
 
 production:
   adapter: mysql
   database: pg_development
   username: expertiza
-  password: 
+  password:
 
 cucumber:
   <<: *test

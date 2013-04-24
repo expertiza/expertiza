@@ -7,7 +7,7 @@ class MetareviewQuestionnaire < Questionnaire
     return "metareview".to_sym
   end
   
-  def get_metareviews_for(participant)
+  def get_assessments_for(participant)
     participant.get_metareviews()  
   end  
   

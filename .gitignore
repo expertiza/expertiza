@@ -1,5 +1,4 @@
 log
-/config/database.yml
 tmp
 *.swp
 pg_data

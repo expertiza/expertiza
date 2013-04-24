@@ -12,7 +12,6 @@ Permission.create(:name => 'administer assignments')
 Permission.create(:name => 'do assignments')
 Permission.create(:name => 'administer instructors')
 Permission.create(:name => 'administer courses')
-Permission.create(:name => 'advice')
 
 ###### markup_styles
 MarkupStyle.create(:name => 'Textile')
@@ -34,6 +33,7 @@ SiteController.create(:name => 'admin', :builtin => false, :permission_id => Per
 SiteController.create(:name => 'course', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'assignment', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'questionnaire', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
+SiteController.create(:name => 'advice', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'participants', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'reports', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
 SiteController.create(:name => 'institution', :builtin => false, :permission_id => Permission.find_by_name('administer pg').id)
@@ -65,8 +65,6 @@ SiteController.create(:name => 'sign_up_sheet', :builtin => false, :permission_i
 SiteController.create(:name => 'suggestion', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'leaderboard', :builtin => false, :permission_id => Permission.find_by_name('public actions - execute').id)
 SiteController.create(:name => 'delete_object', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
-SiteController.create(:name => 'edit_advice', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
-SiteController.create(:name => 'save_advice', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 
 ###### content_pages
 ContentPage.create(:title => 'Home Page', :name => 'home', :markup_style_id => MarkupStyle.find_by_name('Textile').id, :permission_id => Permission.find_by_name('public pages - view').id,
@@ -164,8 +162,8 @@ ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('suggestion').id, :name => 'create', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('suggestion').id, :name => 'new', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('leaderboard').id, :name => 'index', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('edit_advice').id, :name => 'edit_advice', :permission_id => Permission.find_by_name('advice').id, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('save_advice').id, :name => 'save_advice', :permission_id => Permission.find_by_name('advice').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('advice').id, :name => 'edit_advice', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('advice').id, :name => 'save_advice', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
 
 ###### menu_items
 MenuItem.create(:parent_id => nil, :name => 'home', :label => 'Home', :seq => 1, :content_page_id => ContentPage.find_by_name('home').id, 
@@ -272,8 +270,8 @@ SystemSettings.create(:site_name => 'Expertiza',
 
 ###### users
 # Default administrator
-puts "Creating admin user with password 'admin'"
-User.create!(:name => 'admin',
+puts "Find or create admin user with password 'admin'"
+tu = User.find_by_name('admin') || User.create!(:name => 'admin',
              :email => 'anything@mailinator.com',
              :clear_password => 'admin',
              :clear_password_confirmation => 'admin',
@@ -283,7 +281,6 @@ User.create!(:name => 'admin',
              :email_on_review_of_review => true, 
              :is_new_user => false, 
              :master_permission_granted => false)
-tu = User.find_by_name('admin')
 tu.parent_id = tu.id
 tu.save!
 

@@ -23,7 +23,7 @@ class Assignment < ActiveRecord::Base
   # has_many :responses, :through => :response_maps, :source => 'response'
 
   validates_presence_of :name
-  validates_uniqueness_of :scope => [:directory_path, :instructor_id]
+  validates_uniqueness_of :directory_path, :scope => :instructor_id
 
   COMPLETE = "Complete"
 

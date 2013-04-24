@@ -22,15 +22,11 @@ class AssignmentTest < ActiveSupport::TestCase
 
   # Scope of the assignment is defined by the a combination of the directory_path and instructor_id
   def test_uniqueness_scope
-    a = Assignment.new
-    b = Assignment.new
-    a.directory_path = "Home"
-    a.instructor_id = 1
-    b.directory_path = "Home"
-    b.instructor_id = 1
-
+    a = Assignment.create! :name => 'a', :directory_path => "Home", :instructor_id => 1
+    b = Assignment.create :name => 'b', :directory_path => "Home", :instructor_id => 1
     assert !b.valid?
-    end
+    assert b.errors.invalid?(:directory_path)
+  end
     
   #duplicate names must not be present
   def test_duplicate_name
@@ -39,6 +35,7 @@ class AssignmentTest < ActiveSupport::TestCase
     a.course_id = 1
     a.instructor_id = 1
     a.name = "Sam"
+    a.save
 
     assert !a.duplicate_name?
   end

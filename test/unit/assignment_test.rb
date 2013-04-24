@@ -1,60 +1,14 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class AssignmentTest < ActiveSupport::TestCase
-  fixtures :assignments, :assignment_questionnaires, :questionnaires, :courses, :questions, :response_maps, :responses
 
-  def test_get_metareview_questionnaire_id()
-    assignment = assignments(:assignment5)
-    assert_equal questionnaires(:questionnaire2).id,assignment.get_metareview_questionnaire_id()
-  end
+  fixtures :questionnaires, :assignments
 
   def setup
     # Database was initialized with (at least) 3 questionnaires.
     @questionnaire1 = Questionnaire.find(questionnaires(:questionnaire1).id)
     @questionnaire2 = Questionnaire.find(questionnaires(:questionnaire2).id)
     @questionnaire3 = Questionnaire.find(questionnaires(:questionnaire3).id)
-  end
-
-  def test_get_assignments_for_course()
-    assert_equal [assignments(:assignment1)],Assignment.get_assignments_for_course(courses(:course1))
-  end
-
-  def test_get_review_comments()
-    response_type = ["TeamReviewResponseMap","ParticipantReviewResponseMap","ReviewResponseMap"]
-    assignment = assignments(:assignment2)
-    assert_equal [],assignment.get_review_comments(response_type)
-  end
-
-  def test_average_tokens()
-    assignment = assignments(:assignment0)
-    assert_equal 5,assignment.average_tokens(["This is a test review"])
-    assert_equal 1,assignment.average_tokens(["TeSt test"])
-    assert_equal 3.0,assignment.average_tokens(["This is a test review","TEST test"])
-  end
-
-  def test_get_review_questions()
-    assignment = assignments(:assignment2)
-    assert_equal [questions(:question1).txt],assignment.get_review_questions("ReviewQuestionnaire")
-  end
-
-  def test_count_average_subquestions()
-    assignment = assignments(:assignment2)
-    assert_equal 1,assignment.count_average_subquestions("ReviewQuestionnaire")
-  end
-
-  def test_get_number_of_reviewers()
-    assignment = assignments(:assignment2)
-    assert_equal 0,assignment.get_number_of_reviewers("ReviewQuestionnaire")
-  end
-
-  def test_count_questions()
-    assignment = assignments(:assignment2)
-    assert_equal 1,assignment.count_questions("ReviewQuestionnaire")
-  end
-
-  def test_get_average_num_of_reviews()
-    assignment = assignments(:assignment2)
-    assert_equal 1,assignment.get_average_num_of_reviews(["TeamReviewResponseMap","ParticipantReviewResponseMap","ReviewResponseMap"])
   end
 
   def test_invalid_with_empty_attributes
@@ -91,6 +45,7 @@ class AssignmentTest < ActiveSupport::TestCase
   end
 
   def test_validate_name
+
     # Create a new assignment
     a = Assignment.new
     # Assignment should not be valid, because some fields have not been created.
@@ -109,7 +64,7 @@ class AssignmentTest < ActiveSupport::TestCase
     b.instructor_id = 1
 
     assert !b.valid?
-  end
+    end
     
   #duplicate names must not be present
   def test_duplicate_name
@@ -137,7 +92,7 @@ class AssignmentTest < ActiveSupport::TestCase
   def test_get_review_questionnaire_id
     a = Assignment.new
     assert !a.get_review_questionnaire_id
-  end
+    end
 
   def test_compute__scores
     a = Assignment.new

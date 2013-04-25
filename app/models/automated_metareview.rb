@@ -25,12 +25,12 @@ class AutomatedMetareview < ActiveRecord::Base
     
     speller = Aspell.new("en_US")
     speller.suggestion_mode = Aspell::NORMAL
-    @review_array = preprocess.check_correct_spellings(@review_array, speller)
+    #@review_array = preprocess.check_correct_spellings(@review_array, speller)
     # puts "printing review_array"
-    @review_array.each{
-      |rev|
-      puts rev
-    }
+    #@review_array.each{
+      #|rev|
+      #puts rev
+    #}
     
     #checking for plagiarism by comparing with question and responses
     plag_instance = PlagiarismChecker.new
@@ -47,7 +47,7 @@ class AutomatedMetareview < ActiveRecord::Base
       self.tone_negative = 0
       self.tone_neutral =  0
       self.plagiarism = true
-      # puts "All responses are copied!!"
+      #puts "All responses are copied!!"
       return
     elsif(result_comparison == SOME_RESPONSES_PLAGIARISED)
       self.plagiarism = true
@@ -61,15 +61,14 @@ class AutomatedMetareview < ActiveRecord::Base
       self.plagiarism = false
     end
     
-    # puts "length of review array after google check - #{@review_array.length}"
+    #puts "length of review array after google check - #{@review_array.length}"
     
     if(@review_array.length > 0)
       #formatting the review responses, segmenting them at punctuations
       review_text = preprocess.segment_text(0, @review_array)
-      
       #removing quoted text from reviews
       review_text = preprocess.remove_text_within_quotes(review_text) #review_text is an array
-      
+            
       #fetching submission data as an array and segmenting them at punctuations    
       subm_text = preprocess.segment_text(0, preprocess.fetch_submission_data(map_id))
       # puts "subm_text #{subm_text}"
@@ -87,7 +86,7 @@ class AutomatedMetareview < ActiveRecord::Base
       #calculating end time
       end_time = Time.now
       relevance_time = end_time - beginning_time
-      # puts "************* relevance_time - #{relevance_time}"      
+      #puts "************* relevance_time - #{relevance_time}"      
       
       #---------    
       # checking for plagiarism
@@ -101,7 +100,7 @@ class AutomatedMetareview < ActiveRecord::Base
         end
         end_time = Time.now
         plagiarism_time = end_time - beginning_time
-        # puts "************* plagiarism_time - #{plagiarism_time}"
+        #puts "************* plagiarism_time - #{plagiarism_time}"
       end
       #---------      
       #content
@@ -118,7 +117,7 @@ class AutomatedMetareview < ActiveRecord::Base
       self.content_summative = content_probs[0]# * 10000).round.to_f/10000
       self.content_problem = content_probs[1] #* 10000).round.to_f/10000
       self.content_advisory = content_probs[2] #* 10000).round.to_f/10000
-      # puts "************* content_time - #{content_time}"
+      #puts "************* content_time - #{content_time}"
       #---------    
       # tone
       beginning_time = Time.now
@@ -131,7 +130,7 @@ class AutomatedMetareview < ActiveRecord::Base
       #self.tone = "POSITIVE - #{(tone_array[0]* 10000).round.to_f/10000}, NEGATIVE - #{(tone_array[1]* 10000).round.to_f/10000}, NEUTRAL - #{(tone_array[2]* 10000).round.to_f/10000}"
       end_time = Time.now
       tone_time = end_time - beginning_time
-      # puts "************* tone_time - #{tone_time}"
+      #puts "************* tone_time - #{tone_time}"
       # #---------
       # quantity
       beginning_time = Time.now
@@ -139,7 +138,7 @@ class AutomatedMetareview < ActiveRecord::Base
       self.quantity = quant.number_of_unique_tokens(review_text)
       end_time = Time.now
       quantity_time = end_time - beginning_time
-      # puts "************* quantity_time - #{quantity_time}"
+      #puts "************* quantity_time - #{quantity_time}"
       # #---------     
       # # fetch version_num for this new response_id if previous versions of this response already exists in the table
       @metas = AutomatedMetareview.find(:first, :conditions => ["response_id = ?", self.response_id], :order => "version_num DESC")

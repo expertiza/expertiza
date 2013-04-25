@@ -1,5 +1,7 @@
+
 class Assignment < ActiveRecord::Base
   include DynamicReviewMapping
+
 
   belongs_to :course
   belongs_to :wiki_type
@@ -17,7 +19,7 @@ class Assignment < ActiveRecord::Base
   has_many :assignment_questionnaires
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
-  has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
+  has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy  
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
   # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
   # has_many :responses, :through => :response_maps, :source => 'response'
@@ -124,13 +126,16 @@ class Assignment < ActiveRecord::Base
   end
 
   def contributors
-    #ACS Contributors are just teams, so removed check to see if it is a team assignment
-    @contributors ||= teams #ACS
+    @contributors ||= team_assignment ? teams : participants
   end
 
+  def set_instructor(user_id)
+    self.instructor_id = user_id
+  end
+
+
   def review_mappings
-    #ACS Reviews must be mapped just for teams, so removed check to see if it is a team assignment
-    @review_mappings ||= team_review_mappings #ACS
+    @review_mappings ||= team_assignment ? team_review_mappings : participant_review_mappings
   end
 
   def assign_metareviewer_dynamically(metareviewer)
@@ -198,9 +203,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def review_mappings
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+    if team_assignment
+      TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+    else
+      ParticipantReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+    end
   end
   
   def metareview_mappings
@@ -218,13 +225,22 @@ class Assignment < ActiveRecord::Base
   def get_scores(questions)
     scores = Hash.new
 
-    scores[:participants] = Hash.new    
+    scores[:participants] = Hash.new
     self.participants.each{
       | participant |
-      scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
-    }
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
+      scores[:participants][participant.id.to_s.to_sym] = Hash.new
+      scores[:participants][participant.id.to_s.to_sym][:participant] = participant
+      questionnaires.each{
+        | questionnaire |
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+
+      }
+      scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
+    }        
+    
+    if self.team_assignment
       scores[:teams] = Hash.new
       index = 0
       self.teams.each{
@@ -233,12 +249,12 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:team] = team
         assessments = TeamReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
-        #... = ScoreCache.get_participant_score(team, id, questionnaire.display_type)
         index += 1
       }
+    end
     return scores
   end
-  
+
   def get_contributor(contrib_id)
     if team_assignment
       return AssignmentTeam.find(contrib_id)
@@ -378,9 +394,11 @@ class Assignment < ActiveRecord::Base
   
     # Get all review mappings for this assignment & author
     participant = AssignmentParticipant.find(author_id)
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    author = participant.team
+    if team_assignment
+      author = participant.team
+    else
+      author = participant
+    end
     
     for mapping in author.review_mappings
 
@@ -425,11 +443,6 @@ class Assignment < ActiveRecord::Base
  # It appears that this method is not used at present!
  def is_wiki_assignment
    return (self.wiki_type_id > 1)
- end
-
- # Check to see if assignment is a microtask
- def is_microtask?
-   return (self.microtask.nil?) ? False : self.microtask
  end
  
  #
@@ -556,11 +569,14 @@ def add_participant(user_name)
     end
  end  
   
- def assign_reviewers(mapping_strategy)
-   #ACS Always assign reviewers for a team
-   #removed check to see if it is a team assignment
-   #defined in DynamicReviewMapping module
-   assign_reviewers_for_team(mapping_strategy)
+ def assign_reviewers(mapping_strategy)  
+      if (team_assignment)      
+          #defined in DynamicReviewMapping module
+          assign_reviewers_for_team(mapping_strategy)
+      else          
+          #defined in DynamicReviewMapping module
+          assign_individual_reviewer(mapping_strategy) 
+      end  
   end  
 
 #this is for staggered deadline assignments or assignments with signup sheet
@@ -586,9 +602,11 @@ end
     review_questionnaire_id = get_review_questionnaire_id()
     @questions = Question.find(:all, :conditions =>["questionnaire_id = ?", review_questionnaire_id])
     @review_scores = Hash.new
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    @response_type = "TeamReviewResponseMap"
+    if (self.team_assignment)
+      @response_type = "TeamReviewResponseMap"
+    else
+      @response_type = "ParticipantReviewResponseMap"
+    end
 
 
     @myreviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", self.id, @type] )

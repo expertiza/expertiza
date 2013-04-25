@@ -126,7 +126,6 @@ student1:
   email_on_review: 1
   master_permission_granted: 1
   handle: stu1
-  is_new_user: 0
   
 student2:
   parent_id: <%= Fixtures.identify(:instructor1) %>
@@ -141,7 +140,6 @@ student2:
   email_on_review: 1
   master_permission_granted: 1
   handle: stu2
-  is_new_user: 1
 
 student3:
   name: student3

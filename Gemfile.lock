@@ -156,7 +156,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   bind-it (= 0.2.0)
-  capistrano
+  capistrano (~> 2.14.2)
   capybara (= 0.3.9)
   cucumber (= 1.1.4)
   cucumber-rails (= 0.3.2)

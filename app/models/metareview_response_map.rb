@@ -63,8 +63,12 @@ class MetareviewResponseMap < ResponseMap
     
     index = 2
     while index < row.length
-      #ACS Make All contributors as teams
-      contributor = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, id)
+      if Assignment.find(id).team_assignment
+        contributor = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, id)        
+      else
+        user = User.find_by_name(row[0].to_s.strip)
+        contributor = AssignmentParticipant.find_by_user_id_and_parent_id(user.id, id)
+      end
       
       if contributor == nil
         raise ImportError, "Contributor, "+row[0].to_s+", was not found."     
@@ -81,10 +85,12 @@ class MetareviewResponseMap < ResponseMap
       if reviewer.nil?
         raise ImportError, "Metareviewer,  "+row[index].to_s+", for contributor, "+contributor.name+", and reviewee, "+row[1].to_s+", was not found."
       end
-
-      #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-      # to treat all assignments as team assignments
-      reviewmapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(contributor.id, reviewee.id)
+      
+      if Assignment.find(id).team_assignment
+        reviewmapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(contributor.id, reviewee.id)
+      else
+        reviewmapping = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(contributor.id, reviewee.id)
+      end
       if reviewmapping.nil?
         raise ImportError, "No review mapping was found for contributor, "+contributor.name+", and reviewee, "+row[1].to_s+"."
       end

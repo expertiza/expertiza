@@ -11,10 +11,10 @@
     <% @assignments.each do |assignment| %>
       <tr class="listingRow" align="justify">
 	      <td align="justify"><%= link_to assignment.name, :action => 'one_assignment_all_students', :assignment_id => assignment.id%></td>
-	      <td align="justify"><%= Response.get_average_score(assignment.id).to_s + "%" %></td>
-	      <td align="justify"><%= Response.get_total_reviews_completed(assignment.id) %></td>
-	      <td align="justify"><%= Response.get_total_reviews_assigned(assignment.id) %></td>
-	      <td align="justify"><%= Response.get_percentage_reviews_completed(assignment.id).to_s + "%" %></td>
+	      <td align="justify"><%= assignment.get_average_score().to_s + "%" %></td>
+	      <td align="justify"><%= assignment.get_total_reviews_completed() %></td>
+	      <td align="justify"><%= assignment.get_total_reviews_assigned() %></td>
+	      <td align="justify"><%= assignment.get_percentage_reviews_completed().to_s + "%" %></td>
       </tr>
     <% end %>
   </table>

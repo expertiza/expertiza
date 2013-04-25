@@ -1,4 +1,6 @@
+require "lib/hamer.rb"
 class GradesController < ApplicationController
+  include Hamer
   helper :file
   helper :submitted_content
 
@@ -15,12 +17,31 @@ class GradesController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     }
     @scores = @assignment.get_scores(@questions)
+    @due_dates= DueDate.find(:all, :conditions => ["assignment_id = ? and deadline_type_id = ? ", @assignment.id,2])
+
+    @weighted_submissions = nil    
+    @post_review_deadline = false
+    
+    if (Time.new.to_datetime >  @due_dates[0].due_at.to_datetime)
+      #call only after review deadline
+      reviewers = get_reviewer_objects(@assignment.users)
+      submissions = get_submission_objects(@assignment.participants)
+      @weighted_submissions = Hamer.calculate_weighted_scores_and_reputation(submissions, reviewers)[:submissions]
+      @post_review_deadline = true
+    end
+    #this is where we calculate and display reputation per person
+    #puts "-----------------------------------------------------------"
+    #@weighted_submissions = Hamer.calculate_weighted_scores_and_reputation(submissions, reviewers)[:submissions]
+    @thisReputation =  "ADD REPUTATION HERE"
   end
 
   def view_my_scores
+    @thisReputation = "grades_controller/view_my_scores"
+    #Hamer.calculate_weighted_scores_and_reputation(Assignment.find(449).participants, Assignment.find(449).users)
     @participant = AssignmentParticipant.find(params[:id])
     return if redirect_when_disallowed
     @assignment = @participant.assignment
+    @due_dates= DueDate.find(:all, :conditions => ["assignment_id = ? and deadline_type_id = ? ", @assignment.id,2])
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
@@ -48,8 +69,19 @@ class GradesController < ApplicationController
         end
       end
     end
-  end
     
+    @weighted_submissions = nil    
+    @post_review_deadline = false
+    
+    if (Time.new.to_datetime >   @due_dates[0].due_at.to_datetime)
+      #call only after review deadline
+        reviewers = get_reviewer_objects(@assignment.users)
+        submissions = get_submission_objects(@assignment.participants)
+        @weighted_submission = Hamer.calculate_weighted_scores_and_reputation_for_a_submission(submissions, reviewers, @participant)
+        @post_review_deadline = true
+    end
+  end
+   
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
@@ -207,9 +239,8 @@ class GradesController < ApplicationController
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
     # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
     ## This following code was cloned from response_controller.
-
-    #ACS Check if team count is more than 1 instead of checking if it is a team assignment
-    if @participant.assignment.team_count > 1
+    
+    if @participant.assignment.team_assignment
       team = @participant.team
       if(!team.nil?)
         unless team.has_user session[:user]

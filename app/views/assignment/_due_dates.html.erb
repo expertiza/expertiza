@@ -41,7 +41,7 @@
                    <%= select('submit_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
                </TD>
 			   <TD ALIGN=CENTER WIDTH=10%>
-                   <%= select('submit_deadline', 'threshold', [[8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
+                   <%= select('submit_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
                </TD>
            </TR>
            <TR>
@@ -131,87 +131,6 @@
                    <%= select('drop_topic_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
                </TD>
           </TR>
-         <TR>
-           <TD ALIGN=LEFT WIDTH=20%>
-             SignUp deadline
-           </TD>
-           <TD ALIGN="CENTER">
-             <input type="text" id="signup_due_at" name ="signup_deadline[due_at]"/>
-             <img src="/images/cal.gif" onClick="NewCal('signup_due_at','YYYYMMDD',true,24); return false;"/>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('signup_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>3 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('signup_deadline', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('signup_deadline', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('signup_deadline', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('signup_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('signup_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
-           </TD>
-         </TR>
-         <TR>
-           <TD ALIGN=LEFT WIDTH=20%>
-             Team Formation deadline
-           </TD>
-           <TD ALIGN="CENTER">
-             <input type="text" id="team_formation_due_at" name ="team_formation_deadline[due_at]"/>
-             <img src="/images/cal.gif" onClick="NewCal('team_formation_due_at','YYYYMMDD',true,24); return false;"/>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('team_formation_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>3 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('team_formation_deadline', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('team_formation_deadline', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('team_formation_deadline', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('team_formation_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('team_formation_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
-           </TD>
-         </TR>
-         <TR>
-           <TD ALIGN=LEFT WIDTH=20%>
-             Resubmission deadline
-           </TD>
-           <TD ALIGN="CENTER">
-             <input type="text" id="resubmission_due_at" name ="resubmission_deadline[due_at]"/>
-             <img src="/images/cal.gif" onClick="NewCal('resubmission_due_at','YYYYMMDD',true,24); return false;"/>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('resubmission_deadline', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>3 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('resubmission_deadline', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('resubmission_deadline', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('resubmission_deadline', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('resubmission_deadline', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]],:selected =>1 )%>
-           </TD>
-           <TD ALIGN=CENTER WIDTH=10%>
-             <%= select('resubmission_deadline', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96] ],:selected =>1 )%>
-           </TD>
-         </TR>
        </table>
     </div>
 <br/>
@@ -223,3 +142,4 @@
 </div>
 <br/>
 <script>get_assignment_startdate();</script>
+    

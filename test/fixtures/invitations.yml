@@ -47,15 +47,3 @@ invitation2:
   from_id: <%= Fixtures.identify(:student3) %>
   to_id: <%= Fixtures.identify(:student1) %>
   reply_status: A
-
- invitation3:
-   assignment_id: <%= Fixtures.identify(:assignment_project2) %>
-   from_id: <%= Fixtures.identify(:student5) %>
-   to_id: <%= Fixtures.identify(:student6) %>
-   reply_status: W
-
- invitation4:
-    assignment_id: <%= Fixtures.identify(:assignment_project2) %>
-    from_id: <%= Fixtures.identify(:student6) %>
-    to_id: <%= Fixtures.identify(:student5) %>
-    reply_status: W

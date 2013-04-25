@@ -13,7 +13,7 @@ class WordnetBasedSimilarity
     reviewState = reviewVertex.state
     submState = submVertex.state
     
-    # puts("@@@@@@@@@ Comparing Vertices:: #{review} and #{submission} :: RevState:: #{reviewState} and SubmState:: #{submState}");
+    #puts("@@@@@@@@@ Comparing Vertices:: #{review} and #{submission} :: RevState:: #{reviewState} and SubmState:: #{submState}");
     @match = 0
     @count = 0
     
@@ -31,16 +31,16 @@ class WordnetBasedSimilarity
       return @match
     end   
     
-    stokRev = review.split(" ")
+    #stokRev = review.split(" ")
     #stokSub = submission.split(" ") #should've been inside when doing n * n comparison
     
     #iterating through review tokens
-    for i in (0..stokRev.length-1)
+    #for i in (0..stokRev.length-1)
       #if either of the tokens is null
-      if(stokRev[i].nil?)
-        next #continue with the next token
-      end
-      revToken = stokRev[i].downcase()
+      #if(stokRev[i].nil?)
+       # next #continue with the next token
+      #end
+      revToken = review #stokRev[i].downcase()
       if(reviewPOS.empty?)#do not reset POS for every new token, it changes the POS of the vertex e.g. like has diff POS for vertices "like"(n) and "would like"(v)
         reviewPOS = determine_POS(reviewVertex).strip
       end
@@ -54,7 +54,7 @@ class WordnetBasedSimilarity
       #if the review token is a frequent word, continue
       if(is_frequent_word(revToken))
         # puts("Skipping frequent review token .. #{revToken}")
-        next #equivalent of the "continue"
+        return NOMATCH #next #equivalent of the "continue"
       end
       
       #fetching synonyms, hypernyms, hyponyms etc. for the review token       
@@ -75,15 +75,15 @@ class WordnetBasedSimilarity
       # puts "reviewHyponyms:: #{revHypo} .. #{revHypo.class}"
       # puts "reviewAntonyms:: #{revAnt} .. #{revAnt.class}"
         
-      stokSub = submission.split(" ")
+      #stokSub = submission.split(" ")
       #iterating through submission tokens
-      for j in (0..stokSub.length-1)
+      #for j in (0..stokSub.length-1)
       
-        if(stokSub[i].nil?)
-          next
-        end
+        #if(stokSub[j].nil?)
+          #next
+        #end
         
-        subToken = stokSub[j].downcase()
+        subToken = submission #stokSub[j].downcase()
         if(submPOS.empty?)#do not reset POS for every new token, it changes the POS of the vertex e.g. like has diff POS for vertices "like"(n) and "would like"(v)
           submPOS = determine_POS(submVertex).strip
         end
@@ -97,7 +97,7 @@ class WordnetBasedSimilarity
         #if the review token is a frequent word, continue
         if(is_frequent_word(subToken))
           # puts("Skipping frequent subtoken .. #{subToken}")
-          next #equivalent of the "continue"
+          return NOMATCH #equivalent of the "continue"
         end
                     
         #fetching synonyms, hypernyms, hyponyms etc. for the submission token
@@ -129,28 +129,28 @@ class WordnetBasedSimilarity
             @match = @match + NEGEXACT
           end
           @count+=1
-          next #skip all remaining checks
+          return @match #next #skip all remaining checks
         end #end of if condition checking for exact matches
         #------------------------------------------
         #*****For Synonyms
         #if the method returns 'true' it indicates a synonym match of some kind was found and the remaining checks can be skipped
         if(check_match(revToken, subToken, revSyn, submSyn, revStem, submStem, reviewState, submState, SYNONYM, ANTONYM))
-          next
+          return @match #next
         end
         #------------------------------------------
         #ANTONYMS
         if(check_match(revToken, subToken, revAnt, submAnt, revStem, submStem, reviewState, submState, ANTONYM, SYNONYM))
-          next
+          return @match #next
         end
         #------------------------------------------
         #*****For Hypernyms
         if(check_match(revToken, subToken, revHyper, submHyper, revStem, submStem, reviewState, submState, HYPERNYM, NEGHYPERNYM))
-          next
+          return @match #next
         end
         #------------------------------------------   
         #*****For Hyponyms
         if(check_match(revToken, subToken, revHypo, submHypo, revStem, submStem, reviewState, submState, HYPONYM, NEGHYPONYM))
-          next
+          return @match #next
         end
          
         #overlap across definitions   
@@ -169,15 +169,15 @@ class WordnetBasedSimilarity
             @match = @match + NEGOVERLAPDEFIN
           end
           @count+=1
-          next
+          return @match #next
         end
         
         #no match found!
         # puts "No Match found!"
         @match = @match + NOMATCH
         @count+=1
-      end #end of the for loop for submission tokens 
-    end #end of the for loop for review tokens
+      #end #end of the for loop for submission tokens 
+    #end #end of the for loop for review tokens
     
     if(@count > 0)
       # puts ("Match: #{@match} Count:: #{@count}")

@@ -9,9 +9,7 @@ class DueDate < ActiveRecord::Base
 
 
   def due_at_is_valid_datetime
-    unless due_at.blank?
-      errors.add(:due_at, 'must be a valid datetime') if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
-    end
+    errors.add(:due_at, 'must be a valid datetime') if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
   end
 
   def self.copy(old_assignment_id, new_assignment_id)    

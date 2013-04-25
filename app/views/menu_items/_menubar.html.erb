@@ -8,7 +8,7 @@ if session[:menu]
        item = session[:menu].get_item(item_id)
        selected = session[:menu].selected?(item.id)%>
   <li<%= if selected then ' class="selected"' end %>>
-  <a href=<%= URI.encode("/menu/#{item.name}") %>><%= item.label %></a>
+    <a href="/menu/<%= item.name %>"><%= item.label %></a>
     <%= if selected and depth > 0 
 	  render :partial => 'menu_items/menubar', 
             :locals => {:level => level + 1, :depth => depth - 1,

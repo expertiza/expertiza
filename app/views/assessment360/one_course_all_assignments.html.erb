@@ -12,7 +12,7 @@
         <td align="justify">
           <%= link_to assignment.name, :action => 'one_assignment_all_students', :assignment_id => assignment.id%>
         </td>
-        <td align="center"><%= Response.get_average_score(assignment.id).to_s + "%" %>
+        <td align="center"><%= assignment.get_average_score().to_s + "%" %>
         <img src="<%= @assignment_distribution[assignment] %>" ></td>
         <td> <img src="<%= @assignment_pie_charts[assignment] %>" > </td>
         <td> <img src="<%= @assignment_bar_charts[assignment] %>" > </td>

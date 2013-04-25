@@ -33,7 +33,7 @@ Feature: Manage the questionnaires in Expertiza
       And I press "Select"
       And I fill in "Name" with "PublicMetareview"
       And I press "Create review"
-    Then I should see "PublicMetareview"
+    Then I should see "Review1"
 
   @instructor
   @manage_questionnaires

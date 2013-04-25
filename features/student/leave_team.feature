@@ -3,7 +3,7 @@ Feature: Leave team
   As a student and
   As a member of the team
   I want to quit from the team
-
+@wip
 Scenario: Leave my team of an assignment
   Given I am participating on a "team_assignment"
   And I am logged in as a "student1"

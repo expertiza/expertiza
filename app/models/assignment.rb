@@ -25,7 +25,7 @@ class Assignment < ActiveRecord::Base
   # has_many :responses, :through => :response_maps, :source => 'response'
 
   validates_presence_of :name
-  validates_uniqueness_of :scope => [:directory_path, :instructor_id]
+  validates_uniqueness_of :directory_path, :scope => :instructor_id
 
   COMPLETE = "Complete"
 
@@ -249,29 +249,12 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:team] = team
         assessments = TeamReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
-        #... = ScoreCache.get_participant_score(team, id, questionnaire.display_type)
         index += 1
       }
     end
     return scores
   end
-  
-=begin
-  def compute_scores
-    scores = Hash.new
-    questionnaires = self.questionnaires
-    
-    self.participants.each{
-      | participant |
-      pScore = Hash.new
-      pScore[:id] = participant.id
-      
-      
-      scores << pScore
-    }
-  end
-=end
-  
+
   def get_contributor(contrib_id)
     if team_assignment
       return AssignmentTeam.find(contrib_id)

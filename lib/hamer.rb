@@ -1,6 +1,6 @@
 module Hamer
   def self.calculate_weighted_scores_and_reputation(submissions, reviewers)
-
+    
     # Initialize weights
     submissions.each {|s| s.reviews.each {|review| review.weight = 1}}
 
@@ -9,6 +9,7 @@ module Hamer
     begin
       # Store previous weights to determine convergence
       previous_weights = submissions.map{|s|s.reviews.map(&:weight)}
+      
       # Reset reviewer inaccuracy
       reviewers.each {|reviewer| reviewer.inaccuracy = 0 }
 
@@ -27,7 +28,7 @@ module Hamer
           reviewer.inaccuracy += review_inaccuracy / reviewer.reviews.count
         end
       end
-
+      
       average_inaccuracy = reviewers.map(&:inaccuracy).sum / reviewers.size
       # Pass 2: Use reviewer inaccuracy to calculate new review score weights
       submissions.each do |submission|
@@ -63,8 +64,7 @@ module Hamer
     end
 =end
   end
-
-
+  
   # Ensure all numbers in lists a and b are equal
   # Options: :precision => Number of digits to round to
   def self.converged?(a, b, options={:precision => 2})

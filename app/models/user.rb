@@ -136,6 +136,14 @@ class User < ActiveRecord::Base
   def get_instructor
     self.id
   end
+
+  def instructor_id
+    case role.name
+    when 'Instructor' then id
+    when 'Teaching Assistant' then Ta.get_my_instructor(id)
+    else raise NotImplementedError.new "for role #{role.name}"
+    end
+  end
   
   def set_courses_to_assignment 
     @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')    
@@ -250,11 +258,14 @@ class User < ActiveRecord::Base
   def is_teaching_assistant_for?(student)
     return false if self.role.name != 'Teaching Assistant'
     return false if student.role.name != 'Student'
-    Course.all.each do |c|
-      return true if 
-        c.participants.all(:conditions => "user_id=#{student.id}").size > 0 &&
-        c.participants.all(:conditions => "user_id=#{id}").size > 0
+    return true if Course.all.any? do |c|
+      c.participants.all(:conditions => "user_id=#{student.id}").size > 0 &&
+      c.participants.all(:conditions => "user_id=#{id}").size > 0
     end
+    return false
+  end
+
+  def is_teaching_assistant?
     false
   end
 

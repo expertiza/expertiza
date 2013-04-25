@@ -265,7 +265,15 @@ class AssignmentParticipant < Participant
       return ParticipantReviewResponseMap.get_assessments_for(self)
     end
   end
-   
+  
+  def get_reviews_by_reviewer(reviewer)
+    if self.assignment.team_assignment
+      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
+    else
+      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
+    end
+  end
+  
   def get_metareviews
     MetareviewResponseMap.get_assessments_for(self)  
   end

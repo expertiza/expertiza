@@ -6,16 +6,19 @@ When /^I create a (public|private) assignment named "([^"]*)" using (no due date
   else
     use_review = true
     ((review_name,),) = review_setting.scan(/^review named \"([^"]*)\"$/)
-    Given "I have a public review named \"#{review_name}\""
+    step "I have a public review named \"#{review_name}\""
   end
 
-  When "I follow the \"Manage...\" link as an \"instructor\""
-    And "I follow \"Create Public Assignment\""
-	And "I fill in \"#{assignment_name}\" for \"Assignment name: \""
-    if use_review
-      And "I fill in \"2020-01-01 00:00:00\" for \"submit_deadline[due_at]\""
-      And "I fill in \"2020-01-02 00:00:00\" for \"review_deadline[due_at]\""
-	  And "I select \"#{review_name}\" from \"questionnaires[review]\""
+  step "I follow the \"Manage...\" link as an \"instructor\""
+    step "I follow \"Create Public Assignment\""
+	step "I fill in \"#{assignment_name}\" for \"Assignment name\""
+	
+  if use_review
+    step "I fill in \"2020-01-01 00:00:00\" for \"submit_deadline[due_at]\""
+    step "I fill in \"2020-01-02 00:00:00\" for \"review_deadline[due_at]\""
+	  step "I select \"#{review_name}\" from \"questionnaires[review]\""
+	  
+  	step "I press \"Save assignment\""
   end
 	And "I press \"Save assignment\""
   Then "I should see \"#{assignment_name}\""

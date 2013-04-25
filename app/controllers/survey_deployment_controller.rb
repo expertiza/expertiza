@@ -1,6 +1,5 @@
 
 class SurveyDeploymentController < ApplicationController
-
  
   def new 
     @surveys=Questionnaire.find_all_by_type('CourseEvaluationQuestionnaire').map{|u| [u.name, u.id] }
@@ -19,12 +18,12 @@ class SurveyDeploymentController < ApplicationController
     if(@survey_deployment.save)
       add_participants(@survey_deployment.num_of_students,@survey_deployment.id)
       redirect_to :action=>'list'
-     else
+    else 
       @surveys=Questionnaire.find_all_by_type('CourseEvaluationQuestionnaire').map{|u| [u.name, u.id] }
       @course = Course.find_all_by_instructor_id(session[:user].id).map{|u| [u.name, u.id] }
       @total_students = CourseParticipant.find_all_by_parent_id(@course[0][1]).count
       render(:action=>'new')
-     end     
+    end     
   end
   
   def list

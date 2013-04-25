@@ -81,7 +81,6 @@ Given /^an assignment named "(\S+)" exists$/ do |assignment|
 
 end
 
-
 Given 'I am logged in as admin' do
   When 'I go to the login page'
 
@@ -91,7 +90,6 @@ Given 'I am logged in as admin' do
 
   Then 'I should be logged in as "admin"'
 end
-
 
 Then /^I should see "(\S+)" in the list$/ do |assignment|
    node =  find('.theTable td').node().content()

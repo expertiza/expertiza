@@ -5,7 +5,7 @@ Feature: View Leaderboard
 @wip
 Scenario: View the leaderboard
 
-  Given a team assignment named "test_assignment" exists
+  Given an assignment named "test_assignment" exists
   Given a student with the username "Student1" exists
   And add "Student1" to this "test_assignment"
   And I log in as "Student1"

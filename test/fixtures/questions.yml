@@ -2,21 +2,9 @@
 question1:
  txt: Was assignment guidelines followed?
  true_false: false
- questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
+ questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
  weight: 5
   
-question8:
- txt: Was assignment completed?
- true_false: false
- questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
- weight: 4
-
-question9:
- txt: Did the assignment have test cases?
- true_false: false
- questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
- weight: 3
- 
 question2:
  txt: Was the assignment graded fairly?
  true_false: false
@@ -51,18 +39,6 @@ question7:
  txt: What future changes should be implemented on expertiza?
  true_false: false
  questionnaire_id: <%= Fixtures.identify(:global_survey_questionnaire) %>
- weight: 5
-
-question_c1:
- txt: What future changes should be implemented on expertiza?
- true_false: false
- questionnaire_id: <%= Fixtures.identify(:questionnaire_c0) %>
- weight: 5
-
-question_c2:
- txt: What future changes should be implemented on back channel?
- true_false: false
- questionnaire_id: <%= Fixtures.identify(:questionnaire_c0) %>
  weight: 5
 
 #question8:

@@ -1,9 +1,29 @@
+<% stage = participant.assignment.get_current_stage %>
+<% form_tag({:action=>'remove_hyperlink',:id => participant.id},{:method => 'post' }) do %>
+<% if stage != "Complete" %>
+    <b>Hyperlink Actions:</b><BR/>
+    </br>
+
+        <%= submit_tag 'Delete selected hyperlink' %>
+       </br>
+</br>
+<%end%>
+
 <b>Hyperlinks</b>&nbsp;&nbsp;&nbsp;<a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <div id="url" style="">  
    <ul>
-    <% participant.get_hyperlinks.each{
-       | link | %>      
-        <li><a href="<%= link %>" target="new"><%= link %></a></li>
-  <% } %>
+        <% participant.get_hyperlinks.each_with_index{
+                | link, index | %>
+        <% if stage != "Complete" %>
+             <% if index == 0 %>
+            <input type="radio"  id='chk_links' name='chk_links' checked value="<%=index%>"/>
+                 <% else %>
+             <input type="radio"  id='chk_links' name='chk_links' value="<%=index%>"/>
+               <% end %>
+        <%end%>
+            <a href="<%= link %>" target="new"><%= link %></a>
+            <br/>
+        <% } %>
   </ul> 
 </div>
+<% end %>

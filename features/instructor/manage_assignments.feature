@@ -13,9 +13,10 @@ Feature: Manage the assignments in Expertiza
 	When I follow the "Manage..." link as an "instructor"
 	  And I follow "Create Public Assignment"
 	  And I fill in "Assignment1" for "Assignment name: "
-	  And I fill in "2020-01-01 00:00:00" for "submit_deadline[due_at]"
-	  And I fill in "2020-01-02 00:00:00" for "review_deadline[due_at]"
-	  And I select "test_review" from "questionnaires[review]"
+      And I fill in "2020-01-01 00:00:00" for "submit_deadline_due_at"
+	  And I fill in "2020-01-02 00:00:00" for "review_deadline_due_at"
+      And I select "test_review" from "questionnaires[review]"
+      And I check "assignment_availability_flag"
 	  And I press "Save assignment"
 	Then I should see "Assignment1"
 
@@ -44,24 +45,3 @@ Feature: Manage the assignments in Expertiza
   @too_many
   @wip
   Scenario: Adding too many students to a team for an assignment should fail.
-    Given an instructor named "instructor1"
-	  And a student named "student1"
-	  And a student named "student2"
-	  And a student named "student3"
-	  And I am logged in as "instructor1"   
-	When I create a public assignment named "Assignment4" with max team size 2
-	  And I add user "student1" as a participant to assignment "Assignment4"
-	  And I add user "student2" as a participant to assignment "Assignment4"
-	  And I add user "student3" as a participant to assignment "Assignment4"
-	  And I press "Logout"
-	  And I log in as "student1"
-	  And I create a team named "team1" for the assignment "Assignment4"
-	  And I invite the user "student2" to my team for the assignment "Assignment4"
-	  And I invite the user "student3" to my team for the assignment "Assignment4"
-	  And I press "Logout"
-	  And I log in as "student2"
-	  And I join a team named "team1" for the assignment "Assignment4"
-	  And I press "Logout"
-	  And I log in as "student3"
-	  And I join a team named "team1" for the assignment "Assignment4"
-	Then I should not see "Leave Team"

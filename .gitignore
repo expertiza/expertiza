@@ -15,9 +15,6 @@ local.properties
 .classpath
 .settings/
 .loadpath
-capybara-*html
-config/database.yml
-*~
 
 # External tool builders
 .externalToolBuilders/

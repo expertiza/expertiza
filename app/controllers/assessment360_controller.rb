@@ -20,7 +20,7 @@ class Assessment360Controller < ApplicationController
 
     @assignments.each do |assignment|
       # Pie Chart Data .....................................
-      reviewed = assignment.get_percentage_reviews_completed()
+      reviewed = Response.get_percentage_reviews_completed(assignment.id)
       pending = 100 - reviewed
       reviewed_msg = reviewed.to_s + "% reviewed"
       pending_msg = pending.to_s + "% pending"
@@ -42,8 +42,8 @@ class Assessment360Controller < ApplicationController
       date = assignment.created_at.to_datetime.to_date
 
       while ((date <=> Date.today) <= 0)
-        if assignment.get_total_reviews_completed_by_type_and_date(@REVIEW_TYPES.first, date) != 0 then
-          bar_1_data.push(assignment.get_total_reviews_completed_by_type_and_date(@REVIEW_TYPES.first, date))
+        if Response.get_total_reviews_completed_by_type_and_date(assignment.id, @REVIEW_TYPES.first, date) != 0 then
+          bar_1_data.push(Response.get_total_reviews_completed_by_type_and_date(assignment.id, @REVIEW_TYPES.first, date))
           dates.push(date.month.to_s + "-" + date.day.to_s)
         end
 
@@ -52,7 +52,8 @@ class Assessment360Controller < ApplicationController
 
       color_1 = 'c53711'
       min=0
-      max= assignment.get_total_reviews_assigned
+      #max= assignment.get_total_reviews_assigned
+      max = Response.get_total_reviews_assigned(assignment.id)
 
       GoogleChart::BarChart.new("600x80", " ", :vertical, false) do |bc|
         bc.data "Review", bar_1_data, color_1
@@ -66,7 +67,7 @@ class Assessment360Controller < ApplicationController
       end
       
       # Histogram score distribution .......................
-      bar_2_data = assignment.get_score_distribution
+      bar_2_data = Response.get_score_distribution(assignment.id)
       color_2 = '4D89F9'
       min = 0
       max = 100
@@ -214,7 +215,7 @@ class Assessment360Controller < ApplicationController
     @participant = Participant.find_by_user_id(params[:user_id])
     @questionnaires = @assignment.questionnaires
     bar_1_data = [@participant.get_average_score]
-    bar_2_data = [@assignment.get_average_score]
+    bar_2_data = [Response.get_average_score(@assignment.id)]
     color_1 = 'c53711'
     color_2 = '0000ff'
     min=0

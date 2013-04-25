@@ -12,17 +12,10 @@
      
 <%= render :partial => 'participant_title', :locals => {:prefix => prefix } %>        
 <% pindex = 3 %>
-<% for participant in tscore[:team].get_participants %>   
-    <%
-        ws = @weighted_submissions.nil? ? nil : @weighted_submissions[participant.id]  
-    %>   
-    <%= render :partial => 'grades/participant',
-               :locals => {:prefix => prefix+"_"+pindex.to_s,
- 	 			           :team => true,
-                           :pscore => @scores[:participants][participant.id.to_s.to_sym],
-                           :weighted_submission => ws
-                           } 
-    %>  
-    <% pindex += 1 %>                            
+  <% for participant in tscore[:team].get_participants %>     
+     <%= render :partial => 'grades/participant',
+                :locals => {:prefix => prefix+"_"+pindex.to_s,
+     	 			        :team => true,
+                            :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>  
+     <% pindex += 1 %>                            
 <% end %>        
-

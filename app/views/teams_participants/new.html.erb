@@ -1,0 +1,12 @@
+<H1>New Team Member</H1>
+<% session[:team_id] = @team.id %>
+
+<% form_tag :action => 'create' do %>
+<%= hidden_field_tag 'id', @team.id %>
+Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+<input type='submit' value='Add'/>
+<% end %>
+  
+<BR/>
+
+<%= link_to 'Back', :controller => 'course_team', :action => 'list', :id => @team.parent_id %>

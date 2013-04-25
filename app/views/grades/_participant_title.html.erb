@@ -2,28 +2,27 @@
 <% colwidth = 7  %>
 
 <TR <% if prefix %>id='<%= prefix %>_1' style="display:none"<% end %>>
-<TH WIDTH="<%= namecolwidth %>%" class=right_rep>&nbsp;</TH>
-<TH COLSPAN="3" WIDTH="<%= colwidth*2 %>%" class=both_rep>Submitted work</TH>
-<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%" class=both_rep>Reviewing</TH>
-<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%" class=both_rep>Author Feedback</TH>
+<TH WIDTH="<%= namecolwidth %>%">&nbsp;</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
 <% if @assignment.team_assignment %>
-  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%" class=both_rep>Teammate Review</TH>
+  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
 <% end %>
-<TH WIDTH="<%= colwidth %>%" class=left_rep>&nbsp;</TH></TR>
+<TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
 
 <TR <% if prefix %>id='<%= prefix %>_2' style="display:none"<% end %>>
-<TH WIDTH="<%= namecolwidth %>%" ALIGN="LEFT" class=right_rep>Contributor</TH>
-<TH WIDTH="<%= colwidth %>%" class=left_rep>Average</TH>
+<TH WIDTH="<%= namecolwidth %>%" ALIGN="LEFT">Contributor</TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
 <TH WIDTH="<%= colwidth %>%">Range</TH>
-<!-- "This is a diff. from E-730 F12" -->
-<TH WIDTH="<%= colwidth %>%" class=right_rep>Weighted <br>Score</TH>
-<!-- "Diff. ends" -->
-<TH WIDTH="<%= colwidth %>%" class=left_rep>Average</TH>
-<TH WIDTH="<%= colwidth %>%" class=right_rep>Range </TH>
-<TH WIDTH="<%= colwidth %>%" class=left_rep>Average</TH>
-<TH WIDTH="<%= colwidth %>%" class=right_rep>Range </TH>
-<% if @assignment.team_assignment %>
-  <TH WIDTH="<%= colwidth %>%" class=left_rep>Average</TH>
-  <TH WIDTH="<%= colwidth %>%" class=right_rep>Range </TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH>
+  <!--ACS Display teammate review ratings only for teams with size greater than 1-->
+  <% if @assignment.team_count > 1 %>
+  <TH WIDTH="<%= colwidth %>%">Average</TH>
+  <TH WIDTH="<%= colwidth %>%">Range </TH>
 <% end %>   
-<TH WIDTH="<%= colwidth %>%" class=left_rep>Final Score</TH></TR>
+<TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
+    

@@ -1,17 +1,18 @@
 class AssignmentController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
-
+  
+  #-------------------------------------------------------------------------------------------------------------------
+  # COPY
   # Creates a copy of an assignment along with dates and submission directory
+  #-------------------------------------------------------------------------------------------------------------------
   def copy
     Assignment.record_timestamps = false
-    #creating a copy of an assignment; along with the dates and submission directory too
     old_assign = Assignment.find(params[:id])
     new_assign = old_assign.clone
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(new_assign)
-    
     new_assign.update_attribute('name','Copy of ' + new_assign.name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
@@ -23,8 +24,7 @@ class AssignmentController < ApplicationController
     session[:copy_flag] = true
     new_assign.copy_flag = true
 
-    
-    if new_assign.save 
+    if new_assign.save
       Assignment.record_timestamps = true
 
       old_assign.assignment_questionnaires.each do |aq|
@@ -41,6 +41,7 @@ class AssignmentController < ApplicationController
       new_assign.create_node()
       
       flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
+
       redirect_to :action => 'edit', :id => new_assign.id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
@@ -133,7 +134,6 @@ class AssignmentController < ApplicationController
       @weeks = params[:weeks].to_i      
     end
     
-    
     @assignment.days_between_submissions = @days + (@weeks*7)
     
     # Deadline types used in the deadline_types DB table
@@ -160,7 +160,7 @@ class AssignmentController < ApplicationController
     
     deadline = DeadlineType.find_by_name("team_formation")
     @team_formation_deadline = deadline.id
-
+    
     check_flag = @assignment.availability_flag
 
     if(check_flag == true && params[:submit_deadline].nil?)
@@ -185,8 +185,11 @@ class AssignmentController < ApplicationController
         max_round = 2;
         
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
+        due_date = DueDate::set_duedate(params[:signup_deadline],@signup_deadline, @assignment.id, 0)
+        due_date = DueDate::set_duedate(params[:team_formation_deadline],@team_formation_deadline, @assignment.id, 0)
+
  #       raise "Please enter a valid Drop-Topic deadline" if !due_date
-        
+
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys
             #setting the Due Dates with a helper function written in DueDate.rb
@@ -214,7 +217,7 @@ class AssignmentController < ApplicationController
         # Create submission directory for this assignment
         # If assignment is a Wiki Assignment (or has no directory)
         # the helper will not create a path
-        FileHelper.create_directory(@assignment)
+        FileHelper.create_directory(@assignment) 
         
         # Creating node information for assignment display
         @assignment.create_node()
@@ -228,7 +231,6 @@ class AssignmentController < ApplicationController
         @wiki_types = WikiType.find(:all)
         render :action => 'new'
       end
-      
     else
       @wiki_types = WikiType.find(:all)
       render :action => 'new'
@@ -375,6 +377,7 @@ class AssignmentController < ApplicationController
     @assignment = Assignment.find(params[:id])
     prepare_to_edit
   end
+  
   #--------------------------------------------------------------------------------------------------------------------
   # PREPARE_TO_EDIT  (Helper function for CREATE, EDIT and UPDATE)
   # Prepare to edit existing assignment
@@ -437,12 +440,12 @@ class AssignmentController < ApplicationController
     @limits[:metareview] = default_limit_value
     @limits[:feedback]   = default_limit_value
     @limits[:teammate]   = default_limit_value
-   
+
     @weights[:review] = 100
     @weights[:metareview] = 0
     @weights[:feedback] = 0
-    @weights[:teammate] = 0    
-    
+    @weights[:teammate] = 0
+
     @assignment.questionnaires.each{
       | questionnaire |
       aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
@@ -462,6 +465,7 @@ class AssignmentController < ApplicationController
     
     @assignment.questionnaires.each{
       | questionnaire |
+
       aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
       if params[:limits][questionnaire.symbol].length > 0
         aq.update_attribute('notification_limit',params[:limits][questionnaire.symbol])
@@ -472,8 +476,39 @@ class AssignmentController < ApplicationController
       aq.update_attribute('user_id',user_id)
     }
   end
-  
-  def update      
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # GET_PATH (Helper function for CREATE and UPDATE)
+  #  return the file location if there is any for the assignment
+  #--------------------------------------------------------------------------------------------------------------------
+  def get_path
+    begin
+      file_path = @assignment.get_path
+    rescue
+      file_path = nil
+    end
+    return file_path
+  end
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # COPY_PARTICIPANTS_FROM_COURSE
+  #  if assignment and course are given copy the course participants to assignment
+  #--------------------------------------------------------------------------------------------------------------------
+  def copy_participants_from_course
+    if params[:assignment][:course_id]
+      begin
+        Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
+      rescue
+        flash[:error] = $!
+      end
+    end
+  end
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # UPDATE
+  #  make updates to assignment
+  #--------------------------------------------------------------------------------------------------------------------
+  def update
     if params[:assignment][:course_id]
       begin
         Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
@@ -520,12 +555,18 @@ class AssignmentController < ApplicationController
       end
       
       begin
-        # Iterate over due_dates, from due_date[0] to the maximum due_date
+         # Iterate over due_dates, from due_date[0] to the maximum due_date
+
         if params[:due_date]
           for due_date_key in params[:due_date].keys
             due_date_temp = DueDate.find(due_date_key)
-            due_date_temp.update_attributes(params[:due_date][due_date_key])     
-            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
+            # delete the previous jobs from the delayed_jobs table
+            djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', @assignment.id])
+            for dj in djobs
+              delete_from_delayed_queue(dj.id)
+            end
+            due_date_temp.update_attributes(params[:due_date][due_date_key])              
+            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0						
           end
 	        # add to the delayed_jobs queue according to the updated due_dates
           add_to_delayed_queue
@@ -544,16 +585,24 @@ class AssignmentController < ApplicationController
       render :action => 'edit'
     end    
   end
-  
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # SHOW
+  #
+  #--------------------------------------------------------------------------------------------------------------------
   def show
     @assignment = Assignment.find(params[:id])
   end
-  
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # DELETE
+  #  delete assignment
+  #--------------------------------------------------------------------------------------------------------------------
   def delete
     assignment = Assignment.find(params[:id])
-    
+
     # If the assignment is already deleted, go back to the list of assignments
-    if assignment 
+    if assignment
       begin
       	#delete from delayed_jobs queue
         djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', assignment.id])
@@ -568,7 +617,7 @@ class AssignmentController < ApplicationController
         end
         assignment.delete(params[:force])
         @a = Node.find(:first, :conditions => ['node_object_id = ? and type = ?',params[:id],'AssignmentNode'])
-     
+
         @a.destroy
         flash[:notice] = "The assignment is deleted"
       rescue
@@ -578,30 +627,71 @@ class AssignmentController < ApplicationController
         flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
       end
     end
-    
+
     redirect_to :controller => 'tree_display', :action => 'list'
-  end  
-  
+  end
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # LIST
+  #
+  #--------------------------------------------------------------------------------------------------------------------
   def list
     set_up_display_options("ASSIGNMENT")
     @assignments=super(Assignment)
     #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
-  
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # TOGGLE_ACCESS
+  #  Toggle the access permission for this assignment from public to private, or vice versa
+  #--------------------------------------------------------------------------------------------------------------------
+  def toggle_access
+    assignment = Assignment.find(params[:id])
+    assignment.private = !assignment.private
+    assignment.save
+
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # DEFINE_INSTRUCTOR_NOTIFICATION_LIMIT
+  #  !!!NO usages found
+  #--------------------------------------------------------------------------------------------------------------------
+  def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
+    existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
+    if existing.nil?
+      NotificationLimit.create(:user_id => session[:user].id,
+                               :assignment_id => assignment_id,
+                               :questionnaire_id => questionnaire_id,
+                               :limit => limit)
+    else
+      existing.limit = limit
+      existing.save
+    end
+  end
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # ASSOCIATE_ASSIGNMENT_TO_COURSE
+  #  !!!NO usages found
+  #--------------------------------------------------------------------------------------------------------------------
   def associate_assignment_to_course
     @assignment = Assignment.find(params[:id])
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @courses = @user.set_courses_to_assignment
   end
-  
-  def remove_assignment_from_course    
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # REMOVE_ASSIGNMENT_FROM_COURSE
+  #  !!!NO usages found
+  #--------------------------------------------------------------------------------------------------------------------
+  def remove_assignment_from_course
     assignment = Assignment.find(params[:id])
     oldpath = assignment.get_path rescue nil
-    assignment.course_id = nil    
+    assignment.course_id = nil
     assignment.save
     newpath = assignment.get_path rescue nil
     FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
-  end  
+  end
 end

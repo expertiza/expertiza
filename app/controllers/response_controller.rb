@@ -11,18 +11,6 @@ class ResponseController < ApplicationController
     get_content
   end
   
-  # "This is a diff. from E-730 F12"
-  def update_cycle
-    @response = Response.find(params[:id])
-    if @response.cycle==0 then
-      @response.cycle=1
-    else
-      @response.cycle=0
-    end
-    @response.save
-    redirect_to :controller => 'grades', :action => 'view', :id => params[:assignment_id]
-  end
-  
   def delete
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
@@ -399,7 +387,7 @@ class ResponseController < ApplicationController
     @map.notification_accepted = false
     @map.save
     #@map.assignment.id == 561 or @map.assignment.id == 559 or 
-    if(@map.assignment.id == 562 or @map.assignment.id == 592 or @map.assignment.id == 598 or @map.assignment.id == 588) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
+    if(@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
       #puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
       if(params["save_options"].nil? or params["save_options"].empty?)#default it to with metareviews
         params["save_options"] = "WithMeta"

@@ -1,7 +1,15 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class AssignmentTest < ActiveSupport::TestCase
-  fixtures :assignments
+
+  fixtures :questionnaires, :assignments
+
+  def setup
+    # Database was initialized with (at least) 3 questionnaires.
+    @questionnaire1 = Questionnaire.find(questionnaires(:questionnaire1).id)
+    @questionnaire2 = Questionnaire.find(questionnaires(:questionnaire2).id)
+    @questionnaire3 = Questionnaire.find(questionnaires(:questionnaire3).id)
+  end
 
   def test_invalid_with_empty_attributes
     # Create a new assignment

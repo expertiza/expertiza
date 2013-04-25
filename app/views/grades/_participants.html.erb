@@ -1,26 +1,13 @@
-<!-- PARTICIPANTS -->
-<%= render :partial => 'participant_title', :locals => {:prefix => nil} %>
-
+<!-- PARTICIPANTS --> 
+<%= render :partial => 'participant_title', :locals => {:prefix => nil}  %>
 <% index = 0 %>
-
 <% @assignment.participants.each{
-
-        | participant | %>
-
-    <%= render :partial => 'grades/participant',
-
-               :locals => {:prefix => 'user_'+index.to_s,
-
-                           :team => false,
-
-                           :pscore => @scores[:participants][participant.id.to_s.to_sym],
-
-                           :weighted_submission => @weighted_submissions[participant.id]} %>
-
-<%
-
-   index += 1
-
-   } %>
-
-<!-- END PARTICIPANTS -->
+    | participant | %>   
+     <%= render :partial => 'grades/participant',
+                :locals => {:prefix => 'user_'+index.to_s,
+                            :team => false,
+                            :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>                                                                                   
+<% 
+     index += 1
+    } %> 
+<!-- END PARTICIPANTS --> 

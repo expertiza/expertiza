@@ -14,7 +14,8 @@
   Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
   <%= hidden_field_tag('id', @mapping.id) %>
   <input type='submit' value='Add Metareviewer'/><br/><br/>
-  <% if !@mapping.assignment.team_assignment %>
+    <!-- ACS removed check to see if it is a team assignment -->
+    <% if @mapping.assignment.team_count < 2 %>
      <%= check_box 'options','include', {:checked => 'checked'},  "true", "false"  %>&nbsp;Include the selected user as a participant in the assignment.<br/>
   <% end %>
 <% end %>

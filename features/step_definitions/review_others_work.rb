@@ -1,7 +1,7 @@
 Given 'I am assigned as a reviewer for an assignment' do
-  Given 'a review named "test_review" exists'
-  And 'an assignment named "test_assignment" exists'
-  And 'I am participating in "test_assignment"'
+  step 'a review named "test_review" exists'
+  step 'an assignment named "test_assignment" exists'
+  step 'I am participating in "test_assignment"'
 end
 
 Given /^a review named "(\S+)" exists$/ do |review|
@@ -22,9 +22,9 @@ Given /^a review named "(\S+)" exists$/ do |review|
 end
 
 Given 'I am participating in "test_assignment"' do
-  And 'a student with the username "student1" exists'
-  And 'a student with the username "student2" exists'
-  Then '"student2" is assigned as the reviewer'
+  step 'a student with the username "student1" exists'
+  step 'a student with the username "student2" exists'
+  step '"student2" is assigned as the reviewer'
   click_button 'Logout'
 end
 
@@ -36,9 +36,9 @@ Given /^"(\S+)" is assigned as the reviewer/ do |username|
 end
 
 Given 'I open that particular assignment and begin review' do
-  Given 'I am logged in as "student2"'
-  And 'I should find "test_assignment" under list of assignments'
-  And 'I click the "test_assignment" link'
+  step 'I am logged in as "student2"'
+  step 'I should find "test_assignment" under list of assignments'
+  step 'I click the "test_assignment" link'
 
   find(:xpath, "//a[contains(.,'Others' work'')]").click
   find(:xpath, "//a[contains(.,'Begin')]").click
@@ -54,7 +54,3 @@ Given 'I should see "Your response was successfully saved"' do
     assert(false)
   end
 end
-
-
-
-

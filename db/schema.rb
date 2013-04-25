@@ -52,10 +52,10 @@ ActiveRecord::Schema.define(:version => 20130403182858) do
     t.string   "review_assignment_strategy"
     t.integer  "max_reviews_per_submission"
     t.integer  "review_topic_threshold",            :default => 0
+    t.boolean  "availability_flag"
     t.boolean  "copy_flag",                         :default => false
     t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "microtask",                         :default => false
-    t.boolean  "availability_flag"
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -322,6 +322,7 @@ ActiveRecord::Schema.define(:version => 20130403182858) do
     t.text     "additional_comment"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "version_num"
   end
 
   add_index "responses", ["map_id"], :name => "fk_response_response_map"

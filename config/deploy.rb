@@ -1,11 +1,5 @@
 require 'bundler/capistrano'
 
-task :alldos2unix do
-  `find ./*`.split("\n").each do |str|
-    `dos2unix #{str}`
-  end
-end
-
 set :application, "expertiza"
 set :repository,  "git://github.com/expertiza/expertiza.git"
 set :use_sudo, false

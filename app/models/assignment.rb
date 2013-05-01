@@ -34,6 +34,8 @@ class Assignment < ActiveRecord::Base
   COMPLETE = 'Finished'
   WAITLIST = 'Waitlist open'
 
+  REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
+
   #  Review Strategy information.
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
   RS_STUDENT_SELECTED = 'Student-Selected'

@@ -23,7 +23,7 @@
   <% @responses_versions.each do |response| %>
     <% rm = ResponseMap.find(response.map_id) %>
     <% as = Assignment.find(rm.reviewed_object_id) %>
-    <% questionnaire = Questionnaire.find(as.questionnaires[0].id) %>
+    <% questionnaire = Questionnaire.find(as.questionnaires[Assignment::REVIEW_QUESTIONNAIRES[:review]].id) %>
     <% if questionnaire.section.eql? "Custom" %>
       <% file_url = nil
         @current_folder = DisplayOption.new

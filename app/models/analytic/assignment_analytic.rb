@@ -17,8 +17,9 @@ module AssignmentAnalytic
   def average_num_team_reviews
     if num_teams == 0
       0
+    else
+      total_num_team_reviews.to_f/num_teams
     end
-    total_num_team_reviews.to_f/num_teams
   end
 
   def max_num_team_reviews
@@ -33,8 +34,9 @@ module AssignmentAnalytic
   def average_team_score
     if num_teams == 0
       0
+    else
+      self.team_scores.inject(:+).to_f/num_teams
     end
-    self.team_scores.inject(:+).to_f/num_teams
   end
 
   def max_team_score
@@ -46,7 +48,6 @@ module AssignmentAnalytic
   end
 
 
-  private
   def team_review_counts
     list = Array.new
     self.teams.each do |team|

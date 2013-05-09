@@ -1,9 +1,16 @@
+require 'helpers/course_helper'
+require 'helpers/analytic_helper'
+require 'models/analytic/assignment_analytic'
+require 'models/analytic/assignment_team_analytic'
+require 'models/analytic/course_analytic'
 class AnalyticController < ApplicationController
   include CourseHelper
   include AnalyticHelper
 
   before_filter :init
+  def index
 
+  end
   def init
     #all internal not use by the page
     @available_scope_types = [:courses, :assignments, :teams]
@@ -73,6 +80,7 @@ class AnalyticController < ApplicationController
   def graph_data_type_list
     #cross checking @available_data_type[chart_type] with @available_data_type[scope]
     data_type_list =  @available_data_types[params[:scope].to_sym] & @available_data_types[params[:type].to_sym]
+    data_type_list.sort!
     respond_to do |format|
       format.json { render :json => data_type_list}
     end
@@ -148,6 +156,10 @@ class AnalyticController < ApplicationController
     respond_to do |format|
       format.json { render :json => sort_by_name(team_list) }
     end
+  end
+
+  def render_sample
+
   end
 
 

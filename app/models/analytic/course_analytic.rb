@@ -17,8 +17,9 @@ module CourseAnalytic
   def average_num_assignment_teams
     if num_assignments == 0
       0
+    else
+      total_num_assignment_teams.to_f/num_assignments
     end
-    total_num_assignment_teams.to_f/num_assignments
   end
 
   def max_num_assignment_teams
@@ -33,8 +34,9 @@ module CourseAnalytic
   def average_assignment_score
     if num_assignments == 0
       0
+    else
+      assignment_average_scores.inject(:+).to_f/num_assignments
     end
-    assignment_average_scores.inject(:+).to_f/num_assignments
   end
 
   def max_assignment_score
@@ -75,7 +77,6 @@ module CourseAnalytic
   end
 
 
-  private
   def assignment_team_counts
     list = Array.new
     self.assignments.each do |assignment|

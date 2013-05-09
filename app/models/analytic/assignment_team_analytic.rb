@@ -11,10 +11,11 @@ module AssignmentTeamAnalytic
 
   #========== score ========#
   def average_review_score
-    if num_reviews == 0
-      0
+    if self.num_reviews == 0
+      return 0
+    else
+      review_scores.inject(:+).to_f/num_reviews
     end
-    review_scores.inject(:+).to_f/num_reviews
   end
 
   def max_review_score
@@ -31,10 +32,11 @@ module AssignmentTeamAnalytic
   end
 
   def average_review_word_count
-    if num_reviews == 0
-      0
+    if self.num_reviews == 0
+      return 0
+    else
+      total_review_word_count.to_f/num_reviews
     end
-    total_review_word_count.to_f/num_reviews
   end
 
   def max_review_word_count
@@ -53,8 +55,9 @@ module AssignmentTeamAnalytic
   def average_review_character_count
     if num_reviews == 0
       0
+    else
+      total_review_character_count.to_f/num_reviews
     end
-    total_review_character_count.to_f/num_reviews
   end
 
   def max_review_character_count
@@ -68,7 +71,6 @@ module AssignmentTeamAnalytic
 
 
 
-  private
   def review_character_counts
     list = Array.new
     self.responses.each do |response|

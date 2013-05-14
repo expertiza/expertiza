@@ -555,6 +555,9 @@ def add_participant(user_name)
       end
     end
  end  
+ 
+ def dummy
+ end
   
  def assign_reviewers(mapping_strategy)
    #ACS Always assign reviewers for a team

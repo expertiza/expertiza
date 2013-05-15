@@ -525,7 +525,7 @@ class SignUpSheetController < ApplicationController
       end
 
       topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(due_date['t_id'], DeadlineType.find_by_name('metareview').id)
-      topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + (review_rounds+1).to_s]})
+      topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + (review_rounds+1).to_s]}) unless topic_deadline_subm.nil?
       flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
     }
 

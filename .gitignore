@@ -170,3 +170,4 @@ log/
 
 # RubyMine
 .idea
+*.sql.gz

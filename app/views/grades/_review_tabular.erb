@@ -1,0 +1,145 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+
+<!-- CSS Style for Tabular View -->
+<style>
+    .reviewTable {width:100%;}
+    .reviewTable td{padding:5px; font-size:10pt;}
+    .reviewTable th{background:#bbb; font-size:11pt; padding:8px;}
+    .reviewTable tr:nth-child(even){background:#ddd;}   /*stripe the table rows for easy viewing*/
+    .reviewTable tr:nth-child(odd){background:#fff;}
+    .tabs{padding:5px;                                  /* tabs styled here */
+        border:1px #000 solid;
+        background:#ccc;
+        top:10px;
+        margin-right:-1px;
+        position:relative;
+        padding:5px 20px 5px 20px;
+        -moz-border-radius: 15px;                       /*curved corners for firefox*/
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        z-index:9;
+    }
+    .tabs:active, .selected {background:#eee; border-bottom:0px; padding-bottom: 7px;}   /*when tab is selected make it look like its standing in front*/
+    .tabs:hover {background:#fff;}
+    .firstTab {}
+    .tab_wrap {border:1px #000 solid; padding:15px 5px 15px 5px; padding-left:5px; margin-top: 15px; background:#eee; z-index:1;}
+    #meta{color:green;}
+    #review{color:#986633;}
+    #reReview{color:blue;}
+    .rev_legend{margin-top:15px; margin-bottom:15px; background:#eee; border:1px #000 solid; padding: 5px 15px 5px 15px; width:450px;}
+    .rev_info{font-size:9pt;}
+</style>
+
+<!-- Javascript for Tabular View -->
+<script>
+    $(document).ready(function(){
+        $(".showMore").click(function(){                    //expand the comment so all text is showing
+            $(this).prev().html($(this).next().html());
+            $(this).hide();
+            return false;
+        });
+
+        $(".showAllComm").click(function(){                 //expand all comments on the page so all text is showing
+            $(".showMore").each(function(){
+                $(this).prev().html($(this).next().html());
+                $(this).hide();                             //once expanded hide this link
+            });
+            $(this).hide();
+            $(".revertAllComm").show();                     //once expanded show the hide link
+            return false;
+        });
+
+        $(".revertAllComm").click(function(){                //collapse all comments by reloading page...
+            location.reload();
+        });
+    });
+</script>
+<%
+#
+# This section will load the review data
+# At this point params[:id] points to the participant.
+# so what we would do is to find all responses for this participant.
+# the first thing to do is find the response map for the participant.
+# there will be multiple response maps for the the participant because there will
+# be one for each reviewer
+# So first, get all response maps for this reviewee.  Loop thru the resposne maps
+# choose the most appropriate response - if there is more than one response go with
+# the one that has the highest version number.
+
+  rmap_array = ResponseMap.find(:all,:conditions => ["reviewee_id = ?",params[:id].to_i])
+
+   prefix = false
+
+   if(params[:selected_rev].nil?)                       #default to display the 'all' review table
+     params[:selected_rev] = 'all'
+   end
+#
+#  Now we will get the review information and store in an array for easy reference
+#  later when showing the grid of reviews.
+#  A hash of question ids will be created.  Thus we can map a question ID (large random number)
+# to a simple integer, 0,1,2, etc.  This will allow the questions to be displayed in the same
+# order for all reviews.
+   @review_arr = Array.new  # this instance variable is used to display the reviews
+   question_hash = Hash.new # Hash will contain question IDs.
+   num_questions = 0
+   first_response = true
+
+   for resp_map in rmap_array
+     resp_for_rmap = Response.find(:all, :conditions => ["map_id = ?", resp_map.id])
+     latest_version= -1
+     for resp in resp_for_rmap   # find the newest review
+       if (resp.version_num > latest_version)
+         latest_version = resp.version_num
+         review = resp
+       end   # end if a newer version
+     end  # end for responses for a specific response map
+#
+# if the first response, set the number of questions to the number of scores found for this
+# response. And then create the hash.   Then for all use the hash (including the first one)
+#
+    score_arr = Score.find(:all,:conditions => ["response_id = ?", review.id])
+    if first_response == true  # set up the hash for question ids
+       first_response = false
+       num_questions =  score_arr.size
+       tmp_q_index =0
+       for tmp_score in score_arr
+          question_hash[tmp_score.question_id] = tmp_q_index
+          tmp_q_index = tmp_q_index +1
+       end 
+    end  # end first response processing
+# Now add the information about scores by extending the review structure
+#  create new arrays with specific sizes.  We will then plug in the question information
+    review.scores.class.module_eval { attr_accessor :score }
+    review.scores.score = Array.new(num_questions)
+    review.scores.class.module_eval { attr_accessor :question_id }
+    review.scores.question_id = Array.new(num_questions)
+    review.scores.class.module_eval { attr_accessor :comments }
+    review.scores.comments = Array.new(num_questions)
+    for score in score_arr # for each score,use the hash of the question id to get index and plug
+      if (score.score.nil?)
+        review.scores.score[question_hash[score.question_id]] = 0
+      else 
+        review.scores.score[question_hash[score.question_id]] = score.score 
+      end
+      if (score.comments.nil?)
+        review.scores.comments[question_hash[score.question_id]] = "No comments found"
+      else
+        review.scores.comments[question_hash[score.question_id]] = score.comments 
+      end
+      review.scores.question_id[question_hash[score.question_id]] = score.question_id 
+    end   #  for score in score_arr
+
+    @review_arr << review  # store this extended review in the array
+   end  # for each response map in rmap_array
+
+   revnum=0;
+   if (params[:selected_rev] != "all")
+     revnum=params[:selected_rev].to_i-1;
+   end
+# instance variable sel_review contains the one selected review if the user wanted that option
+   @sel_review = @review_arr[revnum]
+%>
+
+<!-- Go render the table! -->
+<%= render :partial => 'grades/review_tabular_all', :locals => {:prefix => nil} %>
+

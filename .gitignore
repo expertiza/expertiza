@@ -170,3 +170,5 @@ log/
 
 # RubyMine
 .idea*~
+.*~
+.idea

@@ -169,4 +169,4 @@ log/
 *.orig
 
 # RubyMine
-.idea
+.idea*~

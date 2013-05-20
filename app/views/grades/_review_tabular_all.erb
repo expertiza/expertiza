@@ -1,0 +1,251 @@
+<%
+   ###########################
+   ##### Tab Navigation ######
+   ###########################
+   if(params[:selected_rev] == 'all' || params[:selected_rev].nil?): css = " selected"         #select the css attr for the selected tab, (the one that appears to be highlighted)
+   else css = ""
+   end
+   row_full = 0
+   review_list_html = (link_to "All ", {:controller => 'grades', :action => 'view_my_scores', :id => @participant.id, :selected_rev=> 'all'}, :class=>"tabs"+css)
+
+   for i in 1...(@review_arr.size+1)                                  #repeat for each review that exists
+     if(params[:selected_rev]==i.to_s): css = " selected"           #select the correct css attr so the selected tab/review is shown as such
+     else css = ""
+     end
+     if(i==3): css_id = "meta"
+     else css_id = ""
+     end
+     review_list_html += (link_to "Review "+i.to_s, {:controller => 'grades', :action => 'view_my_scores', :id => @participant.id, :selected_rev=> i.to_s}, :class=>"tabs"+css)
+     if row_full > 6                                                #if over 6 tabs, start a new row of tabs
+       review_list_html += "<div style='height:6px;'>&nbsp</div>"
+       row_full = -1
+     end
+     row_full += 1
+   end
+%>
+
+<%
+   ################################
+   ##### Single Review Table ######
+   ################################
+   rev_tbl_html = "<table class='reviewTable'>
+	<thead>
+		<tr>
+			<th style='width:20px'>#</th>
+			<th style='width:300px'>Question</th>
+			<th style='width:45px'>Score</th>
+			<th>Response</th>
+		</tr>"
+
+   count = 0
+   for score in @sel_review.scores.score	#loop on review questions
+     quest = Question.find_by_id(@sel_review.scores.question_id[count])               #grab the questions for this assignment
+     if quest.nil?
+       quest_txt = "I didn't find a question in the db... ID:" + count.to_s              #only occurs if error
+       max = "?"
+     else
+       quest_txt = quest.txt.to_s
+       max = quest.questionnaire.max_question_score.to_s
+     end
+     count += 1
+     rev_tbl_html += "
+			<tr>
+				<td>
+					<b>Q" + count.to_s + ":</b>
+				</td>
+				<td>
+					<i>" + quest_txt + "</i> "+
+             "</td>
+				<td>
+					<font style='background:gold; padding:1px 3px 1px 3px;'>" + score.to_s + "</font> / " + max +
+             "</td>
+				<td>
+					" + @sel_review.scores.comments[count-1].gsub("<","&lt;").gsub(">","&gt;").gsub(/\n/,'<br/>') +
+             "</td>
+		</tr>"
+   end #end loop over review questions
+
+   #end the table with the additional comment field
+   rev_tbl_html +="
+	</thead>
+</table>"
+   rev_tbl_html += "<div style='margin-top:10px; margin-left:8px; font-size:9pt;'>
+						<i>Additional Comment:</i>
+						<br/>
+						" + "<div style='margin-left:30px'>" + @sel_review.additional_comment + "</div>" +
+           "</div>"
+
+%>
+
+<%
+   ##############################
+   ##### All Reviews Table ######
+   ##############################
+   rev_tbl_html_all = ""
+   if @review_arr.nil? == false
+     #creat the expand all/hide links
+     rev_tbl_html_all = " <a href='#' class='showAllComm' style='font-size:8pt; color:blue; text-decoration:underline;'>Expand All Comments</a>
+<a href='#' class='revertAllComm' style='font-size:8pt; color:blue; text-decoration:underline; display:none;'>Revert Comments</a>
+<table class='reviewTable'>
+  <thead>
+      <tr>
+        <th style='width:20px'></th>
+        <th style='width:150px'></th>"
+
+     for rev_num in 0...@review_arr.size                      #loop over all the reviews that are for this assignment
+       rev_tbl_html_all += "<th>Review " + (rev_num+1).to_s + "</th>"
+     end
+     rev_tbl_html_all += "</tr>"
+     count = 0
+
+     for row in 1... (@review_arr[0].scores.score.size + 4 + 1)       #loop for each question, and once for: date, overall scores, additional comment, and source link = #qs + 4
+       if row == 1                                                  #row 1 is the date
+         rev_tbl_html_all += "<tr>
+             <td style='font-size:8pt;'><strong>Date</strong></td>
+             <td></td>"
+         for rev in @review_arr
+           rev_tbl_html_all += "<td>"+ rev.updated_at.strftime('%A %B %d %Y, %I:%M%p') +" </td>"
+         end
+         rev_tbl_html_all += "</tr>"
+       end
+
+       if row == 2                                                  #row 2 is the overall score
+         rev_tbl_html_all += "<tr>
+             <td style='font-size:8pt;'><strong>Overall Score</strong></td>
+             <td></td>"
+         for rev in @review_arr
+           rev_tbl_html_all += "<td>"+ (rev.scores.score.inject{ |sum, el| sum + el }.to_f / @review_arr[0].scores.score.size / 5 * 100).round(2).to_s + "%</td>"
+         end
+       end
+       rev_tbl_html_all += "</tr>"
+
+       if row >= 3 and row <= @review_arr[0].scores.score.size+2     #row 1 -> num of questions are for the questions for this assignment
+         quest = Question.find_by_id(@review_arr[0].scores.question_id[count])
+         if quest.nil?
+           quest_txt = "I didn't find a question in the db... ID:" + count.to_s + " key: " +@review_arr[0].scores.question_id[count].to_s
+           max = "?"
+         else
+           quest_txt = quest.txt.to_s
+           max = quest.questionnaire.max_question_score.to_s
+         end
+         rev_tbl_html_all += "
+          <tr>
+            <td>
+              <b>Q" + (count+1).to_s + ":</b>
+            </td>
+            <td style='font-size:8pt;'>
+              <i>" + quest_txt + "</i> "+
+                 "</td>"
+
+         for rev in @review_arr                                    #loop for each review in this assignment
+           qq = Question.find_by_id(@review_arr[0].scores.question_id[count])
+           if qq
+              maxs=qq.questionnaire.max_question_score.to_s
+          else
+               maxs = "N/A"
+          end
+           rev_tbl_html_all += "
+            <td style='font-size:8pt;'>
+              [<strong>"+rev.scores.score[count].to_s+"</strong> / " + maxs + "]" +
+                   " <span id='comment'>" +
+                   rev.scores.comments[count].gsub("<","&lt;").gsub(">","&gt;").gsub(/\n/,'<br/>')[0..64] + "</span>"
+           if rev.scores.comments[count].gsub("<","&lt;").gsub(">","&gt;").gsub(/\n/,'<br/>').size > 64
+             rev_tbl_html_all += "<a href='#' class='showMore' style='text-decoration:underline; color:blue;'>...</a>"
+           end
+           rev_tbl_html_all += "<div style='display:none'> " + rev.scores.comments[count].gsub("<","&lt;").gsub(">","&gt;").gsub(/\n/,'<br/>')  + "</div>" +
+                   "</td>"
+         end
+
+         rev_tbl_html_all += " </tr>"
+         count += 1
+       end
+
+       if row == @review_arr[0].scores.score.size+3              #this row is for the 'additional comment'
+         rev_tbl_html_all += "<tr>
+             <td style='font-size:8pt;'><strong>Additional Comment</strong></td>
+             <td></td>"
+         test = 0
+         for rev in @review_arr
+           rev_tbl_html_all += "<td style='font-size:8pt;'>"+ rev.additional_comment + "</td>"
+           test += 1
+         end
+         rev_tbl_html_all += "</tr>"
+       end
+
+       if row == @review_arr[0].scores.score.size+4             #this row is for the source link/revision number
+         rev_tbl_html_all += "<tr>
+          <td style='font-size:8pt;'><strong>Source Link</strong></td>
+          <td></td>"
+         revision = 1
+         for rev in @review_arr
+           rev_tbl_html_all += "<td style='font-size:8pt;'>"+ (link_to 'Revision '+revision.to_s, :controller => 'submitted_content', :action => 'view', :id => @participant.id) + "</td>"
+         end
+         rev_tbl_html_all += "</tr>"
+
+       end
+
+     end
+     rev_tbl_html_all +="
+  </thead>
+ </table>"
+   end
+%>
+
+<!--   Legend is removed, was supposed to distinguish metareview from review.  Was not completed
+<div class='rev_legend'>
+  <span><strong>Legend:</strong></span>&nbsp;&nbsp;&nbsp;
+  <span id='review'>&#9650; Review </span>&nbsp;&nbsp;&nbsp;
+  <span id='meta'>&#9650; Metareview </span>&nbsp;&nbsp;&nbsp;
+  <span id='reReview'>&#9650; Rereview</span>&nbsp;&nbsp;&nbsp;
+</div>
+-->
+
+
+<!--
+###########################
+##### Echo the Table ######
+###########################
+-->
+<%=  review_list_html %>
+<div class='tab_wrap'>
+  <% if(params[:selected_rev] != 'all') %>        <!-- if a 'single' review table    create the details sections -->
+      <div class='rev_info'>
+        <strong>By:</strong>
+        <%
+           txt = "Reviewer " + params[:selected_rev].to_s
+           if prefix == true
+# Here an instructor is viewing so we show the actual name.
+# first, get the reviewer id which is a participant.  Then get the participant and
+# its user id, then get the user id and the string for the name
+             rmap = ResponseMap.find_by_id(@sel_review.map_id)  
+             participant= Participant.find_by_id(rmap.reviewer)
+             usr=  User.find_by_id(participant.user_id)
+             txt = usr.fullname
+           end
+        %>
+        <%= txt %>
+      </div>
+
+      <div class='rev_info'>                      <!-- field for date -->
+        <strong>Date:</strong>
+        <%= @sel_review.updated_at.strftime('%A %B %d %Y, %I:%M%p')
+        %>
+      </div>
+
+      <div class='rev_info'>
+        <strong>Assignment:</strong> <%= @assignment.name %>      <!-- field for assignment name -->
+      </div>
+
+      <div class='rev_info'>                                      <!-- field for overall score -->
+        <strong>Overall Score:</strong> <%= @sel_review.scores.score.inject{ |sum, el| sum + el }.to_f / @sel_review.scores.score.size / 5 * 100 %> %
+      </div>
+
+      <br/>
+      <%= rev_tbl_html %>                            <!-- RELEASE THE TABLE -->
+
+  <% else %>                                         <!-- Else display the 'all' review table -->
+      <%= rev_tbl_html_all %>                        <!-- RELEASE THE TABLE! -->
+  <% end %>
+</div>
+
+

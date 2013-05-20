@@ -1,8 +1,15 @@
 <H1>Score for <%= @assignment.name %></H1>
-   
-<TABLE class="grades" >
-<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
-<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>                                                                                   
-</TABLE>
-<BR/>
+
+<table class="grades" >
+<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>
+<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+</table>
+
+<br/>
+
+<!-- Tabular View Contains 'All' and single views -->
+<%= render :partial => 'grades/review_tabular', :locals => {:prefix => nil} %>
+
+<br/>
 <a href="javascript:window.history.back()">Back</a>
+

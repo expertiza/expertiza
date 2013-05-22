@@ -171,4 +171,6 @@ log/
 # RubyMine
 .idea*~
 .*~
+
+pg_data
 .idea

@@ -1,20 +1,46 @@
-<h1>Editing assignment</h1>
+<h1>Editing Assignment</h1>
 
-<% form_tag({:action => 'update', :id => @assignment, :review_limit => @limits[:review], :metareview_limit => @limits[:metareview], :teammate_limit => @limits[:teammate], :feedback_limit => @limits[:feedback]},:onsubmit => 'return checkForm();') do %>
-  <%= render :partial => 'content' %>
-    <hr/>
-  <%= render :partial => 'rubrics' %>
-  <%= render :partial => 'review_strategy' %>
-<br/>
-<hr/>
-<%= render :partial => 'due_dates' %>
-<hr/>
+<script>
+    function submit_form() {
+        submit_due_dates();
+        submit_questionnaires();
+    }
+</script>
 
-  &nbsp;&nbsp;<%= submit_tag "Save assignment" %>
+<% form_tag({:action => 'update', :id => @assignment.id}, {:onclick => 'submit_form()'}) do %>
+    <%= render :partial => 'javascript_setup' %>
+    <div id="tabs">
+      <ul>
+        <li><a href="#tabs-1">General</a></li>
+        <li><a href="#tabs-2">Rubrics</a></li>
+        <li><a href="#tabs-3">Review Strategy</a></li>
+        <li><a href="#tabs-4">Due Dates</a></li>
+      </ul>
+      <div id="tabs-1">
+        <%= render :partial => 'content' %>
+      </div>
+      <div id="tabs-2">
+        <%= render :partial => 'rubrics' %>
+      </div>
+      <div id="tabs-3">
+        <%= render :partial => 'review_strategy' %>
+      </div>
+      <div id="tabs-4">
+        <%= render :partial => 'due_dates' %>
+      </div>
+    </div>
+    <script>
+        jQuery(document).ready(function() {
+            jQuery( "#tabs" ).tabs();
+        });
+    </script>
+    <%= submit_tag "Save" %> |
+    <!--<input name='commit' type='submit' onclick='submit_due_dates();submit_questionnaires();' value='Save'> |-->
+    <%= render :partial => '/shared_scripts/back' %>
 <% end %>
+
 <br/>
-<div style="padding: 15px">
-<%= render :partial => '/shared_scripts/back' %>
-</div>
+
+
 
 <script>get_assignment_startdate();</script>

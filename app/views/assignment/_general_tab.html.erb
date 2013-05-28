@@ -1,0 +1,23 @@
+<table id='assignment_general_info_table'>
+  <tr class='heading'>
+    <th width=40%></th>
+    <th width=60%></th>
+  </tr>
+  <%= hidden_field_tag('assignment[instructor_id]', @assignment.instructor_id) %>
+  <%= hidden_field_tag('assignment[course_id]', @assignment.course_id) %>
+
+  <tr id=assignment_name_row>
+    <td style='padding:5px'><%= label_tag('assignment[name]', 'Assignment Name:') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment[name]', @assignment.name, :style => 'width:250px') %></td>
+  </tr>
+
+  <tr id=assignment_instructor_row>
+    <td style='padding:5px'><%= label_tag('assignment[directory_path]', 'Submission Directory:') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment[directory_path]', @assignment.directory_path, :style => 'width:250px', :readonly=>'true') %></td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment[spec_location]', 'Description URL: ') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment[spec_location]', @assignment.spec_location, :style => 'width:250px') %></td>
+  </tr>
+</table>

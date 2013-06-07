@@ -209,7 +209,7 @@ class GradesController < ApplicationController
     ## This following code was cloned from response_controller.
 
     #ACS Check if team count is more than 1 instead of checking if it is a team assignment
-    if @participant.assignment.team_count > 1
+    if @participant.assignment.max_team_size > 1
       team = @participant.team
       if(!team.nil?)
         unless team.has_user session[:user]

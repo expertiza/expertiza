@@ -1,6 +1,5 @@
-<% @assignment = Assignment.find(params[:id]) %>
 <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
-
+<% @assignment = Assignment.find(params[:id]) %>
 <% if flash[:notice] %>
     <div class="flash_note"><%= flash[:notice] %></div>
 <% end %>
@@ -16,19 +15,15 @@
       <% for topic in @sign_up_topics %>
           <tr>
             <td><%= topic.topic_identifier %></td>
-
             <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
 
-
             <% if @assignment.is_microtask? %>
-                <td><%= topic.micropayment %></td>
+                <td align='center'><%= topic.micropayment %></td>
             <% end %>
 
             <td align="center"><%= topic.max_choosers %></td>
-
-            <%= render :partial => 'num_of_choosers', :locals => {:topic=>topic} %>
-
-            <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
+            <%= render :partial => 'available_slots', :locals => {:topic=>topic} %>
+            <%= render :partial => 'num_waiting', :locals => {:topic=>topic} %>
 
             <td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>
           </tr>

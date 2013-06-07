@@ -319,7 +319,7 @@ class AssignmentParticipant < Participant
     currenttime = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
 
     #ACS Check if the team count is greater than one(team assignment)
-    if self.assignment.team_count > 1 and self.assignment.wiki_type.name == "MediaWiki"
+    if self.assignment.max_team_size > 1 and self.assignment.wiki_type.name == "MediaWiki"
        submissions = Array.new
        if self.team
         self.team.get_participants.each {

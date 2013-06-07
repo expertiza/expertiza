@@ -100,7 +100,7 @@ class SignUpSheetController < ApplicationController
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 
     @assignment = Assignment.find(assignment_id)
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @participants = SignedUpUser.find_team_participants(assignment_id)
   end
@@ -247,16 +247,15 @@ class SignUpSheetController < ApplicationController
     @slots_filled = SignUpTopic.find_slots_filled(params[:id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
+    assignment=Assignment.find(params[:id])
 
-    #find whether assignment is team assignment
-    assignment = Assignment.find(params[:id])
-
-
-    if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
+    if assignment.due_dates.find_by_deadline_type_id(1)!= nil
+      if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
       @show_actions = false
+      end
     end
 
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
 
@@ -267,6 +266,7 @@ class SignUpSheetController < ApplicationController
       @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
     end
   end
+
 
   #this function is used to delete a previous signup
   def delete_signup
@@ -284,7 +284,7 @@ class SignUpSheetController < ApplicationController
       flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
       #if team assignment find the creator id from teamusers table and teams
-      #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       #users_team will contain the team id of the team to which the user belongs
       users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
@@ -302,7 +302,7 @@ class SignUpSheetController < ApplicationController
           first_waitlisted_user.save
 
           #update the participants details
-          #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+          #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
           # to treat all assignments as team assignments
 
           user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
@@ -332,7 +332,6 @@ class SignUpSheetController < ApplicationController
 
     #check whether the user already has a team for this assignment
     users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
-
     if users_team.size == 0
       #if team is not yet created, create new team.
       team = create_team(params[:assignment_id])
@@ -342,8 +341,11 @@ class SignUpSheetController < ApplicationController
     else
       confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id])
     end
+
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
+
+
 
   # When using this method when creating fields, update race conditions by using db transactions
   def slotAvailable?(topic_id)
@@ -362,7 +364,6 @@ class SignUpSheetController < ApplicationController
     sign_up = SignedUpUser.new
     sign_up.topic_id = params[:id]
     sign_up.creator_id = creator_id
-
     result = false
     if user_signup.size == 0
 
@@ -405,7 +406,6 @@ class SignUpSheetController < ApplicationController
           SignUpTopic.cancel_all_waitlists(creator_id, assignment_id)
           sign_up.is_waitlisted = false
           sign_up.save
-
           participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
           participant.update_topic_id(topic_id)
           result = true
@@ -454,7 +454,8 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-#this function is used to prevent injection attacks. Do not know how this works.
+#this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
+# attempted until the other topic has been completed..
   def save_topic_dependencies
     # Prevent injection attacks - we're using this in a system() call later
     params[:assignment_id] = params[:assignment_id].to_i.to_s
@@ -525,14 +526,15 @@ class SignUpSheetController < ApplicationController
       end
 
       topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(due_date['t_id'], DeadlineType.find_by_name('metareview').id)
-      topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + (review_rounds+1).to_s]}) unless topic_deadline_subm.nil?
+      topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + (review_rounds+1).to_s]})
       flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
     }
 
     redirect_to_sign_up(params[:assignment_id])
   end
 
-#used by save_topic_dependencies. Do not know how this works
+  #used by save_topic_dependencies. The dependency graph is a partial ordering of topics ... some topics need to be done
+  # before others can be attempted.
   def build_dependency_graph(topics,node)
     dg = RGL::DirectedAdjacencyGraph.new
 

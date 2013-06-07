@@ -15,7 +15,7 @@
   <%= hidden_field_tag('id', @mapping.id) %>
   <input type='submit' value='Add Metareviewer'/><br/><br/>
     <!-- ACS removed check to see if it is a team assignment -->
-    <% if @mapping.assignment.team_count < 2 %>
+    <% if @mapping.assignment.max_team_size < 2 %>
      <%= check_box 'options','include', {:checked => 'checked'},  "true", "false"  %>&nbsp;Include the selected user as a participant in the assignment.<br/>
   <% end %>
 <% end %>

@@ -41,9 +41,9 @@
 
               <td align="center"><%= topic.max_choosers %></td>
 
-              <%= render :partial => 'num_of_choosers', :locals => {:topic=>topic} %>
+              <%= render :partial => 'available_slots', :locals => {:topic=>topic} %>
 
-              <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic}  %>
+              <%= render :partial => 'num_waiting', :locals => {:topic=>topic}  %>
 
               <td align="center">
                   <% topic_identifier = SignUpTopic.find_all_by_assignment_id(@assignment.id).map {|u| [u.topic_identifier, u.id] } %>

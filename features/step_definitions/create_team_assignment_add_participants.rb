@@ -51,7 +51,7 @@ end
 Given /^a team assignment named "(\S+)" exists$/ do |assignment|
   newAssignment = Assignment.new
   newAssignment.name = assignment
-  newAssignment.team_count= 2
+  newAssignment.max_team_size= 2
   newAssignment.allow_suggestions= true
   newAssignment.directory_path = 'test'
   newAssignment.spec_location= 'http://'

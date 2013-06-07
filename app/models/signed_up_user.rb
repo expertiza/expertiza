@@ -1,8 +1,8 @@
 class SignedUpUser < ActiveRecord::Base
   belongs_to :topic, :class_name => 'SignUpTopic'
-  
+
   #the below has been added to make is consistent with the database schema
-  validates_presence_of :topic_id, :creator_id, :is_waitlisted
+  validates_presence_of :topic_id, :creator_id
   #This method is not used anywhere
   #def cancel_waitlists_of_users(creator_id, assignment_id)
   #  waitlisted_topics = SignedUpUser.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.creator_id = " + creator_id.to_s)
@@ -39,7 +39,7 @@ class SignedUpUser < ActiveRecord::Base
     @participants
   end
 
-  def self.find_participants(assignment_id) 
+  def self.find_participants(assignment_id)
     #SignedUpUser.find_by_sql("SELECT t.id as topic_id,u.name as name, s.is_waitlisted as is_waitlisted FROM signed_up_users s, users u, sign_up_topics t where s.creator_id = u.id and s.topic_id = t.id and t.assignment_id = " + assignment_id)
     SignedUpUser.find_by_sql(["SELECT t.id as topic_id,u.name as name, s.is_waitlisted as is_waitlisted FROM signed_up_users s, users u, sign_up_topics t where s.creator_id = u.id and s.topic_id = t.id and t.assignment_id = ?", assignment_id])
   end

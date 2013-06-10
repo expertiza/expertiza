@@ -338,3 +338,5 @@ DeadlineRight.create(:name => 'No')
 DeadlineRight.create(:name => 'Late')
 DeadlineRight.create(:name => 'OK')
 
+###### WikiType
+WikiType.create(:name => 'No')

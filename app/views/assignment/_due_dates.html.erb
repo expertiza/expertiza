@@ -90,7 +90,7 @@
         }
         var html = '<tr id=' + element_id + '>';
 
-        html += '<input class="due_date_id" name="due_date_id" type="hidden" value="' + due_date.id + '">' +
+        html += '<input class="due_date_assignment_id" name="due_date[assignment_id]" type="hidden" value="' + <%= @assignment.id %> + '">' +
                 '<input class="due_date_round" name="due_date[round]" type="hidden" value="' + round_no + '">' +
                 '<input class="due_date_deadline_type_id" name="due_date[deadline_type_id]" type="hidden" value="' + due_date.deadline_type_id + '">';
 
@@ -203,30 +203,30 @@
     <!--javascript function that goes through the due_dates_table and submit the data line by line -->
     <!--ruby method that response to the get request is set_due_date-->
     function submit_due_dates() {
-//        alert('submit_due_dates');
+        //TODO: check if all due dates are correct before saving
+
+        //delete all of the old due dates
+//        jQuery.get("/assignment/delete_all_due_dates?assignment_id=" + <%= @assignment.id %>);
+        jQuery.ajaxQueue({
+            url: "/assignment/delete_all_due_dates?assignment_id=" + <%= @assignment.id %>
+        });
+        //create the new due_dates
         var ajaxReqs = [];
         var i, j;
         var dates = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
         var fields, para;
         for (i = 0; i < dates.length; i++) {
             fields = jQuery(dates[i]).find('input,select');
-            para = "?assignment_id=" + <%= @assignment.id %>;
+            para = "?";
             for (j = 0; j < fields.length; j++) {
                 para += "&" + (fields[j].name + "=" + fields[j].value);
             }
 //            jQuery.get("/assignment/set_due_date" + para);
-            ajaxReqs[i] = jQuery.get("/assignment/set_due_date" + para);
+
+            jQuery.ajaxQueue({
+                url: "/assignment/set_due_date" + para
+            });
         }
-        jQuery.when.apply(ajaxReqs).then(
-            function () {
-                console.log('successfully submitted all of the due dates!');
-            }
-        ).fail(
-            function () {
-                console.log('one or more submission of due dates failed!')
-            }
-        );
-//        console.log('submit_due_dates');
     }
 </script>
 

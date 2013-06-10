@@ -5,9 +5,7 @@
         var i = 0;
         var html;
         html += '<tr id="' + row_id + '">' +
-                '<input name="questionnaire_type" type="hidden" value="' + questionnaire_type + '">' +
-                '<input name="assignment_questionnaire_id" type="hidden" value="' + assignment_questionnaire.id + '">'
-
+                '<input name="assignment_questionnaire[assignment_id]" type="hidden" value="' + <%= @assignment.id %> +'">';
 
         html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>' +
                 '<td align="center">' +
@@ -34,20 +32,29 @@
     }
 
     function submit_questionnaires() {
+        //TODO: check if all due dates are correct before saving
+
+        //delete all of the old due dates
+        jQuery.ajaxQueue({
+            url: "/assignment/delete_all_questionnaires?assignment_id=" + <%= @assignment.id %>
+        });
+
         var i, j;
         var dates = jQuery('#assignment_questionnaire_table>tbody>tr:not(.heading)');
         var fields, para;
-        para = "?assignment_id=" + <%= @assignment.id %>;
+
         for (i = 0; i < dates.length; i++) {
             fields = jQuery(dates[i]).find('input,select');
+            para = "?";
             for (j = 0; j < fields.length; j++) {
                 para += "&" + (fields[j].name + "=" + fields[j].value);
             }
-            jQuery.get("/assignment/set_questionnaire" + para, function(){console.log('submit questionnaire')});
-//            jQuery.ajax({
-//                async: false,
-//                url: "/assignment/set_questionnaire" + para
-//            });
+//            jQuery.get("/assignment/set_questionnaire" + para).done(console.log('done'));
+
+            jQuery.ajaxQueue({
+                url: "/assignment/set_questionnaire" + para
+            });
+
         }
     }
 </script>

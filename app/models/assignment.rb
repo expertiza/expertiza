@@ -1064,11 +1064,11 @@ class Assignment < ActiveRecord::Base
     end
 
     due_dates.sort! do |x, y|
-      if x.nil? && y.nil?
+      if x.due_at.nil? && y.due_at.nil?
         0
-      elsif x.nil?
+      elsif x.due_at.nil?
         -1
-      elsif y.nil?
+      elsif y.due_at.nil?
         1
       else
         x.due_at <=> y.due_at

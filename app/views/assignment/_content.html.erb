@@ -33,7 +33,7 @@
   <tr>
     <td style='padding:5px' id='assignment_require_signup_field'>
       <input name="assignment[require_signup]" type="hidden" value="false" />
-      <%= check_box_tag('assignment[require_signup]', 'true', @assignment.require_signup, {:onchange => 'requireSignUpChanged()'}) %>
+      <%= check_box_tag('assignment[require_signup]', 'true', @assignment.require_signup?, {:onchange => 'requireSignUpChanged()'}) %>
       <%= label_tag('assignment[require_signup]', 'Has Topics?') %>
     </td>
   </tr>

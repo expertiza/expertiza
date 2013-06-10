@@ -49,47 +49,86 @@ class AssignmentController < ApplicationController
     set_up
   end
 
-  def set_due_date
-    assignment = Assignment.find(params[:assignment_id])
-
-    if params[:due_date_id] == 'undefined'
-      if !params[:due_date][:due_at].nil?
-        due_date = DueDate.new(params[:due_date])
-        due_date.assignment = @assignment
-
-        due_date.save
-      end
-    else
-      due_date = assignment.due_dates.find(params[:due_date_id])
-      due_date.update_attributes(params[:due_date])
+  def delete_all_due_dates
+    if params[:assignment_id].nil?
+      return #TODO: add error message
     end
 
-    #respond_to do |format|
-    #  format.json { render :json => params }
-    #end
+    assignment = Assignment.find(params[:assignment_id])
+    if assignment.nil?
+      return #TODO: add error message
+    end
+
+    @due_dates = DueDate.find_all_by_assignment_id(params[:assignment_id])
+    @due_dates.each do |due_date|
+      due_date.delete
+    end
+
+    respond_to do |format|
+      format.json { render :json => @due_dates }
+    end
+  end
+
+  def set_due_date
+    if params[:due_date][:assignment_id].nil?
+      return #TODO: add error message
+    end
+
+    assignment = Assignment.find(params[:due_date][:assignment_id])
+    if assignment.nil?
+      return #TODO: add error message
+    end
+
+    due_at = DateTime.parse(params[:due_date][:due_at])
+    if due_at.nil?
+      return #TODO: add error message
+    end
+
+    @due_date = DueDate.new(params[:due_date])
+    @due_date.save
+
+    respond_to do |format|
+      format.json { render :json => @due_date }
+    end
+  end
+
+  def delete_all_questionnaires
+    assignment = Assignment.find(params[:assignment_id])
+    if assignment.nil?
+      return #TODO: add error message
+    end
+
+    @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:assignment_id])
+    @assignment_questionnaires.each do |assignment_questionnaire|
+      assignment_questionnaire.delete
+    end
+
+    respond_to do |format|
+      format.json { render :json => @assignment_questionnaires }
+    end
   end
 
   def set_questionnaire
-    assignment = Assignment.find(params[:assignment_id])
-    assignment_questionnaire = assignment.assignment_questionnaire(params[:questionnaire_type])
-
-    if params[:assignment_questionnaire_id] == 'undefined'
-      if !params[:assignment_questionnaire][:questionnaire_id].nil?
-        assignment_questionnaire = AssignmentQuestionnaire.new(params[:assignment_questionnaire])
-        assignment_questionnaire.assignment = assignment
-        assignment_questionnaire.save
-      end
-    else
-      if params[:assignment_questionnaire][:questionnaire_id] == ''
-        assignment_questionnaire.delete
-      else
-        assignment_questionnaire.update_attributes(params[:assignment_questionnaire])
-      end
+    if params[:assignment_questionnaire][:assignment_id].nil? or params[:assignment_questionnaire][:questionnaire_id].nil?
+      return #TODO: add error message
     end
 
-    #respond_to do |format|
-    #  format.json { render :json => params }
-    #end
+    assignment = Assignment.find(params[:assignment_questionnaire][:assignment_id])
+    if assignment.nil?
+      return #TODO: add error message
+    end
+
+    questionnaire = Questionnaire.find(params[:assignment_questionnaire][:questionnaire_id])
+    if questionnaire.nil?
+      return #TODO: add error message
+    end
+
+    @assignment_questionnaire = AssignmentQuestionnaire.new(params[:assignment_questionnaire])
+    @assignment_questionnaire.save
+
+    respond_to do |format|
+      format.json { render :json => @assignment_questionnaire }
+    end
   end
 
 
@@ -131,10 +170,12 @@ class AssignmentController < ApplicationController
     reviews = @assignment.find_due_dates('review') + @assignment.find_due_dates('rereview')
     @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
 
-    drop_topic_deadine = @assignment.find_due_dates('drop_topic')
-    signup_deadline = @assignment.find_due_dates('signup')
-    sign_ups = SignUpTopic.find_all_by_assignment_id(@assignment.id)
-    @assignment.require_signup = !(drop_topic_deadine + signup_deadline + sign_ups).empty?
+    #drop_topic_deadine = @assignment.find_due_dates('drop_topic')
+    #signup_deadline = @assignment.find_due_dates('signup')
+    #sign_ups = SignUpTopic.find_all_by_assignment_id(@assignment.id)
+
+    #@assignment.require_signup = !(drop_topic_deadine + signup_deadline + sign_ups).empty?
+
   end
 
   #NOTE: unfortunately this method is needed due to bad data in db @_@
@@ -210,7 +251,7 @@ class AssignmentController < ApplicationController
   #--------------------------------------------------------------------------------------------------------------------
   # COPY_PARTICIPANTS_FROM_COURSE
   #  if assignment and course are given copy the course participants to assignment
-  #
+  # TODO: to be tested
   #--------------------------------------------------------------------------------------------------------------------
   def copy_participants_from_course
     if params[:assignment][:course_id]
@@ -222,6 +263,11 @@ class AssignmentController < ApplicationController
     end
   end
 
+  #-------------------------------------------------------------------------------------------------------------------
+  # COPY
+  # Creates a copy of an assignment along with dates and submission directory
+  # TODO: need to be tested
+  #-------------------------------------------------------------------------------------------------------------------
   def copy
     Assignment.record_timestamps = false
     old_assign = Assignment.find(params[:id])
@@ -312,8 +358,6 @@ class AssignmentController < ApplicationController
     @assignments=super(Assignment)
     #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
-
-  #--------------------------------------------------------------------------------------------------------------------
 
 
   #--------------------------------------------------------------------------------------------------------------------

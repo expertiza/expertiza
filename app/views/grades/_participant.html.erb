@@ -72,7 +72,7 @@
     <TD ALIGN="CENTER">---</TD>
     <% end %>
   <!--ACS Teammate review needs to be done only if there are more than one person in the team-->
-  <% if @assignment.team_count > 1 %>
+  <% if @assignment.max_team_size > 1 %>
     <% if tr_avg %>
     <TD ALIGN="CENTER" VALIGN="TOP">
     	<%if controller.action_name != "view_my_scores"%>

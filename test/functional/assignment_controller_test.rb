@@ -87,7 +87,7 @@ class AssignmentControllerTest < ActionController::TestCase
          :reviews_visible_to_all=>false,
          :rounds_of_reviews=>1,
          :spec_location=> "",
-         :team_count=>0,
+         :max_team_size=>0,
          :name=>"mt_valid_test",
          :course_id=> "",
          :allow_suggestions=>false,

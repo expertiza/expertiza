@@ -1,7 +1,7 @@
 Given /^I am participating on assignment "(\S+)"$/ do |assignment|
   a = Assignment.new
   a.name = assignment
-  a.team_count= 2
+  a.max_team_size= 2
   a.allow_suggestions= true
   a.directory_path = 'test'
   a.spec_location= 'http://'

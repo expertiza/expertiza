@@ -23,7 +23,7 @@ class Assignment < ActiveRecord::Base
   # has_many :responses, :through => :response_maps, :source => 'response'
 
   validates_presence_of :name
-  validates_uniqueness_of :scope => [:directory_path, :instructor_id]
+  #validates_uniqueness_of :scope => [:directory_path, :instructor_id]
 
   COMPLETE = "Complete"
 
@@ -421,18 +421,17 @@ class Assignment < ActiveRecord::Base
     end
     return review_num
   end
-
-  # It appears that this method is not used at present!
-  def is_wiki_assignment
-    return (self.wiki_type_id > 1)
-  end
+ 
+ # It appears that this method is not used at present!
+ def is_wiki_assignment
+   return (self.wiki_type_id > 1)
+ end
 
   # Check to see if assignment is a microtask
   def is_microtask?
     return (self.microtask.nil?) ? False : self.microtask
   end
 
-  #
   def self.is_submission_possible (assignment)
     # Is it possible to upload a file?
     # Check whether the directory text box is nil
@@ -475,7 +474,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def create_node()
+  def create_node
     parent = CourseNode.find_by_node_object_id(self.course_id)
     node = AssignmentNode.create(:node_object_id => self.id)
     if parent != nil
@@ -577,7 +576,6 @@ class Assignment < ActiveRecord::Base
     else
       return due_date
     end
-
   end
 
 
@@ -615,10 +613,8 @@ class Assignment < ActiveRecord::Base
     return @review_scores
   end
 
-
   def get_review_questionnaire_id()
     @revqids = []
-
     @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?", self.id])
     @revqids.each do |rqid|
       rtype = Questionnaire.find(rqid.questionnaire_id).type
@@ -632,13 +628,11 @@ class Assignment < ActiveRecord::Base
 
   def get_next_due_date()
     due_date = self.find_next_stage()
-
     if due_date == nil or due_date == COMPLETE
       return nil
     else
       return due_date
     end
-
   end
 
   def find_next_stage()
@@ -778,13 +772,21 @@ class Assignment < ActiveRecord::Base
   # Checks whether there are duplicate assignments of the same name by the same instructor.
   # If the assignments are assigned to courses, it's OK to have duplicate names in different
   # courses.
+  #
+  # changelog: 5/24/2013
+  # Author: hliu11
+  #   old method only works after the assignment is created
+  #   cover corner case where assignment have not yet been created
   def duplicate_name?
-    if course
-      Assignment.find(:all, :conditions => ['course_id = ? and instructor_id = ? and name = ?',
-                                            course_id, instructor_id, name]).count > 1
+    assignments = Assignment.find_all_by_name(self.name)
+    assignments.select { |x| x.instructor_id == self.instructor_id } unless self.instructor_id.nil?
+    assignments.select { |x| x.course_id == self.course_id } unless self.course_id.nil?
+
+    if self.id.nil?
+      #if the assignment have not yet been created i.e: Assignment.new without save
+      assignments.count > 0
     else
-      Assignment.find(:all, :conditions => ['instructor_id = ? and name = ?',
-                                            instructor_id, name]).count > 1
+      assignments.count > 1
     end
   end
 
@@ -900,7 +902,8 @@ class Assignment < ActiveRecord::Base
     return fields
   end
 
-  #returns a list of assignment objects that belong to a particular course
+#====== code relating to the old analytic project
+ #returns a list of assignment objects that belong to a particular course
   def self.get_assignments_for_course(course_id)
     Assignment.find_all_by_course_id course_id
   end
@@ -1135,6 +1138,221 @@ class Assignment < ActiveRecord::Base
       end
     end
     metareview_questionnaire_id
+  end
+
+#======changes that relates to the new assignment controller
+  def wiki_type_options
+    wiki_type_options = Array.new
+    WikiType.all.each do |wiki_type|
+      if wiki_type.name == 'No'
+        wiki_type_options << ['------', wiki_type.id]
+      else
+        wiki_type_options << [wiki_type.name, wiki_type.id]
+      end
+    end
+
+    wiki_type_options
+  end
+
+  def review_strategy_options
+    review_strategy_options = Array.new
+    Assignment::REVIEW_STRATEGIES.each do |strategy|
+      review_strategy_options << [strategy.to_s, strategy.to_s]
+    end
+    review_strategy_options
+  end
+
+  def questionnaire_options(type)
+    available = Questionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?', self.instructor_id], :order => 'name')
+    options = Array.new
+    available.select { |x| x.type == type }.each do |questionnaire|
+      options << [questionnaire.name, questionnaire.id]
+    end
+    options
+  end
+
+  def questionnaire(type)
+    questionnaire = self.questionnaires.find_by_type(type)
+    if questionnaire.nil?
+      questionnaire = Object.const_get(type).new
+      questionnaire.type = type
+      questionnaire
+    else
+      questionnaire
+    end
+  end
+
+  def assignment_questionnaire(type)
+    assignment_questionnaire = self.assignment_questionnaires.find_by_questionnaire_id(self.questionnaire(type).id)
+
+    if assignment_questionnaire.nil?
+      default_weight = Hash.new
+      default_weight['ReviewQuestionnaire'] = 100
+      default_weight['MetareviewQuestionnaire'] = 0
+      default_weight['AuthorFeedbackQuestionnaire'] = 0
+      default_weight['TeammateReviewQuestionnaire'] = 0
+      default_aq = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(self.instructor.id, nil, nil)
+      if default_aq.nil?
+        default_limit = 15
+      else
+        default_limit = default_aq.notification_limit
+      end
+
+      assignment_questionnaire = AssignmentQuestionnaire.new
+      assignment_questionnaire.questionnaire_weight = default_weight[type]
+      assignment_questionnaire.notification_limit = default_limit
+      assignment_questionnaire.assignment = @assignment
+      assignment_questionnaire
+    else
+      assignment_questionnaire
+    end
+  end
+
+  def questionnaire_id(type)
+    questionnaire = self.questionnaire(type)
+    if questionnaire.nil?
+      nil
+    else
+      questionnaire.id
+    end
+  end
+
+  def assignment_questionnaire_id(type)
+    aq = self.assignment_questionnaire(type)
+    if aq.nil?
+      nil
+    else
+      aq.id
+    end
+  end
+
+  def questionnaire_weight(type)
+    default_weight = Hash.new
+    default_weight['ReviewQuestionnaire'] = 100
+    default_weight['MetareviewQuestionnaire'] = 0
+    default_weight['AuthorFeedbackQuestionnaire'] = 0
+    default_weight['TeammateReviewQuestionnaire'] = 0
+
+    questionnaire = self.questionnaire(type)
+    aqs = AssignmentQuestionnaire.find_all_by_assignment_id(self.id)
+
+    if questionnaire.nil?
+      if aqs.empty?
+        return default_weight[type]
+      else
+        return 0
+      end
+    else
+      aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.id, questionnaire.id)
+      if aq.nil?
+        if aqs.empty?
+          return default_weight[type]
+        else
+          return 0
+        end
+      else
+        return aq.questionnaire_weight
+      end
+    end
+  end
+
+  def notification_limit(type)
+    default_aq = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(self.instructor.id, nil, nil)
+    if default_aq.nil?
+      default_limit = 15
+    else
+      default_limit = default_aq.notification_limit
+    end
+
+    questionnaire = self.questionnaire(type)
+    aqs = AssignmentQuestionnaire.find_all_by_assignment_id(self.id)
+    if questionnaire.nil?
+      if aqs.empty?
+        default_limit
+      else
+        0
+      end
+    else
+      aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.id, questionnaire.id)
+      if aq.nil?
+        if aqs.empty?
+          default_limit
+        else
+          0
+        end
+      else
+        aq.notification_limit
+      end
+    end
+  end
+
+  def due_date(type, round = 0)
+    due_dates = find_due_dates(type)
+    if type == 'submission'
+      due_dates += find_due_dates('resubmission')
+    elsif type == 'review'
+      due_dates += find_due_dates('rereview')
+    end
+
+    due_dates.sort! do |x, y|
+      if x.due_at.nil? && y.due_at.nil?
+        0
+      elsif x.due_at.nil?
+        -1
+      elsif y.due_at.nil?
+        1
+      else
+        x.due_at <=> y.due_at
+      end
+    end
+
+    if due_dates[round].nil? or round < 0
+      due_date = DueDate.new
+      due_date.deadline_type = DeadlineType.find_by_name(type)
+      due_date
+    else
+      due_dates[round]
+    end
+  end
+
+  def find_due_dates(type)
+    self.due_dates.select do |due_date|
+      due_date.deadline_type == DeadlineType.find_by_name(type)
+    end
+  end
+
+  def cleanup_due_dates
+    #delete due_dates without due_at
+    self.due_dates.each do |due_date|
+      if due_date.due_at.nil?
+        due_date.delete
+      end
+    end
+
+    submissions = self.find_due_dates('submission') + self.find_due_dates('resubmission')
+    submissions.sort! { |x, y| x.due_at <=> y.due_at }
+    reviews = self.find_due_dates('review') + self.find_due_dates('rereview')
+    reviews.sort! { |x, y| x.due_at <=> y.due_at }
+
+    while submissions.count > self.rounds_of_reviews
+      submissions.last.delete
+    end
+
+    while reviews.count > self.rounds_of_reviews
+      reviews.last.delete
+    end
+
+    if self.require_signup?
+      drop_topic_count = 1
+    else
+      drop_topic_count = 0
+    end
+
+    drop_topic = self.find_due_dates('drop_topic')
+    drop_topic.sort! { |x, y| y.due_at <=> x.due_at }
+    while drop_topic.count > self.drop_topic_count
+      drop_topic.last.delete
+    end
   end
 
   require 'models/analytic/assignment_analytic'

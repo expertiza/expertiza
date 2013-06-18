@@ -1,0 +1,60 @@
+<%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
+<%= stylesheet_link_tag 'jquery-ui-1.10.3.custom.min' %>
+<script src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="/javascripts/jquery-ui-timepicker-addon.js"></script>
+<script src="/javascripts/jQuery.ajaxQueue.min.js"></script>
+
+<script type="text/javascript">
+    function wikiAssignmentChanged() {
+        if (jQuery('#assignment_wiki_assignment').is(':checked')) {
+            jQuery('#assignment_wiki_type_field').removeAttr('hidden');
+        } else {
+            jQuery('#assignment_wiki_type_field').attr('hidden', true);
+            jQuery('#assignment_wiki_type').val('1');
+        }
+    }
+    function requireSignUpChanged() {
+        if (jQuery('#assignment_require_signup').is(':checked')) {
+            addDueDateTableElement('signup', 0, <%= @assignment.due_date('signup').to_json %>);
+            addDueDateTableElement('drop_topic', 0, <%= @assignment.due_date('drop_topic').to_json %>)
+        } else {
+            removeDueDateTableElement('signup', 0);
+            removeDueDateTableElement('drop_topic', 0);
+        }
+    }
+    function teamAssignmentChanged() {
+        if (jQuery('#assignment_team_assignment').is(':checked')) {
+            jQuery('#assignment_team_count_field').removeAttr('hidden');
+            addDueDateTableElement('team_formation', 0, <%= @assignment.due_date('team_formation').to_json %>)
+        } else {
+            jQuery('#assignment_team_count_field').attr('hidden', true);
+            removeDueDateTableElement('team_formation', 0);
+        }
+    }
+    function staggeredDeadlineChanged() {
+        if (jQuery('#assignment_staggered_deadline').is(':checked')) {
+            jQuery('#assignment_days_between_submissions_field').removeAttr('hidden');
+        } else {
+            jQuery('#assignment_days_between_submissions_field').attr('hidden', true);
+        }
+    }
+    function microtaskChanged() {
+        if (jQuery('#assignment_microtask').is(':checked')) {
+
+        } else {
+
+        }
+    }
+
+    function reviewStrategyChanged() {
+        var val = jQuery('#assignment_review_assignment_strategy').val();
+        if (val == 'Auto-Selected') {
+            jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
+        } else if (val == ''){
+            jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
+        } else {
+            jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
+        }
+    }
+</script>
+

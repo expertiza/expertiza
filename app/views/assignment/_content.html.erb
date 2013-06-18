@@ -1,147 +1,166 @@
-<script type="text/javascript">
-function onChange(){
-	count = document.getElementById("team_count1");
-	hidden = document.getElementById("team_count2");
-	document.poppedLayer3 = eval('document.getElementById("teammate_review")');
-	var dropdownIndex = document.getElementById('teamselect').selectedIndex;
-	var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
-	if(dropdownValue == "true"){
-		count.style.display = "";
-		hidden.style.display = "none";
-		document.poppedLayer3.style.display = "";
-	}else{
-		count.style.display = "none";
-		hidden.style.display  = "";
-		document.poppedLayer3.style.display = "none";
-	}
-}
+<table id='assignment_general_info_table'>
+  <tr class='heading'>
+    <th width=40%></th>
+    <th width=60%></th>
+  </tr>
+  <%= hidden_field_tag('assignment[instructor_id]', @assignment.instructor_id) %>
+  <%= hidden_field_tag('assignment[course_id]', @assignment.course_id) %>
+  <%= hidden_field_tag('assignment[id]', @assignment.id) %>
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment[name]', 'Assignment Name:') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment[name]', @assignment.name, :style => 'width:250px') %></td>
+  </tr>
 
-function get_assignment_startdate() {
-    //var start_date = document.getElementById("assignment_startdate");
-    var staggered_label = document.getElementById("staggered_label");
-    var days_between_chapters = document.getElementById("days_between_chapters");
-    var dropdownIndex = document.getElementById('staggered_deadline').selectedIndex;
-	var dropdownValue = document.getElementById('staggered_deadline')[dropdownIndex].value;
-	if(dropdownValue == "true"){
-		//start_date.style.display = "";
-        staggered_label.style.display = "";
-        days_between_chapters.style.display = "";
-	}else{
-		//start_date.style.display = "none";
-        staggered_label.style.display = "none";
-        days_between_chapters.style.display = "none";
-	}
-}
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment[directory_path]', 'Submission Directory:') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment[directory_path]', @assignment.directory_path, :style => 'width:250px') %></td>
+  </tr>
 
-function onChangeWikiType(){
-	submission_directory = document.getElementById("assgt_directory");
-	var dropdownIndex = document.getElementById('wikiselect').selectedIndex;
-	if(dropdownIndex == 0){
-		submission_directory.innerHTML = "Submission directory:"
-	}else{
-		submission_directory.innerHTML = "Base URL for Wiki:"
-	}
-}
-</script>
-
-<% if flash[:notice] != nil and flash[:notice].strip != "" %>
-<div class="flash_error">
-	<%= flash[:notice] %>
-</div>
-<% end %>
-<%= error_messages_for 'assignment' %>
-
-<!--[form:assignment]-->
-<table>
-
-<tr>
-<td><table>
-<tr>
-  <td><label for="assignment_name">Assignment name: </label></td>
-  <td><%= text_field 'assignment', 'name'  %></td>
-</tr>
-<tr>
-  <td><label for="assignment_directory" id="assgt_directory">Submission directory: </label></td>
-  <td><%= text_field 'assignment', 'directory_path'%></td>
-</tr>
-<tr>
-  <td height="50" valign="top"><label for="assignment_spec">URL of assignment description:</label></td>
-  <td height="50" valign="top"><%= text_field 'assignment', 'spec_location'  %></td>
-</tr>
-<tr>  
-</table></td>
-
-<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-
-<td><table>
-<tr>
-  <td width="250"><label for="wiki_type">Wiki Type:</label></td>
-  <td>
-    <% if @wiki_types.length == 0 %>
-      <em>There are currently no wiki assignment types defined</em>
-      <br/>
-      <br/>
-    <% else %>
-      <select id="wikiselect" name="assignment[wiki_type_id]" width="15%" onchange="onChangeWikiType();">
-      <% @wiki_types.each do |wiki_type| %>
-        <option style="width:75px" value="<%= wiki_type.id %>"
-        <%= ' selected' if wiki_type.id == @assignment.wiki_type_id %> >
-        <%= wiki_type.name %>
-        </option>
-      <% end %>
-      </select>
-    <% end %>
-  </td>
-</tr>
-<tr>
-  <td><label for="team_assignment">Team assignment:</label></td>
-  <td>
-  		<select id="teamselect" name="assignment[team_assignment]" onchange="onChange();">
-  		 <option value=false style="width:75px">No</option>
-         <!--ACS We need to have this logic in place to display the proper value in the drop down-->
-         <option value=true style="width:75px" <% if @assignment.team_assignment %>SELECTED<%end%>>Yes</option>
-        </select>
-  </td>  
-</tr>
-
- <tr><td><label for="staggered">Staggered deadline?</label></td>
-
- <td>
-  		<select id="staggered_deadline" name="assignment[staggered_deadline]" onchange="get_assignment_startdate();">
-  		 <option value=false style="width:75px">No</option>
-         <option value=true style="width:75px" <% if @assignment.staggered_deadline %>SELECTED<%end%>>Yes</option>
-        </select>
-  </td>
-
- </tr>
-
-  <tr><td><label>Microtask Assignment?</label></td>
-
- <td>
-  		<select id="microtask" name="assignment[microtask]" >
-  		 <option value=false style="width:75px">No</option>
-         <option value=true style="width:75px" <% if @assignment.microtask %>SELECTED<%end%>>Yes</option>
-        </select>
-  </td>
-
- </tr>
-
-<tr id="team_count1" style="display:none">  
-  <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>   
-  <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5%></td>  
-  </td> 
-</tr>
-
-<tr id="team_count2">
-  <td colspan="2" height="50">&nbsp;</td>
-</tr> 
-</table></td>
-</tr>
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment[spec_location]', 'Description URL: ') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment[spec_location]', @assignment.spec_location, :style => 'width:250px') %></td>
+  </tr>
 </table>
 
-<p>
-</p>
-<script type="text/javascript">onChangeWikiType();</script>
-<script type="text/javascript">onChange();</script>
+<br/><hr/>
 
-<!--[eoform:assignment]-->
+<table id='assignment_general_setting_table'>
+  <tr class='heading'>
+    <th width=30%></th>
+    <th width=70%></th>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_require_signup_field'>
+      <input name="assignment[require_signup]" type="hidden" value="false" />
+      <%= check_box_tag('assignment[require_signup]', 'true', @assignment.require_signup?, {:onchange => 'requireSignUpChanged()'}) %>
+      <%= label_tag('assignment[require_signup]', 'Has Topics?') %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_team_assignment_field'>
+      <input name="assignment[team_assignment]" type="hidden" value="false" />
+      <%= check_box_tag('assignment[team_assignment]', 'true', @assignment.team_assignment, {:onchange => 'teamAssignmentChanged()'}) %>
+      <%= label_tag('assignment[team_assignment]', 'Has Teams?') %>
+    </td>
+    <td style='padding:5px' id='assignment_team_count_field'>
+      <%= label_tag('assignment[team_count]', 'Maximum Number of Participant:') %>
+      <%= text_field_tag('assignment[team_count]', @assignment.team_count) %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_wiki_assignment_field'>
+      <%= check_box_tag('assignment_wiki_assignment', 'true', (@assignment.wiki_type.name != 'No'), :onchange => 'wikiAssignmentChanged()') %>
+      <%= label_tag('assignment_wiki_assignment', 'Wiki Assignment') %>
+    </td>
+    <td style='padding:5px' id='assignment_wiki_type_field'>
+      <%= label_tag('assignment[wiki_type_id]', 'Wiki System Type:') %>
+      <%= select('assignment', 'wiki_type_id', @assignment.wiki_type_options, :selected => @assignment.wiki_type_id) %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_staggered_deadline_field'>
+      <input name="assignment[staggered_deadline]" type="hidden" value="false" />
+      <%= check_box_tag('assignment[staggered_deadline]', 'true', @assignment.staggered_deadline, {:onchange => 'staggeredDeadlineChanged()'}) %>
+      <%= label_tag('assignment[staggered_deadline]', 'Staggered Deadline Assignment') %>
+    </td>
+    <td style='padding:5px' id='assignment_days_between_submissions_field'>
+      <%= label_tag('assignment[days_between_submissions]', 'Days Between Chapters:') %>
+      <%= text_field_tag('assignment[days_between_submissions]', @assignment.days_between_submissions, {:onchange => 'daysBetweenSubmissionsChanged()'}) %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_microtask_field'>
+      <input name="assignment[microtask]" type="hidden" value="false" />
+      <%= check_box_tag('assignment[microtask]', 'true', @assignment.microtask, {:onchange => 'microtaskChanged()'}) %>
+      <%= label_tag('assignment[microtask]', 'Micro-Task Assignment') %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_review_visible_to_all_field'>
+      <input name="assignment[reviews_visible_to_all]" type="hidden" value="false" />
+      <%= check_box_tag('assignment[reviews_visible_to_all]', 'true', @assignment.reviews_visible_to_all) %>
+      <%= label_tag('assignment[reviews_visible_to_all]', 'Reviews Visible to All Other Reviewers') %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_allow_suggestion_field'>
+      <input name="assignment[allow_suggestions]" type="hidden" value="false" />
+      <%= check_box_tag('assignment[allow_suggestions]', 'true', @assignment.allow_suggestions) %>
+      <%= label_tag('assignment[reviews_visible_to_all]', 'Allow Topic Suggestions from Students') %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_availability_flag_field'>
+      <input name="assignment[availability_flag]" type="hidden" value="false" />
+      <%= check_box_tag('assignment[availability_flag]', 'true', @assignment.availability_flag) %>
+      <%= label_tag('assignment[availability_flag]', 'Available to Students') %>
+    </td>
+  </tr>
+</table>
+
+<script>
+    jQuery(document).ready(function () {
+        wikiAssignmentChanged();
+        requireSignUpChanged();
+        teamAssignmentChanged();
+        staggeredDeadlineChanged();
+        microtaskChanged();
+    });
+</script>
+
+
+<!--old scripts-->
+<script>
+    function onChange() {
+        count = document.getElementById("team_count1");
+        hidden = document.getElementById("team_count2");
+        document.poppedLayer3 = eval('document.getElementById("teammate_review")');
+        var dropdownIndex = document.getElementById('teamselect').selectedIndex;
+        var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
+        if (dropdownValue == "true") {
+            count.style.display = "";
+            hidden.style.display = "none";
+            document.poppedLayer3.style.display = "";
+        } else {
+            count.style.display = "none";
+            hidden.style.display = "";
+            document.poppedLayer3.style.display = "none";
+        }
+    }
+
+    function get_assignment_startdate() {
+        //var start_date = document.getElementById("assignment_startdate");
+        var staggered_label = document.getElementById("staggered_label");
+        var days_between_chapters = document.getElementById("days_between_chapters");
+        var dropdownIndex = document.getElementById('staggered_deadline').selectedIndex;
+        var dropdownValue = document.getElementById('staggered_deadline')[dropdownIndex].value;
+        if (dropdownValue == "true") {
+            //start_date.style.display = "";
+            staggered_label.style.display = "";
+            days_between_chapters.style.display = "";
+        } else {
+            //start_date.style.display = "none";
+            staggered_label.style.display = "none";
+            days_between_chapters.style.display = "none";
+        }
+    }
+
+    function onChangeWikiType() {
+        submission_directory = document.getElementById("assgt_directory");
+        var dropdownIndex = document.getElementById('wikiselect').selectedIndex;
+        if (dropdownIndex == 0) {
+            submission_directory.innerHTML = "Submission directory:"
+        } else {
+            submission_directory.innerHTML = "Base URL for Wiki:"
+        }
+    }
+</script>
+

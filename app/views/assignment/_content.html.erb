@@ -45,8 +45,8 @@
       <%= label_tag('assignment[team_assignment]', 'Has Teams?') %>
     </td>
     <td style='padding:5px' id='assignment_team_count_field'>
-      <%= label_tag('assignment[team_count]', 'Maximum Number of Participant:') %>
-      <%= text_field_tag('assignment[team_count]', @assignment.team_count) %>
+      <%= label_tag('assignment[max_team_size]', 'Maximum Number of Participant:') %>
+      <%= text_field_tag('assignment[max_team_size]', @assignment.max_team_size) %>
     </td>
   </tr>
 
@@ -119,23 +119,6 @@
 
 <!--old scripts-->
 <script>
-    function onChange() {
-        count = document.getElementById("team_count1");
-        hidden = document.getElementById("team_count2");
-        document.poppedLayer3 = eval('document.getElementById("teammate_review")');
-        var dropdownIndex = document.getElementById('teamselect').selectedIndex;
-        var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
-        if (dropdownValue == "true") {
-            count.style.display = "";
-            hidden.style.display = "none";
-            document.poppedLayer3.style.display = "";
-        } else {
-            count.style.display = "none";
-            hidden.style.display = "";
-            document.poppedLayer3.style.display = "none";
-        }
-    }
-
     function get_assignment_startdate() {
         //var start_date = document.getElementById("assignment_startdate");
         var staggered_label = document.getElementById("staggered_label");

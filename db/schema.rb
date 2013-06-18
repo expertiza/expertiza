@@ -45,6 +45,7 @@ ActiveRecord::Schema.define(:version => 20130606204315) do
     t.integer  "num_reviewers",                     :default => 0,     :null => false
     t.text     "spec_location"
     t.integer  "author_feedback_questionnaire_id"
+    t.integer  "max_team_size",                     :default => 0,     :null => false
     t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions"
@@ -55,7 +56,6 @@ ActiveRecord::Schema.define(:version => 20130606204315) do
     t.boolean  "copy_flag",                         :default => false
     t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "microtask",                         :default => false
-    t.integer  "max_team_size",                     :default => 0
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"

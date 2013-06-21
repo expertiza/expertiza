@@ -133,7 +133,7 @@ class AssignmentController < ApplicationController
 
 
   def update
-    @assignment = Assignment.find(params[:assignment][:id])
+    @assignment = Assignment.find(params[:id])
 
     params[:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
 
@@ -141,9 +141,9 @@ class AssignmentController < ApplicationController
       flash[:note] = 'Assignment was successfully saved.'
       #TODO: deal with submission path change
 
-      #TODO: cleanup questionnaires
+      #TODO: clean up questionnaires
 
-      #TODO: cleanup the due_dates
+      #TODO: clean up the due_dates
 
       redirect_to :action => 'edit', :id => @assignment.id
     else
@@ -378,10 +378,10 @@ class AssignmentController < ApplicationController
   end
 
   #--------------------------------------------------------------------------------------------------------------------
-  # ASSOCIATE_ASSIGNMENT_TO_COURSE
+  # ASSOCIATE_ASSIGNMENT_WITH_COURSE
   # TODO: NO usages found, need verification
   #--------------------------------------------------------------------------------------------------------------------
-  def associate_assignment_to_course
+  def associate_assignment_with_course
     @assignment = Assignment.find(params[:id])
     @user = ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]

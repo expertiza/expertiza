@@ -32,29 +32,18 @@
     }
 
     function submit_questionnaires() {
-        //TODO: check if all due dates are correct before saving
-
-        //delete all of the old due dates
-        jQuery.ajaxQueue({
-            url: "/assignment/delete_all_questionnaires?assignment_id=" + <%= @assignment.id %>
-        });
-
-        var i, j;
-        var dates = jQuery('#assignment_questionnaire_table>tbody>tr:not(.heading)');
-        var fields, para;
-
-        for (i = 0; i < dates.length; i++) {
-            fields = jQuery(dates[i]).find('input,select');
+        var data, para, fields, i, j;
+        //delete old assignment_questionnaires
+        jQuery.get("/assignment/delete_all_questionnaires?assignment_id=" + <%= @assignment.id %>);
+        //create the new assignment_questionnaires
+        data = jQuery('#assignment_questionnaire_table>tbody>tr:not(.heading)');
+        for (i = 0; i < data.length; i++) {
+            fields = jQuery(data[i]).find('input,select');
             para = "?";
             for (j = 0; j < fields.length; j++) {
                 para += "&" + (fields[j].name + "=" + fields[j].value);
             }
-//            jQuery.get("/assignment/set_questionnaire" + para).done(console.log('done'));
-
-            jQuery.ajaxQueue({
-                url: "/assignment/set_questionnaire" + para
-            });
-
+            jQuery.get("/assignment/set_questionnaire" + para);
         }
     }
 </script>
@@ -86,10 +75,10 @@
   </tr>
   <script>
       jQuery(document).ready(function () {
-          addQuestionnaireTableRow('ReviewQuestionnaire', <%= @assignment.questionnaire('ReviewQuestionnaire').to_json %>, <%= @assignment.assignment_questionnaire('ReviewQuestionnaire').to_json %>, <%= @assignment.questionnaire_options('ReviewQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('MetareviewQuestionnaire', <%= @assignment.questionnaire('MetareviewQuestionnaire').to_json %>, <%= @assignment.assignment_questionnaire('MetareviewQuestionnaire').to_json %>, <%= @assignment.questionnaire_options('MetareviewQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', <%= @assignment.questionnaire('AuthorFeedbackQuestionnaire').to_json %>, <%= @assignment.assignment_questionnaire('AuthorFeedbackQuestionnaire').to_json %>, <%= @assignment.questionnaire_options('AuthorFeedbackQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('TeammateReviewQuestionnaire', <%= @assignment.questionnaire('TeammateReviewQuestionnaire').to_json %>, <%= @assignment.assignment_questionnaire('TeammateReviewQuestionnaire').to_json %>, <%= @assignment.questionnaire_options('TeammateReviewQuestionnaire').to_json %>);
+          addQuestionnaireTableRow('ReviewQuestionnaire', <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+          addQuestionnaireTableRow('MetareviewQuestionnaire', <%= questionnaire(@assignment, 'MetareviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json %>);
+          addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', <%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>);
+          addQuestionnaireTableRow('TeammateReviewQuestionnaire', <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json %>);
       }());
   </script>
 </table>

@@ -134,7 +134,6 @@ class AssignmentController < ApplicationController
 
   def update
     @assignment = Assignment.find(params[:id])
-
     params[:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
 
     if @assignment.update_attributes(params[:assignment])

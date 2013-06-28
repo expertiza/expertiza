@@ -6,17 +6,23 @@
 <h1>Editing Assignment</h1>
 
 <script>
-    function prepareToSubmit() {
+    function validate() {
+        return true;
+    }
+
+    function submit_form() {
         //validating the form
-//        validate();
-        //submit the due dates and questionnaires before submitting the rest of the form
-        jQuery.ajaxSetup({async: false});
-        submit_due_dates();
-        submit_questionnaires();
+        if (validate()) {
+            //submit the due dates and questionnaires before submitting the rest of the form
+            jQuery.ajaxSetup({async: false});
+            submit_due_dates();
+            submit_questionnaires();
+            jQuery('#assignment_form').submit();
+        }
     }
 </script>
 
-<% form_tag({:action => 'update', :id => @assignment.id}, {:onSubmit => 'prepareToSubmit()'}) do %>
+<% form_tag({:action => 'update', :id => @assignment.id}, {:id => 'assignment_form'}) do %>
     <div id="tabs">
       <ul>
         <li><a href="#tabs-1">General</a></li>
@@ -37,38 +43,13 @@
       <div id="tabs-4">
         <%= render :partial => 'assignment/edit/due_dates' %>
       </div>
-      <div id="tabs-5">
-        <%= render :action => 'sign_up_sheet/add_signup_topics' %>
-      </div>
     </div>
     <script>
         jQuery(document).ready(function () {
             jQuery("#tabs").tabs();
         });
     </script>
-    <%= submit_tag "Save" %> | <%= render :partial => '/shared_scripts/back' %>
+    <%= button_to_function 'Save', 'submit_form()' %>| <%= render :partial => '/shared_scripts/back' %>
 <% end %>
 
 <br/>
-
-
-<!--old scripts-->
-<!--<script>get_assignment_startdate();</script>-->
-<script>
-//    function get_assignment_startdate() {
-//        //var start_date = document.getElementById("assignment_startdate");
-//        var staggered_label = document.getElementById("staggered_label");
-//        var days_between_chapters = document.getElementById("days_between_chapters");
-//        var dropdownIndex = document.getElementById('staggered_deadline').selectedIndex;
-//        var dropdownValue = document.getElementById('staggered_deadline')[dropdownIndex].value;
-//        if (dropdownValue == "true") {
-//            //start_date.style.display = "";
-//            staggered_label.style.display = "";
-//            days_between_chapters.style.display = "";
-//        } else {
-//            //start_date.style.display = "none";
-//            staggered_label.style.display = "none";
-//            days_between_chapters.style.display = "none";
-//        }
-//    }
-</script>

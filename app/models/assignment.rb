@@ -70,7 +70,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_teams?
-    !self.teams.empty?
+    @has_teams ||= !self.teams.empty?
   end
 
   def assign_reviewer_dynamically(reviewer, topic)

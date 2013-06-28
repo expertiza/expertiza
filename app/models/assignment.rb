@@ -69,6 +69,10 @@ class Assignment < ActiveRecord::Base
     @has_topics ||= !sign_up_topics.empty?
   end
 
+  def has_teams?
+    !self.teams.empty?
+  end
+
   def assign_reviewer_dynamically(reviewer, topic)
     # The following method raises an exception if not successful which 
     # has to be captured by the caller (in review_mapping_controller)

@@ -1,79 +1,3 @@
-<script>
-    function requireSignUpChanged() {
-        var msg = 'Warning! Unchecking this box will remove all topics and the reservations of everyone who is sign up for them';
-
-        if (jQuery('#assignment_require_signup').is(':checked')) {
-            addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json %>);
-            addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json %>)
-        } else {
-            if (confirm(msg)) {
-                removeDueDateTableElement('signup', 0);
-                removeDueDateTableElement('drop_topic', 0);
-            } else {
-                jQuery('#assignment_require_signup').prop('checked', true);
-            }
-        }
-    }
-
-    function wikiAssignmentChanged() {
-        if (jQuery('#assignment_wiki_assignment').is(':checked')) {
-            jQuery('#assignment_wiki_type_field').removeAttr('hidden');
-        } else {
-            jQuery('#assignment_wiki_type_field').attr('hidden', true);
-            jQuery('#assignment_wiki_type').val('1');
-        }
-    }
-
-    function teamAssignmentChanged() {
-        var msg = 'Warning! Unchecking this box will remove teams that already exist.'
-
-        if (jQuery('#assignment_team_assignment').is(':checked')) {
-            jQuery('#assignment_team_count_field').removeAttr('hidden');
-            addDueDateTableElement('team_formation', 0, <%= due_date(@assignment, 'team_formation').to_json %>)
-        } else {
-            if (confirm(msg)) {
-                jQuery('#assignment_team_count_field').attr('hidden', true);
-                removeDueDateTableElement('team_formation', 0);
-            } else {
-                jQuery('#assignment_team_assignment').prop('checked', true);
-            }
-        }
-    }
-
-    function staggeredDeadlineChanged() {
-        var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
-
-        if (jQuery('#assignment_staggered_deadline').is(':checked')) {
-            jQuery('#assignment_days_between_submissions_field').removeAttr('hidden');
-        } else {
-            if (confirm(msg)) {
-                jQuery('#assignment_days_between_submissions_field').attr('hidden', true);
-            } else {
-                jQuery('#assignment_staggered_deadline').prop('checked', true);
-            }
-        }
-    }
-
-    function microtaskChanged() {
-        if (jQuery('#assignment_microtask').is(':checked')) {
-
-        } else {
-
-        }
-    }
-
-    function reviewStrategyChanged() {
-        var val = jQuery('#assignment_review_assignment_strategy').val();
-        if (val == 'Auto-Selected') {
-            jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
-        } else if (val == '') {
-            jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
-        } else {
-            jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
-        }
-    }
-</script>
-
 <table id='assignment_general_info_table'>
   <tr class='heading'>
     <th width=30%></th>
@@ -117,7 +41,7 @@
   <tr>
     <td style='padding:5px' id='assignment_private_field'>
       <input name="assignment[private]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[private]', 'true', @assignment.private, {:onChange => 'requireSignUpChanged()'}) %>
+      <%= check_box_tag('assignment[private]', 'true', @assignment.private?) %>
       <%= label_tag('assignment[private]', 'Private?') %>
     </td>
   </tr>
@@ -125,12 +49,12 @@
   <tr>
     <td style='padding:5px' id='assignment_require_signup_field'>
       <input name="assignment[require_signup]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[require_signup]', 'true', @assignment.require_signup, {:onChange => 'requireSignUpChanged()'}) %>
+      <%= check_box_tag('assignment[require_signup]', 'true', @assignment.require_signup?, {:onChange => 'hasTopicsChanged()'}) %>
       <%= label_tag('assignment[require_signup]', 'Has topics?') %>
     </td>
   </tr>
 
-  <% if @assignment.require_signup %>
+  <% if @assignment.require_signup? %>
       <script>
           jQuery(document).ready(function () {
               addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json %>);
@@ -142,7 +66,7 @@
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
       <input name="assignment[team_assignment]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[team_assignment]', 'true', @assignment.team_assignment, {:onChange => 'teamAssignmentChanged()'}) %>
+      <%= check_box_tag('assignment[team_assignment]', 'true', @assignment.team_assignment, {:onChange => 'hasTeamsChanged()'}) %>
       <%= label_tag('assignment[team_assignment]', 'Has teams?') %>
     </td>
 
@@ -210,34 +134,77 @@
   </tr>
 </table>
 
-
-<!--old scripts-->
 <script>
-    function get_assignment_startdate() {
-        //var start_date = document.getElementById("assignment_startdate");
-        var staggered_label = document.getElementById("staggered_label");
-        var days_between_chapters = document.getElementById("days_between_chapters");
-        var dropdownIndex = document.getElementById('staggered_deadline').selectedIndex;
-        var dropdownValue = document.getElementById('staggered_deadline')[dropdownIndex].value;
-        if (dropdownValue == "true") {
-            //start_date.style.display = "";
-            staggered_label.style.display = "";
-            days_between_chapters.style.display = "";
+    function hasTopicsChanged() {
+        var msg = 'Warning! Unchecking this box will remove all topics and the reservations of everyone who is sign up for them';
+        var checkbox = jQuery('#assignment_require_signup')
+
+        if (checkbox.is(':checked')) {
+            addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json %>);
+            addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json %>)
         } else {
-            //start_date.style.display = "none";
-            staggered_label.style.display = "none";
-            days_between_chapters.style.display = "none";
+            if (<%= @assignment.has_topics? %>) {
+                if (confirm(msg)) {
+                    removeDueDateTableElement('signup', 0);
+                    removeDueDateTableElement('drop_topic', 0);
+                } else {
+                    checkbox.prop('checked', true);
+                }
+            } else {
+                removeDueDateTableElement('signup', 0);
+                removeDueDateTableElement('drop_topic', 0);
+            }
         }
     }
 
-    function onChangeWikiType() {
-        submission_directory = document.getElementById("assgt_directory");
-        var dropdownIndex = document.getElementById('wikiselect').selectedIndex;
-        if (dropdownIndex == 0) {
-            submission_directory.innerHTML = "Submission directory:"
+    function hasTeamsChanged() {
+        var msg = 'Warning! Unchecking this box will remove teams that already exist.'
+        var checkbox = jQuery('#assignment_team_assignment');
+        var team_count_field = jQuery('#assignment_team_count_field');
+
+        if (checkbox.is(':checked')) {
+            team_count_field.removeAttr('hidden');
+            addDueDateTableElement('team_formation', 0, <%= due_date(@assignment, 'team_formation').to_json %>)
         } else {
-            submission_directory.innerHTML = "Base URL for Wiki:"
+            if (<%= @assignment.has_teams?%>) {
+                if (confirm(msg)) {
+                    team_count_field.attr('hidden', true);
+                    removeDueDateTableElement('team_formation', 0);
+                } else {
+                    checkbox.prop('checked', true);
+                }
+            } else {
+                team_count_field.attr('hidden', true);
+                removeDueDateTableElement('team_formation', 0);
+            }
+        }
+    }
+
+    function wikiAssignmentChanged() {
+        if (jQuery('#assignment_wiki_assignment').is(':checked')) {
+            jQuery('#assignment_wiki_type_field').removeAttr('hidden');
+        } else {
+            jQuery('#assignment_wiki_type_field').attr('hidden', true);
+            jQuery('#assignment_wiki_type').val('1');
+        }
+    }
+
+    function staggeredDeadlineChanged() {
+        if (jQuery('#assignment_staggered_deadline').is(':checked')) {
+            jQuery('#assignment_days_between_submissions_field').removeAttr('hidden');
+        } else {
+            jQuery('#assignment_days_between_submissions_field').attr('hidden', true);
+        }
+    }
+
+   function reviewStrategyChanged() {
+        var val = jQuery('#assignment_review_assignment_strategy').val();
+        if (val == 'Auto-Selected') {
+            jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
+        } else if (val == '') {
+            jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
+        } else {
+            jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
         }
     }
 </script>
-

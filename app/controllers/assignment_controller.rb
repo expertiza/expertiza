@@ -131,6 +131,11 @@ class AssignmentController < ApplicationController
     if @assignment.update_attributes(params[:assignment])
       flash[:note] = 'Assignment was successfully saved.'
       #TODO: deal with submission path change
+      # Need to rename the bottom-level directory and/or move intermediate directories on the path to an
+      # appropriate place
+      # Probably there are 2 different operations:
+      #  - rename an assgt. -- implemented by renaming a directory
+      #  - assigning an assignment to a course -- implemented by moving a directory.
 
       redirect_to :action => 'edit', :id => @assignment.id
     else

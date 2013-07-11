@@ -7,6 +7,9 @@
 
       <td align="center"><%= topic.max_choosers %></td>
       <%= render :partial => 'available_slots', :locals => {:topic=>topic} %>
+
       <%= render :partial => 'num_waiting', :locals => {:topic=>topic} %>
 
       <td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>
+
+      <td align="center"></td>

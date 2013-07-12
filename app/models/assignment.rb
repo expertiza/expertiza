@@ -34,8 +34,8 @@ class Assignment < ActiveRecord::Base
 
   #  Review Strategy information.
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
-  RS_STUDENT_SELECTED    = 'Student-Selected'
-  RS_AUTO_SELECTED       = 'Auto-Selected'
+  RS_STUDENT_SELECTED = 'Student-Selected'
+  RS_AUTO_SELECTED = 'Auto-Selected'
   REVIEW_STRATEGIES = [RS_INSTRUCTOR_SELECTED, RS_STUDENT_SELECTED, RS_AUTO_SELECTED]
 
   DEFAULT_MAX_REVIEWERS = 3
@@ -52,7 +52,11 @@ class Assignment < ActiveRecord::Base
 
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
+<<<<<<< HEAD
                                             contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'submission' }
+=======
+        contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'submission' }
+>>>>>>> 3e6fbbbc2e787dbf87f8a096282bc154e6b518b7
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
@@ -263,7 +267,11 @@ class Assignment < ActiveRecord::Base
 
   def get_path
     if self.course_id == nil and self.instructor_id == nil
+<<<<<<< HEAD
       raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.'
+=======
+      raise 'Path can not be created. The assignment must be associated with either a course or an instructor.'
+>>>>>>> 3e6fbbbc2e787dbf87f8a096282bc154e6b518b7
     end
     if self.wiki_type_id != 1
       raise PathError, 'No path needed'
@@ -317,7 +325,11 @@ class Assignment < ActiveRecord::Base
 
   # Determine if the next due date from now allows for reviews
   def review_allowed(topic_id=nil)
+<<<<<<< HEAD
     return (check_condition('review_allowed_id', topic_id) )
+=======
+    return (check_condition('review_allowed_id', topic_id) or check_condition('rereview_allowed_id', topic_id))
+>>>>>>> 3e6fbbbc2e787dbf87f8a096282bc154e6b518b7
   end
 
   # Determine if the next due date from now allows for metareviews
@@ -520,7 +532,11 @@ class Assignment < ActiveRecord::Base
     rounds = 0
     for i in (0 .. due_dates.length-1)
       deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
+<<<<<<< HEAD
       if deadline_type.name == 'review'
+=======
+      if deadline_type.name == 'review' || deadline_type.name == 'rereview'
+>>>>>>> 3e6fbbbc2e787dbf87f8a096282bc154e6b518b7
         rounds = rounds + 1
       end
     end
@@ -906,7 +922,11 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+<<<<<<< HEAD
   def clean_up_due_dates
+=======
+  def cleanup_due_dates
+>>>>>>> 3e6fbbbc2e787dbf87f8a096282bc154e6b518b7
     #delete due_dates without due_at
     self.due_dates.each do |due_date|
       if due_date.due_at.nil?

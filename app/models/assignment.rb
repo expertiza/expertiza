@@ -52,6 +52,7 @@ class Assignment < ActiveRecord::Base
 
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
+
                                             contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'submission' }
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
@@ -263,7 +264,7 @@ class Assignment < ActiveRecord::Base
 
   def get_path
     if self.course_id == nil and self.instructor_id == nil
-      raise 'Path can not be created. The assignment must be associated with either a course or an instructor.'
+      raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.'
 
     end
     if self.wiki_type_id != 1
@@ -318,7 +319,7 @@ class Assignment < ActiveRecord::Base
 
   # Determine if the next due date from now allows for reviews
   def review_allowed(topic_id=nil)
-    return (check_condition('review_allowed_id', topic_id) or check_condition('rereview_allowed_id', topic_id))
+    return (check_condition('review_allowed_id', topic_id) )
   end
 
   # Determine if the next due date from now allows for metareviews

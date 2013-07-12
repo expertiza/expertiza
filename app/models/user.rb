@@ -128,7 +128,8 @@ class User < ActiveRecord::Base
       end
       return user     
   end 
-  
+
+  #HOLY SHIT THIS METHOD A SIN!!! and not the good kind of sin!
   def set_instructor (new_assign)  
     new_assign.instructor_id = self.id  
   end

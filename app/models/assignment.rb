@@ -34,8 +34,8 @@ class Assignment < ActiveRecord::Base
 
   #  Review Strategy information.
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
-  RS_STUDENT_SELECTED    = 'Student-Selected'
-  RS_AUTO_SELECTED       = 'Auto-Selected'
+  RS_STUDENT_SELECTED = 'Student-Selected'
+  RS_AUTO_SELECTED = 'Auto-Selected'
   REVIEW_STRATEGIES = [RS_INSTRUCTOR_SELECTED, RS_STUDENT_SELECTED, RS_AUTO_SELECTED]
 
   DEFAULT_MAX_REVIEWERS = 3
@@ -263,7 +263,8 @@ class Assignment < ActiveRecord::Base
 
   def get_path
     if self.course_id == nil and self.instructor_id == nil
-      raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.'
+      raise 'Path can not be created. The assignment must be associated with either a course or an instructor.'
+
     end
     if self.wiki_type_id != 1
       raise PathError, 'No path needed'
@@ -317,7 +318,7 @@ class Assignment < ActiveRecord::Base
 
   # Determine if the next due date from now allows for reviews
   def review_allowed(topic_id=nil)
-    return (check_condition('review_allowed_id', topic_id) )
+    return (check_condition('review_allowed_id', topic_id) or check_condition('rereview_allowed_id', topic_id))
   end
 
   # Determine if the next due date from now allows for metareviews
@@ -520,8 +521,8 @@ class Assignment < ActiveRecord::Base
     rounds = 0
     for i in (0 .. due_dates.length-1)
       deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
-      if deadline_type.name == 'review'
-        rounds = rounds + 1
+      if deadline_type.name == 'review' || deadline_type.name == 'rereview'
+       rounds = rounds + 1
       end
     end
     rounds
@@ -906,7 +907,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def clean_up_due_dates
+  def cleanup_due_dates
     #delete due_dates without due_at
     self.due_dates.each do |due_date|
       if due_date.due_at.nil?

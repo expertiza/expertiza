@@ -495,6 +495,8 @@ function FormatDate(pDate)
 	else if (this.Format.toUpperCase()=="YYYYMMDD")
 		return (this.Year+DateSeparator+month+DateSeparator+pDate);
 	else if (this.Format.toUpperCase()=="MMMDDYYYY")
-		return (this.GetMonthName(false)+DateSeparator+pDate+DateSeparator+this.Year);			
+		return (this.GetMonthName(false)+DateSeparator+pDate+DateSeparator+this.Year);
+    else if (this.Format == "javascript_toUTCString")
+        return (this.toUTCString());
 }
 Calendar.prototype.FormatDate=FormatDate;	

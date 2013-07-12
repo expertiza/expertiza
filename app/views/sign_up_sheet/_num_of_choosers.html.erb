@@ -1,7 +1,7 @@
 <% found_in_slots = false %>
 <% for slot in @slots_filled %>
     <% if slot.topic_id.to_s == topic.id.to_s %>
-        <td align="center"><%=  topic.micropayment %></td>
+        <td align="center"><%= slot.count %></td>
         <% found_in_slots = true %>
     <% end %>
 <% end %>

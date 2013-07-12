@@ -96,15 +96,13 @@ def create_teams
  def bequeath
    team = AssignmentTeam.find(params[:id])
    assignment = Assignment.find(team.parent_id)
-   unless assignment.course_id.nil?
+   if assignment.course_id >= 0
       course = Course.find(assignment.course_id)
       team.copy(course.id)
       flash[:note] = "\""+team.name+"\" was successfully copied to \""+course.name+"\""
    else
-      flash[:error] = %Q[This assignment is not assigned to a course.
-                         <a href="#{url_for(:controller => 'assignment', :action => 'associate_assignment_with_course',
-                                            :id => assignment.id)}">Fix this</a>.]
-   end
+      flash[:error] = "This assignment is not #{url_for(:controller => 'assignment', :action => 'assign', :id => assignment.id)} with a course."
+   end      
    redirect_to :controller => 'team', :action => 'list', :id => assignment.id
  end
 end

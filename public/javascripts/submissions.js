@@ -23,7 +23,7 @@ function collapseSubDirectory(row) {
 function createNewFolder(){
 	var new_folder = prompt("Enter a name for a new folder","");
 	input1 = document.createElement("input");
-	var form = document.getElementsByTagName('form')[2];
+	var form = document.getElementsByTagName('form')[4];
 	input1.type = "hidden";
 	input1.name = "faction[create]";
 	input1.value = new_folder;

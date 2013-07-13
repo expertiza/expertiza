@@ -52,8 +52,8 @@ class Assignment < ActiveRecord::Base
 
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
-
                                             contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'submission' }
+
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
@@ -265,7 +265,6 @@ class Assignment < ActiveRecord::Base
   def get_path
     if self.course_id == nil and self.instructor_id == nil
       raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.'
-
     end
     if self.wiki_type_id != 1
       raise PathError, 'No path needed'
@@ -314,7 +313,7 @@ class Assignment < ActiveRecord::Base
 
   # Determine if the next due date from now allows for submissions
   def submission_allowed(topic_id=nil)
-    return (check_condition('submission_allowed_id', topic_id) or check_condition('resubmission_allowed_id', topic_id))
+    return (check_condition('submission_allowed_id', topic_id) )
   end
 
   # Determine if the next due date from now allows for reviews
@@ -522,8 +521,8 @@ class Assignment < ActiveRecord::Base
     rounds = 0
     for i in (0 .. due_dates.length-1)
       deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
-      if deadline_type.name == 'review' || deadline_type.name == 'rereview'
-       rounds = rounds + 1
+      if deadline_type.name == 'review'
+        rounds = rounds + 1
       end
     end
     rounds
@@ -908,7 +907,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def cleanup_due_dates
+  def clean_up_due_dates
     #delete due_dates without due_at
     self.due_dates.each do |due_date|
       if due_date.due_at.nil?

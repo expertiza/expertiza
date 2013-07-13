@@ -106,16 +106,18 @@ class InvitationController < ApplicationController
       current_team = AssignmentTeam.find(:first, :conditions => ['id = ? and parent_id = ?', team.team_id, student.parent_id])
       if current_team != nil
        #@team_user.team_id = current_team.id
-       current_team.add_member(User.find(@inv.to_id)) 
+      add_member_return= current_team.add_member(User.find(@inv.to_id), @inv.assignment_id)
       end
     end
 
-    #also update the user's topic id
+    #also update the user's topic id.
+   if add_member_return        # there was room for the member on the team
     participant = Participant.find_by_user_id_and_parent_id(student.user_id,student.parent_id)
     participant.update_topic_id(Participant.find_by_user_id_and_parent_id(@inv.from_id,student.parent_id).topic_id)
     #@team_user.user_id = @inv.to_id
     #@team_user.save
-    
+   else flash[:error]= "The team already has the maximum number of members."
+   end
     redirect_to :controller => 'student_team', :action => 'view', :id => student.id
   end
   

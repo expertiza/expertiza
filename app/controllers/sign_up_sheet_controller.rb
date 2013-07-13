@@ -443,7 +443,8 @@ class SignUpSheetController < ApplicationController
       flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
     end
     team = Team.find(team_id)
-    team.add_member(user)
+    assignment_id= team.parent_id
+    team.add_member(user,assignment_id)
   end
 
   def has_user(user, team_id)

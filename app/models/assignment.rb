@@ -52,7 +52,8 @@ class Assignment < ActiveRecord::Base
 
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
-        contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'submission' }
+                                            contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'submission' }
+
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
@@ -263,7 +264,7 @@ class Assignment < ActiveRecord::Base
 
   def get_path
     if self.course_id == nil and self.instructor_id == nil
-      raise 'Path can not be created. The assignment must be associated with either a course or an instructor.'
+      raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.'
     end
     if self.wiki_type_id != 1
       raise PathError, 'No path needed'
@@ -407,7 +408,7 @@ class Assignment < ActiveRecord::Base
 
   # Get all review mappings for this assignment & reviewer
   # required to give reviewer location of new submission content
-  # link can not be provided as it might give user ability to access data not
+  # link cannot be provided as it might give user ability to access data not
   # available to them.  
   #ajbudlon, sept 07, 2007      
   def get_review_number(mapping)
@@ -520,7 +521,7 @@ class Assignment < ActiveRecord::Base
     rounds = 0
     for i in (0 .. due_dates.length-1)
       deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
-      if deadline_type.name == 'review' || deadline_type.name == 'rereview'
+      if deadline_type.name == 'review'
         rounds = rounds + 1
       end
     end
@@ -906,7 +907,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def cleanup_due_dates
+  def clean_up_due_dates
     #delete due_dates without due_at
     self.due_dates.each do |due_date|
       if due_date.due_at.nil?

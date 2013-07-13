@@ -68,7 +68,9 @@ class StudentTeamController < ApplicationController
   def leave
     @student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(@student.user_id)
-    
+    #remove the topic_id from participants
+    @student.update_topic_id(nil)
+
     #remove the entry from teams_users
     user = TeamsUser.find(:first, :conditions =>["team_id =? and user_id =?", params[:team_id], @student.user_id])
     if user

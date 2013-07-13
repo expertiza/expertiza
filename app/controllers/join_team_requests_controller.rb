@@ -40,9 +40,10 @@ class JoinTeamRequestsController < ApplicationController
   #create a new join team request entry for join_team_request table and add it to the table
   def create
     @join_team_request = JoinTeamRequest.new
-    @join_team_request.comments = params[:comments][0]
+    @join_team_request.comments = params[:comments]
     @join_team_request.status = 'P'
     @join_team_request.team_id = params[:team_id]
+
     participant = Participant.find_by_user_id_and_parent_id(session[:user][:id],params[:assignment_id])
     @join_team_request.participant_id= participant.id
     respond_to do |format|

@@ -1,25 +1,7 @@
 <h2>
   Partner Advertisements for Topic: <%= SignUpTopic.find_by_id(params[:id]).topic_name %>
   </h2>
-  <% notifyflag=false %>
-  <% @results.each {|result|
-    %>
-  <% if Participant.find_by_parent_id_and_user_id(result[:assignment_id],session[:user].id).topic_id!=nil%>
-          <% notifyflag=true %>
-  <%end%>
-      <%}%>
-  <% if notifyflag %>
-  <p style="color: green;">
-    [You already have a team so you cannot make a request to join a team]
-  </p>
-      <% notfiyflag= false %>
 
-     <%end%>
-<% if !notifyflag %>
-  <p style="color: green;">
-    [You can make a request to join a team by clicking the request invitation link]
-  </p>
-  <%end%>
 
 <table class="general">
   <tr>
@@ -45,8 +27,7 @@
             <td align="center" width="500"><%= result[:name] %></td>
             <td align="center" width="500"><%= team_members  %></td>
             <td align="center" width="500"><%= result[:comments_for_advertisement] %></td>
-             <% if Participant.find_by_parent_id_and_user_id(result[:assignment_id],session[:user].id).topic_id==nil%>
-
+          <% if  Participant.find_by_parent_id_and_user_id(result[:assignment_id],session[:user].id)!=nil %>
             <td align="center"><%= link_to "Request invitation", :controller => 'join_team_requests', :action => 'new',
                             :assignment_id=>result[:assignment_id],
                             :topic_id=>result[:topic_id],

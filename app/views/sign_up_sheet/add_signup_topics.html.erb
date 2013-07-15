@@ -13,6 +13,8 @@
       <% for topic in @sign_up_topics %>
           <tr>
              <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic} %>
+
+            <td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>
           </tr>
           <% i=i+1 %>
       <% end %>

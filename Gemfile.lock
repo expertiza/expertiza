@@ -120,7 +120,8 @@ GEM
     mini_portile (0.5.1)
     multi_json (1.7.7)
     multi_test (0.0.2)
-    mysql2 (0.3.13)
+    mysql (2.9.1)
+    mysql (2.9.1-x86-mingw32)
     net-scp (1.1.2)
       net-ssh (>= 2.6.5)
     net-sftp (2.1.2)
@@ -244,7 +245,7 @@ DEPENDENCIES
   guard-rspec
   hoptoad_notifier
   launchy
-  mysql2
+  mysql
   nokogiri
   open-uri-cached
   rails (~> 3.0.0)

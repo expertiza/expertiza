@@ -8,7 +8,7 @@ gem 'fastercsv'
 gem 'gdata', :require => false
 gem 'gchartrb', :require => 'google_chart'
 gem 'hoptoad_notifier'
-gem 'mysql2'
+gem 'mysql'
 gem 'rdoc'
 gem 'RedCloth'
 gem 'rake'

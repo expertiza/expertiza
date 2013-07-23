@@ -2,8 +2,8 @@
 #functions to add new topics to an assignment, edit properties of a particular topic, delete a topic, etc
 #are included here
 
-#A point to be taken into consideration is that :id(except when explicitly stated) here means topic id and not assignment id
-#( this is referenced as :assignment id in the params has)
+#A point to be taken into consideration is that :id (except when explicitly stated) here means topic id and not assignment id
+#(this is referenced as :assignment id in the params has)
 #The way it works is that assignments have their own id's, so do topics. A topic has a foreign key dependecy on the assignment_id
 #Hence each topic has a field called assignment_id which points which can be used to identify the assignment that this topic belongs
 #to

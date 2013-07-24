@@ -1,19 +1,16 @@
 class LeaderboardController < ApplicationController
 
+  before_filter :authorize
+
   # Our logic for the overall leaderboard. This method provides the data for
   # the Top 3 leaderboards and the Personal Achievement leaderboards.
   def index
-    @user = session[:user]
-
-    session_user_id = @user.id
-    # ===> Add something to catch if there isn't a legit user
-    #
-    @instructorQuery = LeaderboardHelper.userIsInstructor?(session_user_id)
+    @instructorQuery = LeaderboardHelper.userIsInstructor?(current_user.id)
 
     if @instructorQuery
-      @courseList = LeaderboardHelper.instructorCourses(session_user_id)
+      @courseList = LeaderboardHelper.instructorCourses(current_user.id)
     else
-      @courseList = LeaderboardHelper.studentInWhichCourses(session_user_id)
+      @courseList = LeaderboardHelper.studentInWhichCourses(current_user.id)
     end
 
     @csHash= Leaderboard.getParticipantEntriesInCourses(@courseList, @user.id)

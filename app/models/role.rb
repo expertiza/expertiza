@@ -22,7 +22,7 @@ class Role < ActiveRecord::Base
   def self.administrator
     @@administrator_role ||= find_by_name 'Administrator'
   end
-  alias_method :administrator, :admin
+  alias_method :admin, :administrator
   def self.superadministrator
     @@superadministrator_role ||= find_by_name 'Super-Administrator'
   end

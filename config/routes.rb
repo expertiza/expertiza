@@ -1,7 +1,11 @@
 Expertiza::Application.routes.draw do
   resources :pages do
-    collection do
-      get :home
+    get :home
+  end
+
+  resources :leaderboard do
+    member do
+      get :index
     end
   end
 

@@ -26,6 +26,9 @@ gem 'nokogiri'
 gem 'seer'
 gem 'gchart'
 
+# Navigation
+gem 'simple-navigation'
+
 group :development do
   gem 'ruby-debug19'
   gem 'sqlite3-ruby', :require => 'sqlite3'

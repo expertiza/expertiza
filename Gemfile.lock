@@ -203,6 +203,8 @@ GEM
     rubyzip (0.9.9)
     rwordnet (0.1.3)
     seer (0.10.0)
+    simple-navigation (3.11.0)
+      activesupport (>= 2.3.2)
     slop (3.4.5)
     sqlite3 (1.3.7)
     sqlite3 (1.3.7-x86-mingw32)
@@ -258,5 +260,6 @@ DEPENDENCIES
   rubyzip
   rwordnet
   seer
+  simple-navigation
   sqlite3-ruby
   stanford-core-nlp

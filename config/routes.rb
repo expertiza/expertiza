@@ -1,4 +1,4 @@
-Expertiza::Application.routes.draw do
+Expertiza::Application.routes.draw do |map|
   resources :pages do
     get :home
   end
@@ -22,4 +22,9 @@ Expertiza::Application.routes.draw do
   end
 
   root to: 'pages#home'
+
+  map.resources :join_team_requests
+  map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
+  map.connect ':controller/service.wsdl', :action => 'wsdl'
+  map.connect ':controller/:action/:id'
 end

@@ -17,24 +17,24 @@ class AuthController < ApplicationController
         session[:user] = user
         AuthController.set_current_role(user.role_id,session)
 
-        respond_to do |wants|
-          wants.html do
+        respond_to do |format|
+          format.html do
             ## This line must be modified to read as shown at left when a new version of Goldberg is installed!
             redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user]) 
           end
-          wants.xml do
+          format.xml do
             render :nothing => true, :status => 200
           end
         end
 
       else
         logger.warn "Failed login attempt"
-        respond_to do |wants|
-          wants.html do
+        respond_to do |format|
+          format.html do
             flash[:error] = "Incorrect Name/Password"
             redirect_to :controller => 'password_retrieval', :action => 'forgotten'
           end
-          wants.xml do
+          format.xml do
             render :nothing => true, :status => 404
           end
         end

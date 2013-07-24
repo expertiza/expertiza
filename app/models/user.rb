@@ -1,57 +1,50 @@
 class User < ActiveRecord::Base
-  
+
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {:if => lambda { false }} # Don't validate email uniqueness
-    config.password_field = :clear_password
-    config.crypted_password_field = :password
-    config.crypto_provider = Authlogic::CryptoProviders::Sha1
-    config.salt_first = true
     Authlogic::CryptoProviders::Sha1.join_token = ''
     Authlogic::CryptoProviders::Sha1.stretches = 1
   end
 
   has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id', :dependent => :destroy
-  # FIXME:          :class_name should be AssignmentParticipant, probably. In most cases it's used that way. But all?
   has_many :assignments, :through => :participants
-  
-  belongs_to :parent, :class_name => 'User', :foreign_key => 'parent_id'
-  belongs_to :role
-  
+
   has_many :teams_users, :dependent => :destroy
   has_many :teams, :through => :teams_users
-  
+
+  belongs_to :parent, class_name: :user
+  belongs_to :role
+
   validates_presence_of :name
-  validates_presence_of :email, :message => "can't be blank; use anything@mailinator.com for test users"
-  validates_format_of :email, :with => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, :allow_blank => true
   validates_uniqueness_of :name
 
-  # happens in this order. see http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html
+  validates_presence_of :email, :message => "can't be blank"
+  validates_format_of :email, :with => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, :allow_blank => true
+
   before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.clear_password.blank? } # AuthLogic
   after_create :email_welcome
 
-  def list_mine(object_type, user_id)
-    object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
-  end
-  
-  def get_available_users(name)    
+  def get_available_users(name)
     lesser_roles = role.get_parents
     all_users = User.find(:all, :conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
     visible_users = all_users.select{|user| lesser_roles.include? user.role}
     return visible_users[0,10] # the first 10
   end
 
-  def role
-    if self.role_id
-      @role ||= Role.find(self.role_id)
-    end
-    return @role
+  def can_impersonate?(user)
+    user &&
+      self == user || # can impersonate self
+      self.is_teaching_assistant_for?(user) || #TAs can impersonate their students
+      self.is_creator_of?(user) ||
+      can_impersonate?(user.parent) # recursive
   end
 
-  def can_impersonate?(other_user)
-    return true if other_user == self # can impersonate self
-    return true if self.is_teaching_assistant_for? other_user #TAs can impersonate their students
-    return false if other_user == other_user.parent # no one can impersonate a top-level parent (usually superadmin)
-    return other_user.parent == self || can_impersonate?(other_user.parent) # recursive
+  def admin?
+    role.id == Role.admin if role
+  end
+
+  def is_creator_of?(user)
+    self == user.creator
   end
 
   def assign_random_password
@@ -82,27 +75,27 @@ class User < ActiveRecord::Base
   end
 
   def self.import(row,session,id = nil)
-      if row.length != 4
-       raise ArgumentError, "Not enough items" 
-      end    
-      user = User.find_by_name(row[0])    
-      
-      if user == nil
-        attributes = ImportFileHelper::define_attributes(row)
-        user = ImportFileHelper::create_new_user(attributes,session)
-      else
-        user.clear_password = row[3].strip
-        user.email = row[2].strip
-        user.fullname = row[1].strip
-        user.parent_id = (session[:user]).id
-        user.save
-      end
+    if row.length != 4
+      raise ArgumentError, "Not enough items" 
+    end    
+    user = User.find_by_name(row[0])    
+
+    if user == nil
+      attributes = ImportFileHelper::define_attributes(row)
+      user = ImportFileHelper::create_new_user(attributes,session)
+    else
+      user.clear_password = row[3].strip
+      user.email = row[2].strip
+      user.fullname = row[1].strip
+      user.parent_id = (session[:user]).id
+      user.save
+    end
   end  
-  
+
   def get_author_name
     return self.fullname
   end
-    
+
   def self.yesorno(elt)
     if elt==true
       "yes"
@@ -112,28 +105,28 @@ class User < ActiveRecord::Base
       ""
     end
   end    
-    
+
   # locate User based on provided login.
   # If user supplies e-mail or name, the
   # helper will try to find that User account.
   def self.find_by_login(login)
-      user = User.find_by_email(login)
-      if user == nil
-         items = login.split("@")
-         shortName = items[0]
-         userList = User.find(:all, {:conditions=> ["name =?",shortName]})
-         if userList != nil && userList.length == 1
-            user = userList.first            
-         end
+    user = User.find_by_email(login)
+    if user == nil
+      items = login.split("@")
+      shortName = items[0]
+      userList = User.find(:all, {:conditions=> ["name =?",shortName]})
+      if userList != nil && userList.length == 1
+        user = userList.first            
       end
-      return user     
+    end
+    return user     
   end 
 
   #HOLY SHIT THIS METHOD A SIN!!! and not the good kind of sin!
   def set_instructor (new_assign)  
     new_assign.instructor_id = self.id  
   end
-  
+
   def get_instructor
     self.id
   end
@@ -145,7 +138,7 @@ class User < ActiveRecord::Base
     else raise NotImplementedError.new "for role #{role.name}"
     end
   end
-  
+
   def set_courses_to_assignment 
     @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')    
   end
@@ -166,18 +159,18 @@ class User < ActiveRecord::Base
     cert.version = 1
     cert.subject = cert.issuer = OpenSSL::X509::Name.parse("/C="+self.id.to_s)
     cert.public_key = new_public
-    
+
     # certificate will be valid for 1 year
     cert.not_before = Time.now
     cert.not_after = Time.now+3600*24*365
-    
+
     # self-sign (we trust our own certificates) it using the private key
     cert.sign(new_key, OpenSSL::Digest::SHA1.new)
-    
+
     # convert to a textual form and save it in the database
     self.digital_certificate = cert.to_pem
     self.save
-    
+
     # when replacing an existing key, update any digital signatures made previously with the new key
     if (replacing_key)
       participants = AssignmentParticipant.find_all_by_user_id(self.id)
@@ -187,7 +180,7 @@ class User < ActiveRecord::Base
         end
       end
     end
-    
+
     # return the new private key
     new_private
   end
@@ -223,6 +216,10 @@ class User < ActiveRecord::Base
     }
   end
 
+  def creator
+    parent
+  end
+
   def self.get_export_fields(options)
     fields = Array.new
     if (options["personal_details"] == "true")
@@ -244,16 +241,16 @@ class User < ActiveRecord::Base
   end
 
   def self.from_params(params)
-      if params[:user_id]
-        user = User.find(params[:user_id])
-      else
-        user = User.find_by_name(params[:user][:name])
-      end
-      if user.nil?
-         newuser = url_for :controller => 'users', :action => 'new'
-         raise "Please <a href='#{newuser}'>create an account</a> for this user to continue."
-      end
-      return user
+    if params[:user_id]
+      user = User.find(params[:user_id])
+    else
+      user = User.find_by_name(params[:user][:name])
+    end
+    if user.nil?
+      newuser = url_for :controller => 'users', :action => 'new'
+      raise "Please <a href='#{newuser}'>create an account</a> for this user to continue."
+    end
+    return user
   end
 
   def is_teaching_assistant_for?(student)

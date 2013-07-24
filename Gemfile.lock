@@ -213,6 +213,7 @@ GEM
     stanford-core-nlp (0.5.1)
       bind-it (~> 0.2.5)
     stream (0.5)
+    superfish-rails (1.6.0.1)
     thor (0.14.6)
     treetop (1.4.14)
       polyglot
@@ -252,7 +253,6 @@ DEPENDENCIES
   open-uri-cached
   rails (~> 3.0.0)
   rake
-  rdoc
   rgl
   rjb
   rspec-rails
@@ -263,3 +263,4 @@ DEPENDENCIES
   simple-navigation
   sqlite3-ruby
   stanford-core-nlp
+  superfish-rails

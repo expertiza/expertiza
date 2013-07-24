@@ -2,32 +2,30 @@ source 'http://rubygems.org'
 
 gem 'rails', '~>3.0.0'
 
-gem 'capistrano'
 gem 'authlogic', :require => 'authlogic'
+gem 'bind-it'
+gem 'capistrano'
+gem 'edavis10-ruby-web-search'
+gem 'engtagger'
 gem 'fastercsv'
+gem 'ffi-aspell'
 gem 'gdata', :require => false
+gem 'gchart'
 gem 'gchartrb', :require => 'google_chart'
 gem 'hoptoad_notifier'
 gem 'mysql'
-gem 'rdoc'
-gem 'RedCloth'
-gem 'rake'
-gem 'rgl', :require => 'rgl/adjacency'
-gem 'rubyzip', :require => 'zip/zip'
-gem 'engtagger'
-gem 'stanford-core-nlp'
-gem 'rjb'
-gem 'bind-it'
-gem 'rwordnet'
-gem 'open-uri-cached'
-gem 'edavis10-ruby-web-search'
-gem 'ffi-aspell'
 gem 'nokogiri'
+gem 'open-uri-cached'
+gem 'rake'
+gem 'RedCloth'
+gem 'rgl', :require => 'rgl/adjacency'
+gem 'rjb'
+gem 'rubyzip', :require => 'zip/zip'
+gem 'rwordnet'
 gem 'seer'
-gem 'gchart'
-
-# Navigation
 gem 'simple-navigation'
+gem 'stanford-core-nlp'
+gem 'superfish-rails'
 
 group :development do
   gem 'ruby-debug19'
@@ -35,13 +33,13 @@ group :development do
 end
 
 group :test do
-  gem "rspec-rails"
+  gem 'capybara'
   gem 'cucumber'
   gem 'cucumber-rails'
-  gem 'gherkin'
-  gem 'capybara'
   gem 'database_cleaner'
-  gem 'launchy'
   gem 'guard-rails'
   gem 'guard-rspec'
+  gem 'gherkin'
+  gem 'launchy'
+  gem "rspec-rails"
 end

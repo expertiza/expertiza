@@ -1,6 +1,9 @@
 Expertiza::Application.routes.draw do |map|
   resources :pages do
-    get :home
+    member do
+      get :home
+      get :contact_us
+    end
   end
 
   resources :leaderboard do

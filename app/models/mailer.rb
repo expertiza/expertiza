@@ -21,7 +21,6 @@ class Mailer < ActionMailer::Base
 
      @from = "expertiza-support@lists.ncsu.edu"
      @body = defn[:body]
-     @sent_on = Time.now 
      @content_type = 'text/html'
   end
 end

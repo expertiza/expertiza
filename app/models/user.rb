@@ -2,6 +2,7 @@ class User < ActiveRecord::Base
 
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {:if => lambda { false }} # Don't validate email uniqueness
+    config.crypto_provider = Authlogic::CryptoProviders::Sha1
     Authlogic::CryptoProviders::Sha1.join_token = ''
     Authlogic::CryptoProviders::Sha1.stretches = 1
   end
@@ -122,7 +123,6 @@ class User < ActiveRecord::Base
     return user     
   end 
 
-  #HOLY SHIT THIS METHOD A SIN!!! and not the good kind of sin!
   def set_instructor (new_assign)  
     new_assign.instructor_id = self.id  
   end

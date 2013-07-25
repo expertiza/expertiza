@@ -2,8 +2,8 @@
 #functions to add new topics to an assignment, edit properties of a particular topic, delete a topic, etc
 #are included here
 
-#A point to be taken into consideration is that :id(except when explicitly stated) here means topic id and not assignment id
-#( this is referenced as :assignment id in the params has)
+#A point to be taken into consideration is that :id (except when explicitly stated) here means topic id and not assignment id
+#(this is referenced as :assignment id in the params has)
 #The way it works is that assignments have their own id's, so do topics. A topic has a foreign key dependecy on the assignment_id
 #Hence each topic has a field called assignment_id which points which can be used to identify the assignment that this topic belongs
 #to
@@ -650,7 +650,7 @@ class SignUpSheetController < ApplicationController
   #gets team_details to show it on team_details view for a given assignment
   def team_details
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
-      @results =get_team_details(assignment.id, topic.id)
+      @results =ad_info(assignment.id, topic.id)
       @results.each do |result|
         result.attributes().each do |attr|
           if attr[0].equal? "name"
@@ -669,25 +669,17 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  #searches and returns team members for a given team_id
+  # searches and returns team members for a given team_id
   def find_team_members(team_id)
     TeamsUser.find_all_by_team_id(team_id).each { |teamuser|
       team_members+=User.find(teamuser.user_id).handle+" "
     }
   end
 
-  #get the team details to display them in team_details view when assignment-participant
-  #clicks for seeing the advertisement related to
-  def get_team_details(assignment_id, topic_id)
-    query = "select t.name, t.comments_for_advertisement, p.handle,t.id as team_id, p.id as participant_id, p.topic_id as topic_id, p.parent_id as assignment_id"
-    query = query + " from teams t, teams_users tu, participants p"
-    query = query + " where"
-    query = query + " p.parent_id = '#{assignment_id}' and"
-    query = query + " p.topic_id = '#{topic_id}'  and"
-    query = query + " t.parent_id = p.parent_id and"
-    query = query + " tu.user_id = p.user_id and"
-    query = query + " t.id = tu.team_id"
-    query = query + " group by t.name;"
+  # get info related to the ad for partners so that it can be displayed when an assignment_participant
+  # clicks to see ads related to a topic
+  def ad_info(assignment_id, topic_id)
+    query = "select t.id as team_id,t.comments_for_advertisement,t.name,su.assignment_id from teams t, signed_up_users s,sign_up_topics su where s.topic_id='"+topic_id.to_s+"' and s.creator_id=t.id and s.topic_id = su.id;    "
     SignUpTopic.find_by_sql(query)
   end
 

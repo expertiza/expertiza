@@ -5,22 +5,21 @@ When /^I create a (public|private) assignment named "([^"]*)" using (no due date
     use_review = false
   else
     use_review = true
-    ((review_name,),) = review_setting.scan(/^review named \"([^"]*)\"$/)
+    review_name = review_setting.scan(/^review named \"([^"]*)\"$/)
     step "I have a public review named \"#{review_name}\""
   end
 
   step "I follow the \"Manage...\" link as an \"instructor\""
     step "I follow \"Create Public Assignment\""
-	step "I fill in \"#{assignment_name}\" for \"Assignment name\""
-	
-  if use_review
-    step "I fill in \"2020-01-01 00:00:00\" for \"submit_deadline[due_at]\""
-    step "I fill in \"2020-01-02 00:00:00\" for \"review_deadline[due_at]\""
-	  step "I select \"#{review_name}\" from \"questionnaires[review]\""
-	  
-  	step "I press \"Save assignment\""
-  end
+    step "I fill in \"Name\" with \"#{assignment_name}\""
+    step "I press \"Create\""
+    step "I should see \"Assignment was successfully created.\""
 
+  if use_review
+    step "I fill in \"2020/01/01 00:00:00 +0000\" for \"Submission\""
+    step "I fill in \"2020/01/02 00:00:00 +0000\" for \"Review\""
+  end
+   step "I press \"Save\""
 end
 
 When /^I add user "([^"]*)" as a participant to assignment "([^"]*)"$/ do |user_name, assignment_name|  
@@ -32,22 +31,25 @@ When /^I add user "([^"]*)" as a participant to assignment "([^"]*)"$/ do |user_
   step "I should see \"#{user_name}\""
 end
 
-When /^I create a (public|private) assignment named "([^"]*)" with max team size (\d+)$/ do  |public_or_private,assignment_name,team_size|  
+When /^I create a (public|private) assignment named "([^"]*)" with max team size (\d+)$/ do  |public_or_private,assignment_name,team_size|
   step "I have a public review named \"test_review\""
     step "I have a public metareview named \"test_metareview\""
   step "I follow the \"Manage...\" link as an \"instructor\""
     step "I follow \"Create Public Assignment\""
-    step "I fill in \"#{assignment_name}\" for \"Assignment name: \""
-    step "I fill in \"2020-01-01 00:00:00\" for \"submit_deadline[due_at]\""
-    step "I fill in \"2020-01-02 00:00:00\" for \"review_deadline[due_at]\""
-    step "I fill in \"2020-01-03 00:00:00\" for \"reviewofreview_deadline[due_at]\""
+    step "I fill in \"Name\" with \"#{assignment_name}\""
+    step "I press \"Create\""
+    step "I should see \"Assignment was successfully created.\""
+    step "I check \"Has teams?\""
+    step "I fill in \"#{team_size}\" for \"Maximum number of members per team\""
+    step "I check \"assignment_availability_flag\""
+    step "I fill in \"2020/01/01 00:00:00 +0000\" for \"submit_deadline[due_at]\""
+    step "I fill in \"2020/01/02 00:00:00 +0000\" for \"review_deadline[due_at]\""
+    step "I fill in \"2020/01/03 00:00:00 +0000\" for \"reviewofreview_deadline[due_at]\""
     step "I select \"test_review\" from \"questionnaires[review]\""
     step "I select \"test_metareview\" from \"questionnaires[metareview]\""
-    step "I select \"Yes\" from \"teamselect\""
-    step "I fill in \"#{team_size}\" for \"assignment_team_count\""
-    step "I press \"Save assignment\""
+    step "I press \"Save\""
   step "I should see \"#{assignment_name}\""
-end	
+end
 
 When /^I (create|join) a team named "([^"]*)" for the assignment "([^"]*)"$/ do |create_join, team_name,assignment_name|
   step "I follow \"Student_task\""

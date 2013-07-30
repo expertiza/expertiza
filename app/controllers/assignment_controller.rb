@@ -24,6 +24,7 @@ class AssignmentController < ApplicationController
   end
 
   def create
+    params[:assignment][:max_team_size] ||= 1
     @assignment = Assignment.new(params[:assignment])
 
     if @assignment.save

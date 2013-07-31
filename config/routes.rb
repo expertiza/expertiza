@@ -1,10 +1,7 @@
 Expertiza::Application.routes.draw do |map|
-  resources :pages do
-    member do
-      get :home
-      get :contact_us
-    end
-  end
+  match 'home', controller: :pages, action: :home
+  match 'contact_us', controller: :pages, action: :contact_us
+  match 'credits', controller: :pages, action: :credits
 
   resources :leaderboard do
     member do

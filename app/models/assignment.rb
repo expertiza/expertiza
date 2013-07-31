@@ -5,6 +5,7 @@ class Assignment < ActiveRecord::Base
 
   #alias_attribute :team_count, :max_team_size
 
+  # Does not necessarily belong to a course!
   belongs_to :course
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to

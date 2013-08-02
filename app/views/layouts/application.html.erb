@@ -60,16 +60,11 @@
     <div class="wrapper">
       <div class="container">
 
-        <!-- The following code should be removed when the logout button is relocated -->
         <div class="sidebar">
           <div class="sidecontent">
-            <!--%= render_component(:controller => 'page/auth', :action =>
-            'login_logout') %-->
             <%= render :partial => 'auth/login' %>
           </div>
         </div>
-        <!-- class="sidebar" -->
-        <!-- End of code that should be removed when the logout button is relocated -->
 
         <div class="main">
           <div class="content">
@@ -82,6 +77,9 @@
             <% end -%>
             <% if flash[:alert] -%>
               <div class="flash_error"><%= flash[:alert] %></div>
+            <% end -%>
+            <% if flash[:notice] -%>
+              <div class="flash_error"><%= flash[:notice] %></div>
             <% end -%>
             <%= yield %>
           </div>

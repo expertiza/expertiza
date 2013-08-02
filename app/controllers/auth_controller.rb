@@ -113,9 +113,9 @@ class AuthController < ApplicationController
 
   def self.set_current_role(role_id, session)
     if role_id
-      role = Role.find(role_id)
+      role = Role.find role_id
       if role
-        if not role.cache or not role.cache.has_key?(:credentials)
+        if !role.cache || !role.cache.has_key?(:credentials)
           Role.rebuild_cache
         end
         session[:credentials] = role.cache[:credentials]

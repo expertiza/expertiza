@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 
 gem 'rails', '~>3.0.0'
 
-gem 'authlogic', '~>3.1.3'
+gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', :require => 'authlogic'
 gem 'bind-it'
 gem 'capistrano'
 gem 'edavis10-ruby-web-search'

@@ -38,8 +38,9 @@ Feature: Manage the assignments in Expertiza
 	
   @instructor
   @manage_assignments
-  Scenario: Creating an assignment with no due date available to student should fail.
+  Scenario: Creating an assignment that is available to students with no due date should fail.
 	When I create a public assignment named "Assignment3" using no due date
+     And "Available to students" is checked
 	Then I should not see "Assignment was successfully created."
 
   Scenario: Creating an assignment with no due date if not available to student should not fail.

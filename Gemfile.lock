@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/expertiza/authlogic.git
+  revision: 09163c7d2a9b21942c6716e885a14305e1aa0390
+  specs:
+    expertiza-authlogic (3.2.0)
+      activerecord (>= 3.0.0)
+      activesupport (>= 3.0.0)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -33,9 +41,6 @@ GEM
     addressable (2.3.5)
     archive-tar-minitar (0.5.2)
     arel (2.0.10)
-    authlogic (3.1.3)
-      activerecord (>= 3.0.0)
-      activesupport (>= 3.0.0)
     bind-it (0.2.7)
       rjb (~> 1.4.3)
     builder (2.1.2)
@@ -227,7 +232,6 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth
-  authlogic (~> 3.1.3)
   bind-it
   capistrano
   capybara
@@ -236,6 +240,7 @@ DEPENDENCIES
   database_cleaner
   edavis10-ruby-web-search
   engtagger
+  expertiza-authlogic!
   fastercsv
   ffi-aspell
   gchart

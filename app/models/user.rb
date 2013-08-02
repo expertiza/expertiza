@@ -25,6 +25,10 @@ class User < ActiveRecord::Base
   before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.clear_password.blank? } # AuthLogic
   after_create :email_welcome
 
+  def salt_first?
+    true
+  end
+
   def get_available_users(name)
     lesser_roles = role.get_parents
     all_users = User.find(:all, :conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering

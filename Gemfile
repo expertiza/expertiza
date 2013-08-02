@@ -23,6 +23,7 @@ gem 'rjb'
 gem 'rubyzip', :require => 'zip/zip'
 gem 'rwordnet'
 gem 'seer'
+gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
 

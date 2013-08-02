@@ -1,4 +1,4 @@
-require 'models/analytic/score_analytic'
+require 'analytic/score_analytic'
 module ResponseAnalytic
   def num_questions
     self.scores.count

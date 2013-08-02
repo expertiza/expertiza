@@ -1,5 +1,5 @@
 class Assignment < ActiveRecord::Base
-  require 'models/analytic/assignment_analytic'
+  require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   include DynamicReviewMapping
 

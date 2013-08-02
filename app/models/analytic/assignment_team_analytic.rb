@@ -1,4 +1,4 @@
-require 'models/analytic/response_analytic'
+require 'analytic/response_analytic'
 module AssignmentTeamAnalytic
   #======= general ==========#
   def num_participants

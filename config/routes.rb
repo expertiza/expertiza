@@ -41,6 +41,13 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :impersonate do
+    collection do
+      get :impersonate
+      post :impersonate
+    end
+  end
+
   resources :join_team_requests
 
   resources :leaderboard do

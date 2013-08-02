@@ -1,5 +1,11 @@
 <ul id='suckerfish'>
-  <li><%= link_to 'Home', :root %></li>
+  <li>
+  <%= link_to 'Home', :root %>
+  <ul>
+    <li><%= link_to 'Leaderboard', leaderboard_index_path %></li>
+  </ul>
+  </li>
+
   <li>
   <%= link_to 'Contact Us', 'contact_us' %>
   <ul>

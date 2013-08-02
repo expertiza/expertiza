@@ -115,7 +115,7 @@ class AuthController < ApplicationController
     if role_id
       role = Role.find role_id
       if role
-        if !role.cache || !role.cache.has_key?(:credentials)
+        if !role.cache || !role.cache.try(:has_key?, :credentials)
           Role.rebuild_cache
         end
         session[:credentials] = role.cache[:credentials]

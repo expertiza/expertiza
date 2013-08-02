@@ -10,7 +10,7 @@ module AuthHelper
     end
     return action_name
   end
-  
+
   def self.get_home_controller(user)
     begin
       controller_name = ApplicationHelper::get_user_role(user).send(:get_home_controller)

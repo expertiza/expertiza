@@ -35,6 +35,12 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :export_file do
+    collection do
+      get :start
+    end
+  end
+
   resources :grades do
     collection do
       get :view
@@ -48,13 +54,20 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :import_file do
+    collection do
+      get :start
+    end
+  end
+
   resources :join_team_requests
 
-  resources :leaderboard do
+  resources :leaderboard, constraints: { id: /\d+/ } do
     collection do
       get :index
     end
   end
+  match 'leaderboard/index', controller: :leaderboard, action: :index
 
   resources :menu_items do
     collection do
@@ -92,6 +105,8 @@ Expertiza::Application.routes.draw do |map|
       get :review_report
     end
   end
+
+  resources :roles
 
   resources :sign_up_sheet do
     collection do
@@ -137,10 +152,19 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :drill
       get :list
+      get :goto_author_feedbacks
     end
   end
 
-  match 'menu/:name', controller: :menu_items, action: :link, method: :get
+  resources :users do
+    collection do
+      get :list
+      get :show_selection
+      get :auto_complete_for_user_name
+    end
+  end
+
+  match '/menu/*name', controller: :menu_items, action: :link
   match ':page_name', controller: :content_pages, action: :view, method: :get
 
   root to: 'pages#home'

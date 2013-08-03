@@ -7,20 +7,29 @@
 
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
     <%= csrf_meta_tag %>
-    <%= stylesheet_link_tag "application" %>
-    <%= stylesheet_link_tag "dddropdownpanel" %>
-    <%= stylesheet_link_tag "goldberg" %>
-    <%= stylesheet_link_tag "layout" %>
-    <%= stylesheet_link_tag "redbox" %>
+    <%= stylesheet_link_tag 'dddropdownpanel',
+      'goldberg',
+      'layout',
+      'redbox' %>
 
-    <%= javascript_include_tag :defaults %>
-    <%= javascript_include_tag 'jquery-1.9.1' %>
-    <%= javascript_include_tag 'prototype' %>
+    <%= javascript_include_tag :defaults,
+      'jquery',
+      'redbox',
+      'suckerfish',
+      'actionmenu',
+      'tableactions',
+      'application',
+      'datetimepicker',
+      'CalendarPopup',
+      'ajaxtabs',
+      'sorttable',
+      'shared',
+      'textareasizer' %>
   </head>
 
   <body>
     <div class="header">
-      <img src="/images/logo.jpg">
+    <%= image_tag "/images/logo.jpg" %>
 
       <h1>Expertiza</h1>
 

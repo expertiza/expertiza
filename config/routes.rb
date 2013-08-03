@@ -1,8 +1,4 @@
 Expertiza::Application.routes.draw do |map|
-  match 'home', controller: :pages, action: :home
-  match 'contact_us', controller: :pages, action: :contact_us
-  match 'credits', controller: :pages, action: :credits
-
   resources :assessment360 do
     collection do
       get :one_course_all_assignments
@@ -25,6 +21,10 @@ Expertiza::Application.routes.draw do |map|
       post :logout
     end
   end
+
+  resources :content_pages
+
+  resources :controller_actions
 
   resources :course do
     collection do
@@ -53,6 +53,15 @@ Expertiza::Application.routes.draw do |map|
   resources :leaderboard do
     collection do
       get :index
+    end
+  end
+
+  resources :menu_items do
+    collection do
+      get :move_down
+      get :move_up
+      get :new_for
+      get :link
     end
   end
 
@@ -121,6 +130,9 @@ Expertiza::Application.routes.draw do |map|
       get :list
     end
   end
+
+  match 'menu/:name', controller: :menu_items, action: :link, method: :get
+  match ':page_name', controller: :content_pages, action: :view, method: :get
 
   root to: 'pages#home'
 

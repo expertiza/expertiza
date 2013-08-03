@@ -38,9 +38,9 @@ class ContentPage < ActiveRecord::Base
 
   def content_html
     if self.content_cache and self.content_cache.length > 0
-      return self.content_cache
+      return self.content_cache.html_safe
     else
-      return self.markup_content
+      return self.markup_content.html_safe
     end
   end
 

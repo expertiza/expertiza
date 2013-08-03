@@ -1,7 +1,10 @@
 class PagesController < ApplicationController
-  def home
+  def setup
+    render 'site_admin'
   end
+  alias_method :admin, :setup
 
-  def contact_us
+  def leaderboard
+    redirect_to controller: :leaderboard, action: :index
   end
 end

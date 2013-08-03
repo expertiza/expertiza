@@ -4,7 +4,6 @@ include GoldbergFilters
 class ApplicationController < ActionController::Base
   before_filter :goldberg_security_filter
 
-  helper_method :current_user_session, :current_user_role?
   protect_from_forgery unless Rails.env.test?
   around_filter :set_time_zone
 
@@ -53,12 +52,8 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def current_user_session
-    @current_user_session ||= session[:user]
-  end
-
   def current_user
-    @current_user ||= current_user_session
+    @current_user ||= session[:user]
   end
   helper_method :current_user
 

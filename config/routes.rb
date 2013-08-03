@@ -43,7 +43,7 @@ Expertiza::Application.routes.draw do |map|
 
   resources :impersonate do
     collection do
-      get :impersonate
+      get :start
       post :impersonate
     end
   end
@@ -96,6 +96,7 @@ Expertiza::Application.routes.draw do |map|
   resources :sign_up_sheet do
     collection do
       get :add_signup_topics
+      get :add_signup_topics_staggered
       get :view_publishing_rights
     end
   end
@@ -109,6 +110,14 @@ Expertiza::Application.routes.draw do |map|
   resources :survey do
     collection do
       get :assign
+    end
+  end
+
+  resources :survey_deployment do
+    collection do
+      get :list
+      get :delete
+      get :reminder_thread
     end
   end
 

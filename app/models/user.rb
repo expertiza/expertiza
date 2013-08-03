@@ -13,7 +13,8 @@ class User < ActiveRecord::Base
   has_many :teams_users, :dependent => :destroy
   has_many :teams, :through => :teams_users
 
-  belongs_to :parent, class_name: :user
+  has_many :children, class_name: 'User', :foreign_key => 'parent_id'
+  belongs_to :parent, class_name: 'User'
   belongs_to :role
 
   validates_presence_of :name

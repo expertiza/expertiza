@@ -19,7 +19,7 @@ module ParticipantsHelper
     attributes["name"] = line_split[config["name"].to_i]
     attributes["fullname"] = config["fullname"]
     attributes["email"] = line_split[config["email"].to_i]
-    attributes["clear_password"] = assign_password(8)
+    attributes["password"] = assign_password(8)
     attributes["email_on_submission"] = 1
     attributes["email_on_review"] = 1
     attributes["email_on_review_of_review"] = 1
@@ -37,7 +37,7 @@ module ParticipantsHelper
         participant = add_user_to_assignment(params, user)
       end   
       if participant != nil
-        participant.email(attrs["clear_password"], home_page)
+        participant.email(attrs["password"], home_page)
       end   
       return user 
   end

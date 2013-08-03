@@ -2,8 +2,8 @@ puts "Loading data from features/support/seeds.rb"
 
 User.create!(:name => 'student',
              :email => 'student@mailinator.com',
-             :clear_password => 'password',
-             :clear_password_confirmation => 'password',
+             :password => 'password',
+             :password_confirmation => 'password',
              :role_id => Role.find_by_name('Student').id,
              :email_on_review => true,
              :email_on_submission => true,

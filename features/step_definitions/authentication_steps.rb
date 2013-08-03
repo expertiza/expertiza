@@ -16,8 +16,8 @@ Given /^a student with the username "(\S+)" exists$/ do |username|
     User.create({
                     :name => username,
                     :fullname => username,
-                    :clear_password => 'password',
-                    :clear_password_confirmation => 'password',
+                    :password => 'password',
+                    :password_confirmation => 'password',
                     :role => Role.find_by_name!('student'),
                     :email => "#{username}@mailinator.com",
                     :is_new_user => false
@@ -63,8 +63,8 @@ Given /an? (Student|Teaching Assistant|Instructor|Administrator|Super-Administra
   User.create({
     :name => name,
     :fullname => name,
-    :clear_password => 'password',
-    :clear_password_confirmation => 'password',
+    :password => 'password',
+    :password_confirmation => 'password',
     :role => Role.find_by_name!(user_type),
     :email => "#{name}@mailinator.com",
     :parent_id => parent_id,

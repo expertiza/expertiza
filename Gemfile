@@ -26,6 +26,7 @@ gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
+gem 'will_paginate'
 
 group :development do
   gem 'ruby-debug19'
@@ -34,8 +35,7 @@ end
 
 group :test do
   gem 'capybara'
-  gem 'cucumber'
-  gem 'cucumber-rails'
+  gem 'cucumber-rails', require: false
   gem 'database_cleaner'
   gem 'guard-rails'
   gem 'guard-rspec'

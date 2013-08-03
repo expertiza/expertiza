@@ -1,13 +1,7 @@
 require 'menu'
-
+require 'goldberg_filters'
 
 class MenuItemsController < ApplicationController
-
-  # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [ :destroy, :create, :update, 
-                                      :move_up, :move_down ], 
-  :redirect_to => { :action => :list }
-
   def index
     list
     render :action => 'list'
@@ -148,10 +142,7 @@ class MenuItemsController < ApplicationController
   end
 
   def link
-    str = String.new(params[:name][0])
-    for k in 1..params[:name].length-1
-      str = String.new(str + "/" + params[:name][k])
-    end
+    str = params[:name]
     node = session[:menu].select(str)
     if node
       redirect_to node.url

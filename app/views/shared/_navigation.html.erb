@@ -1,15 +1,6 @@
-<ul id='suckerfish'>
-  <li>
-  <%= link_to 'Home', :root %>
-  <ul>
-    <li><%= link_to 'Leaderboard', leaderboard_index_path %></li>
+<div class="topmenu">
+  <ul id="suckerfish">
+    <%= render :partial => 'menu_items/suckerfish',
+      :locals => {:items => session[:menu].get_menu(0)} %>
   </ul>
-  </li>
-
-  <li>
-  <%= link_to 'Contact Us', 'contact_us' %>
-  <ul>
-    <li><%= link_to 'Credits & License', 'credits' %></li>
-  </ul>
-  </li>
-</ul>
+</div>

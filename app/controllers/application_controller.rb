@@ -1,4 +1,8 @@
+require 'goldberg_filters'
+include GoldbergFilters
+
 class ApplicationController < ActionController::Base
+  before_filter :goldberg_security_filter
 
   helper_method :current_user_session, :current_user_role?
   protect_from_forgery unless Rails.env.test?
@@ -28,6 +32,7 @@ class ApplicationController < ActionController::Base
       flash[:notice] = 'Please log in.'
       redirect_back
     end
+    @user = current_user
   end
 
   def current_permission(args = {})

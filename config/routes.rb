@@ -96,6 +96,12 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :permissions, constraints: { id: /\d+/ } do
+    collection do
+      get :list
+    end
+  end
+
   resources :profile, constraints: { id: /\d+/ } do
     collection do
       get :edit
@@ -124,13 +130,30 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :roles
+  resources :roles do
+    collection do
+      get :list
+    end
+  end
+
+  resources :roles_permissions do
+    collection do
+      get :new_permission_for_role
+    end
+  end
 
   resources :sign_up_sheet do
     collection do
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :view_publishing_rights
+    end
+  end
+
+  resources :site_controllers do
+    collection do
+      get :list
+      get :new_called
     end
   end
 

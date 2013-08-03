@@ -34,7 +34,7 @@ class UsersControllerTest < ActionController::TestCase
   
   # 201 edit a user�s profile
   def test_update
-    post :update, :id => @testUser, :user => { :clear_password => "",
+    post :update, :id => @testUser, :user => { :password => "",
       :name => "student1",
       :fullname => "new Student1test",
       :email => "student1test@test.test"}
@@ -52,7 +52,7 @@ class UsersControllerTest < ActionController::TestCase
     # It will raise an error while execute render method in controller
     # Because the goldberg variables didn't been initialized  in the test framework
 #   assert_raise (ActionView::TemplateError){
-    post :update, :id => @testUser, :user => { :clear_password => "",
+    post :update, :id => @testUser, :user => { :password => "",
           :name => "" }
 #         }
     assert !assigns(:user).valid?                                    
@@ -64,8 +64,8 @@ class UsersControllerTest < ActionController::TestCase
     # It will raise an error while execute render method in controller
     # Because the goldberg variables didn't been initialized  in the test framework
 #   assert_raise (ActionView::TemplateError){
-    post :update, :id => @testUser, :user => { :clear_password => "test",
-      :clear_password_confirmation => "nottest"}
+    post :update, :id => @testUser, :user => { :password => "test",
+      :password_confirmation => "nottest"}
 #   }
     assert !assigns(:user).valid?                                    
     assert_template 'users/edit'

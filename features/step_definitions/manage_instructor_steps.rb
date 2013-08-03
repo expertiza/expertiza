@@ -12,8 +12,8 @@ And /^I create a new instructor named "(\S+)"$/ do |instructor|
   fill_in 'user_name', :with => instructor
   fill_in 'user_fullname', :with => instructor
   fill_in 'user_email', :with => "#{instructor}@ncsu.edu"
-  fill_in 'user_clear_password', :with => 'password'
-  fill_in 'user_clear_password_confirmation', :with => 'password'
+  fill_in 'user_password', :with => 'password'
+  fill_in 'user_password_confirmation', :with => 'password'
   click_button 'Create'
 end
 

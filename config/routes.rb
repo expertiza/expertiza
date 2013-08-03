@@ -35,6 +35,12 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :course_evaluation do
+    collection do
+      get :list
+    end
+  end
+
   resources :export_file do
     collection do
       get :start
@@ -90,6 +96,18 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :profile, constraints: { id: /\d+/ } do
+    collection do
+      get :edit
+    end
+  end
+
+  resources :publishing do
+    collection do
+      get :view
+    end
+  end
+
   resources :questionnaire do
     collection do
       get :view
@@ -113,6 +131,13 @@ Expertiza::Application.routes.draw do |map|
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :view_publishing_rights
+    end
+  end
+
+  resources :student_task do
+    collection do
+      get :list
+      get :view
     end
   end
 

@@ -23,7 +23,7 @@ class User < ActiveRecord::Base
   validates_presence_of :email, :message => "can't be blank"
   validates_format_of :email, :with => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, :allow_blank => true
 
-  before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.clear_password.blank? } # AuthLogic
+  before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.password.blank? } # AuthLogic
   after_create :email_welcome
 
   def salt_first?
@@ -65,19 +65,19 @@ class User < ActiveRecord::Base
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
-    MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", clear_password)
+    MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)
   end
 
-  def check_password(clear_password)
+  def check_password(password)
     Authlogic::CryptoProviders::Sha1.stretches = 1
-    Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + clear_password])
+    Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + password])
   end
 
   # Resets the password to be mailed to the user
   def reset_password
     randomize_password
     save
-    clear_password
+    password
   end
 
   def self.random_password(size=8)
@@ -94,7 +94,7 @@ class User < ActiveRecord::Base
       attributes = ImportFileHelper::define_attributes(row)
       user = ImportFileHelper::create_new_user(attributes,session)
     else
-      user.clear_password = row[3].strip
+      user.password = row[3].strip
       user.email = row[2].strip
       user.fullname = row[1].strip
       user.parent_id = (session[:user]).id

@@ -22,7 +22,12 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :content_pages
+  resources :content_pages do
+    collection do
+      get :list
+      match ':id', action: :show
+    end
+  end
 
   resources :controller_actions
 
@@ -81,6 +86,7 @@ Expertiza::Application.routes.draw do |map|
       get :move_up
       get :new_for
       get :link
+      get :list
     end
   end
 

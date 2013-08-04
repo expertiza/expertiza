@@ -1,5 +1,4 @@
 require 'menu'
-require 'goldberg_filters'
 
 class MenuItemsController < ApplicationController
   def index
@@ -160,7 +159,7 @@ class MenuItemsController < ApplicationController
   protected
   
   def foreign
-    if self.id
+    if self.respond_to?(:id)
       @parents = MenuItem.find(:all,
                                :conditions => ['id not in (?)', self.id],
                                :order => 'name')

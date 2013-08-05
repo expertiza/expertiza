@@ -4,6 +4,10 @@
 //= require superfish
 //= require hoverIntent
 
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase();
+}
+
 function checkForm()
 {
   return checkWeights(); // && checkDeadlines();

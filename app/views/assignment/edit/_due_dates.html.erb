@@ -96,9 +96,9 @@
 
         html += '<td class="due_date_name" width="15%">';
         if (round_no != 0) {
-            html += 'Round ' + round_no + ': ' + deadline_type.capitalize();
+            html += 'Round ' + round_no + ': ' + capitalize(deadline_type);
         } else {
-            html += deadline_type.replace("_", " ").capitalize();
+            capitalize(html += deadline_type.replace("_", " "));
         }
         html += '</td>';
 

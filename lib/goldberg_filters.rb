@@ -34,9 +34,9 @@ module GoldbergFilters
 
       if make_public
         public_role = Role.find(@settings.public_role_id)
-        if not public_role or not public_role.cache or 
-            not public_role.cache[:credentials] or 
-            not public_role.cache[:menu]
+        if !public_role or !public_role.cache ||
+          !public_role.cache[:credentials] ||
+          !public_role.cache[:menu]
           Role.rebuild_cache
           public_role = Role.find(@settings.public_role_id)
         end
@@ -44,7 +44,7 @@ module GoldbergFilters
         session[:credentials] = public_role.cache[:credentials]
         session[:menu] = public_role.cache[:menu]
       end
-      
+
       if session[:credentials].role_id != @settings.public_role_id
         logger.info "(Logged-in user)"
         if session[:last_time] != nil
@@ -58,11 +58,11 @@ module GoldbergFilters
           end
         end
       end
-      
+
       # If this is a page request check that it exists, and if not
       # redirect to the "unknown" page
       if params[:controller] == 'content_pages' and
-          params[:action] == 'view'
+        params[:action] == 'view'
         if not session[:credentials].pages.has_key?(params[:page_name].to_s)
           logger.warn "(Unknown page? #{params[:page_name].to_s})"
           redirect_to @settings.not_found_page.url
@@ -77,9 +77,9 @@ module GoldbergFilters
         return false
       end
     end  # if @settings
-    
+
     session[:last_time] = Time.now
-    
+
     return true
   end
 end

@@ -11,8 +11,9 @@ Given /^I am participating in (team|individual) assignment "(\S+)"$/ do |assignm
   a.allow_suggestions= true
   a.directory_path = 'test'
   a.spec_location= 'http://'
-  a.availability_flag=true
-  a.team_assignment=is_team_assignment
+  a.availability_flag= true
+  a.team_assignment= is_team_assignment
+  a.require_signup= true
   a.save
 
   dropDeadline = DueDate.new

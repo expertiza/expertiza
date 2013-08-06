@@ -29,7 +29,13 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :controller_actions
+  resources :controller_actions do
+    collection do
+      get 'list'
+      post ':id', action: :update
+      get 'new_for'
+    end
+  end
 
   resources :course do
     collection do
@@ -207,6 +213,8 @@ Expertiza::Application.routes.draw do |map|
       get :drill
       get :list
       get :goto_author_feedbacks
+      get :goto_assignments
+      get :goto_courses
     end
   end
 

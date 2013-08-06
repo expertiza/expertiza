@@ -13,6 +13,7 @@ gem 'gdata', :require => false
 gem 'gchart'
 gem 'gchartrb', :require => 'google_chart'
 gem 'hoptoad_notifier'
+gem 'jquery-rails'
 gem 'mysql'
 gem 'nokogiri'
 gem 'open-uri-cached'

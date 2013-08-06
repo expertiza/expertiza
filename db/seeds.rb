@@ -65,6 +65,7 @@ SiteController.create(:name => 'sign_up_sheet', :builtin => false, :permission_i
 SiteController.create(:name => 'suggestion', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'leaderboard', :builtin => false, :permission_id => Permission.find_by_name('public actions - execute').id)
 SiteController.create(:name => 'delete_object', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
+SiteController.create(:name => 'advertise_for_partner', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
 
 ###### content_pages
 ContentPage.create(:title => 'Home Page', :name => 'home', :markup_style_id => MarkupStyle.find_by_name('Textile').id, :permission_id => Permission.find_by_name('public pages - view').id,
@@ -164,6 +165,11 @@ ControllerAction.create(:site_controller_id => SiteController.find_by_name('sugg
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('leaderboard').id, :name => 'index', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('advice').id, :name => 'edit_advice', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('advice').id, :name => 'save_advice', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('advertise_for_partner').id, :name => 'add_advertise_comment', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('advertise_for_partner').id, :name => 'edit', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('advertise_for_partner').id, :name => 'new', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('advertise_for_partner').id, :name => 'remove', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('advertise_for_partner').id, :name => 'update', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 
 ###### menu_items
 MenuItem.create(:parent_id => nil, :name => 'home', :label => 'Home', :seq => 1, :content_page_id => ContentPage.find_by_name('home').id, 

@@ -36,8 +36,8 @@ module GoldbergFilters
         public_role = Role.find(@settings.public_role_id)
         if !public_role ||
           !public_role.cache ||
-          !public_role.cache[:credentials] ||
-          !public_role.cache[:menu]
+          !public_role.cache.try(:[], :credentials) ||
+          !public_role.cache.try(:[], :menu)
           Role.rebuild_cache
           public_role = Role.find(@settings.public_role_id)
         end

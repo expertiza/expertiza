@@ -1,4 +1,17 @@
 Expertiza::Application.routes.draw do |map|
+
+  resources :admin do
+    collection do
+      get :list_super_administrators
+      get :list_administrators
+      get :new_administrator
+      get :list_instructors
+      get :show_instructor
+      get :new_instructor
+      get :remove_instructor
+    end
+  end
+
   resources :assessment360 do
     collection do
       get :one_course_all_assignments
@@ -77,6 +90,12 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :institution do
+    collection do
+      get :list
+    end
+  end
+
   resources :join_team_requests
 
   resources :leaderboard, constraints: { id: /\d+/ } do
@@ -85,6 +104,8 @@ Expertiza::Application.routes.draw do |map|
     end
   end
   match 'leaderboard/index', controller: :leaderboard, action: :index
+
+  resources :markup_styles
 
   resources :menu_items do
     collection do
@@ -169,6 +190,13 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :statistics do
+    collection do
+      get :list_surveys
+      get :list
+    end
+  end
+
   resources :student_task do
     collection do
       get :list
@@ -202,6 +230,12 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :system_settings do
+    collection do
+      get :list
+    end
+  end
+
   resources :team do
     collection do
       get :list
@@ -210,11 +244,7 @@ Expertiza::Application.routes.draw do |map|
 
   resources :tree_display do
     collection do
-      get :drill
-      get :list
-      get :goto_author_feedbacks
-      get :goto_assignments
-      get :goto_courses
+      get ':action'
     end
   end
 

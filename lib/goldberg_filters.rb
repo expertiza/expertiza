@@ -34,7 +34,8 @@ module GoldbergFilters
 
       if make_public
         public_role = Role.find(@settings.public_role_id)
-        if !public_role or !public_role.cache ||
+        if !public_role ||
+          !public_role.cache ||
           !public_role.cache[:credentials] ||
           !public_role.cache[:menu]
           Role.rebuild_cache

@@ -1,12 +1,14 @@
 class Mailer < ActionMailer::Base
-  def message(defn)
-    mail(
-      :subject => defn[:subject],
-      :to => defn[:recipients],
-      :bcc => defn[:bcc],
-      :from => 'expertiza-support@lists.ncsu.edu'
-    ) do
-      render :partial => defn[:body][:partial_name], :locals => defn.delete(:partial_name)
-    end
+  default from: 'expertiza-support@lists.ncsu.edu'
+
+  def generic_message(defn)
+    @partial_name = defn[:body][:partial_name]
+    @user = defn[:body][:user]
+    @first_name = defn[:body][:first_name]
+    @password = defn[:body][:password]
+
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:bcc])
   end
 end

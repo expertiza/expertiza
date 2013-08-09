@@ -2,16 +2,16 @@ source 'http://rubygems.org'
 
 gem 'rails', '~>3.0.0'
 
-gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', :require => 'authlogic'
 gem 'bind-it'
 gem 'capistrano'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
+gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', :require => 'authlogic'
 gem 'fastercsv'
 gem 'ffi-aspell'
-gem 'gdata', :require => false
 gem 'gchart'
 gem 'gchartrb', :require => 'google_chart'
+gem 'gdata', :require => false
 gem 'hoptoad_notifier'
 gem 'jquery-rails'
 gem 'mysql'
@@ -38,9 +38,9 @@ group :test do
   gem 'capybara'
   gem 'cucumber-rails', require: false
   gem 'database_cleaner'
+  gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
-  gem 'gherkin'
   gem 'launchy'
   gem "rspec-rails"
 end

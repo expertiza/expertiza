@@ -1,5 +1,7 @@
 puts "Loading data from features/support/seeds.rb"
 
+require Rails.root.join('db/seeds')
+
 User.create!(:name => 'student',
              :email => 'student@mailinator.com',
              :password => 'password',

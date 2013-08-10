@@ -286,7 +286,8 @@ SystemSettings.create(:site_name => 'Expertiza',
 ###### users
 # Default administrator
 puts "Find or create admin user with password 'admin'"
-tu = User.find_by_name('admin') || User.create!(:name => 'admin',
+tu = User.find_by_name('admin') || User.new
+tu.attributes = {:name => 'admin',
              :email => 'anything@mailinator.com',
              :clear_password => 'admin',
              :clear_password_confirmation => 'admin',
@@ -295,7 +296,7 @@ tu = User.find_by_name('admin') || User.create!(:name => 'admin',
              :email_on_submission => true, 
              :email_on_review_of_review => true, 
              :is_new_user => false, 
-             :master_permission_granted => false)
+             :master_permission_granted => false}
 tu.parent_id = tu.id
 tu.save!
 

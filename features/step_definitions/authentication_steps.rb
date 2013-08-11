@@ -26,13 +26,9 @@ Given /^a student with the username "(\S+)" exists$/ do |username|
 end
 
 Then /I should be logged in as "(\S+)"/ do |username|
-  #find('.sidebar td').should have_content "User: #{username}"
-  node = find('.sidebar td').node().content()
-  if(node.include? username)
-    assert(true)
-  else
-    assert(false)
-  end
+  find('.sidebar td', :text => username)
+    .has_text?(username)
+    .should be_true
 end
 
 Given /I am logged in as "([^"]*)"/ do |username|

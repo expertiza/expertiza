@@ -22,9 +22,12 @@ Expertiza::Application.routes.draw do |map|
     collection do
       delete :delete
       post :remove_assignment_from_course
+      post ':id', action: :update
       get :associate_assignment_with_course
       get :toggle_access
       get :copy
+      get :show
+      get :edit
     end
   end
 

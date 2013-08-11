@@ -48,7 +48,11 @@ module AssignmentHelper
     options
   end
 
+  #retrive or create a due_date
+  # use in views/assignment/edit.html.erb
   def due_date(assignment, type, round = 0)
+
+
     due_dates = assignment.find_due_dates(type)
     if type == 'submission'
       due_dates += assignment.find_due_dates('resubmission')
@@ -56,26 +60,23 @@ module AssignmentHelper
       due_dates += assignment.find_due_dates('rereview')
     end
 
-    due_dates.sort! do |x, y|
-      if x.due_at.nil? && y.due_at.nil?
-        0
-      elsif x.due_at.nil?
-        -1
-      elsif y.due_at.nil?
-        1
-      else
-        x.due_at <=> y.due_at
-      end
-    end
+    due_dates.delete_if { |due_date| due_date.due_at.nil? }
+    due_dates.sort! { |x, y| x.due_at <=> y.due_at }
 
     if due_dates[round].nil? or round < 0
       due_date = DueDate.new
       due_date.deadline_type = DeadlineType.find_by_name(type)
+      #creating new round
+      #TODO: add code to assign default permission to the newly created due_date according to the due_date type
+      due_date.submission_allowed_id = DueDate.default_permission(type, 'submission_allowed')
+      due_date.review_allowed_id = DueDate.default_permission(type, 'review_allowed')
+      due_date.review_of_review_allowed_id = DueDate.default_permission(type, 'review_of_review_allowed')
       due_date
     else
       due_dates[round]
     end
   end
+
 
   def questionnaire(assignment, type)
     questionnaire = assignment.questionnaires.find_by_type(type)

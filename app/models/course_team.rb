@@ -17,13 +17,18 @@ class CourseTeam < Team
     "TeamNode"
   end
 
+  # since this team is not an assignment team, the assignment_id is nil.
+  def assignment_id
+    nil
+  end
+
   #depricated: dead and bugged code, not used
  def copy(assignment_id)
    new_team = AssignmentTeam.create_node_object(self.name, assignment_id)
    copy_members(new_team)
  end
 
-  #depricate: the functionality belongs to course
+  #deprecate: the functionality belongs to course
   def add_participant(course_id, user)
     if CourseParticipant.find_by_parent_id_and_user_id(course_id, user.id) == nil
       CourseParticipant.create(:parent_id => course_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
@@ -38,7 +43,7 @@ class CourseTeam < Team
         raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"
       else
         if TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", id, user.id]).nil?
-          add_member(user)
+          add_member(user, nil)
         end
       end
       index = index + 1

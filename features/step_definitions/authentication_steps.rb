@@ -2,8 +2,8 @@ Given 'I am logged in as a student' do
   step 'a student with the username "student" exists'
   step 'I go to the login page'
   
-  fill_in 'login_name', :with => 'student'
-  fill_in 'login_password', :with => 'password'
+  fill_in 'User Name', :with => 'student'
+  fill_in 'Password', :with => 'password'
   click_button 'Login'
   
   step 'I should be logged in as "student"'

@@ -24,7 +24,7 @@ class TeamsParticipantsController < ApplicationController
     end
     team = Team.find_by_id(params[:id])    
     
-      team.add_member(user)
+      team.add_member(user, team.parent_id)
     
     #  flash[:error] = $!
     #end

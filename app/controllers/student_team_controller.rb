@@ -22,7 +22,7 @@ class StudentTeamController < ApplicationController
       parent = AssignmentNode.find_by_node_object_id(@student.parent_id)
       TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
       user = User.find(@student.user_id)
-      @team.add_member(user)      
+      @team.add_member(user, @team.parent_id)    
       redirect_to :controller => 'student_team', :action => 'view' , :id=> @student.id
     else
       flash[:notice] = 'Team name is already in use.'
@@ -68,7 +68,9 @@ class StudentTeamController < ApplicationController
   def leave
     @student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(@student.user_id)
-    
+    #remove the topic_id from participants
+    @student.update_topic_id(nil)
+
     #remove the entry from teams_users
     user = TeamsUser.find(:first, :conditions =>["team_id =? and user_id =?", params[:team_id], @student.user_id])
     if user

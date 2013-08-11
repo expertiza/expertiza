@@ -1,4 +1,4 @@
-And /^Given that assignment test student signup is listed$/ do
+And /^Given that assignment Test Student Signup is listed$/ do
   should have_link 'Assignments'
   click_link 'Assignments'
 
@@ -6,13 +6,13 @@ And /^Given that assignment test student signup is listed$/ do
      click_link 'Accept'
   end
 
-  should have_link "test student signup"
+  should have_link "Test Student Signup"
 
 end
 
-Then /^I click the test student signup link$/ do
-  should have_link "test student signup"
-  click_link "test student signup"
+Then /^I click the Test Student Signup link$/ do
+  should have_link "Test Student Signup"
+  click_link "Test Student Signup"
 end
 
 Then /^I click the Signup sheet link$/ do

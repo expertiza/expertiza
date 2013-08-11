@@ -24,8 +24,11 @@ class TeamsUsersController < ApplicationController
     end
     team = Team.find_by_id(params[:id])    
     
-      team.add_member(user)
-    
+      add_member_return=team.add_member(user, team.parent_id)
+    if add_member_return==false
+      flash[:error]= "The team already has the maximum number of members."
+    end
+
     #  flash[:error] = $!
     #end
     redirect_to :controller => 'team', :action => 'list', :id => team.parent_id

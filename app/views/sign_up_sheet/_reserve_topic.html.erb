@@ -1,0 +1,17 @@
+<% if @show_actions %>
+    <% action_symbol_added = false %>
+    <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+        <% for selected_topic in @selected_topics %>
+            <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted%>
+                <td align="center"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+                <% action_symbol_added = true %>
+            <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
+                <td align="center"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+                <% action_symbol_added = true %>
+            <% end %>
+        <% end %>
+    <% end %>
+    <% if action_symbol_added == false %>
+        <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
+    <% end %>
+<% end %>

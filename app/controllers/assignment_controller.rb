@@ -1,11 +1,3 @@
-#Author: Hao Liu
-#Email: hliu11@ncsu.edu
-#last update: May, 21, 2013
-
-#change log:
-#5/21/13
-#  -rewrite new, edit
-
 class AssignmentController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
@@ -32,6 +24,7 @@ class AssignmentController < ApplicationController
   end
 
   def create
+    params[:assignment][:max_team_size] ||= 1
     @assignment = Assignment.new(params[:assignment])
 
     if @assignment.save
@@ -51,12 +44,12 @@ class AssignmentController < ApplicationController
 
   def delete_all_due_dates
     if params[:assignment_id].nil?
-      return #TODO: add error message
+      return 
     end
 
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      return #TODO: add error message
+      return 
     end
 
     @due_dates = DueDate.find_all_by_assignment_id(params[:assignment_id])
@@ -71,17 +64,17 @@ class AssignmentController < ApplicationController
 
   def set_due_date
     if params[:due_date][:assignment_id].nil?
-      return #TODO: add error message
+      return 
     end
 
     assignment = Assignment.find(params[:due_date][:assignment_id])
     if assignment.nil?
-      return #TODO: add error message
+      return 
     end
 
     due_at = DateTime.parse(params[:due_date][:due_at])
     if due_at.nil?
-      return #TODO: add error message
+      return 
     end
 
     @due_date = DueDate.new(params[:due_date])
@@ -95,7 +88,7 @@ class AssignmentController < ApplicationController
   def delete_all_questionnaires
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      return #TODO: add error message
+      return
     end
 
     @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:assignment_id])
@@ -110,17 +103,17 @@ class AssignmentController < ApplicationController
 
   def set_questionnaire
     if params[:assignment_questionnaire][:assignment_id].nil? or params[:assignment_questionnaire][:questionnaire_id].nil?
-      return #TODO: add error message
+      return
     end
 
     assignment = Assignment.find(params[:assignment_questionnaire][:assignment_id])
     if assignment.nil?
-      return #TODO: add error message
+      return
     end
 
     questionnaire = Questionnaire.find(params[:assignment_questionnaire][:questionnaire_id])
     if questionnaire.nil?
-      return #TODO: add error message
+      return 
     end
 
     @assignment_questionnaire = AssignmentQuestionnaire.new(params[:assignment_questionnaire])
@@ -139,6 +132,11 @@ class AssignmentController < ApplicationController
     if @assignment.update_attributes(params[:assignment])
       flash[:note] = 'Assignment was successfully saved.'
       #TODO: deal with submission path change
+      # Need to rename the bottom-level directory and/or move intermediate directories on the path to an
+      # appropriate place
+      # Probably there are 2 different operations:
+      #  - rename an assgt. -- implemented by renaming a directory
+      #  - assigning an assignment to a course -- implemented by moving a directory.
 
       redirect_to :action => 'edit', :id => @assignment.id
     else
@@ -375,10 +373,6 @@ class AssignmentController < ApplicationController
     @courses = @user.set_courses_to_assignment
   end
 
-  #--------------------------------------------------------------------------------------------------------------------
-  # REMOVE_ASSIGNMENT_FROM_COURSE
-  # TODO: NO usages found, need verification
-  #--------------------------------------------------------------------------------------------------------------------
   def remove_assignment_from_course
     assignment = Assignment.find(params[:id])
     oldpath = assignment.get_path rescue nil

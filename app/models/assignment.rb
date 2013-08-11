@@ -942,10 +942,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-end
   #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
   # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
   def has_partner_ads?(id)
     Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
   end
+
 end

@@ -2,7 +2,8 @@ puts "Loading data from features/support/seeds.rb"
 
 require Rails.root.join('db/seeds')
 
-User.create!(:name => 'student',
+u = User.find_by_name('student') || User.new
+u.attributes = {:name => 'student',
              :email => 'student@mailinator.com',
              :password => 'password',
              :password_confirmation => 'password',
@@ -12,4 +13,5 @@ User.create!(:name => 'student',
              :email_on_review_of_review => true,
              :is_new_user => false,
              :master_permission_granted => false,
-             :parent_id => User.find_by_name('admin').id)
+             :parent_id => User.find_by_name('admin').id}
+u.save!

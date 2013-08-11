@@ -5,6 +5,7 @@ class Assignment < ActiveRecord::Base
 
   #alias_attribute :team_count, :max_team_size
 
+  # Does not necessarily belong to a course!
   belongs_to :course
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to
@@ -52,7 +53,8 @@ class Assignment < ActiveRecord::Base
 
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
-        contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'submission' }
+                                            contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'submission' }
+
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
@@ -67,6 +69,10 @@ class Assignment < ActiveRecord::Base
 
   def has_topics?
     @has_topics ||= !sign_up_topics.empty?
+  end
+
+  def has_teams?
+    @has_teams ||= !self.teams.empty?
   end
 
   def assign_reviewer_dynamically(reviewer, topic)
@@ -259,7 +265,7 @@ class Assignment < ActiveRecord::Base
 
   def get_path
     if self.course_id == nil and self.instructor_id == nil
-      raise 'Path can not be created. The assignment must be associated with either a course or an instructor.'
+      raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.'
     end
     if self.wiki_type_id != 1
       raise PathError, 'No path needed'
@@ -308,12 +314,12 @@ class Assignment < ActiveRecord::Base
 
   # Determine if the next due date from now allows for submissions
   def submission_allowed(topic_id=nil)
-    return (check_condition('submission_allowed_id', topic_id) or check_condition('resubmission_allowed_id', topic_id))
+    return (check_condition('submission_allowed_id', topic_id) )
   end
 
   # Determine if the next due date from now allows for reviews
   def review_allowed(topic_id=nil)
-    return (check_condition('review_allowed_id', topic_id) or check_condition('rereview_allowed_id', topic_id))
+    return (check_condition('review_allowed_id', topic_id) )
   end
 
   # Determine if the next due date from now allows for metareviews
@@ -403,7 +409,7 @@ class Assignment < ActiveRecord::Base
 
   # Get all review mappings for this assignment & reviewer
   # required to give reviewer location of new submission content
-  # link can not be provided as it might give user ability to access data not
+  # link cannot be provided as it might give user ability to access data not
   # available to them.  
   #ajbudlon, sept 07, 2007      
   def get_review_number(mapping)
@@ -516,7 +522,7 @@ class Assignment < ActiveRecord::Base
     rounds = 0
     for i in (0 .. due_dates.length-1)
       deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
-      if deadline_type.name == 'review' || deadline_type.name == 'rereview'
+      if deadline_type.name == 'review'
         rounds = rounds + 1
       end
     end
@@ -902,7 +908,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def cleanup_due_dates
+  def clean_up_due_dates
     #delete due_dates without due_at
     self.due_dates.each do |due_date|
       if due_date.due_at.nil?
@@ -936,4 +942,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+end
+  #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
+  # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
+  def has_partner_ads?(id)
+    Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
+  end
 end

@@ -29,18 +29,10 @@
       <% else %>
           <tr>
       <% end %>
-      <td><%= topic.topic_identifier %></td>
-      <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
 
-      <% if @assignment.is_microtask? %>
-          <td align="center"><%= topic.micropayment %></td>
-      <% end %>
+    <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic} %>
+    <%= render :partial => 'reserve_topic', :locals => {:i=>i, :topic=>topic} %>
 
-      <td align="center"><%= topic.max_choosers %></td>
-      <%= render :partial => 'available_slots', :locals => {:topic=>topic} %>
-      <%= render :partial => 'num_waiting', :locals => {:topic=>topic} %>
-
-      <td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>
       </tr>
       <% i=i+1 %>
   <% end %>

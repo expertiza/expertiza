@@ -12,6 +12,14 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :advertise_for_partner do
+    collection do
+      get :edit
+      get :remove
+      post ':id', action: :update
+    end
+  end
+
   resources :assessment360 do
     collection do
       get :one_course_all_assignments
@@ -77,6 +85,7 @@ Expertiza::Application.routes.draw do |map|
   resources :grades do
     collection do
       get :view
+      get :view_my_scores
     end
   end
 
@@ -98,6 +107,8 @@ Expertiza::Application.routes.draw do |map|
       get :list
     end
   end
+
+  resources :invitation
 
   resources :join_team_requests
 
@@ -123,6 +134,7 @@ Expertiza::Application.routes.draw do |map|
   resources :participants do
     collection do
       get :list
+      get :change_handle
     end
   end
 
@@ -182,6 +194,7 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :add_signup_topics
       get :add_signup_topics_staggered
+      get :signup_topics
       get :view_publishing_rights
     end
   end
@@ -200,9 +213,30 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :student_review do
+    collection do
+      get :list
+    end
+  end
+
   resources :student_task do
     collection do
       get :list
+      get :view
+    end
+  end
+
+  resources :student_team do
+    collection do
+      get :view
+      get :edit
+      get :leave
+      get :auto_complete_for_user_name
+    end
+  end
+
+  resources :submitted_content do
+    collection do
       get :view
     end
   end

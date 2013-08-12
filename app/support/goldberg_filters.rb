@@ -34,7 +34,7 @@ module GoldbergFilters
 
       if make_public
         public_role = Role.find(@settings.public_role_id)
-        if !public_role ||
+        if !public_role.cache.is_a?(Hash) || !public_role ||
           !public_role.cache ||
           !public_role.cache.try(:[], :credentials) ||
           !public_role.cache.try(:[], :menu)

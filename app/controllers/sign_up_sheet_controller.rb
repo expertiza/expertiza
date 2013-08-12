@@ -14,19 +14,19 @@ class SignUpSheetController < ApplicationController
   require 'graph/graphviz_dot'
   require 'rgl/topsort'
 
-#Includes functions for team management. Refer /app/helpers/ManageTeamHelper
+  #Includes functions for team management. Refer /app/helpers/ManageTeamHelper
   include ManageTeamHelper
-#Includes functions for Dead line management. Refer /app/helpers/DeadLineHelper
+  #Includes functions for Dead line management. Refer /app/helpers/DeadLineHelper
   include DeadlineHelper
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [:destroy, :create, :update],
-         :redirect_to => {:action => :list}
+    :redirect_to => {:action => :list}
 
-#This displays a page that lists all the available topics for an assignment.
-#Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
-#Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics
-#can have different deadlines.
+  #This displays a page that lists all the available topics for an assignment.
+  #Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
+  #Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics
+  #can have different deadlines.
   def add_signup_topics_staggered
     load_add_signup_topics(params[:id])
 
@@ -80,19 +80,19 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-#similar to the above function except that all the topics and review/submission rounds have the similar deadlines
+  #similar to the above function except that all the topics and review/submission rounds have the similar deadlines
   def add_signup_topics
     load_add_signup_topics(params[:id])
   end
 
-#Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like 
-#the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
+  #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like 
+  #the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
   def view_publishing_rights
     load_add_signup_topics(params[:id])
   end
 
-#retrieves all the data associated with the given assignment. Includes all topics, 
-#participants(people who are doing this assignment) and signed up users (people who have chosen a topic (confirmed or waitlisted)
+  #retrieves all the data associated with the given assignment. Includes all topics, 
+  #participants(people who are doing this assignment) and signed up users (people who have chosen a topic (confirmed or waitlisted)
   def load_add_signup_topics(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', assignment_id])
@@ -105,7 +105,7 @@ class SignUpSheetController < ApplicationController
     @participants = SignedUpUser.find_team_participants(assignment_id)
   end
 
-# Prepares the form for adding a new topic. Used in conjuntion with create
+  # Prepares the form for adding a new topic. Used in conjuntion with create
   def new
     @id = params[:id]
     @sign_up_topic = SignUpTopic.new
@@ -144,7 +144,7 @@ class SignUpSheetController < ApplicationController
       topic.save
       redirect_to_sign_up(params[:id])
     else
-#set the values for the new topic and commit to database
+      #set the values for the new topic and commit to database
       @sign_up_topic = SignUpTopic.new
       @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
       @sign_up_topic.topic_name = params[:topic][:topic_name]
@@ -173,8 +173,8 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-#simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
-#staggered means that different topics can have different deadlines.
+  #simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
+  #staggered means that different topics can have different deadlines.
   def redirect_to_sign_up(assignment_id)
     assignment = Assignment.find(assignment_id)
     if assignment.staggered_deadline == true
@@ -203,13 +203,13 @@ class SignUpSheetController < ApplicationController
     end
     redirect_to_sign_up(params[:assignment_id])
   end
-#prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
+  #prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
   def edit
     @topic = SignUpTopic.find(params[:id])
     @assignment_id = params[:assignment_id]
   end
 
-#updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
+  #updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
   def update
     topic = SignUpTopic.find(params[:id])
 
@@ -230,7 +230,7 @@ class SignUpSheetController < ApplicationController
           flash[:error] = 'Value of maximum choosers can only be increased! No change has been made to max choosers.'
         end
       end
-#update tables
+      #update tables
       topic.category = params[:topic][:category]
       topic.topic_name = params[:topic][:topic_name]
       topic.micropayment = params[:topic][:micropayment]
@@ -251,7 +251,7 @@ class SignUpSheetController < ApplicationController
 
     if assignment.due_dates.find_by_deadline_type_id(1)!= nil
       if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
-      @show_actions = false
+        @show_actions = false
       end
     end
 
@@ -455,8 +455,8 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-#this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
-# attempted until the other topic has been completed..
+  #this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
+  # attempted until the other topic has been completed..
   def save_topic_dependencies
     # Prevent injection attacks - we're using this in a system() call later
     params[:assignment_id] = params[:assignment_id].to_i.to_s
@@ -472,7 +472,7 @@ class SignUpSheetController < ApplicationController
       end
     }
 
-   # Save the dependency in the topic dependency table
+    # Save the dependency in the topic dependency table
     TopicDependency.save_dependency(topics)
 
     node = 'id'
@@ -499,9 +499,9 @@ class SignUpSheetController < ApplicationController
   end
 
 
-#If the instructor needs to explicitly change the start/due dates of the topics 
-#This is true in case of a staggered deadline type assignment. Individual deadlines can 
-# be set on a per topic  and per round basis
+  #If the instructor needs to explicitly change the start/due dates of the topics 
+  #This is true in case of a staggered deadline type assignment. Individual deadlines can 
+  # be set on a per topic  and per round basis
   def save_topic_deadlines
 
     due_dates = params[:due_date]
@@ -559,7 +559,7 @@ class SignUpSheetController < ApplicationController
     dg.remove_vertex("fake")
     dg
   end
-#used by save_topic_dependencies. Do not know how this works
+  #used by save_topic_dependencies. Do not know how this works
   def create_common_start_time_topics(dg)
     dg_reverse = dg.clone.reverse()
     set_of_topics = Array.new

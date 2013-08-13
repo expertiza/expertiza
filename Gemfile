@@ -30,7 +30,7 @@ gem 'superfish-rails'
 gem 'will_paginate'
 
 group :development do
-  gem 'ruby-debug19'
+  gem 'debugger'
   gem 'sqlite3-ruby', :require => 'sqlite3'
 end
 

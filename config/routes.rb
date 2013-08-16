@@ -49,7 +49,7 @@ Expertiza::Application.routes.draw do |map|
   resources :content_pages do
     collection do
       get :list
-      match ':id', action: :show
+      get ':page_name', action: :view
     end
   end
 
@@ -297,7 +297,7 @@ Expertiza::Application.routes.draw do |map|
   match '/menu/*name', controller: :menu_items, action: :link
   match ':page_name', controller: :content_pages, action: :view, method: :get
 
-  root to: 'pages#home'
+  root to: 'content_pages#view', page_name: 'home'
 
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   map.connect ':controller/service.wsdl', :action => 'wsdl'

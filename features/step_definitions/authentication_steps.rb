@@ -87,10 +87,7 @@ When /I log in as "([^"]*)"/ do |username|
 end
 
 Given 'I am not logged in' do
-  if(find_button('Logout').nil?)
-  else
-    click_link('Logout')
-  end
+  first('#logout-button').try(:click)
 end
 
 When /^I log in as a "([^\"]*)" with password "([^\"]*)"$/ do |username, password|

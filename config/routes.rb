@@ -99,6 +99,7 @@ Expertiza::Application.routes.draw do |map|
   resources :import_file do
     collection do
       get :start
+      get :import
     end
   end
 
@@ -155,7 +156,7 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :profile, constraints: { id: /\d+/ } do
+  resources :profile do
     collection do
       get :edit
     end

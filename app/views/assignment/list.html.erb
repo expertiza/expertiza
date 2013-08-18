@@ -4,7 +4,7 @@
 	<%= flash[:notice] %>
 </div>
 <% end %>
-<% form_tag :action => 'list' do %>
+<%= form_tag :action => 'list' do %>
 	<%= select(:display_option, :name, 
 			   @display_options, {}, 
 			   {:onchange => "document.forms[0].submit()"} ) %>

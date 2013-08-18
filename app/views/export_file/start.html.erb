@@ -1,5 +1,5 @@
 <h2>Export <%= @title %></h2>
-<% form_tag({:controller => 'export_file', :action => 'export'}, {:method => 'post', :multipart => true, :name => 'export_form'}) do %>
+<%= form_tag({:controller => 'export_file', :action => 'export'}, {:method => 'post', :multipart => true, :name => 'export_form'}) do %>
     <table>
       <tr>
         <td valign='Top'>Delimiter:</td>

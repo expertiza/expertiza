@@ -6,7 +6,8 @@ Expertiza::Application.routes.draw do |map|
       get :list_instructors
       get :list_super_administrators
       get :new_administrator
-      get :new_instructor
+      post :new_instructor
+      post :create_instructor
       get :remove_instructor
       get :show_instructor
     end
@@ -73,6 +74,14 @@ Expertiza::Application.routes.draw do |map|
   resources :course_evaluation do
     collection do
       get :list
+    end
+  end
+
+  resources :eula do
+    collection do
+      get :accept
+      get :decline
+      get :display
     end
   end
 
@@ -187,6 +196,7 @@ Expertiza::Application.routes.draw do |map|
   resources :roles do
     collection do
       get :list
+      post ':id', action: :update
     end
   end
 
@@ -294,6 +304,7 @@ Expertiza::Application.routes.draw do |map|
   resources :users do
     collection do
       get :list
+      post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
     end

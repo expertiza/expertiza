@@ -133,8 +133,12 @@ Expertiza::Application.routes.draw do |map|
 
   resources :participants do
     collection do
+      get :add
+      post :add
+      get :auto_complete_for_user_name
       get :list
       get :change_handle
+      post :delete
     end
   end
 

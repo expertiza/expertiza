@@ -19,8 +19,7 @@ class AuthController < ApplicationController
 
         respond_to do |format|
           format.html do
-            ## This line must be modified to read as shown at left when a new version of Goldberg is installed!
-            redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user]) 
+            redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])
           end
           format.xml do
             render :nothing => true, :status => 200

@@ -28,7 +28,7 @@ class ApplicationController < ActionController::Base
 
   def authorize(args = {})
     unless current_permission(args).allow?(params[:controller], params[:action])
-      flash[:notice] = 'Please log in.'
+      flash[:warn] = 'Please log in.'
       redirect_back
     end
     @user = current_user

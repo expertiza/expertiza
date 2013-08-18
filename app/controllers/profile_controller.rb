@@ -1,14 +1,9 @@
-#Allows a user to update their own profile information
 class ProfileController < ApplicationController
-
-  #load the view with the current fields
-  #only valid if user is logged in
   def edit 
     @user = session[:user]
     @assignment_questionnaire = AssignmentQuestionnaire.first :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]
   end
 
-  #store parameters to user object
   def update
     @user = session[:user]
 
@@ -23,7 +18,6 @@ class ProfileController < ApplicationController
       flash[:error] = 'Profile was not updated.'
     end
 
-    redirect_to :action => 'edit'
+    redirect_to controller: :profile, action: :edit
   end
-
 end

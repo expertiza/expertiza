@@ -8,7 +8,7 @@
 =end
 
 Given /^I am logged in as a "(\S+)"$/ do |username|
-  if(!find_button('Logout').nil?)
+  if find_button 'Logout'
     click_button 'Logout'
   end
   step 'I go to the login page'
@@ -17,7 +17,7 @@ Given /^I am logged in as a "(\S+)"$/ do |username|
   fill_in 'login_password', :with => 'password'
   click_button 'Login'
 
-  if(!find_link('Accept').nil?)
+  if find_link 'Accept'
     click_link 'Accept'
   end
 

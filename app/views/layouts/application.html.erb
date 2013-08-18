@@ -1,87 +1,66 @@
 <!doctype html>
-<html>
-  <head>
-    <title>
-      <%= params[:controller] %> | <%= params[:action] %>
-    </title>
+<head>
+  <title>
+    <%= params[:controller] %> | <%= params[:action] %>
+  </title>
 
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
-    <%= csrf_meta_tag %>
-    <%= stylesheet_link_tag 'dddropdownpanel',
-      'goldberg',
-      'layout',
-      'redbox' %>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+  <%= csrf_meta_tag %>
+  <%= stylesheet_link_tag 'dddropdownpanel',
+    'goldberg',
+    'layout',
+    'redbox' %>
 
-    <%= javascript_include_tag 'jquery',
-      'redbox',
-      'suckerfish',
-      'actionmenu',
-      'tableactions',
-      'application',
-      'datetimepicker',
-      'CalendarPopup',
-      'ajaxtabs',
-      'sorttable',
-      'shared',
-      'textareasizer' %>
-  </head>
+  <%= javascript_include_tag 'jquery',
+    'redbox',
+    'suckerfish',
+    'actionmenu',
+    'tableactions',
+    'application',
+    'datetimepicker',
+    'CalendarPopup',
+    'ajaxtabs',
+    'sorttable',
+    'shared',
+    'textareasizer'
+  %>
+</head>
 
-  <body>
-    <div class="header">
-      <%= image_tag "/images/logo.jpg" %>
+<body>
+  <%= render 'shared/header' %>
 
-      <h1>Expertiza</h1>
+  <%= render 'shared/navigation' %>
 
-      <h2>Reusable learning objects through peer review</h2>
-    </div>
+  <div class="wrapper">
+    <div class="container">
 
-    <div class="navbar">
-      <%= render 'shared/navigation' %>
-    </div>
-
-    <div class="wrapper">
-      <div class="container">
-
-        <div class="sidebar">
-          <div class="sidecontent">
-            <%= render :partial => 'auth/login' %>
-          </div>
+      <div class="sidebar">
+        <div class="sidecontent">
+          <%= render :partial => 'auth/login' %>
         </div>
-
-        <div class="main">
-          <div class="content">
-            <div class="breadcrumbs">
-              <%= render :partial => 'menu_items/breadcrumbs', :locals => {:crumbs => session[:menu].crumbs} %>
-            </div>
-
-            <% if flash[:note] -%>
-              <div class="flash_note"><%= flash[:note] %></div>
-            <% end -%>
-            <% if flash[:error] -%>
-              <div class="flash_error"><h1>Error!</h1><%= flash[:error] %></div>
-            <% end -%>
-            <% if flash[:alert] -%>
-              <div class="flash_error"><%= flash[:alert] %></div>
-            <% end -%>
-            <% if flash[:notice] -%>
-              <div class="flash_error"><%= flash[:notice] %></div>
-            <% end -%>
-            <%= yield %>
-          </div>
-          <!-- class="content" -->
-        </div>
-        <!-- class="main" -->
       </div>
 
-      <div class="clearing">&nbsp;</div>
+      <div class="main">
+        <div class="content">
+            <%= render :partial => 'menu_items/breadcrumbs', :locals => { :crumbs => session[:menu].crumbs } %>
 
+          <%= render 'shared/flash_messages' %>
+
+          <%= yield %>
+
+        </div>
+      </div>
     </div>
-    <!-- class="wrapper" -->
 
-    <div class="footer" align="center">
-      <%= render 'shared/footer_message' %>
-    </div>
-    <!-- class="footer" -->
+    <div class="clearing">&nbsp;</div>
 
-  </body>
+  </div>
+  <!-- class="wrapper" -->
+
+  <div class="footer" align="center">
+    <%= render 'shared/footer_message' %>
+  </div>
+  <!-- class="footer" -->
+
+</body>
 </html>

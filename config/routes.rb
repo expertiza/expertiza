@@ -2,13 +2,13 @@ Expertiza::Application.routes.draw do |map|
 
   resources :admin do
     collection do
-      get :list_super_administrators
       get :list_administrators
-      get :new_administrator
       get :list_instructors
-      get :show_instructor
+      get :list_super_administrators
+      get :new_administrator
       get :new_instructor
       get :remove_instructor
+      get :show_instructor
     end
   end
 

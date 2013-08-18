@@ -1,6 +1,8 @@
-<div class="topmenu">
-  <ul id="suckerfish">
-    <%= render :partial => 'menu_items/suckerfish',
-      :locals => {:items => session[:menu].get_menu(0)} %>
-  </ul>
+<div class="navbar">
+  <div class="topmenu">
+    <ul id="suckerfish">
+      <%= render :partial => 'menu_items/suckerfish',
+        :locals => {:items => session[:menu].try(:get_menu, 0)} %>
+    </ul>
+  </div>
 </div>

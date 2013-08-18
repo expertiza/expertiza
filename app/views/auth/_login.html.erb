@@ -14,21 +14,21 @@
     </tr>
 
     <% if session[:super_user] %>
-      <% form_tag :controller => 'impersonate', :action => 'impersonate' do %>
+      <%= form_tag :controller => 'impersonate', :action => 'impersonate' do %>
         <tr><td><input id="impersonate_name" name="impersonate[name]" size="12"
             title="Enter a user account to impersonate" type="text"
             onKeyUp="UpdateButton();" /></td></tr>
         <tr><td><input name="commit" id="revert_button" type="submit" value="Revert" /></td></tr>
       <% end %>
     <% else %>
-      <% form_tag :controller => 'auth', :action => 'logout' do %>
+      <%= form_tag :controller => 'auth', :action => 'logout' do %>
         <tr><td><%= submit_tag "Logout", id: 'logout-button' %></td></tr>
       <% end %>
     <% end -%>
   </table>
 <% else %>
   <h1>Login</h1>
-  <% form_tag :controller => 'auth', :action => 'login' do %>
+  <%= form_tag :controller => 'auth', :action => 'login' do %>
     <p><label for="login_name">User Name</label><br/>
       <%= text_field 'login', 'name', :size => 12 %></p>
 

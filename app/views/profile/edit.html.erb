@@ -2,7 +2,7 @@
 
 <br/>
 
-<% form_for @user, url: 'profile#update' do |f| %>
+<%= form_for @user, url: 'profile#update' do |f| %>
   <%= render :partial => 'users/name' %>
   <hr/>
   <%= render :partial => 'users/password' %> 

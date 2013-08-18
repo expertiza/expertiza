@@ -1,12 +1,12 @@
 <h1>Manage users</h1>
 
 <br/>
-<% form_tag :action => 'show_selection' do %>
+<%= form_tag :action => 'show_selection' do %>
 View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
 <input type='submit' value='Edit'/>
 <% end %>
 
-<% form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
+<%= form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
     Search users: <%= text_field_tag(:letter,params[:letter]) %>
     <%= select_tag(:search_by, options_for_select([['Username', 1], ['Full name', 2], ['Email', 3]])) %>
     <%= submit_tag("Search") %>

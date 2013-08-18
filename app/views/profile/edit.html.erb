@@ -2,7 +2,7 @@
 
 <br/>
 
-<% form_tag({:action => 'update', :id => @user}) do %>
+<% form_for @user do %>
   <%= render :partial => 'users/name' %>
   <hr/>
   <%= render :partial => 'users/password' %> 

@@ -22,7 +22,7 @@
       <% end %>
     <% else %>
       <% form_tag :controller => 'auth', :action => 'logout' do %>
-        <tr><td><%= submit_tag "Logout" %></td></tr>
+        <tr><td><%= submit_tag "Logout", id: 'logout-button' %></td></tr>
       <% end %>
     <% end -%>
   </table>

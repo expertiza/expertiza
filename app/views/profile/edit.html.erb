@@ -2,7 +2,7 @@
 
 <br/>
 
-<% form_for @user do %>
+<% form_for @user, url: 'profile#update' do |f| %>
   <%= render :partial => 'users/name' %>
   <hr/>
   <%= render :partial => 'users/password' %> 
@@ -14,8 +14,9 @@
   <%= render :partial => 'handle' %>  
   <% if @user.role.parent_id != nil %>
     <%= render :partial => 'limit' %>
-  <% end %>    
+  <% end %>
   <label>Preferred Time Zone</label>
   <%= time_zone_select("user", "timezonepref") %><br />
-  <%= submit_tag 'Save' %>
+
+  <%= f.submit 'Save' %>
 <% end %>

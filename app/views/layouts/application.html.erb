@@ -42,7 +42,9 @@
 
       <div class="main">
         <div class="content">
+          <% if session[:menu] %>
             <%= render :partial => 'menu_items/breadcrumbs', :locals => { :crumbs => session[:menu].crumbs } %>
+          <% end %>
 
           <%= render 'shared/flash_messages' %>
 

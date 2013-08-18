@@ -13,7 +13,7 @@ class ImpersonateController < ApplicationController
 
   def impersonate
     # default error message
-    if params[:user] and params[:user][:name]
+    if params[:user] && params[:user][:name]
       message = "No user exists with the name '#{params[:user][:name]}'"
     end
 
@@ -25,7 +25,9 @@ class ImpersonateController < ApplicationController
         user = User.find_by_name(params[:user][:name])
         if user
           unless original_user.can_impersonate? user
-            raise flash[:error] = "You cannot impersonate #{params[:user][:name]}"
+            flash[:error] = "You cannot impersonate #{params[:user][:name]}"
+            redirect_back
+            return
           end
 
           if session[:super_user] == nil
@@ -35,7 +37,8 @@ class ImpersonateController < ApplicationController
           session[:user] = user
         else
           flash[:error] = message
-          raise
+          redirect_back
+          return
         end
       else
         # Impersonate a new account
@@ -43,14 +46,17 @@ class ImpersonateController < ApplicationController
           user = User.find_by_name(params[:impersonate][:name])
           if user
             unless original_user.can_impersonate? user
-              raise flash[:error] = "You cannot impersonate #{params[:user][:name]}"
+              flash[:error] = "You cannot impersonate #{params[:user][:name]}"
+              redirect_back
+              return
             end
 
             AuthController.clear_user_info(session, nil)
             session[:user] = user
           else
             flash[:error] = message
-            raise
+            redirect_back
+            return
           end
           # Revert to original account
         else
@@ -61,7 +67,8 @@ class ImpersonateController < ApplicationController
             session[:super_user] = nil
           else
             flash[:error] = "No original account was found. Please close your browser and start a new session."
-            raise
+            redirect_back
+            return
           end
         end
       end

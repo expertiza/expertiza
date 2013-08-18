@@ -32,12 +32,12 @@ end
 
 When /^I follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
   with_scope(selector) do
-    click_link(link)
+    first(link).click
   end
 end
 
 When /^I click on "([^"]*)"$/ do |name|
-  click_link name
+  first(name).click
 end
 
 When /^I fill in "([^"]*)" with "([^"]*)"(?: within "([^"]*)")?$/ do |field, value, selector|

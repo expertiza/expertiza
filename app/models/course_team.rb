@@ -22,31 +22,17 @@ class CourseTeam < Team
     nil
   end
 
-  #depricated: dead and bugged code, not used
  def copy(assignment_id)
-   new_team = AssignmentTeam.create_node_object(self.name, assignment_id)
+   new_team = AssignmentTeam.create_team_and_node(assignment_id)
+   new_team.name = name
+   new_team.save
    copy_members(new_team)
  end
 
-  #deprecate: the functionality belongs to course
+  #deprecated: the functionality belongs to course
   def add_participant(course_id, user)
     if CourseParticipant.find_by_parent_id_and_user_id(course_id, user.id) == nil
       CourseParticipant.create(:parent_id => course_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
-    end
-  end
-
-  def import_participants(starting_index, row)
-    index = starting_index
-    while(index < row.length)
-      user = User.find_by_name(row[index].to_s.strip)
-      if user.nil?
-        raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"
-      else
-        if TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", id, user.id]).nil?
-          add_member(user, nil)
-        end
-      end
-      index = index + 1
     end
   end
 
@@ -71,27 +57,31 @@ class CourseTeam < Team
     return output
   end
 
-  def self.handle_duplicate(name, course_id, handle_dups)
-    team = find(:first, :conditions => ["name =? and parent_id =?", name, course_id])
+  def self.handle_duplicate(team, name, course_id, handle_dups)
+    puts ">>>at beginning of handle_duplicate, name = "+ name
+    puts ">>>at beginning of handle_duplicate, handle_dups = "+ handle_dups
     if team.nil? #no duplicate
       return name
     end
-    if handle_dups == "ignore" #ignore: not create the new team
+    if handle_dups == "ignore" #ignore: do not create the new team
+      p '>>>setting name to nil ...'
       return nil
     end
     if handle_dups == "rename" #rename: rename new team
-      return generate_team_name
+      return self.generate_team_name(Course.find(course_id).name)
     end
     if handle_dups == "replace" #replace: delete old team
       team.delete
       return name
+    else # handle_dups = "insert"
+      return nil
     end
   end
 
   #TODO: unused variable session
   def self.import(row,session,course_id,options)
     if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
-      raise ArgumentError, "Not enough items"
+      raise ArgumentError, "Not enough fields on this line"
     end
 
     if Course.find(course_id) == nil
@@ -100,22 +90,28 @@ class CourseTeam < Team
 
     if options[:has_column_names] == "true"
       name = row[0].to_s.strip
-      name = handle_duplicate(name, course_id, options[:handle_dups])
+      team = find(:first, :conditions => ["name =? and parent_id =?", name, course_id])
+      team_exists = !team.nil?
+      name = handle_duplicate(team, name, course_id, options[:handle_dups])
       index = 1
     else
-      name = generate_team_name
+      name = self.generate_team_name(Course.find(course_id).name)
       index = 0
     end
 
-    if name.nil?
-      return
+    # handle_dups == "rename" ||" replace"
+    # create new team for the team to be inserted
+    if name
+      team=CourseTeam.create_team_and_node(course_id)
+      team.name = name
+      team.save
     end
 
-    team = CourseTeam.create(:name => name, :parent_id => course_id)
-    course_node = CourseNode.find_by_node_object_id(course_id)
-    TeamNode.create(:parent_id => course_node.id, :node_object_id => team.id)
-
-    team.import_participants(index, row)
+    # handle_dups == "rename" ||" replace" || "insert"
+    # insert team members into team unless team was pre-existing & we ignore duplicate teams
+    if !(team_exists && options[:handle_dups] == "ignore")
+      team.import_team_members(index, row)
+    end
   end
 
   def self.export(csv, parent_id, options)
@@ -163,5 +159,13 @@ class CourseTeam < Team
         csv << tcsv
       }
     end
+  end
+
+  def self.create_team_and_node(course_id)
+    course = Course.find(course_id)
+    teamname = Team.generate_team_name(course.name)
+    team = CourseTeam.create(:name=>teamname, :parent_id => course_id)
+    TeamNode.create(:parent_id =>course_id,:node_object_id=>team.id)
+    team
   end
 end

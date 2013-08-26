@@ -44,6 +44,8 @@
 #This function lets the user choose a particular topic. This function is invoked when the user clicks the green check mark in
 #the signup sheet
   def signup
+    puts "++++++++++++++++++++++++++++"
+    puts "you called me in signup_controller!"
     #find the assignment to which user is signing up
     assignment = Assignment.find(params[:assignment_id])
 
@@ -55,7 +57,7 @@
 
       if users_team.size == 0
         #if team is not yet created, create new team.
-        team = create_team(params[:assignment_id])
+        team = AssignmentTeam.create_team_and_node(params[:assignment_id])
         user = User.find(session[:user].id)
         teamuser = create_team_users(user, team.id)
         confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id])

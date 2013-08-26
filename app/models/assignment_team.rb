@@ -98,58 +98,58 @@ class AssignmentTeam < Team
     return 'TeamReviewResponseMap'
   end
 
-  def self.import(row,session,id,options)
+  def self.handle_duplicate(team, name, assgt_id, handle_dups)
+    puts ">>>at beginning of handle_duplicate, name = "+ name
+    puts ">>>at beginning of handle_duplicate, handle_dups = "+ handle_dups
+    if team.nil? #no duplicate
+      return name
+    end
+    if handle_dups == "ignore" #ignore: do not create the new team
+      p '>>>setting name to nil ...'
+      return nil
+    end
+    if handle_dups == "rename" #rename: rename new team
+      return self.generate_team_name(Assignment.find(assgt_id).name)
+    end
+    if handle_dups == "replace" #replace: delete old team
+      team.delete
+      return name
+    else # handle_dups = "insert"
+      return nil
+    end
+  end
+
+  def self.import(row,session,assgt_id,options)
     if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
-      raise ArgumentError, "Not enough items"
+      raise ArgumentError, "Not enough fields on this line"
     end
 
-    if Assignment.find(id) == nil
-      raise ImportError, "The assignment with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+    if Assignment.find(assgt_id) == nil
+      raise ImportError, "The assignment with id \""+assgt_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
 
     if options[:has_column_names] == "true"
       name = row[0].to_s.strip
+      team = find(:first, :conditions => ["name =? and parent_id =?", name, assgt_id])
+      team_exists = !team.nil?
+      name = handle_duplicate(team, name, assgt_id, options[:handle_dups])
       index = 1
     else
-      name = generate_team_name()
+      name = self.generate_team_name(Assignment.find(assgt_id).name)
       index = 0
     end
 
-    currTeam = AssignmentTeam.find(:first, :conditions => ["name =? and parent_id =?",name,id])
-
-    if options[:handle_dups] == "ignore" && currTeam != nil
-      return
+    # create new team for the team to be inserted
+    # do not create new team if we choose 'ignore' or 'insert' duplicate teams
+    if name
+      team=AssignmentTeam.create_team_and_node(assgt_id)
+      team.name = name
+      team.save
     end
 
-    if currTeam != nil && options[:handle_dups] == "rename"
-      name = generate_team_name()
-      currTeam = nil
-    end
-    if options[:handle_dups] == "replace" && teams.first != nil
-      for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", currTeam.id])
-        teamsuser.destroy
-      end
-      currTeam.destroy
-      currTeam = nil
-    end
-
-    if currTeam == nil
-      currTeam = AssignmentTeam.create(:name => name, :parent_id => id)
-      parent = AssignmentNode.find_by_node_object_id(id)
-      TeamNode.create(:parent_id => parent.id, :node_object_id => currTeam.id)
-    end
-
-    while(index < row.length)
-      user = User.find_by_name(row[index].to_s.strip)
-      if user == nil
-        raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"
-      elsif currTeam != nil
-        currUser = TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])
-        if currUser == nil
-          currTeam.add_member(user)
-        end
-      end
-      index = index+1
+    # insert team members into team unless team was pre-existing & we ignore duplicate teams
+    if !(team_exists && options[:handle_dups] == "ignore")
+      team.import_team_members(index, row)
     end
   end
 
@@ -183,7 +183,10 @@ class AssignmentTeam < Team
   end
 
   def copy(course_id)
-    new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})
+    new_team = CourseTeam.create_team_and_node(course_id)
+    new_team.name = name
+    new_team.save
+    #new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})
     copy_members(new_team)
   end
 
@@ -250,6 +253,14 @@ class AssignmentTeam < Team
       fields.push("Team members")
     end
     fields.push("Assignment Name")
+  end
+
+  def self.create_team_and_node(assignment_id)
+    assignment = Assignment.find(assignment_id)
+    teamname = Team.generate_team_name(assignment.name)
+    team = AssignmentTeam.create(:name=>teamname, :parent_id => assignment_id)
+    TeamNode.create(:parent_id =>assignment_id,:node_object_id=>team.id)
+    team
   end
 
   require 'models/analytic/assignment_team_analytic'

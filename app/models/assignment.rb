@@ -28,6 +28,7 @@ class Assignment < ActiveRecord::Base
   # has_many :responses, :through => :response_maps, :source => 'response'
 
   validates_presence_of :name
+  #validates_presence_of :directory_path, :on => :update
   #validates_uniqueness_of :scope => [:directory_path, :instructor_id]
 
   COMPLETE = 'Finished'
@@ -95,6 +96,11 @@ class Assignment < ActiveRecord::Base
       raise 'This topic has too many reviews; please select another one.' unless candidate_topics_to_review.include?(topic)
     end
 
+    p "contributors.nil?"
+    p contributors.nil?
+    p "Contributors:"
+    p contributors.class
+    p contributors.size
     contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
@@ -135,6 +141,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def contributors
+    p "in contributors method:"
+    p "teams.size"
+    p teams.size
     #ACS Contributors are just teams, so removed check to see if it is a team assignment
     @contributors ||= teams #ACS
   end

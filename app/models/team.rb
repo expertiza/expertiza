@@ -70,6 +70,7 @@ class Team < ActiveRecord::Base
       TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
       add_participant(self.parent_id, user)
     end
+
     return can_add_member
   end
 
@@ -131,6 +132,34 @@ class Team < ActiveRecord::Base
 
         nextTeamMemberIndex += 1
       end
+    end
+  end
+
+  def self.generate_team_name(teamnameprefix)
+    counter = 1
+    while (true)
+      teamname = teamnameprefix + "_Team#{counter}"
+      if (!Team.find_by_name(teamname))
+        return teamname
+      end
+      counter=counter+1
+    end
+  end
+
+  def import_team_members(starting_index, row)
+    puts ">>>in import_team_members, row.length = " + row.length.to_s
+    index = starting_index
+    while(index < row.length)
+      puts ">>> user_id:" + row[index].to_s.strip
+      user = User.find_by_name(row[index].to_s.strip)
+      if user.nil?
+        raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"
+      else
+        if TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", id, user.id]).nil?
+          add_member(user, nil)
+        end
+      end
+      index = index + 1
     end
   end
 end

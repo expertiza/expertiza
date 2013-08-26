@@ -129,6 +129,9 @@ class AssignmentController < ApplicationController
     @assignment = Assignment.find(params[:id])
     params[:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
 
+    #TODO: require params[:assignment][:directory_path] to be not null
+    #TODO: insert warning if directory_path is duplicated
+
     if @assignment.update_attributes(params[:assignment])
       flash[:note] = 'Assignment was successfully saved.'
       #TODO: deal with submission path change
@@ -162,6 +165,10 @@ class AssignmentController < ApplicationController
     submissions = @assignment.find_due_dates('submission') + @assignment.find_due_dates('resubmission')
     reviews = @assignment.find_due_dates('review') + @assignment.find_due_dates('rereview')
     @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
+
+    if @assignment.directory_path.try :empty?
+      @assignment.directory_path = nil
+    end
 
     #drop_topic_deadine = @assignment.find_due_dates('drop_topic')
     #signup_deadline = @assignment.find_due_dates('signup')
@@ -367,7 +374,9 @@ class AssignmentController < ApplicationController
   end
 
   def associate_assignment_to_course
+    puts '>>>>' + params[:id].to_s
     @assignment = Assignment.find(params[:id])
+    @assignment.inspect
     @user = ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @courses = @user.set_courses_to_assignment

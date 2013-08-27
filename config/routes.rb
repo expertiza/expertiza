@@ -301,7 +301,7 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :users do
+  resources :users, constraints: { id: /\d+/ } do
     collection do
       get :list
       post ':id', action: :update

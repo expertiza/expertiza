@@ -37,7 +37,7 @@ When /^I follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
 end
 
 When /^I click on "([^"]*)"$/ do |name|
-  first(name).click
+  (first(name).try :click) || click_link(name)
 end
 
 When /^I fill in "([^"]*)" with "([^"]*)"(?: within "([^"]*)")?$/ do |field, value, selector|

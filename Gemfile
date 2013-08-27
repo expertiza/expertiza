@@ -32,6 +32,7 @@ gem 'will_paginate'
 group :development do
   gem 'debugger'
   gem 'sqlite3-ruby', :require => 'sqlite3'
+  gem 'selenium-webdriver'
 end
 
 group :test do

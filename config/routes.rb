@@ -163,7 +163,9 @@ Expertiza::Application.routes.draw do |map|
   resources :permissions, constraints: { id: /\d+/ } do
     collection do
       get :list
+      get ':id', action: :show
       post ':id', action: :update
+      delete ':id', action: :destroy
     end
   end
 

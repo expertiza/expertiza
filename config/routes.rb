@@ -298,6 +298,7 @@ Expertiza::Application.routes.draw do |map|
   resources :tree_display do
     collection do
       get ':action'
+      post 'list'
     end
   end
 

@@ -9,6 +9,7 @@ Expertiza::Application.routes.draw do |map|
       post :new_instructor
       post :create_instructor
       get :remove_instructor
+      post :remove_instructor
       get :show_instructor
     end
   end
@@ -162,6 +163,7 @@ Expertiza::Application.routes.draw do |map|
   resources :permissions, constraints: { id: /\d+/ } do
     collection do
       get :list
+      post ':id', action: :update
     end
   end
 

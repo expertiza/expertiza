@@ -22,7 +22,7 @@ Then /^I should be able to see "(\S+)" under the list of instructors$/ do |instr
 end
 
 When /^I click on "(\S+)" starting with "(\S+)"$/ do |name, alphabet|
-  first(alphabet).click
+  first('.letters').first(:link, alphabet).click
   click_link name
 end
 

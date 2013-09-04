@@ -31,6 +31,7 @@ When /^I add user "([^"]*)" as a participant to assignment "([^"]*)"$/ do |user_
   step "I should see \"#{user_name}\""
 end
 
+@javascript
 When /^I create a (public|private) assignment named "([^"]*)" with max team size (\d+)$/ do  |public_or_private,assignment_name,team_size|
   step "I have a public review named \"test_review\""
     step "I have a public metareview named \"test_metareview\""
@@ -42,6 +43,7 @@ When /^I create a (public|private) assignment named "([^"]*)" with max team size
     step "I check \"Has teams?\""
     step "I fill in \"#{team_size}\" for \"Maximum number of members per team\""
     step "I check \"assignment_availability_flag\""
+    step "I click on \"Due dates\""
     step "I fill in \"2020/01/01 00:00:00 +0000\" for \"submit_deadline[due_at]\""
     step "I fill in \"2020/01/02 00:00:00 +0000\" for \"review_deadline[due_at]\""
     step "I fill in \"2020/01/03 00:00:00 +0000\" for \"reviewofreview_deadline[due_at]\""

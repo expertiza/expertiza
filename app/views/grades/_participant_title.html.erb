@@ -6,7 +6,7 @@
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</TH>
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
-<% if @assignment.team_assignment %>
+<% if @assignment.team_assignment? %>
   <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
 <% end %>
 <TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           

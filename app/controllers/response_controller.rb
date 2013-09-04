@@ -174,7 +174,7 @@ class ResponseController < ApplicationController
   def redirect_when_disallowed(response)
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
     # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment
+    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
       team = response.map.reviewer.team
       unless team.has_user session[:user]
         redirect_to '/denied?reason=You are not on the team that wrote this feedback'
@@ -446,7 +446,7 @@ class ResponseController < ApplicationController
   def redirect_when_disallowed(response)
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
     # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment
+    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
       team = response.map.reviewer.team
       unless team.has_user session[:user]
         redirect_to '/denied?reason=You are not on the team that wrote this feedback'

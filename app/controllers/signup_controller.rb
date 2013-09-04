@@ -27,7 +27,7 @@
     #Find whether the user has signed up for any topics; if so the user won't be able to
     #sign up again unless the former was a waitlisted topic
     #if team assignment, then team id needs to be passed as parameter else the user's id
-    if assignment.team_assignment == true
+    if assignment.team_assignment?
       users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
 
       if users_team.size == 0
@@ -49,8 +49,7 @@
     #find the assignment to which user is signing up
     assignment = Assignment.find(params[:assignment_id])
 
-    #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
-    if assignment.team_assignment == true
+    if assignment.team_assignment?
 
       #check whether the user already has a team for this assignment
       users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
@@ -163,7 +162,7 @@
       flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
       #if team assignment find the creator id from teamusers table and teams
-      if assignment.team_assignment == true
+      if assignment.team_assignment?
         #users_team will contain the team id of the team to which the user belongs
         users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
         signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)

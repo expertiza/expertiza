@@ -1,9 +1,8 @@
 Given /^I am participating in (team|individual) assignment "(\S+)"$/ do |assignment_type,assignment|
   a = Assignment.new
-  is_team_assignment=false
   a.max_team_size=1
+
   if assignment_type= /^team$/
-    is_team_assignment= true
     a.max_team_size=3
   end
 
@@ -12,7 +11,6 @@ Given /^I am participating in (team|individual) assignment "(\S+)"$/ do |assignm
   a.directory_path = 'test'
   a.spec_location= 'http://'
   a.availability_flag= true
-  a.team_assignment= is_team_assignment
   a.require_signup= true
   a.save
 

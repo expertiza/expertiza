@@ -16,7 +16,7 @@ class DelayedMailer
 			if assignment != nil && assignment.id != nil
 				if(self.deadline_type == "metareview")
             mail_metareviewers
-            if (assignment.team_assignment==1)
+            if (assignment.team_assignment?)
                teamMails = getTeamMembersMail
                email_reminder(teamMails, "teammate review")
             end
@@ -46,7 +46,7 @@ class DelayedMailer
 
         if(self.deadline_type == "team_formation")
           assignment = Assignment.find(self.assignment_id)
-          if(assignment.team_assignment == 1)
+          if(assignment.team_assignment?)
             mail_assignment_participants
           else
             emails = Array.new
@@ -64,7 +64,7 @@ class DelayedMailer
 
     # If there are sign_up topics for an assignement then send a mail toonly signed_up_users else send a mail to all participants
     if(sign_up_topics == nil || sign_up_topics.count == 0)
-      if !assignment.team_assignment
+      unless assignment.team_assignment?
         mail_assignment_participants
       else
         teamMails = getTeamMembersMail
@@ -76,7 +76,7 @@ class DelayedMailer
     else
       for topic in sign_up_topics
         signedUpUsers = SignedUpUser.find(:all, :conditions => ['topic_id = ?', topic.id])
-        if(assignment.team_assignment == 0)
+        unless assignment.team_assignment?
           for signedUser in signedUpUsers
             uid  = signedUser.creator_id
             user = User.find(uid)

@@ -70,7 +70,6 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
 
   test "method_get_import_team_assignment_with_no_reviewee" do
     @assignment = assignments(:assignment2)
-    @assignment.team_assignment= true
     assert_raise (ImportError) {ReviewResponseMap.import(['student1','student2'], 2, @assignment)}
   end
 

@@ -42,6 +42,14 @@ class Assignment < ActiveRecord::Base
 
   DEFAULT_MAX_REVIEWERS = 3
 
+  def team_assignment?
+    max_team_size == 1
+  end
+
+  def team_assignment
+    team_assignment?
+  end
+
   # Returns a set of topics that can be reviewed.
   # We choose the topics if one of its submissions has received the fewest reviews so far
   def candidate_topics_to_review
@@ -252,7 +260,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_contributor(contrib_id)
-    if team_assignment
+    if team_assignment?
       return AssignmentTeam.find(contrib_id)
     else
       return AssignmentParticipant.find(contrib_id)

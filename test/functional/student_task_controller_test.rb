@@ -100,7 +100,7 @@ class StudentTaskControllerTest < ActionController::TestCase
   def test_team_assignment
     participant=Participant.find(participants(:par13))
     assignment=Assignment.find(:first,:conditions => ["id=?",participant.parent_id] )
-    team_result = assignment.team_assignment
+    team_result = assignment.team_assignment?
     team_assert = 'false'
     assert_equal(team_assert.to_s ,team_result.to_s)
   end

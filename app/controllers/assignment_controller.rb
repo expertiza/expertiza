@@ -183,10 +183,6 @@ class AssignmentController < ApplicationController
     if @assignment.require_signup.nil?
       @assignment.require_signup = false
     end
-    if @assignment.team_assignment.nil?
-      @assignment.team_assignment = false
-      @assignment.max_team_size = 0
-    end
     if @assignment.wiki_type.nil?
       @assignment.wiki_type = WikiType.find_by_name('No')
     end

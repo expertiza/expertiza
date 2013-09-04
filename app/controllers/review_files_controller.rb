@@ -76,7 +76,7 @@ class ReviewFilesController < ApplicationController
 
     # Find all files over all versions submitted by the team
     all_review_files = []
-    if @participant.assignment.team_assignment
+    if @participant.assignment.team_assignment?
       @participant.team.get_participants.each { |member|
         all_review_files += ReviewFile.find_all_by_author_participant_id(member.id)
       }

@@ -43,7 +43,7 @@ class Assignment < ActiveRecord::Base
   DEFAULT_MAX_REVIEWERS = 3
 
   def team_assignment?
-    max_team_size == 1
+    max_team_size > 1
   end
 
   def team_assignment

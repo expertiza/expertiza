@@ -141,12 +141,11 @@
 
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
-      <input name="assignment[team_assignment]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[team_assignment]', 'true', @assignment.team_assignment, {:onChange => 'hasTeamsChanged()'}) %>
-      <%= label_tag('assignment[team_assignment]', 'Has teams?') %>
+      <%= check_box_tag('team_assignment', 'true', @assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
+      <%= label_tag('team_assignment', 'Has teams?') %>
     </td>
 
-    <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' unless @assignment.team_assignment %>>
+    <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' unless @assignment.team_assignment? %>>
       <%= label_tag('assignment[max_team_size]', 'Maximum number of members per team:') %>
       <%= text_field_tag('assignment[max_team_size]', @assignment.max_team_size, {:style => 'width:20px'}) %>
     </td>
@@ -235,7 +234,7 @@
 
     function hasTeamsChanged() {
         var msg = 'Warning! Unchecking this box will remove teams that already exist.';
-        var checkbox = jQuery('#assignment_team_assignment');
+        var checkbox = jQuery('#team_assignment');
         var team_count_field = jQuery('#assignment_team_count_field');
 
         if (checkbox.is(':checked')) {

@@ -28,6 +28,7 @@ class Assignment < ActiveRecord::Base
   # has_many :responses, :through => :response_maps, :source => 'response'
 
   validates_presence_of :name
+  #validates_presence_of :directory_path, :on => :update
   #validates_uniqueness_of :scope => [:directory_path, :instructor_id]
 
   COMPLETE = 'Finished'
@@ -40,6 +41,14 @@ class Assignment < ActiveRecord::Base
   REVIEW_STRATEGIES = [RS_INSTRUCTOR_SELECTED, RS_STUDENT_SELECTED, RS_AUTO_SELECTED]
 
   DEFAULT_MAX_REVIEWERS = 3
+
+  def team_assignment?
+    max_team_size > 1
+  end
+
+  def team_assignment
+    team_assignment?
+  end
 
   # Returns a set of topics that can be reviewed.
   # We choose the topics if one of its submissions has received the fewest reviews so far
@@ -95,6 +104,11 @@ class Assignment < ActiveRecord::Base
       raise 'This topic has too many reviews; please select another one.' unless candidate_topics_to_review.include?(topic)
     end
 
+    p "contributors.nil?"
+    p contributors.nil?
+    p "Contributors:"
+    p contributors.class
+    p contributors.size
     contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
@@ -135,6 +149,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def contributors
+    p "in contributors method:"
+    p "teams.size"
+    p teams.size
     #ACS Contributors are just teams, so removed check to see if it is a team assignment
     @contributors ||= teams #ACS
   end
@@ -243,7 +260,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_contributor(contrib_id)
-    if team_assignment
+    if team_assignment?
       return AssignmentTeam.find(contrib_id)
     else
       return AssignmentParticipant.find(contrib_id)
@@ -947,5 +964,4 @@ class Assignment < ActiveRecord::Base
   def has_partner_ads?(id)
     Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
   end
-
 end

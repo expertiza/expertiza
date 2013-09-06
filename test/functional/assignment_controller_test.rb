@@ -48,8 +48,7 @@ class AssignmentControllerTest < ActionController::TestCase
       :author_feedback_questionnaire_id  => questionnaire_id,
       :instructor_id => instructorid,
       :course_id => courseid,
-      :wiki_type_id => 1,
-      :team_assignment => "No"
+      :wiki_type_id => 1
     )
     #p flash[:notice].to_s
     assert assignment.save
@@ -80,7 +79,6 @@ class AssignmentControllerTest < ActionController::TestCase
     post :create, :assignment=>
         {:availability_flag=>false,
          :microtask=>true,
-         :team_assignment=>false,
          :review_topic_threshold=>0,
          :private=>false,
          :review_assignment_strategy=>"Instructor-Selected",

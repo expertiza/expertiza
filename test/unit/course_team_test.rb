@@ -24,7 +24,7 @@ class CourseTeamTest < ActiveSupport::TestCase
 
   def test_import_participants
     row = ["instructor1", "student1", "student2"]
-    teams(:team2).import_participants(0, row)
+    teams(:team2).import_team_members(0, row)
     assert_equal teams(:team2).has_user(users(:instructor1)), true
     assert_equal teams(:team2).has_user(users(:student1)), true
     assert_equal teams(:team2).has_user(users(:student2)), true

@@ -263,6 +263,5 @@ class AssignmentTeam < Team
     team
   end
 
-  require 'models/analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
 end  

@@ -178,6 +178,12 @@ Expertiza::Application.routes.draw do |map|
   resources :publishing do
     collection do
       get :view
+      post :update_publish_permissions
+      post :set_publish_permission
+      get :grant
+      get :grant_with_private_key
+      post :grant_with_private_key
+      get :set_publish_permission
     end
   end
 
@@ -312,6 +318,7 @@ Expertiza::Application.routes.draw do |map|
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
+      get :keys
     end
   end
 

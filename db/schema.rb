@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130827132007) do
+ActiveRecord::Schema.define(:version => 20130905183106) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -41,7 +41,6 @@ ActiveRecord::Schema.define(:version => 20130827132007) do
     t.integer  "review_of_review_questionnaire_id"
     t.integer  "teammate_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
-    t.boolean  "team_assignment"
     t.integer  "wiki_type_id",                      :default => 0,     :null => false
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false
@@ -567,6 +566,7 @@ ActiveRecord::Schema.define(:version => 20130827132007) do
     t.text    "digital_certificate"
     t.string  "persistence_token"
     t.string  "timezonepref"
+    t.text    "public_key"
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

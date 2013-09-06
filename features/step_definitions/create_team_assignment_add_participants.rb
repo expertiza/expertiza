@@ -53,7 +53,6 @@ Given /^a team assignment named "(\S+)" exists$/ do |assignment|
   newAssignment.directory_path = 'test'
   newAssignment.spec_location= 'http://'
   newAssignment.availability_flag=true
-  newAssignment.team_assignment=true
   newAssignment.save
 
   submitDate = DueDate.new

@@ -23,7 +23,7 @@ class DueDate < ActiveRecord::Base
     default_permission['metareview'] = Hash.new
     default_permission['metareview']['submission_allowed'] = permission_id['No']
     default_permission['metareview']['review_allowed'] = permission_id['No']
-    default_permission['metareview']['review_of_review_allowed'] = permission_id['Ok']
+    default_permission['metareview']['review_of_review_allowed'] = permission_id['OK']
 
     default_permission['drop_topic'] = Hash.new
     default_permission['drop_topic']['submission_allowed'] = permission_id['OK']

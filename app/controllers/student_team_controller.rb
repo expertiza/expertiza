@@ -14,10 +14,11 @@ class StudentTeamController < ApplicationController
     return unless current_user_id?(@student.user_id)
 
     check = AssignmentTeam.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @student.parent_id])        
-    @team = AssignmentTeam.new(params[:team])
-    @team.parent_id = @student.parent_id    
+
     #check if the team name is in use
-    if (check.length == 0)      
+    if (check.length == 0)
+      @team = AssignmentTeam.new(params[:team])
+      @team.parent_id = @student.parent_id
       @team.save
       parent = AssignmentNode.find_by_node_object_id(@student.parent_id)
       TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)

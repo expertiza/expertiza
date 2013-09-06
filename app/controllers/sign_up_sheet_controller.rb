@@ -324,6 +324,8 @@ class SignUpSheetController < ApplicationController
   end
 
   def signup
+    puts "++++++++++++++++++++++++++++"
+    puts "you called me in sign_up_sheet_controller!"
     #find the assignment to which user is signing up
     assignment = Assignment.find(params[:assignment_id])
 
@@ -334,7 +336,7 @@ class SignUpSheetController < ApplicationController
     users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
     if users_team.size == 0
       #if team is not yet created, create new team.
-      team = create_team(params[:assignment_id])
+      team = AssignmentTeam.create_team_and_node(params[:assignment_id])
       user = User.find(session[:user].id)
       teamuser = create_team_users(user, team.id)
       confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id])
@@ -414,37 +416,6 @@ class SignUpSheetController < ApplicationController
     end
 
     result
-  end
-
-  def create_team(assignment_id)
-    assignment = Assignment.find(assignment_id)
-    #check_for_existing_team_name(parent,generate_team_name(parent.name))
-    teamname = generate_team_name(assignment.name)
-    team = AssignmentTeam.create(:name => teamname, :parent_id => assignment.id)
-    TeamNode.create(:parent_id => assignment.id, :node_object_id => team.id)
-    team
-  end
-
-  def generate_team_name(teamnameprefix)
-    counter = 1
-    while (true)
-      teamname = teamnameprefix + "_Team#{counter}"
-      if (!Team.find_by_name(teamname))
-        return teamname
-      end
-      counter=counter+1
-    end
-  end
-
-  def create_team_users(user, team_id)
-    #user = User.find_by_name(params[:user][:name].strip)
-    if !user
-      urlCreate = url_for :controller => 'users', :action => 'new'
-      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
-    end
-    team = Team.find(team_id)
-    assignment_id= team.parent_id
-    team.add_member(user,assignment_id)
   end
 
   def has_user(user, team_id)

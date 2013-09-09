@@ -50,7 +50,7 @@ class QuestionnaireController < ApplicationController
 
   # Edit a questionnaire
   def edit
-    begin
+    #begin
       @questionnaire = Questionnaire.find(params[:id])
       redirect_to :action => 'list' if @questionnaire == nil
 
@@ -58,7 +58,7 @@ class QuestionnaireController < ApplicationController
         @questionnaire.update_attributes(params[:questionnaire])
         save
       end
-      
+
       export if params['export']
       import if params['import']
 
@@ -66,9 +66,9 @@ class QuestionnaireController < ApplicationController
         flash[:id] = params[:id]
         redirect_to :action => 'edit_advice', :id => params[:questionnaire][:id]
       end
-    rescue
-      flash[:error] = $!
-    end
+    #rescue
+      #flash[:error] = $!
+    #end
   end
 
   # Define a new questionnaire
@@ -280,20 +280,8 @@ private
     @questionnaire = Questionnaire.find(params[:id])
 
     file = params['csv']
-    questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
-    @questions_from_import = questions if @questionnaire.section=="Custom"
 
-    if questions != nil and questions.length > 0
-      # delete the existing questions if no scores have been recorded yet
-      @questionnaire.questions.each do |question|
-        raise "Cannot import new questions, scores exist" if Score.find_by_question_id(question.id)
-        if (Questionnaire.find_by_id(question.questionnaire_id).section == "Custom")
-            QuestionType.find_by_question_id(question.id).delete
-        end
-        question.delete
-      end
-      @questionnaire.questions = questions
-    end
+    @questionnaire.questions << QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice

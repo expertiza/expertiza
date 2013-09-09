@@ -57,10 +57,6 @@
               @assignment.participants.each do |participant|
                 if (user.id == participant.user.id)
                   permissionGranted = participant.permission_granted?
-                  hasSignature = !participant.digital_signature.nil?
-                  if (permissionGranted && hasSignature)
-                      signatureValid = participant.verify_digital_signature(participant.digital_signature)
-                  end
                 end
               end
             %>

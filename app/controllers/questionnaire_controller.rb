@@ -12,7 +12,7 @@ class QuestionnaireController < ApplicationController
     orig_questionnaire = Questionnaire.find(params[:id])
     questions = Question.find_all_by_questionnaire_id(params[:id])
     @questionnaire = orig_questionnaire.clone
-    @questionnaire.instructor_id = session[:user].instructor_id
+    @questionnaire.instructor_id = session[:user].instructor_id  ## Why was TA-specific code removed here?  See Project E713.
     @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
     clone_questionnaire_details(questions)
@@ -103,7 +103,7 @@ class QuestionnaireController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
-  def edit_advice
+  def edit_advice  ##Code used to be in this class, was removed.  I have not checked the other class.
     redirect_to :controller => 'advice', :action => 'edit_advice'
   end
 
@@ -115,7 +115,7 @@ class QuestionnaireController < ApplicationController
       flash[:notice] = "The questionnaire's question advice was successfully saved"
       #redirect_to :action => 'list'
       redirect_to :controller => 'advice', :action => 'save_advice'
-    end
+    end   ##Rescue clause was removed; why?
   end
 
   # Toggle the access permission for this assignment from public to private, or vice versa
@@ -281,6 +281,7 @@ private
 
     file = params['csv']
     questions = QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
+    @questions_from_import = questions if @questionnaire.section=="Custom"
 
     if questions != nil and questions.length > 0
       # delete the existing questions if no scores have been recorded yet

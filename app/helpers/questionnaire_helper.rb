@@ -5,8 +5,8 @@ module QuestionnaireHelper
   
   CSV_QUESTION = 0
   CSV_TYPE = 1
-  CSV_WEIGHT = 2
-  #CSV_PARAM = 3
+  CSV_PARAM = 2
+  CSV_WEIGHT = 3
 
   def self.create_questionnaire_csv(questionnaire, user_name)
    csv_data = FasterCSV.generate do |csv|
@@ -21,6 +21,8 @@ module QuestionnaireHelper
       else
         row << QuestionType.find_by_question_id(question.id).q_type
       end
+
+      row << question.question_type.try(:parameters) || ''
 
       row << question.weight
 
@@ -45,6 +47,7 @@ module QuestionnaireHelper
   
   def self.get_questions_from_csv(questionnaire, file)
     questions = Array.new
+    custom_rubric = questionnaire.section == "Custom"
     
     CSV::Reader.parse(file) do |row|
       if row.length > 0
@@ -52,43 +55,29 @@ module QuestionnaireHelper
         score = questionnaire.max_question_score
         q = Question.new
 
-        #if questionnaire.section == "Custom"
-          #q_type = QuestionType.new
-        #  q_type.question_id = q.id
-        #end
+        q_type = QuestionType.new if custom_rubric
+
         q.true_false = false
-        
-        for cell in row
+
+        row.each do |cell|
           case i
             when CSV_QUESTION
               q.txt = cell.strip if cell != nil
             when CSV_TYPE
               if cell != nil
-                if cell.downcase.strip === Question::TRUE_FALSE.downcase
-                  q.true_false = true
-                elsif cell.downcase.strip === Question::NUMERIC.downcase
-                  q.true_false = false
-                else
-                 # q_type.q_type = cell.strip
-                end
+                q.true_false = cell.downcase.strip == Question::TRUE_FALSE.downcase
+                q_type.q_type = cell.strip if custom_rubric
+              end
+            when CSV_PARAM
+              if custom_rubric
+                q_type.parameters = cell.strip if cell
               end
             when CSV_WEIGHT
-              q.weight = cell.strip.to_i if cell != nil
-            #when CSV_PARAM
-            #  if questionnaire.section != "Custom"
-            #    if score >= questionnaire.min_question_score and cell != nil
-            #      a = QuestionAdvice.new(:score => score, :advice => cell.strip) if !q.true_false
-            #    end
-            #  else
-            #      q_type.parameters = cell.strip
-            #  end
+              q.weight = cell.strip.to_i if cell
             else
                 if score >= questionnaire.min_question_score and cell != nil
-                  #if questionnaire.section == "Custom"
-                   a = QuestionAdvice.new(:score => score, :advice => cell.strip)
-                  #end
-                  a = QuestionAdvice.new(:score => 1, :advice => cell.strip) if q.true_false and i == 4
-                  a = QuestionAdvice.new(:score => 0, :advice => cell.strip) if q.true_false and i == 5
+                  a = QuestionAdvice.new(:score => score, :advice => cell.strip) if custom_rubric
+                  a = QuestionAdvice.new(:score => questionnaire.min_question_score + i - 4, :advice => cell.strip)
                   score = score - 1
                   q.question_advices << a
                 end
@@ -97,14 +86,16 @@ module QuestionnaireHelper
           i = i + 1
         end
 
-        #q_type.save
-        #@q << q_type
-        questions << q
+        q.save
 
+        q_type.question = q if custom_rubric
+        q_type.save if custom_rubric
+
+        questions << q
       end
     end
-  
-    return questions
+
+    questions
   end
 
   def self.adjust_advice_size(questionnaire, question)

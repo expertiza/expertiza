@@ -53,18 +53,19 @@
 	</tr>
    <% #end %>
 	<% 	i = 1   %>
-    <% if params['import'] && @questionnaire.section == "Custom"%>
-      <% for @question in @questions_from_import %>
-        <% @question.to_json %>
+    <%# if params['import'] && @questionnaire.section == "Custom"%>
+      <!--<%# for @question in @questionnaire.questions %>
+        <%# @question.to_json %>
         <script type="text/javascript">
-            var txt = '<%= @question.txt %>';
+            var txt = '<%#= @question.txt %>';
             addQuestion(txt,"", "");
         </script>
-        <% 	i += 1 %>
-      <% end %>
-    <% else %>
+        <%# 	i += 1 %>
+      <%# end %>-->
+    <%# else %>
         <% for @question in @questionnaire.questions %>
           <% @q = QuestionType.find_by_question_id(@question.id) if !params['import'] %>
+          <% @q ||= QuestionType.new %>
           <% if params['import']  %>
             <% @q = QuestionType.new %>
           <% end %>
@@ -98,7 +99,7 @@
             </tr>
         <% 	i += 1 %>
         <% end %>
-        <% end %>
+        <%# end %>
 </table>
 
 <BR/>

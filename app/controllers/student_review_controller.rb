@@ -40,11 +40,8 @@ class StudentReviewController < ApplicationController
         end
       }
       review_rounds = @assignment.get_review_rounds
-      if review_rounds == 1
-        deadline_type_id = DeadlineType.find_by_name('review').id
-      else
-        deadline_type_id = DeadlineType.find_by_name('rereview').id        
-      end
+      deadline_type_id = DeadlineType.find_by_name('review').id
+
       @metareview_mappings.each do |metareview_mapping|
         review_mapping = ResponseMap.find_by_id(metareview_mapping.reviewed_object_id)
         if review_mapping

@@ -236,6 +236,7 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :list_surveys
       get :list
+      get :view_responses
     end
   end
 

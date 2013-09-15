@@ -203,6 +203,12 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :review_files do
+    collection do
+      get :show_all_submitted_files
+    end
+  end
+
   resources :roles do
     collection do
       get :list

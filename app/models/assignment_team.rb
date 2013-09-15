@@ -262,6 +262,4 @@ class AssignmentTeam < Team
     TeamNode.create(:parent_id =>assignment_id,:node_object_id=>team.id)
     team
   end
-
-  include AssignmentTeamAnalytic
-end  
+end

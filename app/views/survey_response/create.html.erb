@@ -6,7 +6,7 @@
     action = 'create'
   end
 %>
-<% form_tag(:action => action, :survey_id => @survey.id) do %>
+<%= form_tag(:action => action, :survey_id => @survey.id) do %>
 
 <% @min= @survey.min_question_score %>
 <% @max= @survey.max_question_score %>

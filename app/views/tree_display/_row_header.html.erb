@@ -14,7 +14,7 @@
 	<%else%>
      <% if child_nodes %>
        <TD WIDTH="2%" ALIGN="RIGHT"><a id="<%= prefix %>Link" name="<%= prefix %>Link" href="#" <% if child_nodes.length > 0  %>onclick="toggleList('<%= prefix %>',<%= child_nodes.length %>);alternate('theTable');return false;"><img src="/images/expand.png"><% else %>onclick="return false;"><img src="/images/noaction.png"><% end %></a></div></TD>
-       <TD WIDTH="2%" ALIGN="RIGHT"><%= link_to '<img src="/images/drill.png">', :controller => 'tree_display', :action => 'drill', :root => parent_node.id %></TD>
+       <TD WIDTH="2%" ALIGN="RIGHT"><%= link_to image_tag('/images/drill.png'), :controller => 'tree_display', :action => 'drill', :root => parent_node.id %></TD>
      <% end %>
 	<%end%>	     
 <% end %>    

@@ -4,5 +4,4 @@
 # Mime::Type.register "text/richtext", :rtf
 # Mime::Type.register_alias "text/html", :iphone
 
-require 'mime_types'
-Mime::Types.import_apache_mime_types
+Mime::Type.register "image/gif", :gif

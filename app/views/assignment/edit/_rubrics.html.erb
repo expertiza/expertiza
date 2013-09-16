@@ -75,10 +75,10 @@
   </tr>
   <script>
       jQuery(document).ready(function () {
-          addQuestionnaireTableRow('ReviewQuestionnaire', <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('MetareviewQuestionnaire', <%= questionnaire(@assignment, 'MetareviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', <%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('TeammateReviewQuestionnaire', <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json %>);
+          addQuestionnaireTableRow('ReviewQuestionnaire', <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>);
+          addQuestionnaireTableRow('MetareviewQuestionnaire', <%= questionnaire(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>);
+          addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', <%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>);
+          addQuestionnaireTableRow('TeammateReviewQuestionnaire', <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>);
       }());
   </script>
 </table>

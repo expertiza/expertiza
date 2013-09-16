@@ -1,6 +1,6 @@
 <h1>Editing user</h1>
 
-<% form_tag :action => 'update', :id => @user do %>
+<%= form_tag :action => 'update', :id => @user do %>
   <p><label for="role_id">Role</label><br/>
   <%= collection_select 'user', 'role_id', @all_roles, :id, :name %></p>
 

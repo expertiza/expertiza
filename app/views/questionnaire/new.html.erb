@@ -2,7 +2,7 @@
 <table><tr>
        <td>Select Questionnaire Type</td>
        <td>
-        <% form_tag :action => 'select_questionnaire_type'  do %>
+        <%= form_tag :action => 'select_questionnaire_type'  do %>
         <%= hidden_field 'questionnaire', 'id' %>
         <%= hidden_field 'questionnaire', 'private' %>
         <%= hidden_field 'questionnaire', 'type' %>

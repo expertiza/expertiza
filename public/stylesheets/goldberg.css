@@ -3,37 +3,6 @@
 Goldberg-specific stylesheet.
 */
 
-
-/*** Flash Notices and Errors ***/
-div.flash_note {
-background-color:#ddffd1;
-border:2px solid #32b704;
-color:#185702;
-padding:5px 20px 5px;
-margin-bottom: 15px ;
-}
-
-div.flash_error, div.errorExplanation {
-background-color:#ffddd1;
-border:2px solid #b73204;
-color:#571802;
-padding:5px 20px 5px;
-margin-bottom: 15px ;
-}
-
-div.fieldWithErrors input {  
-background-color:#ffddd1;
-}
-
-#content div.flash_error h1 { 
-color:#571802;
-}
-
-#content div.errorExplanation h2 { 
-color:#571802;
-}
-
-
 /*** Hierarchical list in a table ***/
  
 table.table_as_list {

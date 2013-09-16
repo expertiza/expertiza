@@ -22,7 +22,7 @@
 	<tr>
 	  <td valign="top"><b>Private Key:</b></td>
 	  <td>
-		<% form_tag :action => 'grant_with_private_key' do %>
+		<%= form_tag :action => 'grant_with_private_key' do %>
 		<% if (!@participant.nil?) %>
 		  <%= hidden_field_tag :id, @participant.id %> 
 		<% end %>

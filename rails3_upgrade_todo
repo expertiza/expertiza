@@ -1,0 +1,308 @@
+[31m[1mSoon-to-be-deprecated ActiveRecord calls[0m
+[37mMethods such as find(:all), find(:first), finds with conditions, and the :joins option will soon be deprecated.
+[1mMore information:[0m [36mhttp://m.onkey.org/2010/1/22/active-record-query-interface
+
+[37mThe culprits: 
+[33m	- app//controllers/admin_controller.rb
+[33m	- app//controllers/assignment_controller.rb
+[33m	- app//controllers/assignment_controller.rb~
+[33m	- app//controllers/assignment_signups_controller.rb
+[33m	- app//controllers/content_pages_controller.rb
+[33m	- app//controllers/controller_actions_controller.rb
+[33m	- app//controllers/invitation_controller.rb
+[33m	- app//controllers/menu_items_controller.rb
+[33m	- app//controllers/popup_controller.rb
+[33m	- app//controllers/questionnaire_controller.rb
+[33m	- app//controllers/questions_controller.rb
+[33m	- app//controllers/reports_controller.rb
+[33m	- app//controllers/response_controller.rb
+[33m	- app//controllers/review_mapping_controller.rb
+[33m	- app//controllers/roles_controller.rb
+[33m	- app//controllers/sign_up_sheet_controller.rb
+[33m	- app//controllers/signup_controller.rb
+[33m	- app//controllers/site_controllers_controller.rb
+[33m	- app//controllers/statistics_controller.rb
+[33m	- app//controllers/student_task_controller.rb
+[33m	- app//controllers/student_task_controller.rb~
+[33m	- app//controllers/student_team_controller.rb
+[33m	- app//controllers/survey_controller.rb
+[33m	- app//controllers/survey_deployment_controller.rb
+[33m	- app//controllers/survey_response_controller.rb
+[33m	- app//controllers/system_settings_controller.rb
+[33m	- app//controllers/users_controller.rb
+[33m	- app//helpers/assignment_helper.rb
+[33m	- app//helpers/dynamic_review_mapping.rb
+[33m	- app//helpers/leaderboard_helper.rb
+[33m	- app//helpers/participants_helper.rb
+[33m	- app//helpers/survey_helper.rb
+[33m	- app//helpers/team_helper.rb
+[33m	- app//models/administrator.rb
+[33m	- app//models/assignment.rb
+[33m	- app//models/assignment_node.rb
+[33m	- app//models/assignment_participant.rb
+[33m	- app//models/assignment_team.rb
+[33m	- app//models/automated_metareview/plagiarism_check.rb
+[33m	- app//models/automated_metareview/text_preprocessing.rb
+[33m	- app//models/content_page.rb
+[33m	- app//models/controller_action.rb
+[33m	- app//models/course_node.rb
+[33m	- app//models/course_participant.rb
+[33m	- app//models/course_team.rb
+[33m	- app//models/courses_users.rb
+[33m	- app//models/due_date.rb
+[33m	- app//models/folder_node.rb
+[33m	- app//models/instructor.rb
+[33m	- app//models/leaderboard.rb
+[33m	- app//controllers/assignment_controller.rb
+[33m	- app//controllers/assignment_controller.rb~
+[33m	- app//controllers/grades_controller.rb
+[33m	- app//controllers/invitation_controller.rb
+[33m	- app//controllers/popup_controller.rb
+[33m	- app//controllers/profile_controller.rb
+[33m	- app//controllers/review_files_controller.rb
+[33m	- app//controllers/review_mapping_controller.rb
+[33m	- app//controllers/sign_up_sheet_controller.rb
+[33m	- app//controllers/signup_controller.rb
+[33m	- app//controllers/student_team_controller.rb
+[33m	- app//controllers/system_settings_controller.rb
+[33m	- app//helpers/dynamic_review_mapping.rb
+[33m	- app//helpers/leaderboard_helper.rb
+[33m	- app//helpers/questionnaire_helper.rb
+[33m	- app//models/administrator.rb
+[33m	- app//models/assignment.rb
+[33m	- app//models/assignment_participant.rb
+[33m	- app//models/assignment_team.rb
+[33m	- app//models/automated_metareview/plagiarism_check.rb
+[33m	- app//models/automated_metareview/text_preprocessing.rb
+[33m	- app//models/automated_metareview.rb
+[33m	- app//models/course_team.rb
+[33m	- app//models/instructor.rb
+[33m	- app//models/leaderboard.rb
+[33m	- app//models/menu_item.rb
+[33m	- app//models/review_response_map.rb
+[33m	- app//models/score_cache.rb
+[33m	- app//models/sign_up_topic.rb
+[33m	- app//models/super_administrator.rb
+[33m	- app//models/ta.rb
+[33m	- app//views/advertise_for_partner/show.html.erb
+[33m	- app//views/popup/participants_popup.html.erb
+[33m	- app//views/popup/team_users_popup.html.erb
+[33m	- app//views/review_mapping/_list_review_mappings.html.erb
+[33m	- app//views/review_mapping/_participantscore.html.erb
+[33m	- app//views/review_mapping/_report.html.erb
+[33m	- app//views/review_mapping/_teamscore.html.erb
+[33m	- app//views/review_mapping/select_mapping.html.erb
+[33m	- app//views/student_team/view.html.erb
+[33m	- app//views/tree_display/actions/_assignments_actions.html.erb
+[33m	- app//controllers/admin_controller.rb
+[33m	- app//controllers/assignment_controller.rb
+[33m	- app//controllers/assignment_controller.rb~
+[33m	- app//controllers/grades_controller.rb
+[33m	- app//controllers/invitation_controller.rb
+[33m	- app//controllers/popup_controller.rb
+[33m	- app//controllers/profile_controller.rb
+[33m	- app//controllers/questionnaire_controller.rb
+[33m	- app//controllers/reports_controller.rb
+[33m	- app//controllers/response_controller.rb
+[33m	- app//controllers/review_mapping_controller.rb
+[33m	- app//controllers/sign_up_sheet_controller.rb
+[33m	- app//controllers/signup_controller.rb
+[33m	- app//controllers/student_task_controller.rb
+[33m	- app//controllers/student_task_controller.rb~
+[33m	- app//controllers/student_team_controller.rb
+[33m	- app//controllers/survey_controller.rb
+[33m	- app//controllers/survey_response_controller.rb
+[33m	- app//controllers/users_controller.rb
+[33m	- app//helpers/assignment_helper.rb
+[33m	- app//helpers/dynamic_review_mapping.rb
+[33m	- app//helpers/leaderboard_helper.rb
+[33m	- app//helpers/participants_helper.rb
+[33m	- app//helpers/survey_helper.rb
+[33m	- app//helpers/team_helper.rb
+[33m	- app//models/assignment.rb
+[33m	- app//models/assignment_node.rb
+[33m	- app//models/assignment_participant.rb
+[33m	- app//models/assignment_team.rb
+[33m	- app//models/automated_metareview/plagiarism_check.rb
+[33m	- app//models/automated_metareview/text_preprocessing.rb
+[33m	- app//models/automated_metareview.rb
+[33m	- app//models/course_node.rb
+[33m	- app//models/course_participant.rb
+[33m	- app//models/course_team.rb
+[33m	- app//models/courses_users.rb
+[33m	- app//models/due_date.rb
+[33m	- app//models/folder_node.rb
+[33m	- app//models/instructor.rb
+[33m	- app//models/leaderboard.rb
+[33m	- app//models/menu_item.rb
+[33m	- app//models/participant.rb
+[33m	- app//models/questionnaire_node.rb
+[33m	- app//models/response_map.rb
+[33m	- app//helpers/dynamic_review_mapping.rb
+[33m	- app//models/administrator.rb
+[33m	- app//models/assignment.rb
+[33m	- app//models/assignment_team.rb
+[33m	- app//models/super_administrator.rb
+[0m
+[31m[1mOld router API[0m
+[37mThe router API has totally changed.
+[1mMore information:[0m [36mhttp://yehudakatz.com/2009/12/26/the-rails-3-router-rack-it-up/
+
+[37mThe culprits: 
+[33m	- config/routes.rb
+[0m
+[31m[1mDeprecated test_help path[0m
+[37mYou now must require 'rails/test_help' not just 'test_help'.
+[1mMore information:[0m [36mhttp://weblog.rubyonrails.org/2009/9/1/gem-packaging-best-practices
+
+[37mThe culprits: 
+[33m	- test//test_helper.rb.rails2
+[0m
+[31m[1mDeprecated constant(s)[0m
+[37mConstants like RAILS_ENV, RAILS_ROOT, and RAILS_DEFAULT_LOGGER are now deprecated.
+[1mMore information:[0m [36mhttp://litanyagainstfear.com/blog/2010/02/03/the-rails-module/
+
+[37mThe culprits: 
+[33m	- app//helpers/participants_helper.rb
+[33m	- app//models/assignment.rb
+[33m	- app//models/course.rb
+[33m	- app//models/site_controller.rb
+[33m	- app//views/layouts/application.html.erb
+[33m	- lib//tasks/goldberg.rake
+[33m	- lib//tasks/hoptoad_notifier_tasks.rake
+[0m
+[31m[1mOld gem bundling (config.gems)[0m
+[37mThe old way of bundling is gone now.  You need a Gemfile for bundler.
+[1mMore information:[0m [36mhttp://omgbloglol.com/post/353978923/the-path-to-rails-3-approaching-the-upgrade
+
+[37mThe culprits: 
+[33m	- config/environments/cucumber.rb
+[0m
+[31m[1mDeprecated ActionMailer API[0m
+[37mYou're using the old ActionMailer API to send e-mails in a controller, model, or observer.
+[1mMore information:[0m [36mhttp://lindsaar.net/2010/1/26/new-actionmailer-api-in-rails-3
+
+[37mThe culprits: 
+[33m	- app/models//assignment.rb
+[33m	- app/models//automated_metareview.rb
+[33m	- app/models//courses_users.rb
+[33m	- app/models//participant.rb
+[33m	- app/models//response.rb
+[33m	- app/controllers//assignment_controller.rb~
+[33m	- app/controllers//grades_controller.rb
+[0m
+[31m[1mOld Rails generator API[0m
+[37mA plugin in the app is using the old generator API (a new one may be available at http://github.com/trydionel/rails3-generators).
+[1mMore information:[0m [36mhttp://blog.plataformatec.com.br/2010/01/discovering-rails-3-generators/
+
+[37mThe culprits: 
+[33m	- vendor/plugins/delayed_job/generators/
+[33m	- vendor/plugins/delayed_job/generators/delayed_job/
+[0m
+[31m[1mDeprecated ERb helper calls[0m
+[37mBlock helpers that use concat (e.g., form_for) should use <%= instead of <%.  The current form will continue to work for now, but you will get deprecation warnings since this form will go away in the future.
+[1mMore information:[0m [36mhttp://weblog.rubyonrails.org/
+
+[37mThe culprits: 
+[33m	- app/views/grades/conflict_notification.html.erb
+[33m	- app/views/join_team_requests/edit.html.erb
+[33m	- app/views/question_types/edit.html.erb
+[33m	- app/views/question_types/new.html.erb
+[33m	- app/views/review_mapping/_searchbox.html.erb
+[33m	- app/views/admin/list_administrators.html.erb
+[33m	- app/views/admin/list_instructors.html.erb
+[33m	- app/views/admin/new_administrator.html.erb
+[33m	- app/views/admin/new_instructor.html.erb
+[33m	- app/views/advertise_for_partner/edit.html.erb
+[33m	- app/views/advertise_for_partner/new.html.erb
+[33m	- app/views/advice/edit_advice.html.erb
+[33m	- app/views/advice/list.html.erb
+[33m	- app/views/assignment/associate_assignment_with_course.html.erb
+[33m	- app/views/assignment/edit.html.erb
+[33m	- app/views/assignment/list.html.erb
+[33m	- app/views/assignment/new.html.erb
+[33m	- app/views/auth/_login.html.erb
+[33m	- app/views/auth/login.html.erb
+[33m	- app/views/content_pages/edit.html.erb
+[33m	- app/views/content_pages/new.html.erb
+[33m	- app/views/controller_actions/edit.html.erb
+[33m	- app/views/controller_actions/new.html.erb
+[33m	- app/views/course/_add_individual.html.erb
+[33m	- app/views/course/edit.html.erb
+[33m	- app/views/course/new.html.erb
+[33m	- app/views/export_file/start.html.erb
+[33m	- app/views/grades/edit.html.erb
+[33m	- app/views/impersonate/start.html.erb
+[33m	- app/views/import_file/start.html.erb
+[33m	- app/views/institution/edit.html.erb
+[33m	- app/views/institution/new.html.erb
+[33m	- app/views/join_team_requests/_list_received.html.erb
+[33m	- app/views/markup_styles/edit.html.erb
+[33m	- app/views/markup_styles/new.html.erb
+[33m	- app/views/menu_items/edit.html.erb
+[33m	- app/views/menu_items/new.html.erb
+[33m	- app/views/mine_review_data/view_review_charts.html.erb
+[33m	- app/views/participants/change_handle.html.erb
+[33m	- app/views/password_retrieval/forgotten.html.erb
+[33m	- app/views/permissions/edit.html.erb
+[33m	- app/views/permissions/new.html.erb
+[33m	- app/views/profile/edit.html.erb
+[33m	- app/views/publishing/grant.html.erb
+[33m	- app/views/questionnaire/copy_questionnaire.html.erb
+[33m	- app/views/questionnaire/delete_questionnaire.html.erb
+[33m	- app/views/questionnaire/edit.html.erb
+[33m	- app/views/questionnaire/new.html.erb
+[33m	- app/views/questionnaire/select_questionnaire_type.html.erb
+[33m	- app/views/response/response.html.erb
+[33m	- app/views/review_mapping/select_mapping.html.erb
+[33m	- app/views/review_mapping/select_metareviewer.html.erb
+[33m	- app/views/review_mapping/select_reviewer.html.erb
+[33m	- app/views/roles/edit.html.erb
+[33m	- app/views/roles/new.html.erb
+[33m	- app/views/roles_permissions/edit.html.erb
+[33m	- app/views/roles_permissions/new.html.erb
+[33m	- app/views/roles_permissions/new_permission_for_role.html.erb
+[33m	- app/views/shared_scripts/_add_individual.html.erb
+[33m	- app/views/sign_up_sheet/add_signup_topics_staggered.html.erb
+[33m	- app/views/site_controllers/edit.html.erb
+[33m	- app/views/site_controllers/new.html.erb
+[33m	- app/views/statistics/list.html.erb
+[33m	- app/views/student_team/edit.html.erb
+[33m	- app/views/student_team/view.html.erb
+[33m	- app/views/submitted_content/_hyperlink.html.erb
+[33m	- app/views/submitted_content/_main.html.erb
+[33m	- app/views/submitted_content/_submitted_files.html.erb
+[33m	- app/views/suggestion/new.html.erb
+[33m	- app/views/suggestion/show.html.erb
+[33m	- app/views/survey/assign.html.erb
+[33m	- app/views/survey/list.html.erb
+[33m	- app/views/survey_deployment/new.html.erb
+[33m	- app/views/survey_response/create.html.erb
+[33m	- app/views/survey_response/submit.html.erb
+[33m	- app/views/system_settings/edit.html.erb
+[33m	- app/views/system_settings/new.html.erb
+[33m	- app/views/team/create_teams_view.html.erb
+[33m	- app/views/team/edit.html.erb
+[33m	- app/views/teams_participants/new.html.erb
+[33m	- app/views/teams_users/new.html.erb
+[33m	- app/views/tree_display/_page_header.html.erb
+[33m	- app/views/users/_pagination.html.erb
+[33m	- app/views/users/edit.html.erb
+[33m	- app/views/users/list.html.erb
+[33m	- app/views/users/new.html.erb
+[0m
+[31m[1mDeprecated AJAX helper calls[0m
+[37mAJAX javascript helpers have been switched to be unobtrusive and use :remote => true instead of having a seperate function to handle remote requests.
+[1mMore information:[0m [36mhttp://blog.jordanwest.me/modest-rubyist-archive/rails-3-ujs-and-csrf-meta-tags
+
+[37mThe culprits: 
+[33m	- app/views/automated_metareviews/list.html.erb
+[33m	- app/views/review_mapping/_report.html.erb
+[0m
+[31m[1mDeprecated ActionMailer attribute :sent_on[0m
+[37mUsing the new mailer API, you can specify :date to the mail method.
+[1mMore information:[0m [36mhttp://stackoverflow.com/questions/7367185/weird-error-when-delivering-mail-undefined-method-index-for-2011-09-09-2215
+
+[37mThe culprits: 
+[33m	- app/models/mailer.rb
+[0m

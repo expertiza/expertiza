@@ -5,7 +5,7 @@
       <%= select('assignment', 'review_assignment_strategy', review_strategy_options, {:include_blank => '----', :selected => @assignment.review_assignment_strategy}) %>
       <script>
           jQuery(document).ready(function() {reviewStrategyChanged();});
-          jQuery('#assignment_review_assignment_strategy').change(function() {reviewStrategyChanged();})();
+          jQuery('#assignment_review_assignment_strategy').on('change', function() {reviewStrategyChanged();});
       </script>
 
       <img src="/images/info.png" title="- Instructor-Selected: Instructor decides who reviews whom

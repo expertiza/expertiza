@@ -6,7 +6,7 @@
 <% end %>
 
 <h2>Grades</h2>
-<% form_for :mailer, :url => { :action => 'send_grading_conflict_email' } do |form| %>
+<%= form_for :mailer, :url => { :action => 'send_grading_conflict_email' } do |form| %>
 
 <%= render :partial => 'review_table',
            :locals => {

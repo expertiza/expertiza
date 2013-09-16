@@ -1,8 +1,3 @@
-require 'helpers/course_helper'
-require 'helpers/analytic_helper'
-require 'models/analytic/assignment_analytic'
-require 'models/analytic/assignment_team_analytic'
-require 'models/analytic/course_analytic'
 class AnalyticController < ApplicationController
   include CourseHelper
   include AnalyticHelper

@@ -12,6 +12,12 @@ module ApplicationHelper
     end
   end
 
+  def flash_message(type)
+    if flash[type]
+      "<div class='flash_#{type.to_s}'>#{flash[type]}</div>".html_safe
+    end
+  end
+
   def self.get_user_role(l_user)
     user = nil
 

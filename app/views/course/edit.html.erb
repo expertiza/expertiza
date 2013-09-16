@@ -1,6 +1,6 @@
 <h1>Edit Course</h1>
 
-<% form_tag :action => 'update', :id => @course.id do %>
+<%= form_tag :action => 'update', :id => @course.id do %>
    <%= render :partial => 'course' %>
    <%= submit_tag "Update" %>   
 <% end %>

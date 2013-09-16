@@ -2,7 +2,6 @@ class AdviceController < ApplicationController
 
   # Modify the advice associated with a questionnaire
   def edit_advice
-    params[:id] = flash[:id]
     @questionnaire = get(Questionnaire, params[:id])
 
     for question in @questionnaire.questions
@@ -20,13 +19,10 @@ class AdviceController < ApplicationController
         QuestionnaireHelper::adjust_advice_size(@questionnaire, question)
       end
     end
-    @questionnaire = get(Questionnaire, params[:id])
   end
 
   # save the advice for a questionnaire
   def save_advice
-
-    params[:id] = flash[:id]
     @questionnaire = get(Questionnaire, params[:id])
 
     begin
@@ -34,10 +30,10 @@ class AdviceController < ApplicationController
         QuestionAdvice.update(advice_key, params[:advice][advice_key])
       end
       flash[:notice] = "The questionnaire's question advice was successfully saved"
-      redirect_to :action => 'list', :controller => 'questionnaire'
+      redirect_to :action => 'edit_advice', :id => params[:id]
 
     rescue ActiveRecord::RecordNotFound
-      render :action => 'edit_advice'
+      render :action => 'edit_advice', :id => params[:id]
     end
   end
 end

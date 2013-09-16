@@ -63,8 +63,7 @@ class QuestionnaireController < ApplicationController
       import if params['import']
 
       if params['view_advice']
-        flash[:id] = params[:id]
-        redirect_to :action => 'edit_advice', :id => params[:questionnaire][:id]
+        redirect_to :controller => 'advice', :action => 'edit_advice', :id => params[:questionnaire][:id]
       end
     #rescue
       #flash[:error] = $!

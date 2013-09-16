@@ -4,9 +4,7 @@ And /^I move to the "([^"]*)" page$/ do |assignment|
 end
 
 And /^I click the "([^"]*)" link$/ do |task|
-  if(!find_link('Accept').nil?)
-    click_link 'Accept'
-  end
+  first('#accept-link').try(:click)
 
   should have_link task
   click_link task

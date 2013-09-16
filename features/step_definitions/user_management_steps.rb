@@ -14,8 +14,8 @@ Given /I try to create a "([^"]+)" user named "([^"]*)"/ do |role,name|
   step "I fill in \"user[name]\" with \"#{name}\""
   step "I fill in \"user[fullname]\" with \"#{name}\""
   step "I fill in \"user[email]\" with \"#{name}@mailinator.com\""
-  step "I fill in \"user[clear_password]\" with \"password\""
-  step "I fill in \"user[clear_password_confirmation]\" with \"password\""
+  step "I fill in \"user[password]\" with \"password\""
+  step "I fill in \"user[password_confirmation]\" with \"password\""
   step "I press \"Create\""
 end
 

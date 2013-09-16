@@ -1,44 +1,47 @@
 source 'http://rubygems.org'
 
+gem 'rails', '~>3.0.0'
+
+gem 'bind-it'
 gem 'capistrano'
-gem 'expertiza-authlogic', '~> 2.1.6.1', :require => 'authlogic'
-gem 'fastercsv'
-gem 'gdata', :require => false
-gem 'gchartrb', :require => 'google_chart'
-gem 'hoptoad_notifier'
-gem 'mysql'
-gem 'rdoc'
-gem 'rails', '2.3.15'
-gem 'RedCloth'
-gem 'rake'
-gem 'rgl', :require => 'rgl/adjacency'
-gem 'rubyzip', :require => 'zip/zip'
-gem 'rdoc'
-gem 'engtagger'
-gem 'stanford-core-nlp', "0.3.0"
-gem 'rjb', "1.4.3"
-gem 'bind-it', "0.2.0"
-gem 'rwordnet'
-gem 'open-uri-cached'
 gem 'edavis10-ruby-web-search'
-#gem 'stemmer'
+gem 'engtagger'
+gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', :require => 'authlogic'
+gem 'fastercsv'
 gem 'ffi-aspell'
-gem 'nokogiri'
-gem 'seer'
 gem 'gchart'
+gem 'gchartrb', :require => 'google_chart'
+gem 'gdata', :require => false
+gem 'hoptoad_notifier'
+gem 'jquery-rails'
+gem 'mysql'
+gem 'nokogiri'
+gem 'open-uri-cached'
+gem 'rake'
+gem 'RedCloth'
+gem 'rgl', :require => 'rgl/adjacency'
+gem 'rjb'
+gem 'rubyzip', :require => 'zip/zip'
+gem 'rwordnet'
+gem 'seer'
+gem 'sprockets'
+gem 'stanford-core-nlp'
+gem 'superfish-rails'
+gem 'will_paginate'
+
 group :development do
-  gem 'mongrel'
-  gem 'ruby-debug'
+  gem 'debugger'
+  gem 'sqlite3-ruby', :require => 'sqlite3'
+  gem 'selenium-webdriver'
 end
 
 group :test do
-  gem "rspec-rails", "1.3.2"
-  gem 'cucumber', '1.1.4', :require => false
-  gem 'cucumber-rails', '0.3.2', :require => false
-  gem 'gherkin', '~> 2.7.6'
-  gem 'capybara', '0.3.9'
-  gem 'database_cleaner', '>= 0.5.0', :require => false
-  gem 'launchy', '0.4.0'
+  gem 'capybara'
+  gem 'cucumber-rails', require: false
+  gem 'database_cleaner'
+  gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
+  gem 'launchy'
+  gem "rspec-rails"
 end

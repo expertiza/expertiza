@@ -154,6 +154,6 @@ class Score < ActiveRecord::Base
     end
   end
 
-  require 'models/analytic/score_analytic'
+  require 'analytic/score_analytic'
   include ScoreAnalytic
 end

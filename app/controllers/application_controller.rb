@@ -1,62 +1,68 @@
-# Filters added to this controller will be run for all controllers in the application.
-# Likewise, all the methods added will be available for all controllers.
+require 'goldberg_filters'
+include GoldbergFilters
+
 class ApplicationController < ActionController::Base
+  before_filter :goldberg_security_filter
 
-  helper_method :current_user_session, :current_user, :current_user_role?
   protect_from_forgery unless Rails.env.test?
-  filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
   around_filter :set_time_zone
-  
+
   def set_time_zone
-      old_time_zone = Time.zone
-      logger.debug !(session[:user].nil?)
-      if (!(session[:user].nil?)) 
-          logger.debug "set timezone debug"
-          current_user_id = session[:user].id
-          preferredtimezone = User.find_by_id(current_user_id).timezonepref
-          logger.debug preferredtimezone
-          Time.zone = preferredtimezone if logged_in?
-      end
+    old_time_zone = Time.zone
+    logger.debug !(session[:user].nil?)
+    if (!(session[:user].nil?)) 
+      logger.debug "set timezone debug"
+      current_user_id = session[:user].id
+      preferredtimezone = User.find_by_id(current_user_id).timezonepref
+      logger.debug preferredtimezone
+      Time.zone = preferredtimezone if logged_in?
+    end
   ensure
-      yield
-      Time.zone = preferredtimezone
-  end
-  
-  def logged_in?
-      if(!(session[:user].nil?))
-          true
-      else
-          false
-      end
+    yield
+    Time.zone = preferredtimezone
   end
 
-  def authorize 
-    unless session[:user]
-      flash[:notice] = "Please log in."
-      redirect_to(:controller => 'user_sessions', :action => 'new')
+  def logged_in?
+    current_user
+  end
+
+  def authorize(args = {})
+    unless current_permission(args).allow?(params[:controller], params[:action])
+      flash[:warn] = 'Please log in.'
+      redirect_back
     end
+    @user = current_user
   end
-  
+
+  def current_permission(args = {})
+    @authority ||= Authority.new args.merge({
+      current_user: current_user
+    })
+  end
+  delegate :allow?, to: :current_permission
+  helper_method :allow?
+
+  def redirect_back(default = :root)
+    redirect_to request.env['HTTP_REFERER'] ? :back : default
+  end
+
   def current_user_role?
-    session[:user].role.name
+    current_user.role.name
   end
+  helper_method :current_user_role?
 
   private
-  def current_user_session
-    return @current_user_session if defined?(@current_user_session)
-    @current_user_session = UserSession.find
-  end
 
   def current_user
-    return @current_user if defined?(@current_user)
-    @current_user = current_user_session && current_user_session.record
+    @current_user ||= session[:user]
   end
+  helper_method :current_user
 
   def require_user
     unless current_user
       store_location
       flash[:notice] = "You must be logged in to access this page"
-      redirect_to session[:return_to]
+      redirect_back
       return false
     end
   end
@@ -86,7 +92,7 @@ class ApplicationController < ActionController::Base
     if constraint == nil or constraint == ''
       constraint = 'list_mine'
     end
-    
+
     ApplicationHelper::get_user_role(session[:user]).send(constraint, object_type, session[:user].id)
   end
 
@@ -95,7 +101,7 @@ class ApplicationController < ActionController::Base
     # because it is private and belongs to someone else), so catch the exceptions.
     ApplicationHelper::get_user_role(session[:user]).get(object_type, id, session[:user].id)
   end
-  
+
   def set_up_display_options(object_type)
     # Create a set that will be used to populate the dropbox when a user lists a set of objects (assgts., questionnaires, etc.)
     # Get the Instructor::questionnaire constant
@@ -104,7 +110,7 @@ class ApplicationController < ActionController::Base
     @display_option.name = 'list_mine'
     @display_option.name = params[:display_option][:name] if params[:display_option]
   end
-  
+
   # Use this method to validate the current user in order to avoid allowing users
   # to see unauthorized data.
   # Ex: return unless current_user_id?(params[:user_id])

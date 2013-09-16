@@ -54,7 +54,7 @@
         <h2>Upload next version of Code Files</h2>
     <% end %>
 
-    <% form_tag({:controller => 'review_files' , :action=>'submit_review_file',
+    <%= form_tag({:controller => 'review_files' , :action=>'submit_review_file',
                  :participant_id => @participant.id},
                 {:method => 'post', :enctype => "multipart/form-data",
                  :onSubmit => "return checkIfFileExists(uploaded_review_file.value,1);"}) do %>

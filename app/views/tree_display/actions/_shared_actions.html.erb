@@ -4,8 +4,7 @@
       { :controller => controller, :action=>'edit', :id => node.node_object_id},
       { :title => 'Edit ' + model.downcase } %>
     <%= link_to image_tag('/images/tree_view/delete-icon-24.png', :title => 'Delete ' + model.downcase),
-      { :controller => controller, :action=>'delete', :id => node.node_object_id },
-      { :title => 'Delete ' + model.downcase } %>
+      node.node_object, method: :delete  %>
     <% if Object.const_get(model).find(node.node_object_id).private %>
       <%= link_to image_tag('/images/tree_view/lock-off-disabled-icon-24.png', :title => 'Make public'),
         { :controller => controller, :action=>'toggle_access', :id => node.node_object_id },

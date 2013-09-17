@@ -179,12 +179,18 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :questionnaire do
+  resources :questionnaires do
     collection do
       post :toggle_access
       post :copy
     end
   end
+  resources :review_questionnaires, controller: :questionnaires
+  resources :metareview_questionnaires, controller: :questionnaires
+  resources :teammate_review_questionnaires, controller: :questionnaires
+  resources :survey_questionnaires, controller: :questionnaires
+  resources :global_survey_questionnaires, controller: :questionnaires
+  resources :course_evaluation_questionnaires, controller: :questionnaires
 
   resources :review_mapping do
     collection do
@@ -296,7 +302,7 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :team do
+  resources :teams do
     collection do
       get :list
     end

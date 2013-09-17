@@ -50,12 +50,12 @@ class ApplicationController < ActionController::Base
   end
   helper_method :current_user_role?
 
-  private
-
   def current_user
     @current_user ||= session[:user]
   end
   helper_method :current_user
+
+  private
 
   def require_user
     unless current_user

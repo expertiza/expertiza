@@ -54,11 +54,11 @@ class User < ActiveRecord::Base
   end
 
   def admin?
-    role.id == super_admin? || Role.admin if role
+    role == super_admin? || Role.admin
   end
 
   def super_admin?
-    role.id == Role.super_admin if role
+    role == Role.super_admin
   end
 
   def is_creator_of?(user)

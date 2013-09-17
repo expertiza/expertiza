@@ -1,4 +1,4 @@
-class QuestionnaireController < ApplicationController
+class QuestionnairesController < ApplicationController
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
@@ -20,7 +20,6 @@ class QuestionnaireController < ApplicationController
 
   # Remove a given questionnaire
   def delete
-
     @questionnaire = Questionnaire.find(params[:id])
 
     if @questionnaire
@@ -43,31 +42,29 @@ class QuestionnaireController < ApplicationController
     redirect_to :action => 'list', :controller => 'tree_display'
   end
 
-  # View a questionnaire
   def view
+    redirect_to action: :show
+  end
+
+  def show
     @questionnaire = Questionnaire.find(params[:id])
   end
 
   # Edit a questionnaire
   def edit
-    #begin
-      @questionnaire = Questionnaire.find(params[:id])
-      redirect_to :action => 'list' if @questionnaire == nil
+    @questionnaire = Questionnaire.find(params[:id])
+    redirect_to Questionnaire if @questionnaire == nil
 
-      if params['save']
-        @questionnaire.update_attributes(params[:questionnaire])
-        save
-      end
+    if params['save']
+      @questionnaire.update_attributes(params[:questionnaire])
+    end
 
-      export if params['export']
-      import if params['import']
+    export if params['export']
+    import if params['import']
 
-      if params['view_advice']
-        redirect_to :controller => 'advice', :action => 'edit_advice', :id => params[:questionnaire][:id]
-      end
-    #rescue
-      #flash[:error] = $!
-    #end
+    if params['view_advice']
+      redirect_to :controller => 'advice', :action => 'edit_advice', :id => params[:questionnaire][:id]
+    end
   end
 
   # Define a new questionnaire
@@ -90,7 +87,6 @@ class QuestionnaireController < ApplicationController
     @questionnaire.display_type = params[:questionnaire][:display_type]
   end
 
-  # Save the new questionnaire to the database
   def create
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
     if (session[:user]).role.name == "Teaching Assistant"
@@ -100,6 +96,21 @@ class QuestionnaireController < ApplicationController
     end
     save
     redirect_to :controller => 'tree_display', :action => 'list'
+  end
+
+  def update
+    @questionnaire = Questionnaire.find(params[:id])
+    if current_user.role == Role.ta
+      @questionnaire.instructor_id = Ta.get_my_instructor(current_user.id)
+    else
+      @questionnaire.instructor_id = current_user.id
+    end
+
+    if @questionnaire.update_attributes(params[:questionnaire])
+      redirect_to :controller => 'tree_display', :action => 'list'
+    else
+      render 'edit'
+    end
   end
 
   def edit_advice  ##Code used to be in this class, was removed.  I have not checked the other class.

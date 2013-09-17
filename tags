@@ -91,7 +91,6 @@ ArrayOfHashes	vendor/plugins/graphr-0-1-9/lib/graph/base_extensions.rb	/^class A
 Assessment360Controller	app/controllers/assessment360_controller.rb	/^class Assessment360Controller < ApplicationController$/;"	c
 Assignment	app/models/assignment.rb	/^class Assignment < ActiveRecord::Base$/;"	c
 AssignmentAnalytic	app/models/analytic/assignment_analytic.rb	/^module AssignmentAnalytic$/;"	m
-AssignmentController	app/controllers/assignment_controller.rb	/^class AssignmentController < ApplicationController$/;"	c
 AssignmentController	test/functional/assignment_controller_test.rb	/^class AssignmentController; def rescue_action(e) raise e end; end$/;"	c
 AssignmentControllerTest	test/functional/assignment_controller_test.rb	/^class AssignmentControllerTest < ActionController::TestCase$/;"	c
 AssignmentHelper	app/helpers/assignment_helper.rb	/^module AssignmentHelper$/;"	m
@@ -105,6 +104,7 @@ AssignmentSignupsController	app/controllers/assignment_signups_controller.rb	/^c
 AssignmentTeam	app/models/assignment_team.rb	/^class AssignmentTeam < Team$/;"	c
 AssignmentTeamAnalytic	app/models/analytic/assignment_team_analytic.rb	/^module AssignmentTeamAnalytic$/;"	m
 AssignmentTest	test/unit/assignment_test.rb	/^class AssignmentTest < ActiveSupport::TestCase$/;"	c
+AssignmentsController	app/controllers/assignments_controller.rb	/^class AssignmentsController < ApplicationController$/;"	c
 AuthController	app/controllers/auth_controller.rb	/^class AuthController < ApplicationController$/;"	c
 AuthController	test/functional/auth_controller_test.rb	/^class AuthController; def rescue_action(e) raise e end; end$/;"	c
 AuthControllerTest	test/functional/auth_controller_test.rb	/^class AuthControllerTest < ActionController::TestCase$/;"	c
@@ -650,12 +650,12 @@ QuestionaireTest	test/unit/rubric_test.rb	/^class QuestionaireTest < ActiveSuppo
 QuestionaireTest	test/unit/score_view_test.rb	/^class QuestionaireTest < ActiveSupport::TestCase$/;"	c
 Questionnaire	app/models/questionnaire.rb	/^class Questionnaire < ActiveRecord::Base$/;"	c
 QuestionnaireAnalytic	app/models/analytic/questionnaire_analytic.rb	/^module QuestionnaireAnalytic$/;"	m
-QuestionnaireController	app/controllers/questionnaire_controller.rb	/^class QuestionnaireController < ApplicationController$/;"	c
 QuestionnaireController	test/functional/questionnaire_controller_test.rb	/^ class QuestionnaireController;$/;"	c
 QuestionnaireControllerTest	test/functional/questionnaire_controller_test.rb	/^class QuestionnaireControllerTest < ActionController::TestCase$/;"	c	class:QuestionnaireController
 QuestionnaireHelper	app/helpers/questionnaire_helper.rb	/^module QuestionnaireHelper$/;"	m
 QuestionnaireNode	app/models/questionnaire_node.rb	/^class QuestionnaireNode < Node $/;"	c
 QuestionnaireTypeNode	app/models/questionnaire_type_node.rb	/^class QuestionnaireTypeNode < FolderNode  $/;"	c
+QuestionnairesController	app/controllers/questionnaires_controller.rb	/^class QuestionnairesController < ApplicationController$/;"	c
 QuestionsController	app/controllers/questions_controller.rb	/^class QuestionsController < ApplicationController$/;"	c
 RUNIT	vendor/plugins/graphr-0-1-9/tests/runtests.rb	/^module RUNIT$/;"	m
 Ra.Ha	public/javascripts/highcharts.js	/^b){for(var c in a)a[c]&&a[c]!==b&&a[c].destroy&&a[c].destroy(),delete a[c]}function Ra(a){$a||($a=U(wa));a&&$a.appendChild(a);$a.innerHTML=""}function qa(a,b){var c="Highcharts error #"+a+": www.highcharts.com\/errors\/"+a;if(b)throw c;else O.console&&console.log(c)}function ia(a){return parseFloat(a.toPrecision(14))}function Ha(a,b){xa=o(a,b.animation)}function Hb(){var a=N.global.useUTC,b=a?"getUTC":"get",c=a?"setUTC":"set";Za=a?Date.UTC:function(a,b,c,g,h,i){return(new Date(a,b,o(c,1),o(g,0),o(h,$/;"	f
@@ -745,6 +745,7 @@ ReviewMappingController	app/controllers/review_mapping_controller.rb	/^class Rev
 ReviewMappingController	test/functional/review_mapping_controller_test.rb	/^class ReviewMappingController; def rescue_action(e) raise e end; end$/;"	c
 ReviewMappingControllerTest	test/functional/review_mapping_controller_test.rb	/^class ReviewMappingControllerTest < ActionController::TestCase$/;"	c
 ReviewQuestionnaire	app/models/review_questionnaire.rb	/^class ReviewQuestionnaire < Questionnaire$/;"	c
+ReviewQuestionnairesController	app/controllers/review_questionnaires_controller.rb	/^class ReviewQuestionnairesController < QuestionnairesController$/;"	c
 ReviewResponseMap	app/models/review_response_map.rb	/^class ReviewResponseMap < ResponseMap$/;"	c
 ReviewResponseMapTest	test/unit/review_response_map_test.rb	/^class ReviewResponseMapTest < ActiveSupport::TestCase$/;"	c
 Reviewer	lib/hamer.rb	/^    class Reviewer$/;"	c	class:Hamer.Test
@@ -839,7 +840,7 @@ SystemSettingsController	app/controllers/system_settings_controller.rb	/^class S
 Ta	app/models/ta.rb	/^class Ta < User$/;"	c
 TaMapping	app/models/ta_mapping.rb	/^class TaMapping < ActiveRecord::Base$/;"	c
 Team	app/models/team.rb	/^class Team < ActiveRecord::Base$/;"	c
-TeamController	app/controllers/team_controller.rb	/^class TeamController < ApplicationController$/;"	c
+TeamController	app/controllers/teams_controller.rb	/^class TeamController < ApplicationController$/;"	c
 TeamControllerTest	test/functional/team_controller_test.rb	/^class TeamControllerTest < ActionController::TestCase$/;"	c
 TeamControllerTest	test/unit/invitation_controller_test.rb	/^class TeamControllerTest < ActionController::TestCase$/;"	c
 TeamExistsError	app/models/team_exists_error.rb	/^class TeamExistsError < StandardError$/;"	c
@@ -1075,7 +1076,7 @@ add_self_reviewer	app/controllers/review_mapping_controller.rb	/^  def add_self_
 add_signup_topics	app/controllers/sign_up_sheet_controller.rb	/^  def add_signup_topics$/;"	f	class:SignUpSheetController
 add_signup_topics_staggered	app/controllers/sign_up_sheet_controller.rb	/^  def add_signup_topics_staggered$/;"	f	class:SignUpSheetController
 add_ta	app/controllers/course_controller.rb	/^  def add_ta$/;"	f	class:CourseController
-add_to_delayed_queue	app/controllers/assignment_controller.rb	/^  def add_to_delayed_queue$/;"	f	class:AssignmentController
+add_to_delayed_queue	app/controllers/assignments_controller.rb	/^  def add_to_delayed_queue$/;"	f	class:AssignmentsController
 add_to_links	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def add_to_links(link)$/;"	f	class:DirectedGraph
 add_user_to_assignment	app/controllers/review_mapping_controller.rb	/^  def add_user_to_assignment$/;"	f	class:ReviewMappingController
 add_user_to_assignment	app/helpers/participants_helper.rb	/^  def self.add_user_to_assignment(params, user)$/;"	F
@@ -1174,7 +1175,7 @@ assignment_min_scores	app/models/analytic/course_analytic.rb	/^  def assignment_
 assignment_questionnaire	app/helpers/assignment_helper.rb	/^  def assignment_questionnaire(assignment, type)$/;"	f	class:AssignmentHelper
 assignment_review_counts	app/models/analytic/course_analytic.rb	/^  def assignment_review_counts$/;"	f	class:CourseAnalytic
 assignment_team_counts	app/models/analytic/course_analytic.rb	/^  def assignment_team_counts$/;"	f	class:CourseAnalytic
-associate_assignment_to_course	app/controllers/assignment_controller.rb	/^  def associate_assignment_to_course$/;"	f	class:AssignmentController.copy
+associate_assignment_to_course	app/controllers/assignments_controller.rb	/^  def associate_assignment_to_course$/;"	f	class:AssignmentsController.copy
 associated_courses	app/helpers/course_helper.rb	/^  def associated_courses(user)$/;"	f	class:CourseHelper
 augmentWidthOrHeight	public/javascripts/jquery-1.9.1.js	/^function augmentWidthOrHeight( elem, name, extra, isBorderBox, styles ) {$/;"	f
 augmentWidthOrHeight	public/javascripts/jquery.js	/^function augmentWidthOrHeight( elem, name, extra, isBorderBox, styles ) {$/;"	f
@@ -1217,7 +1218,7 @@ before_destroy	vendor/plugins/acts_as_nested_set/lib/active_record/acts/nested_s
 before_save	app/models/content_page.rb	/^  def before_save$/;"	f	class:ContentPage
 begin_survey	app/controllers/survey_response_controller.rb	/^  def begin_survey$/;"	f	class:SurveyResponseController
 below	app/models/menu_item.rb	/^  def below$/;"	f	class:MenuItem
-bequeath	app/controllers/team_controller.rb	/^ def bequeath$/;"	f	class:TeamController
+bequeath	app/controllers/teams_controller.rb	/^ def bequeath$/;"	f	class:TeamController
 bequeath_all	app/controllers/participants_controller.rb	/^ def bequeath_all   $/;"	f	class:ParticipantsController
 between?	vendor/plugins/craken/lib/enumeration.rb	/^  def between?(a,b)$/;"	f	class:Enumeration
 break_at_coordinating_conjunctions	app/models/automated_metareview/sentence_state.rb	/^  def break_at_coordinating_conjunctions(str_with_pos_tags)$/;"	f	class:SentenceState
@@ -1308,7 +1309,7 @@ clear_files	vendor/plugins/rails_upgrade/test/application_checker_test.rb	/^  de
 clear_session	app/controllers/auth_controller.rb	/^  def self.clear_session(session)$/;"	F	class:AuthController
 clear_user_info	app/controllers/auth_controller.rb	/^  def self.clear_user_info(session, assignment_id)$/;"	F	class:AuthController
 cloneCopyEvent	public/javascripts/jquery-1.9.1.js	/^function cloneCopyEvent( src, dest ) {$/;"	f
-clone_questionnaire_details	app/controllers/questionnaire_controller.rb	/^  def clone_questionnaire_details(questions)$/;"	f	class:QuestionnaireController
+clone_questionnaire_details	app/controllers/questionnaires_controller.rb	/^  def clone_questionnaire_details(questions)$/;"	f	class:QuestionnairesController
 cnLeft	public/javascripts/datetimepicker.js	/^var cnLeft="500";\/\/left coordinate of calendar window$/;"	v
 cnTop	public/javascripts/datetimepicker.js	/^var cnTop="200";\/\/top coordinate of calendar window.$/;"	v
 coerce	vendor/plugins/craken/lib/enumeration.rb	/^  def coerce(o)$/;"	f	class:Enumeration
@@ -1374,7 +1375,7 @@ contributor_to_review	app/models/assignment.rb	/^  def contributor_to_review(rev
 contributors	app/models/assignment.rb	/^  def contributors$/;"	f	class:Assignment
 controller	app/models/controller_action.rb	/^  def controller$/;"	f	class:ControllerAction
 controller_action	app/models/menu.rb	/^    def controller_action$/;"	f	class:Menu.Node
-controller_actions	app/controllers/site_controllers_controller.rb	/^  def controller_actions(controller_name)$/;"	f	class:SiteControllersController.classify_controllers
+controller_actions	app/controllers/site_controllers_controller.rb	/^  def controller_actions(controller_name)$/;"	f	class:SiteControllersController
 controller_actions	db/goldberg_db_postgresql.sql	/^CREATE TABLE controller_actions ($/;"	t
 controller_actions.id	db/goldberg_db_postgresql.sql	/^    id serial NOT NULL,$/;"	F
 controller_actions.name	db/goldberg_db_postgresql.sql	/^    name character varying(255) NOT NULL,$/;"	F
@@ -1382,9 +1383,9 @@ controller_actions.permission_id	db/goldberg_db_postgresql.sql	/^    permission_
 controller_actions.site_controller_id	db/goldberg_db_postgresql.sql	/^    site_controller_id integer NOT NULL,$/;"	F
 controller_name	vendor/gems/hoptoad_notifier-2.4.4/test/javascript_notifier_test.rb	/^    def controller_name$/;"	f	class:JavascriptNotifierTest.FakeController
 converged	lib/hamer.rb	/^  def self.converged?(a, b, options={:precision => 2})$/;"	F	class:Hamer
-copy	app/controllers/assignment_controller.rb	/^  def copy$/;"	f	class:AssignmentController
+copy	app/controllers/assignments_controller.rb	/^  def copy$/;"	f	class:AssignmentsController
 copy	app/controllers/course_controller.rb	/^  def copy$/;"	f	class:CourseController
-copy	app/controllers/questionnaire_controller.rb	/^  def copy$/;"	f	class:QuestionnaireController
+copy	app/controllers/questionnaires_controller.rb	/^  def copy$/;"	f	class:QuestionnairesController
 copy	app/models/assignment_participant.rb	/^  def copy(course_id)$/;"	f	class:AssignmentParticipant.get_cycle_similarity_score.get_cycle_deviation_score
 copy	app/models/assignment_team.rb	/^  def copy(course_id)$/;"	f	class:AssignmentTeam
 copy	app/models/course_participant.rb	/^  def copy(assignment_id)$/;"	f	class:CourseParticipant
@@ -1392,7 +1393,7 @@ copy	app/models/course_team.rb	/^ def copy(assignment_id)$/;"	f	class:CourseTeam
 copy	app/models/due_date.rb	/^  def self.copy(old_assignment_id, new_assignment_id)$/;"	F	class:DueDate
 copy_members	app/models/team.rb	/^  def copy_members(new_team)$/;"	f	class:Team
 copy_participants	app/models/course.rb	/^  def copy_participants(assignment_id)$/;"	f	class:Course
-copy_participants_from_course	app/controllers/assignment_controller.rb	/^  def copy_participants_from_course$/;"	f	class:AssignmentController
+copy_participants_from_course	app/controllers/assignments_controller.rb	/^  def copy_participants_from_course$/;"	f	class:AssignmentsController
 copy_selected_file	app/controllers/submitted_content_controller.rb	/^  def copy_selected_file$/;"	f
 count	vendor/plugins/dynamic_form/test/dynamic_form_test.rb	/^        def count() 1 end$/;"	f	class:DynamicFormTest.setup_post
 count	vendor/plugins/dynamic_form/test/dynamic_form_test.rb	/^        def count() 1 end$/;"	f	class:setup_user.[]
@@ -1400,9 +1401,9 @@ count	vendor/plugins/dynamic_form/test/dynamic_form_test.rb	/^      def count$/;
 course_list	app/controllers/analytic_controller.rb	/^  def course_list$/;"	f	class:AnalyticController
 course_options	app/helpers/assignment_helper.rb	/^  def course_options(instructor)$/;"	f	class:AssignmentHelper
 create	app/controllers/advertise_for_partner_controller.rb	/^  def create$/;"	f	class:AdvertiseForPartnerController
-create	app/controllers/assignment_controller.rb	/^  def create$/;"	f	class:AssignmentController
 create	app/controllers/assignment_questionnaire_controller.rb	/^  def create$/;"	f	class:AssignmentQuestionnaireController
 create	app/controllers/assignment_signups_controller.rb	/^  def create        $/;"	f	class:AssignmentSignupsController
+create	app/controllers/assignments_controller.rb	/^  def create$/;"	f	class:AssignmentsController
 create	app/controllers/content_pages_controller.rb	/^  def create$/;"	f	class:ContentPagesController
 create	app/controllers/controller_actions_controller.rb	/^  def create$/;"	f	class:ControllerActionsController
 create	app/controllers/course_controller.rb	/^  def create$/;"	f	class:CourseController
@@ -1415,7 +1416,7 @@ create	app/controllers/menu_items_controller.rb	/^  def create$/;"	f	class:MenuI
 create	app/controllers/permissions_controller.rb	/^  def create$/;"	f	class:PermissionsController
 create	app/controllers/pg_users_controller.rb	/^  def self.create(role, controller, success_action, failure_action)$/;"	F	class:PgUsersController
 create	app/controllers/question_types_controller.rb	/^  def create$/;"	f	class:QuestionTypesController
-create	app/controllers/questionnaire_controller.rb	/^  def create$/;"	f	class:QuestionnaireController
+create	app/controllers/questionnaires_controller.rb	/^  def create$/;"	f	class:QuestionnairesController
 create	app/controllers/questions_controller.rb	/^  def create$/;"	f	class:QuestionsController
 create	app/controllers/response_controller.rb	/^  def create     $/;"	f	class:ResponseController
 create	app/controllers/roles_controller.rb	/^  def create$/;"	f	class:RolesController
@@ -1427,7 +1428,7 @@ create	app/controllers/suggestion_controller.rb	/^  def create    $/;"	f	class:S
 create	app/controllers/survey_deployment_controller.rb	/^  def create$/;"	f	class:SurveyDeploymentController
 create	app/controllers/survey_response_controller.rb	/^  def create$/;"	f	class:SurveyResponseController
 create	app/controllers/system_settings_controller.rb	/^  def create$/;"	f	class:SystemSettingsController
-create	app/controllers/team_controller.rb	/^ def create$/;"	f	class:TeamController
+create	app/controllers/teams_controller.rb	/^ def create$/;"	f	class:TeamController
 create	app/controllers/teams_participants_controller.rb	/^  def create    $/;"	f	class:TeamsParticipantsController
 create	app/controllers/teams_users_controller.rb	/^  def create    $/;"	f	class:TeamsUsersController
 create	app/controllers/users_controller.rb	/^  def create$/;"	f	class:UsersController
@@ -1463,8 +1464,8 @@ create_team	db/migrate/102_standardize_review_mappings.rb	/^  def self.create_te
 create_team_and_node	app/models/assignment_team.rb	/^  def self.create_team_and_node(assignment_id)$/;"	F	class:AssignmentTeam
 create_team_and_node	app/models/course_team.rb	/^  def self.create_team_and_node(course_id)$/;"	F	class:CourseTeam
 create_team_users	app/helpers/manage_team_helper.rb	/^  def create_team_users(user, team_id)$/;"	f	class:ManageTeamHelper
-create_teams	app/controllers/team_controller.rb	/^def create_teams$/;"	f	class:TeamController
-create_teams_view	app/controllers/team_controller.rb	/^def create_teams_view$/;"	f	class:TeamController
+create_teams	app/controllers/teams_controller.rb	/^def create_teams$/;"	f	class:TeamController
+create_teams_view	app/controllers/teams_controller.rb	/^def create_teams_view$/;"	f	class:TeamController
 create_topic_deadline	app/controllers/sign_up_sheet_controller.rb	/^  def create_topic_deadline(due_date, offset, topic_id)$/;"	f	class:SignUpSheetController
 create_topic_deadline	app/helpers/deadline_helper.rb	/^  def create_topic_deadline(due_date, offset, topic_id)$/;"	f	class:DeadlineHelper
 creator	app/models/user.rb	/^  def creator$/;"	f	class:User
@@ -1512,17 +1513,17 @@ define_attributes	app/helpers/import_file_helper.rb	/^  def self.define_attribut
 define_attributes	app/helpers/import_topics_helper.rb	/^  def self.define_attributes(row)$/;"	F	class:ImportTopicsHelper
 define_attributes	app/helpers/participants_helper.rb	/^  def self.define_attributes(line_split, config)   $/;"	F
 define_constant	vendor/gems/hoptoad_notifier-2.4.4/test/helper.rb	/^  def define_constant(name, value)$/;"	f	class:DefinesConstants
-define_instructor_notification_limit	app/controllers/assignment_controller.rb	/^  def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)$/;"	f	class:AssignmentController.copy
+define_instructor_notification_limit	app/controllers/assignments_controller.rb	/^  def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)$/;"	f	class:AssignmentsController.copy
 define_user	app/helpers/participants_helper.rb	/^  def self.define_user(attrs, session, params, home_page)$/;"	F
 delayhidemenu.clearhidemenu	public/javascripts/balloontip.js	/^function clearhidemenu(){$/;"	f
-delete	app/controllers/assignment_controller.rb	/^  def delete$/;"	f	class:AssignmentController.copy
+delete	app/controllers/assignments_controller.rb	/^  def delete$/;"	f	class:AssignmentsController.copy
 delete	app/controllers/course_controller.rb	/^  def delete$/;"	f	class:CourseController
 delete	app/controllers/participants_controller.rb	/^  def delete$/;"	f	class:ParticipantsController
-delete	app/controllers/questionnaire_controller.rb	/^  def delete$/;"	f	class:QuestionnaireController
+delete	app/controllers/questionnaires_controller.rb	/^  def delete$/;"	f	class:QuestionnairesController
 delete	app/controllers/response_controller.rb	/^  def delete$/;"	f	class:ResponseController
 delete	app/controllers/sign_up_sheet_controller.rb	/^  def delete$/;"	f	class:SignUpSheetController
 delete	app/controllers/survey_deployment_controller.rb	/^   def delete$/;"	f	class:SurveyDeploymentController
-delete	app/controllers/team_controller.rb	/^ def delete   $/;"	f	class:TeamController
+delete	app/controllers/teams_controller.rb	/^ def delete   $/;"	f	class:TeamController
 delete	app/controllers/teams_participants_controller.rb	/^  def delete$/;"	f	class:TeamsParticipantsController
 delete	app/controllers/teams_users_controller.rb	/^  def delete$/;"	f	class:TeamsUsersController
 delete	app/models/assignment.rb	/^  def delete(force = nil)$/;"	f	class:Assignment
@@ -1541,23 +1542,23 @@ delete	db/migrate/099_standardize_review_of_review_mappings.rb	/^  def self.dele
 delete	db/migrate/102_standardize_review_mappings.rb	/^  def self.delete(mapping, reason)$/;"	F	class:StandardizeReviewMappings
 delete_all	app/controllers/assignment_questionnaire_controller.rb	/^  def delete_all$/;"	f	class:AssignmentQuestionnaireController
 delete_all	app/controllers/due_date_controller.rb	/^  def delete_all$/;"	f	class:DueDateController
-delete_all	app/controllers/team_controller.rb	/^def delete_all$/;"	f	class:TeamController
+delete_all	app/controllers/teams_controller.rb	/^def delete_all$/;"	f	class:TeamController
 delete_all_by_parent	app/models/team.rb	/^  def self.delete_all_by_parent(parent)$/;"	F	class:Team
-delete_all_due_dates	app/controllers/assignment_controller.rb	/^  def delete_all_due_dates$/;"	f	class:AssignmentController
+delete_all_due_dates	app/controllers/assignments_controller.rb	/^  def delete_all_due_dates$/;"	f	class:AssignmentsController
 delete_all_metareviewers	app/controllers/review_mapping_controller.rb	/^  def delete_all_metareviewers    $/;"	f	class:ReviewMappingController
-delete_all_questionnaires	app/controllers/assignment_controller.rb	/^  def delete_all_questionnaires$/;"	f	class:AssignmentController
+delete_all_questionnaires	app/controllers/assignments_controller.rb	/^  def delete_all_questionnaires$/;"	f	class:AssignmentsController
 delete_all_reviewers	app/controllers/review_mapping_controller.rb	/^  def delete_all_reviewers      $/;"	f	class:ReviewMappingController
 delete_all_reviewers_and_metareviewers	app/controllers/review_mapping_controller.rb	/^  def delete_all_reviewers_and_metareviewers$/;"	f	class:ReviewMappingController
 delete_assignment_participant	app/controllers/participants_controller.rb	/^  def delete_assignment_participant$/;"	f	class:ParticipantsController
 delete_at_indices	vendor/plugins/graphr-0-1-9/lib/graph/base_extensions.rb	/^  def delete_at_indices(indices = [])$/;"	f	class:Array
 delete_directory	app/helpers/file_helper.rb	/^  def self.delete_directory(in_object)$/;"	F	class:FileHelper
 delete_display	app/controllers/participants_controller.rb	/^  def delete_display$/;"	f	class:ParticipantsController
-delete_from_delayed_queue	app/controllers/assignment_controller.rb	/^  def delete_from_delayed_queue(delayed_job_id)$/;"	f	class:AssignmentController
+delete_from_delayed_queue	app/controllers/assignments_controller.rb	/^  def delete_from_delayed_queue(delayed_job_id)$/;"	f	class:AssignmentsController
 delete_items	app/controllers/participants_controller.rb	/^  def delete_items$/;"	f	class:ParticipantsController
 delete_mappings	app/models/response_map.rb	/^  def self.delete_mappings(mappings, force=nil)$/;"	F	class:ResponseMap
 delete_metareview	app/controllers/review_mapping_controller.rb	/^  def delete_metareview$/;"	f	class:ReviewMappingController
 delete_metareviewer	app/controllers/review_mapping_controller.rb	/^  def delete_metareviewer$/;"	f	class:ReviewMappingController
-delete_questions	app/controllers/questionnaire_controller.rb	/^  def delete_questions(questionnaire_id)$/;"	f	class:QuestionnaireController
+delete_questions	app/controllers/questionnaires_controller.rb	/^  def delete_questions(questionnaire_id)$/;"	f	class:QuestionnairesController
 delete_review	app/controllers/review_mapping_controller.rb	/^  def delete_review$/;"	f	class:ReviewMappingController
 delete_reviewer	app/controllers/review_mapping_controller.rb	/^  def delete_reviewer$/;"	f	class:ReviewMappingController
 delete_selected	app/controllers/teams_participants_controller.rb	/^  def delete_selected$/;"	f	class:TeamsParticipantsController
@@ -1833,8 +1834,8 @@ each_node_in_links	vendor/plugins/graphr-0-1-9/lib/graph/graphviz_dot.rb	/^  def
 each_reachable_node_once_breadth_first	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def each_reachable_node_once_breadth_first(node, inclusive = true, &block)$/;"	f	class:DirectedGraph
 each_reachable_node_once_depth_first	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def each_reachable_node_once_depth_first(node, inclusive = true, &block)$/;"	f	class:DirectedGraph
 edit	app/controllers/advertise_for_partner_controller.rb	/^  def edit$/;"	f	class:AdvertiseForPartnerController
-edit	app/controllers/assignment_controller.rb	/^  def edit$/;"	f	class:AssignmentController
 edit	app/controllers/assignment_signups_controller.rb	/^  def edit$/;"	f	class:AssignmentSignupsController
+edit	app/controllers/assignments_controller.rb	/^  def edit$/;"	f	class:AssignmentsController
 edit	app/controllers/content_pages_controller.rb	/^  def edit$/;"	f	class:ContentPagesController
 edit	app/controllers/controller_actions_controller.rb	/^  def edit$/;"	f	class:ControllerActionsController
 edit	app/controllers/course_controller.rb	/^  def edit$/;"	f	class:CourseController
@@ -1846,7 +1847,7 @@ edit	app/controllers/menu_items_controller.rb	/^  def edit$/;"	f	class:MenuItems
 edit	app/controllers/permissions_controller.rb	/^  def edit$/;"	f	class:PermissionsController
 edit	app/controllers/profile_controller.rb	/^  def edit $/;"	f	class:ProfileController
 edit	app/controllers/question_types_controller.rb	/^  def edit$/;"	f	class:QuestionTypesController
-edit	app/controllers/questionnaire_controller.rb	/^  def edit$/;"	f	class:QuestionnaireController
+edit	app/controllers/questionnaires_controller.rb	/^  def edit$/;"	f	class:QuestionnairesController
 edit	app/controllers/questions_controller.rb	/^  def edit$/;"	f	class:QuestionsController
 edit	app/controllers/response_controller.rb	/^  def edit$/;"	f	class:ResponseController
 edit	app/controllers/roles_controller.rb	/^  def edit$/;"	f	class:RolesController
@@ -1856,11 +1857,11 @@ edit	app/controllers/site_controllers_controller.rb	/^  def edit$/;"	f	class:Sit
 edit	app/controllers/student_team_controller.rb	/^  def edit $/;"	f	class:StudentTeamController
 edit	app/controllers/submitted_content_controller.rb	/^  def edit$/;"	f	class:SubmittedContentController
 edit	app/controllers/system_settings_controller.rb	/^  def edit$/;"	f	class:SystemSettingsController
-edit	app/controllers/team_controller.rb	/^ def edit$/;"	f	class:TeamController
+edit	app/controllers/teams_controller.rb	/^ def edit$/;"	f	class:TeamController
 edit	app/controllers/users_controller.rb	/^  def edit$/;"	f	class:UsersController
 edit	app/controllers/waitlists_controller.rb	/^  def edit$/;"	f	class:WaitlistsController
 edit_advice	app/controllers/advice_controller.rb	/^  def edit_advice$/;"	f	class:AdviceController
-edit_advice	app/controllers/questionnaire_controller.rb	/^  def edit_advice  ##Code used to be in this class, was removed.  I have not checked the other class.$/;"	f	class:QuestionnaireController
+edit_advice	app/controllers/questionnaires_controller.rb	/^  def edit_advice  ##Code used to be in this class, was removed.  I have not checked the other class.$/;"	f	class:QuestionnairesController
 effective_permission_id	app/models/controller_action.rb	/^  def effective_permission_id$/;"	f	class:ControllerAction
 element.ontouchstart	public/javascripts/highcharts.js	/^css:function(a){var b=this.element,b=a&&a.width&&b.nodeName.toLowerCase()==="text",c,d="",e=function(a,b){return"-"+b.toLowerCase()};if(a&&a.color)a.fill=a.color;this.styles=a=v(this.styles,a);$&&b&&delete a.width;if(Da&&!Z)b&&delete a.width,L(this.element,a);else{for(c in a)d+=c.replace(\/([A-Z])\/g,e)+":"+a[c]+";";this.attr({style:d})}b&&this.added&&this.renderer.buildText(this);return this},on:function(a,b){if(fb&&a==="click")this.element.ontouchstart=function(a){a.preventDefault();b()};this.element["on"+$/;"	f
 email	app/models/assignment.rb	/^  def email(author_id)$/;"	f	class:Assignment
@@ -1896,7 +1897,7 @@ exception_class	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/rails3_t
 exception_class	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/tasks.rb	/^      def exception_class$/;"	f	class:ApplicationController
 expand_multiple	vendor/plugins/gc4r/lib/gc4r.rb	/^    def expand_multiple data, delimiter = "|"$/;"	f	class:GC4R.GoogleChartsObject
 export	app/controllers/export_file_controller.rb	/^  def export$/;"	f	class:ExportFileController
-export	app/controllers/questionnaire_controller.rb	/^  def export$/;"	f	class:QuestionnaireController
+export	app/controllers/questionnaires_controller.rb	/^  def export$/;"	f	class:QuestionnairesController
 export	app/models/assignment.rb	/^  def self.export(csv, parent_id, options)$/;"	F	class:Assignment
 export	app/models/assignment_participant.rb	/^  def self.export(csv,parent_id,options)$/;"	F	class:AssignmentParticipant.get_cycle_similarity_score.get_cycle_deviation_score
 export	app/models/assignment_team.rb	/^  def self.export(csv, parent_id, options)$/;"	F	class:AssignmentTeam
@@ -2202,7 +2203,7 @@ get_participant_type	app/models/course_team.rb	/^  def get_participant_type$/;"	
 get_participants	app/models/assignment_team.rb	/^  def get_participants$/;"	f	class:AssignmentTeam
 get_participants	app/models/course.rb	/^  def get_participants$/;"	f	class:Course
 get_participants	app/models/team.rb	/^  def get_participants$/;"	f	class:Team
-get_path	app/controllers/assignment_controller.rb	/^  def get_path$/;"	f	class:AssignmentController
+get_path	app/controllers/assignments_controller.rb	/^  def get_path$/;"	f	class:AssignmentsController
 get_path	app/models/assignment.rb	/^  def get_path$/;"	f	class:Assignment
 get_path	app/models/assignment_participant.rb	/^  def get_path$/;"	f	class:AssignmentParticipant.get_cycle_similarity_score.get_cycle_deviation_score
 get_path	app/models/assignment_team.rb	/^  def get_path$/;"	f	class:AssignmentTeam
@@ -2357,7 +2358,7 @@ ignore_user_agent_only=	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/
 ignored_class_names	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/notice.rb	/^    def ignored_class_names$/;"	f
 impersonate	app/controllers/impersonate_controller.rb	/^  def impersonate$/;"	f	class:ImpersonateController
 import	app/controllers/import_file_controller.rb	/^  def import    $/;"	f	class:ImportFileController
-import	app/controllers/questionnaire_controller.rb	/^  def import$/;"	f	class:QuestionnaireController
+import	app/controllers/questionnaires_controller.rb	/^  def import$/;"	f	class:QuestionnairesController
 import	app/models/assignment_participant.rb	/^  def self.import(row,session,id)    $/;"	F	class:AssignmentParticipant.get_cycle_similarity_score.get_cycle_deviation_score
 import	app/models/assignment_team.rb	/^  def self.import(row,session,assgt_id,options)$/;"	F	class:AssignmentTeam
 import	app/models/course_participant.rb	/^  def self.import(row,session,id)$/;"	F	class:CourseParticipant
@@ -2409,7 +2410,7 @@ index	app/controllers/waitlists_controller.rb	/^  def index$/;"	f	class:Waitlist
 indices	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def indices(anInteger)$/;"	f	class:BooleanMatrix
 info	vendor/gems/hoptoad_notifier-2.4.4/test/helper.rb	/^  def info(*args);  end$/;"	f	class:FakeLogger
 inherit	app/controllers/participants_controller.rb	/^ def inherit$/;"	f	class:ParticipantsController
-inherit	app/controllers/team_controller.rb	/^ def inherit$/;"	f	class:TeamController
+inherit	app/controllers/teams_controller.rb	/^ def inherit$/;"	f	class:TeamController
 inherited	vendor/plugins/graphr-0-1-9/tests/runtests.rb	/^    def TestCase.inherited(subclass)$/;"	F	class:RUNIT.TestCase
 init	app/controllers/analytic_controller.rb	/^  def init$/;"	f	class:AnalyticController
 init	app/helpers/dynamic_review_mapping.rb	/^  def init()$/;"	f	class:DynamicReviewMapping
@@ -2589,8 +2590,8 @@ links_from_to?	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def l
 links_to	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def links_to(node)$/;"	f	class:BackLinkedDirectedGraph
 links_to_from	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def links_to_from(to, from)$/;"	f	class:BackLinkedDirectedGraph
 list	app/controllers/application_controller.rb	/^  def list(object_type)$/;"	f	class:ApplicationController
-list	app/controllers/assignment_controller.rb	/^  def list$/;"	f	class:AssignmentController.copy
 list	app/controllers/assignment_signups_controller.rb	/^  def list$/;"	f	class:AssignmentSignupsController
+list	app/controllers/assignments_controller.rb	/^  def list$/;"	f	class:AssignmentsController.copy
 list	app/controllers/automated_metareviews_controller.rb	/^  def list$/;"	f	class:AutomatedMetareviewsController
 list	app/controllers/content_pages_controller.rb	/^  def list$/;"	f	class:ContentPagesController
 list	app/controllers/controller_actions_controller.rb	/^  def list$/;"	f	class:ControllerActionsController
@@ -2611,7 +2612,7 @@ list	app/controllers/student_task_controller.rb	/^  def list$/;"	f	class:Student
 list	app/controllers/suggestion_controller.rb	/^  def list$/;"	f	class:SuggestionController
 list	app/controllers/survey_deployment_controller.rb	/^  def list$/;"	f	class:SurveyDeploymentController
 list	app/controllers/system_settings_controller.rb	/^  def list$/;"	f	class:SystemSettingsController
-list	app/controllers/team_controller.rb	/^ def list$/;"	f	class:TeamController
+list	app/controllers/teams_controller.rb	/^ def list$/;"	f	class:TeamController
 list	app/controllers/teams_participants_controller.rb	/^  def list$/;"	f	class:TeamsParticipantsController
 list	app/controllers/teams_users_controller.rb	/^  def list$/;"	f	class:TeamsUsersController
 list	app/controllers/tree_display_controller.rb	/^  def list$/;"	f	class:TreeDisplayController
@@ -2727,8 +2728,8 @@ name	app/models/teams_participant.rb	/^  def name$/;"	f	class:TeamsParticipant
 name	app/models/teams_user.rb	/^  def name$/;"	f	class:TeamsUser
 namespace	vendor/plugins/rails_upgrade/lib/routes_upgrader.rb	/^      def namespace(name, options = {})$/;"	f	class:Rails.Upgrading.RouteRedrawer
 new	app/controllers/advertise_for_partner_controller.rb	/^  def new$/;"	f	class:AdvertiseForPartnerController
-new	app/controllers/assignment_controller.rb	/^  def new$/;"	f	class:AssignmentController
 new	app/controllers/assignment_signups_controller.rb	/^  def new$/;"	f	class:AssignmentSignupsController
+new	app/controllers/assignments_controller.rb	/^  def new$/;"	f	class:AssignmentsController
 new	app/controllers/content_pages_controller.rb	/^  def new$/;"	f	class:ContentPagesController
 new	app/controllers/controller_actions_controller.rb	/^  def new$/;"	f	class:ControllerActionsController
 new	app/controllers/course_controller.rb	/^  def new$/;"	f	class:CourseController
@@ -2739,7 +2740,7 @@ new	app/controllers/markup_styles_controller.rb	/^  def new$/;"	f	class:MarkupSt
 new	app/controllers/menu_items_controller.rb	/^  def new$/;"	f	class:MenuItemsController
 new	app/controllers/permissions_controller.rb	/^  def new$/;"	f	class:PermissionsController
 new	app/controllers/question_types_controller.rb	/^  def new$/;"	f	class:QuestionTypesController
-new	app/controllers/questionnaire_controller.rb	/^  def new$/;"	f	class:QuestionnaireController
+new	app/controllers/questionnaires_controller.rb	/^  def new$/;"	f	class:QuestionnairesController
 new	app/controllers/questions_controller.rb	/^  def new$/;"	f	class:QuestionsController
 new	app/controllers/response_controller.rb	/^  def new$/;"	f	class:ResponseController
 new	app/controllers/roles_controller.rb	/^  def new$/;"	f	class:RolesController
@@ -2749,7 +2750,7 @@ new	app/controllers/site_controllers_controller.rb	/^  def new$/;"	f	class:SiteC
 new	app/controllers/suggestion_controller.rb	/^  def new$/;"	f	class:SuggestionController
 new	app/controllers/survey_deployment_controller.rb	/^  def new $/;"	f	class:SurveyDeploymentController
 new	app/controllers/system_settings_controller.rb	/^  def new$/;"	f	class:SystemSettingsController
-new	app/controllers/team_controller.rb	/^ def new$/;"	f	class:TeamController
+new	app/controllers/teams_controller.rb	/^ def new$/;"	f	class:TeamController
 new	app/controllers/teams_participants_controller.rb	/^  def new$/;"	f	class:TeamsParticipantsController
 new	app/controllers/teams_users_controller.rb	/^  def new$/;"	f	class:TeamsUsersController
 new	app/controllers/users_controller.rb	/^  def new$/;"	f	class:UsersController
@@ -2800,6 +2801,7 @@ opts_to_string	vendor/plugins/rails_upgrade/lib/routes_upgrader.rb	/^      def o
 or	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def or(index1, index2)$/;"	f	class:BooleanMatrix
 otherConfirmedTopicforUser	app/controllers/sign_up_sheet_controller.rb	/^  def otherConfirmedTopicforUser(assignment_id, creator_id)$/;"	f	class:SignUpSheetController
 otherConfirmedTopicforUser	app/controllers/signup_controller.rb	/^  def otherConfirmedTopicforUser(assignment_id, creator_id)$/;"	f	class:SignupController
+other_roles	app/models/role.rb	/^  def other_roles$/;"	f	class:Role.rebuild_cache
 others_work	app/controllers/student_task_controller.rb	/^  def others_work$/;"	f	class:StudentTaskController
 output	vendor/plugins/rails_upgrade/lib/gemfile_generator.rb	/^      def output$/;"	f	class:Rails.Upgrading.GemfileGenerator
 overlap	app/models/automated_metareview/wordnet_based_similarity.rb	/^def overlap(def1, def2, speller)$/;"	f	class:WordnetBasedSimilarity.find_stem_word
@@ -2815,7 +2817,6 @@ participants_popup	app/controllers/popup_controller.rb	/^def participants_popup$
 path_to	features/support/paths.rb	/^  def path_to(page_name)$/;"	f	class:NavigationHelpers
 perform	app/mailers/delayed_mailer.rb	/^  def perform$/;"	f	class:DelayedMailer
 permission	app/models/controller_action.rb	/^  def permission$/;"	f	class:ControllerAction
-permission	app/models/site_controller.rb	/^  def permission$/;"	f	class:SiteController
 permission_denied_page	app/models/system_settings.rb	/^  def permission_denied_page$/;"	f	class:SystemSettings
 permissions	db/goldberg_db_postgresql.sql	/^CREATE TABLE permissions ($/;"	t
 permissions.id	db/goldberg_db_postgresql.sql	/^    id serial NOT NULL,$/;"	F
@@ -2904,7 +2905,7 @@ reminder_thread	app/controllers/survey_deployment_controller.rb	/^  def reminder
 remove	app/controllers/advertise_for_partner_controller.rb	/^  def remove$/;"	f	class:AdvertiseForPartnerController
 remove	app/controllers/student_team_controller.rb	/^  def remove$/;"	f	class:StudentTeamController
 removeEvent	public/javascripts/sorttable.js	/^function removeEvent(element, type, handler) {$/;"	f
-remove_assignment_from_course	app/controllers/assignment_controller.rb	/^  def remove_assignment_from_course$/;"	f	class:AssignmentController.copy
+remove_assignment_from_course	app/controllers/assignments_controller.rb	/^  def remove_assignment_from_course$/;"	f	class:AssignmentsController.copy
 remove_empty_advice	app/helpers/response_helper.rb	/^  def remove_empty_advice(advices)$/;"	f	class:ResponseHelper
 remove_hyperlink	app/controllers/submitted_content_controller.rb	/^  def remove_hyperlink$/;"	f
 remove_hyperlink	app/models/assignment_participant.rb	/^  def remove_hyperlink(index)$/;"	f	class:AssignmentParticipant.get_cycle_similarity_score.get_cycle_deviation_score
@@ -2998,15 +2999,15 @@ s	public/javascripts/jquery-ui-1.10.3.custom.min.js	/^(function(e,t){function i(
 salt_first?	app/models/user.rb	/^  def salt_first?$/;"	f	class:User
 sanitize_filename	app/helpers/file_helper.rb	/^  def self.sanitize_filename(file_name)$/;"	F	class:FileHelper
 sanitize_folder	app/helpers/file_helper.rb	/^  def self.sanitize_folder(folder)$/;"	F	class:FileHelper
-save	app/controllers/questionnaire_controller.rb	/^  def save$/;"	f	class:QuestionnaireController
+save	app/controllers/questionnaires_controller.rb	/^  def save$/;"	f	class:QuestionnairesController
 save_administrator	app/controllers/admin_controller.rb	/^  def save_administrator # saves newly created administrator to database$/;"	f	class:AdminController
 save_advice	app/controllers/advice_controller.rb	/^  def save_advice$/;"	f	class:AdviceController
-save_advice	app/controllers/questionnaire_controller.rb	/^  def save_advice$/;"	f	class:QuestionnaireController
+save_advice	app/controllers/questionnaires_controller.rb	/^  def save_advice$/;"	f	class:QuestionnairesController
 save_dependency	app/models/topic_dependency.rb	/^  def self.save_dependency(topics)$/;"	F	class:TopicDependency
 save_mapping	app/helpers/dynamic_review_mapping.rb	/^  def save_mapping (round_num)$/;"	f	class:DynamicReviewMapping.assign_reviewers_for_team
-save_new_question_parameters	app/controllers/questionnaire_controller.rb	/^  def save_new_question_parameters(qid, q_num)$/;"	f	class:QuestionnaireController
-save_new_questions	app/controllers/questionnaire_controller.rb	/^  def save_new_questions(questionnaire_id)$/;"	f	class:QuestionnaireController
-save_questions	app/controllers/questionnaire_controller.rb	/^  def save_questions(questionnaire_id)$/;"	f	class:QuestionnaireController
+save_new_question_parameters	app/controllers/questionnaires_controller.rb	/^  def save_new_question_parameters(qid, q_num)$/;"	f	class:QuestionnairesController
+save_new_questions	app/controllers/questionnaires_controller.rb	/^  def save_new_questions(questionnaire_id)$/;"	f	class:QuestionnairesController
+save_questions	app/controllers/questionnaires_controller.rb	/^  def save_questions(questionnaire_id)$/;"	f	class:QuestionnairesController
 save_super_administrator	app/controllers/admin_controller.rb	/^  def save_super_administrator$/;"	f	class:AdminController
 save_topic_deadlines	app/controllers/sign_up_sheet_controller.rb	/^  def save_topic_deadlines$/;"	f	class:SignUpSheetController
 save_topic_dependencies	app/controllers/sign_up_sheet_controller.rb	/^  def save_topic_dependencies$/;"	f	class:SignUpSheetController
@@ -3020,7 +3021,7 @@ segment_text	app/models/automated_metareview/text_preprocessing.rb	/^def segment
 select	app/models/menu.rb	/^  def select(name)$/;"	f	class:Menu.initialize
 select_mapping	app/controllers/review_mapping_controller.rb	/^  def select_mapping$/;"	f	class:ReviewMappingController
 select_metareviewer	app/controllers/review_mapping_controller.rb	/^  def select_metareviewer$/;"	f	class:ReviewMappingController
-select_questionnaire_type	app/controllers/questionnaire_controller.rb	/^  def select_questionnaire_type$/;"	f	class:QuestionnaireController
+select_questionnaire_type	app/controllers/questionnaires_controller.rb	/^  def select_questionnaire_type$/;"	f	class:QuestionnairesController
 select_reviewer	app/controllers/review_mapping_controller.rb	/^  def select_reviewer$/;"	f	class:ReviewMappingController
 selected	app/models/menu.rb	/^  def selected$/;"	f	class:Menu.initialize
 selected?	app/models/menu.rb	/^  def selected?(menu_id)$/;"	f	class:Menu.initialize
@@ -3053,7 +3054,7 @@ set_courses_to_assignment	app/models/user.rb	/^  def set_courses_to_assignment $
 set_current_role	app/controllers/auth_controller.rb	/^  def self.set_current_role(role_id, session)$/;"	F	class:AuthController
 set_default_values	vendor/plugins/graphr-0-1-9/lib/graph/graphviz_dot.rb	/^  def set_default_values$/;"	f	class:DotGraphPrinter
 set_development_env	vendor/gems/hoptoad_notifier-2.4.4/test/notifier_test.rb	/^  def set_development_env$/;"	f	class:NotifierTest
-set_due_date	app/controllers/assignment_controller.rb	/^  def set_due_date$/;"	f	class:AssignmentController
+set_due_date	app/controllers/assignments_controller.rb	/^  def set_due_date$/;"	f	class:AssignmentsController
 set_duedate	app/models/due_date.rb	/^  def self.set_duedate (duedate, deadline, assign_id, max_round)$/;"	F	class:DueDate
 set_edge_attributes	vendor/plugins/graphr-0-1-9/lib/graph/graphviz_dot.rb	/^  def set_edge_attributes(anEdge, aHash)$/;"	f	class:DotGraphPrinter
 set_edge_labels	vendor/plugins/graphr-0-1-9/lib/graph/graphviz_dot.rb	/^  def set_edge_labels(edges)$/;"	f	class:DotGraphPrinter
@@ -3065,14 +3066,14 @@ set_node_attributes	vendor/plugins/graphr-0-1-9/lib/graph/graphviz_dot.rb	/^  de
 set_node_labels_and_shape	vendor/plugins/graphr-0-1-9/lib/graph/graphviz_dot.rb	/^  def set_node_labels_and_shape(nodes)$/;"	f	class:DotGraphPrinter
 set_public_env	vendor/gems/hoptoad_notifier-2.4.4/test/notifier_test.rb	/^  def set_public_env$/;"	f	class:NotifierTest
 set_publish_permission	app/controllers/publishing_controller.rb	/^  def set_publish_permission$/;"	f	class:PublishingController
-set_questionnaire	app/controllers/assignment_controller.rb	/^  def set_questionnaire$/;"	f	class:AssignmentController
+set_questionnaire	app/controllers/assignments_controller.rb	/^  def set_questionnaire$/;"	f	class:AssignmentsController
 set_semantic_labels_for_edges	app/models/automated_metareview/graph_generator.rb	/^def set_semantic_labels_for_edges$/;"	f	class:GraphGenerator.generate_graph.remove_redundant_edges
 set_start_due_date	app/controllers/sign_up_sheet_controller.rb	/^  def set_start_due_date(assignment_id, set_of_topics)$/;"	f	class:SignUpSheetController
 set_start_due_date	app/helpers/deadline_helper.rb	/^  def set_start_due_date(assignment_id,set_of_topics)$/;"	f	class:DeadlineHelper
 set_student_directory_num	app/models/assignment_participant.rb	/^  def set_student_directory_num$/;"	f	class:AssignmentParticipant.get_cycle_similarity_score.get_cycle_deviation_score
 set_time_zone	app/controllers/application_controller.rb	/^  def set_time_zone$/;"	f	class:ApplicationController
-set_up	app/controllers/assignment_controller.rb	/^  def set_up$/;"	f	class:AssignmentController
-set_up_defaults	app/controllers/assignment_controller.rb	/^  def set_up_defaults$/;"	f	class:AssignmentController
+set_up	app/controllers/assignments_controller.rb	/^  def set_up$/;"	f	class:AssignmentsController
+set_up_defaults	app/controllers/assignments_controller.rb	/^  def set_up_defaults$/;"	f	class:AssignmentsController
 set_up_display_options	app/controllers/application_controller.rb	/^  def set_up_display_options(object_type)$/;"	f	class:ApplicationController
 setup	app/models/menu.rb	/^    def setup(item)$/;"	f	class:Menu.Node
 setup	test/functional/advertise_for_partners_controller_test.rb	/^  def setup$/;"	f	class:JoinTeamRequestsControllerTest
@@ -3129,8 +3130,8 @@ setup_post	vendor/plugins/dynamic_form/test/dynamic_form_test.rb	/^  def setup_p
 setup_user	vendor/plugins/dynamic_form/test/dynamic_form_test.rb	/^  def setup_user$/;"	f
 sfEls	public/javascripts/suckerfish.js	/^		sfEls[i].onmouseover=function() {$/;"	c
 sfHover	public/javascripts/suckerfish.js	/^sfHover = function() {$/;"	f
-show	app/controllers/assignment_controller.rb	/^  def show$/;"	f	class:AssignmentController
 show	app/controllers/assignment_signups_controller.rb	/^  def show$/;"	f	class:AssignmentSignupsController
+show	app/controllers/assignments_controller.rb	/^  def show$/;"	f	class:AssignmentsController
 show	app/controllers/content_pages_controller.rb	/^  def show$/;"	f	class:ContentPagesController
 show	app/controllers/controller_actions_controller.rb	/^  def show$/;"	f	class:ControllerActionsController
 show	app/controllers/institutions_controller.rb	/^  def show$/;"	f	class:InstitutionsController
@@ -3762,9 +3763,9 @@ to_xml	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/notice.rb	/^    d
 toggleAll	public/javascripts/grading.js	/^  function toggleAll(numteams){    $/;"	f
 toggleTeam	public/javascripts/grading.js	/^  function toggleTeam(elementId){$/;"	f
 toggleTeams	public/javascripts/grading.js	/^  function toggleTeams(numteams,hidden){$/;"	f
-toggle_access	app/controllers/assignment_controller.rb	/^  def toggle_access$/;"	f	class:AssignmentController
+toggle_access	app/controllers/assignments_controller.rb	/^  def toggle_access$/;"	f	class:AssignmentsController
 toggle_access	app/controllers/course_controller.rb	/^  def toggle_access$/;"	f	class:CourseController
-toggle_access	app/controllers/questionnaire_controller.rb	/^  def toggle_access$/;"	f	class:QuestionnaireController
+toggle_access	app/controllers/questionnaires_controller.rb	/^  def toggle_access$/;"	f	class:QuestionnairesController
 toggle_col	app/helpers/dynamic_review_mapping.rb	/^  def toggle_col(position)$/;"	f	class:DynamicReviewMapping.assign_reviewers_for_team.restore.populate_row_matrices.populate_column_matrices.col_enough_zeros.col_enough_ones.toggle_zeros_row.toggle_zeros_col.toggle_row
 toggle_reminder_thread	app/controllers/survey_deployment_controller.rb	/^  def toggle_reminder_thread$/;"	f	class:SurveyDeploymentController
 toggle_row	app/helpers/dynamic_review_mapping.rb	/^  def toggle_row(position)$/;"	f	class:DynamicReviewMapping.assign_reviewers_for_team.restore.populate_row_matrices.populate_column_matrices.col_enough_zeros.col_enough_ones.toggle_zeros_row.toggle_zeros_col
@@ -4012,8 +4013,8 @@ up	db/migrate_save/024_create_review_of_reviews.rb	/^  def self.up$/;"	F	class:C
 up	db/migrate_save/025_create_review_of_review_scores.rb	/^  def self.up$/;"	F	class:CreateReviewOfReviewScores
 up	db/migrate_save/026_create_question_advices.rb	/^  def self.up$/;"	F	class:CreateQuestionAdvices
 update	app/controllers/advertise_for_partner_controller.rb	/^  def update$/;"	f	class:AdvertiseForPartnerController
-update	app/controllers/assignment_controller.rb	/^  def update$/;"	f	class:AssignmentController
 update	app/controllers/assignment_signups_controller.rb	/^  def update$/;"	f	class:AssignmentSignupsController
+update	app/controllers/assignments_controller.rb	/^  def update$/;"	f	class:AssignmentsController
 update	app/controllers/content_pages_controller.rb	/^  def update$/;"	f	class:ContentPagesController
 update	app/controllers/controller_actions_controller.rb	/^  def update$/;"	f	class:ControllerActionsController
 update	app/controllers/course_controller.rb	/^  def update$/;"	f	class:CourseController
@@ -4033,7 +4034,7 @@ update	app/controllers/sign_up_sheet_controller.rb	/^  def update$/;"	f	class:Si
 update	app/controllers/site_controllers_controller.rb	/^  def update$/;"	f	class:SiteControllersController
 update	app/controllers/student_team_controller.rb	/^  def update$/;"	f	class:StudentTeamController
 update	app/controllers/system_settings_controller.rb	/^  def update$/;"	f	class:SystemSettingsController
-update	app/controllers/team_controller.rb	/^ def update  $/;"	f	class:TeamController
+update	app/controllers/teams_controller.rb	/^ def update  $/;"	f	class:TeamController
 update	app/controllers/users_controller.rb	/^  def update$/;"	f	class:UsersController
 update	app/controllers/waitlists_controller.rb	/^  def update$/;"	f	class:WaitlistsController
 update_cache	app/models/score_cache.rb	/^  def self.update_cache(rid)$/;"	F	class:ScoreCache
@@ -4044,7 +4045,7 @@ update_mapping	db/migrate/099_standardize_review_of_review_mappings.rb	/^  def s
 update_mapping	db/migrate/102_standardize_review_mappings.rb	/^  def self.update_mapping(mapping)$/;"	F	class:StandardizeReviewMappings
 update_publish_permission	test/functional/publishing_controller_test.rb	/^  def update_publish_permission$/;"	f	class:PublishingControllerTest
 update_publish_permissions	app/controllers/publishing_controller.rb	/^  def update_publish_permissions$/;"	f	class:PublishingController
-update_question_type	app/controllers/questionnaire_controller.rb	/^  def update_question_type (question_type_key)$/;"	f	class:QuestionnaireController
+update_question_type	app/controllers/questionnaires_controller.rb	/^  def update_question_type (question_type_key)$/;"	f	class:QuestionnairesController
 update_resubmit_times	app/models/assignment_participant.rb	/^  def update_resubmit_times$/;"	f	class:AssignmentParticipant.get_cycle_similarity_score.get_cycle_deviation_score
 update_score_cache	app/models/score_cache.rb	/^  def self.update_score_cache()$/;"	F	class:ScoreCache
 update_topic_id	app/models/participant.rb	/^  def update_topic_id(topic_id)$/;"	f	class:Participant
@@ -4093,7 +4094,7 @@ verify_digital_signature	app/models/assignment_participant.rb	/^  def verify_dig
 view	app/controllers/content_pages_controller.rb	/^  def view$/;"	f	class:ContentPagesController
 view	app/controllers/grades_controller.rb	/^  def view$/;"	f	class:GradesController
 view	app/controllers/publishing_controller.rb	/^  def view   $/;"	f	class:PublishingController
-view	app/controllers/questionnaire_controller.rb	/^  def view$/;"	f	class:QuestionnaireController
+view	app/controllers/questionnaires_controller.rb	/^  def view$/;"	f	class:QuestionnairesController
 view	app/controllers/reports_controller.rb	/^  def view$/;"	f	class:ReportsController
 view	app/controllers/response_controller.rb	/^  def view$/;"	f	class:ResponseController
 view	app/controllers/student_task_controller.rb	/^  def view$/;"	f	class:StudentTaskController

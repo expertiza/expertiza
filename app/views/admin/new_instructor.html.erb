@@ -5,7 +5,7 @@
  <% end %>
 
 <%= flash[:notice] %>
-<%= form_tag :action => 'create_instructor' do %>
+<%= form_tag 'create_instructor' do %>
   <%= render :partial => 'users/user' %>
   <% if @found %>
    <%= submit_tag "Save", :name=>"save" %>

@@ -1,4 +1,5 @@
 class ControllerAction < ActiveRecord::Base
+  belongs_to :site_controller
 
   validates_presence_of :name
   validates_uniqueness_of :name, :scope => 'site_controller_id'

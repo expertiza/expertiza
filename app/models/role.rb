@@ -3,6 +3,7 @@ require "menu"
 
 class Role < ActiveRecord::Base
   belongs_to :parent, :class_name => 'Role'
+  has_many :users
 
   serialize :cache
   validates_presence_of :name

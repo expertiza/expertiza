@@ -227,7 +227,11 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :site_controllers
+  resources :site_controllers do
+    collection do
+      get 'list'
+    end
+  end
 
   resources :statistics do
     collection do

@@ -183,7 +183,7 @@ Expertiza::Application.routes.draw do |map|
     collection do
       post :toggle_access
       get :copy
-      get :select_questionnaire_type
+      post :select_questionnaire_type
     end
   end
   resources :review_questionnaires, controller: :questionnaires

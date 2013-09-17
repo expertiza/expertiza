@@ -70,6 +70,7 @@ GEM
       cucumber (>= 1.2.0)
       nokogiri (>= 1.5.0)
       rails (~> 3.0)
+    daemons (1.1.9)
     database_cleaner (1.0.1)
     debugger (1.6.1)
       columnize (>= 0.3.1)
@@ -77,6 +78,11 @@ GEM
       debugger-ruby_core_source (~> 1.2.3)
     debugger-linecache (1.2.0)
     debugger-ruby_core_source (1.2.3)
+    delayed_job (4.0.0)
+      activesupport (>= 3.0, < 4.1)
+    delayed_job_active_record (4.0.0)
+      activerecord (>= 3.0, < 4.1)
+      delayed_job (>= 3.0, < 4.1)
     diff-lcs (1.2.4)
     edavis10-ruby-web-search (0.0.2)
       json
@@ -248,8 +254,10 @@ DEPENDENCIES
   capistrano
   capybara
   cucumber-rails
+  daemons
   database_cleaner
   debugger
+  delayed_job_active_record
   edavis10-ruby-web-search
   engtagger
   expertiza-authlogic!

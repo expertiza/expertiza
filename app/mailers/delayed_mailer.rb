@@ -1,60 +1,60 @@
 class DelayedMailer
-	#Keeps info required for delayed job
-	#to send mail at a particular time
-	attr_accessor:assignment_id
-	attr_accessor:deadline_type
-  attr_accessor:due_at
+  #Keeps info required for delayed job
+  #to send mail at a particular time
+  attr_accessor :assignment_id
+  attr_accessor :deadline_type
+  attr_accessor :due_at
 
-	def initialize(assignment_id, deadline_type, due_at)
-		self.assignment_id=assignment_id
-		self.deadline_type=deadline_type
+  def initialize(assignment_id, deadline_type, due_at)
+    self.assignment_id=assignment_id
+    self.deadline_type=deadline_type
     self.due_at = due_at
-	end
-				 	
-	def perform
-			assignment = Assignment.find(self.assignment_id)
-			if assignment != nil && assignment.id != nil
-				if(self.deadline_type == "metareview")
-            mail_metareviewers
-            if (assignment.team_assignment?)
-               teamMails = getTeamMembersMail
-               email_reminder(teamMails, "teammate review")
-            end
-        end
+  end
 
-        if(self.deadline_type == "review")
-          mail_reviewers # to all reviewers
-        end
-
-        if(self.deadline_type == "submission"|| self.deadline_type == "resubmission")
-          mail_signed_up_users  # to all signed up users
-        end
-
-        if(self.deadline_type == "drop_topic")
-          sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', self.assignment_id])
-          if(sign_up_topics != nil && sign_up_topics.count != 0)
-            mail_signed_up_users #reminder to signed_up users of the assignment
-          end
-        end
-
-        if(self.deadline_type == "signup")
-          sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', self.assignment_id])
-          if(sign_up_topics != nil && sign_up_topics.count != 0)
-            mail_assignment_participants #reminder to all participants
-          end
-        end
-
-        if(self.deadline_type == "team_formation")
-          assignment = Assignment.find(self.assignment_id)
-          if(assignment.team_assignment?)
-            mail_assignment_participants
-          else
-            emails = Array.new
-            email_reminder(emails, self.deadline_type)
-          end
+  def perform
+    assignment = Assignment.find(self.assignment_id)
+    if assignment != nil && assignment.id != nil
+      if(self.deadline_type == "metareview")
+        mail_metareviewers
+        if (assignment.team_assignment?)
+          teamMails = getTeamMembersMail
+          email_reminder(teamMails, "teammate review")
         end
       end
-	end
+
+      if(self.deadline_type == "review")
+        mail_reviewers # to all reviewers
+      end
+
+      if(self.deadline_type == "submission"|| self.deadline_type == "resubmission")
+        mail_signed_up_users  # to all signed up users
+      end
+
+      if(self.deadline_type == "drop_topic")
+        sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', self.assignment_id])
+        if(sign_up_topics != nil && sign_up_topics.count != 0)
+          mail_signed_up_users #reminder to signed_up users of the assignment
+        end
+      end
+
+      if(self.deadline_type == "signup")
+        sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', self.assignment_id])
+        if(sign_up_topics != nil && sign_up_topics.count != 0)
+          mail_assignment_participants #reminder to all participants
+        end
+      end
+
+      if(self.deadline_type == "team_formation")
+        assignment = Assignment.find(self.assignment_id)
+        if(assignment.team_assignment?)
+          mail_assignment_participants
+        else
+          emails = Array.new
+          email_reminder(emails, self.deadline_type)
+        end
+      end
+    end
+  end
 
   # Find the signed_up_users of the assignment and send mails to them
   def mail_signed_up_users
@@ -132,10 +132,10 @@ class DelayedMailer
     emails = Array.new
     reviewer_tuples = ResponseMap.find(:all, :conditions => ['reviewed_object_id = ? AND (type = "ParticipantReviewResponseMap" OR type = "TeamReviewResponseMap")', self.assignment_id])
     for reviewer in reviewer_tuples
-        participant = Participant.find(:first, :conditions => ['parent_id = ? AND id = ?', self.assignment_id, reviewer.reviewer_id])
-        uid  = participant.user_id
-        user = User.find(uid)
-        emails << user.email
+      participant = Participant.find(:first, :conditions => ['parent_id = ? AND id = ?', self.assignment_id, reviewer.reviewer_id])
+      uid  = participant.user_id
+      user = User.find(uid)
+      emails << user.email
     end
     email_reminder(emails, self.deadline_type)
   end
@@ -161,10 +161,10 @@ class DelayedMailer
     end
 
     Mailer.deliver_message(
-        {:bcc => emails,
-         :subject => subject,
-         :body => body
-        })
+      {:bcc => emails,
+       :subject => subject,
+       :body => body
+    })
   end
 end
 

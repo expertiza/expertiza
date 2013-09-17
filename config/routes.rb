@@ -156,7 +156,7 @@ Expertiza::Application.routes.draw do |map|
   resources :password_retrieval do
     collection do
       get :forgotten
-      get :send_password
+      post :send_password
     end
   end
 

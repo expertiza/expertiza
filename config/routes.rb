@@ -63,7 +63,7 @@ Expertiza::Application.routes.draw do |map|
     collection do
       post :delete
       post :toggle_access
-      post :copy
+      get :copy
       get :view_teaching_assistants
     end
   end
@@ -182,7 +182,8 @@ Expertiza::Application.routes.draw do |map|
   resources :questionnaires do
     collection do
       post :toggle_access
-      post :copy
+      get :copy
+      get :select_questionnaire_type
     end
   end
   resources :review_questionnaires, controller: :questionnaires

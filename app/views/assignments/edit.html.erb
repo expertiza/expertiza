@@ -22,7 +22,7 @@
     }
 </script>
 
-<%= form_tag({:action => 'update', :id => @assignment.id}, {:id => 'assignment_form'}) do %>
+<%= form_for @assignment, html: { id: 'assignment_form' } do %>
     <div id="tabs">
       <ul>
         <li><a href="#tabs-1">General</a></li>
@@ -32,16 +32,16 @@
         <li><a href="#tabs-5">Topics</a></li>
       </ul>
       <div id="tabs-1">
-        <%= render 'assignment/edit/general' %>
+        <%= render 'assignments/edit/general' %>
       </div>
       <div id="tabs-2">
-        <%= render 'assignment/edit/rubrics' %>
+        <%= render 'assignments/edit/rubrics' %>
       </div>
       <div id="tabs-3">
-        <%= render 'assignment/edit/review_strategy' %>
+        <%= render 'assignments/edit/review_strategy' %>
       </div>
       <div id="tabs-4">
-        <%= render 'assignment/edit/due_dates' %>
+        <%= render 'assignments/edit/due_dates' %>
       </div>
       <div id="tabs-5">
         <%= render 'sign_up_sheet/add_signup_topics' %>

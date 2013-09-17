@@ -52,8 +52,6 @@ class AuthController < ApplicationController
   end
 
   def self.authorised?(session, params)
-    return true if session[:user].super_admin?
-
     authorised = false  # default
     check_controller = false
 

@@ -1,4 +1,4 @@
-class AssignmentController < ApplicationController
+class AssignmentsController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
 

@@ -28,16 +28,12 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :assignment do
+  resources :assignments do
     collection do
-      delete :delete
-      post :remove_assignment_from_course
-      post ':id', action: :update
       get :associate_assignment_with_course
-      get :toggle_access
       get :copy
-      get :show
-      get :edit
+      get :toggle_access
+      post :remove_assignment_from_course
     end
   end
 
@@ -230,6 +226,7 @@ Expertiza::Application.routes.draw do |map|
   resources :site_controllers do
     collection do
       get 'list'
+      get 'new_called'
     end
   end
 

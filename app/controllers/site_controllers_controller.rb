@@ -53,7 +53,7 @@ class SiteControllersController < ApplicationController
     if @site_controller.update_attributes(params[:site_controller])
       flash[:notice] = 'SiteController was successfully updated.'
       Role.rebuild_cache
-      redirect_to :action => 'show', :id => @site_controller
+      redirect_to @site_controller
     else
       foreign
       render :action => 'edit'

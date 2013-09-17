@@ -18,6 +18,7 @@ before_install:
     - rvm rubygems 1.8.23
     - gem install ruby-debug -- --with-ruby-include=$rvm_path/src/ruby-1.9.3-head/
     - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.9.3-head/
+    - gem install debugger
     - bundle config build.raspell --with-opt-dir=
 before_script:
     - mysql -u root < db/grant_expertiza.sql

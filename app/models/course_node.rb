@@ -1,5 +1,6 @@
 class CourseNode < Node 
   belongs_to :course, :class_name => "Course", :foreign_key => "node_object_id"
+  belongs_to :node_object, :class_name => "Course"
 
   # Returns the table in which to locate Courses
   def self.table

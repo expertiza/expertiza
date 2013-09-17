@@ -53,6 +53,10 @@ class Role < ActiveRecord::Base
     end
   end
 
+  def other_roles
+    Role.where('id != ?', id).order(:name)
+  end
+
   def rebuild_credentials
     self.cache[:credentials] = Credentials.new(self.id)
   end

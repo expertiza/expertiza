@@ -1,4 +1,4 @@
-class InstitutionController < ApplicationController
+class InstitutionsController < ApplicationController
   def index
     list
     render :action => 'list'
@@ -24,7 +24,7 @@ class InstitutionController < ApplicationController
     @institution = Institution.new(params[:institution])
     if @institution.save
       flash[:notice] = 'Institution was successfully created.'
-      redirect_to :action => 'list'
+      redirect_to action: :index
     else
       render :action => 'new'
     end

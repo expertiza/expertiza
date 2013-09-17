@@ -2,22 +2,16 @@ class SiteControllersController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-         :redirect_to => { :action => :list }
+         :redirect_to => { :action => :index }
 
   def index
-    list
-    render :action => 'list'
+    @builtin_site_controllers = SiteController.builtin
+    @app_site_controllers = SiteController.application
+    classify_controllers
   end
 
   def list
-    @builtin_site_controllers = SiteController.find(:all,
-                                            :conditions => "builtin = 1",
-                                            :order => 'name')
-    @app_site_controllers = 
-      SiteController.find(:all,
-                          :conditions => "builtin is null or builtin = 0",
-                          :order => 'name')
-    classify_controllers
+    redirect_to action: 'index'
   end
 
   def show
@@ -30,13 +24,11 @@ class SiteControllersController < ApplicationController
 
   def new
     foreign
-    @site_controller = SiteController.new
+    @site_controller = SiteController.new(name: params[:id])
   end
 
   def new_called
-    foreign
-    @site_controller = SiteController.new(:name => params[:id])
-    render :action => 'new'
+    redirect_to :action => 'new'
   end
 
   def create
@@ -44,7 +36,7 @@ class SiteControllersController < ApplicationController
     if @site_controller.save
       flash[:notice] = 'SiteController was successfully created.'
       Role.rebuild_cache
-      redirect_to :action => 'list'
+      redirect_to :action => 'index'
     else
       foreign
       render :action => 'new'
@@ -71,31 +63,26 @@ class SiteControllersController < ApplicationController
   def destroy
     SiteController.find(params[:id]).destroy
     Role.rebuild_cache
-    redirect_to :action => 'list'
+    redirect_to :action => 'index'
   end
 
 
-  protected 
-
+  protected
 
   def foreign
-    @permissions = Permission.find(:all, :order => 'name')
+    @permissions = Permission.order(:name)
   end
-
-
 
   # @unknown contains ApplicationController class objects hashed by
   # name, while @app, @builtin and @missing are arrays of
   # SiteController ActiveRecord objects.
-
   def classify_controllers
     from_classes = SiteController.classes
-    
-    from_db = SiteController.find(:all,
-                                      :order => 'name')
+
+    from_db = SiteController.order(:name)
     known = Hash.new
     @missing = Array.new
-    for dbc in from_db do
+    from_db.each do |dbc|
       if from_classes.has_key? dbc.name
         known[dbc.name] = dbc
       else
@@ -107,7 +94,7 @@ class SiteControllersController < ApplicationController
     @app = Array.new
     @builtin = Array.new
 
-    for name in from_classes.keys.sort do
+    from_classes.keys.sort.each do |name|
       if known.has_key? name
         if known[name].builtin == 1
           @builtin << known[name]
@@ -123,8 +110,6 @@ class SiteControllersController < ApplicationController
     @has_unknown = (@unknown.keys.length > 0) ? true : false
     @has_app     = (@app.length > 0)     ? true : false
     @has_builtin = (@builtin.length > 0) ? true : false
-
-    return
   end
 
   

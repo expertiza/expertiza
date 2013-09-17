@@ -113,11 +113,7 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :institution do
-    collection do
-      get :list
-    end
-  end
+  resources :institutions
 
   resources :invitation
 
@@ -231,12 +227,7 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :site_controllers do
-    collection do
-      get :list
-      get :new_called
-    end
-  end
+  resources :site_controllers
 
   resources :statistics do
     collection do

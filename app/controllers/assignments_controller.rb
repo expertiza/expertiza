@@ -12,28 +12,24 @@ class AssignmentsController < ApplicationController
 
   def new
     @assignment = Assignment.new
-    @assignment.course = Course.find(params[:parent_id]) unless params[:parent_id].nil?
+    @assignment.course = Course.find(params[:parent_id]) if params[:parent_id]
 
-    if @assignment.course.nil?
-      @assignment.instructor = session[:user]
-    else
-      @assignment.instructor = @assignment.course.instructor
-    end
+    @assignment.instructor = @assignment.course.instructor if @assignment.course
+    @assignment.instructor ||= current_user
 
     @assignment.wiki_type_id = 1 #default no wiki type
+    @assignment.max_team_size = 1
   end
 
   def create
-    params[:assignment][:max_team_size] ||= 1
     @assignment = Assignment.new(params[:assignment])
 
     if @assignment.save
       @assignment.create_node
-      flash[:note] = 'Assignment was successfully created.'
-      flash[:alert] = "There is already an assignment named #{@assignment.name}" if @assignment.duplicate_name?
-      redirect_to :action => 'edit', :id => @assignment.id
+      flash[:success] = 'Assignment was successfully created.'
+      redirect_to @assignment
     else
-      render :action => 'new'
+      render 'new'
     end
   end
 
@@ -44,7 +40,7 @@ class AssignmentsController < ApplicationController
 
   def delete_all_due_dates
     if params[:assignment_id].nil?
-      return 
+      return
     end
 
     assignment = Assignment.find(params[:assignment_id])
@@ -169,13 +165,6 @@ class AssignmentsController < ApplicationController
     if @assignment.directory_path.try :empty?
       @assignment.directory_path = nil
     end
-
-    #drop_topic_deadine = @assignment.find_due_dates('drop_topic')
-    #signup_deadline = @assignment.find_due_dates('signup')
-    #sign_ups = SignUpTopic.find_all_by_assignment_id(@assignment.id)
-
-    #@assignment.require_signup = !(drop_topic_deadine + signup_deadline + sign_ups).empty?
-
   end
 
   #NOTE: unfortunately this method is needed due to bad data in db @_@

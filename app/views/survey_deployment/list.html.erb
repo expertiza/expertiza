@@ -24,6 +24,6 @@
 
 <%= link_to "Add New Deployment", :action=>"new" %><p>
 
-<% if session[:user].role_id == 4 %>
+<% if current_user.role == Role.super_admin %>
   <%= link_to "Reminder thread status", :action=>"reminder_thread" %>
 <% end %>

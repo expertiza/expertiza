@@ -1,23 +1,19 @@
 class AdminController < ApplicationController
   def new_instructor
-    @user = User.find_by_name(params[:name])
-    if @user
-      @found = true
-    else
-      @user = User.new
+    @user = User.find_or_create_by_name(params[:name])
 
-      # these values need to be true by default so new users receive e-mail on these events unless they opt not to
+    # these values need to be true by default so new users receive e-mail on these events unless they opt not to
+    if @user.new_record?
       @user.email_on_review = true
       @user.email_on_submission = true
       @user.email_on_review_of_review = true
+      @user.role = Role.instructor
     end
-    @user.name = params[:name]
-    @user.role = Role.instructor
   end
 
   def create_instructor
     if params['save']
-      @user = User.find_by_name params[:user][:name]
+      @user = User.find_or_create_by_name params[:user][:name]
       @user.role = Role.instructor
       @user.update_attributes(params[:user])
       redirect_to :action => 'list_instructors'

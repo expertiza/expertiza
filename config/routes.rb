@@ -65,6 +65,9 @@ Expertiza::Application.routes.draw do |map|
       post :toggle_access
       get :copy
       get :view_teaching_assistants
+      post :add_ta
+      get :auto_complete_for_user_name
+      post :remove_ta
     end
   end
 

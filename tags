@@ -2966,13 +2966,9 @@ save_topic_dependencies	app/controllers/sign_up_sheet_controller.rb	/^  def save
 saving	app/controllers/response_controller.rb	/^  def saving   $/;"	f	class:ResponseController
 schedule	vendor/plugins/craken/lib/raketab.rb	/^    def schedule(&block)$/;"	f	class:Raketab
 scope_condition	vendor/plugins/acts_as_nested_set/lib/active_record/acts/nested_set.rb	/^              def scope_condition$/;"	f	class:ActiveRecord.Acts.NestedSet.ClassMethods.acts_as_nested_set
-search_administrator	app/controllers/admin_controller.rb	/^  def search_administrator$/;"	f	class:AdminController
 search_edges	app/models/automated_metareview/graph_generator.rb	/^def search_edges(list, in_vertex, out, index)$/;"	f	class:GraphGenerator.generate_graph
 search_edges_to_set_null	app/models/automated_metareview/graph_generator.rb	/^def search_edges_to_set_null(list, in_vertex, out, index)$/;"	f	class:GraphGenerator.generate_graph
-search_instructor	app/controllers/admin_controller.rb	/^  def search_instructor$/;"	f	class:AdminController
-search_super_administrator	app/controllers/admin_controller.rb	/^  def search_super_administrator$/;"	f	class:AdminController
-search_users	app/controllers/admin_controller.rb	/^  def search_users (role)$/;"	f	class:AdminController
-search_users	app/controllers/admin_controller.rb	/^  def search_users$/;"	f	class:AdminController
+search_users	app/controllers/admin_controller.rb	/^  def search_users(role)$/;"	f	class:AdminController
 search_vertices	app/models/automated_metareview/graph_generator.rb	/^def search_vertices(list, s, index)$/;"	f	class:GraphGenerator.generate_graph
 segment_text	app/models/automated_metareview/text_preprocessing.rb	/^def segment_text(flag, text_array)$/;"	f	class:TextPreprocessing
 select	app/models/menu.rb	/^  def select(name)$/;"	f	class:Menu.initialize

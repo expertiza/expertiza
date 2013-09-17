@@ -26,6 +26,14 @@ class User < ActiveRecord::Base
   before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.password.blank? } # AuthLogic
   after_create :email_welcome
 
+  scope :superadministrators, -> { where role_id: Role.superadministrator }
+  scope :superadmins, -> { superadministrators }
+  scope :administrators, -> { where role_id: Role.administrator }
+  scope :admins, -> { administrators }
+  scope :instructors, -> { where role_id: Role.instructor }
+  scope :tas, -> { where role_id: Role.ta }
+  scope :students, -> { where role_id: Role.student }
+
   def salt_first?
     true
   end

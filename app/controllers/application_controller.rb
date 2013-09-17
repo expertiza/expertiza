@@ -12,8 +12,7 @@ class ApplicationController < ActionController::Base
     logger.debug !(session[:user].nil?)
     if (!(session[:user].nil?)) 
       logger.debug "set timezone debug"
-      current_user_id = session[:user].id
-      preferredtimezone = User.find_by_id(current_user_id).timezonepref
+      preferredtimezone = User.find_by_id(current_user.id).timezonepref
       logger.debug preferredtimezone
       Time.zone = preferredtimezone if logged_in?
     end
@@ -115,12 +114,7 @@ class ApplicationController < ActionController::Base
   # to see unauthorized data.
   # Ex: return unless current_user_id?(params[:user_id])
   def current_user_id?(user_id)
-    if user_id != session[:user].id
-      redirect_to '/denied'
-      return false
-    else
-      return true
-    end
+    redirect_to '/denied' unless user_id == current_user.id
   end
 
 end

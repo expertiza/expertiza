@@ -205,19 +205,15 @@ class AssignmentController < ApplicationController
   end
 
 
-  #====== old stuff =====#
   # this function finds all the due_dates for a given assignment and calculates the time when the reminder for these deadlines needs to be sent. Enqueues them in the delayed_jobs table
   def add_to_delayed_queue
-    duedates = DueDate::find_all_by_assignment_id(@assignment.id)
-    for i in (0 .. duedates.length-1)
-      deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
-      due_at = duedates[i].due_at(:db).to_s
-      Time.parse(due_at)
-      due_at= Time.parse(due_at)
-      mi=find_min_from_now(due_at)
-      diff = mi-(duedates[i].threshold)*60
-      dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at(:db).to_s), 1, diff.minutes.from_now)
-      duedates[i].update_attribute(:delayed_job_id, dj.id)
+    due_dates = @assignment.due_dates
+    due_dates.each do |due_date|
+      deadline_type_name = due_date.deadline_type.name
+      seconds_until_due = due_at - Time.now
+      minutes_until_due = seconds_until_due / 60
+      dj = Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type_name, due_at), 1, minutes_until_due)
+      due_date.update_attribute(:delayed_job_id, dj.id)
     end
   end
 

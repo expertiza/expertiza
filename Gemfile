@@ -2,8 +2,11 @@ source 'http://rubygems.org'
 
 gem 'rails', '~>3.0.0'
 
+## Gems in Alphabetical Order
+
 gem 'bind-it'
 gem 'capistrano'
+gem 'delayed_job_active_record'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
 gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', :require => 'authlogic'
@@ -30,6 +33,7 @@ gem 'superfish-rails'
 gem 'will_paginate'
 
 group :development do
+  gem 'daemons'
   gem 'debugger'
   gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'

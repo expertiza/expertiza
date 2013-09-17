@@ -157,22 +157,19 @@ class MenuItemsController < ApplicationController
 
 
   protected
-  
+
   def foreign
     if self.respond_to?(:id)
-      @parents = MenuItem.find(:all,
-                               :conditions => ['id not in (?)', self.id],
-                               :order => 'name')
+      @parents = MenuItem.where('id != ?', self.id).order(:name)
     else
-      @parents = MenuItem.find(:all,
-                               :order => 'name')
+      @parents = MenuItem.order(:name)
     end
-    @parents.unshift MenuItem.new(:id => nil, :name => '(root)')
-    @actions = ControllerAction.find(:all, :order => 'site_controller_id, name')
-    @actions.unshift ControllerAction.new(:id => nil, 
-                                          :name => '(none)')
 
-    @pages = ContentPage.find(:all, :order => 'name')
+    @parents.unshift MenuItem.new(:id => nil, :name => '(root)')
+    @actions = ControllerAction.order_by_controller_and_action
+    @actions.unshift ControllerAction.new(:id => nil, :name => '(none)')
+
+    @pages = ContentPage.order(:name)
     @pages.unshift ContentPage.new(:id => nil, :name => '(none)')
   end
 

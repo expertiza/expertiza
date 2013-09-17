@@ -181,8 +181,6 @@ Expertiza::Application.routes.draw do |map|
 
   resources :questionnaire do
     collection do
-      get :view
-      post :delete
       post :toggle_access
       post :copy
     end

@@ -47,7 +47,7 @@
             <h2>Review <%= count %></h2>
             <!-- Display the latest review first -->
             <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a>
-            <%= review.display_as_html(prefix) %>
+            <%= review.display_as_html(prefix, count) %>
                 <%= render :partial => 'questionnaire', :locals => {:file_url => file_url, :review => review} %>
             <!-- get all previous versions -->
             <% @sorted_array=Array.new %>
@@ -64,7 +64,7 @@
                     <% @str = @sorted[i].id.to_s %>
                     <!-- display previous versions in descending order -->
                     <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a>
-                    <%= @sorted[i].display_as_html(prefix) %>
+                    <%= @sorted[i].display_as_html(prefix, count) %>
                     <%= render :partial => 'questionnaire', :locals => {:file_url => file_url, :review => review} %>
                     <br/>
                     <script>

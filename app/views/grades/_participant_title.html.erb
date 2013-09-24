@@ -6,7 +6,7 @@
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</TH>
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
-<% if @assignment.team_assignment %>
+<% if @assignment.team_assignment? %>
   <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
 <% end %>
 <TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
@@ -18,8 +18,9 @@
 <TH WIDTH="<%= colwidth %>%">Average</TH>
 <TH WIDTH="<%= colwidth %>%">Range </TH>
 <TH WIDTH="<%= colwidth %>%">Average</TH>
-<TH WIDTH="<%= colwidth %>%">Range </TH> 
-<% if @assignment.team_assignment %>
+<TH WIDTH="<%= colwidth %>%">Range </TH>
+  <!--ACS Display teammate review ratings only for teams with size greater than 1-->
+  <% if @assignment.max_team_size > 1 %>
   <TH WIDTH="<%= colwidth %>%">Average</TH>
   <TH WIDTH="<%= colwidth %>%">Range </TH>
 <% end %>   

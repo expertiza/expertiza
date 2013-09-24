@@ -1,6 +1,8 @@
 module TeamHelper
 
   #separates the file into the necessary elements to create a new user
+  #This method is never called. But it is not an elegant way to call 'generate_team_name'
+  #method in this file, another instance of this method is in team.rb.
   def self.upload_teams(file, assignment_id, options,logger) 
     unknown = Array.new
     while (rline = file.gets)        

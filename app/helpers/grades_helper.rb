@@ -1,18 +1,19 @@
 module GradesHelper
-    def label(object_name, method, label)
-    content_tag(:label, h(label), :for => "#{object_name}_#{method}")
-  end
 
+ # Render the accordian title
   def get_accordion_title(last_topic, new_topic)
     if last_topic.eql? nil
       #this is the first accordion
       render :partial => "response/accordion", :locals => {:title => new_topic, :is_first => true}
+
     elsif !new_topic.eql? last_topic
       #render new accordion
       render :partial => "response/accordion", :locals => {:title => new_topic, :is_first => false}
+
     end
   end
 
+  # Render the table to display the question, score and response
   def construct_table(parameters)
     table_hash = {"table_title" => nil, "table_headers" => nil, "start_table" => false, "start_col" => false, "end_col" => false, "end_table" => false}
 
@@ -51,33 +52,37 @@ module GradesHelper
     table_hash
   end
 
+  # Render the question, score and response and set default parameters
   def find_question_type(question, ques_type, q_number, is_view, file_url, score, score_range)
     default_textfield_size = "3"
     default_textarea_size = "40x5"
     default_dropdown = ["Edit Rubric", "No Values"]
 
+    #refactored code
+    q_parameter =  ques_type.parameters.split("::")
+    table_hash = construct_table(q_parameter)
+    view_output = nil
+    if is_view
+      view_output = "No Response"
+      if !score.comments.nil?
+        view_output = score.comments
+      end
+    end
+
+
+    # Render appropriate control for each question type
     case ques_type.q_type
       when "Checkbox"
-        #Parameters
-        #section::tableTitle::tableHeader1|tableHeader2::curr_col_ques|total_col_ques|curr_col|max_cols
-
-        #look for table parameters
-        table_hash = construct_table(ques_type.parameters.split("::"))
-
-        #check to see if rendering view
-        view_output = nil
         if is_view
           view_output = "<img src=\"/images/delete_icon.png\">" + question.txt + "<br/>"
           if score.comments == "1"
             view_output = "<img src=\"/images/Check-icon.png\">" + question.txt + "<br/>"
           end
         end
-
-        render :partial => "response/checkbox", :locals => {:ques_num => q_number, :ques_text => question.txt, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+        param1 = "response/checkbox"
+        param2 = {:ques_num => q_number, :ques_text => question.txt, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+        render_ui(param1,param2)
       when "TextField"
-        #Parameters
-        #section::size::separator1|separator2::curr_ques|max_ques
-        q_parameter =  ques_type.parameters.split("::")
 
         #look for size parameters
         size = default_textfield_size
@@ -97,21 +102,10 @@ module GradesHelper
             is_last = true
           end
         end
-
-        #check to see if rendering view
-        view_output = nil
-        if is_view
-          view_output = "No Response"
-          if !score.comments.nil?
-            view_output = score.comments
-          end
-        end
-
-        render :partial => "response/textfield", :locals => {:ques_num => q_number, :field_size => size, :ques_text => question.txt, :separator => separator, :isFirst => is_first, :isLast => is_last, :view => view_output}
+        param1 = "response/textfield"
+        param2 = {:ques_num => q_number, :field_size => size, :ques_text => question.txt, :separator => separator, :isFirst => is_first, :isLast => is_last, :view => view_output}
+        render_ui(param1,param2)
       when "TextArea"
-        #Parameters
-        #section::size::tableTitle::tableHeader1|tableHeader2::curr_col_ques|total_col_ques|curr_col|max_cols
-        q_parameter =  ques_type.parameters.split("::")
 
         #look for size parameters
         size = default_textarea_size
@@ -119,90 +113,50 @@ module GradesHelper
           size = q_parameter[1]
         end
 
-        #look for table parameters
-        table_hash = construct_table(q_parameter)
+        param1 = "response/textarea"
+        param2 = {:ques_num => q_number, :area_size => size, :ques_text => question.txt, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+        render_ui(param1,param2)
 
-        #check to see if rendering view
-        view_output = nil
-        if is_view
-          view_output = "No Response"
-          if !score.comments.nil?
-            view_output = score.comments
-          end
-        end
-
-        render :partial => "response/textarea", :locals => {:ques_num => q_number, :area_size => size, :ques_text => question.txt, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
       when "UploadFile"
-        #Parameters
-        #section
 
         #check to see if rendering view
-        view_output = nil
         if is_view
           view_output = "File has not been uploaded"
           if !file_url.nil?
             view_output = file_url.to_s
           end
         end
-
-        render :partial => "response/fileUpload", :locals => {:ques_num => q_number, :ques_text => question.txt, :view => view_output}
+        param1 = "response/fileUpload"
+        param2 =  {:ques_num => q_number, :ques_text => question.txt, :view => view_output}
+        render_ui(param1,param2)
       when "DropDown"
-        #Parameters
-        #section::ddValue1|ddValue2::tableTitle::tableHeader1|tableHeader2::curr_col_ques|total_col_ques|curr_col|max_cols
-        q_parameter =  ques_type.parameters.split("::")
 
         #look for dropdown values
         dd_values = default_dropdown
         if !q_parameter[1].nil? && q_parameter[1].length > 0
           dd_values = q_parameter[1].split("|")
         end
-
-        #look for table parameters
-        table_hash = construct_table(q_parameter)
-
-        #check to see if rendering view
-        view_output = nil
-        if is_view
-          view_output = "No Response"
-          if !score.comments.nil?
-            view_output = score.comments
-          end
-        end
-
-        render :partial => "response/dropdown", :locals => {:ques_num => q_number, :ques_text => question.txt, :options => dd_values, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+        param1 = "response/dropdown"
+        param2 = {:ques_num => q_number, :ques_text => question.txt, :options => dd_values, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+        render_ui(param1,param2)
       when "Rating"
-        #Parameters
-        #section::curr_ques|2
-
-        q_parameter =  ques_type.parameters.split("::")
-
-        #get current question
         if !q_parameter[1].nil? && q_parameter[1].length > 0
           curr_ques = q_parameter[1].split("|")[0]
         end
 
-        #look for table parameters
-        table_hash = construct_table(q_parameter)
-
-        #check to see if rendering view
-        view_output = nil
         if curr_ques == 2
-          if is_view
-            view_output = "No Response"
-            if !score.comments.nil?
-              view_output = score.comments
-            end
-          end
-          render :partial => "response/textarea", :locals => {:ques_num => q_number, :area_size => default_textarea_size, :ques_text => question.txt, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+          param1 = "response/textarea"
+          param2 = {:ques_num => q_number, :area_size => default_textarea_size, :ques_text => question.txt, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+
         else
-          if is_view
-            view_output = "No Response"
-            if !score.comments.nil?
-              view_output = score.comments
+          param1 = "response/dropdown"
+          param2 =  {:ques_num => q_number, :ques_text => question.txt, :options => score_range, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+
             end
-          end
-          render :partial => "response/dropdown", :locals => {:ques_num => q_number, :ques_text => question.txt, :options => score_range, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
+        render_ui(param1,param2)
         end
       end
+  def render_ui(param1,param2)
+    render :partial => param1,:locals =>param2
   end
 end

@@ -39,7 +39,7 @@ class AssignmentParticipant < Participant
   # all the participants in this assignment reviewed by this person
   def get_reviewees
     reviewees = []
-    if self.assignment.team_assignment == true 
+    if self.assignment.team_assignment?
       rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'TeamReviewResponseMap'"])
       rmaps.each do |rm|
         reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants)
@@ -56,7 +56,7 @@ class AssignmentParticipant < Participant
   # all the participants in this assignment who have reviewed this person
   def get_reviewers
     reviewers = []
-    if self.assignment.team_assignment == true && self.team
+    if self.assignment.team_assignment? && self.team
       rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
     else
       rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])      
@@ -169,9 +169,20 @@ class AssignmentParticipant < Participant
     self.assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)
+    
+    # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
+    # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
+    if assignment.is_microtask?
+      topic = SignUpTopic.find_by_assignment_id(assignment.id)
+      if !topic.nil?
+        scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
+        scores[:max_pts_available] = topic.micropayment
+      end
+    end
+
     return scores
   end
 
@@ -207,15 +218,20 @@ class AssignmentParticipant < Participant
     self.save
   end
 
-  # TODO:REFACTOR: This shouldn't be handled using an if statement, but using 
-  # polymorphism for individual and team participants
-  def get_hyperlinks         
-    if self.team     
-      links = self.team.get_hyperlinks     
+  def get_members
+    if self.team.nil?
+      [self]
     else        
-      links = get_hyperlinks_array
+      self.team.get_participants
     end
+  end
 
+
+  def get_hyperlinks
+    links = Array.new
+    for team_member in self.get_members
+      links.concat(team_member.get_hyperlinks_array)
+    end
     return links
   end
 
@@ -249,15 +265,21 @@ class AssignmentParticipant < Participant
   end
   
   def get_reviews
-    if self.assignment.team_assignment
-      return TeamReviewResponseMap.get_assessments_for(self.team)          
+    #ACS Always get assessments for a team
+    #removed check to see if it is a team assignment
+    return TeamReviewResponseMap.get_assessments_for(self.team)
+  end
+  
+  def get_reviews_by_reviewer(reviewer)
+    if self.assignment.team_assignment?
+      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
     else
-      return ParticipantReviewResponseMap.get_assessments_for(self)
+      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
     end
   end
   
   def get_reviews_by_reviewer(reviewer)
-    if self.assignment.team_assignment
+    if self.assignment.team_assignment?
       return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
     else
       return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
@@ -295,8 +317,9 @@ class AssignmentParticipant < Participant
   
   def get_wiki_submissions
     currenttime = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
- 
-    if self.assignment.team_assignment and self.assignment.wiki_type.name == "MediaWiki"
+
+    #ACS Check if the team count is greater than one(team assignment)
+    if self.assignment.max_team_size > 1 and self.assignment.wiki_type.name == "MediaWiki"
        submissions = Array.new
        if self.team
         self.team.get_participants.each {
@@ -388,59 +411,16 @@ class AssignmentParticipant < Participant
   # reference: http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
   def self.grant_publishing_rights(privateKey, participants)
     for participant in participants
-      # get the current time in UTC
-      time_now = Time.now.utc
-      
-      # generate a hash to digitally sign
-      hash_data = participant.get_hash(time_now)
-            
-      # generate a digital signature of the hash
-      private_key2 = OpenSSL::PKey::RSA.new(privateKey)
-      cipher_text = Base64.encode64(private_key2.private_encrypt(hash_data))
-      
-      # save the digital signature and the time stamp in the database.  Time stamp needs to be 
-      # saved so we can generate the hash again later and compare it to the one digitally signed.
-      participant.digital_signature = cipher_text
-      participant.time_stamp = time_now
-      
       #now, check to make sure the digital signature is valid, if not raise error
-      if (participant.verify_digital_signature(cipher_text))
-        participant.update_attribute('permission_granted', 1)
-        participant.save
-      else
-        participant.update_attribute('permission_granted', 0)
-        participant.digital_signature=nil
-        participant.time_stamp=nil
-        raise "invalid key"
-      end
-      
+      participant.permission_granted = participant.verify_digital_signature(privateKey)
+      participant.save
+      raise 'Invalid key' unless participant.permission_granted
     end
   end
   
   # verify the digital signature is valid
-  def verify_digital_signature(cipher_text)
-    # get a hash based on the time stamp saved in the database
-    hash_data = get_hash(self.time_stamp)
-
-    # get the public key from the digital certificate saved in the database
-    certificate1 = self.user.digital_certificate 
-    cert = OpenSSL::X509::Certificate.new(certificate1)
-    begin
-      public_key1 = cert.public_key 
-      public_key = OpenSSL::PKey::RSA.new(public_key1)
-      
-      # decrypt the hash from the passed in digital signature and compare to the one
-      # we just generated to see if it is valid
-      clear_text = public_key.public_decrypt(Base64.decode64(cipher_text))
-      if (hash_data == clear_text)
-        true
-      else
-        false;
-      end
-      
-    rescue Exception => msg  
-      false
-    end
+  def verify_digital_signature(private_key)
+    user.public_key == OpenSSL::PKey::RSA.new(private_key).public_key.to_pem
   end
   
   #define a handle for a new participant
@@ -476,7 +456,8 @@ class AssignmentParticipant < Participant
         dirnum = 0
       end
       self.update_attribute('directory_num',dirnum)
-      if self.assignment.team_assignment
+      #ACS Get participants irrespective of the number of participants in the team
+      #removed check to see if it is a team assignment
         self.team.get_participants.each{
             | member |
             if member.directory_num == nil or member.directory_num < 0
@@ -484,7 +465,6 @@ class AssignmentParticipant < Participant
               member.save
             end
         }
-      end
     end
   end
 

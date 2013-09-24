@@ -1,58 +1,55 @@
-<h1>Editing assignment</h1>
+<%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
+<%= stylesheet_link_tag 'jquery-ui-1.10.3.custom.min' %>
+<script src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="/javascripts/jquery-ui-timepicker-addon.js"></script>
 
-<% form_tag({:action => 'update', :id => @assignment, :review_limit => @limits[:review], :metareview_limit => @limits[:metareview], :teammate_limit => @limits[:teammate], :feedback_limit => @limits[:feedback]},:onsubmit => 'return checkForm();') do %>
-  <%= render :partial => 'content' %>
-    <hr/>
-  <%= render :partial => 'rubrics' %>
-  <%= render :partial => 'review_strategy' %>
-<br/>
-<hr/>
-<div style="font-size:large;"><b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b></div>  
-  <table>
-    <tr style="font-size:12px;padding:15px">
-        <th style="padding:10px">Deadline type</th>
-        <th style="padding:10px">Date &amp; time</th>
-        <th style="padding:10px">Submission allowed</th>
-        <th style="padding:10px">Review allowed</th>
-        <th style="padding:10px">Resubmission allowed</th>
-        <th style="padding:10px">Re-review allowed</th>
-        <th style="padding:10px">Metareview allowed</th>
-		<th style="padding:10px">Reminder (hrs)</th>
-    </tr>
-    <% 	i = 0;
-        duedates = @assignment.due_dates
-		 
-        duedates.sort! {|a,b| a.due_at <=> b.due_at}
-		for @due_date in duedates %>
-	        <% heading = @due_date.deadline_type.name.titleize + " deadline" %>
-			<tr>
-				<td align ="center"><%= heading%></td>
-				<td align ="center"><%= text_field 'due_date[]', 'due_at', :size=>30%></td>
-			<% if @due_date.deadline_type_id != 6 %>
-				<td align ="center"><%= select('due_date[]', 'submission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'resubmission_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'rereview_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'review_of_review_allowed_id', [ ['No', 1],['Late', 2],['OK', 3]])%></td>
-				<td align ="center"><%= select('due_date[]', 'threshold', [ [8, 8],[16, 16],[24, 24],[32, 32],[40, 40],[48, 48],[56, 56],[64, 64],[72, 72],[80, 80],[88, 88],[96, 96]])%></td>
-				<td align ="center"><%= hidden_field('due_date[]', 'flag', 'value' => 0)%></td>
-			<% end %>
-			</tr>
-			<% i += 1 %>
-		<% end %>
-    </table>
-<br/>
-<div id="days_between_chapters" style="position:relative">
-  <label>Number of {weeks, days} between submission of successive chapters:</label>
-  <input type="text" id="weeks" name ="weeks" maxlength="2" size="3" value="<%=@weeks%>"/> week(s) &nbsp;
-  <input type="text" id="days" name ="days" maxLength="2" size="3" value="<%=@days%>"/> day(s)          
-</div>
-<br/>
-  &nbsp;&nbsp;<%= submit_tag "Save assignment" %>
+<h1>Editing Assignment</h1>
+
+<script>
+    function validate() {
+        return true;
+    }
+
+    function submit_form() {
+        //validating the form
+        if (validate()) {
+            //submit the due dates and questionnaires before submitting the rest of the form
+            jQuery.ajaxSetup({async: false});
+            submit_due_dates();
+            submit_questionnaires();
+            jQuery('#assignment_form').submit();
+        }
+    }
+</script>
+
+<% form_tag({:action => 'update', :id => @assignment.id}, {:id => 'assignment_form'}) do %>
+    <div id="tabs">
+      <ul>
+        <li><a href="#tabs-1">General</a></li>
+        <li><a href="#tabs-2">Rubrics</a></li>
+        <li><a href="#tabs-3">Review strategy</a></li>
+        <li><a href="#tabs-4">Due dates</a></li>
+        <li><a href="#tabs-5">Topics</a></li>
+      </ul>
+      <div id="tabs-1">
+        <%= render :partial => 'assignment/edit/general' %>
+      </div>
+      <div id="tabs-2">
+        <%= render :partial => 'assignment/edit/rubrics' %>
+      </div>
+      <div id="tabs-3">
+        <%= render :partial => 'assignment/edit/review_strategy' %>
+      </div>
+      <div id="tabs-4">
+        <%= render :partial => 'assignment/edit/due_dates' %>
+      </div>
+    </div>
+    <script>
+        jQuery(document).ready(function () {
+            jQuery("#tabs").tabs();
+        });
+    </script>
+    <%= button_to_function 'Save', 'submit_form()' %>| <%= render :partial => '/shared_scripts/back' %>
 <% end %>
-<br/>
-<div style="padding: 15px">
-<%= render :partial => '/shared_scripts/back' %>
-</div>
 
-<script>get_assignment_startdate();</script>
+<br/>

@@ -2,6 +2,7 @@ Feature: View scores for an assignment
   In order to view resulting scores
   As a student
 
+@wip
 Scenario: View my submitted work scores
   Given I am logged in as a student
     And I move to the "Assignments" page
@@ -13,6 +14,7 @@ Scenario: View my submitted work scores
   When I click the "show reviews" link
   Then I should see the three reviews for my submitted work with corresponding scores
 
+@wip
 Scenario: View my author feedback scores
   Given I am logged in as a student
     And I move to the "Assignments" page
@@ -22,6 +24,7 @@ Scenario: View my author feedback scores
   When I click the "show author feedbacks" link
   Then I should see the author feedback review with corresponding score
 
+@wip
 Scenario: View my teammate review scores
   Given I am logged in as a student
     And I move to the "Assignments" page

@@ -1,7 +1,7 @@
 class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
-  
+
   def display_as_html(prefix = nil, count = nil, file_url = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
@@ -14,12 +14,12 @@ class Response < ActiveRecord::Base
       identifier += "<H2>Feedback from author</H2>"
     end
     if prefix
-      identifier += "<B>Reviewer:</B> "+self.map.reviewer.fullname
+      identifier += "<B>Reviewer:</B> #{count}"#+self.map.reviewer.fullname
       str = prefix+"_"+self.id.to_s
     else
       identifier += '<B>'+self.map.get_title+'</B> '+count.to_s+'</B>'
       str = self.id.to_s
-    end    
+    end
     code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">hide review</a><BR/>'
     code += "<B>Last reviewed:</B> "
     if self.updated_at.nil?
@@ -28,7 +28,7 @@ class Response < ActiveRecord::Base
       code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end
     code += '<div id="review_'+str+'" style=""><BR/><BR/>'
-    
+
     # Test for whether custom rubric needs to be used
     if ((self.map.questionnaire.section.eql? "Custom") && (self.map.type.to_s != 'FeedbackResponseMap'))
       #return top of view
@@ -36,98 +36,90 @@ class Response < ActiveRecord::Base
     end
     # End of custom code
     count = 0
-    self.scores.each{
-      | reviewScore |
+    self.scores.each {
+        |reviewScore|
       count += 1
       code += '<big><b>Question '+count.to_s+":</b> <I>"+Question.find_by_id(reviewScore.question_id).txt+"</I></big><BR/><BR/>"
       code += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find_by_id(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B></TD></TR>"
       if reviewScore.comments != nil
-        code += '<TR><TD valign="top"><B>Response:</B></TD><TD>' + reviewScore.comments.gsub("<","&lt;").gsub(">","&gt;").gsub(/\n/,'<BR/>')
+        code += '<TR><TD valign="top"><B>Response:</B></TD><TD>' + reviewScore.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
       end
       code += '</TD></TR></TABLE><BR/>'
-    }           
-    
+    }
+
     if self.additional_comment != nil
-      comment = self.additional_comment.gsub('^p','').gsub(/\n/,'<BR/>&nbsp;&nbsp;&nbsp;')
+      comment = self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>&nbsp;&nbsp;&nbsp;')
     else
       comment = ''
     end
     code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
     return code
-  end  
-  
+  end
+
   # Computes the total score awarded for a review
   def get_total_score
-    total_score = 0
-    
-    self.map.questionnaire.questions.each{
-      | question |
-      item = Score.find_by_response_id_and_question_id(self.id, question.id)
-      if(item != nil)
-        total_score += item.score
-      end
-    }    
-    return total_score        
-  end  
-  
- #Generate an email to the instructor when a new review exceeds the allowed difference
- #ajbudlon, nov 18, 2008
- def notify_on_difference(new_pct,avg_pct,limit)
-   mapping = self.map
-   instructor = mapping.assignment.instructor 
-   Mailer.deliver_message(
-     {:recipients => instructor.email,
-      :subject => "Expertiza Notification: A review score is outside the acceptable range",
-      :body => {        
-        :first_name => ApplicationHelper::get_user_first_name(instructor),
-        :reviewer_name => mapping.reviewer.fullname,
-        :type => "review",
-        :reviewee_name => mapping.reviewee.fullname,
-        :limit => limit,
-        :new_pct => new_pct,
-        :avg_pct => avg_pct,
-        :types => "reviews",
-        :performer => "reviewer",
-        :assignment => mapping.assignment,    
-        :partial_name => 'limit_notify'
-      }
-     }
-   )         
+    scores.map(&:score).sum
   end
- 
+
+  #Generate an email to the instructor when a new review exceeds the allowed difference
+  #ajbudlon, nov 18, 2008
+  def notify_on_difference(new_pct, avg_pct, limit)
+    mapping = self.map
+    instructor = mapping.assignment.instructor
+    Mailer.deliver_message(
+        {:recipients => instructor.email,
+         :subject => "Expertiza Notification: A review score is outside the acceptable range",
+         :body => {
+             :first_name => ApplicationHelper::get_user_first_name(instructor),
+             :reviewer_name => mapping.reviewer.fullname,
+             :type => "review",
+             :reviewee_name => mapping.reviewee.fullname,
+             :limit => limit,
+             :new_pct => new_pct,
+             :avg_pct => avg_pct,
+             :types => "reviews",
+             :performer => "reviewer",
+             :assignment => mapping.assignment,
+             :partial_name => 'limit_notify'
+         }
+        }
+    )
+  end
+
   def delete
-    self.scores.each {|score| score.destroy}
+    self.scores.each { |score| score.destroy }
     self.destroy
   end
-  
+
+  #bug fixed
   # Returns the average score for this response as an integer (0-100)
   def get_average_score()
     if get_maximum_score != 0 then
-      ((get_alternative_total_score.to_f / get_maximum_score.to_f) * 100).to_i
+      ((get_total_score.to_f / get_maximum_score.to_f) * 100).to_i
     else
       0
     end
   end
-  
+
   # Returns the maximum possible score for this response
   def get_maximum_score()
     max_score = 0
 
-    self.scores.each  {|score| max_score = max_score + score.question.questionnaire.max_question_score }
+    self.scores.each { |score| max_score = max_score + score.question.questionnaire.max_question_score }
 
     max_score
   end
-  
+
   # Returns the total score from this response
   def get_alternative_total_score()
     # TODO The method get_total_score() above does not seem correct.  Replace with this method.
     total_score = 0
 
-    self.scores.each  {|score| total_score = total_score + score.score }
+    self.scores.each { |score| total_score = total_score + score.score }
 
     total_score
   end
-  
+
   # Function which considers a given assignment
   # and checks if a given review is still valid for score calculation
   # The basic rule is that
@@ -147,7 +139,7 @@ class Response < ActiveRecord::Base
       return is_valid
     end
 
-    resubmission_times.each do | resubmission_time |
+    resubmission_times.each do |resubmission_time|
       # if the response is after a resubmission that is
       # before the latest_review_phase_start_time (check second condition below)
       # then we are good - the response is valid and we can break
@@ -166,4 +158,7 @@ class Response < ActiveRecord::Base
 
     is_valid
   end
+
+  require 'models/analytic/response_analytic'
+  include ResponseAnalytic
 end

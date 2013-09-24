@@ -1,5 +1,8 @@
-create database pg_development;
-create database pg_test;
+drop database if exists pg_development;
+drop database if exists pg_test;
+
+create database if not exists pg_development CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';
+create database if not exists pg_test CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';
 
 create user expertiza@localhost;
 

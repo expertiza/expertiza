@@ -5,25 +5,14 @@
     <div class="flash_note"><%= flash[:notice] %></div>
 <% end %>
 
-
 <% if @sign_up_topics.size != 0 %>
-
     <table class="general">
-
       <tr><%= render :partial => 'table_header' %></tr>
 
       <% i=1 %>
       <% for topic in @sign_up_topics %>
           <tr>
-            <td><%= topic.topic_identifier %></td>
-
-            <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
-
-            <td align="center"><%= topic.max_choosers %></td>
-
-            <%= render :partial => 'num_of_choosers', :locals => {:topic=>topic} %>
-
-            <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
+             <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic} %>
 
             <td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>
           </tr>
@@ -38,8 +27,8 @@
     </div>
 <% end %>
 
-
 <% session[:return_to] = request.request_uri %>
 <br/><br/>
 
 <%= render :partial => 'add_topics' %>
+<a href="javascript:history.back()">Back</a>

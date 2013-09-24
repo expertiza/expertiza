@@ -9,7 +9,7 @@ class ProfileController < ApplicationController
  end
   
  #store parameters to user object
- def update
+  def update
     @user = session[:user]
     
     unless params[:assignment_questionnaire].nil? or params[:assignment_questionnaire][:notification_limit].blank?

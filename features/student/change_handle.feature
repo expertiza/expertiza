@@ -6,7 +6,7 @@ Feature: Change the handle as a user
 
 Scenario: Change my handle for current assignment
   Given I am logged in as a student
-    And I am participating on assignment "team_assignment"
+    And I am participating in assignment "team_assignment"
     And I move to the "Assignments" page
     And I click on "team_assignment"
     And I follow "Change your handle" 

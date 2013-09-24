@@ -1,9 +1,15 @@
-  <th width="5%">Topic #</th>
-  <th width="75%">Topic name(s)</th>
-  <th width="5%">Max choosers</th>
-  <th width="5%">Current choosers</th>
-  <th width="5%">Choosers on waitlist</th>
-  <% if @assignment.staggered_deadline == true %>
-      <th width="5%">Dependency</th>
-  <% end %>
-  <th width="5%">Actions</th>
+<th width="5%">Topic #</th>
+<th width="50%">Topic name(s)</th>
+<% if @assignment.is_microtask? %>
+    <th width="5%">Micro- payment</th>
+<% end %>
+<th width="5%">Num. of slots</th>
+<th width="5%">Available slots</th>
+<th width="5%">Num. on waitlist</th>
+<% if @assignment.staggered_deadline == true %>
+    <th width="5%">Dependencies</th>
+<% end %>
+<% if @assignment.has_partner_ads?(params[:id]) %>
+ <th width="5%">Advertise- ment(s)</th>
+<% end %>
+<th width="5%">Actions</th>

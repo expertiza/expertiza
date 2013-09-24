@@ -8,10 +8,20 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(@participant.user_id)
     
     @assignment = @participant.assignment
-    
-    if @assignment.team_assignment && @participant.team.nil?
+
+    #ACS We have to check if the number of members on the team is more than 1(group assignment)
+    #hence use team count for the check
+    if @assignment.max_team_size > 1 && @participant.team.nil?
       flash[:alert] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_team/view/#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
       redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
+      else if @participant.team.nil?
+             #create a new team for current user before submission
+             team = AssignmentTeam.create_team_and_node(@assignment.id)
+             puts "+++++@participant.user_id = "+ @participant.user_id.to_s
+             puts "+++++@assignment.id = "+ @assignment.id.to_s
+             team.add_member(User.find(@participant.user_id),@assignment.id)
+             puts "+++++++++ I just create a new team!"
+           end
     end
   end
   
@@ -28,6 +38,7 @@ class SubmittedContentController < ApplicationController
 
     begin
       participant.submmit_hyperlink(params['submission'])
+      participant.update_resubmit_times
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end    
@@ -40,7 +51,7 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(participant.user_id)
 
     begin
-      participant.remove_hyperlink(params['index'].to_i)
+      participant.remove_hyperlink(params['chk_links'].to_i)
     rescue 
       flash[:error] = $!
     end    

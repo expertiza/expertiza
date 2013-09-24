@@ -4,6 +4,7 @@ class Question < ActiveRecord::Base
     belongs_to :review_of_review_score  # ditto
     has_many :question_advices, :order => 'score' # for each question, there is separate advice about each possible score
     has_many :signup_choices # ?? this may reference signup type questionnaires
+    has_one :question_type
     
     validates_presence_of :txt # user must define text content for a question
     validates_presence_of :weight # user must specify a weight for a question

@@ -130,6 +130,4 @@ end
     end
     redirect_to :controller => 'review_mapping', :action => 'list_mappings', :id => assignment_id
   end
-
-
 end

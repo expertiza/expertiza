@@ -14,7 +14,7 @@ class Response < ActiveRecord::Base
       identifier += "<H2>Feedback from author</H2>"
     end
     if prefix
-      identifier += "<B>Reviewer:</B> "+self.map.reviewer.fullname
+      identifier += "<B>Reviewer:</B> #{count}"#+self.map.reviewer.fullname
       str = prefix+"_"+self.id.to_s
     else
       identifier += '<B>'+self.map.get_title+'</B> '+count.to_s+'</B>'

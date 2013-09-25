@@ -39,7 +39,6 @@ ActiveRecord::Schema.define(:version => 20130905183106) do
     t.integer  "review_of_review_questionnaire_id"
     t.integer  "teammate_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
-    t.boolean  "team_assignment"
     t.integer  "wiki_type_id",                      :default => 0,     :null => false
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false

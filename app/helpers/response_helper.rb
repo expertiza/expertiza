@@ -34,17 +34,21 @@ module ResponseHelper
   def self.notify_instructor(assignment,curr_item,questionnaire,total,count)
      max_possible_score, weights = assignment.get_max_score_possible(questionnaire)
      new_score = curr_item.get_total_score.to_f*weights            
-     existing_score = (total.to_f/count).to_f*weights 
+     existing_score = (total.to_f/count).to_f*weights
+
      aq = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(assignment.instructor_id, assignment.id, questionnaire.id)
     
-     if aq == nil
+     unless aq
        aq = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(assignment.instructor_id, nil, nil)
      end
-     allowed_difference = max_possible_score.to_f * aq.notification_limit / 100      
-     if new_score < (existing_score - allowed_difference) or new_score > (existing_score + allowed_difference)
-       new_pct = new_score.to_f/max_possible_score
-       avg_pct = existing_score.to_f/max_possible_score
-       curr_item.notify_on_difference(new_pct,avg_pct,aq.notification_limit)
+
+     if aq
+       allowed_difference = max_possible_score.to_f * aq.notification_limit / 100
+       if new_score < (existing_score - allowed_difference) or new_score > (existing_score + allowed_difference)
+         new_pct = new_score.to_f/max_possible_score
+         avg_pct = existing_score.to_f/max_possible_score
+         curr_item.notify_on_difference(new_pct,avg_pct,aq.notification_limit)
+       end
      end
   end
 

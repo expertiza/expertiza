@@ -40,13 +40,6 @@ class User < ActiveRecord::Base
     return visible_users[0,10] # the first 10
   end
 
-  def role
-    if self.role_id
-      @role ||= Role.find(self.role_id)
-    end
-    return @role
-  end
-
   def can_impersonate?(other_user)
     return true if other_user == self # can impersonate self
     return true if self.is_teaching_assistant_for? other_user #TAs can impersonate their students

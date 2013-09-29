@@ -5,8 +5,9 @@
     <HR/>
     <% count = 0 %>
     <% for review in rscore[:assessments] %>
+      <% review_feedback = nil %>
 
-    <% count = count + 1 %>
+      <% count = count + 1 %>
 
     <% file_url = nil
     review_questionnaire = @assignment.questionnaires.select {|x| x.display_type == 'Review'}
@@ -80,9 +81,7 @@
                 <% end %>
             <% end %>
             <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
-            if map
-                review_feedback = map.response
-            end %>
+            review_feedback = map.try :response %>
             <% if review_feedback %>
                 <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
                 <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>
@@ -91,7 +90,6 @@
             <% end %>
             <BR/><HR/><BR/>
         <% else %>
-            <% review_feedback = nil %>
             <h2>Review <%= count %></h2>
             <!-- Display the latest review first -->
             <%= review.display_as_html(nil,review.version_num, file_url) %><BR/><BR/>
@@ -124,9 +122,7 @@
                 <% end %>
             <% end %>
             <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
-            if map
-                review_feedback = map.response
-            end %>
+                review_feedback = map.try :response %>
             <% if review_feedback %>
                 <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
                 <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>

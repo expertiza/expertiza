@@ -30,7 +30,7 @@ class GradesController < ApplicationController
 
     ## When user clicks on the notification, it should go away
     #deleting all review notifications
-    rmaps = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(@participant.id, @participant.assignment.id)
+    rmaps = @participant.response_maps
     for rmap in rmaps
       rmap.notification_accepted = true
       rmap.save

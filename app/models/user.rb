@@ -32,12 +32,24 @@ class User < ActiveRecord::Base
   def list_mine(object_type, user_id)
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end
-  
+
   def get_available_users(name)    
     lesser_roles = role.get_parents
     all_users = User.find(:all, :conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
     visible_users = all_users.select{|user| lesser_roles.include? user.role}
     return visible_users[0,10] # the first 10
+  end
+
+  def first_name
+    fullname[/,.+/][/\w+/] if fullname
+  end
+
+  def super_admin?
+    role.name == 'Super-Administrator'
+  end
+
+  def admin?
+    role.name == 'Administrator'
   end
 
   def can_impersonate?(other_user)

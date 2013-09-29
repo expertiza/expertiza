@@ -65,6 +65,10 @@ class ApplicationController < ActionController::Base
   # to see unauthorized data.
   # Ex: return unless current_user_id?(params[:user_id])
   def current_user_id?(user_id)
-    redirect_to '/denied' unless current_user.try(:id) == user_id
+    current_user.try(:id) == user_id
+  end
+
+  def denied
+    redirect_to '/denied'
   end
 end

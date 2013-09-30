@@ -44,6 +44,8 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :author_feedback_questionnaires, controller: 'questionnaires'
+
   resources :content_pages do
     collection do
       get :list

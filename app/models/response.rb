@@ -2,6 +2,13 @@ class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
 
+  delegate :questionnaire, :reviewee, :reviewer,
+    :to => :map
+
+  def team_has_user?(user)
+    reviewer.team.has_user user
+  end
+
   def display_as_html(prefix = nil, count = nil, file_url = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
@@ -14,7 +21,7 @@ class Response < ActiveRecord::Base
       identifier += "<H2>Feedback from author</H2>"
     end
     if prefix
-      identifier += "<B>Reviewer:</B> "+self.map.reviewer.fullname
+      identifier += "<B>Reviewer:</B> #{count}"#+self.map.reviewer.fullname
       str = prefix+"_"+self.id.to_s
     else
       identifier += '<B>'+self.map.get_title+'</B> '+count.to_s+'</B>'

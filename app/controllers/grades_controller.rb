@@ -3,8 +3,8 @@ class GradesController < ApplicationController
   helper :submitted_content
 
   #the view grading report provides the instructor with an overall view of all the grades for
-  #an assignment. It lists all participants of an assignment and all the reviews they recieved.
-  #It also gives a final score which is an average of all the reviews and greatest difference
+  #an assignment. It lists all participants of an assignment and all the reviews they received.
+  #It also gives a final score, which is an average of all the reviews and greatest difference
   #in the scores of all the reviews.  
   def view
     @assignment = Assignment.find(params[:id])

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130916224736) do
+ActiveRecord::Schema.define(:version => 20130930021106) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -392,8 +392,8 @@ ActiveRecord::Schema.define(:version => 20130916224736) do
   add_index "scores", ["response_id"], :name => "fk_score_response"
 
   create_table "sessions", :force => true do |t|
-    t.string   "session_id", :default => "", :null => false
-    t.text     "data"
+    t.string   "session_id",                     :default => "", :null => false
+    t.text     "data",       :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -568,6 +568,7 @@ ActiveRecord::Schema.define(:version => 20130916224736) do
     t.string  "persistence_token"
     t.string  "timezonepref"
     t.text    "public_key"
+    t.string  "type"
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

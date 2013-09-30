@@ -15,28 +15,13 @@ class AuthController < ApplicationController
       if user and user.valid_password?(params[:login][:password])
         logger.info "User #{params[:login][:name]} successfully logged in"
         session[:user] = user
-        AuthController.set_current_role(user.role_id,session)
+        AuthController.set_current_role(user.role_id, session)
 
-        respond_to do |format|
-          format.html do
-            redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])
-          end
-          format.xml do
-            render :nothing => true, :status => 200
-          end
-        end
-
+        redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])
       else
         logger.warn "Failed login attempt"
-        respond_to do |format|
-          format.html do
-            flash[:error] = "Incorrect Name/Password"
-            redirect_to :controller => 'password_retrieval', :action => 'forgotten'
-          end
-          format.xml do
-            render :nothing => true, :status => 404
-          end
-        end
+        flash[:error] = "Incorrect Name/Password"
+        redirect_to :controller => 'password_retrieval', :action => 'forgotten'
       end
     end
   end  # def login

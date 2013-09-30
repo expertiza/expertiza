@@ -48,11 +48,7 @@ class Team < ActiveRecord::Base
   end
 
   def has_user(user)
-    if TeamsUser.find_by_team_id_and_user_id(self.id, user.id)
-      return true
-    else
-      return false
-    end
+    users.include? user
   end
 
   def add_member(user, assignment_id)

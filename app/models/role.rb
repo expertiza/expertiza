@@ -3,6 +3,7 @@ require "menu"
 
 class Role < ActiveRecord::Base
   belongs_to :parent, :class_name => 'Role'
+  has_many :users
 
   serialize :cache
   validates_presence_of :name
@@ -13,22 +14,34 @@ class Role < ActiveRecord::Base
   def self.student
     @@student_role ||= find_by_name 'Student'
   end
+
   def self.ta
     @@ta_role ||= find_by_name 'Teaching Assistant'
   end
+
   def self.instructor
     @@instructor_role ||= find_by_name 'Instructor'
   end
+
   def self.administrator
     @@administrator_role ||= find_by_name 'Administrator'
   end
+
+  def self.admin
+    administrator
+  end
+
   def self.superadministrator
     @@superadministrator_role ||= find_by_name 'Super-Administrator'
   end
-  
+
+  def self.super_admin
+    superadministrator
+  end
+
   def Role.rebuild_cache
     roles = Role.find(:all)
-    
+
     for role in roles do
       role.cache = nil
       role.save # we have to do this to clear it
@@ -38,6 +51,10 @@ class Role < ActiveRecord::Base
       role.rebuild_menu
       role.save
     end
+  end
+
+  def other_roles
+    Role.where('id != ?', id).order(:name)
   end
 
   def rebuild_credentials
@@ -53,7 +70,7 @@ class Role < ActiveRecord::Base
   # return ids of roles that are below this role
   def get_available_roles  
     ids = Array.new
-    
+
     current = self.parent_id
     while current
       role = Role.find(current)
@@ -73,7 +90,7 @@ class Role < ActiveRecord::Base
     seen = Hash.new
 
     current = self.id
-    
+
     while current
       role = Role.find(current)
       if role 

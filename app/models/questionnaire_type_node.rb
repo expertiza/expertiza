@@ -1,5 +1,6 @@
 class QuestionnaireTypeNode < FolderNode  
   belongs_to :table, :class_name => "TreeFolder", :foreign_key => "node_object_id"
+  belongs_to :node_object, :class_name => "TreeFolder"
   
   def self.table
     "tree_folders"

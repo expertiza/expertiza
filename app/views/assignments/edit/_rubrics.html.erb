@@ -1,0 +1,87 @@
+<script type="text/javascript">
+    function addQuestionnaireTableRow(questionnaire_type, questionnaire, assignment_questionnaire, questionnaire_options) {
+        var questionnaire_table = jQuery('#assignment_questionnaire_table>tbody>tr');
+        var row_id = 'questionnaire_table_' + questionnaire_type;
+        var i = 0;
+        var html;
+        html += '<tr id="' + row_id + '">' +
+                '<input name="assignment_questionnaire[assignment_id]" type="hidden" value="' + <%= @assignment.id %> +'">';
+
+        html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>' +
+                '<td align="center">' +
+                '<select id="questionnaire_id" name="assignment_questionnaire[questionnaire_id]" style="width:300px">' +
+                '<option value="">--None--</option>';
+
+        for (i = 0; i < questionnaire_options.length; i++) {
+            html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>'
+        }
+
+        html += '</select></td>';
+
+        html += '<td align="center"><input name="assignment_questionnaire[questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
+                '<td align="center"><input name="assignment_questionnaire[notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>' +
+                '</tr>';
+
+        questionnaire_table.last().after(html);
+        jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
+    }
+
+    function removeQuestionnaireTableRow(questionnaire_type) {
+        var row_id = 'questionnaire_table_' + questionnaire_type;
+        jQuery('#' + row_id).remove();
+    }
+
+    function submit_questionnaires() {
+        var data, para, fields, i, j;
+        //delete old assignment_questionnaires
+        jQuery.get("/assignment/delete_all_questionnaires?assignment_id=" + <%= @assignment.id %>);
+        //create the new assignment_questionnaires
+        data = jQuery('#assignment_questionnaire_table>tbody>tr:not(.heading)');
+        for (i = 0; i < data.length; i++) {
+            fields = jQuery(data[i]).find('input,select');
+            para = "?";
+            for (j = 0; j < fields.length; j++) {
+                para += "&" + (fields[j].name + "=" + fields[j].value);
+            }
+            jQuery.get("/assignment/set_questionnaire" + para);
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function metareview_due_date() {
+
+        var metareview = document.getElementById("metareview_due_date_label");
+
+        var dropdownIndex = document.getElementById('metareview_quest').selectedIndex;
+        var dropdownValue = document.getElementById('metareview_quest')[dropdownIndex].value;
+        if (dropdownValue != "0") {
+            metareview.style.display = "";
+        } else {
+            metareview.style.display = "none";
+        }
+    }
+</script>
+
+<table class='exp' id='assignment_questionnaire_table' style='padding:10px'>
+  <tr class='heading'>
+    <th width="10%"></th>
+    <th align='center' width="30%">Questionnaire</th>
+    <th align='center' width="15%">Weight</th>
+    <th align='center' width="15%">Notification Limit
+      <img src="/images/info.png" title="If two reviews differ by more than this amount, the instructor will be notified by e-mail.">
+    </th>
+    <th width='30%'></th>
+  </tr>
+  <script>
+      jQuery(document).ready(function () {
+          addQuestionnaireTableRow('ReviewQuestionnaire', <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>);
+          addQuestionnaireTableRow('MetareviewQuestionnaire', <%= questionnaire(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>);
+          addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', <%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>);
+          addQuestionnaireTableRow('TeammateReviewQuestionnaire', <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>);
+      }());
+  </script>
+</table>
+
+
+

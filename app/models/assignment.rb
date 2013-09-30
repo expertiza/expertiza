@@ -1,5 +1,5 @@
 class Assignment < ActiveRecord::Base
-  require 'models/analytic/assignment_analytic'
+  require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   include DynamicReviewMapping
 
@@ -28,6 +28,7 @@ class Assignment < ActiveRecord::Base
   # has_many :responses, :through => :response_maps, :source => 'response'
 
   validates_presence_of :name
+  validates_uniqueness_of :name
   #validates_presence_of :directory_path, :on => :update
   #validates_uniqueness_of :scope => [:directory_path, :instructor_id]
 

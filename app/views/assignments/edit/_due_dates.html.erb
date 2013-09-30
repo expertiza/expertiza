@@ -1,0 +1,252 @@
+<!--5/19/2013 Change Log -->
+<!--Author: Hao Liu-->
+<!--Email: hliu11@ncsu.edu-->
+<!--1. switch to ruby tag helper methods instead of HTML tags-->
+<!--2. switch to a new date time picker-->
+<!--3. actually pretty much rewrote the whole thing...-->
+
+<script type="text/javascript">
+    function changeReviewRounds() {
+        var new_round_count = parseInt(jQuery('#assignment_rounds_of_reviews').val());
+        if (new_round_count <= 0) {
+            alert('ERROR: number of rounds of review cannot be less than 0');
+            return
+        }
+
+        var i;
+        var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
+        var current_round_count = 0;
+        var round_no;
+        for (i = 0; i < due_dates_table_element_list.length; i++) {
+            round_no = parseInt(due_dates_table_element_list[i].id.split('_').last());
+            if (!isNaN(round_no)) {
+                if (current_round_count < round_no) {
+                    current_round_count = round_no;
+                }
+            }
+        }
+        var original_round_count = <%= @assignment.rounds_of_reviews%>;
+
+        if (new_round_count == current_round_count) {
+            return
+        }
+
+        if (new_round_count >= original_round_count && current_round_count < original_round_count) {
+            //make sure all the rounds are already displayed
+            <% for i in 1..@assignment.rounds_of_reviews %>
+            addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment,'submission', i-1).to_json.html_safe %>);
+            addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment,'review', i-1).to_json.html_safe %>);
+            <% end %> //use ruby because i need the i variable... @_@ unfortunate but dunno how to get around
+            //dont worry the addDueDateTableElement function check to see if it exist first before doing anything
+        }
+
+        if (new_round_count < current_round_count) {
+            for (i = new_round_count + 1; i <= current_round_count; i++) {
+                removeDueDateTableElement('submission', i);
+                removeDueDateTableElement('review', i);
+            }
+            return
+        }
+
+        if (new_round_count > current_round_count) {
+            for (i = original_round_count + 1; i <= new_round_count; i++) {
+                addDueDateTableElement('submission', i, <%= due_date(@assignment,'submission', -1).to_json.html_safe %>);
+                addDueDateTableElement('review', i, <%= due_date(@assignment,'review', -1).to_json.html_safe %>);
+            }
+        }
+    }
+
+    <!--javascript functions that create and remove the entry of the set_due_date table-->
+    function addDueDateTableElement(deadline_type, round_no, due_date) {
+//round_no = 0 for submission and review is not possible
+//round_no = 0 is used for other deadlines
+        var element_id;
+        var previous_element;
+        if (round_no == 0) {
+            previous_element = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').last();
+            element_id = deadline_type;
+            if (jQuery('#' + element_id).length != 0) {
+                return
+            }
+        } else {
+            if (deadline_type == 'submission') {
+                if (round_no == 1) {
+                    previous_element = jQuery('#due_date_heading');
+                } else {
+                    previous_element = jQuery('#review_round_' + (round_no - 1));
+                }
+            } else if (deadline_type == 'review') {
+                previous_element = jQuery('#submission_round_' + round_no);
+            } else {
+                console.log('error: addDueDateTableElement');
+            }
+            element_id = deadline_type + '_round_' + round_no;
+            if (jQuery('#' + element_id).length != 0) {
+                return
+            }
+        }
+        if (previous_element.length == 0) {
+            return
+        }
+        var html = '<tr id=' + element_id + '>';
+
+        html += '<input class="due_date_assignment_id" name="due_date[assignment_id]" type="hidden" value="' + <%= @assignment.id %> + '">' +
+                '<input class="due_date_round" name="due_date[round]" type="hidden" value="' + round_no + '">' +
+                '<input class="due_date_deadline_type_id" name="due_date[deadline_type_id]" type="hidden" value="' + due_date.deadline_type_id + '">';
+
+        html += '<td class="due_date_name" width="15%">';
+        if (round_no != 0) {
+            html += 'Round ' + round_no + ': ' + capitalize(deadline_type);
+        } else {
+            capitalize(html += deadline_type.replace("_", " "));
+        }
+        html += '</td>';
+
+        var due_at = due_date.due_at;
+        if (due_at == null) {
+            due_at = '';
+        }
+        html += '<td align="center" class="due_date_due_at" width="25%">' +
+                '<input id="datetimepicker_' + element_id +
+                '" name="due_date[due_at]" style="width: 200px" type="text" value="' +
+                due_at + '">' + '</td>';
+
+        html += '<td align="center" class="due_date_submission_allowed_id" width="10%">' +
+                '<select id="due_date_submission_allowed_id" name="due_date[submission_allowed_id]">' +
+                '<option value="">---</option>' +
+                '<option value="1">No</option>' +
+                '<option value="2">Late</option>' +
+                '<option value="3">Yes</option>' +
+                '</select></td>';
+
+        html += '<td align="center" class="due_date_review_allowed_id" width="10%">' +
+                '<select id="due_date_review_allowed_id" name="due_date[review_allowed_id]">' +
+                '<option value="">---</option>' +
+                '<option value="1">No</option>' +
+                '<option value="2">Late</option>' +
+                '<option value="3">Yes</option>' +
+                '</select></td>';
+
+//        html += '<td align="center" class="due_date_resubmission_allowed_id" width="10%">' +
+//                '<select id="due_date_resubmission_allowed_id" name="due_date[resubmission_allowed_id]">' +
+//                '<option value="">---</option>' +
+//                '<option value="1">No</option>' +
+//                '<option value="2">Late</option>' +
+//                '<option value="3">Yes</option>' +
+//                '</select></td>';
+
+//        html += '<td align="center" class="due_date_rereview_allowed_id" width="10%">' +
+//                '<select id="due_date_rereview_allowed_id" name="due_date[rereview_allowed_id]">' +
+//                '<option value="">---</option>' +
+//                '<option value="1">No</option>' +
+//                '<option value="2">Late</option>' +
+//                '<option value="3">Yes</option>' +
+//                '</select></td>';
+
+        html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">' +
+                '<select id="due_date_review_of_review_allowed_id" name="due_date[review_of_review_allowed_id]">' +
+                '<option value="">---</option>' +
+                '<option value="1">No</option>' +
+                '<option value="2">Late</option>' +
+                '<option value="3">Yes</option>' +
+                '</select></td>';
+
+        html += '<td align="center" class="due_date_threshold" width="10%">' +
+                '<select id="due_date_threshold" name="due_date[threshold]">' +
+                '<option value="">---</option>' +
+                '<option value="8">8</option>' +
+                '<option value="16">16</option>' +
+                '<option value="24">24</option>' +
+                '<option value="32">32</option>' +
+                '<option value="40">40</option>' +
+                '<option value="48">48</option>' +
+                '<option value="56">56</option>' +
+                '<option value="64">64</option>' +
+                '<option value="72">72</option>' +
+                '<option value="80">80</option>' +
+                '<option value="88">88</option>' +
+                '<option value="96">96</option>' +
+                '</select></td>';
+
+        previous_element.after(html);
+
+        jQuery('#due_date_submission_allowed_id').val(due_date.submission_allowed_id).attr('id', '');
+        jQuery('#due_date_resubmission_allowed_id').val(due_date.resubmission_allowed_id).attr('id', '');
+        jQuery('#due_date_review_allowed_id').val(due_date.review_allowed_id).attr('id', '');
+        jQuery('#due_date_rereview_allowed_id').val(due_date.rereview_allowed_id).attr('id', '');
+        jQuery('#due_date_review_of_review_allowed_id').val(due_date.review_of_review_allowed_id).attr('id', '');
+        jQuery('#due_date_threshold').val(due_date.threshold).attr('id', '');
+
+        jQuery('#datetimepicker_' + element_id).datetimepicker({
+            dateFormat: 'yy/mm/dd',
+            timeFormat: 'HH:mm:ss z',
+            controlType: 'select',
+            timezoneList: [
+                { value: -000, label: 'GMT'},
+                { value: -300, label: 'Eastern'},
+                { value: -360, label: 'Central' },
+                { value: -420, label: 'Mountain' },
+                { value: -480, label: 'Pacific' }
+            ]
+        });
+    }
+    function removeDueDateTableElement(deadline_type, round_no) {
+        var element_id;
+        if (round_no == 0) {
+            element_id = '#' + deadline_type;
+        } else {
+            element_id = '#' + deadline_type + '_round_' + round_no;
+        }
+        jQuery(element_id).remove();
+    }
+
+    <!--javascript function that goes through the due_dates_table and submit the data line by line -->
+    <!--ruby method that response to the get request is set_due_date-->
+    function submit_due_dates() {
+        var data, para, fields, i, j;
+        //delete old due_dates
+        jQuery.get("/assignment/delete_all_due_dates?assignment_id=" + <%= @assignment.id %>);
+        //create the new due_dates
+        data = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
+        for (i = 0; i < data.length; i++) {
+            fields = jQuery(data[i]).find('input,select');
+            para = "?";
+            for (j = 0; j < fields.length; j++) {
+                para += "&" + (fields[j].name + "=" + fields[j].value);
+            }
+            jQuery.get("/assignment/set_due_date" + para);
+        }
+    }
+</script>
+
+<div style="font-size:large;">
+  <b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b>
+</div>
+
+<div style='padding: 5px' id='review_round'>
+  <%= label_tag('assignment[rounds_of_reviews]', 'Number of Review Rounds:') %>
+  <%= text_field_tag('assignment[rounds_of_reviews]', @assignment.rounds_of_reviews, :style => 'width:50px') %>
+  <%= button_to_function('Set', 'changeReviewRounds()') %>
+</div>
+
+<table class='exp' id='due_dates_table' style='padding:10px'>
+  <tr id='due_date_heading'>
+    <th width=15%>Deadline type</th>
+    <th width=25%>Date & time</th>
+    <th width=10%>Submission allowed</th>
+    <th width=10%>Review allowed</th>
+    <!--<th width=10%>Resubmission Allowed</th>-->
+    <!--<th width=10%>Re-Review Allowed</th>-->
+    <th width=10%>Meta-review allowed</th>
+    <th width=10%>Reminder(hrs)</th>
+  </tr>
+  <script>
+      jQuery(document).ready(function () {
+          <% for i in 1..@assignment.rounds_of_reviews %>
+          addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json.html_safe %>);
+          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json.html_safe %>);
+          <% end %>
+          addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json.html_safe %>);
+      }());
+  </script>
+</table>

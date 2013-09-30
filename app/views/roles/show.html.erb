@@ -71,8 +71,7 @@ for each:</p>
 
 <hr/>
 <p><%= link_to 'Edit', :action => 'edit', :id => @role %> |
-<%= link_to 'Delete', {:action => 'destroy', :id => @role}, 
-    :confirm => 'Are you sure?', :method => :post %> </p>
+<%= link_to 'Delete', @role, confirm: 'Are you sure?', method: :delete %> </p>
 
-<p><%= link_to 'Back', :action => 'list' %> to Roles list</p>
+<p><%= link_to 'Back', Role %> to Roles list</p>
 

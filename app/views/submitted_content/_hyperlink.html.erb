@@ -1,5 +1,5 @@
 <% stage = participant.assignment.get_current_stage %>
-<% form_tag({:action=>'remove_hyperlink',:id => participant.id},{:method => 'post' }) do %>
+<%= form_tag({:action=>'remove_hyperlink',:id => participant.id},{:method => 'post' }) do %>
 <% if stage != "Complete" %>
     <b>Hyperlink Actions:</b><BR/>
     </br>

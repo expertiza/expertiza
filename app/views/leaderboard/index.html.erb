@@ -1,16 +1,16 @@
 <SCRIPT LANGUAGE="JavaScript">
-function toggleVis(id) {
-                var elem = document.getElementById(id+"_myDiv");
-                if(elem.style.display == 'none'){
-                        elem.style.display = '';
-                        document.getElementById(id+"_show").style.display = 'none';
-                        document.getElementById(id+"_hide").style.display = '';
-                } else {
-                        elem.style.display = 'none';
-                        document.getElementById(id+"_show").style.display = '';
-                        document.getElementById(id+"_hide").style.display = 'none';
-                }
-        }
+  function toggleVis(id) {
+    var elem = document.getElementById(id+"_myDiv");
+    if(elem.style.display == 'none'){
+      elem.style.display = '';
+      document.getElementById(id+"_show").style.display = 'none';
+      document.getElementById(id+"_hide").style.display = '';
+      } else {
+      elem.style.display = 'none';
+      document.getElementById(id+"_show").style.display = '';
+      document.getElementById(id+"_hide").style.display = 'none';
+    }
+  }
 </SCRIPT>
 
 <h1>Leaderboards for <%=@user.fullname%></h1>
@@ -25,12 +25,12 @@ function toggleVis(id) {
 </div>
 
 <% if @instructorQuery == false%>
-<a href="#1" onClick="toggleVis('achievementLeaderboard');">	
-  <span id="achievementLeaderboard_show">View Personal Achievement Leaderboards</span>
-  <span id="achievementLeaderboard_hide" style="display: none">Hide Personal Achievement Leaderboards</span>
-</a>
-<br/><br/>
-<div id="achievementLeaderboard_myDiv" style="display:none">
-  <%= render :partial => 'achievementLeaderBoards' %>
-</div>
+  <a href="#1" onClick="toggleVis('achievementLeaderboard');">	
+    <span id="achievementLeaderboard_show">View Personal Achievement Leaderboards</span>
+    <span id="achievementLeaderboard_hide" style="display: none">Hide Personal Achievement Leaderboards</span>
+  </a>
+  <br/><br/>
+  <div id="achievementLeaderboard_myDiv" style="display:none">
+    <%= render :partial => 'achievementLeaderBoards' %>
+  </div>
 <% end %>

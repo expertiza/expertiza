@@ -42,28 +42,30 @@
         action = "list"
       end
     %>
+</div>
+</div>
 
-  <span>&nbsp; &raquo;
-    <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => id %>
-    (<%= student_task.relative_deadline %> left)
-  </span><br/>
+<span>&nbsp; &raquo;
+  <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => id %>
+  (<%= student_task.relative_deadline %> left)
+</span><br/>
 <% end %>
 
 <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
 <% @taskrevisions.each do |student_task|
   participant = student_task.participant
-     stage = student_task.current_stage
-     duedate = participant.assignment.get_stage_deadline(participant.topic_id)
-     controller = ""
-     action = ""
-     if stage == "submission" or stage == "resubmission"
-       controller = "submitted_content"
-       action = "edit"
-     elsif stage == "review" or stage == "rereview" or stage == "metareview"
-       controller = "student_review"
-       action = "list"
-     end
-   %>
+  stage = student_task.current_stage
+  duedate = participant.assignment.get_stage_deadline(participant.topic_id)
+  controller = ""
+  action = ""
+  if stage == "submission" or stage == "resubmission"
+    controller = "submitted_content"
+    action = "edit"
+  elsif stage == "review" or stage == "rereview" or stage == "metareview"
+    controller = "student_review"
+    action = "list"
+  end
+%>
 
  <span>&nbsp; &raquo; <%= link_to participant.assignment.name + " " +
    stage, :controller => controller, :action => action, :id => participant.id %> 
@@ -76,38 +78,36 @@
   <span class="notification">&nbsp; &raquo; <%= link_to student_task.assignment.name + ": " +
     student_task.current_stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => student_task.participant.id %></span><br/>
 <% end %>
-                                                                             </div>
 
-                                                                             <div class="topictable">
-                                                                               <table class="listing" cellpadding="2">
-                                                                                 <tr class="taskheader">
-                                                                                   <th>&nbsp;</th>
-                                                                                   <th>Assignment</th>
-                                                                                   <th>Course</th>
-                                                                                   <th>Topic</th>
-                                                                                   <th>Current Stage</th>
-                                                                                   <th>Stage Deadline</th>
-                                                                                   <th>Publishing Rights</th>
-                                                                                 </tr>
+<div class="topictable">
+  <table class="listing" cellpadding="2">
+    <tr class="taskheader">
+      <th>&nbsp;</th>
+      <th>Assignment</th>
+      <th>Course</th>
+      <th>Topic</th>
+      <th>Current Stage</th>
+      <th>Stage Deadline</th>
+      <th>Publishing Rights</th>
+    </tr>
 
-                                                                                 <% @student_tasks.each do |student_task| %>
-                                                                                   <% participant = student_task.participant %>
-                                                                                   <% if student_task.assignment %>
-                                                                                     <tr class="listingRow">
-                                                                                       <td>&nbsp;</td>
-                                                                                       <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
-                                                                                       <td>
-                                                                                         <% participant.get_course_string %></td>
-                                                                                       <td><%= participant.get_topic_string %></td>
-                                                                                       <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
-                                                                                       <td><%= student_task.stage_deadline %></td>
-                                                                                       <td align=center>
-                                                                                         <% if participant.permission_granted %>granted
-                                                                                         <% else %>denied
-                                                                                         <% end %></td>
-                                                                                     </tr>
-                                                                                   <% end %>
-                                                                                 <% end %>
-                                                                               </table>
-                                                                             </div>
-                                                                           </div>
+    <% @student_tasks.each do |student_task| %>
+      <% participant = student_task.participant %>
+      <% if student_task.assignment %>
+        <tr class="listingRow">
+          <td>&nbsp;</td>
+          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
+          <td>
+            <% participant.get_course_string %></td>
+          <td><%= participant.get_topic_string %></td>
+          <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
+          <td><%= student_task.stage_deadline %></td>
+          <td align=center>
+            <% if participant.permission_granted %>granted
+            <% else %>denied
+            <% end %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+</div>

@@ -63,7 +63,7 @@ function submitAction(container_id, action_url){
      <% if definition[:type] == "display" %>       
        <%= element[definition[:field].to_sym] %>
      <% elsif definition[:type] == "fetch" %>
-       <%= ApplicationHelper.get_field(element,definition[:field],definition[:model],definition[:column]) %>       
+       <%= get_field(element,definition[:field],definition[:model]) %>       
      <% else %>            
          <% 
             disabled = false

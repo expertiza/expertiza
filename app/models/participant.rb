@@ -6,12 +6,24 @@ class Participant < ActiveRecord::Base
   has_many   :comments, :dependent => :destroy
   has_many   :resubmission_times, :dependent => :destroy
   has_many   :reviews, :class_name => 'ResponseMap', :foreign_key => 'reviewer_id'
-  #has_many :response_maps, :foreign_key => 'reviewee_id'
+  has_many   :team_reviews, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewer_id'
   has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id'
-  # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
-  #has_many :responses, :through => :response_maps
-  
+
   validates_numericality_of :grade, :allow_nil => true
+
+  def review_response_maps
+    ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
+  end
+
+  def get_current_stage
+    assignment.get_current_stage topic_id
+  end
+  alias_method :current_stage, :get_current_stage
+
+  def get_stage_deadline
+    assignment.get_stage_deadline topic_id
+  end
+  alias_method :stage_deadline, :get_stage_deadline
 
   def name
     User.find(self.user_id).name

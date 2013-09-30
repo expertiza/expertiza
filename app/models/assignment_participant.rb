@@ -219,20 +219,12 @@ class AssignmentParticipant < Participant
   end
 
   def get_members
-    if self.team.nil?
-      [self]
-    else        
-      self.team.get_participants
-    end
+    team.try :participants
   end
 
 
   def get_hyperlinks
-    links = Array.new
-    for team_member in self.get_members
-      links.concat(team_member.get_hyperlinks_array)
-    end
-    return links
+    team.try :get_hyperlinks
   end
 
   def get_hyperlinks_array

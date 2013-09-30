@@ -8,16 +8,18 @@ class ApplicationController < ActionController::Base
   before_filter :set_time_zone
   before_filter :goldberg_security_filter
 
-  def authorize
-    unless current_user
-      flash[:notice] = "Please log in."
-      redirect_to :controller => 'user_sessions', :action => 'new'
+  def authorize(args = {})
+    unless current_permission(args).allow?(params[:controller], params[:action])
+      flash[:warn] = 'Please log in.'
+      redirect_back
     end
     @user = current_user
   end
 
-  def current_user
-    session[:user]
+  def current_permission(args = {})
+    @authority ||= Authority.new args.merge({
+      current_user: current_user
+    })
   end
   delegate :allow?, to: :current_permission
   helper_method :allow?

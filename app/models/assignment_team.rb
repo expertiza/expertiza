@@ -65,17 +65,7 @@ class AssignmentTeam < Team
   end
 
   def self.get_first_member(team_id)
-    participant = nil
-    begin
-      team = Team.find(team_id)
-      user_id = team.teams_users.first.user_id
-      participant = Participant.find_by_user_id_and_parent_id(user_id,team.parent_id)
-    rescue NoMethodError => e
-      puts "Ignoring error: #{e}"
-    rescue ActiveRecord::RecordNotFound => e
-      puts "Ignoring error: #{e}"
-    end
-    return participant
+    find(team_id).participants.first
   end
 
   def get_hyperlinks
@@ -262,4 +252,8 @@ class AssignmentTeam < Team
     TeamNode.create(:parent_id =>assignment_id,:node_object_id=>team.id)
     team
   end
+end
+
+  require 'models/analytic/assignment_team_analytic'
+  include AssignmentTeamAnalytic
 end

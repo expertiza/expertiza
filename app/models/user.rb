@@ -53,12 +53,16 @@ class User < ActiveRecord::Base
       can_impersonate?(user.parent) # recursive
   end
 
-  def admin?
-    role == super_admin? || Role.admin
+  def first_name
+    fullname[/,.+/][/\w+/] if fullname
   end
 
   def super_admin?
-    role == Role.super_admin
+    role.name == 'Super-Administrator'
+  end
+
+  def admin?
+    role.name == 'Administrator'
   end
 
   def is_creator_of?(user)

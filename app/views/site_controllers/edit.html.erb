@@ -1,9 +1,9 @@
 <h1>Edit Controller</h1>
 
-<%= form_for @site_controller do |form| %>
+<% form_tag :action => 'update', :id => @site_controller do %>
   <%= render :partial => 'form' %>
-  <%= form.submit 'Edit' %>
+  <%= submit_tag 'Edit' %>
 <% end %>
 
-<%= link_to 'Show', @site_controller %> |
-<%= link_to 'Back', SiteController %>
+<%= link_to 'Show', :action => 'show', :id => @site_controller %> |
+<%= link_to 'Back', :action => 'list' %>

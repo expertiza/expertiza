@@ -18,7 +18,7 @@
 </script>
 
 <% @assignment = Assignment.find(params[:id]) %>
-<%= form_tag({:action => 'save_topic_dependencies', :id => 'dependency', :assignment_id => @assignment.id}, { :id => 'dependency' }) do %>
+<% form_tag({:action => 'save_topic_dependencies', :id => 'dependency', :assignment_id => @assignment.id}, { :id => 'dependency' }) do %>
   <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
 
   <% if flash[:notice] %>
@@ -88,7 +88,7 @@
   <span class="inline" id="due_date_hide" style="display: none">Hide start/due date</span>
 </a>
 
-      <%= form_tag :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
+      <% form_tag :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
       <div id="due_date_myDiv" style="display:none" align="left">
         <br/>
 

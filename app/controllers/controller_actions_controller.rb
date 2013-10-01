@@ -2,22 +2,29 @@ class ControllerActionsController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-         :redirect_to => { :action => :index }
+         :redirect_to => { :action => :list }
 
 
   def index
-    @controller_actions = ControllerAction.order(:name).paginate(per_page: 50, page: 1)
+    list
+    render :action => 'list'
   end
 
 
   def list
-    redirect_to :action => 'index'
+    # @controller_action_pages, @controller_actions = paginate :controller_actions, :per_page => 50, :order => 'site_controller_id, name'
+    @controller_actions = ControllerAction.find(:all,
+                                                :order => 'name')
   end
 
 
   def show
     @controller_action = ControllerAction.find(params[:id])
-    @permission = @controller_action.permission || Permission.new(:id => nil, :name => '(default)')
+    if @controller_action.permission_id
+      @permission = Permission.find(@controller_action.permission_id)
+    else
+      @permission = Permission.new(:id => nil, :name => '(default)')
+    end
   end
 
 
@@ -83,15 +90,18 @@ class ControllerActionsController < ApplicationController
     site_controller_id = @controller_action.site_controller_id
     @controller_action.destroy
     Role.rebuild_cache
-    redirect_to @controller_action.site_controller
+    redirect_to :controller => 'site_controllers', :action => 'show',
+    :id => @controller_action.site_controller_id
   end
+
 
   protected
 
+  
   def foreign
-    @controllers = SiteController.order :name
-
-    @permissions = Permission.order :name
+    @controllers = SiteController.find(:all, :order => 'name')
+    
+    @permissions = Permission.find(:all, :order => 'name')
     @permissions.unshift Permission.new(:id => nil, :name => '(default)')
   end
 

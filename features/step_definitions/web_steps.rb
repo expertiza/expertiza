@@ -25,27 +25,19 @@ When /^I go to (.+)$/ do |page_name|
 end
 
 When /^I press "([^"]*)"(?: within "([^"]*)")?$/ do |button, selector|
-  if selector
-    with_scope(selector) do
-      first(:button, button).click
-    end
-  else
-    first(:button, button).click
+  with_scope(selector) do
+    click_button(button)
   end
 end
 
 When /^I follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
-  if selector
-    with_scope(selector) do
-      first(:link, link).click
-    end
-  else
-    first(:link, link).click
+  with_scope(selector) do
+    click_link(link)
   end
 end
 
 When /^I click on "([^"]*)"$/ do |name|
-  (first(name).try :click) || click_link(name)
+  click_link name
 end
 
 When /^I fill in "([^"]*)" with "([^"]*)"(?: within "([^"]*)")?$/ do |field, value, selector|

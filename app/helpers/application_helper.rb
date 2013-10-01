@@ -18,10 +18,4 @@ module ApplicationHelper
   def get_field(element, field)
     element.send field
   end
-
-  def flash_message(type)
-    if flash[type]
-      "<div class='flash_#{type.to_s}'>#{flash[type]}</div>".html_safe
-    end
-  end
 end

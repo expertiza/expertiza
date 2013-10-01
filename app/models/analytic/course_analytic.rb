@@ -1,4 +1,4 @@
-require 'analytic/assignment_analytic'
+require 'models/analytic/assignment_analytic'
 module CourseAnalytic
   #====== general statistics ======#
   def num_participants

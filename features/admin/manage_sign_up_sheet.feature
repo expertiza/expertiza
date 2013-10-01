@@ -9,7 +9,6 @@ Background:
         And I click on "Manage Assignments"
         Then I should see "test_assignment"
 
-    @wip
     Scenario: Add a new topic
         Given I click on "Add signup sheet" 
         And I follow "New topic"
@@ -22,8 +21,6 @@ Background:
         And I press "Create"
         Then I should see "Topic was successfully created"
         And I should see "test_topic"
-
-    @wip
     Scenario: Edit a topic
         Given the topic "test_topic" for assignment "test_assignment" exists 
         And I click on "Edit signup sheet"

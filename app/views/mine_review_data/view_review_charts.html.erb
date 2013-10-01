@@ -4,7 +4,7 @@
   <table align="left">
     <tr>
       <td style="width: 40px;">
-        <%= form_tag({:course_list=>@course_list}) do %>
+        <% form_tag({:course_list=>@course_list}) do %>
             Select Graph :
             <br/>
             <select name='display[graph_type]' style="width: 15em">
@@ -37,7 +37,7 @@
         <div>
           <% if @assignments and !@assignments.empty? %>
               <table>
-                <%= form_tag({:course_list=>@course_list, :course_id=>@selected_course, :graph_type=>@selected_graph}) do %>
+                <% form_tag({:course_list=>@course_list, :course_id=>@selected_course, :graph_type=>@selected_graph}) do %>
                     <% index=0 %>
                     <% @assignments.each do |course, assignments| %>
                         <% if course and !course.empty? %>

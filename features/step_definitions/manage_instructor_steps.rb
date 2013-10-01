@@ -12,8 +12,8 @@ And /^I create a new instructor named "(\S+)"$/ do |instructor|
   fill_in 'user_name', :with => instructor
   fill_in 'user_fullname', :with => instructor
   fill_in 'user_email', :with => "#{instructor}@ncsu.edu"
-  fill_in 'user_password', :with => 'password'
-  fill_in 'user_password_confirmation', :with => 'password'
+  fill_in 'user_clear_password', :with => 'password'
+  fill_in 'user_clear_password_confirmation', :with => 'password'
   click_button 'Create'
 end
 
@@ -22,7 +22,7 @@ Then /^I should be able to see "(\S+)" under the list of instructors$/ do |instr
 end
 
 When /^I click on "(\S+)" starting with "(\S+)"$/ do |name, alphabet|
-  first('.letters').first(:link, alphabet).click
+  click_link alphabet
   click_link name
 end
 

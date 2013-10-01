@@ -6,13 +6,13 @@ class UserTest < ActiveSupport::TestCase
   def test_random_password_generation_for_new_users
     u = User.new(:email => "new@guy.co", :name => 'newguy')
     u.save!
-    assert u.password.present?
+    assert u.clear_password.present?
   end
   
   def test_no_random_password_generation_for_new_users_with_specified_password
-    u = User.new(:email => "new@guy.co", :name => 'newguy', :password => 'mypass', :password_confirmation => 'mypass')
+    u = User.new(:email => "new@guy.co", :name => 'newguy', :clear_password => 'mypass', :clear_password_confirmation => 'mypass')
     u.save!
-    assert_equal "mypass", u.password
+    assert_equal "mypass", u.clear_password
   end
   
   # 101 add a new user 
@@ -20,8 +20,8 @@ class UserTest < ActiveSupport::TestCase
     user = User.new
     user.name = "testStudent1"
     user.fullname = "test_Student_1"
-    user.password = "testStudent1"
-    user.password_confirmation = "testStudent1"
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
     user.email = "testStudent1@foo.edu"
     user.role_id = "1"
     user.save! # an exception is thrown if the user is invalid
@@ -31,8 +31,8 @@ class UserTest < ActiveSupport::TestCase
   def test_add_user_with_exist_name
     user = User.new
     user.name = 'student1'
-    user.password = "testStudent1"
-    user.password_confirmation = "testStudent1"
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
     user.fullname = "student1_fullname",
     user.role_id = "3"
     assert !user.save
@@ -116,13 +116,13 @@ class UserTest < ActiveSupport::TestCase
     user = User.new
     user.name = "testStudent1"
     user.fullname = "test_Student_1"
-    user.password = "testStudent1"
-    user.password_confirmation = "testStudent1"
+    user.clear_password = "testStudent1"
+    user.clear_password_confirmation = "testStudent1"
     user.email = "testStudent1@foo.edu"
     user.role_id = "1"
     user.save! # an exception is thrown if the user is invalid
 
-    email = MailerHelper::send_mail_to_user(user,"Test Email","user_welcome",user.password)
+    email = MailerHelper::send_mail_to_user(user,"Test Email","user_welcome",user.clear_password)
     assert !ActionMailer::Base.deliveries.empty?         # Checks if the mail has been queued in the delivery queue
 
     assert_equal [user.email], email.to                  # Checks if the mail is being sent to proper user

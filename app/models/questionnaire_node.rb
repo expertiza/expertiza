@@ -1,6 +1,5 @@
 class QuestionnaireNode < Node 
   belongs_to :questionnaire, :class_name => "Questionnaire", :foreign_key => "node_object_id"
-  belongs_to :node_object, :class_name => "Questionnaire"
   
   def self.table
     "questionnaires"

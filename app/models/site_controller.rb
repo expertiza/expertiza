@@ -1,27 +1,42 @@
 class SiteController < ActiveRecord::Base
-  has_many :controller_actions
-  belongs_to :permission
 
   validates_presence_of :name
   validates_uniqueness_of :name
+  attr_accessor :permission
 
-  scope :builtin, -> { where(builtin: 1).order(:name) }
-  scope :application, -> { where('builtin is null or builtin = 0').order(:name) }
+  def permission
+    @permission ||= Permission.find_by_id(self.permission_id)
+    return @permission
+  end
 
   def actions
-    @actions ||= controller_actions.order(:name)
+    @actions ||= ControllerAction.find(:all,
+                                       :conditions =>
+                                       "site_controller_id = #{self.id}",
+                                       :order => 'name')
   end
 
 
   def self.classes
+    for file in Dir.glob("#{RAILS_ROOT}/app/controllers/*.rb") do
+      begin
+        load file
+      rescue
+        logger.info "Couldn't load file '#{file}' (already loaded?)"
+      end
+    end
+    
     classes = Hash.new
-
+    
     ObjectSpace.each_object(Class) do |klass|
-      if klass.respond_to?(:controller_name) && klass.superclass.to_s == ApplicationController.to_s
+      if klass.respond_to? :controller_name
+        if klass.superclass.to_s == ApplicationController.to_s
           classes[klass.controller_name] = klass
+        end
       end
     end
 
-    classes
+    return classes
   end
+
 end

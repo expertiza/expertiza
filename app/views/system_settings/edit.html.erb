@@ -1,6 +1,6 @@
 <h1>Editing System Settings</h1>
 
-<%= form_tag :action => 'update', :id => @system_settings do %>
+<% form_tag :action => 'update', :id => @system_settings do %>
   <%= render :partial => 'form' %>
   <%= submit_tag 'Edit' %>
 <% end %>

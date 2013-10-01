@@ -1,7 +1,5 @@
 <h1>Instructors</h1>
 
-<%= will_paginate @users %>
-
 <table>
   <tr><th>Name</th><th>Full Name</th><th>Email Address</th><th>Parent</th></tr>
 <% for user in @users %>
@@ -16,7 +14,7 @@
 </table>
 
 <hr/>
-<%= form_tag('new_instructor', method: :get) do %>
+<% form_tag({:action => 'new_instructor'}, {:method => 'post'}) do %>
 
 <br>
 <%= text_field_tag('name', '', {'size' => 30}) %>

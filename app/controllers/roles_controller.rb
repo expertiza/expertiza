@@ -1,14 +1,17 @@
 class RolesController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify method: :post, only: [ :destroy, :create, :update ], redirect_to: Role
+  verify :method => :post, :only => [ :destroy, :create, :update ],
+         :redirect_to => { :action => :list }
 
   def index
-    @roles = Role.order(:name)
+    list
+    render :action => 'list'
   end
 
   def list
-    redirect_to Role
+    @roles = Role.find(:all,
+                       :order => 'name')
   end
 
   def show
@@ -28,7 +31,7 @@ class RolesController < ApplicationController
     if @role.save
       Role.rebuild_cache
       flash[:notice] = 'Role was successfully created.'
-      redirect_to Role
+      redirect_to :action => 'list'
     else
       foreign
       render :action => 'new'
@@ -55,14 +58,25 @@ class RolesController < ApplicationController
 
   def destroy
     Role.find(params[:id]).destroy
-    redirect_to Role
+    redirect_to :action => 'list'
   end
 
   protected
 
   def foreign
-    @other_roles = @role.other_roles
-
-    @users = @role.users
+    if @role.id
+      @other_roles = Role.find(:all,
+                             :conditions => ['id not in (?)', @role.id],
+                             :order => 'name')
+    else
+      @other_roles = Role.find(:all,
+                               :order => 'name')
+    end
+    @other_roles ||= Array.new
+    @other_roles.unshift Role.new(:id => nil, :name => '(none)')
+    @users = User.find(:all,
+                       :conditions => ['role_id = ?', @role.id],
+                       :order => 'name')
   end
+    
 end

@@ -14,7 +14,7 @@ class Menu
       @name = item.name
       @id = item.id
       @label = item.label
-
+      
       if item.controller_action
         @site_controller_id = item.controller_action.controller.id
         @controller_action_id = item.controller_action.id
@@ -91,9 +91,17 @@ class Menu
     if role
       if role.cache[:credentials].permission_ids.size > 0
         items = MenuItem.items_for_permissions(role.cache[:credentials].permission_ids)
+#         items = MenuItem.find_by_sql(["select * from view_menu_items " +
+#                                       "where permission_id in (?) " +
+#                                       "order by menu_item_seq", 
+#                                       role.cache[:credentials].permission_ids ])
+      else  # role has no permissions
+        # (items will remain as nil: the only node will be the root)
       end
     else  # No role given: build menu of everything
       items = MenuItem.items_for_permissions
+#       items = MenuItem.find_by_sql("select * from view_menu_items " +
+#                                    "order by menu_item_seq")
     end
 
     if items
@@ -147,8 +155,8 @@ class Menu
       @selected = Hash.new
       @vector = Array.new
       @crumbs = Array.new
-
-      while node && node.id
+      
+      while node and node.id
         @selected[node.id] = node
         @vector.unshift node
         @crumbs.unshift node.id
@@ -156,17 +164,21 @@ class Menu
       end
       @vector.unshift @root
       return @by_name[name]
+    else
+      return nil
     end
   end
 
   def get_item(item_id)
-    @by_id[item_id]
+    return @by_id[item_id]
   end
 
   # Returns the array of items at the given level.
   def get_menu(level)
     if @vector.length > level
-      @vector[level].children
+      return @vector[level].children
+    else
+      return nil
     end
   end
 
@@ -175,7 +187,9 @@ class Menu
   # or nil if no item is selected.
   def selected
     if @vector.length > 0
-      @vector[@vector.length - 1].name
+      return @vector[@vector.length - 1].name
+    else
+      return nil
     end
   end
   

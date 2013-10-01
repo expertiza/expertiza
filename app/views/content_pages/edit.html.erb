@@ -1,6 +1,6 @@
 <h1>Editing Content Page</h1>
 
-<%= form_tag :action => 'update', :id => @content_page do %>
+<% form_tag :action => 'update', :id => @content_page do %>
   <%= render :partial => 'form' %>
   <%= submit_tag 'Edit' %>
 <% end %>

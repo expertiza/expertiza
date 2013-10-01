@@ -1,5 +1,5 @@
 <h2>Import <%= @title %></h2>
-<%= form_tag({:controller => 'import_file', :action => 'import'}, {:method => 'post', :multipart => true, :name => 'import_form'}) do %>
+<% form_tag({:controller => 'import_file', :action => 'import'}, {:method => 'post', :multipart => true, :name => 'import_form'}) do %>
 <table>
  <tr>
   <td valign='Top'>Delimiter:</td>

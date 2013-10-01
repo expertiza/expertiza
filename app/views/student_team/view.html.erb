@@ -155,7 +155,7 @@
 
 <% if @student.team == nil %>
     <h2>Create Team</h2>
-    <%= form_tag :controller => 'student_team', :action => 'create' do %>
+    <% form_tag :controller => 'student_team', :action => 'create' do %>
         <%= hidden_field_tag 'id', @student.id %>
         <label for="team_name">Team Name:</label>&nbsp;
         <%= text_field 'team', 'name' %>
@@ -163,7 +163,7 @@
     <% end %>
 <% else %>
     <h2>Invite people</h2>
-    <%= form_tag :controller => 'invitation', :action => 'create' do %>
+    <% form_tag :controller => 'invitation', :action => 'create' do %>
         <%= hidden_field_tag 'team_id', @student.team.id %>
         <%= hidden_field_tag 'student_id', @student.id %>
         <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>

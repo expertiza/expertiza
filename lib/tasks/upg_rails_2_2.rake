@@ -78,8 +78,8 @@ namespace :upg_rails_2_2 do
   task :update_deprecated_code do
 
     deprecated_reg_exp = {
-      '<%= form_tag ... %>'       => "<%=[\\ ]\\{0,1\\}form_tag\\(.*\\)[\\ ]\\{0,1\\}%>/<%= form_tag\\1do %>",
-      '<%= start_form_tag ... %>' => "<%=[\\ ]\\{0,1\\}start_form_tag\\(.*\\)[\\ ]\\{0,1\\}%>/<%= form_tag\\1do %>",
+      '<%= form_tag ... %>'       => "<%=[\\ ]\\{0,1\\}form_tag\\(.*\\)[\\ ]\\{0,1\\}%>/<% form_tag\\1do %>",
+      '<%= start_form_tag ... %>' => "<%=[\\ ]\\{0,1\\}start_form_tag\\(.*\\)[\\ ]\\{0,1\\}%>/<% form_tag\\1do %>",
       '<%= end_form_tag %>'       => "<%=[\\ ]\\{0,1\\}end_form_tag[\\ ]\\{0,1\\}%>/<% end %>",
       ':post => true'             => ":post => true/:method => :post"
     }

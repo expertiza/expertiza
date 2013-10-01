@@ -5,7 +5,6 @@
 
 class AssignmentNode < Node   
   belongs_to :assignment, :class_name => "Assignment", :foreign_key => "node_object_id"
-  belongs_to :node_object, :class_name => 'Assignment'
   # Returns the table in which to locate Assignments
   def self.table
     "assignments"

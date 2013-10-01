@@ -16,7 +16,8 @@
 <tr><th> Name </th><th> Permission </th></tr>
 <% for action in @actions -%>
 <tr>
-<td> <%= link_to action.name, action %> </td>
+<td> <%= link_to action.name, :controller => 'controller_actions',
+                 :action => 'show', :id => action.id %> </td>
 <td> <%= action.permission.name %> </td> 
 <% end -%>
 </table>
@@ -31,6 +32,7 @@
 
 <hr/>
 <p><%= link_to 'Edit', :action => 'edit', :id => @site_controller %> |
-  <%= link_to 'Delete', @site_controller, method: :delete, confirm: 'Are you sure?' %> </p>
+<%= link_to 'Delete', {:action => 'destroy', :id => @site_controller}, 
+    :confirm => 'Are you sure?', :method => :post %> </p>
 
-<p><%= link_to 'Back to all controllers', SiteController %></p>
+<p><%= link_to 'Back', :action => 'list' %> to Controllers list</p>

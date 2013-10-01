@@ -1,0 +1,1407 @@
+-- MySQL dump 10.10
+--
+-- Host: localhost    Database: pg_development
+-- ------------------------------------------------------
+-- Server version	5.0.27-community
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `assignment_questionnaires`
+--
+
+DROP TABLE IF EXISTS `assignment_questionnaires`;
+CREATE TABLE `assignment_questionnaires` (
+  `id` int(11) NOT NULL auto_increment,
+  `assignment_id` int(11) default NULL,
+  `questionnaire_id` int(11) default NULL,
+  `user_id` int(11) default NULL,
+  `notification_limit` int(11) NOT NULL default '15',
+  `questionnaire_weight` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `fk_aq_user_id` (`user_id`),
+  KEY `fk_aq_assignments_id` (`assignment_id`),
+  KEY `fk_aq_questionnaire_id` (`questionnaire_id`),
+  CONSTRAINT `fk_aq_questionnaire_id` FOREIGN KEY (`questionnaire_id`) REFERENCES `questionnaires` (`id`),
+  CONSTRAINT `fk_aq_assignments_id` FOREIGN KEY (`assignment_id`) REFERENCES `assignments` (`id`),
+  CONSTRAINT `fk_aq_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `assignment_questionnaires`
+--
+
+LOCK TABLES `assignment_questionnaires` WRITE;
+/*!40000 ALTER TABLE `assignment_questionnaires` DISABLE KEYS */;
+INSERT INTO `assignment_questionnaires` VALUES (1,NULL,NULL,2,15,0);
+/*!40000 ALTER TABLE `assignment_questionnaires` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `assignments`
+--
+
+DROP TABLE IF EXISTS `assignments`;
+CREATE TABLE `assignments` (
+  `id` int(11) NOT NULL auto_increment,
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  `name` varchar(255) default NULL,
+  `directory_path` varchar(255) default NULL,
+  `submitter_count` int(10) NOT NULL default '0',
+  `course_id` int(11) default '0',
+  `instructor_id` int(11) default '0',
+  `private` tinyint(1) NOT NULL default '0',
+  `num_reviews` int(11) NOT NULL default '0',
+  `num_review_of_reviews` int(11) NOT NULL default '0',
+  `num_review_of_reviewers` int(11) NOT NULL default '0',
+  `review_strategy_id` int(11) default '0',
+  `mapping_strategy_id` int(11) default '0',
+  `review_questionnaire_id` int(11) default NULL,
+  `review_of_review_questionnaire_id` int(11) default NULL,
+  `reviews_visible_to_all` tinyint(1) default NULL,
+  `team_assignment` tinyint(1) default NULL,
+  `wiki_type_id` int(11) default NULL,
+  `require_signup` tinyint(1) default NULL,
+  `num_reviewers` int(10) NOT NULL default '0',
+  `spec_location` text,
+  `author_feedback_questionnaire_id` int(11) default NULL,
+  `teammate_review_questionnaire_id` int(10) default NULL,
+  `team_count` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `fk_assignments_review_questionnaires` (`review_questionnaire_id`),
+  KEY `fk_assignments_review_of_review_questionnaires` (`review_of_review_questionnaire_id`),
+  KEY `fk_assignments_wiki_types` (`wiki_type_id`),
+  KEY `fk_assignments_instructors` (`instructor_id`),
+  KEY `fk_assignments_courses` (`course_id`),
+  KEY `fk_assignments_review_strategies` (`review_strategy_id`),
+  KEY `fk_assignments_mapping_strategies` (`mapping_strategy_id`),
+  CONSTRAINT `fk_assignments_mapping_strategies` FOREIGN KEY (`mapping_strategy_id`) REFERENCES `mapping_strategies` (`id`),
+  CONSTRAINT `fk_assignments_courses` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`),
+  CONSTRAINT `fk_assignments_instructors` FOREIGN KEY (`instructor_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_assignments_review_of_review_questionnaires` FOREIGN KEY (`review_of_review_questionnaire_id`) REFERENCES `questionnaires` (`id`),
+  CONSTRAINT `fk_assignments_review_questionnaires` FOREIGN KEY (`review_questionnaire_id`) REFERENCES `questionnaires` (`id`),
+  CONSTRAINT `fk_assignments_review_strategies` FOREIGN KEY (`review_strategy_id`) REFERENCES `review_strategies` (`id`),
+  CONSTRAINT `fk_assignments_wiki_types` FOREIGN KEY (`wiki_type_id`) REFERENCES `wiki_types` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `assignments`
+--
+
+LOCK TABLES `assignments` WRITE;
+/*!40000 ALTER TABLE `assignments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `assignments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `comments`
+--
+
+DROP TABLE IF EXISTS `comments`;
+CREATE TABLE `comments` (
+  `id` int(11) NOT NULL auto_increment,
+  `participant_id` int(11) NOT NULL,
+  `private` tinyint(1) NOT NULL,
+  `comment` text NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `comments`
+--
+
+LOCK TABLES `comments` WRITE;
+/*!40000 ALTER TABLE `comments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `comments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `content_pages`
+--
+
+DROP TABLE IF EXISTS `content_pages`;
+CREATE TABLE `content_pages` (
+  `id` int(11) NOT NULL auto_increment,
+  `title` varchar(255) default NULL,
+  `name` varchar(255) NOT NULL default '',
+  `markup_style_id` int(11) default NULL,
+  `content` text,
+  `permission_id` int(11) NOT NULL default '0',
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  `content_cache` text,
+  PRIMARY KEY  (`id`),
+  KEY `fk_content_page_permission_id` (`permission_id`),
+  KEY `fk_content_page_markup_style_id` (`markup_style_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `content_pages`
+--
+
+LOCK TABLES `content_pages` WRITE;
+/*!40000 ALTER TABLE `content_pages` DISABLE KEYS */;
+INSERT INTO `content_pages` VALUES (1,'Home Page','home',1,'<h1>Welcome to Expertiza</h1> <p> The Expertiza project is a system for using peer review to create reusable learning objects.  Students do different assignments; then peer review selects the best work in each category, and assembles it to create a single unit.</p>',3,'2006-06-12 00:31:56','2007-02-23 10:17:45','<h1>Welcome to Expertiza</h1> <p> The Expertiza project is system for using peer review to create reusable learning objects.  Students do different assignments; then peer review selects the best work in each category, and assembles it to create a single unit.</p>'),(2,'Session Expired','expired',1,'h1. Session Expired\n\nYour session has expired due to inactivity.\n\nTo continue please login again.\n',3,'2006-06-12 00:33:14','2007-02-23 10:17:45','<h1>Session Expired</h1>\n\n\n  <p>Your session has expired due to inactivity.</p>\n\n\n  <p>To continue please login again.</p>'),(3,'Not Found!','notfound',1,'h1. Not Found\n\nThe page you requested was not found!\n\nPlease contact your system administrator.',3,'2006-06-12 00:33:49','2007-02-23 10:17:45','<h1>Not Found</h1>\n\n\n  <p>The page you requested was not found!</p>\n\n\n  <p>Please contact your system administrator.</p>'),(4,'Permission Denied!','denied',1,'h1. Permission Denied\n\nSorry, but you don\'t have permission to view that page.\n\nPlease contact your system administrator.',3,'2006-06-12 00:34:30','2007-02-23 10:17:45','<h1>Permission Denied</h1>\n\n\n <p>Sorry, but you don&#8217;t have permission to view that page.</p>\n\n\n  <p>Please contact your system administrator.</p>'),(6,'Contact Us','contact_us',1,'h1. Contact Us\n\nVisit the Goldberg Project Homepage at \"http://goldberg.rubyforge.org\":http://goldberg.rubyforge.org for further information on Goldberg.  Visit the Goldberg RubyForge Project Info Page at \"http://rubyforge.org/projects/goldberg\":http://rubyforge.org/projects/goldberg to access the project\'s files and development information.\n',3,'2006-06-12 10:13:47','2007-02-23 10:17:46','<h1>Contact Us</h1>\n\n\n  <p>Visit the Goldberg Project Homepage at <a href=\"http://goldberg.rubyforge.org\">http://goldberg.rubyforge.org</a> for further information on Goldberg.  Visit the Goldberg RubyForge Project Info Page at <a href=\"http://rubyforge.org/projects/goldberg\">http://rubyforge.org/projects/goldberg</a> to access the project&#8217;s files and development information.</p>'),(8,'Site Administration','site_admin',1,'h1. Goldberg Setup\n\nThis is where you will find all the Goldberg-specific administration and configuration features.  In here you can:\n\n* Set up Users.\n\n* Manage Roles and their Permissions.\n\n* Set up any Controllers and their Actions for your application.\n\n* Edit the Content Pages of the site.\n\n* Adjust Goldberg\'s system settings.\n\n\nh2. Users\n\nYou can set up Users with a username, password and a Role.\n\n\nh2. Roles and Permissions\n\nA User\'s Permissions affect what Actions they can perform and what Pages they can see.  And because each Menu Item is based either on a Page or an Action, the Permissions determine what Menu Items the User can and cannot see.\n\nA Role is a set of Permissions.  Roles are assigned to Users.  Roles are hierarchical: a Role can have a parent Role; and if so it will inherit the Permissions of the parent Role, and all its parents.\n\n\nh2. Controllers and Actions\n\nTo execute any Action, a user must have the appropriate Permission.  Therefore all Controllers and Actions you set up for your Rails application need to be entered here, otherwise no user will be able to execute them.\n\nYou start by setting up the Controller and assigning it a Permission.  The Permission will be used as the default for any Actions invoked for that Controller.\n\nYou have the option of setting up specific Actions for the Controllers.  You would want to do that if the Action were to appear as a Menu Item, or if it were to have a different level of security to the default for the Controller.\n\n\nh2. Content Pages\n\nGoldberg has a very simple CMS built in.  You can create pages to be displayed on the site, possibly in menu items.\n\n\nh2. Menu Editor\n\nOnce you have set up your Controller Actions and Content Pages, you can put them into the site\'s menu using the Menu Editor.\n\nIn the Menu Editor you can add and remove Menu Items and move them around.  The security of a Menu Item (whether the user can see it or not) depends on the Permission of the Action or Page attached to that Menu Item.\n\nh2. System Settings\n\nGo here to view and edit the settings that determine how Goldberg operates.\n',1,'2006-06-21 21:32:35','2010-01-20 17:50:59','<h1>Goldberg Setup</h1>\n\n\n	<p>This is where you will find all the Goldberg-specific administration and configuration features.  In here you can:</p>\n\n\n	<ul>\n	<li>Set up Users.</li>\n	</ul>\n\n\n	<ul>\n	<li>Manage Roles and their Permissions.</li>\n	</ul>\n\n\n	<ul>\n	<li>Set up any Controllers and their Actions for your application.</li>\n	</ul>\n\n\n	<ul>\n	<li>Edit the Content Pages of the site.</li>\n	</ul>\n\n\n	<ul>\n	<li>Adjust Goldberg&#8217;s system settings.</li>\n	</ul>\n\n\n	<h2>Users</h2>\n\n\n	<p>You can set up Users with a username, password and a Role.</p>\n\n\n	<h2>Roles and Permissions</h2>\n\n\n	<p>A User&#8217;s Permissions affect what Actions they can perform and what Pages they can see.  And because each Menu Item is based either on a Page or an Action, the Permissions determine what Menu Items the User can and cannot see.</p>\n\n\n	<p>A Role is a set of Permissions.  Roles are assigned to Users.  Roles are hierarchical: a Role can have a parent Role; and if so it will inherit the Permissions of the parent Role, and all its parents.</p>\n\n\n	<h2>Controllers and Actions</h2>\n\n\n	<p>To execute any Action, a user must have the appropriate Permission.  Therefore all Controllers and Actions you set up for your Rails application need to be entered here, otherwise no user will be able to execute them.</p>\n\n\n	<p>You start by setting up the Controller and assigning it a Permission.  The Permission will be used as the default for any Actions invoked for that Controller.</p>\n\n\n	<p>You have the option of setting up specific Actions for the Controllers.  You would want to do that if the Action were to appear as a Menu Item, or if it were to have a different level of security to the default for the Controller.</p>\n\n\n	<h2>Content Pages</h2>\n\n\n	<p>Goldberg has a very simple <span class=\"caps\">CMS</span> built in.  You can create pages to be displayed on the site, possibly in menu items.</p>\n\n\n	<h2>Menu Editor</h2>\n\n\n	<p>Once you have set up your Controller Actions and Content Pages, you can put them into the site&#8217;s menu using the Menu Editor.</p>\n\n\n	<p>In the Menu Editor you can add and remove Menu Items and move them around.  The security of a Menu Item (whether the user can see it or not) depends on the Permission of the Action or Page attached to that Menu Item.</p>\n\n\n	<h2>System Settings</h2>\n\n\n	<p>Go here to view and edit the settings that determine how Goldberg operates.</p>'),(9,'Administration','admin',1,'h1. Site Administration\n\nThis is where the administrator can set up the site.\n\nThere is one menu item here by default -- \"Setup\":/menu/setup.  That contains all the Goldberg configuration options.\n\nYou can add more menu items here to administer your application if you want, by going to \"Setup, Menu Editor\":/menu/setup/menus.\n',7,'2006-06-26 16:47:09','2010-01-20 17:50:41','<h1>Site Administration</h1>\n\n\n	<p>This is where the administrator can set up the site.</p>\n\n\n	<p>There is one menu item here by default&#8212;<a href=\"/menu/setup\">Setup</a>.  That contains all the Goldberg configuration options.</p>\n\n\n	<p>You can add more menu items here to administer your application if you want, by going to <a href=\"/menu/setup/menus\">Setup, Menu Editor</a>.</p>'),(10,'Credits and License','credits',1,'h1. Credits and License\n\nGoldberg contains original material and third-party material from various sources.\n\nAll original material is (p) Public Domain, No Rights Reserved.  Goldberg comes with no warranty whatsoever.\n\nThe copyright for any third party material remains with the original author, and the material is distributed here under the original terms.  \n\nMaterial has been selected from sources with licensing terms and conditions that allow use and redistribution for both personal and business purposes.  These licences include public domain, BSD-style licences, and Creative Commons licences (but *not* Creative Commons Non-Commercial).\n\nIf you are an author and you believe your copyrighted material has been included in Goldberg in breach of your licensing terms and conditions, please contact Dave Nelson (urbanus at 240gl dot org).\n\n\nh2. Layouts\n\nGoldberg comes with a choice of layouts, adapted from various sources.\n\nh3. The Default\n\nThe default layout is a modified version of Andreas09 by Anreas Viklund.  Andreas09 is distributed under free/unlicensed terms, with an informal request that credit be given to the original author.  The original template can be obtained from \"Open Source Web Design\":http://www.oswd.org/design/preview/id/2493/.\n\nAuthor\'s website: \"andreasviklund.com\":http://andreasviklund.com/.\n\n\nh3. \"Earth Wind and Fire\"\n\nOriginally designed by Brett Hillesheim (brett7481 at msn dot com) and distributed under free terms (from the MadSeason website: \"Every template we create is completely open source, meaning you can take it and do whatever you want with it\").  The original template can be obtained from \"Open Source Web Design\":http://www.oswd.org/design/preview/id/2453/.\n\nAuthor\'s website: \"www.madseason.co.uk\":http://www.madseason.co.uk/.\n\n\nh3. \"Snooker\"\n\n\"Snooker\" is an original design and is therefore Public Domain.  It incorporates dynamic two-column layout techniques described on the \"A List Apart\":http://alistapart.com/articles/negativemargins website.\n\n\nh3. \"Spoiled Brat\"\n\nOriginally designed by \"Rayk Web Design\":http://www.raykdesign.net/ and distributed under the terms of the \"Creative Commons Attribution Share Alike\":http://creativecommons.org/licenses/by-sa/2.5/legalcode licence.  The original template can be obtained from \"Open Web Design\":http://www.openwebdesign.org/viewdesign.phtml?id=2894/.\n\nAuthor\'s website: \"www.csstinderbox.com\":http://www.csstinderbox.com/.\n\n\nh2. Other Features\n\nGoldberg also contains some miscellaneous code and techniques from other sources.\n\nh3. Suckerfish Menus\n\nThe three templates \"Earth Wind and Fire\", \"Snooker\" and \"Spoiled Brat\" have all been configured to use Suckerfish menus.  This technique of using a combination of CSS and Javascript to implement dynamic menus was first described by \"A List Apart\":http://www.alistapart.com/articles/dropdowns/.  Goldberg\'s implementation also incorporates techniques described by \"HTMLDog\":http://www.htmldog.com/articles/suckerfish/dropdowns/.\n\nh3. Tabbed Panels\n\nGoldberg\'s implementation of tabbed panels was adapted from \n\"InternetConnection\":http://support.internetconnection.net/CODE_LIBRARY/Javascript_Show_Hide.shtml.\n',3,'2006-10-02 10:35:35','2007-02-23 10:17:46','<h1>Credits and Licence</h1>\n\n\n  <p>Goldberg contains original material and third party material from various sources.</p>\n\n\n <p>All original material is (p) Public Domain, No Rights Reserved.  Goldberg comes with no warranty whatsoever.</p>\n\n\n <p>The copyright for any third party material remains with the original author, and the material is distributed here under the original terms.</p>\n\n\n  <p>Material has been selected from sources with licensing terms and conditions that allow use and redistribution for both personal and business purposes.  These licences include public domain, <span class=\"caps\">BSD</span>-style licences, and Creative Commons licences (but <strong>not</strong> Creative Commons Non-Commercial).</p>\n\n\n  <p>If you are an author and you believe your copyrighted material has been included in Goldberg in breach of your licensing terms and conditions, please contact Dave Nelson (urbanus at 240gl dot org).</p>\n\n\n  <h2>Layouts</h2>\n\n\n  <p>Goldberg comes with a choice of layouts, adapted from various sources.</p>\n\n\n <h3>The Default</h3>\n\n\n  <p>The default layout is a modified version of Andreas09 by Anreas Viklund.  Andreas09 is distributed under free/unlicensed terms, with an informal request that credit be given to the original author.  The original template can be obtained from <a href=\"http://www.oswd.org/design/preview/id/2493/\">Open Source Web Design</a>.</p>\n\n\n  <p>Author&#8217;s website: <a href=\"http://andreasviklund.com/\">andreasviklund.com</a>.</p>\n\n\n <h3>&#8220;Earth Wind and Fire&#8221;</h3>\n\n\n  <p>Originally designed by Brett Hillesheim (brett7481 at msn dot com) and distributed under free terms (from the MadSeason website: &#8220;Every template we create is completely open source, meaning you can take it and do whatever you want with it&#8221;).  The original template can be obtained from <a href=\"http://www.oswd.org/design/preview/id/2453/\">Open Source Web Design</a>.</p>\n\n\n  <p>Author&#8217;s website: <a href=\"http://www.madseason.co.uk/\">www.madseason.co.uk</a>.</p>\n\n\n <h3>&#8220;Snooker&#8221;</h3>\n\n\n  <p>&#8220;Snooker&#8221; is an original design and is therefore Public Domain.  It incorporates dynamic two-column layout techniques described on the <a href=\"http://alistapart.com/articles/negativemargins\">A List Apart</a> website.</p>\n\n\n  <h3>&#8220;Spoiled Brat&#8221;</h3>\n\n\n <p>Originally designed by <a href=\"http://www.raykdesign.net/\">Rayk Web Design</a> and distributed under the terms of the <a href=\"http://creativecommons.org/licenses/by-sa/2.5/legalcode\">Creative Commons Attribution Share Alike</a> licence.  The original template can be obtained from <a href=\"http://www.openwebdesign.org/viewdesign.phtml?id=2894/\">Open Web Design</a>.</p>\n\n\n <p>Author&#8217;s website: <a href=\"http://www.csstinderbox.com/\">www.csstinderbox.com</a>.</p>\n\n\n <h2>Other Features</h2>\n\n\n <p>Goldberg also contains some miscellaneous code and techniques from other sources.</p>\n\n\n  <h3>Suckerfish Menus</h3>\n\n\n <p>The three templates &#8220;Earth Wind and Fire&#8221;, &#8220;Snooker&#8221; and &#8220;Spoiled Brat&#8221; have all been configured to use Suckerfish menus.  This technique of using a combination of <span class=\"caps\">CSS</span> and Javascript to implement dynamic menus was first described by <a href=\"http://www.alistapart.com/articles/dropdowns/\">A List Apart</a>.  Goldberg&#8217;s implementation also incorporates techniques described by <a href=\"http://www.htmldog.com/articles/suckerfish/dropdowns/\">HTMLDog</a>.</p>\n\n\n <h3>Tabbed Panels</h3>\n\n\n  <p>Goldberg&#8217;s implementation of tabbed panels was adapted from \n<a href=\"http://support.internetconnection.net/CODE_LIBRARY/Javascript_Show_Hide.shtml\">InternetConnection</a>.</p>');
+/*!40000 ALTER TABLE `content_pages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `controller_actions`
+--
+
+DROP TABLE IF EXISTS `controller_actions`;
+CREATE TABLE `controller_actions` (
+  `id` int(11) NOT NULL auto_increment,
+  `site_controller_id` int(11) NOT NULL default '0',
+  `name` varchar(255) NOT NULL default '',
+  `permission_id` int(11) default NULL,
+  `url_to_use` varchar(255) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_controller_action_permission_id` (`permission_id`),
+  KEY `fk_controller_action_site_controller_id` (`site_controller_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `controller_actions`
+--
+
+LOCK TABLES `controller_actions` WRITE;
+/*!40000 ALTER TABLE `controller_actions` DISABLE KEYS */;
+INSERT INTO `controller_actions` VALUES (1,1,'view_default',3,NULL),(2,1,'view',3,NULL),(3,7,'list',NULL,NULL),(4,6,'list',NULL,NULL),(5,3,'login',4,NULL),(6,3,'logout',4,NULL),(7,5,'link',4,NULL),(8,1,'list',NULL,NULL),(9,8,'list',NULL,NULL),(10,2,'list',NULL,NULL),(11,5,'list',NULL,NULL),(12,9,'list',NULL,NULL),(14,3,'login_failed',4,NULL),(15,10,'list',7,NULL),(16,12,'list_instructors',9,''),(17,12,'list_administrators',6,''),(18,12,'list_super_administrators',1,''),(19,13,'list_folders',7,''),(20,14,'create',7,''),(21,15,'list',7,''),(22,15,'create_questionnaire',7,''),(23,15,'edit_questionnaire',7,''),(24,15,'copy_questionnaire',7,''),(25,15,'save_questionnaire',7,''),(26,20,'add_student',7,''),(28,20,'edit_team_members',7,''),(29,14,'new',7,''),(30,14,'list',7,''),(31,20,'list_students',7,''),(32,22,'list',6,''),(33,23,'list',8,''),(34,20,'list_courses',7,''),(35,20,'list_assignments',7,''),(36,26,'edit',NULL,''),(37,27,'create',4,''),(38,27,'submit',NULL,''),(39,28,'list',NULL,''),(40,28,'list_assignments',NULL,''),(41,29,'list',NULL,''),(42,30,'start',NULL,NULL),(43,30,'restore',8,NULL),(44,32,'list',NULL,NULL),(45,36,'list',NULL,NULL),(46,37,'list_surveys',NULL,NULL),(47,38,'list',NULL,NULL),(48,38,'drill',NULL,NULL),(49,38,'goto_questionnaires',NULL,NULL),(50,38,'goto_author_feedbacks',NULL,NULL),(51,38,'goto_review_rubrics',NULL,NULL),(52,38,'goto_global_survey',NULL,NULL),(53,38,'goto_surveys',NULL,NULL),(54,38,'goto_course_evaluations',NULL,NULL),(55,38,'goto_courses',NULL,NULL),(56,38,'goto_assignments',NULL,NULL),(59,38,'goto_teammate_reviews',NULL,NULL),(60,20,'change_handle',8,NULL),(61,38,'goto_metareview_rubrics',NULL,NULL),(62,38,'goto_teammatereview_rubrics',NULL,NULL),(63,33,'view_my_scores',8,NULL);
+/*!40000 ALTER TABLE `controller_actions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `courses`
+--
+
+DROP TABLE IF EXISTS `courses`;
+CREATE TABLE `courses` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) default NULL,
+  `instructor_id` int(11) default NULL,
+  `directory_path` varchar(255) default NULL,
+  `info` text,
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  `private` tinyint(1) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `fk_course_users` (`instructor_id`),
+  CONSTRAINT `fk_course_users` FOREIGN KEY (`instructor_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `courses`
+--
+
+LOCK TABLES `courses` WRITE;
+/*!40000 ALTER TABLE `courses` DISABLE KEYS */;
+/*!40000 ALTER TABLE `courses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `deadline_rights`
+--
+
+DROP TABLE IF EXISTS `deadline_rights`;
+CREATE TABLE `deadline_rights` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(32) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `deadline_rights`
+--
+
+LOCK TABLES `deadline_rights` WRITE;
+/*!40000 ALTER TABLE `deadline_rights` DISABLE KEYS */;
+INSERT INTO `deadline_rights` VALUES (1,'No'),(2,'Late'),(3,'OK');
+/*!40000 ALTER TABLE `deadline_rights` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `deadline_types`
+--
+
+DROP TABLE IF EXISTS `deadline_types`;
+CREATE TABLE `deadline_types` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(32) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `deadline_types`
+--
+
+LOCK TABLES `deadline_types` WRITE;
+/*!40000 ALTER TABLE `deadline_types` DISABLE KEYS */;
+INSERT INTO `deadline_types` VALUES (1,'submission'),(2,'review'),(3,'resubmission'),(4,'rereview'),(5,'metareview');
+/*!40000 ALTER TABLE `deadline_types` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `due_dates`
+--
+
+DROP TABLE IF EXISTS `due_dates`;
+CREATE TABLE `due_dates` (
+  `id` int(11) NOT NULL auto_increment,
+  `due_at` datetime default NULL,
+  `deadline_type_id` int(11) default NULL,
+  `assignment_id` int(11) default NULL,
+  `late_policy_id` int(11) default NULL,
+  `submission_allowed_id` int(11) default NULL,
+  `review_allowed_id` int(11) default NULL,
+  `resubmission_allowed_id` int(11) default NULL,
+  `rereview_allowed_id` int(11) default NULL,
+  `review_of_review_allowed_id` int(11) default NULL,
+  `round` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_deadline_type_due_date` (`deadline_type_id`),
+  KEY `fk_due_dates_assignments` (`assignment_id`),
+  KEY `fk_due_date_late_policies` (`late_policy_id`),
+  KEY `idx_submission_allowed` (`submission_allowed_id`),
+  KEY `idx_review_allowed` (`review_allowed_id`),
+  KEY `idx_resubmission_allowed` (`resubmission_allowed_id`),
+  KEY `idx_rereview_allowed` (`rereview_allowed_id`),
+  KEY `idx_review_of_review_allowed` (`review_of_review_allowed_id`),
+  CONSTRAINT `fk_deadline_type_due_date` FOREIGN KEY (`deadline_type_id`) REFERENCES `deadline_types` (`id`),
+  CONSTRAINT `fk_due_dates_assignments` FOREIGN KEY (`assignment_id`) REFERENCES `assignments` (`id`),
+  CONSTRAINT `fk_due_date_late_policies` FOREIGN KEY (`late_policy_id`) REFERENCES `late_policies` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `due_dates`
+--
+
+LOCK TABLES `due_dates` WRITE;
+/*!40000 ALTER TABLE `due_dates` DISABLE KEYS */;
+/*!40000 ALTER TABLE `due_dates` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `goldberg_content_pages`
+--
+
+DROP TABLE IF EXISTS `goldberg_content_pages`;
+CREATE TABLE `goldberg_content_pages` (
+  `id` int(11) NOT NULL auto_increment,
+  `title` varchar(255) default NULL,
+  `name` varchar(255) NOT NULL default '',
+  `markup_style_id` int(11) default NULL,
+  `content` text,
+  `permission_id` int(11) NOT NULL default '0',
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  `content_cache` text,
+  `markup_style` varchar(255) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_content_page_permission_id` (`permission_id`),
+  KEY `fk_content_page_markup_style_id` (`markup_style_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `goldberg_content_pages`
+--
+
+LOCK TABLES `goldberg_content_pages` WRITE;
+/*!40000 ALTER TABLE `goldberg_content_pages` DISABLE KEYS */;
+INSERT INTO `goldberg_content_pages` VALUES (1,'Home Page','home',1,'h1. Welcome to Goldberg!\n\nLooks like you have succeeded in getting Goldberg up and running.  Now you will probably want to customize your site.\n\n*Very important:* The default login for the administrator is \"admin\", password \"admin\".  You must change that before you make your site public!\n\nh2. Administering the Site\n\nAt the login prompt, enter an administrator username and password.  The top menu should change: a new item called \"Administration\" will appear.  Go there for further details.\n',3,'2006-06-12 00:31:56','2007-05-21 14:01:58','<h1>Welcome to Goldberg!</h1>\n\n\n  <p>Looks like you have succeeded in getting Goldberg up and running.  Now you will probably want to customise your site.</p>\n\n\n  <p><strong>Very important:</strong> The default login for the administrator is &#8220;admin&#8221;, password &#8220;admin&#8221;.  You must change that before you make your site public!</p>\n\n\n <h2>Administering the Site</h2>\n\n\n <p>At the login prompt, enter an administrator username and password.  The top menu should change: a new item called &#8220;Administration&#8221; will appear.  Go there for further details.</p>','Textile'),(2,'Session Expired','expired',1,'h1. Session Expired\n\nYour session has expired due to inactivity.\n\nTo continue please login again.\n',3,'2006-06-12 00:33:14','2007-05-21 14:01:58','<h1>Session Expired</h1>\n\n\n  <p>Your session has expired due to inactivity.</p>\n\n\n  <p>To continue please login again.</p>','Textile'),(3,'Not Found!','notfound',1,'h1. Not Found\n\nThe page you requested was not found!\n\nPlease contact your system administrator.',3,'2006-06-12 00:33:49','2007-05-21 14:01:59','<h1>Not Found</h1>\n\n\n <p>The page you requested was not found!</p>\n\n\n  <p>Please contact your system administrator.</p>','Textile'),(4,'Permission Denied!','denied',1,'h1. Permission Denied\n\nSorry, but you don\'t have permission to view that page.\n\nPlease contact your system administrator.',3,'2006-06-12 00:34:30','2007-05-21 14:01:59','<h1>Permission Denied</h1>\n\n\n  <p>Sorry, but you don&#8217;t have permission to view that page.</p>\n\n\n  <p>Please contact your system administrator.</p>','Textile'),(6,'Contact Us','contact_us',1,'h1. Contact Us\n\nVisit the Goldberg Project Homepage at \"http://goldberg.rubyforge.org\":http://goldberg.rubyforge.org for further information on Goldberg. Visit the Goldberg RubyForge Project Info Page at \"http://rubyforge.org/projects/goldberg\":http://rubyforge.org/projects/goldberg to access the project\'s files and development information.',3,'2006-06-12 10:13:47','2007-05-21 14:01:59','<h1>Contact Us</h1>\n\n\n <p>Visit the Goldberg Project Homepage at <a href=\"http://goldberg.rubyforge.org\">http://goldberg.rubyforge.org</a> for further information on Goldberg. Visit the Goldberg RubyForge Project Info Page at <a href=\"http://rubyforge.org/projects/goldberg\">http://rubyforge.org/projects/goldberg</a> to access the project&#8217;s files and development information.</p>','Textile'),(8,'Site Administration','site_admin',1,'h1. Goldberg Setup\n\nThis is where you will find all the Goldberg-specific administration and configuration features.  In here you can:\n\n* Set up Users.\n\n* Manage Roles and their Permissions.\n\n* Set up any Controllers and their Actions for your application.\n\n* Edit the Content Pages of the site.\n\n* Adjust Goldberg\'s system settings.\n\n\nh2. Users\n\nYou can set up Users with a username, password and a Role.\n\n\nh2. Roles and Permissions\n\nA User\'s Permissions affect what Actions they can perform and what Pages they can see.  And because each Menu Item is based either on a Page or an Action, the Permissions determine what Menu Items the User can and cannot see.\n\nA Role is a set of Permissions.  Roles are assigned to Users.  Roles are hierarchical: a Role can have a parent Role; and if so it will inherit the Permissions of the parent Role, and all its parents.\n\n\nh2. Controllers and Actions\n\nTo execute any Action, a user must have the appropriate Permission.  Therefore all Controllers and Actions you set up for your Rails application need to be entered here, otherwise no user will be able to execute them.\n\nYou start by setting up the Controller and assigning it a Permission.  The Permission will be used as the default for any Actions invoked for that Controller.\n\nYou have the option of setting up specific Actions for the Controllers.  You would want to do that if the Action were to appear as a Menu Item, or if it were to have a different level of security to the default for the Controller.\n\n\nh2. Content Pages\n\nGoldberg has a very simple CMS built in.  You can create pages to be displayed on the site, possibly in menu items.\n\n\nh2. Menu Editor\n\nOnce you have set up your Controller Actions and Content Pages, you can put them into the site\'s menu using the Menu Editor.\n\nIn the Menu Editor you can add and remove Menu Items and move them around.  The security of a Menu Item (whether the user can see it or not) depends on the Permission of the Action or Page attached to that Menu Item.\n\nh2. System Settings\n\nGo here to view and edit the settings that determine how Goldberg operates.\n',1,'2006-06-21 21:32:35','2007-05-21 14:01:59','<h1>Goldberg Setup</h1>\n\n\n  <p>This is where you will find all the Goldberg-specific administration and configuration features.  In here you can:</p>\n\n\n <ul>\n  <li>Set up Users.</li>\n  </ul>\n\n\n <ul>\n  <li>Manage Roles and their Permissions.</li>\n  </ul>\n\n\n <ul>\n  <li>Set up any Controllers and their Actions for your application.</li>\n </ul>\n\n\n <ul>\n  <li>Edit the Content Pages of the site.</li>\n  </ul>\n\n\n <ul>\n  <li>Adjust Goldberg&#8217;s system settings.</li>\n </ul>\n\n\n <h2>Users</h2>\n\n\n  <p>You can set up Users with a username, password and a Role.</p>\n\n\n <h2>Roles and Permissions</h2>\n\n\n  <p>A User&#8217;s Permissions affect what Actions they can perform and what Pages they can see.  And because each Menu Item is based either on a Page or an Action, the Permissions determine what Menu Items the User can and cannot see.</p>\n\n\n  <p>A Role is a set of Permissions.  Roles are assigned to Users.  Roles are hierarchical: a Role can have a parent Role; and if so it will inherit the Permissions of the parent Role, and all its parents.</p>\n\n\n <h2>Controllers and Actions</h2>\n\n\n  <p>To execute any Action, a user must have the appropriate Permission.  Therefore all Controllers and Actions you set up for your Rails application need to be entered here, otherwise no user will be able to execute them.</p>\n\n\n  <p>You start by setting up the Controller and assigning it a Permission.  The Permission will be used as the default for any Actions invoked for that Controller.</p>\n\n\n <p>You have the option of setting up specific Actions for the Controllers.  You would want to do that if the Action were to appear as a Menu Item, or if it were to have a different level of security to the default for the Controller.</p>\n\n\n <h2>Content Pages</h2>\n\n\n  <p>Goldberg has a very simple <span class=\"caps\">CMS</span> built in.  You can create pages to be displayed on the site, possibly in menu items.</p>\n\n\n  <h2>Menu Editor</h2>\n\n\n  <p>Once you have set up your Controller Actions and Content Pages, you can put them into the site&#8217;s menu using the Menu Editor.</p>\n\n\n <p>In the Menu Editor you can add and remove Menu Items and move them around.  The security of a Menu Item (whether the user can see it or not) depends on the Permission of the Action or Page attached to that Menu Item.</p>\n\n\n <h2>System Settings</h2>\n\n\n  <p>Go here to view and edit the settings that determine how Goldberg operates.</p>','Textile'),(9,'Administration','admin',1,'h1. Site Administration\n\nThis is where the administrator can set up the site.\n\nThere is one menu item here by default -- \"Setup\":/menu/setup.  That contains all the Goldberg configuration options.\n\nYou can add more menu items here to administer your application if you want, by going to \"Setup, Menu Editor\":/menu/setup/menus.\n',1,'2006-06-26 16:47:09','2007-05-21 14:01:59','<h1>Site Administration</h1>\n\n\n <p>This is where the administrator can set up the site.</p>\n\n\n <p>There is one menu item here by default&#8212;<a href=\"/menu/setup\">Setup</a>.  That contains all the Goldberg configuration options.</p>\n\n\n <p>You can add more menu items here to administer your application if you want, by going to <a href=\"/menu/setup/menus\">Setup, Menu Editor</a>.</p>','Textile'),(10,'Credits and Licence','credits',1,'h1. Credits and Licence\n\nGoldberg contains original material and third party material from various sources.\n\nAll original material is (p) Public Domain, No Rights Reserved.  Goldberg comes with no warranty whatsoever.\n\nThe copyright for any third party material remains with the original author, and the material is distributed here under the original terms.  \n\nMaterial has been selected from sources with licensing terms and conditions that allow use and redistribution for both personal and business purposes.  These licences include public domain, BSD-style licences, and Creative Commons licences (but *not* Creative Commons Non-Commercial).\n\nIf you are an author and you believe your copyrighted material has been included in Goldberg in breach of your licensing terms and conditions, please contact Dave Nelson (urbanus at 240gl dot org).\n\n\nh2. Layouts\n\nGoldberg comes with a choice of layouts, adapted from various sources.\n\nh3. The Default\n\nThe default layout is a modified version of Andreas09 by Anreas Viklund.  Andreas09 is distributed under free/unlicensed terms, with an informal request that credit be given to the original author.  The original template can be obtained from \"Open Source Web Design\":http://www.oswd.org/design/preview/id/2493/.\n\nAuthor\'s website: \"andreasviklund.com\":http://andreasviklund.com/.\n\n\nh3. \"Earth Wind and Fire\"\n\nOriginally designed by Brett Hillesheim (brett7481 at msn dot com) and distributed under free terms (from the MadSeason website: \"Every template we create is completely open source, meaning you can take it and do whatever you want with it\").  The original template can be obtained from \"Open Source Web Design\":http://www.oswd.org/design/preview/id/2453/.\n\nAuthor\'s website: \"www.madseason.co.uk\":http://www.madseason.co.uk/.\n\n\nh3. \"Snooker\"\n\n\"Snooker\" is an original design and is therefore Public Domain.  It incorporates dynamic two-column layout techniques described on the \"A List Apart\":http://alistapart.com/articles/negativemargins website.\n\n\nh3. \"Spoiled Brat\"\n\nOriginally designed by \"Rayk Web Design\":http://www.raykdesign.net/ and distributed under the terms of the \"Creative Commons Attribution Share Alike\":http://creativecommons.org/licenses/by-sa/2.5/legalcode licence.  The original template can be obtained from \"Open Web Design\":http://www.openwebdesign.org/viewdesign.phtml?id=2894/.\n\nAuthor\'s website: \"www.csstinderbox.com\":http://www.csstinderbox.com/.\n\n\nh2. Other Features\n\nGoldberg also contains some miscellaneous code and techniques from other sources.\n\nh3. Suckerfish Menus\n\nThe three templates \"Earth Wind and Fire\", \"Snooker\" and \"Spoiled Brat\" have all been configured to use Suckerfish menus.  This technique of using a combination of CSS and Javascript to implement dynamic menus was first described by \"A List Apart\":http://www.alistapart.com/articles/dropdowns/.  Goldberg\'s implementation also incorporates techniques described by \"HTMLDog\":http://www.htmldog.com/articles/suckerfish/dropdowns/.\n\nh3. Tabbed Panels\n\nGoldberg\'s implementation of tabbed panels was adapted from \n\"InternetConnection\":http://support.internetconnection.net/CODE_LIBRARY/Javascript_Show_Hide.shtml.\n',3,'2006-10-02 10:35:35','2007-05-21 14:01:59','<h1>Credits and Licence</h1>\n\n\n  <p>Goldberg contains original material and third party material from various sources.</p>\n\n\n <p>All original material is (p) Public Domain, No Rights Reserved.  Goldberg comes with no warranty whatsoever.</p>\n\n\n <p>The copyright for any third party material remains with the original author, and the material is distributed here under the original terms.</p>\n\n\n  <p>Material has been selected from sources with licensing terms and conditions that allow use and redistribution for both personal and business purposes.  These licences include public domain, <span class=\"caps\">BSD</span>-style licences, and Creative Commons licences (but <strong>not</strong> Creative Commons Non-Commercial).</p>\n\n\n  <p>If you are an author and you believe your copyrighted material has been included in Goldberg in breach of your licensing terms and conditions, please contact Dave Nelson (urbanus at 240gl dot org).</p>\n\n\n  <h2>Layouts</h2>\n\n\n  <p>Goldberg comes with a choice of layouts, adapted from various sources.</p>\n\n\n <h3>The Default</h3>\n\n\n  <p>The default layout is a modified version of Andreas09 by Anreas Viklund.  Andreas09 is distributed under free/unlicensed terms, with an informal request that credit be given to the original author.  The original template can be obtained from <a href=\"http://www.oswd.org/design/preview/id/2493/\">Open Source Web Design</a>.</p>\n\n\n  <p>Author&#8217;s website: <a href=\"http://andreasviklund.com/\">andreasviklund.com</a>.</p>\n\n\n <h3>&#8220;Earth Wind and Fire&#8221;</h3>\n\n\n  <p>Originally designed by Brett Hillesheim (brett7481 at msn dot com) and distributed under free terms (from the MadSeason website: &#8220;Every template we create is completely open source, meaning you can take it and do whatever you want with it&#8221;).  The original template can be obtained from <a href=\"http://www.oswd.org/design/preview/id/2453/\">Open Source Web Design</a>.</p>\n\n\n  <p>Author&#8217;s website: <a href=\"http://www.madseason.co.uk/\">www.madseason.co.uk</a>.</p>\n\n\n <h3>&#8220;Snooker&#8221;</h3>\n\n\n  <p>&#8220;Snooker&#8221; is an original design and is therefore Public Domain.  It incorporates dynamic two-column layout techniques described on the <a href=\"http://alistapart.com/articles/negativemargins\">A List Apart</a> website.</p>\n\n\n  <h3>&#8220;Spoiled Brat&#8221;</h3>\n\n\n <p>Originally designed by <a href=\"http://www.raykdesign.net/\">Rayk Web Design</a> and distributed under the terms of the <a href=\"http://creativecommons.org/licenses/by-sa/2.5/legalcode\">Creative Commons Attribution Share Alike</a> licence.  The original template can be obtained from <a href=\"http://www.openwebdesign.org/viewdesign.phtml?id=2894/\">Open Web Design</a>.</p>\n\n\n <p>Author&#8217;s website: <a href=\"http://www.csstinderbox.com/\">www.csstinderbox.com</a>.</p>\n\n\n <h2>Other Features</h2>\n\n\n <p>Goldberg also contains some miscellaneous code and techniques from other sources.</p>\n\n\n  <h3>Suckerfish Menus</h3>\n\n\n <p>The three templates &#8220;Earth Wind and Fire&#8221;, &#8220;Snooker&#8221; and &#8220;Spoiled Brat&#8221; have all been configured to use Suckerfish menus.  This technique of using a combination of <span class=\"caps\">CSS</span> and Javascript to implement dynamic menus was first described by <a href=\"http://www.alistapart.com/articles/dropdowns/\">A List Apart</a>.  Goldberg&#8217;s implementation also incorporates techniques described by <a href=\"http://www.htmldog.com/articles/suckerfish/dropdowns/\">HTMLDog</a>.</p>\n\n\n <h3>Tabbed Panels</h3>\n\n\n  <p>Goldberg&#8217;s implementation of tabbed panels was adapted from \n<a href=\"http://support.internetconnection.net/CODE_LIBRARY/Javascript_Show_Hide.shtml\">InternetConnection</a>.</p>','Textile'),(11,'Not Permitted','unconfirmed',NULL,'h1. Not Permitted\n\nSorry, but you are not allowed to log into the site until your registration has been confirmed.\n\nIf there is an issue please contact the system administrator.\n',3,'2007-04-01 10:37:42','2007-05-21 14:01:59','<h1>Not Permitted</h1>\n\n\n <p>Sorry, but you are not allowed to log into the site until your registration has been confirmed.</p>\n\n\n  <p>If there is an issue please contact the system administrator.</p>','Textile');
+/*!40000 ALTER TABLE `goldberg_content_pages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `goldberg_controller_actions`
+--
+
+DROP TABLE IF EXISTS `goldberg_controller_actions`;
+CREATE TABLE `goldberg_controller_actions` (
+  `id` int(11) NOT NULL auto_increment,
+  `site_controller_id` int(11) NOT NULL default '0',
+  `name` varchar(255) NOT NULL default '',
+  `permission_id` int(11) default NULL,
+  `url_to_use` varchar(255) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_controller_action_permission_id` (`permission_id`),
+  KEY `fk_controller_action_site_controller_id` (`site_controller_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `goldberg_controller_actions`
+--
+
+LOCK TABLES `goldberg_controller_actions` WRITE;
+/*!40000 ALTER TABLE `goldberg_controller_actions` DISABLE KEYS */;
+INSERT INTO `goldberg_controller_actions` VALUES (1,1,'view_default',3,NULL),(2,1,'view',3,NULL),(3,7,'list',NULL,NULL),(4,6,'list',NULL,NULL),(5,3,'login',4,NULL),(6,3,'logout',4,NULL),(7,5,'link',4,NULL),(8,1,'list',NULL,NULL),(9,8,'list',NULL,NULL),(10,2,'list',NULL,NULL),(11,5,'list',NULL,NULL),(12,9,'list',NULL,NULL),(13,3,'forgotten',4,NULL),(14,3,'login_failed',4,NULL),(15,10,'list',NULL,NULL),(16,10,'self_register',4,''),(17,10,'confirm_registration',4,''),(18,10,'confirm_registration_submit',4,''),(19,10,'self_create',4,''),(20,10,'forgot_password',4,''),(21,10,'forgot_password_submit',4,''),(22,10,'reset_password',4,''),(23,10,'reset_password_submit',4,'');
+/*!40000 ALTER TABLE `goldberg_controller_actions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `goldberg_markup_styles`
+--
+
+DROP TABLE IF EXISTS `goldberg_markup_styles`;
+CREATE TABLE `goldberg_markup_styles` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `goldberg_markup_styles`
+--
+
+LOCK TABLES `goldberg_markup_styles` WRITE;
+/*!40000 ALTER TABLE `goldberg_markup_styles` DISABLE KEYS */;
+/*!40000 ALTER TABLE `goldberg_markup_styles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `goldberg_menu_items`
+--
+
+DROP TABLE IF EXISTS `goldberg_menu_items`;
+CREATE TABLE `goldberg_menu_items` (
+  `id` int(11) NOT NULL auto_increment,
+  `parent_id` int(11) default NULL,
+  `name` varchar(255) NOT NULL default '',
+  `label` varchar(255) NOT NULL default '',
+  `seq` int(11) default NULL,
+  `controller_action_id` int(11) default NULL,
+  `content_page_id` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_menu_item_controller_action_id` (`controller_action_id`),
+  KEY `fk_menu_item_content_page_id` (`content_page_id`),
+  KEY `fk_menu_item_parent_id` (`parent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `goldberg_menu_items`
+--
+
+LOCK TABLES `goldberg_menu_items` WRITE;
+/*!40000 ALTER TABLE `goldberg_menu_items` DISABLE KEYS */;
+INSERT INTO `goldberg_menu_items` VALUES (1,NULL,'home','Home',1,NULL,1),(2,NULL,'contact_us','Contact Us',3,NULL,6),(3,NULL,'admin','Administration',2,NULL,9),(5,9,'setup/permissions','Permissions',3,4,NULL),(6,9,'setup/roles','Roles',2,3,NULL),(7,9,'setup/pages','Content Pages',5,8,NULL),(8,9,'setup/controllers','Controllers / Actions',4,9,NULL),(9,3,'setup','Setup',1,NULL,8),(11,9,'setup/menus','Menu Editor',6,11,NULL),(12,9,'setup/system_settings','System Settings',7,12,NULL),(13,9,'setup/users','Users',1,15,NULL),(14,2,'credits','Credits &amp; Licence',1,NULL,10);
+/*!40000 ALTER TABLE `goldberg_menu_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `goldberg_permissions`
+--
+
+DROP TABLE IF EXISTS `goldberg_permissions`;
+CREATE TABLE `goldberg_permissions` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `goldberg_permissions`
+--
+
+LOCK TABLES `goldberg_permissions` WRITE;
+/*!40000 ALTER TABLE `goldberg_permissions` DISABLE KEYS */;
+INSERT INTO `goldberg_permissions` VALUES (1,'Administer site'),(2,'Public pages - edit'),(3,'Public pages - view'),(4,'Public actions - execute'),(5,'Members only page -- view');
+/*!40000 ALTER TABLE `goldberg_permissions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `goldberg_roles`
+--
+
+DROP TABLE IF EXISTS `goldberg_roles`;
+CREATE TABLE `goldberg_roles` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  `parent_id` int(11) default NULL,
+  `description` varchar(255) NOT NULL default '',
+  `default_page_id` int(11) default NULL,
+  `cache` text,
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  `start_path` varchar(255) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_role_parent_id` (`parent_id`),
+  KEY `fk_role_default_page_id` (`default_page_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `goldberg_roles`
+--
+
+LOCK TABLES `goldberg_roles` WRITE;
+/*!40000 ALTER TABLE `goldberg_roles` DISABLE KEYS */;
+INSERT INTO `goldberg_roles` VALUES (1,'Public',NULL,'Members of the public who are not logged in.',NULL,'--- \n:credentials: !ruby/object:Goldberg::Credentials \n  actions: \n    goldberg/site_controllers: \n      list: false\n    goldberg/menu_items: \n      list: false\n      link: true\n    goldberg/roles: \n      list: false\n    goldberg/permissions: \n      list: false\n    goldberg/system_settings: \n      list: false\n    goldberg/content_pages: \n      list: false\n      view_default: true\n      view: true\n    goldberg/auth: \n      logout: true\n      forgotten: true\n      login_failed: true\n      login: true\n    goldberg/controller_actions: \n      list: false\n    goldberg/users: \n      self_register: true\n      list: false\n      forgot_password: true\n      forgot_password_submit: true\n      reset_password: true\n      reset_password_submit: true\n      confirm_registration: true\n      self_create: true\n      confirm_registration_submit: true\n  controllers: \n    goldberg/site_controllers: false\n    goldberg/roles_permissions: false\n    goldberg/menu_items: false\n    goldberg/permissions: false\n    goldberg/roles: false\n    goldberg/system_settings: false\n    goldberg/content_pages: false\n    goldberg/auth: false\n    goldberg/controller_actions: false\n    goldberg/users: false\n  pages: \n    notfound: true\n    admin: false\n    site_admin: false\n    unconfirmed: true\n    contact_us: true\n    credits: true\n    home: true\n    expired: true\n    denied: true\n  permission_ids: \n  - 4\n  - 3\n  role_id: 1\n  role_ids: \n  - 1\n  updated_at: 2007-03-31 20:37:43 -04:00\n:menu: !ruby/object:Goldberg::Menu \n  by_id: \n    1: &id003 !ruby/object:Goldberg::Menu::Node \n      content_page_id: 1\n      controller_action_id: \n      id: 1\n      label: Home\n      name: home\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /home\n    2: &id001 !ruby/object:Goldberg::Menu::Node \n      children: \n      - 14\n      content_page_id: 6\n      controller_action_id: \n      id: 2\n      label: Contact Us\n      name: contact_us\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /contact_us\n    14: &id002 !ruby/object:Goldberg::Menu::Node \n      content_page_id: 10\n      controller_action_id: \n      id: 14\n      label: Credits &amp; Licence\n      name: credits\n      parent: \n      parent_id: 2\n      site_controller_id: \n      url: /credits\n  by_name: \n    contact_us: *id001\n    credits: *id002\n    home: *id003\n  crumbs: \n  - 1\n  root: &id004 !ruby/object:Goldberg::Menu::Node \n    children: \n    - 1\n    - 2\n    parent: \n  selected: \n    1: *id003\n  vector: \n  - *id004\n  - *id003\n','2006-06-23 21:03:49','2007-05-21 14:02:01',NULL),(2,'Member',1,'',NULL,'--- \n:credentials: !ruby/object:Goldberg::Credentials \n  actions: \n    goldberg/site_controllers: \n      list: false\n    goldberg/menu_items: \n      list: false\n      link: true\n    goldberg/roles: \n      list: false\n    goldberg/permissions: \n      list: false\n    goldberg/system_settings: \n      list: false\n    goldberg/content_pages: \n      list: false\n      view_default: true\n      view: true\n    goldberg/auth: \n      logout: true\n      forgotten: true\n      login_failed: true\n      login: true\n    goldberg/controller_actions: \n      list: false\n    goldberg/users: \n      self_register: true\n      list: false\n      forgot_password: true\n      forgot_password_submit: true\n      reset_password: true\n      reset_password_submit: true\n      confirm_registration: true\n      self_create: true\n      confirm_registration_submit: true\n  controllers: \n    goldberg/site_controllers: false\n    goldberg/roles_permissions: false\n    goldberg/menu_items: false\n    goldberg/permissions: false\n    goldberg/roles: false\n    goldberg/system_settings: false\n    goldberg/content_pages: false\n    goldberg/auth: false\n    goldberg/controller_actions: false\n    goldberg/users: false\n  pages: \n    notfound: true\n    admin: false\n    site_admin: false\n    unconfirmed: true\n    contact_us: true\n    credits: true\n    home: true\n    expired: true\n    denied: true\n  permission_ids: \n  - 5\n  - 4\n  - 3\n  role_id: 2\n  role_ids: \n  - 2\n  - 1\n  updated_at: 2007-03-31 20:37:43 -04:00\n:menu: !ruby/object:Goldberg::Menu \n  by_id: \n    1: &id003 !ruby/object:Goldberg::Menu::Node \n      content_page_id: 1\n      controller_action_id: \n      id: 1\n      label: Home\n      name: home\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /home\n    2: &id001 !ruby/object:Goldberg::Menu::Node \n      children: \n      - 14\n      content_page_id: 6\n      controller_action_id: \n      id: 2\n      label: Contact Us\n      name: contact_us\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /contact_us\n    14: &id002 !ruby/object:Goldberg::Menu::Node \n      content_page_id: 10\n      controller_action_id: \n      id: 14\n      label: Credits &amp; Licence\n      name: credits\n      parent: \n      parent_id: 2\n      site_controller_id: \n      url: /credits\n  by_name: \n    contact_us: *id001\n    credits: *id002\n    home: *id003\n  crumbs: \n  - 1\n  root: &id004 !ruby/object:Goldberg::Menu::Node \n    children: \n    - 1\n    - 2\n    parent: \n  selected: \n    1: *id003\n  vector: \n  - *id004\n  - *id003\n','2006-06-23 21:03:50','2007-05-21 14:02:01',NULL),(3,'Administrator',2,'',8,'--- \n:credentials: !ruby/object:Goldberg::Credentials \n  actions: \n    goldberg/site_controllers: \n      list: true\n    goldberg/menu_items: \n      list: true\n      link: true\n    goldberg/roles: \n      list: true\n    goldberg/permissions: \n      list: true\n    goldberg/system_settings: \n      list: true\n    goldberg/content_pages: \n      list: true\n      view_default: true\n      view: true\n    goldberg/auth: \n      logout: true\n      forgotten: true\n      login_failed: true\n      login: true\n    goldberg/controller_actions: \n      list: true\n    goldberg/users: \n      self_register: true\n      list: true\n      forgot_password: true\n      forgot_password_submit: true\n      reset_password: true\n      reset_password_submit: true\n      confirm_registration: true\n      self_create: true\n      confirm_registration_submit: true\n  controllers: \n    goldberg/site_controllers: true\n    goldberg/roles_permissions: true\n    goldberg/menu_items: true\n    goldberg/permissions: true\n    goldberg/roles: true\n    goldberg/system_settings: true\n    goldberg/content_pages: true\n    goldberg/auth: true\n    goldberg/controller_actions: true\n    goldberg/users: true\n  pages: \n    notfound: true\n    admin: true\n    site_admin: true\n    unconfirmed: true\n    contact_us: true\n    credits: true\n    home: true\n    expired: true\n    denied: true\n  permission_ids: \n  - 1\n  - 5\n  - 4\n  - 2\n  - 3\n  role_id: 3\n  role_ids: \n  - 3\n  - 2\n  - 1\n  updated_at: 2007-03-31 20:37:43 -04:00\n:menu: !ruby/object:Goldberg::Menu \n  by_id: \n    5: &id009 !ruby/object:Goldberg::Menu::Node \n      content_page_id: \n      controller_action_id: 4\n      id: 5\n      label: Permissions\n      name: setup/permissions\n      parent: \n      parent_id: 9\n      site_controller_id: 6\n      url: /goldberg/permissions/list\n    11: &id004 !ruby/object:Goldberg::Menu::Node \n      content_page_id: \n      controller_action_id: 11\n      id: 11\n      label: Menu Editor\n      name: setup/menus\n      parent: \n      parent_id: 9\n      site_controller_id: 5\n      url: /goldberg/menu_items/list\n    6: &id006 !ruby/object:Goldberg::Menu::Node \n      content_page_id: \n      controller_action_id: 3\n      id: 6\n      label: Roles\n      name: setup/roles\n      parent: \n      parent_id: 9\n      site_controller_id: 7\n      url: /goldberg/roles/list\n    1: &id011 !ruby/object:Goldberg::Menu::Node \n      content_page_id: 1\n      controller_action_id: \n      id: 1\n      label: Home\n      name: home\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /home\n    12: &id003 !ruby/object:Goldberg::Menu::Node \n      content_page_id: \n      controller_action_id: 12\n      id: 12\n      label: System Settings\n      name: setup/system_settings\n      parent: \n      parent_id: 9\n      site_controller_id: 9\n      url: /goldberg/system_settings/list\n    7: &id002 !ruby/object:Goldberg::Menu::Node \n      content_page_id: \n      controller_action_id: 8\n      id: 7\n      label: Content Pages\n      name: setup/pages\n      parent: \n      parent_id: 9\n      site_controller_id: 1\n      url: /goldberg/content_pages/list\n    2: &id007 !ruby/object:Goldberg::Menu::Node \n      children: \n      - 14\n      content_page_id: 6\n      controller_action_id: \n      id: 2\n      label: Contact Us\n      name: contact_us\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /contact_us\n    13: &id001 !ruby/object:Goldberg::Menu::Node \n      content_page_id: \n      controller_action_id: 15\n      id: 13\n      label: Users\n      name: setup/users\n      parent: \n      parent_id: 9\n      site_controller_id: 10\n      url: /goldberg/users/list\n    8: &id012 !ruby/object:Goldberg::Menu::Node \n      content_page_id: \n      controller_action_id: 9\n      id: 8\n      label: Controllers / Actions\n      name: setup/controllers\n      parent: \n      parent_id: 9\n      site_controller_id: 8\n      url: /goldberg/site_controllers/list\n    3: &id005 !ruby/object:Goldberg::Menu::Node \n      children: \n      - 9\n      content_page_id: 9\n      controller_action_id: \n      id: 3\n      label: Administration\n      name: admin\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /admin\n    14: &id010 !ruby/object:Goldberg::Menu::Node \n      content_page_id: 10\n      controller_action_id: \n      id: 14\n      label: Credits &amp; Licence\n      name: credits\n      parent: \n      parent_id: 2\n      site_controller_id: \n      url: /credits\n    9: &id008 !ruby/object:Goldberg::Menu::Node \n      children: \n      - 13\n      - 6\n      - 5\n      - 8\n      - 7\n      - 11\n      - 12\n      content_page_id: 8\n      controller_action_id: \n      id: 9\n      label: Setup\n      name: setup\n      parent: \n      parent_id: 3\n      site_controller_id: \n      url: /site_admin\n  by_name: \n    setup/users: *id001\n    setup/pages: *id002\n    setup/system_settings: *id003\n    setup/menus: *id004\n    admin: *id005\n    setup/roles: *id006\n    contact_us: *id007\n    setup: *id008\n    setup/permissions: *id009\n    credits: *id010\n    home: *id011\n    setup/controllers: *id012\n  crumbs: \n  - 1\n  root: &id013 !ruby/object:Goldberg::Menu::Node \n    children: \n    - 1\n    - 3\n    - 2\n    parent: \n  selected: \n    1: *id011\n  vector: \n  - *id013\n  - *id011\n','2006-06-23 21:03:48','2007-05-21 14:02:01','/menu/admin');
+/*!40000 ALTER TABLE `goldberg_roles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `goldberg_roles_permissions`
+--
+
+DROP TABLE IF EXISTS `goldberg_roles_permissions`;
+CREATE TABLE `goldberg_roles_permissions` (
+  `id` int(11) NOT NULL auto_increment,
+  `role_id` int(11) NOT NULL default '0',
+  `permission_id` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `fk_roles_permission_role_id` (`role_id`),
+  KEY `fk_roles_permission_permission_id` (`permission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `goldberg_roles_permissions`
+--
+
+LOCK TABLES `goldberg_roles_permissions` WRITE;
+/*!40000 ALTER TABLE `goldberg_roles_permissions` DISABLE KEYS */;
+INSERT INTO `goldberg_roles_permissions` VALUES (4,3,1),(6,1,3),(7,3,2),(9,1,4),(10,2,5);
+/*!40000 ALTER TABLE `goldberg_roles_permissions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `goldberg_site_controllers`
+--
+
+DROP TABLE IF EXISTS `goldberg_site_controllers`;
+CREATE TABLE `goldberg_site_controllers` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  `permission_id` int(11) NOT NULL default '0',
+  `builtin` int(11) default '0',
+  PRIMARY KEY  (`id`),
+  KEY `fk_site_controller_permission_id` (`permission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `goldberg_site_controllers`
+--
+
+LOCK TABLES `goldberg_site_controllers` WRITE;
+/*!40000 ALTER TABLE `goldberg_site_controllers` DISABLE KEYS */;
+INSERT INTO `goldberg_site_controllers` VALUES (1,'goldberg/content_pages',1,1),(2,'goldberg/controller_actions',1,1),(3,'goldberg/auth',1,1),(5,'goldberg/menu_items',1,1),(6,'goldberg/permissions',1,1),(7,'goldberg/roles',1,1),(8,'goldberg/site_controllers',1,1),(9,'goldberg/system_settings',1,1),(10,'goldberg/users',1,1),(11,'goldberg/roles_permissions',1,1);
+/*!40000 ALTER TABLE `goldberg_site_controllers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `goldberg_system_settings`
+--
+
+DROP TABLE IF EXISTS `goldberg_system_settings`;
+CREATE TABLE `goldberg_system_settings` (
+  `id` int(11) NOT NULL auto_increment,
+  `site_name` varchar(255) NOT NULL default '',
+  `site_subtitle` varchar(255) default NULL,
+  `footer_message` varchar(255) default '',
+  `public_role_id` int(11) NOT NULL default '0',
+  `session_timeout` int(11) NOT NULL default '0',
+  `default_markup_style_id` int(11) default '0',
+  `site_default_page_id` int(11) NOT NULL default '0',
+  `not_found_page_id` int(11) NOT NULL default '0',
+  `permission_denied_page_id` int(11) NOT NULL default '0',
+  `session_expired_page_id` int(11) NOT NULL default '0',
+  `menu_depth` int(11) NOT NULL default '0',
+  `start_path` varchar(255) default NULL,
+  `site_url_prefix` varchar(255) default NULL,
+  `self_reg_enabled` tinyint(1) default NULL,
+  `self_reg_role_id` int(11) default NULL,
+  `self_reg_confirmation_required` tinyint(1) default NULL,
+  `self_reg_confirmation_error_page_id` int(11) default NULL,
+  `self_reg_send_confirmation_email` tinyint(1) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_system_settings_public_role_id` (`public_role_id`),
+  KEY `fk_system_settings_site_default_page_id` (`site_default_page_id`),
+  KEY `fk_system_settings_not_found_page_id` (`not_found_page_id`),
+  KEY `fk_system_settings_permission_denied_page_id` (`permission_denied_page_id`),
+  KEY `fk_system_settings_session_expired_page_id` (`session_expired_page_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `goldberg_system_settings`
+--
+
+LOCK TABLES `goldberg_system_settings` WRITE;
+/*!40000 ALTER TABLE `goldberg_system_settings` DISABLE KEYS */;
+INSERT INTO `goldberg_system_settings` VALUES (1,'Goldberg','A website development tool for Ruby on Rails','A <a href=\"http://goldberg.rubyforge.org\">Goldberg</a> site',1,7200,1,1,3,4,2,3,'','http://localhost:3000/',0,NULL,0,11,0);
+/*!40000 ALTER TABLE `goldberg_system_settings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `goldberg_users`
+--
+
+DROP TABLE IF EXISTS `goldberg_users`;
+CREATE TABLE `goldberg_users` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  `password` varchar(40) NOT NULL default '',
+  `role_id` int(11) NOT NULL default '0',
+  `password_salt` varchar(255) default NULL,
+  `fullname` varchar(255) default NULL,
+  `email` varchar(255) default NULL,
+  `start_path` varchar(255) default NULL,
+  `self_reg_confirmation_required` tinyint(1) default NULL,
+  `confirmation_key` varchar(255) default NULL,
+  `password_changed_at` datetime default NULL,
+  `password_expired` tinyint(1) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_user_role_id` (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `goldberg_users`
+--
+
+LOCK TABLES `goldberg_users` WRITE;
+/*!40000 ALTER TABLE `goldberg_users` DISABLE KEYS */;
+INSERT INTO `goldberg_users` VALUES (2,'admin','d033e22ae348aeb5660fc2140aec35850c4da997',3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+/*!40000 ALTER TABLE `goldberg_users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `institutions`
+--
+
+DROP TABLE IF EXISTS `institutions`;
+CREATE TABLE `institutions` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `institutions`
+--
+
+LOCK TABLES `institutions` WRITE;
+/*!40000 ALTER TABLE `institutions` DISABLE KEYS */;
+INSERT INTO `institutions` VALUES (1,'North Carolina State University');
+/*!40000 ALTER TABLE `institutions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `invitations`
+--
+
+DROP TABLE IF EXISTS `invitations`;
+CREATE TABLE `invitations` (
+  `id` int(11) NOT NULL auto_increment,
+  `assignment_id` int(11) default NULL,
+  `from_id` int(11) default NULL,
+  `to_id` int(11) default NULL,
+  `reply_status` char(1) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_invitationfrom_users` (`from_id`),
+  KEY `fk_invitationto_users` (`to_id`),
+  KEY `fk_invitation_assignments` (`assignment_id`),
+  CONSTRAINT `fk_invitation_assignments` FOREIGN KEY (`assignment_id`) REFERENCES `assignments` (`id`),
+  CONSTRAINT `fk_invitationfrom_users` FOREIGN KEY (`from_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_invitationto_users` FOREIGN KEY (`to_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `invitations`
+--
+
+LOCK TABLES `invitations` WRITE;
+/*!40000 ALTER TABLE `invitations` DISABLE KEYS */;
+/*!40000 ALTER TABLE `invitations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `languages`
+--
+
+DROP TABLE IF EXISTS `languages`;
+CREATE TABLE `languages` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(32) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `languages`
+--
+
+LOCK TABLES `languages` WRITE;
+/*!40000 ALTER TABLE `languages` DISABLE KEYS */;
+/*!40000 ALTER TABLE `languages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `late_policies`
+--
+
+DROP TABLE IF EXISTS `late_policies`;
+CREATE TABLE `late_policies` (
+  `id` int(11) NOT NULL auto_increment,
+  `penalty_period_in_minutes` int(11) default NULL,
+  `penalty_per_unit` int(11) default NULL,
+  `expressed_as_percentage` tinyint(1) default NULL,
+  `max_penalty` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `penalty_period_length_unit` (`penalty_period_in_minutes`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `late_policies`
+--
+
+LOCK TABLES `late_policies` WRITE;
+/*!40000 ALTER TABLE `late_policies` DISABLE KEYS */;
+INSERT INTO `late_policies` VALUES (1,30,1,NULL,20),(2,60,1,NULL,20),(3,90,1,NULL,20),(4,120,1,NULL,20);
+/*!40000 ALTER TABLE `late_policies` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `mapping_strategies`
+--
+
+DROP TABLE IF EXISTS `mapping_strategies`;
+CREATE TABLE `mapping_strategies` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `mapping_strategies`
+--
+
+LOCK TABLES `mapping_strategies` WRITE;
+/*!40000 ALTER TABLE `mapping_strategies` DISABLE KEYS */;
+INSERT INTO `mapping_strategies` VALUES (1,'Static, pseudo-random'),(2,'Dynamic, fewest extant reviews');
+/*!40000 ALTER TABLE `mapping_strategies` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `markup_styles`
+--
+
+DROP TABLE IF EXISTS `markup_styles`;
+CREATE TABLE `markup_styles` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `markup_styles`
+--
+
+LOCK TABLES `markup_styles` WRITE;
+/*!40000 ALTER TABLE `markup_styles` DISABLE KEYS */;
+INSERT INTO `markup_styles` VALUES (1,'Textile'),(2,'Markdown');
+/*!40000 ALTER TABLE `markup_styles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `menu_items`
+--
+
+DROP TABLE IF EXISTS `menu_items`;
+CREATE TABLE `menu_items` (
+  `id` int(11) NOT NULL auto_increment,
+  `parent_id` int(11) default NULL,
+  `name` varchar(255) NOT NULL default '',
+  `label` varchar(255) NOT NULL default '',
+  `seq` int(11) default NULL,
+  `controller_action_id` int(11) default NULL,
+  `content_page_id` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_menu_item_controller_action_id` (`controller_action_id`),
+  KEY `fk_menu_item_content_page_id` (`content_page_id`),
+  KEY `fk_menu_item_parent_id` (`parent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `menu_items`
+--
+
+LOCK TABLES `menu_items` WRITE;
+/*!40000 ALTER TABLE `menu_items` DISABLE KEYS */;
+INSERT INTO `menu_items` VALUES (1,NULL,'home','Home',1,NULL,1),(2,NULL,'contact_us','Contact Us',10,NULL,6),(3,NULL,'admin','Administration',2,NULL,8),(5,9,'setup/permissions','Permissions',3,4,NULL),(6,9,'setup/roles','Roles',2,3,NULL),(7,9,'setup/pages','Content Pages',5,8,NULL),(8,9,'setup/controllers','Controllers / Actions',4,9,NULL),(9,3,'setup','Setup',1,NULL,8),(11,9,'setup/menus','Menu Editor',6,11,NULL),(12,9,'setup/system_settings','System Settings',7,12,NULL),(13,34,'manage/users','Users',1,15,NULL),(14,2,'credits','Credits &amp; Licence',1,NULL,10),(15,43,'show/instructors','Instructors',4,16,NULL),(16,43,'show/administrators','Administrators',3,17,NULL),(17,43,'show/super-administrators','Super-Administrators',2,18,NULL),(22,43,'show/institutions','Institutions',1,32,NULL),(26,NULL,'student_task','Assignments',8,33,NULL),(27,NULL,'profile','Profile',9,36,NULL),(30,34,'impersonate','Impersonate User',5,42,NULL),(32,NULL,'Survey Deployments','Survey Deployments',4,45,NULL),(33,32,'Statistical Test','Statistical Test',3,46,NULL),(34,NULL,'manage instructor content','Manage...',3,48,NULL),(35,34,'manage/questionnaires','Questionnaires',2,49,NULL),(36,35,'manage/questionnaires/review rubrics','Review rubrics',1,51,NULL),(37,35,'manage/questionnaires/author feedbacks','Author feedbacks',4,50,NULL),(38,35,'manage/questionnaires/global survey','Global survey',5,52,NULL),(39,35,'manage/questionnaires/surveys','Surveys',6,53,NULL),(40,35,'manage/questionnaires/course evaluations','Course evaluations',7,53,NULL),(41,34,'manage/courses','Courses',3,55,NULL),(42,34,'manage/assignments','Assignments',4,56,NULL),(43,3,'show','Show...',2,15,NULL),(45,35,'manage/questionnaires/metareview rubrics','Metareview rubrics',2,61,NULL),(46,35,'manage/questionnaires/teammate review rubrics','Teammate review rubrics',3,62,NULL);
+/*!40000 ALTER TABLE `menu_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `nodes`
+--
+
+DROP TABLE IF EXISTS `nodes`;
+CREATE TABLE `nodes` (
+  `id` int(11) NOT NULL auto_increment,
+  `parent_id` int(11) default NULL,
+  `node_object_id` int(11) default NULL,
+  `type` varchar(255) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nodes`
+--
+
+LOCK TABLES `nodes` WRITE;
+/*!40000 ALTER TABLE `nodes` DISABLE KEYS */;
+INSERT INTO `nodes` VALUES (1,NULL,1,'FolderNode'),(2,NULL,2,'FolderNode'),(3,NULL,3,'FolderNode'),(11,1,4,'FolderNode'),(12,1,5,'FolderNode'),(13,1,6,'FolderNode'),(14,1,7,'FolderNode'),(15,1,8,'FolderNode'),(16,1,9,'FolderNode'),(17,1,10,'FolderNode');
+/*!40000 ALTER TABLE `nodes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `participants`
+--
+
+DROP TABLE IF EXISTS `participants`;
+CREATE TABLE `participants` (
+  `id` int(11) NOT NULL auto_increment,
+  `submit_allowed` tinyint(1) default '1',
+  `review_allowed` tinyint(1) default '1',
+  `user_id` int(11) default NULL,
+  `parent_id` int(11) default NULL,
+  `directory_num` int(11) default NULL,
+  `submitted_at` datetime default NULL,
+  `topic` varchar(255) default NULL,
+  `permission_granted` tinyint(1) default NULL,
+  `penalty_accumulated` int(10) NOT NULL default '0',
+  `submitted_hyperlink` varchar(500) default NULL,
+  `grade` float default NULL,
+  `type` varchar(255) default NULL,
+  `handle` varchar(255) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_participant_users` (`user_id`),
+  CONSTRAINT `fk_participant_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `participants`
+--
+
+LOCK TABLES `participants` WRITE;
+/*!40000 ALTER TABLE `participants` DISABLE KEYS */;
+/*!40000 ALTER TABLE `participants` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `permissions`
+--
+
+DROP TABLE IF EXISTS `permissions`;
+CREATE TABLE `permissions` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `permissions`
+--
+
+LOCK TABLES `permissions` WRITE;
+/*!40000 ALTER TABLE `permissions` DISABLE KEYS */;
+INSERT INTO `permissions` VALUES (1,'administer goldberg'),(3,'public pages - view'),(4,'public actions - execute'),(6,'administer pg'),(7,'administer assignments'),(8,'do assignments'),(9,'administer instructors'),(10,'administer courses');
+/*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `plugin_schema_info`
+--
+
+DROP TABLE IF EXISTS `plugin_schema_info`;
+CREATE TABLE `plugin_schema_info` (
+  `plugin_name` varchar(255) default NULL,
+  `version` int(11) default NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `plugin_schema_info`
+--
+
+LOCK TABLES `plugin_schema_info` WRITE;
+/*!40000 ALTER TABLE `plugin_schema_info` DISABLE KEYS */;
+INSERT INTO `plugin_schema_info` VALUES ('goldberg',3);
+/*!40000 ALTER TABLE `plugin_schema_info` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `question_advices`
+--
+
+DROP TABLE IF EXISTS `question_advices`;
+CREATE TABLE `question_advices` (
+  `id` int(11) NOT NULL auto_increment,
+  `question_id` int(11) default NULL,
+  `score` int(11) default NULL,
+  `advice` text,
+  PRIMARY KEY  (`id`),
+  KEY `fk_question_question_advices` (`question_id`),
+  CONSTRAINT `fk_question_question_advices` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `question_advices`
+--
+
+LOCK TABLES `question_advices` WRITE;
+/*!40000 ALTER TABLE `question_advices` DISABLE KEYS */;
+/*!40000 ALTER TABLE `question_advices` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `questionnaires`
+--
+
+DROP TABLE IF EXISTS `questionnaires`;
+CREATE TABLE `questionnaires` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(64) default NULL,
+  `instructor_id` int(11) NOT NULL default '0',
+  `private` tinyint(1) NOT NULL default '0',
+  `min_question_score` int(11) NOT NULL default '0',
+  `max_question_score` int(11) default NULL,
+  `created_at` datetime default NULL,
+  `updated_at` datetime NOT NULL,
+  `default_num_choices` int(11) default NULL,
+  `type` varchar(255) default NULL,
+  `display_type` varchar(255) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `questionnaires`
+--
+
+LOCK TABLES `questionnaires` WRITE;
+/*!40000 ALTER TABLE `questionnaires` DISABLE KEYS */;
+/*!40000 ALTER TABLE `questionnaires` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `questions`
+--
+
+DROP TABLE IF EXISTS `questions`;
+CREATE TABLE `questions` (
+  `id` int(11) NOT NULL auto_increment,
+  `txt` text,
+  `true_false` tinyint(1) default NULL,
+  `weight` int(11) default NULL,
+  `questionnaire_id` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_question_questionnaires` (`questionnaire_id`),
+  CONSTRAINT `fk_question_questionnaires` FOREIGN KEY (`questionnaire_id`) REFERENCES `questionnaires` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `questions`
+--
+
+LOCK TABLES `questions` WRITE;
+/*!40000 ALTER TABLE `questions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `questions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `response_maps`
+--
+
+DROP TABLE IF EXISTS `response_maps`;
+CREATE TABLE `response_maps` (
+  `id` int(11) NOT NULL auto_increment,
+  `reviewed_object_id` int(11) NOT NULL,
+  `reviewer_id` int(11) NOT NULL,
+  `reviewee_id` int(11) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_response_map_reviewer` (`reviewer_id`),
+  CONSTRAINT `fk_response_map_reviewer` FOREIGN KEY (`reviewer_id`) REFERENCES `participants` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `response_maps`
+--
+
+LOCK TABLES `response_maps` WRITE;
+/*!40000 ALTER TABLE `response_maps` DISABLE KEYS */;
+/*!40000 ALTER TABLE `response_maps` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `responses`
+--
+
+DROP TABLE IF EXISTS `responses`;
+CREATE TABLE `responses` (
+  `id` int(11) NOT NULL auto_increment,
+  `map_id` int(11) NOT NULL,
+  `additional_comment` varchar(255) default NULL,
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_response_response_map` (`map_id`),
+  CONSTRAINT `fk_response_response_map` FOREIGN KEY (`map_id`) REFERENCES `response_maps` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `responses`
+--
+
+LOCK TABLES `responses` WRITE;
+/*!40000 ALTER TABLE `responses` DISABLE KEYS */;
+/*!40000 ALTER TABLE `responses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `resubmission_times`
+--
+
+DROP TABLE IF EXISTS `resubmission_times`;
+CREATE TABLE `resubmission_times` (
+  `id` int(11) NOT NULL auto_increment,
+  `participant_id` int(11) default NULL,
+  `resubmitted_at` datetime default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_resubmission_times_participants` (`participant_id`),
+  CONSTRAINT `fk_resubmission_times_participants` FOREIGN KEY (`participant_id`) REFERENCES `participants` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `resubmission_times`
+--
+
+LOCK TABLES `resubmission_times` WRITE;
+/*!40000 ALTER TABLE `resubmission_times` DISABLE KEYS */;
+/*!40000 ALTER TABLE `resubmission_times` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `review_strategies`
+--
+
+DROP TABLE IF EXISTS `review_strategies`;
+CREATE TABLE `review_strategies` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `review_strategies`
+--
+
+LOCK TABLES `review_strategies` WRITE;
+/*!40000 ALTER TABLE `review_strategies` DISABLE KEYS */;
+INSERT INTO `review_strategies` VALUES (1,'questionnaire');
+/*!40000 ALTER TABLE `review_strategies` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `roles`
+--
+
+DROP TABLE IF EXISTS `roles`;
+CREATE TABLE `roles` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  `parent_id` int(11) default NULL,
+  `description` varchar(255) NOT NULL default '',
+  `default_page_id` int(11) default NULL,
+  `cache` text,
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_role_parent_id` (`parent_id`),
+  KEY `fk_role_default_page_id` (`default_page_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `roles`
+--
+
+LOCK TABLES `roles` WRITE;
+/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
+INSERT INTO `roles` VALUES (1,'Student',NULL,'',NULL,'--- \n:credentials: !ruby/object:Credentials \n  actions: \n    menu_items: \n      list: false\n      link: true\n    roles: \n      list: false\n    tree_display: \n      goto_metareview_rubrics: false\n      goto_author_feedbacks: false\n      goto_questionnaires: false\n      list: false\n      goto_assignments: false\n      goto_course_evaluations: false\n      goto_global_survey: false\n      drill: false\n      goto_teammatereview_rubrics: false\n      goto_surveys: false\n      goto_teammate_reviews: false\n      goto_review_rubrics: false\n      goto_courses: false\n    auth: \n      logout: true\n      login_failed: true\n      login: true\n    profile: \n      edit: true\n    student_task: \n      list: true\n    institution: \n      list: false\n    assignment: \n      new: false\n      list: false\n      create: false\n    site_controllers: \n      list: false\n    statistics: \n      list_surveys: false\n    impersonate: \n      start: false\n      restore: true\n    questionnaire: \n      list: false\n      copy_questionnaire: false\n      edit_questionnaire: false\n      create_questionnaire: false\n      save_questionnaire: false\n    participants: \n      add_student: false\n      change_handle: true\n      edit_team_members: false\n      list_assignments: false\n      list_courses: false\n      list_students: false\n    admin: \n      list_instructors: false\n      list_super_administrators: false\n      list_administrators: false\n    review_mapping: \n      list: false\n    team: \n      list: false\n      list_assignments: false\n    users: \n      list: false\n    system_settings: \n      list: false\n    controller_actions: \n      list: false\n    permissions: \n      list: false\n    content_pages: \n      list: false\n      view_default: true\n      view: true\n    teams_users: \n      list: false\n    course: \n      list_folders: false\n    grades: \n      view_my_scores: true\n    survey_deployment: \n      list: false\n    survey_response: \n      submit: true\n      create: true\n  controllers: \n    import_file: false\n    roles: false\n    menu_items: false\n    response: true\n    publishing: true\n    tree_display: false\n    auth: false\n    profile: true\n    student_task: true\n    institution: false\n    assignment: false\n    site_controllers: false\n    statistics: false\n    impersonate: false\n    questionnaire: false\n    markup_styles: false\n    course_evaluation: true\n    participants: false\n    admin: false\n    student_team: true\n    roles_permissions: false\n    export_file: false\n    invitation: true\n    review_mapping: false\n    team: false\n    survey: false\n    users: false\n    system_settings: false\n    permissions: false\n    controller_actions: false\n    content_pages: false\n    eula: true\n    password_retrieval: true\n    teams_users: false\n    reports: true\n    course: false\n    student_review: true\n    submitted_content: true\n    survey_deployment: false\n    participant_choices: false\n    grades: false\n    survey_response: true\n  pages: \n    admin: false\n    notfound: true\n    site_admin: false\n    contact_us: true\n    credits: true\n    denied: true\n    expired: true\n    home: true\n  permission_ids: \n  - 8\n  - 4\n  - 3\n  role_id: 1\n  role_ids: \n  - 1\n  updated_at: 2010-01-20 17:51:26 -05:00\n:menu: !ruby/object:Menu \n  by_id: \n    27: &id001 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 36\n      id: 27\n      label: Profile\n      name: profile\n      parent: \n      parent_id: \n      site_controller_id: 26\n      url: /profile/edit\n    1: &id005 !ruby/object:Menu::Node \n      content_page_id: 1\n      controller_action_id: \n      id: 1\n      label: Home\n      name: home\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /home\n    2: &id003 !ruby/object:Menu::Node \n      children: \n      - 14\n      content_page_id: 6\n      controller_action_id: \n      id: 2\n      label: Contact Us\n      name: contact_us\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /contact_us\n    14: &id004 !ruby/object:Menu::Node \n      content_page_id: 10\n      controller_action_id: \n      id: 14\n      label: Credits &amp; Licence\n      name: credits\n      parent: \n      parent_id: 2\n      site_controller_id: \n      url: /credits\n    26: &id002 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 33\n      id: 26\n      label: Assignments\n      name: student_task\n      parent: \n      parent_id: \n      site_controller_id: 23\n      url: /student_task/list\n  by_name: \n    profile: *id001\n    student_task: *id002\n    contact_us: *id003\n    credits: *id004\n    home: *id005\n  crumbs: \n  - 1\n  root: &id006 !ruby/object:Menu::Node \n    children: \n    - 1\n    - 26\n    - 27\n    - 2\n    parent: \n  selected: \n    1: *id005\n  vector: \n  - *id006\n  - *id005\n','2010-01-20 17:50:24','2010-01-20 17:51:26'),(2,'Instructor',5,'',NULL,'--- \n:credentials: !ruby/object:Credentials \n  actions: \n    menu_items: \n      list: false\n      link: true\n    roles: \n      list: false\n    tree_display: \n      goto_metareview_rubrics: true\n      goto_author_feedbacks: true\n      goto_questionnaires: true\n      list: true\n      goto_assignments: true\n      goto_course_evaluations: true\n      goto_global_survey: true\n      drill: true\n      goto_teammatereview_rubrics: true\n      goto_surveys: true\n      goto_teammate_reviews: true\n      goto_review_rubrics: true\n      goto_courses: true\n    auth: \n      logout: true\n      login_failed: true\n      login: true\n    profile: \n      edit: true\n    student_task: \n      list: true\n    institution: \n      list: false\n    assignment: \n      new: true\n      list: true\n      create: true\n    site_controllers: \n      list: false\n    statistics: \n      list_surveys: true\n    impersonate: \n      start: true\n      restore: true\n    questionnaire: \n      list: true\n      copy_questionnaire: true\n      edit_questionnaire: true\n      create_questionnaire: true\n      save_questionnaire: true\n    participants: \n      add_student: true\n      change_handle: true\n      edit_team_members: true\n      list_assignments: true\n      list_courses: true\n      list_students: true\n    admin: \n      list_instructors: false\n      list_super_administrators: false\n      list_administrators: false\n    review_mapping: \n      list: true\n    team: \n      list: true\n      list_assignments: true\n    users: \n      list: true\n    system_settings: \n      list: false\n    controller_actions: \n      list: false\n    permissions: \n      list: false\n    content_pages: \n      list: false\n      view_default: true\n      view: true\n    teams_users: \n      list: true\n    course: \n      list_folders: true\n    grades: \n      view_my_scores: true\n    survey_deployment: \n      list: true\n    survey_response: \n      submit: true\n      create: true\n  controllers: \n    import_file: true\n    roles: false\n    menu_items: false\n    response: true\n    publishing: true\n    tree_display: true\n    auth: false\n    profile: true\n    student_task: true\n    institution: false\n    assignment: true\n    site_controllers: false\n    statistics: true\n    impersonate: true\n    questionnaire: true\n    markup_styles: false\n    course_evaluation: true\n    participants: true\n    admin: false\n    student_team: true\n    roles_permissions: false\n    export_file: true\n    invitation: true\n    review_mapping: true\n    team: true\n    survey: true\n    users: false\n    system_settings: false\n    permissions: false\n    controller_actions: false\n    content_pages: false\n    eula: true\n    password_retrieval: true\n    teams_users: true\n    reports: true\n    course: true\n    student_review: true\n    submitted_content: true\n    survey_deployment: true\n    participant_choices: true\n    grades: true\n    survey_response: true\n  pages: \n    admin: true\n    notfound: true\n    site_admin: false\n    contact_us: true\n    credits: true\n    denied: true\n    expired: true\n    home: true\n  permission_ids: \n  - 7\n  - 8\n  - 4\n  - 3\n  role_id: 2\n  role_ids: \n  - 2\n  - 5\n  - 1\n  updated_at: 2010-01-20 17:51:26 -05:00\n:menu: !ruby/object:Menu \n  by_id: \n    38: &id005 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 52\n      id: 38\n      label: Global survey\n      name: manage/questionnaires/global survey\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_global_survey\n    27: &id007 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 36\n      id: 27\n      label: Profile\n      name: profile\n      parent: \n      parent_id: \n      site_controller_id: 26\n      url: /profile/edit\n    33: &id011 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 46\n      id: 33\n      label: Statistical Test\n      name: Statistical Test\n      parent: \n      parent_id: 32\n      site_controller_id: 37\n      url: /statistics/list_surveys\n    39: &id016 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 53\n      id: 39\n      label: Surveys\n      name: manage/questionnaires/surveys\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_surveys\n    45: &id006 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 61\n      id: 45\n      label: Metareview rubrics\n      name: manage/questionnaires/metareview rubrics\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_metareview_rubrics\n    34: &id012 !ruby/object:Menu::Node \n      children: \n      - 13\n      - 35\n      - 41\n      - 42\n      - 30\n      content_page_id: \n      controller_action_id: 48\n      id: 34\n      label: Manage...\n      name: manage instructor content\n      parent: \n      parent_id: \n      site_controller_id: 38\n      url: /tree_display/drill\n    1: &id020 !ruby/object:Menu::Node \n      content_page_id: 1\n      controller_action_id: \n      id: 1\n      label: Home\n      name: home\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /home\n    40: &id001 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 53\n      id: 40\n      label: Course evaluations\n      name: manage/questionnaires/course evaluations\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_surveys\n    46: &id002 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 62\n      id: 46\n      label: Teammate review rubrics\n      name: manage/questionnaires/teammate review rubrics\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_teammatereview_rubrics\n    35: &id017 !ruby/object:Menu::Node \n      children: \n      - 36\n      - 45\n      - 46\n      - 37\n      - 38\n      - 39\n      - 40\n      content_page_id: \n      controller_action_id: 49\n      id: 35\n      label: Questionnaires\n      name: manage/questionnaires\n      parent: \n      parent_id: 34\n      site_controller_id: 38\n      url: /tree_display/goto_questionnaires\n    13: &id004 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 15\n      id: 13\n      label: Users\n      name: manage/users\n      parent: \n      parent_id: 34\n      site_controller_id: 10\n      url: /users/list\n    2: &id015 !ruby/object:Menu::Node \n      children: \n      - 14\n      content_page_id: 6\n      controller_action_id: \n      id: 2\n      label: Contact Us\n      name: contact_us\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /contact_us\n    30: &id010 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 42\n      id: 30\n      label: Impersonate User\n      name: impersonate\n      parent: \n      parent_id: 34\n      site_controller_id: 30\n      url: /impersonate/start\n    41: &id013 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 55\n      id: 41\n      label: Courses\n      name: manage/courses\n      parent: \n      parent_id: 34\n      site_controller_id: 38\n      url: /tree_display/goto_courses\n    36: &id003 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 51\n      id: 36\n      label: Review rubrics\n      name: manage/questionnaires/review rubrics\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_review_rubrics\n    14: &id018 !ruby/object:Menu::Node \n      content_page_id: 10\n      controller_action_id: \n      id: 14\n      label: Credits &amp; Licence\n      name: credits\n      parent: \n      parent_id: 2\n      site_controller_id: \n      url: /credits\n    42: &id021 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 56\n      id: 42\n      label: Assignments\n      name: manage/assignments\n      parent: \n      parent_id: 34\n      site_controller_id: 38\n      url: /tree_display/goto_assignments\n    37: &id009 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 50\n      id: 37\n      label: Author feedbacks\n      name: manage/questionnaires/author feedbacks\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_author_feedbacks\n    26: &id008 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 33\n      id: 26\n      label: Assignments\n      name: student_task\n      parent: \n      parent_id: \n      site_controller_id: 23\n      url: /student_task/list\n    43: &id014 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 15\n      id: 43\n      label: Show...\n      name: show\n      parent: \n      parent_id: 3\n      site_controller_id: 10\n      url: /users/list\n    32: &id019 !ruby/object:Menu::Node \n      children: \n      - 33\n      content_page_id: \n      controller_action_id: 45\n      id: 32\n      label: Survey Deployments\n      name: Survey Deployments\n      parent: \n      parent_id: \n      site_controller_id: 36\n      url: /survey_deployment/list\n  by_name: \n    manage/questionnaires/course evaluations: *id001\n    manage/questionnaires/teammate review rubrics: *id002\n    manage/questionnaires/review rubrics: *id003\n    manage/users: *id004\n    manage/questionnaires/global survey: *id005\n    manage/questionnaires/metareview rubrics: *id006\n    profile: *id007\n    student_task: *id008\n    manage/questionnaires/author feedbacks: *id009\n    impersonate: *id010\n    Statistical Test: *id011\n    manage instructor content: *id012\n    manage/courses: *id013\n    show: *id014\n    contact_us: *id015\n    manage/questionnaires/surveys: *id016\n    manage/questionnaires: *id017\n    credits: *id018\n    Survey Deployments: *id019\n    home: *id020\n    manage/assignments: *id021\n  crumbs: \n  - 1\n  root: &id022 !ruby/object:Menu::Node \n    children: \n    - 1\n    - 34\n    - 32\n    - 26\n    - 27\n    - 2\n    parent: \n  selected: \n    1: *id020\n  vector: \n  - *id022\n  - *id020\n','2010-01-20 17:50:24','2010-01-20 17:51:26'),(3,'Administrator',2,'',NULL,'--- \n:credentials: !ruby/object:Credentials \n  actions: \n    menu_items: \n      list: false\n      link: true\n    roles: \n      list: false\n    tree_display: \n      goto_metareview_rubrics: true\n      goto_author_feedbacks: true\n      goto_questionnaires: true\n      list: true\n      goto_assignments: true\n      goto_course_evaluations: true\n      goto_global_survey: true\n      drill: true\n      goto_teammatereview_rubrics: true\n      goto_surveys: true\n      goto_teammate_reviews: true\n      goto_review_rubrics: true\n      goto_courses: true\n    auth: \n      logout: true\n      login_failed: true\n      login: true\n    profile: \n      edit: true\n    student_task: \n      list: true\n    institution: \n      list: false\n    assignment: \n      new: true\n      list: true\n      create: true\n    site_controllers: \n      list: false\n    statistics: \n      list_surveys: true\n    impersonate: \n      start: true\n      restore: true\n    questionnaire: \n      list: true\n      copy_questionnaire: true\n      edit_questionnaire: true\n      create_questionnaire: true\n      save_questionnaire: true\n    participants: \n      add_student: true\n      change_handle: true\n      edit_team_members: true\n      list_assignments: true\n      list_courses: true\n      list_students: true\n    admin: \n      list_instructors: false\n      list_super_administrators: false\n      list_administrators: false\n    review_mapping: \n      list: true\n    team: \n      list: true\n      list_assignments: true\n    users: \n      list: true\n    system_settings: \n      list: false\n    controller_actions: \n      list: false\n    permissions: \n      list: false\n    content_pages: \n      list: false\n      view_default: true\n      view: true\n    teams_users: \n      list: true\n    course: \n      list_folders: true\n    grades: \n      view_my_scores: true\n    survey_deployment: \n      list: true\n    survey_response: \n      submit: true\n      create: true\n  controllers: \n    import_file: true\n    roles: false\n    menu_items: false\n    response: true\n    publishing: true\n    tree_display: true\n    auth: false\n    profile: true\n    student_task: true\n    institution: false\n    assignment: true\n    site_controllers: false\n    statistics: true\n    impersonate: true\n    questionnaire: true\n    markup_styles: false\n    course_evaluation: true\n    participants: true\n    admin: false\n    student_team: true\n    roles_permissions: false\n    export_file: true\n    invitation: true\n    review_mapping: true\n    team: true\n    survey: true\n    users: false\n    system_settings: false\n    permissions: false\n    controller_actions: false\n    content_pages: false\n    eula: true\n    password_retrieval: true\n    teams_users: true\n    reports: true\n    course: true\n    student_review: true\n    submitted_content: true\n    survey_deployment: true\n    participant_choices: true\n    grades: true\n    survey_response: true\n  pages: \n    admin: true\n    notfound: true\n    site_admin: false\n    contact_us: true\n    credits: true\n    denied: true\n    expired: true\n    home: true\n  permission_ids: \n  - 7\n  - 7\n  - 8\n  - 4\n  - 3\n  role_id: 3\n  role_ids: \n  - 3\n  - 2\n  - 5\n  - 1\n  updated_at: 2010-01-20 17:51:26 -05:00\n:menu: !ruby/object:Menu \n  by_id: \n    38: &id005 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 52\n      id: 38\n      label: Global survey\n      name: manage/questionnaires/global survey\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_global_survey\n    27: &id007 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 36\n      id: 27\n      label: Profile\n      name: profile\n      parent: \n      parent_id: \n      site_controller_id: 26\n      url: /profile/edit\n    33: &id011 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 46\n      id: 33\n      label: Statistical Test\n      name: Statistical Test\n      parent: \n      parent_id: 32\n      site_controller_id: 37\n      url: /statistics/list_surveys\n    39: &id016 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 53\n      id: 39\n      label: Surveys\n      name: manage/questionnaires/surveys\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_surveys\n    45: &id006 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 61\n      id: 45\n      label: Metareview rubrics\n      name: manage/questionnaires/metareview rubrics\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_metareview_rubrics\n    34: &id012 !ruby/object:Menu::Node \n      children: \n      - 13\n      - 35\n      - 41\n      - 42\n      - 30\n      content_page_id: \n      controller_action_id: 48\n      id: 34\n      label: Manage...\n      name: manage instructor content\n      parent: \n      parent_id: \n      site_controller_id: 38\n      url: /tree_display/drill\n    1: &id020 !ruby/object:Menu::Node \n      content_page_id: 1\n      controller_action_id: \n      id: 1\n      label: Home\n      name: home\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /home\n    40: &id001 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 53\n      id: 40\n      label: Course evaluations\n      name: manage/questionnaires/course evaluations\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_surveys\n    46: &id002 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 62\n      id: 46\n      label: Teammate review rubrics\n      name: manage/questionnaires/teammate review rubrics\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_teammatereview_rubrics\n    35: &id017 !ruby/object:Menu::Node \n      children: \n      - 36\n      - 45\n      - 46\n      - 37\n      - 38\n      - 39\n      - 40\n      content_page_id: \n      controller_action_id: 49\n      id: 35\n      label: Questionnaires\n      name: manage/questionnaires\n      parent: \n      parent_id: 34\n      site_controller_id: 38\n      url: /tree_display/goto_questionnaires\n    13: &id004 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 15\n      id: 13\n      label: Users\n      name: manage/users\n      parent: \n      parent_id: 34\n      site_controller_id: 10\n      url: /users/list\n    2: &id015 !ruby/object:Menu::Node \n      children: \n      - 14\n      content_page_id: 6\n      controller_action_id: \n      id: 2\n      label: Contact Us\n      name: contact_us\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /contact_us\n    30: &id010 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 42\n      id: 30\n      label: Impersonate User\n      name: impersonate\n      parent: \n      parent_id: 34\n      site_controller_id: 30\n      url: /impersonate/start\n    41: &id013 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 55\n      id: 41\n      label: Courses\n      name: manage/courses\n      parent: \n      parent_id: 34\n      site_controller_id: 38\n      url: /tree_display/goto_courses\n    36: &id003 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 51\n      id: 36\n      label: Review rubrics\n      name: manage/questionnaires/review rubrics\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_review_rubrics\n    14: &id018 !ruby/object:Menu::Node \n      content_page_id: 10\n      controller_action_id: \n      id: 14\n      label: Credits &amp; Licence\n      name: credits\n      parent: \n      parent_id: 2\n      site_controller_id: \n      url: /credits\n    42: &id021 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 56\n      id: 42\n      label: Assignments\n      name: manage/assignments\n      parent: \n      parent_id: 34\n      site_controller_id: 38\n      url: /tree_display/goto_assignments\n    37: &id009 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 50\n      id: 37\n      label: Author feedbacks\n      name: manage/questionnaires/author feedbacks\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_author_feedbacks\n    26: &id008 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 33\n      id: 26\n      label: Assignments\n      name: student_task\n      parent: \n      parent_id: \n      site_controller_id: 23\n      url: /student_task/list\n    43: &id014 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 15\n      id: 43\n      label: Show...\n      name: show\n      parent: \n      parent_id: 3\n      site_controller_id: 10\n      url: /users/list\n    32: &id019 !ruby/object:Menu::Node \n      children: \n      - 33\n      content_page_id: \n      controller_action_id: 45\n      id: 32\n      label: Survey Deployments\n      name: Survey Deployments\n      parent: \n      parent_id: \n      site_controller_id: 36\n      url: /survey_deployment/list\n  by_name: \n    manage/questionnaires/course evaluations: *id001\n    manage/questionnaires/teammate review rubrics: *id002\n    manage/questionnaires/review rubrics: *id003\n    manage/users: *id004\n    manage/questionnaires/global survey: *id005\n    manage/questionnaires/metareview rubrics: *id006\n    profile: *id007\n    student_task: *id008\n    manage/questionnaires/author feedbacks: *id009\n    impersonate: *id010\n    Statistical Test: *id011\n    manage instructor content: *id012\n    manage/courses: *id013\n    show: *id014\n    contact_us: *id015\n    manage/questionnaires/surveys: *id016\n    manage/questionnaires: *id017\n    credits: *id018\n    Survey Deployments: *id019\n    home: *id020\n    manage/assignments: *id021\n  crumbs: \n  - 1\n  root: &id022 !ruby/object:Menu::Node \n    children: \n    - 1\n    - 34\n    - 32\n    - 26\n    - 27\n    - 2\n    parent: \n  selected: \n    1: *id020\n  vector: \n  - *id022\n  - *id020\n','2010-01-20 17:50:24','2010-01-20 17:51:26'),(4,'Super-Administrator',3,'',NULL,'--- \n:credentials: !ruby/object:Credentials \n  actions: \n    menu_items: \n      list: true\n      link: true\n    roles: \n      list: true\n    tree_display: \n      goto_metareview_rubrics: true\n      goto_author_feedbacks: true\n      goto_questionnaires: true\n      list: true\n      goto_assignments: true\n      goto_course_evaluations: true\n      goto_global_survey: true\n      drill: true\n      goto_teammatereview_rubrics: true\n      goto_surveys: true\n      goto_teammate_reviews: true\n      goto_review_rubrics: true\n      goto_courses: true\n    auth: \n      logout: true\n      login_failed: true\n      login: true\n    profile: \n      edit: true\n    student_task: \n      list: true\n    institution: \n      list: true\n    assignment: \n      new: true\n      list: true\n      create: true\n    site_controllers: \n      list: true\n    statistics: \n      list_surveys: true\n    impersonate: \n      start: true\n      restore: true\n    questionnaire: \n      list: true\n      copy_questionnaire: true\n      edit_questionnaire: true\n      create_questionnaire: true\n      save_questionnaire: true\n    participants: \n      add_student: true\n      change_handle: true\n      edit_team_members: true\n      list_assignments: true\n      list_courses: true\n      list_students: true\n    admin: \n      list_instructors: true\n      list_super_administrators: true\n      list_administrators: true\n    review_mapping: \n      list: true\n    team: \n      list: true\n      list_assignments: true\n    users: \n      list: true\n    system_settings: \n      list: true\n    controller_actions: \n      list: true\n    permissions: \n      list: true\n    content_pages: \n      list: true\n      view_default: true\n      view: true\n    teams_users: \n      list: true\n    course: \n      list_folders: true\n    grades: \n      view_my_scores: true\n    survey_deployment: \n      list: true\n    survey_response: \n      submit: true\n      create: true\n  controllers: \n    import_file: true\n    roles: true\n    menu_items: true\n    response: true\n    publishing: true\n    tree_display: true\n    auth: true\n    profile: true\n    student_task: true\n    institution: true\n    assignment: true\n    site_controllers: true\n    statistics: true\n    impersonate: true\n    questionnaire: true\n    markup_styles: true\n    course_evaluation: true\n    participants: true\n    admin: true\n    student_team: true\n    roles_permissions: true\n    export_file: true\n    invitation: true\n    review_mapping: true\n    team: true\n    survey: true\n    users: true\n    system_settings: true\n    permissions: true\n    controller_actions: true\n    content_pages: true\n    eula: true\n    password_retrieval: true\n    teams_users: true\n    reports: true\n    course: true\n    student_review: true\n    submitted_content: true\n    survey_deployment: true\n    participant_choices: true\n    grades: true\n    survey_response: true\n  pages: \n    admin: true\n    notfound: true\n    site_admin: true\n    contact_us: true\n    credits: true\n    denied: true\n    expired: true\n    home: true\n  permission_ids: \n  - 7\n  - 7\n  - 7\n  - 1\n  - 9\n  - 6\n  - 8\n  - 4\n  - 3\n  role_id: 4\n  role_ids: \n  - 4\n  - 3\n  - 2\n  - 5\n  - 1\n  updated_at: 2010-01-20 17:51:26 -05:00\n:menu: !ruby/object:Menu \n  by_id: \n    16: &id007 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 17\n      id: 16\n      label: Administrators\n      name: show/administrators\n      parent: \n      parent_id: 43\n      site_controller_id: 12\n      url: /admin/list_administrators\n    38: &id008 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 52\n      id: 38\n      label: Global survey\n      name: manage/questionnaires/global survey\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_global_survey\n    5: &id022 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 4\n      id: 5\n      label: Permissions\n      name: setup/permissions\n      parent: \n      parent_id: 9\n      site_controller_id: 6\n      url: /permissions/list\n    27: &id011 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 36\n      id: 27\n      label: Profile\n      name: profile\n      parent: \n      parent_id: \n      site_controller_id: 26\n      url: /profile/edit\n    22: &id019 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 32\n      id: 22\n      label: Institutions\n      name: show/institutions\n      parent: \n      parent_id: 43\n      site_controller_id: 22\n      url: /institution/list\n    33: &id018 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 46\n      id: 33\n      label: Statistical Test\n      name: Statistical Test\n      parent: \n      parent_id: 32\n      site_controller_id: 37\n      url: /statistics/list_surveys\n    11: &id010 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 11\n      id: 11\n      label: Menu Editor\n      name: setup/menus\n      parent: \n      parent_id: 9\n      site_controller_id: 5\n      url: /menu_items/list\n    17: &id013 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 18\n      id: 17\n      label: Super-Administrators\n      name: show/super-administrators\n      parent: \n      parent_id: 43\n      site_controller_id: 12\n      url: /admin/list_super_administrators\n    39: &id027 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 53\n      id: 39\n      label: Surveys\n      name: manage/questionnaires/surveys\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_surveys\n    6: &id016 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 3\n      id: 6\n      label: Roles\n      name: setup/roles\n      parent: \n      parent_id: 9\n      site_controller_id: 7\n      url: /roles/list\n    45: &id009 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 61\n      id: 45\n      label: Metareview rubrics\n      name: manage/questionnaires/metareview rubrics\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_metareview_rubrics\n    12: &id006 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 12\n      id: 12\n      label: System Settings\n      name: setup/system_settings\n      parent: \n      parent_id: 9\n      site_controller_id: 9\n      url: /system_settings/list\n    34: &id020 !ruby/object:Menu::Node \n      children: \n      - 13\n      - 35\n      - 41\n      - 42\n      - 30\n      content_page_id: \n      controller_action_id: 48\n      id: 34\n      label: Manage...\n      name: manage instructor content\n      parent: \n      parent_id: \n      site_controller_id: 38\n      url: /tree_display/drill\n    1: &id032 !ruby/object:Menu::Node \n      content_page_id: 1\n      controller_action_id: \n      id: 1\n      label: Home\n      name: home\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /home\n    40: &id001 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 53\n      id: 40\n      label: Course evaluations\n      name: manage/questionnaires/course evaluations\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_surveys\n    7: &id003 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 8\n      id: 7\n      label: Content Pages\n      name: setup/pages\n      parent: \n      parent_id: 9\n      site_controller_id: 1\n      url: /content_pages/list\n    46: &id002 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 62\n      id: 46\n      label: Teammate review rubrics\n      name: manage/questionnaires/teammate review rubrics\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_teammatereview_rubrics\n    35: &id028 !ruby/object:Menu::Node \n      children: \n      - 36\n      - 45\n      - 46\n      - 37\n      - 38\n      - 39\n      - 40\n      content_page_id: \n      controller_action_id: 49\n      id: 35\n      label: Questionnaires\n      name: manage/questionnaires\n      parent: \n      parent_id: 34\n      site_controller_id: 38\n      url: /tree_display/goto_questionnaires\n    13: &id005 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 15\n      id: 13\n      label: Users\n      name: manage/users\n      parent: \n      parent_id: 34\n      site_controller_id: 10\n      url: /users/list\n    2: &id025 !ruby/object:Menu::Node \n      children: \n      - 14\n      content_page_id: 6\n      controller_action_id: \n      id: 2\n      label: Contact Us\n      name: contact_us\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /contact_us\n    30: &id015 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 42\n      id: 30\n      label: Impersonate User\n      name: impersonate\n      parent: \n      parent_id: 34\n      site_controller_id: 30\n      url: /impersonate/start\n    41: &id021 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 55\n      id: 41\n      label: Courses\n      name: manage/courses\n      parent: \n      parent_id: 34\n      site_controller_id: 38\n      url: /tree_display/goto_courses\n    8: &id031 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 9\n      id: 8\n      label: Controllers / Actions\n      name: setup/controllers\n      parent: \n      parent_id: 9\n      site_controller_id: 8\n      url: /site_controllers/list\n    36: &id004 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 51\n      id: 36\n      label: Review rubrics\n      name: manage/questionnaires/review rubrics\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_review_rubrics\n    14: &id029 !ruby/object:Menu::Node \n      content_page_id: 10\n      controller_action_id: \n      id: 14\n      label: Credits &amp; Licence\n      name: credits\n      parent: \n      parent_id: 2\n      site_controller_id: \n      url: /credits\n    3: &id017 !ruby/object:Menu::Node \n      children: \n      - 9\n      - 43\n      content_page_id: 8\n      controller_action_id: \n      id: 3\n      label: Administration\n      name: admin\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /site_admin\n    42: &id033 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 56\n      id: 42\n      label: Assignments\n      name: manage/assignments\n      parent: \n      parent_id: 34\n      site_controller_id: 38\n      url: /tree_display/goto_assignments\n    9: &id024 !ruby/object:Menu::Node \n      children: \n      - 6\n      - 5\n      - 8\n      - 7\n      - 11\n      - 12\n      content_page_id: 8\n      controller_action_id: \n      id: 9\n      label: Setup\n      name: setup\n      parent: \n      parent_id: 3\n      site_controller_id: \n      url: /site_admin\n    15: &id026 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 16\n      id: 15\n      label: Instructors\n      name: show/instructors\n      parent: \n      parent_id: 43\n      site_controller_id: 12\n      url: /admin/list_instructors\n    37: &id014 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 50\n      id: 37\n      label: Author feedbacks\n      name: manage/questionnaires/author feedbacks\n      parent: \n      parent_id: 35\n      site_controller_id: 38\n      url: /tree_display/goto_author_feedbacks\n    26: &id012 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 33\n      id: 26\n      label: Assignments\n      name: student_task\n      parent: \n      parent_id: \n      site_controller_id: 23\n      url: /student_task/list\n    43: &id023 !ruby/object:Menu::Node \n      children: \n      - 22\n      - 17\n      - 16\n      - 15\n      content_page_id: \n      controller_action_id: 15\n      id: 43\n      label: Show...\n      name: show\n      parent: \n      parent_id: 3\n      site_controller_id: 10\n      url: /users/list\n    32: &id030 !ruby/object:Menu::Node \n      children: \n      - 33\n      content_page_id: \n      controller_action_id: 45\n      id: 32\n      label: Survey Deployments\n      name: Survey Deployments\n      parent: \n      parent_id: \n      site_controller_id: 36\n      url: /survey_deployment/list\n  by_name: \n    manage/questionnaires/course evaluations: *id001\n    manage/questionnaires/teammate review rubrics: *id002\n    setup/pages: *id003\n    manage/questionnaires/review rubrics: *id004\n    manage/users: *id005\n    setup/system_settings: *id006\n    show/administrators: *id007\n    manage/questionnaires/global survey: *id008\n    manage/questionnaires/metareview rubrics: *id009\n    setup/menus: *id010\n    profile: *id011\n    student_task: *id012\n    show/super-administrators: *id013\n    manage/questionnaires/author feedbacks: *id014\n    impersonate: *id015\n    setup/roles: *id016\n    admin: *id017\n    Statistical Test: *id018\n    show/institutions: *id019\n    manage instructor content: *id020\n    manage/courses: *id021\n    setup/permissions: *id022\n    show: *id023\n    setup: *id024\n    contact_us: *id025\n    show/instructors: *id026\n    manage/questionnaires/surveys: *id027\n    manage/questionnaires: *id028\n    credits: *id029\n    Survey Deployments: *id030\n    setup/controllers: *id031\n    home: *id032\n    manage/assignments: *id033\n  crumbs: \n  - 1\n  root: &id034 !ruby/object:Menu::Node \n    children: \n    - 1\n    - 3\n    - 34\n    - 32\n    - 26\n    - 27\n    - 2\n    parent: \n  selected: \n    1: *id032\n  vector: \n  - *id034\n  - *id032\n','2010-01-20 17:50:25','2010-01-20 17:51:26'),(5,'Teaching Assistant',1,'',NULL,'--- \n:credentials: !ruby/object:Credentials \n  actions: \n    menu_items: \n      list: false\n      link: true\n    roles: \n      list: false\n    tree_display: \n      goto_metareview_rubrics: false\n      goto_author_feedbacks: false\n      goto_questionnaires: false\n      list: false\n      goto_assignments: false\n      goto_course_evaluations: false\n      goto_global_survey: false\n      drill: false\n      goto_teammatereview_rubrics: false\n      goto_surveys: false\n      goto_teammate_reviews: false\n      goto_review_rubrics: false\n      goto_courses: false\n    auth: \n      logout: true\n      login_failed: true\n      login: true\n    profile: \n      edit: true\n    student_task: \n      list: true\n    institution: \n      list: false\n    assignment: \n      new: false\n      list: false\n      create: false\n    site_controllers: \n      list: false\n    statistics: \n      list_surveys: false\n    impersonate: \n      start: false\n      restore: true\n    questionnaire: \n      list: false\n      copy_questionnaire: false\n      edit_questionnaire: false\n      create_questionnaire: false\n      save_questionnaire: false\n    participants: \n      add_student: false\n      change_handle: true\n      edit_team_members: false\n      list_assignments: false\n      list_courses: false\n      list_students: false\n    admin: \n      list_instructors: false\n      list_super_administrators: false\n      list_administrators: false\n    review_mapping: \n      list: false\n    team: \n      list: false\n      list_assignments: false\n    users: \n      list: false\n    system_settings: \n      list: false\n    controller_actions: \n      list: false\n    permissions: \n      list: false\n    content_pages: \n      list: false\n      view_default: true\n      view: true\n    teams_users: \n      list: false\n    course: \n      list_folders: false\n    grades: \n      view_my_scores: true\n    survey_deployment: \n      list: false\n    survey_response: \n      submit: true\n      create: true\n  controllers: \n    import_file: false\n    roles: false\n    menu_items: false\n    response: true\n    publishing: true\n    tree_display: false\n    auth: false\n    profile: true\n    student_task: true\n    institution: false\n    assignment: false\n    site_controllers: false\n    statistics: false\n    impersonate: false\n    questionnaire: false\n    markup_styles: false\n    course_evaluation: true\n    participants: false\n    admin: false\n    student_team: true\n    roles_permissions: false\n    export_file: false\n    invitation: true\n    review_mapping: false\n    team: false\n    survey: false\n    users: false\n    system_settings: false\n    permissions: false\n    controller_actions: false\n    content_pages: false\n    eula: true\n    password_retrieval: true\n    teams_users: false\n    reports: true\n    course: false\n    student_review: true\n    submitted_content: true\n    survey_deployment: false\n    participant_choices: false\n    grades: false\n    survey_response: true\n  pages: \n    admin: false\n    notfound: true\n    site_admin: false\n    contact_us: true\n    credits: true\n    denied: true\n    expired: true\n    home: true\n  permission_ids: \n  - 8\n  - 4\n  - 3\n  role_id: 5\n  role_ids: \n  - 5\n  - 1\n  updated_at: 2010-01-20 17:51:27 -05:00\n:menu: !ruby/object:Menu \n  by_id: \n    27: &id001 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 36\n      id: 27\n      label: Profile\n      name: profile\n      parent: \n      parent_id: \n      site_controller_id: 26\n      url: /profile/edit\n    1: &id005 !ruby/object:Menu::Node \n      content_page_id: 1\n      controller_action_id: \n      id: 1\n      label: Home\n      name: home\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /home\n    2: &id003 !ruby/object:Menu::Node \n      children: \n      - 14\n      content_page_id: 6\n      controller_action_id: \n      id: 2\n      label: Contact Us\n      name: contact_us\n      parent: \n      parent_id: \n      site_controller_id: \n      url: /contact_us\n    14: &id004 !ruby/object:Menu::Node \n      content_page_id: 10\n      controller_action_id: \n      id: 14\n      label: Credits &amp; Licence\n      name: credits\n      parent: \n      parent_id: 2\n      site_controller_id: \n      url: /credits\n    26: &id002 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 33\n      id: 26\n      label: Assignments\n      name: student_task\n      parent: \n      parent_id: \n      site_controller_id: 23\n      url: /student_task/list\n  by_name: \n    profile: *id001\n    student_task: *id002\n    contact_us: *id003\n    credits: *id004\n    home: *id005\n  crumbs: \n  - 1\n  root: &id006 !ruby/object:Menu::Node \n    children: \n    - 1\n    - 26\n    - 27\n    - 2\n    parent: \n  selected: \n    1: *id005\n  vector: \n  - *id006\n  - *id005\n','2010-01-20 17:50:52','2010-01-20 17:51:27');
+/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `roles_permissions`
+--
+
+DROP TABLE IF EXISTS `roles_permissions`;
+CREATE TABLE `roles_permissions` (
+  `id` int(11) NOT NULL auto_increment,
+  `role_id` int(11) NOT NULL default '0',
+  `permission_id` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `fk_roles_permission_role_id` (`role_id`),
+  KEY `fk_roles_permission_permission_id` (`permission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `roles_permissions`
+--
+
+LOCK TABLES `roles_permissions` WRITE;
+/*!40000 ALTER TABLE `roles_permissions` DISABLE KEYS */;
+INSERT INTO `roles_permissions` VALUES (6,1,3),(7,3,2),(9,1,4),(10,2,5),(11,4,6),(12,4,1),(14,2,7),(15,3,7),(16,4,7),(17,4,9),(18,1,8);
+/*!40000 ALTER TABLE `roles_permissions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `schema_info`
+--
+
+DROP TABLE IF EXISTS `schema_info`;
+CREATE TABLE `schema_info` (
+  `version` int(11) default NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `schema_info`
+--
+
+LOCK TABLES `schema_info` WRITE;
+/*!40000 ALTER TABLE `schema_info` DISABLE KEYS */;
+INSERT INTO `schema_info` VALUES (114);
+/*!40000 ALTER TABLE `schema_info` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `scores`
+--
+
+DROP TABLE IF EXISTS `scores`;
+CREATE TABLE `scores` (
+  `id` int(11) NOT NULL auto_increment,
+  `question_id` int(11) NOT NULL,
+  `score` int(11) default NULL,
+  `comments` text,
+  `response_id` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_score_questions` (`question_id`),
+  KEY `fk_score_response` (`response_id`),
+  CONSTRAINT `fk_score_questions` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`),
+  CONSTRAINT `fk_score_response` FOREIGN KEY (`response_id`) REFERENCES `responses` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `scores`
+--
+
+LOCK TABLES `scores` WRITE;
+/*!40000 ALTER TABLE `scores` DISABLE KEYS */;
+/*!40000 ALTER TABLE `scores` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `site_controllers`
+--
+
+DROP TABLE IF EXISTS `site_controllers`;
+CREATE TABLE `site_controllers` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  `permission_id` int(11) NOT NULL default '0',
+  `builtin` int(11) default '0',
+  PRIMARY KEY  (`id`),
+  KEY `fk_site_controller_permission_id` (`permission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `site_controllers`
+--
+
+LOCK TABLES `site_controllers` WRITE;
+/*!40000 ALTER TABLE `site_controllers` DISABLE KEYS */;
+INSERT INTO `site_controllers` VALUES (1,'content_pages',1,1),(2,'controller_actions',1,1),(3,'auth',1,1),(4,'markup_styles',1,1),(5,'menu_items',1,1),(6,'permissions',1,1),(7,'roles',1,1),(8,'site_controllers',1,1),(9,'system_settings',1,1),(10,'users',1,1),(11,'roles_permissions',1,1),(12,'admin',1,0),(13,'course',7,0),(14,'assignment',7,0),(15,'questionnaire',7,0),(20,'participants',7,0),(21,'reports',8,0),(22,'institution',6,0),(23,'student_task',8,0),(26,'profile',8,0),(27,'survey_response',4,0),(28,'team',7,0),(29,'teams_users',7,0),(30,'impersonate',7,0),(31,'import_file',7,0),(32,'review_mapping',7,0),(33,'grades',7,0),(34,'course_evaluation',8,0),(35,'participant_choices',7,0),(36,'survey_deployment',7,0),(37,'statistics',7,0),(38,'tree_display',7,0),(40,'student_team',8,0),(41,'invitation',8,0),(42,'survey',7,0),(43,'password_retrieval',4,0),(45,'submitted_content',8,0),(46,'eula',8,0),(47,'student_review',8,0),(48,'publishing',8,0),(49,'export_file',7,0),(50,'response',8,0);
+/*!40000 ALTER TABLE `site_controllers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `survey_deployments`
+--
+
+DROP TABLE IF EXISTS `survey_deployments`;
+CREATE TABLE `survey_deployments` (
+  `id` int(11) NOT NULL auto_increment,
+  `course_evaluation_id` int(11) default NULL,
+  `start_date` datetime default NULL,
+  `end_date` datetime default NULL,
+  `num_of_students` int(11) default NULL,
+  `last_reminder` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `survey_deployments`
+--
+
+LOCK TABLES `survey_deployments` WRITE;
+/*!40000 ALTER TABLE `survey_deployments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `survey_deployments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `survey_participants`
+--
+
+DROP TABLE IF EXISTS `survey_participants`;
+CREATE TABLE `survey_participants` (
+  `id` int(11) NOT NULL auto_increment,
+  `user_id` int(11) default NULL,
+  `survey_deployment_id` int(11) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `survey_participants`
+--
+
+LOCK TABLES `survey_participants` WRITE;
+/*!40000 ALTER TABLE `survey_participants` DISABLE KEYS */;
+/*!40000 ALTER TABLE `survey_participants` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `survey_responses`
+--
+
+DROP TABLE IF EXISTS `survey_responses`;
+CREATE TABLE `survey_responses` (
+  `id` int(11) NOT NULL auto_increment,
+  `score` int(10) default NULL,
+  `comments` text,
+  `assignment_id` int(10) NOT NULL default '0',
+  `question_id` int(10) NOT NULL default '0',
+  `survey_id` int(10) NOT NULL default '0',
+  `email` varchar(255) default NULL,
+  `survey_deployment_id` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_survey_assignments` (`assignment_id`),
+  KEY `fk_survey_questions` (`question_id`),
+  KEY `fk_survey_questionnaires` (`survey_id`),
+  CONSTRAINT `fk_survey_assignments` FOREIGN KEY (`assignment_id`) REFERENCES `assignments` (`id`),
+  CONSTRAINT `fk_survey_questionnaires` FOREIGN KEY (`survey_id`) REFERENCES `questionnaires` (`id`),
+  CONSTRAINT `fk_survey_questions` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `survey_responses`
+--
+
+LOCK TABLES `survey_responses` WRITE;
+/*!40000 ALTER TABLE `survey_responses` DISABLE KEYS */;
+/*!40000 ALTER TABLE `survey_responses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `system_settings`
+--
+
+DROP TABLE IF EXISTS `system_settings`;
+CREATE TABLE `system_settings` (
+  `id` int(11) NOT NULL auto_increment,
+  `site_name` varchar(255) NOT NULL default '',
+  `site_subtitle` varchar(255) default NULL,
+  `footer_message` varchar(255) default '',
+  `public_role_id` int(11) NOT NULL default '0',
+  `session_timeout` int(11) NOT NULL default '0',
+  `default_markup_style_id` int(11) default '0',
+  `site_default_page_id` int(11) NOT NULL default '0',
+  `not_found_page_id` int(11) NOT NULL default '0',
+  `permission_denied_page_id` int(11) NOT NULL default '0',
+  `session_expired_page_id` int(11) NOT NULL default '0',
+  `menu_depth` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `fk_system_settings_public_role_id` (`public_role_id`),
+  KEY `fk_system_settings_site_default_page_id` (`site_default_page_id`),
+  KEY `fk_system_settings_not_found_page_id` (`not_found_page_id`),
+  KEY `fk_system_settings_permission_denied_page_id` (`permission_denied_page_id`),
+  KEY `fk_system_settings_session_expired_page_id` (`session_expired_page_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `system_settings`
+--
+
+LOCK TABLES `system_settings` WRITE;
+/*!40000 ALTER TABLE `system_settings` DISABLE KEYS */;
+INSERT INTO `system_settings` VALUES (1,'Expertiza','Reusable learning objects through peer review','<a href=\"http://research.csc.ncsu.edu/efg/expertiza/papers\">Expertiza</a>',1,7200,1,1,3,4,2,3);
+/*!40000 ALTER TABLE `system_settings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ta_mappings`
+--
+
+DROP TABLE IF EXISTS `ta_mappings`;
+CREATE TABLE `ta_mappings` (
+  `id` int(11) NOT NULL auto_increment,
+  `ta_id` int(11) default NULL,
+  `course_id` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_ta_mappings_ta_id` (`ta_id`),
+  KEY `fk_ta_mappings_course_id` (`course_id`),
+  CONSTRAINT `fk_ta_mappings_course_id` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`),
+  CONSTRAINT `fk_ta_mappings_ta_id` FOREIGN KEY (`ta_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `ta_mappings`
+--
+
+LOCK TABLES `ta_mappings` WRITE;
+/*!40000 ALTER TABLE `ta_mappings` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ta_mappings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `teams`
+--
+
+DROP TABLE IF EXISTS `teams`;
+CREATE TABLE `teams` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) default NULL,
+  `parent_id` int(11) default NULL,
+  `type` varchar(255) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `teams`
+--
+
+LOCK TABLES `teams` WRITE;
+/*!40000 ALTER TABLE `teams` DISABLE KEYS */;
+/*!40000 ALTER TABLE `teams` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `teams_users`
+--
+
+DROP TABLE IF EXISTS `teams_users`;
+CREATE TABLE `teams_users` (
+  `id` int(11) NOT NULL auto_increment,
+  `team_id` int(11) default NULL,
+  `user_id` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_users_teams` (`team_id`),
+  KEY `fk_teams_users` (`user_id`),
+  CONSTRAINT `fk_teams_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_users_teams` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `teams_users`
+--
+
+LOCK TABLES `teams_users` WRITE;
+/*!40000 ALTER TABLE `teams_users` DISABLE KEYS */;
+/*!40000 ALTER TABLE `teams_users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tree_folders`
+--
+
+DROP TABLE IF EXISTS `tree_folders`;
+CREATE TABLE `tree_folders` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) default NULL,
+  `child_type` varchar(255) default NULL,
+  `parent_id` int(11) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `tree_folders`
+--
+
+LOCK TABLES `tree_folders` WRITE;
+/*!40000 ALTER TABLE `tree_folders` DISABLE KEYS */;
+INSERT INTO `tree_folders` VALUES (1,'Questionnaires','QuestionnaireTypeNode',NULL),(2,'Courses','CourseNode',NULL),(3,'Assignments','AssignmentNode',NULL),(4,'Review','QuestionnaireNode',NULL),(5,'Metareview','QuestionnaireNode',NULL),(6,'Author Feedback','QuestionnaireNode',NULL),(7,'Teammate Review','QuestionnaireNode',NULL),(8,'Survey','QuestionnaireNode',NULL),(9,'Global Survey','QuestionnaireNode',NULL),(10,'Course Evaluation','QuestionnaireNode',NULL);
+/*!40000 ALTER TABLE `tree_folders` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  `password` varchar(40) NOT NULL default '',
+  `role_id` int(11) NOT NULL default '0',
+  `password_salt` varchar(255) default NULL,
+  `fullname` varchar(255) default NULL,
+  `email` varchar(255) default NULL,
+  `parent_id` int(11) default NULL,
+  `private_by_default` tinyint(1) default '0',
+  `mru_directory_path` varchar(128) default NULL,
+  `email_on_review` tinyint(1) default NULL,
+  `email_on_submission` tinyint(1) default NULL,
+  `email_on_review_of_review` tinyint(1) default NULL,
+  `is_new_user` tinyint(1) default '1',
+  `master_permission_granted` tinyint(1) default NULL,
+  `handle` varchar(255) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `fk_user_role_id` (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (2,'admin','d033e22ae348aeb5660fc2140aec35850c4da997',4,NULL,'','',2,0,NULL,1,1,1,0,0,NULL);
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `wiki_types`
+--
+
+DROP TABLE IF EXISTS `wiki_types`;
+CREATE TABLE `wiki_types` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `wiki_types`
+--
+
+LOCK TABLES `wiki_types` WRITE;
+/*!40000 ALTER TABLE `wiki_types` DISABLE KEYS */;
+INSERT INTO `wiki_types` VALUES (1,'No'),(2,'MediaWiki'),(3,'DokuWiki');
+/*!40000 ALTER TABLE `wiki_types` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2010-01-20 22:51:47

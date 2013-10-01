@@ -4,7 +4,7 @@
   <ul id="actionmenu">
     <li class="daddy">&nbsp;
       <ul>
-        <%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Assignment', :controller => 'assignments', :node => node, :owner_id => owner_id} %>
+        <%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Assignment', :controller => 'assignment', :node => node, :owner_id => owner_id} %>
         <% if is_available(session[:user], owner_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)), owner_id)) %>
             <div>
               <%= link_to image_tag('/images/tree_view/add-participant-24.png', :title => 'Add participants'), {:controller => 'participants', :action => 'list', :id => node.node_object_id, :model => 'Assignment'}, {:title => 'Add participants'} %>
@@ -13,7 +13,7 @@
               <!--ACS Show the create team option in the assignment for the instructor only if
                the assignment allows teams to be formed with more than 1 participant-->
               <% if @assignment.max_team_size > 1 %>
-                  <%= link_to image_tag('/images/tree_view/create-teams-24.png', :title => 'Create teams'), {:controller => 'teams', :action => 'list', :id => node.node_object_id, :type => 'Assignment'}, {:title => 'Create teams'} %>
+                  <%= link_to image_tag('/images/tree_view/create-teams-24.png', :title => 'Create teams'), {:controller => 'team', :action => 'list', :id => node.node_object_id, :type => 'Assignment'}, {:title => 'Create teams'} %>
               <% end %>
               <% signup_topic = SignUpTopic.find(:first, :conditions => ['assignment_id = ?', node.node_object_id]) %>
               <% if signup_topic %>
@@ -32,9 +32,9 @@
             </div>
             <div>
               <% if Assignment.find(node.node_object_id).course_id %>
-                  <%= link_to image_tag('/images/tree_view/remove-from-course-24.png', :title => 'Remove from course'), {:controller => 'assignments', :action => 'remove_assignment_from_course', :id => node.node_object_id}, {:title => 'Remove from course'} %>
+                  <%= link_to image_tag('/images/tree_view/remove-from-course-24.png', :title => 'Remove from course'), {:controller => 'assignment', :action => 'remove_assignment_from_course', :id => node.node_object_id}, {:title => 'Remove from course'} %>
               <% else %>
-                  <%= link_to image_tag('/images/tree_view/assign-course-blue-24.png', :title => 'Assign to course'), {:controller => 'assignments', :action => 'associate_assignment_with_course', :id => node.node_object_id}, {:title => 'Assign to course'} %>
+                  <%= link_to image_tag('/images/tree_view/assign-course-blue-24.png', :title => 'Assign to course'), {:controller => 'assignment', :action => 'associate_assignment_with_course', :id => node.node_object_id}, {:title => 'Assign to course'} %>
               <% end %>
               <%= link_to image_tag('/images/tree_view/assign-reviewers-24.png', :title => 'Assign reviewers'), {:controller => 'review_mapping', :action => 'list_mappings', :id => node.node_object_id}, {:title => 'Assign reviewers'} %>
               <%= link_to image_tag('/images/tree_view/assign-survey-24.png', :title => 'Assign surveys'), {:controller => 'survey', :action => 'assign', :id => node.node_object_id}, {:title => 'Assign surveys'} %>

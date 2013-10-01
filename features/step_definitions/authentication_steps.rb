@@ -16,8 +16,8 @@ Given /^a student with the username "(\S+)" exists$/ do |username|
     User.create({
                     :name => username,
                     :fullname => username,
-                    :password => 'password',
-                    :password_confirmation => 'password',
+                    :clear_password => 'password',
+                    :clear_password_confirmation => 'password',
                     :role => Role.find_by_name!('student'),
                     :email => "#{username}@mailinator.com",
                     :is_new_user => false
@@ -26,9 +26,13 @@ Given /^a student with the username "(\S+)" exists$/ do |username|
 end
 
 Then /I should be logged in as "(\S+)"/ do |username|
-  find('.sidebar td', :text => username)
-    .has_text?(username)
-    .should be_true
+  #find('.sidebar td').should have_content "User: #{username}"
+  node = find('.sidebar td').node().content()
+  if(node.include? username)
+    assert(true)
+  else
+    assert(false)
+  end
 end
 
 Given /I am logged in as "([^"]*)"/ do |username|
@@ -59,8 +63,8 @@ Given /an? (Student|Teaching Assistant|Instructor|Administrator|Super-Administra
   User.create({
     :name => name,
     :fullname => name,
-    :password => 'password',
-    :password_confirmation => 'password',
+    :clear_password => 'password',
+    :clear_password_confirmation => 'password',
     :role => Role.find_by_name!(user_type),
     :email => "#{name}@mailinator.com",
     :parent_id => parent_id,
@@ -87,7 +91,10 @@ When /I log in as "([^"]*)"/ do |username|
 end
 
 Given 'I am not logged in' do
-  first('#logout-button').try(:click)
+  if(find_button('Logout').nil?)
+  else
+    click_link('Logout')
+  end
 end
 
 When /^I log in as a "([^\"]*)" with password "([^\"]*)"$/ do |username, password|

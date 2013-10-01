@@ -140,11 +140,11 @@ class UsersController < ApplicationController
   end
 
   def update
-    @user = User.find params[:id]
+    @user = User.find(params[:id])   
 
-    if @user.update_attributes params[:user]
+    if @user.update_attributes(params[:user])
       flash[:notice] = 'User was successfully updated.'
-      redirect_to @user
+      redirect_to :action => 'show', :id => @user
     else
       foreign
       render :action => 'edit'

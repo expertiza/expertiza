@@ -1,6 +1,6 @@
 class StatisticsController < ApplicationController
   def list_surveys 
-    @surveys = SurveyQuestionnaire.all
+    @surveys = Questionnaire.find_all_by_type_id(4)
   end
   
   def list #list deployments for the survey

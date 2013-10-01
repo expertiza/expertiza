@@ -1,15 +1,9 @@
 class ControllerAction < ActiveRecord::Base
-  belongs_to :site_controller
 
   validates_presence_of :name
   validates_uniqueness_of :name, :scope => 'site_controller_id'
 
   attr_accessor :controller, :permission, :url, :allowed, :specific_name
-
-  scope :order_by_controller_and_action, -> {
-    joins('left outer join site_controllers on site_controller_id = site_controllers.id').
-    order('site_controllers.name, name')
-  }
 
   def controller
     @controller ||= SiteController.find(self.site_controller_id)

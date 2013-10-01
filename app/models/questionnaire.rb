@@ -16,7 +16,7 @@ class Questionnaire < ActiveRecord::Base
     validates_numericality_of :max_question_score
     validates_numericality_of :min_question_score
 
-    validates_presence_of :section # indicates custom rubric section 
+    validates_presence_of :section, :on => :create # indicates custom rubric section
 
     DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
     DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question

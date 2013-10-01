@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
   end
 
   has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id', :dependent => :destroy
+  has_many :assignment_participants, :class_name => 'AssignmentParticipant', :foreign_key => 'user_id', :dependent => :destroy
   # FIXME:          :class_name should be AssignmentParticipant, probably. In most cases it's used that way. But all?
   has_many :assignments, :through => :participants
   

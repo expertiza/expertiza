@@ -61,6 +61,7 @@
             <% end %>
             <% @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
             <% if(@sorted.size>1) %>
+                <h3>Previous versions</h3>
                 <% for i in 1..@sorted.size-1 %>
                     <% @str = @sorted[i].id.to_s %>
                     <!-- display previous versions in descending order -->

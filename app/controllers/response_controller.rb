@@ -427,8 +427,10 @@ class ResponseController < ApplicationController
       team = response.map.reviewer.team
       unless team.has_user session[:user]
         redirect_to '/denied?reason=You are not on the team that wrote this feedback'
-        return true
+      else
+        return false
       end
+      response.map.read_attribute(:type)
     end
     
     !current_user_id?(response.map.reviewer.user_id)

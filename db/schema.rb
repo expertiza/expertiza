@@ -568,7 +568,6 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
     t.string  "persistence_token"
     t.string  "timezonepref"
     t.text    "public_key"
-    t.string  "type"
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

@@ -16,7 +16,7 @@ class StudentTask
       :assignment => participant.assignment,
       :topic => participant.topic,
       :current_stage => participant.current_stage,
-      :stage_deadline => Time.parse(participant.stage_deadline)
+      :stage_deadline => (Time.parse(participant.stage_deadline) rescue Time.now + 1.years)
     )
   end
 

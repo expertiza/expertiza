@@ -202,6 +202,7 @@ Expertiza::Application.routes.draw do |map|
   resources :response do
     collection do
       get :new_feedback
+      get :view
     end
   end
 

@@ -199,6 +199,12 @@ Expertiza::Application.routes.draw do |map|
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_evaluation_questionnaires, controller: :questionnaires
 
+  resources :response do
+    collection do
+      get :new_feedback
+    end
+  end
+
   resources :review_mapping do
     collection do
       get :list_mappings

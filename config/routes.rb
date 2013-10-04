@@ -97,6 +97,7 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :view_my_scores
+      get :remove_hyperlink
     end
   end
 

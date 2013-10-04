@@ -1,7 +1,8 @@
 require 'goldberg_filters'
-include GoldbergFilters
 
 class ApplicationController < ActionController::Base
+  include GoldbergFilters
+
   helper_method :current_user_session, :current_user, :current_user_role?
   protect_from_forgery unless Rails.env.test?
   filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
@@ -81,7 +82,11 @@ class ApplicationController < ActionController::Base
     current_user.try(:id) == user_id
   end
 
-  def denied
-    redirect_to '/denied'
+  def denied(reason=nil)
+    if reason
+      redirect_to "/denied?reason=#{reason}"
+    else
+      redirect_to "/denied"
+    end
   end
 end

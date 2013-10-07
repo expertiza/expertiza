@@ -97,9 +97,8 @@
         <tr class="listingRow">
           <td>&nbsp;</td>
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
-          <td>
-            <% participant.get_course_string %></td>
-          <td><%= participant.get_topic_string.html_safe %></td>
+          <td><%= student_task.course.name %></td>
+          <td><%= student_task.topic_name %></td>
           <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
           <td><%= student_task.stage_deadline %></td>
           <td align=center>

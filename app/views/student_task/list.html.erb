@@ -42,13 +42,11 @@
         action = "list"
       end
     %>
-</div>
-</div>
 
-<span>&nbsp; &raquo;
-  <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => id %>
-  (<%= student_task.relative_deadline %> left)
-</span><br/>
+  <span>&nbsp; &raquo;
+    <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => id %>
+    (<%= student_task.relative_deadline %> left)
+  </span><br/>
 <% end %>
 
 <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
@@ -78,6 +76,7 @@
   <span class="notification">&nbsp; &raquo; <%= link_to student_task.assignment.name + ": " +
     student_task.current_stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => student_task.participant.id %></span><br/>
 <% end %>
+</div>
 
 <div class="topictable">
   <table class="listing" cellpadding="2">

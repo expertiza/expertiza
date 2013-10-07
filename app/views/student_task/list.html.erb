@@ -77,6 +77,7 @@
     student_task.current_stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => student_task.participant.id %></span><br/>
 <% end %>
 </div>
+</div>
 
 <div class="topictable">
   <table class="listing" cellpadding="2">
@@ -98,7 +99,7 @@
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
           <td>
             <% participant.get_course_string %></td>
-          <td><%= participant.get_topic_string %></td>
+          <td><%= participant.get_topic_string.html_safe %></td>
           <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
           <td><%= student_task.stage_deadline %></td>
           <td align=center>

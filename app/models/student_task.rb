@@ -30,6 +30,10 @@ class StudentTask
     end.sort_by(&:stage_deadline)
   end
 
+  def topic_name
+    topic.try(:topic_name) || '-'
+  end
+
   def complete?
     stage_deadline == 'Complete'
   end

@@ -281,6 +281,7 @@ Expertiza::Application.routes.draw do |map|
   resources :submitted_content do
     collection do
       get :view
+      get :edit
     end
   end
 

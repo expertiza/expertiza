@@ -1,0 +1,11 @@
+codeclimate expertiza ncsu
+https://codeclimate.com/github/expertiza/expertiza/GraphGenerator
+
+remove all debug output
+duplicate code -> method
+long loop / if-else branch
+
+create test cases
+figure out how to call the piece of wde before start refractoring
+refractor: points on top
+run your test again

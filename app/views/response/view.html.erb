@@ -3,7 +3,9 @@
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
   <br/><hr/><br/>  
 <% end %>
-<%= @map.show_review() %>
+
+<% @review_versions = @map.get_all_versions() %>
+<%= render :partial => 'review', :locals => { :versions => @review_versions } %>
 
 <% if false %>[start erb comment] Changes to accommodate Jen's custom rubric [end erb comment]<% end %>
 <% file_url = nil

@@ -257,7 +257,7 @@ module ResponseHelper
         else
           if is_view
             view_output = "No Response"
-            if !@review_scores[q_number].comments.nil?
+            if @review_scores[q_number].comments
               view_output = @review_scores[q_number].comments
             end
           end

@@ -88,12 +88,8 @@
         <% end %>
                             <li>
                                 <p>
-                                    <%=label("custom_response", ques_num, ques_text)%>
-                                    <% if @review_scores[ques_num].comments.nil?%>
-                                        <%= select_tag "custom_response[#{ques_num}]", options_for_select(options, @review_scores[ques_num].comments.to_i)%>
-                                    <% else %>
-                                        <%= select_tag "custom_response[#{ques_num}]", options_for_select(options, @review_scores[ques_num].comments.gsub(/\"/,'&quot;'))%>
-                                    <% end %>
+                                  <%=label("custom_response", ques_num, ques_text)%>
+                                  <%= select_tag "custom_response[#{ques_num}]", options_for_select(options, @review_scores[ques_num].comments.try(:gsub, /\"/, '').to_i) %>
                                 </p>
                             </li>
         <% if end_col %>

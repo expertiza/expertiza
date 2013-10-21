@@ -34,6 +34,10 @@ Expertiza::Application.routes.draw do |map|
       get :copy
       get :toggle_access
       post :remove_assignment_from_course
+      get :set_questionnaire
+      get :set_due_date
+      get :delete_all_questionnaires
+      get :delete_all_due_dates
     end
   end
 

@@ -34,7 +34,7 @@
     function submit_questionnaires() {
         var data, para, fields, i, j;
         //delete old assignment_questionnaires
-        jQuery.get("/assignment/delete_all_questionnaires?assignment_id=" + <%= @assignment.id %>);
+        jQuery.get("/assignments/delete_all_questionnaires?assignment_id=" + <%= @assignment.id %>);
         //create the new assignment_questionnaires
         data = jQuery('#assignment_questionnaire_table>tbody>tr:not(.heading)');
         for (i = 0; i < data.length; i++) {
@@ -43,7 +43,7 @@
             for (j = 0; j < fields.length; j++) {
                 para += "&" + (fields[j].name + "=" + fields[j].value);
             }
-            jQuery.get("/assignment/set_questionnaire" + para);
+            jQuery.get("/assignments/set_questionnaire" + para);
         }
     }
 </script>

@@ -3,6 +3,9 @@ require 'redcloth'
 class ContentPage < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
+
+  belongs_to :permission
+
   attr_accessor :content_html
 
   def self.find_for_permission(p_ids)

@@ -114,7 +114,7 @@ module ResponseHelper
     table_hash
   end
 
-  def find_question_type(question, ques_type, q_number, is_view, file_url, score_range)
+  def find_question_type(question, ques_type, q_number, is_view, file_url, score, score_range)
     default_textfield_size = "3"
     default_textarea_size = "40x5"
     default_dropdown = ["Edit Rubric", "No Values"]
@@ -131,7 +131,7 @@ module ResponseHelper
         view_output = nil
         if is_view
           view_output = "<img src=\"/images/delete_icon.png\">" + question.txt + "<br/>"
-          if @review_scores[q_number].comments == "1"
+          if @review_scores && @review_scores[q_number].comments == "1"
             view_output = "<img src=\"/images/Check-icon.png\">" + question.txt + "<br/>"
           end
         end
@@ -165,7 +165,7 @@ module ResponseHelper
         view_output = nil
         if is_view
           view_output = "No Response"
-          if !@review_scores[q_number].comments.nil?
+          if @review_scores && !@review_scores[q_number].comments.nil?
             view_output = @review_scores[q_number].comments
           end
         end
@@ -189,7 +189,7 @@ module ResponseHelper
         view_output = nil
         if is_view
           view_output = "No Response"
-          if !@review_scores[q_number].comments.nil?
+          if @review_scores && !@review_scores[q_number].comments.nil?
             view_output = @review_scores[q_number].comments
           end
         end
@@ -249,7 +249,7 @@ module ResponseHelper
         if curr_ques == "2"
           if is_view
             view_output = "No Response"
-            if !@review_scores[q_number].comments.nil?
+            if @review_scores && !@review_scores[q_number].comments.nil?
               view_output = @review_scores[q_number].comments
             end
           end
@@ -257,7 +257,7 @@ module ResponseHelper
         else
           if is_view
             view_output = "No Response"
-            if !@review_scores[q_number].comments.nil?
+            if !@review_scores[q_number].try(:comments)
               view_output = @review_scores[q_number].comments
             end
           end

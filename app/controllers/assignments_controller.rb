@@ -27,7 +27,7 @@ class AssignmentsController < ApplicationController
     if @assignment.save
       @assignment.create_node
       flash[:success] = 'Assignment was successfully created.'
-      redirect_to @assignment
+      redirect_to edit_assignment_path(@assignment)
     else
       render 'new'
     end

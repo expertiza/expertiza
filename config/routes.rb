@@ -154,6 +154,8 @@ Expertiza::Application.routes.draw do |map|
       get :list
       get :change_handle
       post :delete
+      get :inherit
+      get :bequeath_all
     end
   end
 

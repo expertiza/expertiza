@@ -16,7 +16,7 @@ class Participant < ActiveRecord::Base
   end
 
   def get_current_stage
-    assignment.get_current_stage topic_id
+    assignment.try :get_current_stage, topic_id
   end
   alias_method :current_stage, :get_current_stage
 

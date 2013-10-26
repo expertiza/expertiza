@@ -279,6 +279,10 @@ end
     v1 = search_vertices(@vertices, array1[count1-1], i)
     v2 = vertex
     #if such an edge did not already exist
+    add_nonexisting_edge(i, string, v1, v2)   #TODO method_3_extracted
+  end
+
+  def add_nonexisting_edge(i, string, v1, v2)  #TODO method_3_created
     if (!v1.nil? and !v2.nil? and (e = search_edges(@edges, v1, v2, i)) == -1)
       @edges[@num_edges] = Edge.new(string, VERB)
       @edges[@num_edges].in_vertex = v1
@@ -297,16 +301,8 @@ def pos_edge_processing(string, count, i, previousEdgeV2)   #TODO METHOD_CREATED
   v1 = search_vertices(@vertices, nouns[nCount-1], i)
   v2 = previousEdgeV2 #the current adjective vertex
                  #if such an edge does not already exist add it
-  if(!v1.nil? and !v2.nil? and (e = search_edges(@edges, v1, v2, i)) == -1)
-    # puts "** Adding noun-adj edge .. #{v1.name} - #{v2.name}"
-    @edges[@num_edges] = Edge.new(string,VERB)
-    @edges[@num_edges].in_vertex = v1
-    @edges[@num_edges].out_vertex = v2
-    @edges[@num_edges].index = i
-    @num_edges+=1
-    #since an edge was just added we try to check if there exist any redundant edges that can be removed
-    remove_redundant_edges(v1, v2, i)
-  end
+  add_nonexisting_edge(i, string, v1, v2)   #TODO method_3_extracted
+
 end
 #------------------------------------------#------------------------------------------#------------------------------------------
 

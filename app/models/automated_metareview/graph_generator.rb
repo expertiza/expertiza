@@ -121,53 +121,11 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
         #if an adjective was found earlier, we add a new edge
         if(prevType == ADJ)
             #set previous noun's property to null, if it was set, if there is a noun before the adjective
-            if(nCount > 1)
-              v1 = search_vertices(@vertices, nouns[nCount-2], i) #fetching the previous noun, the one before the current noun (therefore -2)
-              v2 = search_vertices(@vertices, adjectives[adjCount-1], i) #fetching the previous adjective
-              #if such an edge exists - DELETE IT - search_edges_to_set_null() returns the position in the array at which such an edge exists
-              if(!v1.nil? and !v2.nil? and (e = search_edges_to_set_null(@edges, v1, v2, i)) != -1) #-1 is when no such edge exists
-                @edges[e] = nil #setting the edge to null
-                #if @num_edges had been previously incremented, decrement it
-                if(@num_edges > 0)
-                  @num_edges-=1 #deducting an edge count
-                end
-              end
-            end
-            #if this noun vertex was encountered for the first time, nCount < 1,
-            #so do adding of edge outside the if condition
-            #add a new edge with v1 as the adjective and v2 as the new noun
-            v1 = search_vertices(@vertices, adjectives[adjCount-1], i)
-            v2 = nounVertex #the noun vertex that was just created
-            #if such an edge did not already exist
-            if(!v1.nil? and !v2.nil? and (e = search_edges(@edges, v1, v2, i)) == -1)
-              @edges[@num_edges] = Edge.new("noun-property",VERB)
-              @edges[@num_edges].in_vertex = v1
-              @edges[@num_edges].out_vertex = v2
-              @edges[@num_edges].index = i
-              @num_edges+=1
-              #since an edge was just added we try to check if there exist any redundant edges that can be removed
-              remove_redundant_edges(v1, v2, i)
-            end
-         end
+          fixing_edges(adjCount, adjectives, i, nCount, nounVertex, nouns, "noun-property")  #TODO Method_2_Extracted
+        end
          #a noun has been found and has established a verb as an in_vertex and such an edge doesnt already previously exist
           if(vCount > 0) #and fAppendedVertex == 0
-            pos_edge_processing("verb", vCount, i, nounVertex)
-
-=begin
-            #add edge only when a fresh vertex is created not when existing vertex is appended to
-            v1 = search_vertices(@vertices, verbs[vCount-1], i)
-            v2 = nounVertex
-            #if such an edge does not already exist add it
-            if(!v1.nil? and !v2.nil? and (e = search_edges(@edges,v1, v2, i)) == -1)
-              @edges[@num_edges] = Edge.new("verb", VERB)
-              @edges[@num_edges].in_vertex = v1 #for vCount = 0
-              @edges[@num_edges].out_vertex = v2
-              @edges[@num_edges].index = i
-              @num_edges+=1
-              #since an edge was just added we try to check if there exist any redundant edges that can be removed
-              remove_redundant_edges(v1, v2, i)
-            end
-=end
+            pos_edge_processing("verb", vCount, i, nounVertex) #TODO METHOD_EXtracted
           end
           prevType = NOUN
       #------------------------------------------
@@ -204,20 +162,7 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
 
         #by default associate the adjective with the previous/latest noun and if there is a noun following it immediately, then remove the property from the older noun (done under noun condition)
         if(nCount > 0) #gets the previous noun to form the edge
-          pos_edge_processing("noun-property", nCount, i, adjective)
-          #v1 = search_vertices(@vertices, nouns[nCount-1], i)
-          #v2 = adjective #the current adjective vertex
-          ##if such an edge does not already exist add it
-          #if(!v1.nil? and !v2.nil? and (e = search_edges(@edges, v1, v2, i)) == -1)
-          #  # puts "** Adding noun-adj edge .. #{v1.name} - #{v2.name}"
-          #  @edges[@num_edges] = Edge.new("noun-property",VERB)
-          #  @edges[@num_edges].in_vertex = v1
-          #  @edges[@num_edges].out_vertex = v2
-          #  @edges[@num_edges].index = i
-          #  @num_edges+=1
-          #  #since an edge was just added we try to check if there exist any redundant edges that can be removed
-          #  remove_redundant_edges(v1, v2, i)
-          #end
+          pos_edge_processing("noun-property", nCount, i, adjective) #TODO METHOD_EXtracted
         end
         prevType = ADJ
         #end of if condition for adjective
@@ -252,50 +197,13 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
           #if an adverb was found earlier, we set that as the verb's property
           if(prevType == ADV)
             #set previous verb's property to null, if it was set, if there is a verb following the adverb
-            if(vCount > 1)
-              v1 = search_vertices(@vertices, verbs[vCount-2], i) #fetching the previous verb, the one before the current one (hence -2)
-              v2 = search_vertices(@vertices, adverbs[advCount-1], i) #fetching the previous adverb
-              #if such an edge exists - DELETE IT
-              if(!v1.nil? and !v2.nil? and (e = search_edges_to_set_null(@edges, v1, v2, i)) != -1)
-                @edges[e] = nil #setting the edge to null
-                if(@num_edges > 0)
-                  @num_edges-=1 #deducting an edge count
-                end
-              end
-            end
-            #if this verb vertex was encountered for the first time, vCount < 1,
-            #so do adding of edge outside the if condition
-            #add a new edge with v1 as the adverb and v2 as the new verb
-            v1 = search_vertices(@vertices, adverbs[advCount-1], i)
-            v2 = verbVertex
-            #if such an edge did not already exist
-            if(!v1.nil? and !v2.nil? and (e = search_edges(@edges, v1, v2, i)) == -1)
-              @edges[@num_edges] = Edge.new("verb-property",VERB)
-              @edges[@num_edges].in_vertex = v1
-              @edges[@num_edges].out_vertex = v2
-              @edges[@num_edges].index = i
-              @num_edges+=1
-              #since an edge was just added we try to check if there exist any redundant edges that can be removed
-              remove_redundant_edges(v1, v2, i)
-            end
+
+            fixing_edges(advCount, adverbs, i, vCount, verbVertex, verbs, "verb-property")  #TODO Method_Extracted_2
           end
 
           #making the previous noun, one of the vertices of the verb edge
           if(nCount > 0) #and fAppendedVertex == 0
-            pos_edge_processing("verb", nCount, i, verbVertex)
-            #gets the previous noun to form the edge
-            #v1 = search_vertices(@vertices, nouns[nCount-1], i)
-            #v2 = verbVertex
-            ##if such an edge does not already exist add it
-            #if(!v1.nil? and !v2.nil? and (e = search_edges(@edges, v1, v2, i)) == -1)
-            #  @edges[@num_edges] = Edge.new("verb",VERB)
-            #  @edges[@num_edges].in_vertex = v1 #for nCount = 0;
-            #  @edges[@num_edges].out_vertex = v2 #the verb
-            #  @edges[@num_edges].index = i
-            #  @num_edges+=1
-            #  #since an edge was just added we try to check if there exist any redundant edges that can be removed
-            #  remove_redundant_edges(v1, v2, i)
-            #end
+            pos_edge_processing("verb", nCount, i, verbVertex)     #TODO METHOD_EXtracted
           end
           prevType = VERB
         #------------------------------------------
@@ -329,19 +237,7 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
 
           #by default associate it with the previous/latest verb and if there is a verb following it immediately, then remove the property from the verb
           if(vCount > 0) #gets the previous verb to form a verb-adverb edge
-            pos_edge_processing("verb-property", vCount, i, adverb)
-            #v1 = search_vertices(@vertices, verbs[vCount-1], i)
-            #v2 = adverb
-            ##if such an edge does not already exist add it
-            #if(!v1.nil? and !v2.nil? && (e = search_edges(@edges, v1, v2, i)) == -1)
-            #  @edges[@num_edges] = Edge.new("verb-property",VERB)
-            #  @edges[@num_edges].in_vertex = v1 #for nCount = 0;
-            #  @edges[@num_edges].out_vertex = v2 #the verb
-            #  @edges[@num_edges].index = i
-            #  @num_edges+=1
-            #  #since an edge was just added we try to check if there exist any redundant edges that can be removed
-            #  remove_redundant_edges(v1, v2, i)
-            #end
+            pos_edge_processing("verb-property", vCount, i, adverb)  #TODO METHOD_EXtracted
           end
           prevType = ADV
         #end of if condition for adverb
@@ -365,10 +261,39 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
   # puts("Number of edges:: #{@num_edges}")
   # puts("Number of vertices:: #{@num_vertices}")
   return @num_edges
-end #end of the graphGenerate method
+end
+
+  def fixing_edges(count1, array1, i, count2, vertex, array2, string)   #TODO Method_2_Created
+    if (count2 > 1)
+      v1 = search_vertices(@vertices, array2[count2-2], i) #fetching the previous verb, the one before the current one (hence -2)
+      v2 = search_vertices(@vertices, array1[count1-1], i) #fetching the previous adverb
+                                                          #if such an edge exists - DELETE IT
+      if (!v1.nil? and !v2.nil? and (e = search_edges_to_set_null(@edges, v1, v2, i)) != -1)
+        @edges[e] = nil #setting the edge to null
+        if (@num_edges > 0)
+          @num_edges-=1 #deducting an edge count
+        end
+      end
+    end
+
+    v1 = search_vertices(@vertices, array1[count1-1], i)
+    v2 = vertex
+    #if such an edge did not already exist
+    if (!v1.nil? and !v2.nil? and (e = search_edges(@edges, v1, v2, i)) == -1)
+      @edges[@num_edges] = Edge.new(string, VERB)
+      @edges[@num_edges].in_vertex = v1
+      @edges[@num_edges].out_vertex = v2
+      @edges[@num_edges].index = i
+      @num_edges+=1
+      #since an edge was just added we try to check if there exist any redundant edges that can be removed
+      remove_redundant_edges(v1, v2, i)
+    end
+  end
+
+#end of the graphGenerate method
 
 #------------------------------------------#------------------------------------------#------------------------------------------
-def pos_edge_processing(string, count, i, previousEdgeV2)
+def pos_edge_processing(string, count, i, previousEdgeV2)   #TODO METHOD_CREATED
   v1 = search_vertices(@vertices, nouns[nCount-1], i)
   v2 = previousEdgeV2 #the current adjective vertex
                  #if such an edge does not already exist add it
@@ -383,6 +308,8 @@ def pos_edge_processing(string, count, i, previousEdgeV2)
     remove_redundant_edges(v1, v2, i)
   end
 end
+#------------------------------------------#------------------------------------------#------------------------------------------
+
 #------------------------------------------#------------------------------------------#------------------------------------------
 def search_vertices(list, s, index)
     for i in (0..list.length-1)

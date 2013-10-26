@@ -388,7 +388,7 @@ def search_edges(list, in_vertex, out, index)
       #  (list[i].out_vertex.name.casecmp(out.name)==0 or list[i].out_vertex.name.include?(out.name))) or
       #  ((list[i].in_vertex.name.casecmp(out.name)==0 or list[i].in_vertex.name.include?(out.name)) and
       #  (list[i].out_vertex.name.casecmp(in_vertex.name)==0 or list[i].out_vertex.name.include?(in_vertex.name))))
-      if(matching_edge?(list, i, in_vertex.name, out.name) or matching_edge?(list, i, out.name, in_vertex.name)) #TODO implementation
+      if(matching_edge?(list[i].in_vertex.name, list[i].out_vertex.name, in_vertex.name, out.name))  #TODO implementation
         # puts("***** Found edge! : index:: #{index} list[i].index:: #{list[i].index}")
         #if an edge was found
         edgePos = i #returning its position in the array
@@ -403,13 +403,12 @@ def search_edges(list, in_vertex, out, index)
 end # end of searchdges
 
 #------------------------------------------#------------------------------------------#------------------------------------------
-def matching_edge?(list, i, vertex1, vertex2)     #TODO new method for long if
-  condition1 = (list[i].in_vertex.name.casecmp(vertex1.name)==0
-  condition1b = list[i].in_vertex.name.include?(vertex1.name))
-  condition2 = (list[i].out_vertex.name.casecmp(vertex2.name)==0
-  condition2b = list[i].out_vertex.name.include?(vertex2.name))
-
-  return (condition1 or condition1b) and (condition2 or condition2b)
+def matching_edge?(name1, name2, vertex1, vertex2)     #TODO new method for long if
+  c1 = name1.casecmp(vertex1.name) == 0 or name1.include?(vertex1.name)
+  c2 = name2.casecmp(vertex2.name) == 0 or name2.include?(vertex2.name)
+  c3 = name1.casecmp(vertex2.name) == 0 or name1.include?(vertex2.name)
+  c4 = name2.casecmp(vertex1.name) == 0 or name2.include?(vertex1.name)
+  return (c1 and c2) or (c3 and c4)
 end
 #------------------------------------------#------------------------------------------#------------------------------------------
 

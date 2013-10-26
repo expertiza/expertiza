@@ -404,9 +404,12 @@ end # end of searchdges
 
 #------------------------------------------#------------------------------------------#------------------------------------------
 def matching_edge?(list, i, vertex1, vertex2)     #TODO new method for long if
-  condition1 = (list[i].in_vertex.name.casecmp(vertex1.name)==0 or list[i].in_vertex.name.include?(vertex1.name))
-  condition2 = (list[i].out_vertex.name.casecmp(vertex2.name)==0 or list[i].out_vertex.name.include?(vertex2.name))
-  return condition1 and condition2
+  condition1 = (list[i].in_vertex.name.casecmp(vertex1.name)==0
+  condition1b = list[i].in_vertex.name.include?(vertex1.name))
+  condition2 = (list[i].out_vertex.name.casecmp(vertex2.name)==0
+  condition2b = list[i].out_vertex.name.include?(vertex2.name))
+
+  return (condition1 or condition1b) and (condition2 or condition2b)
 end
 #------------------------------------------#------------------------------------------#------------------------------------------
 

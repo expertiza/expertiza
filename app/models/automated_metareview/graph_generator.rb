@@ -384,10 +384,11 @@ def search_edges(list, in_vertex, out, index)
   for i in (0..list.length-1)
     if(!list[i].nil? and !list[i].in_vertex.nil? and !list[i].out_vertex.nil?)
       #checking for exact match with an edge
-      if(((list[i].in_vertex.name.casecmp(in_vertex.name)==0 or list[i].in_vertex.name.include?(in_vertex.name)) and
-        (list[i].out_vertex.name.casecmp(out.name)==0 or list[i].out_vertex.name.include?(out.name))) or
-        ((list[i].in_vertex.name.casecmp(out.name)==0 or list[i].in_vertex.name.include?(out.name)) and
-        (list[i].out_vertex.name.casecmp(in_vertex.name)==0 or list[i].out_vertex.name.include?(in_vertex.name))))
+      #if(((list[i].in_vertex.name.casecmp(in_vertex.name)==0 or list[i].in_vertex.name.include?(in_vertex.name)) and
+      #  (list[i].out_vertex.name.casecmp(out.name)==0 or list[i].out_vertex.name.include?(out.name))) or
+      #  ((list[i].in_vertex.name.casecmp(out.name)==0 or list[i].in_vertex.name.include?(out.name)) and
+      #  (list[i].out_vertex.name.casecmp(in_vertex.name)==0 or list[i].out_vertex.name.include?(in_vertex.name))))
+      if(matching_edge?(list, i, in_vertex.name, out.name) or matching_edge?(list, i, out.name, in_vertex.name)) #TODO implementation
         # puts("***** Found edge! : index:: #{index} list[i].index:: #{list[i].index}")
         #if an edge was found
         edgePos = i #returning its position in the array
@@ -400,6 +401,13 @@ def search_edges(list, in_vertex, out, index)
   end #end of the for loop
   return edgePos
 end # end of searchdges
+
+#------------------------------------------#------------------------------------------#------------------------------------------
+def matching_edge?(list, i, vertex1, vertex2)     #TODO new method for long if
+  condition1 = (list[i].in_vertex.name.casecmp(vertex1.name)==0 or list[i].in_vertex.name.include?(vertex1.name))
+  condition2 = (list[i].out_vertex.name.casecmp(vertex2.name)==0 or list[i].out_vertex.name.include?(vertex2.name))
+  return condition1 and condition2
+end
 #------------------------------------------#------------------------------------------#------------------------------------------
 
 def search_edges_to_set_null(list, in_vertex, out, index)

@@ -375,6 +375,10 @@ end
   true - if an edge exists and false - if an edge doesn't exist
   edge[] list, vertex in, vertex out, int index
 =end
+def edge_not_nil?(obj)     #TODO multiple ifs
+  return !obj.nil? and !obj.in_vertex.nil? and !obj.out_vertex.nil?
+end
+
 def search_edges(list, in_vertex, out, index)
   edgePos = -1
   if(list.nil?)#if the list is null
@@ -382,7 +386,7 @@ def search_edges(list, in_vertex, out, index)
   end
 
   for i in (0..list.length-1)
-    if(!list[i].nil? and !list[i].in_vertex.nil? and !list[i].out_vertex.nil?)
+    if(edge_not_nil?(list[i]))  #TODO implemnkdkasjfjk
       #checking for exact match with an edge
       #if(((list[i].in_vertex.name.casecmp(in_vertex.name)==0 or list[i].in_vertex.name.include?(in_vertex.name)) and
       #  (list[i].out_vertex.name.casecmp(out.name)==0 or list[i].out_vertex.name.include?(out.name))) or
@@ -410,18 +414,24 @@ def matching_edge?(name1, name2, vertex1, vertex2)     #TODO new method for long
   c4 = name2.casecmp(vertex1.name) == 0 or name2.include?(vertex1.name)
   return (c1 and c2) or (c3 and c4)
 end
+
+def null_matching_edge?(name1, name2, vertex1, vertex2)   #TODO new method (redundant) for long if
+  c1 = name1.downcase == vertex1.name.downcase and name2.downcase == vertex2.name.downcase
+  c2 = name1.downcase == vertex2.name.downcase and  name2.downcase == vertex1.name.downcase
+  return c1 or c2
+end
 #------------------------------------------#------------------------------------------#------------------------------------------
 
 def search_edges_to_set_null(list, in_vertex, out, index)
   edgePos = -1
   # puts("***** Searching edge to set to null:: #{in_vertex.name} - #{out.name} ... num_edges #{@num_edges}")
   for i in 0..@num_edges - 1
-    if(!list[i].nil? and !list[i].in_vertex.nil? and !list[i].out_vertex.nil?)
+    if(edge_not_nil?(list[i]))
       # puts "comparing with #{list[i].in_vertex.name} - #{list[i].out_vertex.name}"
       #puts "#{list[i].in_vertex.name.downcase == in_vertex.name.downcase} - #{list[i].out_vertex.name.downcase == out.name.downcase}"
       #checking for exact match with an edge
-      if((list[i].in_vertex.name.downcase == in_vertex.name.downcase and list[i].out_vertex.name.downcase == out.name.downcase) or
-              (list[i].in_vertex.name.downcase == out.name.downcase and list[i].out_vertex.name.downcase == in_vertex.name.downcase))
+
+      if(null_matching_edge?(list[i].in_vertex, list[i].out_vertex, in_vertex.name, out.name))
         #if an edge was found
         edgePos = i #returning its position in the array
         #INCREMENT FREQUENCY IF THE EDGE WAS FOUND IN A DIFFERENT SENT. (CHECK BY MAINTAINING A TEXT NUMBER AND CHECKING IF THE NEW # IS DIFF FROM PREV #)
@@ -489,7 +499,7 @@ def print_graph(edges, vertices)
   puts("*******")
   puts("*** List of edges::")
   for j in (0..edges.length-1)
-    if(!edges[j].nil? and !edges[j].in_vertex.nil? and !edges[j].out_vertex.nil?)
+    if(edge_not_nil?(edges[j]))
       puts("@@@ Edge:: #{edges[j].in_vertex.name} & #{edges[j].out_vertex.name}")
       puts("*** Frequency:: #{edges[j].frequency} State:: #{edges[j].in_vertex.state} & #{edges[j].out_vertex.state}")
       puts("*** Label:: #{edges[j].label}")

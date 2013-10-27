@@ -247,7 +247,7 @@ class Assignment < ActiveRecord::Base
 
     scores[:participants] = Hash.new
     self.participants.each do |participant|
-      scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
+      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
     end
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments

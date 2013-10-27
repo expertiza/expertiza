@@ -77,7 +77,7 @@ class AssignmentTeam < Team
   end
 
   def get_path
-    self.get_participants.first.get_path
+    self.get_participants.first.dir_path
   end
 
   def get_submitted_files

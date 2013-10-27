@@ -60,7 +60,7 @@ class GradesController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 
-    @scores = @participant.get_scores(@questions)
+    @scores = @participant.scores(@questions)
   end
 
   def instructor_review
@@ -154,7 +154,7 @@ class GradesController < ApplicationController
     if @submission == "review"
       @caction = "view_review"
       @symbol = "review"
-      process_response("Review", "Reviewer", @participant.get_reviews, "ReviewQuestionnaire")
+      process_response("Review", "Reviewer", @participant.reviews, "ReviewQuestionnaire")
     elsif @submission == "review_of_review"
       @symbol = "metareview"
       process_response("Metareview", "Metareviewer", @participant.get_metareviews, "MetareviewQuestionnaire")

@@ -27,6 +27,7 @@ gem 'rjb'
 gem 'rubyzip', :require => 'zip/zip'
 gem 'rwordnet'
 gem 'seer'
+gem 'simple-navigation'         #added by Krunal
 gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'

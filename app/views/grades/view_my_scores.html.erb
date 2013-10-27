@@ -1,8 +1,46 @@
 <H1>Score for <%= @assignment.name %></H1>
-   
-<TABLE class="grades" >
-<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
-<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>                                                                                   
-</TABLE>
+<div>
+  <ul class="ui-tabs-nav pull right">abc</ul>
+</div>
+
+
 <BR/>
+
+
+<%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
+<%= stylesheet_link_tag 'jquery-ui-1.10.3.custom.min' %>
+<script src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="/javascripts/jquery-ui-timepicker-addon.js"></script>
+
+<%= form_for @assignment, html: {id: 'assignment_form'} do %>
+    <div id="tabs">
+      <ul>
+        <li id="tab1" class="selected"><a href="#tabs-1">Submitted Work</a></li>
+        <li id="tab2"><a href="#tabs-2">Reviewing</a></li>
+        <li id="tab3"><a href="#tabs-3">Meta Reviews</a></li>
+        <li id="tab4"><a href="#tabs-4">Author Feedback</a></li>
+
+      </ul>
+      <div id="tabs-1">
+        <%= render :partial => 'grades/submittedwork', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      </div>
+      <div id="tabs-2">
+        <p>test1</p>
+      </div>
+      <div id="tabs-3">
+        <p>test1</p>
+      </div>
+      <div id="tabs-4">
+        <p>test1</p>
+      </div>
+
+    </div>
+    <script>
+        jQuery(document).ready(function () {
+            jQuery("#tabs").tabs();
+        });
+    </script>
+<% end %>
+
+
 <a href="javascript:window.history.back()">Back</a>

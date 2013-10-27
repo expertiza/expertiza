@@ -87,7 +87,7 @@ module AssignmentTeamAnalytic
   def review_scores
     list = Array.new
     self.responses.each do |response|
-      list << response.get_average_score
+      list << response.average_score
     end
     if (list.empty?)
       [0]

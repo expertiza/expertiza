@@ -1,4 +1,5 @@
 class CourseParticipant < Participant
+
   belongs_to :course, :class_name => 'Course', :foreign_key => 'parent_id'
   
   # Copy this participant to an assignment

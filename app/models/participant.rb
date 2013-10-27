@@ -77,13 +77,17 @@ class Participant < ActiveRecord::Base
     return topic.topic_name
   end
 
+  #OSS808 Change 26/10/2013
+  #Method commented as it is not used anywhere in the project
+=begin
   def able_to_submit
-    if submit_allowed
+   if submit_allowed
       return true
     end
     return false
   end
-  #Nithya Pari - Second Test Change
+=end
+
   def able_to_review
     if review_allowed
       return true

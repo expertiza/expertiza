@@ -19,6 +19,7 @@ attr_accessor :vertices, :num_vertices, :edges, :num_edges, :pipeline, :pos_tagg
    * type = 2 - new review
 =end
 def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIdentify)
+
   #initializing common arrays
   @vertices = Array.new
   @num_vertices = 0
@@ -279,24 +280,7 @@ def remove_redundant_vertices(s, index)
   j = @num_vertices - 1
   verts = @vertices
   while j >= 0
-   if(!verts[j].nil? and verts[j].index == index and s.casecmp(verts[j].name) != 0 and
-     (s.downcase.include?(verts[j].name.downcase) and verts[j].name.length > 1))
-     #the last 'length' condition is added so as to prevent "I" (an indiv. vertex) from being replaced by nil
-     # puts "*** string index = #{index}... verts[j].index = #{verts[j].index}"
-     # puts "**** remove_redundant_vertices setting #{verts[j].name} to nil!"
-     #search through all the edges and set those with this vertex as in-out- vertex to null
-     if(!@edges.nil?)
-       for i in 0..@edges.length - 1
-         edge = @edges[i]
-         if(!edge.nil? and (edge.in_vertex == verts[j] or edge.out_vertex == verts[j]))
-           # puts "edge #{edge.in_vertex.name} - #{edge.out_vertex.name}"
-           @edges[i] = nil #setting that edge to nil
-         end
-       end
-     end
-     #finally setting the vertex to  null
-     verts[j] = nil
-   end
+   verts = find_redundant_vertices(index, j, s, verts)
    j-=1
   end #end of while loop
 
@@ -314,6 +298,28 @@ def remove_redundant_vertices(s, index)
   @vertices = vertices_array
   @num_vertices = counter+1 #since @num_vertices is always one advanced of the last vertex
 end
+
+  def find_redundant_vertices(index, j, s, verts)
+    if (!verts[j].nil? and verts[j].index == index and s.casecmp(verts[j].name) != 0 and
+        (s.downcase.include?(verts[j].name.downcase) and verts[j].name.length > 1))
+      #the last 'length' condition is added so as to prevent "I" (an indiv. vertex) from being replaced by nil
+      # puts "*** string index = #{index}... verts[j].index = #{verts[j].index}"
+      # puts "**** remove_redundant_vertices setting #{verts[j].name} to nil!"
+      #search through all the edges and set those with this vertex as in-out- vertex to null
+      if (!@edges.nil?)
+        for i in 0..@edges.length - 1
+          edge = @edges[i]
+          if (!edge.nil? and (edge.in_vertex == verts[j] or edge.out_vertex == verts[j]))
+            # puts "edge #{edge.in_vertex.name} - #{edge.out_vertex.name}"
+            @edges[i] = nil #setting that edge to nil
+          end
+        end
+      end
+      #finally setting the vertex to  null
+      verts[j] = nil
+    end
+    return verts
+  end
 
 #------------------------------------------#------------------------------------------#------------------------------------------
 
@@ -401,19 +407,7 @@ def remove_redundant_edges(in_vertex, out, index)
   list = @edges
   j = @num_edges - 1
   while j >= 0 do
-    if(!list[j].nil? and list[j].index == index)
-     #when invertices are eq and out-verts are substrings or vice versa
-      if(in_vertex.name.casecmp(list[j].in_vertex.name) == 0 and out.name.casecmp(list[j].out_vertex.name) != 0 and out.name.downcase.include?(list[j].out_vertex.name.downcase))
-        # puts("FOUND out_vertex match for edge:: #{list[j].in_vertex.name} - #{list[j].out_vertex.name}")
-        list[j] = nil
-        #@num_edges-=1
-        #when in-vertices are only substrings and out-verts are equal
-      elsif(in_vertex.name.casecmp(list[j].in_vertex.name)!=0 and in_vertex.name.downcase.include?(list[j].in_vertex.name.downcase) and out.name.casecmp(list[j].out_vertex.name)==0)
-        # puts("FOUND in_vertex match for edge: #{list[j].in_vertex.name} - #{list[j].out_vertex.name}")
-        list[j] = nil
-        #@num_edges-=1
-      end
-    end
+    list = find_redundant_edges(in_vertex, index, j, list, out)
     j-=1
   end #end of the while loop
   # puts "**** search_edges:: Old number #{@num_edges}"
@@ -433,27 +427,54 @@ def remove_redundant_edges(in_vertex, out, index)
   # puts "**** search_edges:: New number of edges #{@num_edges}"
 end
 
+  def find_redundant_edges(in_vertex, index, j, list, out)
+    if (!list[j].nil? and list[j].index == index)
+      #when invertices are eq and out-verts are substrings or vice versa
+      if (in_vertex.name.casecmp(list[j].in_vertex.name) == 0 and out.name.casecmp(list[j].out_vertex.name) != 0 and out.name.downcase.include?(list[j].out_vertex.name.downcase))
+        # puts("FOUND out_vertex match for edge:: #{list[j].in_vertex.name} - #{list[j].out_vertex.name}")
+        list[j] = nil
+        #@num_edges-=1
+        #when in-vertices are only substrings and out-verts are equal
+      elsif (in_vertex.name.casecmp(list[j].in_vertex.name)!=0 and in_vertex.name.downcase.include?(list[j].in_vertex.name.downcase) and out.name.casecmp(list[j].out_vertex.name)==0)
+        # puts("FOUND in_vertex match for edge: #{list[j].in_vertex.name} - #{list[j].out_vertex.name}")
+        list[j] = nil
+        #@num_edges-=1
+      end
+    end
+    return list
+  end
+
 #------------------------------------------#------------------------------------------#------------------------------------------
 def print_graph(edges, vertices)
-  puts("*** List of vertices::")
-  for j in (0..vertices.length-1)
-    if(!vertices[j].nil?)
-      puts("@@@ Vertex:: #{vertices[j].name}")
-      puts("*** Frequency:: #{vertices[j].frequency} State:: #{vertices[j].state}")
-      puts("*** Label:: #{vertices[j].label} Parent:: #{vertices[j].parent}")
+  print_vertices(vertices)
+  print_edges(edges)
+end
+
+  def print_edges(edges)
+    puts("*** List of edges::")
+    for j in (0..edges.length-1)
+      if (edge_not_nil?(edges[j]))
+        puts("@@@ Edge:: #{edges[j].in_vertex.name} & #{edges[j].out_vertex.name}")
+        puts("*** Frequency:: #{edges[j].frequency} State:: #{edges[j].in_vertex.state} & #{edges[j].out_vertex.state}")
+        puts("*** Label:: #{edges[j].label}")
+      end
     end
+    puts("--------------")
   end
-  puts("*******")
-  puts("*** List of edges::")
-  for j in (0..edges.length-1)
-    if(edge_not_nil?(edges[j]))
-      puts("@@@ Edge:: #{edges[j].in_vertex.name} & #{edges[j].out_vertex.name}")
-      puts("*** Frequency:: #{edges[j].frequency} State:: #{edges[j].in_vertex.state} & #{edges[j].out_vertex.state}")
-      puts("*** Label:: #{edges[j].label}")
+
+  def print_vertices(vertices)
+    puts("*** List of vertices::")
+    for j in (0..vertices.length-1)
+      if (!vertices[j].nil?)
+        puts("@@@ Vertex:: #{vertices[j].name}")
+        puts("*** Frequency:: #{vertices[j].frequency} State:: #{vertices[j].state}")
+        puts("*** Label:: #{vertices[j].label} Parent:: #{vertices[j].parent}")
+      end
     end
+    puts("*******")
   end
-  puts("--------------")
-end #end of print_graph method
+
+#end of print_graph method
 
 #------------------------------------------#------------------------------------------#------------------------------------------
 #Identifying parents and labels for the vertices
@@ -471,30 +492,37 @@ def find_parents(t)
   #puts "parsed sentence #{parsed_sentence}"
   #iterating through the set of tokens and identifying each token's parent
   #puts "unTaggedString.length #{unTaggedString.length}"
-  for j in (0..unTaggedString.length - 1)
-    #puts "unTaggedString[#{j}] #{unTaggedString[j]}"
-    if(tp.is_punct(unTaggedString[j]))
-      next
-    end
-    if(tp.contains_punct(unTaggedString[j]))
-      unTaggedString[j] = tp.contains_punct(unTaggedString[j])
-      # puts "unTaggedString #{unTaggedString[j]} and #{tp.contains_punct_bool(unTaggedString[j])}"
-    end
-    if(!unTaggedString[j].nil? and !tp.contains_punct_bool(unTaggedString[j]))
-      pat = parsed_sentence.getAllNodesByWordPattern(unTaggedString[j])
-      pat = pat.toArray
-      parent = parsed_sentence.getParents(pat[0]).toArray
-    end
-    #puts "parent of #{unTaggedString[j]} is #{parent[0]}"
-    if(!parent.nil? and !parent[0].nil?)
-      parents[j] =  (parent[0].to_s)[0..(parent[0].to_s).index("-")-1]#extracting the name of the parent (since it is in the foramt-> "name-POS")
-      #puts "parents[#{j}] = #{parents[j]}"
-    else
-      parents[j] = nil
-    end
-  end
+  parents = identify_parents(parents, parsed_sentence, tp, unTaggedString)
   return parents
-end #end of find_parents method
+end
+
+  def identify_parents(parents, parsed_sentence, tp, unTaggedString)    #TODO          gjhg
+    for j in (0..unTaggedString.length - 1)
+      #puts "unTaggedString[#{j}] #{unTaggedString[j]}"
+      if (tp.is_punct(unTaggedString[j]))
+        next
+      end
+      if (tp.contains_punct(unTaggedString[j]))
+        unTaggedString[j] = tp.contains_punct(unTaggedString[j])
+        # puts "unTaggedString #{unTaggedString[j]} and #{tp.contains_punct_bool(unTaggedString[j])}"
+      end
+      if (!unTaggedString[j].nil? and !tp.contains_punct_bool(unTaggedString[j]))
+        pat = parsed_sentence.getAllNodesByWordPattern(unTaggedString[j])
+        pat = pat.toArray
+        parent = parsed_sentence.getParents(pat[0]).toArray
+      end
+      #puts "parent of #{unTaggedString[j]} is #{parent[0]}"
+      if (!parent.nil? and !parent[0].nil?)
+        parents[j] = (parent[0].to_s)[0..(parent[0].to_s).index("-")-1] #extracting the name of the parent (since it is in the foramt-> "name-POS")
+                                                                        #puts "parents[#{j}] = #{parents[j]}"
+      else
+        parents[j] = nil
+      end
+    end
+    return parents
+  end
+
+#end of find_parents method
 #------------------------------------------#------------------------------------------#------------------------------------------
 #Identifying parents and labels for the vertices
 def find_labels(t)
@@ -530,37 +558,47 @@ end # end of find_labels method
 =begin
    * Setting semantic labels for edges based on the labels vertices have with their parents
 =end
+
+def find_edge_with_parent(i)
+  for k in (0..@edges.length - 1)
+    if(!@edges[k].nil? and !@edges[k].in_vertex.nil? and !@edges[k].out_vertex.nil?)
+      if((@edges[k].in_vertex.name.equal?(@vertices[i].name) and @edges[k].out_vertex.name.equal?(parent.name)) or (@edges[k].in_vertex.name.equal?(parent.name) and @edges[k].out_vertex.name.equal?(@vertices[i].name)))
+        #set the role label
+        if(@edges[k].label.nil?)
+          @edges[k].label = @vertices[i].label
+        elsif(!@edges[k].label.nil? and (@edges[k].label == "NMOD" or @edges[k].label == "PMOD") and (@vertices[i].label != "NMOD" or @vertices[i].label != "PMOD"))
+          @edges[k].label = @vertices[i].label
+        end
+      end
+    end
+  end
+end
+#------------------------------------------#------------------------------------------#------------------------------------------
 def set_semantic_labels_for_edges
   # puts "*** inside set_semantic_labels_for_edges"
   for i in (0.. @vertices.length - 1)
     if(!@vertices[i].nil? and !@vertices[i].parent.nil?) #parent = null for ROOT
         #search for the parent vertex
-        for j in (0..@vertices.length - 1)
-          if(!@vertices[j].nil? and (@vertices[j].name.casecmp(@vertices[i].parent) == 0 or
-                @vertices[j].name.downcase.include?(@vertices[i].parent.downcase)))
-            # puts("**Parent:: #{@vertices[j].name}")
-            parent = @vertices[j]
-            break #break out of search for the parent
-          end
-        end
+        parent = find_parent_vertex(i)  #TODO removed nested loop
         if(!parent.nil?)#{
           #check if an edge exists between vertices[i] and the parent
-          for k in (0..@edges.length - 1)
-            if(!@edges[k].nil? and !@edges[k].in_vertex.nil? and !@edges[k].out_vertex.nil?)
-              if((@edges[k].in_vertex.name.equal?(@vertices[i].name) and @edges[k].out_vertex.name.equal?(parent.name)) or (@edges[k].in_vertex.name.equal?(parent.name) and @edges[k].out_vertex.name.equal?(@vertices[i].name)))
-                #set the role label
-                if(@edges[k].label.nil?)
-                  @edges[k].label = @vertices[i].label
-                elsif(!@edges[k].label.nil? and (@edges[k].label == "NMOD" or @edges[k].label == "PMOD") and (@vertices[i].label != "NMOD" or @vertices[i].label != "PMOD"))
-                  @edges[k].label = @vertices[i].label
-                end
-              end
-            end
-          end
+          find_edge_with_parent(i)
         end#end of if paren.nil? condition
     end
   end #end of for loop
-end #end of set_semantic_labels_for_edges method
+end
+
+  def find_parent_vertex(i)
+    for j in (0..@vertices.length - 1)
+      if (!@vertices[j].nil? and (@vertices[j].name.casecmp(@vertices[i].parent) == 0 or
+          @vertices[j].name.downcase.include?(@vertices[i].parent.downcase)))
+        # puts("**Parent:: #{@vertices[j].name}")
+        parent = @vertices[j]
+        break #break out of search for the parent
+      end
+    end
+    parent
+  end #end of set_semantic_labels_for_edges method
 
 end # end of the class GraphGenerator
 #------------------------------------------#------------------------------------------#------------------------------------------

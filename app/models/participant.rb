@@ -32,11 +32,16 @@ class Participant < ActiveRecord::Base
   
   def fullname
     User.find(self.user_id).fullname
-  end 
-  
+  end
+
+  #OSS808 Change 26/10/2013
+  # Trying to modify the depricated code
+  # TODO How do we test this code?
   def delete(force = nil)     
-    maps = ResponseMap.find(:all, :conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
-    
+    #maps = ResponseMap.find(:all, :conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
+    maps = ResponseMap.find_all_by_reviewee_id_or_reviewer_id(self.id,self.id)
+
+
     if force or ((maps.nil? or maps.length == 0) and 
                  self.team.nil?)
       force_delete(maps)
@@ -69,7 +74,7 @@ class Participant < ActiveRecord::Base
      end
      self.destroy
   end
-  # Nithya Pari - 26th October 2013
+
   def get_topic_string
     if topic.nil? or topic.topic_name.empty?
       return "<center>&#8212;</center>"

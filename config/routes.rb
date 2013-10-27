@@ -94,10 +94,6 @@ Expertiza::Application.routes.draw do |map|
   resources :export_file do
     collection do
       get :start
-
-      #oss808
-      get :export
-      put :export
     end
   end
 

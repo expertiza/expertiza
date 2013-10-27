@@ -4,7 +4,62 @@ require 'yaml'
 # Code Review: Notice that Participant overloads two different concepts: 
 #              contribution and participant (see fields of the participant table).
 #              Consider creating a new table called contributions.
-class AssignmentParticipant < Participant  
+class AssignmentParticipant < Participant
+  # Returns the average score of one question from all reviews for this user on this assignment as an floating point number
+  # Params: question - The Question object to retrieve the scores from
+  # OSS808 Change 26/10/2013
+  # get_average_question_score
+  def average_question_score(question)
+    sum_of_scores = 0
+    number_of_scores = 0
+
+    self.response_maps.each do |response_map|
+      # TODO There must be a more elegant way of doing this...
+      unless response_map.response.nil?
+        response_map.response.scores.each do |score|
+          if score.question == question then
+            sum_of_scores = sum_of_scores + score.score
+            number_of_scores = number_of_scores + 1
+          end
+        end
+      end
+    end
+
+    return 0 if number_of_scores == 0
+    (((sum_of_scores.to_f / number_of_scores.to_f) * 100).to_i) / 100.0
+  end
+
+  # Returns the average score of all reviews for this user on this assignment (Which assignment ??? )
+
+  def average_score()
+    return 0 if self.response_maps.size == 0
+
+    sum_of_scores = 0
+
+    self.response_maps.each do |response_map|
+      if !response_map.response.nil?  then
+        sum_of_scores = sum_of_scores + response_map.response.average_score
+      end
+    end
+
+    (sum_of_scores / self.response_maps.size).to_i
+  end
+  def average_score_per_assignment(assignment_id)
+    return 0 if self.response_maps.size == 0
+
+    sum_of_scores = 0
+
+    self.response_maps.metareview_response_maps.each do |metaresponse_map|
+      if !metaresponse_map.response.nil? && response_map == assignment_id then
+        sum_of_scores = sum_of_scores + response_map.response.average_score
+      end
+    end
+
+    (sum_of_scores / self.response_maps.size).to_i
+  end
+
+
+
   require 'wiki_helper'
   
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 

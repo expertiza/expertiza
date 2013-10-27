@@ -761,7 +761,7 @@ class Assignment < ActiveRecord::Base
 
     self.response_maps.each do |response_map|
       if !response_map.response.nil? then
-        sum_of_scores = sum_of_scores + response_map.response.get_average_score
+        sum_of_scores = sum_of_scores + response_map.response.average_score
       end
     end
 
@@ -773,7 +773,7 @@ class Assignment < ActiveRecord::Base
 
     self.response_maps.each do |response_map|
       if !response_map.response.nil? then
-        score = response_map.response.get_average_score.to_i
+        score = response_map.response.average_score.to_i
         distribution[score] += 1 if score >= 0 and score <= 100
       end
     end

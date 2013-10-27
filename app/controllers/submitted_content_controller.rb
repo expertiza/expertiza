@@ -1,4 +1,4 @@
-require 'zip/zip'
+require 'zip'
 
 class SubmittedContentController < ApplicationController
   helper :wiki

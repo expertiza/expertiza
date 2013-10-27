@@ -34,6 +34,10 @@ Expertiza::Application.routes.draw do |map|
       get :copy
       get :toggle_access
       post :remove_assignment_from_course
+      get :set_questionnaire
+      get :set_due_date
+      get :delete_all_questionnaires
+      get :delete_all_due_dates
     end
   end
 
@@ -97,7 +101,9 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :view_my_scores
+      get :instructor_review
       get :remove_hyperlink
+      get :conflict_notification
     end
   end
 
@@ -147,6 +153,8 @@ Expertiza::Application.routes.draw do |map|
       get :auto_complete_for_user_name
       get :list
       get :change_handle
+      get :inherit
+      get :bequeath_all
       post :delete
     end
   end
@@ -192,6 +200,7 @@ Expertiza::Application.routes.draw do |map|
       post :select_questionnaire_type
     end
   end
+
   resources :review_questionnaires, controller: :questionnaires
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires
@@ -203,6 +212,9 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :new_feedback
       get :view
+      post :delete
+      get :remove_hyperlink
+      get :saving
     end
   end
 
@@ -210,6 +222,11 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :list_mappings
       get :review_report
+      get :show_available_submissions
+      get :add_self_reviewer
+      get :delete_all_reviewers_and_metareviewers
+      get :assign_reviewer_dynamically
+      get :assign_metareviewer_dynamically
     end
   end
 
@@ -282,6 +299,11 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :edit
+      get :submit_hyperlink
+      get :submit_file
+      get :folder_action
+      get :remove_hyperlink
+      get :download
     end
   end
 
@@ -345,6 +367,17 @@ Expertiza::Application.routes.draw do |map|
 
   root to: 'content_pages#view', page_name: 'home'
 
+  match 'users/list', :to => 'users#list'
+
+  match '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
+  match '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'
+  match '/submitted_content/submit_file', :to => 'submitted_content#submit_file'
+  match '/review_mapping/show_available_submissions', :to => 'review_mapping#show_available_submissions'
+  match '/review_mapping/assign_reviewer_dynamically', :to => 'review_mapping#assign_reviewer_dynamically'
+  match "/review_mapping/assign_metareviewer_dynamically", :to => 'review_mapping#assign_metareviewer_dynamically'
+  match 'response/', :to => 'response#saving'
+
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   map.connect ':controller/service.wsdl', :action => 'wsdl'
+  match ':controller(/:action(/:id))(.:format)'
 end

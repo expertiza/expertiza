@@ -16,7 +16,7 @@ NEGATIVE_DESCRIPTORS = [
         "barring", "overuse", "repitition", "useless", "biased", "rushed", "absent", "wordy", "bad", "less", 
         "unclear", "difficult", "vague", "briefly", "hard", "broken","replicate","replicated", "digress", "clutter",
         "cluttered", "inadequate", "deviation", "contrived", "contrive", "horrid", "trouble","uneven", "unevenly", "alot",
-        "incorrect"]
+        "incorrect", "nonsense", "insufficient"]
 =begin
   SENTENCE CLAUSE OR PHRASE FOLLOWING THESE WORDS CARRY A NEGATIVE MEANING (EITHER SUBTLE OR OVERT)
 =end

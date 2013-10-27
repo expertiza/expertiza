@@ -191,4 +191,4 @@ par19:
   parent_id: <%= Fixtures.identify(:assignment_project1) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
-  handle: "par19
+  handle: "par19"

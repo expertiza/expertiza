@@ -1,3 +1,6 @@
+#!/bin/env ruby
+# encoding: utf-8
+
 require 'test_helper'
 require 'automated_metareview/sentence_state'
     
@@ -9,12 +12,12 @@ class SentenceStateTest < ActiveSupport::TestCase
     @sstate = SentenceState.new
   end
   
-  test "Identify State 1" do
+ test "Identify State 1" do
     sentence = "Parallel lines never meet."
     #getting the tagged string
     tagged_string = @pos_tagger.get_readable(sentence)
     #calling the identify_sentence_state method with tagged_string as a parameter
-    state_array = sstate.identify_sentence_state(tagged_string) #returns an array containing states as the output (depending on the number and types of segments)    
+    state_array = sstate.identify_sentence_state(tagged_string) #returns an array containing states as the output (depending on the number and types of segments)
     assert_equal(state_array[0], NEGATED)
   end  
   

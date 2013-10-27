@@ -96,8 +96,8 @@
       <% if student_task.assignment %>
         <tr class="listingRow">
           <td>&nbsp;</td>
-          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
-          <td><%= student_task.course.name %></td>
+          <td><b><%= link_to student_task.assignment, :action => 'view', :id => participant %></b></td>
+          <td><%= student_task.course %></td>
           <td><%= student_task.topic_name %></td>
           <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
           <td><%= student_task.stage_deadline %></td>

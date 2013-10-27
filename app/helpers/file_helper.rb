@@ -52,7 +52,7 @@ module FileHelper
   
   def self.delete_directory(in_object)
     begin
-      entries = Dir.entries(in_object.get_path)    
+      entries = Dir.entries(in_object.dir_path)
       if entries and entries.size == 2
         FileUtils.remove_dir(in_object.get_path)          
       end 
@@ -65,7 +65,7 @@ module FileHelper
   
   def self.create_directory(in_object)     
     begin
-      if !File.exists? in_object.get_path
+      if !File.exists? in_object.dir_path
         FileUtils.mkdir_p(in_object.get_path)
       end
     rescue PathError

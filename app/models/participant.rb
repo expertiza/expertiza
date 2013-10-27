@@ -83,7 +83,7 @@ class Participant < ActiveRecord::Base
     end
     return false
   end
-  
+  #Nithya Pari - Second Test Change
   def able_to_review
     if review_allowed
       return true

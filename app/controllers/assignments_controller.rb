@@ -35,7 +35,7 @@ class AssignmentsController < ApplicationController
 
   def edit
     @assignment = Assignment.find(params[:id])
-    set_up
+    set_up_assignment_review
   end
 
   def delete_all_due_dates
@@ -155,7 +155,7 @@ class AssignmentsController < ApplicationController
 
 #NOTE: many of these functions actually belongs to other models
 #====setup methods for new and edit method=====#
-  def set_up
+  def set_up_assignment_review
     set_up_defaults
 
     submissions = @assignment.find_due_dates('submission') + @assignment.find_due_dates('resubmission')

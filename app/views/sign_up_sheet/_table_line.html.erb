@@ -1,14 +1,14 @@
 <td><%= topic.topic_identifier %></td>
-<td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
+<td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 
 <% if @assignment.is_microtask? %>
     <td align="center"><%= topic.micropayment %></td>
 <% end %>
 
 <td align="center"><%= topic.max_choosers %></td>
-<%= render :partial => 'available_slots', :locals => {:topic=>topic} %>
+<%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
 
-<%= render :partial => 'num_waiting', :locals => {:topic=>topic} %>
+<%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
 
 <% if @assignment.has_partner_ads?(params[:id]) %>
  <td align="center">

@@ -163,7 +163,7 @@ class GradesController < ApplicationController
       process_response("Feedback", "Author", @participant.get_feedback, "AuthorFeedbackQuestionnaire")
     elsif @submission == "teammate_review"
       @symbol = "teammate"
-      process_response("Teammate Review", "Reviewer", @participant.get_teammate_reviews, "TeammateReviewQuestionnaire")
+      process_response("Teammate Review", "Reviewer", @participant.teammate_reviews, "TeammateReviewQuestionnaire")
     end
 
     @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."

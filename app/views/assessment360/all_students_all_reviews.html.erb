@@ -26,7 +26,7 @@
          <% if assignment_participant.nil? %>
            <td></td><td></td>
          <% else %>
-         <% teammate_reviews = assignment_participant.get_teammate_reviews() ; meta_reviews = assignment_participant.get_metareviews() %>
+         <% teammate_reviews = assignment_participant.teammate_reviews() ; meta_reviews = assignment_participant.get_metareviews() %>
          <% if !teammate_reviews.nil? %>
           <% teammate_average = 0 %>
           <% teammate_reviews.each do |teammate_review| %>

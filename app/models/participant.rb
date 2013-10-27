@@ -35,7 +35,7 @@ class Participant < ActiveRecord::Base
   end
 
   #OSS808 Change 26/10/2013
-  # Trying to modify the depricated code
+  # Trying to modify the deprecated code
   # TODO How do we test this code?
   def delete(force = nil)     
     #maps = ResponseMap.find(:all, :conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
@@ -79,7 +79,9 @@ class Participant < ActiveRecord::Base
      self.destroy
   end
 
-  def get_topic_string
+  #OSS808 Change 27/10/2013
+  #Method renamed to  topic_name from get_topic_string
+  def topic_name
     if topic.nil? or topic.topic_name.empty?
       return "<center>&#8212;</center>"
     end

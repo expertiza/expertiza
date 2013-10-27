@@ -158,7 +158,7 @@ class Assessment360Controller < ApplicationController
      @assignments.each do |assignment|
        assignment_participant = assignment.participants.find_by_user_id(@current_student.user_id)
        if  !assignment_participant.nil?
-       teammate_scores = assignment_participant.get_teammate_reviews()
+       teammate_scores = assignment_participant.teammate_reviews()
        meta_scores = assignment_participant.get_metareviews()
        j = 1.to_i
        average = 0;

@@ -28,7 +28,7 @@ class SentenceStateTest < ActiveSupport::TestCase
   end     
   
   test "Identify State 3" do
-    sentence = "I’m not ever going to do any homework."
+    sentence = "I am not ever going to do any homework."
     #getting the tagged string
     tagged_string = @pos_tagger.get_readable(sentence)
     #calling the identify_sentence_state method with tagged_string as a parameter

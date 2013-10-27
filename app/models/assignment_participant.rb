@@ -92,21 +92,16 @@ class AssignmentParticipant < Participant
   end
 
   # all the participants in this assignment reviewed by this person
-  # OSS808 Change 27/10/2013
-  # Renamed from get_reviewees to reviewees
-  # Changed Deprecated Code
-  def reviewees
+  def get_reviewees
     reviewees = []
     if self.assignment.team_assignment?
-      #rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'TeamReviewResponseMap'"])
-      rmaps = ResponseMap.find_all_by_reviewer_id_and_type(self.id,'TeamReviewResponseMap')
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'TeamReviewResponseMap'"])
       rmaps.each do |rm|
         reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants)
       end
     else
-      #rmaps = ResponseMap.find(:all, :conditions => ['reviewer_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
-      rmaps = ResponseMap.find_all_by_reviewer_id_and_type(self.id,'ParticipantReviewResponseMap')
-        rmaps.each do |rm|
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      rmaps.each do |rm|
         reviewees.push(AssignmentParticipant.find(rm.reviewee_id))
       end
     end
@@ -114,19 +109,12 @@ class AssignmentParticipant < Participant
   end
   
   # all the participants in this assignment who have reviewed this person
-  # OSS808 Change 27/10/2013
-  # Renamed from get_reviewers to reviewers
-  # Removed Depricated code
-
-  def reviewersCode
+  def get_reviewers
     reviewers = []
     if self.assignment.team_assignment? && self.team
-      #rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
-      rmaps = ResponseMap.find_all_by_reviewee_id_and_type(self.team.id,'TeamReviewResponseMap')
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
     else
-      #rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
-      rmaps = ResponseMap.find_all_by_reviewee_id_and_type(self.id,'ParticipantReviewResponseMap')
-
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])      
     end
     rmaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
@@ -141,10 +129,10 @@ class AssignmentParticipant < Participant
  
   def get_two_node_cycles
     cycles = []
-    self.reviewers.each do |ap|
-      if ap.reviewers.include?(self)
+    self.get_reviewers.each do |ap|
+      if ap.get_reviewers.include?(self) 
         self.get_reviews_by_reviewer(ap).nil? ? next : s01 = self.get_reviews_by_reviewer(ap).get_total_score
-        ap.reviews_by_reviewer(self).nil? ? next : s10 = ap.get_reviews_by_reviewer(self).get_total_score
+        ap.get_reviews_by_reviewer(self).nil? ? next : s10 = ap.get_reviews_by_reviewer(self).get_total_score
         cycles.push([[self, s01], [ap, s10]])
       end
     end
@@ -153,12 +141,12 @@ class AssignmentParticipant < Participant
   
   def get_three_node_cycles
     cycles = []
-    self.reviewers.each do |ap1|
-      ap1.reviewers.each do |ap2|
-        if ap2.reviewers.include?(self)
+    self.get_reviewers.each do |ap1|
+      ap1.get_reviewers.each do |ap2|
+        if ap2.get_reviewers.include?(self)  
           self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score   
-          ap1.reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
-          ap2.reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score
+          ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score   
+          ap2.get_reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score   
           cycles.push([[self, s01], [ap1, s12], [ap2, s20]])
         end
       end
@@ -168,14 +156,14 @@ class AssignmentParticipant < Participant
   
   def get_four_node_cycles
     cycles = []
-    self.reviewers.each do |ap1|
-      ap1.reviewers.each do |ap2|
-        ap2.reviewers.each do |ap3|
-          if ap3.reviewers.include?(self)
+    self.get_reviewers.each do |ap1|
+      ap1.get_reviewers.each do |ap2|
+        ap2.get_reviewers.each do |ap3|
+          if ap3.get_reviewers.include?(self)  
             self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score   
-            ap1.reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
-            ap2.reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score
-            ap3.reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score
+            ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score   
+            ap2.get_reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score  
+            ap3.get_reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score   
             cycles.push([[self, s01], [ap1, s12], [ap2, s23], [ap3, s30]])
           end 
         end
@@ -230,9 +218,7 @@ class AssignmentParticipant < Participant
   end
 
   # Return scores that this participant has been given
-  # OSS808 Change 27/10/2013
-  # Renamed from get_scores to scores
-  def scores(questions)
+  def get_scores(questions)
     scores = Hash.new
     scores[:participant] = self # This doesn't appear to be used anywhere
     self.assignment.questionnaires.each do |questionnaire|
@@ -324,28 +310,13 @@ class AssignmentParticipant < Participant
   def get_feedback
     return FeedbackResponseMap.get_assessments_for(self)      
   end
-
-  # OSS808 Change 27/10/2013
-  # Renamed to reviews from get_reviews
-  def reviews
+  
+  def get_reviews
     #ACS Always get assessments for a team
     #removed check to see if it is a team assignment
     return TeamReviewResponseMap.get_assessments_for(self.team)
   end
-
-  # OSS808 Change 27/10/2013
-  # Renamed to reviews_by_reviewer from get_reviews_by_reviewer
-  def reviews_by_reviewer(reviewer)
-    if self.assignment.team_assignment?
-      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
-    else
-      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
-    end
-  end
-
-  # OSS808 Change 27/10/2013
-  # Duplicated method - commented
-=begin
+  
   def get_reviews_by_reviewer(reviewer)
     if self.assignment.team_assignment?
       return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
@@ -353,7 +324,14 @@ class AssignmentParticipant < Participant
       return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
     end
   end
-=end
+  
+  def get_reviews_by_reviewer(reviewer)
+    if self.assignment.team_assignment?
+      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
+    else
+      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
+    end
+  end
       
   def get_metareviews
     MetareviewResponseMap.get_assessments_for(self)  
@@ -366,7 +344,7 @@ class AssignmentParticipant < Participant
   def get_submitted_files()
     files = Array.new
     if(self.directory_num)      
-      files = get_files(self.dir_path)
+      files = get_files(self.get_path)
     end
     return files
   end  
@@ -504,11 +482,9 @@ class AssignmentParticipant < Participant
       end
     end  
     self.save!
-  end
-
-  # OSS808 Change 27/10/2013
-  # Renamed from dir_path to dir_path  (20 occurances have been changed)
-  def dir_path
+  end  
+  
+  def get_path
      path = self.assignment.get_path + "/"+ self.directory_num.to_s     
      return path
   end

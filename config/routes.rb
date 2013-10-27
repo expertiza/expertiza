@@ -94,6 +94,9 @@ Expertiza::Application.routes.draw do |map|
   resources :export_file do
     collection do
       get :start
+      # OSS808 Change 27/10/2013
+      # Added missing routes
+      get :export
     end
   end
 
@@ -156,6 +159,7 @@ Expertiza::Application.routes.draw do |map|
       post :delete
       get :inherit
       get :bequeath_all
+
     end
   end
 

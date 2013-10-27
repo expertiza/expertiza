@@ -92,28 +92,9 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
       #if the token is a noun
       if(taggedToken.include?("NN") or taggedToken.include?("PRP") or taggedToken.include?("IN") or taggedToken.include?("/EX") or taggedToken.include?("WP"))
         #either add on to a previous vertex or create a brand new noun vertex
-        if(prevType == NOUN) #adding to a previous noun vertex
-           nCount -= 1 #decrement, since we are accessing a previous noun vertex
-           prevVertex = search_vertices(@vertices, nouns[nCount], i) #fetching the previous vertex
-           nouns[nCount] = nouns[nCount].to_s + " " + plainToken #concatenating with contents of the previous noun vertex
-           #checking if the previous noun concatenated with "s" already exists among the vertices
-           if((nounVertex = search_vertices(@vertices, nouns[nCount], i)) == nil)
-              prevVertex.name = prevVertex.name.to_s + " " + plainToken #concatenating the nouns
-              nounVertex = prevVertex #the current concatenated vertex will be considered
-              if(labels[labelCounter] != "NMOD" or labels[labelCounter] != "PMOD")#resetting labels for the concatenated vertex
-                nounVertex.label = labels[labelCounter]
-              end
-              #fAppendedVertex = 1
-           end#if the vertex already exists, just use nounVertex - the returned vertex for ops.
-        else #if the previous token is not a noun, create a brand new vertex
-           nouns[nCount] = plainToken #this is checked for later on
-           nounVertex = search_vertices(@vertices, plainToken, i)
-           if(nounVertex == nil) #the string doesn't already exist
-              @vertices[@num_vertices] = Vertex.new(nouns[nCount], NOUN, i, state, labels[labelCounter], parents[parentCounter], posTag)
-              nounVertex = @vertices[@num_vertices] #the newly formed vertex will be considered
-              @num_vertices+=1
-           end
-        end #end of if prevType was noun
+
+        prevVertex, nCount, nounVertex, nouns = tagged_token_check(nCount, nounVertex, nouns, i, labelCounter, labels, parentCounter, parents, plainToken, posTag, prevType, prevVertex, state, NOUN) #end of if prevType was noun #TODO long if
+
         remove_redundant_vertices(nouns[nCount], i)
         nCount+=1 #increment nCount for a new noun vertex just created (or existing previous vertex appended with new text)
 
@@ -124,9 +105,9 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
           fixing_edges(adjCount, adjectives, i, nCount, nounVertex, nouns, "noun-property")  #TODO Method_2_Extracted
         end
          #a noun has been found and has established a verb as an in_vertex and such an edge doesnt already previously exist
-          if(vCount > 0) #and fAppendedVertex == 0
-            pos_edge_processing("verb", vCount, i, nounVertex) #TODO METHOD_EXtracted
-          end
+        if(vCount > 0) #and fAppendedVertex == 0
+          pos_edge_processing("verb", vCount, i, nounVertex) #TODO METHOD_EXtracted
+        end
           prevType = NOUN
       #------------------------------------------
 
@@ -134,29 +115,8 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
       #adjectives are vertices but they are not connected by an edge to the nouns, instead they are the noun's properties
       elsif(taggedToken.include?("/JJ"))
         adjective = nil
-        if(prevType == ADJ) #combine the adjectives
-          # puts("PREV ADJ here:: #{plainToken}")
-          if(adjCount >= 1)
-            adjCount = adjCount - 1
-            prevVertex = search_vertices(@vertices, adjectives[adjCount], i) #fetching the previous vertex
-            adjectives[adjCount] = adjectives[adjCount] + " " + plainToken
-            #if the concatenated vertex didn't already exist
-            if((adjective = search_vertices(@vertices, adjectives[adjCount], i)).nil?)
-              prevVertex.name = prevVertex.name+" "+plainToken
-              adjective = prevVertex #set it as "adjective" for further execution
-              if(labels[labelCounter] != "NMOD" or labels[labelCounter] != "PMOD") #resetting labels for the concatenated vertex
-                adjective.label = labels[labelCounter]
-              end
-            end
-          end
-        else #new adjective vertex
-          adjectives[adjCount] = plainToken
-          if((adjective = search_vertices(@vertices, plainToken, i)).nil?) #the string doesn't already exist
-            @vertices[@num_vertices] = Vertex.new(adjectives[adjCount], ADJ, i, state, labels[labelCounter], parents[parentCounter], posTag)
-            adjective = @vertices[@num_vertices]
-            @num_vertices+=1
-          end
-        end
+        prevVertex, adjCount, adjective, adjectives = tagged_token_check(adjCount, adjective, adjectives, i, labelCounter, labels, parentCounter, parents, plainToken, posTag, prevType, prevVertex, state, ADJ) #TODO long if
+
         remove_redundant_vertices(adjectives[adjCount], i)
         adjCount+=1 #incrementing, since a new adjective was created or an existing one updated.
 
@@ -171,26 +131,7 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
         #if the string is a verb or a modal//length condition for verbs is, be, are...
         elsif(taggedToken.include?("/VB") or taggedToken.include?("MD"))
           verbVertex = nil
-          if(prevType == VERB) #combine the verbs
-            vCount = vCount - 1
-            prevVertex = search_vertices(@vertices, verbs[vCount], i) #fetching the previous vertex
-            verbs[vCount] = verbs[vCount] + " " + plainToken
-            #if the concatenated vertex didn't already exist
-            if((verbVertex = search_vertices(@vertices, verbs[vCount], i)) == nil)
-              prevVertex.name = prevVertex.name + " " + plainToken
-              verbVertex = prevVertex #concatenated vertex becomes the new verb vertex
-              if(labels[labelCounter] != "NMOD" or labels[labelCounter] != "PMOD")#resetting labels for the concatenated vertex
-                verbVertex.label = labels[labelCounter]
-              end
-            end
-          else
-            verbs[vCount] = plainToken
-            if((verbVertex = search_vertices(@vertices, plainToken, i)) == nil)
-              @vertices[@num_vertices] = Vertex.new(plainToken, VERB, i, state, labels[labelCounter], parents[parentCounter], posTag)
-              verbVertex = @vertices[@num_vertices] #newly created verb vertex will be considered in the future
-              @num_vertices+=1
-            end
-          end
+          prevVertex, vCount, verbVertex, verbs = tagged_token_check(vCount, verbVertex, verbs, i, labelCounter, labels, parentCounter, parents, plainToken, posTag, prevType, prevVertex, state, VERB)  #TODO long if
           remove_redundant_vertices(verbs[vCount], i)
           vCount+=1
 
@@ -210,28 +151,7 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
         #if the string is an adverb
         elsif(taggedToken.include?("RB"))
           adverb = nil
-          if(prevType == ADV) #appending to existing adverb
-            if(advCount >= 1)
-              advCount = advCount - 1
-            end
-            prevVertex = search_vertices(@vertices, adverbs[advCount], i) #fetching the previous vertex
-            adverbs[advCount] = adverbs[advCount] + " " + plainToken
-            #if the concatenated vertex didn't already exist
-            if((adverb = search_vertices(@vertices, adverbs[advCount], i)) == nil)
-              prevVertex.name = prevVertex.name + " " + plainToken
-              adverb = prevVertex #setting it as "adverb" for further computation
-              if(labels[labelCounter] != "NMOD" or labels[labelCounter] != "PMOD") #resetting labels for the concatenated vertex
-                adverb.label = labels[labelCounter]
-              end
-            end
-          else #else creating a new vertex
-            adverbs[advCount] = plainToken
-            if((adverb = search_vertices(@vertices, plainToken, i)) == nil)
-              @vertices[@num_vertices] = Vertex.new(adverbs[advCount], ADV, i, state, labels[labelCounter], parents[parentCounter], posTag);
-              adverb = @vertices[@num_vertices]
-              @num_vertices+=1
-            end
-          end
+          prevVertex, advCount, adverb, adverbs = tagged_token_check(advCount, adverb, adverbs, i, labelCounter, labels, parentCounter, parents, plainToken, posTag, prevType, prevVertex, state, ADV)  #TODO long if
           remove_redundant_vertices(adverbs[advCount], i)
           advCount+=1
 
@@ -262,6 +182,33 @@ def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIden
   # puts("Number of vertices:: #{@num_vertices}")
   return @num_edges
 end
+
+  def tagged_token_check(count, posVertex, posArray, i, labelCounter, labels, parentCounter, parents, plainToken, posTag, prevType, prevVertex, state, pos)
+    if (prevType == pos) #appending to existing pos
+      if (count >= 1)
+        count = count - 1
+      end
+      prevVertex = search_vertices(@vertices, posArray[count], i) #fetching the previous vertex
+      posArray[count] = posArray[count] + " " + plainToken
+                                                                    #if the concatenated vertex didn't already exist
+      if ((posVertex = search_vertices(@vertices, posArray[count], i)) == nil)
+        prevVertex.name = prevVertex.name + " " + plainToken
+        posVertex = prevVertex #setting it as the appropriate pos for further computation
+        if (labels[labelCounter] != "NMOD" or labels[labelCounter] != "PMOD") #resetting labels for the concatenated vertex
+          posVertex.label = labels[labelCounter]
+        end
+      end
+    else #else creating a new vertex
+      posArray[count] = plainToken
+      if ((posVertex = search_vertices(@vertices, plainToken, i)) == nil)
+        @vertices[@num_vertices] = Vertex.new(posArray[count], pos, i, state, labels[labelCounter], parents[parentCounter], posTag);
+        posVertex = @vertices[@num_vertices]
+        @num_vertices+=1
+      end
+    end
+    return prevVertex, count, posVertex, posArray
+  end
+
 
   def fixing_edges(count1, array1, i, count2, vertex, array2, string)   #TODO Method_2_Created
     if (count2 > 1)
@@ -412,13 +359,13 @@ def matching_edge?(name1, name2, vertex1, vertex2)     #TODO new method for long
   c2 = name2.casecmp(vertex2.name) == 0 or name2.include?(vertex2.name)
   c3 = name1.casecmp(vertex2.name) == 0 or name1.include?(vertex2.name)
   c4 = name2.casecmp(vertex1.name) == 0 or name2.include?(vertex1.name)
-  return (c1 and c2) or (c3 and c4)
+  return ((c1 and c2) or (c3 and c4))
 end
 
 def null_matching_edge?(name1, name2, vertex1, vertex2)   #TODO new method (redundant) for long if
   c1 = name1.downcase == vertex1.name.downcase and name2.downcase == vertex2.name.downcase
   c2 = name1.downcase == vertex2.name.downcase and  name2.downcase == vertex1.name.downcase
-  return c1 or c2
+  return (c1 or c2)
 end
 #------------------------------------------#------------------------------------------#------------------------------------------
 

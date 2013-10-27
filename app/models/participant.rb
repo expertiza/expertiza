@@ -1,4 +1,4 @@
-#vineeta
+#vineeta khurana
 class Participant < ActiveRecord::Base
   belongs_to :user
   belongs_to :topic, :class_name => 'SignUpTopic'

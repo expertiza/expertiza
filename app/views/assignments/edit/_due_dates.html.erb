@@ -181,7 +181,7 @@
             dateFormat: 'yy/mm/dd',
             timeFormat: 'HH:mm z',
             controlType: 'select',
-            timezoneList: [{value:'<%=Time.zone_offset(@user.timezonepref)%>', label: '<%=@user.timezonepref%>'}]
+            timezoneList: [{value:'<%=Time.zone_offset(@user.timezonepref)%>', label: '<%=@user.timezonepref.split("\s")[0]%>'}]
 
             /*timezoneList: [
                 { value: -000, label: 'GMT'},

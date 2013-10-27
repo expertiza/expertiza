@@ -48,4 +48,10 @@ group :test do
   gem 'guard-rspec'
   gem 'launchy'
   gem "rspec-rails"
+
+  # OSS808 Change 27/10/2013
+  # Added to enable attachment of test reporter to test framework
+  gem "test-unit"
+  gem "minitest"
+  gem "minitest-reporters", '>= 0.5.0'
 end

@@ -49,10 +49,14 @@ class Participant < ActiveRecord::Base
       raise "Associations exist for this participant"        
     end
   end
-  
+
+  #OSS808 Change 26/10/2013
+  # Depricated Code has been changed
+
   def force_delete(maps)
-    times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])    
-    
+    #times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])
+    times = ResubmissionTime.find_all_by_participant_id(self.id);
+
     if times
       times.each { |time| time.destroy }
     end
@@ -99,7 +103,9 @@ class Participant < ActiveRecord::Base
     end
     return false
   end
-  
+
+  #OSS808 Change 26/10/2013
+  # email does not work. It should be made to work in the future
   def email(pw, home_page)
     user = User.find_by_id(self.user_id)
     assignment = Assignment.find_by_id(self.assignment_id)

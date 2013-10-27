@@ -269,16 +269,7 @@ class AssignmentsController < ApplicationController
 
     if new_assign.save
       Assignment.record_timestamps = true
-
-      old_assign.assignment_questionnaires.each do |aq|
-        AssignmentQuestionnaire.create(
-            :assignment_id => new_assign.id,
-            :questionnaire_id => aq.questionnaire_id,
-            :user_id => session[:user].id,
-            :notification_limit => aq.notification_limit,
-            :questionnaire_weight => aq.questionnaire_weight
-        )
-      end
+      copy_assignment_questionnaire(old_assign,new_assign)
 
       DueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node()
@@ -373,4 +364,16 @@ class AssignmentsController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
+end
+
+def copy_assignment_questionnaire (old_assign, new_assign)
+  old_assign.assignment_questionnaires.each do |aq|
+    AssignmentQuestionnaire.create(
+        :assignment_id => new_assign.id,
+        :questionnaire_id => aq.questionnaire_id,
+        :user_id => session[:user].id,
+        :notification_limit => aq.notification_limit,
+        :questionnaire_weight => aq.questionnaire_weight
+    )
+  end
 end

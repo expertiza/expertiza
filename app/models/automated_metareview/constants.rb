@@ -161,7 +161,7 @@ public static String[] NEGATIVE_DESCRIPTORS = new String[4879];
 =end
 NEGATIVE_DESCRIPTORS = [
       #negated phrases (topical words I spotted in text)
-      "NOTHING", "nowhere", "scarcely", "scarce", "zero", "drawback",
+    "nonsense", "insufficient", "NOTHING", "nowhere", "scarcely", "scarce", "zero", "drawback",
           "barely", "hardly", "deny", "refuse", "fail", "failed",
           "without", "ambiguous", "ambiguity", "neither", "empty",
         "deviation", "lacks", "lack", "lacking", "lacked", "abrupt", "abruptly", "somewhat", "copied", "copy",
@@ -172,8 +172,7 @@ NEGATIVE_DESCRIPTORS = [
         "confused", "confuses", "trivial", "triviality", "typo", "typos", "somewhat", "concerns", "concern",
         "barring", "overuse", "repitition", "useless", "biased", "rushed", "absent", "wordy", "bad", "less", 
         "unclear", "difficult", "vague", "briefly", "hard", "broken","replicate","replicated", "digress", "clutter",
-        "cluttered", "inadequate", "deviation", "contrived", "contrive", "horrid", "trouble","uneven", "unevenly", "alot",
-        "incorrect", "nonsense", "insufficient"]
+        "cluttered", "inadequate", "deviation", "contrived", "contrive", "horrid", "trouble","uneven", "unevenly", "alot", "incorrect"]
 =begin
   SENTENCE CLAUSE OR PHRASE FOLLOWING THESE WORDS CARRY A NEGATIVE MEANING (EITHER SUBTLE OR OVERT)
 =end

@@ -1,6 +1,5 @@
 module GradesHelper
-
- # Render the accordian title
+ # Render the title
   def get_accordion_title(last_topic, new_topic)
     if last_topic.eql? nil
       #this is the first accordion

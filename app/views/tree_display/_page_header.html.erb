@@ -24,8 +24,41 @@ Sort by:
 </TD>
 <TD width="5%" align="left"><%= submit_tag "Sort" %></TD>
 </TR>
+
+
+      <%= label_tag(:search_string, "") %>
+      <%= text_field_tag(:search_string) %>
+               by
+
+  <select name='searchnode' style="width: 10em">
+    <option value='Q' <% if @searchnode == 'Q'%>selected<% end %>>Questionnare</option>
+    <option value='C' <% if @searchnode == 'C'%>selected<% end %>>Courses</option>
+    <option value='A' <% if @searchnode == 'A'%>selected<% end %>>Assignments</option>
+  </select>
+      <%= submit_tag("Search") %>
+
+
+
+      <%= label_tag(:clear) %>
+      <%= submit_tag("clear") %>
+
+
+
+  <select name='filternode' style="width: 10em">
+    <option value='ACN' <% if @filternode == 'ACN'%>selected<% end %>>Assignment by course name</option>
+    <option value='QAN' <% if @filternode == 'QAN'%>selected<% end %>>Questionnare by assignment name</option>
+  </select>
+      <%= label_tag(:filter_string, "") %>
+      <%= text_field_tag(:filter_string) %>
+  <%= submit_tag("Filter") %>
+
+
+
 </TABLE>
+
 <% if @root %>
 	<%= hidden_field_tag('root', @root_node.id) %>	
 <% end %>	
 <% end %>
+
+

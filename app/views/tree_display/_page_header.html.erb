@@ -2,16 +2,10 @@
 <%= form_tag({:action => 'list'}) do %>
 <TABLE width="80%">
 <TR>
-<TD width="30%" align="left">
-<input type='radio' name='display[check]' id='public_radio' value='1' onclick='submit();' <% if @show == nil %>checked<% end %>>
 
-<label for='public_radio'>Show public and private items</label>
-<br/>
-<input type='radio' name='display[check]' id='private_radio' value='0' onclick='submit();' <% if @show != nil %>checked<% end %>>
-<label for='private_radio'>Show private items only</label>
-</TD>
-<TD width="50%" align="right">
-Sort by: 
+<TD width="50%" align="left">
+  </br>
+Sort by:           &nbsp
 <select name='display[sortvar]' style="width: 10em">
   <option value='name' <% if @sortvar == 'name'%>selected<% end %>>name</option>
   <option value='created_at' <% if @sortvar == 'created_at'%>selected<% end %>>date created</option>
@@ -21,35 +15,52 @@ Sort by:
   <option value='asc' <% if @sortorder == 'asc'%>selected<% end %>>ascending</option>
   <option value='desc' <% if @sortorder == 'desc'%>selected<% end %>>descending</option>
 </select>
+  &nbsp &nbsp &nbsp
+  <%= submit_tag "Sort" %>
 </TD>
-<TD width="5%" align="left"><%= submit_tag "Sort" %></TD>
-</TR>
 
+    </TR>
+  <TR>
+
+  <TD width="30%" align="left">
+    </br></br>
+    <input type='radio' name='display[check]' id='public_radio' value='1' onclick='submit();' <% if @show == nil %>checked<% end %>>
+
+    <label for='public_radio'>Show public and private items</label>
+    <br/>
+    <input type='radio' name='display[check]' id='private_radio' value='0' onclick='submit();' <% if @show != nil %>checked<% end %>>
+    <label for='private_radio'>Show private items only</label>
+  </TD>
+
+</TR>
+          Search: &nbsp
 
       <%= label_tag(:search_string, "") %>
       <%= text_field_tag(:search_string) %>
-               by
+               in
 
   <select name='searchnode' style="width: 10em">
     <option value='Q' <% if @searchnode == 'Q'%>selected<% end %>>Questionnare</option>
     <option value='C' <% if @searchnode == 'C'%>selected<% end %>>Courses</option>
     <option value='A' <% if @searchnode == 'A'%>selected<% end %>>Assignments</option>
   </select>
+  &nbsp  &nbsp
       <%= submit_tag("Search") %>
 
+  &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+      <%= submit_tag("Reset") %>
 
 
-      <%= label_tag(:clear) %>
-      <%= submit_tag("clear") %>
-
-
-
-  <select name='filternode' style="width: 10em">
+           </br></br>
+   Filter:  &nbsp
+  <select name='filternode' style="width: 17em">
     <option value='ACN' <% if @filternode == 'ACN'%>selected<% end %>>Assignment by course name</option>
     <option value='QAN' <% if @filternode == 'QAN'%>selected<% end %>>Questionnare by assignment name</option>
   </select>
+  &nbsp
       <%= label_tag(:filter_string, "") %>
       <%= text_field_tag(:filter_string) %>
+  &nbsp  &nbsp
   <%= submit_tag("Filter") %>
 
 

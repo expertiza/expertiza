@@ -1,0 +1,12 @@
+Feature: Create Users via GUI
+  In order to allow students to use expertiza
+  As an administive user
+  I want to create new users
+
+Scenario:  Log into Expertiza, create users
+  Given a browser is open to Expertiza with logging create_users-log.txt
+  And I am logged into Expertiza as an Admin
+  When I go to manage users
+  And I want to create CREATE_USERS_NUMBER users with the name CREATE_USERS_USERNAME
+  Then make sure the CREATE_USERS_NUMBER users with the name CREATE_USERS_USERNAME were created
+  And I close the browser

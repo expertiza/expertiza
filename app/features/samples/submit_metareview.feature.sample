@@ -1,0 +1,17 @@
+Feature: Submit Metareview as a Student
+  In order to submit a metareview
+  As a student and participant of an assignment
+  I want to fill out the metareview online and submit it
+
+Scenario:  Submit Metareview for an assignment
+  Given a browser is open to Expertiza with logging submit_metareview-log.txt
+  And I am logged into Expertiza as SUBMIT_METAREVIEW_LOGIN with password SUBMIT_METAREVIEW_PASSWORD
+  And I open assignment SUBMIT_METAREVIEW_ASSIGNMENT
+  Then I click the "Others' work" link
+  Then I click to begin the metareview
+  And I fill in the metareview
+  And I click the "Save Metareview" button
+  Then I click the "Continue" link
+  Then I click the "View" link
+  And I verify that the metareview was saved
+  And I close the browser

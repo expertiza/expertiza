@@ -1,0 +1,22 @@
+<h1>List of Assignments</h1>
+<br/>
+<br/>
+<table class="listing" cellpadding=2>
+  <tr>
+  <th>&nbsp;</th>
+  <th>Assignment</th>
+  <th>Average Score</th>
+  <th>Google Chart</th>
+   </tr>
+
+  <% @assignments.each do |assignment, average| %>
+    <% if assignment.name != nil %>
+      <tr class="listingRow">
+      <td>&nbsp;</td>
+      <td><%= link_to assignment.name, :controller => 'Assessment360Controller',  :action => 'one_assignment_one_student'%></td>
+    <td><%= average.first.attributes["avg(this_.score)"]  %></td>
+
+      </tr>
+    <% end %>
+  <% end %>
+</table>

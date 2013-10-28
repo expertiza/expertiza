@@ -1,0 +1,291 @@
+GIT
+  remote: https://github.com/expertiza/authlogic.git
+  revision: 09163c7d2a9b21942c6716e885a14305e1aa0390
+  specs:
+    expertiza-authlogic (3.2.0)
+      activerecord (>= 3.0.0)
+      activesupport (>= 3.0.0)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    RedCloth (4.2.9)
+    RedCloth (4.2.9-x86-mingw32)
+    abstract (1.0.0)
+    actionmailer (3.0.20)
+      actionpack (= 3.0.20)
+      mail (~> 2.2.19)
+    actionpack (3.0.20)
+      activemodel (= 3.0.20)
+      activesupport (= 3.0.20)
+      builder (~> 2.1.2)
+      erubis (~> 2.6.6)
+      i18n (~> 0.5.0)
+      rack (~> 1.2.5)
+      rack-mount (~> 0.6.14)
+      rack-test (~> 0.5.7)
+      tzinfo (~> 0.3.23)
+    activemodel (3.0.20)
+      activesupport (= 3.0.20)
+      builder (~> 2.1.2)
+      i18n (~> 0.5.0)
+    activerecord (3.0.20)
+      activemodel (= 3.0.20)
+      activesupport (= 3.0.20)
+      arel (~> 2.0.10)
+      tzinfo (~> 0.3.23)
+    activeresource (3.0.20)
+      activemodel (= 3.0.20)
+      activesupport (= 3.0.20)
+    activesupport (3.0.20)
+    addressable (2.3.5)
+    arel (2.0.10)
+    bind-it (0.2.7)
+      rjb (~> 1.4.3)
+    builder (2.1.2)
+    capistrano (2.15.5)
+      highline
+      net-scp (>= 1.0.0)
+      net-sftp (>= 2.0.0)
+      net-ssh (>= 2.0.14)
+      net-ssh-gateway (>= 1.1.0)
+    capybara (2.1.0)
+      mime-types (>= 1.16)
+      nokogiri (>= 1.3.3)
+      rack (>= 1.0.0)
+      rack-test (>= 0.5.4)
+      xpath (~> 2.0)
+    childprocess (0.3.9)
+      ffi (~> 1.0, >= 1.0.11)
+    coderay (1.0.9)
+    columnize (0.3.6)
+    cucumber (1.3.5)
+      builder (>= 2.1.2)
+      diff-lcs (>= 1.1.3)
+      gherkin (~> 2.12.0)
+      multi_json (~> 1.7.5)
+      multi_test (>= 0.0.2)
+    cucumber-rails (1.3.1)
+      capybara (>= 1.1.2)
+      cucumber (>= 1.2.0)
+      nokogiri (>= 1.5.0)
+      rails (~> 3.0)
+    daemons (1.1.9)
+    database_cleaner (1.0.1)
+    debugger (1.6.1)
+      columnize (>= 0.3.1)
+      debugger-linecache (~> 1.2.0)
+      debugger-ruby_core_source (~> 1.2.3)
+    debugger-linecache (1.2.0)
+    debugger-ruby_core_source (1.2.3)
+    delayed_job (4.0.0)
+      activesupport (>= 3.0, < 4.1)
+    delayed_job_active_record (4.0.0)
+      activerecord (>= 3.0, < 4.1)
+      delayed_job (>= 3.0, < 4.1)
+    diff-lcs (1.2.4)
+    edavis10-ruby-web-search (0.0.2)
+      json
+    engtagger (0.1.2)
+    erubis (2.6.6)
+      abstract (>= 1.0.0)
+    fastercsv (1.5.5)
+    ffi (1.9.0)
+    ffi (1.9.0-x86-mingw32)
+    ffi-aspell (0.0.3)
+      ffi (>= 1.0.11)
+    formatador (0.2.4)
+    gchart (1.0.0)
+    gchartrb (0.8)
+    gdata (1.1.2)
+    gherkin (2.12.0)
+      multi_json (~> 1.3)
+    gherkin (2.12.0-x86-mingw32)
+      multi_json (~> 1.3)
+    guard (1.8.1)
+      formatador (>= 0.2.4)
+      listen (>= 1.0.0)
+      lumberjack (>= 1.0.2)
+      pry (>= 0.9.10)
+      thor (>= 0.14.6)
+    guard-rails (0.4.7)
+      guard (>= 0.2.2)
+    guard-rspec (3.0.2)
+      guard (>= 1.8)
+      rspec (~> 2.13)
+    highline (1.6.19)
+    hike (1.2.3)
+    hoptoad_notifier (2.4.11)
+      activesupport
+      builder
+    i18n (0.5.0)
+    jquery-rails (3.0.4)
+      railties (>= 3.0, < 5.0)
+      thor (>= 0.14, < 2.0)
+    json (1.8.0)
+    launchy (2.3.0)
+      addressable (~> 2.3)
+    listen (1.2.2)
+      rb-fsevent (>= 0.9.3)
+      rb-inotify (>= 0.9)
+      rb-kqueue (>= 0.2)
+    lumberjack (1.0.4)
+    mail (2.2.20)
+      activesupport (>= 2.3.6)
+      i18n (>= 0.4.0)
+      mime-types (~> 1.16)
+      treetop (~> 1.4.8)
+    method_source (0.8.1)
+    mime-types (1.23)
+    mini_portile (0.5.1)
+    multi_json (1.7.7)
+    multi_test (0.0.2)
+    mysql (2.9.1)
+    mysql (2.9.1-x86-mingw32)
+    net-scp (1.1.2)
+      net-ssh (>= 2.6.5)
+    net-sftp (2.1.2)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.6.8)
+    net-ssh-gateway (1.2.0)
+      net-ssh (>= 2.6.5)
+    nokogiri (1.6.0)
+      mini_portile (~> 0.5.0)
+    nokogiri (1.6.0-x86-mingw32)
+      mini_portile (~> 0.5.0)
+    open-uri-cached (0.0.5)
+    polyglot (0.3.3)
+    pry (0.9.12.2)
+      coderay (~> 1.0.5)
+      method_source (~> 0.8)
+      slop (~> 3.4)
+    pry (0.9.12.2-x86-mingw32)
+      coderay (~> 1.0.5)
+      method_source (~> 0.8)
+      slop (~> 3.4)
+      win32console (~> 1.3)
+    rack (1.2.8)
+    rack-mount (0.6.14)
+      rack (>= 1.0.0)
+    rack-test (0.5.7)
+      rack (>= 1.0)
+    rails (3.0.20)
+      actionmailer (= 3.0.20)
+      actionpack (= 3.0.20)
+      activerecord (= 3.0.20)
+      activeresource (= 3.0.20)
+      activesupport (= 3.0.20)
+      bundler (~> 1.0)
+      railties (= 3.0.20)
+    railties (3.0.20)
+      actionpack (= 3.0.20)
+      activesupport (= 3.0.20)
+      rake (>= 0.8.7)
+      rdoc (~> 3.4)
+      thor (~> 0.14.4)
+    rake (10.1.0)
+    rb-fsevent (0.9.3)
+    rb-inotify (0.9.0)
+      ffi (>= 0.5.0)
+    rb-kqueue (0.2.0)
+      ffi (>= 0.5.0)
+    rdoc (3.12.2)
+      json (~> 1.4)
+    rgl (0.4.0)
+      rake
+      stream (>= 0.5)
+    rjb (1.4.8)
+    rspec (2.14.1)
+      rspec-core (~> 2.14.0)
+      rspec-expectations (~> 2.14.0)
+      rspec-mocks (~> 2.14.0)
+    rspec-core (2.14.4)
+    rspec-expectations (2.14.0)
+      diff-lcs (>= 1.1.3, < 2.0)
+    rspec-mocks (2.14.1)
+    rspec-rails (2.14.0)
+      actionpack (>= 3.0)
+      activesupport (>= 3.0)
+      railties (>= 3.0)
+      rspec-core (~> 2.14.0)
+      rspec-expectations (~> 2.14.0)
+      rspec-mocks (~> 2.14.0)
+    rubyzip (0.9.9)
+    rwordnet (0.1.3)
+    seer (0.10.0)
+    selenium-webdriver (2.35.1)
+      childprocess (>= 0.2.5)
+      multi_json (~> 1.0)
+      rubyzip (< 1.0.0)
+      websocket (~> 1.0.4)
+    slop (3.4.5)
+    sprockets (2.10.0)
+      hike (~> 1.2)
+      multi_json (~> 1.0)
+      rack (~> 1.0)
+      tilt (~> 1.1, != 1.3.0)
+    sqlite3 (1.3.7)
+    sqlite3 (1.3.7-x86-mingw32)
+    sqlite3-ruby (1.3.3)
+      sqlite3 (>= 1.3.3)
+    stanford-core-nlp (0.5.1)
+      bind-it (~> 0.2.5)
+    stream (0.5)
+    superfish-rails (1.6.0.1)
+    thor (0.14.6)
+    tilt (1.4.1)
+    treetop (1.4.14)
+      polyglot
+      polyglot (>= 0.3.1)
+    tzinfo (0.3.37)
+    websocket (1.0.7)
+    will_paginate (3.0.4)
+    win32console (1.3.2-x86-mingw32)
+    xpath (2.0.0)
+      nokogiri (~> 1.3)
+
+PLATFORMS
+  ruby
+  x86-mingw32
+
+DEPENDENCIES
+  RedCloth
+  bind-it
+  capistrano
+  capybara
+  cucumber-rails
+  daemons
+  database_cleaner
+  debugger
+  delayed_job_active_record
+  edavis10-ruby-web-search
+  engtagger
+  expertiza-authlogic!
+  fastercsv
+  ffi-aspell
+  gchart
+  gchartrb
+  gdata
+  gherkin
+  guard-rails
+  guard-rspec
+  hoptoad_notifier
+  jquery-rails
+  launchy
+  mysql
+  nokogiri
+  open-uri-cached
+  rails (~> 3.0.0)
+  rake
+  rgl
+  rjb
+  rspec-rails
+  rubyzip
+  rwordnet
+  seer
+  selenium-webdriver
+  sprockets
+  sqlite3-ruby
+  stanford-core-nlp
+  superfish-rails
+  will_paginate

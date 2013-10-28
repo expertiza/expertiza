@@ -1,0 +1,20 @@
+<%= error_messages_for 'course' %>
+
+<!--[form:course]-->
+<table>
+	<tr>
+		<td valign="top"><label for="course_title">Title</label></td>
+		<td><%= text_field 'course', 'title'  %></td>
+	</tr>
+
+	<tr>
+		<td valign="top"><label for="course_directory_path">Directory path</label></td>
+		<td><%= text_field 'course', 'directory_path'  %></td>
+	</tr>
+	<tr>
+		<td valign="top"><label for="course_info">Info</label></td>
+		<td><%= text_field 'course', 'info'  %></td>
+	</tr>
+</table>
+<!--[eoform:course]-->
+

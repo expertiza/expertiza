@@ -1,0 +1,21 @@
+<h1> Pending Course Evaluations </h1>
+
+<table class=listing cellpadding=2 width=50%>
+<% if (@surveys.size > 0) %>
+<tr><th align = left> Course </th>
+<th align=left> Due Date </th></tr>
+<% i=0 %>
+<% @surveys.each do |s| %>
+<tr><td align = left><%= link_to Course.find_by_id(s[3]).title ,:controller=>'survey_response',:action=>'create' ,:id=> s[1],:questionnaire_id=>s[0].id, :course_eval=>'1', :course_id=> s[3] %>&nbsp &nbsp</td>
+<td align = left><%= s[2].strftime('%A %B %d %Y, %I:%M%p') %></td></tr>
+<% end %>
+<% else %>
+<tr>
+<td>
+<div class="flash_note">
+There exist no pending course evaluations.
+</div>
+</td> </tr>
+<%end%>
+
+</table>

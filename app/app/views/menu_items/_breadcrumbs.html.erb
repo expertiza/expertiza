@@ -1,0 +1,6 @@
+<div class="breadcrumbs">
+  <% crumbs.each_with_index do |crumb, i| %>
+    <%= link_to crumb.label, "/menu/#{crumb.name}" %>
+    <%= ">" if i < (crumbs.length - 1) %>
+  <% end %>
+</div>

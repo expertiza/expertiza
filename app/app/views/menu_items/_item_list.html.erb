@@ -1,0 +1,52 @@
+<% counter = 0
+for item_id in items do 
+  item = @menu.get_item(item_id) -%>
+<tr class="depth<%= depth %>">
+<td> <div class="menu_title"><%= link_to item.label, :action =>  'edit', 
+     :id => item.id%><br/>[<%= item.name %>]</div></td>
+
+<td><% if item.controller_action_id %>
+      <%= image_tag("/images/action.png") %> <%= link_to "#{item.site_controller.name}:#{item.controller_action.name}", 
+	     :controller => 'controller_actions', :action => 'edit',
+	     :id => item.controller_action_id %>
+
+    <% else %>
+      <%= image_tag("/images/page.png") %> <%= link_to item.content_page.name, 
+        :controller => 'content_pages', :action => 'show', :id =>
+      item.content_page_id %>
+
+    <% end %></td>	
+
+<td><% if counter > 0 -%>
+<%= link_to image_tag("/images/up.png"), 
+    {:action => 'move_up', :id => item.id},
+    :method => :post %>
+<% end %></td>
+
+<td><% if counter < (items.length - 1) -%>
+<%= link_to image_tag("/images/down.png"), 
+    {:action => 'move_down', :id => item.id},
+    :method => :post %>
+<% end %></td>
+
+<td>
+<% if not item.children or item.children.length == 0 -%>
+<%= link_to image_tag("/images/delete.png"), 
+    {:action => 'destroy', :id => item.id},
+    :confirm => 'Delete this menu item?', :method => :post %>
+<% end -%>
+</td>
+
+<td><%= if depth < (@settings.menu_depth - 1)
+	  link_to image_tag("/images/add.png"), 
+	  {:action => 'new_for', :id => item.id} 
+	end %></td>
+</tr>
+
+<% if item.children and item.children.length > 0 -%>
+<%= render :partial => 'item_list', :locals => {:items =>
+item.children, :depth => depth + 1} %>
+<% end -%>
+<% counter += 1
+end -%>
+

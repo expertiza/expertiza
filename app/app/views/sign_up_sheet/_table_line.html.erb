@@ -1,0 +1,25 @@
+<td><%= topic.topic_identifier %></td>
+<td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
+
+<% if @assignment.is_microtask? %>
+    <td align="center"><%= topic.micropayment %></td>
+<% end %>
+
+<td align="center"><%= topic.max_choosers %></td>
+<%= render :partial => 'available_slots', :locals => {:topic=>topic} %>
+
+<%= render :partial => 'num_waiting', :locals => {:topic=>topic} %>
+
+<% if @assignment.has_partner_ads?(params[:id]) %>
+ <td align="center">
+   <% signed_up_team =SignedUpUser.find_by_topic_id(topic.id)%>
+   <% if signed_up_team!=nil %>
+     <% team_id=signed_up_team.creator_id %>
+      <% if Team.find(team_id).advertise_for_partner?   %>
+        <% link_to :controller => 'sign_up_sheet', :action => 'team_details', :assignment_id=>params[:id], :id=>topic.id do %>
+          <i class="icon-bullhorn icon-large" style='text-decoration: none; color: black;'></i>
+        <% end %>
+     <% end %>
+   <% end %>
+ </td>
+<% end %>

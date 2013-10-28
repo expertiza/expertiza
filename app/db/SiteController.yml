@@ -1,0 +1,67 @@
+--- 
+- !ruby/object:SiteController 
+  attributes: 
+    name: content_pages
+    permission_id: "1"
+    id: "1"
+    builtin: "1"
+- !ruby/object:SiteController 
+  attributes: 
+    name: controller_actions
+    permission_id: "1"
+    id: "2"
+    builtin: "1"
+- !ruby/object:SiteController 
+  attributes: 
+    name: auth
+    permission_id: "1"
+    id: "3"
+    builtin: "1"
+- !ruby/object:SiteController 
+  attributes: 
+    name: markup_styles
+    permission_id: "1"
+    id: "4"
+    builtin: "1"
+- !ruby/object:SiteController 
+  attributes: 
+    name: menu_items
+    permission_id: "1"
+    id: "5"
+    builtin: "1"
+- !ruby/object:SiteController 
+  attributes: 
+    name: permissions
+    permission_id: "1"
+    id: "6"
+    builtin: "1"
+- !ruby/object:SiteController 
+  attributes: 
+    name: roles
+    permission_id: "1"
+    id: "7"
+    builtin: "1"
+- !ruby/object:SiteController 
+  attributes: 
+    name: site_controllers
+    permission_id: "1"
+    id: "8"
+    builtin: "1"
+- !ruby/object:SiteController 
+  attributes: 
+    name: system_settings
+    permission_id: "1"
+    id: "9"
+    builtin: "1"
+- !ruby/object:SiteController 
+  attributes: 
+    name: users
+    permission_id: "1"
+    id: "10"
+    builtin: "1"
+- !ruby/object:SiteController 
+  attributes: 
+    name: roles_permissions
+    permission_id: "1"
+    id: "11"
+    builtin: "1"

@@ -1,0 +1,32 @@
+<table>
+  <tr id='assignment_review_assignment_strategy_row'>
+    <td>
+      <%= label_tag('assignment[review_assignment_strategy]', 'Review Strategy:') %>
+      <%= select('assignment', 'review_assignment_strategy', review_strategy_options, {:include_blank => '----', :selected => @assignment.review_assignment_strategy}) %>
+      <script>
+          jQuery(document).ready(function() {reviewStrategyChanged();});
+          jQuery('#assignment_review_assignment_strategy').on('change', function() {reviewStrategyChanged();});
+      </script>
+
+      <img src="/images/info.png" title="- Instructor-Selected: Instructor decides who reviews whom
+- Student-Selected: Students choose from a list of assignments or topics to review.
+- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.">
+    </td>
+  </tr>
+
+  <tr id="assignment_review_topic_threshold_row">
+    <td>
+      <%= label_tag('assignment[review_topic_threshold]', 'Review topic threshold(k):') %>
+      <%= text_field_tag('assignment[review_topic_threshold]', @assignment.review_topic_threshold) %>
+      <img src="/images/info.png" title="A topic is reviewable if the minimum number of reviews already done for the submissions
+on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic.">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <%= label_tag('assignment[max_reviews_per_submission]', 'Maximum number of review per submission:') %>
+      <%= text_field_tag('assignment[max_reviews_per_submission]', @assignment.max_reviews_per_submission, {:style => 'width:75px'}) %>
+    </td>
+  </tr>
+</table>

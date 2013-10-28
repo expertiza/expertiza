@@ -1,0 +1,7 @@
+<%= render :partial => 'submitted_content/title' %> 
+
+<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
+
+<a href="javascript:window.history.back()">Back</a>
+
+

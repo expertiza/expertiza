@@ -1,0 +1,26 @@
+<%= error_messages_for 'topic' %>
+
+<p></p>
+
+<table>
+  <tr>
+    <td><label for="topic_identifier">Topic id</label></td>
+    <td><label for="topic_name">&nbsp;&nbsp;Topic name</label></td>
+    <td><label for="category">Topic category</label><br/></td>
+  </tr>
+  <tr>
+    <td><%= text_field 'topic', 'topic_identifier', :size => 2 %></td>
+    <td><%= text_field 'topic', 'topic_name' %></td>
+    <td><%= text_field 'topic', 'category', :size => 10 %></td>
+  </tr>
+</table>
+
+<p><label for="max_choosers">Number of slots</label><br/>
+  <%= text_field 'topic', 'max_choosers', :size => 1 %></p>
+
+<% if @topic.assignment.is_microtask? %>  
+  <p><label for="micropayment">Micropayment</label><br/>
+    <%= text_field 'topic', 'micropayment' %></p>
+<% end %>
+
+<br/>

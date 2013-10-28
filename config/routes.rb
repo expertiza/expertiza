@@ -96,7 +96,8 @@ Expertiza::Application.routes.draw do |map|
       get :start
       # OSS808 Change 27/10/2013
       # Added missing routes
-      get :export
+      #get :export
+      post :export
     end
   end
 

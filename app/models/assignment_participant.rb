@@ -92,15 +92,21 @@ class AssignmentParticipant < Participant
   end
 
   # all the participants in this assignment reviewed by this person
-  def get_reviewees
+  #OSS808 Change 27/10/2013
+  # Renamed to reviewees from get_reviewees
+  # Commented Deprecated code and re wrote the code
+
+  def reviewees
     reviewees = []
     if self.assignment.team_assignment?
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'TeamReviewResponseMap'"])
+      #rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'TeamReviewResponseMap'"])
+      rmaps = ResponseMap.find_all_by_reviewer_id_and_type(self.id,'TeamReviewResponseMap')
       rmaps.each do |rm|
         reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants)
       end
     else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      #rmaps = ResponseMap.find(:all, :conditions => ['reviewer_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      rmaps = ResponseMap.find_all_by_reviewer_id_and_type(self.id,'ParticipantReviewResponseMap')
       rmaps.each do |rm|
         reviewees.push(AssignmentParticipant.find(rm.reviewee_id))
       end
@@ -109,36 +115,56 @@ class AssignmentParticipant < Participant
   end
   
   # all the participants in this assignment who have reviewed this person
+  #OSS808 Change 27/10/2013
+  # Renamed to reviewers from get_reviewers
+  # Commented Deprecated code and re wrote the code
+
   def get_reviewers
     reviewers = []
     if self.assignment.team_assignment? && self.team
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
+      #rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
+      rmaps = ResponseMap.find_all_by_reviewee_id_and_type(self.team.id,'TeamReviewResponseMap')
     else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])      
+      #rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      rmaps = ResponseMap.find_all_by_reviewee_id_and_type(self.id,'ParticipantReviewResponseMap')
     end
     rmaps.each do |rm|
-      reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
+      #reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
+       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
     end
     return reviewers  
-  end  
+  end
 
+  #OSS808 Change 27/10/2013
+  # Renamed to review_score from get_review_score
 
-  def get_review_score
+  def review_score
     review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
     assessment = review_questionnaire.get_assessments_for(self)
     return (Score.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f    
   end
-    
-  def fullname
-    self.user.fullname
-  end
-  
+
+  #OSS808 Change 27/10/2013
+  #Method redundant, already in participant.rb
+
+  #def fullname
+   # self.user.fullname
+  #end
+
+  #OSS808 Change 27/10/2013
+  # Method redundant, already in participant.rb
+
+=begin
   def name
     self.user.name
   end
+=end
 
   # Return scores that this participant has been given
-  def get_scores(questions)
+  #OSS808 Change 27/10/2013
+  #Renamed to scores from get_scores
+
+  def scores(questions)
     scores = Hash.new
     scores[:participant] = self # This doesn't appear to be used anywhere
     self.assignment.questionnaires.each do |questionnaire|
@@ -212,31 +238,39 @@ class AssignmentParticipant < Participant
     if part.nil?
        CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id)       
     end
-  end  
-  
-  def get_course_string
-    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...    
-    begin
-      course = Course.find(self.assignment.course.id)
-      if course.name.strip.length == 0
-        raise
-      end
-      return course.name 
-    rescue      
-      return "<center>&#8212;</center>" 
-    end
   end
+
+  #OSS808 Change 27/10/2013
+  #renamed from get_feedback
   
-  def get_feedback
+  def feedback
     return FeedbackResponseMap.get_assessments_for(self)      
   end
-  
-  def get_reviews
+
+  #OSS808 Change 27/10/2013
+  # Renamed from get_reviews to reviews
+
+  def reviews
     #ACS Always get assessments for a team
     #removed check to see if it is a team assignment
     return TeamReviewResponseMap.get_assessments_for(self.team)
   end
-  
+
+  #OSS808 Change 27/10/2013
+  # Renamed to reviews_by_reviewer from get_reviews_by_reviewer
+
+  def reviews_by_reviewer(reviewer)
+    if self.assignment.team_assignment?
+      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
+    else
+      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
+    end
+  end
+
+  #OSS808 Change 27/10/2013
+  # Commented the Duplicated Code, already present in assignment_participant.rb
+
+=begin
   def get_reviews_by_reviewer(reviewer)
     if self.assignment.team_assignment?
       return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
@@ -244,16 +278,12 @@ class AssignmentParticipant < Participant
       return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
     end
   end
-  
-  def get_reviews_by_reviewer(reviewer)
-    if self.assignment.team_assignment?
-      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
-    else
-      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
-    end
-  end
-      
-  def get_metareviews
+=end
+
+  #OSS808 Change 27/10/2013
+  # Renamed to metareviews from get_metareviews
+
+  def metareviews
     MetareviewResponseMap.get_assessments_for(self)  
   end
 
@@ -268,17 +298,20 @@ class AssignmentParticipant < Participant
   def submitted_files
     files = Array.new
     if(self.directory_num)      
-      files = get_files(self.get_path)
+      files = files_in_directory(self.dir_path)
     end
     return files
-  end  
+  end
+
+  #OSS808 Change 27/10/2013
+  #Method renamed to files_in_directory from get_files
   
-  def get_files(directory)      
+  def files_in_directory(directory)
       files_list = Dir[directory + "/*"]
       files = Array.new
       for file in files_list            
         if File.directory?(file) then          
-          dir_files = get_files(file)          
+          dir_files = files_in_directory(file)
           dir_files.each{|f| files << f}
         end
         files << file               
@@ -309,12 +342,17 @@ class AssignmentParticipant < Participant
     else
        return Array.new
     end
-  end    
-  
+  end
+
+  #OSS808 Change 27/10/2013
+  #Redundant Method - already in participant.rb  and assignment_participant.rb
+
+=begin
   def name
     self.user.name
   end
-    
+=end
+
   def team
     AssignmentTeam.get_team(self)
   end
@@ -406,10 +444,13 @@ class AssignmentParticipant < Participant
       end
     end  
     self.save!
-  end  
-  
-  def get_path
-     path = self.assignment.get_path + "/"+ self.directory_num.to_s     
+  end
+
+  #OSS808 Change 27/10/2013
+  #Renamed to dir_path from get_path
+
+  def dir_path
+     path = self.assignment.dir_path + "/"+ self.directory_num.to_s
      return path
   end
   
@@ -438,8 +479,41 @@ class AssignmentParticipant < Participant
         }
     end
   end
+  #OSS808 Change 27/10/2013
+  #moved from participant.rb
 
-private
+  def get_current_stage
+    assignment.try :get_current_stage, topic_id
+  end
+  alias_method :current_stage, :get_current_stage
+
+  #OSS808 Change 27/10/2013
+  #moved from participant.rb
+
+  def get_stage_deadline
+    assignment.get_stage_deadline topic_id
+  end
+  alias_method :stage_deadline, :get_stage_deadline
+
+
+  #OSS808 Change 27/10/2013
+  #moved from participant.rb
+  def review_response_maps
+    ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
+  end
+
+  #OSS808 Change 28/10/2013
+  #created a new method get_cycle
+
+  def get_cycle
+    a[]=Cycle.two_node_cycles
+    a<<Cycle.three_node_cycles
+    a<<a.Cycle.four_node_cycles
+    deviation_score= Cycle.get_cycle_similarity_score(a)
+    similarity_score=Cycle.get_cycle_deviation_score(a)
+    end
+
+    private
 
   # Use submmit_hyperlink(), remove_hyperlink() instead
   def submitted_hyperlinks=(val)
@@ -450,14 +524,13 @@ end   #class ends
 
 
 #OSS808 Change 27/10/2013
-#Method commented as it is defined outside the class and also present in superclass
+#Method commented as it is defined outside the class and also present in superclass, hence redundant
 =begin
-
 def get_topic_string
     if topic.nil? or topic.topic_name.empty?
       return "<center>&#8212;</center>"
     end
     return topic.topic_name
   end
-
 =end
+

@@ -121,13 +121,13 @@ class AssignmentParticipantTest < ActiveSupport::TestCase
       # try changing the time stamp and verify the digital signature is no longer valid
       saved_time_stamp = participant.time_stamp
       participant.time_stamp = (Time.now + 1).utc.strftime("%Y-%m-%d %H:%M:%S")
-      assert !participant.verify_digital_signature(participant.digital_signature)
+      assert !participant.verify_digital_signature(private_key)
       
       # try changing the assignment name and verify the digital signature is no longer valid
       participant.time_stamp = saved_time_stamp
       saved_assignment_name = participant.assignment.name
       participant.assignment.name = "XXXX"
-      assert !participant.verify_digital_signature(participant.digital_signature)
+      assert !participant.verify_digital_signature(private_key)
       participant.assignment.name = saved_assignment_name
     end
   end
@@ -198,4 +198,5 @@ class AssignmentParticipantTest < ActiveSupport::TestCase
 
     assert participant.valid?
   end
+
 end

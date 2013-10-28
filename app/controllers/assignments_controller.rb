@@ -365,7 +365,7 @@ class AssignmentsController < ApplicationController
 
   def remove_assignment_from_course
     assignment = Assignment.find(params[:id])
-    oldpath = assignment.get_path rescue nil
+    oldpath = assignment.dir_path rescue nil
     assignment.course_id = nil
     assignment.save
     newpath = assignment.get_path rescue nil

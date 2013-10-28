@@ -1,4 +1,3 @@
-#vineeta khurana
 class Participant < ActiveRecord::Base
   belongs_to :user
   belongs_to :topic, :class_name => 'SignUpTopic'
@@ -12,20 +11,6 @@ class Participant < ActiveRecord::Base
 
   validates_numericality_of :grade, :allow_nil => true
 
-  def review_response_maps
-    ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
-  end
-
-  def get_current_stage
-    assignment.try :get_current_stage, topic_id
-  end
-  alias_method :current_stage, :get_current_stage
-
-  def get_stage_deadline
-    assignment.get_stage_deadline topic_id
-  end
-  alias_method :stage_deadline, :get_stage_deadline
-
   def name
     User.find(self.user_id).name
   end
@@ -34,13 +19,13 @@ class Participant < ActiveRecord::Base
     User.find(self.user_id).fullname
   end
 
-  #OSS808 Change 26/10/2013
-  # Trying to modify the deprecated code
-  # TODO How do we test this code?
-  def delete(force = nil)     
-    #maps = ResponseMap.find(:all, :conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
-    maps = ResponseMap.find_all_by_reviewee_id_or_reviewer_id(self.id,self.id)
 
+  def delete(force = nil)
+    #OSS808 Change 26/10/2013
+    # Modified deprecated code
+    # TODO How do we test this code?  #need a controller test_oss808
+    #maps = ResponseMap.find(:all, :conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
+    ResponseMap.find_all_by_reviewee_id(self.id)  ? maps=ResponseMap.find_all_by_reviewee_id(self.id)  : maps=ResponseMap.find_all_by_reviewer_id(self.id)
 
     if force or ((maps.nil? or maps.length == 0) and 
                  self.team.nil?)
@@ -50,10 +35,10 @@ class Participant < ActiveRecord::Base
     end
   end
 
-  #OSS808 Change 26/10/2013
-  # Depricated Code has been changed
 
   def force_delete(maps)
+    #OSS808 Change 26/10/2013
+    # Deprecated Code has been changed
     #times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])
     times = ResubmissionTime.find_all_by_participant_id(self.id);
 
@@ -89,7 +74,9 @@ class Participant < ActiveRecord::Base
   end
 
   #OSS808 Change 26/10/2013
-  #Method commented as it is not used anywhere in the project
+  #Method commented as it is not used anywhere in the project and also it just
+  # returns the value of the variable which can be done by attr_accessor
+
 =begin
   def able_to_submit
    if submit_allowed
@@ -113,17 +100,17 @@ class Participant < ActiveRecord::Base
     assignment = Assignment.find_by_id(self.assignment_id)
 
     Mailer.deliver_message(
-            {:recipients => user.email,
-             :subject => "You have been registered as a participant in Assignment #{assignment.name}",
-             :body => {  
-              :home_page => home_page,  
-              :first_name => ApplicationHelper::get_user_first_name(user),
-              :name =>user.name,
-              :password =>pw,
-              :partial_name => "register"
-             }
-            }
-    )   
+        {:recipients => user.email,
+         :subject => "You have been registered as a participant in Assignment #{assignment.name}",
+         :body => {
+             :home_page => home_page,
+             :first_name => ApplicationHelper::get_user_first_name(user),
+             :name =>user.name,
+             :password =>pw,
+             :partial_name => "register"
+         }
+        }
+    )
   end
 
   #This function updates the topic_id for a participant in assignments where a signup sheet exists
@@ -151,7 +138,6 @@ class Participant < ActiveRecord::Base
 
 
 
-
   # Return scores that this participant for the given questions
   def get_scores(questions)
     scores = Hash.new
@@ -166,5 +152,20 @@ class Participant < ActiveRecord::Base
     return scores
   end
 
+  #OSS808 Change 27/10/2013
+  #moved from assignment_participant.rb
+
+  def get_course_string
+    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
+    begin
+      course = Course.find(self.assignment.course.id)
+      if course.name.strip.length == 0
+        raise
+      end
+      return course.name
+    rescue
+      return "<center>&#8212;</center>"
+    end
+  end
 
 end

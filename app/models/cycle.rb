@@ -1,3 +1,5 @@
+#OSS808 Change 27/10/2013
+#new class created to handle code related to cycles between reviews previously being handled by AssignmentParticipant
 class Cycle
   # To change this template use File | Settings | File Templates.
 
@@ -12,8 +14,8 @@ class Cycle
     cycles = []
     self.get_reviewers.each do |ap|
       if ap.get_reviewers.include?(self)
-        self.get_reviews_by_reviewer(ap).nil? ? next : s01 = self.get_reviews_by_reviewer(ap).get_total_score
-        ap.get_reviews_by_reviewer(self).nil? ? next : s10 = ap.get_reviews_by_reviewer(self).get_total_score
+        self.reviews_by_reviewer(ap).nil? ? next : s01 = self.reviews_by_reviewer(ap).get_total_score
+        ap.reviews_by_reviewer(self).nil? ? next : s10 = ap.get_reviews_by_reviewer(self).get_total_score
         cycles.push([[self, s01], [ap, s10]])
       end
     end
@@ -27,9 +29,9 @@ class Cycle
     self.get_reviewers.each do |ap1|
       ap1.get_reviewers.each do |ap2|
         if ap2.get_reviewers.include?(self)
-          self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score
-          ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
-          ap2.get_reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score
+          self.reviews_by_reviewer(ap1).nil? ? next : s01 = self.reviews_by_reviewer(ap1).get_total_score
+          ap1.reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
+          ap2.reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score
           cycles.push([[self, s01], [ap1, s12], [ap2, s20]])
         end
       end
@@ -37,16 +39,19 @@ class Cycle
     return cycles
   end
 
-  def get_four_node_cycles
+  #OSS808 Change 27/10/2013
+  #Method renamed to four_node_cycles from get_four_node_cycles
+
+  def four_node_cycles
     cycles = []
     self.get_reviewers.each do |ap1|
       ap1.get_reviewers.each do |ap2|
         ap2.get_reviewers.each do |ap3|
           if ap3.get_reviewers.include?(self)
-            self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score
-            ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
-            ap2.get_reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score
-            ap3.get_reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score
+            self.reviews_by_reviewer(ap1).nil? ? next : s01 = self.reviews_by_reviewer(ap1).get_total_score
+            ap1.reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
+            ap2.reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score
+            ap3.reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score
             cycles.push([[self, s01], [ap1, s12], [ap2, s23], [ap3, s30]])
           end
         end
@@ -78,7 +83,7 @@ class Cycle
     count = 0.0
     for member in 0 ... cycle.size do
       participant = AssignmentParticipant.find(cycle[member][0].id)
-      total_score = participant.get_review_score
+      total_score = participant.review_score
       deviation_score = deviation_score + (total_score - cycle[member][1]).abs
       count = count + 1.0
     end

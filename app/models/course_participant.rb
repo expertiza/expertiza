@@ -40,7 +40,7 @@ class CourseParticipant < Participant
   end
   
   def get_path
-    Course.find(self.parent_id).get_path + self.directory_num.to_s + "/"
+    Course.find(self.parent_id).dir_path + self.directory_num.to_s + "/"
   end
 
   # provide export functionality for Assignment Participants

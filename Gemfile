@@ -50,5 +50,10 @@ group :test do
   gem "rspec-rails"
 end
 
+group :production do
+  gem 'pg'
+  gem 'rails_12factor'
+end
+
 heroku_java_home = '/usr/lib/jvm/java-6-openjdk'
 ENV['JAVA_HOME'] = heroku_java_home if Dir.exist?(heroku_java_home)

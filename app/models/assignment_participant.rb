@@ -59,7 +59,7 @@ class AssignmentParticipant < Participant
     if self.assignment.team_assignment? && self.team
       rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
     else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])      
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
     end
     rmaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))

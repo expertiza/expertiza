@@ -27,7 +27,12 @@ class SignedUpUser < ActiveRecord::Base
         names = '(missing team)'
         for participant_name in participant_names
           if team_name_added == false
-            names = "<br/> <b>" + participant_name.team_name + "</b>" + "<br/>" + participant_name.u_name + " "
+            if  participant_names.size !=1
+
+              names =  participant_name.team_name +  ": " + participant_name.u_name + " "
+            else
+              names =  participant_name.u_name + " "
+            end
             team_name_added = true
           else
             names = names + participant_name.u_name + " "

@@ -50,14 +50,16 @@
 
                 <% if (@l%2) == 0 %>
                     <tr bgcolor="#ffffff">
-                        <td bgcolor="#ffffff" rowspan= <%= @rspan%>>
-                            <%= link_to_remote_redbox  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
+                        <td bgcolor="#ffffff" rowspan= <%= @rspan%> >
+                          <%= username %>
+                          <%#= link_to_remote_redbox username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
                         </td>
-                    
+
                  <%else %>
                     <tr bgcolor="#DDDDBB">
                         <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
-                            <%= link_to_remote_redbox  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
+                          <%= username %>
+                            <%#= link_to_remote_redbox(username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id}) %>
                         </td>
 
                 <%end %>
@@ -82,7 +84,13 @@
                                 <%else %>
                                     <td id = "green" bgcolor="#DDDDBB" align = 'center' colspan=1>
                                 <%end %>
-                                <%= link_to_remote_redbox Team.find(ri.reviewee_id).name, :url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
+                                <% if Team.find(ri.reviewee_id).users.size==1 %>
+                                  <%=  Team.find(ri.reviewee_id).users.first.name %>
+                                <% else %>
+                                  <%=  Team.find(ri.reviewee_id).name %>
+                                <% end %>
+
+                                <%#= link_to_remote_redbox Team.find(ri.reviewee_id).name,:url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
                                 </td>
                             <%= render :partial => 'teamscore' %>
 
@@ -93,7 +101,7 @@
                             <%end %>
                             <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                                </td>
-                        <tr/>
+                        </tr>
 
                         <% elsif !@assignment.team_assignment? %>
                             <% @participantid = (Participant.find(ri.reviewee_id)).user_id %>
@@ -117,7 +125,7 @@
                                    <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                             
                             </td>
-                            <tr/>
+                            </tr>
                         <%end %>
 
                     <% else %>
@@ -139,7 +147,7 @@
                             <%end %>
                             No
                             </td>
-                            <tr/>
+                            </tr>
                         <% elsif !@assignment.team_assignment? %>
                             <% @participantid = Participant.find(ri.reviewee_id).user_id %>
                             <% @myuser = 0%>
@@ -162,7 +170,7 @@
                            <%end %>
                                 No
                                 </td>
-                                <tr/>
+                                </tr>
                       <%end %>
                   <%end %>
               <%end %>

@@ -1,6 +1,10 @@
 <TR class="row"><TD>       
      <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><img src="/images/expand.png"/></a>
-     <%= tscore[:team].name %></TD>
+     <% if tscore[:team].participant_size?(:team)  %>
+        <%= tscore[:team].get_participants.first.name %></TD>
+     <% else %>
+        <%= tscore[:team].name %>
+     <% end %>
      <% if tscore[:scores][:avg] %>
       	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.2f",tscore[:scores][:avg]) %>%</TD>
        	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.0f",tscore[:scores][:min]) %>% - <%= sprintf("%.0f",tscore[:scores][:max]) %>%</TD>

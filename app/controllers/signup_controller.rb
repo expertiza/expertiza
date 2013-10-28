@@ -37,7 +37,7 @@
         @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
       end
     else
-      @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)
+        @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)
     end
   end
 

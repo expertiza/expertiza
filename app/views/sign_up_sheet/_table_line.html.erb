@@ -18,6 +18,7 @@
       <% if Team.find(team_id).advertise_for_partner?   %>
         <% link_to :controller => 'sign_up_sheet', :action => 'team_details', :assignment_id=>params[:id], :id=>topic.id do %>
           <i class="icon-bullhorn icon-large" style='text-decoration: none; color: black;'></i>
+               <p>advertise</p>
         <% end %>
      <% end %>
    <% end %>

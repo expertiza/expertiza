@@ -253,6 +253,14 @@ class AssignmentTeam < Team
     team
   end
 
+  #Remove a team given the team id
+  def self.remove_team_by_id(id)
+    old_team = AssignmentTeam.find(id)
+    if old_team != nil
+      old_team.destroy
+    end
+  end
+
   require './app/models/analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
 end

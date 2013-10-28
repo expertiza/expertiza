@@ -39,20 +39,27 @@ class JoinTeamRequestsController < ApplicationController
   # POST /join_team_requests.xml
   #create a new join team request entry for join_team_request table and add it to the table
   def create
-    @join_team_request = JoinTeamRequest.new
-    @join_team_request.comments = params[:comments]
-    @join_team_request.status = 'P'
-    @join_team_request.team_id = params[:team_id]
+    #check if the advertisement is from a team member and if so disallow requesting invitations
+    team_member=TeamsUser.all(:conditions => ['team_id =? and user_id =?', params[:team_id],session[:user][:id]])
+    if (team_member.size > 0)
+      flash[:note] = "You are already a member of team."
+    else
 
-    participant = Participant.find_by_user_id_and_parent_id(session[:user][:id],params[:assignment_id])
-    @join_team_request.participant_id= participant.id
-    respond_to do |format|
-      if @join_team_request.save
-        format.html { redirect_to(@join_team_request, :notice => 'JoinTeamRequest was successfully created.') }
-        format.xml  { render :xml => @join_team_request, :status => :created, :location => @join_team_request }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @join_team_request.errors, :status => :unprocessable_entity }
+      @join_team_request = JoinTeamRequest.new
+      @join_team_request.comments = params[:comments]
+      @join_team_request.status = 'P'
+      @join_team_request.team_id = params[:team_id]
+
+      participant = Participant.find_by_user_id_and_parent_id(session[:user][:id],params[:assignment_id])
+      @join_team_request.participant_id= participant.id
+      respond_to do |format|
+        if @join_team_request.save
+          format.html { redirect_to(@join_team_request, :notice => 'JoinTeamRequest was successfully created.') }
+          format.xml  { render :xml => @join_team_request, :status => :created, :location => @join_team_request }
+        else
+          format.html { render :action => "new" }
+          format.xml  { render :xml => @join_team_request.errors, :status => :unprocessable_entity }
+        end
       end
     end
   end

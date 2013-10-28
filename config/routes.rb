@@ -123,9 +123,19 @@ Expertiza::Application.routes.draw do |map|
 
   resources :institutions
 
-  resources :invitation
+  resources :invitation do
+    collection do
+      get :cancel
+      get :accept
+      get :decline
+    end
+  end
 
-  resources :join_team_requests
+  resources :join_team_requests do
+    collection do
+      get :decline
+    end
+  end
 
   resources :leaderboard, constraints: { id: /\d+/ } do
     collection do
@@ -153,6 +163,8 @@ Expertiza::Application.routes.draw do |map|
       get :auto_complete_for_user_name
       get :list
       get :change_handle
+      get :inherit
+      get :bequeath_all
       post :delete
     end
   end
@@ -245,6 +257,9 @@ Expertiza::Application.routes.draw do |map|
       get :add_signup_topics_staggered
       get :signup_topics
       get :view_publishing_rights
+      get :signup
+      get :delete_signup
+      get :team_details
     end
   end
 
@@ -282,6 +297,7 @@ Expertiza::Application.routes.draw do |map|
       get :edit
       get :leave
       get :auto_complete_for_user_name
+      get :update
     end
   end
 

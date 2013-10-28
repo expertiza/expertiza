@@ -2,7 +2,7 @@
 
     <BR/>
     <%= render :partial => 'grades/review_table', :locals => {:ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer"} %>
-    <BR/>
+
     <HR/>
 
     <%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
@@ -14,8 +14,6 @@
 
         <div id="reviewtabs">
           <ul>
-
-
             <% for i in 1..rscore[:assessments].length %>
                 <li id="tab<%= i %>"><a href="#reviewtabs-<%= i %>">Review <%= i %></a></li>
             <% end %>
@@ -119,9 +117,7 @@
 
 
                         </div>
-                        <BR/>
-                        <HR/>
-                        <BR/>
+
                     <% else %>
 
                       <div id="reviewtabs-<%= count %>">
@@ -171,9 +167,7 @@
                         <% end %>
 
                        </div>
-                        <BR/>
-                        <HR/>
-                        <BR/>
+
                     <% end %>
                 <% end %>
 

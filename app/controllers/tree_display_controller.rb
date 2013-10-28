@@ -73,28 +73,31 @@ class TreeDisplayController < ApplicationController
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list
-
-    if params[:search_string]
-      if params[:searchnode] == 'Q'
-        session[:root] = 1
-      elsif params[:searchnode] == 'C'
-        session[:root] = 2
-      elsif params[:searchnode] == 'A'
-      session[:root] = 3
+    if params[:commit] == 'Search'
+      if params[:search_string]
+        if params[:searchnode] == 'Q'
+          session[:root] = 1
+        elsif params[:searchnode] == 'C'
+          session[:root] = 2
+        elsif params[:searchnode] == 'A'
+        session[:root] = 3
+        end
+        $search = params[:search_string]
+      else
+        $search = nil
       end
-      $search = params[:search_string]
-    else
-      $search = nil
     end
 
     if params[:commit] == 'Filter'
       filter
     end
 
-                  if params[:commit] == 'clear'
-                    $search = nil
-                  end
+    if params[:commit] == 'Reset'
+       $search = nil
+    end
+
     @search = $search
+
     display = params[:display] || session[:display]
     if display
       @sortvar = display[:sortvar]
@@ -126,6 +129,7 @@ class TreeDisplayController < ApplicationController
 
 
   def filter
+
     search = params[:filter_string]
     filternode = params[:filternode]
     qid = String.new("filter+")
@@ -135,19 +139,17 @@ class TreeDisplayController < ApplicationController
       if assignment
         assignmentid = assignment.id
 
-      assignquest = AssignmentQuestionnaire.find_all_by_assignment_id(assignmentid)
+        assignquest = AssignmentQuestionnaire.find_all_by_assignment_id(assignmentid)
         if assignquest
-      for n in assignquest  do
-        qid << n.questionnaire_id.to_s + "+"
-      end
-      session[:root] = 1
-                      end
+           for n in assignquest  do
+             qid << n.questionnaire_id.to_s + "+"
+           end
+        session[:root] = 1
+        end
       end
     elsif filternode == 'ACN'
       session[:root] = 2
       qid <<  search
-
-
     end
 
 

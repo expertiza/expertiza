@@ -21,12 +21,12 @@ class CourseNode < Node
       if(splitsearch[0] == 'filter')
         search = splitsearch[1]
       else
-      search = "%"+search+"%"
+        search = "%"+search+"%"
       end
       find(:all, :include => :course, :conditions => [get_course_query_conditions(show, user_id)+ " and courses.name LIKE ?" , get_courses_managed_by_user(user_id), search], :order => "courses.#{sortvar} #{sortorder}")
     else
-    find(:all, :include => :course, :conditions => [get_course_query_conditions(show, user_id) , get_courses_managed_by_user(user_id)], :order => "courses.#{sortvar} #{sortorder}")
-        end
+      find(:all, :include => :course, :conditions => [get_course_query_conditions(show, user_id) , get_courses_managed_by_user(user_id)], :order => "courses.#{sortvar} #{sortorder}")
+    end
   end
 
   #get the query conditions for a public course

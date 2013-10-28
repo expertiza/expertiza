@@ -6,7 +6,7 @@ class QuestionnaireNode < Node
     "questionnaires"
   end
   
-  def self.get(sortvar = nil,sortorder = nil, user_id = nil,show = nil,parent_id = nil)
+  def self.get(sortvar = nil,sortorder = nil, user_id = nil,show = nil,parent_id = nil,search=nil)
     if show   
       if User.find(user_id).role.name != "Teaching Assistant"
         conditions = 'questionnaires.instructor_id = ?'
@@ -38,9 +38,33 @@ class QuestionnaireNode < Node
     end
     if sortorder.nil?
       sortorder = 'ASC'
-    end         
-        
-    find(:all, :include => :questionnaire, :conditions => [conditions,values], :order => "questionnaires.#{sortvar} #{sortorder}")       
+    end
+    if search
+      splitsearch = search.split("+")
+        if(splitsearch[0] == "filter")
+        splitsearch.delete_at(0)
+        conditions += " and questionnaires.id in "
+        if splitsearch.length == 1
+          conditions += splitsearch[0]
+        else
+        conditions += "("+splitsearch[0]
+        i=1
+        while i < splitsearch.length do
+          conditions += ',' + splitsearch[i]
+          i = i+1
+        end
+              conditions += ')'
+        end
+        find(:all, :include => :questionnaire, :conditions => [conditions,values], :order => "questionnaires.#{sortvar} #{sortorder}")
+        else
+      conditions += " and questionnaires.name LIKE ?"
+      search = "%"+search+"%"
+      find(:all, :include => :questionnaire, :conditions => [conditions,values,search], :order => "questionnaires.#{sortvar} #{sortorder}")
+      end
+
+    else
+    find(:all, :include => :questionnaire, :conditions => [conditions,values], :order => "questionnaires.#{sortvar} #{sortorder}")
+      end
   end 
   
   def get_name

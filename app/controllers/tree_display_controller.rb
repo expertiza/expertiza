@@ -1,6 +1,5 @@
 class TreeDisplayController < ApplicationController
   helper :application
-
   # direct access to questionnaires
   def goto_questionnaires
     node_object = TreeFolder.find_by_name('Questionnaires')
@@ -74,6 +73,28 @@ class TreeDisplayController < ApplicationController
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list
+
+    if params[:search_string]
+      if params[:searchnode] == 'Q'
+        session[:root] = 1
+      elsif params[:searchnode] == 'C'
+        session[:root] = 2
+      elsif params[:searchnode] == 'A'
+      session[:root] = 3
+      end
+      $search = params[:search_string]
+    else
+      $search = nil
+    end
+
+    if params[:commit] == 'Filter'
+      filter
+    end
+
+                  if params[:commit] == 'clear'
+                    $search = nil
+                  end
+    @search = $search
     display = params[:display] || session[:display]
     if display
       @sortvar = display[:sortvar]
@@ -92,7 +113,7 @@ class TreeDisplayController < ApplicationController
 
     if session[:root]
       @root_node = Node.find(session[:root])
-      @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show)
+      @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show,nil,@search)
     else
       @child_nodes = FolderNode.get()
     end
@@ -102,4 +123,38 @@ class TreeDisplayController < ApplicationController
     session[:root] = params[:root]
     redirect_to :controller => 'tree_display', :action => 'list'
   end
+
+
+  def filter
+    search = params[:filter_string]
+    filternode = params[:filternode]
+    qid = String.new("filter+")
+
+    if filternode == 'QAN'
+      assignment = Assignment.find_by_name(search)
+      if assignment
+        assignmentid = assignment.id
+
+      assignquest = AssignmentQuestionnaire.find_all_by_assignment_id(assignmentid)
+        if assignquest
+      for n in assignquest  do
+        qid << n.questionnaire_id.to_s + "+"
+      end
+      session[:root] = 1
+                      end
+      end
+    elsif filternode == 'ACN'
+      session[:root] = 2
+      qid <<  search
+
+
+    end
+
+
+  $search = qid
+
+
+  end
+
+
 end

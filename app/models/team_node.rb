@@ -19,7 +19,7 @@ class TeamNode < Node
     Team.find(self.node_object_id).name    
   end
   
-  def get_children(sortvar = nil,sortorder = nil,user_id = nil,parent_id = nil)
+  def get_children(sortvar = nil,sortorder = nil,user_id = nil,parent_id = nil,search=nil)
     TeamUserNode.get(self.node_object_id)
   end  
 end

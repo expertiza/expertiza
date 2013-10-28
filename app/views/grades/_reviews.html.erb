@@ -10,12 +10,14 @@
     <script src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="/javascripts/jquery-ui-timepicker-addon.js"></script>
 
-    <%= form_for @assignment, html: {id: 'assignment_form'} do %>
+    <%= form_for @assignment, html: {id: 'review_form'} do %>
 
-        <div id="tabs">
+        <div id="reviewtabs">
           <ul>
+
+
             <% for i in 1..rscore[:assessments].length %>
-                <li id="tabs-" <%= i %>"><a href="#tabs-"<%= i %>>Review <%= i %></a></li>
+                <li id="tab<%= i %>"><a href="#reviewtabs-<%= i %>">Review <%= i %></a></li>
             <% end %>
           </ul>
 
@@ -25,7 +27,7 @@
 
               <% count = count + 1 %>
 
-              <div id="tabs-" <%= i %>>
+
 
                 <% file_url = nil
                    review_questionnaire = @assignment.questionnaires.select { |x| x.display_type == 'Review' }
@@ -63,6 +65,10 @@
                     <% end %>
                 <% else %>
                     <% if @questionnaire.section.eql? "Custom" %>
+
+                      <div id="reviewtabs-<%= count %>">
+
+
                         <h2>Review <%= count %></h2>
                         <!-- Display the latest review first -->
                         <a name="<%= prefix+"_"+review.map.reviewer.name %>"></a>
@@ -111,10 +117,14 @@
                             for Review <%= count %>
                         <% end %>
 
+
+                        </div>
                         <BR/>
                         <HR/>
                         <BR/>
                     <% else %>
+
+                      <div id="reviewtabs-<%= count %>">
 
                         <h2>Review <%= count %></h2>
                         <!-- Display the latest review first -->
@@ -160,20 +170,30 @@
                             for Review <%= count %>
                         <% end %>
 
+                       </div>
                         <BR/>
                         <HR/>
                         <BR/>
                     <% end %>
                 <% end %>
-              </div>
+
           <% end %>
+
+
+
         </div>
+
+
         <script>
             jQuery(document).ready(function () {
-                jQuery("#tabs").tabs();
+                jQuery("#reviewtabs").tabs();
             });
         </script>
+
     <% end %>
+
+
+
 <% else %>
     <i>No reviews have been completed for this user's submissions.</i>
 <% end %>

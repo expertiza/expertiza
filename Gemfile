@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'rails', '~>3.0.0'
-
+ruby '1.9.3'
 ## Gems in Alphabetical Order
 
 gem 'bind-it'
@@ -24,15 +24,13 @@ gem 'rake'
 gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rjb'
-gem 'rubyzip', :require => 'zip/zip'
+gem 'rubyzip', :require => 'zip'
 gem 'rwordnet'
 gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'will_paginate'
-
-gem "heroku", "~> 3.0.1"
 
 group :development do
   gem 'daemons'

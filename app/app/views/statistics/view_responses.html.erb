@@ -1,0 +1,33 @@
+<h2>Survey Response for <%=@survey.name %></h2>
+<h4>Deployment Dates 1:<%= @deployment_date1 %></h4>
+<h4>Deployment Dates 2:<%= @deployment_date2 %></h4>
+
+
+<table class=listing cellpadding=2>
+<tr><th>Question </th><th>Type</th><th colspan=2>0</th><th colspan=2>1</th><th colspan=2>2</th><th colspan=2>3</th>
+<th colspan=2>4</th><th colspan=2>5</th><th>t-Test Score</th></tr>
+<% @questions.each do |q| %>
+<tr>
+<td><%= q.txt %></td>
+<% if q.true_false %>
+<td>True/False</td>
+<% else %>
+<td>Numeric</td>
+<% end %>
+<% for i in @survey.min_question_score..@survey.max_question_score %>
+<td>
+<%= @num_responses1[q.id][i]*100 %>%
+</td>
+<td>
+<%= @num_responses2[q.id][i]*100 %>%
+</td>
+<% end %>
+<td><%= @t_score[q.id] %></td>
+</tr>
+
+<% end %>
+</table>
+
+
+
+

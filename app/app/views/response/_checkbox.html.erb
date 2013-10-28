@@ -1,0 +1,102 @@
+<% if !view.nil? %>
+    <% if !table_title.nil? %>
+        <p><b> <%= table_title %> </b></p>
+        <hr>
+    <% end %>
+    <% if start_table %>
+        <table class='general'>
+        <% if !table_headers.nil? %>
+            <tr>
+                <% table_headers.split("|").each { |header| %>
+                <th cellspacing="20%"><%= header %></th>
+                <% } %>
+            </tr>
+            <tr>
+        <% end %>
+    <% end %>
+    <% if start_col %>
+                <td>
+                    <ul>
+    <% end %>
+                        <li>
+                            <p>
+                                <%= view %>
+                            </p>
+                        </li>
+    <% if end_col %>
+                    </ul>
+                </td>
+    <% end %>
+    <% if end_table %>
+            </tr>
+        </table>
+    <% end %>
+<% elsif controller.action_name == 'new' %>
+    <% if !table_title.nil? %>
+        <p><b> <%= table_title %> </b></p>
+        <hr>
+    <% end %>
+    <% if start_table %>
+        <table class='general'>
+        <% if !table_headers.nil? %>
+            <tr>
+                <% table_headers.split("|").each { |header| %>
+                <th cellspacing="20%"><%= header %></th>
+                <% } %>
+            </tr>
+            <tr>
+        <% end %>
+    <% end %>
+    <% if start_col %>
+                <td>
+                    <ul>
+    <% end %>
+                        <li>
+                            <p>
+                                <%= check_box("custom_response", ques_num) %>
+                                <%= label("custom_response", ques_num, ques_text) %>
+                            </p>
+                        </li>
+    <% if end_col %>
+                    </ul>
+                </td>
+    <% end %>
+    <% if end_table %>
+            </tr>
+        </table>
+    <% end %>
+<%else%>
+    <% if !table_title.nil? %>
+        <p><b> <%= table_title %> </b></p>
+        <hr>
+    <% end %>
+    <% if start_table %>
+        <table class='general'>
+        <% if !table_headers.nil? %>
+            <tr>
+                <% table_headers.split("|").each { |header| %>
+                <th cellspacing="20%"><%= header %></th>
+                <% } %>
+            </tr>
+            <tr>
+        <% end %>
+    <% end %>
+    <% if start_col %>
+                <td>
+                    <ul>
+    <% end %>
+                        <li>
+                            <p>
+                                <%= check_box("custom_response", ques_num, {:checked => @review_scores[ques_num].comments.to_i == 1}) %>
+                                <%= label("custom_response", ques_num, ques_text) %>
+                            </p>
+                        </li>
+    <% if end_col %>
+                    </ul>
+                </td>
+    <% end %>
+    <% if end_table %>
+            </tr>
+        </table>
+    <% end %>
+<%end%>

@@ -1,0 +1,22 @@
+<h1>Listing Content Pages</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Title</th>
+    <th>Created At</th>
+    <th>Updated At</th>
+  </tr>
+  
+<% for content_page in @content_pages %>
+  <tr>
+    <td><%= link_to content_page.name, :action => 'show', :id => content_page.id %></td>
+    <td><%= h content_page.title %></td>
+    <td><%= content_page.created_at %></td>
+    <td><%= content_page.updated_at %></td>
+  </tr>
+<% end %>
+</table>
+
+<hr/>
+<p><%= link_to 'New content_page', :action => 'new' %></p>

@@ -1,0 +1,26 @@
+<div class = "exp">
+<%if user_list.length > 0%>
+
+<table>
+  <tr ><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th>
+  <tr><th class="head">Name</th><th class="head">Full Name</th class="head"><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Metareview</th><th class="head">Handle</th></tr>
+<% for participant in user_list 
+   user = User.find(participant.user_id) %>
+  <tr class= "exp">
+    <td ><%= link_to user.name, :controller=> 'users', :action => 'show', :id => user.id %></td>
+    <td ><%= user.fullname %></td>
+    <td ><%= user.email %></td>
+    <td ><%= link_to user.role.name, :controller => 'roles', :action => 'show', :id => user.role.id %></td>
+    <td  align="center"><%= (User.find_by_id(user.parent_id)).name %></td>
+    <td ><%= User.yesorno(user.email_on_review) %></td>
+    <td ><%= User.yesorno(user.email_on_submission) %></td>
+    <td ><%= User.yesorno(user.email_on_review_of_review) %></td>    
+    <td ><%= participant.handle %></td>
+           
+    <td ><%= link_to 'Remove', :controller => controller, :action => 'delete', :method => :post, :id => participant.id %></td>
+  </tr>
+<% end -%>
+</table>
+<% end -%>
+
+</div>    

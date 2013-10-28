@@ -1,0 +1,10 @@
+<div class="navbar">
+  <div class="topmenu">
+    <ul id="suckerfish" class='sf-menu'>
+      <% if session[:menu] %>
+        <%= render :partial => 'menu_items/suckerfish',
+          :locals => { items: session[:menu].get_menu(0) } %>
+      <% end %>
+    </ul>
+  </div>
+</div>

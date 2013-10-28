@@ -1,0 +1,8 @@
+&nbsp;&nbsp;&nbsp;<a href="#" id="advice_<%= i %>Link" name="advice_<%= i %>Link" onClick="toggleElement('advice_<%= i %>','advice');return false;">show advice</a><br/>
+<div id="advice_<%= i %>" style="display:none;padding:12px">
+<% advice_list.each{ | item | %>
+    <div onMouseover="style.color = '#986633'" onMouseOut="style.color = 'black'">
+      <%=item.score%>:&nbsp;<%=item.advice %>
+    </div>
+  <%}%>
+</div>

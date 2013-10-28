@@ -1,0 +1,42 @@
+<%= error_messages_for 'menu_item' %>
+
+<!--[form:menu_item]-->
+
+<table>
+<tr><th>Name</th>
+<td colspan="2"><%= text_field 'menu_item', 'name' %></td></tr>
+
+<tr><th>Label</th>
+<td colspan="2"><%= text_field 'menu_item', 'label' %></td></tr>
+
+<tr><th>Controller Action<br/><strong>OR</strong> Content Page</th>
+<td><%= collection_select 'menu_item', 'controller_action_id',
+          @actions, :id, :fullname %></td>
+<td>OR <%= collection_select 'menu_item', 'content_page_id',
+          @pages, :id, :name %></td>
+</tr>
+
+<% if @can_change_parent -%>
+
+<tr><th>Parent Menu Item</th>
+<td colspan="2"></td>
+</tr>
+<tr><th></th>
+<td colspan="2">
+<table class="table_as_list">
+<tr>
+<td><%= radio_button :menu_item, :parent_id, ""  %></td>
+<td>(root)</td>
+</tr>
+<%= render :partial => 'item_parent_list', :locals => {:items => @items,
+    :depth => 0} %>
+</table></td>
+</tr>
+<% end -%>
+</table>
+
+<% if not @can_change_parent -%>
+<%= hidden_field :menu_item, :parent_id %>
+<% end -%> 
+<!--[eoform:menu_item]-->
+

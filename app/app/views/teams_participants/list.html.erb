@@ -1,0 +1,17 @@
+<H1>Team Members for <%= @assignment.name %></H1>
+
+
+<H3>Team Name: <%= @team.name %></H3>
+
+<% 
+   column_definitions = Array.new
+   column_definitions << {:name => 'Team Member', :type => 'fetch', :model => 'User', :field => 'name', :column => 'user_id'}
+   column_definitions << {:name => 'Remove from Team',  :action => 'delete_team_user', :controller => 'teams_participants'}
+   
+   delete_options = {:enabled => true, :controller => 'teams_participants'}
+%>
+<%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :delete_options => delete_options, :elements => @teams_participants} %>
+
+<BR/>
+<%= link_to 'New Team Member', :action => 'new', :id => @team %>
+| <%= link_to 'Back', :action => 'list', :controller => 'team', :id => @team.assignment_id %>

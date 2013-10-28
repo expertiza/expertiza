@@ -1,0 +1,29 @@
+<!-- FEEDBACKS --> 
+<% if rscore and rscore[:assessments].length > 0 %>
+  <BR/>
+  <%= render :partial => 'grades/review_table',
+           :locals => {
+           :ctrl => 'review_feedback',
+           :caction => 'view',
+           :symbol => "feedback".to_sym,
+           :prefix => prefix,
+           :assignment => participant.assignment,
+           :reviews => rscore[:assessments],
+           :collabel => "Feedback",
+           :rowlabel => "Author"
+           }%>
+  <BR/>         
+  <HR/> 
+  <% count = 0 %>
+  <% for feedback in rscore[:assessments] %>
+    <% count = count + 1 %>
+    <% if controller.action_name != "view_my_scores" %>
+      <a name="<%=prefix+"_"+feedback.map.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
+    <% else %>
+      <%= feedback.display_as_html(nil,count) %><BR/><BR/>
+    <% end %>      
+  <% end %>
+<% else %>
+  <i>No author feedback has been provided for this user's reviews.</i>
+<% end %>
+<!-- END FEEDBACKS -->

@@ -40,6 +40,7 @@ GEM
     activesupport (3.0.20)
     addressable (2.3.5)
     arel (2.0.10)
+    automated_metareview (0.0.2)
     bind-it (0.2.7)
       rjb (~> 1.4.3)
     builder (2.1.2)
@@ -250,6 +251,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth
+  automated_metareview (= 0.0.2)
   bind-it
   capistrano
   capybara

@@ -32,6 +32,8 @@ gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'will_paginate'
 
+gem "heroku", "~> 3.0.1"
+
 group :development do
   gem 'daemons'
   gem 'debugger'
@@ -49,3 +51,6 @@ group :test do
   gem 'launchy'
   gem "rspec-rails"
 end
+
+heroku_java_home = '/usr/lib/jvm/java-6-openjdk'
+ENV['JAVA_HOME'] = heroku_java_home if Dir.exist?(heroku_java_home)

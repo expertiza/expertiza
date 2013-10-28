@@ -186,7 +186,8 @@ class ResponseController < ApplicationController
         score.update_attribute('comments',v[:comment])
      end
     rescue
-      msg = "Your response was not saved. Cause: "+ $!
+      msg = "Your response was not saved. Cause: "
+
     end
 
     begin
@@ -195,7 +196,7 @@ class ResponseController < ApplicationController
     
       msg = "Your response was successfully saved."
     rescue
-      msg = "An error occurred while saving the response: "+$!
+      msg = "An error occurred while saving the response: "
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
   end  
@@ -327,7 +328,7 @@ class ResponseController < ApplicationController
         score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
       end  
     rescue
-      error_msg = "Your response was not saved. Cause: " + $!
+      error_msg = "Your response was not saved. Cause: "
     end
     
     begin
@@ -337,7 +338,8 @@ class ResponseController < ApplicationController
       msg = "Your response was successfully saved."
     rescue
       @response.delete
-      error_msg = "Your response was not saved. Cause: " + $!
+      error_msg = "Your response was not saved. Cause: "
+
     end
     
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
@@ -364,7 +366,7 @@ class ResponseController < ApplicationController
     @map.notification_accepted = false
     @map.save
     #@map.assignment.id == 561 or @map.assignment.id == 559 or 
-    if(@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
+   # if(@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
       #puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
       if(params["save_options"].nil? or params["save_options"].empty?)#default it to with metareviews
         params["save_options"] = "WithMeta"
@@ -386,9 +388,9 @@ class ResponseController < ApplicationController
         # puts "WithoutMeta"
         redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
-    else
-      redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
-    end
+    #else
+     # redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+    #end
   end
   
   def redirection

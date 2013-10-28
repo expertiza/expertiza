@@ -39,7 +39,7 @@ group :development do
   gem 'selenium-webdriver'
 end
 
-group :test do
+ group :test do
   gem 'capybara'
   gem 'cucumber-rails', require: false
   gem 'database_cleaner'
@@ -48,6 +48,7 @@ group :test do
   gem 'guard-rspec'
   gem 'launchy'
   gem "rspec-rails"
+  gem 'shoulda'
 
   # OSS808 Change 27/10/2013
   # Added to enable attachment of test reporter to test framework

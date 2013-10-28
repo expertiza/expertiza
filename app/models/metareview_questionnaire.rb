@@ -8,7 +8,7 @@ class MetareviewQuestionnaire < Questionnaire
   end
   
   def get_assessments_for(participant)
-    participant.get_metareviews()  
+    participant.metareviews()
   end  
   
 

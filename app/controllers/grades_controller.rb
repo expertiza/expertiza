@@ -14,7 +14,7 @@ class GradesController < ApplicationController
             |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-    @scores = @assignment.get_scores(@questions)
+    @scores = @assignment.scores(@questions)
   end
 
   def view_my_scores
@@ -60,7 +60,7 @@ class GradesController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 
-    @scores = @participant.get_scores(@questions)
+    @scores = @participant.scores(@questions)
   end
 
   def instructor_review
@@ -154,13 +154,13 @@ class GradesController < ApplicationController
     if @submission == "review"
       @caction = "view_review"
       @symbol = "review"
-      process_response("Review", "Reviewer", @participant.get_reviews, "ReviewQuestionnaire")
+      process_response("Review", "Reviewer", @participant.reviews, "ReviewQuestionnaire")
     elsif @submission == "review_of_review"
       @symbol = "metareview"
-      process_response("Metareview", "Metareviewer", @participant.get_metareviews, "MetareviewQuestionnaire")
+      process_response("Metareview", "Metareviewer", @participant.metareviews, "MetareviewQuestionnaire")
     elsif @submission == "review_feedback"
       @symbol = "feedback"
-      process_response("Feedback", "Author", @participant.get_feedback, "AuthorFeedbackQuestionnaire")
+      process_response("Feedback", "Author", @participant.feedback, "AuthorFeedbackQuestionnaire")
     elsif @submission == "teammate_review"
       @symbol = "teammate"
       process_response("Teammate Review", "Reviewer", @participant.teammate_reviews, "TeammateReviewQuestionnaire")

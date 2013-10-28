@@ -56,6 +56,7 @@ class User < ActiveRecord::Base
 
   def first_name
     fullname[/,.+/][/\w+/] if fullname
+
   end
 
   def super_admin?

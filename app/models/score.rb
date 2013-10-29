@@ -92,7 +92,7 @@ class Score < ActiveRecord::Base
 
       #questionnaireData = MyView.where('q1_id = ? AND s_response_id = ?',questions[0].questionnaire_id,response .id).select('q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score')
       #questionnaireData = MyView.where('q1_id = ? AND s_response_id = ?',questions[0].questionnaire_id,response .id).select('q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score').first
-      questionnaireData = MyView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM my_views WHERE q1_id = ? AND s_response_id = ?",questions[0].questionnaire_id,response .id]
+      questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE q1_id = ? AND s_response_id = ?",questions[0].questionnaire_id,response .id]
       weighted_score = questionnaireData[0].weighted_score.to_f
       sum_of_weights = questionnaireData[0].sum_of_weights.to_f
       max_question_score = questionnaireData[0].q1_max_question_score.to_f

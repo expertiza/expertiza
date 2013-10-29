@@ -1,6 +1,6 @@
 <TR class="row"><TD>       
      <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><img src="/images/expand.png"/></a>
-     <% if tscore[:team].participant_size?(:team)  %>
+     <% if tscore[:team].get_participants.size==1  %>
         <%= tscore[:team].get_participants.first.name %></TD>
      <% else %>
         <%= tscore[:team].name %>

@@ -10,11 +10,9 @@
                # reviews done
             </th>
             <th width = "20%">
-            	<% if @assignment.team_assignment %>
+
                 Team reviewed
-				<% else %>
-				Participant reviewed
-				<% end %>
+
             </th>
             <th width = "8%">
                 Score awarded
@@ -85,9 +83,9 @@
                                     <td id = "green" bgcolor="#DDDDBB" align = 'center' colspan=1>
                                 <%end %>
                                 <% if Team.find(ri.reviewee_id).users.size==1 %>
-                                  <%=  Team.find(ri.reviewee_id).users.first.name %>
+                                    <%=  Team.find(ri.reviewee_id).users.first.name %>
                                 <% else %>
-                                  <%=  Team.find(ri.reviewee_id).name %>
+                                    <%=  Team.find(ri.reviewee_id).name %>
                                 <% end %>
 
                                 <%#= link_to_remote_redbox Team.find(ri.reviewee_id).name,:url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id} %>

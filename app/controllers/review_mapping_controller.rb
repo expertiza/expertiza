@@ -188,7 +188,8 @@ class ReviewMappingController < ApplicationController
       assignment.add_participant(user.name)
     rescue
       flash[:error] = $!
-    end    
+    end
+    debugger
     if params[:contributor_id]
       redirect_to :action => 'add_reviewer',     :id => params[:id], :user_id => user.id, :contributor_id => params[:contributor_id]
     else
@@ -277,16 +278,19 @@ class ReviewMappingController < ApplicationController
   
   def delete_review
     mapping = ResponseMap.find(params[:id])
-    mapping.response.delete          
-    redirect_to :action => 'delete_reviewer', :id => mapping.id
+    assignment_id = mapping.assignment.id
+    mapping.delete
+    #redirect_to :action => 'delete_reviewer', :id => mapping.id
+    redirect_to :action => 'list_mappings', :id => assignment_id
   end
   
   def delete_metareview
     mapping = MetareviewResponseMap.find(params[:id])
-    metareview = mapping.response
-    metareview.delete
+    assignment_id = mapping.assignment.id
+    #metareview = mapping.response
+    #metareview.delete
     mapping.delete
-    redirect_to :action => 'list_mappings', :id => mapping.review_mapping.assignment_id
+    redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
   def list

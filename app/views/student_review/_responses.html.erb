@@ -17,7 +17,7 @@
           <%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %>
         </td>
 	      <td>&nbsp;</td>
-        <% if map.response %>            
+        <% if map.created_at == map.updated_at %>
           <% array_not_empty = 0 %>
           <% @sorted_array = Array.new %>
           <% @prev = Response.all %>
@@ -95,7 +95,7 @@
               <% end %>
             </td>
           <% end %>
-        <% else %><%-# Deadline has passed, and the work was not submitted -%>
+        <% else %>
       	  <td>Begin</td><td> (Work has not yet been submitted)</td>for
         <% end %>         
       <% review_no += 1 %>

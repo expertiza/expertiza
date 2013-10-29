@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130930021106) do
+ActiveRecord::Schema.define(:version => 20131023055647) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
     t.integer  "review_of_review_questionnaire_id"
     t.integer  "teammate_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
+    t.boolean  "team_assignment"
     t.integer  "wiki_type_id",                      :default => 0,     :null => false
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false
@@ -278,9 +279,9 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",      :default => "", :null => false
+    t.string  "q_type",                     :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1,  :null => false
+    t.integer "question_id", :default => 1, :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -296,8 +297,8 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.text     "instruction_loc"
     t.string   "section"
+    t.text     "instruction_loc"
   end
 
   create_table "questions", :force => true do |t|
@@ -309,25 +310,18 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
 
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
-  create_table "response_maps", :force => true do |t|
-    t.integer "reviewed_object_id",    :default => 0,     :null => false
-    t.integer "reviewer_id",           :default => 0,     :null => false
-    t.integer "reviewee_id",           :default => 0,     :null => false
-    t.string  "type",                  :default => "",    :null => false
-    t.boolean "notification_accepted", :default => false
-  end
-
-  add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"
-
   create_table "responses", :force => true do |t|
-    t.integer  "map_id",             :default => 0, :null => false
+    t.integer  "map_id",                :default => 0,     :null => false
     t.text     "additional_comment"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "version_num"
+    t.integer  "reviewed_object_id",                       :null => false
+    t.integer  "reviewer_id"
+    t.integer  "reviewee_id",                              :null => false
+    t.string   "type",                                     :null => false
+    t.boolean  "notification_accepted", :default => false
   end
-
-  add_index "responses", ["map_id"], :name => "fk_response_response_map"
 
   create_table "resubmission_times", :force => true do |t|
     t.integer  "participant_id"

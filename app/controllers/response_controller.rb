@@ -66,13 +66,13 @@ class ResponseController < ApplicationController
          @return = params[:return]
          @response = Response.find_by_map_id_and_version_num(params[:id],@largest_version_num.version_num)
          return if redirect_when_disallowed(@response)
-         @modified_object = @response.id
+         @modified_object = @response.response_id
          @map = @response.map
          get_content
          @review_scores = Array.new
          @questions.each{
          | question |
-           @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+           @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
          }
     #**********************
     # Check whether this is Jen's assgt. & if so, use her rubric
@@ -143,13 +143,13 @@ class ResponseController < ApplicationController
       @largest_version_num=@sorted[0]
     end
     @response = Response.find_by_map_id_and_version_num(@map.id,@largest_version_num.version_num)
-    @modified_object = @response.id          
+    @modified_object = @response.response_id
     get_content    
     @review_scores = Array.new
     @question_type = Array.new
     @questions.each{
       | question |
-      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+      @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
       @question_type << QuestionType.find_by_question_id(question.id)
     }
     # Check whether this is a custom rubric
@@ -166,10 +166,10 @@ class ResponseController < ApplicationController
   def update
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
-    @myid = @response.id
+    @myid = @response.response_id
     msg = ""
     begin 
-      @myid = @response.id
+      @myid = @response.response_id
       @map = @response.map
       @response.update_attribute('additional_comment',params[:review][:comments])
       
@@ -178,9 +178,9 @@ class ResponseController < ApplicationController
      
       params[:responses].each_pair do |k,v|
       
-        score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
+        score = Score.find_by_response_id_and_question_id(@response.response_id, questions[k.to_i].id)
           if(score == nil)
-           score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+           score = Score.create(:response_id => @response.response_id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
           end
         score.update_attribute('score',v[:score])
         score.update_attribute('comments',v[:comment])
@@ -191,7 +191,7 @@ class ResponseController < ApplicationController
 
     begin
        ResponseHelper.compare_scores(@response, @questionnaire)
-       ScoreCache.update_cache(@response.id)
+       ScoreCache.update_cache(@response.response_id)
     
       msg = "Your response was successfully saved."
     rescue
@@ -202,10 +202,10 @@ class ResponseController < ApplicationController
   
   def custom_update
     @response = Response.find(params[:id])
-    @myid = @response.id
+    @myid = @response.response_id
     msg = ""
     begin
-      @myid = @response.id
+      @myid = @response.response_id
       @map = @response.map
       @response.update_attribute('additional_comment',"")
 
@@ -213,7 +213,7 @@ class ResponseController < ApplicationController
       questions = @questionnaire.questions
 
       for i in 0..questions.size-1
-        score = Score.find_by_response_id_and_question_id(@response.id, questions[i.to_i].id)
+        score = Score.find_by_response_id_and_question_id(@response.response_id, questions[i.to_i].id)
         score.update_attribute('comments',params[:custom_response][i.to_s])
       end
     rescue
@@ -225,7 +225,7 @@ class ResponseController < ApplicationController
   end
 
   def new_feedback
-    review = Response.find(params[:id])
+    review = ResponseMap.find(params[:id])
     if review
       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, review.map.assignment.id)
       map = FeedbackResponseMap.find_by_reviewed_object_id_and_reviewer_id(review.id, reviewer.id)
@@ -239,7 +239,7 @@ class ResponseController < ApplicationController
   end
   
   def view
-    @response = Response.find(params[:id])
+    @response = ResponseMap.find(params[:id])
     return if redirect_when_disallowed(@response)
     @map = @response.map
     get_content
@@ -247,12 +247,15 @@ class ResponseController < ApplicationController
     @question_type = Array.new
     @questions.each{
       | question |
-      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+      @review_scores << Score.find_by_response_id_and_question_id(@map.response_id, question.id)
       @question_type << QuestionType.find_by_question_id(question.id)
     }
+    puts @question_type
+    puts @review_scores
   end
   
   def new
+    debugger
     @header = "New"
     @next_action = "create"    
     @feedback = params[:feedback]
@@ -319,12 +322,18 @@ class ResponseController < ApplicationController
       else
           @version=1
       end
-      @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:version_num=>@version)
-      @res = @response.id
+      @response = Response.find_by_map_id(@map.id)
+      @response.additional_comment = params[:review][:comments]
+      @response.version_num = @version
+      @response.save
+
+      #@response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:version_num=>@version)
+
+      @res = @response.response_id
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions     
       params[:responses].each_pair do |k,v|
-        score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+        score = Score.create(:response_id => @response.response_id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
       end  
     rescue
       error_msg = "Your response was not saved. Cause: " + $!
@@ -333,7 +342,7 @@ class ResponseController < ApplicationController
     begin
       ResponseHelper.compare_scores(@response, @questionnaire)
       ScoreCache.update_cache(@res)
-      @map.save
+      #@map.save
       msg = "Your response was successfully saved."
     rescue
       @response.delete
@@ -345,13 +354,15 @@ class ResponseController < ApplicationController
   
   def custom_create
     @map = ResponseMap.find(params[:id])
-    @response = Response.create(:map_id => @map.id, :additional_comment => "")
-    @res = @response.id
+    @map.additional_comment = ""
+    @map.save
+    #@response = Response.create(:map_id => @map.id, :additional_comment => "")
+    @res = @response.response_id
     @questionnaire = @map.questionnaire
     questions = @questionnaire.questions
     for i in 0..questions.size-1
         # Local variable score is unused; can it be removed?
-        score = Score.create(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
+        score = Score.create(:response_id => @response.response_id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
     end
     msg = "#{@map.get_title} was successfully saved."
     

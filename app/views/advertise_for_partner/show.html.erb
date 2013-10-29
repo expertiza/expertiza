@@ -34,10 +34,10 @@
                     </td>
                 <% else %>
                     <td>
-                      <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
+                      <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.response_id} %>
                     </td>
                     <td>
-                      <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+                      <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.response_id, :return => "teammate"} %>
                     </td>
                 <% end %>
             <% end %>

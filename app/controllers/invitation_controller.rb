@@ -18,15 +18,13 @@ class InvitationController < ApplicationController
       if !participant
         flash[:note] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
       else
-        team_member=TeamsUser.all(:conditions => ['team_id =? and user_id =?', team.id, user.id])
-
+        team_member = TeamsUser.all(:conditions => ['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
         if (team_member.size > 0)
           flash[:note] = "\"#{user.name}\" is already a member of team."
         else
-          sent_invitation=Invitation.all(:conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', student.user_id, user.id, student.parent_id])
           #check if the invited user is already invited (i.e. awaiting reply)
-          if sent_invitation.length == 0
+          if Invitation.is_invited?(student.user_id, user.id, student.parent_id)
             @invitation = Invitation.new
             @invitation.to_id = user.id
             @invitation.from_id = student.user_id
@@ -39,7 +37,9 @@ class InvitationController < ApplicationController
         end
       end
     end
+
     update_join_team_request
+
     redirect_to :controller => 'student_team', :action => 'view', :id=> student.id
   end
 

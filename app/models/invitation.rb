@@ -65,4 +65,12 @@ class Invitation < ActiveRecord::Base
 
     return can_add_member
   end
+
+  def self.is_invited?(invitee_user_id, invited_user_id, assignment_id)
+    sent_invitation = Invitation.all(:conditions => ['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', invitee_user_id, invited_user_id, assignment_id])
+    if sent_invitation.length == 0
+      return true
+    end
+    return false
+  end
 end

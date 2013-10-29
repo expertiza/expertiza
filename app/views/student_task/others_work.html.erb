@@ -14,7 +14,7 @@
       <!--% removed code that handles team and individual assignments differently -->
   <% author = AssignmentTeam.find(review_map.team_id)
      if author != nil %>
-    <% @review = Review.find_by_review_mapping_id(review_map.id) %>
+    <% @review = Review.find_by_review_mapping_id(review_map.map_id) %>
     <% if (@review)%>
       <li><%= @assignment.name %> Review <%= review_no%> &nbsp;<%= link_to "View",{:controller => 'review', :action => 'view_review', :id => @review.id} %> &nbsp;
       <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
@@ -22,7 +22,7 @@
       <% end %>
     <% else %>    
   	  <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
-		<li><%= @assignment.name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.id, :assignment => @assignment.id} %></li>
+		<li><%= @assignment.name %> Review <%=review_no%> &nbsp;<%= link_to "Begin",{:controller => 'review', :action => 'new_review', :id => review_map.map_id, :assignment => @assignment.id} %></li>
   	  <% else %>
    		<li><%= @assignment.name %> Review <%=review_no%> &nbsp;Begin</li>
   	  <% end 
@@ -36,7 +36,7 @@
    <tr><ul>
      <%ror_no = 1%>
      <%for ror_map in @review_of_review_mappings %>
-        <%@ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.id)%>
+        <%@ror = ReviewOfReview.find_by_review_of_review_mapping_id(ror_map.map_id)%>
         <% if (@ror)%>
           <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Metareview
               <%= ror_no%> &nbsp;<%= link_to "View",{:controller => 'review_of_review', :action => 'view', :id => @ror.id} %> &nbsp;
@@ -48,7 +48,7 @@
               <% if StudentAssignmentHelper::get_current_stage(@assignment.id) != "Complete" %>
                  <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Metareview
                      <%= ror_no%> &nbsp;<%= link_to "Begin",{:controller => 'review_of_review', :action => 'new',
-                                         :id => ror_map.id, :assignment => @assignment.id} %>
+                                         :id => ror_map.map_id, :assignment => @assignment.id} %>
                 </li>
               <%else%>
                 <li><%= Assignment.find_by_id(review_map.assignment_id).name %> Metareview <%=ror_no%> &nbsp;Begin</li>

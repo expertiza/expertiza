@@ -40,7 +40,7 @@ class GradesController < ApplicationController
     #deleting all metareview notifications
     rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
     for rmap in rmaps
-      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.id)
+      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.map_id)
       if !mmaps.nil?
         for mmap in mmaps
           mmap.notification_accepted = true
@@ -90,10 +90,10 @@ class GradesController < ApplicationController
         review_mapping = ParticipantReviewResponseMap.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
       end
     end
-    review = Response.find_by_map_id(review_mapping.id)
+    review = Response.find_by_map_id(review_mapping.map_id)
 
     unless review_exists
-      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.id, :return => "instructor"
+      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.map_id, :return => "instructor"
     else
       redirect_to :controller => 'response', :action => 'edit', :id => review.id, :return => "instructor"
     end

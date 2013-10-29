@@ -1,7 +1,5 @@
 class ResponseMap < Response
 
-  alias_attribute :id, :map_id
-
   def response_id
     self['id']
   end
@@ -21,7 +19,7 @@ class ResponseMap < Response
         if map.response
           @all_resp=Response.all
           for element in @all_resp
-            if (element.map_id == map.id)
+            if (element.map_id == map.map_id)
               @array_sort << element
             end
           end

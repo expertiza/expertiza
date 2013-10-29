@@ -7,7 +7,7 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
 
-    map_id = @response.map.id
+    map_id = @response.map.map_id
     @response.delete
     redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
   end
@@ -23,7 +23,7 @@ class ResponseController < ApplicationController
     @prev=Response.all
     #get all versions and find the latest version
     for element in @prev
-      if (element.map_id==@map.id)
+      if (element.map_id==@map.map_id)
         array_not_empty=1
         @review_scores << element
       end
@@ -100,7 +100,7 @@ class ResponseController < ApplicationController
       @feedback = params[:feedback]
       @map = ResponseMap.find(params[:id])
       @return = params[:return]
-      @modified_object = @map.id
+      @modified_object = @map.map_id
       get_content
       #**********************
       # Check whether this is Jen's assgt. & if so, use her rubric
@@ -133,7 +133,7 @@ class ResponseController < ApplicationController
     @review_scores=Array.new
     @prev=Response.all
     for element in @prev
-      if (element.map_id==@map.id)
+      if (element.map_id==@map.map_id)
         array_not_empty=1
         @review_scores << element
       end
@@ -142,7 +142,7 @@ class ResponseController < ApplicationController
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
     end
-    @response = Response.find_by_map_id_and_version_num(@map.id, @largest_version_num.version_num)
+    @response = Response.find_by_map_id_and_version_num(@map.map_id, @largest_version_num.version_num)
     @modified_object = @response.response_id
     get_content
     @review_scores = Array.new
@@ -197,7 +197,7 @@ class ResponseController < ApplicationController
     rescue
       msg = "An error occurred while saving the response: "+$!
     end
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
   end
 
   def custom_update
@@ -221,7 +221,7 @@ class ResponseController < ApplicationController
     end
 
     msg = "#{@map.get_title} was successfully saved."
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
   end
 
   def new_feedback
@@ -232,14 +232,14 @@ class ResponseController < ApplicationController
       if map.nil?
         map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)
       end
-      redirect_to :action => 'new', :id => map.id, :return => "feedback"
+      redirect_to :action => 'new', :id => map.map_id, :return => "feedback"
     else
       redirect_to :back
     end
   end
 
   def view
-    @response = ResponseMap.find(params[:id])
+    @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
     @map = @response.map
     get_content
@@ -261,7 +261,7 @@ class ResponseController < ApplicationController
     @feedback = params[:feedback]
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
-    @modified_object = @map.id
+    @modified_object = @map.map_id
     get_content
 
     # Check whether this is a custom rubric
@@ -302,7 +302,7 @@ class ResponseController < ApplicationController
       @review_scores=Array.new
       @prev=Response.all
       for element in @prev
-        if (element.map_id==@map.id)
+        if (element.map_id==@map.map_id)
           array_not_empty=1
           @review_scores << element
         end
@@ -322,8 +322,7 @@ class ResponseController < ApplicationController
       else
         @version=1
       end
-      debugger
-      @response = Response.find__all_by_map_id(@map.id)[0]
+      @response = Response.find_all_by_map_id(@map.map_id)[0]
       @response.additional_comment = params[:review][:comments]
       @response.version_num = @version
       @response.save
@@ -350,7 +349,7 @@ class ResponseController < ApplicationController
       error_msg = "Your response was not saved. Cause: " + $!
     end
 
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end
 
   def custom_create
@@ -384,9 +383,9 @@ class ResponseController < ApplicationController
       #calling the automated metareviewer controller, which calls its corresponding model/view
       if (params[:save_options] == "WithMeta")
         # puts "WithMeta"
-        redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.id
+        redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.map_id
       elsif (params[:save_options] == "EmailMeta")
-        redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+        redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
         # calculate the metareview metrics
         @automated_metareview = AutomatedMetareview.new
         #pass in the response id as a parameter
@@ -396,10 +395,10 @@ class ResponseController < ApplicationController
         @automated_metareview.send_metareview_metrics_email(@response, params[:id])
       elsif (params[:save_options] == "WithoutMeta")
         # puts "WithoutMeta"
-        redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+        redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
     else
-      redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+      redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
     end
   end
 

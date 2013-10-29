@@ -189,7 +189,7 @@ class ReviewMappingController < ApplicationController
     rescue
       flash[:error] = $!
     end
-    debugger
+
     if params[:contributor_id]
       redirect_to :action => 'add_reviewer',     :id => params[:id], :user_id => user.id, :contributor_id => params[:contributor_id]
     else

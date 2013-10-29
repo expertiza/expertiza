@@ -1,7 +1,5 @@
 class ResponseMap < Response
 
-  alias_attribute :id, :map_id
-
   def response_id
     self['id']
   end

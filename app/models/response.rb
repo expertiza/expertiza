@@ -51,7 +51,8 @@ class Response < ActiveRecord::Base
     end
     # End of custom code
     count = 0
-    self.scores.each {
+    #self.scores.each {
+    Score.find_all_by_response_id(self.response_id).each {
         |reviewScore|
       count += 1
       code += '<big><b>Question '+count.to_s+":</b> <I>"+Question.find_by_id(reviewScore.question_id).txt+"</I></big><BR/><BR/>"

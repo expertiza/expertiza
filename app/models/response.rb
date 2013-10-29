@@ -1,9 +1,17 @@
 class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
+  belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id'
+  has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id'
+  before_create :add_dummy_map_id
 
-  delegate :questionnaire, :reviewee, :reviewer,
-    :to => :map
+  def add_dummy_map_id
+    self.map_id = Response.maximum(:map_id) + 1
+  end
+
+  def map
+    self
+  end
 
   def team_has_user?(user)
     reviewer.team.has_user user
@@ -21,7 +29,7 @@ class Response < ActiveRecord::Base
       identifier += "<H2>Feedback from author</H2>"
     end
     if prefix
-      identifier += "<B>Reviewer:</B> #{count}"#+self.map.reviewer.fullname
+      identifier += "<B>Reviewer:</B> #{count}" #+self.map.reviewer.fullname
       str = prefix+"_"+self.id.to_s
     else
       identifier += '<B>'+self.map.get_title+'</B> '+count.to_s+'</B>'

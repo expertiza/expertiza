@@ -1,0 +1,11 @@
+
+<p><b>Controller:</b> <%= @controller_action.controller.name %></p>
+<p><b>Action:</b> <%= @controller_action.name %></p>
+<p><b>Permission:</b> <%= @controller_action.permission.name %></p>
+
+<hr/>
+<p><%= link_to 'Edit', :action => 'edit', :id => @controller_action %> |
+<%= link_to 'Delete', {:action => 'destroy', :id => @controller_action.id}, 
+    :confirm => 'Are you sure?', 
+    :method => :post %></p>
+<p><%= link_to 'Back', :action => 'list' %> to Controllers/Actions list</p>

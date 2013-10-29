@@ -1,0 +1,3 @@
+"student1"*"student1"*"student1@foo.edu"*"-"*
+"student2"*"student2"*"student2@foo.edu"*"-"*
+"student3"*"student3"*"student3@foo.edu"*"-"*

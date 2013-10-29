@@ -1,0 +1,47 @@
+<h2>Advertisements</h2>
+
+<h2>Team members</h2>
+<% if @student.team == nil %>
+    You don't have a team yet!
+<% else %>
+
+    <b>Team Name: </b><%= @student.team.name %>
+
+    <%= link_to "Edit Name",
+                {:controller => 'student_team', :action => 'edit', :team_id => @student.team.id, :student_id => @student.id} %>
+    <table>
+      <tr>
+        <td><b>Username &nbsp</b></td>
+        <td><b>Full Name &nbsp</b></td>
+        <td><b>Email &nbsp</b></td>
+        <td></td>
+      </tr>
+      <% for member in @student.team.get_participants %>
+          <tr>
+            <td><%= member.user.name %></td>
+            <td><%= member.user.fullname %></td>
+            <td><%= member.user.email %></td>
+            <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
+
+                <% map = TeammateReviewResponseMap.find(:first, :conditions => ['reviewer_id = ? and reviewee_id = ?', @student.id, member.id])
+                   if map.nil?
+                       map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
+                   end
+                   review = map.response
+                   if review.nil? %>
+                    <td>
+                      <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.id, :return => "teammate"} %>
+                    </td>
+                <% else %>
+                    <td>
+                      <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
+                    </td>
+                    <td>
+                      <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+                    </td>
+                <% end %>
+            <% end %>
+          </tr>
+      <% end %>
+    </table>
+<% end %>

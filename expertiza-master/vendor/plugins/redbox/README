@@ -1,0 +1,89 @@
+Redbox
+======
+
+Redbox is a very simple lightbox library, which is a way of display a model popup window which may contain any html, while the rest
+of the page is faded out behind it. There are already many such libraries around for this, but:
+
+ - Often they do a little more than I wanted
+ - Many of them require a large javascript library that isn't prototype/scriptaculous. While I don't really have an opinion on which library
+   is better, prototype is generally the one that we're using for rails, so I wanted a lightbox that took advantage of that,
+   rather than forcing me to include another library which might class.
+ - Many of them where not compatible with rails' ajax system. I wanted to be able to do multi-page forms within a lightbox,
+   using form_remote_tag, or any other means of reloading the lightbox div using ajax.
+
+And of course, I wanted it all packaged as a nice rails plugin with handy helpers to use it. 
+
+
+Credits
+=======
+
+Much of the design, and some of the javascript and css are shamelessly ripped from the Thickbox library, by Cody Lindley. 
+
+This library should be considered to be a derivative work of Thickbox, and is also released under the MIT licence.
+
+http://jquery.com/demo/thickbox/
+
+Redbox Rails plugin development by Craig Ambrose
+
+http://www.craigambrose.com
+
+Additional code submissions, testing and bugfixes by:
+- Brandon Keepers
+- Niko Dittmann
+- Randy Parker
+- Julien Coupard
+- Erin Staniland
+(and many more)
+
+Licence
+=======
+
+MIT License
+
+http://www.opensource.org/licenses/mit-license.php
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so.
+
+
+Usage
+=====
+
+Examine the public methods of redbox_helper.rb. They will all look familiar, much like the existing link helpers, except that they work with redboxes. You should not need to interact with the javascript directly.
+
+Redbox provides three helpers which are used instead of a regular “link_to” helper when linking to a redbox.
+
+link_to_redbox(name, id, html_options = {})
+
+This is used if you already have an HTML element in your page (presumably hidden, but it doesn’t have to be) and you wish to use it for your redbox. Specify it by it’s id, and you’re in business.
+
+link_to_component_redbox(name, url_options = {}, html_options = {})
+
+This serves essentially the same purpose, but it uses the url_options supplied to load another page from your app into a hidden div on page load. This saves you having to do it yourself, but beware that there are definite performance implications to using components.
+
+link_to_remote_redbox(name, link_to_remote_options = {}, html_options = {})
+
+This waits until the link is clicked on to load the redbox using ajax, and displays loading graphics while it’s waiting.
+
+link_to_close_redbox(name, html_options = {})
+
+Allows you to put a link (presumably inside the redbox) to close it. Other way to close it is to refresh the entire page, but obviously closing it with javascript is spiffier.
+
+More Info
+=========
+
+A static page is maintained for this plugin at:
+
+	http://www.craigambrose.com/projects/redbox
+
+Updates are always posted at:
+
+	http://blog.craigambrose.com
+	
+Bugs, once you have tracked down the exact problem and can reproduce a failure case, can be reported to:
+
+	craig@craigambrose.com
+
+If you find this plugin useful, you can give something back to the community by examining your own code and seeing
+what bits of functionality are generic enough to be useful as a rails plugin. Releasing rails plugins is dead
+simple, and helps us all do better work.
+

@@ -1,0 +1,17 @@
+<h1>Super-Administrators</h1>
+
+<table>
+  <tr><th>Name</th><th>Full name</th><th>E-mail address</th><th>Parent</th></tr>
+<% for user in @users %>
+  <tr>
+    <td><%= link_to user.name, :action => 'show',
+            :id => user.id %></td>
+    <td><%= user.fullname %></td>
+    <td><%= user.email %></td>
+    <td><%= (User.find_by_id(user.parent_id)).name  %></td>
+    </tr>
+<% end -%>
+</table>
+
+<hr/>
+<p><%= link_to 'New Super administrator', :action => 'new' %></p>

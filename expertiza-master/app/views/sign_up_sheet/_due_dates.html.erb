@@ -1,0 +1,39 @@
+<table class="general">
+    <tr>
+    <th>#</th>
+	<th>Topic name</th>
+    <th>Submission deadline</th>
+    <th>Review deadline</th>
+    
+    <%for i in 2..@assignment.get_review_rounds%>
+        <th>Resubmission deadline <%=i%></th>
+        <th>Review deadline <%=i%></th>
+    <%end%>
+    <th>Metareview deadline</th>
+    </tr>
+    <% i=0 %>
+    <%@resubmission_rounds = @assignment.get_review_rounds%>
+  
+    <% for @due_date in @duedates %>      
+      <tr>
+        <td><%= @due_date['topic_identifier'] %></td>
+		<td><%= @due_date['topic_name'] %></td>
+        <%= hidden_field('due_date[]', 't_id', :id => 'due_date_' + @due_date['t_id'].to_s) %>
+        <%for j in 1..@resubmission_rounds%>
+        <td>
+          <%= text_field 'due_date[]' ,'submission_' + j.to_s, :size=>20, :id => 'due_date_' + @due_date.t_id.to_s + '_submission_' + j.to_s + '_due_date' , :onclick => "NewCal('due_date_" + @due_date.t_id.to_s + "_submission_" + j.to_s + "_due_date','YYYYMMDD',true,24); return false;" %>
+        </td>
+        <td>
+          <%= text_field 'due_date[]', 'review_' + j.to_s, :size=>20, :id => 'due_date_' + @due_date.t_id.to_s + '_review_' + j.to_s + '_due_date', :onclick => "NewCal('due_date_" + @due_date.t_id.to_s + "_review_" + j.to_s + "_due_date','YYYYMMDD',true,24); return false;" %>
+        </td>
+        <%end%>
+        <td>
+          <%= text_field 'due_date[]' ,'submission_' + (j+1).to_s, :size=>20, :id => 'due_date_' + @due_date.t_id.to_s + '_submission_' + (j+1).to_s + '_due_date' , :onclick => "NewCal('due_date_" + @due_date.t_id.to_s + "_submission_" + (j+1).to_s + "_due_date','YYYYMMDD',true,24); return false;" %>
+        </td>
+      </tr>
+      <% i=i+1 %>
+    <% end %>
+</table>
+<br/>
+<%= submit_tag "Save start/due dates" %>
+

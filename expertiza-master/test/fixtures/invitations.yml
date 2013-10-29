@@ -1,0 +1,61 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+create_invitation_with_waiting_reply:
+  from_id: <%= Fixtures.identify(:student4) %>
+  to_id: <%= Fixtures.identify(:student7) %>
+  assignment_id: <%= Fixtures.identify(:assignment0) %>
+  reply_status: 'W'
+
+accept_invitation_with_team_and_members:
+  from_id: <%= Fixtures.identify(:student4) %>
+  to_id: <%= Fixtures.identify(:student7) %>
+  assignment_id: <%= Fixtures.identify(:assignment0) %>
+  reply_status: 'A'
+  
+accept_invitation_without_team:
+  from_id: <%= Fixtures.identify(:student4) %>
+  to_id: <%= Fixtures.identify(:student9) %>
+  assignment_id: <%= Fixtures.identify(:assignment0) %>
+  reply_status: 'A'
+  
+decline_invitation:
+  from_id: <%= Fixtures.identify(:student5) %>
+  to_id: <%= Fixtures.identify(:student8) %>
+  assignment_id: <%= Fixtures.identify(:assignment0) %>
+  reply_status: 'W'
+  
+cancel_invitation:
+  from_id: <%= Fixtures.identify(:student4) %>
+  to_id: <%= Fixtures.identify(:student8) %>
+  assignment_id: <%= Fixtures.identify(:assignment0) %>
+  reply_status: 'W'
+  
+accept_invitation_with_team_and_no_members:
+  from_id: <%= Fixtures.identify(:student4) %>
+  to_id: <%= Fixtures.identify(:student9) %>
+  assignment_id: <%= Fixtures.identify(:assignment0) %>
+  reply_status: 'A'
+  
+#Invitations for course_object_oriented and instructor1
+invitation1:
+  assignment_id: <%= Fixtures.identify(:assignment_project1) %>
+  from_id: <%= Fixtures.identify(:student1) %>
+  to_id: <%= Fixtures.identify(:student2) %>
+  reply_status: A
+
+invitation2:
+  assignment_id: <%= Fixtures.identify(:assignment_project2) %>
+  from_id: <%= Fixtures.identify(:student3) %>
+  to_id: <%= Fixtures.identify(:student1) %>
+  reply_status: A
+
+ invitation3:
+   assignment_id: <%= Fixtures.identify(:assignment_project2) %>
+   from_id: <%= Fixtures.identify(:student5) %>
+   to_id: <%= Fixtures.identify(:student6) %>
+   reply_status: W
+
+ invitation4:
+    assignment_id: <%= Fixtures.identify(:assignment_project2) %>
+    from_id: <%= Fixtures.identify(:student6) %>
+    to_id: <%= Fixtures.identify(:student5) %>
+    reply_status: W

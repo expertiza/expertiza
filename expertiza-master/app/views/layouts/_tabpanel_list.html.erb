@@ -1,0 +1,7 @@
+<br/>
+<ul class="tablist">
+<% for i in 0 ... div_ids.length do -%>
+<li><a<%= if div_current == div_ids[i] then ' class="current"' else '' end %>
+href="javascript:switchid('<%= div_ids[i] %>');"><%= div_names[i] %></a></li>
+<% end -%>
+</ul>

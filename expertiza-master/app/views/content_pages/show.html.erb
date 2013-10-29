@@ -1,0 +1,57 @@
+<h1> Content Page: <%=h @content_page.title %></h1>
+
+<table>
+<tr><th>Name</th><td><%=h @content_page.name %></td></tr>
+<tr><th>Title</th><td><%=h @content_page.title %></td></tr>
+<tr><th>Created At</th><td><%=h @content_page.created_at %></td></tr>
+<tr><th>Updated At</th><td><%=h @content_page.updated_at %></td></tr>
+</table>
+
+<hr/>
+<h2> Page Preview </h2>
+
+<div class="html_panel">
+<%= @content_page.content_html %>
+</div>
+
+
+<h2> Dependants </h2>
+
+<div class="guidance_text">
+<p><strong>Note:</strong> if other parts of the site are dependent on
+this page you will not be allowed to delete it, otherwise the site
+would be broken. If you want to delete this page first set all of its
+dependants to use some other page.</p>
+</div>
+
+<h3> System Default Pages </h3>
+
+<% if @system_pages -%>
+<ul>
+  <% for page in @system_pages do-%>
+  <li><%= page %></li>
+  <% end -%>
+</ul>
+<% else -%>
+<p> (Not a system default page) </p>
+<% end -%>
+
+
+<h3> Menu Items </h3>
+
+<% if @menu_items and @menu_items.length > 0 -%>
+<ul>
+<% for item in @menu_items do -%>
+<li> <%=h item.label %> </li>
+<% end -%>
+</ul> 
+<% else -%>
+<p> (No menu items for this page) </p>
+<% end -%>
+
+<hr/>
+<p><%= link_to 'Edit', :action => 'edit', :id => @content_page %> |
+<%= link_to 'Delete', {:action => 'destroy', :id => @content_page}, 
+    :confirm => 'Delete this Content Page?', :method => :post %></p>
+
+<p><%= link_to 'Back', :action => 'list' %> to Content Pages list</p>

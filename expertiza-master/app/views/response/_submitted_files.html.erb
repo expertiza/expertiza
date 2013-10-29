@@ -1,0 +1,7 @@
+<% @files = participant.get_submitted_files %>
+<% if @files and @files.length > 0 %>
+<b>Submitted Files</b>&nbsp;&nbsp;&nbsp;<a href="#" id="filesLink" name="filesLink" onClick="toggleElement('files','files');return false;">show files</a><br/>
+  <div id="files" style="display:none">
+     <%= display_directory_tree(participant, @files, true) %>
+  </div>
+<% end %>

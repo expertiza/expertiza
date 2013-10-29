@@ -76,7 +76,7 @@ end
   def compare_reviews_with_questions_responses(auto_metareview, map_id)
     review_text_arr = auto_metareview.review_array
     response = Response.find(:first, :conditions => ["map_id = ?", map_id])
-    scores = Score.find(:all, :conditions => ["response_id = ?", response.id])
+    scores = Score.find(:all, :conditions => ["response_id = ?", response.response_id])
     questions = Array.new
     #fetching the questions for the responses
     for i in 0..scores.length - 1

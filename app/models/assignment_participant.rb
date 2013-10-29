@@ -168,7 +168,6 @@ class AssignmentParticipant < Participant
     scores[:participant] = self # This doesn't appear to be used anywhere
     self.assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
-      debugger
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
       scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end

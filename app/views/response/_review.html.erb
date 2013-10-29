@@ -33,7 +33,7 @@
     rs_temp = @review_scores
     @review_scores = Array.new
     questions.each{ | question |
-      @review_scores << Score.find_by_response_id_and_question_id(response.id, question.id)
+      @review_scores << Score.find_by_response_id_and_question_id(response.response_id, question.id)
     }
     i = 0
     questions.each { | question |

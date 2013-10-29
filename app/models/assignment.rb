@@ -341,9 +341,13 @@ class Assignment < ActiveRecord::Base
       # directory is empty
     end
 
-    (directory.size == 2) ?
-        Dir.delete(RAILS_ROOT + '/pg_data/' + self.directory_path) :
-        raise 'Assignment directory is not empty' if !is_wiki_assignment && !self.directory_path.empty? && !directory.nil?
+    if !is_wiki_assignment and !self.directory_path.empty? and !directory.nil?
+      if directory.size == 2
+        Dir.delete(RAILS_ROOT + '/pg_data/' + self.directory_path)
+      else
+        raise 'Assignment directory is not empty'
+      end
+    end
     self.assignment_questionnaires.each { |aq| aq.destroy }
     self.destroy
   end
@@ -554,19 +558,29 @@ class Assignment < ActiveRecord::Base
     (due_date == nil || due_date == 'Finished') ? nil : due_date
   end
 
-  def find_next_stage
-    due_dates = DueDate.find(:all, conditions: ['assignment_id = ?', self.id], order: 'due_at DESC')
-    if due_dates != nil && due_dates.size > 0
+  def find_next_stage()
+    due_dates = DueDate.find(:all,
+                             :conditions => ['assignment_id = ?', self.id],
+                             :order => 'due_at DESC')
+
+    if due_dates != nil and due_dates.size > 0
       if Time.now > due_dates[0].due_at
         return 'Finished'
       else
         i = 0
-        due_dates.each do |due_date|
-          (i > 0) ? return due_dates[i-1] : return nil if Time.now < due_date.due_at &&
-              (due_dates[i+1] == nil || Time.now > due_dates[i+1].due_at)
+        for due_date in due_dates
+          if Time.now < due_date.due_at and
+              (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
+            if i > 0
+              return due_dates[i-1]
+            else
+              return nil
+            end
+          end
           i = i + 1
         end
-       return nil
+
+        return nil
       end
     end
   end

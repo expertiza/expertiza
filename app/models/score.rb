@@ -70,6 +70,7 @@ class Score < ActiveRecord::Base
     @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
     x = 0
+    y = 0
     if @questionnaire.section == "Custom"
       @questions.each {
           |question|

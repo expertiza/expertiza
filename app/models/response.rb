@@ -82,24 +82,27 @@ class Response < ActiveRecord::Base
   def notify_on_difference(new_pct, avg_pct, limit)
     mapping = self.map
     instructor = mapping.assignment.instructor
-    Mailer.deliver_message(
-        {:recipients => instructor.email,
-         :subject => "Expertiza Notification: A review score is outside the acceptable range",
-         :body => {
-             :first_name => ApplicationHelper::get_user_first_name(instructor),
-             :reviewer_name => mapping.reviewer.fullname,
-             :type => "review",
-             :reviewee_name => mapping.reviewee.fullname,
-             :limit => limit,
-             :new_pct => new_pct,
-             :avg_pct => avg_pct,
-             :types => "reviews",
-             :performer => "reviewer",
-             :assignment => mapping.assignment,
-             :partial_name => 'limit_notify'
-         }
-        }
-    )
+    begin
+      Mailer.deliver_message(
+          {:recipients => instructor.email,
+           :subject => "Expertiza Notification: A review score is outside the acceptable range",
+           :body => {
+               :first_name => ApplicationHelper::get_user_first_name(instructor),
+               :reviewer_name => mapping.reviewer.fullname,
+               :type => "review",
+               :reviewee_name => mapping.reviewee.fullname,
+               :limit => limit,
+               :new_pct => new_pct,
+               :avg_pct => avg_pct,
+               :types => "reviews",
+               :performer => "reviewer",
+               :assignment => mapping.assignment,
+               :partial_name => 'limit_notify'
+           }
+          }
+      )
+    rescue
+    end
   end
 
   def delete

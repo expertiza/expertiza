@@ -9,7 +9,7 @@ class MetareviewResponseMap < ResponseMap
       @sorted_array=Array.new
       @prev=Response.all
       for element in @prev
-        if(element.map_id==self.review_mapping.id)
+        if(element.map_id==self.review_mapping.map_id)
           array_not_empty=1
           @sorted_array << element
         end
@@ -93,12 +93,12 @@ class MetareviewResponseMap < ResponseMap
         raise ImportError, "No review mapping was found for contributor, "+contributor.name+", and reviewee, "+row[1].to_s+"."
       end
         
-      existing_mappings = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewer_id_and_reviewed_object_id(reviewee.id, reviewer.id, reviewmapping.id)
+      existing_mappings = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewer_id_and_reviewed_object_id(reviewee.id, reviewer.id, reviewmapping.map_id)
       # if no mappings have already been imported for this combination
       # create it. 
 
       if existing_mappings.size == 0
-          MetareviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => reviewmapping.id )                            
+          MetareviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => reviewmapping.map_id )
       end    
       
       index += 1

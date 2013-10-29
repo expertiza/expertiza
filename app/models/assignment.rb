@@ -234,7 +234,7 @@ class Assignment < ActiveRecord::Base
   def metareview_mappings
     mappings = Array.new
     self.review_mappings.each do |map|
-      mmap = MetareviewResponseMap.find_by_reviewed_object_id(map.id)
+      mmap = MetareviewResponseMap.find_by_reviewed_object_id(map.map_id)
       if mmap != nil
         mappings << mmap
       end
@@ -616,7 +616,7 @@ class Assignment < ActiveRecord::Base
     @response_maps=ResponseMap.find(:all, :conditions => ['reviewed_object_id = ? and type = ?', self.id, @response_type])
     for response_map in @response_maps
       # Check if response is there
-      @corresponding_response = Response.find(:first, :conditions => ['map_id = ?', response_map.id])
+      @corresponding_response = Response.find(:first, :conditions => ['map_id = ?', response_map.map_id])
       @respective_scores = Hash.new
       if @review_scores[response_map.reviewer_id] != nil
         @respective_scores = @review_scores[response_map.reviewer_id]

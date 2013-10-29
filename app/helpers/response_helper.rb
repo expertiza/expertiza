@@ -5,51 +5,52 @@ module ResponseHelper
   # the existing scores by a given percentage (defined by
   # the instructor) then notify the instructor.
   # ajbudlon, nov 18, 2008
-  def self.compare_scores(new_response, questionnaire) 
+  def self.compare_scores(new_response, questionnaire)
     map_class = new_response.map.class
     existing_responses = map_class.get_assessments_for(new_response.map.reviewee)
-    total, count = get_total_scores(existing_responses,new_response)     
+    total, count = get_total_scores(existing_responses, new_response)
     if count > 0
       notify_instructor(new_response.map.assignment, new_response, questionnaire, total, count)
     end
-  end   
-  
+  end
+
   # Compute the scores previously awarded to the recipient
   # ajbudlon, nov 18, 2008
-  def self.get_total_scores(item_list,curr_item)
+  def self.get_total_scores(item_list, curr_item)
     total = 0
     count = 0
     item_list.each {
-      | item | 
+        |item|
       if item.id != curr_item.id
-        count += 1        
-        total += item.get_total_score                
+        count += 1
+        total += item.get_total_score
       end
-    } 
-    return total,count
+    }
+    return total, count
   end
-  
+
   # determine if the instructor should be notified
   # ajbudlon, nov 18, 2008
-  def self.notify_instructor(assignment,curr_item,questionnaire,total,count)
-     max_possible_score, weights = assignment.get_max_score_possible(questionnaire)
-     new_score = curr_item.get_total_score.to_f*weights            
-     existing_score = (total.to_f/count).to_f*weights
+  def self.notify_instructor(assignment, curr_item, questionnaire, total, count)
+    max_possible_score, weights = assignment.get_max_score_possible(questionnaire)
+    new_score = curr_item.get_total_score.to_f*weights
+    existing_score = (total.to_f/count).to_f*weights
 
-     aq = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(assignment.instructor_id, assignment.id, questionnaire.id)
-    
-     unless aq
-       aq = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(assignment.instructor_id, nil, nil)
-     end
+    aq = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(assignment.instructor_id, assignment.id, questionnaire.id)
 
-     if aq
-       allowed_difference = max_possible_score.to_f * aq.notification_limit / 100
-       if new_score < (existing_score - allowed_difference) or new_score > (existing_score + allowed_difference)
-         new_pct = new_score.to_f/max_possible_score
-         avg_pct = existing_score.to_f/max_possible_score
-         curr_item.notify_on_difference(new_pct,avg_pct,aq.notification_limit)
-       end
-     end
+    unless aq
+      aq = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(assignment.instructor_id, nil, nil)
+    end
+
+    if aq
+      allowed_difference = max_possible_score.to_f * aq.notification_limit / 100
+      if new_score < (existing_score - allowed_difference) or new_score > (existing_score + allowed_difference)
+        new_pct = new_score.to_f/max_possible_score
+        avg_pct = existing_score.to_f/max_possible_score
+        debugger
+        curr_item.notify_on_difference(new_pct, avg_pct, aq.notification_limit)
+      end
+    end
   end
 
   def label(object_name, method, label)
@@ -58,7 +59,7 @@ module ResponseHelper
 
   def remove_empty_advice(advices)
     filtered_advices = Array.new
-    advices.each { | advice |
+    advices.each { |advice|
       if advice.advice.to_s != ""
         filtered_advices << advice
       end
@@ -140,7 +141,7 @@ module ResponseHelper
       when "TextField"
         #Parameters
         #section::size::separator1|separator2::curr_ques|max_ques
-        q_parameter =  ques_type.parameters.split("::")
+        q_parameter = ques_type.parameters.split("::")
 
         #look for size parameters
         size = default_textfield_size
@@ -174,7 +175,7 @@ module ResponseHelper
       when "TextArea"
         #Parameters
         #section::size::tableTitle::tableHeader1|tableHeader2::curr_col_ques|total_col_ques|curr_col|max_cols
-        q_parameter =  ques_type.parameters.split("::")
+        q_parameter = ques_type.parameters.split("::")
 
         #look for size parameters
         size = default_textarea_size
@@ -212,7 +213,7 @@ module ResponseHelper
       when "DropDown"
         #Parameters
         #section::ddValue1|ddValue2::tableTitle::tableHeader1|tableHeader2::curr_col_ques|total_col_ques|curr_col|max_cols
-        q_parameter =  ques_type.parameters.split("::")
+        q_parameter = ques_type.parameters.split("::")
 
         #look for dropdown values
         dd_values = default_dropdown
@@ -237,7 +238,7 @@ module ResponseHelper
         #Parameters
         #section::currQues|2
 
-        q_parameter =  ques_type.parameters.split("::")
+        q_parameter = ques_type.parameters.split("::")
 
         #get current question
         if !q_parameter[1].nil? && q_parameter[1].length > 0
@@ -263,6 +264,6 @@ module ResponseHelper
           end
           render :partial => "response/dropdown", :locals => {:ques_num => q_number, :ques_text => question.txt, :options => score_range, :table_title => nil, :table_headers => nil, :start_col => nil, :start_table => nil, :end_col => nil, :end_table => nil, :view => view_output}
         end
-      end
+    end
   end
 end

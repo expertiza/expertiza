@@ -8,7 +8,7 @@
 
 #Displays all the topics available for an assignment, including number of people who can choose the topic, number of
 #people who have already chosen the topic, etc
-  def signup_topics
+  def list
     @assignment_id = params[:id]
     @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', params[:id]])
     @slots_filled =  SignUpTopic.find_slots_filled(params[:id])
@@ -34,10 +34,10 @@
         @selected_topics = nil
       else
         #TODO: fix this; cant use 0
-        @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
+        @selected_topics = other_confirmed_topic_for_user(params[:id], users_team[0].t_id)
       end
     else
-      @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)
+      @selected_topics = other_confirmed_topic_for_user(params[:id], session[:user].id)
     end
   end
 
@@ -59,14 +59,14 @@
         team = AssignmentTeam.create_team_and_node(params[:assignment_id])
         user = User.find(session[:user].id)
         teamuser = create_team_users(user, team.id)
-        confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id])
+        confirmationStatus = confirm_topic(team.id, params[:id], params[:assignment_id])
       else
-        confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id])
+        confirmationStatus = confirm_topic(users_team[0].t_id, params[:id], params[:assignment_id])
       end
     else
-      confirmationStatus = confirmTopic(session[:user].id, params[:id], params[:assignment_id])
+      confirmationStatus = confirm_topic(session[:user].id, params[:id], params[:assignment_id])
     end
-    redirect_to :action => 'signup_topics', :id => params[:assignment_id]
+    redirect_to :action => 'list', :id => params[:assignment_id]
   end
 
   # When using this method when creating fields, update race conditions by using db transactions
@@ -74,14 +74,14 @@
     SignUpTopic.slotAvailable?(topic_id)
   end
 #checks for other topics a user may have already signed up for. These include both confirmed as well as waitlisted topics
-  def otherConfirmedTopicforUser(assignment_id, creator_id)
+  def other_confirmed_topic_for_user(assignment_id, creator_id)
     user_signup = SignedUpUser.find_user_signup_topics(assignment_id,creator_id)
     user_signup
   end
 
-  def confirmTopic(creator_id, topic_id, assignment_id)
+  def confirm_topic(creator_id, topic_id, assignment_id)
     #check whether user has signed up already
-    user_signup = otherConfirmedTopicforUser(assignment_id, creator_id)
+    user_signup = other_confirmed_topic_for_user(assignment_id, creator_id)
 
     sign_up = SignedUpUser.new
     sign_up.topic_id = params[:id]
@@ -125,7 +125,7 @@
           end
         else
           #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-          SignUpTopic.cancel_all_waitlists(creator_id, assignment_id)
+          Waitlist.cancel_all_waitlists(creator_id, assignment_id)
           sign_up.is_waitlisted = false
           sign_up.save
 
@@ -146,7 +146,7 @@
 
   def delete_signup
     delete_signup_for_topic(params[:assignment_id],params[:id])
-    redirect_to :action => 'signup_topics', :id => params[:assignment_id]
+    redirect_to :action => 'list', :id => params[:assignment_id]
   end
 
 #used by delete_signup function above. This functions updates all the database tables when the user drops the topic
@@ -190,7 +190,7 @@
           end
           participant.update_topic_id(topic_id)
 
-          SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
+          Waitlist.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)
         end
       end
 

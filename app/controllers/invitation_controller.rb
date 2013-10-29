@@ -84,7 +84,7 @@ class InvitationController < ApplicationController
               participant = Participant.find_by_user_id_and_parent_id(user_id,old_team.assignment.id)
               participant.update_topic_id(old_teams_signup.topic_id)
                
-              SignUpTopic.cancel_all_waitlists(first_waitlisted_signup.creator_id, SignUpTopic.find(old_teams_signup.topic_id)['assignment_id'])
+              Waitlist.cancel_all_waitlists(first_waitlisted_signup.creator_id, SignUpTopic.find(old_teams_signup.topic_id)['assignment_id'])
             end # if !first_waitlisted_signup.nil
             # Remove the now-empty team from the slot it is occupying.
           end # if old_teams_signup.is_waitlisted == false

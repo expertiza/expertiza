@@ -2,18 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7b276755-119f-45da-826d-3c241428717f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/shared/_flash_messages.html.erb" afterPath="$PROJECT_DIR$/app/views/shared/_flash_messages.html.erb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/join_team_requests/_list_received.html.erb" afterPath="$PROJECT_DIR$/app/views/join_team_requests/_list_received.html.erb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/sign_up_sheet/_table_line.html.erb" afterPath="$PROJECT_DIR$/app/views/sign_up_sheet/_table_line.html.erb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/assignment_team.rb" afterPath="$PROJECT_DIR$/app/models/assignment_team.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log/development.log" afterPath="$PROJECT_DIR$/log/development.log" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/invitation.rb" afterPath="$PROJECT_DIR$/app/models/invitation.rb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/invitation_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/invitation_controller.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/unit/invitation_controller_test.rb" afterPath="$PROJECT_DIR$/test/unit/invitation_controller_test.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/join_team_requests_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/join_team_requests_controller.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/join_team_requests/new.html.erb" afterPath="$PROJECT_DIR$/app/views/join_team_requests/new.html.erb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/routes.rb" afterPath="$PROJECT_DIR$/config/routes.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/signed_up_user.rb" afterPath="$PROJECT_DIR$/app/models/signed_up_user.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/teams_user.rb" afterPath="$PROJECT_DIR$/app/models/teams_user.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/user.rb" afterPath="$PROJECT_DIR$/app/models/user.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="expertiza.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -25,16 +18,17 @@
     <file path="$PROJECT_DIR$/../CSC517_BackchannelApp/BackchannelApp/Gemfile" changelist="7b276755-119f-45da-826d-3c241428717f" time="1381971728113" ignored="false" />
     <file path="/routes.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1383002252535" ignored="false" />
     <file path="/teams_user.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1382997517359" ignored="false" />
-    <file path="/invitation_controller.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1382996044154" ignored="false" />
+    <file path="/invitation_controller.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1383008636899" ignored="false" />
     <file path="/Rails expertiza: development" changelist="7b276755-119f-45da-826d-3c241428717f" time="1382815337295" ignored="false" />
     <file path="/assignment_team.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1382998096766" ignored="false" />
     <file path="/a.dummy" changelist="7b276755-119f-45da-826d-3c241428717f" time="1383000212870" ignored="false" />
     <file path="/signed_up_user.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1382998031228" ignored="false" />
-    <file path="/invitation.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1382997248143" ignored="false" />
+    <file path="/invitation.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1383008533383" ignored="false" />
     <file path="/_flash_messages.html.erb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1383000379321" ignored="false" />
     <file path="/_table_line.html.erb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1383001922317" ignored="false" />
     <file path="/join_team_requests_controller.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1383002016580" ignored="false" />
     <file path="/invitation_controller_test.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1383002803859" ignored="false" />
+    <file path="/user.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1383007090290" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,10 +53,55 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
+      <file leaf-file-name="invitation.rb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/models/invitation.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="68" column="11" selection-start="3668" selection-end="3668" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="signup_topics.html.erb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/views/sign_up_sheet/signup_topics.html.erb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="3.75">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="_reserve_topic.html.erb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/views/sign_up_sheet/_reserve_topic.html.erb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="11" column="23" selection-start="995" selection-end="995" vertical-scroll-proportion="-6.875">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="invitation_controller.rb" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/controllers/invitation_controller.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="140" selection-start="513" selection-end="513" vertical-scroll-proportion="0.0">
+            <state line="42" column="4" selection-start="1714" selection-end="1714" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="invitations.yml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/fixtures/invitations.yml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="admin_controller_test.rb" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/functional/admin_controller_test.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="5" column="51" selection-start="198" selection-end="198" vertical-scroll-proportion="0.21613833">
               <folding />
             </state>
           </provider>
@@ -72,24 +111,6 @@
         <entry file="file://$PROJECT_DIR$/app/controllers/student_team_controller.rb">
           <provider selected="true" editor-type-id="text-editor">
             <state line="16" column="85" selection-start="773" selection-end="773" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="invitation_controller_test.rb" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/unit/invitation_controller_test.rb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="4" selection-start="640" selection-end="640" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="institutions_controller_test.rb" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/test/functional/institutions_controller_test.rb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -133,11 +154,9 @@
       <list>
         <option value="$PROJECT_DIR$/config/database.yml" />
         <option value="db-console:/6ed7edb9/b0ca2c1f-1e44-41af-b1de-5bf1ed86bd6b/" />
-        <option value="$PROJECT_DIR$/app/models/invitation.rb" />
         <option value="$PROJECT_DIR$/app/models/teams_user.rb" />
         <option value="$PROJECT_DIR$/app/models/signed_up_user.rb" />
         <option value="$PROJECT_DIR$/app/models/assignment_team.rb" />
-        <option value="$PROJECT_DIR$/app/controllers/invitation_controller.rb" />
         <option value="$PROJECT_DIR$/app/views/join_team_requests/_list_received.html.erb" />
         <option value="$PROJECT_DIR$/app/views/shared/_flash_messages.html.erb" />
         <option value="$PROJECT_DIR$/app/views/sign_up_sheet/_table_line.html.erb" />
@@ -146,6 +165,9 @@
         <option value="$PROJECT_DIR$/config/routes.rb" />
         <option value="$PROJECT_DIR$/app/views/join_team_requests/create.html" />
         <option value="$PROJECT_DIR$/test/unit/invitation_controller_test.rb" />
+        <option value="$PROJECT_DIR$/app/models/user.rb" />
+        <option value="$PROJECT_DIR$/app/models/invitation.rb" />
+        <option value="$PROJECT_DIR$/app/controllers/invitation_controller.rb" />
       </list>
     </option>
   </component>
@@ -157,8 +179,8 @@
     <option name="CUSTOM_FILTER" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="48" />
-    <option name="y" value="42" />
+    <option name="x" value="5" />
+    <option name="y" value="111" />
     <option name="width" value="1359" />
     <option name="height" value="777" />
   </component>
@@ -252,24 +274,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="unit" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="expertiza" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="expertiza" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="functional" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -295,7 +299,7 @@
   <component name="PropertiesComponent">
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="options.lastSelected" value="Errors" />
+    <property name="options.lastSelected" value="org.jetbrains.plugins.ruby.settings.RubyIdeSdkConfigurable" />
     <property name="recentsLimit" value="5" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/app/views" />
     <property name="FullScreen" value="false" />
@@ -766,19 +770,19 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="48" y="42" width="1359" height="777" extended-state="0" />
+    <frame x="5" y="111" width="1359" height="777" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32941177" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32794118" sideWeight="0.4996192" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32794118" sideWeight="0.4996192" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32901752" sideWeight="0.7985294" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2916984" sideWeight="0.57941175" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2916984" sideWeight="0.6720588" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.42058823" sideWeight="0.24828637" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.42058823" sideWeight="0.75171363" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42058823" sideWeight="0.24828637" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.19705883" sideWeight="0.75171363" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20147058" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -851,63 +855,44 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/models/invitation.rb">
+    <entry file="file://$PROJECT_DIR$/test/unit/invitation_controller_test.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="21" selection-start="2824" selection-end="2824" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/sign_up_topic.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="52" selection-start="3445" selection-end="3445" vertical-scroll-proportion="0.6146245" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/signed_up_user.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="77" column="2" selection-start="4935" selection-end="4935" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/assignment_team.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="255" column="34" selection-start="8085" selection-end="8085" vertical-scroll-proportion="0.0">
+        <state line="18" column="4" selection-start="640" selection-end="640" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/teams_user.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="17" selection-start="464" selection-end="464" vertical-scroll-proportion="0.0">
+        <state line="26" column="17" selection-start="464" selection-end="464" vertical-scroll-proportion="1.1370262">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/join_team_requests/_list_received.html.erb">
+    <entry file="file://$PROJECT_DIR$/app/models/sign_up_topic.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="98" selection-start="1784" selection-end="1784" vertical-scroll-proportion="-12.98">
+        <state line="62" column="52" selection-start="3445" selection-end="3445" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/shared/_flash_messages.html.erb">
+    <entry file="file://$PROJECT_DIR$/test/functional/institutions_controller_test.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="41" selection-start="108" selection-end="108" vertical-scroll-proportion="-1.875">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/invitation_controller.rb">
+    <entry file="file://$PROJECT_DIR$/app/models/signed_up_user.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="140" selection-start="513" selection-end="513" vertical-scroll-proportion="0.0">
+        <state line="77" column="2" selection-start="4935" selection-end="4935" vertical-scroll-proportion="3.5">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/sign_up_sheet/_table_line.html.erb">
+    <entry file="file://$PROJECT_DIR$/app/models/user.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="27" selection-start="940" selection-end="940" vertical-scroll-proportion="-12.5">
+        <state line="268" column="49" selection-start="8002" selection-end="8002" vertical-scroll-proportion="0.44759208">
           <folding />
         </state>
       </provider>
@@ -919,23 +904,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/join_team_requests/new.html.erb">
+    <entry file="file://$PROJECT_DIR$/app/views/sign_up_sheet/_reserve_topic.html.erb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="0" selection-start="674" selection-end="674" vertical-scroll-proportion="-10.625">
+        <state line="11" column="23" selection-start="995" selection-end="995" vertical-scroll-proportion="-6.875">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/join_team_requests/create.html">
+    <entry file="file://$PROJECT_DIR$/app/views/sign_up_sheet/signup_topics.html.erb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/routes.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="135" column="18" selection-start="2442" selection-end="2442" vertical-scroll-proportion="0.5049261">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="3.75">
           <folding />
         </state>
       </provider>
@@ -947,16 +925,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/unit/invitation_controller_test.rb">
+    <entry file="file://$PROJECT_DIR$/app/models/invitation.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="4" selection-start="640" selection-end="640" vertical-scroll-proportion="0.0">
+        <state line="68" column="11" selection-start="3668" selection-end="3668" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/functional/institutions_controller_test.rb">
+    <entry file="file://$PROJECT_DIR$/app/controllers/invitation_controller.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="42" column="4" selection-start="1714" selection-end="1714" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/functional/advertise_for_partners_controller_test.rb">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/fixtures/invitations.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/functional/admin_controller_test.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="51" selection-start="198" selection-end="198" vertical-scroll-proportion="0.21613833">
           <folding />
         </state>
       </provider>

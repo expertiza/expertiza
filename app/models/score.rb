@@ -111,7 +111,7 @@ class Score < ActiveRecord::Base
     map=ResponseMap.find(response.map_id)
     #assignment_participant = Participant.find(:all, :conditions => ["id = ?", map.reviewee_id])
     @sorted_deadlines = nil
-    @sorted_deadlines = DueDate.find_all_by_assignment_id(map.reviewed_object_id).order('due_at DESC')
+    @sorted_deadlines = DueDate.find(:all, :conditions => ["assignment_id = ?", map.reviewed_object_id], :order => 'due_at DESC')
 
     # to check the validity of the response
     if @sorted_deadlines.nil?

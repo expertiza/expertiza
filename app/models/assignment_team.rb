@@ -8,50 +8,59 @@ class AssignmentTeam < Team
 
 # Whether this team includes a given participant or not
   def includes?(participant)
-    participants.include?(participant)
+    return participants.include?(participant)
   end
 
   def assign_reviewer(reviewer)
-    TeamReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    TeamReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+                                 :reviewed_object_id => assignment.id)
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object 
   def reviewed_by?(reviewer)
-    TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    return TeamReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
+                                                       self.id, reviewer.id, assignment.id]) > 0
   end
 
   # Topic picked by the team
   def topic
     team_topic = nil
+
     participants.each do |participant|
       team_topic = participant.topic
       break if team_topic
     end
+
     team_topic
   end
 
   # Whether the team has submitted work or not
   def has_submissions?
-    participants.each { |participant| return true if participant.has_submissions? }
-    false
+    participants.each do |participant|
+      return true if participant.has_submissions?
+    end
+    return false
   end
 
   def reviewed_contributor?(contributor)
-    TeamReviewResponseMap.find(:all, conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
+    return TeamReviewResponseMap.find(:all,
+                                      :conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
+                                                      contributor.id, self.id, assignment.id]).empty? == false
   end
 
 # END of contributor methods
 
   def participants
-    @participants ||= AssignmentParticipant.find(:all, conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
+    @participants ||= AssignmentParticipant.find(:all, :conditions => ['parent_id = ? and user_id IN (?)', parent_id, users])
   end
 
   def delete
     if read_attribute(:type) == 'AssignmentTeam'
-      sign_up = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
-      sign_up.each &:destroy
+      signup = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
+      signup.each &:destroy
     end
+
     super
   end
 
@@ -61,8 +70,10 @@ class AssignmentTeam < Team
 
   def get_hyperlinks
     links = Array.new
-    self.get_participants.each { |team_member| links.concat(team_member.get_hyperlinks_array) }
-    links
+    for team_member in self.get_participants
+      links.concat(team_member.get_hyperlinks_array)
+    end
+    return links
   end
 
   def get_path
@@ -74,53 +85,62 @@ class AssignmentTeam < Team
   end
 
   def get_review_map_type
-    'TeamReviewResponseMap'
+    return 'TeamReviewResponseMap'
   end
 
-  def self.handle_duplicate(team, name, assignment_id, handle_duplicates)
+  def self.handle_duplicate(team, name, assgt_id, handle_dups)
     puts ">>>at beginning of handle_duplicate, name = "+ name
-    puts ">>>at beginning of handle_duplicate, handle_duplicates = "+ handle_duplicates
-    return name if team.nil? #no duplicate
-
-    if handle_duplicates == "ignore" #ignore: do not create the new team
+    puts ">>>at beginning of handle_duplicate, handle_dups = "+ handle_dups
+    if team.nil? #no duplicate
+      return name
+    end
+    if handle_dups == "ignore" #ignore: do not create the new team
       p '>>>setting name to nil ...'
       return nil
     end
-    return self.generate_team_name(Assignment.find(assignment_id).name) if handle_duplicates == "rename" #rename: rename new team
-
-    if handle_duplicates == "replace" #replace: delete old team
+    if handle_dups == "rename" #rename: rename new team
+      return self.generate_team_name(Assignment.find(assgt_id).name)
+    end
+    if handle_dups == "replace" #replace: delete old team
       team.delete
       return name
-    else # handle_duplicates = "insert"
+    else # handle_dups = "insert"
       return nil
     end
   end
 
-  def self.import(row,session,assignment_id,options)
-    raise ArgumentError, "Not enough fields on this line" if (row.length < 2 && options[:has_column_names] == "true") || (row.length < 1 && options[:has_column_names] != "true")
-    raise ImportError, "The assignment with id \""+assignment_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find(assignment_id) == nil
+  def self.import(row,session,assgt_id,options)
+    if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
+      raise ArgumentError, "Not enough fields on this line"
+    end
+
+    if Assignment.find(assgt_id) == nil
+      raise ImportError, "The assignment with id \""+assgt_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+    end
 
     if options[:has_column_names] == "true"
       name = row[0].to_s.strip
-      team = find(:first, conditions: ["name =? && parent_id =?", name, assignment_id])
+      team = find(:first, :conditions => ["name =? and parent_id =?", name, assgt_id])
       team_exists = !team.nil?
-      name = handle_duplicate(team, name, assignment_id, options[:handle_dups])
+      name = handle_duplicate(team, name, assgt_id, options[:handle_dups])
       index = 1
     else
-      name = self.generate_team_name(Assignment.find(assignment_id).name)
+      name = self.generate_team_name(Assignment.find(assgt_id).name)
       index = 0
     end
 
     # create new team for the team to be inserted
     # do not create new team if we choose 'ignore' or 'insert' duplicate teams
     if name
-      team = AssignmentTeam.create_team_and_node(assignment_id)
+      team=AssignmentTeam.create_team_and_node(assgt_id)
       team.name = name
       team.save
     end
 
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
-    team.import_team_members(index, row) if !(team_exists && options[:handle_dups] == "ignore")
+    if !(team_exists && options[:handle_dups] == "ignore")
+      team.import_team_members(index, row)
+    end
   end
 
   def email
@@ -142,11 +162,14 @@ class AssignmentTeam < Team
   def get_participants
     users = self.users
     participants = Array.new
-    users.each do |user|
-      participant = AssignmentParticipant.find_by_user_id_and_parent_id(user.id, self.parent_id)
-      participants << participant if participant != nil
-    end
-    participants
+    users.each{
+        | user |
+      participant = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,self.parent_id)
+      if participant != nil
+        participants << participant
+      end
+    }
+    return participants
   end
 
   def copy(course_id)
@@ -158,7 +181,9 @@ class AssignmentTeam < Team
   end
 
   def add_participant(assignment_id, user)
-    AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.find_by_parent_id_and_user_id(assignment_id, user.id) == nil
+    if AssignmentParticipant.find_by_parent_id_and_user_id(assignment_id, user.id) == nil
+      AssignmentParticipant.create(:parent_id => assignment_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
+    end
   end
 
   def assignment
@@ -171,54 +196,60 @@ class AssignmentTeam < Team
     scores[:team] = self # This doesn't appear to be used anywhere
     assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
-      scores[questionnaire.symbol][:assessments] = Response.all(joins: :map, conditions: {response_maps: {reviewee_id: self.id, type: 'TeamReviewResponseMap'}})
+      scores[questionnaire.symbol][:assessments] = Response.all(:joins => :map,
+                                                                :conditions => {:response_maps => {:reviewee_id => self.id, :type => 'TeamReviewResponseMap'}})
       scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)
-    scores
+    return scores
   end
 
   def self.get_team(participant)
     team = nil
     teams_users = TeamsUser.find_all_by_user_id(participant.user_id)
-    teams_users.each do |tuser|
-      fteam = Team.find(:first, conditions: ['parent_id = ? && id = ?', participant.parent_id, tuser.team_id])
-      team = fteam if fteam
-    end
+    teams_users.each {
+        | tuser |
+      fteam = Team.find(:first, :conditions => ['parent_id = ? and id = ?',participant.parent_id,tuser.team_id])
+      if fteam
+        team = fteam
+      end
+    }
     team
   end
 
   def self.export(csv, parent_id, options)
-    current_assignment = Assignment.find(parent_id)
-    current_assignment.teams.each do |team|
+    currentAssignment = Assignment.find(parent_id)
+    currentAssignment.teams.each { |team|
       tcsv = Array.new
-      team_users = Array.new
+      teamUsers = Array.new
       tcsv.push(team.name)
-      if options["team_name"] == "false"
-        team_members = TeamsUser.find(:all, conditions: ['team_id = ?', team.id])
-        team_members.each do |user|
-          team_users.push(user.name)
-          team_users.push(" ")
+      if (options["team_name"] == "false")
+        teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
+        teamMembers.each do |user|
+          teamUsers.push(user.name)
+          teamUsers.push(" ")
         end
-        tcsv.push(team_users)
+        tcsv.push(teamUsers)
       end
-      tcsv.push(current_assignment.name)
+      tcsv.push(currentAssignment.name)
       csv << tcsv
-    end
+    }
   end
 
   def self.get_export_fields(options)
     fields = Array.new
     fields.push("Team Name")
-    fields.push("Team members") if options["team_name"] == "false"
+    if (options["team_name"] == "false")
+      fields.push("Team members")
+    end
     fields.push("Assignment Name")
   end
 
   def self.create_team_and_node(assignment_id)
     assignment = Assignment.find(assignment_id)
-    team_name = Team.generate_team_name(assignment.name)
-    team = AssignmentTeam.create(name: team_name, parent_id: assignment_id)
-    TeamNode.create(parent_id: assignment_id, node_object_id: team.id)
+    teamname = Team.generate_team_name(assignment.name)
+    team = AssignmentTeam.create(:name=>teamname, :parent_id => assignment_id)
+    TeamNode.create(:parent_id =>assignment_id,:node_object_id=>team.id)
     team
   end
 

@@ -24,7 +24,7 @@ gem 'rake'
 gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rjb'
-gem 'rubyzip', :require => 'zip'
+gem 'rubyzip', "~> 0.9.9", :require => 'zip/zip'
 gem 'rwordnet'
 gem 'seer'
 gem 'sprockets'
@@ -50,10 +50,6 @@ group :test do
   gem "rspec-rails"
 end
 
-group :production do
-  gem 'pg'
-  gem 'rails_12factor'
-end
-
+# set JAVA_HOME so Heroku will install gems that need it
 heroku_java_home = '/usr/lib/jvm/java-6-openjdk'
 ENV['JAVA_HOME'] = heroku_java_home if Dir.exist?(heroku_java_home)

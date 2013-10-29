@@ -1,9 +1,0 @@
---- 
-- !ruby/object:MarkupStyle 
-  attributes: 
-    name: Textile
-    id: "1"
-- !ruby/object:MarkupStyle 
-  attributes: 
-    name: Markdown
-    id: "2"

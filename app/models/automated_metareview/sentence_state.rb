@@ -2,224 +2,254 @@ require 'automated_metareview/negations'
 require 'automated_metareview/constants'
 
 class SentenceState
-  attr_accessor :broken_sentences
+  @interim_noun_verb
+  @state
+
+  @@prev_negative_word
+
+  # Make a new state instance based on the type of the current_state
+  def factory(state)
+    {POSITIVE => PositiveState, NEGATIVE_DESCRIPTOR => NegativeDescriptorState, NEGATIVE_PHRASE => NegativePhraseState, SUGGESTIVE => SuggestiveState, NEGATIVE_WORD => NegativeWordState}[state].new()
+  end
+
   def identify_sentence_state(str_with_pos_tags)
     # puts("**** Inside identify_sentence_state #{str_with_pos_tags}")
-    #break the sentence at the co-ordinating conjunction
-    num_conjunctions = break_at_coordinating_conjunctions(str_with_pos_tags)
+    #ask TaggedSentence class to break the sentence at the co-ordinating conjunction
+    sentence = TaggedSentence.new(str_with_pos_tags)
+    sentences_sections = sentence.break_at_coord_conjunctions()
 
     states_array = Array.new
-    if(@broken_sentences == nil)
-      states_array[0] = sentence_state(str_with_pos_tags)
-      #identifying states for each of the sentence segments
-    else
-      for i in (0..num_conjunctions)
-        if(!@broken_sentences[i].nil?)
-          states_array[i] = sentence_state(@broken_sentences[i])
-        end
-      end
+    i = 0
+    sentences_sections.each do |section_tokens|
+      states_array[i] = sentence_state(section_tokens)
+      i+=1
     end
-    return states_array
+    
+    states_array
   end #end of the methods
-      #------------------------------------------#------------------------------------------
-  def break_at_coordinating_conjunctions(str_with_pos_tags)
-    st = str_with_pos_tags.split(" ")
-    count = st.length
-    counter = 0
 
-    @broken_sentences = Array.new
-    #if the sentence contains a co-ordinating conjunction
-    if(str_with_pos_tags.include?("CC"))
-      counter = 0
-      temp = ""
-      for i in (0..count-1)
-        ps = st[i]
-        if(!ps.nil? and ps.include?("CC"))
-          @broken_sentences[counter] = temp #for "run/NN on/IN..."
-          counter+=1
-          temp = ps[0..ps.index("/")]
-          #the CC or IN goes as part of the following sentence
-        elsif (!ps.nil? and !ps.include?("CC"))
-          temp = temp +" "+ ps[0..ps.index("/")]
-        end
-      end
-      if(!temp.empty?) #setting the last sentence segment
-        @broken_sentences[counter] = temp
-        counter+=1
-      end
-    else
-      @broken_sentences[counter] = str_with_pos_tags
-      counter+=1
-    end
-    return counter
-  end #end of the method
-      #------------------------------------------#------------------------------------------
+  def sentence_state(sentence_tokens) #str_with_pos_tags)
+    #initialize state variables so that the original sentence state is positive
+    @state = POSITIVE
+    current_state = factory(@state)
+    @@prev_negative_word = false
 
-      #Checking if the token is a negative token
-  def sentence_state(str_with_pos_tags)
-    state = POSITIVE
-    #checking single tokens for negated words
-    st = str_with_pos_tags.split(" ")
-    count = st.length
+    @interim_noun_verb = false
+    sentence_tokens.each_with_next do |curr_token, next_token|
+      #get current token type
+      current_token_type = get_token_type([curr_token, next_token])
 
-    num_of_tokens = 0
-    interim_noun_verb  = false #0 indicates no interim nouns or verbs
+      #Ask State class to get current state based on current state, current_token_type, and if there was a prev_negative_word
 
-    num_of_tokens, tagged_tokens, tokens = parse_sentence_tokens(num_of_tokens, st)
-
-    #iterating through the tokens to determine state
-    prev_negative_word =""
-    state_var = State.factory(state)
-    #next_state = state
-    for j  in (0..num_of_tokens-1)
-      #checking type of the word
-      #checking for negated words or phrases
-      type_methods = [self.method(:is_negative_word), self.method(:is_negative_descriptor), self.method(:is_suggestive), self.method(:is_negative_phrase), self.method(:is_suggestive_phrase)]
-      current_token_type = POSITIVE
-      type_methods.each do |what_type_is|
-        if current_token_type == POSITIVE
-          current_token_type = what_type_is.call(tokens[j..(num_of_tokens-1)])
-        end
-      end
-      #puts tokens[j]
-      #puts returned_type
-
-      #----------------------------------------------------------------------
-      #comparing 'returnedType' with the existing STATE of the sentence clause
-      #after returnedType is identified, check its state and compare it to the existing state
-      #if present state is negative and an interim non-negative or non-suggestive word was found, set the flag to true
-      if((state == NEGATIVE_WORD or state == NEGATIVE_DESCRIPTOR or state == NEGATIVE_PHRASE) and current_token_type == POSITIVE)
-        if(interim_noun_verb == false and (tagged_tokens[j].include?("NN") or tagged_tokens[j].include?("PR") or tagged_tokens[j].include?("VB") or tagged_tokens[j].include?("MD")))
-          interim_noun_verb = true
-        end
-      end
-      double_negative = false
-      #print "I am in the state "
-      #puts state
-      state, interim_noun_verb = state_var.next_state(current_token_type, prev_negative_word, interim_noun_verb)
-      state_var = State.factory(state)
+      current_state = factory(current_state.next_state(current_token_type))
 
       #setting the prevNegativeWord
-      if(tokens[j].casecmp("NO") == 0 or tokens[j].casecmp("NEVER") == 0 or tokens[j].casecmp("NONE") == 0)
-        prev_negative_word = tokens[j]
+      NEGATIVE_EMPHASIS_WORDS.each do |e|
+        if curr_token.casecmp(e)
+          @@prev_negative_word = true
+        end
       end
 
     end #end of for loop
 
-    if(state == NEGATIVE_DESCRIPTOR or state == NEGATIVE_WORD or state == NEGATIVE_PHRASE)
-      state = NEGATED
-    end
-
-    return state
+    current_state.get_state()
   end
+  def get_token_type(current_token)
+    #input parsers
+    get_word = lambda { |c| c[0]}
+    get_phrase = lambda {|c| c[1].nil? ? nil : c[0]+' '+c[1]}
 
-  def parse_sentence_tokens(i, st)
-    tokens = Array.new
-    tagged_tokens = Array.new
-    #fetching all the tokens
-    for k in (0..st.length-1)
-      ps = st[k]
-      #setting the tagged string
-      tagged_tokens[i] = ps
-      if (ps.include?("/"))
-        ps = ps[0..ps.index("/")-1]
-      end
-      #removing punctuations
-      if (ps.include?("."))
-        tokens[i] = ps[0..ps.index(".")-1]
-      elsif (ps.include?(","))
-        tokens[i] = ps.gsub(",", "")
-      elsif (ps.include?("!"))
-        tokens[i] = ps.gsub("!", "")
-      elsif (ps.include?(";"))
-        tokens[i] = ps.gsub(";", "")
-      else
-        tokens[i] = ps
-        i+=1
-      end
-    end
-    #end of the for loop
-    return i, tagged_tokens, tokens
-  end
-
-#------------------------------------------#------------------------------------------
-
-#Checking if the token is a negative token
-  def is_negative_word(word_array)
-    word = word_array.first
-    not_negated = POSITIVE
-    for i in (0..NEGATED_WORDS.length - 1)
-      if(word.casecmp(NEGATED_WORDS[i]) == 0)
-        not_negated =  NEGATIVE_WORD #indicates negation found
-        break
-      end
-    end
-    return not_negated
-  end
-#------------------------------------------#------------------------------------------
-
-#Checking if the token is a negative token
-  def is_negative_descriptor(word_array)
-    word = word_array.first
-    not_negated = POSITIVE
-    for i in (0..NEGATIVE_DESCRIPTORS.length - 1)
-      if(word.casecmp(NEGATIVE_DESCRIPTORS[i]) == 0)
-        not_negated =  NEGATIVE_DESCRIPTOR #indicates negation found
-        break
-      end
-    end
-    return not_negated
-  end
-
-#------------------------------------------#------------------------------------------
-
-#Checking if the phrase is negative
-  def is_negative_phrase(word_array)
-    not_negated = POSITIVE
-    if word_array.size > 1
-      phrase = word_array[0]+" "+word_array[1]
-
-      for i in (0..NEGATIVE_PHRASES.length - 1)
-        if(phrase.casecmp(NEGATIVE_PHRASES[i]) == 0)
-          not_negated =  NEGATIVE_PHRASE #indicates negation found
-          break
+    #types holds relationships between word_or_phrase_array_of_type => [input parser of type, type]
+    types = {NEGATED_WORDS => [get_word, NEGATIVE_WORD], NEGATIVE_DESCRIPTORS => [get_word, NEGATIVE_DESCRIPTOR], SUGGESTIVE_WORDS => [get_word, SUGGESTIVE], NEGATIVE_PHRASES => [get_phrase,NEGATIVE_PHRASE], SUGGESTIVE_PHRASES => [get_phrase, SUGGESTIVE]}
+    current_token_type = POSITIVE
+    types.each do |word_or_phrase_array, type_definition|
+      get_word_or_phrase, word_or_phrase_type = type_definition[0], type_definition[1]
+      token = get_word_or_phrase.(current_token)
+      unless token.nil?
+        word_or_phrase_array.each do |word_or_phrase|
+            if token.casecmp(word_or_phrase) == 0
+              current_token_type = word_or_phrase_type
+              break
+            end
         end
       end
     end
-
-    return not_negated
+    current_token_type
   end
-
-#------------------------------------------#------------------------------------------
-#Checking if the token is a suggestive token
-  def is_suggestive(word_array)
-    word = word_array.first
-    not_suggestive = POSITIVE
-    #puts "inside is_suggestive for token:: #{word}"
-    for i in (0..SUGGESTIVE_WORDS.length - 1)
-      if(word.casecmp(SUGGESTIVE_WORDS[i]) == 0)
-        not_suggestive =  SUGGESTIVE #indicates negation found
-        break
-      end
+  def next_state(current_token_type)
+    #@@prev_negative_word = prev_negative_word
+    method = {POSITIVE => self.method(:positive), NEGATIVE_DESCRIPTOR => self.method(:negative_descriptor), NEGATIVE_PHRASE => self.method(:negative_phrase), SUGGESTIVE => self.method(:suggestive), NEGATIVE_WORD => self.method(:negative_word)}[current_token_type]
+    method.call()
+    if @state != POSITIVE
+      set_interim_noun_verb(false) #resetting
     end
-    return not_suggestive
+    @state
   end
-#------------------------------------------#------------------------------------------
+  #SentenceState is responsible for keeping track of interim words
+  def get_interim_noun_verb
+    @interim_noun_verb
+  end
+  def set_interim_noun_verb(interim_noun_verb)
+    @interim_noun_verb = interim_noun_verb
+  end
 
-#Checking if the PHRASE is suggestive
-  def is_suggestive_phrase(word_array)
-    not_suggestive = POSITIVE
-    if word_array.size > 1
-      phrase = word_array[0]+" "+word_array[1]
-
-      for i in (0..SUGGESTIVE_PHRASES.length - 1)
-        if(phrase.casecmp(SUGGESTIVE_PHRASES[i]) == 0)
-          not_suggestive =  SUGGESTIVE #indicates negation found
-          break
-        end
-      end
+  #if there is an interim word between two states, it will become state1 else it will be state2
+  def if_interim_then_state_is(state1, state2)
+    if @interim_noun_verb   #there are some words in between
+      state = state1
+    else
+      state = state2
     end
-    return not_suggestive
+    state
   end
-
 end #end of the class
+    #This is a type of state where the sentence clause is positive
+class PositiveState < SentenceState
+
+
+  def negative_word
+    #puts "next token is negative"
+
+    @state = NEGATIVE_WORD
+  end
+  def positive
+
+    @state = POSITIVE
+    #puts "next token is positive"
+  end
+  def negative_descriptor
+    @state = NEGATIVE_DESCRIPTOR
+    #puts "next token is negative"
+  end
+  def negative_phrase
+    @state = NEGATIVE_PHRASE
+    #puts "next token is negative phrase"
+  end
+  def suggestive
+    @state = SUGGESTIVE
+    #puts "next token is suggestive"
+  end
+  def get_state
+    #puts "positive"
+    POSITIVE
+  end
+end
+
+#This is a type of state where the sentence clause is negative because of a negative word
+class NegativeWordState < SentenceState
+  @@prev_negative_word
+
+  def negative_word
+    @state = @@prev_negative_word ? POSITIVE : NEGATIVE_WORD
+
+    #state
+  end
+  def positive
+    #puts "next token is positive"
+    set_interim_noun_verb(true)
+    @state = NEGATIVE_WORD
+
+  end
+  def negative_descriptor
+    @state = POSITIVE
+    #puts "next token is negative"
+  end
+  def negative_phrase
+    @state = POSITIVE
+    #puts "next token is negative phrase"
+  end
+  def suggestive
+    @state = if_interim_then_state_is(NEGATIVE_PHRASE, SUGGESTIVE)
+    #puts "next token is suggestive"
+  end
+  def get_state
+    #puts "negative_word"
+    @state = NEGATED
+  end
+end
+class NegativePhraseState < SentenceState
+  def negative_word
+    @state = if_interim_then_state_is(NEGATIVE_WORD, POSITIVE)
+    #puts "next token is negative"
+  end
+  def positive
+    set_interim_noun_verb(true)
+    @state = NEGATIVE_PHRASE
+    #puts "next token is positive"
+  end
+  def negative_descriptor
+    @state = NEGATIVE_DESCRIPTOR
+    #puts "next token is negative"
+  end
+  def negative_phrase
+    @state = NEGATIVE_PHRASE
+    #puts "next token is negative phrase"
+  end
+  def suggestive
+    @state = SUGGESTIVE #e.g.:"I too short and I suggest ..."
+                        #puts "next token is suggestive"
+  end
+  def get_state
+    #puts "negative phrase"
+    @state = NEGATED
+  end
+end
+class SuggestiveState < SentenceState
+  def negative_word
+    @state = SUGGESTIVE
+    #puts "next token is negative"
+  end
+  def positive
+    @state = SUGGESTIVE
+    #puts "next token is positive"
+  end
+  def negative_descriptor
+    @state = NEGATIVE_DESCRIPTOR
+    #puts "next token is negative"
+  end
+  def negative_phrase
+    @state = NEGATIVE_PHRASE
+    #puts "next token is negative phrase"
+  end
+  def suggestive
+    @state = SUGGESTIVE #e.g.:"I too short and I suggest ..."
+                        #puts "next token is suggestive"
+  end
+  def get_state
+    #puts "suggestive"
+    SUGGESTIVE
+  end
+end
+class NegativeDescriptorState < SentenceState
+  def negative_word
+    @state = if_interim_then_state_is(NEGATIVE_WORD, POSITIVE)
+    #puts "next token is negative"
+  end
+  def positive
+    set_interim_noun_verb(true)
+    @state = NEGATIVE_DESCRIPTOR
+    #puts "next token is positive"
+  end
+  def negative_descriptor
+    @state = if_interim_then_state_is(NEGATIVE_DESCRIPTOR, POSITIVE)
+    #puts "next token is negative"
+  end
+  def negative_phrase
+    @state = if_interim_then_state_is(NEGATIVE_PHRASE, POSITIVE)
+    #puts "next token is negative phrase"
+  end
+  def suggestive
+    @state = SUGGESTIVE #e.g.:"I hardly(-) suggested(S) ..."
+                        #puts "next token is suggestive"
+  end
+  def get_state
+    #puts "negative_descriptor"
+    NEGATED
+  end
+
+end
+class Array
+  def each_with_next(&block)
+    [*self, nil].each_cons(2, &block)
+  end
+end

@@ -19,7 +19,6 @@ class GraphGenerator
    * type = 2 - new review
 =end
   def generate_graph(text, pos_tagger, coreNLPTagger, forRelevance, forPatternIdentify)
-
     #initializing common arrays
     @vertices = Array.new
     @num_vertices = 0
@@ -103,11 +102,11 @@ class GraphGenerator
           #if an adjective was found earlier, we add a new edge
           if (prevType == ADJ)
             #set previous noun's property to null, if it was set, if there is a noun before the adjective
-            fixing_edges(adjCount, adjectives, i, nCount, nounVertex, nouns, "noun-property") #TODO Method_2_Extracted
+            fixing_edges(adjCount, adjectives, i, nCount, nounVertex, nouns, "noun-property")
           end
           #a noun has been found and has established a verb as an in_vertex and such an edge doesnt already previously exist
           if (vCount > 0) #and fAppendedVertex == 0
-            pos_edge_processing("verb", vCount, i, nounVertex) #TODO METHOD_EXtracted
+            pos_edge_processing("verb", vCount, i, nounVertex)
           end
           prevType = NOUN
           #------------------------------------------
@@ -123,7 +122,7 @@ class GraphGenerator
 
           #by default associate the adjective with the previous/latest noun and if there is a noun following it immediately, then remove the property from the older noun (done under noun condition)
           if (nCount > 0) #gets the previous noun to form the edge
-            pos_edge_processing("noun-property", nCount, i, adjective) #TODO METHOD_EXtracted
+            pos_edge_processing("noun-property", nCount, i, adjective)
           end
           prevType = ADJ
           #end of if condition for adjective
@@ -140,12 +139,12 @@ class GraphGenerator
           if (prevType == ADV)
             #set previous verb's property to null, if it was set, if there is a verb following the adverb
 
-            fixing_edges(advCount, adverbs, i, vCount, verbVertex, verbs, "verb-property") #TODO Method_Extracted_2
+            fixing_edges(advCount, adverbs, i, vCount, verbVertex, verbs, "verb-property")
           end
 
           #making the previous noun, one of the vertices of the verb edge
           if (nCount > 0) #and fAppendedVertex == 0
-            pos_edge_processing("verb", nCount, i, verbVertex) #TODO METHOD_EXtracted
+            pos_edge_processing("verb", nCount, i, verbVertex)
           end
           prevType = VERB
           #------------------------------------------
@@ -158,7 +157,7 @@ class GraphGenerator
 
           #by default associate it with the previous/latest verb and if there is a verb following it immediately, then remove the property from the verb
           if (vCount > 0) #gets the previous verb to form a verb-adverb edge
-            pos_edge_processing("verb-property", vCount, i, adverb) #TODO METHOD_EXtracted
+            pos_edge_processing("verb-property", vCount, i, adverb)
           end
           prevType = ADV
           #end of if condition for adverb
@@ -211,7 +210,7 @@ class GraphGenerator
   end
 
 
-  def fixing_edges(count1, array1, i, count2, vertex, array2, string) #TODO Method_2_Created
+  def fixing_edges(count1, array1, i, count2, vertex, array2, string)
     if (count2 > 1)
       v1 = search_vertices(@vertices, array2[count2-2], i) #fetching the previous verb, the one before the current one (hence -2)
       v2 = search_vertices(@vertices, array1[count1-1], i) #fetching the previous adverb
@@ -227,10 +226,10 @@ class GraphGenerator
     v1 = search_vertices(@vertices, array1[count1-1], i)
     v2 = vertex
     #if such an edge did not already exist
-    add_nonexisting_edge(i, string, v1, v2) #TODO method_3_extracted
+    add_nonexisting_edge(i, string, v1, v2)
   end
 
-  def add_nonexisting_edge(i, string, v1, v2) #TODO method_3_created
+  def add_nonexisting_edge(i, string, v1, v2)
     if (!v1.nil? and !v2.nil? and (e = search_edges(@edges, v1, v2, i)) == -1)
       @edges[@num_edges] = Edge.new(string, VERB)
       @edges[@num_edges].in_vertex = v1
@@ -245,11 +244,11 @@ class GraphGenerator
 #end of the graphGenerate method
 
 #------------------------------------------#------------------------------------------#------------------------------------------
-  def pos_edge_processing(string, count, i, previousEdgeV2) #TODO METHOD_CREATED
+  def pos_edge_processing(string, count, i, previousEdgeV2)
     v1 = search_vertices(@vertices, nouns[nCount-1], i)
     v2 = previousEdgeV2 #the current adjective vertex
                         #if such an edge does not already exist add it
-    add_nonexisting_edge(i, string, v1, v2) #TODO method_3_extracted
+    add_nonexisting_edge(i, string, v1, v2)
 
   end
 
@@ -331,8 +330,8 @@ And reset the @vertices array with non-null elements.
   true - if an edge exists and false - if an edge doesn't exist
   edge[] list, vertex in, vertex out, int index
 =end
-  def edge_not_nil?(obj) #TODO multiple ifs
-    return !obj.nil? and !obj.in_vertex.nil? and !obj.out_vertex.nil?
+  def edge_not_nil?(obj)
+    return (!obj.nil? and !obj.in_vertex.nil? and !obj.out_vertex.nil?)
   end
 
   def search_edges(list, in_vertex, out, index)
@@ -342,13 +341,13 @@ And reset the @vertices array with non-null elements.
     end
 
     for i in (0..list.length-1)
-      if (edge_not_nil?(list[i])) #TODO implemnkdkasjfjk
+      if (edge_not_nil?(list[i]))
                                   #checking for exact match with an edge
                                   #if(((list[i].in_vertex.name.casecmp(in_vertex.name)==0 or list[i].in_vertex.name.include?(in_vertex.name)) and
                                   #  (list[i].out_vertex.name.casecmp(out.name)==0 or list[i].out_vertex.name.include?(out.name))) or
                                   #  ((list[i].in_vertex.name.casecmp(out.name)==0 or list[i].in_vertex.name.include?(out.name)) and
                                   #  (list[i].out_vertex.name.casecmp(in_vertex.name)==0 or list[i].out_vertex.name.include?(in_vertex.name))))
-        if (matching_edge?(list[i].in_vertex.name, list[i].out_vertex.name, in_vertex.name, out.name)) #TODO implementation
+        if (matching_edge?(list[i].in_vertex.name, list[i].out_vertex.name, in_vertex.name, out.name))
                                                                                                        # puts("***** Found edge! : index:: #{index} list[i].index:: #{list[i].index}")
                                                                                                        #if an edge was found
           edgePos = i #returning its position in the array
@@ -365,7 +364,7 @@ And reset the @vertices array with non-null elements.
 # end of searchdges
 
 #------------------------------------------#------------------------------------------#------------------------------------------
-  def matching_edge?(name1, name2, vertex1, vertex2) #TODO new method for long if
+  def matching_edge?(name1, name2, vertex1, vertex2)
     c1 = name1.casecmp(vertex1.name) == 0 or name1.include?(vertex1.name)
     c2 = name2.casecmp(vertex2.name) == 0 or name2.include?(vertex2.name)
     c3 = name1.casecmp(vertex2.name) == 0 or name1.include?(vertex2.name)
@@ -373,7 +372,7 @@ And reset the @vertices array with non-null elements.
     return ((c1 and c2) or (c3 and c4))
   end
 
-  def null_matching_edge?(name1, name2, vertex1, vertex2) #TODO new method (redundant) for long if
+  def null_matching_edge?(name1, name2, vertex1, vertex2)
     c1 = name1.downcase == vertex1.name.downcase and name2.downcase == vertex2.name.downcase
     c2 = name1.downcase == vertex2.name.downcase and name2.downcase == vertex1.name.downcase
     return (c1 or c2)
@@ -504,7 +503,7 @@ And reset the @edges array with non-null elements.
     return parents
   end
 
-  def identify_parents(parents, parsed_sentence, tp, unTaggedString) #TODO          gjhg
+  def identify_parents(parents, parsed_sentence, tp, unTaggedString)
     for j in (0..unTaggedString.length - 1)
       #puts "unTaggedString[#{j}] #{unTaggedString[j]}"
       if (tp.is_punct(unTaggedString[j]))
@@ -590,7 +589,7 @@ And reset the @edges array with non-null elements.
     for i in (0.. @vertices.length - 1)
       if (!@vertices[i].nil? and !@vertices[i].parent.nil?) #parent = null for ROOT
                                                             #search for the parent vertex
-        parent = find_parent_vertex(i) #TODO removed nested loop
+        parent = find_parent_vertex(i)
         if (!parent.nil?) #{
                           #check if an edge exists between vertices[i] and the parent
           find_edge_with_parent(i)

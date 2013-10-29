@@ -15,7 +15,7 @@ class AssignmentParticipant < Participant
   validates_presence_of :handle
   
   def includes?(participant)
-    participant == self
+    return participant == self
   end
 
   def assign_reviewer(reviewer)
@@ -26,40 +26,49 @@ class AssignmentParticipant < Participant
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object 
   def reviewed_by?(reviewer)
-    ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
+    return ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 
                                               self.id, reviewer.id, assignment.id]) > 0
   end
 
   def has_submissions?
-    ((get_submitted_files.length > 0) || (get_wiki_submissions.length > 0) || (get_hyperlinks_array.length > 0))
+    return ((get_submitted_files.length > 0) or 
+            (get_wiki_submissions.length > 0) or 
+            (get_hyperlinks_array.length > 0)) 
   end
 
   # all the participants in this assignment reviewed by this person
   def get_reviewees
     reviewees = []
     if self.assignment.team_assignment?
-      rmaps = ResponseMap.find(:all, conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
-      rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'TeamReviewResponseMap'"])
+      rmaps.each do |rm|
+        reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants)
+      end
     else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
-      rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      rmaps.each do |rm|
+        reviewees.push(AssignmentParticipant.find(rm.reviewee_id))
+      end
     end
-    reviewees
+   return reviewees
   end
   
   # all the participants in this assignment who have reviewed this person
   def get_reviewers
     reviewers = []
-    (self.assignment.team_assignment? && self.team) ?
-        rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} && type = 'TeamReviewResponseMap'"]) :
-        rmaps = ResponseMap.find(:all, conditions: ["reviewee_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
-    rmaps.each {|rm| reviewers.push(AssignmentParticipant.find(rm.reviewer_id))}
-
-    reviewers
+    if self.assignment.team_assignment? && self.team
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
+    else
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])      
+    end
+    rmaps.each do |rm|
+      reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
+    end
+    return reviewers  
   end  
   
   # Cycle data structure
-  # Each edge of the cycle stores a participant and the score given to the participant by the reviewer.
+  # Each edge of the cycle stores a participant and the score given by to the participant by the reviewer.
   # Consider a 3 node cycle: A --> B --> C --> A (A reviewed B; B reviewed C and C reviewed A)
   # For the above cycle, the data structure would be: [[A, SCA], [B, SAB], [C, SCB]], where SCA is the score given by C to A.
  
@@ -72,7 +81,7 @@ class AssignmentParticipant < Participant
         cycles.push([[self, s01], [ap, s10]])
       end
     end
-    cycles
+    return cycles
   end
   
   def get_three_node_cycles
@@ -87,7 +96,7 @@ class AssignmentParticipant < Participant
         end
       end
     end
-    cycles
+    return cycles
   end
   
   def get_four_node_cycles
@@ -105,49 +114,50 @@ class AssignmentParticipant < Participant
         end
       end
     end
-    cycles
+    return cycles
   end
   
   # Per cycle
   def get_cycle_similarity_score(cycle)
     similarity_score = 0.0
     count = 0.0
-
-    0 ... cycle.size-1.each do |pivot|
+    for pivot in 0 ... cycle.size-1 do 
       pivot_score = cycle[pivot][1]
+      # puts "Pivot:" + cycle[pivot][1].to_s
+      for other in pivot+1 ... cycle.size do
+        # puts "Other:" + cycle[other][1].to_s
         similarity_score = similarity_score + (pivot_score - cycle[other][1]).abs
         count = count + 1.0
+      end
     end
     similarity_score = similarity_score / count unless count == 0.0
-    similarity_score
+    return similarity_score
   end
   
   # Per cycle
   def get_cycle_deviation_score(cycle)    
     deviation_score = 0.0
     count = 0.0
-
-    0 ... cycle.size.each do |member|
+    for member in 0 ... cycle.size do 
       participant = AssignmentParticipant.find(cycle[member][0].id)
       total_score = participant.get_review_score
       deviation_score = deviation_score + (total_score - cycle[member][1]).abs
       count = count + 1.0
     end
-
     deviation_score = deviation_score / count unless count == 0.0
-    deviation_score
+    return deviation_score
   end
 
   def get_review_score
     review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
     assessment = review_questionnaire.get_assessments_for(self)
-    (Score.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f
+    return (Score.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f    
   end
     
   def fullname
     self.user.fullname
   end
-
+  
   def name
     self.user.name
   end
@@ -173,13 +183,13 @@ class AssignmentParticipant < Participant
       end
     end
 
-    scores
+    return scores
   end
 
   # Appends the hyperlink to a list that is stored in YAML format in the DB
   # @exception  If is hyperlink was already there
   #             If it is an invalid URL
-  def submit_hyperlink(hyperlink)
+  def submmit_hyperlink(hyperlink)
     hyperlink.strip!
     raise "The hyperlink cannot be empty" if hyperlink.empty?
 
@@ -224,7 +234,9 @@ class AssignmentParticipant < Participant
   #Copy this participant to a course
   def copy(course_id)
     part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
-    CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id) if part.nil?
+    if part.nil?
+       CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id)       
+    end
   end  
   
   def get_course_string
@@ -234,27 +246,35 @@ class AssignmentParticipant < Participant
       if course.name.strip.length == 0
         raise
       end
-      return course.name
+      return course.name 
     rescue      
       return "<center>&#8212;</center>" 
     end
   end
   
   def get_feedback
-    FeedbackResponseMap.get_assessments_for(self)
+    return FeedbackResponseMap.get_assessments_for(self)      
   end
   
   def get_reviews
     #ACS Always get assessments for a team
     #removed check to see if it is a team assignment
-    TeamReviewResponseMap.get_assessments_for(self.team)
+    return TeamReviewResponseMap.get_assessments_for(self.team)
   end
   
   def get_reviews_by_reviewer(reviewer)
     if self.assignment.team_assignment?
-       TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
+      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
     else
-      ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
+      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
+    end
+  end
+  
+  def get_reviews_by_reviewer(reviewer)
+    if self.assignment.team_assignment?
+      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
+    else
+      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
     end
   end
       
@@ -266,43 +286,49 @@ class AssignmentParticipant < Participant
     TeammateReviewResponseMap.get_assessments_for(self)
   end
 
-  def get_submitted_files
+  def get_submitted_files()
     files = Array.new
-    files = get_files(self.get_path) if self.directory_num
-    files
+    if(self.directory_num)      
+      files = get_files(self.get_path)
+    end
+    return files
   end  
   
   def get_files(directory)      
       files_list = Dir[directory + "/*"]
       files = Array.new
-
-      files_list.each do |file|
-        if File.directory?(file)
-          dir_files = get_files(file)
+      for file in files_list            
+        if File.directory?(file) then          
+          dir_files = get_files(file)          
           dir_files.each{|f| files << f}
         end
-        files << file
-      end
-      files
+        files << file               
+      end      
+      return files
   end
   
   def get_wiki_submissions
-    current_time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
+    currenttime = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
 
     #ACS Check if the team count is greater than one(team assignment)
-    if self.assignment.max_team_size > 1 && self.assignment.wiki_type.name == "MediaWiki"
+    if self.assignment.max_team_size > 1 and self.assignment.wiki_type.name == "MediaWiki"
        submissions = Array.new
-       self.team.get_participants.each do |user|
-         val = WikiType.review_mediawiki_group(self.assignment.directory_path, current_time, user.handle)
-         submissions << val if val != nil
-       end if self.team
-       submissions
+       if self.team
+        self.team.get_participants.each {
+          | user |
+          val = WikiType.review_mediawiki_group(self.assignment.directory_path, currenttime, user.handle)         
+          if val != nil
+              submissions << val
+          end                 
+        }
+       end
+       return submissions
     elsif self.assignment.wiki_type.name == "MediaWiki"
-       return WikiType.review_mediawiki(self.assignment.directory_path, current_time, self.handle)
+       return WikiType.review_mediawiki(self.assignment.directory_path, currenttime, self.handle)       
     elsif self.assignment.wiki_type.name == "DocuWiki"
-       return WikiType.review_docuwiki(self.assignment.directory_path, current_time, self.handle)
+       return WikiType.review_docuwiki(self.assignment.directory_path, currenttime, self.handle)             
     else
-       Array.new
+       return Array.new
     end
   end    
   
@@ -317,41 +343,48 @@ class AssignmentParticipant < Participant
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row,session,id)    
-    raise ArgumentError, "No user id has been specified." if row.length < 1
+    if row.length < 1
+       raise ArgumentError, "No user id has been specified." 
+    end
     user = User.find_by_name(row[0])        
-    if user == nil
-      raise ArgumentError, "The record containing #{row[0]} does not have enough items." if row.length < 4
+    if (user == nil)
+      if row.length < 4
+        raise ArgumentError, "The record containing #{row[0]} does not have enough items."
+      end
       attributes = ImportFileHelper::define_attributes(row)
       user = ImportFileHelper::create_new_user(attributes,session)
+    end                  
+    if Assignment.find(id) == nil
+       raise ImportError, "The assignment with id \""+id.to_s+"\" was not found."
     end
-    raise ImportError, "The assignment with id \""+id.to_s+"\" was not found." if Assignment.find(id) == nil
-    if find(:all, {conditions: ['user_id=? && parent_id=?', user.id, id]}).size == 0
-          new_part = AssignmentParticipant.create(:user_id => user.id, :parent_id => id)
-          new_part.set_handle()
+    if (find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, id]}).size == 0)
+          newpart = AssignmentParticipant.create(:user_id => user.id, :parent_id => id)
+          newpart.set_handle()
     end             
   end  
   
   # provide export functionality for Assignment Participants
   def self.export(csv,parent_id,options)
-     find_all_by_parent_id(parent_id).each do |part|
-       user = part.user
-       csv << [
-           user.name,
-           user.fullname,
-           user.email,
-           user.role.name,
-           user.parent.name,
-           user.email_on_submission,
-           user.email_on_review,
-           user.email_on_review_of_review,
-           part.handle
-       ]
-     end
+     find_all_by_parent_id(parent_id).each{
+          |part|
+          user = part.user
+          csv << [
+            user.name,
+            user.fullname,          
+            user.email,
+            user.role.name,
+            user.parent.name,
+            user.email_on_submission,
+            user.email_on_review,
+            user.email_on_review_of_review,
+            part.handle
+          ]
+      } 
   end
   
   def self.get_export_fields(options)
     fields = ["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"]
-    fields
+    return fields            
   end
   
   # generate a hash string that we can digitally sign, consisting of the 
@@ -368,10 +401,10 @@ class AssignmentParticipant < Participant
   # grant publishing rights to one or more assignments. Using the supplied private key, 
   # digital signatures are generated.
   # reference: http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
-  def self.grant_publishing_rights(private_key, participants)
-    participants.each do |participant|
+  def self.grant_publishing_rights(privateKey, participants)
+    for participant in participants
       #now, check to make sure the digital signature is valid, if not raise error
-      participant.permission_granted = participant.verify_digital_signature(private_key)
+      participant.permission_granted = participant.verify_digital_signature(privateKey)
       participant.save
       raise 'Invalid key' unless participant.permission_granted
     end
@@ -383,19 +416,22 @@ class AssignmentParticipant < Participant
   end
   
   #define a handle for a new participant
-  def set_handle
+  def set_handle()
     if self.user.handle == nil or self.user.handle == ""
       self.handle = self.user.name
-    elsif AssignmentParticipant.find_all_by_parent_id_and_handle(self.assignment.id, self.user.handle).length > 0
+    else
+      if AssignmentParticipant.find_all_by_parent_id_and_handle(self.assignment.id, self.user.handle).length > 0
         self.handle = self.user.name
       else
         self.handle = self.user.handle
       end
+    end  
     self.save!
   end  
   
   def get_path
-    path = self.assignment.get_path + "/"+ self.directory_num.to_s
+     path = self.assignment.get_path + "/"+ self.directory_num.to_s     
+     return path
   end
   
   def update_resubmit_times
@@ -405,29 +441,36 @@ class AssignmentParticipant < Participant
   
   def set_student_directory_num
     if self.directory_num.nil? or self.directory_num < 0           
-      max_num = AssignmentParticipant.find(:first, conditions: ['parent_id = ?', self.parent_id], :order => 'directory_num desc').directory_num
-      max_num ? dir_num = max_num + 1 : dir_num = 0
-      self.update_attribute('directory_num',dir_num)
+      maxnum = AssignmentParticipant.find(:first, :conditions=>['parent_id = ?',self.parent_id], :order => 'directory_num desc').directory_num
+      if maxnum
+        dirnum = maxnum + 1
+      else
+        dirnum = 0
+      end
+      self.update_attribute('directory_num',dirnum)
       #ACS Get participants irrespective of the number of participants in the team
       #removed check to see if it is a team assignment
-        self.team.get_participants.each do | member |
-          if member.directory_num == nil or member.directory_num < 0
-            member.directory_num = self.directory_num
-            member.save
-          end
-        end
+        self.team.get_participants.each{
+            | member |
+            if member.directory_num == nil or member.directory_num < 0
+              member.directory_num = self.directory_num
+              member.save
+            end
+        }
     end
   end
 
 private
 
-  # Use submit_hyperlink, remove_hyperlink() instead
+  # Use submmit_hyperlink(), remove_hyperlink() instead
   def submitted_hyperlinks=(val)
     write_attribute :submitted_hyperlinks, val
   end
 end
 
 def get_topic_string
-  return "<center>&#8212;</center>" if topic.nil? or topic.topic_name.empty?
-  topic.topic_name
-end
+    if topic.nil? or topic.topic_name.empty?
+      return "<center>&#8212;</center>"
+    end
+    return topic.topic_name
+  end

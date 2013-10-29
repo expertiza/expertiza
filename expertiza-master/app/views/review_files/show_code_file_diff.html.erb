@@ -1,0 +1,501 @@
+<head>
+
+<script type="text/javascript"
+        src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js">
+</script>
+
+<script type="text/javascript"
+        src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js">
+</script>
+
+<script type="text/javascript">
+
+    // Global Variables
+    var file_id = -1;
+    var comment_offset = -1;
+    var highlight_cell_id = -1;
+    var noCommentsHtml = "<br/><font style=\"color: #7a7a7a;\">No Comments yet</font>";
+
+    /**
+     * Sends the comment content corresponding to the file offset indicated by
+     * global variable 'comment_offset' to the controller submit_comment which
+     * inserts the comment in the database.
+     */
+    function ajaxSubmitComment() {
+        var commentText = document.getElementById('forminput_2');
+
+        if(!commentText.value) {
+            alert('Cannot save an empty Comment');
+        }
+        else {
+            new Ajax.Request('/review_files/submit_comment', {
+                method:'get',
+                parameters: {
+                    file_id :file_id,
+                    file_offset :comment_offset,
+                    comment_content :commentText.value
+                }
+            });
+            // Highlight the table cell (containing the line number) just clicked
+            var lineNumCellDom = document.getElementById(highlight_cell_id);
+            lineNumCellDom.style.fontWeight="900";
+            lineNumCellDom.bgColor = "cyan";
+        }
+        createComments(highlight_cell_id, line_number, comment_offset, file_id);
+    }
+
+    /** HELPER METHOD
+     * Hides the comment Window.
+     */
+    function hideCommentWindow() {
+        $("#myDiv2").fadeOut();
+    }
+
+    /** HELPER METHOD
+     * Constructs an image link 'X' for closing the comment Window and returns 
+     * markup as a string.
+     */
+    function constructCloseWindowLink() {
+        return "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' " +
+                "onclick='hideCommentWindow()'><img float='right' " +
+                "src='/images/tree_view/delete-icon-16.png' alt='Icon'></a><br>";
+    }
+
+    /** HELPER METHOD
+     * Constructs a header indicating the line number corresponding to the
+     * comment(s) displayed in the comment Window.
+     * @params line_number The line number for which the comment Window
+     *                     displays comments.
+     */
+    function constructWindowHeader(line_number) {
+        return "<b style='font-size: larger;'><u>" + "Comments for Line# " +
+                line_number + "</u></b>" + constructCloseWindowLink();
+    }
+
+    /**
+     * Displays the comments corresponding to 'line_number' in a comment Window.
+     *
+     * @param line_number Line number for which comments are to be displayed.
+     * @param offset the file offset for which the comments are to be fetched
+     * @param fileId the file id of the review file for which comments are to
+     *               be fetched.
+     */
+    function viewComments(line_number, offset, fileId) {
+        if(!line_number) { return; }
+
+        var commentWindowDom = document.getElementById('myDiv2');
+
+        new Ajax.Request('/review_files/get_comments', {
+            method: 'get',
+            parameters: {
+                file_id: fileId,
+                file_offset: offset
+            },
+            onSuccess: function(return_value) {
+                var all_comments = return_value.responseText ?
+                        return_value.responseText : noCommentsHtml;//"No Comments yet<br/>";
+
+                commentWindowDom.innerHTML = constructWindowHeader(line_number) +
+                        "<br>" + all_comments;
+                $('#myDiv2').fadeIn();
+            },
+            onFailure: function() { alert("Failed to retrieve comments for this Line") }
+        });
+    }
+
+    /**
+     * Method to display all existing comments corresponding to the 'clicked'
+     * line number and to also display the form for submitting more comments.
+     *
+     * @param cell_id contains the div id of the cell in the main diff display table
+     *          tp be highlighted.
+     * @param line_num Line Number for which the comments are to be displayed/saved.
+     * @param offset Character offset of the beginning of this line from file start.
+     * @param fileId The fileId of the review file which is being commented.
+     */
+    function createComments(cell_id, line_num, offset, fileId) { // or filepath
+
+        if(!line_num) { return; }
+
+        // Store the following data in the global variables for access in another method
+        file_id = fileId;
+        comment_offset = offset;
+        highlight_cell_id = cell_id;
+        line_number = line_num;
+
+        // Grab existing HTML of the comment window -- contains textarea for
+        // writing comments plus a Submit button.
+        var commentForm = document.getElementById('comment_window').innerHTML;
+
+        // Dom corr to the comment Window. This dom will be populated with
+        // (a) existing comments and (b) form to submit a new comment
+        var commentWindowDom = document.getElementById('myDiv2');
+
+        new Ajax.Request('/review_files/get_comments', {
+            method: 'get',
+            parameters: {
+                file_id: fileId,
+                file_offset: offset
+            },
+            onSuccess: function(return_value) {
+                var all_comments = return_value.responseText ?
+                        return_value.responseText : noCommentsHtml+"<br/>";//"No Comments yet<br/>";
+
+                var commentWindowHtml = constructWindowHeader(line_num) + "<br>" +
+                        all_comments + "<br>" + commentForm;
+
+                // To avoid div id contention, change name of div ids.
+                commentWindowHtml = commentWindowHtml.replace("forminput","forminput_2");
+                commentWindowDom.innerHTML = commentWindowHtml;
+                $('#myDiv2').fadeIn();
+            },
+            onFailure: function(){ alert("Failed to retrieve comments for this Line") }
+        });
+    }
+
+
+</script>
+
+<style >
+    .parentDisable {
+        position:absolute;
+        width:250px;
+        /*height:200px;*/
+        top:350px;    left:250px;
+        display:none;
+        padding: 6px;
+        z-index:3;
+        color: black;
+        background-color: rgba(221, 227, 226, 0.93);
+        border:1px solid black;
+        border-radius:5px;
+        -moz-border-radius:5px;
+        -webkit-border-radius:5px;
+    }
+
+    a.line_number:link {
+        COLOR: black;
+        text-decoration: underline;
+    }
+    a.line_number:visited {
+        COLOR: black;
+        text-decoration: underline;
+    }
+    a.line_number:active {
+        COLOR: black;
+        text-decoration: underline;
+    }
+
+    a.line_number_hover :hover {
+        background-color: black;
+        COLOR: white;
+        text-decoration: underline;
+        font-weight: bold;
+    }
+
+    .curved {
+        -moz-border-radius:10px;
+        -webkit-border-radius:10px;
+        behavior:url(border-radius.htc);
+    }
+
+    td{ font-color: black; }
+
+    pre{ margin: 0px; }
+
+    .margin{ margin: 0cm; }
+
+    #code_review_frame_div{
+        border:1;
+        width:100%;
+        height:440px;
+    }
+
+    #version_header{
+        border:1;
+        width:100%;
+        height:28px;
+        vertical-align: middle;
+    }
+
+    tr.highlight :hover { font-weight: bold;  }
+
+    td.version_number {
+        background-color: white;
+        color: black;
+        border-left: thin solid gray;
+        border-right: thin solid gray;
+        border-top: thin solid gray;
+        border-bottom: thin solid gray;
+    }
+
+
+    td.version_number :hover {
+        font-weight: bold;
+        color: blue;
+    }
+
+    td.current_version {
+        background-color: rgb(255, 0, 28);
+        color: black;
+        font-weight: bold;
+        border-left: thin solid black;
+        border-right: thin solid black;
+        border-top: thin solid black;
+        border-bottom: thin solid black;
+    }
+
+    td.top_header {
+        border-bottom: thin brown;
+    }
+
+    .dashboard_header_css {
+        border-bottom: none;
+        border-left: thin solid black;
+        border-right: thin solid black;
+        border-top: thin solid black;
+        border-width: 1px;
+        color: white;
+        background-color: rgb(150, 0, 4);
+    }
+
+    .dashboard_content_css{
+        border: thin solid;
+        border-width: 1px;
+        background-color: rgba(250, 3, 0, 0.12);
+    }
+
+    .version_diff_header {
+        border-bottom: none;
+        border-left: thin solid black;
+        border-right:thin solid black;
+        border-top: thin solid black;
+        border-width: 1px;
+        background-color: rgb(150, 0, 4);
+        color: white;
+    }
+
+    a.version_link {
+        color: black;
+    }
+
+</style>
+
+</head>
+
+
+<font face="courier" size="2">
+
+<script>
+    $(document).ready (
+        function() {
+            $("#myDiv2").draggable();
+            $("#comment_window").fadeOut(0);
+        }
+    );
+</script>
+
+</br>
+
+<div id="dashboard_header" class="dashboard_header_css" >
+  <table  cellpadding='3' cellspacing='4'  >
+    <tr ><td class="top_header"><b style="font-size: large;"><%= File.basename(@current_review_file.filepath) %> </b><b style="font-size: smaller;">(Version <%= @current_review_file.version_number %>)</b></td></tr>
+  </table>
+</div>
+
+<div id="dashboard_header_content" class = "dashboard_content_css" >
+  <table  cellpadding='5px' cellspacing='4' >
+    <tr>
+      <td align="right">View Version:</td>
+      <!-- Prepare the 'versions' array from the @version_fileId_map -->
+      <% file_versions = [] %>
+      <% @version_fileId_map.sort.each do |version, review_file_id| %>
+          <% file_versions << version.to_i %>
+      <% end %>
+
+      <!-- Iterate over all hashes and display the version and link -->
+      <!-- corresponding to each hash -->
+      <% @version_fileId_map.sort.each do |each_version, review_file_id| %>
+          <% if each_version.to_s == @current_review_file.version_number.to_s %>
+              <td class="version_number current_version" >
+                <%= link_to each_version,
+                            {:controller => 'review_files',
+                             :action => 'show_code_file',
+                             :review_file_id => review_file_id,
+                             :participant_id => @participant.id,
+                             :versions => file_versions}, :class =>"version_link" %>
+              </td>
+          <% else %>
+              <td class="version_number" >
+                <%= link_to each_version,
+                            {:controller => 'review_files',
+                             :action => 'show_code_file',
+                             :review_file_id => review_file_id,
+                             :participant_id => @participant.id,
+                             :versions => file_versions}, :class =>"version_link" %>
+              </td>
+          <% end %>
+
+      <% end %>
+    </tr>
+
+    <tr>
+      <td align="right">View Diff with:</td>
+      <!-- Iterate over all hashes and display the version and link -->
+      <!-- corresponding to each hash -->
+      <% @version_fileId_map.sort.each do |each_version, review_file_id| %>
+          <% if each_version.to_s == @current_review_file.version_number.to_s %>
+              <td style="color: black">
+                <%= each_version %>
+              </td>
+          <% else %>
+              <td class="version_number" >
+                <%= link_to each_version, {:controller => 'review_files',
+                                           :action => 'show_code_file_diff',
+                                           :participant_id => @participant.id,
+                                           :versions => file_versions,
+                                           :diff_with_file_id => review_file_id,
+                                           :current_version_id => @current_review_file.id},
+                            :class =>"version_link" %>
+              </td>
+          <% end %>
+
+      <% end %>
+    </tr>
+  </table>
+</div>
+
+<br/>
+
+
+
+<div id="version_header" class="version_diff_header" >
+  <table width="100%"  cellpadding='0' cellspacing='4' >
+    <tr >
+      <td>&nbsp;&nbsp; </td>
+      <td><b style="font-size: large;">
+        <%= File.basename(@file_on_left.filepath) %></b>&nbsp;&nbsp;<b>Version:</b><b style="font-size: large;">[<%= @file_on_left.version_number %>]</b></td>
+      <td>&nbsp;&nbsp; </td>
+      <td><b style="font-size: large;">
+        <%= File.basename(@file_on_right.filepath) %></b>&nbsp;&nbsp;<b>Version:</b><b style="font-size: large;">[<%= @file_on_right.version_number %>]</b></td>
+    </tr>
+  </table>
+</div>
+
+
+<!--  THE DIV OF THE TABLE -->
+<div  id="code_review_frame_div" class="margin" style= "border: thin solid;  overflow: auto; border-width: 1px;" >
+  <table width="100%" cellpadding='0' cellspacing='0' style="table-layout: fixed; word-wrap: break-word;" >
+
+    <% for i in 0..@shareObj['linearray1'].size %>
+
+        <% @color = "White" %>
+        <% line1color = "lightgray"%>
+        <% line2color = "lightgray"%>
+        <% line1_font_weight = "normal" %>
+        <% line2_font_weight = "normal" %>
+
+        <!-- THESE FOUR STATEMENTS DETERMINE THE COLOR OF THE ROW -->
+        <% if (@shareObj['comparator'][i] == DiffHelper::ADDED) then @color="palegreen"%><%end%>
+        <% if (@shareObj['comparator'][i] == DiffHelper::DELETED) then @color="pink"%><%end%>
+        <% if (@shareObj['comparator'][i] == DiffHelper::CHANGED) then @color="#FEF5CA"%><%end%>
+        <% if (@shareObj['comparator'][i] == DiffHelper::UNCHANGED) then @color="WHITE"%><%end%>
+
+        <% if (@shareObj['comparator'][i] == DiffHelper::ADDED) then line1color="#7CCD7C"%><%end%>
+        <% if (@shareObj['comparator'][i] == DiffHelper::DELETED) then line1color="#FF6A6A"%><%end%>
+        <% if (@shareObj['comparator'][i] == DiffHelper::CHANGED) then line1color="khaki"%><%end%>
+        <% if (@shareObj['comparator'][i] == DiffHelper::UNCHANGED) then line1color="lightgray"%><%end%>
+
+        <% if (@shareObj['comparator'][i] == DiffHelper::ADDED) then line2color="#7CCD7C"%><%end%>
+        <% if (@shareObj['comparator'][i] == DiffHelper::DELETED) then line2color="#FF6A6A"%><%end%>
+        <% if (@shareObj['comparator'][i] == DiffHelper::CHANGED) then line2color="khaki"%><%end%>
+        <% if (@shareObj['comparator'][i] == DiffHelper::UNCHANGED) then line2color="lightgray"%><%end%>
+        <tr bgcolor="<%=@color%>" class="highlight">
+
+          <!-- FILE ON LEFT -->
+          <!-- If map contains an entry for this line number then there exists -->
+          <!-- a comment of this row in the html table. -->
+          <% if @highlight_cell_left_file[i] %>
+              <% line1color = 'cyan' %>
+              <% line1_font_weight = "bold" %>
+          <%end%>
+
+
+          <!-- LINE NUMBER 1   -->
+          <td width="4%" id="td_old_<%=i%>" bgcolor="<%=line1color%>" style="font-weight: <%= line1_font_weight %> ;border-right: thin solid black;vertical-align: top;"><a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="viewComments('<%= @shareObj['linenumarray1'][i] %>', '<%=@shareObj['offsetarray1'][i]%>', '<%=@file_on_left.id %>' )"><u> <pre><%=@shareObj['linenumarray1'][i]%></pre></u></a></td>
+          <td width="1%"></td>
+
+          <!-- THE ACTUAL DATA LINE -->
+          <td width="45%" style="vertical-align: middle;"><pre><%=@shareObj['linearray1'][i]%></pre></td>
+
+          <!-- FILE ON RIGHT -->
+          <!-- If map contains an entry for this line number then there exists -->
+          <!--  a comment of this row in the html table. -->
+          <% if @highlight_cell_right_file[i] %>
+              <% line2color = 'cyan' %>
+              <% line2_font_weight = "bold" %>
+          <%end%>
+
+          <!-- Allow commenting on code file only if this is the most recent version -->
+          <!-- AND if current user is reviewer (i.e. != author/author's team) -->
+          <% if @shareObj['linearray2'][i].blank? %>
+              <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;">
+                <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" ><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
+          <% elsif @current_review_file.version_number.to_i >= file_versions.sort[-2] and session[:user].id != @participant.user_id %>
+              <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;">
+                <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="createComments('td_new_<%= i %>', '<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@file_on_right.id %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
+          <% else %>
+              <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-left: thin solid black; border-right: thin solid black; vertical-align: top;">
+                <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" onclick="viewComments('<%= @shareObj['linenumarray2'][i] %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@file_on_right.id %>')"><u> <pre><%=@shareObj['linenumarray2'][i]%></pre></u></a></td>
+          <% end %>
+
+          <td width="1%"></td>
+
+          <!-- THE ACTUAL DATA LINE -->
+          <td width="45%" style="vertical-align: middle;"><pre><%=@shareObj['linearray2'][i]%></pre></td>
+
+        </tr>
+
+    <%end%>
+  </table>
+</div>
+
+<br/><br/>
+
+<table width="100%">
+  <tr>
+    <td valign="top">
+      <%= link_to "<< Back to File Listing", :controller => 'review_files',
+                  :action => 'show_all_submitted_files',
+                  :participant_id => @participant.id %>
+    </td>
+
+    <td valign="top" align="right">
+      <a href="javascript:void(0)" id="color_guide_link" name="color_guideLink" onClick="toggleElement('color_guide','colorGuide');return false;">Color guide</a><br/>
+      <div id="color_guide" style="display: none;">
+        <table class="general">
+          <br/>
+          <tr align="center">
+            <td bgcolor="white" width='20%'>Unchanged</td>
+            <td bgcolor="#FEF5CA" width='20%'>Changed</td>
+            <td bgcolor="pink" width='20%'>Deleted</td>
+            <td bgcolor="palegreen" width='20%'>Added</td>
+            <td bgcolor="cyan" width='20%'>Contains<br/>Comment(s)</td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<!--   The popup which pops up as one intends to click or view comments -->
+<div id="myDiv2" class="parentDisable" onLoad="assign()"></div>
+<div id="comment_window">
+  <textarea id="forminput" cols=28 rows=5></textarea> <br>
+  <button onclick="ajaxSubmitComment()"><b>Save Comment</b></button>
+</div>
+</font>
+
+
+
+

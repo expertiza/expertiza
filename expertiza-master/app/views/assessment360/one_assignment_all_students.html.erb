@@ -1,0 +1,25 @@
+<div>
+  <h1> <%= @assignment.name %> </h1>
+  <table class="listing" cellpadding=2 border="1">
+    <tr>
+      <th>Student name</th>
+      <th colspan = 2>Score</th>
+    </tr>
+    <% @participants.each do |participant| %>
+    <tr>
+      <td>
+        <%= link_to participant.user.fullname , :action => 'one_assignment_one_student', :assignment_id => params[:assignment_id] ,:user_id => participant.user.id %>
+      </td>
+      <td>
+        <%= participant.get_average_score %>%
+      </td>
+      <td>
+        <img src="<%= @bc[participant.user.id] %>">
+      </td>
+    </tr>
+    <% end %>
+  </table>
+  <div style="margin-top: 25px;">
+    <%= link_to 'Back to All Assignments', :action => 'all_assignments_all_students', :course_id => @assignment.course_id %>
+  </div>
+</div>

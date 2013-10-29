@@ -1,0 +1,22 @@
+<% child_nodes = node.get_children(@sortvar,@sortorder,@show) %>
+<%= render :partial => 'row_header', 
+           :locals => {
+               :depth => depth, 
+               :prefix => prefix, 
+               :rowtype => rowtype,               
+               :parent_node => node,
+               :child_nodes => child_nodes               
+            } %>
+<% if node.get_partial_name %>           
+<%= render :partial => '/tree_display/actions/'+node.get_partial_name, 
+           :locals => {:id => node.node_object_id} %>
+<% else %>
+    <%= render :partial=> '/tree_display/actions/no_actions' %>
+<% end %>                        
+<%= render :partial => 'row_footer', 
+           :locals => {
+               :depth => depth, 
+               :prefix => prefix, 
+               :parent_node => node,
+               :child_nodes => child_nodes 
+            } %> 

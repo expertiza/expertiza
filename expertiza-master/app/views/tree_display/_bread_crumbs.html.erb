@@ -1,0 +1,12 @@
+<BR/>
+<% if @root_node %>        
+     <%= link_to "Return to top", :controller => 'tree_display', :action => 'drill' %>
+     <%  
+     curr_node = @root_node
+     while curr_node.parent_id 
+       curr_node = Node.find(curr_node.parent_id) %>
+       &nbsp;&rarr;&nbsp;
+       <%= link_to curr_node.get_name, :controller => 'tree_display', :action => 'drill', :root => curr_node.id %>
+     <% end %>
+     &nbsp;&rarr;&nbsp;<%= @root_node.get_name %><% 
+   end %>

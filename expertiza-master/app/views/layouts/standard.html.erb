@@ -1,0 +1,32 @@
+<!DocTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3g.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Language" content="en-us" />
+
+	<%= stylesheet_link_tag 'redbox' %>
+	<%= javascript_include_tag :defaults %>
+	<%= javascript_include_tag 'redbox' %>	
+	</head>
+
+<body id="rails-list">
+	<div id="container">
+
+		<div class="header">
+			<img src="/images/logo.jpg"/>
+		</div>
+
+		<div id = "content">
+			<%= yield -%>
+		</div>
+
+		<div id= "close" align='right'>	
+			<b> <%= link_to_close_redbox "X", :title => "Close" %> </b>
+				<!--<%= link_to_close_redbox image_tag("close.png", :border=>0,:title => "Close" )%> -->		
+		</div>	
+	</div>
+	
+</body>
+</html>

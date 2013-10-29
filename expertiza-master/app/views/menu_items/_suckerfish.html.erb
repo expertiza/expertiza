@@ -1,0 +1,18 @@
+<% items.each do |item_id|
+  item = session[:menu].get_item(item_id)
+  selected = session[:menu].selected?(item.id)
+  long_name = item.name.split(/\W/).collect{|word| word.capitalize}.join(' ')
+%>
+<li>
+  <a href=<%= URI.encode("/menu/#{item.name}") %>
+  <%= if item.children
+        ' class="daddy"'
+      end %>title='<%= long_name %>'><%= item.label.html_safe %></a>
+    <% if item.children -%>
+      <ul>
+        <%= render :partial => 'menu_items/suckerfish', 
+          :locals => {:items => item.children} %>
+      </ul>
+    <% end -%>
+  </li>
+<% end -%>

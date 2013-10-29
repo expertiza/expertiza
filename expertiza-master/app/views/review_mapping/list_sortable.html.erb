@@ -1,0 +1,46 @@
+<h1>Participants</h1>
+<h2>Assignment: <%= @assignment.name %></h2>
+<br/>
+<table width="100%" cellpadding="10" class="sortable">
+<tr CLASS="head" >
+  <th width="30%">Contributor</th>
+  <th width="30%">Reviewer</th>
+  <th width="30%">Metareviewer</th>
+</tr>
+<% index = 0 %>
+<% @entries.each{
+    | entry |
+    index+=1 
+    if index % 2 == 0
+       bgcolor = "#FAFAE8"
+    else 
+       bgcolor = "#E8E8D1"
+    end
+%>
+<tr >
+<td style="background-color:<%=bgcolor%>"><%= entry[0] %>
+<td style="background-color:<%=bgcolor%>"><%= entry[1] %>
+<td style="background-color:<%=bgcolor%>"><%= entry[2] %>
+</tr>
+<% } %>
+
+</table>
+<% 
+  session[:return_to] = request.request_uri    
+%>
+<%= link_to 'Assign reviewers automatically', :action => 'select_mapping', :id => @assignment.id %>
+| <%= link_to 'Import reviewer mappings', 
+            :controller=>'import_file', 
+            :action=>'start', 
+            :model => 'ReviewResponseMap', 
+            :title => 'Reviewer Mappings',
+            :expected_fields =>  "Contributor, Reviewer1, Reviewer2, ... , ReviewerN",
+            :id => @assignment.id %> 
+| <%= link_to 'Import metareviewer mappings', 
+            :controller=>'import_file', 
+            :action=>'start', 
+            :model => 'MetareviewresponseMap', 
+            :title => 'Metareviewer Mappings',
+            :expected_fields => 'Contributor, Reviewer, Metareviewer1, Metareviewer2, ... MetareviewerN',
+            :id => @assignment.id %>
+| <%= link_to 'Back', :controller => 'tree_display', :action => 'list' %>

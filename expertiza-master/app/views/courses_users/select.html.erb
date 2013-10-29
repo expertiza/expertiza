@@ -1,0 +1,11 @@
+<h1>Courses</h1>
+
+<table>
+  <tr><th>Title</th><th>Information</th></tr>
+<% for course in @courses %>
+  <tr>
+    <td><%= link_to course.title, :action => 'list', :id => course.id %></td>
+    <td><%= course.info %></td>
+  </tr>
+<% end -%>
+</table>

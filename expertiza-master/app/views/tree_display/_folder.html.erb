@@ -1,0 +1,8 @@
+<%= render :partial=> 'row_header', :locals => {:depth => 0, :prefix => prefix, :name => name, :rowtype => rowtype, :nodes => nodes, :directory => nil, :creation_date => nil} %>
+<% if action_partial %> 
+	<%= render :partial=> '/tree_display/actions/'+action_partial+'_folder_actions' %>
+<% else %>
+    <%= render :partial=> '/tree_display/actions/no_actions' %>
+<% end %>
+<%= render :partial=> 'row_footer', :locals => {:depth => 0, :prefix => prefix, :nodes => nodes} %> 
+

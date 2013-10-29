@@ -1,0 +1,21 @@
+--- 
+- !ruby/object:Permission 
+  attributes: 
+    name: Administer site
+    id: "1"
+- !ruby/object:Permission 
+  attributes: 
+    name: Public pages - edit
+    id: "2"
+- !ruby/object:Permission 
+  attributes: 
+    name: Public pages - view
+    id: "3"
+- !ruby/object:Permission 
+  attributes: 
+    name: Public actions - execute
+    id: "4"
+- !ruby/object:Permission 
+  attributes: 
+    name: Members only page -- view
+    id: "5"

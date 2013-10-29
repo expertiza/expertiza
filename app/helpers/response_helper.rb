@@ -47,7 +47,6 @@ module ResponseHelper
       if new_score < (existing_score - allowed_difference) or new_score > (existing_score + allowed_difference)
         new_pct = new_score.to_f/max_possible_score
         avg_pct = existing_score.to_f/max_possible_score
-        debugger
         curr_item.notify_on_difference(new_pct, avg_pct, aq.notification_limit)
       end
     end

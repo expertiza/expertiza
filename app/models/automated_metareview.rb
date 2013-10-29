@@ -5,6 +5,8 @@ require 'automated_metareview/plagiarism_check'
 require 'automated_metareview/tone'
 require 'automated_metareview/text_quantity'
 require 'automated_metareview/constants'
+require 'ffi/aspell'
+
 
 #gem install edavis10-ruby-web-search
 #gem install google-api-client
@@ -23,9 +25,11 @@ class AutomatedMetareview < ActiveRecord::Base
     @review_array = preprocess.fetch_review_data(self, map_id)
     # puts "self.responses #{self.responses}"
     
-    speller = Aspell.new("en_US")
+    #speller = Aspell.new("en_US")
+    speller = FFI::Aspell::Speller.new('en_US')
     speller.suggestion_mode = Aspell::NORMAL
-    @review_array = preprocess.check_correct_spellings(@review_array, speller)
+
+   # @review_array = preprocess.check_correct_spellings(@review_array, speller)
     # puts "printing review_array"
     @review_array.each{
       |rev|

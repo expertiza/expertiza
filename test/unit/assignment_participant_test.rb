@@ -19,6 +19,11 @@ class AssignmentParticipantTest < ActiveSupport::TestCase
 
   end
 
+  def test_course_string
+    participant = participants(:par0)
+    assert_equal 'CSC110',participant.course_string
+  end
+
   def test_add_course_participant()
     participant = CourseParticipant.new
 
@@ -127,7 +132,7 @@ class AssignmentParticipantTest < ActiveSupport::TestCase
       participant.time_stamp = saved_time_stamp
       saved_assignment_name = participant.assignment.name
       participant.assignment.name = "XXXX"
-      assert !participant.verify_digital_signature(private_key)
+      assert !participant.verify_digital_signature(privatticipant.digitL)
       participant.assignment.name = saved_assignment_name
     end
   end

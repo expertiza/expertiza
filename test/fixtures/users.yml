@@ -128,7 +128,7 @@ student1:
   master_permission_granted: 1
   handle: stu1
   is_new_user: 0
-  public_key: OpenSSL::PKey::RSA.generate( 1024 ).public_key.to_pem
+
   
 student2:
   parent_id: <%= Fixtures.identify(:instructor1) %>

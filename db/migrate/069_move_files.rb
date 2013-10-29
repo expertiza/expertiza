@@ -77,10 +77,10 @@ class MoveFiles < ActiveRecord::Migration
            
       assignment.directory_path = path                
       assignment.save
-      if oldpath != assignment.dir_path
+      if oldpath != assignment.get_path
         FileHelper.create_directory(assignment)    
         oldcontents = Dir.glob(oldpath + "/*")        
-        FileUtils.mv(oldcontents,assignment.dir_path)
+        FileUtils.mv(oldcontents,assignment.get_path)
       end
     else
       puts "Two or more assignments exist for the same path. Assignment: "+assignment.name+" Path: "+assignment.directory_path

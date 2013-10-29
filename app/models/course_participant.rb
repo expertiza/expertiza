@@ -29,18 +29,24 @@ class CourseParticipant < Participant
     if (find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, course.id]}).size == 0)
        create(:user_id => user.id, :parent_id => course.id)
     end   
-  end 
-  
-  def get_course_string
+  end
+
+  # OSS808 Change 28/10/2013
+  # renamed to course_string from get_course_string
+  def course_string
     # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
     if self.course == nil or self.course.name == nil or self.course.name.strip == ""
       return "<center>&#8212;</center>"
     end
     return self.course.name
   end
-  
+
+
+  #OSS808 Change 28/10/2013
+  #Could not remove get from method name because get_path method exists in various models like
+  #course, assignment, etc and there are dynamic usages of this method
   def get_path
-    Course.find(self.parent_id).dir_path + self.directory_num.to_s + "/"
+    Course.find(self.parent_id).get_path + self.directory_num.to_s + "/"
   end
 
   # provide export functionality for Assignment Participants

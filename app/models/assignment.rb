@@ -290,7 +290,7 @@ class Assignment < ActiveRecord::Base
       raise PathError, 'No path needed'
     end
     if self.course_id != nil && self.course_id > 0
-      path = Course.find(self.course_id).dir_path
+      path = Course.find(self.course_id).get_path
     else
       path = RAILS_ROOT + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/'
     end

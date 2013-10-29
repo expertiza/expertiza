@@ -13,6 +13,10 @@ class AssignmentParticipant < Participant
   has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   belongs_to  :user
 
+  # OSS808 Change 28/10/2013
+  # get_average_question_score
+  has_many :collusion_cycles
+
   validates_presence_of :handle
 
   # Returns the average score of one question from all reviews for this user on this assignment as an floating point number
@@ -87,14 +91,14 @@ class AssignmentParticipant < Participant
 
   def has_submissions?
     return ((submitted_files.length > 0) or
-            (get_wiki_submissions.length > 0) or 
+            (wiki_submissions.length > 0) or
             (get_hyperlinks_array.length > 0)) 
   end
 
   # all the participants in this assignment reviewed by this person
   #OSS808 Change 27/10/2013
   # Renamed to reviewees from get_reviewees
-  # Commented Deprecated code and re wrote the code
+  # Commented Deprecated code and re-wrote the code
 
   def reviewees
     reviewees = []
@@ -129,10 +133,105 @@ class AssignmentParticipant < Participant
       rmaps = ResponseMap.find_all_by_reviewee_id_and_type(self.id,'ParticipantReviewResponseMap')
     end
     rmaps.each do |rm|
-      #reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
        reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
     end
     return reviewers  
+  end
+
+  # OSS808 Change 28/10/2013
+  # Moved to class CollusionCycle
+=begin
+  # Cycle data structure
+  # Each edge of the cycle stores a participant and the score given by to the participant by the reviewer.
+  # Consider a 3 node cycle: A --> B --> C --> A (A reviewed B; B reviewed C and C reviewed A)
+  # For the above cycle, the data structure would be: [[A, SCA], [B, SAB], [C, SCB]], where SCA is the score given by C to A.
+
+  def get_two_node_cycles
+    cycles = []
+    self.get_reviewers.each do |ap|
+      if ap.get_reviewers.include?(self)
+        self.get_reviews_by_reviewer(ap).nil? ? next : s01 = self.get_reviews_by_reviewer(ap).get_total_score
+        ap.get_reviews_by_reviewer(self).nil? ? next : s10 = ap.get_reviews_by_reviewer(self).get_total_score
+        cycles.push([[self, s01], [ap, s10]])
+      end
+    end
+    return cycles
+  end
+
+  def get_three_node_cycles
+    cycles = []
+    self.get_reviewers.each do |ap1|
+      ap1.get_reviewers.each do |ap2|
+        if ap2.get_reviewers.include?(self)
+          self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score
+          ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
+          ap2.get_reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score
+          cycles.push([[self, s01], [ap1, s12], [ap2, s20]])
+        end
+      end
+    end
+    return cycles
+  end
+
+  def get_four_node_cycles
+    cycles = []
+    self.get_reviewers.each do |ap1|
+      ap1.get_reviewers.each do |ap2|
+        ap2.get_reviewers.each do |ap3|
+          if ap3.get_reviewers.include?(self)
+            self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score
+            ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
+            ap2.get_reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score
+            ap3.get_reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score
+            cycles.push([[self, s01], [ap1, s12], [ap2, s23], [ap3, s30]])
+          end
+        end
+      end
+    end
+    return cycles
+  end
+
+  # Per cycle
+  def get_cycle_similarity_score(cycle)
+    similarity_score = 0.0
+    count = 0.0
+    for pivot in 0 ... cycle.size-1 do
+      pivot_score = cycle[pivot][1]
+      # puts "Pivot:" + cycle[pivot][1].to_s
+      for other in pivot+1 ... cycle.size do
+        # puts "Other:" + cycle[other][1].to_s
+        similarity_score = similarity_score + (pivot_score - cycle[other][1]).abs
+        count = count + 1.0
+      end
+    end
+    similarity_score = similarity_score / count unless count == 0.0
+    return similarity_score
+  end
+
+  # Per cycle
+  def get_cycle_deviation_score(cycle)
+    deviation_score = 0.0
+    count = 0.0
+    for member in 0 ... cycle.size do
+      participant = AssignmentParticipant.find(cycle[member][0].id)
+      total_score = participant.get_review_score
+      deviation_score = deviation_score + (total_score - cycle[member][1]).abs
+      count = count + 1.0
+    end
+    deviation_score = deviation_score / count unless count == 0.0
+    return deviation_score
+  end
+=end
+
+  #OSS808 Change 28/10/2013
+  #created a new method collusion_cycles to access cycles related code
+
+  def collusion_cycles
+    self.collusion_cycles=CollusionCycle.two_node_cycles
+    self.collusion_cycles<<CollusionCycle.three_node_cycles
+    self.collusion_cycles<<CollusionCycle.four_node_cycles
+    similarity_score= CollusionCycle.cycle_similarity_score(self.collusion_cycles)
+    deviation_score=CollusionCycle.cycle_deviation_score(self.collusion_cycles)
   end
 
   #OSS808 Change 27/10/2013
@@ -298,7 +397,7 @@ class AssignmentParticipant < Participant
   def submitted_files
     files = Array.new
     if(self.directory_num)      
-      files = files_in_directory(self.dir_path)
+      files = files_in_directory(self.get_path)
     end
     return files
   end
@@ -318,8 +417,10 @@ class AssignmentParticipant < Participant
       end      
       return files
   end
-  
-  def get_wiki_submissions
+
+  #OSS808 Change 28/10/2013
+  # Renamed to wiki_submissions from get_wiki_submissions
+  def wiki_submissions
     currenttime = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
 
     #ACS Check if the team count is greater than one(team assignment)
@@ -447,10 +548,11 @@ class AssignmentParticipant < Participant
   end
 
   #OSS808 Change 27/10/2013
-  #Renamed to dir_path from get_path
+  #Could not remove get from method name because get_path method exists in various models like
+  #course, assignment, etc and there are dynamic usages of this method
 
-  def dir_path
-     path = self.assignment.dir_path + "/"+ self.directory_num.to_s
+  def get_path
+     path = self.assignment.get_path + "/"+ self.directory_num.to_s
      return path
   end
   
@@ -502,16 +604,21 @@ class AssignmentParticipant < Participant
     ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
   end
 
-  #OSS808 Change 28/10/2013
-  #created a new method get_cycle
 
-  def get_cycle
-    a[]=Cycle.two_node_cycles
-    a<<Cycle.three_node_cycles
-    a<<a.Cycle.four_node_cycles
-    deviation_score= Cycle.get_cycle_similarity_score(a)
-    similarity_score=Cycle.get_cycle_deviation_score(a)
+  # OSS808 Change 28/10/2013
+  # renamed method to course_string from get_course_string
+  def course_string
+    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
+    begin
+      course = Course.find(self.assignment.course.id)
+      if course.name.strip.length == 0
+        raise
+      end
+      return course.name
+    rescue
+      return "<center>&#8212;</center>"
     end
+  end
 
     private
 

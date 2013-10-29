@@ -1,8 +1,0 @@
-<% for column in RolesPermission.content_columns %>
-<p>
-  <b><%= column.human_name %>:</b> <%=h @roles_permission.send(column.name) %>
-</p>
-<% end %>
-
-<%= link_to 'Edit', :action => 'edit', :id => @roles_permission %> |
-<%= link_to 'Back', :action => 'list' %>

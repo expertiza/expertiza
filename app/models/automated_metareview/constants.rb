@@ -204,4 +204,5 @@ SUGGESTIVE_WORDS = ["would", "could", "should",
 SUGGESTIVE_PHRASES = ["for example","try adding", "instead of", #(explaining what isnt good and what potentially could be)
     "little more", "try to", "need more", "needs to", "need to", "more detail",
     "can be", "was expecting", "am expecting", "is required"]
- 
+
+NEGATIVE_EMPHASIS_WORDS = ["NO", "NEVER", "NONE"]

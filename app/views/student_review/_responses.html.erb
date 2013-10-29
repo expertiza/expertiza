@@ -4,7 +4,7 @@
       <%- # ACS Have metareviews done for all teams  -%>
       <%- # removed code that handles team and individual assignments differently  -%>
       <% if map.type.to_s == "MetareviewResponseMap" %>
-          <% review_mapping = ResponseMap.find(map.reviewed_object_id) %>
+          <% review_mapping = Response.find(map.reviewed_object_id) %>
           <% participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id) %>
       <% else %>
           <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>

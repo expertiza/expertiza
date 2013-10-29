@@ -225,7 +225,7 @@ class ResponseController < ApplicationController
   end
 
   def new_feedback
-    review = ResponseMap.find(params[:id])
+    review = Response.find(params[:id])
     if review
       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, review.map.assignment.id)
       map = FeedbackResponseMap.find_by_reviewed_object_id_and_reviewer_id(review.id, reviewer.id)

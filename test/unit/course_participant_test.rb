@@ -17,8 +17,10 @@ class CourseTest < ActiveSupport::TestCase
     end
   end
 
-  def test_get_course_string
-    assert_equal 'CSC110',@course_participant.get_course_string
+  # OSS808 Change 28/10/2013
+  # renamed test to match change in method name
+  def test_course_string
+    assert_equal 'CSC110',@course_participant.course_string
   end
 
   def test_import
@@ -27,13 +29,13 @@ class CourseTest < ActiveSupport::TestCase
     end
     assert_difference('CourseParticipant.count') do
       assert_difference('User.count') do
-        CourseParticipant.import(['luke','Luke Skywalker','luke@gmail.com','darthvader'],{:user=>users(:superadmin)},courses(:course_e_commerce).id)
+        CourseParticipant.import(['luke','Skywalker,Luke','luke@gmail.com','darthvader'],{:user=>users(:superadmin)},courses(:course_e_commerce).id)
       end
     end
   end
 
   def test_get_path
-    assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110//',@course_participant.dir_path
+    assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110//',@course_participant.get_path
   end
 
   def test_export

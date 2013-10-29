@@ -16,11 +16,11 @@ class Tone
     negative_file = "app/models/automated_metareview/negative-words.csv"
     positive = Array.new
     negative = Array.new
-    FasterCSV.foreach(positive_file) do |text|
+    CSV.foreach(positive_file) do |text|
       positive << text[0]
     end
 
-    FasterCSV.foreach(negative_file) do |text|
+    CSV.foreach(negative_file) do |text|
       negative << text[0]
     end
 

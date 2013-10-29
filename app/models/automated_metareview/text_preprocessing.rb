@@ -170,7 +170,7 @@ def read_patterns(filename, pos)
       state = SUGGESTIVE
   end
     
-  FasterCSV.foreach(filename) do |text|
+  CSV.foreach(filename) do |text|
     in_vertex = text[0][0..text[0].index("=")-1].strip
     out_vertex = text[0][text[0].index("=")+2..text[0].length].strip
 
@@ -204,7 +204,7 @@ def read_patterns(filename, pos)
       patterns[i].out_vertex = Vertex.new(out_vertex, NOUN, i, state, nil, nil, first_string_out_vertex[first_string_out_vertex.index("/")+1..first_string_out_vertex.length])
     end
     i+=1 #incrementing for each pattern 
-  end #end of the FasterCSV.foreach loop
+  end #end of the CSV.foreach loop
   num_patterns = i
   return patterns
 end

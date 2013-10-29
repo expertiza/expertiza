@@ -152,20 +152,21 @@ class Participant < ActiveRecord::Base
     return scores
   end
 
+=begin
   #OSS808 Change 27/10/2013
-  #moved from assignment_participant.rb
-
-  def get_course_string
+  #moved from assignment_participant.rb and renamed to  course_string from get_course_string
+  def course_string
     # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
     begin
-      course = Course.find(self.assignment.course.id)
-      if course.name.strip.length == 0
+      #course = Course.find(self.assignment.course.id)
+      if self.course.name.strip.length == 0
         raise
       end
-      return course.name
+      return self.course.name
     rescue
       return "<center>&#8212;</center>"
     end
   end
+=end
 
 end

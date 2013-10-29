@@ -17,4 +17,11 @@ describe Participant do
     expect(Participant).to have(0).records
   end
 
+  it "can add users" do
+    Participant.create!(:user_id => 5, :type =>"AssignmentParticipant")
+    expect(Participant).to have(1).record
+  end
+
+
+
 end

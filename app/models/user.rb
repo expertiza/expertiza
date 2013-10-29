@@ -55,6 +55,7 @@ class User < ActiveRecord::Base
   end
 
   def first_name
+
     fullname[/,.+/][/\w+/] if fullname
 
   end

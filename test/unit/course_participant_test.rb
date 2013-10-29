@@ -35,7 +35,7 @@ class CourseTest < ActiveSupport::TestCase
   end
 
   def test_get_path
-    assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110//',@course_participant.get_path
+    assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110//',@course_participant.dir_path
   end
 
   def test_export

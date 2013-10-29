@@ -267,6 +267,9 @@ end
  Looks for spelling mistakes in the text and fixes them using the raspell library available for ruby 
 =end
 def check_correct_spellings(review_text_array, speller)
+  config  = FFI::Aspell.config_new
+  speller1 = FFI::Aspell.speller_new(config)
+
   review_text_array_temp = Array.new
   #iterating through each response
   review_text_array.each{
@@ -277,9 +280,12 @@ def check_correct_spellings(review_text_array, speller)
     review_tokens.each{
       |review_tok|
       #checkiing the stem word's spelling for correctness
-      if(!speller.check(review_tok))
-        if(!speller.suggest(review_tok).first.nil?)
-          review_tok = speller.suggest(review_tok).first
+      if(!FFI::Aspell.speller_check(speller1, review_tok, review_tok.length))
+      #if(!speller.check(review_tok))
+       # if(!speller.suggest(review_tok).first.nil?)
+        if(!FFI::Aspell.speller_suggest(speller1, review_tok, review_tok.length))
+          #review_tok = speller.suggest(review_tok).first
+          review_tok=FFI::Aspell.speller_suggest(speller1, review_tok, review_tok.length).first
         end
      end
      review_text_temp = review_text_temp +" " + review_tok.downcase

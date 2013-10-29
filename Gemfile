@@ -31,10 +31,12 @@ gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'will_paginate'
+gem 'ffi-aspell'
+gem 'raspell'
 
 group :development do
   gem 'daemons'
-  gem 'debugger'
+  #gem 'debugger'
   gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'
 end

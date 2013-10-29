@@ -94,6 +94,7 @@ Expertiza::Application.routes.draw do |map|
   resources :export_file do
     collection do
       get :start
+      get :export
     end
   end
 
@@ -207,6 +208,7 @@ Expertiza::Application.routes.draw do |map|
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_evaluation_questionnaires, controller: :questionnaires
 
+
   resources :response do
     collection do
       get :new_feedback
@@ -219,6 +221,8 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :list_mappings
       get :review_report
+      get :add_self_reviewer
+      get :show_available_submissions
     end
   end
 
@@ -291,6 +295,8 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :edit
+      get :submit_hyperlink
+      get :remove_hyperlink
     end
   end
 
@@ -351,9 +357,12 @@ Expertiza::Application.routes.draw do |map|
 
   match '/menu/*name', controller: :menu_items, action: :link
   match ':page_name', controller: :content_pages, action: :view, method: :get
+  match '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
 
   root to: 'content_pages#view', page_name: 'home'
 
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   map.connect ':controller/service.wsdl', :action => 'wsdl'
+
+  match ':controller(/:action(/:id))(.:format)'
 end

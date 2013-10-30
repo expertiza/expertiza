@@ -99,7 +99,7 @@ class GraphGenerator
           #if an adjective was found earlier, we add a new edge
           if (prevType == ADJ)
             #set previous noun's property to null, if it was set, if there is a noun before the adjective
-            fixing_edges(adjCount, adjectives, i, nCount, nounVertex, nouns, "noun-property")
+            update_pos_property(adjCount, adjectives, i, nCount, nounVertex, nouns, "noun-property")
           end
           #a noun has been found and has established a verb as an in_vertex and such an edge doesnt already previously exist
           if (vCount > 0) #and fAppendedVertex == 0
@@ -136,7 +136,7 @@ class GraphGenerator
           if (prevType == ADV)
             #set previous verb's property to null, if it was set, if there is a verb following the adverb
 
-            fixing_edges(advCount, adverbs, i, vCount, verbVertex, verbs, "verb-property")
+            update_pos_property(advCount, adverbs, i, vCount, verbVertex, verbs, "verb-property")
           end
 
           #making the previous noun, one of the vertices of the verb edge
@@ -207,7 +207,7 @@ class GraphGenerator
   end
 
 
-  def fixing_edges(count1, array1, i, count2, vertex, array2, string)
+  def update_pos_property(count1, array1, i, count2, vertex, array2, string)
     if (count2 > 1)
       v1 = search_vertices(@vertices, array2[count2-2], i) #fetching the previous verb, the one before the current one (hence -2)
       v2 = search_vertices(@vertices, array1[count1-1], i) #fetching the previous adverb
@@ -496,11 +496,11 @@ And reset the @edges array with non-null elements.
     #puts "parsed sentence #{parsed_sentence}"
     #iterating through the set of tokens and identifying each token's parent
     #puts "unTaggedString.length #{unTaggedString.length}"
-    parents = identify_parents(parents, parsed_sentence, tp, unTaggedString)
+    parents = identify_parents_of_tokens(parents, parsed_sentence, tp, unTaggedString)
     return parents
   end
 
-  def identify_parents(parents, parsed_sentence, tp, unTaggedString)
+  def identify_parents_of_tokens(parents, parsed_sentence, tp, unTaggedString)
     for j in (0..unTaggedString.length - 1)
       #puts "unTaggedString[#{j}] #{unTaggedString[j]}"
       if (tp.is_punct(unTaggedString[j]))

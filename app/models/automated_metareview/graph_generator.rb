@@ -33,9 +33,7 @@ class GraphGenerator
         next
       end
       unTaggedString = text[i].split(" ")
-      # puts "UnTagged String:: #{unTaggedString}"
       taggedString = @pos_tagger.get_readable(text[i])
-      # puts "taggedString:: #{taggedString}"
 
       #Initializing some arrays
       nouns = Array.new
@@ -86,7 +84,6 @@ class GraphGenerator
           state = states_array[states_counter]
           states_counter+=1
         end
-        # puts("**Value:: #{plainToken} LabelCounter:: #{labelCounter} ParentCounter:: #{parentCounter} POStag:: #{posTag} .. state = #{state}")
 
         #------------------------------------------
         #if the token is a noun
@@ -564,9 +561,7 @@ And reset the @edges array with non-null elements.
 
 # end of find_labels method
 #------------------------------------------#------------------------------------------#------------------------------------------
-=begin
-   * Setting semantic labels for edges based on the labels vertices have with their parents
-=end
+
 
   def find_edge_with_parent(i)
     for k in (0..@edges.length - 1)
@@ -584,6 +579,9 @@ And reset the @edges array with non-null elements.
   end
 
 #------------------------------------------#------------------------------------------#------------------------------------------
+=begin
+    * Setting semantic labels for edges based on the labels vertices have with their parents
+=end
   def set_semantic_labels_for_edges
     # puts "*** inside set_semantic_labels_for_edges"
     for i in (0.. @vertices.length - 1)
@@ -591,7 +589,7 @@ And reset the @edges array with non-null elements.
                                                             #search for the parent vertex
         parent = find_parent_vertex(i)
         if (!parent.nil?) #{
-                          #check if an edge exists between vertices[i] and the parent
+          #check if an edge exists between vertices[i] and the parent
           find_edge_with_parent(i)
         end #end of if paren.nil? condition
       end

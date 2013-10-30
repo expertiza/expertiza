@@ -2,12 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7b276755-119f-45da-826d-3c241428717f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/functional/invitation_controller_test.rb" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/tmp/pids/server.pid" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/invitation_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/invitation_controller.rb" />
     </list>
     <ignored path="expertiza.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="7b276755-119f-45da-826d-3c241428717f" time="1382999490047" ignored="false" />
+    <file path="/Dummy.txt" changelist="7b276755-119f-45da-826d-3c241428717f" time="1383162629934" ignored="false" />
     <file path="$PROJECT_DIR$/../CSC517_BackchannelApp/BackchannelApp/app/controllers/posts_controller.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1381971728113" ignored="false" />
     <file path="$PROJECT_DIR$/../CSC517_BackchannelApp/BackchannelApp/app/controllers/users_controller.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1381971728113" ignored="false" />
     <file path="$PROJECT_DIR$/../CSC517_BackchannelApp/BackchannelApp/app/controllers/sessions_controller.rb" changelist="7b276755-119f-45da-826d-3c241428717f" time="1381971728113" ignored="false" />
@@ -60,10 +59,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="invitation_controller.rb" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="invitation_controller.rb" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/controllers/invitation_controller.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="42" column="4" selection-start="1714" selection-end="1714" vertical-scroll-proportion="0.0">
+            <state line="43" column="5" selection-start="1811" selection-end="1811" vertical-scroll-proportion="0.4600939">
               <folding />
             </state>
           </provider>
@@ -78,16 +77,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="invitation_controller_test.rb" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/functional/invitation_controller_test.rb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="8" column="0" selection-start="262" selection-end="262" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="publishing_controller_test.rb" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="publishing_controller_test.rb" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/functional/publishing_controller_test.rb">
           <provider selected="true" editor-type-id="text-editor">
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
@@ -128,8 +118,8 @@
         <option value="$PROJECT_DIR$/test/unit/invitation_controller_test.rb" />
         <option value="$PROJECT_DIR$/app/models/user.rb" />
         <option value="$PROJECT_DIR$/app/models/invitation.rb" />
-        <option value="$PROJECT_DIR$/app/controllers/invitation_controller.rb" />
         <option value="$PROJECT_DIR$/test/functional/invitation_controller_test.rb" />
+        <option value="$PROJECT_DIR$/app/controllers/invitation_controller.rb" />
       </list>
     </option>
   </component>
@@ -189,7 +179,6 @@
     </navigator>
     <panes>
       <pane id="RailsProjectView" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -274,21 +263,22 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="options.lastSelected" value="org.jetbrains.plugins.ruby.settings.RubyIdeSdkConfigurable" />
     <property name="recentsLimit" value="5" />
+    <property name="options.lastSelected" value="org.jetbrains.plugins.ruby.settings.RubyIdeSdkConfigurable" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/app/views" />
     <property name="FullScreen" value="false" />
     <property name="RakeTaksPopup.undocumentedIncluded" value="false" />
     <property name="DefaultHtmlFileTemplate" value="Html5" />
-    <property name="options.splitter.details.proportions" value="0.2" />
-    <property name="options.searchVisible" value="true" />
-    <property name="Ruby.ViewRefParam.DefaultExtension" value="html.erb" />
     <property name="dynamic.classpath" value="false" />
+    <property name="Ruby.ViewRefParam.DefaultExtension" value="html.erb" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="RunManager" selected="Test::Unit/Shoulda/Minitest.invitation_controller_test">
     <configuration default="false" name="db:create" type="RakeRunConfigurationType" factoryName="Rake" temporary="true">
@@ -532,13 +522,6 @@
       <RTEST_RUN_CONFIG_SETTINGS_ID NAME="RUNNER_OPTIONS" VALUE="" />
       <method />
     </configuration>
-    <configuration default="true" type="JavascriptDebugSession" factoryName="Remote" singleton="true">
-      <JSRemoteDebuggerConfigurationSettings>
-        <option name="engineId" />
-        <option name="fileUrl" />
-      </JSRemoteDebuggerConfigurationSettings>
-      <method />
-    </configuration>
     <configuration default="true" type="CucumberRunConfigurationType" factoryName="Cucumber">
       <predefined_log_file id="RUBY_CUCUMBER" enabled="true" />
       <module name="" />
@@ -572,6 +555,13 @@
       <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="CUCUMBER_RUNNER_PATH" VALUE="" />
       <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="USE_CUSTOM_RUNNER" VALUE="false" />
       <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="SETTINGS_VERSION" VALUE="2" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugSession" factoryName="Remote" singleton="true">
+      <JSRemoteDebuggerConfigurationSettings>
+        <option name="engineId" value="embedded" />
+        <option name="fileUrl" />
+      </JSRemoteDebuggerConfigurationSettings>
       <method />
     </configuration>
     <configuration default="true" type="com.intellij.persistence.run.ConsoleRunConfigurationType" factoryName="Query Language Console">
@@ -685,14 +675,14 @@
       <method />
     </configuration>
     <list size="8">
-      <item index="0" class="java.lang.String" itemvalue="Rake.test" />
-      <item index="1" class="java.lang.String" itemvalue="Rake.spec" />
-      <item index="2" class="java.lang.String" itemvalue="Rails.Production: expertiza" />
-      <item index="3" class="java.lang.String" itemvalue="Rails.Development: expertiza" />
-      <item index="4" class="java.lang.String" itemvalue="Rake.db:create" />
-      <item index="5" class="java.lang.String" itemvalue="Rake.db:migrate" />
-      <item index="6" class="java.lang.String" itemvalue="Rake.db:drop" />
-      <item index="7" class="java.lang.String" itemvalue="Test::Unit/Shoulda/Minitest.invitation_controller_test" />
+      <item index="0" class="java.lang.String" itemvalue="Rake.db:create" />
+      <item index="1" class="java.lang.String" itemvalue="Rake.db:migrate" />
+      <item index="2" class="java.lang.String" itemvalue="Rake.db:drop" />
+      <item index="3" class="java.lang.String" itemvalue="Test::Unit/Shoulda/Minitest.invitation_controller_test" />
+      <item index="4" class="java.lang.String" itemvalue="Rake.test" />
+      <item index="5" class="java.lang.String" itemvalue="Rake.spec" />
+      <item index="6" class="java.lang.String" itemvalue="Rails.Production: expertiza" />
+      <item index="7" class="java.lang.String" itemvalue="Rails.Development: expertiza" />
     </list>
     <recent_temporary>
       <list size="4">
@@ -751,14 +741,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="36" y="26" width="1359" height="777" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32941177" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32794118" sideWeight="0.4996192" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32901752" sideWeight="0.7985294" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2916984" sideWeight="0.5411765" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.29626808" sideWeight="0.5411765" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42058823" sideWeight="0.24828637" order="7" side_tool="true" content_ui="tabs" />
@@ -768,6 +757,7 @@
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32794118" sideWeight="0.4996192" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32847896" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -837,16 +827,12 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/app/models/user.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="268" column="49" selection-start="8002" selection-end="8002" vertical-scroll-proportion="0.44759208">
-          <folding />
-        </state>
+        <state line="268" column="49" selection-start="8002" selection-end="8002" vertical-scroll-proportion="0.44759208" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/join_team_requests_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="47" column="6" selection-start="1422" selection-end="1422" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="47" column="6" selection-start="1422" selection-end="1422" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/invitation.rb">
@@ -858,65 +844,42 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/join_team_requests/new.html.erb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="0" selection-start="674" selection-end="674" vertical-scroll-proportion="-10.625">
-          <folding />
-        </state>
+        <state line="17" column="0" selection-start="674" selection-end="674" vertical-scroll-proportion="-10.625" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/sign_up_sheet/_reserve_topic.html.erb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="23" selection-start="995" selection-end="995" vertical-scroll-proportion="0.4768786">
-          <folding />
-        </state>
+        <state line="11" column="23" selection-start="995" selection-end="995" vertical-scroll-proportion="0.4768786" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/sign_up_sheet/signup_topics.html.erb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="3.75">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="3.75" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/fixtures/invitations.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/invitation_controller.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="4" selection-start="1714" selection-end="1714" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/functional/assignment_controller_test.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="197" column="27" selection-start="7909" selection-end="7909" vertical-scroll-proportion="0.33251232">
-          <folding />
-        </state>
+        <state line="197" column="27" selection-start="7909" selection-end="7909" vertical-scroll-proportion="0.33251232" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/functional/advertise_for_partners_controller_test.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/functional/pages_controller_test.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/functional/password_retrieval_controller_test.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/functional/admin_controller_test.rb">
@@ -928,21 +891,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/student_team_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="9" selection-start="2389" selection-end="2389" vertical-scroll-proportion="1.9110577">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/functional/invitation_controller_test.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="0" selection-start="262" selection-end="262" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="53" column="9" selection-start="2389" selection-end="2389" vertical-scroll-proportion="1.9110577" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/functional/publishing_controller_test.rb">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/invitation_controller.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="5" selection-start="1811" selection-end="1811" vertical-scroll-proportion="0.4600939">
           <folding />
         </state>
       </provider>

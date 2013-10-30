@@ -42,13 +42,17 @@ class InvitationController < ApplicationController
 
     redirect_to :controller => 'student_team', :action => 'view', :id=> student.id
   end
-  
+
   def update_join_team_request(user,student)
     #update the status in the join_team_request to A
-    participant= AssignmentParticipant.first( :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
-    old_entry = JoinTeamRequest.first(:conditions => ['participant_id =? and team_id =?', participant.id,params[:team_id]])
-    if old_entry
-       old_entry.update_attribute("status",'A')
+    if user && student
+      participant= AssignmentParticipant.first( :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
+      if participant
+        old_entry = JoinTeamRequest.first(:conditions => ['participant_id =? and team_id =?', participant.id,params[:team_id]])
+        if old_entry
+          old_entry.update_attribute("status",'A')
+        end
+      end
     end
   end
   

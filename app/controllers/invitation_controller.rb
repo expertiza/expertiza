@@ -66,12 +66,12 @@ class InvitationController < ApplicationController
     @inv.reply_status = 'A'
     @inv.save
 
-    invited_user_id = Participant.find(params[:student_id]).user_id
+    student = Participant.find(params[:student_id])
     
     #Remove the users previous team since they are accepting an invite for possibly a new team.
-    TeamsUser.remove_team(invited_user_id, params[:team_id])
+    TeamsUser.remove_team(student.user_id, params[:team_id])
     #Accept the invite and return boolean on whether the add was successful
-    add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id)
+    add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
     #If add wasn't successful because team was full display message
     unless add_successful
       flash[:error]= "The team already has the maximum number of members."

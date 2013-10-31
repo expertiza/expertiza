@@ -340,10 +340,6 @@ And reset the @vertices array with non-null elements.
     for i in (0..list.length-1)
       if (edge_not_nil?(list[i]))
                                   #checking for exact match with an edge
-                                  #if(((list[i].in_vertex.name.casecmp(in_vertex.name)==0 or list[i].in_vertex.name.include?(in_vertex.name)) and
-                                  #  (list[i].out_vertex.name.casecmp(out.name)==0 or list[i].out_vertex.name.include?(out.name))) or
-                                  #  ((list[i].in_vertex.name.casecmp(out.name)==0 or list[i].in_vertex.name.include?(out.name)) and
-                                  #  (list[i].out_vertex.name.casecmp(in_vertex.name)==0 or list[i].out_vertex.name.include?(in_vertex.name))))
         if (matching_edge?(list[i].in_vertex.name, list[i].out_vertex.name, in_vertex.name, out.name))
                                                                                                        # puts("***** Found edge! : index:: #{index} list[i].index:: #{list[i].index}")
                                                                                                        #if an edge was found

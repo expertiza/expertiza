@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131029020318) do
+ActiveRecord::Schema.define(:version => 20131103014327) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -398,6 +398,17 @@ ActiveRecord::Schema.define(:version => 20131029020318) do
     t.integer "parent_id"
     t.integer "node_object_id"
     t.string  "type"
+  end
+
+  create_table "participant_score_views", :id => false, :force => true do |t|
+    t.integer "response_id",                      :default => 0, :null => false
+    t.integer "score"
+    t.integer "weight"
+    t.string  "questionaire_type",  :limit => 64
+    t.integer "max_question_score"
+    t.integer "team_id",                          :default => 0, :null => false
+    t.integer "participant_id"
+    t.integer "assignment_id"
   end
 
   create_table "participants", :force => true do |t|

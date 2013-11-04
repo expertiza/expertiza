@@ -280,7 +280,7 @@ DEPENDENCIES
   rgl
   rjb
   rspec-rails
-  rubyzip
+  rubyzip (< 1.0.0)
   rwordnet
   seer
   selenium-webdriver

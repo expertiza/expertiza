@@ -53,6 +53,11 @@ class User < ActiveRecord::Base
     role.name == 'Administrator'
   end
 
+  def teaching_assistant?
+    role.name == 'Teaching Assistant'
+  end
+  alias_method :is_teaching_assistant?, :teaching_assistant?
+
   def can_impersonate?(other_user)
     return true if other_user == self # can impersonate self
     return true if self.is_teaching_assistant_for? other_user #TAs can impersonate their students
@@ -247,17 +252,16 @@ class User < ActiveRecord::Base
   end
 
   def is_teaching_assistant_for?(student)
-    return false if self.role.name != 'Teaching Assistant'
+    return false unless is_teaching_assistant?
     return false if student.role.name != 'Student'
-    return true if Course.all.any? do |c|
-      c.participants.all(:conditions => "user_id=#{student.id}").size > 0 &&
-      c.participants.all(:conditions => "user_id=#{id}").size > 0
-    end
-    return false
-  end
 
-  def is_teaching_assistant?
-    false
+    # We have to use the Ta object instead of User object
+    # because single table inheritance is not currently functioning
+    ta = Ta.find(id)
+
+    return true if ta.courses_assisted_with.any? do |c|
+      c.assignments.map(&:participants).flatten.map(&:user_id).include? student.id
+    end
   end
 
 end

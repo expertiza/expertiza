@@ -1,12 +1,17 @@
 
 class Ta < User
   has_many :ta_mappings
+  has_and_belongs_to_many :courses, :join_table => :ta_mappings
   
   QUESTIONNAIRE = [['My questionnaires','list_mine'],
             ['All public questionnaires','list_all']]
   
   ASSIGNMENT = [['My assignments','list_mine'],
                 ['All public assignments','list_all']]
+
+  def courses_assisted_with
+    courses.map { |c| Course.find(c.course_id) }
+  end
 
   def list_all(object_type, user_id)
     object_type.find(:all, 

@@ -34,6 +34,10 @@ Expertiza::Application.routes.draw do |map|
       get :copy
       get :toggle_access
       post :remove_assignment_from_course
+      get :set_questionnaire
+      get :set_due_date
+      get :delete_all_questionnaires
+      get :delete_all_due_dates
     end
   end
 
@@ -97,7 +101,9 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :view_my_scores
+      get :instructor_review
       get :remove_hyperlink
+      get :conflict_notification
     end
   end
 
@@ -148,6 +154,8 @@ Expertiza::Application.routes.draw do |map|
       get :list
       get :change_handle
       post :delete
+      get :inherit
+      get :bequeath_all
     end
   end
 
@@ -203,6 +211,7 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :new_feedback
       get :view
+      post :delete
     end
   end
 

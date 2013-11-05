@@ -265,11 +265,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_contributor(contrib_id)
-    if team_assignment?
+   # if team_assignment?
       return AssignmentTeam.find(contrib_id)
-    else
-      return AssignmentParticipant.find(contrib_id)
-    end
+   # else
+   #  return AssignmentParticipant.find(contrib_id)
+   # end
   end
 
   # parameterized by questionnaire

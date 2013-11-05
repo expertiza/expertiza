@@ -158,6 +158,7 @@ Expertiza::Application.routes.draw do |map|
       get :add
       post :add
       get :auto_complete_for_user_name
+      get :delete_assignment_participant
       get :list
       get :change_handle
       post :delete
@@ -232,6 +233,8 @@ Expertiza::Application.routes.draw do |map|
       get :delete_all_reviewers
       get :select_mapping
       get :delete_all_reviewers_and_metareviewers
+      get :assign_reviewer_dynamically
+      post :assign_reviewer_dynamically
       get :add_reviewer
       get :auto_complete_for_user_name
       post :add_reviewer

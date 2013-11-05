@@ -56,11 +56,11 @@ class AssignmentParticipant < Participant
   # all the participants in this assignment who have reviewed this person
   def get_reviewers
     reviewers = []
-    if self.assignment.team_assignment? && self.team
+    #if self.assignment.team_assignment? && self.team
       rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
-    else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
-    end
+    #else
+     # rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+    #end
     rmaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
     end
@@ -263,19 +263,19 @@ class AssignmentParticipant < Participant
   end
   
   def get_reviews_by_reviewer(reviewer)
-    if self.assignment.team_assignment?
+    #if self.assignment.team_assignment?
       return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
-    else
-      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
-    end
+   # else
+    #  return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
+   # end
   end
   
   def get_reviews_by_reviewer(reviewer)
-    if self.assignment.team_assignment?
+   # if self.assignment.team_assignment?
       return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
-    else
-      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
-    end
+    #else
+    #  return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
+    #end
   end
       
   def get_metareviews

@@ -3,7 +3,6 @@ source 'http://rubygems.org'
 gem 'rails', '~>3.0.0'
 
 ## Gems in Alphabetical Order
-
 gem 'bind-it'
 gem 'capistrano'
 gem 'delayed_job_active_record'

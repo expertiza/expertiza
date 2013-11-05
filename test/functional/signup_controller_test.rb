@@ -26,7 +26,7 @@ class SignupControllerTest < ActionController::TestCase
   test "should_be_able_to_signup_for_topic" do
     get :delete_signup, {:id => sign_up_topics(:Topic1).id,:assignment_id => assignments(:assignment_project1).id }
     assert_response :redirect
-    get :signup, {:id => sign_up_topics(:Topic1).id,:assignment_id => assignments(:assignment_project1).id }
+    get :sign_up, {:id => sign_up_topics(:Topic1).id,:assignment_id => assignments(:assignment_project1).id }
     assert_redirected_to :action => "list", :id =>  assignments(:assignment_project1).id
   end
 

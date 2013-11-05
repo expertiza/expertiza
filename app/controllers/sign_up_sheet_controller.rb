@@ -265,7 +265,7 @@ class SignUpSheetController < ApplicationController
     SignUpTopic.reassign_topic(@user_id,assignment_id, topic_id)
   end
 
-  def signup
+  def sign_up
 
     #find the assignment to which user is signing up
     @assignment = Assignment.find(params[:assignment_id])
@@ -367,27 +367,7 @@ class SignUpSheetController < ApplicationController
   #used by save_topic_dependencies. The dependency graph is a partial ordering of topics ... some topics need to be done
   # before others can be attempted.
   def build_dependency_graph(topics,node)
-    dg = RGL::DirectedAdjacencyGraph.new
-
-    #create a graph of the assignment with appropriate dependency
-    topics.collect { |topic|
-      topic[1].each { |dependent_node|
-        edge = Array.new
-        #if a topic is not dependent on any other topic
-        dependent_node = dependent_node.to_i
-        if dependent_node == 0
-          edge.push("fake")
-        else
-          #if we want the topic names to be displayed in the graph replace node to topic_name
-          edge.push(SignUpTopic.find(dependent_node)[node])
-        end
-        edge.push(SignUpTopic.find(topic[0])[node])
-        dg.add_edges(edge)
-      }
-    }
-    #remove the fake vertex
-    dg.remove_vertex("fake")
-    dg
+    SignupSheet.create_dependency_graph(topics,node)
   end
   #used by save_topic_dependencies. Do not know how this works
   def create_common_start_time_topics(dg)

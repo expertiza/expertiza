@@ -1,7 +1,3 @@
-Conversation started today
-Satvik Andi
-4:01pm
-Satvik Andi
 class ResponseController < ApplicationController
   helper :wiki
   helper :submitted_content

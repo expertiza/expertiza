@@ -151,7 +151,7 @@ class AssignmentParticipant < Participant
   def get_review_score
     review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
     assessment = review_questionnaire.get_assessments_for(self)
-    return (Score.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f
+    return (Score.compute_scores(assessment, review_questionnaire.questions).avg / 100.00) * review_questionnaire.max_possible_score.to_f
   end
 
   def fullname

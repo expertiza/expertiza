@@ -47,15 +47,17 @@
                 <% if (@l%2) == 0 %>
                     <tr bgcolor="#ffffff">
                         <td bgcolor="#ffffff" rowspan= <%= @rspan%>>
-                             <%= link_to_remote_redbox username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
+                             <%= link_to_remote_redbox  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
                         </td>
-              <%else %>
-                  <tr bgcolor="#DDDDBB">
-                    <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
-                         <%= link_to_remote_redbox(username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id}) %>
-                     </td>
-              <%end %>
-              <%if (@count == (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
+                 <%else %>
+                    <tr bgcolor="#DDDDBB">
+                        <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
+                            <%= link_to_remote_redbox(username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id}) %>
+                        </td>
+
+                <%end %>
+
+                <%if (@count == (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
                     <td align = "center" rowspan= <%= @rspan%>>
                         <%= @count %>/<%= @rspan %>
                     </td>
@@ -80,7 +82,8 @@
                                 <% else %>
                                     <%=  Team.find(ri.reviewee_id).name %>
                                 <% end %>
-                                <%= link_to_remote_redbox Team.find(ri.reviewee_id).name,:url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
+
+                                <%#= link_to_remote_redbox Team.find(ri.reviewee_id).name,:url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
                                 </td>
                             <%= render :partial => 'teamscore' %>
 

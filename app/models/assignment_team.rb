@@ -252,7 +252,8 @@ class AssignmentTeam < Team
     TeamNode.create(:parent_id =>assignment_id,:node_object_id=>team.id)
     team
   end
+end
 
-  require './app/models/analytic/assignment_team_analytic'
+  require 'models/analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
 end

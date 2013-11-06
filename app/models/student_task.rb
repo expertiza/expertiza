@@ -16,7 +16,7 @@ class StudentTask
       :assignment => participant.assignment,
       :topic => participant.topic,
       :current_stage => participant.current_stage,
-      :stage_deadline => (Time.parse(participant.stage_deadline) rescue Time.now + 1.years)
+      :stage_deadline => Time.parse(participant.stage_deadline)
     )
   end
 
@@ -28,10 +28,6 @@ class StudentTask
     user.assignment_participants.map do |participant|
       StudentTask.from_participant participant
     end.sort_by(&:stage_deadline)
-  end
-
-  def topic_name
-    topic.try(:topic_name) || '-'
   end
 
   def complete?

@@ -28,7 +28,6 @@ class SignedUpUser < ActiveRecord::Base
         for participant_name in participant_names
           if team_name_added == false
             if  participant_names.size !=1
-
               names =  participant_name.team_name + " "
             else
               names =  participant_name.u_name + " "

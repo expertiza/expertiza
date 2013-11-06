@@ -1,16 +1,16 @@
 <h1>Summary report for <%= @assignment.name %></h1>
 <BR/>
 <% if @scores[:teams] %>
-  <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
+    <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
     <BR/><BR/>
 <% end %>
 <TABLE class="grades" width="100%">
   <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
-  <% if @scores[:teams].length > 0 %>
-      <%= render :partial => 'teams' %>
-  <% else %>
-      <TR><TD>No teams are defined for this assignment</TD></TR>
-  <% end %>
+<% if @scores[:teams].length > 0 %>
+  <%= render :partial => 'teams' %>
+<% else %>
+   <TR><TD>No teams are defined for this assignment</TD></TR>
+<% end %>
 </TABLE>
 <BR/><BR/>
 <%= link_to 'Export '+'Grades',

@@ -874,7 +874,7 @@ module DynamicReviewMapping
 
     @assignment = assignment
     number_of_reviews = num_review_of_reviews.to_i
-    contributors = TeamReviewResponseMap.find_all_by_reviewed_object_id(@assignment.id)
+      contributors = TeamReviewResponseMap.find_all_by_reviewed_object_id(@assignment.id)
     users = Array.new
     mappings = Hash.new
     reviews_per_user = 0

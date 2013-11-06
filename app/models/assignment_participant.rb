@@ -224,7 +224,7 @@ class AssignmentParticipant < Participant
 
 
   def get_hyperlinks
-    team.try :get_hyperlinks
+    team.try(:get_hyperlinks) || []
   end
 
   def get_hyperlinks_array

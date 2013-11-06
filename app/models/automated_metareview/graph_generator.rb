@@ -103,7 +103,7 @@ class GraphGenerator
           end
           #a noun has been found and has established a verb as an in_vertex and such an edge doesnt already previously exist
           if (vCount > 0) #and fAppendedVertex == 0
-            pos_edge_processing("verb", vCount, i, nounVertex)
+            pos_edge_processing("verb", vCount, i, nounVertex, nouns)
           end
           prevType = NOUN
           #------------------------------------------
@@ -119,7 +119,7 @@ class GraphGenerator
 
           #by default associate the adjective with the previous/latest noun and if there is a noun following it immediately, then remove the property from the older noun (done under noun condition)
           if (nCount > 0) #gets the previous noun to form the edge
-            pos_edge_processing("noun-property", nCount, i, adjective)
+            pos_edge_processing("noun-property", nCount, i, adjective, adjectives)
           end
           prevType = ADJ
           #end of if condition for adjective
@@ -141,7 +141,7 @@ class GraphGenerator
 
           #making the previous noun, one of the vertices of the verb edge
           if (nCount > 0) #and fAppendedVertex == 0
-            pos_edge_processing("verb", nCount, i, verbVertex)
+            pos_edge_processing("verb", nCount, i, verbVertex, verbs)
           end
           prevType = VERB
           #------------------------------------------
@@ -154,7 +154,7 @@ class GraphGenerator
 
           #by default associate it with the previous/latest verb and if there is a verb following it immediately, then remove the property from the verb
           if (vCount > 0) #gets the previous verb to form a verb-adverb edge
-            pos_edge_processing("verb-property", vCount, i, adverb)
+            pos_edge_processing("verb-property", vCount, i, adverb, adverbs)
           end
           prevType = ADV
           #end of if condition for adverb
@@ -241,8 +241,8 @@ class GraphGenerator
 #end of the graphGenerate method
 
 #------------------------------------------#------------------------------------------#------------------------------------------
-  def pos_edge_processing(string, count, i, previousEdgeV2)
-    v1 = search_vertices(@vertices, nouns[nCount-1], i)
+  def pos_edge_processing(string, count, i, previousEdgeV2, array)
+    v1 = search_vertices(@vertices, array[count-1], i)
     v2 = previousEdgeV2 #the current adjective vertex
                         #if such an edge does not already exist add it
     add_nonexisting_edge(i, string, v1, v2)

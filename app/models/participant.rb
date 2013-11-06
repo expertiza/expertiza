@@ -21,11 +21,9 @@ class Participant < ActiveRecord::Base
 
 
   def delete(force = nil)
-    #OSS808 Change 26/10/2013
-    # Modified deprecated code
+
     # TODO How do we test this code?  #need a controller test_oss808
-    #maps = ResponseMap.find(:all, :conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
-    ResponseMap.find_all_by_reviewee_id(self.id)  ? maps=ResponseMap.find_all_by_reviewee_id(self.id)  : maps=ResponseMap.find_all_by_reviewer_id(self.id)
+    maps = ResponseMap.all(:conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
 
     if force or ((maps.nil? or maps.length == 0) and 
                  self.team.nil?)
@@ -37,9 +35,6 @@ class Participant < ActiveRecord::Base
 
 
   def force_delete(maps)
-    #OSS808 Change 26/10/2013
-    # Deprecated Code has been changed
-    #times = ResubmissionTime.find(:all, :conditions => ['participant_id = ?',self.id])
     times = ResubmissionTime.find_all_by_participant_id(self.id);
 
     if times
@@ -64,27 +59,12 @@ class Participant < ActiveRecord::Base
      self.destroy
   end
 
-  #OSS808 Change 27/10/2013
-  #Method renamed to  topic_name from get_topic_string
   def topic_name
     if topic.nil? or topic.topic_name.empty?
       return "<center>&#8212;</center>"
     end
     return topic.topic_name
   end
-
-  #OSS808 Change 26/10/2013
-  #Method commented as it is not used anywhere in the project and also it just
-  # returns the value of the variable which can be done by attr_accessor
-
-=begin
-  def able_to_submit
-   if submit_allowed
-      return true
-    end
-    return false
-  end
-=end
 
   def able_to_review
     if review_allowed
@@ -93,7 +73,6 @@ class Participant < ActiveRecord::Base
     return false
   end
 
-  #OSS808 Change 26/10/2013
   # email does not work. It should be made to work in the future
   def email(pw, home_page)
     user = User.find_by_id(self.user_id)
@@ -151,22 +130,5 @@ class Participant < ActiveRecord::Base
     scores[:total_score] = assignment.compute_total_score(scores)
     return scores
   end
-
-=begin
-  #OSS808 Change 27/10/2013
-  #moved from assignment_participant.rb and renamed to  course_string from get_course_string
-  def course_string
-    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
-    begin
-      #course = Course.find(self.assignment.course.id)
-      if self.course.name.strip.length == 0
-        raise
-      end
-      return self.course.name
-    rescue
-      return "<center>&#8212;</center>"
-    end
-  end
-=end
 
 end

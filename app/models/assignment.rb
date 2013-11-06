@@ -851,7 +851,7 @@ class Assignment < ActiveRecord::Base
 
         if options['team_score'] == 'true'
           if team[:scores]
-            tcsv.push(team[:scores].max, team[:scores].avg, team[:scores].min, participant.fullname)
+            tcsv.push(team[:scores][:max], team[:scores][:avg], team[:scores][:min], participant.fullname)
           else
             tcsv.push('---', '---', '---')
           end
@@ -859,7 +859,7 @@ class Assignment < ActiveRecord::Base
 
         if options['submitted_score']
           if pscore[:review]
-            tcsv.push(pscore[:review][:scores].max, pscore[:review][:scores].min, pscore[:review][:scores].avg)
+            tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg])
           else
             tcsv.push('---', '---', '---')
           end
@@ -867,7 +867,7 @@ class Assignment < ActiveRecord::Base
 
         if options['metareview_score']
           if pscore[:metareview]
-            tcsv.push(pscore[:metareview][:scores].max, pscore[:metareview][:scores].min, pscore[:metareview][:scores].avg)
+            tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg])
           else
             tcsv.push('---', '---', '---')
           end
@@ -875,7 +875,7 @@ class Assignment < ActiveRecord::Base
 
         if options['author_feedback_score']
           if pscore[:feedback]
-            tcsv.push(pscore[:feedback][:scores].max, pscore[:feedback][:scores].min, pscore[:feedback][:scores].avg)
+            tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg])
           else
             tcsv.push('---', '---', '---')
           end
@@ -883,7 +883,7 @@ class Assignment < ActiveRecord::Base
 
         if options['teammate_review_score']
           if pscore[:teammate]
-            tcsv.push(pscore[:teammate][:scores].max, pscore[:teammate][:scores].min, pscore[:teammate][:scores].avg)
+            tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg])
           else
             tcsv.push('---', '---', '---')
           end

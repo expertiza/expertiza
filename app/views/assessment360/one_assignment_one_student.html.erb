@@ -15,7 +15,7 @@
         <font style="font-weight:bold"><%= @participant.fullname %> Average</font>
       </td>
       <td>
-        <%= @participant.get_average_score %>%
+        <%= @participant.average_score %>%
       </td>
     </tr>
   </table>
@@ -33,7 +33,9 @@
       <% questionnaire.questions.each do |question|  %>
         <tr>
           <td>
-            <%= @participant.get_average_question_score(question) %>
+
+            <!-- @participant.average_question_score(question) -->
+            <%= @participant.average_question_score(question) %>
           </td>
           <td>
             <%= question.txt %>

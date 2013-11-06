@@ -36,9 +36,6 @@ class Assignment < ActiveRecord::Base
   WAITLIST = 'Waitlist open'
 
   REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
-
-  REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
-
   #  Review Strategy information.
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
   RS_STUDENT_SELECTED = 'Student-Selected'
@@ -247,7 +244,7 @@ class Assignment < ActiveRecord::Base
 
     scores[:participants] = Hash.new
     self.participants.each do |participant|
-      scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
+      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
     end
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
@@ -761,7 +758,7 @@ class Assignment < ActiveRecord::Base
 
     self.response_maps.each do |response_map|
       if !response_map.response.nil? then
-        sum_of_scores = sum_of_scores + response_map.response.get_average_score
+        sum_of_scores = sum_of_scores + response_map.response.average_score
       end
     end
 
@@ -773,7 +770,7 @@ class Assignment < ActiveRecord::Base
 
     self.response_maps.each do |response_map|
       if !response_map.response.nil? then
-        score = response_map.response.get_average_score.to_i
+        score = response_map.response.average_score.to_i
         distribution[score] += 1 if score >= 0 and score <= 100
       end
     end
@@ -836,7 +833,7 @@ class Assignment < ActiveRecord::Base
         |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-    @scores = @assignment.get_scores(@questions)
+    @scores = @assignment.scores(@questions)
 
     if @scores[:teams].nil?
       return csv

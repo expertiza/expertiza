@@ -94,6 +94,10 @@ Expertiza::Application.routes.draw do |map|
   resources :export_file do
     collection do
       get :start
+      # OSS808 Change 27/10/2013
+      # Added missing routes
+      get :export
+      post :export
     end
   end
 
@@ -123,7 +127,15 @@ Expertiza::Application.routes.draw do |map|
 
   resources :institutions
 
-  resources :invitation
+  resources :invitation do
+  # OSS808 Change 28/10/2013
+  # Added missing routes
+  collection do
+    get :cancel
+    get :accept
+    get :decline
+  end
+  end
 
   resources :join_team_requests
 
@@ -291,6 +303,8 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :edit
+      post :submit_hyperlink #OSS808
+      get :remove_hyperlink #OSS808
     end
   end
 

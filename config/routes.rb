@@ -356,4 +356,5 @@ Expertiza::Application.routes.draw do |map|
 
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   map.connect ':controller/service.wsdl', :action => 'wsdl'
+  match ':controller(/:action(/:id))(.:format)'
 end

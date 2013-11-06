@@ -74,7 +74,6 @@ class GradesController < ApplicationController
       reviewee = participant.team
       review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
 
-
     if review_mapping.nil?
         review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
     end

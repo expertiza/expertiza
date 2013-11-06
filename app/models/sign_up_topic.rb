@@ -88,7 +88,6 @@ class SignUpTopic < ActiveRecord::Base
 
         #update participants
         assignment = Assignment.find(self.assignment_id)
-
           user_id = TeamsUser.find(:first, :conditions => {:team_id => next_wait_listed_user.creator_id}).user_id
           participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
         

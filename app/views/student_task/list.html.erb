@@ -42,11 +42,13 @@
         action = "list"
       end
     %>
+</div>
+</div>
 
-  <span>&nbsp; &raquo;
-    <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => id %>
-    (<%= student_task.relative_deadline %> left)
-  </span><br/>
+<span>&nbsp; &raquo;
+  <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => id %>
+  (<%= student_task.relative_deadline %> left)
+</span><br/>
 <% end %>
 
 <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
@@ -76,8 +78,6 @@
   <span class="notification">&nbsp; &raquo; <%= link_to student_task.assignment.name + ": " +
     student_task.current_stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => student_task.participant.id %></span><br/>
 <% end %>
-</div>
-</div>
 
 <div class="topictable">
   <table class="listing" cellpadding="2">
@@ -97,8 +97,9 @@
         <tr class="listingRow">
           <td>&nbsp;</td>
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
-          <td><%= student_task.course.name %></td>
-          <td><%= student_task.topic_name %></td>
+          <td>
+            <% participant.get_course_string %></td>
+          <td><%= participant.get_topic_string %></td>
           <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
           <td><%= student_task.stage_deadline %></td>
           <td align=center>

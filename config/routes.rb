@@ -97,9 +97,6 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :view_my_scores
-      get :instructor_review
-      get :remove_hyperlink
-      get :conflict_notification
     end
   end
 
@@ -201,14 +198,6 @@ Expertiza::Application.routes.draw do |map|
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_evaluation_questionnaires, controller: :questionnaires
 
-  resources :response do
-    collection do
-      get :new_feedback
-      get :view
-      post :delete
-    end
-  end
-
   resources :review_mapping do
     collection do
       get :list_mappings
@@ -284,7 +273,6 @@ Expertiza::Application.routes.draw do |map|
   resources :submitted_content do
     collection do
       get :view
-      get :edit
     end
   end
 

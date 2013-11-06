@@ -10,9 +10,7 @@
                # reviews done
             </th>
             <th width = "20%">
-
                 Team reviewed
-
             </th>
             <th width = "8%">
                 Score awarded
@@ -48,21 +46,19 @@
 
                 <% if (@l%2) == 0 %>
                     <tr bgcolor="#ffffff">
-                        <td bgcolor="#ffffff" rowspan= <%= @rspan%> >
-                          <%= username %>
-                          <%#= link_to_remote_redbox username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
+                        <td bgcolor="#ffffff" rowspan= <%= @rspan%>>
+                             <%= link_to_remote_redbox username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
                         </td>
 
-                 <%else %>
-                    <tr bgcolor="#DDDDBB">
-                        <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
-                          <%= username %>
-                            <%#= link_to_remote_redbox(username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id}) %>
-                        </td>
+              <%else %>
+                  <tr bgcolor="#DDDDBB">
+                    <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
+                         <%= link_to_remote_redbox(username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id}) %>
+                     </td>
 
-                <%end %>
+              <%end %>
 
-                <%if (@count == (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
+              <%if (@count == (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
                     <td align = "center" rowspan= <%= @rspan%>>
                         <%= @count %>/<%= @rspan %>
                     </td>
@@ -74,10 +70,7 @@
 
                 <% (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id, @type])).each do |ri| %>
                     <% if (Response.find_by_map_id(ri.id)) %>
-
-
-
-                        <%if  Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0 %>
+                      <%if  Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0 %>
                             <%@team = Team.find(ri.reviewee_id) %>
                             <% @teamid = @team.id%>
                                 <% if (@l%2) == 0 %>
@@ -90,8 +83,7 @@
                                 <% else %>
                                     <%=  Team.find(ri.reviewee_id).name %>
                                 <% end %>
-
-                                <%#= link_to_remote_redbox Team.find(ri.reviewee_id).name,:url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
+                                <%= link_to_remote_redbox Team.find(ri.reviewee_id).name,:url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
                                 </td>
                             <%= render :partial => 'teamscore' %>
 
@@ -103,7 +95,6 @@
                             <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                                </td>
                         </tr>
-
 
                         <%end %>
 
@@ -130,9 +121,6 @@
                       <%end %>
                   <%end %>
               <% end %>
-
-
-
           <%end %>
       <%end %>
 	

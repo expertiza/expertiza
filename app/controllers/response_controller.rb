@@ -269,12 +269,8 @@ class ResponseController < ApplicationController
         @question_type << QuestionType.find_by_question_id(question.id)
       }
       if !@map.contributor.nil?
-       # if @map.assignment.team_assignment?
           team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
           @topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
-       # else
-       #   @topic_id = Participant.find(@map.contributor).topic_id
-       # end
       end
       if !@topic_id.nil?
         @signedUpTopic = SignUpTopic.find(@topic_id).topic_name
@@ -423,7 +419,7 @@ class ResponseController < ApplicationController
   def redirect_when_disallowed(response)
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
     # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-    if response.map.read_attribute(:type) == 'FeedbackResponseMap' #&& response.map.assignment.team_assignment?
+    if response.map.read_attribute(:type) == 'FeedbackResponseMap'
       team = response.map.reviewer.team
       unless team.has_user session[:user]
         redirect_to '/denied?reason=You are not on the team that wrote this feedback'

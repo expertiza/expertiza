@@ -41,7 +41,7 @@ end
 
 group :test do
   gem 'capybara'
-  gem 'cucumber-rails', require: true
+  gem 'cucumber-rails', require: false
   gem 'database_cleaner'
   gem 'gherkin'
   gem 'guard-rails'

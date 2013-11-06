@@ -1,5 +1,4 @@
 <td><%= topic.topic_identifier %></td>
-#show topic name
 <td><%= render :partial => 'topic_names', :locals => {:i => i, :topic=>topic} %></td>
 
 <% if @assignment.is_microtask? %>

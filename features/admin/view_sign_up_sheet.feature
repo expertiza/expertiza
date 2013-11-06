@@ -3,7 +3,7 @@ Feature: View sign up sheet
   As an administrator
   I want to be able to check team size by its name
 
-
+ @wip
   Scenario: topic is selected by a team
     Given I am logged in as admin
     Given an assignment named "Exp" exists

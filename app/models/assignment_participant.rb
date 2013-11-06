@@ -24,7 +24,7 @@ class AssignmentParticipant < Participant
   end
 
   # Evaluates whether this participant contribution was reviewed by reviewer
-  # @param[in] reviewer AssignmentParticipant object
+  # @param[in] reviewer AssignmentParticipant object 
   def reviewed_by?(reviewer)
     return ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
                                               self.id, reviewer.id, assignment.id]) > 0
@@ -151,7 +151,7 @@ class AssignmentParticipant < Participant
   def get_review_score
     review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
     assessment = review_questionnaire.get_assessments_for(self)
-    return (Score.compute_scores(assessment, review_questionnaire.questions).avg / 100.00) * review_questionnaire.max_possible_score.to_f
+    return (Score.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f
   end
 
   def fullname
@@ -240,7 +240,7 @@ class AssignmentParticipant < Participant
   end
 
   def get_course_string
-    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
+    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...    
     begin
       course = Course.find(self.assignment.course.id)
       if course.name.strip.length == 0
@@ -387,7 +387,7 @@ class AssignmentParticipant < Participant
     return fields
   end
 
-  # generate a hash string that we can digitally sign, consisting of the
+  # generate a hash string that we can digitally sign, consisting of the 
   # assignment name, user name, and time stamp passed in.
   def get_hash(time_stamp)
     # first generate a hash from the assignment name itself
@@ -398,7 +398,7 @@ class AssignmentParticipant < Participant
     Digest::SHA1.digest(sign)
   end
 
-  # grant publishing rights to one or more assignments. Using the supplied private key,
+  # grant publishing rights to one or more assignments. Using the supplied private key, 
   # digital signatures are generated.
   # reference: http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
   def self.grant_publishing_rights(privateKey, participants)

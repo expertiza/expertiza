@@ -39,7 +39,7 @@ group :development do
   gem 'selenium-webdriver'
 end
 
- group :test do
+group :test do
   gem 'capybara'
   gem 'cucumber-rails', require: false
   gem 'database_cleaner'

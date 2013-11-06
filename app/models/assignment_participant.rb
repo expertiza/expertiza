@@ -10,19 +10,13 @@ class AssignmentParticipant < Participant
   
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
   has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
+  has_many    :collusion_cycles
   has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   belongs_to  :user
-
-  # OSS808 Change 28/10/2013
-  # get_average_question_score
-  has_many :collusion_cycles
-
   validates_presence_of :handle
 
   # Returns the average score of one question from all reviews for this user on this assignment as an floating point number
   # Params: question - The Question object to retrieve the scores from
-  # OSS808 Change 26/10/2013
-  # get_average_question_score
   def average_question_score(question)
     sum_of_scores = 0
     number_of_scores = 0
@@ -96,20 +90,14 @@ class AssignmentParticipant < Participant
   end
 
   # all the participants in this assignment reviewed by this person
-  #OSS808 Change 27/10/2013
-  # Renamed to reviewees from get_reviewees
-  # Commented Deprecated code and re-wrote the code
-
-  def reviewees
+   def reviewees
     reviewees = []
     if self.assignment.team_assignment?
-      #rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} AND type = 'TeamReviewResponseMap'"])
       rmaps = ResponseMap.find_all_by_reviewer_id_and_type(self.id,'TeamReviewResponseMap')
       rmaps.each do |rm|
         reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants)
       end
     else
-      #rmaps = ResponseMap.find(:all, :conditions => ['reviewer_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
       rmaps = ResponseMap.find_all_by_reviewer_id_and_type(self.id,'ParticipantReviewResponseMap')
       rmaps.each do |rm|
         reviewees.push(AssignmentParticipant.find(rm.reviewee_id))
@@ -119,113 +107,20 @@ class AssignmentParticipant < Participant
   end
   
   # all the participants in this assignment who have reviewed this person
-  #OSS808 Change 27/10/2013
-  # Renamed to reviewers from get_reviewers
-  # Commented Deprecated code and re wrote the code
-
   def get_reviewers
     reviewers = []
     if self.assignment.team_assignment? && self.team
-      #rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
       rmaps = ResponseMap.find_all_by_reviewee_id_and_type(self.team.id,'TeamReviewResponseMap')
     else
-      #rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
       rmaps = ResponseMap.find_all_by_reviewee_id_and_type(self.id,'ParticipantReviewResponseMap')
     end
     rmaps.each do |rm|
-       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
+      reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
     end
     return reviewers  
   end
 
-  # OSS808 Change 28/10/2013
-  # Moved to class CollusionCycle
-=begin
-  # Cycle data structure
-  # Each edge of the cycle stores a participant and the score given by to the participant by the reviewer.
-  # Consider a 3 node cycle: A --> B --> C --> A (A reviewed B; B reviewed C and C reviewed A)
-  # For the above cycle, the data structure would be: [[A, SCA], [B, SAB], [C, SCB]], where SCA is the score given by C to A.
-
-  def get_two_node_cycles
-    cycles = []
-    self.get_reviewers.each do |ap|
-      if ap.get_reviewers.include?(self)
-        self.get_reviews_by_reviewer(ap).nil? ? next : s01 = self.get_reviews_by_reviewer(ap).get_total_score
-        ap.get_reviews_by_reviewer(self).nil? ? next : s10 = ap.get_reviews_by_reviewer(self).get_total_score
-        cycles.push([[self, s01], [ap, s10]])
-      end
-    end
-    return cycles
-  end
-
-  def get_three_node_cycles
-    cycles = []
-    self.get_reviewers.each do |ap1|
-      ap1.get_reviewers.each do |ap2|
-        if ap2.get_reviewers.include?(self)
-          self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score
-          ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
-          ap2.get_reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score
-          cycles.push([[self, s01], [ap1, s12], [ap2, s20]])
-        end
-      end
-    end
-    return cycles
-  end
-
-  def get_four_node_cycles
-    cycles = []
-    self.get_reviewers.each do |ap1|
-      ap1.get_reviewers.each do |ap2|
-        ap2.get_reviewers.each do |ap3|
-          if ap3.get_reviewers.include?(self)
-            self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score
-            ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
-            ap2.get_reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score
-            ap3.get_reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score
-            cycles.push([[self, s01], [ap1, s12], [ap2, s23], [ap3, s30]])
-          end
-        end
-      end
-    end
-    return cycles
-  end
-
-  # Per cycle
-  def get_cycle_similarity_score(cycle)
-    similarity_score = 0.0
-    count = 0.0
-    for pivot in 0 ... cycle.size-1 do
-      pivot_score = cycle[pivot][1]
-      # puts "Pivot:" + cycle[pivot][1].to_s
-      for other in pivot+1 ... cycle.size do
-        # puts "Other:" + cycle[other][1].to_s
-        similarity_score = similarity_score + (pivot_score - cycle[other][1]).abs
-        count = count + 1.0
-      end
-    end
-    similarity_score = similarity_score / count unless count == 0.0
-    return similarity_score
-  end
-
-  # Per cycle
-  def get_cycle_deviation_score(cycle)
-    deviation_score = 0.0
-    count = 0.0
-    for member in 0 ... cycle.size do
-      participant = AssignmentParticipant.find(cycle[member][0].id)
-      total_score = participant.get_review_score
-      deviation_score = deviation_score + (total_score - cycle[member][1]).abs
-      count = count + 1.0
-    end
-    deviation_score = deviation_score / count unless count == 0.0
-    return deviation_score
-  end
-=end
-
-  #OSS808 Change 28/10/2013
-  #created a new method collusion_cycles to access cycles related code
-
+  #Accessing cycles related code
   def collusion_cycles
     self.collusion_cycles=CollusionCycle.two_node_cycles
     self.collusion_cycles<<CollusionCycle.three_node_cycles
@@ -234,35 +129,13 @@ class AssignmentParticipant < Participant
     deviation_score=CollusionCycle.cycle_deviation_score(self.collusion_cycles)
   end
 
-  #OSS808 Change 27/10/2013
-  # Renamed to review_score from get_review_score
-
   def review_score
     review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
     assessment = review_questionnaire.get_assessments_for(self)
     return (Score.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f    
   end
 
-  #OSS808 Change 27/10/2013
-  #Method redundant, already in participant.rb
-
-  #def fullname
-   # self.user.fullname
-  #end
-
-  #OSS808 Change 27/10/2013
-  # Method redundant, already in participant.rb
-
-=begin
-  def name
-    self.user.name
-  end
-=end
-
   # Return scores that this participant has been given
-  #OSS808 Change 27/10/2013
-  #Renamed to scores from get_scores
-
   def scores(questions)
     scores = Hash.new
     scores[:participant] = self # This doesn't appear to be used anywhere
@@ -339,15 +212,10 @@ class AssignmentParticipant < Participant
     end
   end
 
-  #OSS808 Change 27/10/2013
-  #renamed from get_feedback
-  
   def feedback
     return FeedbackResponseMap.get_assessments_for(self)      
   end
 
-  #OSS808 Change 27/10/2013
-  # Renamed from get_reviews to reviews
 
   def reviews
     #ACS Always get assessments for a team
@@ -355,8 +223,6 @@ class AssignmentParticipant < Participant
     return TeamReviewResponseMap.get_assessments_for(self.team)
   end
 
-  #OSS808 Change 27/10/2013
-  # Renamed to reviews_by_reviewer from get_reviews_by_reviewer
 
   def reviews_by_reviewer(reviewer)
     if self.assignment.team_assignment?
@@ -366,34 +232,16 @@ class AssignmentParticipant < Participant
     end
   end
 
-  #OSS808 Change 27/10/2013
-  # Commented the Duplicated Code, already present in assignment_participant.rb
-
-=begin
-  def get_reviews_by_reviewer(reviewer)
-    if self.assignment.team_assignment?
-      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)          
-    else
-      return ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
-    end
-  end
-=end
-
-  #OSS808 Change 27/10/2013
-  # Renamed to metareviews from get_metareviews
-
   def metareviews
     MetareviewResponseMap.get_assessments_for(self)  
   end
 
-  #OSS808 Change 27/10/2013
-  #Method renamed to teammate_reviews from get_teammate_reviews
+
   def teammate_reviews
     TeammateReviewResponseMap.get_assessments_for(self)
   end
 
-  #OSS808 Change 27/10/2013
-  #Method renamed to submitted_files from get_submitted_files
+
   def submitted_files
     files = Array.new
     if(self.directory_num)      
@@ -402,8 +250,6 @@ class AssignmentParticipant < Participant
     return files
   end
 
-  #OSS808 Change 27/10/2013
-  #Method renamed to files_in_directory from get_files
   
   def files_in_directory(directory)
       files_list = Dir[directory + "/*"]
@@ -418,8 +264,7 @@ class AssignmentParticipant < Participant
       return files
   end
 
-  #OSS808 Change 28/10/2013
-  # Renamed to wiki_submissions from get_wiki_submissions
+
   def wiki_submissions
     currenttime = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
 
@@ -444,15 +289,6 @@ class AssignmentParticipant < Participant
        return Array.new
     end
   end
-
-  #OSS808 Change 27/10/2013
-  #Redundant Method - already in participant.rb  and assignment_participant.rb
-
-=begin
-  def name
-    self.user.name
-  end
-=end
 
   def team
     AssignmentTeam.get_team(self)
@@ -547,9 +383,6 @@ class AssignmentParticipant < Participant
     self.save!
   end
 
-  #OSS808 Change 27/10/2013
-  #Could not remove get from method name because get_path method exists in various models like
-  #course, assignment, etc and there are dynamic usages of this method
 
   def get_path
      path = self.assignment.get_path + "/"+ self.directory_num.to_s
@@ -563,7 +396,7 @@ class AssignmentParticipant < Participant
   
   def set_student_directory_num
     if self.directory_num.nil? or self.directory_num < 0           
-      maxnum = AssignmentParticipant.find(:first, :conditions=>['parent_id = ?',self.parent_id], :order => 'directory_num desc').directory_num
+      maxnum = AssignmentParticipant.first(:conditions=>['parent_id = ?',self.parent_id], :order => 'directory_num desc').directory_num
       if maxnum
         dirnum = maxnum + 1
       else
@@ -581,16 +414,12 @@ class AssignmentParticipant < Participant
         }
     end
   end
-  #OSS808 Change 27/10/2013
-  #moved from participant.rb
 
   def get_current_stage
     assignment.try :get_current_stage, topic_id
   end
   alias_method :current_stage, :get_current_stage
 
-  #OSS808 Change 27/10/2013
-  #moved from participant.rb
 
   def get_stage_deadline
     assignment.get_stage_deadline topic_id
@@ -598,15 +427,11 @@ class AssignmentParticipant < Participant
   alias_method :stage_deadline, :get_stage_deadline
 
 
-  #OSS808 Change 27/10/2013
-  #moved from participant.rb
   def review_response_maps
     ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
   end
 
 
-  # OSS808 Change 28/10/2013
-  # renamed method to course_string from get_course_string
   def course_string
     # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
     begin
@@ -627,17 +452,4 @@ class AssignmentParticipant < Participant
     write_attribute :submitted_hyperlinks, val
   end
 
-end   #class ends
-
-
-#OSS808 Change 27/10/2013
-#Method commented as it is defined outside the class and also present in superclass, hence redundant
-=begin
-def get_topic_string
-    if topic.nil? or topic.topic_name.empty?
-      return "<center>&#8212;</center>"
-    end
-    return topic.topic_name
-  end
-=end
-
+end

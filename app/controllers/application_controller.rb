@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery unless Rails.env.test?
   filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
   before_filter :set_time_zone
-  #before_filter :goldberg_security_filter
+  before_filter :goldberg_security_filter
 
   def authorize(args = {})
     #unless current_permission(args).allow?(params[:controller], params[:action])

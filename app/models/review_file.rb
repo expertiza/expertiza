@@ -27,7 +27,6 @@ class ReviewFile < ActiveRecord::Base
 
     # For all other members of the team, find the most recent version of code
     #   review files submitted by any of them.
-    #if participant.assignment.team_assignment?
       participant.team.get_participants.each { |member|
         file = ReviewFile.find(
             :first, :conditions => ['author_participant_id = ?', member.id],
@@ -43,7 +42,6 @@ class ReviewFile < ActiveRecord::Base
 
         max_version_num = max_member_version if max_member_version > max_version_num
       }
-    #end
     puts max_version_num
     return max_version_num
   end

@@ -41,13 +41,11 @@
           <tr>
             <th>&nbsp;</th>
             <th>&nbsp;</th>
-            <%# if @assignment.team_assignment? %>
                 <%   if !showed_team
                %>
              <td align="center" rowspan="<%= team.users.size %>"><b><%= team.name %></b></td>
            <% end %>
            <% showed_team = true %>
-         <%# end %>
             <td><%=user.name%></td>
             <td><%=user.fullname%></td>
             <%

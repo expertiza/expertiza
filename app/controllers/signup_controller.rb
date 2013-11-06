@@ -27,7 +27,6 @@
     #Find whether the user has signed up for any topics; if so the user won't be able to
     #sign up again unless the former was a waitlisted topic
     #if team assignment, then team id needs to be passed as parameter else the user's id
-   # if assignment.team_assignment?
       users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
 
       if users_team.size == 0
@@ -36,9 +35,6 @@
         #TODO: fix this; cant use 0
         @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
       end
-   # else
-   #    @selected_topics = otherConfirmedTopicforUser(params[:id], session[:user].id)
-   # end
   end
 
 #This function lets the user choose a particular topic. This function is invoked when the user clicks the green check mark in
@@ -48,8 +44,6 @@
     puts "you called me in signup_controller!"
     #find the assignment to which user is signing up
     assignment = Assignment.find(params[:assignment_id])
-
-   # if assignment.team_assignment?
 
       #check whether the user already has a team for this assignment
       users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
@@ -63,9 +57,6 @@
       else
         confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id])
       end
-   # else
-    #  confirmationStatus = confirmTopic(session[:user].id, params[:id], params[:assignment_id])
-   # end
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
@@ -162,13 +153,9 @@
       flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
       #if team assignment find the creator id from teamusers table and teams
-    #  if assignment.team_assignment?
         #users_team will contain the team id of the team to which the user belongs
         users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
         signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
-   #   else
-   #     signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, session[:user].id)
-   #   end
 
       #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
       if signup_record.is_waitlisted == false
@@ -182,12 +169,8 @@
           first_waitlisted_user.save
 
           #update the participants details
-         # if assignment.team_assignment?
             user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
             participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
-         # else
-        #    participant = Participant.find_by_user_id_and_parent_id(first_waitlisted_user.creator_id, assignment.id)
-        #  end
           participant.update_topic_id(topic_id)
 
           SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id,assignment_id)

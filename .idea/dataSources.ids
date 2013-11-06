@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source source="LOCAL" name="Rails expertiza: cucumber" product="" version="" jdbc-version="" driver-name="" driver-version="" uuid="3f4e4560-ceb4-439e-a21e-250169d6925a">
+    <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+    <jdbc-url>jdbc:mysql://127.0.0.1/pg_test</jdbc-url>
+    <user-name>root</user-name>
+    <libraries/>
+  </data-source>
+  <data-source source="LOCAL" name="Rails expertiza: development" product="" version="" jdbc-version="" driver-name="" driver-version="" uuid="b0ca2c1f-1e44-41af-b1de-5bf1ed86bd6b">
+    <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+    <jdbc-url>jdbc:mysql://127.0.0.1/pg_development</jdbc-url>
+    <user-name>root</user-name>
+    <libraries/>
+  </data-source>
+  <data-source source="LOCAL" name="Rails expertiza: production" product="" version="" jdbc-version="" driver-name="" driver-version="" uuid="bd013bb1-b8d1-460f-999a-9025f0cc2476">
+    <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+    <jdbc-url>jdbc:mysql://127.0.0.1/pg_production</jdbc-url>
+    <user-name>root</user-name>
+    <libraries/>
+  </data-source>
+  <data-source source="LOCAL" name="Rails expertiza: test" product="" version="" jdbc-version="" driver-name="" driver-version="" uuid="8e2ed46a-f4ae-4772-8f1a-da08473f071e">
+    <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+    <jdbc-url>jdbc:mysql://127.0.0.1/pg_test</jdbc-url>
+    <user-name>root</user-name>
+    <libraries/>
+  </data-source>
+</component>

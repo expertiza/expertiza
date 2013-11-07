@@ -3,7 +3,9 @@
 # newer version of cucumber-rails. Consider adding your own code to a new file
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
-
+require 'simplecov'
+SimpleCov.start 'rails'
+SimpleCov.coverage_dir 'coverage/cucumber'
 require 'cucumber/rails'
 
 # Capybara defaults to CSS3 selectors rather than XPath.

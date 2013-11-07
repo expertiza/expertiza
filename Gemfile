@@ -48,4 +48,6 @@ group :test do
   gem 'guard-rspec'
   gem 'launchy'
   gem "rspec-rails"
+  gem 'simplecov', :require => false, :group => :test
+
 end

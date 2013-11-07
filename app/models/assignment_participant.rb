@@ -20,20 +20,20 @@ class AssignmentParticipant < Participant
 
   def assign_reviewer(reviewer)
     ParticipantReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
-      :reviewed_object_id => assignment.id)
+                                        :reviewed_object_id => assignment.id)
   end
 
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object 
   def reviewed_by?(reviewer)
     return ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
-                                              self.id, reviewer.id, assignment.id]) > 0
+                                                              self.id, reviewer.id, assignment.id]) > 0
   end
 
   def has_submissions?
     return ((get_submitted_files.length > 0) or
-            (get_wiki_submissions.length > 0) or
-            (get_hyperlinks_array.length > 0))
+        (get_wiki_submissions.length > 0) or
+        (get_hyperlinks_array.length > 0))
   end
 
   # all the participants in this assignment reviewed by this person
@@ -50,7 +50,7 @@ class AssignmentParticipant < Participant
         reviewees.push(AssignmentParticipant.find(rm.reviewee_id))
       end
     end
-   return reviewees
+    return reviewees
   end
 
   # all the participants in this assignment who have reviewed this person
@@ -151,7 +151,7 @@ class AssignmentParticipant < Participant
   def get_review_score
     review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
     assessment = review_questionnaire.get_assessments_for(self)
-    return (Score.compute_scores(assessment, review_questionnaire.questions).avg / 100.00) * review_questionnaire.max_possible_score.to_f
+    return (Score.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f
   end
 
   def fullname
@@ -235,7 +235,7 @@ class AssignmentParticipant < Participant
   def copy(course_id)
     part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
     if part.nil?
-       CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id)
+      CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id)
     end
   end
 
@@ -295,16 +295,16 @@ class AssignmentParticipant < Participant
   end
 
   def get_files(directory)
-      files_list = Dir[directory + "/*"]
-      files = Array.new
-      for file in files_list
-        if File.directory?(file) then
-          dir_files = get_files(file)
-          dir_files.each{|f| files << f}
-        end
-        files << file
+    files_list = Dir[directory + "/*"]
+    files = Array.new
+    for file in files_list
+      if File.directory?(file) then
+        dir_files = get_files(file)
+        dir_files.each{|f| files << f}
       end
-      return files
+      files << file
+    end
+    return files
   end
 
   def get_wiki_submissions
@@ -312,23 +312,23 @@ class AssignmentParticipant < Participant
 
     #ACS Check if the team count is greater than one(team assignment)
     if self.assignment.max_team_size > 1 and self.assignment.wiki_type.name == "MediaWiki"
-       submissions = Array.new
-       if self.team
+      submissions = Array.new
+      if self.team
         self.team.get_participants.each {
-          | user |
+            | user |
           val = WikiType.review_mediawiki_group(self.assignment.directory_path, currenttime, user.handle)
           if val != nil
-              submissions << val
+            submissions << val
           end
         }
-       end
-       return submissions
+      end
+      return submissions
     elsif self.assignment.wiki_type.name == "MediaWiki"
-       return WikiType.review_mediawiki(self.assignment.directory_path, currenttime, self.handle)
+      return WikiType.review_mediawiki(self.assignment.directory_path, currenttime, self.handle)
     elsif self.assignment.wiki_type.name == "DocuWiki"
-       return WikiType.review_docuwiki(self.assignment.directory_path, currenttime, self.handle)
+      return WikiType.review_docuwiki(self.assignment.directory_path, currenttime, self.handle)
     else
-       return Array.new
+      return Array.new
     end
   end
 
@@ -344,7 +344,7 @@ class AssignmentParticipant < Participant
   # if user does not exist, it will be created and added to this assignment
   def self.import(row,session,id)
     if row.length < 1
-       raise ArgumentError, "No user id has been specified."
+      raise ArgumentError, "No user id has been specified."
     end
     user = User.find_by_name(row[0])
     if (user == nil)
@@ -355,31 +355,31 @@ class AssignmentParticipant < Participant
       user = ImportFileHelper::create_new_user(attributes,session)
     end
     if Assignment.find(id) == nil
-       raise ImportError, "The assignment with id \""+id.to_s+"\" was not found."
+      raise ImportError, "The assignment with id \""+id.to_s+"\" was not found."
     end
     if (find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, id]}).size == 0)
-          newpart = AssignmentParticipant.create(:user_id => user.id, :parent_id => id)
-          newpart.set_handle()
+      newpart = AssignmentParticipant.create(:user_id => user.id, :parent_id => id)
+      newpart.set_handle()
     end
   end
 
   # provide export functionality for Assignment Participants
   def self.export(csv,parent_id,options)
-     find_all_by_parent_id(parent_id).each{
-          |part|
-          user = part.user
-          csv << [
-            user.name,
-            user.fullname,
-            user.email,
-            user.role.name,
-            user.parent.name,
-            user.email_on_submission,
-            user.email_on_review,
-            user.email_on_review_of_review,
-            part.handle
-          ]
-      }
+    find_all_by_parent_id(parent_id).each{
+        |part|
+      user = part.user
+      csv << [
+          user.name,
+          user.fullname,
+          user.email,
+          user.role.name,
+          user.parent.name,
+          user.email_on_submission,
+          user.email_on_review,
+          user.email_on_review_of_review,
+          part.handle
+      ]
+    }
   end
 
   def self.get_export_fields(options)
@@ -430,8 +430,8 @@ class AssignmentParticipant < Participant
   end
 
   def get_path
-     path = self.assignment.get_path + "/"+ self.directory_num.to_s
-     return path
+    path = self.assignment.get_path + "/"+ self.directory_num.to_s
+    return path
   end
 
   def update_resubmit_times

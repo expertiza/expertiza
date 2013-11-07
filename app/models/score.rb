@@ -5,20 +5,17 @@ class Score < ActiveRecord::Base
   # parameters
   #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
   #  questions - the list of questions that was filled out in the process of doing those assessments
-
-
   def self.compute_scores(assessments, questions)
-    scores = ParticipantScore.new
+    scores = Hash.new
     if assessments.length > 0
-      scores.max = -999999999
-      scores.min = 999999999
+      scores[:max] = -999999999
+      scores[:min] = 999999999
       total_score = 0
       length_of_assessments=assessments.length.to_f
       q_types = Array.new
       questions.each {
           |question|
         q_types << QuestionType.find_by_question_id(question.id)
-
       }
       assessments.each {
           |assessment|
@@ -26,11 +23,11 @@ class Score < ActiveRecord::Base
 
         curr_score = get_total_score(:response => assessment, :questions => questions, :q_types => q_types)
 
-        if curr_score > scores.max
-          scores.max = curr_score
+        if curr_score > scores[:max]
+          scores[:max] = curr_score
         end
-        if curr_score < scores.min
-          scores.min = curr_score
+        if curr_score < scores[:min]
+          scores[:min] = curr_score
         end
 
         # Check if the review is invalid. If is not valid do not include in score calculation
@@ -41,11 +38,14 @@ class Score < ActiveRecord::Base
         total_score += curr_score
       }
       if (length_of_assessments!=0)
-        scores.avg = total_score.to_f / length_of_assessments
+        scores[:avg] = total_score.to_f / length_of_assessments
       else
-        scores.avg=0
+        scores[:avg]=0
       end
-
+    else
+      scores[:max] = nil
+      scores[:min] = nil
+      scores[:avg] = nil
     end
     return scores
   end
@@ -63,16 +63,14 @@ class Score < ActiveRecord::Base
     weighted_score = 0
     sum_of_weights = 0
 
-    #Check for invalid reviews.
-    #Check if the latest review done by the reviewer falls into the latest review stage
     @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
     x = 0
     if @questionnaire.section == "Custom"
-      @questions .each {
+      @questions.each {
           |question|
-        item = Score.find_by_response_id_and_question_id(@response .id, question.id)
-        if @q_types .length <= x
+        item = Score.find_by_response_id_and_question_id(@response.id, question.id)
+        if @q_types.length <= x
           @q_types[x] = QuestionType.find_by_question_id(question.id)
         end
 
@@ -89,9 +87,6 @@ class Score < ActiveRecord::Base
         max_question_score = @questionnaire.max_question_score
       }
     else
-
-      #questionnaireData = MyView.where('q1_id = ? AND s_response_id = ?',questions[0].questionnaire_id,response .id).select('q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score')
-      #questionnaireData = MyView.where('q1_id = ? AND s_response_id = ?',questions[0].questionnaire_id,response .id).select('q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score').first
       questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE q1_id = ? AND s_response_id = ?",@questions[0].questionnaire_id,@response .id]
       weighted_score = questionnaireData[0].weighted_score.to_f
       sum_of_weights = questionnaireData[0].sum_of_weights.to_f
@@ -106,6 +101,8 @@ class Score < ActiveRecord::Base
       return -1 #indicating no score
     end
   end
+  #Check for invalid reviews.
+  #Check if the latest review done by the reviewer falls into the latest review stage
 
   def self.submission_valid?(response)
     map=ResponseMap.find(response.map_id)

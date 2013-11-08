@@ -247,6 +247,7 @@ Expertiza::Application.routes.draw do |map|
       get :add_signup_topics_staggered
       get :signup_topics
       get :view_publishing_rights
+      get :signup
     end
   end
 

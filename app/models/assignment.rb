@@ -772,6 +772,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+
   #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
   # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
   def has_partner_ads?(id)

@@ -21,13 +21,13 @@ class SignUpSheetController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [:destroy, :create, :update],
-    :redirect_to => {:action => :list}
+         :redirect_to => {:action => :list}
 
   #This displays a page that lists all the available topics for an assignment.
   #Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   #Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics
   #can have different deadlines.
-  def add_signup_topics_staggered
+  def add_signup_topic
     load_add_signup_topics(params[:id])
 
     @review_rounds = Assignment.find(params[:id]).get_review_rounds
@@ -36,7 +36,7 @@ class SignUpSheetController < ApplicationController
     #Use this until you figure out how to initialize this array
     @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
 
-    if !@topics.nil?
+    unless @topics.nil?
       i=0
       @topics.each { |topic|
 
@@ -45,13 +45,8 @@ class SignUpSheetController < ApplicationController
         @duedates[i]['topic_name'] = topic.topic_name
 
         for j in 1..@review_rounds
-          if j == 1
             duedate_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('submission').id)
             duedate_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('review').id)
-          else
-            duedate_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(topic.id, DeadlineType.find_by_name('resubmission').id, j)
-            duedate_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(topic.id, DeadlineType.find_by_name('rereview').id, j)
-          end
           if !duedate_subm.nil? && !duedate_rev.nil?
             @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
             @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
@@ -62,8 +57,8 @@ class SignUpSheetController < ApplicationController
               create_topic_deadline(due_date, 0, topic.id)
             }
             # code execution would have hit the else part during review_round one. So we'll do only round one
-            duedate_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('submission').id)
-            duedate_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('review').id)
+            #duedate_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('submission').id)
+            #duedate_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('review').id)
             @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
             @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
           end
@@ -79,19 +74,22 @@ class SignUpSheetController < ApplicationController
       }
     end
   end
+  def add_signup_topics_staggered
+       add_signup_topic
+  end
 
   #similar to the above function except that all the topics and review/submission rounds have the similar deadlines
   def add_signup_topics
     load_add_signup_topics(params[:id])
   end
 
-  #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like 
+  #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
   #the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
   def view_publishing_rights
     load_add_signup_topics(params[:id])
   end
 
-  #retrieves all the data associated with the given assignment. Includes all topics, 
+  #retrieves all the data associated with the given assignment. Includes all topics,
   #participants(people who are doing this assignment) and signed up users (people who have chosen a topic (confirmed or waitlisted)
   def load_add_signup_topics(assignment_id)
     @id = assignment_id
@@ -114,8 +112,8 @@ class SignUpSheetController < ApplicationController
   end
 
   #This method is used to create signup topics
-  #In this code params[:id] is the assignment id and not topic id. The intuition is 
-  #that assignment id will virtually be the signup sheet id as well as we have assumed 
+  #In this code params[:id] is the assignment id and not topic id. The intuition is
+  #that assignment id will virtually be the signup sheet id as well as we have assumed
   #that every assignment will have only one signup sheet
   def create
     topic = SignUpTopic.find_by_topic_name_and_assignment_id(params[:topic][:topic_name], params[:id])
@@ -140,7 +138,7 @@ class SignUpSheetController < ApplicationController
       end
 
       topic.category = params[:topic][:category]
-      #topic.assignment_id = params[:id] 
+      #topic.assignment_id = params[:id]
       topic.save
       redirect_to_sign_up(params[:id])
     else
@@ -188,16 +186,16 @@ class SignUpSheetController < ApplicationController
   def delete
     @topic = SignUpTopic.find(params[:id])
 
-    if !@topic.nil?
+    unless @topic.nil?
       @topic.destroy
     else
       flash[:error] = "Topic could not be deleted"
     end
 
-    #if this assignment has staggered deadlines then destroy the dependencies as well    
+    #if this assignment has staggered deadlines then destroy the dependencies as well
     if Assignment.find(params[:assignment_id])['staggered_deadline'] == true
       dependencies = TopicDependency.find_all_by_topic_id(params[:id])
-      if !dependencies.nil?
+      unless dependencies.nil?
         dependencies.each { |dependency| dependency.destroy }
       end
     end
@@ -213,7 +211,7 @@ class SignUpSheetController < ApplicationController
   def update
     topic = SignUpTopic.find(params[:id])
 
-    if !topic.nil?
+    unless topic.nil?
       topic.topic_identifier = params[:topic][:topic_identifier]
 
       #While saving the max choosers you should be careful; if there are users who have signed up for this particular
@@ -250,7 +248,7 @@ class SignUpSheetController < ApplicationController
     assignment=Assignment.find(params[:id])
 
     if assignment.due_dates.find_by_deadline_type_id(1)!= nil
-      if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
+      unless assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
         @show_actions = false
       end
     end
@@ -258,13 +256,8 @@ class SignUpSheetController < ApplicationController
     #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
+    SignUpTopic.remove_team(users_team, @assignment_id)
 
-    if users_team.size == 0
-      @selected_topics = nil
-    else
-      #TODO: fix this; cant use 0
-      @selected_topics = otherConfirmedTopicforUser(params[:id], users_team[0].t_id)
-    end
   end
 
 
@@ -274,157 +267,58 @@ class SignUpSheetController < ApplicationController
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
+
   def delete_signup_for_topic(assignment_id, topic_id)
-    #find whether assignment is team assignment
-    assignment = Assignment.find(assignment_id)
-
-    #making sure that the drop date deadline hasn't passed
-    dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})
-    if (!dropDate.nil? && dropDate.due_at < Time.now)
-      flash[:error] = "You cannot drop this topic because the drop deadline has passed."
-    else
-      #if team assignment find the creator id from teamusers table and teams
-      #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-      # to treat all assignments as team assignments
-      #users_team will contain the team id of the team to which the user belongs
-      users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
-      signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
-
-      #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
-      if signup_record.is_waitlisted == false
-        #find the first wait listed user if exists
-        first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
-
-        if !first_waitlisted_user.nil?
-          # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-          ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
-          first_waitlisted_user.is_waitlisted = false
-          first_waitlisted_user.save
-
-          #update the participants details
-          #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-          # to treat all assignments as team assignments
-
-          user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-          participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
-
-          participant.update_topic_id(topic_id)
-
-          SignUpTopic.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
-        end
-      end
-
-      if !signup_record.nil?
-        participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-        #update participant's topic id to nil
-        participant.update_topic_id(nil)
-        signup_record.destroy
-      end
-    end #end condition for 'drop deadline' check
+    @user_id = session[:user].id
+    SignUpTopic.reassign_topic(@user_id,assignment_id, topic_id)
   end
 
   def signup
-    puts "++++++++++++++++++++++++++++"
-    puts "you called me in sign_up_sheet_controller!"
+
     #find the assignment to which user is signing up
     assignment = Assignment.find(params[:assignment_id])
-
+    @user_id = session[:user].id
     #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
     #Always use team_id ACS
 
     #check whether the user already has a team for this assignment
-    users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
+    users_team = SignedUpUser.find_team_users(params[:assignment_id], @user_id)
     if users_team.size == 0
       #if team is not yet created, create new team.
       team = AssignmentTeam.create_team_and_node(params[:assignment_id])
-      user = User.find(session[:user].id)
+      user = User.find(@user_id)
       teamuser = create_team_users(user, team.id)
-      confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id])
+      confirmationStatus = confirm_topic(team.id, params[:id], params[:assignment_id])
     else
-      confirmationStatus = confirmTopic(users_team[0].t_id, params[:id], params[:assignment_id])
+      confirmationStatus = confirm_topic(users_team[0].t_id, params[:id], params[:assignment_id])
     end
-
+    #signup_team(@assignment, @user_id, params[:id])
     redirect_to :action => 'signup_topics', :id => params[:assignment_id]
   end
 
+  def signup_team(assignment_id, user_id, topic_id)
+
+  end
 
 
   # When using this method when creating fields, update race conditions by using db transactions
-  def slotAvailable?(topic_id)
+  def self.slotAvailable?(topic_id)
     SignUpTopic.slotAvailable?(topic_id)
   end
 
-  def otherConfirmedTopicforUser(assignment_id, creator_id)
+  def self.other_confirmed_topic_for_user(assignment_id, creator_id)
+
     user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
     user_signup
   end
 
-  def confirmTopic(creator_id, topic_id, assignment_id)
-    #check whether user has signed up already
-    user_signup = otherConfirmedTopicforUser(assignment_id, creator_id)
-
-    sign_up = SignedUpUser.new
-    sign_up.topic_id = params[:id]
-    sign_up.creator_id = creator_id
-    result = false
-    if user_signup.size == 0
-
-      # Using a DB transaction to ensure atomic inserts
-      ActiveRecord::Base.transaction do
-        #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-        if slotAvailable?(topic_id)
-          sign_up.is_waitlisted = false
-
-          #Update topic_id in participant table with the topic_id
-          participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-
-          participant.update_topic_id(topic_id)
-        else
-          sign_up.is_waitlisted = true
-        end
-        if sign_up.save
-          result = true
-        end
-      end
-    else
-      #If all the topics choosen by the user are waitlisted,
-      for user_signup_topic in user_signup
-        if user_signup_topic.is_waitlisted == false
-          flash[:error] = "You have already signed up for a topic."
-          return false
-        end
-      end
-
-      # Using a DB transaction to ensure atomic inserts
-      ActiveRecord::Base.transaction do
-        #check whether user is clicking on a topic which is not going to place him in the waitlist
-        if !slotAvailable?(topic_id)
-          sign_up.is_waitlisted = true
-          if sign_up.save
-            result = true
-          end
-        else
-          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user        
-          SignUpTopic.cancel_all_waitlists(creator_id, assignment_id)
-          sign_up.is_waitlisted = false
-          sign_up.save
-          participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-          participant.update_topic_id(topic_id)
-          result = true
-        end
-      end
-    end
-
-    result
+  def confirm_topic(creator_id, topic_id, assignment_id)
+    @param_id = params[:id]
+    @user_id = session[:user].id
+    Waitlist.waitlist_teams(@param_id, @user_id, creator_id, topic_id, assignment_id)
   end
 
-  def has_user(user, team_id)
-    if TeamsUser.find_by_team_id_and_user_id(team_id, user.id)
-      return true
-    else
-      return false
-    end
-  end
+
 
   #this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
   # attempted until the other topic has been completed..
@@ -470,8 +364,8 @@ class SignUpSheetController < ApplicationController
   end
 
 
-  #If the instructor needs to explicitly change the start/due dates of the topics 
-  #This is true in case of a staggered deadline type assignment. Individual deadlines can 
+  #If the instructor needs to explicitly change the start/due dates of the topics
+  #This is true in case of a staggered deadline type assignment. Individual deadlines can
   # be set on a per topic  and per round basis
   def save_topic_deadlines
 
@@ -554,18 +448,8 @@ class SignUpSheetController < ApplicationController
   end
 
   def create_topic_deadline(due_date, offset, topic_id)
-    topic_deadline = TopicDeadline.new
-    topic_deadline.topic_id = topic_id
-    topic_deadline.due_at = DateTime.parse(due_date.due_at.to_s) + offset.to_i
-    topic_deadline.deadline_type_id = due_date.deadline_type_id
-    topic_deadline.late_policy_id = due_date.late_policy_id
-    topic_deadline.submission_allowed_id = due_date.submission_allowed_id
-    topic_deadline.review_allowed_id = due_date.review_allowed_id
-    topic_deadline.resubmission_allowed_id = due_date.resubmission_allowed_id
-    topic_deadline.rereview_allowed_id = due_date.rereview_allowed_id
-    topic_deadline.review_of_review_allowed_id = due_date.review_of_review_allowed_id
-    topic_deadline.round = due_date.round
-    topic_deadline.save
+    DueDate.assign_topic_deadline(due_date, offset, topic_id)
+
   end
 
   def set_start_due_date(assignment_id, set_of_topics)
@@ -600,7 +484,7 @@ class SignUpSheetController < ApplicationController
           num_due_dates = prev_saved_due_dates.length
           #for each due date in the current topic he want to compare it to the previous due date
           for x in 0..num_due_dates - 1
-            #we don't want the old date to move earlier in time so we save it as the new due date and destroy the old one  
+            #we don't want the old date to move earlier in time so we save it as the new due date and destroy the old one
             if DateTime.parse(set_of_due_dates[x].due_at.to_s) + offset.to_i < DateTime.parse(prev_saved_due_dates[x].due_at.to_s)
               set_of_due_dates[x] = prev_saved_due_dates[x]
               offset = 0
@@ -619,7 +503,7 @@ class SignUpSheetController < ApplicationController
   end
 
   #gets team_details to show it on team_details view for a given assignment
-  def team_details
+  def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
       @results =ad_info(assignment.id, topic.id)
       @results.each do |result|
@@ -632,20 +516,15 @@ class SignUpSheetController < ApplicationController
       @results.each { |result|
         @team_members = ""
         TeamsUser.find_all_by_team_id(result[:team_id]).each { |teamuser|
-          puts 'Userblaahsdb asd' +User.find(teamuser.user_id).to_json
+          #puts 'Userblaahsdb asd' +User.find(teamuser.user_id).to_json
           @team_members+=User.find(teamuser.user_id).name+" "
         }
       }
-      #@team_members = find_team_members(topic)  
+      #@team_members = find_team_members(topic)
     end
   end
 
   # searches and returns team members for a given team_id
-  def find_team_members(team_id)
-    TeamsUser.find_all_by_team_id(team_id).each { |teamuser|
-      team_members+=User.find(teamuser.user_id).handle+" "
-    }
-  end
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
@@ -654,7 +533,7 @@ class SignUpSheetController < ApplicationController
     SignUpTopic.find_by_sql(query)
   end
 
-  def create_default_for_microtask
+  def add_default_microtask
     assignment_id = params[:id]
     @sign_up_topic = SignUpTopic.new
     @sign_up_topic.topic_identifier = 'MT1'
@@ -668,7 +547,6 @@ class SignUpSheetController < ApplicationController
     if @assignment.staggered_deadline?
       topic_set = Array.new
       topic = @sign_up_topic.id
-
     end
 
     if @sign_up_topic.save
@@ -679,6 +557,4 @@ class SignUpSheetController < ApplicationController
       render :action => 'new', :id => assignment_id
     end
   end
-
-
 end

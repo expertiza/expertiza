@@ -1,10 +1,11 @@
-require 'automated_metareview/text_preprocessing'
-require 'automated_metareview/predict_class'
-require 'automated_metareview/degree_of_relevance'
-require 'automated_metareview/plagiarism_check'
-require 'automated_metareview/tone'
-require 'automated_metareview/text_quantity'
-require 'automated_metareview/constants'
+#require 'automated_metareview/text_preprocessing'
+#require 'automated_metareview/predict_class'
+#require 'automated_metareview/degree_of_relevance'
+#require 'automated_metareview/plagiarism_check'
+#require 'automated_metareview/tone'
+#require 'automated_metareview/text_quantity'
+#require 'automated_metareview/constants'
+require 'automated_metareview'
 
 #gem install edavis10-ruby-web-search
 #gem install google-api-client
@@ -14,8 +15,9 @@ class AutomatedMetareview < ActiveRecord::Base
   #has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
   attr_accessor :responses, :review_array
   #the code that drives the metareviewing
+
   def calculate_metareview_metrics(response, map_id)
-    # puts "inside perform_metareviews!!"    
+    puts "inside perform_metareviews!!"
     
     preprocess = TextPreprocessing.new
     # puts "map_id #{map_id}"
@@ -23,9 +25,9 @@ class AutomatedMetareview < ActiveRecord::Base
     @review_array = preprocess.fetch_review_data(self, map_id)
     # puts "self.responses #{self.responses}"
     
-    speller = Aspell.new("en_US")
-    speller.suggestion_mode = Aspell::NORMAL
-    @review_array = preprocess.check_correct_spellings(@review_array, speller)
+    #speller = Aspell.new("en_US")
+    #speller.suggestion_mode = Aspell::NORMAL
+    #@review_array = preprocess.check_correct_spellings(@review_array, speller)
     # puts "printing review_array"
     @review_array.each{
       |rev|
@@ -49,9 +51,9 @@ class AutomatedMetareview < ActiveRecord::Base
       self.plagiarism = true
       # puts "All responses are copied!!"
       return
-    elsif(result_comparison == SOME_RESPONSES_PLAGIARISED)
-      self.plagiarism = true
-    end
+  elsif(result_comparison == SOME_RESPONSES_PLAGIARISED)
+    self.plagiarism = true
+  end
     
     #checking plagiarism (by comparing responses with search results from google), we look for quoted text, exact copies i.e.
     google_plagiarised = plag_instance.google_search_response(self)

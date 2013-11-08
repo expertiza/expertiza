@@ -1321,7 +1321,7 @@ call	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/rack.rb	/^    def c
 call	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/user_informer.rb	/^    def call(env)$/;"	f	class:HoptoadNotifier.UserInformer
 can_impersonate?	app/models/user.rb	/^  def can_impersonate?(user)$/;"	f	class:User
 cancel	app/controllers/invitation_controller.rb	/^  def cancel$/;"	f	class:InvitationController
-cancel_all_waitlists	app/models/sign_up_topic.rb	/^  def self.cancel_all_waitlists(creator_id, assignment_id)$/;"	F	class:SignUpTopic
+cancel_all_waitlists	app/models/waitlist.rb	/^  def self.cancel_all_waitlists(creator_id, assignment_id)$/;"	F	class:Waitlist
 candidate_topics_to_review	app/models/assignment.rb	/^  def candidate_topics_to_review$/;"	f	class:Assignment
 candidate_version	tmp/librarian/cache/source/chef/site/877777683730772c/windows/version-uri/094423e7e1f88e74/package/providers/package.rb	/^def candidate_version$/;"	f
 capistrano_hook	vendor/gems/hoptoad_notifier-2.4.4/generators/hoptoad/hoptoad_generator.rb	/^  def capistrano_hook$/;"	f
@@ -1534,7 +1534,7 @@ createTween	public/javascripts/jquery.js	/^function createTween( value, prop, an
 createTweens	public/javascripts/jquery-1.9.1.js	/^function createTweens( animation, props ) {$/;"	f
 create_administrator	app/controllers/admin_controller.rb	/^  def create_administrator$/;"	f	class:AdminController
 create_common_start_time_topics	app/controllers/sign_up_sheet_controller.rb	/^  def create_common_start_time_topics(dg)$/;"	f	class:SignUpSheetController
-create_default_for_microtask	app/controllers/sign_up_sheet_controller.rb	/^  def create_default_for_microtask$/;"	f	class:SignUpSheetController
+add_default_microtask	app/controllers/sign_up_sheet_controller.rb	/^  def add_default_microtask$/;"	f	class:SignUpSheetController
 create_directory	app/helpers/file_helper.rb	/^  def self.create_directory(in_object)     $/;"	F	class:FileHelper
 create_directory_from_path	app/helpers/file_helper.rb	/^  def self.create_directory_from_path(path)     $/;"	F	class:FileHelper
 create_dummy	vendor/gems/hoptoad_notifier-2.4.4/test/helper.rb	/^  def create_dummy$/;"	f	class:Test
@@ -3019,8 +3019,8 @@ options.type	public/javascripts/jquery_ujs.js	/^          type: method || 'GET',
 options.xhrFields.withCredentials	public/javascripts/jquery_ujs.js	/^            withCredentials: withCredentials$/;"	p
 opts_to_string	vendor/plugins/rails_upgrade/lib/routes_upgrader.rb	/^      def opts_to_string(opts)$/;"	f	class:Rails.Upgrading.RouteObject
 or	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def or(index1, index2)$/;"	f	class:BooleanMatrix
-otherConfirmedTopicforUser	app/controllers/sign_up_sheet_controller.rb	/^  def otherConfirmedTopicforUser(assignment_id, creator_id)$/;"	f	class:SignUpSheetController
-otherConfirmedTopicforUser	app/controllers/signup_controller.rb	/^  def otherConfirmedTopicforUser(assignment_id, creator_id)$/;"	f	class:SignupController
+other_confirmed_topic_for_user	app/controllers/sign_up_sheet_controller.rb	/^  def other_confirmed_topic_for_user(assignment_id, creator_id)$/;"	f	class:SignUpSheetController
+other_confirmed_topic_for_user	app/controllers/signup_controller.rb	/^  def other_confirmed_topic_for_user(assignment_id, creator_id)$/;"	f	class:SignupController
 other_roles	app/models/role.rb	/^  def other_roles$/;"	f	class:Role.rebuild_cache
 others_work	app/controllers/student_task_controller.rb	/^  def others_work$/;"	f	class:StudentTaskController
 output	vendor/plugins/rails_upgrade/lib/gemfile_generator.rb	/^      def output$/;"	f	class:Rails.Upgrading.GemfileGenerator
@@ -3447,8 +3447,8 @@ sibling	public/javascripts/jquery-1.9.1.js	/^function sibling( cur, dir ) {$/;"	
 signed_up_topic	app/models/assignment.rb	/^  def signed_up_topic(contributor)$/;"	f	class:Assignment
 signup	app/controllers/sign_up_sheet_controller.rb	/^  def signup$/;"	f	class:SignUpSheetController
 signup	app/controllers/signup_controller.rb	/^  def signup$/;"	f	class:SignupController
-signup_topics	app/controllers/sign_up_sheet_controller.rb	/^  def signup_topics$/;"	f	class:SignUpSheetController
-signup_topics	app/controllers/signup_controller.rb	/^  def signup_topics$/;"	f	class:SignupController
+list	app/controllers/sign_up_sheet_controller.rb	/^  def list$/;"	f	class:SignUpSheetController
+list	app/controllers/signup_controller.rb	/^  def list$/;"	f	class:SignupController
 site_controller	app/models/menu.rb	/^    def site_controller$/;"	f	class:Menu.Node
 site_controllers	db/goldberg_db_postgresql.sql	/^CREATE TABLE site_controllers ($/;"	t
 site_controllers.builtin	db/goldberg_db_postgresql.sql	/^    builtin integer$/;"	F

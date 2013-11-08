@@ -1,4 +1,4 @@
-require 'spec_helper'
+require_relative '../spec_helper'
 
 describe ContentPage do
   let(:content_page) { ContentPage.new }

@@ -35,9 +35,6 @@ class Assignment < ActiveRecord::Base
   WAITLIST = 'Waitlist open'
 
   REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
-
-  REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
-
   #  Review Strategy information.
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
   RS_STUDENT_SELECTED = 'Student-Selected'
@@ -223,7 +220,7 @@ class Assignment < ActiveRecord::Base
 
     scores[:participants] = Hash.new
     self.participants.each do |participant|
-      scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
+      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
     end
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
@@ -636,7 +633,9 @@ class Assignment < ActiveRecord::Base
     return 0 if get_total_reviews_assigned == 0
     sum_of_scores = 0
     self.response_maps.each do |response_map|
-      sum_of_scores = sum_of_scores + response_map.response.get_average_score if !response_map.response.nil?
+      if !response_map.response.nil? then
+        sum_of_scores = sum_of_scores + response_map.response.average_score
+      end
     end
     (sum_of_scores / get_total_reviews_completed).to_i
   end
@@ -645,9 +644,9 @@ class Assignment < ActiveRecord::Base
     distribution = Array.new(101, 0)
 
     self.response_maps.each do |response_map|
-      if !response_map.response.nil?
-        score = response_map.response.get_average_score.to_i
-        distribution[score] += 1 if score >= 0 && score <= 100
+      if !response_map.response.nil? then
+        score = response_map.response.average_score.to_i
+        distribution[score] += 1 if score >= 0 and score <= 100
       end
     end
     distribution
@@ -693,8 +692,11 @@ class Assignment < ActiveRecord::Base
     @assignment = Assignment.find(parent_id)
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
-    questionnaires.each { |questionnaire| @questions[questionnaire.symbol] = questionnaire.questions }
-    @scores = @assignment.get_scores(@questions)
+    questionnaires.each {
+        |questionnaire|
+      @questions[questionnaire.symbol] = questionnaire.questions
+    }
+    @scores = @assignment.scores(@questions)
 
     return csv if @scores[:teams].nil?
 

@@ -1,5 +1,7 @@
 class ExportFileController < ApplicationController
-  require 'fastercsv'
+  # OSS808 Change 28/10/2013
+  # FasterCSV replaced now by CSV which is present by default in Ruby
+  #require 'fastercsv'
 
   def start
     @model = params[:model]
@@ -33,7 +35,7 @@ class ExportFileController < ApplicationController
       filename = "out.txt"
       delimiter = other_char
     end
-    csv_data = FasterCSV.generate(:col_sep => delimiter) do |csv|
+    csv_data = CSV.generate(:col_sep => delimiter) do |csv|
       csv << Object.const_get(params[:model]).get_export_fields(params[:options])
 
       Object.const_get(params[:model]).export(csv, params[:id],params[:options])

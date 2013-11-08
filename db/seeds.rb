@@ -293,7 +293,7 @@ tu.attributes = {:name => 'admin',
              :email_on_review => true, 
              :email_on_submission => true, 
              :email_on_review_of_review => true, 
-             :is_new_user => false, 
+             :is_new_user => false,
              :master_permission_granted => false}
 tu.parent_id = tu.id
 tu.save!

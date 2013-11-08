@@ -37,8 +37,11 @@ class AssignmentParticipant < Participant
     (((sum_of_scores.to_f / number_of_scores.to_f) * 100).to_i) / 100.0
   end
 
-  # Returns the average score of all reviews for this user on this assignment
+  def dir_path
+    assignment.try :directory_path
+  end
 
+  # Returns the average score of all reviews for this user on this assignment
   def average_score
     return 0 if self.response_maps.size == 0
 
@@ -254,12 +257,11 @@ class AssignmentParticipant < Participant
   def files_in_directory(directory)
       files_list = Dir[directory + "/*"]
       files = Array.new
-        if File.directory?(file) then          
-          dir_files = files_in_directory(file)
+        if File.directory?(directory)
+          dir_files = files_in_directory(directory)
           dir_files.each{|f| files << f}
         end
-        files << file
-      end
+        files << directory
       files
   end
 

@@ -31,6 +31,7 @@ gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'will_paginate'
+gem 'automated_metareview' , '0.0.2'
 
 group :development do
   gem 'daemons'

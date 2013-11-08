@@ -12,4 +12,6 @@
 <% if @assignment.has_partner_ads?(params[:id]) %>
  <th width="5%">Advertise- ment(s)</th>
 <% end %>
+<% if @show_actions %>
 <th width="5%">Actions</th>
+<% end %>

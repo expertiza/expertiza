@@ -247,6 +247,8 @@ Expertiza::Application.routes.draw do |map|
       get :add_signup_topics_staggered
       get :signup_topics
       get :view_publishing_rights
+      get :signup
+      get :delete_signup
     end
   end
 
@@ -291,6 +293,10 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :edit
+      get :remove_hyperlink
+      get :submit_hyperlink
+      get :submit_file
+      get :folder_action
     end
   end
 
@@ -356,4 +362,7 @@ Expertiza::Application.routes.draw do |map|
 
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   map.connect ':controller/service.wsdl', :action => 'wsdl'
+
+  match ':controller(/:action(/:id))(.:format)'
+
 end

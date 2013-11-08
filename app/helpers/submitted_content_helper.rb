@@ -26,8 +26,8 @@ module SubmittedContentHelper
                 else
                         ret += "\n      "
                         parentFolder = File.dirname(file)
-                        if parentFolder != participant.get_path
-                          parentFolder.sub!(participant.get_path+"/","")
+                        if parentFolder != participant.dir_path
+                          parentFolder.sub!(participant.dir_path+"/","")
                           parentFolder += "/"
                         else
                           parentFolder = ""

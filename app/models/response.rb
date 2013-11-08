@@ -60,7 +60,7 @@ class Response < ActiveRecord::Base
       comment = ''
     end
     code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
-    return code
+    return code.html_safe
   end
 
   # Computes the total score awarded for a review

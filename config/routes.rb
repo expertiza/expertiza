@@ -364,5 +364,4 @@ Expertiza::Application.routes.draw do |map|
   map.connect ':controller/service.wsdl', :action => 'wsdl'
 
   match ':controller(/:action(/:id))(.:format)'
-
 end

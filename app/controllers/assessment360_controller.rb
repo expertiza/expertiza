@@ -100,7 +100,7 @@ class Assessment360Controller < ApplicationController
     @bc = Hash.new
     @participants.each do |participant|
       @questionnaires = @assignment.questionnaires
-      bar_1_data = [participant.get_average_score]
+      bar_1_data = [participant.average_score]
       color_1 = 'c53711'
       min = 0
       max = 100
@@ -158,13 +158,13 @@ class Assessment360Controller < ApplicationController
      @assignments.each do |assignment|
        assignment_participant = assignment.participants.find_by_user_id(@current_student.user_id)
        if  !assignment_participant.nil?
-       teammate_scores = assignment_participant.get_teammate_reviews()
-       meta_scores = assignment_participant.get_metareviews()
+       teammate_scores = assignment_participant.teammate_reviews
+       meta_scores = assignment_participant.metareviews
        j = 1.to_i
        average = 0;
        if !teammate_scores.nil?
          teammate_scores.each do |teammate_score|
-            average = average +   teammate_score.get_average_score
+            average = average +   teammate_score.average_score
             bc.data assignment.name.to_s + ", Scores: " + teammate_score.get_average_score.to_s, [teammate_score.get_average_score], colors[i]
             j = j + 1
          end
@@ -187,12 +187,12 @@ class Assessment360Controller < ApplicationController
      @assignments.each do |assignment|
        assignment_participant = assignment.participants.find_by_user_id(@current_student.user_id)
        if  !assignment_participant.nil?
-       meta_scores = assignment_participant.get_metareviews()
+       meta_scores = assignment_participant.metareviews()
        j = 1.to_i
        average = 0;
        if !meta_scores.nil?
          meta_scores.each do |meta_score|
-            average = average +   meta_score.get_average_score
+            average = average +   meta_score.average_score
             bc.data assignment.name.to_s + ", Scores ".to_s +  meta_score.get_average_score.to_s, [meta_score.get_average_score], colors[i]
             j = j + 1
          end
@@ -212,9 +212,9 @@ class Assessment360Controller < ApplicationController
 
   def one_assignment_one_student
     @assignment = Assignment.find_by_id(params[:assignment_id])
-    @participant = Participant.find_by_user_id(params[:user_id])
+    @participant = AssignmentParticipant.find_by_user_id(params[:user_id])
     @questionnaires = @assignment.questionnaires
-    bar_1_data = [@participant.get_average_score]
+    bar_1_data = [@participant.average_score]
     bar_2_data = [Response.get_average_score(@assignment.id)]
     color_1 = 'c53711'
     color_2 = '0000ff'

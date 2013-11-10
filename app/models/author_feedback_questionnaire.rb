@@ -8,7 +8,7 @@ class AuthorFeedbackQuestionnaire < Questionnaire
   end  
   
   def get_assessments_for(participant)
-    participant.get_feedback()  
+    participant.feedback()
   end
 
 

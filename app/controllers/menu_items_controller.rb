@@ -1,13 +1,6 @@
 require 'menu'
 
-
 class MenuItemsController < ApplicationController
-
-  # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [ :destroy, :create, :update, 
-                                      :move_up, :move_down ], 
-  :redirect_to => { :action => :list }
-
   def index
     list
     render :action => 'list'
@@ -148,10 +141,7 @@ class MenuItemsController < ApplicationController
   end
 
   def link
-    str = String.new(params[:name][0])
-    for k in 1..params[:name].length-1
-      str = String.new(str + "/" + params[:name][k])
-    end
+    str = params[:name]
     node = session[:menu].select(str)
     if node
       redirect_to node.url
@@ -167,22 +157,19 @@ class MenuItemsController < ApplicationController
 
 
   protected
-  
-  def foreign
-    if self.id
-      @parents = MenuItem.find(:all,
-                               :conditions => ['id not in (?)', self.id],
-                               :order => 'name')
-    else
-      @parents = MenuItem.find(:all,
-                               :order => 'name')
-    end
-    @parents.unshift MenuItem.new(:id => nil, :name => '(root)')
-    @actions = ControllerAction.find(:all, :order => 'site_controller_id, name')
-    @actions.unshift ControllerAction.new(:id => nil, 
-                                          :name => '(none)')
 
-    @pages = ContentPage.find(:all, :order => 'name')
+  def foreign
+    if self.respond_to?(:id)
+      @parents = MenuItem.where('id != ?', self.id).order(:name)
+    else
+      @parents = MenuItem.order(:name)
+    end
+
+    @parents.unshift MenuItem.new(:id => nil, :name => '(root)')
+    @actions = ControllerAction.order_by_controller_and_action
+    @actions.unshift ControllerAction.new(:id => nil, :name => '(none)')
+
+    @pages = ContentPage.order(:name)
     @pages.unshift ContentPage.new(:id => nil, :name => '(none)')
   end
 

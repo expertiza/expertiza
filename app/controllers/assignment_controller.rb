@@ -29,9 +29,8 @@ class AssignmentController < ApplicationController
 
     if @assignment.save
       @assignment.create_node
-      flash[:note] = 'Assignment was successfully created.'
-      flash[:alert] = "There is already an assignment named #{@assignment.name}" if @assignment.duplicate_name?
-      redirect_to :action => 'edit', :id => @assignment.id
+      flash[:success] = 'Assignment was successfully created.'
+      redirect_to controller: :assignments, action: :edit, id: @assignment.id
     else
       render :action => 'new'
     end

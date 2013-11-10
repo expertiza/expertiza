@@ -4,7 +4,7 @@
     <th>Permission</th>
   </tr>
   
-<% for site_controller in site_controllers %>
+<% site_controllers.each do |site_controller| %>
   <tr class="depth0">
     <td><%= link_to site_controller.name, :action => 'show',
           :id => site_controller %></td>

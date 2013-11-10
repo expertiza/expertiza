@@ -1,0 +1,58 @@
+<%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
+<%= stylesheet_link_tag 'jquery-ui-1.10.3.custom.min' %>
+<script src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="/javascripts/jquery-ui-timepicker-addon.js"></script>
+
+<h1>Editing Assignment</h1>
+
+<script>
+    function validate() {
+        return true;
+    }
+
+    function submit_form() {
+        //validating the form
+        if (validate()) {
+            //submit the due dates and questionnaires before submitting the rest of the form
+            jQuery.ajaxSetup({async: false});
+            submit_due_dates();
+            submit_questionnaires();
+            jQuery('#assignment_form').submit();
+        }
+    }
+</script>
+
+<%= form_for @assignment, html: { id: 'assignment_form' } do %>
+    <div id="tabs">
+      <ul>
+        <li><a href="#tabs-1">General</a></li>
+        <li><a href="#tabs-2">Rubrics</a></li>
+        <li><a href="#tabs-3">Review strategy</a></li>
+        <li><a href="#tabs-4">Due dates</a></li>
+        <li><a href="#tabs-5">Topics</a></li>
+      </ul>
+      <div id="tabs-1">
+        <%= render 'assignments/edit/general' %>
+      </div>
+      <div id="tabs-2">
+        <%= render 'assignments/edit/rubrics' %>
+      </div>
+      <div id="tabs-3">
+        <%= render 'assignments/edit/review_strategy' %>
+      </div>
+      <div id="tabs-4">
+        <%= render 'assignments/edit/due_dates' %>
+      </div>
+      <div id="tabs-5">
+        <%= render 'sign_up_sheet/add_signup_topics' %>
+      </div>
+    </div>
+    <script>
+        jQuery(document).ready(function () {
+            jQuery("#tabs").tabs();
+        });
+    </script>
+    <%= button_to_function 'Save', 'submit_form()' %>| <%= render :partial => '/shared_scripts/back' %>
+<% end %>
+
+<br/>

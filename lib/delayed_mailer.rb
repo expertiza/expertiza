@@ -160,11 +160,11 @@ class DelayedMailer
       body += "Author feedback is optional. However, if you want to give author feedback then the deadline is #{self.due_at}."
     end
 
-    Mailer.deliver_message(
-        {:bcc => emails,
-         :subject => subject,
-         :body => body
-        })
+      Mailer.deliver_message(
+      {:bcc => emails,
+       :subject => subject,
+       :body => body
+    })
   end
 end
 

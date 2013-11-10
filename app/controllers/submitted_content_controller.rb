@@ -71,7 +71,7 @@ class SubmittedContentController < ApplicationController
       @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end           
            
-    curr_directory = participant.get_path.to_s+@current_folder.name
+    curr_directory = participant.dir_path.to_s+@current_folder.name
     
 
     if !File.exists? curr_directory
@@ -188,7 +188,7 @@ private
   
   def move_selected_file
     old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
-    newloc = @participant.get_path
+    newloc = @participant.dir_path
     newloc += "/"
     newloc += params[:faction][:move]
     begin
@@ -237,7 +237,7 @@ private
   end
   
   def create_new_folder
-    newloc = @participant.get_path
+    newloc = @participant.dir_path
     newloc += "/"
     newloc += params[:faction][:create]
     begin

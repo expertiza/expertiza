@@ -18,6 +18,10 @@ class Team < ActiveRecord::Base
     self.destroy
   end
 
+  def get_participants
+    Participant.where user_id: users.map(&:id), parent_id: parent_id
+  end
+
   def get_node_type
     "TeamNode"
   end

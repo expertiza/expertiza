@@ -3,7 +3,9 @@
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
   <br/><hr/><br/>  
 <% end %>
-<%= @map.show_review() %>
+
+<% @review_versions = @map.get_all_versions() %>
+<%= render :partial => 'review', :locals => { :versions => @review_versions } %>
 
 <% if false %>[start erb comment] Changes to accommodate Jen's custom rubric [end erb comment]<% end %>
 <% file_url = nil
@@ -15,7 +17,7 @@
       files = Array.new
       for file in files_list
         if File.directory?(file) then
-          dir_files = get_files(file)
+          dir_files = files_in_directory(file)
           dir_files.each{|f| files << f}
         end
         files << file
@@ -43,7 +45,7 @@
   questions.each {
     | question | %>
     <%= get_accordion_title(current_topic, @question_type[i].parameters.split("::")[0]) %>
-    <%= find_question_type(question, @question_type[i], i, true, file_url,(@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
+    <%= find_question_type(question, @question_type[i], i, true, file_url, nil, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
     <% current_topic = @question_type[i].parameters.split("::")[0]
     i += 1
   } %>

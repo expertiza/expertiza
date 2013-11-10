@@ -77,7 +77,7 @@ module GoldbergFilters
 
       # PERMISSIONS
       # Check whether the user is authorised for this page or action.
-      if not AuthController.authorised?(session, params)
+      if !AuthController.authorised?(session, params)
         redirect_to @settings.permission_denied_page.url
         return false
       end

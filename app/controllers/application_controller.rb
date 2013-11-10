@@ -1,25 +1,39 @@
-# Filters added to this controller will be run for all controllers in the application.
-# Likewise, all the methods added will be available for all controllers.
+require 'goldberg_filters'
+
 class ApplicationController < ActionController::Base
+  include GoldbergFilters
+
   helper_method :current_user_session, :current_user, :current_user_role?
   protect_from_forgery unless Rails.env.test?
   filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
   before_filter :set_time_zone
+  #before_filter :goldberg_security_filter
 
-  def authorize
-    unless current_user
-      flash[:notice] = "Please log in."
-      redirect_to :controller => 'user_sessions', :action => 'new'
-    end
+  def authorize(args = {})
+    #unless current_permission(args).allow?(params[:controller], params[:action])
+      #flash[:warn] = 'Please log in.'
+      #redirect_back
+    #end
+    @user = current_user
   end
+
+  def current_permission(args = {})
+    @authority ||= Authority.new args.merge({
+      current_user: current_user
+    })
+  end
+  delegate :allow?, to: :current_permission
+  helper_method :allow?
+
+  def current_user_role?
+    current_user.role.name
+  end
+  helper_method :current_user_role?
 
   def current_user
-    session[:user]
+    @current_user ||= session[:user]
   end
-
-  def current_user_id
-    current_user.id
-  end
+  helper_method :current_user
 
   def current_user_role
     current_user.role
@@ -30,12 +44,12 @@ class ApplicationController < ActionController::Base
     current_user
   end
 
-  def set_time_zone
-    Time.zone = current_user.timezonepref if current_user
-  end
-
   def redirect_back(default = :root)
     redirect_to request.env['HTTP_REFERER'] ? :back : default
+  end
+
+  def set_time_zone
+    Time.zone = current_user.timezonepref if current_user
   end
 
   private
@@ -68,7 +82,11 @@ class ApplicationController < ActionController::Base
     current_user.try(:id) == user_id
   end
 
-  def denied
-    redirect_to '/denied'
+  def denied(reason=nil)
+    if reason
+      redirect_to "/denied?reason=#{reason}"
+    else
+      redirect_to "/denied"
+    end
   end
 end

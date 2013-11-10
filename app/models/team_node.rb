@@ -1,4 +1,6 @@
 class TeamNode < Node
+  belongs_to :node_object, class_name: 'Team'
+
   def self.table
     "teams"
   end

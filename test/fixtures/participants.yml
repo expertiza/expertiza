@@ -7,7 +7,9 @@ par0:
   topic: Research EPA
   penalty_accumulated: 0
   type : AssignmentParticipant
+  digital_signature: abczyz
   handle: "par0"
+
   
 par1:
   submit_allowed: 1
@@ -18,6 +20,7 @@ par1:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par1"
+  digital_signature: nithya
   submitted_hyperlinks: "--- \n- http://www.ncsu.edu/\n- http://www.google.com/\n"
 
 par2:
@@ -191,4 +194,4 @@ par19:
   parent_id: <%= Fixtures.identify(:assignment_project1) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
-  handle: "par19
+  handle: "par19"

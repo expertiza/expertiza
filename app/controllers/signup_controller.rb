@@ -8,7 +8,7 @@
 
 #Displays all the topics available for an assignment, including number of people who can choose the topic, number of
 #people who have already chosen the topic, etc
-  def signup_topics
+  def list
     @assignment_id = params[:id]
     @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', params[:id]])
     @slots_filled =  SignUpTopic.find_slots_filled(params[:id])
@@ -66,7 +66,7 @@
     else
       confirmationStatus = confirm_topic(session[:user].id, params[:id], params[:assignment_id])
     end
-    redirect_to :action => 'signup_topics', :id => params[:assignment_id]
+    redirect_to :action => 'list', :id => params[:assignment_id]
   end
 
   # When using this method when creating fields, update race conditions by using db transactions
@@ -146,7 +146,7 @@
 
   def delete_signup
     delete_signup_for_topic(params[:assignment_id],params[:id])
-    redirect_to :action => 'signup_topics', :id => params[:assignment_id]
+    redirect_to :action => 'list', :id => params[:assignment_id]
   end
 
 #used by delete_signup function above. This functions updates all the database tables when the user drops the topic

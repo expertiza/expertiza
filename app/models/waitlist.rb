@@ -12,9 +12,9 @@ class Waitlist < ActiveRecord::Base
   end
 
 
-  def self.waitlist_teams (param_id, user_id, creator_id, topic_id, assignment_id)
+  def waitlist_teams (param_id, user_id, creator_id, topic_id, assignment_id)
     #check whether user has signed up already
-    user_signup = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, creator_id)
+    user_signup = other_confirmed_topic_for_user(assignment_id, creator_id)
 
     sign_up = SignedUpUser.new
     sign_up.topic_id = param_id
@@ -25,7 +25,7 @@ class Waitlist < ActiveRecord::Base
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-        if SignUpSheetController.slotAvailable?(topic_id)
+        if slotAvailable?(topic_id)
           sign_up.is_waitlisted = false
 
           #Update topic_id in participant table with the topic_id
@@ -43,7 +43,7 @@ class Waitlist < ActiveRecord::Base
       #If all the topics choosen by the user are waitlisted,
       for user_signup_topic in user_signup
         if user_signup_topic.is_waitlisted == false
-          puts "You have already signed up for a topic."
+          SignUpSheetController.flash_signedup_topic()
 
           return false
         end
@@ -71,7 +71,4 @@ class Waitlist < ActiveRecord::Base
 
     result
   end
-
-
-
 end

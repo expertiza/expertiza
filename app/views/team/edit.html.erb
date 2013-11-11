@@ -1,0 +1,8 @@
+<H1>Edit Team</H1>
+
+<% form_tag :action => 'update' do %>
+<%= hidden_field_tag 'id', @team.id %>
+<%= render :partial => 'form'%>
+<% end %>
+<br/>
+<%= link_to 'Back', :controller => 'team', :action => 'list', :id => @team.parent_id %>

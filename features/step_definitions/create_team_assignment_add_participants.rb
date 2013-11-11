@@ -8,15 +8,18 @@
 =end
 
 Given /^I am logged in as a "(\S+)"$/ do |username|
-  first('#logout-button').try(:click)
-
+  if(!find_button('Logout').nil?)
+    click_button 'Logout'
+  end
   step 'I go to the login page'
 
   fill_in 'login_name', :with => username
   fill_in 'login_password', :with => 'password'
   click_button 'Login'
 
-  first('#accept-link').try(:click)
+  if(!find_link('Accept').nil?)
+    click_link 'Accept'
+  end
 
   step "I should be logged in as \"#{username}\""
 end
@@ -72,7 +75,7 @@ Given /^a team assignment named "(\S+)" exists$/ do |assignment|
 end
 
 Then /^I should see "(\S+)" in the list$/ do |assignment|
-  node =  find('.theTable td').node().content()
+   node =  find('.theTable td').node().content()
   if(node.include? assignment)
     assert(true)
   else

@@ -13,5 +13,5 @@ Feature: Team invitations
     Scenario: Accept an invitation
         Given another student has invited me to their team
         Then I should see that I have an invite pending
-        When I accept the invitation to join the team
+        When I accept the invitation
         Then I should see the person I invited on my team

@@ -1,5 +1,4 @@
 When /^I create a (public|private) assignment named "([^"]*)" using (no due date|review named "[^"]*")$/ do  |public_or_private,assignment_name,review_setting|  
-  session[:user] = User.instructors.first
   use_review = false
   review_name = ""
   if review_setting =~ /^no due date$/
@@ -32,6 +31,7 @@ When /^I add user "([^"]*)" as a participant to assignment "([^"]*)"$/ do |user_
   step "I should see \"#{user_name}\""
 end
 
+@javascript
 When /^I create a (public|private) assignment named "([^"]*)" with max team size (\d+)$/ do  |public_or_private,assignment_name,team_size|
   step "I have a public review named \"test_review\""
     step "I have a public metareview named \"test_metareview\""

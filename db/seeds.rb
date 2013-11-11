@@ -267,6 +267,8 @@ RolesPermission.create(:role_id => Role.find_by_name('Super-Administrator').id, 
 RolesPermission.create(:role_id => Role.find_by_name('Super-Administrator').id, :permission_id => Permission.find_by_name('administer pg').id)
 RolesPermission.create(:role_id => Role.find_by_name('Super-Administrator').id, :permission_id => Permission.find_by_name('administer assignments').id)
 RolesPermission.create(:role_id => Role.find_by_name('Super-Administrator').id, :permission_id => Permission.find_by_name('administer instructors').id)
+# RolesPermission.create(:role_id => Role.find_by_name('').id, :permission_id => Permission.find_by_name('').id)
+# RolesPermission.create(:role_id => Role.find_by_name('').id, :permission_id => Permission.find_by_name('').id)
 
 ###### system_settings
 SystemSettings.create(:site_name => 'Expertiza', 
@@ -287,8 +289,8 @@ puts "Find or create admin user with password 'admin'"
 tu = User.find_by_name('admin') || User.new
 tu.attributes = {:name => 'admin',
              :email => 'anything@mailinator.com',
-             :password => 'admin',
-             :password_confirmation => 'admin',
+             :clear_password => 'admin',
+             :clear_password_confirmation => 'admin',
              :role_id => Role.find_by_name('Super-Administrator').id, 
              :email_on_review => true, 
              :email_on_submission => true, 

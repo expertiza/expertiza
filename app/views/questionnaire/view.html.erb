@@ -1,0 +1,32 @@
+<h1><%= @questionnaire.display_type %>: <%= @questionnaire.name %></h1>
+<BR/>
+<B>Created by:</B> <%= link_to @questionnaire.instructor.name,"mailto:"+@questionnaire.instructor.email %><BR/>
+<B>Created at:</B> <%= @questionnaire.created_at %><BR/>
+<B>Last modified at:</B> <%= @questionnaire.updated_at %>
+<BR/><BR/>
+<TABLE>
+  <% if (@questionnaire.section == "Custom") %>
+        <TR><TH align="left" width="60%">Question</TH><TH align="left">Type</TH><TH>Parameters</TH><TH>Weight</TH><TH>Score Range</TH></TR>
+      <% else %>
+  <TR><TH align="left" width="60%">Question</TH><TH align="left">Type</TH><TH>Weight</TH><TH>Score Range</TH></TR>
+      <% end %>
+<% for question in @questionnaire.questions %>
+      <% curr_ques_type = QuestionType.find_by_question_id(question.id) %>
+<TR><TD align="left"><%= question.txt %></TD>
+    <% if (@questionnaire.section == "Custom") %>
+        <TD align="left"><%= curr_ques_type.q_type %></TD>
+        <td align=center width=170><%= curr_ques_type.parameters %></td>
+    <% else %>
+        <TD align="left"><% if question.true_false %>True/False<% else %>Multiple Choice<% end %></TD>
+     <%end%>
+
+    <TD align="center"><%= question.weight %></TD>
+    <TD align="center"><% if question.true_false %>&nbsp;<% else %><%= @questionnaire.min_question_score %> to <%= @questionnaire.max_question_score %><% end %></TD>
+</TR>
+<% end %>
+</TABLE>
+<BR/>
+<B>Instructions:</B> <%= link_to @questionnaire.instruction_loc, @questionnaire.instruction_loc %>
+
+<BR/>
+<%= link_to "Back", :controller => 'tree_display', :action => 'list' %>

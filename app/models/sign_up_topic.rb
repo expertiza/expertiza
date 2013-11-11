@@ -138,7 +138,8 @@ class SignUpTopic < ActiveRecord::Base
       end
     }
   end
-  def remove_team  (users_team, assignment_id)
+
+  def self.remove_team(users_team, assignment_id)
     if users_team.size == 0
       @selected_topics = nil
     else

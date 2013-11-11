@@ -257,7 +257,7 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :add_signup_topics
       get :add_signup_topics_staggered
-      get :signup_topics
+      get :list
       get :view_publishing_rights
       get :signup
       get :delete_signup

@@ -18,7 +18,7 @@ class AssignmentNode < Node
   #   parent_id: course_id if subset
   
   # returns: list of AssignmentNodes based on query
-  def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil)    
+  def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil,search=nil)
     if show   
       if User.find(user_id).role.name != "Teaching Assistant"
         conditions = 'assignments.instructor_id = ?'
@@ -42,15 +42,25 @@ class AssignmentNode < Node
     if parent_id
       conditions += " and course_id = #{parent_id}"
     end
+
     
     if sortvar.nil?
       sortvar = 'name'
     end
     if sortorder.nil?
       sortorder = 'ASC'
-    end         
-        
-    find(:all, :include => :assignment, :conditions => [conditions,values], :order => "assignments.#{sortvar} #{sortorder}")    
+    end
+
+
+
+    if search
+      conditions += " and assignments.name LIKE ?"
+    search = "%"+search+"%"
+      find(:all, :include => :assignment, :conditions => [conditions,values,search], :order => "assignments.#{sortvar} #{sortorder}")
+      else
+      find(:all, :include => :assignment, :conditions => [conditions,values], :order => "assignments.#{sortvar} #{sortorder}")
+      end
+
   end
   
   # Indicates that this object is always a leaf

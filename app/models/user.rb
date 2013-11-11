@@ -42,7 +42,9 @@ class User < ActiveRecord::Base
   end
 
   def first_name
-    fullname[/,.+/][/\w+/] if fullname
+    if fullname
+      fullname[/,.+/].try(:[], /\w+/) || fullname[/\w+/]
+    end
   end
 
   def super_admin?

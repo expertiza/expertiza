@@ -128,13 +128,11 @@ Expertiza::Application.routes.draw do |map|
   resources :institutions
 
   resources :invitation do
-  # OSS808 Change 28/10/2013
-  # Added missing routes
-  collection do
-    get :cancel
-    get :accept
-    get :decline
-  end
+    collection do
+      get :cancel
+      get :accept
+      get :decline
+    end
   end
 
   resources :join_team_requests
@@ -163,6 +161,7 @@ Expertiza::Application.routes.draw do |map|
       get :add
       post :add
       get :auto_complete_for_user_name
+      get :delete_assignment_participant
       get :list
       get :change_handle
       post :delete
@@ -224,6 +223,9 @@ Expertiza::Application.routes.draw do |map|
       get :new_feedback
       get :view
       post :delete
+      get :remove_hyperlink
+      get :saving
+      get :redirection
     end
   end
 
@@ -231,6 +233,22 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :list_mappings
       get :review_report
+      get :distribution
+      get :select_reviewer
+      get :delete_all_reviewers
+      get :select_mapping
+      get :delete_all_reviewers_and_metareviewers
+      get :assign_reviewer_dynamically
+      post :assign_reviewer_dynamically
+      get :add_reviewer
+      get :auto_complete_for_user_name
+      post :add_reviewer
+      post :add_self_reviewer
+      get :add_user_to_assignment
+      get :delete_reviewer
+      get :select_metareviewer
+      get :delete_all_metareviewers
+      get :show_available_submissions
     end
   end
 
@@ -257,10 +275,11 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :add_signup_topics
       get :add_signup_topics_staggered
-      get :list
-      get :view_publishing_rights
-      get :signup
       get :delete_signup
+      get :list
+      get :signup_topics
+      get :signup
+      get :view_publishing_rights
     end
   end
 
@@ -305,10 +324,10 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :edit
-      get :remove_hyperlink
-      post :submit_hyperlink
-      get :submit_file
       get :folder_action
+      get :remove_hyperlink
+      get :submit_file
+      post :submit_hyperlink
     end
   end
 

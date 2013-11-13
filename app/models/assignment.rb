@@ -237,8 +237,8 @@ class Assignment < ActiveRecord::Base
     scores
   end
 
-  def get_contributor(contributor_id)
-    team_assignment? ? AssignmentTeam.find(contributor_id) : AssignmentParticipant.find(contributor_id)
+  def get_contributor(contrib_id)
+    AssignmentTeam.find(contrib_id)
   end
 
   # parameterized by questionnaire

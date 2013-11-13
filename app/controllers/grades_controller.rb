@@ -71,21 +71,11 @@ class GradesController < ApplicationController
       reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
       reviewer.set_handle()
     end
-
-    if participant.assignment.team_assignment?
       reviewee = participant.team
       review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
-    else
-      reviewee = participant
-      review_mapping = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
-    end
 
     if review_mapping.nil?
-      if participant.assignment.team_assignment?
         review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-      else
-        review_mapping = ParticipantReviewResponseMap.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-      end
     end
     review = Response.find_by_map_id(review_mapping.id)
 

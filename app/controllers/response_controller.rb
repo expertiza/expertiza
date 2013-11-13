@@ -141,50 +141,41 @@ class ResponseController < ApplicationController
         render :action => 'response'
       end
     end
-    def update
-      @response = Response.find(params[:id])
-      return if redirect_when_disallowed(@response)
-      @map = @response.map
-      msg = ""
-      if @map.questionnaire.section.eql? "Custom"
-        begin
-          @response.update_attribute('additional_comment',"")
-          @questionnaire = @map.questionnaire
-          questions = @questionnaire.questions
-          #for all the questions in a particular questionnaire
-          for i in 0..questions.size-1
-            #find score by response id and that response's particular question id
-            score = Score.find_by_response_id_and_question_id(@response.id, questions[i.to_i].id)
-            score.update_attribute('comments',params[:custom_response][i.to_s])
-          end
-        rescue
-          msg = "#{@map.get_title} was not saved."
-        end
-      else
-        begin
-          @response.update_attribute('additional_comment',params[:review][:comments])
-          questions = @questionnaire.questions
-          params[:responses].each_pair do |k,v|
-            score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
-            #we maintain all versions of scores and comments. Hence create a new tuple for every updation
-            if(score == nil)
-              score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
-              #creating a hash in score table with score and comment for a particular question of a particular response
-            end
-            score.update_attribute('score',v[:score])
-            score.update_attribute('comments',v[:comment])
-          end
-        rescue
-          msg = "Your response was not saved. Cause: "+ $!
-        end
-        begin
-          ResponseHelper.compare_scores(@response, @questionnaire)
-          ScoreCache.update_cache(@response.id)
-          msg = "Your response was successfully saved."
-        rescue
-          msg = "An error occurred while saving the response: "+$!
-        end
-        redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
+  end
+  
+  def view
+    @response = Response.find(params[:id])
+    return if redirect_when_disallowed(@response)
+    @map = @response.map
+    get_content
+    @review_scores = Array.new
+    @question_type = Array.new
+    @questions.each{
+      | question |
+      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+      @question_type << QuestionType.find_by_question_id(question.id)
+    }
+  end
+  
+  def new
+    @header = "New"
+    @next_action = "create"    
+    @feedback = params[:feedback]
+    @map = ResponseMap.find(params[:id])
+    @return = params[:return]
+    @modified_object = @map.id
+    get_content  
+    
+    # Check whether this is a custom rubric
+    if @map.questionnaire.section.eql? "Custom"
+      @question_type = Array.new
+      @questions.each{
+        | question |
+        @question_type << QuestionType.find_by_question_id(question.id)
+      }
+      if !@map.contributor.nil?
+          team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
+          @topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
       end
     end
     def new_feedback
@@ -311,16 +302,44 @@ class ResponseController < ApplicationController
         redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
     end
-    def redirection
-      flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
-      flash[:note]  = params[:msg] unless params[:msg] and params[:msg].empty?
-      @map = ResponseMap.find(params[:id])
-      if params[:return] == "feedback"
-        redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
-      elsif params[:return] == "teammate"
-        redirect_to :controller => 'student_team', :action => 'view', :id => @map.reviewer.id
-      elsif params[:return] == "instructor"
-        redirect_to :controller => 'grades', :action => 'view', :id => @map.assignment.id
+  end
+  
+  def redirection
+    flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
+    flash[:note]  = params[:msg] unless params[:msg] and params[:msg].empty?
+    
+    @map = ResponseMap.find(params[:id])
+    if params[:return] == "feedback"
+      redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
+    elsif params[:return] == "teammate"
+      redirect_to :controller => 'student_team', :action => 'view', :id => @map.reviewer.id
+    elsif params[:return] == "instructor"
+      redirect_to :controller => 'grades', :action => 'view', :id => @map.assignment.id
+    else
+      redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
+    end 
+  end
+  
+  private
+    
+  def get_content    
+    @title = @map.get_title 
+    @assignment = @map.assignment
+    @participant = @map.reviewer
+    @contributor = @map.contributor
+    @questionnaire = @map.questionnaire
+    @questions = @questionnaire.questions
+    @min = @questionnaire.min_question_score
+    @max = @questionnaire.max_question_score     
+  end
+  
+  def redirect_when_disallowed(response)
+    # For author feedback, participants need to be able to read feedback submitted by other teammates.
+    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+    if response.map.read_attribute(:type) == 'FeedbackResponseMap'
+      team = response.map.reviewer.team
+      unless team.has_user session[:user]
+        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
       else
         redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
       end

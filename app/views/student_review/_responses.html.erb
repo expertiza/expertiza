@@ -73,8 +73,8 @@
               <% if @assignment.get_current_stage(participant.topic_id) != 'submission' %>
                 <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
                 <td>&nbsp;&nbsp;</td>
-                <%-# Display link for code review if 'any' code review files -%>
-                <%-# have been uploaded i.e. files present in code review dir -%>
+                <%#- Display link for code review if 'any' code review files -%>
+                <%#- have been uploaded i.e. files present in code review dir -%>
                 <td>&nbsp;&nbsp;&nbsp;&nbsp;
                   <% if participant.files_in_directory(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
                     <%= link_to "Review Code", { :controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
@@ -87,18 +87,18 @@
           <% else %>
             <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
             <td>&nbsp;&nbsp;</td>
-            <%-# Display link for code review if 'any' code review files -%>
-            <%-# have been uploaded i.e. files present in code review dir-%>
+            <%#- Display link for code review if 'any' code review files -%>
+            <%#- have been uploaded i.e. files present in code review dir-%>
             <td>&nbsp;&nbsp;&nbsp;&nbsp;
               <% if participant.files_in_directory(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
                 <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
               <% end %>
             </td>
           <% end %>
-        <% else %>
-          <td>Begin</td><td> (Work has not yet been submitted)</td>
-        <% end %>         
-      <% review_no += 1 %>
+        <% else %><%#- Deadline has passed, and the work was not submitted -%>
+          <td>Begin</td><td> (Work has not yet been submitted)</td>for
+        <% end %>
+        <% review_no += 1 %>
       </tr>
     <% end %>
         

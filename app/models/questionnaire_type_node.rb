@@ -6,7 +6,7 @@ class QuestionnaireTypeNode < FolderNode
     "tree_folders"
   end
   
-  def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil)
+  def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil,search=nil)
     parent = TreeFolder.find_by_name("Questionnaires")
     folders = TreeFolder.find_all_by_parent_id(parent.id)
     nodes = Array.new
@@ -28,7 +28,7 @@ class QuestionnaireTypeNode < FolderNode
     TreeFolder.find(self.node_object_id).name    
   end  
   
-  def get_children(sortvar = nil,sortorder = nil,user_id = nil,show=nil,parent_id = nil)
-    QuestionnaireNode.get(sortvar,sortorder,user_id,show,self.node_object_id)
+  def get_children(sortvar = nil,sortorder = nil,user_id = nil,show=nil,parent_id = nil,search=nil)
+    QuestionnaireNode.get(sortvar,sortorder,user_id,show,self.node_object_id,search)
   end
 end

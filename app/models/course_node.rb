@@ -15,8 +15,18 @@ class CourseNode < Node
 
   # returns: list of CourseNodes based on query
   # the get method will return all courses meeting the criteria, but the method name is necessary due to polymorphism
-  def self.get(sortvar = 'name',sortorder ='ASC',user_id = nil,show = nil, parent_id = nil)
-    find(:all, :include => :course, :conditions => [get_course_query_conditions(show, user_id), get_courses_managed_by_user(user_id)], :order => "courses.#{sortvar} #{sortorder}")
+  def self.get(sortvar = 'name',sortorder ='ASC',user_id = nil,show = nil, parent_id = nil,search = nil)
+    if search
+      splitsearch = search.split("+")
+      if(splitsearch[0] == 'filter')
+        search = splitsearch[1]
+      else
+        search = "%"+search+"%"
+      end
+      find(:all, :include => :course, :conditions => [get_course_query_conditions(show, user_id)+ " and courses.name LIKE ?" , get_courses_managed_by_user(user_id), search], :order => "courses.#{sortvar} #{sortorder}")
+    else
+      find(:all, :include => :course, :conditions => [get_course_query_conditions(show, user_id) , get_courses_managed_by_user(user_id)], :order => "courses.#{sortvar} #{sortorder}")
+    end
   end
 
   #get the query conditions for a public course
@@ -66,8 +76,8 @@ class CourseNode < Node
 
   # Gets any children associated with this object
   # the get_children method will return assignments belonging to a course, but the method name is necessary due to polymorphism
-  def get_children(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil)
-    AssignmentNode.get(sortvar,sortorder,user_id,show,self.node_object_id)
+  def get_children(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil,search =nil)
+    AssignmentNode.get(sortvar,sortorder,user_id,show,self.node_object_id,search)
   end
 
   # Gets the name from the associated object  

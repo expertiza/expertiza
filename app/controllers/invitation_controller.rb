@@ -67,7 +67,7 @@ class InvitationController < ApplicationController
     @inv.save
 
     student = Participant.find(params[:student_id])
-    
+
     #Remove the users previous team since they are accepting an invite for possibly a new team.
     TeamsUser.remove_team(student.user_id, params[:team_id])
     #Accept the invite and return boolean on whether the add was successful

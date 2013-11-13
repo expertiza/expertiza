@@ -94,6 +94,10 @@ Expertiza::Application.routes.draw do |map|
   resources :export_file do
     collection do
       get :start
+      # OSS808 Change 27/10/2013
+      # Added missing routes
+      get :export
+      post :export
     end
   end
 
@@ -161,11 +165,14 @@ Expertiza::Application.routes.draw do |map|
       get :add
       post :add
       get :auto_complete_for_user_name
+      get :delete_assignment_participant
       get :list
       get :change_handle
       get :inherit
       get :bequeath_all
       post :delete
+      get :inherit
+      get :bequeath_all
     end
   end
 
@@ -222,6 +229,9 @@ Expertiza::Application.routes.draw do |map|
       get :new_feedback
       get :view
       post :delete
+      get :remove_hyperlink
+      get :saving
+      get :redirection
     end
   end
 
@@ -229,6 +239,22 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :list_mappings
       get :review_report
+      get :distribution
+      get :select_reviewer
+      get :delete_all_reviewers
+      get :select_mapping
+      get :delete_all_reviewers_and_metareviewers
+      get :assign_reviewer_dynamically
+      post :assign_reviewer_dynamically
+      get :add_reviewer
+      get :auto_complete_for_user_name
+      post :add_reviewer
+      post :add_self_reviewer
+      get :add_user_to_assignment
+      get :delete_reviewer
+      get :select_metareviewer
+      get :delete_all_metareviewers
+      get :show_available_submissions
     end
   end
 
@@ -255,7 +281,10 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :add_signup_topics
       get :add_signup_topics_staggered
+      get :delete_signup
+      get :list
       get :signup_topics
+      get :signup
       get :view_publishing_rights
       get :signup
       get :delete_signup
@@ -305,6 +334,10 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :edit
+      get :folder_action
+      get :remove_hyperlink
+      get :submit_file
+      post :submit_hyperlink
     end
   end
 
@@ -370,4 +403,6 @@ Expertiza::Application.routes.draw do |map|
 
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   map.connect ':controller/service.wsdl', :action => 'wsdl'
+
+  match ':controller(/:action(/:id))(.:format)'
 end

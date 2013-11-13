@@ -29,7 +29,7 @@
           if selected_topics.nil? || selected_topics.length == 0
             # there is a signup sheet and user/team hasn't signed up yet, produce a link to do so
             controller = "sign_up_sheet"
-            action = "signup_topics"
+            action = "list"
             id = participant.parent_id
             stage = "signup"
           end
@@ -97,7 +97,7 @@
         <tr class="listingRow">
           <td>&nbsp;</td>
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
-          <td><%= student_task.course.name %></td>
+          <td><%= student_task.course.try :name %></td>
           <td><%= student_task.topic_name %></td>
           <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
           <td><%= student_task.stage_deadline %></td>

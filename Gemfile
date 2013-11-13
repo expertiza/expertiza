@@ -1,6 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'rails', '~>3.0.0'
+
 ## Gems in Alphabetical Order
 gem 'bind-it'
 gem 'capistrano'
@@ -33,25 +34,26 @@ gem 'automated_metareview' , '0.0.2'
 
 group :development do
   gem 'daemons'
-#  gem 'debugger'
   gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'
 end
 
 group :test do
-  gem 'capybara'
   gem 'cucumber-rails', require: false
   gem 'database_cleaner'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'
-  gem "rspec-rails"
-  gem 'shoulda'
-
-  # OSS808 Change 27/10/2013
-  # Added to enable attachment of test reporter to test framework
-  gem "test-unit"
   gem "minitest"
   gem "minitest-reporters", '>= 0.5.0'
+  gem "rspec-rails"
+  gem 'shoulda'
+  gem "test-unit"
+end
+
+group :development, :test do
+  gem 'capybara'
+  gem "capybara-webkit"
+  gem 'rspec-rails'
 end

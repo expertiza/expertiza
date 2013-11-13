@@ -1,0 +1,25 @@
+<%= render :partial => 'scripts' %>
+<h1>New <%= @questionnaire.display_type %></h1>
+<% if @questionnaire.type == "QuizQuestionnaire" %>    <!--handle a questionnaire differently if it is a quiz-->
+    <% form_tag :action => 'create_quiz_type', :pid => @participant_id, :aid => @assignment_id do %>
+        <% $disp_flag = 1 %>
+        <%= render :partial => 'questionnaire' %>
+        <% $disp_flag = 0 %>
+        <%= radio_button_tag(:qtype, "Multiple Choice - radio") %> Multiple Choice - radio <br>
+        <%= radio_button_tag(:qtype, "True False") %> True False <br>
+        <%= radio_button_tag(:qtype, "Essay") %> Essay <br>
+        <%= radio_button_tag(:qtype, "Multiple Choice - checked") %> Multiple Choice - checked <br>
+        <br>
+        <%= submit_tag "Select #{@questionnaire.display_type.downcase} type", :name=>"save" %>
+    <% end %>
+<% else %>
+    <% form_tag :action => 'create_questionnaire', :pid => @participant_id, :aid => @assignment_id do %>
+        <%= render :partial => 'questionnaire' %>
+        <%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
+        <script>
+            for (var x = 1; x <= 5; x++) {addQuestions();}
+        </script>
+    <% end %>
+<% end %>
+<br />
+<a href="javascript:window.history.back()">Back</a>

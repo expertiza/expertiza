@@ -191,6 +191,10 @@ class AssignmentsController < ApplicationController
     if @assignment.review_assignment_strategy.nil?
       @assignment.review_assignment_strategy = ''
     end
+    if @assignment.require_quiz.nil?
+      @assignment.require_quiz =  false
+      @assignment.num_quiz_questions =  0
+    end
   end
 
 
@@ -372,5 +376,7 @@ class AssignmentsController < ApplicationController
     FileHelper.update_file_location(oldpath, newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
   end
+
+
 
 end

@@ -46,6 +46,13 @@ class QuestionnairesController < ApplicationController
     redirect_to action: :show
   end
 
+  #View a quiz questionnaire
+  def view_quiz
+    @questionnaire = Questionnaire.find(params[:id])
+    @participant = Participant.find_by_id(params[:pid]) #creating an instance variable since it needs to be sent to submitted_content/edit
+    render :view
+  end
+
   def show
     @questionnaire = Questionnaire.find(params[:id])
   end
@@ -67,6 +74,41 @@ class QuestionnairesController < ApplicationController
     end
   end
 
+
+  #edit a quiz questionnaire
+  def edit_quiz
+
+    @questionnaire = Questionnaire.find(params[:id])
+    render :edit
+  end
+
+
+  #save an updated quiz questionnaire to the database
+  def update_quiz
+    @questionnaire = Questionnaire.find(params[:id])
+    redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid] if @questionnaire == nil
+    if params['save']
+      @questionnaire.update_attributes(params[:questionnaire])
+
+      for qid in params[:question].keys
+        question_advices = QuestionAdvice.find_all_by_question_id(qid)
+        i=1
+        for question_advice in question_advices
+          if params[:question][qid]["weight"] == i.to_s
+            score = 1
+          else
+            score = 0
+          end
+          i+=1
+          question_advice.update_attributes(:score => score, :advice => params[:question_advice][question_advice.id.to_s]["advice"])
+        end
+      end
+      save
+      #save_choices @questionnaire.id
+    end
+    redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid]
+  end
+
   # Define a new questionnaire
   def new
     @questionnaire = Object.const_get(params[:model]).new
@@ -76,6 +118,85 @@ class QuestionnairesController < ApplicationController
     @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
     @questionnaire.section = "Regular"
   end
+
+  #define a new quiz questionnaire
+  #method invoked by the view
+  def new_quiz
+    @questionnaire = Object.const_get(params[:model]).new
+    @questionnaire.private = params[:private]
+    @questionnaire.min_question_score = 0
+    @questionnaire.max_question_score = 1
+    @participant_id = params[:pid] #creating an instance variable to hold the participant id
+    @assignment_id = params[:aid] #creating an instance variable to hold the assignment id
+    render :new_quiz
+  end
+
+  # Save the new questionnaire to the database
+  def create_questionnaire
+
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
+
+    # TODO: check for Quiz Questionnaire?
+    @questionnaire.quiz_question_type = params[:question_type_var] #store the question type in QuizQuestionnaire
+
+    if @questionnaire.type == "QuizQuestionnaire" #checking if it is a quiz questionnaire
+      participant_id = params[:pid] #creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
+      @questionnaire.min_question_score = 0
+      @questionnaire.max_question_score = 1
+
+      @assignment = Assignment.find_by_id(params[:aid])
+      if @assignment.team_assignment?
+        teams = TeamsUser.find(:all, :conditions => ["user_id = ?", session[:user].id])
+        for t in teams do
+          if team = Team.find(:first, :conditions => ["id = ? and parent_id = ?", t.team_id, @assignment.id])
+            break
+          end
+        end
+        @questionnaire.instructor_id = team.id    #for a team assignment, set the instructor id to the team_id
+      else
+        @questionnaire.instructor_id = participant_id   #for an individual assignment, set the instructor id to the participant_id
+      end
+      save
+      save_choices @questionnaire.id
+      flash[:note] = "Quiz was successfully created"
+      redirect_to :controller => 'submitted_content', :action => 'edit', :id => participant_id
+    else
+      if (session[:user]).role.name == "Teaching Assistant"
+        @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+      end
+      save
+
+      redirect_to :controller => 'tree_display', :action => 'list'
+    end
+  end
+
+  #seperate method for creating a quiz questionnaire because of differences in permission
+  def create_quiz_questionnaire
+    create_questionnaire
+  end
+
+  #render corresponding views based on quiz type
+  def create_quiz_type
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
+    @participant_id = params[:pid]
+    @assignment_id = params[:aid]
+
+    @questionnaire.quiz_question_type = params[:qtype]
+    @question_type = params[:qtype]
+
+    if params[:qtype] == "Multiple Choice - radio"
+      render 'new_quiz_mcq_radio'
+    elsif params[:qtype] == "Multiple Choice - checked"
+      render 'new_quiz_mcq_checked'
+    elsif params[:qtype] == "Essay"
+      render 'new_quiz_essay'
+    elsif params[:qtype] == "True False"
+      render 'new_quiz_true_false'
+    else  #default
+      render 'new_quiz_mcq_radio'
+    end
+  end
+
 
   def select_questionnaire_type
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
@@ -144,10 +265,12 @@ private
     begin
       @questionnaire.save!
       save_questions @questionnaire.id if @questionnaire.id != nil and @questionnaire.id > 0
-      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
-      parent = FolderNode.find_by_node_object_id(pFolder.id)
-      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
-        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+      if @questionnaire.type != "QuizQuestionnaire"
+        pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
+        parent = FolderNode.find_by_node_object_id(pFolder.id)
+        if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
+          QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+        end
       end
     rescue
       flash[:error] = $!
@@ -171,7 +294,9 @@ private
       for question_key in params[:new_question].keys
         q = Question.new(params[:new_question][question_key])
         q.questionnaire_id = questionnaire_id
-        if q.true_false == ''
+        if @questionnaire.type == "QuizQuestionnaire"
+          q.weight = 1 #setting the weight to 1 for quiz questionnaire since the model validates this field
+       # if q.true_false == ''
           q.true_false = false
         end
         unless q.txt.strip.empty?
@@ -258,6 +383,11 @@ private
             Question.delete(question_key)
           else
             # Update existing question.
+            if (@questionnaire.type == "QuizQuestionnaire")
+              Question.update(question_key,:weight => 1, :txt => params[:question][question_key][:txt] )
+            else
+              Question.update(question_key, params[:question][question_key])
+            end
             Question.update(question_key, params[:question][question_key])
           end
         rescue ActiveRecord::RecordNotFound
@@ -268,6 +398,32 @@ private
         for question_type_key in params[:q].keys
           update_question_type(question_type_key)
         end
+      end
+    end
+  end
+
+
+  #method to save the choices associated with a question in a quiz to the database
+  #only for quiz questionnaire
+  def save_choices(questionnaire_id)
+
+    if params[:new_question] and params[:new_choices]
+      questions = Question.find_all_by_questionnaire_id(questionnaire_id)
+      i = 1
+      for question in questions
+        for choice_key in params[:new_choices][i.to_s].keys
+          print choice_key
+          if params[:new_choices][i.to_s][choice_key]["weight"] == 1.to_s
+            score = 1
+          else
+            score = 0
+          end
+          q = QuestionAdvice.new(:score => score, :advice => params[:new_choices][i.to_s][choice_key]["txt"], :question_id => question.id)
+          q.save
+        end
+        i += 1
+        question.weight = 1
+        question.true_false = false
       end
     end
   end

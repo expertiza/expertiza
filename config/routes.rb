@@ -210,8 +210,10 @@ Expertiza::Application.routes.draw do |map|
       post :toggle_access
       get :copy
       post :select_questionnaire_type
+      get :new_quiz
     end
   end
+  match 'questionnaire/new_quiz', controller: :questionnaires, action: :new_quiz
   resources :review_questionnaires, controller: :questionnaires
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires

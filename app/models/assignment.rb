@@ -51,6 +51,37 @@ class Assignment < ActiveRecord::Base
     team_assignment?
   end
 
+  # Returns a set of topics that can be used for taking the quiz.
+  # We choose the topics if one of its quiz submissions has been attempted the fewest times so far
+  def candidate_topics_for_quiz
+    return nil if sign_up_topics.empty?   # This is not a topic assignment
+
+    contributor_set = Array.new(contributors)
+
+    # Reject contributors that have not selected a topic, or have no submissions
+    contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? }
+    contributor_set.reject! { |contributor| !contributor.has_quiz? }
+    # Reject contributions of topics whose deadline has passed
+    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
+        contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
+
+    # Filter the contributors with the least number of reviews
+    # (using the fact that each contributor is associated with a topic)
+    contributor = contributor_set.min_by { |contributor| contributor.quiz_mappings.count }
+
+    min_quizzes = contributor.quiz_mappings.count rescue 0
+    contributor_set.reject! { |contributor| contributor.quiz_mappings.count > min_quizzes + review_topic_threshold }
+
+    puts contributor_set.inspect
+
+    candidate_topics = Set.new
+    contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
+
+    puts candidate_topics.inspect
+    candidate_topics
+  end
+
+
   # Returns a set of topics that can be reviewed.
   # We choose the topics if one of its submissions has received the fewest reviews so far
   def candidate_topics_to_review
@@ -83,6 +114,11 @@ class Assignment < ActiveRecord::Base
     @has_teams ||= !self.teams.empty?
   end
 
+  def assign_quiz_dynamically(reviewer, topic)
+    contributor = contributor_for_quiz(reviewer, topic)
+    reviewer.assign_quiz(contributor)
+  end
+
   def assign_reviewer_dynamically(reviewer, topic)
     # The following method raises an exception if not successful which
     # has to be captured by the caller (in review_mapping_controller)
@@ -90,6 +126,59 @@ class Assignment < ActiveRecord::Base
 
     contributor.assign_reviewer(reviewer)
   end
+
+  # Returns a contributor whose quiz is to be taken if available, otherwise will raise an error
+  def contributor_for_quiz(reviewer, topic)
+    raise "Please select a topic" if has_topics? and topic.nil?
+    raise "This assignment does not have topics" if !has_topics? and topic
+
+    # This condition might happen if the reviewer/quiz taker waited too much time in the
+    # select topic page and other students have already selected this topic.
+    # Another scenario is someone that deliberately modifies the view.
+    if topic
+      raise "This topic has too many quizzes taken; please select another one." unless candidate_topics_for_quiz.include?(topic)
+    end
+
+    contributor_set = Array.new(contributors)
+    work = (topic.nil?) ? 'assignment' : 'topic'
+
+    # 1) Only consider contributors that worked on this topic; 2) remove reviewer/quiz taker as contributor
+    # 3) remove contributors that have not submitted work yet
+    contributor_set.reject! do |contributor|
+      signed_up_topic(contributor) != topic or # both will be nil for assignments with no signup sheet
+          contributor.includes?(reviewer) or
+          !contributor.has_quiz?
+    end
+    raise "There are no more submissions to take quiz on for this #{work}." if contributor_set.empty?
+
+    # Reviewer/quiz taker can take quiz for each submission only once
+    contributor_set.reject! { |contributor| contributor.quiz_taken_by?(contributor, reviewer) }
+    raise "You have already taken the quiz for all submissions for this #{work}." if contributor_set.empty?
+
+    # Reduce to the contributors with the least number of quizzes taken for their submissions ("responses")
+    min_contributor = contributor_set.min_by { |a| a.quiz_responses.count }
+    min_quizzes = min_contributor.quiz_responses.count
+    contributor_set.reject! { |contributor| contributor.quiz_responses.count > min_quizzes }
+
+    # Pick the contributor whose quiz was taken longest ago
+    if min_quizzes > 0
+      # Sort by last quiz mapping id, since it reflects the order in which quizzes were taken
+      # This has a round-robin effect
+      # Sorting on id assumes that ids are assigned sequentially in the db.
+      # .last assumes the database returns rows in the order they were created.
+      # Added unit tests to ensure these conditions are both true with the current database.
+      contributor_set.sort! { |a, b| a.quiz_mappings.last.id <=> b.quiz_mappings.last.id }
+    end
+
+    # Choose a contributor at random (.sample) from the remaining contributors.
+    # Actually, we SHOULD pick the contributor who was least recently picked.  But sample
+    # is much simpler, and probably almost as good, given that even if the contributors are
+    # picked in round-robin fashion, the reviews will not be submitted in the same order that
+    # they were picked.
+     contributor_set.sample
+  end
+
+
 
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
@@ -221,9 +310,32 @@ class Assignment < ActiveRecord::Base
     scores[:participants] = Hash.new
     self.participants.each do |participant|
       scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
+
+
+      # for all quiz questionnaires (quizzes) taken by the participant
+      quiz_responses = Array.new
+      quiz_response_mappings = QuizResponseMap.find_all_by_reviewer_id(participant.id)
+      quiz_response_mappings.each do |qmapping|
+        if (qmapping.response)
+          quiz_responses << qmapping.response
+        end
+      end
+
+      scores[:participants][participant.id.to_s.to_sym][:quiz] = Hash.new
+      scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments] = quiz_responses
+      scores[:participants][participant.id.to_s.to_sym][:quiz][:scores] = Score.compute_quiz_scores(scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments])
+
+      scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
+      scores[:participants][participant.id.to_s.to_sym][:total_score] += participant.compute_quiz_scores(scores[:participants][participant.id.to_s.to_sym])
+
+
+
     end
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
+
+
+
     scores[:teams] = Hash.new
     index = 0
     self.teams.each do |team|
@@ -293,6 +405,11 @@ class Assignment < ActiveRecord::Base
     (check_condition('submission_allowed_id', topic_id) )
   end
 
+  # Determine if the next due date from now allows to take the quizzes
+  def quiz_allowed(topic_id=nil)
+    return check_condition("quiz_allowed_id",topic_id)
+  end
+
   # Determine if the next due date from now allows for reviews
   def review_allowed(topic_id = nil)
     (check_condition('review_allowed_id', topic_id) )
@@ -301,6 +418,10 @@ class Assignment < ActiveRecord::Base
   # Determine if the next due date from now allows for metareviews
   def metareview_allowed(topic_id=nil)
     check_condition('review_of_review_allowed_id', topic_id)
+  end
+
+  def get_quiz_deadline
+    return DueDate.find(:first, :conditions => ['assignment_id = ? and deadline_type_id >= ?', self.id, 7]).due_at
   end
 
   def delete(force = nil)
@@ -682,6 +803,19 @@ class Assignment < ActiveRecord::Base
     # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
     # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
 
+    # If this is an assignment with quiz required
+    if (self.require_quiz?)
+      signups = SignedUpUser.find_all_by_creator_id(contributor.user_id)
+      for signup in signups do
+        signuptopic = SignUpTopic.find_by_id(signup.topic_id)
+        if (signuptopic.assignment_id == self.id)
+          contributors_signup_topic = signuptopic
+          return contributors_signup_topic
+        end
+      end
+    end
+
+    # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
     (!Team.find_by_name_and_id(contributor.name, contributor.id).nil?) ?
         contributors_topic = SignedUpUser.find_by_creator_id(contributor.id) :
         contributors_topic = SignedUpUser.find_by_creator_id(contributor.user_id)

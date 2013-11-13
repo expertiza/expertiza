@@ -1,0 +1,19 @@
+<h2>Quizzes for "<%= @assignment.name %>"</h2>
+
+<% if @assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@reviewee_topic_id) == "Complete" %>
+  <%= render :partial => 'responses', :locals => {:mappings => @quiz_mappings, :title => 'Quiz'} %>
+  <% if @assignment.is_using_dynamic_reviewer_assignment? %>
+	  <%# if @num_reviews_in_progress == 0 %>
+	    <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
+	        <%= render :partial => 'set_dynamic_quiz', :locals => {:assignment => @assignment} %>
+	    <% elsif @assignment.review_assignment_strategy == Assignment::RS_STUDENT_SELECTED %>
+	      <%= render :partial => 'set_self_quiz', :locals => {:assignment => @assignment} %>
+	    <% end %>
+	  <% #end %>
+ <% end %>
+<% else %>
+  <p><em>Quizzes cannot be taken at this time</em></p>
+<% end %>
+
+<br><br>
+<a href="javascript:window.history.back()">Back</a>

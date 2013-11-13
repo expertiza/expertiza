@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130930021106) do
+ActiveRecord::Schema.define(:version => 20131112020534) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -58,6 +58,8 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
     t.boolean  "copy_flag",                         :default => false
     t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "microtask",                         :default => false
+    t.boolean  "require_quiz"
+    t.integer  "num_quiz_questions",                :default => 0,     :null => false
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -164,6 +166,7 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
     t.boolean  "flag",                        :default => false
     t.integer  "threshold",                   :default => 1
     t.integer  "delayed_job_id"
+    t.integer  "quiz_allowed_id"
   end
 
   add_index "due_dates", ["assignment_id"], :name => "fk_due_dates_assignments"
@@ -299,6 +302,7 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
     t.string   "display_type"
     t.string   "section"
     t.text     "instruction_loc"
+    t.text     "quiz_question_type"
   end
 
   create_table "questions", :force => true do |t|
@@ -306,6 +310,8 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
     t.boolean "true_false"
     t.integer "weight"
     t.integer "questionnaire_id"
+    t.float   "average_difficulty_rating", :default => 0.0
+    t.integer "number_of_ratings",         :default => 0
   end
 
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"

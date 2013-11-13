@@ -29,7 +29,11 @@ function deleteQuestions(){
 }
 
 function addQuestions(){
+    <% if @questionnaire.type == "QuizQuestionnaire" %>
+    numQuestionsToAdd = 1;
+    <% else %>
 	numQuestionsToAdd = parseInt(document.getElementById("numQuestionsToAdd").value);
+    <% end %>
     for(i=0; i<numQuestionsToAdd; i++){
 		addQuestion("",""," ");
 	}
@@ -40,6 +44,11 @@ function addQuestion(in_str, parameter_str, type_str){
     table = document.getElementById("questions_table");
     var row = table.insertRow(-1);
     id = num_questions;
+    <% if @questionnaire.type != 'QuizQuestionnaire' %>
+    column = document.createElement("td");
+    column.innerHTML = "<center><input type=checkbox id='question_chk" + num_questions + "'></center>";
+    row.appendChild(column);
+    <% end %>
     column = document.createElement("td");
     column.innerHTML = "<center><input type=checkbox id='question_chk" + num_questions + "'></center>";
     row.appendChild(column);
@@ -83,6 +92,128 @@ function addQuestion(in_str, parameter_str, type_str){
     weights = weights + "</select>";
     column.innerHTML = weights;
     row.appendChild(column);
+    <% if @questionnaire.type == 'QuizQuestionnaire' %>  //add choices in the view if it is a quiz questionnaire
+    <% if @questionnaire.quiz_question_type == "Multiple Choice - radio" %> // if the question is multiple choice - radio
+    for(i = 1; i < 5; i++) {
+        var row_for_choices = table.insertRow(-1);
+        cid = i;
+        column = document.createElement("td");
+        column.innerHTML = "&nbsp;&nbsp;&nbsp;" + i + ".&nbsp; <input id=new_choices_" + cid + "_txt name=new_choices[" + id + "][" + cid + "][txt] size=40     type=text/>";
+        row_for_choices.appendChild(column);
+    }
+    column = document.createElement("td");
+    weights = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id=new_choices_" + cid + "_weight name=new_choices[" + id + "][" + cid + "][weight]>";
+    //Listing the options for a quiz questionnaire
+    <% for weight in Question::ANSWERS %>
+    <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+    <% end %>
+
+    weights = weights + "</select>";
+    column.innerHTML = weights;
+    row_for_choices.appendChild(column);
+    <% elsif @questionnaire.quiz_question_type == "Multiple Choice - checked" %>   // if the question is multiple choice - checked
+    for(i = 1; i < 5; i++) {
+        var row_for_choices = table.insertRow(-1);
+        cid = i;
+        column = document.createElement("td");
+        column.innerHTML = "&nbsp;&nbsp;&nbsp;" + i + ".&nbsp; <input id=new_choices_" + cid + "_txt name=new_choices[" + id + "][" + cid + "][txt] size=40     type=text/>";
+        row_for_choices.appendChild(column);
+
+        column = document.createElement("td");
+        weights = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id=new_choices_" + cid + "_weight name=new_choices[" + id + "][" + cid + "][weight]>";
+        //Listing the options for a quiz questionnaire
+        <% for weight in Question::ANSWERS_MCQ_CHECKED %>
+        <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+        <% end %>
+
+        weights = weights + "</select>";
+        column.innerHTML = weights;
+        row_for_choices.appendChild(column);
+    }
+    <% elsif @questionnaire.quiz_question_type == "Essay" %>   // if the question is essay
+    column = document.createElement("td");
+    cid = 1;
+    column.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp; <input id=new_choices_" + cid + "_txt name=new_choices[" + id + "][" + cid + "][txt] size=40 type=text/>";
+    row.appendChild(column);
+
+    for(i = 1; i < 1; i++) {
+        var row_for_choices = table.insertRow(-1);
+        cid = i;
+        //column = document.createElement("td");
+        //column.innerHTML = "&nbsp;&nbsp;&nbsp;" + i + ".&nbsp; <input id=new_choices_" + cid + "_txt name=new_choices[" + id + "][" + cid + "][txt] size=40     type=text/>";
+        //row_for_choices.appendChild(column);
+
+        column = document.createElement("td");
+        //Listing the options for a quiz questionnaire
+
+
+        weights = weights + "</select>";
+        column.innerHTML = weights;
+        row_for_choices.appendChild(column);
+    }
+    <% elsif @questionnaire.quiz_question_type == "True False" %>   // if the question is true/false
+    for(i = 1; i <3; i++) {
+        var row_for_choices = table.insertRow(-1);
+        cid = i;
+        column = document.createElement("td");
+        if(i == 1)
+        //column.innerHTML = "<b>TRUE</b>";
+            column.innerHTML = "&nbsp;&nbsp;&nbsp;" + i + ".&nbsp; <input id=new_choices_" + cid + "_txt name=new_choices[" + id + "][" + cid + "][txt] size=40 type=text readonly value='TRUE' />";
+        else
+        //column.innerHTML = "<b>FALSE</b>";
+            column.innerHTML = "&nbsp;&nbsp;&nbsp;" + i + ".&nbsp; <input id=new_choices_" + cid + "_txt name=new_choices[" + id + "][" + cid + "][txt] size=40 type=text readonly value='FALSE' />";
+
+        row_for_choices.appendChild(column);
+    }
+    column = document.createElement("td");
+    weights = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id=new_choices_" + cid + "_weight name=new_choices[" + id + "][" + cid + "][weight]>";
+    //Listing the options for a quiz questionnaire
+    <% for weight in Question::ANSWERS_TRUE_FALSE %>
+    <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+    <% end %>
+
+    weights = weights + "</select>";
+    column.innerHTML = weights;
+    row_for_choices.appendChild(column);
+    <% else %> //default
+    for(i = 1; i < 5; i++) {
+        var row_for_choices = table.insertRow(-1);
+        cid = i;
+        column = document.createElement("td");
+        column.innerHTML = "&nbsp;&nbsp;&nbsp;" + i + ".&nbsp; <input id=new_choices_" + cid + "_txt name=new_choices[" + id + "][" + cid + "][txt] size=40     type=text/>";
+        row_for_choices.appendChild(column);
+    }
+    column = document.createElement("td");
+    weights = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id=new_choices_" + cid + "_weight name=new_choices[" + id + "][" + cid + "][weight]>";
+    //Listing the options for a quiz questionnaire
+    <% for weight in Question::ANSWERS %>
+    <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+    <% end %>
+
+    weights = weights + "</select>";
+    column.innerHTML = weights;
+    row_for_choices.appendChild(column);
+    <% end %>   //end of if @questionnaire.quiz_question_type
+    <% else %>  //not quiz questionnaire
+    column = document.createElement("td");
+    gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
+    <% for type in Question::GRADING_TYPES %>
+    <%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
+    <% end %>
+    gradingTypes += "</select>"
+    column.innerHTML = gradingTypes;
+    row.appendChild(column);
+
+    column = document.createElement("td");
+    weights = "<select id=new_question_" + id + "_weight name=new_question[" + id + 		"][weight]>";
+
+    <% for weight in Question::WEIGHTS %>
+    <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+    <% end %>
+    weights = weights + "</select>";
+    column.innerHTML = weights;
+    row.appendChild(column);
+    <% end %>
     num_questions = num_questions + 1;
 }
 

@@ -23,9 +23,9 @@ class AutomatedMetareview < ActiveRecord::Base
     @review_array = preprocess.fetch_review_data(self, map_id)
     # puts "self.responses #{self.responses}"
     
-    speller = Aspell.new("en_US")
-    speller.suggestion_mode = Aspell::NORMAL
-    @review_array = preprocess.check_correct_spellings(@review_array, speller)
+    #speller = Aspell.new("en_US")
+    #speller.suggestion_mode = Aspell::NORMAL
+    #@review_array = preprocess.check_correct_spellings(@review_array, speller)
     # puts "printing review_array"
     @review_array.each{
       |rev|

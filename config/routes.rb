@@ -102,7 +102,7 @@ Expertiza::Application.routes.draw do |map|
       get :view
       get :view_my_scores
       get :instructor_review
-      get :remove_hyperlink
+      post :remove_hyperlink
       get :conflict_notification
     end
   end
@@ -219,6 +219,18 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :list_mappings
       get :review_report
+      get :select_reviewer
+      get :delete_all_reviewers
+      get :select_mapping
+      get :delete_all_reviewers_and_metareviewers
+      post :add_reviewer
+      get :auto_complete_for_user_name
+      get :add_user_to_assignment
+      get :delete_reviewer
+      get :select_metareviewer
+      get :delete_all_metareviewers
+      post :add_metareviewer
+      get :delete_metareviewer
     end
   end
 
@@ -243,6 +255,9 @@ Expertiza::Application.routes.draw do |map|
 
   resources :sign_up_sheet do
     collection do
+
+      get :signup
+      get :delete_signup
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :signup_topics
@@ -289,6 +304,8 @@ Expertiza::Application.routes.draw do |map|
 
   resources :submitted_content do
     collection do
+      get :remove_hyperlink
+      get :submit_hyperlink
       get :view
       get :edit
     end
@@ -356,4 +373,5 @@ Expertiza::Application.routes.draw do |map|
 
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   map.connect ':controller/service.wsdl', :action => 'wsdl'
+  match ':controller(/:action(/:id))(.:format)'
 end

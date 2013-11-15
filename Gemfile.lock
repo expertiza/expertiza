@@ -218,8 +218,6 @@ GEM
       multi_json (~> 1.0)
       rubyzip (< 1.0.0)
       websocket (~> 1.0.4)
-    simple-navigation (3.11.0)
-      activesupport (>= 2.3.2)
     slop (3.4.5)
     sprockets (2.10.0)
       hike (~> 1.2)
@@ -242,7 +240,6 @@ GEM
     tzinfo (0.3.37)
     websocket (1.0.7)
     will_paginate (3.0.4)
-    win32console (1.3.2)
     win32console (1.3.2-x86-mingw32)
     xpath (2.0.0)
       nokogiri (~> 1.3)
@@ -287,7 +284,6 @@ DEPENDENCIES
   rwordnet
   seer
   selenium-webdriver
-  simple-navigation
   sprockets
   sqlite3-ruby
   stanford-core-nlp

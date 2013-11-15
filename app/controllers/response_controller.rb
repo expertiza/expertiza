@@ -1,7 +1,3 @@
-
-
-
-
 class ResponseController < ApplicationController
   helper :wiki
   helper :submitted_content
@@ -341,7 +337,7 @@ class ResponseController < ApplicationController
       msg = "Your response was successfully saved."
     rescue
       @response.delete
-      error_msg = "Your response was not saved. Cause: " + $!
+     # error_msg = "Your response was not saved. Cause: " + $!
     end
 
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]

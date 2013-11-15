@@ -24,8 +24,6 @@ class WordnetBasedSimilarity
     if(review.casecmp(submission) == 0) # and !is_frequent_word(reviewVertex.name) - removing this condition else, it returns a NOMATCH although the frequent words are equal and this negatively impacts the total match value
                                         # puts("Review vertex types #{reviewVertex.type} && #{submVertex.type}")
 =begin
-
-
       if(reviewState.equal?(submState))
         @match = @match + EXACT
       elsif(!reviewState.equal?(submState))

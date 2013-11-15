@@ -255,7 +255,6 @@ Expertiza::Application.routes.draw do |map|
 
   resources :sign_up_sheet do
     collection do
-
       get :signup
       get :delete_signup
       get :add_signup_topics

@@ -50,18 +50,27 @@
         <li id="tab2"><a href="#tabs-12">Reviewing</a></li>
         <li id="tab3"><a href="#tabs-13">Author Feedback</a></li>
         <li id="tab4"><a href="#tabs-14">TeamMate Review</a></li>
+        <li id="tab5"><a href="#tabs-15">Total Score</a></li>
       </ul>
       <div id="tabs-11">
+        #renders a new tab for reviews on submitted work
        <p><%= render :partial => 'grades/submittedwork', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %> </p>
       </div>
       <div id="tabs-12">
+        #renders a new tab for meta reviews
         <%= render :partial => 'grades/meta', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
       </div>
       <div id="tabs-13">
+        #renders a new tab for author feedback
         <%= render :partial => 'grades/author',:locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
       </div>
       <div id="tabs-14">
+        #renders a new tab for team mate reviews
         <%= render :partial => 'grades/teammate',:locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      </div>
+      <div id="tabs-15">
+        #renders a new tab for scores
+        <%= render 'grades/scores' %>
       </div>
     </div>
     <script>

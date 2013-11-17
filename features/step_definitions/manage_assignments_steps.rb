@@ -35,7 +35,7 @@ end
 When /^I create a (public|private) assignment named "([^"]*)" with max team size (\d+)$/ do  |public_or_private,assignment_name,team_size|
   step "I have a public review named \"test_review\""
     step "I have a public metareview named \"test_metareview\""
-  step "I follow the \"Manage...\" link as an \"instructor\""
+    step "I follow the \"Manage...\" link as an \"instructor\""
     step "I follow \"Create Public Assignment\""
     step "I fill in \"Name\" with \"#{assignment_name}\""
     step "I press \"Create\""

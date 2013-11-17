@@ -55,7 +55,9 @@ class User < ActiveRecord::Base
   end
 
   def first_name
-    fullname[/,.+/][/\w+/] if fullname
+    #fullname[/,.+/][/\w+/] if fullname
+    last, first = fullname.split(/,.+/) #split the token
+    first if first
   end
 
   def super_admin?

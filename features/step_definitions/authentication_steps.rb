@@ -58,7 +58,7 @@ Given /an? (Student|Teaching Assistant|Instructor|Administrator|Super-Administra
     
   User.create({
     :name => name,
-    :fullname => name + ", " + name,
+    :fullname => name,
     :password => 'password',
     :password_confirmation => 'password',
     :role => Role.find_by_name!(user_type),

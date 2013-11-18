@@ -54,36 +54,36 @@ class ResponseController < ApplicationController
        end
      end
 
-     #check if the latest review is done in the current phase.
-     #if latest review is in current phase then edit the latest one.
-     #else create a new version and update it.
+        #check if the latest review is done in the current phase.
+        #if latest review is in current phase then edit the latest one.
+        #else create a new version and update it.
 
-     # editing the latest review
-     if (deadline_version.due_at== deadline_time.due_at)
-       #send it to edit here
-       @header = "Edit"
-       @next_action = "update"
-       @return = params[:return]
-       @response = Response.find_by_map_id_and_version_num(params[:id], @largest_version_num.version_num)
-       return if redirect_when_disallowed(@response)
-       @modified_object = @response.response_id
-       @map = @response.map
-       get_content
-       @review_scores = Array.new
-       @questions.each {
-           |question|
-         @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
-       }
-       #**********************
-       # Check whether this is Jen's assgt. & if so, use her rubric
-       if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
-         if @assignment.id < 469
-           @next_action = "custom_update"
-           render :action => 'custom_response'
-         else
-           @next_action = "custom_update"
-           render :action => 'custom_response_2011'
-         end
+        # editing the latest review
+        if (deadline_version.due_at== deadline_time.due_at)
+          #send it to edit here
+          @header = "Edit"
+          @next_action = "update"
+          @return = params[:return]
+          @response = Response.find_by_map_id_and_version_num(params[:id], @largest_version_num.version_num)
+          return if redirect_when_disallowed(@response)
+          @modified_object = @response.response_id
+          @map = @response.map
+          get_content
+          @review_scores = Array.new
+          @questions.each {
+              |question|
+            @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
+          }
+     #**********************
+     # Check whether this is Jen's assgt. & if so, use her rubric
+     if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
+       if @assignment.id < 469
+         @next_action = "custom_update"
+         render :action => 'custom_response'
+       else
+         @next_action = "custom_update"
+         render :action => 'custom_response_2011'
+       end
        else
        # end of special code (except for the end below, to match the if above)
        #**********************

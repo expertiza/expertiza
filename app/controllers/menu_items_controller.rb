@@ -152,7 +152,7 @@ class MenuItemsController < ApplicationController
     for k in 1..params[:name].length-1
       str = String.new(str + "/" + params[:name][k])
     end
-    node = session[:menu].select(str)
+    node = session[:menu].try(:select, str)
     if node
       redirect_to node.url
     else

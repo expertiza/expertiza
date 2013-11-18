@@ -16,109 +16,109 @@ class ResponseController < ApplicationController
   #If so, edit that version otherwise create a new version.
 
   def rereview
-    @map=ResponseMap.find(params[:id])
-    get_content
-    array_not_empty=0
-    @review_scores=Array.new
-    @prev=Response.all
-    #get all versions and find the latest version
-    for element in @prev
-      if (element.map_id==@map.map_id)
-        array_not_empty=1
-        @review_scores << element
-      end
-    end
+     @map=ResponseMap.find(params[:id])
+     get_content
+     array_not_empty=0
+     @review_scores=Array.new
+     @prev=Response.all
+     #get all versions and find the latest version
+     for element in @prev
+       if (element.map_id==@map.map_id)
+         array_not_empty=1
+         @review_scores << element
+       end
+     end
 
-    #sort all the available versions in descending order.
-    if array_not_empty==1
-      @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
-      @largest_version_num=@sorted[0]
-      @latest_phase=@largest_version_num.created_at
-      due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id])
-      @sorted_deadlines=Array.new
-      @sorted_deadlines=due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }
-      current_time=Time.new.getutc
-      #get the highest version numbered review
-      next_due_date=@sorted_deadlines[0]
+     #sort all the available versions in descending order.
+     if array_not_empty==1
+       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+       @largest_version_num=@sorted[0]
+       @latest_phase=@largest_version_num.created_at
+       due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id])
+       @sorted_deadlines=Array.new
+       @sorted_deadlines=due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }
+       current_time=Time.new.getutc
+       #get the highest version numbered review
+       next_due_date=@sorted_deadlines[0]
 
-      #check in which phase the latest review was done.
-      for deadline_version in @sorted_deadlines
-        if (@largest_version_num.created_at < deadline_version.due_at)
-          break
-        end
-      end
-      for deadline_time in @sorted_deadlines
-        if (current_time < deadline_time.due_at)
-          break
-        end
-      end
-    end
+       #check in which phase the latest review was done.
+       for deadline_version in @sorted_deadlines
+         if (@largest_version_num.created_at < deadline_version.due_at)
+           break
+         end
+       end
+       for deadline_time in @sorted_deadlines
+         if (current_time < deadline_time.due_at)
+           break
+         end
+       end
+     end
 
-    #check if the latest review is done in the current phase.
-    #if latest review is in current phase then edit the latest one.
-    #else create a new version and update it.
+     #check if the latest review is done in the current phase.
+     #if latest review is in current phase then edit the latest one.
+     #else create a new version and update it.
 
-    # editing the latest review
-    if (deadline_version.due_at== deadline_time.due_at)
-      #send it to edit here
-      @header = "Edit"
-      @next_action = "update"
-      @return = params[:return]
-      @response = Response.find_by_map_id_and_version_num(params[:id], @largest_version_num.version_num)
-      return if redirect_when_disallowed(@response)
-      @modified_object = @response.response_id
-      @map = @response.map
-      get_content
-      @review_scores = Array.new
-      @questions.each {
-          |question|
-        @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
-      }
-      #**********************
-      # Check whether this is Jen's assgt. & if so, use her rubric
-      if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
-        if @assignment.id < 469
-          @next_action = "custom_update"
-          render :action => 'custom_response'
-        else
-          @next_action = "custom_update"
-          render :action => 'custom_response_2011'
-        end
-      else
-        # end of special code (except for the end below, to match the if above)
-        #**********************
+     # editing the latest review
+     if (deadline_version.due_at== deadline_time.due_at)
+       #send it to edit here
+       @header = "Edit"
+       @next_action = "update"
+       @return = params[:return]
+       @response = Response.find_by_map_id_and_version_num(params[:id], @largest_version_num.version_num)
+       return if redirect_when_disallowed(@response)
+       @modified_object = @response.response_id
+       @map = @response.map
+       get_content
+       @review_scores = Array.new
+       @questions.each {
+           |question|
+         @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
+       }
+       #**********************
+       # Check whether this is Jen's assgt. & if so, use her rubric
+       if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
+         if @assignment.id < 469
+           @next_action = "custom_update"
+           render :action => 'custom_response'
+         else
+           @next_action = "custom_update"
+           render :action => 'custom_response_2011'
+         end
+       else
+       # end of special code (except for the end below, to match the if above)
+       #**********************
 
         render :action => 'response'
 
       end
-      #   render :action => 'edit'
-    else
-      #else create a new version and update it.
+       #   render :action => 'edit'
+     else
+       #else create a new version and update it.
 
-      @header = "New"
-      @next_action = "create"
-      @feedback = params[:feedback]
-      @map = ResponseMap.find(params[:id])
-      @return = params[:return]
-      @modified_object = @map.map_id
-      get_content
-      #**********************
-      # Check whether this is Jen's assgt. & if so, use her rubric
-      if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
-        if @assignment.id < 469
-          @next_action = "custom_create"
-          render :action => 'custom_response'
-        else
-          @next_action = "custom_create"
-          render :action => 'custom_response_2011'
-        end
-      else
-        # end of special code (except for the end below, to match the if above)
-        #**********************
-        render :action => 'response'
-      end
+       @header = "New"
+       @next_action = "create"
+       @feedback = params[:feedback]
+       @map = ResponseMap.find(params[:id])
+       @return = params[:return]
+       @modified_object = @map.map_id
+       get_content
+       #**********************
+       # Check whether this is Jen's assgt. & if so, use her rubric
+       if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
+         if @assignment.id < 469
+           @next_action = "custom_create"
+           render :action => 'custom_response'
+         else
+           @next_action = "custom_create"
+           render :action => 'custom_response_2011'
+         end
+       else
+         # end of special code (except for the end below, to match the if above)
+         #**********************
+         render :action => 'response'
+       end
 
-    end
+     end
   end
 
   def edit
@@ -176,11 +176,11 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions
 
-      params[:responses].each_pair do |k, v|
+      params[:responses].each_pair do |k,v|
 
         score = Score.find_by_response_id_and_question_id(@response.response_id, questions[k.to_i].id)
         if (score == nil)
-          score = Score.create(:response_id => @response.response_id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+          score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
         end
         score.update_attribute('score', v[:score])
         score.update_attribute('comments', v[:comment])

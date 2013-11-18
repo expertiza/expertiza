@@ -59,7 +59,7 @@ class ResponseController < ApplicationController
         #else create a new version and update it.
 
         # editing the latest review
-        if (deadline_version.due_at== deadline_time.due_at)
+     if (deadline_version.due_at== deadline_time.due_at)
           #send it to edit here
           @header = "Edit"
           @next_action = "update"

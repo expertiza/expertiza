@@ -2,10 +2,7 @@ class Assignment < ActiveRecord::Base
   require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   include DynamicReviewMapping
-
-  #alias_attribute :team_count, :max_team_size
-
-  # Does not necessarily belong to a course!
+  has_paper_trail
   belongs_to :course
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to
@@ -15,15 +12,17 @@ class Assignment < ActiveRecord::Base
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
   has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
-  has_many :due_dates
+  has_many :due_dates, :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
-  has_many :assignment_questionnaires
+  has_many :assignment_questionnaires,:dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
+  has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
+  # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
   # has_many :responses, :through => :response_maps, :source => 'response'
 
   validates_presence_of :name
@@ -434,27 +433,30 @@ class Assignment < ActiveRecord::Base
 # user_name - the user account name of the participant to add
   def add_participant(user_name)
     user = User.find_by_name(user_name)
-    raise "The user account with the name #{user_name} does not exist. Please <a href='" + url_for(:controller => 'users', :action => 'new') + "'>create</a> the user first." if user.nil?
+    raise "The user account with the name #{user_name} does not exist. Please <a href='" + url_for(:controller => 'users', :action => 'new') + "'>create</a> the user first." unless user
     participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)
     if participant
       raise "The user #{user.name} is already a participant."
-    else
-      new_part = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
-      new_part.set_handle()
     end
   end
-
-  def create_node
-    parent = CourseNode.find_by_node_object_id(self.course_id)
-    node = AssignmentNode.create(:node_object_id => self.id)
-    node.parent_id = parent.id if parent != nil
-    node.save
-  end
+ 
+ def create_node()
+      parent = CourseNode.find_by_node_object_id(self.course_id)
+      node = AssignmentNode.new(:node_object_id => self.id)
+      if parent
+        node.parent_id = parent.id
+      end
+      node.save
+ end
 
   def get_current_stage(topic_id = nil)
-    return 'Unknown' if topic_id.nil? if self.staggered_deadline?
+    return 'Unknown' if self.staggered_deadline && !topic_id
     due_date = find_current_stage(topic_id)
-    (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
+    if due_date == nil || due_date == COMPLETE
+      COMPLETE
+    else
+      DeadlineType.find(due_date.deadline_type_id).name
+    end
   end
 
   def get_stage_deadline(topic_id = nil)

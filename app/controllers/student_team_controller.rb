@@ -23,7 +23,10 @@ class StudentTeamController < ApplicationController
       parent = AssignmentNode.find_by_node_object_id(@student.parent_id)
       TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
       user = User.find(@student.user_id)
-      @team.add_member(user, @team.parent_id)    
+      @team.add_member(user, @team.parent_id)
+
+      undo_link("Team \"#{@team.name}\" has been created successfully. ")
+
       redirect_to :controller => 'student_team', :action => 'view' , :id=> @student.id
     else
       flash[:notice] = 'Team name is already in use.'
@@ -42,9 +45,13 @@ class StudentTeamController < ApplicationController
     check = AssignmentTeam.find(:all, :conditions => ["name =? and parent_id =?", params[:team][:name], @team.parent_id])    
     if (check.length == 0)
        if @team.update_attributes(params[:team])
+         undo_link("Team \"#{@team.name}\" has been updated successfully. ")
+
           redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
        end
     elsif (check.length == 1 && (check[0].name <=> @team.name) == 0)
+      undo_link("Team \"#{@team.name}\" has been updated successfully. ")
+
       redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
     else
       flash[:notice] = 'Team name is already in use.'
@@ -63,6 +70,7 @@ class StudentTeamController < ApplicationController
   end
   def remove
     Team.update_all("advertise_for_partner=false",:id=>params[:team_id])
+
     redirect_to :controller => 'student_team', :action => 'view' , :id => params[:team_id]
   end
 
@@ -76,6 +84,8 @@ class StudentTeamController < ApplicationController
     user = TeamsUser.find(:first, :conditions =>["team_id =? and user_id =?", params[:team_id], @student.user_id])
     if user
       user.destroy
+
+      undo_link("User \"#{user.name}\" has been removed from the team successfully. ")
     end
     
     #if your old team does not have any members, delete the entry for the team

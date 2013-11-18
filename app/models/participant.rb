@@ -1,4 +1,5 @@
 class Participant < ActiveRecord::Base
+  has_paper_trail
   belongs_to :user
   belongs_to :topic, :class_name => 'SignUpTopic'
   belongs_to :assignment, :foreign_key => 'parent_id'
@@ -8,6 +9,8 @@ class Participant < ActiveRecord::Base
   has_many   :reviews, :class_name => 'ResponseMap', :foreign_key => 'reviewer_id'
   has_many   :team_reviews, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewer_id'
   has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id'
+
+  has_paper_trail
 
   validates_numericality_of :grade, :allow_nil => true
 

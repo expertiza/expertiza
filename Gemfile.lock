@@ -156,6 +156,9 @@ GEM
     nokogiri (1.6.0-x86-mingw32)
       mini_portile (~> 0.5.0)
     open-uri-cached (0.0.5)
+    paper_trail (2.7.2)
+      activerecord (~> 3.0)
+      railties (~> 3.0)
     polyglot (0.3.3)
     powerbar (1.0.11)
       ansi (~> 1.4.0)
@@ -289,6 +292,7 @@ DEPENDENCIES
   mysql
   nokogiri
   open-uri-cached
+  paper_trail
   rails (~> 3.0.0)
   rake
   rgl

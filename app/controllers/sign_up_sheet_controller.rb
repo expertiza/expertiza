@@ -76,7 +76,7 @@ class SignUpSheetController < ApplicationController
 
       if @sign_up_topic.save
         #NotificationLimit.create(:topic_id => @sign_up_topic.id)
-        flash[:notice] = 'Topic was successfully created.'
+        undo_link("Topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. ")
         redirect_to_sign_up(params[:id])
       else
         render :action => 'new', :id => params[:id]
@@ -88,7 +88,12 @@ class SignUpSheetController < ApplicationController
   def delete
     @topic = SignUpTopic.find(params[:id])
 
-    @topic ? @topic.destroy : flash[:error] = "Topic could not be deleted"
+    if @topic
+      @topic.destroy
+      undo_link("Topic: \"#{@topic.topic_name}\" has been deleted successfully. ")
+    else
+      flash[:error] = "Topic could not be deleted"
+    end
 
     #if this assignment has staggered deadlines then destroy the dependencies as well
     if Assignment.find(params[:assignment_id])['staggered_deadline'] == true
@@ -108,30 +113,32 @@ class SignUpSheetController < ApplicationController
 
 #updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
   def update
-    topic = SignUpTopic.find(params[:id])
+    @topic = SignUpTopic.find(params[:id])
 
-    unless topic.nil?
-      topic.topic_identifier = params[:topic][:topic_identifier]
+    if @topic
+      @topic.topic_identifier = params[:topic][:topic_identifier]
 
       #While saving the max choosers you should be careful; if there are users who have signed up for this particular
       #topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
       #there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
       #it.
-      if SignedUpUser.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
-        topic.max_choosers = params[:topic][:max_choosers]
+      if SignedUpUser.find_by_topic_id(@topic.id).nil? || @topic.max_choosers == params[:topic][:max_choosers]
+        @topic.max_choosers = params[:topic][:max_choosers]
       else
-        if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-          topic.update_waitlisted_users(params[:topic][:max_choosers])
-          topic.max_choosers = params[:topic][:max_choosers]
+        if @topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
+          @topic.update_waitlisted_users(params[:topic][:max_choosers])
+          @topic.max_choosers = params[:topic][:max_choosers]
         else
           flash[:error] = 'Value of maximum choosers can only be increased! No change has been made to max choosers.'
         end
       end
+
       #update tables
-      topic.category = params[:topic][:category]
-      topic.topic_name = params[:topic][:topic_name]
-      topic.micropayment = params[:topic][:micropayment]
-      topic.save
+      @topic.category = params[:topic][:category]
+      @topic.topic_name = params[:topic][:topic_name]
+      @topic.micropayment = params[:topic][:micropayment]
+      @topic.save
+      undo_link("Topic: \"#{@topic.topic_name}\" has been updated successfully. ")
     else
       flash[:error] = "Topic could not be updated"
     end

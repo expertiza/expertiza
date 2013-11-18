@@ -31,19 +31,19 @@ class ResponseController < ApplicationController
 
      #sort all the available versions in descending order.
       if array_not_empty==1
-        @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
-        @largest_version_num=@sorted[0]
-        @latest_phase=@largest_version_num.created_at
-        due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id])
-        @sorted_deadlines=Array.new
-        @sorted_deadlines=due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }
-        current_time=Time.new.getutc
-        #get the highest version numbered review
-        next_due_date=@sorted_deadlines[0]
+         @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+         @largest_version_num=@sorted[0]
+         @latest_phase=@largest_version_num.created_at
+         due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id])
+         @sorted_deadlines=Array.new
+         @sorted_deadlines=due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }
+         current_time=Time.new.getutc
+         #get the highest version numbered review
+         next_due_date=@sorted_deadlines[0]
 
-        #check in which phase the latest review was done.
-        for deadline_version in @sorted_deadlines
-          if (@largest_version_num.created_at < deadline_version.due_at)
+         #check in which phase the latest review was done.
+         for deadline_version in @sorted_deadlines
+           if (@largest_version_num.created_at < deadline_version.due_at)
             break
           end
         end

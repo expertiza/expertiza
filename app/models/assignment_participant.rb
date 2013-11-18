@@ -207,7 +207,23 @@ class AssignmentParticipant < Participant
   def copy(course_id)
     part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
     if part.nil?
-       CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id)       
+       part = CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id)
+       return part
+    end
+  else
+      return nil # return nil so we can tell a copy is not made
+  end  
+  
+  def get_course_string
+    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...    
+    begin
+      course = Course.find(self.assignment.course.id)
+      if course.name.strip.length == 0
+        raise
+      end
+      return course.name 
+    rescue      
+      return "<center>&#8212;</center>".html_safe
     end
   end
 

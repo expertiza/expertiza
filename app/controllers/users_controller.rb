@@ -124,7 +124,7 @@ class UsersController < ApplicationController
       if @user.role.name == "Instructor" or @user.role.name == "Administrator"
         AssignmentQuestionnaire.create(:user_id => @user.id)
       end
-      flash[:notice] = 'User was successfully created.'
+      undo_link("User \"#{@user.name}\" has been created successfully. ")
       redirect_to :action => 'list'
     else
       foreign
@@ -142,8 +142,8 @@ class UsersController < ApplicationController
   def update
     @user = User.find params[:id]
 
-    if @user.update_attributes params[:user]
-      flash[:notice] = 'User was successfully updated.'
+    if @user.update_attributes(params[:user])
+      undo_link("User \"#{@user.name}\" has been updated successfully. ")
       redirect_to @user
     else
       foreign
@@ -154,11 +154,12 @@ class UsersController < ApplicationController
 
   def destroy
     begin
-       user = User.find(params[:id])
-       AssignmentParticipant.find_all_by_user_id(user.id).each{|participant| participant.delete}
-       TeamsUser.find_all_by_user_id(user.id).each{|teamuser| teamuser.delete}
-       AssignmentQuestionnaire.find_all_by_user_id(user.id).each{|aq| aq.destroy}
-       user.destroy
+       @user = User.find(params[:id])
+       AssignmentParticipant.find_all_by_user_id(@user.id).each{|participant| participant.delete}
+       TeamsUser.find_all_by_user_id(@user.id).each{|teamuser| teamuser.delete}
+       AssignmentQuestionnaire.find_all_by_user_id(@user.id).each{|aq| aq.destroy}
+       @user.destroy
+       undo_link("User \"#{@user.name}\" has been deleted successfully. ")
     rescue
       flash[:error] = $!
     end
@@ -224,4 +225,9 @@ class UsersController < ApplicationController
     end
     users
   end
+
+  # generate the undo link
+  #def undo_link
+  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @user.versions.last.id)}>undo</a>"
+  #end
 end

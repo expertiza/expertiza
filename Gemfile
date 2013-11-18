@@ -19,6 +19,7 @@ gem 'jquery-rails'
 gem 'mysql'
 gem 'nokogiri'
 gem 'open-uri-cached'
+gem 'paper_trail'
 gem 'rake'
 gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'
@@ -54,6 +55,5 @@ end
 
 group :development, :test do
   gem 'capybara'
-  gem "capybara-webkit"
   gem 'rspec-rails'
 end

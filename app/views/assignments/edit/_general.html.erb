@@ -128,6 +128,13 @@
       <%= check_box_tag('assignment[require_signup]', 'true', @assignment.require_signup?, {:onChange => 'hasTopicsChanged()'}) %>
       <%= label_tag('assignment[require_signup]', 'Has topics?') %>
     </td>
+    <td style='padding:5px' id='assignment_is_intelligent_field'>
+      <%= label_tag('assignment[is_intelligent]', 'Intelligent Topic Selection:') %>
+      <select id="assignment_is_intelligent_field" name="assignment[is_intelligent]">
+        <option value=false style="width:75px">No</option>
+        <option value=true style="width:75px" <% if @assignment.is_intelligent %>SELECTED<%end%>>Yes</option>
+      </select>
+    </td>
   </tr>
 
   <% if @assignment.require_signup? %>

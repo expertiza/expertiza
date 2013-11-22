@@ -185,13 +185,13 @@ class QuestionnairesController < ApplicationController
     @question_type = params[:qtype]
 
     if params[:qtype] == "Multiple Choice - radio"
-      render 'new_quiz_mcq_radio'
+      render :new_quiz_mcq_radio
     elsif params[:qtype] == "Multiple Choice - checked"
-      render 'new_quiz_mcq_checked'
+      render :new_quiz_mcq_checked
     elsif params[:qtype] == "Essay"
-      render 'new_quiz_essay'
+      render :new_quiz_essay
     elsif params[:qtype] == "True False"
-      render 'new_quiz_true_false'
+      render :new_quiz_true_false
     else  #default
       render 'new_quiz_mcq_radio'
     end

@@ -1,5 +1,8 @@
 <script type="text/javascript">
 num_questions = <%= [@questionnaire.questions.length,1].max %>;
+num_choices = 1;
+choice_id = 1;
+
 var aMail = new Array();
 <% questionnaires = Questionnaire.find_all_by_type(@questionnaire.type) %>
 <% for que in questionnaires %>
@@ -35,7 +38,7 @@ function addQuestions(){
 	numQuestionsToAdd = parseInt(document.getElementById("numQuestionsToAdd").value);
     <% end %>
     for(i=0; i<numQuestionsToAdd; i++){
-		addQuestion("",""," ");
+		addQuestion("","","");
 	}
 }
 
@@ -187,7 +190,8 @@ function addQuestion(in_str, parameter_str, type_str){
     weights = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id=new_choices_" + cid + "_weight name=new_choices[" + id + "][" + cid + "][weight]>";
     //Listing the options for a quiz questionnaire
     <% for weight in Question::ANSWERS %>
-    <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+    <%  %>
+    <%#= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
     <% end %>
 
     weights = weights + "</select>";

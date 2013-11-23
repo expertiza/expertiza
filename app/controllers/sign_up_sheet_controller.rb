@@ -248,7 +248,7 @@ class SignUpSheetController < ApplicationController
     assignment=Assignment.find(params[:id])
 
     if assignment.due_dates.find_by_deadline_type_id(1)!= nil
-      unless assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
+      unless !(assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now )
         @show_actions = false
       end
     end
@@ -279,9 +279,9 @@ class SignUpSheetController < ApplicationController
     @user_id = session[:user].id
     #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
     #Always use team_id ACS
-
+    s = Signupsheet.new
     #check whether the user already has a team for this assignment
-    SignupSheet.signup_team(@assignment, @user_id, params[:id])
+    s.signup_team(@assignment, @user_id, params[:id])
     redirect_to :action => 'list', :id => params[:assignment_id]
   end
 

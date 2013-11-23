@@ -284,7 +284,7 @@ Expertiza::Application.routes.draw do |map|
       get :delete_signup
       get :list
       get :signup_topics
-      get :signup
+      get :sign_up
       get :view_publishing_rights
       get :signup
       get :delete_signup

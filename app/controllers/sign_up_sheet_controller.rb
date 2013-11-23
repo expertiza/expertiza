@@ -248,7 +248,8 @@ class SignUpSheetController < ApplicationController
     assignment=Assignment.find(params[:id])
 
     if assignment.due_dates.find_by_deadline_type_id(1)!= nil
-      unless assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
+      # I change unless to if to show Actions column in signup sheet.
+      if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
         @show_actions = false
       end
     end
@@ -281,7 +282,8 @@ class SignUpSheetController < ApplicationController
     #Always use team_id ACS
 
     #check whether the user already has a team for this assignment
-    SignupSheet.signup_team(@assignment, @user_id, params[:id])
+    s = SignupSheet.new
+    s.signup_team(@assignment, @user_id, params[:id])
     redirect_to :action => 'list', :id => params[:assignment_id]
   end
 

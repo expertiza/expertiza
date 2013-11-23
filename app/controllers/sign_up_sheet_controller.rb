@@ -256,6 +256,14 @@ class SignUpSheetController < ApplicationController
     #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
+
+    if users_team.size == 0
+      @selected_topics = nil
+    else
+      #TODO: fix this; cant use 0
+      @selected_topics = SignUpSheetController.other_confirmed_topic_for_user(params[:id], users_team[0].t_id)
+    end
+
     SignUpTopic.remove_team(users_team, @assignment_id)
 
   end
@@ -279,14 +287,28 @@ class SignUpSheetController < ApplicationController
     @user_id = session[:user].id
     #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
     #Always use team_id ACS
-    s = Signupsheet.new
+    #s = Signupsheet.new
     #check whether the user already has a team for this assignment
-    s.signup_team(@assignment, @user_id, params[:id])
+    #s.signup_team(@assignment, @user_id, params[:id])
+
+    users_team = SignedUpUser.find_team_users(@assignment, @user_id)
+    puts users_team
+    if users_team.size == 0
+      #if team is not yet created, create new team.
+      team = AssignmentTeam.create_team_and_node(@assignment)
+      user = User.find(@user_id)
+
+      teamuser = create_team_users(user, team.id)
+      confirmationStatus = confirm_topic(team.id, params[:id], @assignment)
+    else
+      confirmationStatus = confirm_topic(users_team[0].t_id, params[:id], @assignment)
+    end
+
     redirect_to :action => 'list', :id => params[:assignment_id]
   end
 
   # When using this method when creating fields, update race conditions by using db transactions
-  def self.slotAvailable?(topic_id)
+  def slotAvailable?(topic_id)
     SignUpTopic.slotAvailable?(topic_id)
   end
 
@@ -297,10 +319,70 @@ class SignUpSheetController < ApplicationController
   end
 
   def confirm_topic(creator_id, topic_id, assignment_id)
-    @param_id = params[:id]
+    #@param_id = params[:id]
     @user_id = session[:user].id
-    Waitlist.waitlist_teams(@param_id, @user_id, creator_id, topic_id, assignment_id)
+    #Waitlist.waitlist_teams(@param_id, @user_id, creator_id, topic_id, assignment_id)
+
+    #check whether user has signed up already
+    user_signup = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, creator_id)
+
+    sign_up = SignedUpUser.new
+    sign_up.topic_id = topic_id
+    sign_up.creator_id = creator_id
+    result = false
+    if user_signup.size == 0
+
+      # Using a DB transaction to ensure atomic inserts
+      ActiveRecord::Base.transaction do
+        #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
+        if slotAvailable?(topic_id)
+          sign_up.is_waitlisted = false
+
+          #Update topic_id in participant table with the topic_id
+          participant = Participant.find_by_user_id_and_parent_id( @user_id , assignment_id)
+
+          participant.update_topic_id(topic_id)
+        else
+          sign_up.is_waitlisted = true
+        end
+        if sign_up.save
+          result = true
+        end
+      end
+    else
+      #If all the topics choosen by the user are waitlisted,
+      for user_signup_topic in user_signup
+        if user_signup_topic.is_waitlisted == false
+          SignUpSheetController.flash_signedup_topic()
+
+          return false
+        end
+      end
+
+      # Using a DB transaction to ensure atomic inserts
+      ActiveRecord::Base.transaction do
+        #check whether user is clicking on a topic which is not going to place him in the waitlist
+        if !slotAvailable?(topic_id)
+          sign_up.is_waitlisted = true
+          if sign_up.save
+            result = true
+          end
+        else
+          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
+          cancel_all_waitlists(creator_id, assignment_id)
+          sign_up.is_waitlisted = false
+          sign_up.save
+          participant = Participant.find_by_user_id_and_parent_id( @user_id , assignment_id)
+          participant.update_topic_id(topic_id)
+          result = true
+        end
+      end
+    end
+
+    result
   end
+
+
 
   #this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
   # attempted until the other topic has been completed..

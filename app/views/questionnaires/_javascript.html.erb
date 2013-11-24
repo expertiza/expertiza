@@ -16,6 +16,7 @@
               var question_num = index + 1;
               $('#question' + question_num + ' .check_boxes').hide();
               $('#question' + question_num + ' .radio_buttons').hide();
+              $('#question' + question_num).append("<%= escape_javascript(render 'true_false') %>");
           });
       });
 

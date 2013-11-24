@@ -1,0 +1,11 @@
+<% (1..Assignment.find_by_id(@assignment_id).num_quiz_questions).each do |i| %>
+  <div id="question<%= i %>">
+    Question <%= i %>:   <%= text_field_tag :question, nil, placeholder: 'Enter question...', size: 150 %> <br><br>
+  </div>
+  <div id="qtype">
+    <%= radio_button_tag(id="#{i}", "MCR") %> Multiple Choice - Radio <br>
+    <%= radio_button_tag(id="#{i}", "TF") %> True/False <br>
+    <%= radio_button_tag(id="#{i}", "Essay") %> Essay <br>
+    <%= radio_button_tag(id="#{i}", "MCC") %> Multiple Choice - Checked <br><br>
+  </div>
+<% end %>

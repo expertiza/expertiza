@@ -9,6 +9,7 @@
             var num_quiz_quest = <%= Assignment.find_by_id(@assignment_id).num_quiz_questions %>;
             for (var x = 1; x <= num_quiz_quest; x++) {addQuestions();}
         </script>
+
     <% end %>
 <% end %>
 <br />

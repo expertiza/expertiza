@@ -4,11 +4,14 @@
     <% form_tag :action => 'create_quiz_questionnaire', :pid => @participant_id, :aid => @assignment_id,
                 :question_type_obj => @questionnaire.quiz_question_type, :question_type_var => @question_type do %>
         <%= render :partial => 'questionnaire' %>
+
         <%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
+
         <script>
             var num_quiz_quest = <%= Assignment.find_by_id(@assignment_id).num_quiz_questions %>;
             for (var x = 1; x <= num_quiz_quest; x++) {addQuestions();}
         </script>
+
     <% end %>
 <% end %>
 <br />

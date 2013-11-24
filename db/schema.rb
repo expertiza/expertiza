@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131112020534) do
+ActiveRecord::Schema.define(:version => 20131123213736) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -302,7 +302,6 @@ ActiveRecord::Schema.define(:version => 20131112020534) do
     t.string   "display_type"
     t.string   "section"
     t.text     "instruction_loc"
-    t.text     "quiz_question_type"
   end
 
   create_table "questions", :force => true do |t|

@@ -137,8 +137,6 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
 
     # TODO: check for Quiz Questionnaire?
-    @questionnaire.quiz_question_type = params[:question_type_var] #store the question type in QuizQuestionnaire
-
     if @questionnaire.type == "QuizQuestionnaire" #checking if it is a quiz questionnaire
       participant_id = params[:pid] #creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
       @questionnaire.min_question_score = 0
@@ -174,29 +172,6 @@ class QuestionnairesController < ApplicationController
   def create_quiz_questionnaire
     create_questionnaire
   end
-
-  #render corresponding views based on quiz type
-  def create_quiz_type
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
-    @participant_id = params[:pid]
-    @assignment_id = params[:aid]
-
-    @questionnaire.quiz_question_type = params[:qtype]
-    @question_type = params[:qtype]
-
-    if params[:qtype] == "Multiple Choice - radio"
-      render 'new_quiz_mcq_radio'
-    elsif params[:qtype] == "Multiple Choice - checked"
-      render 'new_quiz_mcq_checked'
-    elsif params[:qtype] == "Essay"
-      render 'new_quiz_essay'
-    elsif params[:qtype] == "True False"
-      render 'new_quiz_true_false'
-    else  #default
-      render 'new_quiz_mcq_radio'
-    end
-  end
-
 
   def select_questionnaire_type
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])

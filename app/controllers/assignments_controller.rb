@@ -128,6 +128,7 @@ class AssignmentsController < ApplicationController
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated
 
+
     if @assignment.update_attributes(params[:assignment])
       flash[:note] = 'Assignment was successfully saved.'
       #TODO: deal with submission path change
@@ -184,6 +185,9 @@ class AssignmentsController < ApplicationController
     end
     if @assignment.microtask.nil?
       @assignment.microtask = false
+    end
+    if @assignment.is_coding_assignment .nil?
+      @assignment.is_coding_assignment  = false
     end
     if @assignment.reviews_visible_to_all.nil?
       @assignment.reviews_visible_to_all = false

@@ -404,6 +404,11 @@ class Assignment < ActiveRecord::Base
     (self.microtask.nil?) ? false : self.microtask
   end
 
+  # Check to see if assignment is a microtask
+  def is_coding_assignment?
+    (self.is_coding_assignment?) ? false : self.is_coding_assignment
+  end
+
   def self.is_submission_possible (assignment)
     # Is it possible to upload a file?
     # Check whether the directory text box is nil

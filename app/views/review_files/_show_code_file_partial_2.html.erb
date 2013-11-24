@@ -1,0 +1,59 @@
+<table  cellpadding='5px' cellspacing='4' >
+  <tr>
+    <td align="right">View Version:</td>
+    <!-- Prepare the 'versions' array from the @version_fileId_map -->
+    <% file_versions = [] %>
+    <% @version_fileId_map.sort.each do |version, review_file_id| %>
+        <% file_versions << version.to_i %>
+    <% end %>
+
+    <!-- Iterate over all hashes and display the version and link -->
+    <!-- corresponding to each hash -->
+    <% @version_fileId_map.sort.each do |each_version, review_file_id| %>
+        <% if each_version.to_s == @current_review_file.version_number.to_s %>
+            <td class="version_number current_version" >
+              <%= link_to each_version,
+                          {:controller => 'review_files',
+                           :action => 'show_code_file',
+                           :review_file_id => review_file_id,
+                           :participant_id => @participant.id,
+                           :versions => file_versions}, :class =>"version_link" %>
+            </td>
+        <% else %>
+            <td class="version_number" >
+              <%= link_to each_version,
+                          {:controller => 'review_files',
+                           :action => 'show_code_file',
+                           :review_file_id => review_file_id,
+                           :participant_id => @participant.id,
+                           :versions => file_versions}, :class =>"version_link" %>
+            </td>
+        <% end %>
+
+    <% end %>
+  </tr>
+
+  <tr>
+    <td align="right">View Diff with:</td>
+    <!-- Iterate over all hashes and display the version and link -->
+    <!-- corresponding to each hash -->
+    <% @version_fileId_map.sort.each do |each_version, review_file_id| %>
+        <% if each_version.to_s == @current_review_file.version_number.to_s %>
+            <td style="color: black">
+              <%= each_version %>
+            </td>
+        <% else %>
+            <td class="version_number" >
+              <%= link_to each_version, {:controller => 'review_files',
+                                         :action => 'show_code_file_diff',
+                                         :participant_id => @participant.id,
+                                         :versions => file_versions,
+                                         :diff_with_file_id => review_file_id,
+                                         :current_version_id => @current_review_file.id},
+                          :class =>"version_link" %>
+            </td>
+        <% end %>
+
+    <% end %>
+  </tr>
+</table>

@@ -62,6 +62,14 @@
         }
     }
 
+    function is_coding_assignmentChanged(){
+        if (jQuery('#assignment_is_coding_assignment').is(':checked')) {
+
+        } else {
+
+        }
+    }
+
     function reviewStrategyChanged() {
         var val = jQuery('#assignment_review_assignment_strategy').val();
         if (val == 'Auto-Selected') {
@@ -184,6 +192,8 @@
     </td>
   </tr>
 
+
+
   <tr>
     <td style='padding:5px' id='assignment_review_visible_to_all_field'>
       <input name="assignment[reviews_visible_to_all]" type="hidden" value="false"/>
@@ -207,6 +217,15 @@
       <%= label_tag('assignment[availability_flag]', 'Available to students?') %>
     </td>
   </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_is_coding_assignment_field'>
+      <input name="assignment[is_coding_assignment]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment[is_coding_assignment]', 'true', @assignment.is_coding_assignment, {:onchange => 'is_coding_assignmentChanged()'}) %>
+      <%= label_tag('assignment[is_coding_assignment]', 'Is code submission required?') %>
+    </td>
+  </tr>
+
 </table>
 
 <script>

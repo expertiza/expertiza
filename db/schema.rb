@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130930021106) do
+ActiveRecord::Schema.define(:version => 20131117022508) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
     t.boolean  "copy_flag",                         :default => false
     t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "microtask",                         :default => false
+    t.boolean  "is_coding_assignment"
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -344,6 +345,8 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
     t.integer  "file_offset"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "initial_line_number"
+    t.integer  "last_line_number"
   end
 
   create_table "review_files", :force => true do |t|

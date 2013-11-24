@@ -241,7 +241,7 @@ class AssignmentParticipant < Participant
   def submitted_files
     files = Array.new
     if(self.directory_num)      
-      files = files_in_directory(self.get_path)
+      files = get_files(self.get_path)
     end
     return files
   end
@@ -256,6 +256,27 @@ class AssignmentParticipant < Participant
         end
         files << directory
       files
+  end
+
+  def get_submitted_files()
+    files = Array.new
+    if(self.directory_num)
+      files = get_files(self.get_path)
+    end
+    return files
+  end
+
+  def get_files(directory)
+    files_list = Dir[directory + "/*"]
+    files = Array.new
+    for file in files_list
+      if File.directory?(file) then
+        dir_files = get_files(file)
+        dir_files.each{|f| files << f}
+      end
+      files << file
+    end
+    return files
   end
 
 

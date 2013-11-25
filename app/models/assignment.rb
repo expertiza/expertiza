@@ -208,8 +208,10 @@ class Assignment < ActiveRecord::Base
   def metareview_mappings
     mappings = Array.new
     self.review_mappings.each do |map|
-      m_map = MetareviewResponseMap.find_by_reviewed_object_id(map.id)
-      mappings << m_map if m_map != nil
+      mmap = MetareviewResponseMap.find_by_reviewed_object_id(map.map_id)
+      if mmap != nil
+        mappings << mmap
+      end
     end
     mappings
   end

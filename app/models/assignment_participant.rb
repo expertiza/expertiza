@@ -342,6 +342,7 @@ class AssignmentParticipant < Participant
     end
     files
   end
+  alias_method :files_in_directory, :get_files
 
   def get_wiki_submissions
     current_time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s

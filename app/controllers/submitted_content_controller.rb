@@ -37,10 +37,10 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(@participant.user_id)
 
     begin
-      @participant.submmit_hyperlink(params['submission'])
+      @participant.submit_hyperlink(params['submission'])
       @participant.update_resubmit_times
     rescue 
-      flash[:error] = "The URL or URI is not valid. Reason: "+$!
+      flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
     end
     undo_link("Link has been submitted successfully. ")
     redirect_to :action => 'edit', :id => @participant.id

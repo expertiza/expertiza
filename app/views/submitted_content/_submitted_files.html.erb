@@ -12,7 +12,7 @@ or<br/><br/>
     	<br>
     <% end %>
   <% end %>
-  <%= form_tag({:action=>'folder_action', :id => participant.id},{:multipart => true}) do %>
+  <%= form_tag({controller: :submitted_content, :action=>'folder_action', :id => participant.id}, :multipart => true, id: 'folder-action-form') do %>
   <% if files.length > 0 and participant.directory_num != nil and participant.directory_num >= 0 %>
 	<% if stage != "Complete" %>
 		<div style="background-color:#EEEEEE; padding-bottom:0.6em"><strong>File and folder actions</strong><br>
@@ -24,7 +24,7 @@ or<br/><br/>
 		<input type="reset" value="Reset"></div><br>
 	<% end %>
     <table>
-	  <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, false) %> </div></td></tr>
+	  <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, false).html_safe %> </div></td></tr>
     </table>
   <% end %>		
   <% end %>

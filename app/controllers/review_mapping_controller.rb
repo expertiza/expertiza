@@ -152,12 +152,12 @@ class ReviewMappingController < ApplicationController
     begin
       user = User.from_params(params)
 
-      regurl = url_for :action => 'add_user_to_assignment', :id => mapping.id, :user_id => user.id               
+      regurl = url_for :action => 'add_user_to_assignment', :id => mapping.map_id, :user_id => user.id
       reviewer = get_reviewer(user,mapping.assignment,regurl)
-      if MetareviewResponseMap.find(:first, :conditions => ['reviewed_object_id = ? and reviewer_id = ?',mapping.id,reviewer.id]) != nil
+      if MetareviewResponseMap.find(:first, :conditions => ['reviewed_object_id = ? and reviewer_id = ?',mapping.map_id,reviewer.id]) != nil
         raise "The metareviewer \""+reviewer.user.name+"\" is already assigned to this reviewer."
       end
-      MetareviewResponseMap.create(:reviewed_object_id => mapping.id,
+      MetareviewResponseMap.create(:reviewed_object_id => mapping.map_id,
                                    :reviewer_id => reviewer.id,
                                    :reviewee_id => mapping.reviewer.id)                         
     rescue  
@@ -188,7 +188,8 @@ class ReviewMappingController < ApplicationController
       assignment.add_participant(user.name)
     rescue
       flash[:error] = $!
-    end    
+    end
+
     if params[:contributor_id]
       redirect_to :action => 'add_reviewer',     :id => params[:id], :user_id => user.id, :contributor_id => params[:contributor_id]
     else
@@ -229,12 +230,12 @@ class ReviewMappingController < ApplicationController
   
   def delete_all_metareviewers    
     mapping = ResponseMap.find(params[:id])    
-    mmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(mapping.id)
+    mmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(mapping.map_id)
 
     failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
     if failedCount > 0
-      url_yes = url_for :action => 'delete_all_metareviewers', :id => mapping.id, :force => 1
-      url_no  = url_for :action => 'delete_all_metareviewers', :id => mapping.id
+      url_yes = url_for :action => 'delete_all_metareviewers', :id => mapping.map_id, :force => 1
+      url_no  = url_for :action => 'delete_all_metareviewers', :id => mapping.map_id
       flash[:error] = "A delete action failed:<br/>#{failedCount} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"                  
     else
       flash[:note] = "All metareview mappings for contributor \""+mapping.reviewee.name+"\" and reviewer \""+mapping.reviewer.name+"\" have been deleted."      
@@ -249,7 +250,7 @@ class ReviewMappingController < ApplicationController
       mapping.delete
       flash[:note] = "The review mapping for \""+mapping.reviewee.name+"\" and \""+mapping.reviewer.name+"\" have been deleted."        
     rescue
-      flash[:error] = "A delete action failed:<br/>" + $! + "Delete this mapping anyway?&nbsp;<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Yes</a>&nbsp;|&nbsp;<a href='/review_mapping/list_mappings/#{assignment_id}'>No</a>"     
+      flash[:error] = "A delete action failed:<br/>" + $! + "Delete this mapping anyway?&nbsp;<a href='/review_mapping/delete_review/"+mapping.map_id.to_s+"'>Yes</a>&nbsp;|&nbsp;<a href='/review_mapping/list_mappings/#{assignment_id}'>No</a>"
     end
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
@@ -262,7 +263,7 @@ class ReviewMappingController < ApplicationController
     begin 
       mapping.delete
     rescue
-      flash[:error] = "A delete action failed:<br/>" + $! + "<a href='/review_mapping/delete_metareview/"+mapping.id.to_s+"'>Delete this mapping anyway>?"     
+      flash[:error] = "A delete action failed:<br/>" + $! + "<a href='/review_mapping/delete_metareview/"+mapping.map_id.to_s+"'>Delete this mapping anyway>?"
     end
     
     redirect_to :action => 'list_mappings', :id => assignment_id
@@ -277,16 +278,19 @@ class ReviewMappingController < ApplicationController
   
   def delete_review
     mapping = ResponseMap.find(params[:id])
-    mapping.response.delete          
-    redirect_to :action => 'delete_reviewer', :id => mapping.id
+    assignment_id = mapping.assignment.id
+    mapping.delete
+    #redirect_to :action => 'delete_reviewer', :id => mapping.id
+    redirect_to :action => 'list_mappings', :id => assignment_id
   end
   
   def delete_metareview
     mapping = MetareviewResponseMap.find(params[:id])
-    metareview = mapping.response
-    metareview.delete
+    assignment_id = mapping.assignment.id
+    #metareview = mapping.response
+    #metareview.delete
     mapping.delete
-    redirect_to :action => 'list_mappings', :id => mapping.review_mapping.assignment_id
+    redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
   def list
@@ -343,7 +347,7 @@ class ReviewMappingController < ApplicationController
       review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
       review_mappings.each{
         |review_map|
-        metareview_mappings = MetareviewResponseMap.find_all_by_reviewed_object_id(review_map.id)
+        metareview_mappings = MetareviewResponseMap.find_all_by_reviewed_object_id(review_map.map_id)
         if metareview_mappings.length == 0
           single = Array.new
           single[0] = contrib.name

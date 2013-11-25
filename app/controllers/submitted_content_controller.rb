@@ -37,10 +37,10 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(@participant.user_id)
 
     begin
-      @participant.submmit_hyperlink(params['submission'])
+      @participant.submit_hyperlink(params['submission'])
       @participant.update_resubmit_times
     rescue 
-      flash[:error] = "The URL or URI is not valid. Reason: "+$!
+      flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
     end
     undo_link("Link has been submitted successfully. ")
     redirect_to :action => 'edit', :id => @participant.id
@@ -73,7 +73,7 @@ class SubmittedContentController < ApplicationController
       @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end           
            
-    curr_directory = participant.dir_path.to_s+@current_folder.name
+    curr_directory = participant.get_path.to_s + @current_folder.name
     
 
     if !File.exists? curr_directory
@@ -128,14 +128,13 @@ class SubmittedContentController < ApplicationController
             
       file_split = file_name.split('.')
       if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
-        send_file(folder_name+ "/" + file_name, :type => Mime::HTML.to_s, :disposition => 'inline')
+        send_file(folder_name+ "/" + file_name, :disposition => 'inline')
       else
         if !File.directory?(folder_name + "/" + file_name)
           file_ext = File.extname(file_name)[1..-1]
           file_ext = 'bin' if file_ext.blank? # default to application/octet-stream
           send_file folder_name + "/" + file_name,
-                    :disposition => 'inline',
-                    :type => Mime::Type.lookup_by_extension(file_ext)
+                    :disposition => 'inline'
         else
           raise "Directory downloads are not supported"
         end

@@ -10,14 +10,24 @@ class Participant < ActiveRecord::Base
   has_many   :team_reviews, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewer_id'
   has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id'
 
+  validates_numericality_of :grade, :allow_nil => true
+
   has_paper_trail
 
-  validates_numericality_of :grade, :allow_nil => true
+  def get_current_stage
+    assignment.try :get_current_stage, topic_id
+  end
+  alias_method :current_stage, :get_current_stage
+
+  def get_stage_deadline
+    assignment.get_stage_deadline topic_id
+  end
+  alias_method :stage_deadline, :get_stage_deadline
 
   def name
     User.find(self.user_id).name
   end
-  
+
   def fullname
     User.find(self.user_id).fullname
   end

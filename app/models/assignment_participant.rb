@@ -4,6 +4,10 @@ require 'yaml'
 # Code Review: Notice that Participant overloads two different concepts: 
 #              contribution and participant (see fields of the participant table).
 #              Consider creating a new table called contributions.
+#
+# Alias methods exist in this class which append 'get_' to many method names. Use
+# the idiomatic ruby method names (without get_)
+
 class AssignmentParticipant < Participant
   require 'wiki_helper'
 
@@ -117,6 +121,7 @@ class AssignmentParticipant < Participant
 
     reviewers
   end
+  alias_method :reviewers, :get_reviewers
 
   # Cycle data structure
   # Each edge of the cycle stores a participant and the score given to the participant by the reviewer.
@@ -134,6 +139,7 @@ class AssignmentParticipant < Participant
     end
     cycles
   end
+  alias_method :two_node_cycles, :get_two_node_cycles
 
   def get_three_node_cycles
     cycles = []
@@ -149,6 +155,7 @@ class AssignmentParticipant < Participant
     end
     cycles
   end
+  alias_method :three_node_cycles, :get_three_node_cycles
 
   def get_four_node_cycles
     cycles = []
@@ -167,6 +174,7 @@ class AssignmentParticipant < Participant
     end
     cycles
   end
+  alias_method :four_node_cycles, :get_four_node_cycles
 
   # Per cycle
   def get_cycle_similarity_score(cycle)
@@ -182,6 +190,7 @@ class AssignmentParticipant < Participant
     similarity_score = similarity_score / count unless count == 0.0
     similarity_score
   end
+  alias_method :cycle_similarity_score, :get_cycle_similarity_score
 
   # Per cycle
   def get_cycle_deviation_score(cycle)
@@ -198,6 +207,7 @@ class AssignmentParticipant < Participant
     deviation_score = deviation_score / count unless count == 0.0
     deviation_score
   end
+  alias_method :cycle_deviation_score, :get_cycle_deviation_score
 
   def review_score
     review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
@@ -272,15 +282,18 @@ class AssignmentParticipant < Participant
   def get_members
     team.try :participants
   end
+  alias_method :members, :get_members
 
 
   def get_hyperlinks
     team.try :get_hyperlinks
   end
+  alias_method :hyperlinks, :get_hyperlinks
 
   def get_hyperlinks_array
     self.submitted_hyperlinks.nil? ? [] : YAML::load(self.submitted_hyperlinks)
   end
+  alias_method :hyperlinks_array, :get_hyperlinks_array
 
   #Copy this participant to a course
   def copy(course_id)
@@ -300,28 +313,24 @@ class AssignmentParticipant < Participant
       return "<center>&#8212;</center>".html_safe
     end
   end
+  alias_method :course_string, :get_course_string
 
   def get_feedback
     FeedbackResponseMap.get_assessments_for(self)
   end
+  alias_method :feedback, :get_feedback
 
   def get_reviews
     #ACS Always get assessments for a team
     #removed check to see if it is a team assignment
     TeamReviewResponseMap.get_assessments_for(self.team)
   end
+  alias_method :reviews, :get_reviews
 
   def get_reviews_by_reviewer(reviewer)
     TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
   end
-
-  def get_reviews_by_reviewer(reviewer)
-    if self.assignment.team_assignment?
-      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
-    else
-      ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
-    end
-  end
+  alias_method :reviews_by_reviewer, :get_reviews_by_reviewer
 
   def metareviews
     MetareviewResponseMap.get_assessments_for(self)  
@@ -337,6 +346,7 @@ class AssignmentParticipant < Participant
     files = get_files(self.get_path) if self.directory_num
     files
   end
+  alias_method :submitted_files, :get_submitted_files
 
   def get_files(directory)
     files_list = Dir[directory + "/*"]
@@ -352,6 +362,7 @@ class AssignmentParticipant < Participant
     files
   end
   alias_method :files_in_directory, :get_files
+  alias_method :files, :get_files
 
   def get_wiki_submissions
     current_time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
@@ -372,6 +383,7 @@ class AssignmentParticipant < Participant
       Array.new
     end
   end
+  alias_method :wiki_submissions, :get_wiki_submissions
 
   def team
     AssignmentTeam.get_team(self)
@@ -426,6 +438,7 @@ class AssignmentParticipant < Participant
     sign = hash_data + self.user.name.to_s + time_stamp.strftime("%Y-%m-%d %H:%M:%S")
     Digest::SHA1.digest(sign)
   end
+  alias_method :hash, :get_hash
 
   # grant publishing rights to one or more assignments. Using the supplied private key, 
   # digital signatures are generated.
@@ -459,6 +472,7 @@ class AssignmentParticipant < Participant
   def get_path
     self.assignment.get_path + "/"+ self.directory_num.to_s
   end
+  alias_method :path, :get_path
 
   def update_resubmit_times
     new_submit = ResubmissionTime.new(:resubmitted_at => Time.now.to_s)
@@ -501,4 +515,5 @@ class AssignmentParticipant < Participant
     return "<center>&#8212;</center>" if topic.nil? or topic.topic_name.empty?
     topic.topic_name
   end
+  alias_method :topic_string, :get_topic_string
 end

@@ -25,8 +25,8 @@ class Questionnaire < ActiveRecord::Base
 
     def compute_weighted_score(symbol, assignment, scores)
       aq = self.assignment_questionnaires.find_by_assignment_id(assignment.id)
-      if scores[symbol][:scores].avg
-        scores[symbol][:scores].avg * aq.questionnaire_weight  / 100.0
+      if scores[symbol][:scores][:avg]
+        scores[symbol][:scores][:avg] * aq.questionnaire_weight  / 100.0
       else
         0
       end

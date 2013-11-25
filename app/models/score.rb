@@ -95,7 +95,7 @@ class Score < ActiveRecord::Base
 
     submission_valid?(@response)
 
-    if (sum_of_weights > 0)
+    if (sum_of_weights > 0 && max_question_score)
       return (weighted_score / (sum_of_weights * max_question_score)) * 100
     else
       return -1 #indicating no score

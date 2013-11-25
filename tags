@@ -639,6 +639,7 @@ PgUsersController	test/functional/pg_users_controller_test.rb	/^class PgUsersCon
 PgUsersControllerTest	test/functional/pg_users_controller_test.rb	/^class PgUsersControllerTest < ActionController::TestCase$/;"	c
 PgUsersHelper	app/helpers/pg_users_helper.rb	/^module PgUsersHelper$/;"	m
 PieChartHelper	app/helpers/analytic_helper.rb	/^module PieChartHelper$/;"	m
+PlagirismCheckTest	spec/models/plagiarism_check_spec.rb	/^class PlagirismCheckTest < ActiveSupport::TestCase$/;"	c
 PlagirismCheckTest	test/unit/automated_metareview/plagiarism_check_test.rb	/^class PlagirismCheckTest < ActiveSupport::TestCase$/;"	c
 PopupController	app/controllers/popup_controller.rb	/^class PopupController < ApplicationController$/;"	c
 PopupWindow	public/javascripts/CalendarPopup.js	/^function PopupWindow(){if(!window.popupWindowIndex){window.popupWindowIndex = 0;}if(!window.popupWindowObjects){window.popupWindowObjects = new Array();}if(!window.listenerAttached){window.listenerAttached = true;PopupWindow_attachListener();}this.index = popupWindowIndex++;popupWindowObjects[this.index] = this;this.divName = null;this.popupWindow = null;this.width=0;this.height=0;this.populated = false;this.visible = false;this.autoHideEnabled = false;this.contents = "";this.url="";this.windowProperties="toolbar=no,location=no,status=no,menubar=no,scrollbars=auto,resizable,alwaysRaised,dependent,titlebar=no";if(arguments.length>0){this.type="DIV";this.divName = arguments[0];}else{this.type="WINDOW";}this.use_gebi = false;this.use_css = false;this.use_layers = false;if(document.getElementById){this.use_gebi = true;}else if(document.all){this.use_css = true;}else if(document.layers){this.use_layers = true;}else{this.type = "WINDOW";}this.offsetX = 0;this.offsetY = 0;this.getXYPosition = PopupWindow_getXYPosition;this.populate = PopupWindow_populate;this.setUrl = PopupWindow_setUrl;this.setWindowProperties = PopupWindow_setWindowProperties;this.refresh = PopupWindow_refresh;this.showPopup = PopupWindow_showPopup;this.hidePopup = PopupWindow_hidePopup;this.setSize = PopupWindow_setSize;this.isClicked = PopupWindow_isClicked;this.autoHide = PopupWindow_autoHide;this.hideIfNotClicked = PopupWindow_hideIfNotClicked;}$/;"	c
@@ -823,6 +824,7 @@ ScoreTest	test/unit/score_test.rb	/^class ScoreTest < ActiveSupport::TestCase$/;
 SelDateColor	public/javascripts/datetimepicker.js	/^var SelDateColor="#FFFF99";\/\/Backgrond color of selected date in textbox.$/;"	v
 Sender	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/sender.rb	/^  class Sender$/;"	c	class:HoptoadNotifier
 SenderTest	vendor/gems/hoptoad_notifier-2.4.4/test/sender_test.rb	/^class SenderTest < Test::Unit::TestCase$/;"	c
+SentenceStateTest	spec/models/sentence_state_spec.rb	/^class SentenceStateTest < ActiveSupport::TestCase$/;"	c
 SentenceStateTest	test/unit/automated_metareview/sentence_state_test.rb	/^class SentenceStateTest < ActiveSupport::TestCase$/;"	c
 Service	tmp/librarian/cache/source/chef/site/877777683730772c/runit/version-uri/fb340dd858cde39b/package/libraries/provider_runit_service.rb	/^    class Service$/;"	c	class:Chef.Provider
 SetPermissionForSuggestion	db/migrate/124_set_permission_for_suggestion.rb	/^class SetPermissionForSuggestion < ActiveRecord::Migration$/;"	c
@@ -3350,6 +3352,7 @@ set_up_display_options	app/controllers/application_controller.rb	/^  def set_up_
 set_value	tmp/librarian/cache/source/chef/site/877777683730772c/windows/version-uri/094423e7e1f88e74/package/libraries/registry_helper.rb	/^    def set_value(mode,path,values,type=nil)$/;"	f	class:Windows.RegistryHelper
 set_values_for_new_topic	app/controllers/sign_up_sheet_controller.rb	/^  def set_values_for_new_topic$/;"	f	class:SignUpSheetController
 setup	app/models/menu.rb	/^    def setup(item)$/;"	f	class:Menu.Node
+setup	spec/models/sentence_state_spec.rb	/^  def setup$/;"	f	class:SentenceStateTest
 setup	test/functional/advertise_for_partners_controller_test.rb	/^  def setup$/;"	f	class:JoinTeamRequestsControllerTest
 setup	test/functional/assignment_controller_test.rb	/^  def setup$/;"	f	class:AssignmentControllerTest
 setup	test/functional/auth_controller_test.rb	/^  def setup$/;"	f	class:AuthControllerTest

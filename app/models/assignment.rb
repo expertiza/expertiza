@@ -24,20 +24,14 @@ class Assignment < ActiveRecord::Base
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
-  #TODO: A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
-  # has_many :responses, :through => :response_maps, :source => 'response'
 
   validates_presence_of :name
   validates_uniqueness_of :name
-  #validates_presence_of :directory_path, :on => :update
-  #validates_uniqueness_of :scope => [:directory_path, :instructor_id]
 
   COMPLETE = 'Finished'
   WAITLIST = 'Waitlist open'
 
   REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
-
-  #REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
 
   #  Review Strategy information.
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'

@@ -1,5 +1,6 @@
-<% child_nodes = node.get_children(@sortvar,@sortorder,session[:user].id,@show) %>
-<%= render :partial => '/tree_display/row_header', 
+
+<% child_nodes = node.get_children(@sortvar,@sortorder,session[:user].id,@show,nil,@search) %>
+<%= render :partial => '/tree_display/row_header',
   :locals => {
   :depth => depth,
   :prefix => prefix,
@@ -8,11 +9,8 @@
   :child_nodes => child_nodes
 } %>
 <% if node.get_partial_name %>
-  <%if node.get_partial_name == 'courses_folder_actions' && session[:user].role_id == 6 %>
-  <%else%>
-    <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
-      :locals => {:node => node} %>
-  <%end%>
+  <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
+    :locals => {:node => node} %>
 <% else %>
   <%= render :partial=> '/tree_display/actions/no_actions' %>
 <% end %>

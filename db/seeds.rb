@@ -158,7 +158,7 @@ ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'goto_teammate_reviews', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'goto_metareview_rubrics', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'goto_teammatereview_rubrics', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'signup_topics', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'list', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'signup', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'delete_signup', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('suggestion').id, :name => 'create', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
@@ -293,7 +293,7 @@ tu.attributes = {:name => 'admin',
              :email_on_review => true, 
              :email_on_submission => true, 
              :email_on_review_of_review => true, 
-             :is_new_user => false, 
+             :is_new_user => false,
              :master_permission_granted => false}
 tu.parent_id = tu.id
 tu.save!

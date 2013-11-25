@@ -12,11 +12,11 @@ module Craken
   end
 
   HOSTNAME          = Socket.gethostname.split('.').first.downcase.strip
-  DEPLOY_PATH       = ENV['deploy_path'] || RAILS_ROOT
+  DEPLOY_PATH       = ENV['deploy_path'] || Rails.root.to_s
   RAKETAB_FILES     = ENV['raketab_files'].split(":") rescue determine_raketab_files
   CRONTAB_EXE       = ENV['crontab_exe'] || "/usr/bin/crontab"
   #RAKE_EXE          = ENV['rake_exe'] || ((rake = `which rake`.strip and rake.empty?) ? "/usr/bin/rake" : rake)
-  RAKETAB_RAILS_ENV = ENV['raketab_rails_env'] || RAILS_ENV
+  RAKETAB_RAILS_ENV = ENV['raketab_rails_env'] || Rails.env
   # assumes root of app is name of app, also takes into account 
   # capistrano deployments
   APP_NAME          = ENV['app_name'] || (DEPLOY_PATH =~ /\/([^\/]*)\/releases\/\d*$/ ? $1 : File.basename(DEPLOY_PATH))

@@ -66,11 +66,11 @@ class AssignmentTeam < Team
   end
 
   def get_path
-    self.get_participants.first.get_path
+    self.get_participants.first.dir_path
   end
 
   def get_submitted_files
-    self.get_participants.first.get_submitted_files
+    self.get_participants.first.submitted_files
   end
 
   def get_review_map_type
@@ -220,6 +220,14 @@ class AssignmentTeam < Team
     team = AssignmentTeam.create(name: team_name, parent_id: assignment_id)
     TeamNode.create(parent_id: assignment_id, node_object_id: team.id)
     team
+  end
+
+  #Remove a team given the team id
+  def self.remove_team_by_id(id)
+    old_team = AssignmentTeam.find(id)
+    if old_team != nil
+      old_team.destroy
+    end
   end
 
   require './app/models/analytic/assignment_team_analytic'

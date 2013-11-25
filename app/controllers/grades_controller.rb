@@ -14,7 +14,7 @@ class GradesController < ApplicationController
             |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-    @scores = @assignment.get_scores(@questions)
+    @scores = @assignment.scores(@questions)
   end
 
   def view_my_scores
@@ -60,7 +60,7 @@ class GradesController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 
-    @scores = @participant.get_scores(@questions)
+    @scores = @participant.scores(@questions)
   end
 
   def instructor_review
@@ -71,21 +71,11 @@ class GradesController < ApplicationController
       reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
       reviewer.set_handle()
     end
-
-    if participant.assignment.team_assignment?
       reviewee = participant.team
       review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
-    else
-      reviewee = participant
-      review_mapping = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
-    end
 
     if review_mapping.nil?
-      if participant.assignment.team_assignment?
         review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-      else
-        review_mapping = ParticipantReviewResponseMap.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-      end
     end
     review = Response.find_by_map_id(review_mapping.id)
 
@@ -154,16 +144,16 @@ class GradesController < ApplicationController
     if @submission == "review"
       @caction = "view_review"
       @symbol = "review"
-      process_response("Review", "Reviewer", @participant.get_reviews, "ReviewQuestionnaire")
+      process_response("Review", "Reviewer", @participant.reviews, "ReviewQuestionnaire")
     elsif @submission == "review_of_review"
       @symbol = "metareview"
-      process_response("Metareview", "Metareviewer", @participant.get_metareviews, "MetareviewQuestionnaire")
+      process_response("Metareview", "Metareviewer", @participant.metareviews, "MetareviewQuestionnaire")
     elsif @submission == "review_feedback"
       @symbol = "feedback"
-      process_response("Feedback", "Author", @participant.get_feedback, "AuthorFeedbackQuestionnaire")
+      process_response("Feedback", "Author", @participant.feedback, "AuthorFeedbackQuestionnaire")
     elsif @submission == "teammate_review"
       @symbol = "teammate"
-      process_response("Teammate Review", "Reviewer", @participant.get_teammate_reviews, "TeammateReviewQuestionnaire")
+      process_response("Teammate Review", "Reviewer", @participant.teammate_reviews, "TeammateReviewQuestionnaire")
     end
 
     @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."

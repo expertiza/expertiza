@@ -2,10 +2,7 @@ class Assignment < ActiveRecord::Base
   require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   include DynamicReviewMapping
-
-  #alias_attribute :team_count, :max_team_size
-
-  # Does not necessarily belong to a course!
+  has_paper_trail
   belongs_to :course
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to
@@ -15,16 +12,16 @@ class Assignment < ActiveRecord::Base
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
   has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
-  has_many :due_dates
+  has_many :due_dates, :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
-  has_many :assignment_questionnaires
+  has_many :assignment_questionnaires,:dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
-  # has_many :responses, :through => :response_maps, :source => 'response'
+  has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
 
   validates_presence_of :name
   validates_uniqueness_of :name
@@ -35,9 +32,6 @@ class Assignment < ActiveRecord::Base
   WAITLIST = 'Waitlist open'
 
   REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
-
-  REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
-
   #  Review Strategy information.
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
   RS_STUDENT_SELECTED = 'Student-Selected'
@@ -223,7 +217,7 @@ class Assignment < ActiveRecord::Base
 
     scores[:participants] = Hash.new
     self.participants.each do |participant|
-      scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
+      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
     end
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
@@ -240,8 +234,8 @@ class Assignment < ActiveRecord::Base
     scores
   end
 
-  def get_contributor(contributor_id)
-    team_assignment? ? AssignmentTeam.find(contributor_id) : AssignmentParticipant.find(contributor_id)
+  def get_contributor(contrib_id)
+    AssignmentTeam.find(contrib_id)
   end
 
   # parameterized by questionnaire
@@ -771,6 +765,7 @@ class Assignment < ActiveRecord::Base
       drop_topic.last.delete
     end
   end
+
 
   #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
   # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column

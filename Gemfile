@@ -3,7 +3,6 @@ source 'http://rubygems.org'
 gem 'rails', '~>3.0.0'
 
 ## Gems in Alphabetical Order
-
 gem 'bind-it'
 gem 'capistrano'
 gem 'delayed_job_active_record'
@@ -20,36 +19,41 @@ gem 'jquery-rails'
 gem 'mysql'
 gem 'nokogiri'
 gem 'open-uri-cached'
+gem 'paper_trail'
 gem 'rake'
 gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rjb'
-gem 'rubyzip', "~> 0.9.9", :require => 'zip/zip'
+gem 'rubyzip', :require => 'zip/zip'
 gem 'rwordnet'
 gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'will_paginate'
+gem 'automated_metareview' , '0.0.2'
 
 group :development do
   gem 'daemons'
-  gem 'debugger'
   gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'
 end
 
 group :test do
-  gem 'capybara'
   gem 'cucumber-rails', require: false
   gem 'database_cleaner'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'
+  gem "minitest"
+  gem "minitest-reporters", '>= 0.5.0'
   gem "rspec-rails"
+  gem 'shoulda'
+  gem "test-unit"
 end
 
-# set JAVA_HOME so Heroku will install gems that need it
-heroku_java_home = '/usr/lib/jvm/java-6-openjdk'
-ENV['JAVA_HOME'] = heroku_java_home if Dir.exist?(heroku_java_home)
+group :development, :test do
+  gem 'capybara'
+  gem 'rspec-rails'
+end

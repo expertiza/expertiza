@@ -5,10 +5,9 @@ require 'yaml'
 #              contribution and participant (see fields of the participant table).
 #              Consider creating a new table called contributions.
 class AssignmentParticipant < Participant
-
   require 'wiki_helper'
 
-  belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id' 
+  belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
   has_many    :collusion_cycles
   has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
@@ -100,19 +99,24 @@ class AssignmentParticipant < Participant
       rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
       rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
     end
+
     reviewees
   end
 
   # all the participants in this assignment who have reviewed this person
   def get_reviewers
     reviewers = []
-    (self.assignment.team_assignment? && self.team) ?
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} && type = 'TeamReviewResponseMap'"]) :
-    rmaps = ResponseMap.find(:all, conditions: ["reviewee_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
-    rmaps.each {|rm| reviewers.push(AssignmentParticipant.find(rm.reviewer_id))}
+    if self.assignment.team_assignment? && self.team
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
+    else
+      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+    end
+    rmaps.each do |rm|
+      reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
+    end
 
     reviewers
-  end  
+  end
 
   # Cycle data structure
   # Each edge of the cycle stores a participant and the score given to the participant by the reviewer.
@@ -122,7 +126,7 @@ class AssignmentParticipant < Participant
   def get_two_node_cycles
     cycles = []
     self.get_reviewers.each do |ap|
-      if ap.get_reviewers.include?(self) 
+      if ap.get_reviewers.include?(self)
         self.get_reviews_by_reviewer(ap).nil? ? next : s01 = self.get_reviews_by_reviewer(ap).get_total_score
         ap.get_reviews_by_reviewer(self).nil? ? next : s10 = ap.get_reviews_by_reviewer(self).get_total_score
         cycles.push([[self, s01], [ap, s10]])
@@ -135,10 +139,10 @@ class AssignmentParticipant < Participant
     cycles = []
     self.get_reviewers.each do |ap1|
       ap1.get_reviewers.each do |ap2|
-        if ap2.get_reviewers.include?(self)  
-          self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score   
-          ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score   
-          ap2.get_reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score   
+        if ap2.get_reviewers.include?(self)
+          self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score
+          ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
+          ap2.get_reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score
           cycles.push([[self, s01], [ap1, s12], [ap2, s20]])
         end
       end
@@ -151,13 +155,13 @@ class AssignmentParticipant < Participant
     self.get_reviewers.each do |ap1|
       ap1.get_reviewers.each do |ap2|
         ap2.get_reviewers.each do |ap3|
-          if ap3.get_reviewers.include?(self)  
-            self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score   
-            ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score   
-            ap2.get_reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score  
-            ap3.get_reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score   
+          if ap3.get_reviewers.include?(self)
+            self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score
+            ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
+            ap2.get_reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score
+            ap3.get_reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score
             cycles.push([[self, s01], [ap1, s12], [ap2, s23], [ap3, s30]])
-          end 
+          end
         end
       end
     end
@@ -174,12 +178,13 @@ class AssignmentParticipant < Participant
       similarity_score = similarity_score + (pivot_score - cycle[other][1]).abs
       count = count + 1.0
     end
+
     similarity_score = similarity_score / count unless count == 0.0
     similarity_score
   end
 
   # Per cycle
-  def get_cycle_deviation_score(cycle)    
+  def get_cycle_deviation_score(cycle)
     deviation_score = 0.0
     count = 0.0
 
@@ -291,7 +296,7 @@ class AssignmentParticipant < Participant
         raise
       end
       return course.name
-    rescue      
+    rescue
       return "<center>&#8212;</center>".html_safe
     end
   end
@@ -307,8 +312,12 @@ class AssignmentParticipant < Participant
   end
 
   def get_reviews_by_reviewer(reviewer)
+    TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
+  end
+
+  def get_reviews_by_reviewer(reviewer)
     if self.assignment.team_assignment?
-      TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
+      return TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
     else
       ParticipantReviewResponseMap.get_reviewer_assessments_for(self, reviewer)
     end
@@ -327,9 +336,9 @@ class AssignmentParticipant < Participant
     files = Array.new
     files = get_files(self.get_path) if self.directory_num
     files
-  end  
+  end
 
-  def get_files(directory)      
+  def get_files(directory)
     files_list = Dir[directory + "/*"]
     files = Array.new
 
@@ -404,8 +413,7 @@ class AssignmentParticipant < Participant
   end
 
   def self.get_export_fields(options)
-    fields = ["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"]
-    fields
+    ["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"]
   end
 
   # generate a hash string that we can digitally sign, consisting of the 
@@ -448,7 +456,6 @@ class AssignmentParticipant < Participant
     self.save!
   end
 
-
   def get_path
     self.assignment.get_path + "/"+ self.directory_num.to_s
   end
@@ -459,9 +466,9 @@ class AssignmentParticipant < Participant
   end
 
   def set_student_directory_num
-    if self.directory_num.nil? or self.directory_num < 0           
+    if self.directory_num.nil? || self.directory_num < 0
       max_num = AssignmentParticipant.find(:first, conditions: ['parent_id = ?', self.parent_id], :order => 'directory_num desc').directory_num
-      max_num ? dir_num = max_num + 1 : dir_num = 0
+      dir_num = max_num ? max_num + 1 : 0
       self.update_attribute('directory_num',dir_num)
       #ACS Get participants irrespective of the number of participants in the team
       #removed check to see if it is a team assignment

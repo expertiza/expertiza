@@ -75,7 +75,7 @@ class SignUpTopic < ActiveRecord::Base
     #making sure that the drop date deadline hasn't passed
     dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})
     if (!dropDate.nil? && dropDate.due_at < Time.now)
-      flash[:error] = "You cannot drop this topic because the drop deadline has passed."
+      #flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
       #if team assignment find the creator id from teamusers table and teams
       #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments

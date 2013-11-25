@@ -59,7 +59,7 @@ class SignedUpUser < ActiveRecord::Base
 
   def self.find_user_signup_topics(assignment_id,creator_id)
     #SignedUpUser.find_by_sql("SELECT t.id as topic_id, t.topic_name as topic_name, u.is_waitlisted as is_waitlisted FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and t.assignment_id = " + assignment_id.to_s + " and u.creator_id =" + creator_id.to_s)
-    SignedUpUser.find_by_sql(["SELECT t.id as topic_id, t.topic_name as topic_name, u.is_waitlisted as is_waitlisted FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and t.assignment_id = ? and u.creator_id = ?", assignment_id.to_s, creator_id.to_s])
+    SignedUpUser.find_by_sql(["SELECT t.id as topic_id, t.topic_name as topic_name, u.is_waitlisted as is_waitlisted, u.preference_priority_number as preference_priority_number FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and t.assignment_id = ? and u.creator_id = ?", assignment_id.to_s, creator_id.to_s])
   end
 
   #If a signup sheet exists then release topics that the given team has selected for the given assignment.

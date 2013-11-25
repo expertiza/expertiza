@@ -245,6 +245,7 @@ class SignUpSheetController < ApplicationController
     @slots_filled = SignUpTopic.find_slots_filled(params[:id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
+    @priority = 0
     assignment=Assignment.find(params[:id])
 
     if assignment.due_dates.find_by_deadline_type_id(1)!= nil
@@ -334,6 +335,8 @@ class SignUpSheetController < ApplicationController
 
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
+        if(@assignment.is_intelligent == 0)
+          puts 'in thisss'
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
         if slotAvailable?(topic_id)
           sign_up.is_waitlisted = false
@@ -344,6 +347,12 @@ class SignUpSheetController < ApplicationController
           participant.update_topic_id(topic_id)
         else
           sign_up.is_waitlisted = true
+        end
+        else
+          sign_up.is_waitlisted = true
+          if params[:priority].to_s.to_f > 0
+          sign_up.preference_priority_number = params[:priority];
+            end
         end
         if sign_up.save
           result = true
@@ -359,6 +368,7 @@ class SignUpSheetController < ApplicationController
         end
       end
 
+=begin
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         #check whether user is clicking on a topic which is not going to place him in the waitlist
@@ -377,12 +387,26 @@ class SignUpSheetController < ApplicationController
           result = true
         end
       end
+=end
     end
 
     result
   end
 
-
+  def set_priority
+    @user_id = session[:user].id
+    users_team = SignedUpUser.find_team_users(params[:assignment_id].to_s, @user_id)
+    puts params[:id]
+    puts @user_id
+    puts 'aaaaaaaaaaaaaaaa'
+    signUp = SignedUpUser.find_by_topic_id_and_creator_id(params[:id], users_team[0].t_id)
+    puts signUp
+    #signUp.preference_priority_number = params[:priority].to_s
+    if params[:priority].to_s.to_f > 0
+      signUp.update_attribute('preference_priority_number' , params[:priority].to_s)
+    end
+    redirect_to :action => 'list', :id => params[:assignment_id]
+  end
 
   #this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
   # attempted until the other topic has been completed..

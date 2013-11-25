@@ -74,14 +74,12 @@ class GradesController < ApplicationController
 
     review_exists = true
 
-    if participant.assignment.team_assignment?
-      reviewee = participant.team
-      review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+    reviewee = participant.team
+    review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
 
     if review_mapping.nil?
       review_exists = false
-      if participant.assignment.team_assignment?
-        review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+      review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
     end
     review = Response.find_by_map_id(review_mapping.map_id)
 

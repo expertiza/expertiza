@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131023055647) do
+ActiveRecord::Schema.define(:version => 20131108132457) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -41,7 +41,6 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.integer  "review_of_review_questionnaire_id"
     t.integer  "teammate_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
-    t.boolean  "team_assignment"
     t.integer  "wiki_type_id",                      :default => 0,     :null => false
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false
@@ -241,6 +240,17 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.string  "type"
   end
 
+  create_table "participant_score_views", :id => false, :force => true do |t|
+    t.integer "response_id",                      :default => 0, :null => false
+    t.integer "score"
+    t.integer "weight"
+    t.string  "questionaire_type",  :limit => 64
+    t.integer "max_question_score"
+    t.integer "team_id",                          :default => 0, :null => false
+    t.integer "participant_id"
+    t.integer "assignment_id"
+  end
+
   create_table "participants", :force => true do |t|
     t.boolean  "submit_allowed",       :default => true
     t.boolean  "review_allowed",       :default => true
@@ -279,9 +289,9 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",                     :null => false
+    t.string  "q_type",      :default => "", :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1, :null => false
+    t.integer "question_id", :default => 1,  :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -297,8 +307,8 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.string   "section"
     t.text     "instruction_loc"
+    t.string   "section"
   end
 
   create_table "questions", :force => true do |t|
@@ -373,6 +383,34 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.float   "score",       :default => 0.0, :null => false
     t.string  "range",       :default => ""
     t.string  "object_type", :default => "",  :null => false
+  end
+
+  create_table "score_views", :id => false, :force => true do |t|
+    t.integer  "question_weight"
+    t.integer  "q_id",                                 :default => 0
+    t.string   "q_type",                               :default => ""
+    t.string   "q_parameters"
+    t.integer  "q_question_id",                        :default => 1
+    t.integer  "q1_id",                                :default => 0
+    t.string   "q1_name",                :limit => 64
+    t.integer  "q1_instructor_id",                     :default => 0
+    t.boolean  "q1_private",                           :default => false
+    t.integer  "q1_min_question_score",                :default => 0
+    t.integer  "q1_max_question_score"
+    t.datetime "q1_created_at"
+    t.datetime "q1_updated_at"
+    t.integer  "q1_default_num_choices"
+    t.string   "q1_type"
+    t.string   "q1_display_type"
+    t.string   "q1_section"
+    t.text     "q1_instruction_loc"
+    t.integer  "ques_id",                              :default => 0,     :null => false
+    t.integer  "ques_questionnaire_id"
+    t.integer  "s_id",                                 :default => 0
+    t.integer  "s_question_id",                        :default => 0
+    t.integer  "s_score"
+    t.text     "s_comments"
+    t.integer  "s_response_id"
   end
 
   create_table "scores", :force => true do |t|

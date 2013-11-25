@@ -20,24 +20,28 @@ class TeamsUsersController < ApplicationController
     user = User.find_by_name(params[:user][:name].strip)
     if !user
       urlCreate = url_for :controller => 'users', :action => 'new'      
-      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."            
+      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
     end
-    team = Team.find_by_id(params[:id])    
-    
-      add_member_return=team.add_member(user, team.parent_id)
+
+    team = Team.find_by_id(params[:id])
+
+    add_member_return=team.add_member(user, team.parent_id)
     if add_member_return==false
       flash[:error]= "The team already has the maximum number of members."
     end
 
-    #  flash[:error] = $!
-    #end
+    @teams_user = TeamsUser.last
+    undo_link("Team user \"#{user.name}\" has been added to \"#{team.name}\" successfully. ")
+
     redirect_to :controller => 'team', :action => 'list', :id => team.parent_id
   end
-        
+
   def delete
-    teamuser = TeamsUser.find(params[:id])   
-    parent_id = Team.find(teamuser.team_id).parent_id
-    teamuser.destroy    
+    @teams_user = TeamsUser.find(params[:id])
+    parent_id = Team.find(@teams_user.team_id).parent_id
+    @user = User.find(@teams_user.user_id)
+    @teams_user.destroy
+    undo_link("Team user \"#{@user.name}\" has been removed successfully. ")
     redirect_to :controller => 'team', :action => 'list', :id => parent_id   
   end    
 
@@ -50,5 +54,11 @@ class TeamsUsersController < ApplicationController
     
     redirect_to :action => 'list', :id => params[:id]
   end
+
+  #def undo_link
+  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @teams_user.versions.last.id)}>undo</a>"
+  #end
+
+
   
 end

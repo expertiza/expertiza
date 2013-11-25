@@ -1,5 +1,7 @@
-require 'fastercsv'
-require 'csv'
+# OSS808 Change 28/10/2013
+# FasterCSV replaced now by CSV which is present by default in Ruby
+#require 'fastercsv'
+#require 'csv'
 
 module QuestionnaireHelper
   
@@ -9,7 +11,7 @@ module QuestionnaireHelper
   CSV_WEIGHT = 3
 
   def self.create_questionnaire_csv(questionnaire, user_name)
-   csv_data = FasterCSV.generate do |csv|
+   csv_data = CSV.generate do |csv|
     for question in questionnaire.questions
       # Each row is formatted as follows
       # Question, question advice (from high score to low), type, weight

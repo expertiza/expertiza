@@ -28,7 +28,7 @@ class SentenceStateTest < ActiveSupport::TestCase
   end     
   
   test "Identify State 3" do
-    sentence = "I’m not ever going to do any homework."
+    sentence = "I am not ever going to do any homework."
     #getting the tagged string
     tagged_string = @pos_tagger.get_readable(sentence)
     #calling the identify_sentence_state method with tagged_string as a parameter
@@ -37,7 +37,7 @@ class SentenceStateTest < ActiveSupport::TestCase
   end 
      
   test "Identify State 4" do
-    sentence = "You aren't ever going to go anywhere with me if you act like that."
+    sentence = "You are not ever going to go anywhere with me if you act like that."
     #getting the tagged string
     tagged_string = @pos_tagger.get_readable(sentence)
     #calling the identify_sentence_state method with tagged_string as a parameter
@@ -82,7 +82,7 @@ class SentenceStateTest < ActiveSupport::TestCase
   end
 
   test "Identify State 9" do
-    sentence = "I don't need none."
+    sentence = "I do not need none."
     #getting the tagged string
     tagged_string = @pos_tagger.get_readable(sentence)
     #calling the identify_sentence_state method with tagged_string as a parameter
@@ -91,7 +91,7 @@ class SentenceStateTest < ActiveSupport::TestCase
   end  
 
   test "Identify State 10" do
-    sentence = "It was so hot, I couldn't hardly breathe."
+    sentence = "It was so hot, I could not hardly breathe."
     #getting the tagged string
     tagged_string = @pos_tagger.get_readable(sentence)
     #calling the identify_sentence_state method with tagged_string as a parameter
@@ -101,7 +101,7 @@ class SentenceStateTest < ActiveSupport::TestCase
   end
   
   test "Identify State 11" do
-    sentence = "I don't want to go nowhere."
+    sentence = "I do not want to go nowhere."
     #getting the tagged string
     tagged_string = @pos_tagger.get_readable(sentence)
     #calling the identify_sentence_state method with tagged_string as a parameter

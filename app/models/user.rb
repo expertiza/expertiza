@@ -35,8 +35,14 @@ class User < ActiveRecord::Base
   scope :tas, -> { where role_id: Role.ta }
   scope :students, -> { where role_id: Role.student }
 
+  has_paper_trail
+
   def salt_first?
     true
+  end
+
+  def list_mine(object_type, user_id)
+    object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end
 
   def get_available_users(name)
@@ -55,7 +61,7 @@ class User < ActiveRecord::Base
   end
 
   def first_name
-    fullname[/,.+/][/\w+/] if fullname
+    fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
   end
 
   def super_admin?

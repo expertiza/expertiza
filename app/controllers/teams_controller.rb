@@ -6,15 +6,19 @@ def create_teams_view
 end
 
 def delete_all
-  parent = Object.const_get(session[:team_type]).find(params[:id])  
-  Team.delete_all_by_parent(parent)
+  parent = Object.const_get(session[:team_type]).find(params[:id])
+  @teams = Team.find_all_by_parent_id(parent.id)
+  @teams.each do |t|
+    t.destroy
+  end
+  undo_link("All teams have been removed successfully. ")
   redirect_to :action => 'list', :id => parent.id
 end
 
 def create_teams
   parent = Object.const_get(session[:team_type]).find(params[:id])
   Team.randomize_all_by_parent(parent, session[:team_type], params[:team][:size].to_i)
-  
+  undo_link("Random teams have been created successfully. ")
   redirect_to :action => 'list', :id => parent.id
  end
 
@@ -35,27 +39,28 @@ def create_teams
    parent = Object.const_get(session[:team_type]).find(params[:id])
    begin
      Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-    team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => parent.id)
-    TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
-    redirect_to :action => 'list', :id => parent.id
+     @team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => parent.id)
+     TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
+     undo_link("Team \"#{@team.name}\" has been created successfully. ")
+     redirect_to :action => 'list', :id => parent.id
    rescue TeamExistsError
-    flash[:error] = $! 
-    redirect_to :action => 'new', :id => parent.id
+     flash[:error] = $! 
+     redirect_to :action => 'new', :id => parent.id
    end
  end
  
  def update  
-   team = Team.find(params[:id])
-   parent = Object.const_get(session[:team_type]).find(team.parent_id)
+   @team = Team.find(params[:id])
+   parent = Object.const_get(session[:team_type]).find(@team.parent_id)
    begin
     Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-    
-    team.name = params[:team][:name]
-    team.save
+    @team.name = params[:team][:name]
+    @team.save
+    undo_link("Team \"@team.name\" has been updated successfully. ")
     redirect_to :action => 'list', :id => parent.id
    rescue TeamExistsError
     flash[:error] = $! 
-    redirect_to :action => 'edit', :id => team.id
+    redirect_to :action => 'edit', :id => @team.id
    end   
  end
  
@@ -64,14 +69,15 @@ def create_teams
  end
  
  def delete   
-   team = Team.find(params[:id])
-   course = Object.const_get(session[:team_type]).find(team.parent_id)
-   team.delete
+   @team = Team.find(params[:id])
+   course = Object.const_get(session[:team_type]).find(@team.parent_id)
+   @team.destroy
+   undo_link("Team \"#{@team.name}\" has been deleted successfully. ")
    redirect_to :action => 'list', :id => course.id
  end
  
  # Copies existing teams from a course down to an assignment
- # The team and team members are all copied.  
+ # The team and team members are all copied.
  def inherit
    assignment = Assignment.find(params[:id])
    if assignment.course_id >= 0

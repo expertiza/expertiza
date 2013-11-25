@@ -39,7 +39,7 @@ class ReviewFilesController < ApplicationController
     SubmittedContentHelper::unzip_file(full_filename, version_dir, true)
 
     # For all files in the version_dir, add entries in the review_file table
-    participant.get_files(version_dir).each do |each_file|
+    participant.files_in_directory(version_dir).each do |each_file|
       @review_file = ReviewFile.new
       @review_file.filepath               = each_file.to_s
       @review_file.version_number         = new_version_number
@@ -76,13 +76,9 @@ class ReviewFilesController < ApplicationController
 
     # Find all files over all versions submitted by the team
     all_review_files = []
-    if @participant.assignment.team_assignment?
       @participant.team.get_participants.each { |member|
         all_review_files += ReviewFile.find_all_by_author_participant_id(member.id)
       }
-    else
-      all_review_files = ReviewFile.find_all_by_author_participant_id(@participant.id)
-    end
 
     # For each file in the above list find out the various versions in which it occurs
     @file_version_map = Hash.new

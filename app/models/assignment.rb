@@ -22,13 +22,9 @@ class Assignment < ActiveRecord::Base
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
   has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
-  # TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
-  # has_many :responses, :through => :response_maps, :source => 'response'
 
   validates_presence_of :name
   validates_uniqueness_of :name
-  #validates_presence_of :directory_path, :on => :update
-  #validates_uniqueness_of :scope => [:directory_path, :instructor_id]
 
   COMPLETE = 'Finished'
   WAITLIST = 'Waitlist open'
@@ -195,7 +191,7 @@ class Assignment < ActiveRecord::Base
     response_map_set.first
   end
 
-  def is_using_dynamic_reviewer_assignment?
+  def dynamic_reviewer_assignment?
     (self.review_assignment_strategy == RS_AUTO_SELECTED || self.review_assignment_strategy == RS_STUDENT_SELECTED) ? true : false
   end
 
@@ -435,30 +431,27 @@ class Assignment < ActiveRecord::Base
 # user_name - the user account name of the participant to add
   def add_participant(user_name)
     user = User.find_by_name(user_name)
-    raise "The user account with the name #{user_name} does not exist. Please <a href='" + url_for(:controller => 'users', :action => 'new') + "'>create</a> the user first." unless user
+    raise "The user account with the name #{user_name} does not exist. Please <a href='" + url_for(:controller => 'users', :action => 'new') + "'>create</a> the user first." if user.nil?
     participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)
     if participant
       raise "The user #{user.name} is already a participant."
+    else
+      new_part = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
+      new_part.set_handle()
     end
   end
- 
- def create_node()
-      parent = CourseNode.find_by_node_object_id(self.course_id)
-      node = AssignmentNode.new(:node_object_id => self.id)
-      if parent
-        node.parent_id = parent.id
-      end
-      node.save
- end
+
+  def create_node
+    parent = CourseNode.find_by_node_object_id(self.course_id)
+    node = AssignmentNode.create(:node_object_id => self.id)
+    node.parent_id = parent.id if parent != nil
+    node.save
+  end
 
   def get_current_stage(topic_id = nil)
-    return 'Unknown' if self.staggered_deadline && !topic_id
+    return 'Unknown' if topic_id.nil? if self.staggered_deadline?
     due_date = find_current_stage(topic_id)
-    if due_date == nil || due_date == COMPLETE
-      COMPLETE
-    else
-      DeadlineType.find(due_date.deadline_type_id).name
-    end
+    (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   def get_stage_deadline(topic_id = nil)
@@ -637,9 +630,7 @@ class Assignment < ActiveRecord::Base
     return 0 if get_total_reviews_assigned == 0
     sum_of_scores = 0
     self.response_maps.each do |response_map|
-      if !response_map.response.nil? then
-        sum_of_scores = sum_of_scores + response_map.response.average_score
-      end
+      sum_of_scores = sum_of_scores + response_map.response.get_average_score if !response_map.response.nil?
     end
     (sum_of_scores / get_total_reviews_completed).to_i
   end
@@ -648,9 +639,9 @@ class Assignment < ActiveRecord::Base
     distribution = Array.new(101, 0)
 
     self.response_maps.each do |response_map|
-      if !response_map.response.nil? then
-        score = response_map.response.average_score.to_i
-        distribution[score] += 1 if score >= 0 and score <= 100
+      if !response_map.response.nil?
+        score = response_map.response.get_average_score.to_i
+        distribution[score] += 1 if score >= 0 && score <= 100
       end
     end
     distribution
@@ -696,11 +687,8 @@ class Assignment < ActiveRecord::Base
     @assignment = Assignment.find(parent_id)
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
-    questionnaires.each {
-        |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    }
-    @scores = @assignment.scores(@questions)
+    questionnaires.each { |questionnaire| @questions[questionnaire.symbol] = questionnaire.questions }
+    @scores = @assignment.get_scores(@questions)
 
     return csv if @scores[:teams].nil?
 

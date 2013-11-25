@@ -12,7 +12,6 @@ class AssignmentParticipantTest < ActiveSupport::TestCase
   def test_add_new_participant()
     participant = Participant.new
 
-    #TODO Should an empty Participant be allowed?
     # assert !participant.valid?
 
     assert participant.valid?

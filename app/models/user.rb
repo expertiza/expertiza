@@ -56,7 +56,7 @@ class User < ActiveRecord::Base
 
   def first_name
     #fullname[/,.+/][/\w+/] if fullname
-    last, first = fullname.split(/,.+/) #split the token
+    last, first = fullname.split(/,.+/)  if fullname #split the token
     first if first
   end
 

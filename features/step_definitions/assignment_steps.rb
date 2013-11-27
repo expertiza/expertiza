@@ -12,6 +12,7 @@ Given /^I am participating in (team|individual) assignment "(\S+)"$/ do |assignm
   a.spec_location= 'http://'
   a.availability_flag= true
   a.require_signup= true
+  a.instructor_id = Instructor.first.id
   a.save
 
   dropDeadline = DueDate.new

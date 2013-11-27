@@ -16,6 +16,7 @@ Feature: Manage the courses in Expertiza
       And I fill in "Course1Directory" for "Course Directory"
       And I fill in "A very informational course about information" for "Course Information"
       And I press "Create"
+    And I follow "Manage Courses"
     Then I should see "Course1"
     
   @instructor
@@ -26,8 +27,10 @@ Feature: Manage the courses in Expertiza
       And I fill in "Course1Directory" for "Course Directory"
       And I fill in "A very informational course about information" for "Course Information"
       And I press "Create"
+      And I follow "Manage Courses"
     Then I should see "Course1"
       And I should see "private"
+
     
   @instructor
   @manage_courses

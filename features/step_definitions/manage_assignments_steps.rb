@@ -50,6 +50,7 @@ When /^I create a (public|private) assignment named "([^"]*)" with max team size
     step "I select \"test_review\" from \"questionnaires[review]\""
     step "I select \"test_metareview\" from \"questionnaires[metareview]\""
     step "I press \"Save\""
+  step "I follow \"Assignments\""
   step "I should see \"#{assignment_name}\""
 end
 

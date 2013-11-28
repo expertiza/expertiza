@@ -1,6 +1,19 @@
 class ParticipantsController < ApplicationController
   auto_complete_for :user, :name
-  
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+
+  def action_allowed?
+    if current_user.role.name.eql?("Administrator") || current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching Assistant")
+      true
+    else if action_name == 'change_handle' && current_user.role.name.eql?("Student")
+           true
+         end
+    end
+  end
+
+  #our changes end E913
   def list
     @root_node = Object.const_get(params[:model]+"Node").find_by_node_object_id(params[:id])     
     @parent = Object.const_get(params[:model]).find(params[:id])

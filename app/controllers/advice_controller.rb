@@ -1,5 +1,15 @@
 class AdviceController < ApplicationController
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
 
+  def action_allowed?
+    if current_user.role.name.eql?("Administrator") || current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching Assistant")
+      true
+    end
+  end
+
+  #our changes end E913
   # Modify the advice associated with a questionnaire
   def edit_advice
     @questionnaire = get(Questionnaire, params[:id])

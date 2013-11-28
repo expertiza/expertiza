@@ -1,4 +1,19 @@
 class AdminController < ApplicationController
+
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+
+  def action_allowed?
+    if current_user.role.name.eql?("Super-Administrator")
+      true
+      else if action_name=='list_instructors' && current_user.role.name.eql?('Administrator')
+          true
+      end
+    end
+  end
+
+  #our changes end E913
   def new_instructor
     @user = User.find_or_create_by_name(params[:name])
 

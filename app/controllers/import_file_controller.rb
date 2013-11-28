@@ -1,5 +1,15 @@
 class ImportFileController < ApplicationController
-  
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+
+  def action_allowed?
+    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")|| current_user.role.name.eql?("Super-Administrator")
+      true
+    end
+  end
+
+#our changes end E913
   def start
     @id = params[:id]
     @expected_fields = params[:expected_fields]

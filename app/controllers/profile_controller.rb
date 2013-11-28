@@ -1,4 +1,12 @@
 class ProfileController < ApplicationController
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+  def action_allowed?
+    if !current_user.nil?
+      true
+    end
+  end
   def edit 
     @user = session[:user]
     @assignment_questionnaire = AssignmentQuestionnaire.first :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]

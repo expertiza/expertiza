@@ -1,4 +1,13 @@
 class PasswordRetrievalController < ApplicationController
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+
+  def action_allowed?
+    true
+  end
+
+#our changes end E913
   def forgotten
   end
 

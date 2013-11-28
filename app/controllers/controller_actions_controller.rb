@@ -3,7 +3,19 @@ class ControllerActionsController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :index }
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
 
+  def action_allowed?
+    if !current_user.nil?
+      if current_user.role.name.eql?("Super-Administrator")
+        true
+      end
+    end
+  end
+
+  #our changes end E913
 
   def index
     @controller_actions = ControllerAction.order(:name).paginate(per_page: 50, page: 1)

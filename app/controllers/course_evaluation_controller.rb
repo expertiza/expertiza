@@ -1,5 +1,15 @@
 class CourseEvaluationController < ApplicationController
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
 
+  def action_allowed?
+    if current_user.role.name.eql?("Student")
+      true
+    end
+  end
+
+  #our changes end E913
   def list #list course evaluations for a user
     unless session[:user] #Check for a valid user
       redirect_to '/'

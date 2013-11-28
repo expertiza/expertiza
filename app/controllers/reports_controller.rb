@@ -1,4 +1,5 @@
 class ReportsController < ApplicationController
+
   def view
     @assignment_id=14;
     

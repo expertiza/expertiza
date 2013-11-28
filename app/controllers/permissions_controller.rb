@@ -1,4 +1,16 @@
 class PermissionsController < ApplicationController
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+
+  def action_allowed?
+    if current_user.role.name.eql?("Super-Administrator")
+      true
+    end
+  end
+
+  #our changes end E913
+
   def index
     list
     render :action => 'list'

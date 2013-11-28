@@ -1,7 +1,17 @@
 class ImpersonateController < ApplicationController
   #auto_complete_for :user, :name
 
-  # auto complete is turned off right now: check the start.html.erb file
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+
+  def action_allowed?
+    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")|| current_user.role.name.eql?("Super-Administrator")
+      true
+    end
+  end
+
+#our changes end E913
   def auto_complete_for_user_name
     @users = session[:user].get_available_users(params[:user][:name])
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false

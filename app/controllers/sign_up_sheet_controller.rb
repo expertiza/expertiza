@@ -13,7 +13,20 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'graph/graphviz_dot'
   require 'rgl/topsort'
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
 
+  def action_allowed?
+    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
+      true
+    else if (action_name =='signup_topics'|| action_name =='signup' || action_name =='delete_signup') && current_user.role.name.eql?("Student")
+           true
+        end
+    end
+  end
+
+#our changes end E913
   #Includes functions for team management. Refer /app/helpers/ManageTeamHelper
   include ManageTeamHelper
   #Includes functions for Dead line management. Refer /app/helpers/DeadLineHelper

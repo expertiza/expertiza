@@ -1,5 +1,19 @@
 class SuggestionController < ApplicationController
- 
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+
+  def action_allowed?
+    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator") || current_user.role.name.eql?("Super-Administrator")
+      true
+    else if (action_name=='create' ||action_name == 'new') && current_user.role.name.eql?("Student")
+           true
+         end
+
+    end
+  end
+
+#our changes end E913
   def add_comment
        @suggestioncomment = SuggestionComment.new(params[:suggestion_comment])
        @suggestioncomment.suggestion_id=params[:id]

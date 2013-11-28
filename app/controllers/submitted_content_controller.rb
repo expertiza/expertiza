@@ -2,7 +2,17 @@ require 'zip/zip'
 
 class SubmittedContentController < ApplicationController
   helper :wiki
-  
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+
+  def action_allowed?
+    if current_user.role.name.eql?("Student")
+      true
+    end
+  end
+
+#our changes end E913
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)

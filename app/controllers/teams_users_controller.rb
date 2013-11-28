@@ -1,5 +1,15 @@
-class TeamsUsersController < ApplicationController  
+class TeamsUsersController < ApplicationController
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
 
+  def action_allowed?
+    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
+      true
+    end
+  end
+
+#our changes end E913
   def auto_complete_for_user_name      
     team = Team.find(session[:team_id])    
     @users = team.get_possible_team_members(params[:user][:name])

@@ -1,5 +1,16 @@
 class PublishingController < ApplicationController
-  
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+
+  def action_allowed?
+    if current_user.role.name.eql?("Student")
+      true
+    end
+  end
+
+#our changes end E913
+
   def view   
     @user = User.find_by_id(session[:user].id) # Find again, because the user's certificate may have changed since login
     @participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)

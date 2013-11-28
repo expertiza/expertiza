@@ -28,6 +28,7 @@ class ApplicationController < ActionController::Base
   def current_user_role?
     current_user.role.name
   end
+
   helper_method :current_user_role?
 
   def current_user

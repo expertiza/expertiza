@@ -1,7 +1,20 @@
 class GradesController < ApplicationController
   helper :file
   helper :submitted_content
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
 
+  def action_allowed?
+    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
+      true
+      else if action_name =='view_my_scores' && current_user.role.name.eql?("Student")
+             return true
+           end
+    end
+  end
+
+#our changes end E913
   #the view grading report provides the instructor with an overall view of all the grades for
   #an assignment. It lists all participants of an assignment and all the reviews they received.
   #It also gives a final score, which is an average of all the reviews and greatest difference

@@ -1,6 +1,23 @@
 class TreeDisplayController < ApplicationController
   helper :application
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
 
+  def action_allowed?
+    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")|| current_user.role.name.eql?("Super-Administrator")
+      true
+      else if current_user.role.name.eql?("Student")
+           false
+      end
+    end
+  end
+
+  def flash_msg
+    flash[:error] = nil
+    flash.keep
+  end
+#our changes end E913
   # direct access to questionnaires
   def goto_questionnaires
     node_object = TreeFolder.find_by_name('Questionnaires')

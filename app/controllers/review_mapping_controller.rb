@@ -3,7 +3,25 @@ class ReviewMappingController < ApplicationController
   use_google_charts
   helper :dynamic_review_assignment
   helper :submitted_content
-  
+  #added the below lines E913
+  include AccessHelper
+  before_filter :auth_check
+
+  def action_allowed?
+    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
+      true
+    else if current_user.role.name.eql?('Student')
+           if action_name == 'add_dynamic_reviewer' || action_name =='release_reservation' || action_name == 'show_available_submissions' || action_name  == 'assign_reviewer_dynamically' || action_name  == 'assign_metareviewer_dynamically'
+              true
+           else
+             false
+           end
+         end
+    end
+  end
+
+#our changes end E913
+
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
     assignment_id = session[:contributor].parent_id

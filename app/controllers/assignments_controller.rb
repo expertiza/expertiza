@@ -139,7 +139,7 @@ class AssignmentsController < ApplicationController
 
       redirect_to :action => 'edit', :id => @assignment.id
     else
-      flash[:error] = 'Assignment save failed.'
+      flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
       redirect_to :action => 'edit', :id => @assignment.id
     end
 

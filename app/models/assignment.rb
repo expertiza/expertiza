@@ -24,7 +24,7 @@ class Assignment < ActiveRecord::Base
   has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
 
   validates_presence_of :name
-  validates_uniqueness_of :name
+  validates_uniqueness_of :name, :scope => :course_id
 
   COMPLETE = 'Finished'
   WAITLIST = 'Waitlist open'

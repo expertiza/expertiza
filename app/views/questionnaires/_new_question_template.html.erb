@@ -2,10 +2,30 @@
   <div id="question<%= i %>">
     Question <%= i %>:   <%= text_field_tag :question, nil, placeholder: 'Enter question...', size: 150 %> <br><br>
   </div>
-  <div id="qtype">
-    <%= radio_button_tag(id="#{i}", "MCR") %> Multiple Choice - Radio <br>
-    <%= radio_button_tag(id="#{i}", "TF") %> True/False <br>
-    <%= radio_button_tag(id="#{i}", "Essay") %> Essay <br>
-    <%= radio_button_tag(id="#{i}", "MCC") %> Multiple Choice - Checked <br><br>
+  <div id="radio_buttons<%= i %>" style="display: none;">
+    <%= radio_button_tag("radio_option_q#{i}", '1') %> <%= text_field_tag :option1, nil, size: 50 %> <br>
+    <%= radio_button_tag("radio_option_q#{i}", '2') %> <%= text_field_tag :option2, nil, size: 50 %> <br>
+    <%= radio_button_tag("radio_option_q#{i}", '3') %> <%= text_field_tag :option3, nil, size: 50 %> <br>
+    <%= radio_button_tag("radio_option_q#{i}", '4') %> <%= text_field_tag :option4, nil, size: 50 %> <br><br>
   </div>
+  <div id="true_false<%= i %>" style="display: none;">
+    <%= radio_button_tag("radio_option_tf#{i}", 'true') %> True <br>
+    <%= radio_button_tag("radio_option_tf#{i}", 'false') %> False <br><br>
+  </div>
+  <div id="essay<%= i %>" style="display: none;">
+    <%= text_area_tag "answer#{i}", nil, rows: 5, cols: 120 %><br><br>
+  </div>
+  <div id="check_boxes<%= i %>" style="display: none;">
+    <%= check_box_tag("check_option#{i}", '1') %> <%= text_field_tag :option1, nil, size: 50 %> <br>
+    <%= check_box_tag("check_option#{i}", '2') %> <%= text_field_tag :option2, nil, size: 50 %> <br>
+    <%= check_box_tag("check_option#{i}", '3') %> <%= text_field_tag :option3, nil, size: 50 %> <br>
+    <%= check_box_tag("check_option#{i}", '4') %> <%= text_field_tag :option4, nil, size: 50 %> <br><br>
+  </div>
+  <div id="qtype">
+    <%= radio_button_tag(id="qtype#{i}", "MCR") %> Multiple Choice - Radio <br>
+    <%= radio_button_tag(id="qtype#{i}", "TF") %> True/False <br>
+    <%= radio_button_tag(id="qtype#{i}", "Essay") %> Essay <br>
+    <%= radio_button_tag(id="qtype#{i}", "MCC") %> Multiple Choice - Checked <br><br>
+  </div>
+
 <% end %>

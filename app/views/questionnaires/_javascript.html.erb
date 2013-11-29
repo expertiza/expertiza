@@ -5,10 +5,10 @@
           // Give the button a certain click behaviour:
           jQuery(button).change(function(){
               var question_num = index + 1;
-              $('#question' + question_num + ' .check_boxes').hide();
-              $('#question' + question_num + ' .true_false').hide();
-              $('#question' + question_num + ' .essay').hide();
-              $('#question' + question_num).append("<%= escape_javascript(render 'multiple_choice_radio') %>");
+              $('#check_boxes' + question_num).hide();
+              $('#essay' + question_num).hide();
+              $('#true_false' + question_num).hide();
+              $('#radio_buttons' + question_num).show();
           });
       });
 
@@ -16,10 +16,10 @@
           // Give the button a certain click behaviour:
           jQuery(button).change(function(){
               var question_num = index + 1;
-              $('#question' + question_num + ' .check_boxes').hide();
-              $('#question' + question_num + ' .radio_buttons').hide();
-              $('#question' + question_num + ' .essay').hide();
-              $('#question' + question_num).append("<%= escape_javascript(render 'true_false') %>");
+              $('#check_boxes' + question_num).hide();
+              $('#radio_buttons' + question_num).hide();
+              $('#essay' + question_num).hide();
+              $('#true_false' + question_num).show();
           });
       });
 
@@ -27,10 +27,10 @@
           // Give the button a certain click behaviour:
           jQuery(button).change(function(){
               var question_num = index + 1;
-              $('#question' + question_num + ' .check_boxes').hide();
-              $('#question' + question_num + ' .radio_buttons').hide();
-              $('#question' + question_num + ' .true_false').hide();
-              $('#question' + question_num).append("<%= escape_javascript(render 'essay') %>");
+              $('#check_boxes' + question_num).hide();
+              $('#true_false' + question_num).hide();
+              $('#radio_buttons' + question_num).hide();
+              $('#essay' + question_num).show();
           });
       });
 
@@ -41,7 +41,7 @@
               $('#question' + question_num + ' .radio_buttons').hide();
               $('#question' + question_num + ' .true_false').hide();
               $('#question' + question_num + ' .essay').hide();
-              $('#question' + question_num).append("<%= escape_javascript(render 'multiple_choice_checked') %>");
+              $('#check_boxes' + question_num).show();
           });
       });
   });

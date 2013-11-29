@@ -437,7 +437,6 @@ class AssignmentParticipant < Participant
     sign = hash_data + self.user.name.to_s + time_stamp.strftime("%Y-%m-%d %H:%M:%S")
     Digest::SHA1.digest(sign)
   end
-  alias_method :hash, :get_hash
 
   # grant publishing rights to one or more assignments. Using the supplied private key, 
   # digital signatures are generated.

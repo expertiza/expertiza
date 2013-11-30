@@ -194,6 +194,7 @@ class Assignment < ActiveRecord::Base
   def dynamic_reviewer_assignment?
     (self.review_assignment_strategy == RS_AUTO_SELECTED || self.review_assignment_strategy == RS_STUDENT_SELECTED) ? true : false
   end
+  alias_method :is_using_dynamic_reviewer_assignment?, :dynamic_reviewer_assignment?
 
   def review_mappings
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments

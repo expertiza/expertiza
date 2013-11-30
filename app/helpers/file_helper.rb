@@ -52,7 +52,7 @@ module FileHelper
   
   def self.delete_directory(in_object)
     begin
-      entries = Dir.entries(in_object.get_path)    
+      entries = Dir.entries(in_object.get_path)
       if entries and entries.size == 2
         FileUtils.remove_dir(in_object.get_path)          
       end 

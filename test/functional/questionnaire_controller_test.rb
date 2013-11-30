@@ -72,4 +72,8 @@ class QuestionnaireControllerTest < ActionController::TestCase
     assert_response(:success)
     assert_not_nil(Questionnaire.find(:first, :conditions => ["name = ?", "test edit name"]))
   end
+
+  def test_undo_link
+
+  end
 end

@@ -17,7 +17,6 @@ class ScoreCache < ActiveRecord::Base
     @t_min = 0
     @teammember = TeamsUser.new
     @t_max = 0
-    
     if @map_type == "TeamReviewResponseMap"
       get_team_score()
     else
@@ -40,7 +39,7 @@ class ScoreCache < ActiveRecord::Base
       @questions[questionnaire.symbol] = questionnaire.questions
     }
     team = Team.find(@contributor_id)
-    @allscores = team.get_scores(@questions)
+    @allscores = team.scores(@questions)
   end
       
   def self.get_participant_score()
@@ -54,7 +53,7 @@ class ScoreCache < ActiveRecord::Base
       |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     } 
-    @allscores = @participant1.get_scores( @questions) # Return scores that this participant has given
+    @allscores = @participant1.scores( @questions) # Return scores that this participant has given
     end
     
   def self.update_score_cache()

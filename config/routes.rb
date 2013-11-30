@@ -94,6 +94,10 @@ Expertiza::Application.routes.draw do |map|
   resources :export_file do
     collection do
       get :start
+      # OSS808 Change 27/10/2013
+      # Added missing routes
+      get :export
+      post :export
     end
   end
 
@@ -123,9 +127,19 @@ Expertiza::Application.routes.draw do |map|
 
   resources :institutions
 
-  resources :invitation
+  resources :invitation do
+    collection do
+      get :cancel
+      get :accept
+      get :decline
+    end
+  end
 
-  resources :join_team_requests
+  resources :join_team_requests do
+    collection do
+      get :decline
+    end
+  end
 
   resources :leaderboard, constraints: { id: /\d+/ } do
     collection do
@@ -151,8 +165,11 @@ Expertiza::Application.routes.draw do |map|
       get :add
       post :add
       get :auto_complete_for_user_name
+      get :delete_assignment_participant
       get :list
       get :change_handle
+      get :inherit
+      get :bequeath_all
       post :delete
       get :inherit
       get :bequeath_all
@@ -200,6 +217,7 @@ Expertiza::Application.routes.draw do |map|
       post :select_questionnaire_type
     end
   end
+
   resources :review_questionnaires, controller: :questionnaires
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires
@@ -212,13 +230,31 @@ Expertiza::Application.routes.draw do |map|
       get :new_feedback
       get :view
       post :delete
+      get :remove_hyperlink
+      get :saving
+      get :redirection
     end
   end
 
   resources :review_mapping do
     collection do
+      get :add_reviewer
+      post :add_reviewer
+      post :add_self_reviewer
+      get :add_self_reviewer
+      get :add_user_to_assignment
+      get :assign_metareviewer_dynamically
+      get :assign_reviewer_dynamically
+      post :assign_reviewer_dynamically
+      get :auto_complete_for_user_name
+      get :delete_all_metareviewers
+      get :delete_all_reviewers
+      get :delete_all_reviewers_and_metareviewers
+      get :delete_reviewer
+      get :distribution
       get :list_mappings
       get :review_report
+<<<<<<< HEAD
       get :select_reviewer
       get :delete_all_reviewers
       get :select_mapping
@@ -231,6 +267,12 @@ Expertiza::Application.routes.draw do |map|
       get :delete_all_metareviewers
       post :add_metareviewer
       get :delete_metareviewer
+=======
+      get :select_metareviewer
+      get :select_reviewer
+      get :select_mapping
+      get :show_available_submissions
+>>>>>>> ultimate/master
     end
   end
 
@@ -259,8 +301,14 @@ Expertiza::Application.routes.draw do |map|
       get :delete_signup
       get :add_signup_topics
       get :add_signup_topics_staggered
+      get :delete_signup
+      get :list
       get :signup_topics
+      get :signup
       get :view_publishing_rights
+      get :signup
+      get :delete_signup
+      get :team_details
     end
   end
 
@@ -298,15 +346,25 @@ Expertiza::Application.routes.draw do |map|
       get :edit
       get :leave
       get :auto_complete_for_user_name
+      get :update
     end
   end
 
   resources :submitted_content do
     collection do
+<<<<<<< HEAD
       get :remove_hyperlink
       get :submit_hyperlink
       get :view
+=======
+      get :download
+>>>>>>> ultimate/master
       get :edit
+      get :folder_action
+      get :remove_hyperlink
+      get :submit_file
+      post :submit_hyperlink
+      get :view
     end
   end
 
@@ -370,7 +428,21 @@ Expertiza::Application.routes.draw do |map|
 
   root to: 'content_pages#view', page_name: 'home'
 
+  match 'users/list', :to => 'users#list'
+
+  match '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
+  match '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'
+  match '/submitted_content/submit_file', :to => 'submitted_content#submit_file'
+  match '/review_mapping/show_available_submissions', :to => 'review_mapping#show_available_submissions'
+  match '/review_mapping/assign_reviewer_dynamically', :to => 'review_mapping#assign_reviewer_dynamically'
+  match "/review_mapping/assign_metareviewer_dynamically", :to => 'review_mapping#assign_metareviewer_dynamically'
+  match 'response/', :to => 'response#saving'
+
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   map.connect ':controller/service.wsdl', :action => 'wsdl'
+<<<<<<< HEAD
+=======
+
+>>>>>>> ultimate/master
   match ':controller(/:action(/:id))(.:format)'
 end

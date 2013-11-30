@@ -35,7 +35,7 @@ class AssignmentsController < ApplicationController
 
   def edit
     @assignment = Assignment.find(params[:id])
-    set_up
+    set_up_assignment_review
   end
 
   def delete_all_due_dates
@@ -139,7 +139,7 @@ class AssignmentsController < ApplicationController
 
       redirect_to :action => 'edit', :id => @assignment.id
     else
-      flash[:error] = 'Assignment save failed.'
+      flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
       redirect_to :action => 'edit', :id => @assignment.id
     end
 
@@ -155,7 +155,7 @@ class AssignmentsController < ApplicationController
 
 #NOTE: many of these functions actually belongs to other models
 #====setup methods for new and edit method=====#
-  def set_up
+  def set_up_assignment_review
     set_up_defaults
 
     submissions = @assignment.find_due_dates('submission') + @assignment.find_due_dates('resubmission')
@@ -269,16 +269,7 @@ class AssignmentsController < ApplicationController
 
     if new_assign.save
       Assignment.record_timestamps = true
-
-      old_assign.assignment_questionnaires.each do |aq|
-        AssignmentQuestionnaire.create(
-            :assignment_id => new_assign.id,
-            :questionnaire_id => aq.questionnaire_id,
-            :user_id => session[:user].id,
-            :notification_limit => aq.notification_limit,
-            :questionnaire_weight => aq.questionnaire_weight
-        )
-      end
+      copy_assignment_questionnaire(old_assign,new_assign)
 
       DueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node()
@@ -373,4 +364,16 @@ class AssignmentsController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
+end
+
+def copy_assignment_questionnaire (old_assign, new_assign)
+  old_assign.assignment_questionnaires.each do |aq|
+    AssignmentQuestionnaire.create(
+        :assignment_id => new_assign.id,
+        :questionnaire_id => aq.questionnaire_id,
+        :user_id => session[:user].id,
+        :notification_limit => aq.notification_limit,
+        :questionnaire_weight => aq.questionnaire_weight
+    )
+  end
 end

@@ -10,7 +10,7 @@ class AssignmentControllerTest < ActionController::TestCase
   fixtures :users
   fixtures :assignments
   fixtures :questionnaires
-  fixtures :courses
+  fixtures :course
   set_fixture_class :system_settings => 'SystemSettings'
   fixtures :system_settings
   fixtures :content_pages

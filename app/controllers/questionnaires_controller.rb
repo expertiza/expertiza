@@ -91,16 +91,12 @@ class QuestionnairesController < ApplicationController
       @questionnaire.update_attributes(params[:questionnaire])
 
       for qid in params[:question].keys
-        question_advices = QuestionAdvice.find_all_by_question_id(qid)
+        quiz_question_choices = QuizQuestionChoice.find_all_by_question_id(qid)
         i=1
-        for question_advice in question_advices
-          if params[:question][qid]["weight"] == i.to_s
-            score = 1
-          else
-            score = 0
-          end
+        question_type= QuestionType.find_by_question_id(qid)
+        for quiz_question_choices in quiz_question_choices
+          quiz_question_choices.update_attributes(:iscorrect => params[:new_choices][qid.to_s][question_type.q_type.to_s][:iscorrect],:txt=> params[:quiz_question_choices][quiz_question_choices.id.to_s][:txt],:question_id=>qid)
           i+=1
-          question_advice.update_attributes(:score => score, :advice => params[:question_advice][question_advice.id.to_s]["advice"])
         end
       end
       save
@@ -141,7 +137,8 @@ class QuestionnairesController < ApplicationController
       participant_id = params[:pid] #creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
-
+      @questionnaire.section = "Quiz"
+       print "=====create_questionnaire========="
       @assignment = Assignment.find_by_id(params[:aid])
       if @assignment.team_assignment?
         teams = TeamsUser.find(:all, :conditions => ["user_id = ?", session[:user].id])
@@ -154,8 +151,11 @@ class QuestionnairesController < ApplicationController
       else
         @questionnaire.instructor_id = participant_id   #for an individual assignment, set the instructor id to the participant_id
       end
+      print "=====save in create_questionnaire begin========="
       save
+      print "=====save in create_questionnaire over========="
       save_choices @questionnaire.id
+      print "=====save_choice in create_questionnaire over========="
       flash[:note] = "Quiz was successfully created"
       redirect_to :controller => 'submitted_content', :action => 'edit', :id => participant_id
     else
@@ -276,6 +276,9 @@ private
         end
         unless q.txt.strip.empty?
           q.save
+          if @questionnaire.type == "QuizQuestionnaire"
+            save_new_question_parameters(q.id, question_key)
+          end
           questionnaire = Questionnaire.find_by_id(questionnaire_id)
           if questionnaire.section == "Custom"
             for i in (questionnaire.min_question_score .. questionnaire.max_question_score)
@@ -349,6 +352,7 @@ private
 
     if params[:question]
       for question_key in params[:question].keys
+        print question_key
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
@@ -385,16 +389,25 @@ private
     if params[:new_question] and params[:new_choices]
       questions = Question.find_all_by_questionnaire_id(questionnaire_id)
       i = 1
+     # q = QuestionType.new
+
       for question in questions
-        for choice_key in params[:new_choices][i.to_s].keys
-          print choice_key
-          if params[:new_choices][i.to_s][choice_key]["weight"] == 1.to_s
+        # question_type = QuestionType.find_by_question_id(question.id)
+
+        q_type = params[:question_type][i.to_s][:type]
+        for choice_key in params[:new_choices][i.to_s][q_type].keys
+          print "=====choce_key="+choice_key+"======="
+          if params[:new_choices][i.to_s][q_type][choice_key]["weight"] == 1.to_s
             score = 1
           else
             score = 0
           end
-          q = QuestionAdvice.new(:score => score, :advice => params[:new_choices][i.to_s][choice_key]["txt"], :question_id => question.id)
-          q.save
+          if (params[:new_choices][i.to_s][q_type][choice_key][:iscorrect])
+          q = QuizQuestionChoice.new(:txt => params[:new_choices][i.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
+          else
+          q = QuizQuestionChoice.new(:txt => params[:new_choices][i.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
+          end
+            q.save
         end
         i += 1
         question.weight = 1

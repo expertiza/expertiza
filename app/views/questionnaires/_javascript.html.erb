@@ -38,9 +38,9 @@
           // Give the button a certain click behaviour:
           jQuery(button).change(function(){
               var question_num = index + 1;
-              $('#question' + question_num + ' .radio_buttons').hide();
-              $('#question' + question_num + ' .true_false').hide();
-              $('#question' + question_num + ' .essay').hide();
+              $('#radio_buttons' + question_num).hide();
+              $('#true_false' + question_num).hide();
+              $('#essay' + question_num).hide();
               $('#check_boxes' + question_num).show();
           });
       });

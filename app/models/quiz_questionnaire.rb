@@ -2,7 +2,7 @@ class QuizQuestionnaire < Questionnaire
 
   #attr_accessible :quiz_question_type
 
-  validates_presence_of :quiz_question_type
+  #validates_presence_of :quiz_question_type
 
   def after_initialize
     self.display_type = 'Quiz'

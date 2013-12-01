@@ -85,17 +85,20 @@ class QuestionnairesController < ApplicationController
 
   #save an updated quiz questionnaire to the database
   def update_quiz
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find(params[:questionnaire][:id])
     redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid] if @questionnaire == nil
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
 
-      for qid in params[:question].keys
+      for qid in params[:new_question].keys
+        @question = Question.find_by_question_id(qid)
+        @question.update_attributes(params[:new_question])
+        question_type= QuestionType.find_by_question_id(qid)
         quiz_question_choices = QuizQuestionChoice.find_all_by_question_id(qid)
         i=1
-        question_type= QuestionType.find_by_question_id(qid)
-        for quiz_question_choices in quiz_question_choices
-          quiz_question_choices.update_attributes(:iscorrect => params[:new_choices][qid.to_s][question_type.q_type.to_s][:iscorrect],:txt=> params[:quiz_question_choices][quiz_question_choices.id.to_s][:txt],:question_id=>qid)
+
+        for quiz_question_choice in quiz_question_choices
+          quiz_question_choice.update_attributes(:iscorrect => params[:new_choices][qid.to_s][question_type.q_type.to_s][:iscorrect],:txt=> params[:quiz_question_choices][quiz_question_choices.id.to_s][:txt],:question_id=>qid)
           i+=1
         end
       end
@@ -402,7 +405,7 @@ private
           else
             score = 0
           end
-          if (params[:new_choices][i.to_s][q_type][choice_key][:iscorrect])
+          if (params[:new_choices][i.to_s][q_type][choice_key][:iscorrect]==1.to_s)
           q = QuizQuestionChoice.new(:txt => params[:new_choices][i.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
           else
           q = QuizQuestionChoice.new(:txt => params[:new_choices][i.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)

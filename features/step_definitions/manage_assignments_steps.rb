@@ -1,5 +1,4 @@
 When /^I create a (public|private) assignment named "([^"]*)" using (no due date|review named "[^"]*")$/ do  |public_or_private,assignment_name,review_setting|  
-  session[:user] = User.instructors.first
   use_review = false
   review_name = ""
   if review_setting =~ /^no due date$/

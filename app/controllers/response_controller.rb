@@ -12,6 +12,8 @@ class ResponseController < ApplicationController
       array_not_empty=1
       @review_scores << element
     end
+  end
+
     def get_scores
       @review_scores = Array.new
       @question_type = Array.new
@@ -117,7 +119,6 @@ class ResponseController < ApplicationController
           render :action => 'response'
         end
       end
-    end
     if array_not_empty==1
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
@@ -167,7 +168,6 @@ class ResponseController < ApplicationController
         render :action => 'response'
       end
     end
-  end
 
   def update  ###-### Seems like this method may no longer be used -- not in E806 version of the file
     @response = Response.find(params[:id])
@@ -272,6 +272,7 @@ class ResponseController < ApplicationController
       else
         @version=1
       end
+    begin
       @response = Response.find_by_map_id(@map_id)
       @response.additional_comment = params[:review][:comments]
       @response.version_num = @version
@@ -395,5 +396,4 @@ class ResponseController < ApplicationController
       end
       !current_user_id?(response.map.reviewer.user_id)
     end
-  end
 end

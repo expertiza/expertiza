@@ -6,7 +6,7 @@ When /^I create a (public|private) assignment named "([^"]*)" using (no due date
   else
     use_review = true
     review_name = review_setting.scan(/^review named \"([^"]*)\"$/)
-    step "I have a public review named \"#{review_name}\""
+    step "I have a public review named \"#{review_name[0][0]}\""
   end
 
   step "I follow the \"Manage...\" link as an \"instructor\""

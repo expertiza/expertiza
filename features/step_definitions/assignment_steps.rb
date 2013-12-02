@@ -2,8 +2,9 @@ Given /^I am participating in (team|individual) assignment "(\S+)"$/ do |assignm
   a = Assignment.new
   a.max_team_size=1
 
-  if assignment_type== /^team$/
+  if assignment_type== "team"
     a.max_team_size=3
+    a.team_assignment=1
   end
 
   a.name = assignment

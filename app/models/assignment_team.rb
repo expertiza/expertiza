@@ -72,6 +72,7 @@ class AssignmentTeam < Team
   def get_submitted_files
     self.get_participants.first.submitted_files
   end
+  alias_method :submitted_files, :get_submitted_files
 
   def get_review_map_type
     'TeamReviewResponseMap'

@@ -141,11 +141,14 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  match 'late_policies', controller: :late_policies, action: :index
+
   resources :leaderboard, constraints: { id: /\d+/ } do
     collection do
       get :index
     end
   end
+
   match 'leaderboard/index', controller: :leaderboard, action: :index
 
   resources :markup_styles

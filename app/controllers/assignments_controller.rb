@@ -45,7 +45,7 @@ class AssignmentsController < ApplicationController
 
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      return 
+      return
     end
 
     @due_dates = DueDate.find_all_by_assignment_id(params[:assignment_id])
@@ -60,17 +60,17 @@ class AssignmentsController < ApplicationController
 
   def set_due_date
     if params[:due_date][:assignment_id].nil?
-      return 
+      return
     end
 
     assignment = Assignment.find(params[:due_date][:assignment_id])
     if assignment.nil?
-      return 
+      return
     end
 
     due_at = DateTime.parse(params[:due_date][:due_at])
     if due_at.nil?
-      return 
+      return
     end
 
     @due_date = DueDate.new(params[:due_date])
@@ -109,7 +109,7 @@ class AssignmentsController < ApplicationController
 
     questionnaire = Questionnaire.find(params[:assignment_questionnaire][:questionnaire_id])
     if questionnaire.nil?
-      return 
+      return
     end
 
     @assignment_questionnaire = AssignmentQuestionnaire.new(params[:assignment_questionnaire])
@@ -128,21 +128,36 @@ class AssignmentsController < ApplicationController
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated
 
-    if @assignment.update_attributes(params[:assignment])
-      flash[:note] = 'Assignment was successfully saved.'
-      #TODO: deal with submission path change
-      # Need to rename the bottom-level directory and/or move intermediate directories on the path to an
-      # appropriate place
-      # Probably there are 2 different operations:
-      #  - rename an assgt. -- implemented by renaming a directory
-      #  - assigning an assignment to a course -- implemented by moving a directory.
+    @hash1 = Hash.new(params[:assignment])
 
-      redirect_to :action => 'edit', :id => @assignment.id
+
+    #puts "----------------------------------"
+    #puts @hash1[:assignment][:late_policy_id]
+    if  @hash1[:assignment][:late_policy_id].to_i > 0
+      if @assignment.update_attributes(params[:assignment])
+        flash[:note] = 'Assignment was successfully saved.'
+        #TODO: deal with submission path change
+        # Need to rename the bottom-level directory and/or move intermediate directories on the path to an
+        # appropriate place
+        # Probably there are 2 different operations:
+        #  - rename an assgt. -- implemented by renaming a directory
+        #  - assigning an assignment to a course -- implemented by moving a directory.
+
+        redirect_to :action => 'edit', :id => @assignment.id
+      else
+        flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
+        redirect_to :action => 'edit', :id => @assignment.id
+      end
     else
-      flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
-      redirect_to :action => 'edit', :id => @assignment.id
-    end
 
+      @hash1[:assignment][:late_policy_id] = nil
+      if @assignment.update_attributes(@hash1[:assignment])
+        redirect_to :action => 'edit', :id => @assignment.id
+      else
+        flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
+        redirect_to :action => 'edit', :id => @assignment.id
+      end
+    end
     #respond_to do |format|
     #  format.json { render :json => params }
     #end

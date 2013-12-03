@@ -7,7 +7,7 @@ class ResponseController < ApplicationController
     #get all previous versions of responses for the response map.
     array_not_empty=0
     @review_scores=Array.new
-    @prev=Response.find_by_map_id(@map.id)
+    @prev=Response.find(@map.id) #find_by_map_id changed to id
     for element in @prev
       array_not_empty=1
       @review_scores << element
@@ -26,9 +26,9 @@ class ResponseController < ApplicationController
     def delete
       @response = Response.find(params[:id])
       return if redirect_when_disallowed(@response)             #user cannot delete other people's responses. Needs to be authenticated.
-      map_id = @response.map.id
+      response_id = @response.id
       @response.delete
-      redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
+      redirect_to :action => 'redirection', :id => response_id, :return => params[:return], :msg => "The response was deleted."
     end
     #Determining the current phase and check if a review is already existing for this stage.
     #If so, edit that version otherwise create a new version.

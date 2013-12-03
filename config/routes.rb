@@ -121,9 +121,17 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  match '/import_file/import', controller: :import_file, action: :import
+
   resources :institutions
 
-  resources :invitation
+  resources :invitation do
+    collection do
+      get :cancel
+      get :accept
+      get :decline
+    end
+  end
 
   resources :join_team_requests
 
@@ -158,6 +166,8 @@ Expertiza::Application.routes.draw do |map|
       get :bequeath_all
     end
   end
+
+  match '/participants/change_handle', controller: :participants, action: :change_handle
 
   resources :password_retrieval do
     collection do
@@ -247,6 +257,8 @@ Expertiza::Application.routes.draw do |map|
       get :add_signup_topics_staggered
       get :signup_topics
       get :view_publishing_rights
+      get :team_details
+      get :signup
     end
   end
 
@@ -349,6 +361,8 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  match '/users/show_selection', controller: :users, action: :show_selection
+  match '/users/list', controller: :users, action: :list
   match '/menu/*name', controller: :menu_items, action: :link
   match ':page_name', controller: :content_pages, action: :view, method: :get
 

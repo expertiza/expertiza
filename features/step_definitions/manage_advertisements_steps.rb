@@ -49,7 +49,7 @@ Given /^a team named "([^"]*)" has an ad with desired qualities "([^"]*)"$/ do |
 end
 
 And /^I click on ad icon$/ do
-  find(:xpath,"//a/img[@alt='Advertise for partners']/..").click
+  find(:xpath,"//a/i[@class='icon-bullhorn icon-large']/..").click
 end
 
 Given /^I sent (a|several) join_team requests? to ad "([^"]*)"$/ do |amount, ad|

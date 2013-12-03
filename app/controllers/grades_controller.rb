@@ -30,21 +30,24 @@ class GradesController < ApplicationController
 
     ## When user clicks on the notification, it should go away
     #deleting all review notifications
-    rmaps = @participant.response_maps
-    for rmap in rmaps
-      rmap.notification_accepted = true
-      rmap.save
+
+    #Varibale rmaps has been replaced by responses, rmap local variable has been replaced by single_response,
+    #mmap local varibale has been replaced by  single_metaresponse, and mmaps has been replaced by metareviewResponses
+    responses = @participant.response_maps
+    for single_response in responses
+      single_response.notification_accepted = true
+      single_response.save
     end
     ############
 
     #deleting all metareview notifications
-    rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
-    for rmap in rmaps
-      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.map_id)
-      if !mmaps.nil?
-        for mmap in mmaps
-          mmap.notification_accepted = true
-          mmap.save
+    responses = ParticipantReviewResponse.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
+    for single_response in responses
+      metareviewResponses = MetareviewResponse.find_all_by_reviewee_id_and_reviewed_object_id(single_response.reviewer_id, single_response.map_id)
+      if !metareviewResponses.nil?
+        for single_metaresponse in metareviewResponses
+          single_metaresponse.notification_accepted = true
+          single_metaresponse.save
         end
       end
     end
@@ -75,16 +78,20 @@ class GradesController < ApplicationController
     review_exists = true
 
     reviewee = participant.team
-    review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+    #TeamReviewResponseMap has been changed to TeamReviewResponse
+    review_mapping = TeamReviewResponse.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
 
     if review_mapping.nil?
       review_exists = false
-      review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+      #TeamReviewResponseMap has been changed to TeamReviewResponse
+      review_mapping = TeamReviewResponse.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
     end
-    review = Response.find_by_map_id(review_mapping.map_id)
+
+    #find_by_map_id has been replaced by  find_by_id and the arguuement map_id is changed to id
+    review = Response.find_by_id(review_mapping.id)
 
     unless review_exists
-      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.map_id, :return => "instructor"
+      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.id, :return => "instructor"
     else
       redirect_to :controller => 'response', :action => 'edit', :id => review.id, :return => "instructor"
     end
@@ -184,6 +191,8 @@ class GradesController < ApplicationController
   private
 
   def process_response(collabel, rowlabel, responses, questionnaire_type)
+
+    # Don't change map here, because it's working on a collection not a map varible.
     @collabel = collabel
     @rowlabel = rowlabel
     @reviews = responses

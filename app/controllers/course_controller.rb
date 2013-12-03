@@ -98,6 +98,8 @@ class CourseController < ApplicationController
       flash[:error] = $!
     end
 
+
+     ## The code here has to be deleted because it corresponds to the ResponseMap which no longer exists
     # already taken care of in association declaration
     #@course.ta_mappings.each{
     #  | map |

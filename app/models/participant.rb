@@ -6,6 +6,8 @@ class Participant < ActiveRecord::Base
   
   has_many   :comments, :dependent => :destroy
   has_many   :resubmission_times, :dependent => :destroy
+
+  ## Anything associated to ResponseMap has been changed to Response like ResponseMap->Response , TeamReviewResponseMap->TeamReviewResponse
   has_many   :reviews, :class_name => 'ResponseMap', :foreign_key => 'reviewer_id'
   has_many   :team_reviews, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewer_id'
   has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id'

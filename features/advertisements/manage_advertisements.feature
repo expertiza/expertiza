@@ -59,15 +59,15 @@ Scenario: Decline join team request
    When I decline the invitation
    Then I should not see "student1"
 
-Scenario: Inviting a respondent to join a full team should fail
+Scenario: Inviting a respondent to join a full team should not fail
   Given I have a team with name "my_team" in assignment "my_assignment"
     And I have created an advertisement
   Given student "student1" sent me a join_team request
     But my team is full
    When I visit the page of "Your team"
-   Then I should see "I want to join your team."
+   Then I should see "This is my ad."
    When I press "Invite"
-   Then I should see "The maximum number in the team is 2. You cannot invite more members."
+   Then I should not see "The team already has the maximum number of members."
 
 Scenario: Inviting a respondent to join a non-full team should pass
   Given I have a team with name "my_team" in assignment "my_assignment"
@@ -75,7 +75,7 @@ Scenario: Inviting a respondent to join a non-full team should pass
   Given student "student1" sent me a join_team request
     And my team is not full
    When I visit the page of "Your team"
-   Then I should see "I want to join your team."
+   Then I should see "This is my ad."
    When I press "Invite"
    Then I should see "Waiting for reply"
 

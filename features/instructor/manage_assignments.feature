@@ -34,13 +34,15 @@ Feature: Manage the assignments in Expertiza
   Scenario: Instructor is notified when an assignment with a duplicate name is created
 	When I create a public assignment named "duplicate_test" using review named "test_review"
 	  And I create a public assignment named "duplicate_test" using review named "test_review"
-	Then I should see "There is already an assignment named"
-	
+    Then I should not see "Assignment was successfully created."
+
+
   @instructor
   @manage_assignments
+  @wip
   Scenario: Creating an assignment that is available to students with no due date should fail.
 	When I create a public assignment named "Assignment3" using no due date
-     And "Available to students" is checked
+     And I check "Available to students"
 	Then I should not see "Assignment was successfully created."
 
   Scenario: Creating an assignment with no due date if not available to student should not fail.

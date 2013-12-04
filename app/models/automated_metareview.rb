@@ -16,13 +16,13 @@ class AutomatedMetareview < ActiveRecord::Base
   attr_accessor :responses, :review_array
   #the code that drives the metareviewing
 
-  def calculate_metareview_metrics(response, map_id)
+  def calculate_metareview_metrics(response, id)
     puts "inside perform_metareviews!!"
     
     preprocess = TextPreprocessing.new
-    # puts "map_id #{map_id}"
+    # puts "id #{id}"
     #fetch the review data as an array 
-    @review_array = preprocess.fetch_review_data(self, map_id)
+    @review_array = preprocess.fetch_review_data(self, id)
     # puts "self.responses #{self.responses}"
     
     #speller = Aspell.new("en_US")
@@ -36,7 +36,7 @@ class AutomatedMetareview < ActiveRecord::Base
     
     #checking for plagiarism by comparing with question and responses
     plag_instance = PlagiarismChecker.new
-    result_comparison = plag_instance.compare_reviews_with_questions_responses(self, map_id)
+    result_comparison = plag_instance.compare_reviews_with_questions_responses(self, id)
     # puts "review_array.length #{@review_array.length}"
     
     if(result_comparison == ALL_RESPONSES_PLAGIARISED)
@@ -73,7 +73,7 @@ class AutomatedMetareview < ActiveRecord::Base
       review_text = preprocess.remove_text_within_quotes(review_text) #review_text is an array
       
       #fetching submission data as an array and segmenting them at punctuations    
-      subm_text = preprocess.segment_text(0, preprocess.fetch_submission_data(map_id))
+      subm_text = preprocess.segment_text(0, preprocess.fetch_submission_data(id))
       # puts "subm_text #{subm_text}"
       # #initializing the pos tagger and nlp tagger/semantic parser  
       pos_tagger = EngTagger.new
@@ -159,9 +159,9 @@ class AutomatedMetareview < ActiveRecord::Base
 The following method 'send_metareview_metrics_email' sends an email to the reviewer 
 listing his/her metareview metrics values.  
 =end  
-  def send_metareview_metrics_email(response, map_id)
+  def send_metareview_metrics_email(response, id)
      response_id = self.response_id
-     reviewer_id = ResponseMap.find_by_id(map_id).reviewer
+     reviewer_id = Response.find_by_id(id).reviewer
      
      reviewer_email = User.find_by_id(Participants.fin_by_id(reviewer_id).user_id).email
      reviewed_url = @url

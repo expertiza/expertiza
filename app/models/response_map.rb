@@ -1,3 +1,4 @@
+=begin
 class ResponseMap < Response
 
   def response_id
@@ -100,3 +101,4 @@ class ResponseMap < Response
     self
   end
 end
+=end

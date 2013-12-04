@@ -48,7 +48,11 @@
             <p> and so on ...</p>
           </div>
           <div id="AuthorFeedback" class="tab-pane col-md-12">
-            <h4>Pane 3 Content</h4>
+            <% if @pscore[:feedback] and @pscore[:feedback][:assessments].length > 0 %>
+                <%= render :partial => 'grades/scores_author_feedback', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:feedback]} %>
+            <% else %>
+                No author feedback has been provided for this user's reviews.
+            <% end %>
           </div>
           <div id="TeammateReview" class="tab-pane col-md-12">
             <h4>Pane 4 Content</h4>

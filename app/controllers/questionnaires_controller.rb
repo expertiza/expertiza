@@ -392,25 +392,24 @@ private
     if params[:new_question] and params[:new_choices]
       questions = Question.find_all_by_questionnaire_id(questionnaire_id)
       i = 1
-     # q = QuestionType.new
-
       for question in questions
         # question_type = QuestionType.find_by_question_id(question.id)
-
         q_type = params[:question_type][i.to_s][:type]
         for choice_key in params[:new_choices][i.to_s][q_type].keys
-          print "=====choce_key="+choice_key+"======="
+          print "=====choice_key="+choice_key+"======="
           if params[:new_choices][i.to_s][q_type][choice_key]["weight"] == 1.to_s
             score = 1
           else
             score = 0
           end
+
           if (params[:new_choices][i.to_s][q_type][choice_key][:iscorrect]==1.to_s)
-          q = QuizQuestionChoice.new(:txt => params[:new_choices][i.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
+            q = QuizQuestionChoice.new(:txt => params[:new_choices][i.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
           else
-          q = QuizQuestionChoice.new(:txt => params[:new_choices][i.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
+            q = QuizQuestionChoice.new(:txt => params[:new_choices][i.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
           end
-            q.save
+
+          q.save
         end
         i += 1
         question.weight = 1

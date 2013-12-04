@@ -1,0 +1,26 @@
+<h2>Questions</h2>
+<% form_tag :action => 'record_response' do %>
+  <% questions = Question.find_all_by_questionnaire_id(182) %>
+  <% questions.each do |question| %>
+    <%= label_tag "#{question.id}", question.txt %> <br>
+    <% question_type = QuestionType.find_by_question_id(question.id)
+       if(question_type.q_type == 'MCR')
+         quiz_question_choices = QuizQuestionChoice.find_all_by_question_id(question.id)
+         quiz_question_choices.each do |choice| %>
+            <%= radio_button_tag "#{question.id}", "#{choice.id}" %><%= label_tag "#{choice.id}", choice.txt %><br>
+    <% end %>
+    <% elsif(question_type.q_type == 'MCC') %>
+       <% quiz_question_choices = QuizQuestionChoice.find_all_by_question_id(question.id) %>
+       <% quiz_question_choices.each do |choice| %>
+         <%= check_box_tag "#{question.id}[]", "#{choice.id}" %><%= label_tag "#{choice.id}", choice.txt %><br>
+       <% end %>
+    <% elsif(question_type.q_type == 'TF') %>
+       <%= radio_button_tag "#{question.id}", 'true' %><%= label_tag "#{question.id}_true", 'True' %><br>
+       <%= radio_button_tag "#{question.id}", 'false' %><%= label_tag "#{question.id}_false", 'False' %><br>
+    <% elsif(question_type.q_type == 'Essay') %>
+       <%= text_area_tag "#{question.id}", nil, :cols => "70", :rows => "5" %><br>
+    <% end %><br>
+  <% end %>
+
+  <%= submit_tag "Submit Quiz", :name=>"save" %>
+<% end %>

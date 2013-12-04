@@ -1,4 +1,4 @@
-class ReviewResponse < ResponseMap
+class ReviewResponse < Response
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'reviewed_object_id'
 
   def questionnaire

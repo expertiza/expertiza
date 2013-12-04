@@ -8,8 +8,8 @@ class Assessment360Controller < ApplicationController
 
   def one_course_all_assignments
     puts "inside one course all assignment"
-    #@REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap"]
-    @REVIEW_TYPES = ["TeammateReviewResponseMap"]
+    #@REVIEW_TYPES = ["ParticipantReviewResponse", "FeedbackResponse", "TeammateReviewResponse", "MetareviewResponse"]
+    @REVIEW_TYPES = ["TeammateReviewResponse"] #TeammateReviewResponseMap changed to TeammateReviewResponse
     @course = Course.find_by_id(params[:course_id])
     @assignments = Assignment.find_all_by_course_id(@course)
     @assignments.reject! {|assignment| assignment.get_total_reviews_assigned_by_type(@REVIEW_TYPES.first) == 0 }

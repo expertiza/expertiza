@@ -39,9 +39,9 @@ class ReviewMappingController < ApplicationController
       # Get the assignment's participant corresponding to the user
       reviewer = get_reviewer(user,assignment,regurl)
       #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-      # to treat all assignments as team assignments
+      # to treat all assignments as team assignments    #TeamReviewResponseMap changed to TeamReviewResponse
       if TeamReviewResponse.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).nil?
-        TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
+        TeamReviewResponse.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
       else
         raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
       end
@@ -78,9 +78,9 @@ class ReviewMappingController < ApplicationController
       begin
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
-        contributor = get_team_from_submission(submission)
-        if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
-          TeamReviewResponseMap.create(:reviewee_id => contributor.id,
+        contributor = get_team_from_submission(submission)   #TeamReviewResponseMap changed to TeamReviewResponse
+        if TeamReviewResponse.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
+          TeamReviewResponse.create(:reviewee_id => contributor.id,
                                        :reviewer_id => reviewer.id,
                                        :reviewed_object_id => assignment.id)
         else
@@ -425,16 +425,16 @@ class ReviewMappingController < ApplicationController
     @assignment = Assignment.find(params[:id])
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @type = "TeamReviewResponseMap"
+    @type = "TeamReviewResponse"  #TeamReviewResponseMap changed to TeamReviewResponse
 
     if params[:user].nil?
-      # This is not a search, so find all reviewers for this assignment
-      @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", @id, @type] )
+      # This is not a search, so find all reviewers for this assignment    #ResponseMap changed to Response
+      @reviewers = Response.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", @id, @type] )
     else
       # This is a search, so find reviewers by user's full name
       us = User.find(:all, :select => "DISTINCT id", :conditions => ["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
       participants = Participant.find(:all, :select => "DISTINCT id", :conditions => ["user_id IN (?) and parent_id = ?", us, @assignment.id] )
-      @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, participants] )
+      @reviewers = Response.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, participants] )
     end
 
     # Arranged as the hash @review_scores[reveiwer_id][reviewee_id] = score for this particular assignment
@@ -449,7 +449,7 @@ class ReviewMappingController < ApplicationController
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     teams = Team.find_all_by_parent_id(params[:id])
-    objtype = "TeamReviewResponseMap"
+    objtype = "TeamReviewResponse"   #TeamReviewResponseMap changed to TeamReviewResponse
     
     teams.each do |team|
       score_cache = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",team.id,  objtype])

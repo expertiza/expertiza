@@ -1,4 +1,5 @@
 class GradesController < ApplicationController
+  use_google_charts
   helper :file
   helper :submitted_content
 
@@ -18,7 +19,29 @@ class GradesController < ApplicationController
   end
 
   def view_my_scores
+
     @participant = AssignmentParticipant.find(params[:id])
+
+    @average_score_results = Array.new
+    @average_score_results = ScoreCache.get_class_scores(@participant.id)
+
+    @statistics = Array.new
+    @average_score_results.each { |x|
+      @statistics << x
+    }
+
+    puts "Participant id"
+    puts @participant.id
+    @average_reviews = ScoreCache.get_reviews_average(@participant.id)
+    @average_metareviews = ScoreCache.get_metareviews_average(@participant.id)
+
+    @my_reviews = ScoreCache.my_reviews(@participant.id)
+
+    puts "My Reviews are"
+    puts @my_reviews
+
+    @my_metareviews = ScoreCache.my_metareviews(@participant.id)
+
     return if redirect_when_disallowed
     @assignment = @participant.assignment
     @questions = Hash.new
@@ -30,7 +53,7 @@ class GradesController < ApplicationController
 
     ## When user clicks on the notification, it should go away
     #deleting all review notifications
-    rmaps = @participant.response_maps
+    rmaps = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(@participant.id, @participant.assignment.id)
     for rmap in rmaps
       rmap.notification_accepted = true
       rmap.save
@@ -40,7 +63,7 @@ class GradesController < ApplicationController
     #deleting all metareview notifications
     rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
     for rmap in rmaps
-      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.map_id)
+      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.id)
       if !mmaps.nil?
         for mmap in mmaps
           mmap.notification_accepted = true
@@ -48,6 +71,44 @@ class GradesController < ApplicationController
         end
       end
     end
+
+
+
+    @assignment_id = @participant.parent_id
+    @score_cache = Array.new
+
+    assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
+
+    @scores = [0,0,0,0,0,0,0,0,0,0]
+
+    for ap in assignment_participants
+      sc_cache=  ScoreCache.find_by_reviewee_id(ap.id)
+      if(sc_cache)
+        @score_cache <<  sc_cache.score
+      end
+    end
+
+
+    #  for x in score_cache
+    @score_cache.each{|x|
+      index=(x/10).to_i
+      if(index>=10)
+        index=9
+      end
+      @scores[index] =  @scores[index] + 1
+    }
+
+
+
+    dataset = GoogleChartDataset.new :data => @scores, :color => '9A0000'
+    data = GoogleChartData.new :datasets => [dataset]
+    axis = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
+    @chart1 = GoogleBarChart.new :width => 500, :height => 200
+    @chart1.data = data
+    @chart1.axis = axis
+
+
+
   end
 
   def edit

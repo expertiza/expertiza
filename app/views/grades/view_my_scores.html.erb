@@ -1,8 +1,87 @@
 <H1>Score for <%= @assignment.name %></H1>
-   
+
 <TABLE class="grades" >
-<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
-<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.scores(@questions)} %>
+  <%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>
+  <%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
 </TABLE>
 <BR/>
+<hr>
+<h2>Class Statistics</h2>
+<hr>
+<br>
+<TABLE class='grades'>
+  <td> <b>Class Average </b>
+  <td>  <b>Class Low  </b>
+  <td>  <b>Class High </b>
+  <td>  <b>Average No. of Reviews </b>
+  <td>  <b>Average No. of Meta Reviews </b>
+  <td>  <b>Reviews Done </b>
+  <td>  <b>Reviews Remaining </b>
+  <td>  <b>MetaReviews Done </b>
+  <td>  <b>MetaReviews Remaining </b>
+    <tr class="row">
+      <td>
+        <%= @statistics[0]%>
+      <td>
+        <%= @statistics[1]%>
+      <td>
+        <%= @statistics[2]%>
+      <td>
+        <div id="test2"><%= @average_reviews %></div>
+      <td>
+        <div id="test3"><%= @average_metareviews %></div>
+
+        <% for x in @my_reviews %>
+            <% if x < 0 %>
+              <td>     <div id="test4"><%= 0 %></div>
+          <% else %>
+              <td>
+                <div id="test4"><%= x %></div>
+          <% end %>
+      <% end %>
+
+      <% for x in @my_metareviews %>
+          <% if x < 0 %>
+              <td>     <div id="test4"><%= 0 %></div>
+          <% else %>
+              <td>
+                <div id="test5"><%= x %></div>
+          <% end %>
+      <% end %>
+</TABLE>
+<hr>
+<div> <h2>Grade Distribution</h2></div>
+<hr>
+<div>
+  <img src= "<%= @chart1.to_url << "&chxr=0,0,100,10" %>"/>
+</div>
+
+<br />
+<div>
+  <%j=0%>
+  <table cellspacing="0" cellpadding="3" border="1" style = "font-size:small;">
+    <tr bgcolor="#cccccc">
+      <th> Range </th>
+      <%@scores.each do |s|%>
+          <% if s != 0%>
+              <td align = "center">(<%= j*10 %>-<%=(j+1) * 10 %>)%</td>
+          <% end %>
+          <% j+= 1%>
+      <%end%>
+
+    </tr>
+
+    <tr>
+      <th> Count </th>
+      <%@scores.each do |s|%>
+          <% if  s != 0%>
+              <td align = "center"><%= s %></td>
+          <% end %>
+      <%end%>
+    </tr>
+
+  </table>
+</div>
+
+
 <a href="javascript:window.history.back()">Back</a>

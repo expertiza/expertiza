@@ -5,11 +5,11 @@ class ResponseController < ApplicationController
 
   def latestResponseVersion
     #get all previous versions of responses for the response map.
-    array_not_empty=0
+    @array_not_empty=0
     @review_scores=Array.new
-    @prev=Response.find(@map.id) #find_by_map_id changed to id
+    @prev=Response.find_all_by_id(@map.id) #find_by_map_id changed to id
     for element in @prev
-      array_not_empty=1
+      @array_not_empty=1
       @review_scores << element
     end
   end
@@ -37,7 +37,7 @@ class ResponseController < ApplicationController
       get_content
       latestResponseVersion
       #sort all the available versions in descending order.
-      if array_not_empty==1
+      if @array_not_empty==1
          @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
          @largest_version_num=@sorted[0]
          @latest_phase=@largest_version_num.created_at
@@ -119,7 +119,7 @@ class ResponseController < ApplicationController
           render :action => 'response'
         end
       end
-    if array_not_empty==1
+    if @array_not_empty==1
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
     end
@@ -152,7 +152,7 @@ class ResponseController < ApplicationController
       return if redirect_when_disallowed(@response)
       @map = @response.map
       LatestResponseVersion
-      if array_not_empty==1
+      if @array_not_empty==1
         @sorted=@review_scores.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
         @largest_version_num=@sorted[0]
       end
@@ -234,6 +234,7 @@ class ResponseController < ApplicationController
       @header = "New"
       @next_action = "create"
       @feedback = params[:feedback]
+      puts (params[:id].to_s)
       @map = Response.find(params[:id])
       @return = params[:return]
       @modified_object = @map.id
@@ -259,7 +260,7 @@ class ResponseController < ApplicationController
       error_msg = ""
       latestResponseVersion
                                                            #if previous responses exist increment the version number.
-      if array_not_empty==1
+      if @array_not_empty==1
         @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
         @largest_version_num=@sorted[0]
         if (@largest_version_num.version_num==nil)

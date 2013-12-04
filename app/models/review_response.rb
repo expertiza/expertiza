@@ -10,9 +10,9 @@ class ReviewResponse < Response
   end
 
   def delete(force = nil)
-    fmaps = FeedbackResponseMap.find_all_by_reviewed_object_id(self.response.response_id)
+    fmaps = FeedbackResponse.find_all_by_reviewed_object_id(self.response.response_id)
     fmaps.each { |fmap| fmap.delete(true) }
-    maps = MetareviewResponseMap.find_all_by_reviewed_object_id(self.id)
+    maps = MetareviewResponse.find_all_by_reviewed_object_id(self.id)
     maps.each { |map| map.delete(force) }
     self.destroy
   end
@@ -59,16 +59,16 @@ class ReviewResponse < Response
       if reviewee == nil
         raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
       end
-      existing = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+      existing = TeamReviewResponse.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
       if existing.nil?
-        TeamReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
+        TeamReviewResponse.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
       end
       index += 1
     end
   end
 
   def show_feedback()
-    map = FeedbackResponseMap.find_by_reviewed_object_id(self.response.response_id)
+    map = FeedbackResponse.find_by_reviewed_object_id(self.response.response_id)
     if map and map.response
       return map.response.display_as_html()
     end

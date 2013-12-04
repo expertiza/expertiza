@@ -266,6 +266,7 @@ class Response < ActiveRecord::Base
     return failedCount
   end
 
+=begin
   def self.find(*args)
     if args.length == 1
       Response.find_by_id(args.first)   #changed find_by_map_id to find_by_id
@@ -273,10 +274,13 @@ class Response < ActiveRecord::Base
       super
     end
   end
+=end
 
+=begin
   def self.find_by_id(*args)
     Response.find_by_id(args.first)   #changed find_by_map_id to find_by_id
   end
+=end
 
   def response
     self

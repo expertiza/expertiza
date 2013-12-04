@@ -81,7 +81,7 @@ class StudentTaskControllerTest < ActionController::TestCase
   # return all the assignments the current user participates in review, or review the object
   def test_review_mapping_single
     participant=Participant.find(participants(:par14))
-    rmaps_result = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(participant.id, participant.assignment.id)
+    rmaps_result = ParticipantReviewResponse.find_all_by_reviewee_id_and_reviewed_object_id(participant.id, participant.assignment.id)
     rmaps_assert = ResponseMap.find(:first,:conditions => ["reviewed_object_id = ? AND reviewee_id = ? AND type = ?",participant.assignment.id,participant.id,'ParticipantReviewResponseMap'] )
     assert_equal(rmaps_assert.to_a,rmaps_result.to_a)
   end

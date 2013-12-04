@@ -21,7 +21,7 @@ class ReviewMappingController < ApplicationController
   end
   
   def select_metareviewer
-    @mapping = Response.find(params[:id])
+    @mapping = Response.find(params[:id])     #ResponseMap has been renamed to Response
   end  
   
   def add_reviewer 
@@ -40,7 +40,7 @@ class ReviewMappingController < ApplicationController
       reviewer = get_reviewer(user,assignment,regurl)
       #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).nil?
+      if TeamReviewResponse.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).nil?
         TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
       else
         raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."

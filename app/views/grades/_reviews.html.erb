@@ -81,7 +81,7 @@
                     </script>
                 <% end %>
             <% end %>
-            <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
+            <% map = FeedbackResponse.find_by_reviewed_object_id(review.id)
             review_feedback = map.try :response %>
             <% if review_feedback %>
                 <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or

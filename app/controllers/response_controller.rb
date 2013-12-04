@@ -219,7 +219,7 @@ class ResponseController < ApplicationController
       review = Response.find(params[:id])
       if review
         reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, review.map.assignment.id)
-        map = FeedbackResponseMap.find_by_reviewed_object_id_and_reviewer_id(review.id, reviewer.id)
+        map = FeedbackResponse.find_by_reviewed_object_id_and_reviewer_id(review.id, reviewer.id)
         if map.nil?
           #if no feedback exists by dat user den only create for dat particular response/review
           map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)

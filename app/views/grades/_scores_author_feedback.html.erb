@@ -21,7 +21,7 @@
     for review in rscore[:assessments]
     %>
     feedback = {};
-    feedback.updated_at = '<%= review.updated_at.strftime('%x\n%X') %>';
+    feedback.updated_at = '<%= review.updated_at.strftime('%x') %><br/><%= review.updated_at.strftime('%X') %>';
     feedback.scores = [];
     feedback.comments = [];
 
@@ -32,17 +32,11 @@
     feedback.comments.push('<%= reviewScore.comments.gsub(/\n/, "<BR/>") %>'.trim());
     <%
     }
-    feedback = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
-    if feedback
-            %>
-    feedback.feedback = '<%= link_to "view", :controller => "response", :action => "view", :id => feedback.id %> <%= link_to "edit", :controller => "response", :action => "edit", :id => feedback.id, :return => "feedback" %>'
-    <% else %>
-    feedback.feedback = '<%= link_to "new", :controller => "response", :action => "new_feedback", :id => review.id %>'
-    <% end %>
+    %>
     author_feedback.reviews.push(feedback);
     <%
     end
-            %>
+    %>
 </script>
 
 <br/><br/>

@@ -95,12 +95,13 @@ module DynamicReviewAssignmentHelper
     #  each submission.
     @submission_review_count = Hash.new
     submissions_in_current_cycle.each do |submission|
-      # Each 'ResponseMap' entry indicates a review has been performed or is in progress.
-      existing_maps = ResponseMap.find_all_by_reviewee_id_and_reviewed_object_id( submission.id, @assignment_id )
-      if existing_maps.nil?
+      # Each 'Response' entry indicates a review has been performed or is in progress.
+      # Changed ResponseMap to Response
+      existing_reviews = Response.find_all_by_reviewee_id_and_reviewed_object_id( submission.id, @assignment_id )
+      if existing_reviews.nil?
         @submission_review_count[submission.id] = 0 # There are no reviews in progress (potential or completed).
       else
-        @submission_review_count[submission.id] = existing_maps.size
+        @submission_review_count[submission.id] = existing_reviews.size
       end
     end
 

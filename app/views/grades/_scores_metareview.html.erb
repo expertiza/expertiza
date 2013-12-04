@@ -1,0 +1,89 @@
+<script>
+    var reviewing = {};
+    reviewing.questions = [];
+    var question;
+    <%
+        review = rscore[:assessments][0]
+        Score.find_all_by_response_id(review.response_id).each {
+               |reviewScore|
+               question = Question.find_by_id(reviewScore.question_id)
+    %>
+    question = {};
+    question.txt = '<%= question.txt %>'.trim();
+    question.max_score = '<%= question.questionnaire.max_question_score.to_s %>'.trim();
+    reviewing.questions.push(question);
+    <%
+        }
+    %>
+    reviewing.reviews = [];
+    var review;
+    <%
+        for review in rscore[:assessments]
+    %>
+    review = {};
+    review.updated_at = '<%= review.updated_at.strftime('%x') %><br/><%= review.updated_at.strftime('%X') %>';
+    review.scores = [];
+    review.comments = [];
+
+    <%
+            Score.find_all_by_response_id(review.response_id).each{ |reviewScore|
+    %>
+    review.scores.push('<%= reviewScore.score.to_s %>'.trim());
+    review.comments.push('<%= reviewScore.comments %>'.trim());
+    <%
+            }
+    %>
+    reviewing.reviews.push(review);
+    <%
+        end
+    %>
+</script>
+
+<br/><br/>
+
+<table class="table round-border-table text-center table-striped" id="reviewing-table">
+  <thead>
+  <tr style="background-color:#dddddd">
+  <th style="text-align:left">Question</th>
+  </thead>
+  <tbody>
+
+  </tbody>
+</table>
+
+<script>
+    // Add questions to the table
+    $('#reviewing-table > tbody:last').append('<tr><td style="text-align:left"><b>Metareview date<b></td></tr>');
+    for (var index = 0; index < reviewing.questions.length; index++) {
+        var q = reviewing.questions[index];
+        $('#reviewing-table > tbody:last').append('<tr><td style="text-align:left">' + q.txt + '</td></tr>');
+    }
+    $('#reviewing-table > tbody:last').append('<tr><td style="text-align:left"><b>Total Score</b></td></tr>');
+
+    // Add reviews to the table
+    for (var index = 0; index < reviewing.reviews.length; index++) {
+        var r = reviewing.reviews[index];
+        $('#reviewing-table > thead').find('tr').each(function () {
+            var trow = $(this);
+            trow.append('<th>Metareview ' + (index + 1) + '</th>');
+        });
+
+        $($('#reviewing-table > tbody > tr')[0]).append('<td>' + r.updated_at + '</td>');
+
+        var obtained_total = 0;
+        var max_total = 0;
+        debugger;
+        $('#reviewing-table > tbody').find('tr').each(function () {
+            var trow = $(this);
+            if (trow.index() >= 1 && trow.index() < reviewing.questions.length + 1) {
+                var qid = trow.index() - 1;
+                obtained_total += parseFloat(r.scores[qid]);
+                max_total += parseFloat(reviewing.questions[qid].max_score);
+                trow.append('<td title=' + r.comments[qid] + '><b>' + r.scores[qid] + '</b> / <b>' + reviewing.questions[qid].max_score + '</b></td>');
+            }
+        });
+        var percentage = Math.round((obtained_total / max_total) * 100 * 100) / 100;
+        $($('#reviewing-table > tbody > tr')[reviewing.questions.length + 1]).append('<td><b>' + percentage + '%</b></td>');
+
+    }
+</script>

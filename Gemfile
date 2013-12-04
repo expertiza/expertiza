@@ -1,5 +1,7 @@
 source 'http://rubygems.org'
 
+raise "Invalid ruby version: #{RUBY_VERSION}" unless RUBY_VERSION[/^1\.9\.3/]
+
 gem 'rails', '~>3.0.0'
 
 ## Gems in Alphabetical Order

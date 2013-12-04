@@ -32,8 +32,8 @@
             <% @count = 0 %>
             <% @rspan = 0 %>
             <%@l = @l+1 %>
-            <% (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id,@type])).each do |ri| %>
-                <% if (Response.find_by_map_id(ri.id)) %>
+            <% (Response.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id,@type])).each do |ri| %>
+                <% if (Response.find_by_id(ri.id)) %>
                     <% @count = @count + 1 %>
                 <% end %>
                 <% if (Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0) %>
@@ -57,18 +57,18 @@
 
                 <%end %>
 
-                <%if (@count == (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
+                <%if (@count == (Response.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
                     <td align = "center" rowspan= <%= @rspan%>>
                         <%= @count %>/<%= @rspan %>
                     </td>
                 <%else %>
-                    <td align = "center" rowspan= <%= @rspan%> style = "color:#DD3300">
+                    <td align = "center" style = "color:#DD3300" rowspan= <%= @rspan%>>
                         <%= @count %>/<%= @rspan %>
                     </td>
                 <%end %>
 
-                <% (ResponseMap.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id, @type])).each do |ri| %>
-                    <% if (Response.find_by_map_id(ri.id)) %>
+                <% (Response.find(:all, :conditions => ["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id, @type])).each do |ri| %>
+                    <% if (Response.find_by_id(ri.id)) %>
                          <%if Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0 %>
                             <%@team = Team.find(ri.reviewee_id) %>
                             <% @teamid = @team.id%>
@@ -92,7 +92,7 @@
                             <%else %>
                                 <td bgcolor="#DDDDBB" align = 'center'>
                             <%end %>
-                            <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+                            <%=  Response.find(:first,:conditions=>["id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                                </td>
                         </tr>
 

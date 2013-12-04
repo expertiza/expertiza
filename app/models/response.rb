@@ -5,8 +5,7 @@ class Response < ActiveRecord::Base
   has_many :metareview_response, :class_name => 'MetareviewResponse', :foreign_key => 'reviewed_object_id'   #changed MetareviewResponseMap -> MetareviewResponse
   #before_create :add_dummy_map_id  #not required
 
-  # not required-- map_id removed from database
-  #def add_dummy_map_id
+  #def add_dummy_map_id               #changed find_by_map_id to find_by_id
   #  self.map_id = Response.maximum(:map_id) + 1
   #end
 

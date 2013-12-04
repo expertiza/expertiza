@@ -105,10 +105,10 @@ class Score < ActiveRecord::Base
   #Check if the latest review done by the reviewer falls into the latest review stage
 
   def self.submission_valid?(response)
-    map=ResponseMap.find(response.map_id)
+    responses=Response.find(response.id)#ResponseMap is changed to Response  and local variable map is been changed to responses
     #assignment_participant = Participant.find(:all, :conditions => ["id = ?", map.reviewee_id])
     @sorted_deadlines = nil
-    @sorted_deadlines = DueDate.find(:all, :conditions => ["assignment_id = ?", map.reviewed_object_id], :order => 'due_at DESC')
+    @sorted_deadlines = DueDate.find.all(:conditions => ["assignment_id = ?", responses.reviewed_object_id], :order => 'due_at DESC')
 
     # to check the validity of the response
     if @sorted_deadlines.nil?
@@ -136,7 +136,7 @@ class Score < ActiveRecord::Base
         end
       end
 
-      resubmission_times =   ResubmissionTime.find_all_by_participant_id(map.reviewee_id).order('resubmitted_at DESC')
+      resubmission_times =   ResubmissionTime.find_all_by_participant_id(responses.reviewee_id).order('resubmitted_at DESC')
       if response .is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)
         @invalid = 0
       else

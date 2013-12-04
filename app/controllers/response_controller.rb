@@ -33,7 +33,7 @@ class ResponseController < ApplicationController
     #Determining the current phase and check if a review is already existing for this stage.
     #If so, edit that version otherwise create a new version.
     def rereview
-      @map=ResponseMap.find(params[:id])
+      @map=Response.find(params[:id])
       get_content
       latestResponseVersion
       #sort all the available versions in descending order.
@@ -69,7 +69,7 @@ class ResponseController < ApplicationController
         @header = "Edit"
         @next_action = "update"
         @return = params[:return]
-        @response = Response.find_by_map_id_and_version_num(params[:id],@largest_version_num.version_num)
+        @response = Response.find_by_id_and_version_num(params[:id],@largest_version_num.version_num)
         return if redirect_when_disallowed(@response)
         @modified_object = @response.id  ###-###
         @map = @response.map
@@ -99,7 +99,7 @@ class ResponseController < ApplicationController
         @header = "New"
         @next_action = "create"
         @feedback = params[:feedback]
-        @map = ResponseMap.find(params[:id])
+        @map = Response.find(params[:id])
         @return = params[:return]
         @modified_object = @map.id
         get_content
@@ -123,7 +123,7 @@ class ResponseController < ApplicationController
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
     end
-    @response = Response.find_by_map_id_and_version_num(@map.map_id, @largest_version_num.version_num)
+    @response = Response.find_by_id_and_version_num(@map.id, @largest_version_num.version_num)
     @modified_object = @response.response_id
     get_content
     @review_scores = Array.new
@@ -156,7 +156,7 @@ class ResponseController < ApplicationController
         @sorted=@review_scores.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
         @largest_version_num=@sorted[0]
       end
-      @response = Response.find_by_map_id_and_version_num(@map.id,@largest_version_num.version_num)
+      @response = Response.find_by_id_and_version_num(@map.id,@largest_version_num.version_num)
       @modified_object = @response.id
       get_content
       get_scores
@@ -222,7 +222,7 @@ class ResponseController < ApplicationController
         map = FeedbackResponse.find_by_reviewed_object_id_and_reviewer_id(review.id, reviewer.id)
         if map.nil?
           #if no feedback exists by dat user den only create for dat particular response/review
-          map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)
+          map = FeedbackResponse.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)
         end
         redirect_to :action => 'new', :id => map.id, :return => "feedback"
       else
@@ -234,7 +234,7 @@ class ResponseController < ApplicationController
       @header = "New"
       @next_action = "create"
       @feedback = params[:feedback]
-      @map = ResponseMap.find(params[:id])
+      @map = Response.find(params[:id])
       @return = params[:return]
       @modified_object = @map.id
       get_content
@@ -253,7 +253,7 @@ class ResponseController < ApplicationController
     end
 
     def create
-      @map = ResponseMap.find(params[:id])                 #assignment/review/metareview id is in params id
+      @map = Response.find(params[:id])                 #assignment/review/metareview id is in params id
       @res = 0
       msg = ""
       error_msg = ""
@@ -273,7 +273,7 @@ class ResponseController < ApplicationController
         @version=1
       end
     begin
-      @response = Response.find_by_map_id(@map_id)
+      @response = Response.find_by_id(@map.id)
       @response.additional_comment = params[:review][:comments]
       @response.version_num = @version
       @response.save
@@ -300,11 +300,11 @@ class ResponseController < ApplicationController
       error_msg = "Your response was not saved. Cause: " + $!
     end
 
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end
 
   def custom_create ###-### Is this used?  It is not present in the master branch.
-    @map = ResponseMap.find(params[:id])
+    @map = Response.find(params[:id])
     @map.additional_comment = ""
     @map.save
     #@response = Response.create(:map_id => @map.id, :additional_comment => "")
@@ -321,7 +321,7 @@ class ResponseController < ApplicationController
   end
 
   def saving
-    @map = ResponseMap.find(params[:id])
+    @map = Response.find(params[:id])
     @return = params[:return]
     @map.notification_accepted = false
     @map.save
@@ -334,19 +334,19 @@ class ResponseController < ApplicationController
       #calling the automated metareviewer controller, which calls its corresponding model/view
       if (params[:save_options] == "WithMeta")
         # puts "WithMeta"
-        redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.map_id
+        redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.id
       elsif (params[:save_options] == "EmailMeta")
-        redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+        redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
         # calculate the metareview metrics
         @automated_metareview = AutomatedMetareview.new
         #pass in the response id as a parameter
-        @response = Response.find_by_map_id(params[:id])
+        @response = Response.find_by_id(params[:id])
         @automated_metareview.calculate_metareview_metrics(@response, params[:id])
         #send email to the reviewer with the metareview details
         @automated_metareview.send_metareview_metrics_email(@response, params[:id])
       elsif (params[:save_options] == "WithoutMeta")
         # puts "WithoutMeta"
-        redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+        redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
     else
       redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
@@ -357,7 +357,7 @@ class ResponseController < ApplicationController
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
 
-    @map = ResponseMap.find(params[:id])
+    @map = Response.find(params[:id])
     if params[:return] == "feedback"
       redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
@@ -385,7 +385,7 @@ class ResponseController < ApplicationController
     def redirect_when_disallowed(response)
       # For author feedback, participants need to be able to read feedback submitted by other teammates.
       # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-      if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
+      if response.map.read_attribute(:type) == 'FeedbackResponse' && response.map.assignment.team_assignment?
         team = response.map.reviewer.team
         unless team.has_user session[:user]
           redirect_to '/denied?reason=You are not on the team that wrote this feedback'

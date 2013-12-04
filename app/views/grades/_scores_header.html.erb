@@ -62,11 +62,15 @@
         <td>
           <% if s_avg %>
               <%= sprintf("%.2f", s_avg) %>%
+          <% else %>
+              ---
           <% end %>
         </td>
         <td>
           <% if s_avg %>
               <%= sprintf("%.0f", s_min) %>% - <%= sprintf("%.0f", s_max) %>%
+          <% else %>
+              ---
           <% end %>
         </td>
         <td>
@@ -86,21 +90,29 @@
         <td>
           <% if f_avg %>
               <%= sprintf("%.2f", f_avg) %>%
+          <% else %>
+              ---
           <% end %>
         </td>
         <td>
           <% if f_avg %>
               <%= sprintf("%.0f", f_min) %>% - <%= sprintf("%.0f", f_max) %>%
+          <% else %>
+              ---
           <% end %>
         </td>
         <td>
           <% if tr_avg %>
               <%= sprintf("%.2f", tr_avg) %>
+          <% else %>
+              ---
           <% end %>
         </td>
         <td>
           <% if tr_avg %>
               <%= sprintf("%.0f", tr_min) %>% - <%= sprintf("%.0f", tr_max) %>%
+          <% else %>
+              ---
           <% end %>
         </td>
         <td><%= stage %></td>

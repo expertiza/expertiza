@@ -21,6 +21,10 @@
         text-align: center;
         vertical-align: middle !important;
     }
+
+    table td {
+        min-width: 108px !important;
+    }
 </style>
 
 
@@ -39,13 +43,17 @@
             <% if @pscore[:review] and @pscore[:review][:assessments].length > 0 %>
                 <%= render :partial => 'grades/scores_submitted_work', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:review]} %>
             <% else %>
-                No reviews yet.
+                <br/>
+                No reviews have been completed for this submission.
             <% end %>
           </div>
           <div id="Reviewing" class="tab-pane col-md-12">
-            <h4>Pane 2 Content</h4>
-
-            <p> and so on ...</p>
+            <% if @pscore[:metareview] and @pscore[:metareview][:assessments].length > 0 %>
+                <%= render :partial => 'grades/scores_metareview', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:metareview]} %>
+            <% else %>
+                <br/>
+                No meta-reviews have been completed for this submission.
+            <% end %>
           </div>
           <div id="AuthorFeedback" class="tab-pane col-md-12">
             <% if @pscore[:feedback] and @pscore[:feedback][:assessments].length > 0 %>
@@ -53,9 +61,6 @@
             <% else %>
                 No author feedback has been provided for this user's reviews.
             <% end %>
-          </div>
-          <div id="TeammateReview" class="tab-pane col-md-12">
-            <h4>Pane 4 Content</h4>
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@
         for review in rscore[:assessments]
     %>
     review = {};
-    review.updated_at = '<%= review.updated_at.strftime('%x\n%X') %>';
+    review.updated_at = '<%= review.updated_at.strftime('%x') %><br/><%= review.updated_at.strftime('%X') %>';
     review.scores = [];
     review.comments = [];
 
@@ -83,8 +83,8 @@
             var trow = $(this);
             if (trow.index() >= 1 && trow.index() < submitted_work.questions.length + 1) {
                 var qid = trow.index() - 1;
-                obtained_total += r.scores[qid];
-                max_total += submitted_work.questions[qid].max_score;
+                obtained_total += parseFloat(r.scores[qid]);
+                max_total += parseFloat(submitted_work.questions[qid].max_score);
                 trow.append('<td title=' + r.comments[qid] + '><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b></td>');
             }
         });

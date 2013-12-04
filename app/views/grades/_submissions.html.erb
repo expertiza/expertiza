@@ -6,13 +6,13 @@
       #ACS Map the reviewee to a team or an individual depending on whether the team size is greater than or equal to 1
       if reviewer != nil and participant.assignment.max_team_size > 1
          reviewee = participant.team  
-         map = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)        
+         response = TeamReviewResponse.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
       elsif reviewer != nil
          reviewee = participant
-         map = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+         response = ParticipantReviewResponse.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
       end       
             
-      if map != nil and map.response != nil
+      if response != nil and response.response != nil
       	display = "Edit Review"
       else
         display = "Create Review"

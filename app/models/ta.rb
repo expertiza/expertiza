@@ -60,7 +60,7 @@ class Ta < User
     mappings = TaMapping.find_all_by_ta_id(user_id)
     mappings.each{
       |map|
-      ids << map.course.id
+      ids << map.course.id                                                    \
     }
     return ids
   end

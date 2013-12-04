@@ -101,6 +101,7 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :view_my_scores
+      get :view_my_scores_new
       get :instructor_review
       get :remove_hyperlink
       get :conflict_notification
@@ -127,7 +128,7 @@ Expertiza::Application.routes.draw do |map|
 
   resources :join_team_requests
 
-  resources :leaderboard, constraints: { id: /\d+/ } do
+  resources :leaderboard, constraints: {id: /\d+/} do
     collection do
       get :index
     end
@@ -166,7 +167,7 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :permissions, constraints: { id: /\d+/ } do
+  resources :permissions, constraints: {id: /\d+/} do
     collection do
       get :list
       get ':id', action: :show
@@ -339,7 +340,7 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-  resources :users, constraints: { id: /\d+/ } do
+  resources :users, constraints: {id: /\d+/} do
     collection do
       get :list
       post ':id', action: :update

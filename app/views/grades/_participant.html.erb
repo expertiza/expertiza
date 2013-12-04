@@ -1,5 +1,6 @@
 <!-- PARTICIPANT -->
-<% 
+<%
+
   participant = pscore[:participant]
   if pscore[:review]
   	s_max = pscore[:review][:scores][:max]
@@ -136,6 +137,7 @@
 	<TD COLSPAN="9"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
-	<TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
+
+  <TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
 </TR>
 <!-- END PARTICIPANT -->

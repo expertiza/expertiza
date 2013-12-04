@@ -221,18 +221,33 @@ class LotteryController < ApplicationController
   def run_intelligent_bid
     assignment = Assignment.find(params[:id]) unless params[:id].blank?
 
-    assignment.sign_up_topics.each do |topic|
+    sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', params[:id]])
+    current_max_slots = Hash.new
+    sign_up_topics.each do |topic|
+      current_max_slots[topic.id] = topic.max_choosers
+    end
+
+    stop = false
+    while (stop == false) do
+      stop = true
+      assignment.sign_up_topics.each do |topic|
         if topic.signed_up_users.size != 0
-            assignments_for_topic =  SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,0)
-            if assignments_for_topic.size == 0
+            assignments_for_topic = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,0)
+            if assignments_for_topic.size < topic.max_choosers
              # puts 'not assigned'
                 bids = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,1, :order => "preference_priority_number")
                 if bids.size == 0
             #   puts 'no bids'
                 else if bids.size == 1
             #   puts 'assigning to the only team'
+
+                    high_prio_topics = is_other_topic_of_higher_priority(params[:id],bids[0].creator_id,bids[0].preference_priority_number,current_max_slots)
+                    if(high_prio_topics == false)
+                    current_max_slots[topic.id] =  current_max_slots[topic.id] -1
                     bids[0].update_attribute('is_waitlisted',0)
+                    stop = false
                     delete_other_bids(assignment.id, bids[0].creator_id)
+                    end
                 else
                     highest_priority = SignedUpUser.find_by_sql(['SELECT MIN(preference_priority_number) preference_priority_number FROM signed_up_users WHERE topic_id = ? and preference_priority_number!=0',topic.id ])
                     if highest_priority.nil?
@@ -240,18 +255,30 @@ class LotteryController < ApplicationController
                     end
                     candidates =  SignedUpUser.find_all_by_topic_id_and_is_waitlisted_and_preference_priority_number(topic.id,1,highest_priority[0].preference_priority_number)
                     if candidates.size == 1
+                      high_prio_topics = is_other_topic_of_higher_priority(params[:id],bids[0].creator_id,bids[0].preference_priority_number,current_max_slots)
+                      if(high_prio_topics == false)
+                     current_max_slots[topic.id] =  current_max_slots[topic.id] -1
+
                         candidates[0].update_attribute('is_waitlisted',0)
+                        stop = false
                         delete_other_bids(assignment.id, candidates[0].creator_id)
+                        end
                     else
                         i = rand(candidates.size)
+                        high_prio_topics = is_other_topic_of_higher_priority(params[:id],bids[0].creator_id,bids[0].preference_priority_number,current_max_slots)
+                        if(high_prio_topics == false)
+                        current_max_slots[topic.id] =  current_max_slots[topic.id] -1
                         candidates[i].update_attribute('is_waitlisted',0)
+                        stop = false
                         delete_other_bids(assignment.id, candidates[i].creator_id)
+                        end
                     end
                 end
             end
 
         end
-    end
+       end
+    end #while end
 
   end
   redirect_to :controller => 'tree_display', :action => 'list'
@@ -263,3 +290,18 @@ end
   end
 
 end
+
+
+def is_other_topic_of_higher_priority(assignment_id, team_id, priority,current_max_slots)
+  if priority
+  result = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su, sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND preference_priority_number < ? AND preference_priority_number != 0",assignment_id, team_id, priority])
+  else
+    result = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su, sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND preference_priority_number != 0",assignment_id, team_id])
+  result.each do |r|
+    if current_max_slots[r.topic_id] > 0
+      return true
+    end
+  end
+  false
+end
+

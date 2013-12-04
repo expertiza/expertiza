@@ -1,8 +1,8 @@
 class AssignmentTeam < Team
 
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
-  has_many    :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
-  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, teams t WHERE r.type = \'TeamReviewResponseMap\' AND r.reviewee_id = t.id AND t.id = #{id}'
+  has_many    :review_mappings, :class_name => 'TeamReviewResponse', :foreign_key => 'reviewee_id'
+  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, teams t WHERE r.type = \'TeamReviewResponse\' AND r.reviewee_id = t.id AND t.id = #{id}'
 
 # START of contributor methods, shared with AssignmentParticipant
 
@@ -12,13 +12,13 @@ class AssignmentTeam < Team
   end
 
   def assign_reviewer(reviewer)
-    TeamReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    TeamReviewResponse.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object 
   def reviewed_by?(reviewer)
-    TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    TeamReviewResponse.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
   end
 
   # Topic picked by the team
@@ -38,7 +38,7 @@ class AssignmentTeam < Team
   end
 
   def reviewed_contributor?(contributor)
-    TeamReviewResponseMap.find(:all, conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
+    TeamReviewResponse.find(:all, conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
   end
 
 # END of contributor methods
@@ -75,7 +75,7 @@ class AssignmentTeam < Team
   alias_method :submitted_files, :get_submitted_files
 
   def get_review_map_type
-    'TeamReviewResponseMap'
+    'TeamReviewResponse'
   end
 
   def self.handle_duplicate(team, name, assignment_id, handle_duplicates)
@@ -172,7 +172,7 @@ class AssignmentTeam < Team
     scores[:team] = self # This doesn't appear to be used anywhere
     assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
-      scores[questionnaire.symbol][:assessments] = TeamReviewResponseMap.find_all_by_reviewee_id(self.id)
+      scores[questionnaire.symbol][:assessments] = TeamReviewResponse.find_all_by_reviewee_id(self.id)
       scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)

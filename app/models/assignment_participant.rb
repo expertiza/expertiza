@@ -10,10 +10,10 @@ require 'yaml'
 
 class AssignmentParticipant < Participant
   require 'wiki_helper'
-
+   #ParticipantReviewResponseMap changed to ParticipantReviewResponse
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
-  has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
-  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r,  participants p WHERE r.type = \'ParticipantReviewResponseMap\' AND r.reviewee_id = p.id AND p.id = #{id}'
+  has_many    :review_mappings, :class_name => 'ParticipantReviewResponse', :foreign_key => 'reviewee_id'
+  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r,  participants p WHERE r.type = \'ParticipantReviewResponse\' AND r.reviewee_id = p.id AND p.id = #{id}'
   belongs_to  :user
   validates_presence_of :handle
 
@@ -62,7 +62,7 @@ class AssignmentParticipant < Participant
     return 0 if self.response_maps.size == 0
 
     sum_of_scores = 0
-
+      ################# I think response_map has to be changed to response_maps #####################
     self.response_maps.metareview_response_maps.each do |metaresponse_map|
       if !metaresponse_map.response.nil? && response_map == assignment_id then
         sum_of_scores = sum_of_scores + response_map.response.average_score
@@ -76,8 +76,8 @@ class AssignmentParticipant < Participant
     participant == self
   end
 
-  def assign_reviewer(reviewer)
-    ParticipantReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+  def assign_reviewer(reviewer) #ParticipantReviewResponseMap was changed to ParticipantReviewResponse
+    ParticipantReviewResponse.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
                                         :reviewed_object_id => assignment.id)
   end
 
@@ -94,13 +94,13 @@ class AssignmentParticipant < Participant
 
   # all the participants in this assignment reviewed by this person
   def reviewees
-    reviewees = []
-    if self.assignment.team_assignment?
-      rmaps = ResponseMap.find(:all, conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
-      rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
-    else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
-      rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
+    reviewees = []   #rmaps below has beenchanged to responseMaps
+    if self.assignment.team_assignment? #ResponseMap changed to Response, and type = 'TeamReviewResponseMap is being changed  to TeamReviewResponse
+      responseMaps = Response.find(:all, conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponse'"])
+      responseMaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
+    else   #type = 'ParticipantReviewResponseMap is being changed  to ParticipantReviewResponse
+      responseMaps = Response.find(:all, :conditions => ["reviewer_id = #{self.id} && type = 'ParticipantReviewResponse'"])
+      responseMaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
     end
 
     reviewees
@@ -108,13 +108,13 @@ class AssignmentParticipant < Participant
 
   # all the participants in this assignment who have reviewed this person
   def get_reviewers
-    reviewers = []
+    reviewers = [] #ResponseMap changed to Response, and type = 'TeamReviewResponseMap is being changed  to TeamReviewResponse
     if self.assignment.team_assignment? && self.team
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
-    else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      responseMaps = Response.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponse'"])
+    else #type = 'ParticipantReviewResponseMap is being changed  to ParticipantReviewResponse
+      responseMaps = Response.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponse'"])
     end
-    rmaps.each do |rm|
+    responseMaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
     end
 

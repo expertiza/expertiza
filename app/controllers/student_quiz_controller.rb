@@ -33,4 +33,23 @@ class StudentQuizController < ApplicationController
       deadline_type_id = DeadlineType.find_by_name('quiz').id
     end
   end
+
+  def record_response
+    questions = Question.find_all_by_questionnaire_id 182
+
+    questions.each do |question|
+      if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
+        params["#{question.id}"].each do |choice|
+          new_response = QuizResponse.new :response => choice, :question_id => question.id, :questionnaire_id => 182
+          new_response.save
+        end
+      else
+        new_response = QuizResponse.new :response => params["#{question.id}"], :question_id => question.id, :questionnaire_id => 182
+        new_response.save
+      end
+    end
+
+    #TODO send assignment id and participant id
+    redirect_to :controller => 'student_quiz', :action => 'list'
+  end
 end

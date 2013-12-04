@@ -217,4 +217,49 @@ class LotteryController < ApplicationController
     # If we have time, we'll replace the current implementation of a random topic assignment with a hill climbing
     # algorithm
   end
+
+  def run_intelligent_bid
+    assignment = Assignment.find(params[:id]) unless params[:id].blank?
+
+    assignment.sign_up_topics.each do |topic|
+        if topic.signed_up_users.size != 0
+            assignments_for_topic =  SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,0)
+            if assignments_for_topic.size == 0
+             # puts 'not assigned'
+                bids = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,1, :order => "preference_priority_number")
+                if bids.size == 0
+            #   puts 'no bids'
+                else if bids.size == 1
+            #   puts 'assigning to the only team'
+                    bids[0].update_attribute('is_waitlisted',0)
+                    delete_other_bids(assignment.id, bids[0].creator_id)
+                else
+                    highest_priority = SignedUpUser.find_by_sql(['SELECT MIN(preference_priority_number) preference_priority_number FROM signed_up_users WHERE topic_id = ? and preference_priority_number!=0',topic.id ])
+                    if highest_priority.nil?
+                        highest_priority[0] = 0
+                    end
+                    candidates =  SignedUpUser.find_all_by_topic_id_and_is_waitlisted_and_preference_priority_number(topic.id,1,highest_priority[0].preference_priority_number)
+                    if candidates.size == 1
+                        candidates[0].update_attribute('is_waitlisted',0)
+                        delete_other_bids(assignment.id, candidates[0].creator_id)
+                    else
+                        i = rand(candidates.size)
+                        candidates[i].update_attribute('is_waitlisted',0)
+                        delete_other_bids(assignment.id, candidates[i].creator_id)
+                    end
+                end
+            end
+
+        end
+    end
+
+  end
+  redirect_to :controller => 'tree_display', :action => 'list'
+end
+
+  def delete_other_bids(assignment_id, user_id)
+     entries =  SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND su.is_waitlisted = 1",assignment_id,user_id] )
+     entries.each { |o| o.destroy }
+  end
+
 end

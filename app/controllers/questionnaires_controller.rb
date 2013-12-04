@@ -426,37 +426,37 @@ private
 
     if params[:new_question] and params[:new_choices]
       questions = Question.find_all_by_questionnaire_id(questionnaire_id)
-      if params[:new_choices][i.to_s][q_type][choice_key]["weight"] == 1.to_s
-        questionnum = 1
-        for question in questions
-          q_type = params[:question_type][questionnum.to_s][:type]
-          if(q_type!="Essay")
-            for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
-              print "=====choice_key="+choice_key+"======="
+      questionnum = 1
 
-              if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
-                score = 1
-              else
-                score = 0
-              end
+      for question in questions
+        q_type = params[:question_type][questionnum.to_s][:type]
+        if(q_type!="Essay")
+          for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
+            print "=====choice_key="+choice_key+"======="
 
-              if(q_type=="MCC")
-                if (params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect]==1.to_s)
-                  q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
-                else
-                  q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
-                end
-              else
-                if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
-                  q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
-                else
-                  q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
-                end
-              end
-
-              q.save
+            if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
+              score = 1
+            else
+              score = 0
             end
+
+            if(q_type=="MCC")
+              if (params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect]==1.to_s)
+                q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
+              else
+                q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
+              end
+            else
+              if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
+                q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
+              else
+                q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
+              end
+            end
+
+            q.save
           end
+        end
         questionnum += 1
         question.weight = 1
         question.true_false = false
@@ -525,5 +525,4 @@ private
       redirect_to :action => 'list', :controller => 'tree_display'
     end
   end
-  end
-  end
+end

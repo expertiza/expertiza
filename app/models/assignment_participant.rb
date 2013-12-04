@@ -158,7 +158,7 @@ class AssignmentParticipant < Participant
   end
 
   # Return scores that this participant has been given
-  def scores(questions)
+  def get_scores(questions)
     scores = Hash.new
     scores[:participant] = self # This doesn't appear to be used anywhere
     self.assignment.questionnaires.each do |questionnaire|

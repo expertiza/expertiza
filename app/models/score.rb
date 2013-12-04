@@ -50,6 +50,32 @@ class Score < ActiveRecord::Base
     return scores
   end
 
+  def self.compute_quiz_scores(responses)
+    scores = Hash.new
+    if responses.length > 0
+      scores[:max] = -999999999
+      scores[:min] = 999999999
+      total_score = 0
+      responses.each {
+          | response |
+        questions = QuizQuestionnaire.find(response.map.reviewed_object_id).questions
+        curr_score = get_total_score(response, questions)
+        if curr_score > scores[:max]
+          scores[:max] = curr_score
+        end
+        if curr_score < scores[:min]
+          scores[:min] = curr_score
+        end
+        total_score += curr_score
+      }
+      scores[:avg] = total_score.to_f / responses.length.to_f
+    else
+      scores[:max] = nil
+      scores[:min] = nil
+      scores[:avg] = nil
+    end
+    return scores
+  end
   # Computes the total score for an assessment
   # params
   #  assessment - specifies the assessment for which the total score is being calculated

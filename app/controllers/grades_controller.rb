@@ -48,6 +48,45 @@ class GradesController < ApplicationController
         end
       end
     end
+
+    @pscore = @participant.get_scores(@questions)
+    @stage = @participant.assignment.get_current_stage(@participant.topic_id)
+  end
+
+  def view_my_scores_new
+    @participant = AssignmentParticipant.find(params[:id])
+    return if redirect_when_disallowed
+    @assignment = @participant.assignment
+    @questions = Hash.new
+    questionnaires = @assignment.questionnaires
+    questionnaires.each {
+        |questionnaire|
+      @questions[questionnaire.symbol] = questionnaire.questions
+    }
+
+    ## When user clicks on the notification, it should go away
+    #deleting all review notifications
+    rmaps = @participant.response_maps
+    for rmap in rmaps
+      rmap.notification_accepted = true
+      rmap.save
+    end
+    ############
+
+    #deleting all metareview notifications
+    rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
+    for rmap in rmaps
+      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.map_id)
+      if !mmaps.nil?
+        for mmap in mmaps
+          mmap.notification_accepted = true
+          mmap.save
+        end
+      end
+    end
+
+    @pscore = @participant.get_scores(@questions)
+    @stage = @participant.assignment.get_current_stage(@participant.topic_id)
   end
 
   def edit

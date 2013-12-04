@@ -1,0 +1,96 @@
+<script>
+    var submitted_work = {};
+    submitted_work.questions = [];
+    var question;
+    <%
+        review = rscore[:assessments][0]
+        Score.find_all_by_response_id(review.response_id).each {
+               |reviewScore|
+               question = Question.find_by_id(reviewScore.question_id)
+    %>
+    question = {};
+    question.txt = '<%= question.txt %>'.trim();
+    question.max_score = '<%= question.questionnaire.max_question_score.to_s %>'.trim();
+    submitted_work.questions.push(question);
+    <%
+        }
+    %>
+    submitted_work.reviews = [];
+    var review;
+    <%
+        for review in rscore[:assessments]
+    %>
+    review = {};
+    review.updated_at = '<%= review.updated_at.strftime('%x\n%X') %>';
+    review.scores = [];
+    review.comments = [];
+
+    <%
+            Score.find_all_by_response_id(review.response_id).each{ |reviewScore|
+    %>
+    review.scores.push('<%= reviewScore.score.to_s %>'.trim());
+    review.comments.push('<%= reviewScore.comments %>'.trim());
+    <%
+            }
+            feedback = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
+            if feedback
+    %>
+            review.feedback = '<%= link_to "view", :controller => "response", :action => "view", :id => feedback.id %> <%= link_to "edit", :controller => "response", :action => "edit", :id => feedback.id, :return => "feedback" %>'
+            <% else %>
+            review.feedback = '<%= link_to "new", :controller => "response", :action => "new_feedback", :id => review.id %>'
+            <% end %>
+    submitted_work.reviews.push(review);
+    <%
+        end
+    %>
+</script>
+
+<br/><br/>
+
+<table class="table round-border-table text-center table-striped" id="submitted-work-table">
+  <thead>
+  <tr style="background-color:#dddddd">
+  <th style="text-align:left">Question</th>
+  </thead>
+  <tbody>
+
+  </tbody>
+</table>
+
+<script>
+    // Add questions to the table
+    $('#submitted-work-table > tbody:last').append('<tr><td style="text-align:left"><b>Review date<b></td></tr>');
+    for (var index = 0; index < submitted_work.questions.length; index++) {
+        var q = submitted_work.questions[index];
+        $('#submitted-work-table > tbody:last').append('<tr><td style="text-align:left">' + q.txt + '</td></tr>');
+    }
+    $('#submitted-work-table > tbody:last').append('<tr><td style="text-align:left"><b>Total Score</b></td></tr>');
+    $('#submitted-work-table > tbody:last').append('<tr><td style="text-align:left"><b>Feedback for review</b></td></tr>');
+
+    // Add reviews to the table
+    for (var index = 0; index < submitted_work.reviews.length; index++) {
+        var r = submitted_work.reviews[index];
+        $('#submitted-work-table > thead').find('tr').each(function () {
+            var trow = $(this);
+            trow.append('<th>Review ' + (index + 1) + '</th>');
+        });
+
+        $($('#submitted-work-table > tbody > tr')[0]).append('<td>' + r.updated_at + '</td>');
+
+        var obtained_total = 0;
+        var max_total = 0;
+        $('#submitted-work-table > tbody').find('tr').each(function () {
+            var trow = $(this);
+            if (trow.index() >= 1 && trow.index() < submitted_work.questions.length + 1) {
+                var qid = trow.index() - 1;
+                obtained_total += r.scores[qid];
+                max_total += submitted_work.questions[qid].max_score;
+                trow.append('<td><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b></td>');
+            }
+        });
+        var percentage = Math.round((obtained_total / max_total) * 100 * 100) / 100;
+        $($('#submitted-work-table > tbody > tr')[submitted_work.questions.length + 1]).append('<td><b>' + percentage + '%</b></td>');
+        $($('#submitted-work-table > tbody > tr')[submitted_work.questions.length + 2]).append('<td><b>' + r.feedback + '</b></td>');
+
+    }
+</script>

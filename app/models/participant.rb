@@ -183,6 +183,7 @@ class Participant < ActiveRecord::Base
 
   # Return scores that this participant for the given questions
   def get_scores(questions)
+
     scores = Hash.new
     scores[:participant] = self
     self.assignment.questionnaires.each do |questionnaire|
@@ -191,6 +192,7 @@ class Participant < ActiveRecord::Base
 
       scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
+
     scores[:total_score] = assignment.compute_total_score(scores)
     return scores
   end

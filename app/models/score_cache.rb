@@ -7,9 +7,9 @@ class ScoreCache < ActiveRecord::Base
     @userset = []
     @team = 0
     @team_number = 0
-    @teamass = 0
-    @reviewmap = Response.find(rid).map_id  #find the map_id for this review
-    @rm = ResponseMap.find(@reviewmap) #find the map for this review
+    @teamass = 0 #Removing @reviewmap because it will be basically duplicating the same value as @rm , once ResponseMap is changed to Response
+  #  @reviewmap = Response.find(rid)  #find the map_id for this review
+    @rm = Response.find(rid) #find the map for this review
     @participant1 = AssignmentParticipant.new
     @contributor_id = 0
     @map_type = @rm.type.to_s #find type of Response map
@@ -17,7 +17,7 @@ class ScoreCache < ActiveRecord::Base
     @t_min = 0
     @teammember = TeamsUser.new
     @t_max = 0
-    if @map_type == "TeamReviewResponseMap"
+    if @map_type == "TeamReviewResponse" #TeamReviewResponseMap has been changed to TeamReviewResponse
       get_team_score()
     else
       get_participant_score()
@@ -89,32 +89,32 @@ class ScoreCache < ActiveRecord::Base
 
   def self.get_score_set_for_review_type(allscores, map_type)
     ##isolates the scores for the particular item needed  (eg: Review, MetaReview, Feedback etc)
-    #  ParticipantReviewResponseMap - Review mappings for single user assignments
-    #  TeamReviewResponseMap - Review mappings for team based assignments
-    #  MetareviewResponseMap - Metareview mappings
-    #  TeammateReviewResponseMap - Review mapping between teammates
-    #  FeedbackResponseMap - Feedback from author to reviewer
+    #  ParticipantReviewResponse - Review mappings for single user assignments
+    #  TeamReviewResponse - Review mappings for team based assignments
+    #  MetareviewResponse - Metareview mappings
+    #  TeammateReviewResponse - Review mapping between teammates
+    #  FeedbackResponse - Feedback from author to reviewer
     
     score_set = Hash.new
-    if map_type == "ParticipantReviewResponseMap"
+    if map_type == "ParticipantReviewResponse"
       if allscores[:review]
         score_set = compute_scoreset(allscores , "review")
       end
-    elsif map_type == "TeamReviewResponseMap"
+    elsif map_type == "TeamReviewResponse"
       if allscores[:review]
         score_set = compute_scoreset(allscores , "review")
       end
     
-    elsif map_type == "TeammateReviewResponseMap"
+    elsif map_type == "TeammateReviewResponse"
       if allscores[:review]
         score_set = compute_scoreset(allscores , "teammate")
       end
       
-    elsif map_type == "MetareviewResponseMap"
+    elsif map_type == "MetareviewResponse"
       if allscores[:metareview]
         score_set = compute_scoreset(allscores , "metareview")
       end
-    elsif map_type == "FeedbackResponseMap"
+    elsif map_type == "FeedbackResponse"
       if allscores[:feedback]
         score_set = compute_scoreset(allscores , "feedback")
       end

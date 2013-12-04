@@ -85,7 +85,7 @@
                 var qid = trow.index() - 1;
                 obtained_total += r.scores[qid];
                 max_total += submitted_work.questions[qid].max_score;
-                trow.append('<td><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b></td>');
+                trow.append('<td title=' + r.comments[qid] + '><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b></td>');
             }
         });
         var percentage = Math.round((obtained_total / max_total) * 100 * 100) / 100;

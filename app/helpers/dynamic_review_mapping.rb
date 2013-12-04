@@ -38,7 +38,7 @@ module DynamicReviewMapping
       current_author_candidate = current_reviewer_candidate
       for j in 0 .. (reviewers.size * num_reviews / authors.size) - 1  # This method potentially assigns authors different #s of reviews, if limit is non-integer
         current_author_candidate = (current_author_candidate + stride) % authors.size   
-        ParticipantReviewResponseMap.create(:reviewee_id => authors[current_author_candidate].id, :reviewer_id => reviewers[i].id, :reviewed_object_id => self.id)
+        ParticipantReviewResponse.create(:reviewee_id => authors[current_author_candidate].id, :reviewer_id => reviewers[i].id, :reviewed_object_id => self.id)
       end
     end
   end  
@@ -119,7 +119,7 @@ module DynamicReviewMapping
       self.teams.each{
         | reviewee |
         if @team_review[i][j] == 1
-          TeamReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewed_object_id => self.id, :reviewee_id => reviewee.id)
+          TeamReviewResponse.create(:reviewer_id => reviewer.id, :reviewed_object_id => self.id, :reviewee_id => reviewee.id)
         end
         j += 1
       }
@@ -607,8 +607,8 @@ module DynamicReviewMapping
           #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
           if !participant.nil?
             reviewer_id = participant.id
-            if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', team_id, reviewer_id]).nil?
-              TeamReviewResponseMap.create(:reviewee_id => team_id, :reviewer_id => reviewer_id, :reviewed_object_id => @assignment.id)
+            if TeamReviewResponse.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', team_id, reviewer_id]).nil?
+              TeamReviewResponse.create(:reviewee_id => team_id, :reviewer_id => reviewer_id, :reviewed_object_id => @assignment.id)
             else
               #if there is such a review mapping just skip it. Or it can be handled by informing
               #the instructor(TODO:)
@@ -621,7 +621,7 @@ module DynamicReviewMapping
       end
     rescue Exception => exc
       #revert the mapping
-      response_mappings = TeamReviewResponseMap.find_all_by_reviewed_object_id(@assignment.id)
+      response_mappings = TeamReviewResponse.find_all_by_reviewed_object_id(@assignment.id)
       if !response_mappings.nil?
         response_mappings.each {|response_mapping|
           response_mapping.delete
@@ -839,8 +839,8 @@ module DynamicReviewMapping
             #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
             if !participant.nil?
               reviewer_id = participant.id
-              if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', reviewee_participant.id, reviewer_id]).nil?
-                ParticipantReviewResponseMap.create(:reviewee_id => reviewee_participant.id, :reviewer_id => reviewer_id, :reviewed_object_id => @assignment.id)
+              if ParticipantReviewResponse.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', reviewee_participant.id, reviewer_id]).nil?
+                ParticipantReviewResponse.create(:reviewee_id => reviewee_participant.id, :reviewer_id => reviewer_id, :reviewed_object_id => @assignment.id)
               else
                 #if there is such a review mapping just skip it. Or it can be handled by informing
                 #the instructor(TODO:)
@@ -855,7 +855,7 @@ module DynamicReviewMapping
       end
     rescue Exception => exc
       #revert the mapping
-      response_mappings = ResponseMap.find_by_reviewed_object_id_and_type(@assignment.id, "ParticipantReviewResponseMap")
+      response_mappings = Response.find_by_reviewed_object_id_and_type(@assignment.id, "ParticipantReviewResponse")
       if !response_mappings.nil?
         response_mappings.each {|response_mapping|
           response_mapping.delete
@@ -874,7 +874,7 @@ module DynamicReviewMapping
 
     @assignment = assignment
     number_of_reviews = num_review_of_reviews.to_i
-      contributors = TeamReviewResponseMap.find_all_by_reviewed_object_id(@assignment.id)
+      contributors = TeamReviewResponse.find_all_by_reviewed_object_id(@assignment.id)
     users = Array.new
     mappings = Hash.new
     reviews_per_user = 0
@@ -894,7 +894,7 @@ module DynamicReviewMapping
     #}
 
     contributors.each {|contributor|
-      map = ResponseMap.find(contributor)
+      map = Response.find(contributor)
       participant = Participant.find(map.reviewer_id)
       users.push(participant.user_id)
     }
@@ -938,7 +938,7 @@ module DynamicReviewMapping
       participant = Participant.find_by_parent_id_and_user_id(@assignment.id, user)
       if !participant.nil?
         contributors.each {|contributor|
-          map = ResponseMap.find(contributor)
+          map = Response.find(contributor)
           #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
           # to treat all assignments as team assignments
           team_members = TeamsUser.find_all_by_team_id(map.reviewee_id)
@@ -957,7 +957,7 @@ module DynamicReviewMapping
       end
       topic_user_id = Hash.new
       temp_contributors.each {|contributor|
-        map = ResponseMap.find(contributor)
+        map = Response.find(contributor)
         #participant = Participant.find_all_by_user_id_and_parent_id(map.reviewee_id, @assignment.id)
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
@@ -1057,7 +1057,7 @@ module DynamicReviewMapping
             #Also check whether this user has not yet been assigned to review this team/user
             participant = Participant.find_by_parent_id_and_user_id(@assignment.id, users[random_index])
 
-            map = ResponseMap.find(mapping[0])
+            map = Response.find(mapping[0])
 
             #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
             # to treat all assignments as team assignments
@@ -1115,7 +1115,7 @@ module DynamicReviewMapping
       #reviewee = mapping[0]
         reviewers = mapping[1]
 
-        map = ResponseMap.find(mapping[0])
+        map = Response.find(mapping[0])
 
 
         reviewers.each{|reviewer|
@@ -1123,8 +1123,8 @@ module DynamicReviewMapping
           #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
           if !participant.nil?
             reviewer_id = participant.id
-            if MetareviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ? and reviewed_object_id = ?', map.reviewer_id, reviewer_id,mapping[0]]).nil?
-              MetareviewResponseMap.create(:reviewee_id => map.reviewer_id, :reviewer_id => reviewer_id, :reviewed_object_id => mapping[0])
+            if MetareviewResponse.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ? and reviewed_object_id = ?', map.reviewer_id, reviewer_id,mapping[0]]).nil?
+              MetareviewResponse.create(:reviewee_id => map.reviewer_id, :reviewer_id => reviewer_id, :reviewed_object_id => mapping[0])
             else
               #if there is such a review mapping just skip it. Or it can be handled by informing
               #the instructor(TODO:..)
@@ -1140,7 +1140,7 @@ module DynamicReviewMapping
       end
     rescue Exception => exc
       #revert the mapping
-      response_mappings = MetareviewResponseMap.find_all_by_reviewed_object_id(@assignment.id)
+      response_mappings = MetareviewResponse.find_all_by_reviewed_object_id(@assignment.id)
       if !response_mappings.nil?
         response_mappings.each {|response_mapping|
           response_mapping.delete

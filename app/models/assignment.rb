@@ -10,17 +10,17 @@ class Assignment < ActiveRecord::Base
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
-  has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
+  has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponse', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
   has_many :due_dates, :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
-  has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
+  has_many :team_review_mappings, :class_name => 'TeamReviewResponse', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
   has_many :assignment_questionnaires,:dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
-  has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
+  has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'Response'
   has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
 
   validates_presence_of :name
@@ -199,15 +199,15 @@ class Assignment < ActiveRecord::Base
   def review_mappings
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+    TeamReviewResponse.find_all_by_reviewed_object_id(self.id)   #changed TeamReviewResponseMap to TeamReviewResponse
   end
 
   def metareview_mappings
     mappings = Array.new
     self.review_mappings.each do |map|
-      mmap = MetareviewResponseMap.find_by_reviewed_object_id(map.map_id)
-      if mmap != nil
-        mappings << mmap
+      metareviewresponse = MetareviewResponse.find_by_reviewed_object_id(map.id)     #changed map.map_id->map.id,MetareviewResponseMap->MetareviewResponse, mmap variable-> metareviewresponse
+      if metareviewresponse != nil
+        mappings << metareviewresponse
       end
     end
     mappings
@@ -227,7 +227,7 @@ class Assignment < ActiveRecord::Base
     self.teams.each do |team|
       scores[:teams][index.to_s.to_sym] = Hash.new
       scores[:teams][index.to_s.to_sym][:team] = team
-      assessments = TeamReviewResponseMap.get_assessments_for(team)
+      assessments = TeamReviewResponse.get_assessments_for(team)
       scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
       #... = ScoreCache.get_participant_score(team, id, questionnaire.display_type)
       index = index + 1
@@ -303,22 +303,22 @@ class Assignment < ActiveRecord::Base
 
   def delete(force = nil)
     begin
-      maps = ParticipantReviewResponseMap.find_all_by_reviewed_object_id(self.id)
-      maps.each { |map| map.delete(force) }
+      reviews = ParticipantReviewResponse.find_all_by_reviewed_object_id(self.id)    #changed ParticipantReviewResponseMap -> ParticipantReviewResponse
+      reviews.each { |review| review.delete(force) }
     rescue
       raise "At least one review response exists for #{self.name}."
     end
 
     begin
-      maps = TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
-      maps.each { |map| map.delete(force) }
+      reviews = TeamReviewResponse.find_all_by_reviewed_object_id(self.id)  #changed TeamReviewResponseMap -> TeamReviewResponse
+      reviews.each { |review| review.delete(force) }
     rescue
       raise "At least one review response exists for #{self.name}."
     end
 
     begin
-      maps = TeammateReviewResponseMap.find_all_by_reviewed_object_id(self.id)
-      maps.each { |map| map.delete(force) }
+      reviews = TeammateReviewResponse.find_all_by_reviewed_object_id(self.id) #changed TeammateReviewResponseMap -> TeammateReviewResponse
+      reviews.each { |review| review.delete(force) }
     rescue
       raise "At least one teammate review response exists for #{self.name}."
     end
@@ -384,7 +384,7 @@ class Assignment < ActiveRecord::Base
   # available to them.
   #ajbudlon, sept 07, 2007
   def get_review_number(mapping)
-    reviewer_mappings = ResponseMap.find_all_by_reviewer_id(mapping.reviewer.id)
+    reviewer_mappings = Response.find_all_by_reviewer_id(mapping.reviewer.id)  #changed ResponseMap -> Response
     review_num = 1
     reviewer_mappings.each do |rm|
       (rm.reviewee.id != mapping.reviewee.id) ? review_num += 1 : break
@@ -514,11 +514,11 @@ class Assignment < ActiveRecord::Base
     @review_scores = Hash.new
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @response_type = 'TeamReviewResponseMap'
+    @response_type = 'TeamReviewResponse' #changed type from 'TeamReviewResponse' to 'TeamReviewResponse'
 
-    @myreviewers = ResponseMap.find(:all, select: 'DISTINCT reviewer_id', conditions: ['reviewed_object_id = ? && type = ? ', self.id, @type])
+    @myreviewers = Response.all(select: 'DISTINCT reviewer_id', conditions: ['reviewed_object_id = ? && type = ? ', self.id, @type])  #changed ResponseMap -> Response
 
-    @response_maps = ResponseMap.find(:all, conditions: ['reviewed_object_id = ? && type = ?', self.id, @response_type])
+    @response_maps = Response.all(conditions: ['reviewed_object_id = ? && type = ?', self.id, @response_type]) #changed ResponseMap -> Response
 
     @response_maps.each do |response_map|
       # Check if response is there

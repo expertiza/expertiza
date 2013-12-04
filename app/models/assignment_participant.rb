@@ -83,8 +83,8 @@ class AssignmentParticipant < Participant
 
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object 
-  def reviewed_by?(reviewer)
-    ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
+  def reviewed_by?(reviewer)   #ParticipantReviewResponseMap changed to ParticipantReviewResponse
+    ParticipantReviewResponse.count(:conditions => ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
                                                        self.id, reviewer.id, assignment.id]) > 0
   end
 
@@ -315,24 +315,24 @@ class AssignmentParticipant < Participant
   alias_method :course_string, :get_course_string
 
   def get_feedback
-    FeedbackResponseMap.get_assessments_for(self)
+    FeedbackResponse.get_assessments_for(self)    #FeedbackResponseMap changed to FeedbackResponse
   end
   alias_method :feedback, :get_feedback
 
   def get_reviews
     #ACS Always get assessments for a team
     #removed check to see if it is a team assignment
-    TeamReviewResponseMap.get_assessments_for(self.team)
+    TeamReviewResponse.get_assessments_for(self.team)#TeamReviewResponseMap changed to TeamReviewResponse
   end
   alias_method :reviews, :get_reviews
 
   def get_reviews_by_reviewer(reviewer)
-    TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
+    TeamReviewResponse.get_reviewer_assessments_for(self.team, reviewer)   # TeamReviewResponseMap  changed to TeamReviewResponseMap
   end
   alias_method :reviews_by_reviewer, :get_reviews_by_reviewer
 
   def metareviews
-    MetareviewResponseMap.get_assessments_for(self)  
+    MetareviewResponseMap.get_assessments_for(self)
   end
 
 

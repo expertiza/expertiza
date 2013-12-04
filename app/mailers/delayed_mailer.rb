@@ -113,11 +113,11 @@ class DelayedMailer
 
   def mail_metareviewers
     emails = Array.new
-    #find reviewers for the assignment
-    reviewer_tuples = ResponseMap.find(:all, :conditions => ['reviewed_object_id = ? AND (type = "ParticipantReviewResponseMap" OR type = "TeamReviewResponseMap")', self.assignment_id])
+    #find reviewers for the assignment     #ResponseMap changed to Response
+    reviewer_tuples = Response.find(:all, :conditions => ['reviewed_object_id = ? AND (type = "ParticipantReviewResponse" OR type = "TeamReviewResponse")', self.assignment_id])
     for reviewer in reviewer_tuples
-      #find metareviewers - people who will review the reviewers
-      meta_reviewer_tuples = ResponseMap.find(:all, :conditions => ['reviewed_object_id = ? AND type = "MetareviewResponseMap"', reviewer.id])
+      #find metareviewers - people who will review the reviewers  #ResponseMap changed to Response
+      meta_reviewer_tuples = Response.find(:all, :conditions => ['reviewed_object_id = ? AND type = "MetareviewResponse"', reviewer.id])
       for metareviewer in meta_reviewer_tuples
         participant = Participant.find(:first, :conditions => ['parent_id = ? AND id = ?', self.assignment_id, metareviewer.reviewer_id])
         uid  = participant.user_id
@@ -129,8 +129,8 @@ class DelayedMailer
   end
 
   def mail_reviewers
-    emails = Array.new
-    reviewer_tuples = ResponseMap.find(:all, :conditions => ['reviewed_object_id = ? AND (type = "ParticipantReviewResponseMap" OR type = "TeamReviewResponseMap")', self.assignment_id])
+    emails = Array.new    #ResponseMap changed to Response
+    reviewer_tuples = Response.find(:all, :conditions => ['reviewed_object_id = ? AND (type = "ParticipantReviewResponse" OR type = "TeamReviewResponse")', self.assignment_id])
     for reviewer in reviewer_tuples
       participant = Participant.find(:first, :conditions => ['parent_id = ? AND id = ?', self.assignment_id, reviewer.reviewer_id])
       uid  = participant.user_id

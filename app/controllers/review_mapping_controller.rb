@@ -269,6 +269,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def release_reservation
+
     mapping = Response.find(params[:id]) #ResponseMap changed to Response
     student_id = mapping.reviewer_id
     mapping.delete
@@ -345,7 +346,7 @@ class ReviewMappingController < ApplicationController
       else
       review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
       review_mappings.each{
-        |review_response|                    #ResponseMap changed to Response
+        |review_response|                    #review_map changed to review_response
         metareview_mappings = MetareviewResponse.find_all_by_reviewed_object_id(review_response.id)
         if metareview_mappings.length == 0
           single = Array.new
@@ -357,7 +358,7 @@ class ReviewMappingController < ApplicationController
         else
           metareview_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
           metareview_mappings.each{
-            |metareview_response|
+            |metareview_response|   #metareview_map changed to metareview_response
               single = Array.new
               single[0] = contrib.name
               single[1] = review_response.reviewer.name
@@ -475,10 +476,10 @@ class ReviewMappingController < ApplicationController
     max_score = 0
     @review_distribution =[0,0,0,0,0,0,0,0,0,0]
     ### For every responsemapping for this assgt, find the reviewer_id and reviewee_id #####
-    @reviews_not_done = 0   #changed ResponseMap.find to Response.all()
-    responses =  Response.all(:conditions =>["reviewed_object_id = ? and type = ?", @assignment.id, objtype])
+    @reviews_not_done = 0   #changed ResponseMap.find to Response.find.all()
+    responses = Response.find.all(:conditions =>["reviewed_object_id = ? and type = ?", @assignment.id, objtype])
     review_report = @assignment.compute_reviews_hash
-    for response in responses
+    for response in responses  #response_map is changed to response and response_maps is changed to responses
       score_for_this_review = review_report[response.reviewer_id][response.reviewee_id]
       if(score_for_this_review != 0)
         @review_distribution[(score_for_this_review/10-1).to_i] = @review_distribution[(score_for_this_review/10-1).to_i] + 1

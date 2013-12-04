@@ -309,7 +309,7 @@ class Assignment < ActiveRecord::Base
 
     scores[:participants] = Hash.new
     self.participants.each do |participant|
-      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
+      scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
 
 
       # for all quiz questionnaires (quizzes) taken by the participant
@@ -830,7 +830,7 @@ class Assignment < ActiveRecord::Base
         |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-    @scores = @assignment.scores(@questions)
+    @scores = @assignment.get_scores(@questions)
 
     return csv if @scores[:teams].nil?
 

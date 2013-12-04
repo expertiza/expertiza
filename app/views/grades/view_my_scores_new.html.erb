@@ -59,7 +59,7 @@
             <% if @pscore[:feedback] and @pscore[:feedback][:assessments].length > 0 %>
                 <%= render :partial => 'grades/scores_author_feedback', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:feedback]} %>
             <% else %>
-                No author feedback has been provided for this user's reviews.
+                No author feedback has been completed for this submission.
             <% end %>
           </div>
         </div>

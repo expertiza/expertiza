@@ -1,36 +1,34 @@
 <table>
-<% review_no = 1%>
-<% mappings.each do | map | %> 
-    <%if @assignment.team_assignment?%>
-        <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
-    <%else%>
-        <% participant = map.reviewee %>
-    <%end%>
+  <% review_no = 1%>
+  <% mappings.each do | map | %>
+    <% if @assignment.team_assignment?%>
+      <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
+    <% else %>
+      <% participant = map.reviewee %>
+    <% end %>
 
-   <% if participant %>
-     <tr><td><b><%= "#{title} #{review_no}." %></b>
-	 <%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %></td>
-		 <td>&nbsp;</td>
-     <% if map.response %>            
-       <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
-
-     <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
-       <%if @assignment.staggered_deadline?%>
-                <%if @assignment.get_current_stage(participant.topic_id) != 'submission'%>
-                   <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
-                <%else%>
-                   <td>Begin</td><td> (Work has not yet been submitted)</td>
-                <%end%>
-       <% else %>
-         <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
-       <% end %>
-
-     <% else %><% # Deadline has passed, and the work was not submitted %>
-  	   <td>Begin</td><td> (Work has not yet been submitted)</td>
-     <% end %>       
-
-     </tr>  
-     <% review_no += 1 %>
-<% end %>
-<% end %>
+    <% if participant %>
+      <tr>
+        <td><b><%= "#{title} #{review_no}." %></b><%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %></td>
+        <td>&nbsp;</td>
+        <% if map.response %>
+          <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
+        <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
+          <% if @assignment.staggered_deadline?%>
+            <% if @assignment.get_current_stage(participant.topic_id) != 'submission'%>
+              <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
+            <%else%>
+              <td>Begin</td><td> (Work has not yet been submitted)</td>
+            <% end %>
+          <% else %>
+            <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+          <% end %>
+        <% else %>
+          <% # Deadline has passed, and the work was not submitted %>
+          <td>Begin</td><td> (Work has not yet been submitted)</td>
+        <% end %>
+      </tr>
+      <% review_no += 1 %>
+    <% end %>
+  <% end %>
 </table>

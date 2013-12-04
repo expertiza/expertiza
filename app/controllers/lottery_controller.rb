@@ -297,6 +297,7 @@ def is_other_topic_of_higher_priority(assignment_id, team_id, priority,current_m
   result = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su, sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND preference_priority_number < ? AND preference_priority_number != 0",assignment_id, team_id, priority])
   else
     result = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su, sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND preference_priority_number != 0",assignment_id, team_id])
+  end
   result.each do |r|
     if current_max_slots[r.topic_id] > 0
       return true

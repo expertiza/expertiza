@@ -32,7 +32,7 @@ class GradesController < ApplicationController
     #deleting all review notifications
 
     #Varibale rmaps has been replaced by responses, rmap local variable has been replaced by single_response,
-    #mmap local varibale has been replaced by  single_metaresponse, and mmaps has been replaced by metareviewResponses
+    #mmap local variable has been replaced by  single_metaresponse, and mmaps has been replaced by metareviewResponses
     responses = @participant.response_maps
     for single_response in responses
       single_response.notification_accepted = true

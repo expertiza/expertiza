@@ -332,12 +332,12 @@ class AssignmentParticipant < Participant
   alias_method :reviews_by_reviewer, :get_reviews_by_reviewer
 
   def metareviews
-    MetareviewResponseMap.get_assessments_for(self)
+    MetareviewResponse.get_assessments_for(self) #MetareviewResponseMap changed to MetareviewResponse
   end
 
 
   def teammate_reviews
-    TeammateReviewResponseMap.get_assessments_for(self)
+    TeammateReviewResponse.get_assessments_for(self)  #TeammateReviewResponseMap changed to TeammateReviewResponse
   end
 
   def get_submitted_files
@@ -505,8 +505,8 @@ class AssignmentParticipant < Participant
   alias_method :stage_deadline, :get_stage_deadline
 
 
-  def review_response_maps
-    ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
+  def review_response_maps #ParticipantReviewResponseMap changed to ParticipantReviewResponse
+    ParticipantReviewResponse.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
   end
 
   def get_topic_string

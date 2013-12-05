@@ -45,23 +45,42 @@ class StudentQuizController < ApplicationController
   end
 
   def record_response
-    puts "record_response"
-    puts params[:questionnaire_id]
     questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
 
+    responses = Array.new
+    valid = 0
     questions.each do |question|
       if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
-        params["#{question.id}"].each do |choice|
-          new_response = QuizResponse.new :response => choice, :question_id => question.id, :questionnaire_id => params[:questionnaire_id]
-          new_response.save
+        if params["#{question.id}"] == nil
+          valid = 1
+        else
+          params["#{question.id}"].each do |choice|
+            new_response = QuizResponse.new :response => choice, :question_id => question.id, :questionnaire_id => params[:questionnaire_id]
+            unless new_response.valid?
+              valid = 1
+            end
+            responses.push(new_response)
+          end
         end
       else
         new_response = QuizResponse.new :response => params["#{question.id}"], :question_id => question.id, :questionnaire_id => params[:questionnaire_id]
-        new_response.save
+        unless new_response.valid?
+          valid = 1
+        end
+        responses.push(new_response)
       end
     end
 
-    #TODO send assignment id and participant id
-    redirect_to :controller => 'student_quiz', :action => 'list'
+    if valid == 0
+      responses.each do |response|
+        response.save
+      end
+      #TODO send assignment id and participant id
+      #TODO redirect to finished quiz view after this
+      redirect_to :controller => 'student_quiz', :action => 'take_quiz'
+    else
+      flash[:error] = "Please answer every question."
+      redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :reviewer_id => session[:user].id, :questionnaire_id => params[:questionnaire_id]
+    end
   end
 end

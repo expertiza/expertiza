@@ -34,6 +34,7 @@ Feature: Manage the courses in Expertiza
     
   @instructor
   @manage_courses
+  @wip
   Scenario: Expertiza will allow an instructor to copy a course
     Given I have a public course named "Course1"
       And I follow "Copy course"
@@ -42,6 +43,7 @@ Feature: Manage the courses in Expertiza
     
   @instructor
   @manage_courses
+  @wip
   Scenario: Expertiza will allow an instructor to delete a course
     Given I have a public course named "Course1"
     And I follow "Delete course"
@@ -49,6 +51,7 @@ Feature: Manage the courses in Expertiza
     
   @instructor
   @manage_courses
+  @wip
   Scenario: Expertiza will allow an instructor to edit a course
     Given I have a public course named "Course1"
       And I follow "Edit course"
@@ -58,6 +61,7 @@ Feature: Manage the courses in Expertiza
     
   @instructor
   @manage_courses
+  @wip
   Scenario: Expertiza will allow an instructor to make a course private
     Given I have a public course named "Course1"
       And I follow "Make private"

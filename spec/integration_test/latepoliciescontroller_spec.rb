@@ -39,6 +39,7 @@ describe 'should create new policy' do
     click_link('New late policy')
     fill_in('late_policy_policy_name', :with => 'test_policy')
     fill_in('late_policy_penalty_per_unit', :with => '1')
+    page.select('Hour', :from => 'late_policy_penalty_unit')
     fill_in('late_policy_max_penalty', :with => '10')
     click_button('Create')
     page.should have_content('test_policy')
@@ -105,5 +106,18 @@ describe 'login as student' do
     click_link('repo')
     click_link('Your work')
     page.should have_content('Score for repo')
+  end
+end
+
+describe 'login as instructor' do
+  it 'view scores as instructor' do
+    visit '/'
+    fill_in('login_name', :with => 'ins1')
+    fill_in('login_password', :with => 'abcd')
+    click_button('Login')
+    visit '/grades/view?id=14'
+    page.should have_content('Summary report')
+    page.should have_content('Average Penalty')
+    page.should have_content('Maximum Penalty')
   end
 end

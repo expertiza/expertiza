@@ -111,5 +111,6 @@ end
 =end
 
 Then /^I should find "(\S+)" under list of assignments$/  do |assignment|
+  step "I follow \"Assignments\""
   should have_content assignment
 end

@@ -49,6 +49,7 @@ Scenario: Respond to an advertisement when I am not on a team
 Scenario: Respond to an advertisement when I am on a team
   Given I have a team with name "my_team" in assignment "my_assignment"
 
+@wip
 Scenario: Decline join team request
   Given a team named "test_team" has an ad with desired qualities "I need a teammate."
   Given I sent a join_team request to ad "I need a teammate."

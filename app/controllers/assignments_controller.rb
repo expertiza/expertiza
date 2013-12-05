@@ -1,7 +1,12 @@
+require 'socket'
+
 class AssignmentsController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
-
+   @create_flag =0
+  @@edit_flag= 0
+  $hostname = '192.168.1.13'
+  $port= 2012
   # change access permission from public to private or vice versa
   def toggle_access
     assignment = Assignment.find(params[:id])
@@ -22,12 +27,16 @@ class AssignmentsController < ApplicationController
   end
 
   def create
+    @create_flag=1
+    puts "In create method"
+    #puts @@create_flag
     @assignment = Assignment.new(params[:assignment])
 
     if @assignment.save
       @assignment.create_node
+
       flash[:success] = 'Assignment was successfully created.'
-      redirect_to controller: :assignments, action: :edit, id: @assignment.id
+      redirect_to controller: :assignments, action: :edit, id: @assignment.id,flag: 1
     else
       render 'new'
     end
@@ -35,6 +44,8 @@ class AssignmentsController < ApplicationController
 
   def edit
     @assignment = Assignment.find(params[:id])
+    @flag = params[:flag].to_i
+    puts "In edit method"
     set_up_assignment_review
   end
 
@@ -123,8 +134,9 @@ class AssignmentsController < ApplicationController
 
   def update
     @assignment = Assignment.find(params[:id])
+    @old_name = @assignment.name
     params[:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
-
+    puts "In update method"
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated
 
@@ -136,7 +148,7 @@ class AssignmentsController < ApplicationController
       # Probably there are 2 different operations:
       #  - rename an assgt. -- implemented by renaming a directory
       #  - assigning an assignment to a course -- implemented by moving a directory.
-
+      assignment_xml_builder(@assignment,@old_name)
       redirect_to :action => 'edit', :id => @assignment.id
     else
       flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
@@ -156,14 +168,66 @@ class AssignmentsController < ApplicationController
 #NOTE: many of these functions actually belongs to other models
 #====setup methods for new and edit method=====#
   def set_up_assignment_review
+    puts "In set up assignment review"
     set_up_defaults
 
     submissions = @assignment.find_due_dates('submission') + @assignment.find_due_dates('resubmission')
     reviews = @assignment.find_due_dates('review') + @assignment.find_due_dates('rereview')
     @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
+    puts(@flag)
 
     if @assignment.directory_path.try :empty?
       @assignment.directory_path = nil
+    end
+  end
+
+  def assignment_xml_builder(assign,oldname)
+    #Get Assignment id
+    @@create_flag=0
+    puts "In XML Builder"
+    @assignment_id = assign.id
+    @course_id = Assignment.find(@assignment_id).course_id
+    @course_name = Course.find(@course_id).name
+    @assignment_name = Assignment.find(@assignment_id).name
+    xml_string = "<msg node='expertiza' type='assignment' length='1'>\n"
+    xml_string += "  <assignment>\n"
+    xml_string += "    <course_name>"+@course_name+"</course_name>\n"
+    xml_string += "    <assignment_name>"+@assignment_name+"</assignment_name>\n"
+    xml_string += "    <intro>Expertiza assignment "+@assignment_name+" for Course : "+@course_name+" </intro>\n"
+    xml_string += "    <assignment_type>Default</assignment_type>\n"
+    xml_string += "    <resubmit>0</resubmit>\n"
+    xml_string += "    <preventlate>0</preventlate>\n"
+    xml_string += "    <emailteachers>0</emailteachers>\n"
+    xml_string += "    <maxbytes>100000</maxbytes>\n"
+    xml_string += "    <grade>0</grade>\n"
+    xml_string += "    <timemodified>0</timemodified>\n"
+    xml_string += "    <submission>"+(@assignment.find_due_dates('submission')[0].due_at.to_i).to_s+"</submission>\n"
+    xml_string += "    <old_name>"+oldname+"</old_name>\n"
+    #due_dates = get_due_dates_assignment(assign)
+    #i=0
+    #for i in 0..(due_dates.size-1)
+     # xml_string += "    <"+DeadlineType.find(due_dates[i].deadline_type_id).name.to_s+">"+due_dates[i].due_at.to_i.to_s+"</"+DeadlineType.find(due_dates[i].deadline_type_id).name.to_s+">\n"
+    #end
+    xml_string += "  </assignment>\n"
+    xml_string += "</msg>"
+    sent_socket(xml_string)
+  end
+
+
+
+  def sent_socket(xml_string)
+    puts "Sending Socket"
+#    hostname = '192.168.1.21'
+#    port = 2012
+
+    begin
+      clientSession = TCPSocket.new($hostname, $port)  #tell the client where to connect
+      data = xml_string
+      clientSession.puts "'#{data}'\n"
+                                                       #    puts clientSession.recv(100)
+      clientSession.close
+    rescue
+      puts "Error message ECONNREFUSED"
     end
   end
 
@@ -288,9 +352,14 @@ class AssignmentsController < ApplicationController
   # DELETE
   # TODO: not been cleanup yep
   #--------------------------------------------------------------------------------------------------------------------
-  def delete
+  def destroy
     assignment = Assignment.find(params[:id])
-
+    @assignment_name = Assignment.find(assignment.id).name
+    xml_string = "<msg node='expertiza' type='assignment_delete' length='1'>\n"
+    xml_string += "  <assignment>\n"
+    xml_string += "    <assignment_name>"+@assignment_name+"</assignment_name>\n"
+    xml_string += "  </assignment>\n"
+    xml_string += "</msg>"
     # If the assignment is already deleted, go back to the list of assignments
     if assignment
       begin
@@ -305,10 +374,12 @@ class AssignmentsController < ApplicationController
         if (id != assignment.instructor_id)
           raise "Not authorised to delete this assignment"
         end
+        sent_socket(xml_string)
         assignment.delete(params[:force])
         @a = Node.find(:first, :conditions => ['node_object_id = ? and type = ?', params[:id], 'AssignmentNode'])
 
-        @a.destroy
+        #@a.destroy
+
         flash[:notice] = "The assignment is deleted"
       rescue
         url_yes = url_for :action => 'delete', :id => params[:id], :force => 1

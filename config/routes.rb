@@ -74,6 +74,8 @@ Expertiza::Application.routes.draw do |map|
       post :add_ta
       get :auto_complete_for_user_name
       post :remove_ta
+      #get :update
+      #post :update
     end
   end
 
@@ -254,7 +256,7 @@ Expertiza::Application.routes.draw do |map|
       get :distribution
       get :list_mappings
       get :review_report
-<<<<<<< HEAD
+#<<<<<<< HEAD
       get :select_reviewer
       get :delete_all_reviewers
       get :select_mapping
@@ -267,12 +269,12 @@ Expertiza::Application.routes.draw do |map|
       get :delete_all_metareviewers
       post :add_metareviewer
       get :delete_metareviewer
-=======
+#=======
       get :select_metareviewer
       get :select_reviewer
       get :select_mapping
       get :show_available_submissions
->>>>>>> ultimate/master
+#>>>>>>> ultimate/master
     end
   end
 
@@ -352,13 +354,13 @@ Expertiza::Application.routes.draw do |map|
 
   resources :submitted_content do
     collection do
-<<<<<<< HEAD
+#<<<<<<< HEAD
       get :remove_hyperlink
       get :submit_hyperlink
       get :view
-=======
+#=======
       get :download
->>>>>>> ultimate/master
+#>>>>>>> ultimate/master
       get :edit
       get :folder_action
       get :remove_hyperlink
@@ -440,9 +442,10 @@ Expertiza::Application.routes.draw do |map|
 
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   map.connect ':controller/service.wsdl', :action => 'wsdl'
-<<<<<<< HEAD
-=======
+#<<<<<<< HEAD
+#=======
 
->>>>>>> ultimate/master
+#>>>>>>> ultimate/master
   match ':controller(/:action(/:id))(.:format)'
 end
+

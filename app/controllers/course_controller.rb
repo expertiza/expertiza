@@ -6,7 +6,8 @@
 class CourseController < ApplicationController
   auto_complete_for :user, :name
   require 'fileutils'
-
+  $hostname = '192.168.1.13'
+  $port = 2012
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
     @users = User.find_by_sql("select * from users where role_id=6") unless search.blank?
@@ -21,11 +22,17 @@ class CourseController < ApplicationController
 
   # Modify an existing course
   def edit
+    puts "In edit method"
     @course = Course.find(params[:id])
   end
 
   def update
+    puts "In update now"
     @course = Course.find(params[:id])
+    xml_string = "<msg node='expertiza' type='course_edit' length='1'>\n"
+    xml_string += "  <course>\n"
+    xml_string += "    <course_old_name>"+@course.name.to_s+"</course_old_name>\n"
+
     if params[:course][:directory_path] and @course.directory_path != params[:course][:directory_path]
       begin
         FileHelper.delete_directory(@course)
@@ -40,6 +47,10 @@ class CourseController < ApplicationController
       end
     end
     @course.update_attributes(params[:course])
+    xml_string += "    <course_new_name>"+@course.name.to_s+"</course_new_name>\n"
+    xml_string += "  </course>\n"
+    xml_string += "</msg>"
+    sent_socket(xml_string)
     undo_link("Course \"#{@course.name}\" has been updated successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
@@ -70,7 +81,7 @@ class CourseController < ApplicationController
   # create a course
   def create
     @course = Course.new(params[:course])
-
+    puts "in Create Method"
     @course.instructor_id = session[:user].id
     begin
       @course.save!
@@ -82,6 +93,8 @@ class CourseController < ApplicationController
       end
       FileHelper.create_directory(@course)
       undo_link("Course \"#{@course.name}\" has been created successfully. ")
+      type= "course"
+      course_xml_builder(@course,type)
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = "The following error occurred while saving the course: "+$!
@@ -90,7 +103,8 @@ class CourseController < ApplicationController
   end
 
   # delete the course
-  def delete
+  def destroy
+    puts "In destroy method"
     @course = Course.find(params[:id])
     begin
       FileHelper.delete_directory(@course)
@@ -103,6 +117,8 @@ class CourseController < ApplicationController
     #  | map |
     #  map.destroy
     #}
+    type = "course_delete"
+    course_xml_builder(@course,type)
     @course.destroy
     undo_link("Course \"#{@course.name}\" has been deleted successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
@@ -128,6 +144,34 @@ class CourseController < ApplicationController
       mapping[:name] = mapping.ta.name
     end
   end
+  def course_xml_builder(course,type)
+    puts "In Course XML Builder"
+    @course_id = course.id
+    @course_name = Course.find(@course_id).name
+    xml_string = "<msg node='expertiza' type='"+type+"' length='1'>\n"
+    xml_string += "  <course>\n"
+    xml_string += "    <course_name>"+@course_name+"</course_name>\n"
+    xml_string += "  </course>\n"
+    xml_string += "</msg>"
+    sent_socket(xml_string)
+  end
+
+  def sent_socket(xml_string)
+#    hostname = '192.168.1.21'
+#    port = 2012
+
+    begin
+      puts "In Sent Socket"
+      clientSession = TCPSocket.new($hostname, $port)  #tell the client where to connect
+      data = xml_string
+      clientSession.puts "'#{data}'\n"
+                                                       #    puts clientSession.recv(100)
+      clientSession.close
+    rescue
+      puts "Error message ECONNREFUSED"
+    end
+  end
+
 
   def add_ta
     @course = Course.find(params[:course_id])

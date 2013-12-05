@@ -1,0 +1,4 @@
+class Flag_Check
+  @@create_flag = 0
+
+end

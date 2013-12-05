@@ -34,6 +34,10 @@ Expertiza::Application.routes.draw do |map|
       get :copy
       get :toggle_access
       post :remove_assignment_from_course
+      get :set_questionnaire
+      get :set_due_date
+      get :delete_all_questionnaires
+      get :delete_all_due_dates
     end
   end
 
@@ -97,6 +101,9 @@ Expertiza::Application.routes.draw do |map|
     collection do
       get :view
       get :view_my_scores
+      get :instructor_review
+      get :remove_hyperlink
+      get :conflict_notification
     end
   end
 
@@ -116,9 +123,21 @@ Expertiza::Application.routes.draw do |map|
 
   resources :institutions
 
-  resources :invitation
+  resources :invitation  do
+   collection do
+    get :cancel
+     get :accept
+     get :decline
+     end
+  end
 
-  resources :join_team_requests
+
+
+  resources :join_team_requests do
+  collection do
+    get :decline
+  end
+  end
 
   resources :leaderboard, constraints: { id: /\d+/ } do
     collection do
@@ -147,6 +166,8 @@ Expertiza::Application.routes.draw do |map|
       get :list
       get :change_handle
       post :delete
+      get :inherit
+      get :bequeath_all
     end
   end
 
@@ -198,10 +219,26 @@ Expertiza::Application.routes.draw do |map|
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_evaluation_questionnaires, controller: :questionnaires
 
-  resources :review_mapping do
+  resources :response do
     collection do
-      get :list_mappings
-      get :review_report
+      get :new_feedback
+      get :view
+      post :delete
+      get :remove_hyperlink
+      get :saving
+      get :redirection
+    end
+  end
+
+  resources :review_mapping do
+  collection do
+     get :list_mappings
+     get :review_report
+     get :remove_hyperlink
+     post :show_available_submissions
+     post :add_self_reviewer
+     post :assign_reviewer_dynamically
+     post :assign_metareviewer_dynamically
     end
   end
 
@@ -230,6 +267,10 @@ Expertiza::Application.routes.draw do |map|
       get :add_signup_topics_staggered
       get :signup_topics
       get :view_publishing_rights
+      get :signup
+      get :delete_signup
+      get :team_details
+      get :signup_topics
     end
   end
 
@@ -273,6 +314,11 @@ Expertiza::Application.routes.draw do |map|
   resources :submitted_content do
     collection do
       get :view
+      get :edit
+      post :submit_hyperlink
+      get :remove_hyperlink
+      get :submit_file
+      get :folder_action
     end
   end
 

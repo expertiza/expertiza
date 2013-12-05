@@ -95,8 +95,9 @@ class Score < ActiveRecord::Base
         item = Score.find_by_response_id_and_question_id(@response.id, question.id)
         if item != nil
           weighted_score += item.score * question.weight
+          sum_of_weights += question.weight
         end
-        sum_of_weights += question.weight
+
       }
     end
 

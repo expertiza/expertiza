@@ -27,8 +27,7 @@ class Question < ActiveRecord::Base
     GRADING_TYPES_CUSTOM = [[CHECKBOX,0],[TEXT_FIELD,1],[TEXTAREA,2],[DROPDOWN,3],[UPLOAD_FILE, 4],[RATING, 5]]
     WEIGHTS = [['1',1],['2',2],['3',3],['4',4],['5',5]]
     
-    attr_accessor :checked
-    
+    attr_accessor :checked,:count
     def delete      
       QuestionAdvice.find_all_by_question_id(self.id).each{|advice| advice.destroy}
       self.destroy

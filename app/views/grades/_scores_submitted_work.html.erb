@@ -113,7 +113,7 @@
 
     $(function () {
         var questions = [], questionScores = [], firstArrayFlag = true, scoreCounter;
-        questions.counter = 0;
+        questions.counter = 1;
 
         $(submitted_work.reviews).each(function(){
             scoreCounter = 0;
@@ -149,9 +149,10 @@
                 labels: {
                     align: 'right',
                     formatter: function () {
-                        questions.counter = questions.counter + 1;
-                        return "Question " + (questions.counter - submitted_work.questions.length);
-
+                        var returnValue = "Question " + questions.counter++;
+                        if(this.isLast)
+                            questions.counter = 1;
+                        return returnValue;
                     }
                 }
             },

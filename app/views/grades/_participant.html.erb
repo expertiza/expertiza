@@ -62,6 +62,7 @@
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",f_avg) %>%
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedbacks</a> (<%= pscore[:feedback][:assessments].size %>)</FONT>
     </TD>
+
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'review_feedback' %></FONT>
@@ -107,6 +108,19 @@
           total_score = pscore[:total_score] 
           title = nil
         end %>
+
+            <% hardline = 85
+               if tr_avg > hardline
+                 total_score = total_score + 0.05*total_score
+
+               elsif tr_avg < hardline and (hardline -tr_avg) > 40
+                  total_score = total_score - 10
+               elsif tr_avg < hardline and (hardline -tr_avg) > 20
+                 total_score = total_score - (hardline -tr_avg)*0.5
+
+            %>
+
+                  <%end%>
         <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %><%= score_postfix %></div>
         <% if controller.action_name != "view_my_scores" %> 
           <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>

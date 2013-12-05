@@ -95,12 +95,25 @@
     }
 
     $(function () {
-        var questions = [], questionScores = [];
+        var questions = [], questionScores = [], firstArrayFlag = true, scoreCounter;
         questions.counter = 0;
 
-        $(submitted_work.reviews[0].scores).each(function(){
-            questionScores.push(parseInt(this));
+        $(submitted_work.reviews).each(function(){
+            scoreCounter = 0;
+            $(this.scores).each(function(){
+                if(firstArrayFlag)
+                    questionScores.push(parseInt(this));
+                else{
+                    questionScores[scoreCounter++] += parseInt(this);
+                }
+            });
+            firstArrayFlag = false;
         });
+
+        for(var counter=0; counter < questionScores.length; counter++){
+            questionScores[counter] /= submitted_work.reviews.length;
+            questionScores[counter] = Math.round(questionScores[counter]*100)/100   ;
+        }
 
         $(submitted_work.questions).each(function(){
             questions.push(this.txt);
@@ -120,7 +133,7 @@
                     align:'right',
                     formatter: function () {
                         questions.counter = questions.counter + 1;
-                            return "Question " + questions.counter;
+                        return "Question " + (questions.counter - submitted_work.questions.length);
                     }
                 }
             },
@@ -128,7 +141,8 @@
                 min: 0,
                 title: {
                     text: 'Average Score'
-                }
+                },
+                max: question.max_score
             },
             legend: {
                 backgroundColor: '#FFFFFF',

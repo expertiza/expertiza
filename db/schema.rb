@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131203051315) do
+ActiveRecord::Schema.define(:version => 20131205154647) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -309,8 +309,6 @@ ActiveRecord::Schema.define(:version => 20131203051315) do
     t.boolean "true_false"
     t.integer "weight"
     t.integer "questionnaire_id"
-    t.float   "average_difficulty_rating", :default => 0.0
-    t.integer "number_of_ratings",         :default => 0
   end
 
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"

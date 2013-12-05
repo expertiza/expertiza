@@ -17,16 +17,18 @@
     %>
     reviewing.reviews = [];
     var review;
-    var parent_review_id;
     <%
         for review in rscore[:assessments]
     %>
     review = {};
     review.updated_at = '<%= review.updated_at.strftime('%x') %><br/><%= review.updated_at.strftime('%X') %>';
+    <% if review.additional_comment %>
     review.additional_comment = '<%= review.additional_comment.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim();
+    <% else %>
+    review.additional_comment = '';
+    <% end %>
     review.scores = [];
     review.comments = [];
-    parent_review_id = '<%= review.reviewed_object_id %>'
     review.parent = {};
     review.parent.questions = [];
     <%
@@ -155,10 +157,12 @@
         $($('#reviewing-table > tbody > tr')[reviewing.questions.length + 1]).append('<td><b>' + percentage + '%</b></td>');
         $($('#reviewing-table > tbody > tr')[reviewing.questions.length + 2]).append('<td><a style="cursor: pointer;">view</a></td>');
         $($('#reviewing-table > tbody > tr')[reviewing.questions.length + 2]).find('td').last().click(function () {
+            var col = $(this).parent().children().index($(this));
             $('#parent-review-table-tbody').empty();
-            $('#parent-review-table > tbody:last').append('<tr><td style="text-align:left"><b>Review date<b></td><td>' + r.parent.updated_at + '</td><td>---</td></tr>');
-            for (var i = 0; i < r.parent.questions.length; i++) {
-                $('#parent-review-table > tbody:last').append('<tr><td style="text-align:left">' + r.parent.questions[i].txt + '</td><td><b>' + r.parent.questions[i].score + '</b> / <b>' + r.parent.questions[i].max_score + '</b></td><td>' + r.parent.questions[i].comment + '</td></tr>');
+            var parent_review = reviewing.reviews[col - 1].parent;
+            $('#parent-review-table > tbody:last').append('<tr><td style="text-align:left"><b>Review date<b></td><td>' + parent_review.updated_at + '</td><td>---</td></tr>');
+            for (var i = 0; i < parent_review.questions.length; i++) {
+                $('#parent-review-table > tbody:last').append('<tr><td style="text-align:left">' + parent_review.questions[i].txt + '</td><td><b>' + parent_review.questions[i].score + '</b> / <b>' + parent_review.questions[i].max_score + '</b></td><td>' + parent_review.questions[i].comment + '</td></tr>');
             }
             $('#parent-review-modal').modal('show');
         });

@@ -222,6 +222,10 @@ class LotteryController < ApplicationController
     assignment = Assignment.find(params[:id]) unless params[:id].blank?
     sign_up_topics = SignUpTopic.find_all_by_assignment_id(params[:id])
 
+    # TODO - provide a seed IF same results are required everytime with same input
+    # our assumption - algorithm is random, running twice on same input may result in different allocations.
+    rand_generator = Random.new
+
     #to keep track of the max slots for a topic
     current_max_slots = Hash.new
     sign_up_topics.each do |topic|
@@ -269,7 +273,7 @@ class LotteryController < ApplicationController
                       end
                     else
                         # randomly choose from the candidates who have given same highest priority for the topic
-                        i = rand(candidates.size)
+                        i = rand_generator.rand(candidates.size)
                         alloted = allot_topic_to_user_if_possible(params[:id],candidates[i],topic,current_max_slots)
                         if(alloted == true)
                           stop = false
@@ -308,7 +312,7 @@ class LotteryController < ApplicationController
   def allot_topic_to_user_if_possible(assignment_id, signed_up_user_entry,topic,current_max_slots)
     high_prio_topics = is_other_topic_of_higher_priority(assignment_id,signed_up_user_entry.creator_id,signed_up_user_entry.preference_priority_number,current_max_slots)
     if(high_prio_topics == false)
-      #current_max_slots[topic.id] =  current_max_slots[topic.id] -1
+      current_max_slots[topic.id] =  current_max_slots[topic.id] -1
       signed_up_user_entry.update_attribute('is_waitlisted',0)
       delete_other_bids(assignment_id, signed_up_user_entry.creator_id)
       return true

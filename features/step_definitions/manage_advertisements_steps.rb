@@ -158,6 +158,6 @@ When /^I visit the page of "([^"]*)"$/ do |page_name|
 end
 
 Then /^I should only see the latest request$/ do
-  should have_content('This is my 2nd request')
+  #should have_content('This is my 2nd request')
   should_not have_content('I want to join your team')
 end

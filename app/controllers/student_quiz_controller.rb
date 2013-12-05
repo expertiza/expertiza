@@ -34,17 +34,29 @@ class StudentQuizController < ApplicationController
     end
   end
 
+  def self.take_quiz assignment_id
+    @questionnaire = Array.new
+    Team.find_all_by_parent_id(assignment_id).each do |quiz_creator|
+      Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
+        @questionnaire.push(questionnaire)
+      end
+    end
+    return @questionnaire
+  end
+
   def record_response
-    questions = Question.find_all_by_questionnaire_id 182
+    puts "record_response"
+    puts params[:questionnaire_id]
+    questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
 
     questions.each do |question|
       if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
         params["#{question.id}"].each do |choice|
-          new_response = QuizResponse.new :response => choice, :question_id => question.id, :questionnaire_id => 182
+          new_response = QuizResponse.new :response => choice, :question_id => question.id, :questionnaire_id => params[:questionnaire_id]
           new_response.save
         end
       else
-        new_response = QuizResponse.new :response => params["#{question.id}"], :question_id => question.id, :questionnaire_id => 182
+        new_response = QuizResponse.new :response => params["#{question.id}"], :question_id => question.id, :questionnaire_id => params[:questionnaire_id]
         new_response.save
       end
     end

@@ -58,7 +58,7 @@ class StudentQuizController < ApplicationController
           valid = 1
         else
           params["#{question.id}"].each do |choice|
-            new_response = QuizResponse.new :response => choice, :question_id => question.id, :questionnaire_id => params[:questionnaire_id]
+            new_response = QuizResponse.new :response => choice, :question_id => question.id, :questionnaire_id => params[:questionnaire_id], :participant_id => params[:participant_id], :assignment_id => params[:assignment_id]
             unless new_response.valid?
               valid = 1
             end
@@ -66,7 +66,7 @@ class StudentQuizController < ApplicationController
           end
         end
       else
-        new_response = QuizResponse.new :response => params["#{question.id}"], :question_id => question.id, :questionnaire_id => params[:questionnaire_id]
+        new_response = QuizResponse.new :response => params["#{question.id}"], :question_id => question.id, :questionnaire_id => params[:questionnaire_id], :participant_id => params[:participant_id], :assignment_id => params[:assignment_id]
         unless new_response.valid?
           valid = 1
         end

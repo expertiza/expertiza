@@ -1,10 +1,11 @@
 <% form_tag :controller => 'student_quiz',
             :action => 'take_quiz',
             :assignment_id => assignment.id,
-            :reviewer_id => session[:user].id do %>
+            :reviewer_id => session[:user].id,
+            :participant_id => @participant.id do %>
 
   <% if assignment.sign_up_topics.count > 0 %>
-    <p><b>Select a topic below to begin for a new quiz:</b></p>
+    <p><b>Select a quiz to begin:</b></p>
     <% StudentQuizController.take_quiz(assignment.id).each do |questionnaire| %>
       <%= radio_button_tag :questionnaire_id, questionnaire.id %> <%= questionnaire.id %>: <%=h questionnaire.name %><br>
     <% end %>
@@ -12,7 +13,7 @@
   <% end %>
 
   <% if assignment.sign_up_topics.count > 0 %>
-     <input type='submit' value='Select a Topic For Quiz'/>
+     <input type='submit' value='Select Quiz'/>
   <% else %>
      <input type='submit' value='Go to Selection Page'/>
   <% end %>

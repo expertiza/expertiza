@@ -77,6 +77,7 @@ Scenario: Inviting a respondent to join a non-full team should pass
     And my team is not full
    When I visit the page of "Your team"
    Then I should see "This is my ad."
+  Then I fill in "user_name" with "student1"
    When I press "Invite"
    Then I should see "Waiting for reply"
 

@@ -17,22 +17,33 @@
     %>
     reviewing.reviews = [];
     var review;
+    var parent_review_id;
     <%
         for review in rscore[:assessments]
     %>
     review = {};
     review.updated_at = '<%= review.updated_at.strftime('%x') %><br/><%= review.updated_at.strftime('%X') %>';
+    review.additional_comment = '<%= review.additional_comment.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim();
     review.scores = [];
     review.comments = [];
-
+    parent_review_id = '<%= review.reviewed_object_id %>'
+    review.parent = {};
+    review.parent.questions = [];
     <%
             Score.find_all_by_response_id(review.response_id).each{ |reviewScore|
     %>
     review.scores.push('<%= reviewScore.score.to_s %>'.trim());
     review.comments.push('<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
     <%
-            }
+        }
+        Score.find_all_by_response_id(review.review_mapping.id).each{ |reviewScore|
+            question = Question.find_by_id(reviewScore.question_id)
     %>
+    review.parent.questions.push({'max_score': '<%= question.questionnaire.max_question_score.to_s %>'.trim(), 'txt': '<%= question.txt %>'.trim(), 'score': '<%= reviewScore.score.to_s %>'.trim(), 'comment': '<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim()});
+    <%
+        }
+    %>
+    review.parent.updated_at = '<%= review.review_mapping.updated_at.strftime('%x') %><br/><%= review.review_mapping.updated_at.strftime('%X') %>';
     reviewing.reviews.push(review);
     <%
         end
@@ -51,6 +62,54 @@
   </tbody>
 </table>
 
+<!-- Modal -->
+<div class="modal fade" id="reviewing-modal" tabindex="-1" role="dialog" aria-labelledby="reviewing-modal-label" aria-hidden="true">
+  <div class="modal-dialog" style="width: 1000px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="reviewing-modal-label">Reviewing</h4>
+      </div>
+      <div class="modal-body">
+        <div id="divReviewingChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="parent-review-modal" tabindex="-1" role="dialog" aria-labelledby="parent-review-modal-label" aria-hidden="true">
+  <div class="modal-dialog" style="width: 1000px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="parent-review-modal-label">Review</h4>
+      </div>
+      <div class="modal-body" style="margin-bottom: -30px;">
+        <table class="table round-border-table text-center table-striped" id="parent-review-table">
+          <thead>
+          <tr style="background-color:#dddddd">
+          <th style="text-align:left">Question</th>
+          <th>Score</th>
+          <th>Comment</th>
+          </thead>
+          <tbody id="parent-review-table-tbody">
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <script>
     // Add questions to the table
     $('#reviewing-table > tbody:last').append('<tr><td style="text-align:left"><b>Metareview date<b></td></tr>');
@@ -59,31 +118,117 @@
         $('#reviewing-table > tbody:last').append('<tr><td style="text-align:left">' + q.txt + '</td></tr>');
     }
     $('#reviewing-table > tbody:last').append('<tr><td style="text-align:left"><b>Total Score</b></td></tr>');
+    $('#reviewing-table > tbody:last').append('<tr><td style="text-align:left"><b>Review</b></td></tr>');
 
     // Add reviews to the table
     for (var index = 0; index < reviewing.reviews.length; index++) {
         var r = reviewing.reviews[index];
         $('#reviewing-table > thead').find('tr').each(function () {
             var trow = $(this);
-            trow.append('<th>Metareview ' + (index + 1) + '</th>');
+            if (r.additional_comment.length > 0) {
+                trow.append('<th title="' + r.additional_comment + '" class="td-top-arrow">Metareview ' + (index + 1) + '<span class="top-arrow"></span></th>');
+            }
+            else {
+                trow.append('<th>Metareview ' + (index + 1) + '</th>');
+            }
         });
 
         $($('#reviewing-table > tbody > tr')[0]).append('<td>' + r.updated_at + '</td>');
 
         var obtained_total = 0;
         var max_total = 0;
-        debugger;
         $('#reviewing-table > tbody').find('tr').each(function () {
             var trow = $(this);
             if (trow.index() >= 1 && trow.index() < reviewing.questions.length + 1) {
                 var qid = trow.index() - 1;
                 obtained_total += parseFloat(r.scores[qid]);
                 max_total += parseFloat(reviewing.questions[qid].max_score);
-                trow.append('<td title="' + r.comments[qid] + '"><b>' + r.scores[qid] + '</b> / <b>' + reviewing.questions[qid].max_score + '</b></td>');
+                if (r.comments[qid].length > 0) {
+                    trow.append('<td class="td-top-arrow" title="' + r.comments[qid] + '"><b>' + r.scores[qid] + '</b> / <b>' + reviewing.questions[qid].max_score + '</b><span class="top-arrow"></span></td>');
+                }
+                else {
+                    trow.append('<td><b>' + r.scores[qid] + '</b> / <b>' + reviewing.questions[qid].max_score + '</b></td>');
+                }
             }
         });
         var percentage = Math.round((obtained_total / max_total) * 100 * 100) / 100;
         $($('#reviewing-table > tbody > tr')[reviewing.questions.length + 1]).append('<td><b>' + percentage + '%</b></td>');
-
+        $($('#reviewing-table > tbody > tr')[reviewing.questions.length + 2]).append('<td><a style="cursor: pointer;">view</a></td>');
+        $($('#reviewing-table > tbody > tr')[reviewing.questions.length + 2]).find('td').last().click(function () {
+            $('#parent-review-table-tbody').empty();
+            $('#parent-review-table > tbody:last').append('<tr><td style="text-align:left"><b>Review date<b></td><td>' + r.parent.updated_at + '</td><td>---</td></tr>');
+            for (var i = 0; i < r.parent.questions.length; i++) {
+                $('#parent-review-table > tbody:last').append('<tr><td style="text-align:left">' + r.parent.questions[i].txt + '</td><td><b>' + r.parent.questions[i].score + '</b> / <b>' + r.parent.questions[i].max_score + '</b></td><td>' + r.parent.questions[i].comment + '</td></tr>');
+            }
+            $('#parent-review-modal').modal('show');
+        });
     }
+
+    $(function () {
+        $('#reviewing-modal').on('shown.bs.modal', function () {
+
+            var questions = [], questionScores = [], firstArrayFlag = true, scoreCounter;
+            questions.counter = 0;
+
+            $(reviewing.reviews).each(function () {
+                scoreCounter = 0;
+                $(this.scores).each(function () {
+                    if (firstArrayFlag)
+                        questionScores.push(parseInt(this));
+                    else {
+                        questionScores[scoreCounter++] += parseInt(this);
+                    }
+                });
+                firstArrayFlag = false;
+            });
+
+            for (var counter = 0; counter < questionScores.length; counter++) {
+                questionScores[counter] /= reviewing.reviews.length;
+                questionScores[counter] = Math.round(questionScores[counter] * 100) / 100;
+            }
+
+            $(reviewing.questions).each(function () {
+                questions.push(this.txt);
+            });
+
+            var masterChart = new Highcharts.Chart({
+                chart: {
+                    type: 'bar',
+                    renderTo: 'divReviewingChart'
+                },
+                title: {
+                    text: 'Average Scores for all Questions'
+                },
+                xAxis: {
+                    categories: questions,
+                    labels: {
+                        align: 'right',
+                        formatter: function () {
+                            questions.counter = questions.counter + 1;
+                            return "Question " + (questions.counter - reviewing.questions.length);
+
+                        }
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Average Score'
+                    },
+                    max: question.max_score
+                },
+                legend: {
+                    enabled: false
+                },
+                series: [
+                    {
+                        name: 'Average Score',
+                        color: '#4572A7',
+                        data: questionScores
+                    }
+                ]
+            });
+        });
+    });
+
 </script>

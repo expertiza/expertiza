@@ -1,5 +1,6 @@
 class LatePolicy < ActiveRecord::Base
 
+  attr_accessible :policy_name, :instructor_id, :max_penalty, :penalty_per_unit, :penalty_unit
   belongs_to :user
 
   has_many :assignments
@@ -8,6 +9,7 @@ class LatePolicy < ActiveRecord::Base
   validates_presence_of :instructor_id
   validates_presence_of :max_penalty
   validates_presence_of :penalty_per_unit
+  validates_presence_of :penalty_unit
 
   validates_numericality_of :max_penalty, :greater_than => 0
   validates_numericality_of :max_penalty, :less_than => 50

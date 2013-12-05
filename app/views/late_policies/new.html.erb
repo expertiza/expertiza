@@ -13,6 +13,16 @@
       <%= text_field 'late_policy', 'penalty_per_unit' %>
     </p>
     <p>
+      <label for="penalty_unit">Penalty Unit:</label><label style="color: #ff0000;">*</label><br/>
+      <!--select name=<='late_policy[:penalty_unit]'%>>
+      <option value='Minute' selected>Minute</option>
+      <option value='Hour' >Hour</option>
+      <option value='Day' >Day</option>
+      </select-->
+      <% @units=["Minute","Hour","Day"]%>
+      <%= select("late_policy","penalty_unit",@units) %>
+    </p>
+    <p>
       <label for="late_policy_penalty_maximum">Maximum Penalty:</label><label style="color: #ff0000;">*</label><br/>
       <%= text_field 'late_policy', 'max_penalty' %>
     </p>

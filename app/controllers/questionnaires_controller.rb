@@ -16,7 +16,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
     clone_questionnaire_details(questions)
-=======
+#=======
     if (session[:user]).role.name != "Teaching Assistant"
       @questionnaire.instructor_id = session[:user].id
     else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
@@ -62,7 +62,7 @@ class QuestionnairesController < ApplicationController
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!      
       redirect_to :action => 'list', :controller => 'tree_display'
     end            
->>>>>>> 151e9e7b1fcc53623c9d4ec14bfb2e20c7a5400a:app/controllers/questionnaire_controller.rb
+#>>>>>>> 151e9e7b1fcc53623c9d4ec14bfb2e20c7a5400a:app/controllers/questionnaire_controller.rb
   end
 
   # Remove a given questionnaire

@@ -30,3 +30,35 @@ Unable to load system_setting, underlying cause No such file to load -- system_s
 /Users/charonmiller/RubymineProjects/expertiza/test/unit/invitation_controller_test.rb:1:in `<top (required)>'
 -e:1:in `load'
 -e:1:in `<main>'
+  [1m[36mSQL (0.0ms)[0m  [1mBEGIN[0m
+  [1m[35mSCHEMA (3.0ms)[0m  SHOW TABLES 
+  [1m[36mSignedUpUser Load (1.0ms)[0m  [1mSELECT `signed_up_users`.* FROM `signed_up_users` WHERE `signed_up_users`.`id` = 187039979 LIMIT 1[0m
+  [1m[35mSQL (0.0ms)[0m  ROLLBACK
+  [1m[36mSQL (0.0ms)[0m  [1mBEGIN[0m
+  [1m[35mSCHEMA (3.0ms)[0m  SHOW TABLES 
+  [1m[36mAssignment Load (1.0ms)[0m  [1mSELECT `assignments`.* FROM `assignments` WHERE `assignments`.`id` = 1023790176 LIMIT 1[0m
+  [1m[35mUser Load (1.0ms)[0m  SELECT `users`.* FROM `users` WHERE `users`.`id` = 1018932494 LIMIT 1
+  [1m[36mSignedUpUser Load (116.1ms)[0m  [1mSELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = 1023790176 AND su.creator_id = 1018932494 AND su.is_waitlisted = 1[0m
+  [1m[35mSignedUpUser Load (1.0ms)[0m  SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = 1023790176 AND su.creator_id = 1018932494 AND su.is_waitlisted = 1
+  [1m[36mSQL (0.0ms)[0m  [1mROLLBACK[0m
+  [1m[36mSQL (1.0ms)[0m  [1mBEGIN[0m
+  [1m[35mSCHEMA (3.0ms)[0m  SHOW TABLES 
+  [1m[36mAssignment Load (1.0ms)[0m  [1mSELECT `assignments`.* FROM `assignments` WHERE `assignments`.`id` = 1023790176 LIMIT 1[0m
+  [1m[35mTeam Load (0.0ms)[0m  SELECT `teams`.* FROM `teams` WHERE `teams`.`id` = 70867691 LIMIT 1
+  [1m[36mSignUpTopic Load (0.0ms)[0m  [1mSELECT `sign_up_topics`.* FROM `sign_up_topics` WHERE (assignment_id = 1023790176)[0m
+  [1m[35mSignedUpUser Load (1.0ms)[0m  SELECT su.* FROM signed_up_users su, sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = 1023790176 AND su.creator_id = 70867691 AND preference_priority_number < 3 AND preference_priority_number != 0
+  [1m[36mSQL (0.0ms)[0m  [1mROLLBACK[0m
+  [1m[36mSQL (0.0ms)[0m  [1mBEGIN[0m
+  [1m[35mSCHEMA (454.6ms)[0m  SHOW TABLES 
+  [1m[36mAssignment Load (1.0ms)[0m  [1mSELECT `assignments`.* FROM `assignments` WHERE `assignments`.`id` = 1023790176 LIMIT 1[0m
+  [1m[35mTeam Load (1.0ms)[0m  SELECT `teams`.* FROM `teams` WHERE `teams`.`id` = 70867691 LIMIT 1
+  [1m[36mSignUpTopic Load (353.4ms)[0m  [1mSELECT `sign_up_topics`.* FROM `sign_up_topics` WHERE (assignment_id = 1023790176)[0m
+  [1m[35mSignedUpUser Load (1.0ms)[0m  SELECT su.* FROM signed_up_users su, sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = 1023790176 AND su.creator_id = 70867691 AND preference_priority_number < 3 AND preference_priority_number != 0
+  [1m[36mSQL (0.0ms)[0m  [1mROLLBACK[0m
+  [1m[36mSQL (0.0ms)[0m  [1mBEGIN[0m
+  [1m[35mSCHEMA (1.0ms)[0m  SHOW TABLES 
+  [1m[36mAssignment Load (0.0ms)[0m  [1mSELECT `assignments`.* FROM `assignments` WHERE `assignments`.`id` = 1023790176 LIMIT 1[0m
+  [1m[35mUser Load (0.0ms)[0m  SELECT `users`.* FROM `users` WHERE `users`.`id` = 1018932494 LIMIT 1
+  [1m[36mSignedUpUser Load (0.0ms)[0m  [1mSELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = 1023790176 AND su.creator_id = 1018932494 AND su.is_waitlisted = 1[0m
+  [1m[35mSignedUpUser Load (0.0ms)[0m  SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = 1023790176 AND su.creator_id = 1018932494 AND su.is_waitlisted = 1
+  [1m[36mSQL (0.0ms)[0m  [1mROLLBACK[0m

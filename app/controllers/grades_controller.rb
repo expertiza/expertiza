@@ -248,6 +248,15 @@ The Expertiza system has brought this to my attention."
       penalties = calculate_penalty(participant.id)
       @total_penalty =0
       if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
+        if(penalties[:submission].nil?)
+          penalties[:submission]=0
+        end
+        if(penalties[:review].nil?)
+          penalties[:review]=0
+        end
+        if(penalties[:meta_review].nil?)
+          penalties[:meta_review]=0
+        end
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
         if(@total_penalty > l_policy.max_penalty)

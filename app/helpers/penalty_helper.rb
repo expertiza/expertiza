@@ -25,6 +25,10 @@ module PenaltyHelper
         #penalties[:author_feedback] = calculate_author_feedback_penalty()
         #penalties[:team_mate_feedback] = calculate_team_feedback_penalty()
       end
+    else
+      penalties[:submission] = 0
+      penalties[:review] = 0
+      penalties[:meta_review] = 0
     end
 
     penalties

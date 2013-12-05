@@ -22,7 +22,11 @@
     %>
     feedback = {};
     feedback.updated_at = '<%= review.updated_at.strftime('%x') %><br/><%= review.updated_at.strftime('%X') %>';
+    <% if review.additional_comment %>
     feedback.additional_comment = '<%= review.additional_comment.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim();
+    <% else %>
+    feedback.additional_comment = '';
+    <% end %>
     feedback.scores = [];
     feedback.comments = [];
 

@@ -56,7 +56,7 @@
 
   </tbody>
 </table>
-
+<div id="divSubmittedWorkChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 <script>
     // Add questions to the table
     $('#submitted-work-table > tbody:last').append('<tr><td style="text-align:left"><b>Review date<b></td></tr>');
@@ -93,4 +93,53 @@
         $($('#submitted-work-table > tbody > tr')[submitted_work.questions.length + 2]).append('<td><b>' + r.feedback + '</b></td>');
 
     }
+
+    $(function () {
+        var questions = [], questionScores = [];
+        questions.counter = 0;
+
+        $(submitted_work.reviews[0].scores).each(function(){
+            questionScores.push(parseInt(this));
+        });
+
+        $(submitted_work.questions).each(function(){
+            questions.push(this.txt);
+        });
+
+        var masterChart = new Highcharts.Chart({
+            chart: {
+                type: 'bar',
+                renderTo: 'divSubmittedWorkChart'
+            },
+            title: {
+                text: 'Questions with Average Scores'
+            },
+            xAxis: {
+                categories: questions,
+                labels: {
+                    align:'right',
+                    formatter: function () {
+                        questions.counter = questions.counter + 1;
+                            return "Question " + questions.counter;
+                    }
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Average Score'
+                }
+            },
+            legend: {
+                backgroundColor: '#FFFFFF',
+                reversed: true
+            },
+            series: [{
+                name: 'Average Score',
+                color:'#4572A7',
+                data: questionScores
+            }]
+        });
+    });
+
 </script>

@@ -12,7 +12,7 @@ class ImportFileController < ApplicationController
     err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
     errors.each{
       |error|
-      err_msg = err_msg+"<li>"+error+"<br/>"
+      err_msg = err_msg+"<li>"+error.to_s+"<br/>"
     }
     err_msg = err_msg+"</ul>"
     if errors.length > 0

@@ -74,6 +74,5 @@ Feature: Manage the users in Expertiza
   Scenario: Delete a user
     Given I View User "charlie_chevy"
       And I delete the user
-    When I View User "charlie_chevy"
     Then I should see "charlie_chevy does not exist."
       And I should not see "User: charlie_chevy"

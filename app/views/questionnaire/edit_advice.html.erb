@@ -1,0 +1,76 @@
+<h1>Edit an existing questionnaire's advice</h1>
+
+<script>
+<% for question in @questionnaire.questions %>
+	<%= "var display_vertical_" + question.id.to_s + " = false;" %>
+<% end %>
+
+function show_vertical_questions(question_id){
+	// Delete the horizontal questions
+	horz = document.getElementById('horizontal_questions_' + question_id);
+	vert = document.getElementById('vertical_questions_' + question_id);
+	horz_questions = horz.getElementsByTagName("input"); // get all the question text boxes
+	vert_questions = vert.getElementsByTagName("input");
+	
+	var i = 0;
+	while(horz_questions.length > 0)
+	{
+		// Copy the value before deleting the horizontal question
+		vert_questions[i].value = horz_questions[0].value;
+		horz_questions[0].parentNode.removeChild(horz_questions[0]);
+		i++;
+	}
+}
+
+function show_horizontal_questions(question_id){
+	vert = document.getElementById('vertical_questions_' + question_id);
+	vert_questions = vert.getElementsByTagName("input");
+	
+	for(var i=0; i<vert_questions.length; i++){
+		var id = vert_questions[i].id.split('_')[1];
+		var col = document.getElementById('horizontal_question_'+question_id+'_'+i);
+		col.innerHTML = '<input id="horizontal_' + id + '_advice" name="advice[' + id + '][advice]" size="12" type="text" value="' + vert_questions[i].value + '"/>';
+	}
+}
+
+</script>
+
+<% form_tag :action => 'save_advice', :id=>@questionnaire.id do %>
+<table>
+	<tr>
+		<th></th>
+		<% 	for i in (0..@questionnaire.max_question_score-@questionnaire.min_question_score) %>
+		<th>
+			<%= @questionnaire.max_question_score-i %>
+			<% if @questionnaire.true_false_questions? %>
+				<% if i == 0 %>
+					/ True
+					<% end %>
+					<% if i == 1 %>
+					/ False
+					<% end %>
+			<% end %>
+		</th>
+		<% 	end %>
+	</tr>
+	<% for question in @questionnaire.questions %>
+		<tr id="horizontal_questions_<%= question.id %>">
+			<td>
+				<a onclick="">
+				<%= question.txt %></a>
+			</td>
+			<% i = 0; %>
+			<% for @advice in question.question_advices.sort {|x,y| y.score <=> x.score } %>
+			<td id="horizontal_question_<%=question.id%>_<%=i%>">
+				<% i = i + 1; %>
+				<%= text_field 'advice[]', 'advice', :size => 12, :id => "horizontal_"+@advice.id.to_s+"_advice"%>
+			</td>
+			<% 	end %>
+		</tr>
+	<% end %>
+</table>
+<br>
+<%= submit_tag "Save Advice", :name=>"save" %>
+<% end %>
+<br>
+<a href="javascript:window.history.back()">Back</a>

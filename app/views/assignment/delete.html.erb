@@ -1,0 +1,23 @@
+<h1>Delete an existing questionnaire</h1>
+<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+<div class="flash_error">
+	<%= flash[:notice] %>
+</div>
+<% end %>
+<% form_tag({:action=>'delete'})do %>
+  	Are you sure you want to delete <%= @assignment.name.capitalize %>?<br/><br/>
+	<table>
+	   <tr>
+	     <th>Name&nbsp;&nbsp;</th><th>Directory path</th>
+	   </tr>
+	   <tr>
+		   <td><%= @assignment.name %></td>
+		   <td><%= @assignment.directory_path %></td>
+		 </tr>
+	</table>
+	<br />
+	<%= submit_tag "Delete assignment", :name=>"delete" %>
+
+<% end %>
+<br />
+<%= render :partial => '/shared_scripts/back' %>

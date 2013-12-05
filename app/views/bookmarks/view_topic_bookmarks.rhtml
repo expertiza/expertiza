@@ -1,0 +1,11 @@
+<b>Bookmarks for the Topic:</b>
+<%=@topic.topic_name%>
+<br/>
+<br/>
+<%= render :partial => 'results' %>
+<%= hidden_field_tag "id", @assignment_id %>
+<%= hidden_field_tag "tid", @topic.id %>
+<br/>
+<br/>
+<%= link_to('Back',:controller => 'signup', :action => 'signup_topics', :id => @assignment_id) %>
+| <%= link_to('Add Bookmark',:controller => 'bookmarks', :action => 'add_bookmark_form', :id => @topic.id) %> </td>

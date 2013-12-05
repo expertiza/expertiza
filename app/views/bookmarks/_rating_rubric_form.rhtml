@@ -1,0 +1,20 @@
+<p>
+  <div>
+    <label for="display_text">Display Text:</label>
+  </div>
+  <div>
+    <%= text_field_tag(:display_text, @rating_rubric.nil? ? nil : @rating_rubric.display_text, :size => 50) %>
+  </div>
+</p>
+<p>
+  <div>
+    <span>Minimum Rating:</span>
+    <span><%= text_field_tag(:minimum_rating, @rating_rubric.nil? ? nil : @rating_rubric.minimum_rating, :size=> 1) %></span>
+    &nbsp;&nbsp;&nbsp;
+    <span>Maximum Rating:</span>
+    <span><%= text_field_tag(:maximum_rating, @rating_rubric.nil? ? nil : @rating_rubric.maximum_rating, :size=> 1) %></span>
+  </div>
+  <div>
+  </div>
+</p>
+

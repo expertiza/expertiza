@@ -25,6 +25,22 @@
     table td {
         min-width: 108px !important;
     }
+
+    .graph-btn {
+        cursor: pointer;
+    }
+
+    .td-top-arrow {
+        position: relative; padding: 5px;
+    }
+
+    .top-arrow {
+        position: absolute;
+        top: 0;
+        right: 0;
+        border-top: 10px solid #428bca;
+        border-left: 10px solid transparent;
+    }
 </style>
 
 
@@ -43,13 +59,15 @@
       <div class="col-md-12">
         <ul class="nav nav-tabs" id="tabs">
           <li><a href="#SubmittedWork" data-toggle="tab">
-            Submitted Work&nbsp;<img id="submitted-work-graph-btn" src="/images/graph.png" data-toggle="modal" data-target="#submitted-work-modal" />
+            Submitted
+            Work&nbsp;<img class="graph-btn" id="submitted-work-graph-btn" src="/images/graph.png" data-toggle="modal" data-target="#submitted-work-modal"/>
           </a></li>
           <li><a href="#Reviewing" data-toggle="tab">
-            Reviewing&nbsp;<img id="reviewing-graph-btn" src="/images/graph.png" />
+            Reviewing&nbsp;<img class="graph-btn" id="reviewing-graph-btn" src="/images/graph.png" data-toggle="modal" data-target="#reviewing-modal"/>
           </a></li>
           <li><a href="#AuthorFeedback" data-toggle="tab">
-            Author Feedback&nbsp;<img id="author-feedback-graph-btn" src="/images/graph.png" />
+            Author
+            Feedback&nbsp;<img class="graph-btn" id="author-feedback-graph-btn" src="/images/graph.png" data-toggle="modal" data-target="#author-feedback-modal"/>
           </a></li>
         </ul>
         <div class="tab-content">

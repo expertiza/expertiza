@@ -21,7 +21,9 @@
         for review in rscore[:assessments]
     %>
     review = {};
+    review.id = '<%= review.id %>';
     review.updated_at = '<%= review.updated_at.strftime('%x') %><br/><%= review.updated_at.strftime('%X') %>';
+    review.additional_comment = '<%= review.additional_comment.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim();
     review.scores = [];
     review.comments = [];
 
@@ -59,7 +61,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="submitted-work-modal" tabindex="-1" role="dialog" aria-labelledby="submitted-work-modal-label" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog" style="width: 1000px">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="submitted-work-modal-label">Submitted Work</h4>
@@ -70,8 +72,10 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
 <script>
@@ -89,7 +93,12 @@
         var r = submitted_work.reviews[index];
         $('#submitted-work-table > thead').find('tr').each(function () {
             var trow = $(this);
-            trow.append('<th>Review ' + (index + 1) + '</th>');
+            if (r.additional_comment.length > 0) {
+                trow.append('<th title="' + r.additional_comment + '" class="td-top-arrow">Review ' + (index + 1) + '<span class="top-arrow"></span></th>');
+            }
+            else {
+                trow.append('<th>Review ' + (index + 1) + '</th>');
+            }
         });
 
         $($('#submitted-work-table > tbody > tr')[0]).append('<td>' + r.updated_at + '</td>');
@@ -102,7 +111,12 @@
                 var qid = trow.index() - 1;
                 obtained_total += parseFloat(r.scores[qid]);
                 max_total += parseFloat(submitted_work.questions[qid].max_score);
-                trow.append('<td title="' + r.comments[qid] + '"><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b></td>');
+                if (r.comments[qid].length > 0) {
+                    trow.append('<td class="td-top-arrow" title="' + r.comments[qid] + '"><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b><span class="top-arrow"></span></td>');
+                }
+                else {
+                    trow.append('<td><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b></td>');
+                }
             }
         });
         var percentage = Math.round((obtained_total / max_total) * 100 * 100) / 100;
@@ -111,69 +125,73 @@
 
     }
 
+
     $(function () {
-        var questions = [], questionScores = [], firstArrayFlag = true, scoreCounter;
-        questions.counter = 1;
 
-        $(submitted_work.reviews).each(function(){
-            scoreCounter = 0;
-            $(this.scores).each(function(){
-                if(firstArrayFlag)
-                    questionScores.push(parseInt(this));
-                else{
-                    questionScores[scoreCounter++] += parseInt(this);
-                }
-            });
-            firstArrayFlag = false;
-        });
+        $('#submitted-work-modal').on('shown.bs.modal', function () {
 
-        for(var counter=0; counter < questionScores.length; counter++){
-            questionScores[counter] /= submitted_work.reviews.length;
-            questionScores[counter] = Math.round(questionScores[counter]*100)/100   ;
-        }
+            var questions = [], questionScores = [], firstArrayFlag = true, scoreCounter;
+            questions.counter = 0;
 
-        $(submitted_work.questions).each(function(){
-            questions.push(this.txt);
-        });
-
-        var masterChart = new Highcharts.Chart({
-            chart: {
-                type: 'bar',
-                renderTo: 'divSubmittedWorkChart'
-            },
-            title: {
-                text: 'Questions with Average Scores'
-            },
-            xAxis: {
-                categories: questions,
-                labels: {
-                    align: 'right',
-                    formatter: function () {
-                        var returnValue = "Question " + questions.counter++;
-                        if(this.isLast)
-                            questions.counter = 1;
-                        return returnValue;
+            $(submitted_work.reviews).each(function () {
+                scoreCounter = 0;
+                $(this.scores).each(function () {
+                    if (firstArrayFlag)
+                        questionScores.push(parseInt(this));
+                    else {
+                        questionScores[scoreCounter++] += parseInt(this);
                     }
-                }
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: 'Average Score'
+                });
+                firstArrayFlag = false;
+            });
+
+            for (var counter = 0; counter < questionScores.length; counter++) {
+                questionScores[counter] /= submitted_work.reviews.length;
+                questionScores[counter] = Math.round(questionScores[counter] * 100) / 100;
+            }
+
+
+            $(submitted_work.questions).each(function () {
+                questions.push(this.txt);
+            });
+
+            var masterChart = new Highcharts.Chart({
+                chart: {
+                    type: 'bar',
+                    renderTo: 'divSubmittedWorkChart'
                 },
-                max: question.max_score
-            },
-            legend: {
-                backgroundColor: '#FFFFFF',
-                reversed: true
-            },
-            series: [
-                {
-                    name: 'Average Score',
-                    color: '#4572A7',
-                    data: questionScores
-                }
-            ]
+                title: {
+                    text: 'Average Scores for all Questions'
+                },
+                xAxis: {
+                    categories: questions,
+                    labels: {
+                        align: 'right',
+                        formatter: function () {
+                            questions.counter = questions.counter + 1;
+                            return "Question " + (questions.counter - submitted_work.questions.length);
+
+                        }
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Average Score'
+                    },
+                    max: question.max_score
+                },
+                legend: {
+                    enabled: false
+                },
+                series: [
+                    {
+                        name: 'Average Score',
+                        color: '#4572A7',
+                        data: questionScores
+                    }
+                ]
+            });
         });
     });
 

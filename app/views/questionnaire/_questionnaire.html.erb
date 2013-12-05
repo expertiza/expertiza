@@ -1,0 +1,83 @@
+<%= error_messages_for 'questionnaire' %>
+
+<!--[form:questionnaire]-->
+<table>
+	<tr>
+		<td valign="top"><label for="questionnaire_name">Name:</label>	</td>
+		<td>
+			<%= text_field 'questionnaire', 'name'  %>
+			<%= hidden_field 'questionnaire', 'id' %>
+			<%= hidden_field 'questionnaire', 'type' %>
+            <%= hidden_field 'questionnaire', 'section' %>
+		</td>		
+	</tr>
+</table>
+<table>
+	<tr>
+        <td>Questionnaire Type</td>
+        <td><input id="section" type="text" value='<%="#{@questionnaire.section}"%>' size=3 disabled="true"></td>
+      </tr>
+  <tr>
+		<td>Min question score:</td>
+		<td><%= text_field 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
+		<td>Max question score:</td>
+		<td><%= text_field 'questionnaire', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
+		<td>Is this <%= @questionnaire.display_type %> private:</td> 
+		<td><%= select(:questionnaire, :private, [ ['no', false], 
+									 		['yes',  true]])%>
+		</td>
+	</tr>
+</table>
+<p>For helping creating a custom rubric please visit this <%= link_to "guide", "http://wikis.lib.ncsu.edu/index.php/Creating_Custom_Rubric" %>.</p>
+<br/>
+<table id="questions_table">
+	<tr>
+        <td colspan=2 style="padding-bottom: 5pt"><strong>Questions</strong>
+		  <input style="margin-left: 50pt" type="button" value="Add" onclick="addQuestions()">
+		  <input id="numQuestionsToAdd" type="text" value="1" size=1> more question(s)
+        </td>
+		<td colspan=2><input type="button" value="Delete selected questions" onclick="deleteQuestions()"></td>
+	</tr>
+	<tr>
+		<td align=left width=30>Delete</td>
+		<td align=center width=300>Question</td>
+		<td align=center width=100>Scoring</td>
+        <% if (@questionnaire.section == "Custom") %>
+          <td align=center width=100>Parameters</td>
+         <%end%>
+		<td align=left>Weight</td>
+	</tr>
+	
+	<% 	i = 1   %>
+    <% for @question in @questionnaire.questions %>
+      <% @q = QuestionType.find_by_question_id(@question.id) %>
+        <tr>
+            <td align=center><input type=checkbox id="question_chk<%= i %>"></td>
+            <td><%= text_field "question[]", 'txt', :size=>70 %></td>
+            <% if (@questionnaire.section == "Custom") %>
+              <% if @q.q_type == "Checkbox"  %>
+                <% selected_value = 0 %>
+              <% elsif @q.q_type == "TextField"%>
+                <% selected_value = 1 %>
+              <% elsif @q.q_type == "TextArea"%>
+                <% selected_value = 2 %>
+              <% elsif @q.q_type == "DropDown"%>
+                <% selected_value = 3 %>
+              <% elsif @q.q_type == "UploadFile"%>
+                <% selected_value = 4 %>
+              <% else selected_value = 5 %>
+              <% end %>
+                <td><%= select("q[]", :q_type, Question::GRADING_TYPES_CUSTOM, :selected => selected_value)%></td>
+                <td><%= text_field "q[]",  'parameters', :size=>30 %></td>
+            <%else%>
+                <td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
+            <% end%>
+
+            <td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
+        </tr>
+	<% 	i += 1 %>
+	<% end %>
+</table>
+<BR/>
+<!--[eoform:course]-->
+

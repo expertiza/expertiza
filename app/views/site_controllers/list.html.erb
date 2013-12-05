@@ -1,0 +1,107 @@
+<h1>Controllers and Actions</h1>
+
+<%
+  div_ids = Array.new
+  div_names = Array.new
+
+  if @has_unknown
+    div_ids << 'unknown'
+    div_names << 'Unknown'
+  end
+
+  if @has_missing
+    div_ids << 'missing'
+    div_names << 'Missing'
+  end
+
+  if @has_app
+    div_ids << 'app'
+    div_names << 'Application'
+  end
+
+  if @has_builtin
+    div_ids << 'builtin'
+    div_names << 'Builtin'
+  end
+
+  first = true
+-%>
+
+<%= render :partial => 'layouts/tabpanel_js',
+    :locals => {:div_ids => div_ids} -%>
+
+
+<% if @has_unknown -%>
+<div id="unknown" style="display:<%= if first then 'block' else 'none' end %>;">
+<%= render :partial => 'layouts/tabpanel_list',
+    :locals => {:div_ids => div_ids, :div_names => div_names,
+                :div_current => 'unknown' } %>
+
+<div class="guidance_text"><p>The following controllers exist as Ruby
+classes, but they have not yet been set up in Goldberg:</p></div>
+<ul>
+<% for name in @unknown.keys do -%>
+<li> <%= link_to name, :action => 'new_called', :id => name %> </li>
+<% end -%>
+</ul>
+</div>
+  <% first = false -%>
+<% end -%>
+
+
+<% if @has_missing -%>
+<div id="missing" style="display:<%= if first then 'block' else 'none' end %>;">
+<%= render :partial => 'layouts/tabpanel_list',
+    :locals => {:div_ids => div_ids, :div_names => div_names,
+                :div_current => 'missing' } %>
+
+<div class="guidance_text"><p>The following controllers have been set
+up in Goldberg, but the Ruby classes for these appear to be missing.</p>
+<p> Are they obsolete?  Should they be deleted? </p></div>
+<%= render(:partial => 'list',
+           :locals => { :site_controllers => @missing }
+	   ) %>
+</div>
+  <% first = false -%>
+<% end -%>
+
+
+<% if @has_app -%>
+<div id="app" style="display:<%= if first then 'block' else 'none' end %>;">
+<%= render :partial => 'layouts/tabpanel_list',
+    :locals => {:div_ids => div_ids, :div_names => div_names,
+                :div_current => 'app' } %>
+
+<div class="guidance_text"><p>These controllers relate to your
+application (i.e. they are not Goldberg's built-in controllers).</p></div>
+<%= render(:partial => 'list',
+           :locals => { :site_controllers => @app }
+	   ) %>
+</div>
+  <% first = false -%>
+<% end -%>
+
+
+<% if @has_builtin %>
+<div id="builtin" style="display:<%= if first then 'block' else 'none' end %>;">
+<%= render :partial => 'layouts/tabpanel_list',
+    :locals => {:div_ids => div_ids, :div_names => div_names,
+                :div_current => 'builtin' } %>
+
+<div class="guidance_text"><p>Builtin controllers belong to Goldberg:
+they are part of Goldberg's configuration. They affect the way the
+site is used and administered.</p>
+
+<p><strong>WARNING!</strong> Use caution in editing these.  You could
+break Goldberg, lock yourself out, or otherwise drastically affect the
+way Goldberg works.</p></div>
+
+<%= render(:partial => 'list',
+           :locals => { :site_controllers => @builtin }
+	   ) %>
+</div>
+  <% first = false -%>
+<% end -%>
+
+<hr/>
+<%= link_to 'New Controller', :action => 'new' %>

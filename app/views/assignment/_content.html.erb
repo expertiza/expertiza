@@ -1,0 +1,136 @@
+<script type="text/javascript">
+function onChange(){
+	count = document.getElementById("team_count1");
+	hidden = document.getElementById("team_count2");
+	document.poppedLayer3 = eval('document.getElementById("teammate_review")');
+	var dropdownIndex = document.getElementById('teamselect').selectedIndex;
+	var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
+	if(dropdownValue == "true"){
+		count.style.display = "";
+		hidden.style.display = "none";
+		document.poppedLayer3.style.display = "";
+	}else{
+		count.style.display = "none";
+		hidden.style.display  = "";
+		document.poppedLayer3.style.display = "none";
+	}
+}
+
+function get_assignment_startdate() {
+    //var start_date = document.getElementById("assignment_startdate");
+    var staggered_label = document.getElementById("staggered_label");
+    var days_between_chapters = document.getElementById("days_between_chapters");
+    var dropdownIndex = document.getElementById('staggered_deadline').selectedIndex;
+	var dropdownValue = document.getElementById('staggered_deadline')[dropdownIndex].value;
+	if(dropdownValue == "true"){
+		//start_date.style.display = "";
+        staggered_label.style.display = "";
+        days_between_chapters.style.display = "";
+	}else{
+		//start_date.style.display = "none";
+        staggered_label.style.display = "none";
+        days_between_chapters.style.display = "none";
+	}
+}
+
+function onChangeWikiType(){
+	submission_directory = document.getElementById("assgt_directory");
+	var dropdownIndex = document.getElementById('wikiselect').selectedIndex;
+	if(dropdownIndex == 0){
+		submission_directory.innerHTML = "Submission directory:"
+	}else{
+		submission_directory.innerHTML = "Base URL for Wiki:"
+	}
+}
+</script>
+
+<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+<div class="flash_error">
+	<%= flash[:notice] %>
+</div>
+<% end %>
+<%= error_messages_for 'assignment' %>
+
+<!--[form:assignment]-->
+<table>
+
+<tr>
+<td><table>
+<tr>
+  <td><label for="assignment_name">Assignment name: </label></td>
+  <td><%= text_field 'assignment', 'name'  %></td>
+</tr>
+<tr>
+  <td><label for="assignment_directory" id="assgt_directory">Submission directory: </label></td>
+  <td><%= text_field 'assignment', 'directory_path'%></td>
+</tr>
+<tr>
+  <td height="50" valign="top"><label for="assignment_spec">URL of assignment description:</label></td>
+  <td height="50" valign="top"><%= text_field 'assignment', 'spec_location'  %></td>
+</tr>
+<tr>  
+</table></td>
+
+<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
+<td><table>
+<tr>
+  <td width="250"><label for="wiki_type">Wiki Type:</label></td>
+  <td>
+    <% if @wiki_types.length == 0 %>
+      <em>There are currently no wiki assignment types defined</em>
+      <br/>
+      <br/>
+    <% else %>
+      <select id="wikiselect" name="assignment[wiki_type_id]" width="15%" onchange="onChangeWikiType();">
+      <% @wiki_types.each do |wiki_type| %>
+        <option style="width:75px" value="<%= wiki_type.id %>"
+        <%= ' selected' if wiki_type.id == @assignment.wiki_type_id %> >
+        <%= wiki_type.name %>
+        </option>
+      <% end %>
+      </select>
+    <% end %>
+  </td>
+</tr>
+<tr>
+  <td><label for="team_assignment">Team assignment:</label></td>
+  <td>
+  		<select id="teamselect" name="assignment[team_assignment]" onchange="onChange();">
+  		 <option value=false style="width:75px">No</option>
+         <option value=true style="width:75px" <% if @assignment.team_assignment %>SELECTED<%end%>>Yes</option>      
+        </select>
+  </td>  
+</tr>
+
+ <tr><td><label for="staggered">Staggered deadline?</label></td>
+
+ <td>
+  		<select id="staggered_deadline" name="assignment[staggered_deadline]" onchange="get_assignment_startdate();">
+  		 <option value=false style="width:75px">No</option>
+         <option value=true style="width:75px" <% if @assignment.staggered_deadline %>SELECTED<%end%>>Yes</option>
+        </select>
+  </td>
+
+ </tr>
+
+<tr id="team_count1" style="display:none">  
+  <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>   
+  <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5%></td>  
+  </td> 
+</tr>
+
+<tr id="team_count2">
+  <td colspan="2" height="50">&nbsp;</td>
+</tr> 
+</table></td>
+</tr>
+</table>
+
+<p>
+</p>
+<script type="text/javascript">onChangeWikiType();</script>
+
+<!--[eoform:assignment]-->
+
+

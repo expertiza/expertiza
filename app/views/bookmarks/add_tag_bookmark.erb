@@ -1,0 +1,13 @@
+<% form_for :tag, @tag, :url => { :action => "create_tag_bookmark", :bmapping_id => params[:id]} do |f| %>
+
+    <div><h1>Add Tags</h1></div>
+    <div class="field">
+      <%= f.label :tagname %><br />
+      <%= f.text_field :tagname %>
+    </div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+    <br/>
+    <div><%= link_to('Back', :back) %> </div>
+<% end %>

@@ -1,0 +1,22 @@
+<% @questionnaire_type = @questionnaire.class.name %>
+
+<h1>Edit an existing <%= @questionnaire_type.downcase %></h1>
+
+
+<% form_tag({:action=>'edit_questionnaire', :id=>@questionnaire.id}, :multipart => true) do %>
+	<%= render :partial => 'questionnaire' %>
+	
+	<%= submit_tag "Save "+@questionnaire_type, :name=>"save" %>
+    <input style="margin-left:36em" type="submit" name="view_advice" value="View advice"/>	
+
+  	<h4>Import/Export (from/to CSV format)</h4>
+  	<input type="submit" name="import" value="Import questions"/>
+  	<input type="file" name="csv" /> <font size="-1">&nbsp;&nbsp; Format: {question}, {'Numeric' | 'True/False'}, {1-5} </font>
+  	<br />
+
+  	<%= submit_tag "Export questions to CSV", :name=>"export" %>
+  	<br />
+<% end %>
+<br />
+
+<%= link_to 'Back', :action => 'list' %>

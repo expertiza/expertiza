@@ -66,6 +66,7 @@ Scenario: Inviting a respondent to join a full team should not fail
     But my team is full
    When I visit the page of "Your team"
    Then I should see "This is my ad."
+  Then I fill in "user_name" with "student1"
    When I press "Invite"
    Then I should not see "The team already has the maximum number of members."
 

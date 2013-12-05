@@ -29,16 +29,16 @@
             Score.find_all_by_response_id(review.response_id).each{ |reviewScore|
     %>
     review.scores.push('<%= reviewScore.score.to_s %>'.trim());
-    review.comments.push('<%= reviewScore.comments %>'.trim());
+    review.comments.push('<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
     <%
             }
             feedback = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
             if feedback
     %>
-            review.feedback = '<%= link_to "view", :controller => "response", :action => "view", :id => feedback.id %> <%= link_to "edit", :controller => "response", :action => "edit", :id => feedback.id, :return => "feedback" %>'
-            <% else %>
-            review.feedback = '<%= link_to "new", :controller => "response", :action => "new_feedback", :id => review.id %>'
-            <% end %>
+    review.feedback = '<%= link_to "view", :controller => "response", :action => "view", :id => feedback.id %> <%= link_to "edit", :controller => "response", :action => "edit", :id => feedback.id, :return => "feedback" %>'
+    <% else %>
+    review.feedback = '<%= link_to "new", :controller => "response", :action => "new_feedback", :id => review.id %>'
+    <% end %>
     submitted_work.reviews.push(review);
     <%
         end
@@ -85,7 +85,7 @@
                 var qid = trow.index() - 1;
                 obtained_total += parseFloat(r.scores[qid]);
                 max_total += parseFloat(submitted_work.questions[qid].max_score);
-                trow.append('<td title=' + r.comments[qid] + '><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b></td>');
+                trow.append('<td title="' + r.comments[qid] + '"><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b></td>');
             }
         });
         var percentage = Math.round((obtained_total / max_total) * 100 * 100) / 100;

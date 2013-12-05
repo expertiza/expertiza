@@ -29,7 +29,7 @@
     Score.find_all_by_response_id(review.response_id).each{ |reviewScore|
     %>
     feedback.scores.push('<%= reviewScore.score.to_s %>'.trim());
-    feedback.comments.push('<%= reviewScore.comments.gsub(/\n/, "<BR/>") %>'.trim());
+    feedback.comments.push('<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
     <%
     }
     %>
@@ -78,8 +78,7 @@
                 var qid = trow.index() - 1;
                 obtained_total += parseFloat(r.scores[qid]);
                 max_total += parseFloat(author_feedback.questions[qid].max_score);
-                debugger;
-                trow.append('<td title=' + r.comments[qid] + '><b>' + r.scores[qid] + '</b> / <b>' + author_feedback.questions[qid].max_score + '</b></td>');
+                trow.append('<td title="' + r.comments[qid] + '"><b>' + r.scores[qid] + '</b> / <b>' + author_feedback.questions[qid].max_score + '</b></td>');
             }
         });
         var percentage = Math.round((obtained_total / max_total) * 100 * 100) / 100;

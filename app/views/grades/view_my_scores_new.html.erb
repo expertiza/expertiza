@@ -31,6 +31,14 @@
 <div class="twbs">
   <div class="container" style="width: 1290px">
     <%= render :partial => 'grades/scores_header', :locals => {:pscore => @pscore, :assignment => @assignment, :stage => @stage} %>
+    <div class="panel panel-default" id="submission-panel" style="display: none">
+      <div class="panel-heading" style="background-color: #ddd">
+        <h3 class="panel-title" style="background-color: #ddd">Submission</h3>
+      </div>
+      <div class="panel-body">
+        <%= render :partial => 'grades/submissions', :locals => {:participant => @pscore[:participant]} %>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-12">
         <ul class="nav nav-tabs" id="tabs">
@@ -59,6 +67,7 @@
             <% if @pscore[:feedback] and @pscore[:feedback][:assessments].length > 0 %>
                 <%= render :partial => 'grades/scores_author_feedback', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:feedback]} %>
             <% else %>
+                <br/>
                 No author feedback has been completed for this submission.
             <% end %>
           </div>
@@ -75,6 +84,9 @@
         jQuery('#tabs li:first a:first').tab('show');
         jQuery(document).tooltip({
             track: true
+        });
+        jQuery('#user_filesLink').click(function () {
+            jQuery('#submission-panel').toggle();
         });
     });
 </script>

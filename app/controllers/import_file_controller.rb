@@ -24,8 +24,10 @@ class ImportFileController < ApplicationController
   protected  
   def importFile(session,params)    
     delimiter = get_delimiter(params)
-    file = params['file']
+    file = params['file'].tempfile
+
     errors = Array.new
+
     file.each_line do |line|
       line.chomp!
       unless line.empty?

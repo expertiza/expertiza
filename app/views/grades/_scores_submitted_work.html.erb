@@ -56,7 +56,24 @@
 
   </tbody>
 </table>
-<div id="divSubmittedWorkChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<!-- Modal -->
+<div class="modal fade" id="submitted-work-modal" tabindex="-1" role="dialog" aria-labelledby="submitted-work-modal-label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="submitted-work-modal-label">Submitted Work</h4>
+      </div>
+      <div class="modal-body">
+        <div id="divSubmittedWorkChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <script>
     // Add questions to the table
     $('#submitted-work-table > tbody:last').append('<tr><td style="text-align:left"><b>Review date<b></td></tr>');
@@ -130,10 +147,11 @@
             xAxis: {
                 categories: questions,
                 labels: {
-                    align:'right',
+                    align: 'right',
                     formatter: function () {
                         questions.counter = questions.counter + 1;
                         return "Question " + (questions.counter - submitted_work.questions.length);
+
                     }
                 }
             },
@@ -148,11 +166,13 @@
                 backgroundColor: '#FFFFFF',
                 reversed: true
             },
-            series: [{
-                name: 'Average Score',
-                color:'#4572A7',
-                data: questionScores
-            }]
+            series: [
+                {
+                    name: 'Average Score',
+                    color: '#4572A7',
+                    data: questionScores
+                }
+            ]
         });
     });
 

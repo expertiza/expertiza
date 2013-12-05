@@ -34,6 +34,10 @@ class StudentQuizController < ApplicationController
     end
   end
 
+  def finished_quiz
+
+  end
+
   def self.take_quiz assignment_id
     @questionnaire = Array.new
     Team.find_all_by_parent_id(assignment_id).each do |quiz_creator|
@@ -46,7 +50,6 @@ class StudentQuizController < ApplicationController
 
   def record_response
     questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
-
     responses = Array.new
     valid = 0
     questions.each do |question|
@@ -77,7 +80,8 @@ class StudentQuizController < ApplicationController
       end
       #TODO send assignment id and participant id
       #TODO redirect to finished quiz view after this
-      redirect_to :controller => 'student_quiz', :action => 'take_quiz'
+      params.inspect
+      redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :questionnaire_id => params[:questionnaire_id]
     else
       flash[:error] = "Please answer every question."
       redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :reviewer_id => session[:user].id, :questionnaire_id => params[:questionnaire_id]

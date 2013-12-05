@@ -9,7 +9,7 @@
     <b><%=label("custom_response", ques_num, ques_text)%></b>
     <% @current_folder = DisplayOption.new
     @current_folder.name = ""
-    files_list = Dir[@participant.assignment.get_path.to_s+ "/" +@map.id.to_s + @current_folder.name + "/*"]
+    files_list = Dir[@participant.assignment.get_path.to_s+ "/" +@responseByid.id.to_s + @current_folder.name + "/*"]
     files = Array.new
     for file in files_list
         if File.directory?(file) then
@@ -24,12 +24,12 @@
     location = parentFolder + File.basename(file)%>
     <u><i><%=link_to File.basename(file), :controller => 'submitted_content', :action => 'download', :download => File.basename(file), "current_folder[name]" =>  File.dirname(file)%></i></u>
     <% end %>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp
-    <%if @map.response.nil?
+    <%if @responseByid.response.nil?
         return_to = "new"
     else
         return_to ="edit"
     end
     %>
-    <%=link_to('Upload File', :action=>'upload', :participant_id => @participant.id, :map => @map.id, :id=>params[:id], :return_to => return_to)%>
+    <%=link_to('Upload File', :action=>'upload', :participant_id => @participant.id, :map => @responseByid.id, :id=>params[:id], :return_to => return_to)%>
     </br></br>
 <% end %>

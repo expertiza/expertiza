@@ -225,7 +225,8 @@ class LotteryController < ApplicationController
     #to keep track of the max slots for a topic
     current_max_slots = Hash.new
     sign_up_topics.each do |topic|
-      current_max_slots[topic.id] = topic.max_choosers
+      assignments_for_topic = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,0)
+      current_max_slots[topic.id] = topic.max_choosers - assignments_for_topic.size
     end
 
     stop = false
@@ -237,7 +238,6 @@ class LotteryController < ApplicationController
         if topic.signed_up_users.size != 0
             #get the teams to which topic has been assigned
             assignments_for_topic = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,0)
-
             #if slots are still available
             if assignments_for_topic.size < topic.max_choosers
                 #get the users who have requested the topic
@@ -256,17 +256,19 @@ class LotteryController < ApplicationController
                 else
                   # if there are more then one team who have chosen the topic get the highest priority  given to the topic
                     highest_priority = SignedUpUser.find_by_sql(['SELECT MIN(preference_priority_number) preference_priority_number FROM signed_up_users WHERE topic_id = ? and preference_priority_number!=0',topic.id ])
-                    if highest_priority.nil?
+                    if highest_priority[0].nil?
                         highest_priority[0] = 0
                     end
                     # get the candidates who have assigned highest priority for the topic
                     candidates =  SignedUpUser.find_all_by_topic_id_and_is_waitlisted_and_preference_priority_number(topic.id,1,highest_priority[0].preference_priority_number)
+
                     if candidates.size == 1
                       alloted = allot_topic_to_user_if_possible(params[:id],candidates[0],topic,current_max_slots)
                       if(alloted == true)
                         stop = false
                       end
                     else
+                        # randomly choose from the candidates who have given same highest priority for the topic
                         i = rand(candidates.size)
                         alloted = allot_topic_to_user_if_possible(params[:id],candidates[i],topic,current_max_slots)
                         if(alloted == true)
@@ -293,7 +295,7 @@ class LotteryController < ApplicationController
     if priority
       result = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su, sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND preference_priority_number < ? AND preference_priority_number != 0",assignment_id, team_id, priority])
     else
-      result = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su, sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND preference_priority_number != 0",assignment_id, team_id])
+      result = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su, sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND preference_priority_number is not null",assignment_id, team_id])
     end
     result.each do |r|
     if current_max_slots[r.topic_id] > 0
@@ -306,9 +308,9 @@ class LotteryController < ApplicationController
   def allot_topic_to_user_if_possible(assignment_id, signed_up_user_entry,topic,current_max_slots)
     high_prio_topics = is_other_topic_of_higher_priority(assignment_id,signed_up_user_entry.creator_id,signed_up_user_entry.preference_priority_number,current_max_slots)
     if(high_prio_topics == false)
-      current_max_slots[topic.id] =  current_max_slots[topic.id] -1
+      #current_max_slots[topic.id] =  current_max_slots[topic.id] -1
       signed_up_user_entry.update_attribute('is_waitlisted',0)
-      delete_other_bids(assignment_id, bids[0].creator_id)
+      delete_other_bids(assignment_id, signed_up_user_entry.creator_id)
       return true
     end
     return false

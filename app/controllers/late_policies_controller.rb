@@ -129,6 +129,7 @@ class LatePoliciesController < ApplicationController
     end
     if (issue_name == false && issue_number == false)
       begin
+        @penalty_policy.update_attributes(params[:late_policy][:penalty_unit])
         @penalty_policy.update_attributes(params[:late_policy])
         @penalty_policy.save!
         @penaltyObjs = CalculatedPenalty.all

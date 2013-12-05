@@ -12,6 +12,7 @@
   <tr>
     <th>Penalty Name</th>
     <th>Penalty Per Unit</th>
+    <th>Penalty Unit</th>
     <th>Maximum Penalty</th>
     <% if is_admin %>
         <th>Instructor Id</th>
@@ -23,6 +24,7 @@
   <tr>
     <td><%= penalty_policy.policy_name %></td>
     <td><%= penalty_policy.penalty_per_unit %></td>
+    <td><%= penalty_policy.penalty_unit %></td>
     <td><%= penalty_policy.max_penalty %></td>
     <% if is_admin %>
         <td><%= User.find_by_id(penalty_policy.instructor_id).name %></td>

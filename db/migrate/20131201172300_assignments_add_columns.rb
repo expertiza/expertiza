@@ -13,5 +13,6 @@ class AssignmentsAddColumns < ActiveRecord::Migration
 
     remove_column :assignments, :calculate_penalty
     remove_column :assignments, :late_policy_id
+    remove_column :assignments, :is_penalty_calculated
   end
 end

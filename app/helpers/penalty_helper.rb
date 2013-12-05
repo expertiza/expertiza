@@ -10,7 +10,7 @@ module PenaltyHelper
     @assignment = @participant.assignment
     @penalty_per_unit = LatePolicy.find_by_id(@assignment.late_policy_id).penalty_per_unit
     @max_penalty_for_no_submission = LatePolicy.find_by_id(@assignment.late_policy_id).max_penalty
-
+    @penalty_unit = LatePolicy.find_by_id(@assignment.late_policy_id).penalty_unit
     #set_penalty_policy()
 
     penalties = Hash.new(0)
@@ -41,14 +41,20 @@ module PenaltyHelper
 
   def calculate_submission_penalty
     penalty = 0
-
+    # penalty_unit = @late_policy.penalty_unit
     submission_due_date = DueDate.find_by_deadline_type_id_and_assignment_id(@submission_deadline_type_id, @assignment.id).due_at
 
     resubmission_times = @participant.resubmission_times
     if(resubmission_times.any?)
       last_submission_time = resubmission_times.at(resubmission_times.size-1).resubmitted_at
       if(last_submission_time > submission_due_date)
+        if(@penalty_unit == 'Minute')
         penalty_minutes = ((last_submission_time - submission_due_date))/60
+        elsif(@penalty_unit == 'Hour')
+          penalty_minutes = ((last_submission_time - submission_due_date))/3600
+        elsif(@penalty_unit == 'Day')
+          penalty_minutes = ((last_submission_time - submission_due_date))/86400
+        end
         penalty_for_submission = penalty_minutes * @penalty_per_unit
         if (penalty_for_submission > @max_penalty_for_no_submission)
           penalty = @max_penalty_for_no_submission
@@ -160,7 +166,14 @@ module PenaltyHelper
     for i in 0...num_of_reviews_required
       if review_map_created_at_list.at(i)
         if (review_map_created_at_list.at(i) > review_due_date)
-          penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/60
+
+            if(@penalty_unit == 'Minute')
+              penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/60
+            elsif(@penalty_unit == 'Hour')
+              penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/3600
+            elsif(@penalty_unit == 'Day')
+              penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/86400
+            end
           penalty_for_this_review = penalty_minutes * @penalty_per_unit
           if (penalty_for_this_review > @max_penalty_for_no_submission)
             penalty = @max_penalty_for_no_submission

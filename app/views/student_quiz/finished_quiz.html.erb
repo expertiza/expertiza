@@ -1,0 +1,52 @@
+<h2>Answers</h2>
+<% questions = Question.find_all_by_questionnaire_id(params[:questionnaire_id]) %>
+
+<% questions.each do |question| %>
+    <%= label_tag "#{question.id}", question.txt %> <br>
+    <% question_type = QuestionType.find_by_question_id(question.id)  %>
+
+
+    <% if(question_type.q_type == 'MCR')  %>
+        <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |answer|  %>
+            <% if(answer.iscorrect) %>
+                <%= p 'Correct answer is    '+answer.txt  %>
+            <% end %>
+        <% end %>
+        <br>
+        <%= p 'You answer is    '+QuizQuestionChoice.find(QuizResponse.find_last_by_question_id(question.id).response).txt  %>
+
+    <% elsif(question_type.q_type == 'MCC') %>
+        <%= p 'Correct answer is    '%>
+        <br>
+        <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |answer|  %>
+            <% if(answer.iscorrect) %>
+                <%= p answer.txt  %>
+                <br>
+            <% end %>
+        <% end %>
+
+        <p>You answer is</p>
+        <% QuizResponse.find_all_by_question_id(question.id).each do |answer| %>
+            <% choice=answer.response %>
+            <% p choice %>
+            <%= p QuizQuestionChoice.find(choice).txt%>
+            <br>
+        <% end %>
+
+    <% elsif(question_type.q_type == 'TF') %>
+        <% if QuizQuestionChoice.find_by_question_id(question.id).iscorrect %>
+            <p> Correct Answer is True <p>
+        <% else %>
+            <p> Correct Answer is False <p>
+        <% end %>
+        <%= p 'You answer is '+QuizResponse.find_last_by_question_id(question.id).response  %>
+
+
+    <% elsif(question_type.q_type == 'Essay') %>
+        <p> Your Answer is <p>
+  <%= p QuizResponse.find_last_by_question_id(question.id).response %>
+    <% end %><br>
+    <br>
+<% end %>
+
+<%= submit_tag "Back", :name=>"save" %>

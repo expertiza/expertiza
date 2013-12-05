@@ -26,14 +26,14 @@ class AssignmentController < ApplicationController
 
       old_assign.assignment_questionnaires.each do |aq|
         AssignmentQuestionnaire.create(
-          :assignment_id => @assignment.id,
-          :questionnaire_id => aq.questionnaire_id,
-          :user_id => session[:user].id,
-          :notification_limit => aq.notification_limit,
-          :questionnaire_weight => aq.questionnaire_weight
+            :assignment_id => @assignment.id,
+            :questionnaire_id => aq.questionnaire_id,
+            :user_id => session[:user].id,
+            :notification_limit => aq.notification_limit,
+            :questionnaire_weight => aq.questionnaire_weight
         )
       end
-      
+
       DueDate.copy(old_assign.id, @assignment.id)
       @assignment.create_node()
 
@@ -42,46 +42,46 @@ class AssignmentController < ApplicationController
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
       redirect_to :action => 'list', :controller => 'tree_display'
-    end    
-  end  
-  
+    end
+  end
+
   def new
     #creating new assignment and setting default values using helper functions
     if params[:parent_id]
-      @course = Course.find(params[:parent_id])           
-    end    
-    
+      @course = Course.find(params[:parent_id])
+    end
+
     @assignment = Assignment.new
-    
+
     @wiki_types = WikiType.find(:all)
-    @private = params[:private] == true        
+    @private = params[:private] == true
     #calling the defalut values mathods
-    get_limits_and_weights 
+    get_limits_and_weights
     if (session[:user].role.name == "Administrator") or (session[:user].role.name == "Super-Administrator")
       flash[:note] = "Note: The Submission Directory field to be filled in is the path relative to the instructor\'s
       home directory (named after his user.name). However, when an administrator creates an assignment,
       (s)he needs to preface the path with the user.name of the instructor whose assignment it is."
     end
   end
-  
-  
+
+
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
     assignment = Assignment.find(params[:id])
     assignment.private = !assignment.private
     assignment.save
-    
+
     redirect_to :controller => 'tree_display', :action => 'list'
   end
-  
+
   # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
   # from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
 
-		curr_time=DateTime.now.to_s(:db)
-		curr_time=Time.parse(curr_time)
-		time_in_min=((due_at - curr_time).to_i/60)
-		return time_in_min
+    curr_time=DateTime.now.to_s(:db)
+    curr_time=Time.parse(curr_time)
+    time_in_min=((due_at - curr_time).to_i/60)
+    return time_in_min
   end
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
   def delete_from_delayed_queue (delayed_job_id)
@@ -93,30 +93,30 @@ class AssignmentController < ApplicationController
 
   # this function finds all the due_dates for a given assignment and calculates the time when the reminder for these deadlines needs to be sent. Enqueues them in the delayed_jobs table
   def add_to_delayed_queue
-		duedates = DueDate::find_all_by_assignment_id(@assignment.id)
-		for i in (0 .. duedates.length-1)
-			deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
-			due_at = duedates[i].due_at.to_datetime.to_s(:db)
-			Time.parse(due_at)
-			due_at= Time.parse(due_at)
-			mi=find_min_from_now(due_at)
-      			diff = mi-(duedates[i].threshold)*60
-	 	        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)) , 1, diff.minutes.from_now)
+    duedates = DueDate::find_all_by_assignment_id(@assignment.id)
+    for i in (0 .. duedates.length-1)
+      deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
+      due_at = duedates[i].due_at.to_datetime.to_s(:db)
+      Time.parse(due_at)
+      due_at= Time.parse(due_at)
+      mi=find_min_from_now(due_at)
+      diff = mi-(duedates[i].threshold)*60
+      dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)) , 1, diff.minutes.from_now)
       #duedates[i].update_attribute(:delayed_job_id, dj.id)
-		end
+    end
   end
 
   def create
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.    
-    @assignment = Assignment.new(params[:assignment])    
+    @assignment = Assignment.new(params[:assignment])
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
-    @user.set_instructor(@assignment) 
-    @assignment.submitter_count = 0    
+    @user.set_instructor(@assignment)
+    @assignment.submitter_count = 0
     ## feedback added
     ##
-    
+
     if params[:days].nil? && params[:weeks].nil?
       @days = 0
       @weeks = 0
@@ -126,11 +126,11 @@ class AssignmentController < ApplicationController
       @weeks = 0
     else
       @days = params[:days].to_i
-      @weeks = params[:weeks].to_i      
+      @weeks = params[:weeks].to_i
     end
-    
+
     @assignment.days_between_submissions = @days + (@weeks*7)
-    
+
     # Deadline types used in the deadline_types DB table
     deadline = DeadlineType.find_by_name("submission")
     @Submission_deadline = deadline.id
@@ -144,16 +144,33 @@ class AssignmentController < ApplicationController
     @Review_of_review_deadline = deadline.id
     deadline = DeadlineType.find_by_name("drop_topic")
     @drop_topic_deadline = deadline.id
+
+    set_requirement
+
     deadline = DeadlineType.find_by_name("signup")
     @signup_deadline = deadline.id
     deadline = DeadlineType.find_by_name("team_formation")
     @team_formation_deadline = deadline.id
     check_flag = @assignment.availability_flag
 
-    if(check_flag == true && params[:submit_deadline].nil?)
-      raise "Please enter a valid Submission deadline!!"
-      render :action => 'create'
+    late_policy_set=set_late_policy(params)
+
+
+    if(check_flag == true && params[:submit_deadline].nil? || !late_policy_set)
+      if(check_flag == true && params[:submit_deadline].nil?)
+        raise "Please enter a valid Submission deadline!!"
+        render :action => 'create'
+      elsif(!late_policy_set)
+        flash[:error] = "Please select a valid late policy!!"
+        @wiki_types = WikiType.find(:all)
+        get_limits_and_weights
+        @private = params[:private] == true
+        render :action => 'new'
+      end
     elsif (@assignment.save)
+      # increment times_used for setting default policy while display. (in late_policies table)
+      @late_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+      @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
       #set_questionnaires
       #set_limits_and_weights
       set_assignment_questionnaires
@@ -161,20 +178,20 @@ class AssignmentController < ApplicationController
       begin
         #setting the Due Dates with a helper function written in DueDate.rb
         if check_flag == true
-            due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
-            raise "Please enter a valid Submission deadline" if !due_date
+          due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
+          raise "Please enter a valid Submission deadline" if !due_date
         else
-            due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
+          due_date = DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
         end
         due_date = DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
 #        raise "Please enter a valid Review deadline" if !due_date
         max_round = 2;
-        
+
         due_date = DueDate::set_duedate(params[:drop_topic_deadline],@drop_topic_deadline, @assignment.id, 0)
         due_date = DueDate::set_duedate(params[:signup_deadline],@signup_deadline, @assignment.id, 0)
         due_date = DueDate::set_duedate(params[:team_formation_deadline],@team_formation_deadline, @assignment.id, 0)
 
- #       raise "Please enter a valid Drop-Topic deadline" if !due_date
+        #       raise "Please enter a valid Drop-Topic deadline" if !due_date
 
         if params[:assignment_helper][:no_of_reviews].to_i >= 2
           for resubmit_duedate_key in params[:additional_submit_deadline].keys
@@ -193,7 +210,7 @@ class AssignmentController < ApplicationController
         end
         #setting the Due Dates with a helper function written in DueDate.rb
         @assignment.questionnaires.each{
-          |questionnaire|
+            |questionnaire|
           if questionnaire.instance_of? MetareviewQuestionnaire
             due_date = DueDate::set_duedate(params[:reviewofreview_deadline],@Review_of_review_deadline, @assignment.id, max_round )
             raise "Please enter a valid Metareview deadline" if !due_date
@@ -207,10 +224,10 @@ class AssignmentController < ApplicationController
 
         # Creating node information for assignment display
         @assignment.create_node()
-        
+
         flash[:alert] = "There is already an assignment named \"#{@assignment.name}\". &nbsp;<a style='color: blue;' href='../../assignment/edit/#{@assignment.id}'>Edit assignment</a>" if @assignment.duplicate_name?
         undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
-        redirect_to :action => 'list', :controller => 'tree_display'
+        redirect_to controller: :assignments, action: :edit, id: @assignment.id
       rescue
         flash[:error] = $!
         prepare_to_edit
@@ -222,6 +239,8 @@ class AssignmentController < ApplicationController
       @wiki_types = WikiType.find(:all)
       render :action => 'new'
     end
+
+
     # function that facilitates sending of email reminders
     add_to_delayed_queue
   end
@@ -305,7 +324,7 @@ class AssignmentController < ApplicationController
   #  SET_DAYS_BETWEEN_SUBMISSIONS  (Helper function for CREATE and UPDATE)
   #   Sets days between submissions for staggered assignments
   #---------------------------------------------------------------------------------------------------------------------
-  
+
   def set_days_between_submissions
 
     if params[:days].nil? && params[:weeks].nil?
@@ -326,19 +345,19 @@ class AssignmentController < ApplicationController
 
   # this function finds all the due_dates for a given assignment and calculates the time when the reminder for these deadlines needs to be sent. Enqueues them in the delayed_jobs table
   def add_to_delayed_queue
-		duedates = DueDate::find_all_by_assignment_id(@assignment.id)
-		for i in (0 .. duedates.length-1)
-			deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
-			due_at = duedates[i].due_at(:db).to_s
-			Time.parse(due_at)
-			due_at= Time.parse(due_at)
-			mi=find_min_from_now(due_at)
+    duedates = DueDate::find_all_by_assignment_id(@assignment.id)
+    for i in (0 .. duedates.length-1)
+      deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
+      due_at = duedates[i].due_at(:db).to_s
+      Time.parse(due_at)
+      due_at= Time.parse(due_at)
+      mi=find_min_from_now(due_at)
       diff = mi-(duedates[i].threshold)*60
       dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at(:db).to_s) , 1, diff.minutes.from_now)
       duedates[i].update_attribute(:delayed_job_id, dj.id)
-		end
+    end
   end
-  
+
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
   def delete_from_delayed_queue(delayed_job_id)
     dj=Delayed::Job.find(delayed_job_id)
@@ -346,21 +365,21 @@ class AssignmentController < ApplicationController
       dj.delete
     end
   end
-  
+
   # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
   # from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
-		curr_time=DateTime.now(:db).to_s
-		curr_time=Time.parse(curr_time)
-		time_in_min=((due_at - curr_time).to_i/60)
-		
-		return time_in_min
+    curr_time=DateTime.now(:db).to_s
+    curr_time=Time.parse(curr_time)
+    time_in_min=((due_at - curr_time).to_i/60)
+
+    return time_in_min
   end
   #--------------------------------------------------------------------------------------------------------------------
   # EDIT
   # Edit existing assignment
   #--------------------------------------------------------------------------------------------------------------------
-  
+
   def edit
     @assignment = Assignment.find(params[:id])
     prepare_to_edit
@@ -379,43 +398,43 @@ class AssignmentController < ApplicationController
       @days = 0
     end
 
-    get_limits_and_weights    
+    get_limits_and_weights
     @wiki_types = WikiType.find(:all)
   end
-  
+
   def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
     existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
     if existing.nil?
       NotificationLimit.create(:user_id => session[:user].id,
-                                :assignment_id => assignment_id,
-                                :questionnaire_id => questionnaire_id,
-                                :limit => limit)
+                               :assignment_id => assignment_id,
+                               :questionnaire_id => questionnaire_id,
+                               :limit => limit)
     else
       existing.limit = limit
       existing.save
-    end    
-  end  
-  
+    end
+  end
+
   def set_questionnaires
     @assignment.questionnaires = Array.new
     params[:questionnaires].each{
-      | key, value |       
+        | key, value |
       if value.to_i > 0 and (q = Questionnaire.find(value))
         @assignment.questionnaires << q
-     end
-    }     
-  end   
-  
-  def get_limits_and_weights 
-    @limits = Hash.new   
+      end
+    }
+  end
+
+  def get_limits_and_weights
+    @limits = Hash.new
     @weights = Hash.new
-    
+
     if session[:user].role.name == "Teaching Assistant"
       user_id = Ta.get_my_instructor(session[:user]).id
     else
       user_id = session[:user].id
     end
-    
+
     default = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)
 
     if default.nil?
@@ -435,24 +454,24 @@ class AssignmentController < ApplicationController
     @weights[:teammate] = 0
 
     @assignment.questionnaires.each{
-      | questionnaire |
+        | questionnaire |
       aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
-      @limits[questionnaire.symbol] = aq.notification_limit   
+      @limits[questionnaire.symbol] = aq.notification_limit
       @weights[questionnaire.symbol] = aq.questionnaire_weight
-    }             
+    }
   end
-  
+
   def set_limits_and_weights
     if session[:user].role.name == "Teaching Assistant"
       user_id = TA.get_my_instructor(session[:user]).id
     else
       user_id = session[:user].id
     end
-    
+
     default = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)
-    
+
     @assignment.questionnaires.each{
-      | questionnaire |
+        | questionnaire |
 
       aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
       if params[:limits][questionnaire.symbol].length > 0
@@ -533,6 +552,19 @@ class AssignmentController < ApplicationController
     end
   end
 
+
+  def set_requirement
+    #@required = Hash.new
+    if params[:required][:review]
+      @assignment.num_reviews = params[:required][:review]
+    end
+
+    if params[:required][:metareview]
+      @assignment.num_review_of_reviews = params[:required][:metareview]
+    end
+
+  end
+
   #--------------------------------------------------------------------------------------------------------------------
   # UPDATE
   #  make updates to assignment
@@ -546,7 +578,7 @@ class AssignmentController < ApplicationController
       end
     end
     @assignment = Assignment.find(params[:id])
-    begin 
+    begin
       oldpath = @assignment.get_path
     rescue
       oldpath = nil
@@ -568,7 +600,91 @@ class AssignmentController < ApplicationController
     @assignment.days_between_submissions = @days + (@weeks*7)
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
-    if @assignment.update_attributes(params[:assignment])     
+    set_requirement
+
+    late_policy_set = set_late_policy(params)
+
+    if @assignment.calculate_penalty == true && params[:assignment][:calculate_penalty] == "false"
+      @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+      @late_policy.update_attribute(:times_used, @late_policy.times_used - 1)
+
+      # delete corresponding rows from Calculated_penalties
+      @penaltyObjs = CalculatedPenalty.all
+
+      @penaltyObjs.each do |pen|
+        @participant = Participant.find_by_id(pen.participant_id)
+        if @participant.parent_id == @assignment.id
+          #@penalties = calculate_penalty(pen.participant_id)
+          #@total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+          pen.delete
+        end
+
+      end
+      @assignment.update_attribute(:is_penalty_calculated, false)
+      @assignment.update_attribute(:late_policy_id, nil)
+    elsif @assignment.calculate_penalty == false && params[:assignment][:calculate_penalty] == "true"
+      # add rows in calculated_penalties
+
+      @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+
+      @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
+
+      participants = AssignmentParticipant.find_all_by_parent_id(@assignment.id)
+      participants.each do |p|
+        @penalties = calculate_penalty(p.id)
+        if(@penalties[:submission] != 0 || @penalties[:review] != 0 || @penalties[:meta_review] != 0)
+          @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+          penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => @penalties[:submission]}
+          CalculatedPenalty.create(penalty_attr1)
+
+          penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => @penalties[:review]}
+          CalculatedPenalty.create(penalty_attr2)
+
+          penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => @penalties[:meta_review]}
+          CalculatedPenalty.create(penalty_attr3)
+        end
+
+      end
+      @assignment.update_attribute(:is_penalty_calculated, true)
+    end
+    # Update the penalties in calculated_penalties table.
+    if @assignment.late_policy_id != params[:assignment][:late_policy_id]
+      #policy changed so we change the times used field for proper ordering of policies in the dropdown
+      @late_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+      if (@late_policy.times_used.to_i > 0)
+        @late_policy.update_attribute(:times_used, @late_policy.times_used - 1)
+      end
+
+      @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+      @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
+
+      @penaltyObjs = CalculatedPenalty.all
+
+      @penaltyObjs.each do |pen|
+        @participant = Participant.find_by_id(pen.participant_id)
+        if @participant.parent_id == @assignment.id
+          @penalties = calculate_penalty(pen.participant_id)
+          @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+          if pen.deadline_type_id.to_i == 1
+            pen.update_attribute(:penalty_points, @penalties[:submission])
+          elsif pen.deadline_type_id.to_i == 2
+            pen.update_attribute(:penalty_points, @penalties[:review])
+          elsif pen.deadline_type_id.to_i == 5
+            pen.update_attribute(:penalty_points, @penalties[:meta_review])
+          end
+        end
+      end
+    end
+
+    if @assignment.calculate_penalty == true && params[:assignment][:calculate_penalty] == "false"
+      params[:assignment][:late_policy_id] = nil
+    end
+    if(!late_policy_set)
+      flash[:error] = "Please select a valid late policy!!"
+      prepare_to_edit
+      @assignment.calculate_penalty = true
+      render :action => 'edit'
+    elsif @assignment.update_attributes(params[:assignment])
       if params[:questionnaires] and params[:limits] and params[:weights]
         #set_questionnaires
         #set_limits_and_weights
@@ -576,16 +692,16 @@ class AssignmentController < ApplicationController
       end
 
       begin
-        newpath = @assignment.get_path        
+        newpath = @assignment.get_path
       rescue
         newpath = nil
       end
       if oldpath != nil and newpath != nil
         FileHelper.update_file_location(oldpath,newpath)
       end
-      
+
       begin
-         # Iterate over due_dates, from due_date[0] to the maximum due_date
+        # Iterate over due_dates, from due_date[0] to the maximum due_date
 
         if params[:due_date]
           for due_date_key in params[:due_date].keys
@@ -595,16 +711,16 @@ class AssignmentController < ApplicationController
             for dj in djobs
               delete_from_delayed_queue(dj.id)
             end
-            due_date_temp.update_attributes(params[:due_date][due_date_key])              
-            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0						
+            due_date_temp.update_attributes(params[:due_date][due_date_key])
+            raise "Please enter a valid date & time" if due_date_temp.errors.length > 0
           end
-	  # add to the delayed_jobs queue according to the updated due_dates
+          # add to the delayed_jobs queue according to the updated due_dates
           add_to_delayed_queue
         end
-     
+
         undo_link("Assignment \"#{@assignment.name}\" was successfully updated. ")
         redirect_to :action => 'show', :id => @assignment
-     
+
       rescue
         flash[:error] = $!
         prepare_to_edit
@@ -613,7 +729,7 @@ class AssignmentController < ApplicationController
     else # Simply refresh the page
       @wiki_types = WikiType.find(:all)
       render :action => 'edit'
-    end    
+    end
   end
 
   #--------------------------------------------------------------------------------------------------------------------
@@ -634,7 +750,7 @@ class AssignmentController < ApplicationController
     # If the assignment is already deleted, go back to the list of assignments
     if @assignment
       begin
-      	#delete from delayed_jobs queue
+        #delete from delayed_jobs queue
         djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', @assignment.id])
         for dj in djobs
           delete_from_delayed_queue(dj.id)
@@ -721,6 +837,22 @@ class AssignmentController < ApplicationController
     FileHelper.update_file_location(oldpath,newpath)
     undo_link("Assignment \"#{@assignment.name}\" has been removed from course successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
+  end
+
+  :private
+  def set_late_policy(params)
+    late_policy_set=true
+    if(params[:assignment][:calculate_penalty]=="true")
+      if(params[:assignment][:late_policy_id].to_i==0)
+        late_policy_set=false
+      end
+    end
+
+    if(params[:assignment][:late_policy_id].to_i==0)
+      @assignment.late_policy_id=nil
+      params[:assignment][:late_policy_id]=nil
+    end
+    return late_policy_set
   end
 
 

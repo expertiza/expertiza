@@ -142,7 +142,6 @@ Then /^I should see \/([^\/]*)\/(?: within "([^"]*)")?$/ do |regexp, selector|
 end
 
 Then /^I should not see "([^"]*)"(?: within "([^"]*)")?$/ do |text, selector|
-  save_and_open_page
   with_scope(selector) do
     if page.respond_to? :should
       page.should have_no_content(text)

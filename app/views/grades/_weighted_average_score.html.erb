@@ -1,0 +1,126 @@
+ <% total_weighted_average = 0 %>
+<br>
+<br>
+
+<%
+   participant = pscore[:participant]
+   if pscore[:review]
+     s_max = pscore[:review][:scores][:max]
+     s_min = pscore[:review][:scores][:min]
+     s_avg = pscore[:review][:scores][:avg]
+   end
+
+%>
+
+<% namecolwidth = 18 %>
+<% colwidth = 7  %>
+<table class="grades">
+  <tr>
+    <TH WIDTH="<%=colwidth %>%">Submitted work</TH>
+    <TH WIDTH="<%= colwidth %>%">Review</TH>
+    <TH WIDTH="<%=colwidth %>%">Author feedback</TH>
+    <TH WIDTH="<%= colwidth %>%">Teammate review</TH>
+    <TH WIDTH="<%= colwidth %>%">Weighted Average</TH>
+
+ </tr>
+
+  <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
+
+  <% if s_avg %>
+        <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %> %
+          <% s_weight = assignment_questionnaire(@assignment, 'ReviewQuestionnaire').questionnaire_weight %>
+          <% if s_weight!=0 %>
+          <% s_weighted_average = (s_weight/100) * (s_avg) %>
+          <% else %>
+          <% s_weighted_average = 0 %>
+          <% end %>
+         <% total_weighted_average+= s_weighted_average %>
+  <% else %>
+        <TD ALIGN="CENTER">---</TD>
+  <% end %>
+
+    <%
+       participant = pscore[:participant]
+       if pscore[:metareview]
+         r_max = pscore[:metareview][:scores][:max]
+         r_min = pscore[:metareview][:scores][:min]
+         r_avg = pscore[:metareview][:scores][:avg]
+       end
+
+    %>
+
+  <% if r_avg %>
+         <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",r_avg) %>%
+           <% r_weight = assignment_questionnaire(@assignment, 'MetareviewQuestionnaire').questionnaire_weight %>
+           <% if r_weight!=0 %>
+           <% r_weighted_average = (r_weight/100) * (r_avg) %>
+           <% else %>
+           <% r_weighted_average = 0 %>
+           <% end %>
+           <% total_weighted_average+= r_weighted_average %>
+         </TD>
+    <% else %>
+        <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+   <%
+       participant = pscore[:participant]
+       if pscore[:feedback]
+         f_max = pscore[:feedback][:scores][:max]
+         f_min = pscore[:feedback][:scores][:min]
+         f_avg = pscore[:feedback][:scores][:avg]
+       end
+
+    %>
+
+  <% if f_avg %>
+          <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",f_avg) %> %
+            <% f_weight = assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').questionnaire_weight %>
+            <% if f_weight!=0 %>
+            <% f_weighted_average = (f_weight/100) * (f_avg) %>
+            <% else %>
+            <% f_weighted_average = 0 %>
+            <% end %>
+            <% total_weighted_average+= f_weighted_average %>
+          </TD>
+    <% else %>
+        <TD ALIGN="CENTER">---</TD>
+  <% end %>
+
+    <%
+       participant = pscore[:participant]
+       if pscore[:teammate]
+         tr_max = pscore[:teammate][:scores][:max]
+         tr_min = pscore[:teammate][:scores][:min]
+         tr_avg = pscore[:teammate][:scores][:avg]
+       end
+
+    %>
+
+    <% if tr_avg %>
+        <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",tr_avg) %>%
+          <% tr_weight = assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').questionnaire_weight %>
+          <% if tr_weight!=0 %>
+              <% tr_weighted_average = (tr_weight/100) * (tr_avg) %>
+          <% else %>
+              <% tr_weighted_average = 0 %>
+          <% end %>
+          <% total_weighted_average+= tr_weighted_average %>
+        </TD>
+    <% else %>
+        <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+
+    <!-- display total weighted average -->
+    <% if total_weighted_average %>
+        <TD ALIGN="CENTER" VALIGN="TOP">   <%= sprintf("%.2f",total_weighted_average) %>%
+        </TD>
+    <% end %>
+
+</tr>
+
+</table>
+
+
+<br><br><br>

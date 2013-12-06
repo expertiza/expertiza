@@ -1,0 +1,27 @@
+<!-- PARTICIPANT -->
+<%
+   participant = pscore[:participant]
+   if pscore[:review]
+     s_max = pscore[:review][:scores][:max]
+     s_min = pscore[:review][:scores][:min]
+     s_avg = pscore[:review][:scores][:avg]
+   end
+   if pscore[:metareview]
+     r_max = pscore[:metareview][:scores][:max]
+     r_min = pscore[:metareview][:scores][:min]
+     r_avg = pscore[:metareview][:scores][:avg]
+   end
+   if pscore[:feedback]
+     f_max = pscore[:feedback][:scores][:max]
+     f_min = pscore[:feedback][:scores][:min]
+     f_avg = pscore[:feedback][:scores][:avg]
+   end
+   if pscore[:teammate]
+     tr_max = pscore[:teammate][:scores][:max]
+     tr_min = pscore[:teammate][:scores][:min]
+     tr_avg = pscore[:teammate][:scores][:avg]
+   end
+%>
+<TR  class="row" id="<%= prefix %>_feedback" style="display:none">
+  <TD COLSPAN="9"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
+</TR>

@@ -1,8 +1,84 @@
 <H1>Score for <%= @assignment.name %></H1>
-   
-<TABLE class="grades" >
-<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
-<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.scores(@questions)} %>
-</TABLE>
+
 <BR/>
+<%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
+<%= stylesheet_link_tag 'jquery-ui-1.10.3.custom.min' %>
+<script src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="/javascripts/jquery-ui-timepicker-addon.js"></script>
+
+<!--put code back here -->
+<%= form_for @assignment, html: {id: 'assignment_form'} do %>
+    <div style=" ">
+      <% pscore=@participant.get_scores(@questions)     #score hash is  assigned here
+         participant = pscore[:participant]
+         if pscore[:max_pts_available]
+           score_postfix = sprintf(" / %.2f",pscore[:max_pts_available])      #assigns maximum value for a question to this variable
+         else
+           score_postfix = "%"
+         end %>
+
+      <% stage = participant.assignment.get_current_stage(participant.topic_id) %>              <!-- it is taking the stage assignment is in e.g. review, metareview -->
+      <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
+
+          <% if stage == "Complete" %>        <!-- topic for that assignment has been finished -->
+              <% if participant.grade
+                   total_score = participant.grade       # assigns total score for that topic of an assignment
+                   title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
+                 else
+                   total_score = pscore[:total_score]    # adds scores of all reviews ; average score
+                   title = nil
+                 end %>
+              <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %><%= score_postfix %>   <!-- dont know what this is doing exactly -->
+              </div>
+              <% if controller.action_name != "view_my_scores" %>
+                  <%= render :partial => 'grades/weighted_average_score',:locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+                  <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
+              <% end %>
+          <% else %>
+              <FONT SIZE="-1">(in <%= stage %>)</FONT>  <!-- shows 'in completion, in finished -->
+          <% end %>
+
+      <% else %>
+          <% if participant.grade %>
+              <%= text_field("participant", "grade", :size => 10) %>  <%= score_postfix %>
+          <% else %>
+              <%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f", pscore[:total_score])) %>  <%= score_postfix %>
+          <% end %>
+      <% end %>
+
+    </div>
+    <div id="tabs">
+      <ul>
+        <li id="tab4"><a href="#tabs-15">Weighted average</a></li>
+        <li id="tab1"><a href="#tabs-11">Submitted work</a></li>
+        <li id="tab2"><a href="#tabs-12">Reviewing</a></li>
+        <li id="tab3"><a href="#tabs-13">Author feedback</a></li>
+        <li id="tab4"><a href="#tabs-14">Teammate review</a></li>
+
+      </ul>
+      <div id="tabs-15">
+        <%= render :partial => 'grades/weighted_average_score',:locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      </div>
+      <div id="tabs-11">
+        <p><%= render :partial => 'grades/submittedwork', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %> </p>
+      </div>
+      <div id="tabs-12">
+        <%= render :partial => 'grades/meta', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      </div>
+      <div id="tabs-13">
+        <%= render :partial => 'grades/author',:locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      </div>
+      <div id="tabs-14">
+        <%= render :partial => 'grades/teammate',:locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      </div>
+
+    </div>
+    <script>
+        jQuery(document).ready(function () {
+            jQuery("#tabs").tabs();
+        });
+    </script>
+<% end %>
+
+
 <a href="javascript:window.history.back()">Back</a>

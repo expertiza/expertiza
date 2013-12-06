@@ -85,4 +85,17 @@ class QuestionsController < ApplicationController
     Question.find(params[:id]).destroy
     redirect_to :action => 'list'
   end
+
+  def review_questions
+    @assignment_id = params[:id]
+    @questions = Array.new
+    Team.find_all_by_parent_id(params[:id]).each do |quiz_creator|
+      Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
+        questions = Question.find_all_by_questionnaire_id(questionnaire.id)
+        questions.each do |question|
+          @questions.push question
+        end
+      end
+    end
+  end
 end

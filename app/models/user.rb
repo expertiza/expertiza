@@ -69,7 +69,11 @@ class User < ActiveRecord::Base
   end
 
   def admin?
-    role.name == 'Administrator' || super_admin?
+    role.admin?
+  end
+
+  def student?
+    role.student?
   end
 
   def is_creator_of?(user)

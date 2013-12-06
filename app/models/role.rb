@@ -15,6 +15,14 @@ class Role < ActiveRecord::Base
     @@student_role ||= find_by_name 'Student'
   end
 
+  def student?
+    name['Student']
+  end
+
+  def admin?
+    name['Administrator'] || super_admin?
+  end
+
   def self.ta
     @@ta_role ||= find_by_name 'Teaching Assistant'
   end

@@ -14,7 +14,7 @@ class GradesController < ApplicationController
         |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-    @scores = @assignment.scores(@questions)
+    @scores = @assignment.get_scores(@questions)
   end
 
   def view_my_scores
@@ -27,7 +27,6 @@ class GradesController < ApplicationController
         |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-
     ## When user clicks on the notification, it should go away
     #deleting all review notifications
     rmaps = @participant.response_maps
@@ -40,7 +39,7 @@ class GradesController < ApplicationController
     #deleting all metareview notifications
     rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
     for rmap in rmaps
-      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.map_id)
+      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.id)
       if !mmaps.nil?
         for mmap in mmaps
           mmap.notification_accepted = true
@@ -60,7 +59,7 @@ class GradesController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 
-    @scores = @participant.scores(@questions)
+    @scores = @participant.get_scores(@questions)
   end
 
   def instructor_review
@@ -72,19 +71,25 @@ class GradesController < ApplicationController
       reviewer.set_handle()
     end
 
-    review_exists = true
-
-    reviewee = participant.team
-    review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+    if participant.assignment.team_assignment?
+      reviewee = participant.team
+      review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+    else
+      reviewee = participant
+      review_mapping = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+    end
 
     if review_mapping.nil?
-      review_exists = false
-      review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+      if participant.assignment.team_assignment?
+        review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+      else
+        review_mapping = ParticipantReviewResponseMap.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+      end
     end
-    review = Response.find_by_map_id(review_mapping.map_id)
+    review = Response.find_by_map_id(review_mapping.id)
 
-    unless review_exists
-      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.map_id, :return => "instructor"
+    if review.nil?
+      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.id, :return => "instructor"
     else
       redirect_to :controller => 'response', :action => 'edit', :id => review.id, :return => "instructor"
     end
@@ -148,16 +153,16 @@ class GradesController < ApplicationController
     if @submission == "review"
       @caction = "view_review"
       @symbol = "review"
-      process_response("Review", "Reviewer", @participant.reviews, "ReviewQuestionnaire")
+      process_response("Review", "Reviewer", @participant.get_reviews, "ReviewQuestionnaire")
     elsif @submission == "review_of_review"
       @symbol = "metareview"
-      process_response("Metareview", "Metareviewer", @participant.metareviews, "MetareviewQuestionnaire")
+      process_response("Metareview", "Metareviewer", @participant.get_metareviews, "MetareviewQuestionnaire")
     elsif @submission == "review_feedback"
       @symbol = "feedback"
-      process_response("Feedback", "Author", @participant.feedback, "AuthorFeedbackQuestionnaire")
+      process_response("Feedback", "Author", @participant.get_feedback, "AuthorFeedbackQuestionnaire")
     elsif @submission == "teammate_review"
       @symbol = "teammate"
-      process_response("Teammate Review", "Reviewer", @participant.teammate_reviews, "TeammateReviewQuestionnaire")
+      process_response("Teammate Review", "Reviewer", @participant.get_teammate_reviews, "TeammateReviewQuestionnaire")
     end
 
     @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."
@@ -193,7 +198,7 @@ class GradesController < ApplicationController
       @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
     }
     @reviews.sort! { |a, b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname }
-    @questionnaire = @assignment.questionnaires.find_by_type(questionnaire_type)
+    @questionnaire =  @assignment.questionnaires.find_by_type(questionnaire_type)
     @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
   end
 
@@ -205,7 +210,7 @@ class GradesController < ApplicationController
     #ACS Check if team count is more than 1 instead of checking if it is a team assignment
     if @participant.assignment.max_team_size > 1
       team = @participant.team
-      if (!team.nil?)
+      if(!team.nil?)
         unless team.has_user session[:user]
           redirect_to '/denied?reason=You are not on the team that wrote this feedback'
           return true

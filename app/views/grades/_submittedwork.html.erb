@@ -1,0 +1,46 @@
+<!-- PARTICIPANT -->
+<%
+   participant = pscore[:participant]
+   if pscore[:review]
+     s_max = pscore[:review][:scores][:max]
+     s_min = pscore[:review][:scores][:min]
+     s_avg = pscore[:review][:scores][:avg]
+   end
+
+%>
+
+
+<% namecolwidth = 18 %>
+<% colwidth = 7  %>
+
+<TABLE class="grades">
+
+<TR>
+  <TH WIDTH="<%=colwidth %>%">Contributor</TH>
+  <TH WIDTH="<%= colwidth %>%">Average</TH>
+  <TH WIDTH="<%= colwidth %>%">Range</TH>
+</TR>
+
+  <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= participant.fullname %>                   <!-- gives participant name -->
+      <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
+    </FONT>
+    </TD>
+<% if s_avg %>
+      <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%     <!-- gives average -->
+
+      </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>%  <!-- gives range -->
+      <% if controller.action_name != "view_my_scores" %>
+          <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
+      <% end %>
+    </TD>
+<% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+
+<% end %>
+
+</TABLE>
+
+<%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %>

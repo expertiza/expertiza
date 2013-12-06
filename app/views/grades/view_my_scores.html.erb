@@ -5,4 +5,84 @@
 <%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.scores(@questions)} %>
 </TABLE>
 <BR/>
+<%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
+<%= stylesheet_link_tag 'jquery-ui-1.10.3.custom.min' %>
+<script src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="/javascripts/jquery-ui-timepicker-addon.js"></script>
+
+<%= form_for @assignment, html: {id: 'assignment_form'} do %>
+   <div style=" ">
+    <% pscore=@participant.get_scores(@questions)
+       participant = pscore[:participant]
+       if pscore[:max_pts_available]
+         score_postfix = sprintf(" / %.2f",pscore[:max_pts_available])
+       else
+         score_postfix = "%"
+       end %>
+
+    <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
+    <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
+
+          <% if stage == "Complete" %>
+              <% if participant.grade
+                   total_score = participant.grade
+                   title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
+                 else
+                   total_score = pscore[:total_score]
+                   title = nil
+                 end %>
+              <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %><%= score_postfix %></div>
+              <% if controller.action_name != "view_my_scores" %>
+                  <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
+              <% end %>
+          <% else %>
+              <FONT SIZE="-1">(in <%= stage %>)</FONT>
+          <% end %>
+
+    <% else %>
+        <% if participant.grade %>
+           <%= text_field("participant", "grade", :size => 10) %><%= score_postfix %>
+        <% else %>
+           <%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f", pscore[:total_score])) %><%= score_postfix %>
+        <% end %>
+    <% end %>
+
+     </div>
+    <div id="tabs">
+      <ul>
+        <li id="tab1"><a href="#tabs-11">Submitted Work</a></li>
+        <li id="tab2"><a href="#tabs-12">Reviewing</a></li>
+        <li id="tab3"><a href="#tabs-13">Author Feedback</a></li>
+        <li id="tab4"><a href="#tabs-14">TeamMate Review</a></li>
+        <li id="tab5"><a href="#tabs-15">Total Score</a></li>
+      </ul>
+      <div id="tabs-11">
+        #renders a new tab for reviews on submitted work
+       <p><%= render :partial => 'grades/submittedwork', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %> </p>
+      </div>
+      <div id="tabs-12">
+        #renders a new tab for meta reviews
+        <%= render :partial => 'grades/meta', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      </div>
+      <div id="tabs-13">
+        #renders a new tab for author feedback
+        <%= render :partial => 'grades/author',:locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      </div>
+      <div id="tabs-14">
+        #renders a new tab for team mate reviews
+        <%= render :partial => 'grades/teammate',:locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      </div>
+      <div id="tabs-15">
+        #renders a new tab for scores
+        <%= render 'grades/scores' %>
+      </div>
+    </div>
+    <script>
+        jQuery(document).ready(function () {
+            jQuery("#tabs").tabs();
+        });
+    </script>
+<% end %>
+
+
 <a href="javascript:window.history.back()">Back</a>

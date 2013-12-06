@@ -35,7 +35,7 @@ class StudentQuizController < ApplicationController
   end
 
   def finished_quiz
-    #@response_map = ResponseMap.find_by_id(params[:map_id])
+    @choice=
     @response = Response.find_by_map_id(params[:map_id])
   end
 
@@ -77,12 +77,23 @@ class StudentQuizController < ApplicationController
     valid = 0
     questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
     questions.each do |question|
+      correct_answer = QuizQuestionChoice.find_by_question_id_and_iscorrect(question.id, 1)
+      puts "this is the correct answer"
       if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
         if params["#{question.id}"] == nil
           valid = 1
         else
           params["#{question.id}"].each do |choice|
-            new_score = Score.new :comments => choice, :question_id => question.id, :response_id => @response.id
+            puts "what is the choice"
+
+            puts choice
+
+            if choice == correct_answer.txt
+              score = 1
+            else
+              score = 0
+            end
+            new_score = Score.new :comments => choice, :question_id => question.id, :response_id => @response.id, :score => score
             unless new_score.valid?
               valid = 1
             end
@@ -90,9 +101,18 @@ class StudentQuizController < ApplicationController
           end
         end
       else
-        new_score = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => @response.id
+
+        if params["#{question.id}"] == correct_answer.txt
+          score = 1
+        elsif (QuestionType.find_by_question_id question.id).q_type == 'Essay'
+          score = NilClass
+        else
+          score = 0
+        end
+        new_score = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => @response.id, :score => score
         puts "Check this out"
         puts new_score.comments
+
         unless new_score.comments != "" && new_score.comments
           valid = 1
         end
@@ -113,11 +133,6 @@ class StudentQuizController < ApplicationController
 
   end
   def grade_essays
-    #@question_types = QuestionType.find_all_by_q_type("Essay")
-    #@questions = Array.new()
-    #@question_types.each do |question_type|
-    #  @questions << Question.find_by_id(question_type.question_id)
-    #end
     @questionnaires = Array.new()
     @questionnaires = Questionnaire.find_all_by_type("QuizQuestionnaire")
     @questionnaire_questions = Hash.new()
@@ -128,11 +143,6 @@ class StudentQuizController < ApplicationController
         if QuestionType.find_by_question_id(question.id).q_type == "Essay"
           essay_questions << question
         end
-        #if question.questionnaire_id == questionnaire.id
-        #if Question_Type.find_by_question_id(question.id).q_type == "Essay"
-        #  essay_questions << question
-        #end
-        #end
       end
       @questionnaire_questions = @questionnaire_questions.merge({questionnaire.id => essay_questions})
     end
@@ -163,44 +173,5 @@ class StudentQuizController < ApplicationController
     end
   end
 
-  def record_response_old
-    questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
-    responses = Array.new
-    valid = 0
-    questions.each do |question|
-      if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
-        if params["#{question.id}"] == nil
-          valid = 1
-        else
-          params["#{question.id}"].each do |choice|
-            new_response = QuizResponse.new :response => choice, :question_id => question.id, :questionnaire_id => params[:questionnaire_id], :participant_id => params[:participant_id], :assignment_id => params[:assignment_id]
-            unless new_response.valid?
-              valid = 1
-            end
-            responses.push(new_response)
-          end
-        end
-      else
-        new_response = QuizResponse.new :response => params["#{question.id}"], :question_id => question.id, :questionnaire_id => params[:questionnaire_id], :participant_id => params[:participant_id], :assignment_id => params[:assignment_id]
-        unless new_response.valid?
-          valid = 1
-        end
-        responses.push(new_response)
-      end
 
-    end
-
-    if valid == 0
-      responses.each do |response|
-        response.save
-      end
-      #TODO send assignment id and participant id
-      #TODO redirect to finished quiz view after this
-      params.inspect
-      redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :questionnaire_id => params[:questionnaire_id]
-    else
-      flash[:error] = "Please answer every question."
-      redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :reviewer_id => session[:user].id, :questionnaire_id => params[:questionnaire_id]
-    end
-  end
 end

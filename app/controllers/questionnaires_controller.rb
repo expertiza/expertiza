@@ -23,19 +23,19 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
 
     if @questionnaire
-       begin
-          name = @questionnaire.name
+      begin
+        name = @questionnaire.name
 
-          for question in @questionnaire.questions
-            current_q_type = QuestionType.find_by_question_id(question.id)
-            unless current_q_type.nil?
-              current_q_type.delete
-            end
+        for question in @questionnaire.questions
+          current_q_type = QuestionType.find_by_question_id(question.id)
+          unless current_q_type.nil?
+            current_q_type.delete
           end
-          @questionnaire.delete
-          flash[:note] = "Questionnaire <B>#{name}</B> was deleted."
+        end
+        @questionnaire.delete
+        flash[:note] = "Questionnaire <B>#{name}</B> was deleted."
       rescue
-          flash[:error] = $!
+        flash[:error] = $!
       end
     end
 
@@ -104,40 +104,40 @@ class QuestionnairesController < ApplicationController
         @quiz_question_choices = QuizQuestionChoice.find_all_by_question_id(qid)
         i=1
         for quiz_question_choice in @quiz_question_choices
-           if  @question_type.q_type!="Essay"
-             if (@question_type.q_type=="MCC")
-               if(params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][i.to_s])
+          if  @question_type.q_type!="Essay"
+            if (@question_type.q_type=="MCC")
+              if(params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][i.to_s])
                 if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][i.to_s][:iscorrect]==1.to_s
                   puts quiz_question_choice.id.to_s+"save q_type done1"
                   quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
                 else
                   quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
                 end
-               else
-                 puts quiz_question_choice.id.to_s+"save q_type done2"
-                 quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-               end
-             else if (@question_type.q_type=="MCR")
-                 if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== i.to_s
-                   quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-                 else
-                   quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+              else
+                puts quiz_question_choice.id.to_s+"save q_type done2"
+                quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+              end
+            else if (@question_type.q_type=="MCR")
+                   if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== i.to_s
+                     quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+                   else
+                     quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+                   end
+                 else if (@question_type.q_type=="TF")
+                        if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== 1.to_s
+                          quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"True")
+                        else
+                          quiz_question_choice.update_attributes(:iscorrect => '0',:txt=>"False")
+                        end
+                      end
                  end
-             else if (@question_type.q_type=="TF")
-                 if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== 1.to_s
-                   quiz_question_choice.update_attributes(:iscorrect => '1')
-                 else
-                   quiz_question_choice.update_attributes(:iscorrect => '0')
-                 end
-             end
-             end
-             end
-              i+=1
+            end
+            i+=1
           end
         end
         questionnum+=1
       end
-     # save
+      # save
       #save_choices @questionnaire.id
     end
     redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid]
@@ -176,7 +176,7 @@ class QuestionnairesController < ApplicationController
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
       @questionnaire.section = "Quiz"
-       print "=====create_questionnaire========="
+      print "=====create_questionnaire========="
       @assignment = Assignment.find_by_id(params[:aid])
       if @assignment.team_assignment?
         teams = TeamsUser.find(:all, :conditions => ["user_id = ?", session[:user].id])
@@ -271,7 +271,7 @@ class QuestionnairesController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
-private
+  private
 
   #save questionnaire object after create or edit
   def save
@@ -309,7 +309,7 @@ private
         q.questionnaire_id = questionnaire_id
         if @questionnaire.type == "QuizQuestionnaire"
           q.weight = 1 #setting the weight to 1 for quiz questionnaire since the model validates this field
-       # if q.true_false == ''
+          # if q.true_false == ''
           q.true_false = false
         end
         unless q.txt.strip.empty?
@@ -446,14 +446,20 @@ private
               else
                 q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
               end
-            else
-              if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
-                q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
-              else
-                q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
-              end
+            else  if(q_type=="TF")
+                    if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
+                      q = QuizQuestionChoice.new(:txt => "True", :iscorrect => "true",:question_id => question.id)
+                    else
+                      q = QuizQuestionChoice.new(:txt => "False", :iscorrect => "false",:question_id => question.id)
+                    end
+                  else
+                    if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
+                      q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
+                    else
+                      q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
+                    end
+                  end
             end
-
             q.save
           end
         end
@@ -464,7 +470,7 @@ private
     end
   end
 
-private
+  private
 
   # FIXME: These private methods belong in the Questionnaire model
 
@@ -474,8 +480,8 @@ private
     csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
 
     send_data csv_data,
-      :type => 'text/csv; charset=iso-8859-1; header=present',
-      :disposition => "attachment; filename=questionnaires.csv"
+              :type => 'text/csv; charset=iso-8859-1; header=present',
+              :disposition => "attachment; filename=questionnaires.csv"
   end
 
   def import

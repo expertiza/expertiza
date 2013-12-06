@@ -27,7 +27,8 @@
 
         <p>You answer is</p>
         <% Score.find_all_by_response_id_and_question_id(@response.id, question.id).each do |answer| %>
-            <% choice=answer.comments %>
+        <% choice = QuizQuestionChoice.find_by_txt_and_question_id(answer.comments, question.id) %>
+            <% #choice=answer.comments %>
             <% p choice %>
             <%= p QuizQuestionChoice.find(choice).txt%>
             <br>

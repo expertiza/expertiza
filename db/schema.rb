@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.integer  "review_questionnaire_id"
     t.integer  "review_of_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
+    t.boolean  "team_assignment"
     t.integer  "wiki_type_id",                      :default => 0,     :null => false
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false
@@ -290,7 +291,7 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",      :default => "", :null => false
+    t.string  "q_type",                     :null => false
     t.string  "parameters"
     t.integer "question_id", :default => 1,  :null => false
   end
@@ -308,8 +309,8 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.text     "instruction_loc"
     t.string   "section"
+    t.text     "instruction_loc"
   end
 
   create_table "questions", :force => true do |t|

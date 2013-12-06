@@ -94,8 +94,6 @@ Expertiza::Application.routes.draw do |map|
   resources :export_file do
     collection do
       get :start
-      # OSS808 Change 27/10/2013
-      # Added missing routes
       get :export
       post :export
     end
@@ -225,6 +223,7 @@ Expertiza::Application.routes.draw do |map|
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_evaluation_questionnaires, controller: :questionnaires
 
+
   resources :response do
     collection do
       get :new_feedback
@@ -341,6 +340,8 @@ Expertiza::Application.routes.draw do |map|
       get :remove_hyperlink
       get :submit_file
       post :submit_hyperlink
+      get :submit_hyperlink
+      get :remove_hyperlink
       get :view
     end
   end
@@ -402,6 +403,7 @@ Expertiza::Application.routes.draw do |map|
 
   match '/menu/*name', controller: :menu_items, action: :link
   match ':page_name', controller: :content_pages, action: :view, method: :get
+  match '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
 
   root to: 'content_pages#view', page_name: 'home'
 

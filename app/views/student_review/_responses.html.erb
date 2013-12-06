@@ -99,10 +99,9 @@
                       <% end %>
                     </td>
                 <% end %>
-            <% else %>%#- Deadline has passed, and the work was not submitted -%>
-                <td>Begin</td>
-                <td> (Work has not yet been submitted)</td>
-                for
+        <% else %>
+      	  <td>Begin</td>
+            <td> Work has not yet been submitted</td>for
             <% end %>
             <% review_no += 1 %>
           </tr>
@@ -114,13 +113,11 @@
                 <% if (@sorted.size > 1) %>
                     <% for i in 1..@sorted.size-1 %>
                         <tr>
-                          <td colspan="10"><%= link_to "Review done at --#{@sorted[i].created_at}", {:controller => 'response', :action => 'view', :id => @sorted[i].id} %></td>
-                        </tr>
-                    <% end %>
-                <% else %>
-                    <tr>
-                      <td><br> <font color="gray" style="font-style: italic;">No Previous Versions available</font></td>
-                    </tr>
+                <td colspan="10"><%= link_to "Review done at --#{@sorted[i].created_at}" ,{:controller => 'response', :action => 'view', :id => @sorted[i].id} %></td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr><td><br> <font color="gray" style="font-style: italic;">No Previous Versions available</font></td></tr>
                 <% end %>
               </TABLE>
           <% end %>

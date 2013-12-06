@@ -24,7 +24,7 @@ cucumber:
 
 production:
   adapter: mysql
-  database: pg_production
-  username: root
-  password: 
+  database: pg_development
+  username: expertiza
+  password:
   host: localhost

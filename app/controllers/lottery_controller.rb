@@ -220,6 +220,9 @@ class LotteryController < ApplicationController
 
   def run_intelligent_bid
     assignment = Assignment.find(params[:id]) unless params[:id].blank?
+    if(@assignment_id)
+      assignment = Assignment.find(@assignment_id)
+    end
     sign_up_topics = SignUpTopic.find_all_by_assignment_id(params[:id])
 
     # TODO - provide a seed IF same results are required everytime with same input
@@ -234,6 +237,7 @@ class LotteryController < ApplicationController
     end
 
     stop = false
+    ActiveRecord::Base.transaction do
     while (!stop) do
       stop = true
       assignment.sign_up_topics.each do |topic|
@@ -258,7 +262,7 @@ class LotteryController < ApplicationController
                       stop = false
                     end
                 else
-                  # if there are more then one team who have chosen the topic get the highest priority  given to the topic
+                  # if there are more then one teams who have chosen the topic, get the highest priority  given to the topic
                     highest_priority = SignedUpUser.find_by_sql(['SELECT MIN(preference_priority_number) preference_priority_number FROM signed_up_users WHERE topic_id = ? and preference_priority_number!=0',topic.id ])
                     if highest_priority[0].nil?
                         highest_priority[0] = 0
@@ -285,16 +289,20 @@ class LotteryController < ApplicationController
         end
        end
     end #while end
-
+    end
+    flash[:notice] = "Please go to the topics section of edit assignment, to check if the assignments were done"
   end
   redirect_to :controller => 'tree_display', :action => 'list'
   end
 
+  #delete all the waitlist entries for the user
   def delete_other_bids(assignment_id, user_id)
      entries =  SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND su.is_waitlisted = 1",assignment_id,user_id] )
      entries.each { |o| o.destroy }
   end
 
+  # this function checks whether the team has given higher priority to other topics
+  # and whether slots are available for those topics
   def is_other_topic_of_higher_priority(assignment_id, team_id, priority,current_max_slots)
     if priority
       result = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su, sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND preference_priority_number < ? AND preference_priority_number != 0",assignment_id, team_id, priority])
@@ -309,16 +317,18 @@ class LotteryController < ApplicationController
   false
   end
 
+  # the team is assigned the topic if he cannot be assigned to other topics
   def allot_topic_to_user_if_possible(assignment_id, signed_up_user_entry,topic,current_max_slots)
     high_prio_topics = is_other_topic_of_higher_priority(assignment_id,signed_up_user_entry.creator_id,signed_up_user_entry.preference_priority_number,current_max_slots)
     if(high_prio_topics == false)
       current_max_slots[topic.id] =  current_max_slots[topic.id] -1
       signed_up_user_entry.update_attribute('is_waitlisted',0)
+      participant = Participant.find_by_user_id_and_parent_id(Team.find(signed_up_user_entry.creator_id).users[0].id, assignment_id)
+      participant.update_topic_id(topic.id)
       delete_other_bids(assignment_id, signed_up_user_entry.creator_id)
       return true
     end
     return false
-
   end
 
 end

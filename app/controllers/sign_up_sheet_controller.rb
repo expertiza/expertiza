@@ -402,6 +402,8 @@ class SignUpSheetController < ApplicationController
     #signUp.preference_priority_number = params[:priority].to_s
     if params[:priority].to_s.to_f > 0
       signUp.update_attribute('preference_priority_number' , params[:priority].to_s)
+    else
+      flash[:error] = "Invalid priority"
     end
     end
     redirect_to :action => 'list', :id => params[:assignment_id]

@@ -599,9 +599,9 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.boolean "leaderboard_privacy",                      :default => false
     t.text    "digital_certificate"
     t.string  "persistence_token"
+    t.boolean "copy_of_emails",                           :default => false
     t.string  "timezonepref"
     t.text    "public_key"
-    t.boolean "copy_of_emails",                           :default => false
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

@@ -87,18 +87,15 @@ class Score < ActiveRecord::Base
         max_question_score = @questionnaire.max_question_score
       }
     else
-      questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE q1_id = ? AND s_response_id = ?",@questions[0].questionnaire_id,@response .id]
-      weighted_score = questionnaireData[0].weighted_score.to_f
-      sum_of_weights = questionnaireData[0].sum_of_weights.to_f
-      max_question_score = questionnaireData[0].q1_max_question_score.to_f
-    end
+      @questions.each {
+          |question|
+        item = Score.find_by_response_id_and_question_id(@response.id, question.id)
+        if item != nil
+          weighted_score += item.score * question.weight
+          sum_of_weights += question.weight
+        end
 
-    submission_valid?(@response)
-
-    if (sum_of_weights > 0 && max_question_score)
-      return (weighted_score / (sum_of_weights * max_question_score)) * 100
-    else
-      return -1 #indicating no score
+      }
     end
   end
   #Check for invalid reviews.

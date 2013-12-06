@@ -77,37 +77,48 @@ class StudentQuizController < ApplicationController
     valid = 0
     questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
     questions.each do |question|
-      correct_answer = QuizQuestionChoice.find_by_question_id_and_iscorrect(question.id, 1)
-      puts "this is the correct answer"
       if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
         if params["#{question.id}"] == nil
           valid = 1
         else
+          correct_answer = QuizQuestionChoice.find_all_by_question_id_and_iscorrect(question.id, 1)
+          score = 0
+          choices = ""
           params["#{question.id}"].each do |choice|
-            puts "what is the choice"
+            correct_answer.each do |correct|
+              puts "what is the choice"
 
-            puts choice
+              puts choice
 
-            if choice == correct_answer.txt
-              score = 1
-            else
-              score = 0
+              if choice == correct.txt
+                score += 1
+                puts score
+              end
+
             end
-            new_score = Score.new :comments => choice, :question_id => question.id, :response_id => @response.id, :score => score
+            choices += choice + ","
+          end
+            if score < correct_answer.count
+              score = 0
+            else
+              score = 1
+            end
+            new_score = Score.new :comments => choices, :question_id => question.id, :response_id => @response.id, :score => score
             unless new_score.valid?
               valid = 1
             end
             scores.push(new_score)
-          end
+
         end
       else
-        puts "true false answer scoring"
+        score = NilClass
+        correct_answer = QuizQuestionChoice.find_by_question_id_and_iscorrect(question.id, 1)
+        puts "essay answer scoring"
         puts params["#{question.id}"]
         puts correct_answer.txt
-        if params["#{question.id}"] == correct_answer.txt#(params["#{question.id}"] <=> correct_answer.txt) == 0
+        if params["#{question.id}"] == correct_answer.txt
           score = 1
         elsif (QuestionType.find_by_question_id question.id).q_type == 'Essay'
-          score = NilClass
         else
           score = 0
         end

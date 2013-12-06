@@ -26,11 +26,12 @@
         <% end %>
 
         <p>You answer is</p>
-        <% Score.find_all_by_response_id_and_question_id(@response.id, question.id).each do |answer| %>
-        <% choice = QuizQuestionChoice.find_by_txt_and_question_id(answer.comments, question.id) %>
+        <% answer = Score.find_by_response_id_and_question_id(@response.id, question.id) %>
+        <% answer.comments.split(',').each do |choice| %>
+        <% #choice = QuizQuestionChoice.find_by_txt_and_question_id(answer.comments, question.id) %>
             <% #choice=answer.comments %>
-            <% p choice %>
-            <%= p QuizQuestionChoice.find(choice).txt%>
+            <%= p choice %>
+            <%#= p QuizQuestionChoice.find_by_txt(choice).txt%>
             <br>
         <% end %>
 

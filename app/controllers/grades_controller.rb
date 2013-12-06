@@ -47,6 +47,7 @@ class GradesController < ApplicationController
         end
       end
     end
+    @pscore = @participant.scores @questions
   end
 
   def edit

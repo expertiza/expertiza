@@ -86,6 +86,57 @@ class StudentQuizController < ApplicationController
 
     redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :questionnaire_id => params[:questionnaire_id]
   end
+  def grade_essays
+    #@question_types = QuestionType.find_all_by_q_type("Essay")
+    #@questions = Array.new()
+    #@question_types.each do |question_type|
+    #  @questions << Question.find_by_id(question_type.question_id)
+    #end
+    @questionnaires = Array.new()
+    @questionnaires = Questionnaire.find_all_by_type("QuizQuestionnaire")
+    @questionnaire_questions = Hash.new()
+    @questionnaires.each do |questionnaire|
+      questions = Question.find_all_by_questionnaire_id(questionnaire.id)
+      essay_questions = Array.new()
+      questions.each do |question|
+        if QuestionType.find_by_question_id(question.id).q_type == "Essay"
+          essay_questions << question
+        end
+        #if question.questionnaire_id == questionnaire.id
+        #if Question_Type.find_by_question_id(question.id).q_type == "Essay"
+        #  essay_questions << question
+        #end
+        #end
+      end
+      @questionnaire_questions = @questionnaire_questions.merge({questionnaire.id => essay_questions})
+    end
+
+
+    @quiz_responses = Hash.new()
+    @questionnaires.each do |questionnaire|
+      @questionnaire_questions[questionnaire.id].each do |question|
+        ungraded_quiz_responses = Array.new()
+        quiz_responses = QuizResponse.find_all_by_question_id(question.id)
+        quiz_responses.each do |response|
+          if !graded?(response, question)
+            ungraded_quiz_responses << response
+          end
+        end
+
+        @quiz_responses = @quiz_responses.merge({question => ungraded_quiz_responses})
+      end
+    end
+
+
+  end
+  def graded?(response, question)
+    if Score.find_by_question_id_and_response_id(question.id, response.id)
+      return true
+    else
+      return false
+    end
+  end
+
   def record_response_old
     questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
     responses = Array.new

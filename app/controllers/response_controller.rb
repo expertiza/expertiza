@@ -298,7 +298,6 @@ class ResponseController < ApplicationController
       array_not_empty=0
       @review_scores=Array.new
       @prev=Response.all
-      logger.info "SAYLEE1"+ @prev.size.to_s
       for element in @prev
         if(element.map_id==@map.id)
           array_not_empty=1
@@ -321,7 +320,6 @@ class ResponseController < ApplicationController
           @version=1
       end
       @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:version_num=>@version)
-      logger.info "SAYLEE"+ @response.size.to_s
       @res = @response.id
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions     

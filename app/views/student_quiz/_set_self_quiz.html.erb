@@ -6,6 +6,7 @@
 
   <% if assignment.sign_up_topics.count > 0 %>
     <p><b>Select a quiz to begin:</b></p>
+    <%= hidden_field_tag :assignment_id, assignment.id%>
     <% StudentQuizController.take_quiz(assignment.id).each do |questionnaire| %>
       <%= radio_button_tag :questionnaire_id, questionnaire.id %> <%= questionnaire.id %>: <%=h questionnaire.name %><br>
     <% end %>

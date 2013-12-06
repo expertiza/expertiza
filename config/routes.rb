@@ -104,7 +104,7 @@ Expertiza::Application.routes.draw do |map|
       get :view
       get :view_my_scores
       get :instructor_review
-      get :remove_hyperlink
+      post :remove_hyperlink
       get :conflict_notification
     end
   end
@@ -237,6 +237,7 @@ Expertiza::Application.routes.draw do |map|
 
   resources :review_mapping do
     collection do
+      post :add_metareviewer
       get :add_reviewer
       post :add_reviewer
       post :add_self_reviewer
@@ -249,6 +250,7 @@ Expertiza::Application.routes.draw do |map|
       get :delete_all_metareviewers
       get :delete_all_reviewers
       get :delete_all_reviewers_and_metareviewers
+      get :delete_metareviewer
       get :delete_reviewer
       get :distribution
       get :list_mappings
@@ -281,6 +283,8 @@ Expertiza::Application.routes.draw do |map|
 
   resources :sign_up_sheet do
     collection do
+      get :signup
+      get :delete_signup
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :delete_signup

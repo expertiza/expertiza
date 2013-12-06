@@ -27,7 +27,6 @@ class GradesController < ApplicationController
         |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-
     ## When user clicks on the notification, it should go away
     #deleting all review notifications
     rmaps = @participant.response_maps

@@ -6,7 +6,7 @@
 			
 		<td>
 			<table>
-				<% @qid = "ParticipantReviewResponseMap"
+				<% @qid = "ParticipantReviewResponse"
                 @sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ?  and object_type = ?",@participantid, @qid  ])%>
                 <% if(@sc) %>
 			        <% t_score= @sc.score %>

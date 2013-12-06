@@ -10,10 +10,10 @@ require 'yaml'
 
 class AssignmentParticipant < Participant
   require 'wiki_helper'
-
+   #ParticipantReviewResponseMap changed to ParticipantReviewResponse
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
-  has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
-  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r,  participants p WHERE r.type = \'ParticipantReviewResponseMap\' AND r.reviewee_id = p.id AND p.id = #{id}'
+  has_many    :review_mappings, :class_name => 'ParticipantReviewResponse', :foreign_key => 'reviewee_id'
+  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r,  participants p WHERE r.type = \'ParticipantReviewResponse\' AND r.reviewee_id = p.id AND p.id = #{id}'
   belongs_to  :user
   validates_presence_of :handle
 
@@ -62,7 +62,7 @@ class AssignmentParticipant < Participant
     return 0 if self.response_maps.size == 0
 
     sum_of_scores = 0
-
+      ################# I think response_map has to be changed to response_maps #####################
     self.response_maps.metareview_response_maps.each do |metaresponse_map|
       if !metaresponse_map.response.nil? && response_map == assignment_id then
         sum_of_scores = sum_of_scores + response_map.response.average_score
@@ -76,15 +76,15 @@ class AssignmentParticipant < Participant
     participant == self
   end
 
-  def assign_reviewer(reviewer)
-    ParticipantReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+  def assign_reviewer(reviewer) #ParticipantReviewResponseMap was changed to ParticipantReviewResponse
+    ParticipantReviewResponse.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
                                         :reviewed_object_id => assignment.id)
   end
 
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object 
-  def reviewed_by?(reviewer)
-    ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
+  def reviewed_by?(reviewer)   #ParticipantReviewResponseMap changed to ParticipantReviewResponse
+    ParticipantReviewResponse.count(:conditions => ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
                                                        self.id, reviewer.id, assignment.id]) > 0
   end
 
@@ -94,13 +94,13 @@ class AssignmentParticipant < Participant
 
   # all the participants in this assignment reviewed by this person
   def reviewees
-    reviewees = []
-    if self.assignment.team_assignment?
-      rmaps = ResponseMap.find(:all, conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
-      rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
-    else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
-      rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
+    reviewees = []   #rmaps below has beenchanged to responseMaps
+    if self.assignment.team_assignment? #ResponseMap changed to Response, and type = 'TeamReviewResponseMap is being changed  to TeamReviewResponse
+      responseMaps = Response.find(:all, conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponse'"])
+      responseMaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
+    else   #type = 'ParticipantReviewResponseMap is being changed  to ParticipantReviewResponse
+      responseMaps = Response.find(:all, :conditions => ["reviewer_id = #{self.id} && type = 'ParticipantReviewResponse'"])
+      responseMaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
     end
 
     reviewees
@@ -108,13 +108,13 @@ class AssignmentParticipant < Participant
 
   # all the participants in this assignment who have reviewed this person
   def get_reviewers
-    reviewers = []
+    reviewers = [] #ResponseMap changed to Response, and type = 'TeamReviewResponseMap is being changed  to TeamReviewResponse
     if self.assignment.team_assignment? && self.team
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
-    else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      responseMaps = Response.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponse'"])
+    else #type = 'ParticipantReviewResponseMap is being changed  to ParticipantReviewResponse
+      responseMaps = Response.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponse'"])
     end
-    rmaps.each do |rm|
+    responseMaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
     end
 
@@ -315,29 +315,29 @@ class AssignmentParticipant < Participant
   alias_method :course_string, :get_course_string
 
   def get_feedback
-    FeedbackResponseMap.get_assessments_for(self)
+    FeedbackResponse.get_assessments_for(self)    #FeedbackResponseMap changed to FeedbackResponse
   end
   alias_method :feedback, :get_feedback
 
   def get_reviews
     #ACS Always get assessments for a team
     #removed check to see if it is a team assignment
-    TeamReviewResponseMap.get_assessments_for(self.team)
+    TeamReviewResponse.get_assessments_for(self.team)#TeamReviewResponseMap changed to TeamReviewResponse
   end
   alias_method :reviews, :get_reviews
 
   def get_reviews_by_reviewer(reviewer)
-    TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
+    TeamReviewResponse.get_reviewer_assessments_for(self.team, reviewer)   # TeamReviewResponseMap  changed to TeamReviewResponseMap
   end
   alias_method :reviews_by_reviewer, :get_reviews_by_reviewer
 
   def metareviews
-    MetareviewResponseMap.get_assessments_for(self)  
+    MetareviewResponse.get_assessments_for(self) #MetareviewResponseMap changed to MetareviewResponse
   end
 
 
   def teammate_reviews
-    TeammateReviewResponseMap.get_assessments_for(self)
+    TeammateReviewResponse.get_assessments_for(self)  #TeammateReviewResponseMap changed to TeammateReviewResponse
   end
 
   def get_submitted_files
@@ -505,8 +505,8 @@ class AssignmentParticipant < Participant
   alias_method :stage_deadline, :get_stage_deadline
 
 
-  def review_response_maps
-    ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
+  def review_response_maps #ParticipantReviewResponseMap changed to ParticipantReviewResponse
+    ParticipantReviewResponse.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
   end
 
   def get_topic_string

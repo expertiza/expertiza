@@ -1,19 +1,20 @@
+
 <h1><%= @title %> for <%= @assignment.name %></h1>
-<% if !(@map.instance_of? TeammateReviewResponseMap) %>
+<% if !(@responseByid.instance_of? TeammateReviewResponse) %>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
   <br/><hr/><br/>  
 <% end %>
 
-<% @review_versions = @map.get_all_versions() %>
+<% @review_versions = @responseByid.get_all_versions() %>
 <%= render :partial => 'review', :locals => { :versions => @review_versions } %>
 
 <% if false %>[start erb comment] Changes to accommodate Jen's custom rubric [end erb comment]<% end %>
 <% file_url = nil
-   if @map.questionnaire.section.eql? "Custom"
+   if @responseByid.questionnaire.section.eql? "Custom"
       @current_folder = DisplayOption.new
       @current_folder.name = ""
-      @participant = Participant.find(@map.reviewer_id)
-      files_list = Dir[@participant.assignment.get_path.to_s+ "/" +@map.map_id.to_s + @current_folder.name + "/*"]
+      @participant = Participant.find(@responseByid.reviewer_id)
+      files_list = Dir[@participant.assignment.get_path.to_s+ "/" +@responseByid.id.to_s + @current_folder.name + "/*"]
       files = Array.new
       for file in files_list
         if File.directory?(file) then
@@ -37,7 +38,7 @@
 
 <HR>
 <%= @response.display_as_html(nil,nil,file_url) %>
-<% if @map.questionnaire.section.eql? "Custom" %>
+<% if @responseByid.questionnaire.section.eql? "Custom" %>
     <%
   i = 0
   current_topic = nil
@@ -55,6 +56,6 @@
 </div>
 <br/>
 
-<%= @map.show_feedback() %>
+<%= @responseByid.show_feedback() %>
 <br/>
 <a href="javascript:window.history.back()">Back</a>

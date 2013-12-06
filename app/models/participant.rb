@@ -3,12 +3,12 @@ class Participant < ActiveRecord::Base
   belongs_to :user
   belongs_to :topic, :class_name => 'SignUpTopic'
   belongs_to :assignment, :foreign_key => 'parent_id'
-  
   has_many   :comments, :dependent => :destroy
   has_many   :resubmission_times, :dependent => :destroy
-  has_many   :reviews, :class_name => 'ResponseMap', :foreign_key => 'reviewer_id'
-  has_many   :team_reviews, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewer_id'
-  has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id'
+ ## Anything associated to ResponseMap has been changed to Response like ResponseMap->Response , TeamReviewResponseMap->TeamReviewResponse
+  has_many   :reviews, :class_name => 'Response', :foreign_key => 'reviewer_id'
+  has_many   :team_reviews, :class_name => 'TeamReviewResponse', :foreign_key => 'reviewer_id'
+  has_many :response_maps, :class_name =>'Response', :foreign_key => 'reviewee_id'
 
   validates_numericality_of :grade, :allow_nil => true
 
@@ -34,28 +34,28 @@ class Participant < ActiveRecord::Base
 
 
   def delete(force = nil)
-
+     #ResponseMap has been changed to Response
     # TODO How do we test this code?  #need a controller test_oss808
-    maps = ResponseMap.all(:conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
-
-    if force or ((maps.nil? or maps.length == 0) and 
+    allResponseMaps = Response.all(:conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
+  #maps above is changed to allResponseMaps
+    if force or ((allResponseMaps.nil? or allResponseMaps.length == 0) and
                  self.team.nil?)
-      force_delete(maps)
+      force_delete(allResponseMaps)
     else
       raise "Associations exist for this participant"        
     end
   end
 
-
-  def force_delete(maps)
+  #maps below is changed to allResponseMaps , hence the force_delete method will take allResponseMaps
+  def force_delete(allResponseMaps)
     times = ResubmissionTime.find_all_by_participant_id(self.id);
 
     if times
       times.each { |time| time.destroy }
     end
     
-    if maps
-      maps.each { |map| map.delete(true) }
+    if allResponseMaps
+      allResponseMaps.each { |map| map.delete(true) }
     end
     
     if self.team

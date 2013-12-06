@@ -1,21 +1,21 @@
-<h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
+<h1><%= @header %> <%= @title %> for <%= @responseByid.assignment.name %></h1>
 
-<% if !@map.contributor.nil?%>
-  <%if @map.assignment.team_assignment?
-        team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
-        topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
+<% if !@responseByid.contributor.nil?%>
+  <%if @responseByid.assignment.team_assignment?
+        team_member = TeamsUser.find_by_team_id(@responseByid.contributor).user_id
+        topic_id = Participant.find_by_parent_id_and_user_id(@responseByid.assignment.id,team_member).topic_id
     else%>
-        <% topic_id = Participant.find(@map.contributor).topic_id%>
+        <% topic_id = Participant.find(@responseByid.contributor).topic_id%>
   <%end%>  
   <%if !topic_id.nil?%>
     <h2>You are reviewing <%=SignUpTopic.find(topic_id).topic_name%></h2>
   <%end%>
-  <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @responseByid.contributor, :stage =>  @assignment.get_current_stage()} %>
   <hr/>
 <% end %>
 <!-- display all versions available -->
 <% @responses_versions = Array.new %>
-<% @responses_versions = @map.get_all_versions() %>
+<% @responses_versions = @responseByid.get_all_versions() %>
 
 <% if @responses_versions.empty? %>
   "<I>No previous review was performed.</I><br/><hr/><br/>"
@@ -72,7 +72,7 @@
 </p>
 
 <br/>
-<%if @map.assignment.id == 562%>
+<%if @responseByid.assignment.id == 562%>
     <%= label_tag 'save_option_label', "Automated suggestions/advice:" %> <br>
     <%= radio_button_tag :save_options,'WithMeta', true %>Yes<br/>
     <%= radio_button_tag :save_options,'WithoutMeta' %>No<br/>
@@ -83,6 +83,6 @@
 <%= hidden_field_tag('return', @return) %>
 <% end %>
 
-<%= @map.show_feedback() %>
+<%= @responseByid.show_feedback() %>
 <a href="javascript:window.history.back()">Back</a>
 

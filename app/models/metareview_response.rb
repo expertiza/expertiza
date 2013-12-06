@@ -1,5 +1,4 @@
-=begin
-class MetareviewResponseMap < Response
+class MetareviewResponse < Response
   belongs_to :reviewee, :class_name => 'Participant', :foreign_key => 'reviewee_id'
   belongs_to :review_mapping, :class_name => 'Response', :foreign_key => 'reviewed_object_id'
   
@@ -106,4 +105,3 @@ class MetareviewResponseMap < Response
     end 
   end  
 end
-=end

@@ -125,8 +125,8 @@ class Leaderboard < ActiveRecord::Base
     ## for team assignments, we look up team numbers from the score_cache table, find the participants within the team, for each team member make a new csEntry with the respective participant_id, questionnaire_id, and total_score
     ## code :Abhishek
 
-    
-   argList = ['MetareviewResponseMap', 'FeedbackResponseMap','TeammateReviewResponseMap']
+    #MetareviewResponseMap, FeedbackResponseMap,TeammateReviewResponseMap changed to
+   argList = ['MetareviewResponse', 'FeedbackResponse','TeammateReviewResponse']
   
    for assgt in assignmentList
             
@@ -139,11 +139,11 @@ class Leaderboard < ActiveRecord::Base
 	    for fMTEntry in fMTEntries
 	        csEntry = CsEntriesAdaptor.new
 	        csEntry.participant_id = fMTEntry.reviewee_id
-	        if (fMTEntry.object_type == 'FeedbackResponseMap')
+	        if (fMTEntry.object_type == 'FeedbackResponse')    #FeedbackResponseMap changed to FeedbackResponse
 	              csEntry.questionnaire_id = assQuestionnaires[assgt.id]["AuthorFeedback"]
-	        elsif (fMTEntry.object_type == 'MetareviewResponseMap')
+	        elsif (fMTEntry.object_type == 'MetareviewResponse') #MetareviewResponseMap changed to MetareviewResponse
 	              csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Metareview"]
-	        elsif (fMTEntry.object_type == 'TeammateReviewResponseMap')
+	        elsif (fMTEntry.object_type == 'TeammateReviewResponse')  #TeammateReviewResponseMap changed to TeammateReviewResponse
                       csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Teamreview"]
                 end
                 csEntry.total_score = fMTEntry.score
@@ -153,7 +153,7 @@ class Leaderboard < ActiveRecord::Base
    	##########now putting stuff in reviews based on if the assignment is a team assignment or not###################
    	    if assTeamHash[assgt.id] == "indie"
                    participant_entries = ScoreCache.find(:all, 
-                                                    :conditions =>["reviewee_id in (?) and object_type = ?", participants_for_assgt, 'ParticipantReviewResponseMap' ]) 
+                                                    :conditions =>["reviewee_id in (?) and object_type = ?", participants_for_assgt, 'ParticipantReviewResponse' ])
                    for participant_entry in participant_entries
                   	    csEntry = CsEntriesAdaptor.new
                  	    csEntry.participant_id = participant_entry.reviewee_id
@@ -165,7 +165,7 @@ class Leaderboard < ActiveRecord::Base
                   assignment_teams = Team.find(:all, 
                                              :conditions => ["parent_id = ? and type = ?", assgt.id, 'AssignmentTeam']) 
                   team_entries = ScoreCache.find(:all, 
-                                              :conditions =>["reviewee_id in (?) and object_type = ?", assignment_teams, 'TeamReviewResponseMap'])
+                                              :conditions =>["reviewee_id in (?) and object_type = ?", assignment_teams, 'TeamReviewResponse'])
                   for team_entry in team_entries
                             team_users = TeamsUser.find(:all, 
                                                 :conditions => ["team_id = ?",team_entry.reviewee_id])

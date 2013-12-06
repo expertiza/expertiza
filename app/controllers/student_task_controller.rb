@@ -20,10 +20,10 @@ class StudentTaskController < ApplicationController
     @can_provide_suggestions = @assignment.allow_suggestions
     #Even if one of the reviewee's work is ready for review "Other's work" link should be active
     if @assignment.staggered_deadline?
-      review_mappings = @participant.team_reviews
+      review_responses = @participant.team_reviews
 
-      review_mappings.each do |review_mapping|
-        participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
+      review_responses.each do |review_response|
+        participant = AssignmentTeam.get_first_member(review_responses.reviewee_id)
 
         if participant && participant.topic
           review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id, 1)
@@ -60,8 +60,8 @@ class StudentTaskController < ApplicationController
       end
     end
 
-    @review_mappings = ResponseMap.find_all_by_reviewer_id(@participant.id)
-    @review_of_review_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)
+    @review_responses = Response.find_all_by_reviewer_id(@participant.id)
+    @review_of_review_responses = MetareviewResponse.find_all_by_reviewer_id(@participant.id)
   end
 
   def your_work

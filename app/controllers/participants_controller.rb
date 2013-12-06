@@ -54,14 +54,14 @@ class ParticipantsController < ApplicationController
   
   def delete_items
     participant = Participant.find(params[:id])
-    maps = params[:ResponseMap]
+    responses = params[:Response]     #maps was changed to responses, and hence the params were changed to Response from ResponseMap
     teamsusers = params[:TeamsUser]      
     
-    if !maps.nil?
-      maps.each{
-        |rmap_id|
+    if !responses.nil?
+      responses.each{
+        |response_id|        #Changing rmap_id to response_id
         begin
-          ResponseMap.find(rmap_id[0].to_i).delete(true)
+          Response.find(response_id[0].to_i).delete(true)   #ReponseMap changed to Resoponse
         rescue
         end
       }

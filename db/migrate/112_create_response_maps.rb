@@ -77,7 +77,7 @@ class CreateResponseMaps < ActiveRecord::Migration
        }
        
        if review.length > 0 && review[0] != nil         
-       FeedbackResponseMap.find_all_by_reviewed_object_id(review[0]['id'].to_i).each{
+       FeedbackResponse.find_all_by_reviewed_object_id(review[0]['id'].to_i).each{
          | fmap |
          if response != nil
           fmap.update_attribute('reviewed_object_id',response.id)

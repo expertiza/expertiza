@@ -6,6 +6,7 @@ module ResponseHelper
   # the instructor) then notify the instructor.
   # ajbudlon, nov 18, 2008
   def self.compare_scores(new_response, questionnaire)
+    #No need to change the map word here , it's working over an object
     map_class = new_response.map.class
     existing_responses = map_class.get_assessments_for(new_response.map.reviewee)
     total, count = get_total_scores(existing_responses, new_response)

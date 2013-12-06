@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class FeedbackResponseMapTest < ActiveSupport::TestCase
+class FeedbackResponseTest < ActiveSupport::TestCase
   fixtures :response_maps, :questionnaires , :assignments, :responses , :response_maps
 
   test "method_assignment" do

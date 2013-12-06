@@ -15,8 +15,8 @@ class PopupController < ApplicationController
 #  if(@reviewid == nil)
     @scores = nil
   else
-    @reviewid = (Response.find_by_map_id(params[:id2])).id
-    @pid = ResponseMap.find(params[:id2]).reviewer_id
+    @reviewid = (Response.find_by_id(params[:id2])).id  #find_by_map_id changed to find_by_id
+    @pid = Response.find(params[:id2]).reviewer_id
     @reviewer_id = Participant.find(@pid).user_id
     
     @scores = Score.find_all_by_response_id(@reviewid)
@@ -76,11 +76,11 @@ def participants_popup
     @scores = nil
     
   else
-    @reviewid = (Response.find_by_map_id(params[:id2])).id
-    @pid = ResponseMap.find(params[:id2]).reviewer_id
+    @reviewid = (Response.find_by_id(params[:id2])).id  #find_by_map_id changed to find_by_id
+    @pid = Response.find(params[:id2]).reviewer_id
     @reviewer_id = Participant.find(@pid).user_id
     #@reviewer_id = ReviewMapping.find(params[:id2]).reviewer_id
-    @assignment_id = ResponseMap.find(params[:id2]).reviewed_object_id
+    @assignment_id = Response.find(params[:id2]).reviewed_object_id
     @assignment = Assignment.find(@assignment_id)
     @participant = Participant.find(:first, :conditions => ["id = ? and parent_id = ? ", params[:id],@assignment_id])
 

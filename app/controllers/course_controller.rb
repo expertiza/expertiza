@@ -156,8 +156,8 @@ class CourseController < ApplicationController
   end
 
 # generate the undo link
-  #def undo_link
-  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
-  #end
+#def undo_link
+#  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
+#end
 
 end

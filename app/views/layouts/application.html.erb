@@ -7,66 +7,72 @@
   <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
   <%= csrf_meta_tag %>
   <%= stylesheet_link_tag 'goldberg',
-    'layout',
-    'application',
-    'flash_messages',
-    'balloontip',
-    'redbox' %>
+                          'layout',
+                          'application',
+                          'flash_messages',
+                          'balloontip',
+                          'redbox' %>
 
   <%= javascript_include_tag :all,
-    'jquery',
-    'redbox',
-    'suckerfish',
-    'superfish',
-    'actionmenu',
-    'tableactions',
-    'application',
-    'datetimepicker',
-    'CalendarPopup',
-    'ajaxtabs',
-    'sorttable',
-    'shared',
-    'textareasizer'
+                             'jquery',
+                             'redbox',
+                             'suckerfish',
+                             'superfish',
+                             'actionmenu',
+                             'tableactions',
+                             'application',
+                             'datetimepicker',
+                             'CalendarPopup',
+                             'ajaxtabs',
+                             'sorttable',
+                             'shared',
+                             'textareasizer'
   %>
 </head>
 
 <body>
-  <%= render 'shared/header' %>
+<%= render 'shared/header' %>
 
-  <%= render 'shared/navigation' %>
+<%= render 'shared/navigation' %>
 
-  <div class="wrapper">
-    <div class="container">
+<div class="wrapper">
+  <div class="container">
 
-      <div class="sidebar">
-        <div class="sidecontent">
-          <%= render :partial => 'auth/login' %>
-        </div>
-      </div>
-
-      <div class="main">
-        <div class="content">
-          <% if session[:menu] %>
-            <%= render :partial => 'menu_items/breadcrumbs', :locals => { :crumbs => session[:menu].crumbs } %>
-          <% end %>
-
-          <%= render 'shared/flash_messages' %>
-
-          <%= yield %>
-
-        </div>
+    <div class="sidebar">
+      <div class="sidecontent">
+        <%= render :partial => 'auth/login' %><br/>
+        <% if session[:user].nil? %>
+        <% else %>
+            <% if session[:user].role_id ==4  %>
+                <a href="/versions/index">Manage Versions Table</a>
+            <% end %>
+        <% end %>
       </div>
     </div>
 
-    <div class="clearing">&nbsp;</div>
+    <div class="main">
+      <div class="content">
+        <% if session[:menu] %>
+            <%= render :partial => 'menu_items/breadcrumbs', :locals => { :crumbs => session[:menu].crumbs } %>
+        <% end %>
 
-  </div>
-  <!-- class="wrapper" -->
+        <%= render 'shared/flash_messages' %>
 
-  <div class="footer" align="center">
-    <%= render 'shared/footer_message' %>
+        <%= yield %>
+
+      </div>
+    </div>
   </div>
-  <!-- class="footer" -->
+
+  <div class="clearing">&nbsp;</div>
+
+</div>
+<!-- class="wrapper" -->
+
+<div class="footer" align="center">
+  <%= render 'shared/footer_message' %>
+</div>
+<!-- class="footer" -->
 
 </body>
 </html>

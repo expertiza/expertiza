@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-class SignupSheet
-
-
-
-end
-
-||||||| merged common ancestors
-=======
 class SignupSheet < ActiveRecord::Base
 
 
@@ -48,4 +39,3 @@ class SignupSheet < ActiveRecord::Base
   end
 end
 
->>>>>>> 5513cf844441d96fcb3a73965c3fe9a8b8b85ac3

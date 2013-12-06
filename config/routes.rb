@@ -400,8 +400,11 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  resources :versions, :path => 'versions_path'
+
   match '/menu/*name', controller: :menu_items, action: :link
   match ':page_name', controller: :content_pages, action: :view, method: :get
+  #match  '/', :to => 'https:localhost:3000'
 
   root to: 'content_pages#view', page_name: 'home'
 

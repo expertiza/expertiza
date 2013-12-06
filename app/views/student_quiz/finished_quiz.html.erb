@@ -13,7 +13,7 @@
             <% end %>
         <% end %>
         <br>
-        <%= p 'You answer is    '+QuizQuestionChoice.find(QuizResponse.find_last_by_question_id(question.id).response).txt  %>
+        <%= p 'You answer is    '+Score.find_by_response_id_and_question_id(@response.id, question.id).comments  %>
 
     <% elsif(question_type.q_type == 'MCC') %>
         <%= p 'Correct answer is    '%>
@@ -26,8 +26,8 @@
         <% end %>
 
         <p>You answer is</p>
-        <% QuizResponse.find_all_by_question_id(question.id).each do |answer| %>
-            <% choice=answer.response %>
+        <% Score.find_all_by_response_id_and_question_id(@response.id, question.id).each do |answer| %>
+            <% choice=answer.comments %>
             <% p choice %>
             <%= p QuizQuestionChoice.find(choice).txt%>
             <br>
@@ -39,12 +39,12 @@
         <% else %>
             <p> Correct Answer is False <p>
         <% end %>
-        <%= p 'You answer is '+QuizResponse.find_last_by_question_id(question.id).response  %>
+        <%= p 'You answer is '+Score.find_by_response_id_and_question_id(@response.id, question.id).comments %>
 
 
     <% elsif(question_type.q_type == 'Essay') %>
         <p> Your Answer is <p>
-  <%= p QuizResponse.find_last_by_question_id(question.id).response %>
+  <%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %>
     <% end %><br>
     <br>
 <% end %>

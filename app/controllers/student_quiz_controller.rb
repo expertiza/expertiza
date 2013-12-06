@@ -35,7 +35,8 @@ class StudentQuizController < ApplicationController
   end
 
   def finished_quiz
-
+    #@response_map = ResponseMap.find_by_id(params[:map_id])
+    @response = Response.find_by_map_id(params[:map_id])
   end
 
   def self.take_quiz assignment_id , reviewer_id
@@ -60,26 +61,19 @@ class StudentQuizController < ApplicationController
       end
     end
     return @questionnaire
-
-
-
-    #Team.find_all_by_parent_id(assignment_id).each do |quiz_creator|
-    #  unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
-    #    Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
-    ##      @questionnaire.push(questionnaire)
-    #   end
-    #  end
-    #end
-    return @questionnaire
   end
   def record_response
     @response = Response.new
     @map = QuizResponseMap.new
-    @map.reviewee_id = Team.find_by_parent_id(params[:assignment_id]).id
+    @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
     @map.reviewer_id = Participant.find_by_user_id_and_parent_id(session[:user].id, params[:assignment_id]).id
+    puts "HELLOOOOO"
     @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
     @map.save
+    puts @map.id
     @response.map_id = @map.id
+    @response.created_at = DateTime.current
+    @response.updated_at = DateTime.current
     @response.save
     questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
     questions.each do |question|
@@ -95,7 +89,7 @@ class StudentQuizController < ApplicationController
 
     end
 
-    redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :questionnaire_id => params[:questionnaire_id]
+    redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :questionnaire_id => params[:questionnaire_id], :map_id => @map.id
   end
   def grade_essays
     #@question_types = QuestionType.find_all_by_q_type("Essay")

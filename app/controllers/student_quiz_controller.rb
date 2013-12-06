@@ -67,29 +67,50 @@ class StudentQuizController < ApplicationController
     @map = QuizResponseMap.new
     @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
     @map.reviewer_id = Participant.find_by_user_id_and_parent_id(session[:user].id, params[:assignment_id]).id
-    puts "HELLOOOOO"
     @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
     @map.save
-    puts @map.id
     @response.map_id = @map.id
     @response.created_at = DateTime.current
     @response.updated_at = DateTime.current
     @response.save
+    scores = Array.new
+    valid = 0
     questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
     questions.each do |question|
       if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
-        params["#{question.id}"].each do |choice|
-          new_response = Score.new :comments => choice, :question_id => question.id, :response_id => @response.id
-          new_response.save
+        if params["#{question.id}"] == nil
+          valid = 1
+        else
+          params["#{question.id}"].each do |choice|
+            new_score = Score.new :comments => choice, :question_id => question.id, :response_id => @response.id
+            unless new_score.valid?
+              valid = 1
+            end
+            scores.push(new_score)
+          end
         end
       else
-        new_response = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => @response.id
-        new_response.save
+        new_score = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => @response.id
+        puts "Check this out"
+        puts new_score.comments
+        unless new_score.comments != "" && new_score.comments
+          valid = 1
+        end
+        scores.push(new_score)
       end
 
     end
+    if valid == 0
+      scores.each do |score|
+        score.save
+      end
+      params.inspect
+      redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :questionnaire_id => params[:questionnaire_id], :map_id => @map.id
+    else
+      flash[:error] = "Please answer every question."
+      redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :questionnaire_id => params[:questionnaire_id]
+    end
 
-    redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :questionnaire_id => params[:questionnaire_id], :map_id => @map.id
   end
   def grade_essays
     #@question_types = QuestionType.find_all_by_q_type("Essay")

@@ -101,8 +101,10 @@ class StudentQuizController < ApplicationController
           end
         end
       else
-
-        if params["#{question.id}"] == correct_answer.txt
+        puts "true false answer scoring"
+        puts params["#{question.id}"]
+        puts correct_answer.txt
+        if params["#{question.id}"] == correct_answer.txt#(params["#{question.id}"] <=> correct_answer.txt) == 0
           score = 1
         elsif (QuestionType.find_by_question_id question.id).q_type == 'Essay'
           score = NilClass

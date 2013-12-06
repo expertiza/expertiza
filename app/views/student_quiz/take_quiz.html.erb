@@ -19,8 +19,8 @@
          <%= check_box_tag "#{question.id}[]", "#{choice.txt}" %><%= label_tag "#{choice.txt}", choice.txt %><br>
        <% end %>
     <% elsif(question_type.q_type == 'TF') %>
-       <%= radio_button_tag "#{question.id}", 'true' %><%= label_tag "#{question.id}_true", 'True' %><br>
-       <%= radio_button_tag "#{question.id}", 'false' %><%= label_tag "#{question.id}_false", 'False' %><br>
+       <%= radio_button_tag "#{question.id}", 'True' %><%= label_tag "#{question.id}_true", 'True' %><br>
+       <%= radio_button_tag "#{question.id}", 'False' %><%= label_tag "#{question.id}_false", 'False' %><br>
     <% elsif(question_type.q_type == 'Essay') %>
        <%= text_area_tag "#{question.id}", nil, :cols => "70", :rows => "5" %><br>
     <% end %><br>

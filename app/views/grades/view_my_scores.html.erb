@@ -2,7 +2,7 @@
    
 <TABLE class="grades" >
 <%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
-<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.scores(@questions)} %>
+<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @pscore} %>
 </TABLE>
 <BR/>
 <%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
@@ -12,7 +12,7 @@
 
 <%= form_for @assignment, html: {id: 'assignment_form'} do %>
    <div style=" ">
-    <% pscore=@participant.get_scores(@questions)
+    <% pscore=@pscore
        participant = pscore[:participant]
        if pscore[:max_pts_available]
          score_postfix = sprintf(" / %.2f",pscore[:max_pts_available])
@@ -50,30 +50,30 @@
      </div>
     <div id="tabs">
       <ul>
-        <li id="tab1"><a href="#tabs-11">Submitted Work</a></li>
-        <li id="tab2"><a href="#tabs-12">Reviewing</a></li>
-        <li id="tab3"><a href="#tabs-13">Author Feedback</a></li>
-        <li id="tab4"><a href="#tabs-14">TeamMate Review</a></li>
-        <li id="tab5"><a href="#tabs-15">Total Score</a></li>
+        <li><a href="#tabs-1">Submitted Work</a></li>
+        <li><a href="#tabs-2">Metareview</a></li>
+        <li><a href="#tabs-3">Author Feedback</a></li>
+        <li><a href="#tabs-4">TeamMate Review</a></li>
+        <li><a href="#tabs-5">Total Score</a></li>
       </ul>
-      <div id="tabs-11">
-        #renders a new tab for reviews on submitted work
-       <p><%= render :partial => 'grades/submitted_work', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %> </p>
+      <div id="tabs-1">
+        <%##renders a new tab for reviews on submitted work%>
+       <p><%= render :partial => 'grades/submitted_work', :locals => {:prefix => 'user',  :team => false, :pscore => @pscore} %> </p>
       </div>
-      <div id="tabs-12">
-        #renders a new tab for meta reviews
-        <%= render :partial => 'grades/meta', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      <div id="tabs-2">
+        <%##renders a new tab for meta reviews%>
+        <%= render :partial => 'grades/meta', :locals => {:prefix => 'user',  :team => false, :pscore => @pscore} %>
       </div>
-      <div id="tabs-13">
-        #renders a new tab for author feedback
-        <%= render :partial => 'grades/author',:locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      <div id="tabs-3">
+        <%##renders a new tab for author feedback%>
+        <%= render :partial => 'grades/author',:locals => {:prefix => 'user',  :team => false, :pscore => @pscore} %>
       </div>
-      <div id="tabs-14">
-        #renders a new tab for team mate reviews
-        <%= render :partial => 'grades/teammate',:locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      <div id="tabs-4">
+        <%##renders a new tab for team mate reviews%>
+        <%= render :partial => 'grades/teammate',:locals => {:prefix => 'user',  :team => false, :pscore => @pscore} %>
       </div>
-      <div id="tabs-15">
-        #renders a new tab for scores
+      <div id="tabs-5">
+        <%##renders a new tab for scores%>
         <%= render 'grades/scores', participant: participant %>
       </div>
     </div>

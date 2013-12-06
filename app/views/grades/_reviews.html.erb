@@ -15,7 +15,7 @@
         <div id="reviewtabs">
           <ul>
             <% for i in 1..rscore[:assessments].length %>
-                <li id="tab<%= i %>"><a href="#reviewtabs-<%= i %>">Review <%= i %></a></li>
+                <li><a href="#reviewtabs-<%= i %>">Review <%= i %></a></li>
             <% end %>
           </ul>
 
@@ -64,107 +64,107 @@
     <% else %>
         <% if @questionnaire.section.eql? "Custom" %>
 
-                      <div id="reviewtabs-<%= count %>">
+          <div id="reviewtabs-<%= count %>">
 
 
             <h2>Review <%= count %></h2>
             <!-- Display the latest review first -->
-                        <a name="<%= prefix+"_"+review.map.reviewer.name %>"></a>
+            <a name="<%= prefix+"_"+review.map.reviewer.name %>"></a>
             <%= review.display_as_html(prefix, count) %>
-                <%= render :partial => 'questionnaire', :locals => {:file_url => file_url, :review => review} %>
+            <%= render :partial => 'questionnaire', :locals => {:file_url => file_url, :review => review} %>
             <!-- get all previous versions -->
             <% @sorted_array=Array.new %>
             <% @prev=Response.all %>
             <%for element in @prev     %>
-                <%if(element.map_id==review.map.map_id)%>
-                    <%array_not_empty=1 %>
-                    <% @sorted_array << element %>
-                <% end %>
+              <%if(element.map_id==review.map.map_id)%>
+                <%array_not_empty=1 %>
+                <% @sorted_array << element %>
+              <% end %>
             <% end %>
-                        <% @sorted=@sorted_array.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) } %>
-                        <% if (@sorted.size>1) %>
-                <h3>Previous versions</h3>
-                <% for i in 1..@sorted.size-1 %>
-                    <% @str = @sorted[i].id.to_s %>
-                    <!-- display previous versions in descending order -->
-                                <a name="<%= prefix+"_"+review.map.reviewer.name %>"></a>
-                    <%= @sorted[i].display_as_html(prefix, count) %>
-                    <%= render :partial => 'questionnaire', :locals => {:file_url => file_url, :review => review} %>
-                    <br/>
-                    <script>
-                                    toggleElement('reviews_<%=@str%>', 'review');
-                    </script>
-                <% end %>
-                <!-- keep only latest version open -->
-                <% for i in 1..@sorted.size-1 %>
-                    <% @str = @sorted[i].id.to_s %>
-                    <script>
-                                    toggleElement('review_<%=@str%>', 'review')
-                    </script>
-                <% end %>
+            <% @sorted=@sorted_array.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) } %>
+            <% if (@sorted.size>1) %>
+              <h3>Previous versions</h3>
+              <% for i in 1..@sorted.size-1 %>
+                <% @str = @sorted[i].id.to_s %>
+                <!-- display previous versions in descending order -->
+                <a name="<%= prefix+"_"+review.map.reviewer.name %>"></a>
+                <%= @sorted[i].display_as_html(prefix, count) %>
+                <%= render :partial => 'questionnaire', :locals => {:file_url => file_url, :review => review} %>
+                <br/>
+                <script>
+                  toggleElement('reviews_<%=@str%>', 'review');
+                </script>
+              <% end %>
+              <!-- keep only latest version open -->
+              <% for i in 1..@sorted.size-1 %>
+                <% @str = @sorted[i].id.to_s %>
+                <script>
+                  toggleElement('review_<%=@str%>', 'review')
+                </script>
+              <% end %>
             <% end %>
             <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
             review_feedback = map.try :response %>
-            <% if review_feedback %>
-                            <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %>
-                            or
-                            <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %>
-                            feedback for Review <%= count %>
-            <% else %>
-                            <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %>
-                            for Review <%= count %>
-            <% end %>
-
-
-                        </div>
-
+          <% if review_feedback %>
+            <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %>
+            or
+            <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %>
+            feedback for Review <%= count %>
         <% else %>
+          <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %>
+          for Review <%= count %>
+      <% end %>
 
-                      <div id="reviewtabs-<%= count %>">
 
-            <h2>Review <%= count %></h2>
-            <!-- Display the latest review first -->
-                        <%= review.display_as_html(nil, review.version_num, file_url) %>
-                        <BR/><BR/>
-            <!-- get all previous versions -->
-            <% @sorted_array=Array.new %>
-            <% @prev=Response.all %>
-            <%for element in @prev     %>
-                <%if(element.map_id==review.map.map_id)%>
-                    <%array_not_empty=1 %>
-                    <% @sorted_array << element %>
-                <% end %>
-            <% end %>
-                        <% @sorted=@sorted_array.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) } %>
-                        <% if (@sorted.size>1) %>
-                <% for i in 1..@sorted.size-1 %>
-                    <% @str = @sorted[i].id.to_s %>
-                    <!-- display previous versions in descending order -->
-                                <%= @sorted[i].display_as_html(nil, @sorted[i].version_num, file_url) %>
-                    <br/>
-                    <script>
-                                    toggleElement('reviews_<%=@str%>', 'review');
-                    </script>
-                <% end %>
-                <!-- keep only latest version open -->
-                <% for i in 1..@sorted.size-1 %>
-                    <% @str = @sorted[i].id.to_s %>
-                    <script>
-                                    toggleElement('review_<%=@str%>', 'review')
-                    </script>
-                <% end %>
-            <% end %>
-            <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
-                review_feedback = map.try :response %>
-            <% if review_feedback %>
-                            <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %>
-                            or
-                            <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %>
-                            feedback for Review <%= count %>
-            <% else %>
-                            <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %>
-                            for Review <%= count %>
-            <% end %>
+    </div>
+
+  <% else %>
+
+    <div id="reviewtabs-<%= count %>">
+
+      <h2>Review <%= count %></h2>
+      <!-- Display the latest review first -->
+      <%= review.display_as_html(nil, review.version_num, file_url) %>
+      <BR/><BR/>
+      <!-- get all previous versions -->
+      <% @sorted_array=Array.new %>
+      <% @prev=Response.all %>
+      <%for element in @prev     %>
+        <%if(element.map_id==review.map.map_id)%>
+          <%array_not_empty=1 %>
+          <% @sorted_array << element %>
+        <% end %>
+      <% end %>
+      <% @sorted=@sorted_array.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) } %>
+      <% if (@sorted.size>1) %>
+        <% for i in 1..@sorted.size-1 %>
+          <% @str = @sorted[i].id.to_s %>
+          <!-- display previous versions in descending order -->
+          <%= @sorted[i].display_as_html(nil, @sorted[i].version_num, file_url) %>
+          <br/>
+          <script>
+            toggleElement('reviews_<%=@str%>', 'review');
+          </script>
+        <% end %>
+        <!-- keep only latest version open -->
+        <% for i in 1..@sorted.size-1 %>
+          <% @str = @sorted[i].id.to_s %>
+          <script>
+            toggleElement('review_<%=@str%>', 'review')
+          </script>
+        <% end %>
+      <% end %>
+      <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
+      review_feedback = map.try :response %>
+    <% if review_feedback %>
+      <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %>
+      or
+      <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %>
+      feedback for Review <%= count %>
+  <% else %>
+    <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %>
+    for Review <%= count %>
+<% end %>
 
                        </div>
 

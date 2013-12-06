@@ -7,7 +7,7 @@
         <%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Assignment', :controller => 'assignment', :node => node, :owner_id => owner_id} %>
         <% if is_available(session[:user], owner_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)), owner_id)) %>
             <div>
-              <%= link_to image_tag('/images/tree_view/add-participant-24.png', :title => 'Add participants'), {:controller => 'participants', :action => 'list', :id => node.node_object_id, :model => 'Assignment'}, {:title => 'Add participants'} %>
+              <%= link_to image_tag('/images/tree_view/add-participant-24.png', :title => 'Add participants'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Participant'}, {:title => 'Add participants'}%>
               <% @assignment = Assignment.find(node.node_object_id) %>
 
               <!--ACS Show the create team option in the assignment for the instructor only if
@@ -30,6 +30,13 @@
                   <% end %>
               <% end %>
             </div>
+            <!-- E726 Changes Begin -->
+            <div>
+              <%= link_to image_tag('/images/image_for_manager.gif', :title => 'Add Manager'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Manager'}, {:title => 'Add Manager'} %>
+              <%= link_to image_tag('/images/image_for_reader.gif', :title => 'Add Reader'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Reader'}, {:title => 'Add Reader'} %>
+            </div>
+            <!-- E726 Changes End -->
+
             <div>
               <% if Assignment.find(node.node_object_id).course_id %>
                   <%= link_to image_tag('/images/tree_view/remove-from-course-24.png', :title => 'Remove from course'), {:controller => 'assignment', :action => 'remove_assignment_from_course', :id => node.node_object_id}, {:title => 'Remove from course'} %>

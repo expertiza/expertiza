@@ -104,6 +104,24 @@ class AssignmentController < ApplicationController
 
   def create
     params[:assignment][:max_team_size] ||= 1
+    # E726 Fall2012 Changes Begin
+        # Code for adding rubrics if option selected in the form was "Same as Review Rubric"
+        if(params[:selfreview_checkbox] == "selfreview_checkbox")
+                 params[:questionnaires][:selfreview] = params[:questionnaires][:review]
+                 params[:weights][:selfreview] = params[:weights][:review]
+                 params[:limits][:selfreview] = params[:limits][:review]
+               end
+       if(params[:managerreview_checkbox] == "managerreview_checkbox")
+                 params[:questionnaires][:managerreview] = params[:questionnaires][:review]
+                 params[:weights][:managerreview] = params[:weights][:review]
+                 params[:limits][:managerreview] = params[:limits][:review]
+               end
+       if(params[:readerreview_checkbox] == "readerreview_checkbox")
+                 params[:questionnaires][:readerreview] = params[:questionnaires][:review]
+                 params[:weights][:readerreview] = params[:weights][:review]
+                 params[:limits][:readerreview] = params[:limits][:review]
+               end
+        # E726 Fall2012 Changes End
     @assignment = Assignment.new(params[:assignment])
 
     if @assignment.save

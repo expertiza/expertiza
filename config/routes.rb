@@ -104,7 +104,7 @@ Expertiza::Application.routes.draw do |map|
       get :view
       get :view_my_scores
       get :instructor_review
-      post :remove_hyperlink
+      get :remove_hyperlink
       get :conflict_notification
     end
   end
@@ -223,7 +223,6 @@ Expertiza::Application.routes.draw do |map|
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_evaluation_questionnaires, controller: :questionnaires
 
-
   resources :response do
     collection do
       get :new_feedback
@@ -254,11 +253,13 @@ Expertiza::Application.routes.draw do |map|
       get :delete_reviewer
       get :distribution
       get :list_mappings
+      get :remove_hyperlink
       get :review_report
       get :select_metareviewer
       get :select_reviewer
       get :select_mapping
       get :show_available_submissions
+      post :show_available_submissions
     end
   end
 
@@ -283,18 +284,14 @@ Expertiza::Application.routes.draw do |map|
 
   resources :sign_up_sheet do
     collection do
-      get :signup
-      get :delete_signup
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :delete_signup
       get :list
       get :signup_topics
       get :signup
-      get :view_publishing_rights
-      get :signup
-      get :delete_signup
       get :team_details
+      get :view_publishing_rights
     end
   end
 
@@ -347,6 +344,11 @@ Expertiza::Application.routes.draw do |map|
       get :submit_hyperlink
       get :remove_hyperlink
       get :view
+      get :edit
+      post :submit_hyperlink
+      get :remove_hyperlink
+      get :submit_file
+      get :folder_action
     end
   end
 

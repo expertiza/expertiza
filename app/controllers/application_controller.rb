@@ -12,16 +12,16 @@ class ApplicationController < ActionController::Base
 
   def authorize(args = {})
     #unless current_permission(args).allow?(params[:controller], params[:action])
-      #flash[:warn] = 'Please log in.'
-      #redirect_back
+    #flash[:warn] = 'Please log in.'
+    #redirect_back
     #end
     @user = current_user
   end
 
   def current_permission(args = {})
     @authority ||= Authority.new args.merge({
-      current_user: current_user
-    })
+                                                current_user: current_user
+                                            })
   end
   delegate :allow?, to: :current_permission
   helper_method :allow?
@@ -110,8 +110,8 @@ class ApplicationController < ActionController::Base
   end
 
   private
-    def record_not_found
-      redirect_to :controller => :tree_display,:action => :list
-    end
+  def record_not_found
+    redirect_to :controller => :tree_display,:action => :list
+  end
 
 end

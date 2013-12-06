@@ -1,8 +1,29 @@
 class VersionsController < ApplicationController
-  before_filter :conflict?
+
+  def index
+    @versions = Version.all
+  end
+
+  def destroy
+    @version = Version.find(params[:id])
+    @version.destroy
+    redirect_to versions_path, :notice => "Your version has been deleted"
+  end
+
+  def deleteAll
+    puts "in delete all"
+    versions = Version.all
+    versions.each do |v|
+      v.destroy
+    end
+    redirect_to versions_path, :notice => "Your versions table has been cleaned"
+  end
+
+  before_filter :conflict? , :except => [:index,:destroy, :deleteAll]
   # test if someone else has edited the same item to undo
+
   def conflict?
-    @version = Version.find_by_id(params[:id])
+    @version = Version.find(params[:id])
     @versions = Version.find(:all,:conditions => ["whodunnit = ? AND created_at = ?", @version.whodunnit,@version.created_at])
     @versions.each do |v|
       if v.item
@@ -43,4 +64,5 @@ class VersionsController < ApplicationController
     undo_link(@message)
     redirect_to :back
   end
+
 end

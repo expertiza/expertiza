@@ -12,6 +12,7 @@ class ResponseController < ApplicationController
       array_not_empty=1
       @review_scores << element
     end
+  end
     def get_scores
       @review_scores = Array.new
       @question_type = Array.new
@@ -118,30 +119,6 @@ class ResponseController < ApplicationController
         end
       end
     end
-    if array_not_empty==1
-      @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
-      @largest_version_num=@sorted[0]
-    end
-    @response = Response.find_by_map_id_and_version_num(@map.map_id, @largest_version_num.version_num)
-    @modified_object = @response.response_id
-    get_content
-    @review_scores = Array.new
-    @question_type = Array.new
-    @questions.each {
-        |question|
-      @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
-      @question_type << QuestionType.find_by_question_id(question.id)
-    }
-    # Check whether this is a custom rubric
-    if @map.questionnaire.section.eql? "Custom"
-      @next_action = "custom_update"
-      render :action => 'custom_response'
-    else
-      # end of special code (except for the end below, to match the if above)
-      #**********************
-      render :action => 'response'
-    end
-  end
 
     def edit
       @header = "Edit"
@@ -167,7 +144,7 @@ class ResponseController < ApplicationController
         render :action => 'response'
       end
     end
-  end
+
 
   def update  ###-### Seems like this method may no longer be used -- not in E806 version of the file
     @response = Response.find(params[:id])
@@ -254,10 +231,20 @@ class ResponseController < ApplicationController
 
     def create
       @map = ResponseMap.find(params[:id])                 #assignment/review/metareview id is in params id
+      logger.info "******************************"
+      logger.info @map.to_yaml
+      logger.info "******************************"
       @res = 0
       msg = ""
       error_msg = ""
       latestResponseVersion
+      array_not_empty=0
+      @review_scores=Array.new
+      @prev=Response.find_by_map_id(@map.id)
+      for element in @prev
+        array_not_empty=1
+        @review_scores << element
+      end
                                                            #if previous responses exist increment the version number.
       if array_not_empty==1
         @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
@@ -286,21 +273,21 @@ class ResponseController < ApplicationController
         score = Score.create(:response_id => @response.response_id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
       end
     rescue
-      error_msg = "Your response was not saved. Cause: " + $!
+      error_msg = "Your response was not saved. Cause: " + $!.to_s
     end
-
-    begin
-      ResponseHelper.compare_scores(@response, @questionnaire)
-      ScoreCache.update_cache(@res)
-      #@map.save
-      msg = "Your response was successfully saved."
-    rescue
-      @response.delete
-      error_msg = "Your response was not saved. Cause: " + $!
-    end
-
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
-  end
+  #
+  #  begin
+  #    ResponseHelper.compare_scores(@response, @questionnaire)
+  #    ScoreCache.update_cache(@res)
+  #    #@map.save
+  #    msg = "Your response was successfully saved."
+  #  rescue
+  #    @response.delete
+  #    error_msg = "Your response was not saved. Cause: " + $!
+  #  end
+  #
+  #  redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
+  #end
 
   def custom_create ###-### Is this used?  It is not present in the master branch.
     @map = ResponseMap.find(params[:id])
@@ -395,5 +382,5 @@ class ResponseController < ApplicationController
       end
       !current_user_id?(response.map.reviewer.user_id)
     end
-  end
+
 end

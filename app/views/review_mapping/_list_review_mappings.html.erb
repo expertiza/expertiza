@@ -148,7 +148,7 @@
   session[:return_to] = request.request_uri    
 %>
 
-<% if !assignment.is_using_dynamic_reviewer_assignment? %>
+<% if !assignment.dynamic_reviewer_assignment? %>
 
 <%= link_to 'Assign reviewers automatically', :action => 'select_mapping', :id => assignment.id %>
 | <%= link_to 'Import reviewer mappings', 

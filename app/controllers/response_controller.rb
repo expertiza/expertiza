@@ -186,7 +186,7 @@ class ResponseController < ApplicationController
         score.update_attribute('comments',v[:comment])
      end
     rescue
-      msg = "Your response was not saved. Cause: "+ $!
+      msg = "Your response was not saved. Cause:189 #{$!}"
     end
 
     begin
@@ -195,7 +195,7 @@ class ResponseController < ApplicationController
     
       msg = "Your response was successfully saved."
     rescue
-      msg = "An error occurred while saving the response: "+$!
+      msg = "An error occurred while saving the response:198 #{$!}"
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
   end  
@@ -327,7 +327,7 @@ class ResponseController < ApplicationController
         score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
       end  
     rescue
-      error_msg = "Error1: Your response was not saved. Cause: "
+      error_msg = "Error1: Your response was not saved. Cause:330 #{$!}"
     end
     
     begin
@@ -337,7 +337,7 @@ class ResponseController < ApplicationController
       msg = "Your response was successfully saved."
     rescue
       @response.delete
-      error_msg = "Error2: Your response was not saved. Cause: "
+      error_msg = "Error2: Your response was not saved. Cause:340 #{$!}"
     end
     
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]

@@ -23,6 +23,15 @@ class AssignmentsController < ApplicationController
 
   def create
     @assignment = Assignment.new(params[:assignment])
+    #This one is working
+    #       emails = Array.new
+    #      #emails<<"vikas.023@gmail.com"
+    #Mailer.generic_message(
+    #    {:bcc => emails,
+    #     :subject => "one",
+    #     #:body => "two",
+    #    :partial_name => 'update'
+    #    }).deliver
 
     if @assignment.save
       @assignment.create_node
@@ -137,6 +146,15 @@ class AssignmentsController < ApplicationController
       #  - rename an assgt. -- implemented by renaming a directory
       #  - assigning an assignment to a course -- implemented by moving a directory.
 
+      if params[:due_date]
+          # delete the previous jobs from the delayed_jobs table
+          djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', @assignment.id])
+          for dj in djobs
+            delete_from_delayed_queue(dj.id)
+          end
+
+        add_to_delayed_queue
+      end
       redirect_to :action => 'edit', :id => @assignment.id
     else
       flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
@@ -193,17 +211,31 @@ class AssignmentsController < ApplicationController
     end
   end
 
-
-  # this function finds all the due_dates for a given assignment and calculates the time when the reminder for these deadlines needs to be sent. Enqueues them in the delayed_jobs table
   def add_to_delayed_queue
-    due_dates = @assignment.due_dates
-    due_dates.each do |due_date|
-      deadline_type_name = due_date.deadline_type.name
-      seconds_until_due = due_at - Time.now
-      minutes_until_due = seconds_until_due / 60
-      dj = Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type_name, due_at), 1, minutes_until_due)
-      due_date.update_attribute(:delayed_job_id, dj.id)
+    duedates = DueDate::find_all_by_assignment_id(@assignment.id)
+    for i in (0 .. duedates.length-1)
+      deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
+      due_at = duedates[i].due_at.to_s(:db)
+      Time.parse(due_at)
+      due_at= Time.parse(due_at)
+      mi=find_min_from_now(due_at)
+      diff = mi-(duedates[i].threshold)*60
+      if diff>0
+      dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)),
+                              1, diff.minutes.from_now)
+      duedates[i].update_attribute(:delayed_job_id, dj.id)
+      end
     end
+  end
+
+  # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
+  # from the current time and returns this difference in minutes
+  def find_min_from_now(due_at)
+
+    curr_time=DateTime.now.to_s(:db)
+    curr_time=Time.parse(curr_time)
+    time_in_min=((due_at - curr_time).to_i/60)
+    return time_in_min
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue

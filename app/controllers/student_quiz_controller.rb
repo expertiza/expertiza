@@ -38,11 +38,13 @@ class StudentQuizController < ApplicationController
 
   end
 
-  def self.take_quiz assignment_id
+  def self.take_quiz assignment_id , reviewer_id
     @questionnaire = Array.new
     Team.find_all_by_parent_id(assignment_id).each do |quiz_creator|
-      Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
-        @questionnaire.push(questionnaire)
+      unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
+        Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
+          @questionnaire.push(questionnaire)
+        end
       end
     end
     return @questionnaire

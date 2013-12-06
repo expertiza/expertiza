@@ -58,7 +58,7 @@
       </ul>
       <div id="tabs-11">
         #renders a new tab for reviews on submitted work
-       <p><%= render :partial => 'grades/submittedwork', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %> </p>
+       <p><%= render :partial => 'grades/submitted_work', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %> </p>
       </div>
       <div id="tabs-12">
         #renders a new tab for meta reviews

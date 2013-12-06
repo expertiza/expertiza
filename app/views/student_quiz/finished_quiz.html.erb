@@ -1,22 +1,23 @@
 <h2>Answers</h2>
 <% questions = Question.find_all_by_questionnaire_id(params[:questionnaire_id]) %>
 
+<% i = 0 %>
 <% questions.each do |question| %>
-    <%= label_tag "#{question.id}", question.txt %> <br>
-    <% question_type = QuestionType.find_by_question_id(question.id)  %>
+    <b>Question <%= i %>: </b><%= label_tag "#{question.id}", question.txt %> <br>
+    <% question_type = QuestionType.find_by_question_id(question.id) %>
 
 
     <% if(question_type.q_type == 'MCR')  %>
         <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |answer|  %>
             <% if(answer.iscorrect) %>
-                <%= p 'Correct answer is    '+answer.txt  %>
+                <%= p 'Correct answer is: '+answer.txt  %>
             <% end %>
         <% end %>
         <br>
-        <%= p 'You answer is    '+Score.find_by_response_id_and_question_id(@response.id, question.id).comments  %>
+        <%= p 'You answer is: '+Score.find_by_response_id_and_question_id(@response.id, question.id).comments  %>
 
     <% elsif(question_type.q_type == 'MCC') %>
-        <%= p 'Correct answer is    '%>
+        <%= p 'Correct answer is: '%>
         <br>
         <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |answer|  %>
             <% if(answer.iscorrect) %>
@@ -25,30 +26,27 @@
             <% end %>
         <% end %>
 
-        <p>You answer is</p>
+        <p>You answer is:<br/>
         <% answer = Score.find_by_response_id_and_question_id(@response.id, question.id) %>
         <% answer.comments.split(',').each do |choice| %>
-        <% #choice = QuizQuestionChoice.find_by_txt_and_question_id(answer.comments, question.id) %>
-            <% #choice=answer.comments %>
             <%= p choice %>
-            <%#= p QuizQuestionChoice.find_by_txt(choice).txt%>
             <br>
         <% end %>
+        </p>
 
     <% elsif(question_type.q_type == 'TF') %>
         <% if QuizQuestionChoice.find_by_question_id(question.id).iscorrect %>
-            <p> Correct Answer is True <p>
+            <p> Correct Answer is: <b>True</b><p>
         <% else %>
-            <p> Correct Answer is False <p>
+            <p> Correct Answer is: <b>False</b><p>
         <% end %>
         <%= p 'You answer is '+Score.find_by_response_id_and_question_id(@response.id, question.id).comments %>
 
 
     <% elsif(question_type.q_type == 'Essay') %>
-        <p> Your Answer is <p>
-  <%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %>
+        <p> Your Answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b><p>
+
     <% end %><br>
     <br>
+    <% i += 1 %>
 <% end %>
-
-<%= submit_tag "Back", :name=>"save" %>

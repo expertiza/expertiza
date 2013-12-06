@@ -363,9 +363,6 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @map.notification_accepted = false
     @map.save
-    #@map.assignment.id == 561 or @map.assignment.id == 559 or 
-    #if(@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
-      #puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
       if(params["save_options"].nil? or params["save_options"].empty?)#default it to with metareviews
         params["save_options"] = "WithMeta"
       end
@@ -386,9 +383,6 @@ class ResponseController < ApplicationController
         # puts "WithoutMeta"
         redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
-    #else
-      #redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
-    #end
   end
   
   def redirection

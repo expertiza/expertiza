@@ -40,38 +40,47 @@ class StudentQuizController < ApplicationController
 
   def self.take_quiz assignment_id , reviewer_id
     @questionnaire = Array.new
-    Team.find_all_by_parent_id(assignment_id).each do |quiz_creator|
-      unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
-        Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
-          @questionnaire.push(questionnaire)
+    @assignment = Assignment.find_by_id(assignment_id)
+    if @assignment.team_assignment?
+      teams = TeamsUser.find_all_by_user_id(reviewer_id)
+      Team.find_all_by_parent_id(assignment_id).each do |quiz_creator|
+        unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
+          Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
+            @questionnaire.push(questionnaire)
+          end
+        end
+      end
+    else
+      Participant.find_all_by_parent_id(assignment_id).each do |quiz_creator|
+        unless quiz_creator.user_id == reviewer_id
+          Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
+            @questionnaire.push(questionnaire)
+          end
         end
       end
     end
     return @questionnaire
+
+
+
+    #Team.find_all_by_parent_id(assignment_id).each do |quiz_creator|
+    #  unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
+    #    Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
+    ##      @questionnaire.push(questionnaire)
+    #   end
+    #  end
+    #end
+    return @questionnaire
   end
   def record_response
-    puts "record_response"
     @response = Response.new
-
     @map = QuizResponseMap.new
-    #puts "I got here"
-    #puts params[:assignment_id]
     @map.reviewee_id = Team.find_by_parent_id(params[:assignment_id]).id
-
-    #puts @map.reviewee_id
-    #puts session[:user].id
-    #puts params[:assignment_id]
-    #puts
     @map.reviewer_id = Participant.find_by_user_id_and_parent_id(session[:user].id, params[:assignment_id]).id
-    #puts @map.reviewer_id
     @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
     @map.save
     @response.map_id = @map.id
     @response.save
-    #puts "PLEASE WORK"
-    #puts @response
-    #puts params[:questionnaire_id]
-
     questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
     questions.each do |question|
       if (QuestionType.find_by_question_id question.id).q_type == 'MCC'

@@ -8,11 +8,6 @@
 
     <% if question_type == 'True/False' %>
       Correct Answer: <%= (QuizQuestionChoice.find_by_question_id(question.id)).iscorrect %><br><br>
-    <% elsif question_type == 'Essay' %>
-      Student Suggested Answer:<br>
-      <% if not QuizQuestionChoice.find_by_question_id(question.id) == nil  %>
-        &nbsp;&nbsp;<%= (QuizQuestionChoice.find_by_question_id(question.id)).txt %><br>
-      <% end %><br>
     <% elsif question_type == 'Multiple Choice - Radio' %>
       <% correct_answer = '' %>
       Answer Options:<br>

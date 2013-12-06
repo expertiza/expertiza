@@ -23,8 +23,105 @@ class AssignmentController < ApplicationController
     @assignment.wiki_type_id = 1 #default no wiki type
   end
 
+  def load_redis
+    rf1 = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", params[:id], "Threshold"])
+    if rf1 == nil
+      rf1 = ScoreCache.new
+    end
+    rf1.reviewee_id = params[:id]
+    rf1.range = "nothing"
+    if params[:assigned][:thresh]
+      rf1.score = params[:assigned][:thresh]
+    else
+      rf1.score = 20
+    end
+    rf1.object_type="Threshold"
+    rf1.save
+
+    rf2 = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", params[:id], "RedisFactor"])
+    if rf2 == nil
+      rf2 = ScoreCache.new
+    end
+    rf2.reviewee_id = params[:id]
+    rf2.range= "nothing"
+
+    if params[:assigned][:rfactor]
+      rf2.score = params[:assigned][:rfactor]
+    else
+      rf2.score = 1
+    end
+
+    rf2.object_type="RedisFactor"
+    rf2.save
+
+    rf3 = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", params[:id], "MaxDeduct"])
+    if rf3 == nil
+      rf3 = ScoreCache.new
+    end
+    rf3.reviewee_id = params[:id]
+    rf3.range= "nothing"
+    if params[:assigned][:mdp]
+      rf3.score = params[:assigned][:mdp]
+    else
+      rf3.score = 20
+    end
+    rf3.object_type="MaxDeduct"
+    rf3.save
+
+    rf4 = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", params[:id], "IfClass"])
+    if rf4 == nil
+      rf4 = ScoreCache.new
+    end
+    rf4.reviewee_id = params[:id]
+    rf4.range= "nothing"
+    if params[:assigned][:ifclass] == true
+      rf4.score = 1
+    elsif params[:assigned][:ifclass] == false
+      rf4.score = 0
+    else
+      rf4.score = 0
+    end
+    rf4.object_type="IfClass"
+    rf4.save
+
+    rf5 = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", params[:id], "HardLine"])
+    if rf5 == nil
+      rf5 = ScoreCache.new
+    end
+    rf5.reviewee_id = params[:id]
+    rf5.range= "nothing"
+    if params[:assigned][:hardline]
+      rf5.score = params[:assigned][:hardline]
+    else
+      rf5.score = 85
+    end
+    rf5.object_type="HardLine"
+    rf5.save
+
+  end
+
+
+
   def create
     params[:assignment][:max_team_size] ||= 1
+    # E726 Fall2012 Changes Begin
+        # Code for adding rubrics if option selected in the form was "Same as Review Rubric"
+        if(params[:selfreview_checkbox] == "selfreview_checkbox")
+                 params[:questionnaires][:selfreview] = params[:questionnaires][:review]
+                 params[:weights][:selfreview] = params[:weights][:review]
+                 params[:limits][:selfreview] = params[:limits][:review]
+               end
+       if(params[:managerreview_checkbox] == "managerreview_checkbox")
+                 params[:questionnaires][:managerreview] = params[:questionnaires][:review]
+                 params[:weights][:managerreview] = params[:weights][:review]
+                 params[:limits][:managerreview] = params[:limits][:review]
+               end
+       if(params[:readerreview_checkbox] == "readerreview_checkbox")
+                 params[:questionnaires][:readerreview] = params[:questionnaires][:review]
+                 params[:weights][:readerreview] = params[:weights][:review]
+                 params[:limits][:readerreview] = params[:limits][:review]
+               end
+        # E726 Fall2012 Changes End
     @assignment = Assignment.new(params[:assignment])
 
     if @assignment.save
@@ -131,7 +228,7 @@ class AssignmentController < ApplicationController
 
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated
-
+    load_redis
     if @assignment.update_attributes(params[:assignment])
       flash[:note] = 'Assignment was successfully saved.'
       #TODO: deal with submission path change

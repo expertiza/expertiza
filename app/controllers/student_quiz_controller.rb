@@ -75,6 +75,7 @@ class StudentQuizController < ApplicationController
     @response.save
     scores = Array.new
     valid = 0
+    score = 0
     questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
     questions.each do |question|
       if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
@@ -82,14 +83,10 @@ class StudentQuizController < ApplicationController
           valid = 1
         else
           correct_answer = QuizQuestionChoice.find_all_by_question_id_and_iscorrect(question.id, 1)
-          score = 0
+
           choices = ""
           params["#{question.id}"].each do |choice|
             correct_answer.each do |correct|
-              puts "what is the choice"
-
-              puts choice
-
               if choice == correct.txt
                 score += 1
                 puts score
@@ -108,24 +105,21 @@ class StudentQuizController < ApplicationController
               valid = 1
             end
             scores.push(new_score)
-
         end
       else
-        score = NilClass
         correct_answer = QuizQuestionChoice.find_by_question_id_and_iscorrect(question.id, 1)
-        puts "essay answer scoring"
+        puts "mcr scoring"
         puts params["#{question.id}"]
         puts correct_answer.txt
-        if params["#{question.id}"] == correct_answer.txt
+        if (QuestionType.find_by_question_id question.id).q_type == 'Essay'
+          puts "i am an essay"
+          score = -1
+        elsif params["#{question.id}"] == correct_answer.txt
           score = 1
-        elsif (QuestionType.find_by_question_id question.id).q_type == 'Essay'
         else
           score = 0
         end
         new_score = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => @response.id, :score => score
-        puts "Check this out"
-        puts new_score.comments
-
         unless new_score.comments != "" && new_score.comments
           valid = 1
         end

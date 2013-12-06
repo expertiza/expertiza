@@ -220,9 +220,7 @@ class LotteryController < ApplicationController
 
   def run_intelligent_bid
     assignment = Assignment.find(params[:id]) unless params[:id].blank?
-    if(@assignment_id)
-      assignment = Assignment.find(@assignment_id)
-    end
+
     sign_up_topics = SignUpTopic.find_all_by_assignment_id(params[:id])
 
     # TODO - provide a seed IF same results are required everytime with same input

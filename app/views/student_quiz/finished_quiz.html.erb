@@ -10,18 +10,18 @@
     <% if(question_type.q_type == 'MCR')  %>
         <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |answer|  %>
             <% if(answer.iscorrect) %>
-                <%= p 'Correct answer is: '+answer.txt  %>
+              Correct answer is: <b><%= p answer.txt  %></b>
             <% end %>
         <% end %>
         <br>
-        <%= p 'You answer is: '+Score.find_by_response_id_and_question_id(@response.id, question.id).comments  %>
+        You answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments  %></b>
 
     <% elsif(question_type.q_type == 'MCC') %>
         <%= p 'Correct answer is: '%>
         <br>
         <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |answer|  %>
             <% if(answer.iscorrect) %>
-                <%= p answer.txt  %>
+                <b><%= p answer.txt  %></b>
                 <br>
             <% end %>
         <% end %>
@@ -29,22 +29,22 @@
         <p>You answer is:<br/>
         <% answer = Score.find_by_response_id_and_question_id(@response.id, question.id) %>
         <% answer.comments.split(',').each do |choice| %>
-            <%= p choice %>
+            <b><%= p choice %></b>
             <br>
         <% end %>
         </p>
 
     <% elsif(question_type.q_type == 'TF') %>
         <% if QuizQuestionChoice.find_by_question_id(question.id).iscorrect %>
-            <p> Correct Answer is: <b>True</b><p>
+          Correct Answer is: <b>True</b><br/>
         <% else %>
-            <p> Correct Answer is: <b>False</b><p>
+          Correct Answer is: <b>False</b><br/>
         <% end %>
-        <%= p 'You answer is '+Score.find_by_response_id_and_question_id(@response.id, question.id).comments %>
+        Your answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b>
 
 
     <% elsif(question_type.q_type == 'Essay') %>
-        <p> Your Answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b><p>
+        Your Answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b>
 
     <% end %><br>
     <br>

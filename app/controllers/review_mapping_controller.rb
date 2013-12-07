@@ -1,8 +1,8 @@
-class ReviewMappingController < ApplicationController
-  auto_complete_for :user, :name
-  use_google_charts
-  helper :dynamic_review_assignment
-  helper :submitted_content
+  class ReviewMappingController < ApplicationController
+    auto_complete_for :user, :name
+    use_google_charts
+    helper :dynamic_review_assignment
+    helper :submitted_content
 
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"

@@ -12,7 +12,7 @@
         <td><b><%= "#{title} #{review_no}." %></b><%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %></td>
         <td>&nbsp;</td>
         <% if map.response %>
-          <td><%#= link_to "View", finish_quiz_url, :map_id => map.id %></td>
+          <td><%= link_to "View", {:controller => 'student_quiz', :action => 'finished_quiz', :map_id => map.id} %></td>
         <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
           <% if @assignment.staggered_deadline?%>
             <% if @assignment.get_current_stage(participant.topic_id) != 'submission'%>
@@ -21,7 +21,7 @@
               <td>Begin</td><td> (Work has not yet been submitted)</td>
             <% end %>
           <% else %>
-            <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+            <td><%= link_to "Begin", {:controller => 'student_quiz', :action => 'take_quiz', :map_id => map.id, :assignment_id => @assignment.id} %></td>
           <% end %>
         <% else %>
           <% # Deadline has passed, and the work was not submitted %>

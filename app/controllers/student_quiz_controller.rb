@@ -88,6 +88,7 @@ class StudentQuizController < ApplicationController
           correct_answer = QuizQuestionChoice.find_all_by_question_id_and_iscorrect(question.id, 1)
           puts correct_answer
           params["#{question.id}"].each do |choice|
+
             correct_answer.each do |correct|
               if choice == correct.txt
                 score += 1
@@ -116,7 +117,6 @@ class StudentQuizController < ApplicationController
         correct_answer = QuizQuestionChoice.find_by_question_id_and_iscorrect(question.id, 1)
         puts "mcr scoring"
         puts params["#{question.id}"]
-        puts correct_answer.txt
         if (QuestionType.find_by_question_id question.id).q_type == 'Essay'
           score = -1
         elsif params["#{question.id}"] == correct_answer.txt

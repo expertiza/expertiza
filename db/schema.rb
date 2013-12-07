@@ -313,6 +313,11 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
 
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
+  create_table "quiz_grades", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "quiz_question_choices", :force => true do |t|
     t.integer "question_id"
     t.text    "txt"

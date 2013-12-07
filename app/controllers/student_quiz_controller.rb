@@ -67,17 +67,13 @@ class StudentQuizController < ApplicationController
   end
 
   def record_response
-
-    @response = Response.new
-    @map = QuizResponseMap.new
-    @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
-    @map.reviewer_id = Participant.find_by_user_id_and_parent_id(session[:user].id, params[:assignment_id]).id
-    @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
-    @map.save
-    @response.map_id = @map.id
+    @map = ResponseMap.find(params[:map_id])
+    @response = Response.new()
+    @response.map_id = params[:map_id]
     @response.created_at = DateTime.current
     @response.updated_at = DateTime.current
     @response.save
+
     @questionnaire = Questionnaire.find_by_id(@map.reviewed_object_id)
     scores = Array.new
     new_scores = Array.new

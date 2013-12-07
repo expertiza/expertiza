@@ -1,5 +1,5 @@
-<% form_tag :controller => 'student_quiz',
-            :action => 'take_quiz',
+<% form_tag :controller => 'review_mapping',
+            :action => 'show_available_submissions_for_quizzes',
             :assignment_id => assignment.id,
             :reviewer_id => session[:user].id,
             :participant_id => @participant.id do %>

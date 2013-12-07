@@ -179,9 +179,9 @@ class QuestionnairesController < ApplicationController
       print "=====create_questionnaire========="
       @assignment = Assignment.find_by_id(params[:aid])
       if @assignment.team_assignment?
-        teams = TeamsUser.find(:all, :conditions => ["user_id = ?", session[:user].id])
+        teams = TeamsUser.find_all_by_user_id(session[:user].id)
         for t in teams do
-          if team = Team.find(:first, :conditions => ["id = ? and parent_id = ?", t.team_id, @assignment.id])
+          if team = Team.find_by_id_and_parent_id(t.team_id, @assignment.id).name
             break
           end
         end

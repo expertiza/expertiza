@@ -1,7 +1,4 @@
-Listing 
-
-<% 
-child_nodes = node.get_children(@sortvar,@sortorder,@show) %>
+<% child_nodes = node.get_children(@sortvar,@sortorder,@show,nil,nil,@search) %>
 <%= render :partial => 'row_header', 
            :locals => {
                :depth => depth, 

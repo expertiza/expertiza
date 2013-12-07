@@ -45,4 +45,5 @@
 
     <% end %><hr>
     <% i += 1 %>
+    <%= link_to "Back",{:controller => 'student_quiz', :action => 'list', :id => @response_map.reviewer_id} %>
 <% end %>

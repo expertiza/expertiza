@@ -38,6 +38,7 @@ class StudentQuizController < ApplicationController
     @response = Response.find_by_map_id(params[:map_id])
     puts "in finished quiz"
     puts params[:map_id]
+
     @response_map = ResponseMap.find_by_id(params[:map_id])
     @questions = Question.find_all_by_questionnaire_id(@response_map.reviewed_object_id)
   end

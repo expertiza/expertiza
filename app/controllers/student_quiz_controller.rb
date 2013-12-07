@@ -65,6 +65,7 @@ class StudentQuizController < ApplicationController
     end
     return @questionnaire
   end
+
   def record_response
     @response = Response.new
     @map = QuizResponseMap.new
@@ -88,8 +89,8 @@ class StudentQuizController < ApplicationController
           valid = 1
         else
           correct_answer = QuizQuestionChoice.find_all_by_question_id_and_iscorrect(question.id, 1)
-          puts correct_answer
           params["#{question.id}"].each do |choice|
+
             correct_answer.each do |correct|
               if choice == correct.txt
                 score += 1
@@ -116,9 +117,6 @@ class StudentQuizController < ApplicationController
         end
       else
         correct_answer = QuizQuestionChoice.find_by_question_id_and_iscorrect(question.id, 1)
-        puts "mcr scoring"
-        puts params["#{question.id}"]
-        puts correct_answer.txt
         if (QuestionType.find_by_question_id question.id).q_type == 'Essay'
           score = -1
         elsif params["#{question.id}"] == correct_answer.txt
@@ -145,6 +143,7 @@ class StudentQuizController < ApplicationController
     end
 
   end
+
   def grade_essays
     @questionnaires = Array.new()
     @questionnaires = Questionnaire.find_all_by_type("QuizQuestionnaire")
@@ -160,7 +159,6 @@ class StudentQuizController < ApplicationController
       @questionnaire_questions = @questionnaire_questions.merge({questionnaire.id => essay_questions})
     end
 
-
     @quiz_responses = Hash.new()
     @questionnaires.each do |questionnaire|
       @questionnaire_questions[questionnaire.id].each do |question|
@@ -175,9 +173,8 @@ class StudentQuizController < ApplicationController
         @quiz_responses = @quiz_responses.merge({question => ungraded_quiz_responses})
       end
     end
-
-
   end
+
   def graded?(response, question)
     if Score.find_by_question_id_and_response_id(question.id, response.id)
       return true

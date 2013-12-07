@@ -1,4 +1,4 @@
-<h1> Listing of All Quiz Questions for <%= Assignment.find(@assignment_id).name %> </h1>
+<h1 xmlns="http://www.w3.org/1999/html"> Listing of All Quiz Questions for <%= Assignment.find(@assignment_id).name %> </h1>
 <table>
   <% @questions.each do |question| %>
     <b> <%= question.txt %><br></b>
@@ -32,6 +32,6 @@
       <% correct_answers.each do |correct_answer| %>
         &nbsp;&nbsp;<%= correct_answer %><br>
       <% end %><br>
-    <% end %>
+    <% end %> <hr>
   <% end %>
 </table>

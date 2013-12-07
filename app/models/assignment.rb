@@ -55,13 +55,10 @@ class Assignment < ActiveRecord::Base
   # We choose the topics if one of its quiz submissions has been attempted the fewest times so far
   def candidate_topics_for_quiz
     return nil if sign_up_topics.empty?   # This is not a topic assignment
-    puts "begin in assignment==="
     contributor_set = Array.new(contributors)
-    puts "begin in assignment2==="
-    puts "in assignment.rb"+contributor_set.inspect
     # Reject contributors that have not selected a topic, or have no submissions
     contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? }
-    puts "begin in assignment3==="
+    puts "begin in assignment3===" + contributors.inspect
     #####contributor_set.reject! { |contributor| !contributor.has_quiz? }
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
@@ -78,8 +75,8 @@ class Assignment < ActiveRecord::Base
 
     candidate_topics = Set.new
     contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
-
-    puts candidate_topics.inspect
+    puts "in assignment.rb!2"
+    #puts candidate_topics.inspect
     candidate_topics
   end
 
@@ -119,7 +116,9 @@ class Assignment < ActiveRecord::Base
 
   def assign_quiz_dynamically(reviewer, topic)
     contributor = contributor_for_quiz(reviewer, topic)
-    reviewer.assign_quiz(contributor)
+    unless contributor.nil?
+    reviewer.assign_quiz(contributor,reviewer,topic)
+    end
   end
 
   def assign_reviewer_dynamically(reviewer, topic)
@@ -149,39 +148,47 @@ class Assignment < ActiveRecord::Base
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor|
       signed_up_topic(contributor) != topic or # both will be nil for assignments with no signup sheet
-          contributor.includes?(reviewer) or
-          !contributor.has_quiz?
+          contributor.includes?(reviewer) ###or !contributor.has_quiz?
     end
     raise "There are no more submissions to take quiz on for this #{work}." if contributor_set.empty?
-
+      #flash[:error] = "There are no more submissions to take quiz on for this #{work}."
+    #redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
+      #return
+    #end
     # Reviewer/quiz taker can take quiz for each submission only once
-    contributor_set.reject! { |contributor| contributor.quiz_taken_by?(contributor, reviewer) }
+    contributor_set.reject! { |contributor| quiz_taken_by?(contributor, reviewer) }
     raise "You have already taken the quiz for all submissions for this #{work}." if contributor_set.empty?
 
     # Reduce to the contributors with the least number of quizzes taken for their submissions ("responses")
-    min_contributor = contributor_set.min_by { |a| a.quiz_responses.count }
-    min_quizzes = min_contributor.quiz_responses.count
-    contributor_set.reject! { |contributor| contributor.quiz_responses.count > min_quizzes }
+   # min_contributor = contributor_set.min_by { |a| a.quiz_responses.count }
+   # min_quizzes = min_contributor.quiz_responses.count
+    #contributor_set.reject! { |contributor| contributor.quiz_responses.count > min_quizzes }
 
     # Pick the contributor whose quiz was taken longest ago
-    if min_quizzes > 0
+    #if min_quizzes > 0
       # Sort by last quiz mapping id, since it reflects the order in which quizzes were taken
       # This has a round-robin effect
       # Sorting on id assumes that ids are assigned sequentially in the db.
       # .last assumes the database returns rows in the order they were created.
       # Added unit tests to ensure these conditions are both true with the current database.
-      contributor_set.sort! { |a, b| a.quiz_mappings.last.id <=> b.quiz_mappings.last.id }
-    end
+     # contributor_set.sort! { |a, b| a.quiz_mappings.last.id <=> b.quiz_mappings.last.id }
+    #end
 
     # Choose a contributor at random (.sample) from the remaining contributors.
     # Actually, we SHOULD pick the contributor who was least recently picked.  But sample
     # is much simpler, and probably almost as good, given that even if the contributors are
     # picked in round-robin fashion, the reviews will not be submitted in the same order that
     # they were picked.
+     puts "in ass.rb!!yes"
     contributor_set.sample
+    #puts "in ass.rb!!yes2"
   end
 
-
+  def quiz_taken_by?(contributor, reviewer)
+    quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id)
+    return QuizResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
+                                                 self.id, reviewer.id, quiz_id]) > 0
+  end
 
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)

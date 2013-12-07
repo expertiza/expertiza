@@ -64,4 +64,18 @@ function toggleList(elementId,listSize) {
         objLinks[i].innerHTML = '<img src="/images/expand.png">'
       }
     }
-}  
+}
+
+function toggleCourseList(elementId, child_nodes, child_size, listSize) {
+    var child_nodes_no = child_nodes.split(",");
+    var child_node_size = child_size.split(",");
+    for(var i=0;i<listSize;i++)
+    {
+        if(child_node_size[i]!=0)
+        {
+            console.log("toggling " + child_nodes_no[i] )
+            toggleList(child_nodes_no[i],child_node_size[i]);
+        }
+    }
+    toggleList(elementId, listSize);
+}

@@ -14,7 +14,7 @@
             <% end %>
         <% end %>
         <br>
-        You answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments  %></b>
+        Your answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments  %></b><br><br>
 
     <% elsif(question_type.q_type == 'MCC') %>
         <%= p 'Correct answer is: '%>
@@ -24,16 +24,12 @@
                 <b><%= p answer.txt  %></b>
                 <br>
             <% end %>
-        <% end %>
+        <% end %><br>
 
-        <p>You answer is:<br/>
-        <% #answer = Score.find_by_response_id_and_question_id(@response.id, question.id) %>
-        <% #answer.comments.split(',').each do |choice| %>
+        Your answer is:<br/>
         <% Score.find_all_by_response_id_and_question_id(@response.id, question.id).each do |answer| %>
-            <b><%= p answer.comments %></b>
-            <br>
-        <% end %>
-        </p>
+            <b><%= p answer.comments %></b><br>
+        <% end %><br>
 
     <% elsif(question_type.q_type == 'TF') %>
         <% if QuizQuestionChoice.find_by_question_id(question.id).iscorrect %>
@@ -41,13 +37,12 @@
         <% else %>
           Correct Answer is: <b>False</b><br/>
         <% end %>
-        Your answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b>
+        Your answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b><br><br>
 
 
     <% elsif(question_type.q_type == 'Essay') %>
-        Your Answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b>
+        Your Answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b><br><br>
 
-    <% end %><br>
-    <br>
+    <% end %><hr>
     <% i += 1 %>
 <% end %>

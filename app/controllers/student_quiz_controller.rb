@@ -45,19 +45,24 @@ class StudentQuizController < ApplicationController
 
   def self.take_quiz assignment_id , reviewer_id
     @quizzes = Array.new
+    reviewer = Participant.find_by_user_id_and_parent_id(reviewer_id,assignment_id)
     @assignment = Assignment.find_by_id(assignment_id)
    # if @assignment.team_assignment?
       teams = TeamsUser.find_all_by_user_id(reviewer_id)
       Team.find_all_by_parent_id(assignment_id).each do |quiz_creator|
         unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
           Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
-            unless QuizResponseMap.find_by_reviewed_object_id_and_reviewer_id(questionnaire.id, reviewer_id)
+           if !@assignment.team_assignment?
+            unless QuizResponseMap.find_by_reviewed_object_id_and_reviewer_id(questionnaire.id, reviewer.id)
               @quizzes.push(questionnaire)
             end
+          else unless QuizResponseMap.find_by_reviewed_object_id_and_reviewer_id(questionnaire.id, reviewer_id)
+                 @quizzes.push(questionnaire)
+               end
           end
         end
       end
-
+    end
     #end
     return @quizzes
   end

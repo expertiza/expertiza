@@ -67,6 +67,7 @@ class StudentQuizController < ApplicationController
   end
 
   def record_response
+
     @response = Response.new
     @map = QuizResponseMap.new
     @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
@@ -77,10 +78,11 @@ class StudentQuizController < ApplicationController
     @response.created_at = DateTime.current
     @response.updated_at = DateTime.current
     @response.save
+    @questionnaire = Questionnaire.find_by_id(@map.reviewed_object_id)
     scores = Array.new
     new_scores = Array.new
     valid = 0
-    questions = Question.find_all_by_questionnaire_id params[:questionnaire_id]
+    questions = Question.find_all_by_questionnaire_id @questionnaire.id
     questions.each do |question|
       score = 0
       if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
@@ -139,7 +141,7 @@ class StudentQuizController < ApplicationController
       redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :map_id => @map.id
     else
       flash[:error] = "Please answer every question."
-      redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :questionnaire_id => params[:questionnaire_id]
+      redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :questionnaire_id => @questionnaire.id
     end
 
   end

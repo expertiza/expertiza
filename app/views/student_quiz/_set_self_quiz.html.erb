@@ -7,15 +7,16 @@
   <% if assignment.sign_up_topics.count > 0 %>
     <p><b>Select a quiz to begin:</b></p>
     <%= hidden_field_tag :assignment_id, assignment.id%>
-    <% StudentQuizController.take_quiz(assignment.id, session[:user].id).each do |questionnaire| %>
-      <%= radio_button_tag :questionnaire_id, questionnaire.id %> <%= questionnaire.id %>: <%=h questionnaire.name %><br>
+    <% quizzes = StudentQuizController.take_quiz(assignment.id, session[:user].id) %>
+    <% if quizzes.count > 0 %>
+        <% quizzes.each do |quiz| #StudentQuizController.take_quiz(assignment.id, session[:user].id).each do |questionnaire| %>
+        <%= radio_button_tag :questionnaire_id, quiz.id %> <%= quiz.id %>: <%=h quiz.name %><br>
+        <% end %>
+        <input type='submit' value='Select Quiz'/>
+    <% else %>
+       <%= "There are no more available quizzes"%>
+       <br>
     <% end %>
     <br />
-  <% end %>
-
-  <% if assignment.sign_up_topics.count > 0 %>
-     <input type='submit' value='Select Quiz'/>
-  <% else %>
-     <input type='submit' value='Go to Selection Page'/>
   <% end %>
 <% end %>

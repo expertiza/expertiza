@@ -64,11 +64,15 @@
                                                                               Assignment::RS_STUDENT_SELECTED)
   end
     def add_quiz_response_map
+      if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
+        flash[:error] = "You have already taken that quiz"
+      else
       @map = QuizResponseMap.new
       @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
       @map.reviewer_id = params[:participant_id]
       @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
       @map.save
+      end
       redirect_to :controller => 'student_quiz', :action => 'list', :id => params[:participant_id]
     end
 

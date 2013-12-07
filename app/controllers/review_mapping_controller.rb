@@ -163,19 +163,31 @@
     begin
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+      #topic_id = Participant.find_by_id(Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id).topic_id
       unless params[:i_dont_care]
-        topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
+        #topic = (topic_id.nil?) ? nil : SignUpTopic.find(topic_id)
+        if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
+          flash[:error] = "You have already taken that quiz"
+        else
+          @map = QuizResponseMap.new
+          puts "final=1==="+params[:questionnaire_id]
+          @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
+          @map.reviewer_id = params[:participant_id]
+          @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
+          @map.save
+        end
       else
         topic = assignment.candidate_topics_for_quiz.to_a.shuffle[0] rescue nil
+        assignment.assign_quiz_dynamically(reviewer, topic)
       end
 
-      assignment.assign_quiz_dynamically(reviewer, topic)
 
-    rescue Exception => e
-      flash[:alert] = (e.nil?) ? $! : e
+
+    #rescue Exception => e
+     # flash[:alert] = (e.nil?) ? $! : e
     end
+      redirect_to :controller => 'student_quiz', :action => 'list', :id => reviewer.id
 
-    redirect_to :controller => 'student_quiz', :action => 'list', :id => reviewer.id
   end
 
   def add_metareviewer

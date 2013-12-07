@@ -11,7 +11,8 @@
 <% form_tag :controller => 'review_mapping',
             :action => 'assign_quiz_dynamically',
             :assignment_id => assignment.id,
-            :reviewer_id => session[:user].id do %>
+            :reviewer_id => session[:user].id,
+            :participant_id => @participant.id do %>
 
     <% if assignment.has_topics? %>
         <p><b>Select a topic below to take a new quiz:</b></p>
@@ -20,12 +21,12 @@
         I don't care which topic I take quiz for.
 
         <table cellpadding="0" id="quiz_list">
-          <% candidate_quiz = StudentQuizController.take_quiz(assignment.id, session[:user].id) %>
-          <% candidate_quiz.sort! { |a, b| a.id <=> b.id } %>
+          <% candidate_quizzes = StudentQuizController.take_quiz(assignment.id, session[:user].id) %>
+          <% candidate_quizzes.sort! { |a, b| a.id <=> b.id } %>
 
-          <% candidate_quiz.each do |candidate| %>
+          <% candidate_quizzes.each do |candidate| %>
               <tr>
-                <td><%= radio_button_tag 'candidate_quiz_id',candidate.id %></td>
+                <td><%= radio_button_tag :questionnaire_id,candidate.id %></td>
                 <td><%= candidate.name %></td>
               </tr>
           <% end %>

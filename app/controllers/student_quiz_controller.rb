@@ -3,7 +3,7 @@ class StudentQuizController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
 
-    @assignment = @participant.assignment
+    @assignment = Assignment.find(@participant.parent_id)
 
     # Find the current phase that the assignment is in.
     @quiz_phase = @assignment.get_current_stage(AssignmentParticipant.find(params[:id]).topic_id)
@@ -35,8 +35,11 @@ class StudentQuizController < ApplicationController
   end
 
   def finished_quiz
-    @choice=
     @response = Response.find_by_map_id(params[:map_id])
+    puts "in finished quiz"
+    puts params[:map_id]
+    @response_map = ResponseMap.find_by_id(params[:map_id])
+    @questions = Question.find_all_by_questionnaire_id(@response_map.reviewed_object_id)
   end
 
   def self.take_quiz assignment_id , reviewer_id
@@ -135,8 +138,7 @@ class StudentQuizController < ApplicationController
       scores.each do |score|
         score.save
       end
-      params.inspect
-      redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :questionnaire_id => params[:questionnaire_id], :map_id => @map.id
+      redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :map_id => @map.id
     else
       flash[:error] = "Please answer every question."
       redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :questionnaire_id => params[:questionnaire_id]

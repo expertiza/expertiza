@@ -1,46 +1,36 @@
 <SCRIPT LANGUAGE="JavaScript">
-function toggleVis(value, id) {
-	var elem = document.getElementById(id);
-	if (value) {
-		elem.style.display = 'none';
-	} else {
-		elem.style.display = '';
-	}
-}
+    function toggleVis(value, id) {
+        var elem = document.getElementById(id);
+        if (value) {
+            elem.style.display = 'none';
+        } else {
+            elem.style.display = '';
+        }
+    }
 </SCRIPT>
 <% form_tag :controller => 'review_mapping',
             :action => 'assign_quiz_dynamically',
             :assignment_id => assignment.id,
             :reviewer_id => session[:user].id do %>
 
-  <% if assignment.has_topics? %>
-    <p><b>Select a topic below to take a new quiz:</b></p>
-		
-		<input id="i_dont_care" name="i_dont_care" type="checkbox" onchange="toggleVis(this.checked, 'topic_list');" /> 
-		I don't care which topic I take quiz for.
-		
-    <table cellpadding="0" id="topic_list">
-    <% candidate_topics_for_quiz = assignment.candidate_topics_for_quiz.to_a %>
-	  <% candidate_topics_for_quiz.sort! { |a, b| a.id <=> b.id } %>
-    <% puts assignment.sign_up_topics.inspect %>
-    <% non_quizzable_topics = assignment.sign_up_topics - candidate_topics_for_quiz %>
-	  <% non_quizzable_topics.sort! { |a, b| a.id <=> b.id } %>
-    <% candidate_topics_for_quiz.each do |topic| %>
-    <tr>
-      <td><%= radio_button_tag 'topic_id', topic.id %></td>
-		  <td><%= topic.topic_identifier %>:</td>
-			<td><%= topic.topic_name %></td>
-	  </tr>
-	  <% end %>
-      <% non_quizzable_topics.each do |topic| %>
-      <tr>
-	    <td></td>
-		<td><font color="gray"><%= topic.topic_identifier %>:</font></td>
-		<td><font color="gray"><%= topic.topic_name %></font></td>
-      </tr>
-	  <% end %>
-    </table>
-  <% end %>
-  <p><input type='submit' value='Request a new quiz'/></p>
-<% end %>
+    <% if assignment.has_topics? %>
+        <p><b>Select a topic below to take a new quiz:</b></p>
 
+        <input id="i_dont_care" name="i_dont_care" type="checkbox" onchange="toggleVis(this.checked, 'quiz_list');" />
+        I don't care which topic I take quiz for.
+
+        <table cellpadding="0" id="quiz_list">
+          <% candidate_quiz = StudentQuizController.take_quiz(assignment.id, session[:user].id) %>
+          <% candidate_quiz.sort! { |a, b| a.id <=> b.id } %>
+
+          <% candidate_quiz.each do |candidate| %>
+              <tr>
+                <td><%= radio_button_tag 'candidate_quiz_id',candidate.id %></td>
+                <td><%= candidate.name %></td>
+              </tr>
+          <% end %>
+
+        </table>
+    <% end %>
+    <p><input type='submit' value='Request a new quiz to take'/></p>
+<% end %>

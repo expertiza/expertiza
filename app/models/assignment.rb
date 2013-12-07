@@ -55,24 +55,26 @@ class Assignment < ActiveRecord::Base
   # We choose the topics if one of its quiz submissions has been attempted the fewest times so far
   def candidate_topics_for_quiz
     return nil if sign_up_topics.empty?   # This is not a topic assignment
-
+    puts "begin in assignment==="
     contributor_set = Array.new(contributors)
-
+    puts "begin in assignment2==="
+    puts "in assignment.rb"+contributor_set.inspect
     # Reject contributors that have not selected a topic, or have no submissions
     contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? }
-    contributor_set.reject! { |contributor| !contributor.has_quiz? }
+    puts "begin in assignment3==="
+    #####contributor_set.reject! { |contributor| !contributor.has_quiz? }
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
         contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
-    contributor = contributor_set.min_by { |contributor| contributor.quiz_mappings.count }
+    ###contributor = contributor_set.min_by { |contributor| contributor.quiz_mappings.count }
 
-    min_quizzes = contributor.quiz_mappings.count rescue 0
-    contributor_set.reject! { |contributor| contributor.quiz_mappings.count > min_quizzes + review_topic_threshold }
+    ### min_quizzes = contributor.quiz_mappings.count rescue 0
+    ###contributor_set.reject! { |contributor| contributor.quiz_mappings.count > min_quizzes + review_topic_threshold }
 
-    puts contributor_set.inspect
+    puts "in assignment.rb"+contributor_set.inspect
 
     candidate_topics = Set.new
     contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
@@ -85,6 +87,7 @@ class Assignment < ActiveRecord::Base
   # Returns a set of topics that can be reviewed.
   # We choose the topics if one of its submissions has received the fewest reviews so far
   def candidate_topics_to_review
+    puts "I,m in assignment.rb candidata"
     return nil if sign_up_topics.empty? # This is not a topic assignment
     contributor_set = Array.new(contributors)
     # Reject contributors that have not selected a topic, or have no submissions
@@ -175,7 +178,7 @@ class Assignment < ActiveRecord::Base
     # is much simpler, and probably almost as good, given that even if the contributors are
     # picked in round-robin fashion, the reviews will not be submitted in the same order that
     # they were picked.
-     contributor_set.sample
+    contributor_set.sample
   end
 
 
@@ -421,7 +424,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_quiz_deadline
-    return DueDate.find(:first, :conditions => ['assignment_id = ? and deadline_type_id >= ?', self.id, 7]).due_at
+    return (DueDate.find(:first, :conditions => ['assignment_id = ? and deadline_type_id >= ?', self.id, 7]).due_at)
   end
 
   def delete(force = nil)
@@ -483,7 +486,7 @@ class Assignment < ActiveRecord::Base
     author.review_mappings.each do |mapping|
       # If the reviewer has requested an e-mail deliver a notification
       # that includes the assignment, and which item has been updated.
-       if mapping.reviewer.user.email_on_submission
+      if mapping.reviewer.user.email_on_submission
         user = mapping.reviewer.user
         Mailer.deliver_message(
             {recipients: user.email,
@@ -805,7 +808,7 @@ class Assignment < ActiveRecord::Base
 
     # If this is an assignment with quiz required
     if (self.require_quiz?)
-      signups = SignedUpUser.find_all_by_creator_id(contributor.user_id)
+      signups = SignedUpUser.find_all_by_creator_id(contributor.id)
       for signup in signups do
         signuptopic = SignUpTopic.find_by_id(signup.topic_id)
         if (signuptopic.assignment_id == self.id)
@@ -876,7 +879,7 @@ class Assignment < ActiveRecord::Base
     fields.push('Author Feedback Max', 'Author Feedback Avg', 'Author Feedback Min') if options['author_feedback_score']
     fields.push('Teammate Review Max', 'Teammate Review Avg', 'Teammate Review Min') if options['teammate_review_score']
     fields.push('Final Score')
-   fields
+    fields
   end
 
   def find_due_dates(type)

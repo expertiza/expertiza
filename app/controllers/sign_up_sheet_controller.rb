@@ -539,4 +539,3 @@ class SignUpSheetController < ApplicationController
     end
   end
 end
-

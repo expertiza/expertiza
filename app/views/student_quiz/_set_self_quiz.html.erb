@@ -11,7 +11,7 @@
     <% if quizzes.count > 0 %>
         <% quizzes.each do |quiz| #StudentQuizController.take_quiz(assignment.id, session[:user].id).each do |questionnaire| %>
         <%= radio_button_tag :questionnaire_id, quiz.id %> <%= quiz.id %>: <%=h quiz.name %><br>
-        <% end %>
+        <% end %><br><br>
         <input type='submit' value='Select Quiz'/>
     <% else %>
        <%= "There are no more available quizzes"%>

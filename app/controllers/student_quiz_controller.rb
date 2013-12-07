@@ -62,6 +62,7 @@ class StudentQuizController < ApplicationController
     end
     return @questionnaire
   end
+
   def record_response
     @response = Response.new
     @map = QuizResponseMap.new
@@ -143,6 +144,7 @@ class StudentQuizController < ApplicationController
     end
 
   end
+
   def grade_essays
     @questionnaires = Array.new()
     @questionnaires = Questionnaire.find_all_by_type("QuizQuestionnaire")
@@ -158,7 +160,6 @@ class StudentQuizController < ApplicationController
       @questionnaire_questions = @questionnaire_questions.merge({questionnaire.id => essay_questions})
     end
 
-
     @quiz_responses = Hash.new()
     @questionnaires.each do |questionnaire|
       @questionnaire_questions[questionnaire.id].each do |question|
@@ -173,9 +174,8 @@ class StudentQuizController < ApplicationController
         @quiz_responses = @quiz_responses.merge({question => ungraded_quiz_responses})
       end
     end
-
-
   end
+
   def graded?(response, question)
     if Score.find_by_question_id_and_response_id(question.id, response.id)
       return true

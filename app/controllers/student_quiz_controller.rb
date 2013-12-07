@@ -147,9 +147,39 @@ class StudentQuizController < ApplicationController
     end
 
   end
-
+  def submit_essay_grades
+    params.inspect
+    response_id = params[:response_id]
+    question_id = params[:question_id]
+    score = params[question_id][:score]
+    puts "this is my score"
+    puts score
+    if score !=  ' '
+      updated_score = Score.find_by_question_id_and_response_id(question_id, response_id)
+      #puts updated_score.id
+      #puts question_id
+      #puts response_id
+      #updated_score.score = score
+      #updated_score.save
+      updated_score.update_attributes(:score => score)
+    else
+      flash[:error] =  "Question was not graded. You must choose a score before submitting for grading."
+    end
+    redirect_to :action => :grade_essays
+  end
   def grade_essays
-    @questionnaires = Array.new()
+    scores = Score.find_all_by_score(-1)
+    @questions = Array.new
+    @answers = Hash.new()
+    @questionnaires = Array.new
+    scores.each do |score|
+      question = Question.find(score.question_id)
+      @questions << question
+      @questionnaires << QuizQuestionnaire.find(question.questionnaire_id)
+      @answers = @answers.merge({Question.find(score.question_id) => score})
+    end
+    @questionnaires = @questionnaires.uniq
+    %%@questionnaires = Array.new()
     @questionnaires = Questionnaire.find_all_by_type("QuizQuestionnaire")
     @questionnaire_questions = Hash.new()
     @questionnaires.each do |questionnaire|
@@ -176,7 +206,7 @@ class StudentQuizController < ApplicationController
 
         @quiz_responses = @quiz_responses.merge({question => ungraded_quiz_responses})
       end
-    end
+    end%
   end
 
   def graded?(response, question)

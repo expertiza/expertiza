@@ -5,8 +5,12 @@ class UsersController < ApplicationController
          :redirect_to => { :action => :list }
 
   def index
-    list
-    render :action => 'list'
+    if (current_user_role? == "Student") 
+      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user])) 
+    else
+      list
+      render :action => 'list'
+    end
   end
   
   def self.participants_in(assignment_id)
@@ -24,348 +28,49 @@ class UsersController < ApplicationController
     @users = User.find(:all, :conditions => ['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%",role.get_available_roles, user.id])
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
-    
+
+  #for displaying the list of users
   def list
-    @noPages=1
     user = session[:user]
     role = Role.find(user.role_id)
-    if(session[:opt].nil? && params[:opt].nil?)
-    session[:opt]="name"
-    end
-    if(!session[:opt].nil? && !params[:opt].nil?)
-    session[:opt]=params[:opt]
-    end
-
-
-    if(session[:opt].nil? || session[:opt].to_s=='name') #Sorting by name
-        session[:letter]=nil
-        #getting users by the order of their name
-      all_users = User.find(:all, :order => 'name', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
-
-      letter = params[:letter]
-      session[:letter] = letter
-      if letter == nil
-        letter = all_users.first.name[0,1].downcase   #setting default character to sorted on
-      end
-      logger.info "#{letter}"
-      @letters = Array.new
-      #paginating the current letter of the name and displaying 20 records in each page.
-      @users = User.paginate(:page => params[:page], :order => 'name',:per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter])
-      #finding total number of users below to find how many pages does this  character needs.
-      @userCount=User.count(:order => 'name',:conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter])
-      #finding number of pages.
-      @noPages=@userCount/20
-      all_users.each {
-         | userObj |
-         first = userObj.name[0,1].downcase
-         if not @letters.include?(first)
-            @letters << first   # pushing all unique starting characters of the names
-         end
-      }
-    end
-
-    if(session[:opt].to_s=='fullname')
-      session[:letter]=nil
-      #getting users by the order of their fullname
-      all_users = User.find(:all, :order => "#{session[:opt]}", :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
-      #paginating the current letter of the fullname and displaying 20 records in each page.
-      letter = params[:letter]  #setting letter with the user selected letter.
-      session[:letter] = letter #setting current session letter to the user selected letter.
-      if letter == nil
-        letter = all_users.first.fullname[0,1].downcase #setting default character to sorted on
-      end
-      logger.info "#{letter}"
-      @letters = Array.new
-      #paginating the current letter of the fullname and displaying 20 records in each page.
-      @users = User.paginate(:page => params[:page], :order => "#{session[:opt]}", :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(fullname,1,1) = ?", role.get_available_roles, user.id, letter])
-      #finding total number of users below to find how many pages does this  character needs.
-      @userCount= User.count(:order => "#{session[:opt]}",:conditions => ["(role_id in (?) or id = ?) and substring(fullname,1,1) = ?", role.get_available_roles, user.id, letter])
-      @noPages=@userCount/20    #finding number of pages.
-        all_users.each {
-         | userObj |
-         first = userObj.fullname[0,1].downcase
-         if not @letters.include?(first)
-            @letters << first          # pushing all unique starting characters of the fullnames
-         end
-      }
-     end
-
-  if(session[:opt].nil? || session[:opt].to_s=='email')
-    session[:letter]=nil
-    #getting users by the order of their email
-    all_users = User.find(:all, :order => 'email', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
-
+    all_users = User.find(:all, :order => 'name', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+    
     letter = params[:letter]
-    session[:letter] = letter        #setting default character of email to sorted on
+    session[:letter] = letter
     if letter == nil
-      letter = all_users.first.email[0,1].downcase
+      letter = all_users.first.name[0,1].downcase
     end
     logger.info "#{letter}"
     @letters = Array.new
-    @users = User.paginate(:page => params[:page], :order => 'email', :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(email,1,1) = ?", role.get_available_roles, user.id, letter])
-    @userCount=User.count(:order => 'email',:conditions => ["(role_id in (?) or id = ?) and substring(email,1,1) = ?", role.get_available_roles, user.id, letter])
-    @noPages=@userCount/20
+
+    @per_page = 1
+
+    # Check if the "Show" button for pagination is clicked
+    # If yes, set @per_page to the value of the selection dropdown
+    # Else, if the request is from one of the letter links on the top
+    # set @per_page to 1 (25 names per page).
+    # Else, set @per_page to the :num_users param passed in from
+    # the will_paginate method from the 'pagination' partial.
+    if params[:paginate_show]
+      @per_page = params[:num_users]
+    elsif params[:from_letter]
+      @per_page = 1
+    else
+      @per_page = params[:num_users]
+    end
+
+    # Get the users list to show on current page
+    @users = paginate_list(role, user.id, letter)
+
     all_users.each {
        | userObj |
-       first = userObj.email[0,1].downcase
+       first = userObj.name[0,1].downcase
        if not @letters.include?(first)
-          @letters << first         # pushing all unique starting characters of the email which would be useful for constructing paginator links.
+          @letters << first  
        end
     }
-    end
-
-    if(session[:opt].nil? || session[:opt].to_s=='role_id')
-        # Getting all role names from Role table
-        session[:letter]=nil
-        @allRoles = Role.find(:all,:order => "name")
-        @rolesAsc= Array.new
-        @allRoles.each do |roleRec|
-         @rolesAsc<<roleRec.id
-        end
-        all_users=Array.new
-        @rolesAsc.each do |roleno|
-          recs= User.find(:all, :conditions => ['role_id = ?', roleno])
-          recs.each do |rec|
-            all_users<<rec    # getting all the users according to their role names.
-          end
-        end
-
-        if !params[:letter].nil?
-          session[:letter] = params[:letter]
-          record=Role.find_by_name(params[:letter])
-          letter=record.id   #setting default role id to sorted on
-        end
-
-        if letter == nil
-          letter = all_users[0].role_id
-        end
-        logger.info "#{letter}"
-        @letters = Array.new
-        @users = User.paginate(:page => params[:page], :order => 'role_id', :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(role_id,1,1) = ?", role.get_available_roles, user.id, letter])
-        @userCount=User.count(:order => 'role_id', :conditions => ['(role_id = ?)', letter])
-        @noPages=@userCount/20
-        all_users.each {
-           | userObj |
-           first = userObj.role.name
-           if not @letters.include?(first)
-              @letters << first
-           end
-          }
-         @letters= @letters.sort    # constructing letters array which is used create paginator link.
-    end
-
-
-
-    if(session[:opt].nil? || session[:opt].to_s=='parent_id')
-        session[:letter]=nil
-
-        @parentIDs=User.find_by_sql("select DISTINCT(parent_id) from Users")  #getting all unique parent_id's
-        @parentNames=Array.new
-        @parentIDs.each do |pid|
-         @parentNames<<(User.find_by_id(pid.parent_id)).name  # getting names of all parent_id's collected above.
-        end
-
-
-        @parentNames=@parentNames.sort
-        @spids = Array.new
-        @parentNames.each do |n|
-         @spids<< (User.find_by_name(n)).id  # getting id's in the order of parent names.
-        end
-
-        all_users= Array.new
-        @spids.each do |spid|
-        recs= User.find(:all, :conditions => ['id = ?', spid])
-        recs.each do |rec|
-          all_users<<rec   # getting all users according to the parent_id's names.
-        end
-        end
-
-        if !params[:letter].nil?
-          session[:letter] = params[:letter]
-        record=User.find_by_name(params[:letter])
-        letter=record.id   # setting default parent_id to be sorted on.
-        end
-
-        if letter == nil
-          letter = @spids[0]
-        end
-        logger.info "#{letter}"
-        @letters = Array.new
-        @users = User.paginate(:page => params[:page], :order => 'parent_id', :per_page => 20, :conditions => ["parent_id = ?",letter])
-        @userCount=User.count(:order => 'parent_id',:conditions => ["parent_id = ?",letter])
-        @noPages=@userCount/20
-        all_users.each {
-           | userObj |
-           first = User.find(userObj.parent_id).name
-           if not @letters.include?(first)
-              @letters << first
-           end
-          }
-         @letters= @letters.sort
-    end
-
-
-  if(session[:opt].nil? || session[:opt].to_s=='review')
-    # Here the values of reviews are stored as 0's or 1's so we need to map them into user readable form like yes or no.
-      if(session[:letter] != 1 || session[:letter]!=0 || session[:letter].nil?)
-        session[:letter]=0
-      end
-    all_users = User.find(:all, :order => 'email_on_review')
-      if params[:letter].nil?
-        letter=session[:letter]
-      end
-      if (params[:letter]=="yes" || params[:letter]=="1")
-        letter=1  # mapping yes with 1
-      end
-      if (params[:letter]=="no" || params[:letter]=="0")
-        letter=0  # mapping no with 0
-      end
-
-    session[:letter] = letter
-
-    logger.info "#{letter}"
-    @letters = Array.new
-    @users = User.paginate(:page => params[:page], :order => 'email_on_review',:per_page => 20, :conditions => ["email_on_review = ?",letter])
-    @userCount=User.count(:order => 'email_on_review',:conditions => ["email_on_review = ?",letter])
-    @noPages=@userCount/20
-    all_users.each {
-       | userObj |
-       first = User.yesorno(userObj.email_on_review)
-       if(first=="")
-           first="no"  # setting default review option to be sorted on.
-       end
-       if not @letters.include?(first)
-          @letters << first
-
-       end
-    }
-
   end
 
-
-  if(session[:opt].nil? || session[:opt].to_s=='submission')
-      if(session[:letter] != 1 || session[:letter]!=0 || session[:letter].nil?)
-        session[:letter]=0
-      end
-    all_users = User.find(:all, :order => 'email_on_submission')
-    puts "First record"
-    puts all_users.first.email_on_submission
-      if params[:letter].nil?
-        letter=session[:letter]
-      end
-      if (params[:letter]=="yes" || params[:letter]=="1")
-          letter=1
-      end
-      if (params[:letter]=="no" || params[:letter]=="0")
-        letter=0
-      end
-
-    session[:letter] = letter
-
-    logger.info "#{letter}"
-    @letters = Array.new
-    @users = User.paginate(:page => params[:page], :order => 'email_on_submission',:per_page => 20, :conditions => ["email_on_submission = ?",letter])
-    @userCount=User.count(:order => 'email_on_submission',:conditions => ["email_on_submission = ?",letter])
-    @noPages=@userCount/20
-    all_users.each {
-       | userObj |
-       first = User.yesorno(userObj.email_on_submission)
-       if(first=="")
-           first="no"
-       end
-       if not @letters.include?(first)
-          @letters << first
-       end
-    }
-
-    end
-
-
-
-if(session[:opt].nil? || session[:opt].to_s=='metareview')
-      if(session[:letter] != 1 || session[:letter]!=0 || session[:letter].nil?)
-        session[:letter]=0
-      end
-    all_users = User.find(:all, :order => 'email_on_review_of_review')
-      if params[:letter].nil?
-        letter=session[:letter]
-      end
-      if (params[:letter]=="yes" || params[:letter]=="1")
-        letter=1
-      end
-      if (params[:letter]=="no" || params[:letter]=="0")
-        letter=0
-      end
-
-    session[:letter] = letter
-
-    logger.info "#{letter}"
-    @letters = Array.new
-    @users = User.paginate(:page => params[:page], :order => 'email_on_review_of_review',:per_page => 20, :conditions => ["email_on_review_of_review = ?",letter])
-    @userCount=User.count(:order => 'email_on_review_of_review',:conditions => ["email_on_review_of_review = ?",letter])
-    @noPages=@userCount/20
-    all_users.each {
-       | userObj |
-       first = User.yesorno(userObj.email_on_review_of_review)
-       if(first=="")
-
-           first="no"
-       end
-       if not @letters.include?(first)
-          @letters << first
-
-       end
-    }
-
-    end
-
-
-
- if(session[:opt].nil? || session[:opt].to_s=='privacy')
-      if(session[:letter] != 1 || session[:letter]!=0 || session[:letter].nil?)
-        session[:letter]=0
-      end
-    all_users = User.find(:all, :order => 'leaderboard_privacy')
-          if params[:letter].nil?
-        letter=session[:letter]
-      end
-      if (params[:letter]=="yes" || params[:letter]=="1")
-
-        letter=1
-      end
-      if (params[:letter]=="no" || params[:letter]=="0")
-
-        letter=0
-      end
-
-    session[:letter] = letter
-
-
-    logger.info "#{letter}"
-    @letters = Array.new
-    puts "PAGE = "
-    puts params[:page]
-    @users = User.paginate(:page => params[:page], :order => 'leaderboard_privacy',:per_page => 20, :conditions => ["leaderboard_privacy = ?",letter])
-    @userCount=User.count(:order => 'leaderboard_privacy',:conditions => ["leaderboard_privacy = ?",letter])
-    @noPages=@userCount/20
-    all_users.each {
-       | userObj |
-       first = User.yesorno(userObj.leaderboard_privacy)
-       if(first=="")
-
-           first="no"
-       end
-       if not @letters.include?(first)
-          @letters << first
-
-       end
-    }
-
-    end
-
-
-  end
-  
   def show_selection
     @user = User.find_by_name(params[:user][:name])
     if @user != nil
@@ -383,8 +88,12 @@ if(session[:opt].nil? || session[:opt].to_s=='metareview')
   end
   
   def show
-    @user = User.find(params[:id])
-    get_role
+    if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
+      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user])) 
+    else
+      @user = User.find(params[:id])
+      get_role
+    end
   end
   
   def new
@@ -393,6 +102,7 @@ if(session[:opt].nil? || session[:opt].to_s=='metareview')
   end
 
   def create
+    
     # if the user name already exists, register the user by email address
     check = User.find_by_name(params[:user][:name])
     if check != nil
@@ -402,17 +112,19 @@ if(session[:opt].nil? || session[:opt].to_s=='metareview')
     @user = User.new(params[:user])
     # record the person who created this new user
     @user.parent_id = (session[:user]).id
+    # set the user's timezone to its parent's
+    @user.timezonepref = User.find(@user.parent_id).timezonepref
     
     if @user.save
       #Instructor and Administrator users need to have a default set for their notifications
-      # the creation of an AssignmentQuestionnaires object with only the User ID field populated
+      # the creation of an AssignmentQuestionnaire object with only the User ID field populated
       # ensures that these users have a default value of 15% for notifications.
       #TAs and Students do not need a default. TAs inherit the default from the instructor,
       # Students do not have any checks for this information.
       if @user.role.name == "Instructor" or @user.role.name == "Administrator"
-        AssignmentQuestionnaires.create(:user_id => @user.id)
+        AssignmentQuestionnaire.create(:user_id => @user.id)
       end
-      flash[:notice] = 'User was successfully created.'
+      undo_link("User \"#{@user.name}\" has been created successfully. ")
       redirect_to :action => 'list'
     else
       foreign
@@ -428,11 +140,11 @@ if(session[:opt].nil? || session[:opt].to_s=='metareview')
   end
 
   def update
-    @user = User.find(params[:id])   
+    @user = User.find params[:id]
 
     if @user.update_attributes(params[:user])
-      flash[:notice] = 'User was successfully updated.'
-      redirect_to :action => 'show', :id => @user
+      undo_link("User \"#{@user.name}\" has been updated successfully. ")
+      redirect_to @user
     else
       foreign
       render :action => 'edit'
@@ -442,11 +154,12 @@ if(session[:opt].nil? || session[:opt].to_s=='metareview')
 
   def destroy
     begin
-       user = User.find(params[:id])
-       AssignmentParticipant.find_all_by_user_id(user.id).each{|participant| participant.delete}
-       TeamsUser.find_all_by_user_id(user.id).each{|teamuser| teamuser.delete}
-       AssignmentQuestionnaires.find_all_by_user_id(user.id).each{|aq| aq.destroy}           
-       user.destroy
+       @user = User.find(params[:id])
+       AssignmentParticipant.find_all_by_user_id(@user.id).each{|participant| participant.delete}
+       TeamsUser.find_all_by_user_id(@user.id).each{|teamuser| teamuser.delete}
+       AssignmentQuestionnaire.find_all_by_user_id(@user.id).each{|aq| aq.destroy}
+       @user.destroy
+       undo_link("User \"#{@user.name}\" has been deleted successfully. ")
     rescue
       flash[:error] = $!
     end
@@ -455,8 +168,12 @@ if(session[:opt].nil? || session[:opt].to_s=='metareview')
   end
   
   def keys
-    @user = User.find(params[:id])
-    @private_key = @user.generate_keys
+    if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
+      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user])) 
+    else     
+      @user = User.find(params[:id])
+      @private_key = @user.generate_keys
+    end
   end
   
   protected
@@ -476,4 +193,41 @@ if(session[:opt].nil? || session[:opt].to_s=='metareview')
     end
   end
 
+  # For filtering the users list with proper search and pagination.
+  def paginate_list(role, user_id, letter)
+    paginate_options = {"1" => 25, "2" => 50, "3" => 100}
+
+    # If the above hash does not have a value for the key,
+    # it means that we need to show all the users on the page
+    #
+    # Just a point to remember, when we use pagination, the
+    # 'users' variable should be an object, not an array
+
+    #The type of condition for the search depends on what the user has selected from the search_by dropdown
+    condition = "(role_id in (?) or id = ?) and name like ?" #default used when clicking on letters
+    search_filter = letter + '%'
+    @search_by = params[:search_by]
+    if @search_by == '1'  #search by user name
+      condition = "(role_id in (?) or id = ?) and name like ?"
+      search_filter = '%' + letter + '%'
+    elsif @search_by == '2' # search by full name
+      condition = "(role_id in (?) or id = ?) and fullname like ?"
+      search_filter = '%' + letter + '%'
+    elsif @search_by == '3' # search by email
+      condition = "(role_id in (?) or id = ?) and email like ?"
+      search_filter = '%' + letter + '%'
+    end
+
+    if (paginate_options["#{@per_page}"].nil?) #displaying all - no pagination
+      users = User.paginate(:page => params[:page], :order => 'name', :per_page => User.count(:all), :conditions => [condition, role.get_available_roles, user_id, search_filter])
+    else #some pagination is active - use the per_page
+      users = User.paginate(:page => params[:page], :order => 'name', :per_page => paginate_options["#{@per_page}"], :conditions => [condition, role.get_available_roles, user_id, search_filter])
+    end
+    users
+  end
+
+  # generate the undo link
+  #def undo_link
+  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @user.versions.last.id)}>undo</a>"
+  #end
 end

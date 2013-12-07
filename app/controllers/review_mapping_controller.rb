@@ -63,23 +63,12 @@
                                                                               requested_topic_id ,
                                                                               Assignment::RS_STUDENT_SELECTED)
   end
-    def show_available_submissions_for_quizzes
-      #assignment = Assignment.find(params[:assignment_id])
-      puts "I am in quizzes"
-      params.inspect
-      #reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], params[:assignment_id])
-      #requested_quiz_id = params[:questionnaire_id]
+    def add_quiz_response_map
       @map = QuizResponseMap.new
       @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
-      @map.reviewer_id = params[:participant_id]#Participant.find_by_user_id_and_parent_id(reviewer.id, params[:assignment_id]).id
+      @map.reviewer_id = params[:participant_id]
       @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
       @map.save
-
-      #@available_quizzes =  Hash.new
-      #@available_quizzes = DynamicQuizAssignmentHelper::quiz_assignment(assignment.id ,
-      #                                                                          reviewer.id,
-      #                                                                          requested_quiz_id ,
-      #                                                                         Assignment::RS_STUDENT_SELECTED)
       redirect_to :controller => 'student_quiz', :action => 'list', :id => params[:participant_id]
     end
 

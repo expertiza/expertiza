@@ -55,7 +55,7 @@ class StudentQuizController < ApplicationController
 
     @quiz_score = (quiz_score/question_count) * 100
     if essay_not_graded == true
-      flash[:note] = "Some essay questions in this quiz have not yet been graded."
+      flash.now[:note] = "Some essay questions in this quiz have not yet been graded."
     end
   end
 

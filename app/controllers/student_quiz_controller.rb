@@ -36,24 +36,26 @@ class StudentQuizController < ApplicationController
 
   def finished_quiz
     @response = Response.find_by_map_id(params[:map_id])
-
     @response_map = ResponseMap.find_by_id(params[:map_id])
     @questions = Question.find_all_by_questionnaire_id(@response_map.reviewed_object_id)
 
-    scores = Score.find_all_by_response_id(@response.id)
-    question_count = @questions.length
-    quiz_score = 0.0
     essay_not_graded = false
-    scores.each do |score|
-      if score.score == '-1'
+    quiz_score = 0.0
+
+    @questions.each do |question|
+      score = Score.find_by_response_id_and_question_id(@response.id, question.id)
+      if score.score == -1
         essay_not_graded = true
       else
         quiz_score += score.score
       end
     end
+
+    question_count = @questions.length
+
     @quiz_score = (quiz_score/question_count) * 100
     if essay_not_graded == true
-      flash[:notice] = "Some essay questions in this quiz have not yet been graded."
+      flash[:note] = "Some essay questions in this quiz have not yet been graded."
     end
   end
 

@@ -36,11 +36,31 @@ class StudentQuizController < ApplicationController
 
   def finished_quiz
     @response = Response.find_by_map_id(params[:map_id])
-    puts "in finished quiz"
-    puts params[:map_id]
 
     @response_map = ResponseMap.find_by_id(params[:map_id])
     @questions = Question.find_all_by_questionnaire_id(@response_map.reviewed_object_id)
+
+    scores = Score.find_all_by_response_id(@response.id)
+    puts "question count"
+    question_count = @questions.length
+    puts question_count
+    quiz_score = 0.0
+    essay_not_graded = false
+    scores.each do |score|
+      if score.score == '-1'
+        puts "im in here"
+        essay_not_graded = true
+      else
+          quiz_score += score.score
+      end
+    end
+    puts "quiz score"
+    puts quiz_score
+    @quiz_score = (quiz_score/question_count) * 100
+    if essay_not_graded == true
+      puts "essay not graded"
+      flash[:notice] = "Some essay questions in this quiz have not yet been graded."
+    end
   end
 
   def self.take_quiz assignment_id , reviewer_id

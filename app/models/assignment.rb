@@ -157,7 +157,7 @@ class Assignment < ActiveRecord::Base
     #end
     # Reviewer/quiz taker can take quiz for each submission only once
     contributor_set.reject! { |contributor| quiz_taken_by?(contributor, reviewer) }
-    raise "You have already taken the quiz for all submissions for this #{work}." if contributor_set.empty?
+    #raise "You have already taken the quiz for all submissions for this #{work}." if contributor_set.empty?
 
     # Reduce to the contributors with the least number of quizzes taken for their submissions ("responses")
    # min_contributor = contributor_set.min_by { |a| a.quiz_responses.count }
@@ -185,9 +185,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def quiz_taken_by?(contributor, reviewer)
-    quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id)
+    quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id).id
     return QuizResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
-                                                 self.id, reviewer.id, quiz_id]) > 0
+                                                 contributor.id, reviewer.id, quiz_id]) > 0
   end
 
   # Returns a contributor to review if available, otherwise will raise an error

@@ -183,8 +183,8 @@
 
 
 
-    #rescue Exception => e
-     # flash[:alert] = (e.nil?) ? $! : e
+    rescue Exception => e
+      flash[:alert] = (e.nil?) ? $! : e
     end
       redirect_to :controller => 'student_quiz', :action => 'list', :id => reviewer.id
 

@@ -47,7 +47,6 @@ class StudentQuizController < ApplicationController
     @quizzes = Array.new
     reviewer = Participant.find_by_user_id_and_parent_id(reviewer_id,assignment_id)
     @assignment = Assignment.find_by_id(assignment_id)
-   # if @assignment.team_assignment?
       teams = TeamsUser.find_all_by_user_id(reviewer_id)
       Team.find_all_by_parent_id(assignment_id).each do |quiz_creator|
         unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
@@ -63,7 +62,6 @@ class StudentQuizController < ApplicationController
         end
       end
     end
-    #end
     return @quizzes
   end
 

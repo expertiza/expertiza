@@ -188,12 +188,15 @@ class QuestionnairesController < ApplicationController
         end
         @questionnaire.instructor_id = team.id    #for a team assignment, set the instructor id to the team_id
 
+      @successful_create = true
       print "=====save in create_questionnaire begin========="
       save
       print "=====save in create_questionnaire over========="
       save_choices @questionnaire.id
       print "=====save_choice in create_questionnaire over========="
-      flash[:note] = "Quiz was successfully created"
+      if @successful_create == true
+        flash[:note] = "Quiz was successfully created"
+      end
       redirect_to :controller => 'submitted_content', :action => 'edit', :id => participant_id
     else
       if (session[:user]).role.name == "Teaching Assistant"
@@ -285,6 +288,7 @@ class QuestionnairesController < ApplicationController
         end
       end
     rescue
+      @successful_create = false
       flash[:error] = $!
     end
   end

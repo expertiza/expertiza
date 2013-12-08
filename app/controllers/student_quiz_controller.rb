@@ -41,24 +41,18 @@ class StudentQuizController < ApplicationController
     @questions = Question.find_all_by_questionnaire_id(@response_map.reviewed_object_id)
 
     scores = Score.find_all_by_response_id(@response.id)
-    puts "question count"
     question_count = @questions.length
-    puts question_count
     quiz_score = 0.0
     essay_not_graded = false
     scores.each do |score|
       if score.score == '-1'
-        puts "im in here"
         essay_not_graded = true
       else
-          quiz_score += score.score
+        quiz_score += score.score
       end
     end
-    puts "quiz score"
-    puts quiz_score
     @quiz_score = (quiz_score/question_count) * 100
     if essay_not_graded == true
-      puts "essay not graded"
       flash[:notice] = "Some essay questions in this quiz have not yet been graded."
     end
   end
@@ -165,15 +159,8 @@ class StudentQuizController < ApplicationController
     response_id = params[:response_id]
     question_id = params[:question_id]
     score = params[question_id][:score]
-    puts "this is my score"
-    puts score
     if score !=  ' '
       updated_score = Score.find_by_question_id_and_response_id(question_id, response_id)
-      #puts updated_score.id
-      #puts question_id
-      #puts response_id
-      #updated_score.score = score
-      #updated_score.save
       updated_score.update_attributes(:score => score)
     else
       flash[:error] =  "Question was not graded. You must choose a score before submitting for grading."

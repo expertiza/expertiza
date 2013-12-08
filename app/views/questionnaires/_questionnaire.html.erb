@@ -73,12 +73,12 @@
                                <% end %>
                               &nbsp;<%= text_field "quiz_question_choices[]", 'txt', :size=>40 %>
                       <% else if @question_type.q_type=="TF" %>
-                               <% if @quiz_question_choices.iscorrect %>
-                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][iscorrect]", '1', true) %>   True
-                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][iscorrect]", '0', false) %>  False
+                               <% if @quiz_question_choices.txt=="True" %>
+                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'True', true) %>   True
+                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'False', false) %>  False
                                <% else %>
-                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][iscorrect]", '1', false) %>  True
-                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][iscorrect]", '0', true) %>   False
+                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'True', false) %>  True
+                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'False', true) %>   False
                               <%end%>
                        <% end %><% end %><% end %>
 

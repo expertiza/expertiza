@@ -127,7 +127,7 @@ class QuestionnairesController < ApplicationController
                         if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== 1.to_s
                           quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"True")
                         else
-                          quiz_question_choice.update_attributes(:iscorrect => '0',:txt=>"False")
+                          quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"False")
                         end
                       end
                  end

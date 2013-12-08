@@ -132,8 +132,10 @@ class StudentQuizController < ApplicationController
         correct_answer = QuizQuestionChoice.find_by_question_id_and_iscorrect(question.id, 1)
         if (QuestionType.find_by_question_id question.id).q_type == 'Essay'
           score = -1
-        elsif params["#{question.id}"] == correct_answer.txt
-          score = 1
+        elsif  correct_answer
+          if params["#{question.id}"] == correct_answer.txt
+            score = 1
+          end
         else
           score = 0
         end

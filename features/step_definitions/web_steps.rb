@@ -35,7 +35,6 @@ When /^I press "([^"]*)"(?: within "([^"]*)")?$/ do |button, selector|
 end
 
 When /^I follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
-  #save_and_open_page
   if selector
     with_scope(selector) do
       first(:link, link).click

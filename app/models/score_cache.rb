@@ -209,27 +209,35 @@ class ScoreCache < ActiveRecord::Base
 
 
   def self.get_reviews_average(pid)
+
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
 
-    assignment_num_reviews = Assignment.find_by_id(@assignment_id).num_reviews
+    assignment_num_reviews = Response.find(:all,:conditions => ["reviewed_object_id=? AND type=?", @assignment_id, 'TeamReviewResponseMap'])
     @assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
 
     count = 0
     @assignment_participants.each{count = count + 1}
-    @average_reviews = assignment_num_reviews/count
+
+    num_review_count=0.0
+    assignment_num_reviews.each{num_review_count = num_review_count + 1.0}
+    @avg_review_count=num_review_count/count
+
   end
 
   def self.get_metareviews_average(pid)
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
-
-    assignment_num_metareviews = Assignment.find_by_id(@assignment_id).num_review_of_reviews
+    assignment_num_metareviews = Response.find(:all,:conditions => ["reviewed_object_id=? AND type=?", @assignment_id, 'MetareviewResponseMap'])
     @assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
 
     count = 0
     @assignment_participants.each{count = count + 1}
-    @average_reviews = assignment_num_metareviews/count
+
+    num_metareview_count=0.0
+    assignment_num_metareviews.each{num_metareview_count = num_metareview_count + 1.0}
+    puts num_metareview_count
+    @average_metareviews = num_metareview_count/count
   end
 
   def self.my_reviews(pid)

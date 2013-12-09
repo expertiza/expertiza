@@ -129,15 +129,12 @@ class StudentQuizController < ApplicationController
           end
         end
       else
+        score = 0
         correct_answer = QuizQuestionChoice.find_by_question_id_and_iscorrect(question.id, 1)
         if (QuestionType.find_by_question_id question.id).q_type == 'Essay'
           score = -1
-        elsif  correct_answer
-          if params["#{question.id}"] == correct_answer.txt
-            score = 1
-          end
-        else
-          score = 0
+        elsif  correct_answer and params["#{question.id}"] == correct_answer.txt
+          score = 1
         end
         new_score = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => @response.id, :score => score
         unless new_score.comments != "" && new_score.comments
@@ -145,7 +142,6 @@ class StudentQuizController < ApplicationController
         end
         scores.push(new_score)
       end
-
     end
     if valid == 0
       scores.each do |score|
@@ -158,6 +154,7 @@ class StudentQuizController < ApplicationController
     end
 
   end
+
   def submit_essay_grades
     params.inspect
     response_id = params[:response_id]
@@ -171,6 +168,7 @@ class StudentQuizController < ApplicationController
     end
     redirect_to :action => :grade_essays
   end
+
   def grade_essays
     scores = Score.find_all_by_score(-1)
     @questions = Array.new

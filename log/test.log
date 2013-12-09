@@ -2639,3 +2639,113 @@ Migrating to CreateParticipantScoreViews (20131103014327)
   [1m[36mAssignmentParticipant Load (0.3ms)[0m  [1mSELECT `participants`.* FROM `participants` WHERE `participants`.`type` = 'AssignmentParticipant' AND `participants`.`id` = 3223 LIMIT 1[0m
   [1m[35mResponse Load (16.0ms)[0m  SELECT `responses`.* FROM `responses` WHERE (reviewed_object_id=159 AND reviewer_id = 3223 AND type='MetareviewResponseMap')
   [1m[36mSQL (0.3ms)[0m  [1mROLLBACK[0m
+  [1m[36mSQL (0.2ms)[0m  [1mBEGIN[0m
+  [1m[35mSCHEMA (90.4ms)[0m  SHOW TABLES 
+  [1m[36mAssignmentParticipant Load (0.7ms)[0m  [1mSELECT `participants`.* FROM `participants` WHERE `participants`.`type` = 'AssignmentParticipant' AND `participants`.`id` = 2944 LIMIT 1[0m
+  [1m[35mAssignmentParticipant Load (14.2ms)[0m  SELECT `participants`.* FROM `participants` WHERE `participants`.`type` = 'AssignmentParticipant' AND `participants`.`parent_id` = 152
+  [1m[36mScoreCache Load (1.2ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2878 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.0ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2879 LIMIT 1
+  [1m[36mScoreCache Load (0.9ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2880 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2881 LIMIT 1
+  [1m[36mScoreCache Load (0.9ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2882 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.5ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2883 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2884 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2885 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2886 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2887 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2888 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2889 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2890 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2891 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2892 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2893 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2894 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2895 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2896 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2897 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2898 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.9ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2899 LIMIT 1
+  [1m[36mScoreCache Load (0.8ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2900 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2901 LIMIT 1
+  [1m[36mScoreCache Load (0.8ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2902 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.9ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2903 LIMIT 1
+  [1m[36mScoreCache Load (0.8ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2904 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2905 LIMIT 1
+  [1m[36mScoreCache Load (0.8ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2906 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2907 LIMIT 1
+  [1m[36mScoreCache Load (0.9ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2908 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2909 LIMIT 1
+  [1m[36mScoreCache Load (0.8ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2910 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2911 LIMIT 1
+  [1m[36mScoreCache Load (0.8ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2912 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2914 LIMIT 1
+  [1m[36mScoreCache Load (0.8ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2915 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.9ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2916 LIMIT 1
+  [1m[36mScoreCache Load (0.9ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2917 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2918 LIMIT 1
+  [1m[36mScoreCache Load (0.8ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2919 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2920 LIMIT 1
+  [1m[36mScoreCache Load (0.9ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2921 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2922 LIMIT 1
+  [1m[36mScoreCache Load (0.9ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2923 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2924 LIMIT 1
+  [1m[36mScoreCache Load (0.8ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2925 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2926 LIMIT 1
+  [1m[36mScoreCache Load (2.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2927 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.6ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2928 LIMIT 1
+  [1m[36mScoreCache Load (1.5ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2929 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.5ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2930 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2931 LIMIT 1[0m
+  [1m[35mScoreCache Load (2.2ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2932 LIMIT 1
+  [1m[36mScoreCache Load (1.7ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2933 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.2ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2934 LIMIT 1
+  [1m[36mScoreCache Load (1.2ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2935 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.0ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2936 LIMIT 1
+  [1m[36mScoreCache Load (1.0ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2937 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.9ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2938 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2939 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2940 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2941 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.5ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2942 LIMIT 1
+  [1m[36mScoreCache Load (1.4ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2943 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2944 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2945 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2946 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2947 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2948 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2949 LIMIT 1[0m
+  [1m[35mScoreCache Load (0.8ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2950 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2951 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2952 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2953 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2954 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2955 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2956 LIMIT 1
+  [1m[36mScoreCache Load (1.4ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2957 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2958 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2959 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2960 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2961 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2962 LIMIT 1
+  [1m[36mScoreCache Load (1.4ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2963 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.4ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2964 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2965 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2966 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2967 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2968 LIMIT 1
+  [1m[36mScoreCache Load (1.3ms)[0m  [1mSELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2969 LIMIT 1[0m
+  [1m[35mScoreCache Load (1.3ms)[0m  SELECT `score_caches`.* FROM `score_caches` WHERE `score_caches`.`reviewee_id` = 2970 LIMIT 1
+  [1m[36mSQL (81.8ms)[0m  [1mROLLBACK[0m
+  [1m[35mSQL (0.3ms)[0m  BEGIN
+  [1m[36mAssignmentParticipant Load (0.5ms)[0m  [1mSELECT `participants`.* FROM `participants` WHERE `participants`.`type` = 'AssignmentParticipant' AND `participants`.`id` = 3223 LIMIT 1[0m
+  [1m[35mResponse Load (23.7ms)[0m  SELECT `responses`.* FROM `responses` WHERE (reviewed_object_id=159 AND reviewer_id = 3223 AND type='TeamReviewResponseMap')
+  [1m[36mSQL (0.2ms)[0m  [1mROLLBACK[0m
+  [1m[35mSQL (0.1ms)[0m  BEGIN
+  [1m[36mAssignmentParticipant Load (0.4ms)[0m  [1mSELECT `participants`.* FROM `participants` WHERE `participants`.`type` = 'AssignmentParticipant' AND `participants`.`id` = 12308 LIMIT 1[0m
+  [1m[35mResponse Load (19.0ms)[0m  SELECT `responses`.* FROM `responses` WHERE (reviewed_object_id=320 AND type='TeamReviewResponseMap')
+  [1m[36mAssignmentParticipant Load (12.3ms)[0m  [1mSELECT `participants`.* FROM `participants` WHERE `participants`.`type` = 'AssignmentParticipant' AND `participants`.`parent_id` = 320[0m
+  [1m[35mSQL (0.2ms)[0m  ROLLBACK
+  [1m[36mSQL (0.1ms)[0m  [1mBEGIN[0m
+  [1m[35mAssignmentParticipant Load (0.3ms)[0m  SELECT `participants`.* FROM `participants` WHERE `participants`.`type` = 'AssignmentParticipant' AND `participants`.`id` = 3223 LIMIT 1
+  [1m[36mResponse Load (15.5ms)[0m  [1mSELECT `responses`.* FROM `responses` WHERE (reviewed_object_id=159 AND reviewer_id = 3223 AND type='MetareviewResponseMap')[0m
+  [1m[35mSQL (0.3ms)[0m  ROLLBACK

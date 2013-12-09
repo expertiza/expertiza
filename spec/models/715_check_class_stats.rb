@@ -22,5 +22,12 @@ describe ScoreCache do
     expect(ScoreCache.my_metareviews(3223)).to eql(actual_metareviews_remaining)
 
   end
+  
+  it "get_reviews_average" do
+
+    actual_review_avg=1.58
+    expect(ScoreCache.get_reviews_average(12308).round(2)).to eql(actual_review_avg)
+
+  end
 
 end

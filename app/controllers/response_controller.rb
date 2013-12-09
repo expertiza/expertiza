@@ -204,7 +204,7 @@ class ResponseController < ApplicationController
       params[:responses].each_pair do |k,v|
 
         score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
-        if score == nil)
+        unless score
           score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
         end
         score.update_attribute('score', v[:score])

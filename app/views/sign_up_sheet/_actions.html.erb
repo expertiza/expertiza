@@ -1,2 +1,4 @@
-<%= link_to image_tag('delete_icon.png', :border => 0, :title => 'delete', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete', :id => topic.id, :assignment_id => params[:id] %>
-<%= link_to image_tag('edit_icon.png', :border => 0, :title => 'edit', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'edit', :id => topic.id, :assignment_id => params[:id] %>
+<%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id => topic.id, :assignment_id => params[:id] %>
+<%= link_to image_tag('bookmark.png', :border => 0, :title => 'Bookmark for topic', :align => 'middle'), :controller=>'bookmarks', :action=> 'view_topic_bookmarks', :id => topic.id , :assignment_id => params[:id] %>
+  <%= link_to image_tag('bookmark-add-icon.png', :border => 0, :title => 'Add Bookmark', :align => 'middle'), :controller=>'bookmarks', :action=> 'add_bookmark_form', :id => topic.id , :assignment_id => params[:id] %>
+

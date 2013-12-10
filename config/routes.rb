@@ -1,5 +1,11 @@
 Expertiza::Application.routes.draw do |map|
+  map.resources :bookmark_tags
 
+  map.resources :books
+
+  map.resources :bookmarks
+
+  map.resources :join_team_requests
   resources :admin do
     collection do
       get :list_super_administrators
@@ -56,6 +62,10 @@ Expertiza::Application.routes.draw do |map|
       get ':page_name', action: :view
     end
   end
+
+
+
+
 
   resources :controller_actions do
     collection do
@@ -215,6 +225,11 @@ Expertiza::Application.routes.draw do |map|
       post :toggle_access
       get :copy
       post :select_questionnaire_type
+      post :list_questionnaires
+      get :list
+      get :edit
+      get :view
+
     end
   end
 
@@ -224,6 +239,8 @@ Expertiza::Application.routes.draw do |map|
   resources :survey_questionnaires, controller: :questionnaires
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_evaluation_questionnaires, controller: :questionnaires
+  resources :bookmarkrating_questionnaires, controller: :questionnaires
+
 
   resources :response do
     collection do
@@ -285,6 +302,7 @@ Expertiza::Application.routes.draw do |map|
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :delete_signup
+      get :edit
       get :list
       get :signup_topics
       get :signup
@@ -416,6 +434,16 @@ Expertiza::Application.routes.draw do |map|
   match 'response/', :to => 'response#saving'
 
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
+
+  map.connect 'bookmark/manage', :controller => "bookmarks", :action => 'manage_bookmarks'
+  map.connect 'bookmark/view', :controller => "bookmarks", :action => 'view_bookmark'
+  map.connect 'bookmark/rating', :controller => "bookmarks", :action => 'view_rating_rubrics'
+  map.connect 'bookmark/rating2', :controller => "bookmarks", :action => 'add_rating_rubric_form'
+  map.connect 'bookmark/add_tag_bookmark', :controller => "bookmarks", :action => "add_tag_bookmark"
+  map.connect 'bookmark/create_tag_bookmark', :controller => "bookmarks", :action => "create_tag_bookmark"
+  map.connect 'bookmark/search_bookmarks', :controller => "bookmarks", :action => 'search_bookmarks'
+  map.connect 'bookmark/view_bookmarks', :controller => "bookmarks", :action => 'view_bookmarks'
+
   map.connect ':controller/service.wsdl', :action => 'wsdl'
 
   match ':controller(/:action(/:id))(.:format)'

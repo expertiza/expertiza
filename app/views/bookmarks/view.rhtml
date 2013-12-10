@@ -12,8 +12,9 @@ if (@check_mapping == nil ) %> <b>You don't have this bookmark in your repositor
 <br />
 <table>
 	<% myurl = @result_tuple["url"] %>
+
     <tr>
-    <td>Bookmark URL:</td><td> <%= auto_link(myurl) %> </td>
+    <td>Bookmark URL:</td><td> <%= Rinku.auto_link(myurl) %> </td>
     </tr>
 	<tr>
 		<td>Bookmark Title:</td><td> <%= @result_tuple["title"] %> </td>

@@ -4,7 +4,7 @@ class SignUpTopic < ActiveRecord::Base
   has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy
   alias_method :deadlines, :topic_deadlines
   has_many :assignment_participants, :foreign_key => 'topic_id'
-
+  has_and_belongs_to_many :bmappings
   belongs_to :assignment
 
   has_paper_trail

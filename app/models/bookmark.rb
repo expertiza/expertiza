@@ -27,7 +27,7 @@ class Bookmark < ActiveRecord::Base
   # If bookmark mapping for a user and a url exists, then edit
   def self.edit_this_bookmark (b_url, b_title, b_tags_text, b_description,session_user)
     bookmark_resource = Bookmark.find(:first, :conditions=>["url = ?",b_url])
-    bmapping_status = "found"
+    @bmapping_status = "found"
     bookmark_user_mapping = Bmapping.find(:first, :conditions =>["user_id = ? and bookmark_id = ?", session_user.id, bookmark_resource.id])
     bookmark_user_mapping.bookmark_id = bookmark_resource.id
     bookmark_user_mapping.title = b_title

@@ -242,21 +242,35 @@ class SignUpSheetController < ApplicationController
   def list
     @assignment_id = params[:id]
     @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', params[:id]])
-    @slots_filled = SignUpTopic.find_slots_filled(params[:id])
+    @slots_filled =  SignUpTopic.find_slots_filled(params[:id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
-    assignment=Assignment.find(params[:id])
 
-    if assignment.due_dates.find_by_deadline_type_id(1)!= nil
-      unless assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
-        @show_actions = false
-      end
+
+    #find whether assignment is team assignment
+    assignment = Assignment.find(params[:id])
+    #end
+
+    if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(DeadlineType.find_by_name("submission").id).due_at < Time.now
+      @show_actions = false
     end
 
-    #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
+    #Find whether the user has signed up for any topics; if so the user won't be able to
+    #sign up again unless the former was a waitlisted topic
+    #if team assignment, then team id needs to be passed as parameter else the user's id
     users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
-    SignUpTopic.remove_team(users_team, @assignment_id)
+
+    if users_team.size == 0
+      @selected_topics = nil
+    else
+      #TODO: fix this; cant use 0
+      @selected_topics = other_confirmed_topic_for_user(params[:id], users_team[0].t_id)
+    end
+
+
+
+
+
 
   end
 
@@ -281,7 +295,7 @@ class SignUpSheetController < ApplicationController
     #Always use team_id ACS
 
     #check whether the user already has a team for this assignment
-    SignupSheet.signup_team(@assignment, @user_id, params[:id])
+    #SignupSheet.signup_team(@assignment, @user_id, params[:id])
     redirect_to :action => 'list', :id => params[:assignment_id]
   end
 

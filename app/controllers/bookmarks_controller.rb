@@ -10,6 +10,12 @@ class BookmarksController < ApplicationController
     return @topic_id
   end
 
+  def show
+    redirect_to(:action => 'view_bookmarks')
+  end
+
+
+
   def add_bookmark
     # If added properly should be redirected to the users collection of bookmarks.
     # If not, should render the form again
@@ -251,20 +257,40 @@ class BookmarksController < ApplicationController
     @search_results = Array.new
     if (@my_user != "all_users")
       @search_results = Bookmark.search_fortags_foruser(@search_array, @my_user, @order_by)
+      print(@search_results)
+      print("Chutya1")
     else
+
       @search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
+      print(@search_results)
+      print("Chutya2")
     end
     if(@my_user == "all_users")
       puts "rendering view"
       render :action => "view_bookmarks"
+      print("Chutya3")
     else
       render :action =>"manage_bookmarks"
+
+      print(@search_results.count)
+      print("Chutya4")
     end
+    print("Chutya5")
   end
+
 
   def add_rating_rubric_form
     @rating_rubric = BookmarkRatingRubric.new
   end
+
+
+  def create
+
+
+
+  end
+
+
 
   def create_rating_rubric
     @rating_rubric = BookmarkRatingRubric.create(:display_text => params[:display_text].strip, :minimum_rating => params[:minimum_rating], :maximum_rating => params[:maximum_rating])

@@ -41,6 +41,17 @@ class User < ActiveRecord::Base
     true
   end
 
+  def bookmark_rated?(bmapping_id)
+    BmappingRatings.find(:first, :conditions => ["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"])
+  end
+
+  def bookmark_added?(bmapping_id)
+    puts "in bookmark_added?***********" + bmapping_id
+    Bmapping.find(:first, :conditions => ["id = #{bmapping_id} AND user_id = #{self.id}"])
+  end
+
+
+
   def list_mine(object_type, user_id)
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end

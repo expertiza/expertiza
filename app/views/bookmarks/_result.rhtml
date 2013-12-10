@@ -17,6 +17,6 @@
     <td>Rating: <%= search_result["bmapping_rating"] %></td>
   </tr>
 </table>
-<%= link_to('Rate Bookmark',:controller => 'bookmarks', :action => 'bookmark_rate',  :search_results => @search_results, :id => @topic, :assignment_id => @assignment_id, :bookmark_id => search_result["id"]) %>
+<%= link_to('Rate Bookmark',:controller => 'bookmarks', :action => 'bookmark_rate', :id => @topic, :assignment_id => @assignment_id, :bookmark_id => search_result["id"]) %>
 
 

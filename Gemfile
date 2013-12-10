@@ -5,6 +5,7 @@ raise "Invalid ruby version: #{RUBY_VERSION}" unless RUBY_VERSION[/^1\.9\.3/]
 gem 'rails', '~>3.0.0'
 
 ## Gems in Alphabetical Order
+gem 'rinku', '~> 1.2.2', :require => 'rails_rinku'
 gem 'bind-it'
 gem 'capistrano'
 gem 'delayed_job_active_record'
@@ -32,6 +33,7 @@ gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
+
 gem 'will_paginate'
 gem 'automated_metareview' , '0.0.2'
 

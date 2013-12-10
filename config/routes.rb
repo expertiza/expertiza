@@ -443,6 +443,8 @@ Expertiza::Application.routes.draw do |map|
   map.connect 'bookmark/create_tag_bookmark', :controller => "bookmarks", :action => "create_tag_bookmark"
   map.connect 'bookmark/search_bookmarks', :controller => "bookmarks", :action => 'search_bookmarks'
   map.connect 'bookmark/view_bookmarks', :controller => "bookmarks", :action => 'view_bookmarks'
+  map.connect 'bookmark/bookmark_rate', :controller => "bookmarks", :action => 'bookmarks_rate'
+  map.connect 'bookmark/view_rating_rubric', :controller => "bookmarks", :action => 'view_rating_rubric'
 
   map.connect ':controller/service.wsdl', :action => 'wsdl'
 

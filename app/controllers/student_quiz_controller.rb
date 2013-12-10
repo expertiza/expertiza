@@ -181,34 +181,6 @@ class StudentQuizController < ApplicationController
       @answers = @answers.merge({Question.find(score.question_id) => score})
     end
     @questionnaires = @questionnaires.uniq
-    %%@questionnaires = Array.new()
-    @questionnaires = Questionnaire.find_all_by_type("QuizQuestionnaire")
-    @questionnaire_questions = Hash.new()
-    @questionnaires.each do |questionnaire|
-      questions = Question.find_all_by_questionnaire_id(questionnaire.id)
-      essay_questions = Array.new()
-      questions.each do |question|
-        if QuestionType.find_by_question_id(question.id).q_type == "Essay"
-          essay_questions << question
-        end
-      end
-      @questionnaire_questions = @questionnaire_questions.merge({questionnaire.id => essay_questions})
-    end
-
-    @quiz_responses = Hash.new()
-    @questionnaires.each do |questionnaire|
-      @questionnaire_questions[questionnaire.id].each do |question|
-        ungraded_quiz_responses = Array.new()
-        quiz_responses = QuizResponse.find_all_by_question_id(question.id)
-        quiz_responses.each do |response|
-          if !graded?(response, question)
-            ungraded_quiz_responses << response
-          end
-        end
-
-        @quiz_responses = @quiz_responses.merge({question => ungraded_quiz_responses})
-      end
-    end%
   end
 
   def graded?(response, question)
@@ -218,6 +190,4 @@ class StudentQuizController < ApplicationController
       return false
     end
   end
-
-
 end

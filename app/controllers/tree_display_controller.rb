@@ -63,6 +63,13 @@ class TreeDisplayController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
+  def goto_bookmarkrating_rubrics
+    node_object = TreeFolder.find_by_name('Bookmarkrating')
+    puts node_object.id
+    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end
+
   # direct access to assignments
   def goto_assignments
     node_object = TreeFolder.find_by_name('Assignments')

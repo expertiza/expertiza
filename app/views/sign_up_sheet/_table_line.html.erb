@@ -9,6 +9,7 @@
 <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
 
 <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
+<td align="center"><%= render :partial => 'actions', :locals => {:topic=>topic} %></td>
 
 <% if @assignment.has_partner_ads?(params[:id]) %>
  <td align="center">

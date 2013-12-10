@@ -1,0 +1,15 @@
+<h1>Courses available for <%= @assignment.name %></h1>
+
+Select a course to which the assignment will belong:
+<BR/><BR/>
+<% form_tag :action => 'update', :id => @assignment.id do %>
+  <% for course in @courses %>
+    <%= radio_button_tag 'assignment[course_id]',course.id %><%= course.name %><br/>
+  <% end %>
+
+  <BR/>
+  <input type='submit' value='Save' />
+<% end %>
+
+<BR/>
+<%= render :partial => '/shared_scripts/back'%>

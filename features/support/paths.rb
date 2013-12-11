@@ -31,6 +31,13 @@ module NavigationHelpers
         pending # There must exist a team 
         team = AssignmentTeam.first.id
        "student_team/edit/#{team}"
+
+    when /Your Work/
+        user_id = User.find_by_name("student").id
+        assignment_id = Assignment.find_by_name("my_assignment").id
+        participant = Participant.find_by_user_id_and_parent_id(user_id, assignment_id)
+        "submitted_content/view?id=#{participant.id}"
+
     else
       begin
         page_name =~ /the (.*) page/

@@ -32,11 +32,7 @@
         <% end %><br>
 
     <% elsif(question_type.q_type == 'TF') %>
-        <% if QuizQuestionChoice.find_by_question_id(question.id).iscorrect %>
-          Correct Answer is: <b>True</b><br/>
-        <% else %>
-          Correct Answer is: <b>False</b><br/>
-        <% end %>
+        Correct Answer is: <b><%=QuizQuestionChoice.find_by_question_id(question.id).txt%></b><br/>
         Your answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b><br><br>
 
 

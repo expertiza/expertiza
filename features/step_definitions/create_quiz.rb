@@ -20,23 +20,23 @@ end
 
 And /^I create a ([^"]*) question and a ([^"]*) question$/ do |question_type_1, question_type_2|
   steps %{
-     When I fill in "Question 1:" with "my #{question_type_1} quiz"
-     And I check question /"#{question_type_1}/"
-     Then I fill in "Question 2:" with "my #{question_type_2} quiz"
-     And I check question /"#{question_type_2}/"
+     When I fill in "new_question_1_txt" with "my #{question_type_1} quiz"
+     And I check question "#{question_type_1}" with question number 1
+     Then I fill in "new_question_2_txt" with "my #{question_type_2} quiz"
+     And I check question "#{question_type_2}" with question number 2
   }
 end
 
-And /^I check question "([^"]*)"$/ do |question_type|
+And /^I check question "([^"]*)" with question number ([^"]*)$/ do |question_type, num|
   case question_type
-  when 'True/False'
+    when 'True/False'
        steps %{
-         When I check "True/False"
-         Then I check "True"
+         When I choose "question_type_#{num}_type_tf"
+         Then I choose "new_choices_1_TF_#{num}_iscorrect_1"
              }
   when 'Essay'
     steps %{
-         When I check "Essay"
+         When I choose "question_type_#{num}_type_essay"
              }
   else
     pending

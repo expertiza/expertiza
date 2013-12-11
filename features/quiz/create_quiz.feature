@@ -11,7 +11,6 @@ Scenario: create a quiz and add questions
      Then I should see "New Quiz"
      When I fill in "Name" with "my test quiz"
 
-      And I create a True/False question and a Essay question
+      And I create a Essay question and a Essay question
      When I press "Create Quiz"
      Then I should see "Quiz was successfully created"
-

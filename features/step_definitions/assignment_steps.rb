@@ -1,5 +1,6 @@
 Given /^I am participating in (team|individual) assignment "(\S+)"$/ do |assignment_type,assignment|
   a = Assignment.new
+  a.team_assignment = 1
   a.max_team_size=1
 
   if assignment_type= /^team$/
@@ -12,6 +13,8 @@ Given /^I am participating in (team|individual) assignment "(\S+)"$/ do |assignm
   a.spec_location= 'http://'
   a.availability_flag= true
   a.require_signup= true
+  a.wiki_type_id = 1
+  a.instructor_id = User.find_by_name("admin").id
   a.save
 
   dropDeadline = DueDate.new

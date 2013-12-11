@@ -39,7 +39,7 @@
 
     <!-- If quiz is required for the assignment, find out if the quiz has already been created -->
 
-    <% if @assignment.get_quiz_deadline < Time.now or (controller.action_name != "view_my_scores" and !(@map and @map.reviewer_id != session[:user].id)) %>
+    <% if (controller.action_name != "view_my_scores" and !(@map and @map.reviewer_id != session[:user].id)) %>
         <br/><b>Quiz:</b><br/><br/>
         <% if questionnaire = Questionnaire.find(:first, :conditions => ["instructor_id = ?", uid]) %>
             <%= link_to 'View Quiz', :controller => :questionnaires, :action => :view_quiz, :id => questionnaire.id, :pid => participant.id %>

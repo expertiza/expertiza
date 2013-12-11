@@ -6,3 +6,5 @@ class StudentQuizControllerTest < ActionController::TestCase
     assert true
   end
 end
+
+

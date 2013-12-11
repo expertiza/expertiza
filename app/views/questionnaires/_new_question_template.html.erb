@@ -1,10 +1,13 @@
 <% (1..Assignment.find_by_id(@assignment_id).num_quiz_questions).each do |i| %>
   <div id="question<%= i %>">
-    Question <%= i %>: <br>
-    <%= text_area "new_question[#{i}]", :txt, placeholder: 'Enter question...', :cols => "60", :rows => "8" %>
+    <label for="text_area">Question <%= i %>: <br></label>
+    <textarea name="new_question[#{i}]" id="text_area" placeholder='Enter question...' cols = "60" rows = "8"></textarea>
+
 
     <span style="margin-left:20px;">
-         <!--hint:--> <%= text_area "question_type[#{i}]","parameters", placeholder: 'Enter hint...', size: 100 %> <br><br>
+    <label for="text_area"></label>
+    <!--hint:--><textarea name="new_question[#{i}]" placeholder='Enter hint...' size= "100"></textarea>
+   <br><br>
     </span>
   </div>
 

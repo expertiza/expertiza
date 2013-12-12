@@ -1,7 +1,7 @@
 require 'rspec'
 require 'spec_helper'
 
-describe 'assignments auto-expand' , do
+describe 'assignments auto-expand'  do
   it 'auto-expands assignments of all courses',  :js => true, :driver => :selenium do
     visit '/'
     page.should have_content('Reusable learning objects through peer review')

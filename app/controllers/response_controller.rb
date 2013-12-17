@@ -304,23 +304,20 @@ class ResponseController < ApplicationController
       else
         @version=1
       end
-    begin
-      @response = Response.find_by_map_id(@map_id)
+      @response = Response.find_by_map_id(@map.id)
       @response.additional_comment = params[:review][:comments]
       @response.version_num = @version
-      @response.save
-
-      #@response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:version_num=>@version)
-
-      @res = @response.response_id
-      @questionnaire = @map.questionnaire
-      questions = @questionnaire.questions
-      params[:responses].each_pair do |k, v|
-        score = Score.create(:response_id => @response.response_id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+      @response.map = @map
+      if @response.save
+        @res = @response.response_id
+        @questionnaire = @map.questionnaire
+        questions = @questionnaire.questions
+        params[:responses].each_pair do |k, v|
+          score = Score.create(:response_id => @response.response_id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+        end
+      else
+        flash[:warn] = "Error1: Your response was not saved. Cause:330 #{$!}"
       end
-    rescue
-      error_msg = "Error1: Your response was not saved. Cause:330 #{$!}"
-    end
 
     begin
       ResponseHelper.compare_scores(@response, @questionnaire)

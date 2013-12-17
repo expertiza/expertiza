@@ -298,11 +298,9 @@ class ResponseController < ApplicationController
       msg = ""
       error_msg = ""
       latestResponseVersion
-      array_not_empty=0
       @review_scores=Array.new
-      @prev=Response.find_by_map_id(@map.id)
+      @prev=Response.where(map_id: @map.id)
       for element in @prev
-        array_not_empty=1
         @review_scores << element
       end
                                                            #if previous responses exist increment the version number.

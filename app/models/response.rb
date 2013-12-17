@@ -78,7 +78,7 @@ class Response < ActiveRecord::Base
     mapping = self.map
     instructor = mapping.assignment.instructor
     Mailer.generic_message(
-        {:recipients => instructor.email,
+        {:to => instructor.email,
          :subject => "Expertiza Notification: A review score is outside the acceptable range",
          :body => {
              :first_name => ApplicationHelper::get_user_first_name(instructor),

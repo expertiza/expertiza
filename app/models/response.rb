@@ -5,6 +5,10 @@ class Response < ActiveRecord::Base
   delegate :questionnaire, :reviewee, :reviewer,
     :to => :map
 
+  def response_id
+    id
+  end
+
   def team_has_user?(user)
     reviewer.team.has_user user
   end

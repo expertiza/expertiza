@@ -5,25 +5,25 @@ class FeedbackResponseMap < ResponseMap
 
   def assignment
     self.review.map.assignment
-  end
-
+  end  
+  
   def show_review()
     if self.review
-      return self.review.display_as_html()
+      return self.review.display_as_html()+"<BR/><BR/><BR/>"
     else
-      return "No review was performed"
+      return "<I>No review was performed.</I><BR/><BR/><BR/>"
     end
-  end
-
+  end   
+  
   def get_title
     return "Feedback"
-  end
-
+  end  
+  
   def questionnaire
     self.assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire')
   end
-
+  
   def contributor
     self.review.map.reviewee
-  end
+  end 
 end

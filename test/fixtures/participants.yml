@@ -195,3 +195,40 @@ par19:
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par19"
+
+#participants for intellligent assignmnets
+par20:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student9) %>
+  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par20"
+
+par21:
+   submit_allowed: 1
+   review_allowed: 0
+   user_id: <%= Fixtures.identify(:student8) %>
+   parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+   penalty_accumulated: 0
+   type : AssignmentParticipant
+   handle: "par21"
+
+par22:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student7) %>
+  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par22"
+
+par23:
+  submit_allowed: 1
+  review_allowed: 0
+  user_id: <%= Fixtures.identify(:student6) %>
+  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  penalty_accumulated: 0
+  type : AssignmentParticipant
+  handle: "par23"

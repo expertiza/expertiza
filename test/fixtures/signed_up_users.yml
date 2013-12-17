@@ -1,0 +1,59 @@
+SignedUpUser1:
+  topic_id: <%= Fixtures.identify(:IntelligentTeam1) %>
+  is_waitlisted: 0
+  creator_id: 1
+  preference_priority_number: 1
+
+SignedUpUser2:
+  topic_id: <%= Fixtures.identify(:IntelligentTeam2) %>
+  is_waitlisted: 0
+  creator_id: 1
+  preference_priority_number: 2
+
+SignedUpUser3:
+  topic_id: <%= Fixtures.identify(:IntelligentTeam3) %>
+  is_waitlisted: 0
+  creator_id: 1
+  preference_priority_number: 1
+
+SignedUpUser4:
+  topic_id: <%= Fixtures.identify(:LotteryTopic1) %>
+  creator_id: <%= Fixtures.identify(:lottery_team1) %>
+  is_waitlisted: 1
+  preference_priority_number: 1
+
+SignedUpUser5:
+  topic_id: <%= Fixtures.identify(:LotteryTopic2) %>
+  creator_id: <%= Fixtures.identify(:lottery_team1) %>
+  is_waitlisted: 1
+  preference_priority_number: 2
+
+SignedUpUser6:
+  topic_id: <%= Fixtures.identify(:LotteryTopic1) %>
+  creator_id: <%= Fixtures.identify(:lottery_team2) %>
+  is_waitlisted: 1
+  preference_priority_number: 2
+
+SignedUpUser7:
+  topic_id: <%= Fixtures.identify(:LotteryTopic2) %>
+  creator_id: <%= Fixtures.identify(:lottery_team2) %>
+  is_waitlisted: 1
+  preference_priority_number: 1
+#SignedUpUser4:
+ # topic_id: <%= Fixtures.identify(:student1) %>
+  #is_waitlisted: 0
+  #creator_id: 1
+  #preference_priority_number: 2
+
+#SignedUpUser5:
+ # topic_id: <%= Fixtures.identify(:student2) %>
+  #is_waitlisted: 0
+  #creator_id: 1
+  #preference_priority_number:  3
+
+#SignedUpUser6:
+ # topic_id: <%= Fixtures.identify(:student3) %>
+  #is_waitlisted: 0
+  #preference_priority_number: 1
+  #creator_id: 1
+  #preference_priority_number: 3

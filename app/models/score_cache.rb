@@ -17,6 +17,7 @@ class ScoreCache < ActiveRecord::Base
     @t_min = 0
     @teammember = TeamsUser.new
     @t_max = 0
+    
     if @map_type == "TeamReviewResponseMap"
       get_team_score()
     else

@@ -2,7 +2,7 @@ class AssignmentTeam < Team
 
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many    :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
-  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, teams t WHERE r.type = \'TeamReviewResponseMap\' AND r.reviewee_id = t.id AND t.id = #{id}'
+  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, teams t WHERE r.map_id = m.id AND m.type = \'TeamReviewResponseMap\' AND m.reviewee_id = t.id AND t.id = #{id}'
 
 # START of contributor methods, shared with AssignmentParticipant
 
@@ -172,7 +172,7 @@ class AssignmentTeam < Team
     scores[:team] = self # This doesn't appear to be used anywhere
     assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = Hash.new
-      scores[questionnaire.symbol][:assessments] = TeamReviewResponseMap.find_all_by_reviewee_id(self.id)
+      scores[questionnaire.symbol][:assessments] = Response.all(joins: :map, conditions: {response_maps: {reviewee_id: self.id, type: 'TeamReviewResponseMap'}})
       scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)

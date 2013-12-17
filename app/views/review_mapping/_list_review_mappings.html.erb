@@ -103,15 +103,15 @@
            <tr style="background-color:<%=bgcolor2%>">            
              <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
                <div style="text-align:right">
-                 <%= link_to 'delete', :action => 'delete_reviewer', :id => map.map_id %><br/>
-                 <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.map_id %><br/>
-                 <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.map_id %>
+                 <%= link_to 'delete', :action => 'delete_reviewer', :id => map.id %><br/>
+                 <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.id %><br/>               
+                 <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.id %>
                </div>
              </td>
 
              <td width="50%">
                <table width="100%">
-               <% rmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(map.map_id)
+               <% rmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(map.id) 
                   rmappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname } %>
                <% rmappings.each{
                   | rmap |
@@ -126,7 +126,7 @@
                    <tr style="background-color:<%=bgcolor3%>">
                      <td><%= rmap.reviewer.name %> (<%= rmap.reviewer.fullname %>)
                        <div style="text-align:right">
-                         <%= link_to 'delete', :action => 'delete_metareviewer', :id => rmap.map_id %><br/>
+                         <%= link_to 'delete', :action => 'delete_metareviewer', :id => rmap.id %><br/>
                        </div>
                      </td>
                    </tr>

@@ -140,6 +140,7 @@ class ResponseController < ApplicationController
       #**********************
       render :action => 'response'
     end
+    end
 
     def edit
       @header = "Edit"
@@ -247,6 +248,7 @@ class ResponseController < ApplicationController
           @topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
       end
     end
+  end
     def new_feedback
       review = Response.find(params[:id])
       if review
@@ -444,7 +446,6 @@ class ResponseController < ApplicationController
         redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
     end
-  end
   
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
@@ -486,6 +487,8 @@ class ResponseController < ApplicationController
         redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
       end
     end
+  end
+
     private
     def get_content
       @title = @map.get_title

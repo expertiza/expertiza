@@ -349,67 +349,6 @@ class ResponseController < ApplicationController
     saving
   end
 
-  def saving
-    @map = ResponseMap.find(params[:id])
-    @return = params[:return]
-    @map.notification_accepted = false
-    @map.save
-      if(params["save_options"].nil? or params["save_options"].empty?)#default it to with metareviews
-        params["save_options"] = "WithMeta"
-      end
-      #calling the automated metareviewer controller, which calls its corresponding model/view
-      if (params[:save_options] == "WithMeta")
-        # puts "WithMeta"
-        redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.map_id
-      elsif (params[:save_options] == "EmailMeta")
-        redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
-        # calculate the metareview metrics
-        @automated_metareview = AutomatedMetareview.new
-        #pass in the response id as a parameter
-        @response = Response.find_by_map_id(params[:id])
-        @automated_metareview.calculate_metareview_metrics(@response, params[:id])
-        #send email to the reviewer with the metareview details
-        @automated_metareview.send_metareview_metrics_email(@response, params[:id])
-      elsif (params[:save_options] == "WithoutMeta")
-        # puts "WithoutMeta"
-        redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
-      end
-      if @map.questionnaire.section.eql? "Custom"
-        #  @map = ResponseMap.find(params[:id])
-        @response = Response.create(:map_id => @map.id, :additional_comment => "")
-        @res = @response.id
-        @questionnaire = @map.questionnaire
-        questions = @questionnaire.questions
-        for i in 0..questions.size-1
-          # Local variable score is unused; can it be removed?
-          score = Score.create(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
-        end
-        msg = "#{@map.get_title} was successfully saved."
-        saving
-      else
-        begin
-          @response=  Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:version_num=>@version)
-          @res = @response.id
-          @questionnaire = @map.questionnaire
-          questions = @questionnaire.questions
-          params[:responses].each_pair do |k,v|
-            score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
-          end
-        rescue
-          error_msg = "Your response was not saved. Cause: " + $!
-        end
-        begin
-          ResponseHelper.compare_scores(@response, @questionnaire)
-          ScoreCache.update_cache(@res)
-          @map.save
-          msg = "Your response was successfully saved."
-        rescue
-          @response.delete
-          error_msg = "Your response was not saved. Cause: " + $!
-        end
-        redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
-      end
-    end
     def saving
       @map = ResponseMap.find(params[:id])
       @return = params[:return]

@@ -4,11 +4,9 @@ class ResponseController < ApplicationController
   helper :file
   def latestResponseVersion
     #get all previous versions of responses for the response map.
-    array_not_empty=0
     @review_scores=Array.new
-    @prev=Response.find_by_map_id(@map.id)
+    @prev=Response.find_all_by_map_id(@map.id)
     for element in @prev
-      array_not_empty=1
       @review_scores << element
     end
   end
@@ -36,7 +34,7 @@ class ResponseController < ApplicationController
       get_content
       latestResponseVersion
       #sort all the available versions in descending order.
-      if array_not_empty==1
+      if @prev.present?
         @sorted=@review_scores.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
         @largest_version_num=@sorted[0]
         @latest_phase=@largest_version_num.created_at
@@ -117,7 +115,7 @@ class ResponseController < ApplicationController
           render :action => 'response'
         end
       end
-    if array_not_empty==1
+    if @prev.present?
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
     end
@@ -150,7 +148,7 @@ class ResponseController < ApplicationController
       return if redirect_when_disallowed(@response)
       @map = @response.map
       LatestResponseVersion
-      if array_not_empty==1
+      if @prev.present?
         @sorted=@review_scores.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
         @largest_version_num=@sorted[0]
       end
@@ -298,7 +296,7 @@ class ResponseController < ApplicationController
       error_msg = ""
       latestResponseVersion
                                                            #if previous responses exist increment the version number.
-      if array_not_empty==1
+      if @prev.present?
         @sorted=@review_scores.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
         @largest_version_num=@sorted[0]
         @version=@largest_version_num.version_num+1
@@ -330,7 +328,7 @@ class ResponseController < ApplicationController
       #@map.save
       msg = "Your response was successfully saved."
     rescue
-      @response.delete
+      @response.try :delete
       error_msg = "Error2: Your response was not saved. Cause:340 #{$!}"
     end
 

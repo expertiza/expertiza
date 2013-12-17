@@ -1,5 +1,4 @@
 load 'test/test_helper.rb'
-require 'ffi/aspell'
 require 'automated_metareview/wordnet_based_similarity'
 require 'automated_metareview/degree_of_relevance'
 require 'automated_metareview/text_preprocessing'

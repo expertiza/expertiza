@@ -1,6 +1,5 @@
 class Mailer < ActionMailer::Base
   default from: 'expertiza-support@lists.ncsu.edu'
-  #default delivery_method: :test if Rails.env.development? || Rails.env.test?
 
   def generic_message(defn)
     @partial_name = defn[:body][:partial_name]
@@ -10,6 +9,8 @@ class Mailer < ActionMailer::Base
     @new_pct = defn[:body][:new_pct]
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
+
+    defn[:to] = 'expertiza@mailinator.com' if Rails.env.development? || Rails.env.test?
 
     mail(subject: defn[:subject],
          to: defn[:to],

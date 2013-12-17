@@ -178,6 +178,7 @@ class AssignmentTeam < Team
     scores[:total_score] = assignment.compute_total_score(scores)
     scores
   end
+  alias_method :scores, :get_scores
 
   def self.get_team(participant)
     team = nil

@@ -319,15 +319,15 @@ class ResponseController < ApplicationController
         flash[:warn] = "Error1: Your response was not saved. Cause:330 #{$!}"
       end
 
-    begin
+    #begin
       ResponseHelper.compare_scores(@response, @questionnaire)
       ScoreCache.update_cache(@res)
       #@map.save
       msg = "Your response was successfully saved."
-    rescue
-      @response.try :delete
-      error_msg = "Error2: Your response was not saved. Cause:340 #{$!}"
-    end
+    #rescue
+      #@response.try :delete
+      #error_msg = "Error2: Your response was not saved. Cause:340 #{$!}"
+    #end
 
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end

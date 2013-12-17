@@ -3,15 +3,16 @@ class Mailer < ActionMailer::Base
   default delivery_method: :test if Rails.env.development? || Rails.env.test?
 
   def generic_message(defn)
-    defn[:to] = 'expertiza@mailinator.com' if Rails.env.development?
     @partial_name = defn[:body][:partial_name]
     @user = defn[:body][:user]
     @first_name = defn[:body][:first_name]
     @password = defn[:body][:password]
+    @new_pct = defn[:body][:new_pct]
+    @avg_pct = defn[:body][:avg_pct]
+    @assignment = defn[:body][:assignment]
 
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
   end
-  alias_method :message, :generic_message
 end

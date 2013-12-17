@@ -1,0 +1,24 @@
+Student_role:
+  name: "Student"
+  default_page_id:
+  description: ""
+  parent_id:
+Teaching_Assistant_role:
+  name: "Teaching Assistant"
+  default_page_id:
+  description: ""
+  parent_id: <%= Fixtures.identify(:Student_role) %>
+Instructor_role:
+  name: "Instructor"
+  default_page_id:
+  description: ""
+  parent_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
+Administrator_role:
+  name: "Administrator"
+  default_page_id:
+  description: ""
+  parent_id: <%= Fixtures.identify(:Instructor_role) %>
+SuperAdministrator_role:
+  name: "Super-Administrator"
+  description: ""
+  parent_id: <%= Fixtures.identify(:Administrator_role) %>

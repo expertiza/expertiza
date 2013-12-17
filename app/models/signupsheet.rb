@@ -1,27 +1,26 @@
-<<<<<<< HEAD
-class SignupSheet
 
 
+class Signupsheet
+  include ManageTeamHelper
+  def initialize
 
-end
-
-||||||| merged common ancestors
-=======
-class SignupSheet < ActiveRecord::Base
-
-
+  end
   def signup_team ( assignment_id, user_id, topic_id )
     users_team = SignedUpUser.find_team_users(assignment_id, user_id)
+    puts users_team
     if users_team.size == 0
       #if team is not yet created, create new team.
       team = AssignmentTeam.create_team_and_node(assignment_id)
       user = User.find(user_id)
+
       teamuser = create_team_users(user, team.id)
       confirmationStatus = confirmTopic(team.id, topic_id, assignment_id)
     else
       confirmationStatus = confirmTopic(users_team[0].t_id, topic_id, assignment_id)
     end
   end
+
+
 
   def self.create_dependency_graph(topics,node)
     dg = RGL::DirectedAdjacencyGraph.new
@@ -47,5 +46,3 @@ class SignupSheet < ActiveRecord::Base
     dg
   end
 end
-
->>>>>>> 5513cf844441d96fcb3a73965c3fe9a8b8b85ac3

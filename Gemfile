@@ -60,4 +60,5 @@ end
 group :development, :test do
   gem 'capybara'
   gem 'rspec-rails'
+  gem 'simplecov', :require => false, :group => :test
 end

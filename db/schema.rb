@@ -11,11 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema.define(:version => 20131108132457) do
-=======
-ActiveRecord::Schema.define(:version => 20131103014327) do
->>>>>>> parent of 17b8eca... Merge project E806 with master ... many conflicts, esp. in response_controller.rb
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"

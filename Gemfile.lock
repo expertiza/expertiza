@@ -233,6 +233,10 @@ GEM
     shoulda-context (1.1.5)
     shoulda-matchers (2.4.0)
       activesupport (>= 3.0.0)
+    simplecov (0.7.1)
+      multi_json (~> 1.0)
+      simplecov-html (~> 0.7.1)
+    simplecov-html (0.7.1)
     slop (3.4.5)
     sprockets (2.10.0)
       hike (~> 1.2)
@@ -305,6 +309,7 @@ DEPENDENCIES
   seer
   selenium-webdriver
   shoulda
+  simplecov
   sprockets
   sqlite3-ruby
   stanford-core-nlp

@@ -11,11 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema.define(:version => 20131205203433) do
-=======
-ActiveRecord::Schema.define(:version => 20131103014327) do
->>>>>>> e916
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -45,7 +41,6 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.integer  "review_of_review_questionnaire_id"
     t.integer  "teammate_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
-    t.boolean  "team_assignment"
     t.integer  "wiki_type_id",                      :default => 0,     :null => false
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false
@@ -302,7 +297,7 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",                     :null => false
+    t.string  "q_type",      :default => "", :null => false
     t.string  "parameters"
     t.integer "question_id", :default => 1,  :null => false
   end
@@ -320,8 +315,8 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.string   "section"
     t.text     "instruction_loc"
+    t.string   "section"
   end
 
   create_table "questions", :force => true do |t|
@@ -408,7 +403,7 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
   create_table "score_views", :id => false, :force => true do |t|
     t.integer  "question_weight"
     t.integer  "q_id",                                 :default => 0
-    t.string   "q_type"
+    t.string   "q_type",                               :default => ""
     t.string   "q_parameters"
     t.integer  "q_question_id",                        :default => 1
     t.integer  "q1_id",                                :default => 0
@@ -618,9 +613,9 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.boolean "leaderboard_privacy",                      :default => false
     t.text    "digital_certificate"
     t.string  "persistence_token"
-    t.boolean "copy_of_emails",                           :default => false
     t.string  "timezonepref"
     t.text    "public_key"
+    t.boolean "copy_of_emails",                           :default => false
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

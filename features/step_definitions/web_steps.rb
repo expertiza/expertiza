@@ -56,7 +56,7 @@ end
 
 When /^I fill in "([^"]*)" for "([^"]*)"(?: within "([^"]*)")?$/ do |value, field, selector|
   with_scope(selector) do
-    fill_in(field, :with => value)
+    fill_in(field, :with => value, :match => :prefer_exact)
   end
 end
 

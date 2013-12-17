@@ -291,10 +291,20 @@ class ResponseController < ApplicationController
     end
     def create
       @map = ResponseMap.find(params[:id])                 #assignment/review/metareview id is in params id
+      logger.info "******************************"
+      logger.info @map.to_yaml
+      logger.info "******************************"
       @res = 0
       msg = ""
       error_msg = ""
       latestResponseVersion
+      array_not_empty=0
+      @review_scores=Array.new
+      @prev=Response.find_by_map_id(@map.id)
+      for element in @prev
+        array_not_empty=1
+        @review_scores << element
+      end
                                                            #if previous responses exist increment the version number.
       if @prev.present?
         @sorted=@review_scores.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}

@@ -4,7 +4,6 @@ Given /^I am participating in (team|individual) assignment "(\S+)"$/ do |assignm
 
   if assignment_type== "team"
     a.max_team_size=3
-    a.team_assignment=1
   end
 
   a.name = assignment

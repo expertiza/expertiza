@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130930021106) do
+ActiveRecord::Schema.define(:version => 20131205203433) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
     t.boolean  "copy_flag",                         :default => false
     t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "microtask",                         :default => false
+    t.boolean  "is_intelligent"
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -82,6 +83,13 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
   end
 
   add_index "automated_metareviews", ["response_id"], :name => "fk_automated_metareviews_responses_id"
+
+  create_table "bids", :force => true do |t|
+    t.integer  "topic_id"
+    t.integer  "team_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -571,6 +579,17 @@ ActiveRecord::Schema.define(:version => 20130930021106) do
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"
+
+  create_table "versions", :force => true do |t|
+    t.string   "item_type",  :null => false
+    t.integer  "item_id",    :null => false
+    t.string   "event",      :null => false
+    t.string   "whodunnit"
+    t.text     "object"
+    t.datetime "created_at"
+  end
+
+  add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
 
   create_table "wiki_types", :force => true do |t|
     t.string "name", :default => "", :null => false

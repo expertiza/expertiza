@@ -1,10 +1,4 @@
-
-
-class Signupsheet
-  include ManageTeamHelper
-  def initialize
-
-  end
+class SignupSheet < ActiveRecord::Base
   def signup_team ( assignment_id, user_id, topic_id )
     users_team = SignedUpUser.find_team_users(assignment_id, user_id)
     puts users_team

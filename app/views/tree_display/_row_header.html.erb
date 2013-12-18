@@ -1,4 +1,7 @@
-<TR <% if rowtype != nil %>CLASS="<%= rowtype %>"<% elsif prefix != nil %>ID="<%= prefix %>" style="display: none;"<% end %>>
+<TR
+<% if rowtype != nil %>CLASS="<%= rowtype %>"
+<% elsif prefix != nil %>ID="<%= prefix %>" style="display: none;"
+<% end %>>
 <% if depth != nil
      index = 0
      while index < depth %>
@@ -29,5 +32,9 @@
 	  <% if parent_node.get_creation_date != nil %>
 	    <BR/><I>Creation Date:</I> <%= parent_node.get_creation_date %>
 	  <% end %>
+        <% if parent_node.get_modified_date != nil %>
+            <BR/><I>Updated Date:</I> <%= parent_node.get_modified_date %>
+        <% end %>
+
   <%end%>		  
 </TD>

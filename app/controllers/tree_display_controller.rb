@@ -75,39 +75,29 @@ class TreeDisplayController < ApplicationController
   def list
     redirect_to controller: :student_task, action: :list if current_user.student?
     if params[:commit] == 'Search'
+      search_node_root = {'Q' => 1, 'C' => 2, 'A' => 3}
+
       if params[:search_string]
-        if params[:searchnode] == 'Q'
-          session[:root] = 1
-        elsif params[:searchnode] == 'C'
-          session[:root] = 2
-        elsif params[:searchnode] == 'A'
-        session[:root] = 3
-        end
-        $search = params[:search_string]
+        search_node = params[:searchnode]
+        session[:root] = search_node_root[search_node]
+        search_string = params[:search_string]
       else
-        $search = nil
-      end
+        search_string = nil
+    end
+    else
+      search_string = nil
     end
 
-    if params[:commit] == 'Filter'
-      filter
-    end
+    search_string = filter if params[:commit] == 'Filter'
+    search_string = nil if params[:commit] == 'Reset'
 
-    if params[:commit] == 'Reset'
-       $search = nil
-    end
+    @search = search_string
 
-    @search = $search
-
-    display = params[:display] || session[:display]
+    display = params[:display] #|| session[:display]
     if display
       @sortvar = display[:sortvar]
       @sortorder = display[:sortorder]
-      if display[:check] == "1"
-        @show = nil
-      else
-        @show = true
-      end
+      @show = (display[:check] == '1') ? nil : true
     else
       @show = true
     end
@@ -121,6 +111,8 @@ class TreeDisplayController < ApplicationController
     else
       @child_nodes = FolderNode.get()
     end
+
+    puts "list end #{@sortorder}"
   end
 
   def drill
@@ -128,36 +120,25 @@ class TreeDisplayController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
-
   def filter
-
     search = params[:filter_string]
-    filternode = params[:filternode]
-    qid = String.new("filter+")
+    filter_node = params[:filternode]
+    qid = 'filter+'
 
-    if filternode == 'QAN'
+    if filter_node == 'QAN'
       assignment = Assignment.find_by_name(search)
       if assignment
-        assignmentid = assignment.id
-
-        assignquest = AssignmentQuestionnaire.find_all_by_assignment_id(assignmentid)
-        if assignquest
-           for n in assignquest  do
-             qid << n.questionnaire_id.to_s + "+"
-           end
+        assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(assignment.id)
+        if assignment_questionnaires
+          assignment_questionnaires.each { |q|  qid << "#{q.questionnaire_id.to_s}+" }
         session[:root] = 1
         end
       end
-    elsif filternode == 'ACN'
+    elsif filter_node == 'ACN'
       session[:root] = 2
       qid <<  search
     end
-
-
-  $search = qid
-
-
+    return qid
   end
-
 
 end

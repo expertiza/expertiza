@@ -192,6 +192,7 @@ GEM
       rdoc (~> 3.4)
       thor (~> 0.14.4)
     rake (10.1.0)
+    raspell (1.3)
     rb-fsevent (0.9.3)
     rb-inotify (0.9.0)
       ffi (>= 0.5.0)
@@ -233,6 +234,10 @@ GEM
     shoulda-context (1.1.5)
     shoulda-matchers (2.4.0)
       activesupport (>= 3.0.0)
+    simplecov (0.7.1)
+      multi_json (~> 1.0)
+      simplecov-html (~> 0.7.1)
+    simplecov-html (0.7.1)
     slop (3.4.5)
     sprockets (2.10.0)
       hike (~> 1.2)
@@ -267,7 +272,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth
-  automated_metareview (= 0.0.2)
+  automated_metareview
   bind-it
   capistrano
   capybara
@@ -297,6 +302,7 @@ DEPENDENCIES
   paper_trail
   rails (~> 3.0.0)
   rake
+  raspell
   rgl
   rinku (~> 1.2.2)
   rjb
@@ -306,6 +312,7 @@ DEPENDENCIES
   seer
   selenium-webdriver
   shoulda
+  simplecov
   sprockets
   sqlite3-ruby
   stanford-core-nlp

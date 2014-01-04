@@ -69,7 +69,7 @@ class Score < ActiveRecord::Base
     if @questionnaire.section == "Custom"
       @questions.each {
           |question|
-        item = Score.find_by_response_id_and_question_id(@response.response_id, question.id)
+        item = Score.find_by_response_id_and_question_id(@response.id, question.id)
         if @q_types.length <= x
           @q_types[x] = QuestionType.find_by_question_id(question.id)
         end

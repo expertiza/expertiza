@@ -104,8 +104,6 @@ Expertiza::Application.routes.draw do |map|
   resources :export_file do
     collection do
       get :start
-      # OSS808 Change 27/10/2013
-      # Added missing routes
       get :export
       post :export
     end
@@ -116,7 +114,7 @@ Expertiza::Application.routes.draw do |map|
       get :view
       get :view_my_scores
       get :instructor_review
-      get :remove_hyperlink
+      post :remove_hyperlink
       get :conflict_notification
     end
   end
@@ -134,6 +132,8 @@ Expertiza::Application.routes.draw do |map|
       get :import
     end
   end
+
+  match '/import_file/import', controller: :import_file, action: :import
 
   resources :institutions
 
@@ -185,6 +185,8 @@ Expertiza::Application.routes.draw do |map|
       get :bequeath_all
     end
   end
+
+  match '/participants/change_handle', controller: :participants, action: :change_handle
 
   resources :password_retrieval do
     collection do
@@ -242,6 +244,7 @@ Expertiza::Application.routes.draw do |map|
   resources :bookmarkrating_questionnaires, controller: :questionnaires
 
 
+
   resources :response do
     collection do
       get :new_feedback
@@ -255,6 +258,7 @@ Expertiza::Application.routes.draw do |map|
 
   resources :review_mapping do
     collection do
+      post :add_metareviewer
       get :add_reviewer
       post :add_reviewer
       post :add_self_reviewer
@@ -267,6 +271,7 @@ Expertiza::Application.routes.draw do |map|
       get :delete_all_metareviewers
       get :delete_all_reviewers
       get :delete_all_reviewers_and_metareviewers
+      get :delete_metareviewer
       get :delete_reviewer
       get :distribution
       get :list_mappings
@@ -299,6 +304,8 @@ Expertiza::Application.routes.draw do |map|
 
   resources :sign_up_sheet do
     collection do
+      get :signup
+      get :delete_signup
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :delete_signup
@@ -306,10 +313,9 @@ Expertiza::Application.routes.draw do |map|
       get :list
       get :signup_topics
       get :signup
-      get :view_publishing_rights
-      get :signup
-      get :delete_signup
+      get :sign_up
       get :team_details
+      get :view_publishing_rights
     end
   end
 
@@ -359,6 +365,8 @@ Expertiza::Application.routes.draw do |map|
       get :remove_hyperlink
       get :submit_file
       post :submit_hyperlink
+      get :submit_hyperlink
+      get :remove_hyperlink
       get :view
     end
   end
@@ -418,8 +426,11 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  match '/users/show_selection', controller: :users, action: :show_selection
+  match '/users/list', controller: :users, action: :list
   match '/menu/*name', controller: :menu_items, action: :link
   match ':page_name', controller: :content_pages, action: :view, method: :get
+  match '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
 
   root to: 'content_pages#view', page_name: 'home'
 

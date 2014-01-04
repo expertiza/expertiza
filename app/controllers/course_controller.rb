@@ -8,17 +8,12 @@
 class CourseController < ApplicationController
   auto_complete_for :user, :name
   require 'fileutils'
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
   def action_allowed?
     if current_user.role.name.eql?("Instructor")
       true
     end
   end
-
-#our changes end E913
 
   def auto_complete_for_user_name
     search = params[:user][:name].to_s

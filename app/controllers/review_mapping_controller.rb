@@ -3,9 +3,6 @@ class ReviewMappingController < ApplicationController
   use_google_charts
   helper :dynamic_review_assignment
   helper :submitted_content
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
   def action_allowed?
     if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
@@ -20,7 +17,6 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-#our changes end E913
 
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"

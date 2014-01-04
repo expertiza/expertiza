@@ -4,9 +4,6 @@ class UsersController < ApplicationController
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :list }
 
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
   def action_allowed?
     if current_user.role.name.eql?('Super-Administrator') ||current_user.role.name.eql?('Administrator') || current_user.role.name.eql?('Instructor') || current_user.role.name.eql?('Teaching_Assistant')
@@ -17,7 +14,6 @@ class UsersController < ApplicationController
     end
   end
 
-#our changes end E913
 
 
   def index

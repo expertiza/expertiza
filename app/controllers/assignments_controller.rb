@@ -1,17 +1,12 @@
 class AssignmentsController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
  def action_allowed?
    if current_user.role.name.eql?("Super-Administrator") || current_user.role.name.eql?("Administrator") || current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching Assistant")
     true
    end
  end
-
-  #our changes end E913
 
   # change access permission from public to private or vice versa
   def toggle_access

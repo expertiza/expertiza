@@ -1,15 +1,11 @@
 class LeaderboardController < ApplicationController
 
   before_filter :authorize
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
   def action_allowed?
     true
   end
 
-  #our changes end E913
 
   # Our logic for the overall leaderboard. This method provides the data for
   # the Top 3 leaderboards and the Personal Achievement leaderboards.

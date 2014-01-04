@@ -1,7 +1,4 @@
 class StatisticsController < ApplicationController
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
   def action_allowed?
     if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
@@ -9,7 +6,6 @@ class StatisticsController < ApplicationController
     end
   end
 
-#our changes end E913
   def list_surveys 
     @surveys = SurveyQuestionnaire.all
   end

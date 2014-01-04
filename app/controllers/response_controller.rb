@@ -2,9 +2,6 @@ class ResponseController < ApplicationController
   helper :wiki
   helper :submitted_content
   helper :file
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
   def action_allowed?
     if !current_user.nil?
@@ -12,7 +9,6 @@ class ResponseController < ApplicationController
     end
   end
 
-#our changes end E913
   def latestResponseVersion
     #get all previous versions of responses for the response map.
     array_not_empty=0

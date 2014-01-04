@@ -1,18 +1,10 @@
 class ExportFileController < ApplicationController
-  # OSS808 Change 28/10/2013
-  # FasterCSV replaced now by CSV which is present by default in Ruby
-  #require 'fastercsv'
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
-
   def action_allowed?
     if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator") || current_user.role.name.eql?("Super-Administrator")
       true
     end
   end
 
-#our changes end E913
   def start
     @model = params[:model]
     if(@model == 'Assignment')

@@ -10,7 +10,7 @@ class ReviewMappingController < ApplicationController
       true
     else
       ['Instructor',
-       'Teaching-Assistant',
+       'Teaching Assistant',
        'Administrator'].include? current_role_name
     end
   end

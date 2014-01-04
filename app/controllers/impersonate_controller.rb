@@ -1,9 +1,9 @@
 class ImpersonateController < ApplicationController
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator',
-     'Super-Administrator'].include? current_role_name
+    case params[:action]
+    when 'impersonate'
+      true
+    end
   end
 
   def auto_complete_for_user_name

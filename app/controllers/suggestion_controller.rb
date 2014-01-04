@@ -1,12 +1,14 @@
 class SuggestionController < ApplicationController
 
   def action_allowed?
-    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator") || current_user.role.name.eql?("Super-Administrator")
-      true
-    else if (action_name=='create' ||action_name == 'new') && current_user.role.name.eql?("Student")
-           true
-         end
-
+    case params[:action]
+    when 'create', 'new'
+      current_role_name.eql? 'Student'
+    else
+      ['Instructor',
+       'Teaching-Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 

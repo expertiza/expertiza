@@ -15,11 +15,13 @@ class SignUpSheetController < ApplicationController
   require 'rgl/topsort'
 
   def action_allowed?
-    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
-      true
-    else if (action_name =='signup_topics'|| action_name =='signup' || action_name =='delete_signup') && current_user.role.name.eql?("Student")
-           true
-        end
+    case params[:action]
+    when 'signup_topics', 'signup', 'delete_signup'
+      current_role_name.eql? 'Student'
+    else
+      ['Instructor',
+       'Teaching-Assistant',
+       'Administrator'].include? current_role_name
     end
   end
 

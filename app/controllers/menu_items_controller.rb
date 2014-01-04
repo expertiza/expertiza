@@ -4,9 +4,10 @@ class MenuItemsController < ApplicationController
 
 
   def action_allowed?
-      if action_name=='link' || current_user.role.name.eql?("Super-Administrator")
-        true
-      end
+    case params[:action]
+    when 'link'
+      current_role_name.eql? 'Super-Administrator'
+    end
   end
 
   def index

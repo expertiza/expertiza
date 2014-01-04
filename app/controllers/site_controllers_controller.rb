@@ -1,9 +1,7 @@
 class SiteControllersController < ApplicationController
 
   def action_allowed?
-    if current_user.role.name.eql?("Super-Administrator")
-      true
-    end
+    current_role_name.eql?("Super-Administrator")
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)

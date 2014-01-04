@@ -1,6 +1,10 @@
 class TreeDisplayController < ApplicationController
   helper :application
 
+  def action_allowed?
+    true
+  end
+
   # direct access to questionnaires
   def goto_questionnaires
     node_object = TreeFolder.find_by_name('Questionnaires')

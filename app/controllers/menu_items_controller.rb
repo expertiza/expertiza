@@ -6,7 +6,7 @@ class MenuItemsController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'link'
-      current_role_name.eql? 'Super-Administrator'
+      true
     end
   end
 

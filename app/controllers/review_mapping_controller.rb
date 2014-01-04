@@ -5,15 +5,13 @@ class ReviewMappingController < ApplicationController
   helper :submitted_content
 
   def action_allowed?
-    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
+    case params[:action]
+    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically'
       true
-    else if current_user.role.name.eql?('Student')
-           if action_name == 'add_dynamic_reviewer' || action_name =='release_reservation' || action_name == 'show_available_submissions' || action_name  == 'assign_reviewer_dynamically' || action_name  == 'assign_metareviewer_dynamically'
-              true
-           else
-             false
-           end
-         end
+    else
+      ['Instructor',
+       'Teaching-Assistant',
+       'Administrator'].include? current_role_name
     end
   end
 

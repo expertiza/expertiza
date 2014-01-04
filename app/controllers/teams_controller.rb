@@ -3,9 +3,9 @@ class TeamController < ApplicationController
 
 
   def action_allowed?
-    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
-      true
-    end
+    ['Instructor',
+     'Teaching-Assistant',
+     'Administrator'].include? current_role_name
   end
 
   def create_teams_view

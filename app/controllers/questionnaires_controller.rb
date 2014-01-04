@@ -7,9 +7,9 @@ class QuestionnairesController < ApplicationController
   before_filter :authorize
 
   def action_allowed?
-    if current_user.role.name.eql?("Administrator") || current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching Assistant")
-      true
-    end
+    ['Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_role_name
   end
 
   # Create a clone of the given questionnaire, copying all associated

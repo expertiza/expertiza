@@ -6,11 +6,14 @@ class UsersController < ApplicationController
 
 
   def action_allowed?
-    if current_user.role.name.eql?('Super-Administrator') ||current_user.role.name.eql?('Administrator') || current_user.role.name.eql?('Instructor') || current_user.role.name.eql?('Teaching_Assistant')
-      true
-    else if action_name.eql?('keys') && current_user.role.name.eql?('Student')
-           true
-    end
+    case params[:action]
+    when 'keys'
+      current_role_name.eql? 'Student'
+    else
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
     end
   end
 

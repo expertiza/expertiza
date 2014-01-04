@@ -4,9 +4,7 @@ class ResponseController < ApplicationController
   helper :file
 
   def action_allowed?
-    if !current_user.nil?
-      true
-    end
+    current_user
   end
 
   def latestResponseVersion

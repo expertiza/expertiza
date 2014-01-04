@@ -2,9 +2,7 @@ class StudentTeamController < ApplicationController
   auto_complete_for :user, :name
 
   def action_allowed?
-    if current_user.role.name.eql?("Student")
-      true
-    end
+    current_role_name.eql?("Student")
   end
 
   def view

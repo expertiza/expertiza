@@ -1,8 +1,8 @@
 class AdviceController < ApplicationController
   def action_allowed?
-    if current_user.role.name.eql?("Administrator") || current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching Assistant")
-      true
-    end
+    ['Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_user.role.name
   end
 
   # Modify the advice associated with a questionnaire

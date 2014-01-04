@@ -13,6 +13,10 @@ class ApplicationController < ActionController::Base
     current_user.role.name
   end
 
+  def current_role_name
+    current_user.role.name
+  end
+
   helper_method :current_user_role?
 
   def user_for_paper_trail

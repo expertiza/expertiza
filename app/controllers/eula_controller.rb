@@ -1,8 +1,6 @@
 class EulaController < ApplicationController
   def action_allowed?
-    if current_user.role.name.eql?("Student")
-      true
-    end
+    current_role_name.eql?("Student")
   end
 
   def display

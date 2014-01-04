@@ -3,9 +3,10 @@ class AssignmentsController < ApplicationController
   before_filter :authorize
 
  def action_allowed?
-   if current_user.role.name.eql?("Super-Administrator") || current_user.role.name.eql?("Administrator") || current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching Assistant")
-    true
-   end
+   ['Super-Administrator',
+    'Administrator',
+    'Instructor',
+    'Teaching Assistant'].include? current_role_name
  end
 
   # change access permission from public to private or vice versa

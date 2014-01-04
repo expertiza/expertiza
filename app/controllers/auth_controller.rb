@@ -6,8 +6,11 @@ class AuthController < ApplicationController
     :redirect_to => { :action => :list }
 
   def action_allowed?
-    if action_name == 'login' ||action_name == 'logout' ||action_name == 'login_failed' || current_user.role.name.eql?("Super-Administrator")
+    case params[:action]
+    when 'login', 'logout', 'login_failed'
       true
+    else
+      current_role_name.eql?("Super-Administrator")
     end
   end
 

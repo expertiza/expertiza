@@ -4,11 +4,13 @@ class GradesController < ApplicationController
   helper :submitted_content
 
   def action_allowed?
-    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
-      true
-      else if action_name =='view_my_scores' && current_user.role.name.eql?("Student")
-             return true
-           end
+    case params[:action]
+    when 'view_my_scores'
+      current_role_name.eql? 'Student'
+    else
+      ['Instructor',
+       'Teaching-Assistant',
+       'Administrator'].include? current_role_name
     end
   end
 

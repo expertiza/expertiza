@@ -1,8 +1,9 @@
 class ImpersonateController < ApplicationController
   def action_allowed?
-    if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")|| current_user.role.name.eql?("Super-Administrator")
-      true
-    end
+    ['Instructor',
+     'Teaching-Assistant',
+     'Administrator',
+     'Super-Administrator'].include? current_role_name
   end
 
   def auto_complete_for_user_name

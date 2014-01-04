@@ -269,6 +269,7 @@ class SignUpSheetController < ApplicationController
     SignUpTopic.remove_team(users_team, @assignment_id)
 
   end
+  end
 
 
   #this function is used to delete a previous signup

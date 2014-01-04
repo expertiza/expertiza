@@ -5,7 +5,6 @@ class CollusionCycle
   # Each edge of the cycle stores a participant and the score given by to the participant by the reviewer.
   # Consider a 3 node cycle: A --> B --> C --> A (A reviewed B; B reviewed C and C reviewed A)
   # For the above cycle, the data structure would be: [[A, SCA], [B, SAB], [C, SCB]], where SCA is the score given by C to A.
-  belongs_to :assignment_participant
 
   def two_node_cycles
     collusion_cycles = []

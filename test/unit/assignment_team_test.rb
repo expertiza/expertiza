@@ -4,7 +4,7 @@ require 'assignment_team'
 require 'test_helper'
 
 class AssignmentParticipantTest < ActiveSupport::TestCase
-  fixtures :assignments, :users, :roles, :participants , :questionnaires, :assignments , :courses, :teams  , :join_team_requests
+  fixtures :assignments, :users, :roles, :participants , :questionnaires, :assignments , :course, :teams  , :join_team_requests
 
   def test_new_add_team
     team = Team.new

@@ -10,7 +10,7 @@ class CourseController; def rescue_action(e) raise e end; end
 
 class CourseControllerTest < ActionController::TestCase
   fixtures :users
-  fixtures :courses, :roles, :tree_folders
+  fixtures :course, :roles, :tree_folders
   fixtures :system_settings, :permissions, :roles_permissions
   fixtures :content_pages, :controller_actions, :site_controllers, :menu_items
    
@@ -64,7 +64,7 @@ class CourseControllerTest < ActionController::TestCase
   def test_update
     post :create, :course => {:name => 'Built Course', :info => 'Blah', :directory_path => 'abc321'}
     assert_equal 'Blah', Course.find_by_name('Built Course').info
-    post :update, :id => Course.find_by_name('Built Course').id, :course => {:info => 'Blah Blah'}    
+    post :update, :id => Course.find_by_name('Built Course').id, :course => {:info => 'Blah Blah'}
     assert_equal 'Blah Blah', Course.find_by_name('Built Course').info
     # What we really want to test is to see if we got where get_home_controller says we should've gotten, but we are cheating for now
     #assert_redirected_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])      

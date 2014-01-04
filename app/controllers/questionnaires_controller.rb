@@ -22,6 +22,51 @@ class QuestionnairesController < ApplicationController
     @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
     clone_questionnaire_details(questions)
+    if (session[:user]).role.name != "Teaching Assistant"
+      @questionnaire.instructor_id = session[:user].id
+    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+    end
+    @questionnaire.name = 'Copy of '+orig_questionnaire.name
+
+    begin
+
+      @questionnaire.created_at = Time.now
+      @questionnaire.save!
+
+      questions.each{ | question |
+
+        newquestion = question.clone
+        newquestion.questionnaire_id = @questionnaire.id
+        newquestion.save        
+        
+        advice = QuestionAdvice.find_by_question_id(question.id)
+        if !(advice.nil?)
+          newadvice = advice.clone
+          newadvice.question_id = newquestion.id
+          newadvice.save
+        end
+
+        if (@questionnaire.section == "Custom")
+          old_question_type = QuestionType.find_by_question_id(question.id)
+          if !(old_question_type.nil?)
+            new_question_type = old_question_type.clone
+            new_question_type.question_id = newquestion.id
+            new_question_type.save
+          end
+        end
+      }
+      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
+      parent = FolderNode.find_by_node_object_id(pFolder.id)
+      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
+        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+      end
+      undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
+      redirect_to :back
+    rescue
+      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!      
+      redirect_to :action => 'list', :controller => 'tree_display'
+    end            
   end
 
   # Remove a given questionnaire
@@ -38,8 +83,12 @@ class QuestionnairesController < ApplicationController
               current_q_type.delete
             end
           end
-          @questionnaire.delete
-          flash[:note] = "Questionnaire <B>#{name}</B> was deleted."
+          @questionnaire.assignments.each{
+              | assignment |
+            raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+          }
+          @questionnaire.destroy
+          undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")
       rescue
           flash[:error] = $!
       end
@@ -63,6 +112,7 @@ class QuestionnairesController < ApplicationController
 
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
+      redirect_to :action => 'view',:id => @questionnaire
     end
 
     export if params['export']
@@ -136,10 +186,11 @@ class QuestionnairesController < ApplicationController
 
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
-    questionnaire = Questionnaire.find(params[:id])
-    questionnaire.private = !questionnaire.private
-    questionnaire.save
-
+    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire.private = !@questionnaire.private
+    @questionnaire.save
+    @access = @questionnaire.private == true ? "private" : "public"
+    undo_link("Questionnaire \"#{@questionnaire.name}\" has been made #{@access} successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -155,6 +206,7 @@ private
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
       end
+      undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
     rescue
       flash[:error] = $!
     end
@@ -201,6 +253,7 @@ private
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
     questions = Question.find(:all, :conditions => "questionnaire_id = " + questionnaire_id.to_s)
+    @deleted_questions = []
     for question in questions
       should_delete = true
       if params[:question] != nil
@@ -218,6 +271,8 @@ private
           question_type = QuestionType.find_by_question_id(question.id)
           question_type.destroy
         end
+        # keep track of the deleted questions
+        @deleted_questions.push(question)
         question.destroy
       end
     end
@@ -302,9 +357,17 @@ private
 
   # clones the contents of a questionnaire, including the questions and associated advice
   def clone_questionnaire_details(questions)
+    if (session[:user]).role.name != "Teaching Assistant"
+      @questionnaire.instructor_id = session[:user].id
+    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+    end
+
+    @questionnaire.name = 'Copy of '+orig_questionnaire.name
+
     begin
+      @questionnaire.created_at = Time.now
       @questionnaire.save!
-      @questionnaire.update_attribute('created_at', Time.now)
 
       questions.each do |question|
         newquestion = question.clone
@@ -312,7 +375,8 @@ private
         newquestion.save
 
         advice = QuestionAdvice.find_by_question_id(question.id)
-        unless advice.nil?
+
+        if advice
           newadvice = advice.clone
           newadvice.question_id = newquestion.id
           newadvice.save
@@ -330,11 +394,16 @@ private
 
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
+
       if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id, @questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
       end
+
+      undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :controller => 'questionnaire', :action => 'view', :id => @questionnaire.id
+
     rescue
+
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
       redirect_to :action => 'list', :controller => 'tree_display'
     end

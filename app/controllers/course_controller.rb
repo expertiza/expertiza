@@ -33,10 +33,10 @@ class CourseController < ApplicationController
   end
 
   def update
-    course = Course.find(params[:id])
-    if params[:course][:directory_path] and course.directory_path != params[:course][:directory_path]
+    @course = Course.find(params[:id])
+    if params[:course][:directory_path] and @course.directory_path != params[:course][:directory_path]
       begin
-        FileHelper.delete_directory(course)
+        FileHelper.delete_directory(@course)
       rescue
         flash[:error] = $!
       end
@@ -47,7 +47,8 @@ class CourseController < ApplicationController
         flash[:error] = $!
       end
     end
-    course.update_attributes(params[:course])
+    @course.update_attributes(params[:course])
+    undo_link("Course \"#{@course.name}\" has been updated successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -65,8 +66,9 @@ class CourseController < ApplicationController
         CourseNode.create(:node_object_id => new_course.id)
       end
 
-      flash[:note] = 'The course is currently associated with an existing location. This could cause errors for furture submissions.'
+      undo_link("Course \"#{orig_course.name}\" has been copied successfully. The copy is currently associated with an existing location from the original course. This could cause errors for future submissions and it is recommended that the copy be edited as needed. ")
       redirect_to :controller => 'course', :action => 'edit', :id => new_course.id
+
     rescue
       flash[:error] = 'The course was not able to be copied: '+$!
       redirect_to :controller => 'tree_display', :action => 'list'
@@ -75,50 +77,55 @@ class CourseController < ApplicationController
 
   # create a course
   def create
-    course = Course.new(params[:course])
+    @course = Course.new(params[:course])
 
-    course.instructor_id = session[:user].id
+    @course.instructor_id = session[:user].id
     begin
-      course.save!
+      @course.save!
       parent_id = CourseNode.get_parent_id
       if parent_id
-        CourseNode.create(:node_object_id => course.id, :parent_id => parent_id)
+        CourseNode.create(:node_object_id => @course.id, :parent_id => parent_id)
       else
-        CourseNode.create(:node_object_id => course.id)
+        CourseNode.create(:node_object_id => @course.id)
       end
-      FileHelper.create_directory(course)
+      FileHelper.create_directory(@course)
+      undo_link("Course \"#{@course.name}\" has been created successfully. ")
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
-      flash[:error] = "The following error occurred while saving the course: "+$!
+      flash[:error] = $! #"The following error occurred while saving the course: #"+
       redirect_to :action => 'new'
     end
   end
 
   # delete the course
   def delete
-    course = Course.find(params[:id])
+    @course = Course.find(params[:id])
     begin
-      FileHelper.delete_directory(course)
+      FileHelper.delete_directory(@course)
     rescue
       flash[:error] = $!
     end
-    CourseNode.find_by_node_object_id(course.id).destroy
-    course.ta_mappings.each{
-      | map |
-      map.destroy
-    }
-    course.destroy
+
+    # already taken care of in association declaration
+    #@course.ta_mappings.each{
+    #  | map |
+    #  map.destroy
+    #}
+    @course.destroy
+    undo_link("Course \"#{@course.name}\" has been deleted successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
   def toggle_access
-    course = Course.find(params[:id])
-    course.private = !course.private
+    @course = Course.find(params[:id])
+    @course.private = !@course.private
     begin
-      course.save!
+      @course.save!
     rescue
       flash[:error] = $!
     end
+    @access = @course.private == true ? "private" : "public"
+    undo_link("Course \"#{@course.name}\" has been made #{@access} successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -137,14 +144,28 @@ class CourseController < ApplicationController
       redirect_to :action => 'view_teaching_assistants', :id => @course.id
     else
       @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
+
       redirect_to :action => 'view_teaching_assistants', :id => @course.id
+
+      @course = @ta_mapping
+      undo_link("TA \"#{@user.name}\" has been added successfully. ")
     end
   end
 
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
+    @ta = User.find(@ta_mapping.ta_id)
     @ta_mapping.destroy
+
+    @course = @ta_mapping
+    undo_link("TA \"#{@ta.name}\" has been removed successfully. ")
+
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end
+
+# generate the undo link
+  #def undo_link
+  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
+  #end
 
 end

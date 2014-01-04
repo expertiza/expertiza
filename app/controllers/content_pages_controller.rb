@@ -5,12 +5,12 @@ class ContentPagesController < ApplicationController
          :redirect_to => { :action => :list }
 
   def action_allowed?
-    if  action_name == 'view' || action_name == 'view_default'
+    case params[:action]
+    when 'view', 'view_default'
       true
-    else if current_user.role.name.eql?("Super-Administrator")
-      true
+    else
+      current_role_name.eql?('Super-Administrator')
     end
-end
   end
 
   def index

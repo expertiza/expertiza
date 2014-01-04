@@ -1,8 +1,6 @@
 class InstitutionsController < ApplicationController
   def action_allowed?
-    if current_user.role.name.eql?("Super-Administrator")
-      true
-    end
+    current_role_name.eql?("Super-Administrator")
   end
 
   def index

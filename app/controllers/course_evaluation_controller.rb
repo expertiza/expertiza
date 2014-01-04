@@ -1,8 +1,6 @@
 class CourseEvaluationController < ApplicationController
   def action_allowed?
-    if current_user.role.name.eql?("Student")
-      true
-    end
+    current_role_name.eql?("Student")
   end
 
   def list #list course evaluations for a user

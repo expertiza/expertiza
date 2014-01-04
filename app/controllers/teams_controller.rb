@@ -4,7 +4,7 @@ class TeamController < ApplicationController
 
   def action_allowed?
     ['Instructor',
-     'Teaching-Assistant',
+     'Teaching Assistant',
      'Administrator'].include? current_role_name
   end
 

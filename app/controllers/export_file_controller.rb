@@ -1,7 +1,7 @@
 class ExportFileController < ApplicationController
   def action_allowed?
     ['Instructor',
-     'Teaching-Assistant',
+     'Teaching Assistant',
      'Administrator',
      'Super-Administrator'].include? current_role_name
   end

@@ -6,7 +6,7 @@ class SuggestionController < ApplicationController
       current_role_name.eql? 'Student'
     else
       ['Instructor',
-       'Teaching-Assistant',
+       'Teaching Assistant',
        'Administrator',
        'Super-Administrator'].include? current_role_name
     end

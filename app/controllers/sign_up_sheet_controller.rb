@@ -20,7 +20,7 @@ class SignUpSheetController < ApplicationController
       current_role_name.eql? 'Student'
     else
       ['Instructor',
-       'Teaching-Assistant',
+       'Teaching Assistant',
        'Administrator'].include? current_role_name
     end
   end

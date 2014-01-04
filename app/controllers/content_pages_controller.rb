@@ -3,9 +3,6 @@ class ContentPagesController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :list }
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
   def action_allowed?
     if  action_name == 'view' || action_name == 'view_default'
@@ -16,7 +13,6 @@ class ContentPagesController < ApplicationController
 end
   end
 
-  #our changes end E913
   def index
     list
     render :action => 'list'

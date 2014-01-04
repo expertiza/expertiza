@@ -1,8 +1,5 @@
 class StudentTeamController < ApplicationController
   auto_complete_for :user, :name
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
   def action_allowed?
     if current_user.role.name.eql?("Student")
@@ -10,7 +7,6 @@ class StudentTeamController < ApplicationController
     end
   end
 
-#our changes end E913
   def view
     @student = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@student.user_id)

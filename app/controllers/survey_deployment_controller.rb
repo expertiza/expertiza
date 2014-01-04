@@ -1,8 +1,5 @@
 
 class SurveyDeploymentController < ApplicationController
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
   def action_allowed?
     if current_user.role.name.eql?("Instructor") || current_user.role.name.eql?("Teaching-Assistant") || current_user.role.name.eql?("Administrator")
@@ -10,7 +7,6 @@ class SurveyDeploymentController < ApplicationController
     end
   end
 
-#our changes end E913
   def new 
     @surveys=Questionnaire.find_all_by_type('CourseEvaluationQuestionnaire').map{|u| [u.name, u.id] }
     @course = Course.find_all_by_instructor_id(session[:user].id).map{|u| [u.name, u.id] }

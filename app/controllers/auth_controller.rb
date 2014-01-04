@@ -1,13 +1,9 @@
 class AuthController < ApplicationController
   helper :auth
-  before_filter :authorize, :except => :login
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :login, :logout ],
     :redirect_to => { :action => :list }
-  #added the below lines E913
-  include AccessHelper
-  before_filter :auth_check
 
   def action_allowed?
     if action_name == 'login' ||action_name == 'logout' ||action_name == 'login_failed' || current_user.role.name.eql?("Super-Administrator")
@@ -15,7 +11,6 @@ class AuthController < ApplicationController
     end
   end
 
-  #our changes end E913
   def login
     if request.get?
       AuthController.clear_session(session)

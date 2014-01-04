@@ -5,7 +5,7 @@ raise "Invalid ruby version: #{RUBY_VERSION}" unless RUBY_VERSION[/^1\.9\.3/]
 gem 'rails', '~>3.0.0'
 
 ## Gems in Alphabetical Order
-gem 'rinku', '~> 1.2.2', :require => 'rails_rinku'
+gem 'automated_metareview'
 gem 'bind-it'
 gem 'capistrano'
 gem 'delayed_job_active_record'
@@ -24,6 +24,8 @@ gem 'nokogiri'
 gem 'open-uri-cached'
 gem 'paper_trail'
 gem 'rake'
+gem 'raspell'
+gem 'rinku', '~> 1.2.2', :require => 'rails_rinku'
 gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rjb'
@@ -35,7 +37,6 @@ gem 'stanford-core-nlp'
 gem 'superfish-rails'
 
 gem 'will_paginate'
-gem 'automated_metareview' , '0.0.2'
 
 group :development do
   gem 'daemons'
@@ -60,4 +61,5 @@ end
 group :development, :test do
   gem 'capybara'
   gem 'rspec-rails'
+  gem 'simplecov', :require => false, :group => :test
 end

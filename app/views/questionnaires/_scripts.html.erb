@@ -5,7 +5,7 @@ var aMail = new Array();
 <% for que in questionnaires %>
 <% all_questions = Question.find_all_by_questionnaire_id(que.id).map {|n| n.txt} %>
 <% for q in all_questions %>
-aMail.push(<%= q.to_json %>);
+aMail.push(<%= q.to_json.html_safe %>);
 <% end %>
 <% end %>
 aMail.sort();
@@ -57,7 +57,7 @@ function addQuestion(in_str, parameter_str, type_str){
         gradingTypes = "<select id=question_" + id + "_true_false name=question_type["+id+"][type]>"
 
     <% for type in Question::GRADING_TYPES_CUSTOM %>
-    <%= "gradingTypes += '<option value=" + type[0].to_s + ">" + type[0].to_s + "</option>';"%>
+      gradingTypes += '<option value=' + '<%= type[0].to_s %>' + '>' + '<%= type[0].to_s %>' + '</option>';
 
     <% end %>
         //gradingTypes += "<option selected=selected value="+type_str+">"+type_str+"</option>";
@@ -65,7 +65,7 @@ function addQuestion(in_str, parameter_str, type_str){
     }else{
         gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
     <% for type in Question::GRADING_TYPES %>
-    <%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
+        <%= ("gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';").html_safe %>
     <% end %>
     }
     gradingTypes += "</select>"
@@ -81,7 +81,7 @@ function addQuestion(in_str, parameter_str, type_str){
     column = document.createElement("td");
     weights = "<select id=new_question_" + id + "_weight name=new_question[" + id +"][weight]>";
 <% for weight in Question::WEIGHTS %>
-<%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+<%= ("weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';").html_safe %>
 <% end %>
     weights = weights + "</select>";
     column.innerHTML = weights;

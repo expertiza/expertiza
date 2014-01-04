@@ -1,4 +1,5 @@
 class GradesController < ApplicationController
+  use_google_charts
   helper :file
   helper :submitted_content
 
@@ -11,26 +12,47 @@ class GradesController < ApplicationController
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
-        |questionnaire|
+            |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
     @scores = @assignment.scores(@questions)
   end
 
   def view_my_scores
+
     @participant = AssignmentParticipant.find(params[:id])
+
+    @average_score_results = Array.new
+    @average_score_results = ScoreCache.get_class_scores(@participant.id)
+
+    @statistics = Array.new
+    @average_score_results.each { |x|
+      @statistics << x
+    }
+
+    puts "Participant id"
+    puts @participant.id
+    @average_reviews = ScoreCache.get_reviews_average(@participant.id)
+    @average_metareviews = ScoreCache.get_metareviews_average(@participant.id)
+
+    @my_reviews = ScoreCache.my_reviews(@participant.id)
+
+    puts "My Reviews are"
+    puts @my_reviews
+
+    @my_metareviews = ScoreCache.my_metareviews(@participant.id)
+
     return if redirect_when_disallowed
     @assignment = @participant.assignment
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
-        |questionnaire|
+      |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-
     ## When user clicks on the notification, it should go away
     #deleting all review notifications
-    rmaps = @participant.response_maps
+    rmaps = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(@participant.id, @participant.assignment.id)
     for rmap in rmaps
       rmap.notification_accepted = true
       rmap.save
@@ -40,7 +62,7 @@ class GradesController < ApplicationController
     #deleting all metareview notifications
     rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
     for rmap in rmaps
-      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.map_id)
+      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.id)
       if !mmaps.nil?
         for mmap in mmaps
           mmap.notification_accepted = true
@@ -48,15 +70,49 @@ class GradesController < ApplicationController
         end
       end
     end
-  end
+    @pscore = @participant.scores @questions
 
+    @assignment_id = @participant.parent_id
+    @score_cache = Array.new
+
+    assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
+
+    @scores = [0,0,0,0,0,0,0,0,0,0]
+
+    for ap in assignment_participants
+      sc_cache=  ScoreCache.find_by_reviewee_id(ap.id)
+      if(sc_cache)
+        @score_cache <<  sc_cache.score
+      end
+    end
+
+
+    #  for x in score_cache
+    @score_cache.each{|x|
+      index=(x/10).to_i
+      if(index>=10)
+        index=9
+      end
+      @scores[index] =  @scores[index] + 1
+    }
+
+
+
+    dataset = GoogleChartDataset.new :data => @scores, :color => '9A0000'
+    data = GoogleChartData.new :datasets => [dataset]
+    axis = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
+    @chart1 = GoogleBarChart.new :width => 500, :height => 200
+    @chart1.data = data
+    @chart1.axis = axis
+  end
+    
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
-        |questionnaire|
+            |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 
@@ -71,20 +127,16 @@ class GradesController < ApplicationController
       reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
       reviewer.set_handle()
     end
-
-    review_exists = true
-
-    reviewee = participant.team
-    review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+      reviewee = participant.team
+      review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
 
     if review_mapping.nil?
-      review_exists = false
-      review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+        review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
     end
-    review = Response.find_by_map_id(review_mapping.map_id)
+    review = Response.find_by_map_id(review_mapping.id)
 
-    unless review_exists
-      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.map_id, :return => "instructor"
+    if review.nil?
+      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.id, :return => "instructor"
     else
       redirect_to :controller => 'response', :action => 'edit', :id => review.id, :return => "instructor"
     end
@@ -106,14 +158,14 @@ class GradesController < ApplicationController
     body_text["##[assignment_name]"] = assignment.name
 
     Mailer.deliver_message(
-        {:recipients => email_form[:recipients],
-         :subject => email_form[:subject],
-         :from => email_form[:from],
-         :body => {
-             :body_text => body_text,
-             :partial_name => "grading_conflict"
-         }
-        }
+            {:recipients => email_form[:recipients],
+             :subject => email_form[:subject],
+             :from => email_form[:from],
+             :body => {
+                     :body_text => body_text,
+                     :partial_name => "grading_conflict"
+             }
+            }
     )
 
     flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
@@ -137,7 +189,7 @@ class GradesController < ApplicationController
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
-        |questionnaire|
+            |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 
@@ -182,18 +234,18 @@ class GradesController < ApplicationController
   end
 
   private
-
+  
   def process_response(collabel, rowlabel, responses, questionnaire_type)
     @collabel = collabel
     @rowlabel = rowlabel
     @reviews = responses
     @reviews.each {
-        |response|
+            |response|
       user = response.map.reviewer.user
       @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
     }
     @reviews.sort! { |a, b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname }
-    @questionnaire = @assignment.questionnaires.find_by_type(questionnaire_type)
+    @questionnaire =  @assignment.questionnaires.find_by_type(questionnaire_type)
     @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
   end
 
@@ -205,7 +257,7 @@ class GradesController < ApplicationController
     #ACS Check if team count is more than 1 instead of checking if it is a team assignment
     if @participant.assignment.max_team_size > 1
       team = @participant.team
-      if (!team.nil?)
+      if(!team.nil?)
         unless team.has_user session[:user]
           redirect_to '/denied?reason=You are not on the team that wrote this feedback'
           return true
@@ -218,7 +270,7 @@ class GradesController < ApplicationController
     return false
   end
 
-  def get_body_text(submission)
+def get_body_text(submission)
     if submission
       role = "reviewer"
       item = "submission"

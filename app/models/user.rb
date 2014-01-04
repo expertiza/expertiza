@@ -80,7 +80,11 @@ class User < ActiveRecord::Base
   end
 
   def admin?
-    role.name == 'Administrator' || super_admin?
+    role.admin?
+  end
+
+  def student?
+    role.student?
   end
 
   def is_creator_of?(user)
@@ -214,6 +218,7 @@ class User < ActiveRecord::Base
     @email_on_review = true
     @email_on_submission = true
     @email_on_review_of_review = true
+    @copy_of_emails = false
   end
 
   def self.export(csv, parent_id, options)
@@ -230,7 +235,7 @@ class User < ActiveRecord::Base
         tcsv.push(user.parent.name)
       end
       if (options["email_options"] == "true")
-        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review)
+        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails)
       end
       if (options["handle"] == "true")
         tcsv.push(user.handle)

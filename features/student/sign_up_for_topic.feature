@@ -1,3 +1,4 @@
+@wip
 Feature: Sign up for a topic as a student
   In order to sign up for a topic
   As an expertiza user

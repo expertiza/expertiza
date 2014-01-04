@@ -3,6 +3,7 @@ db/*.sqlite3
 log/*.log
 tmp/**/*
 config/database.yml
+coverage
 
 #################
 ## Eclipse
@@ -17,6 +18,8 @@ tmp/
 *.bak
 *.swp
 *~.nib
+*.#*
+*#*#
 local.properties
 .classpath
 .settings/

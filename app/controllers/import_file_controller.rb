@@ -17,20 +17,23 @@ class ImportFileController < ApplicationController
     err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
     errors.each{
       |error|
-      err_msg = err_msg+"<li>"+error+"<br/>"
+      err_msg = err_msg+"<li>"+error.to_s+"<br/>"
     }
     err_msg = err_msg+"</ul>"
     if errors.length > 0
       flash[:error] = err_msg
     end
+    undo_link("File has been imported successfully. ")
     redirect_to session[:return_to]    
   end
   
   protected  
   def importFile(session,params)    
     delimiter = get_delimiter(params)
-    file = params['file']
+    file = params['file'].tempfile
+
     errors = Array.new
+
     file.each_line do |line|
       line.chomp!
       unless line.empty?
@@ -73,4 +76,8 @@ class ImportFileController < ApplicationController
       items.each { | value | row << value.sub("\"","").sub("\"","").strip }
       return row
   end
+
+  #def undo_link
+  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => Object.const_get(params[:model]).last.versions.last.id)}>undo</a>"
+  #end
 end

@@ -16,6 +16,7 @@ class MenuItemsController < ApplicationController
 
   def list
     # @menu_item_pages, @menu_items = paginate :menu_items, :per_page => 10
+    @settings = SystemSettings.first
     @menu = Menu.new
     @items = @menu.get_menu(0)
   end

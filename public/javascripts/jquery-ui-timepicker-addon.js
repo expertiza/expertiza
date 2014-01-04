@@ -67,7 +67,7 @@
             showTimezone: null,
             showTime: true,
             stepHour: 1,
-            stepMinute: 1,
+            stepMinute: 5,
             stepSecond: 1,
             stepMillisec: 1,
             stepMicrosec: 1,
@@ -369,8 +369,10 @@
             // Prevent displaying twice
             if ($dp.find("div.ui-timepicker-div").length === 0 && o.showTimepicker) {
                 var noDisplay = ' style="display:none;"',
-                    html = '<div class="ui-timepicker-div'+ (o.isRTL? ' ui-timepicker-rtl' : '') +'"><dl>' + '<dt class="ui_tpicker_time_label"' + ((o.showTime) ? '' : noDisplay) + '>' + o.timeText + '</dt>' +
-                        '<dd class="ui_tpicker_time"' + ((o.showTime) ? '' : noDisplay) + '></dd>';
+                    //html = '<div class="ui-timepicker-div'+ (o.isRTL? ' ui-timepicker-rtl' : '') +'"><dl>' + '<dt class="ui_tpicker_time_label"' + ((o.showTime) ? '' : noDisplay) + '>' + o.timeText + '</dt>' +
+                      //  '<dd class="ui_tpicker_time"' + ((o.showTime) ? '' : noDisplay) + '></dd>';
+                    html = '<div class="ui-timepicker-div'+ (o.isRTL? ' ui-timepicker-rtl' : '') +'"><dl>' + '<dt class="ui_tpicker_time_label"' + ((o.showTime) ? '' : noDisplay) + '>' + '</dt>' +
+                        '<dd class="ui_tpicker_time"' + ((o.showTime) ?  noDisplay : '') + '></dd>';
 
                 // Create the markup
                 for(i=0,l=this.units.length; i<l; i++){

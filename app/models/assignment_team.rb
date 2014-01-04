@@ -72,6 +72,7 @@ class AssignmentTeam < Team
   def get_submitted_files
     self.get_participants.first.submitted_files
   end
+  alias_method :submitted_files, :get_submitted_files
 
   def get_review_map_type
     'TeamReviewResponseMap'
@@ -177,6 +178,7 @@ class AssignmentTeam < Team
     scores[:total_score] = assignment.compute_total_score(scores)
     scores
   end
+  alias_method :scores, :get_scores
 
   def self.get_team(participant)
     team = nil
@@ -220,6 +222,14 @@ class AssignmentTeam < Team
     team = AssignmentTeam.create(name: team_name, parent_id: assignment_id)
     TeamNode.create(parent_id: assignment_id, node_object_id: team.id)
     team
+  end
+
+  #Remove a team given the team id
+  def self.remove_team_by_id(id)
+    old_team = AssignmentTeam.find(id)
+    if old_team != nil
+      old_team.destroy
+    end
   end
 
   require './app/models/analytic/assignment_team_analytic'

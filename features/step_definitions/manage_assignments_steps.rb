@@ -1,5 +1,4 @@
 When /^I create a (public|private) assignment named "([^"]*)" using (no due date|review named "[^"]*")$/ do  |public_or_private,assignment_name,review_setting|  
-  session[:user] = User.instructors.first
   use_review = false
   review_name = ""
   if review_setting =~ /^no due date$/
@@ -7,7 +6,7 @@ When /^I create a (public|private) assignment named "([^"]*)" using (no due date
   else
     use_review = true
     review_name = review_setting.scan(/^review named \"([^"]*)\"$/)
-    step "I have a public review named \"#{review_name}\""
+    step "I have a public review named \"#{review_name[0][0]}\""
   end
 
   step "I follow the \"Manage...\" link as an \"instructor\""
@@ -35,7 +34,7 @@ end
 When /^I create a (public|private) assignment named "([^"]*)" with max team size (\d+)$/ do  |public_or_private,assignment_name,team_size|
   step "I have a public review named \"test_review\""
     step "I have a public metareview named \"test_metareview\""
-  step "I follow the \"Manage...\" link as an \"instructor\""
+    step "I follow the \"Manage...\" link as an \"instructor\""
     step "I follow \"Create Public Assignment\""
     step "I fill in \"Name\" with \"#{assignment_name}\""
     step "I press \"Create\""
@@ -50,6 +49,7 @@ When /^I create a (public|private) assignment named "([^"]*)" with max team size
     step "I select \"test_review\" from \"questionnaires[review]\""
     step "I select \"test_metareview\" from \"questionnaires[metareview]\""
     step "I press \"Save\""
+  step "I follow \"Assignments\""
   step "I should see \"#{assignment_name}\""
 end
 

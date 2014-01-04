@@ -15,6 +15,24 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user_role?
 
+  def user_for_paper_trail
+    if session[:user]
+      session[:user].id
+    else
+      nil
+    end
+  end
+
+  def undo_link(message)
+    @version = Version.find(:all,:conditions => ['whodunnit = ?',session[:user].id]).last
+    if @version.try(:created_at) && Time.now - @version.created_at < 5.0
+      @link_name = params[:redo] == "true" ? "redo" : "undo"
+      flash[:notice] = message + "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @version.id,:redo => !params[:redo])}>#{@link_name}</a>"
+    end
+  end
+
+  private
+
   def current_user
     @current_user ||= session[:user]
   end
@@ -74,4 +92,10 @@ class ApplicationController < ActionController::Base
       redirect_to "/denied"
     end
   end
+
+  private
+    def record_not_found
+      redirect_to :controller => :tree_display,:action => :list
+    end
+
 end

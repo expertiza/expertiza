@@ -214,7 +214,7 @@ class ScoreCache < ActiveRecord::Base
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
 
-    assignment_num_reviews = Response.find(:all,:conditions => ["reviewed_object_id=? AND type=?", @assignment_id, 'TeamReviewResponseMap'])
+    assignment_num_reviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND type=?", @assignment_id, 'TeamReviewResponseMap'])
     @assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
 
     count = 0
@@ -229,7 +229,7 @@ class ScoreCache < ActiveRecord::Base
   def self.get_metareviews_average(pid)
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
-    assignment_num_metareviews = Response.find(:all,:conditions => ["reviewed_object_id=? AND type=?", @assignment_id, 'MetareviewResponseMap'])
+    assignment_num_metareviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND type=?", @assignment_id, 'MetareviewResponseMap'])
     @assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
 
     count = 0
@@ -246,7 +246,7 @@ class ScoreCache < ActiveRecord::Base
     @assignment_id = @participant.parent_id
 
     #@num_of_reviews = ResponseMap.where("reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'TeamReviewResponseMap')
-    @num_of_reviews = Response.find(:all,:conditions => ["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'TeamReviewResponseMap'])
+    @num_of_reviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'TeamReviewResponseMap'])
 
     reviews_remaining = Array.new
     threshold = 2
@@ -262,7 +262,7 @@ class ScoreCache < ActiveRecord::Base
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
 
-    @num_of_metareviews = Response.find(:all,:conditions => ["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'MetareviewResponseMap'])
+    @num_of_metareviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'MetareviewResponseMap'])
 
     metaReviews_remaining = Array.new
     threshold=1

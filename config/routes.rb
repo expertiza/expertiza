@@ -426,19 +426,11 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
-<<<<<<< HEAD
-  resources :versions, :path => 'versions_path'
-
-  match '/menu/*name', controller: :menu_items, action: :link
-  match ':page_name', controller: :content_pages, action: :view, method: :get
-  #match  '/', :to => 'https:localhost:3000'
-=======
   match '/users/show_selection', controller: :users, action: :show_selection
   match '/users/list', controller: :users, action: :list
   match '/menu/*name', controller: :menu_items, action: :link
   match ':page_name', controller: :content_pages, action: :view, method: :get
   match '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
->>>>>>> master
 
   root to: 'content_pages#view', page_name: 'home'
 

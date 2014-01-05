@@ -4,6 +4,21 @@ class UsersController < ApplicationController
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :list }
 
+
+  def action_allowed?
+    case params[:action]
+    when 'keys'
+      current_role_name.eql? 'Student'
+    else
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
+    end
+  end
+
+
+
   def index
     if (current_user_role? == "Student") 
       redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user])) 

@@ -15,6 +15,14 @@ class Role < ActiveRecord::Base
     @@student_role ||= find_by_name 'Student'
   end
 
+  def student?
+    name['Student']
+  end
+
+  def admin?
+    name['Administrator'] || super_admin?
+  end
+
   def self.ta
     @@ta_role ||= find_by_name 'Teaching Assistant'
   end
@@ -33,6 +41,10 @@ class Role < ActiveRecord::Base
 
   def self.superadministrator
     @@superadministrator_role ||= find_by_name 'Super-Administrator'
+  end
+
+  def super_admin?
+    name['Super-Administrator']
   end
 
   def self.super_admin

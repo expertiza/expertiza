@@ -6,6 +6,12 @@ class QuestionnairesController < ApplicationController
 
   before_filter :authorize
 
+  def action_allowed?
+    ['Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_role_name
+  end
+
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
   def copy

@@ -205,10 +205,8 @@ class Assignment < ActiveRecord::Base
   def metareview_mappings
     mappings = Array.new
     self.review_mappings.each do |map|
-      mmap = MetareviewResponseMap.find_by_reviewed_object_id(map.map_id)
-      if mmap != nil
-        mappings << mmap
-      end
+      m_map = MetareviewResponseMap.find_by_reviewed_object_id(map.id)
+      mappings << m_map if m_map != nil
     end
     mappings
   end
@@ -362,18 +360,18 @@ class Assignment < ActiveRecord::Base
       # that includes the assignment, and which item has been updated.
        if mapping.reviewer.user.email_on_submission
         user = mapping.reviewer.user
-        Mailer.deliver_message(
-            {recipients: user.email,
-             subject: "A new submission is available for #{self.name}",
-             body: {
-                 obj_name: self.name,
-                 type: 'submission',
-                 location: get_review_number(mapping).to_s,
-                 first_name: ApplicationHelper::get_user_first_name(user),
-                 partial_name: 'update'
+        Mailer.sync_message(
+            {:to => user.email,
+             :subject => "A new submission is available for #{self.name}",
+             :body => {
+                 :obj_name => self.name,
+                 :type => 'submission',
+                 :location => get_review_number(mapping).to_s,
+                 :first_name => ApplicationHelper::get_user_first_name(user),
+                 :partial_name => 'update'
              }
             }
-        )
+        ).deliver
       end
     end
   end

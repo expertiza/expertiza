@@ -1,0 +1,22 @@
+<div>
+  <label for="assignment_name">Assignment title:</label>
+  <%= text_field 'assignment', 'name'%>
+</div>
+
+<div>
+  <label for="assignment_directory">Assignment directory:</label>
+  <%= text_field 'assignment', 'directory_path'%>
+</div>
+
+<div>
+  <label for="team_assignment">Assignment directory:</label>
+  <%= check_box 'assignment', 'team_assignment', {}, true, false%>
+  <label for="wiki_type">Assignment directory:</label>
+  <%= check_box 'assignment', 'wiki_type', {}, true, false%>
+</div>
+
+<div>
+   Number of Submit/Review periods
+   <%= text_field 'numSubmitReviewPeriods', 'name'%>
+   <input type="button" name="selectButton" value="Set" onclick="addElement();"/>
+</div>

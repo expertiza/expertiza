@@ -1,5 +1,11 @@
 class SurveyController < ApplicationController
 
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator'].include? current_role_name
+  end
+
   def assign
     @assignment = Assignment.find(params[:id])
     @assigned_surveys = SurveyHelper::get_assigned_surveys(@assignment.id)

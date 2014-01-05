@@ -1,12 +1,19 @@
 class TeamController < ApplicationController
  auto_complete_for :user, :name
- 
-def create_teams_view
+
+
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator'].include? current_role_name
+  end
+
+  def create_teams_view
  @parent = Object.const_get(session[:team_type]).find(params[:id])
 end
 
 def delete_all
-  parent = Object.const_get(session[:team_type]).find(params[:id])
+  parent = Object.const_get(session[:team_type]).find(params[:id])  
   @teams = Team.find_all_by_parent_id(parent.id)
   @teams.each do |t|
     t.destroy
@@ -42,10 +49,10 @@ def create_teams
      @team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => parent.id)
      TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
      undo_link("Team \"#{@team.name}\" has been created successfully. ")
-     redirect_to :action => 'list', :id => parent.id
+    redirect_to :action => 'list', :id => parent.id
    rescue TeamExistsError
-     flash[:error] = $! 
-     redirect_to :action => 'new', :id => parent.id
+    flash[:error] = $! 
+    redirect_to :action => 'new', :id => parent.id
    end
  end
  
@@ -77,7 +84,7 @@ def create_teams
  end
  
  # Copies existing teams from a course down to an assignment
- # The team and team members are all copied.
+ # The team and team members are all copied.  
  def inherit
    assignment = Assignment.find(params[:id])
    if assignment.course_id >= 0

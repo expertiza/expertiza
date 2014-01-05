@@ -1,4 +1,7 @@
 class CourseEvaluationController < ApplicationController
+  def action_allowed?
+    current_role_name.eql?("Student")
+  end
 
   def list #list course evaluations for a user
     unless session[:user] #Check for a valid user

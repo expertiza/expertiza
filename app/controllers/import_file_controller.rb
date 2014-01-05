@@ -1,5 +1,11 @@
 class ImportFileController < ApplicationController
-  
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator',
+     'Super-Administrator'].include? current_role_name
+  end
+
   def start
     @id = params[:id]
     @expected_fields = params[:expected_fields]
@@ -12,7 +18,7 @@ class ImportFileController < ApplicationController
     err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
     errors.each{
       |error|
-      err_msg = err_msg+"<li>"+error+"<br/>"
+      err_msg = err_msg+"<li>"+error.to_s+"<br/>"
     }
     err_msg = err_msg+"</ul>"
     if errors.length > 0
@@ -25,8 +31,10 @@ class ImportFileController < ApplicationController
   protected  
   def importFile(session,params)    
     delimiter = get_delimiter(params)
-    file = params['file']
+    file = params['file'].tempfile
+
     errors = Array.new
+
     file.each_line do |line|
       line.chomp!
       unless line.empty?

@@ -14,7 +14,7 @@ class ScoreCacheTest < ActiveSupport::TestCase
     sc_old = ScoreCache.find(:first,:conditions =>["reviewee_id = ? and object_type = ?",  expected_contributor.id, 'TeamReviewResponseMap' ])
     assert_not_nil(sc_old, "This is not the case of update")
 
-    ScoreCache.update_cache(response.response_id)
+    ScoreCache.update_cache(response.id)
     sc_new = ScoreCache.find(:first,:conditions =>["reviewee_id = ? and object_type = ?",  expected_contributor.id, 'TeamReviewResponseMap' ])
     assert_equal(sc_new.score, 83.33,"The score was not saved into score_cache table correctly")
   end
@@ -29,7 +29,7 @@ class ScoreCacheTest < ActiveSupport::TestCase
     sc_old =  ScoreCache.find(:first,:conditions =>["reviewee_id = ? and object_type = ?",  expected_contributor.id, 'TeamReviewResponseMap' ])
     assert_nil(sc_old, "The data is already present in the database, is is not the case of inserting a new record into score cache")
 
-    ScoreCache.update_cache(response.response_id)
+    ScoreCache.update_cache(response.id)
     sc_new = ScoreCache.find(:first,:conditions =>["reviewee_id = ? and object_type = ?",  expected_contributor.id, 'TeamReviewResponseMap' ])
     assert_equal(sc_new.score, 71.67,"The score was not saved into the score_cache table correctly")
   end

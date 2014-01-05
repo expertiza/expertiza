@@ -3,9 +3,15 @@
 #
 # Last modified: 7/18/2008
 # By: ajbudlon
+
+# change access permission from public to private or vice versa
 class CourseController < ApplicationController
   auto_complete_for :user, :name
   require 'fileutils'
+
+  def action_allowed?
+    current_role_name.eql?("Instructor")
+  end
 
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
@@ -84,7 +90,7 @@ class CourseController < ApplicationController
       undo_link("Course \"#{@course.name}\" has been created successfully. ")
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
-      flash[:error] = "The following error occurred while saving the course: "+$!
+      flash[:error] = $! #"The following error occurred while saving the course: #"+
       redirect_to :action => 'new'
     end
   end
@@ -156,8 +162,8 @@ class CourseController < ApplicationController
   end
 
 # generate the undo link
-#def undo_link
-#  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
-#end
+  #def undo_link
+  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
+  #end
 
 end

@@ -1,34 +1,22 @@
 require 'goldberg_filters'
 
 class ApplicationController < ActionController::Base
-  include GoldbergFilters
-  rescue_from ActiveRecord::RecordNotFound, :with => :record_not_found
+  include AccessHelper
 
   helper_method :current_user_session, :current_user, :current_user_role?
   protect_from_forgery unless Rails.env.test?
   filter_parameter_logging :password, :password_confirmation, :clear_password, :clear_password_confirmation
   before_filter :set_time_zone
-  #before_filter :goldberg_security_filter
-
-  def authorize(args = {})
-    #unless current_permission(args).allow?(params[:controller], params[:action])
-    #flash[:warn] = 'Please log in.'
-    #redirect_back
-    #end
-    @user = current_user
-  end
-
-  def current_permission(args = {})
-    @authority ||= Authority.new args.merge({
-                                                current_user: current_user
-                                            })
-  end
-  delegate :allow?, to: :current_permission
-  helper_method :allow?
+  before_filter :authorize
 
   def current_user_role?
     current_user.role.name
   end
+
+  def current_role_name
+    current_user.role.name
+  end
+
   helper_method :current_user_role?
 
   def user_for_paper_trail
@@ -110,8 +98,8 @@ class ApplicationController < ActionController::Base
   end
 
   private
-  def record_not_found
-    redirect_to :controller => :tree_display,:action => :list
-  end
+    def record_not_found
+      redirect_to :controller => :tree_display,:action => :list
+    end
 
 end

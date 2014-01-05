@@ -113,7 +113,8 @@ class AssignmentController < ApplicationController
     @user =  ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(@assignment) 
-    @assignment.submitter_count = 0    
+    @assignment.submitter_count = 0
+    @assignment.bookmarkrating_questionnaire_id=1
     ## feedback added
     ##
     
@@ -428,11 +429,13 @@ class AssignmentController < ApplicationController
     @limits[:metareview] = default_limit_value
     @limits[:feedback]   = default_limit_value
     @limits[:teammate]   = default_limit_value
+    @limits[:bookmarkrating]= default_limit_value
 
     @weights[:review] = 100
     @weights[:metareview] = 0
     @weights[:feedback] = 0
     @weights[:teammate] = 0
+    @weights[:bookmarkrating] = 0
 
     @assignment.questionnaires.each{
       | questionnaire |

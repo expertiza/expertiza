@@ -1,4 +1,7 @@
 class AdvertiseForPartnerController < ApplicationController
+  def action_allowed?
+    current_user.role.name.eql?("Student")
+  end
 
   #adds a new advertise for partners entry in team table...
   def new

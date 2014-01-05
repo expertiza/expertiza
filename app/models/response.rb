@@ -1,16 +1,12 @@
 class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
-  belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id'
-  has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id'
-  before_create :add_dummy_map_id
 
-  def add_dummy_map_id
-    self.map_id = Response.maximum(:map_id) + 1
-  end
+  delegate :questionnaire, :reviewee, :reviewer,
+    :to => :map
 
-  def map
-    self
+  def response_id
+    id
   end
 
   def team_has_user?(user)
@@ -29,7 +25,7 @@ class Response < ActiveRecord::Base
       identifier += "<H2>Feedback from author</H2>"
     end
     if prefix
-      identifier += "<B>Reviewer:</B> #{count}" #+self.map.reviewer.fullname
+      identifier += "<B>Reviewer:</B> #{count}"#+self.map.reviewer.fullname
       str = prefix+"_"+self.id.to_s
     else
       identifier += '<B>'+self.map.get_title+'</B> '+count.to_s+'</B>'
@@ -51,8 +47,7 @@ class Response < ActiveRecord::Base
     end
     # End of custom code
     count = 0
-    #self.scores.each {
-    Score.find_all_by_response_id(self.response_id).each {
+    self.scores.each {
         |reviewScore|
       count += 1
       code += '<big><b>Question '+count.to_s+":</b> <I>"+Question.find_by_id(reviewScore.question_id).txt+"</I></big><BR/><BR/>"
@@ -82,27 +77,24 @@ class Response < ActiveRecord::Base
   def notify_on_difference(new_pct, avg_pct, limit)
     mapping = self.map
     instructor = mapping.assignment.instructor
-    begin
-      Mailer.deliver_message(
-          {:recipients => instructor.email,
-           :subject => "Expertiza Notification: A review score is outside the acceptable range",
-           :body => {
-               :first_name => ApplicationHelper::get_user_first_name(instructor),
-               :reviewer_name => mapping.reviewer.fullname,
-               :type => "review",
-               :reviewee_name => mapping.reviewee.fullname,
-               :limit => limit,
-               :new_pct => new_pct,
-               :avg_pct => avg_pct,
-               :types => "reviews",
-               :performer => "reviewer",
-               :assignment => mapping.assignment,
-               :partial_name => 'limit_notify'
-           }
-          }
-      )
-    rescue
-    end
+    Mailer.generic_message(
+        {:to => instructor.email,
+         :subject => "Expertiza Notification: A review score is outside the acceptable range",
+         :body => {
+             :first_name => ApplicationHelper::get_user_first_name(instructor),
+             :reviewer_name => mapping.reviewer.fullname,
+             :type => "review",
+             :reviewee_name => mapping.reviewee.fullname,
+             :limit => limit,
+             :new_pct => new_pct,
+             :avg_pct => avg_pct,
+             :types => "reviews",
+             :performer => "reviewer",
+             :assignment => mapping.assignment,
+             :partial_name => 'limit_notify'
+         }
+        }
+    ).deliver
   end
 
   def delete

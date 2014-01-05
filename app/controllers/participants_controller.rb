@@ -1,7 +1,18 @@
 class ParticipantsController < ApplicationController
   auto_complete_for :user, :name
 
-   def list
+  def action_allowed?
+    case params[:action]
+    when 'change_handle'
+      current_role_name.eql?("Student")
+    else
+      ['Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
+    end
+  end
+
+  def list
     @root_node = Object.const_get(params[:model]+"Node").find_by_node_object_id(params[:id])     
     @parent = Object.const_get(params[:model]).find(params[:id])
     @participants = @parent.participants  
@@ -15,7 +26,7 @@ class ParticipantsController < ApplicationController
   end
   
   def add   
-    curr_object = Object.const_get(params[:model]).find(params[:id])
+    curr_object = Object.const_get(params[:model]).find(params[:id])    
     begin
       curr_object.add_participant(params[:user][:name])
       user = User.find_by_name(params[:user][:name])
@@ -115,7 +126,7 @@ end
    redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment'   
  end
  
- def bequeath_all
+ def bequeath_all   
    @copied_participants = []
    assignment = Assignment.find(params[:id])
    if assignment.course

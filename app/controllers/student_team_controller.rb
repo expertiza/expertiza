@@ -1,6 +1,10 @@
 class StudentTeamController < ApplicationController
   auto_complete_for :user, :name
-   
+
+  def action_allowed?
+    current_role_name.eql?("Student")
+  end
+
   def view
     @student = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@student.user_id)
@@ -23,7 +27,7 @@ class StudentTeamController < ApplicationController
       parent = AssignmentNode.find_by_node_object_id(@student.parent_id)
       TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
       user = User.find(@student.user_id)
-      @team.add_member(user, @team.parent_id)
+      @team.add_member(user, @team.parent_id)    
 
       undo_link("Team \"#{@team.name}\" has been created successfully. ")
 

@@ -71,6 +71,7 @@ Feature: Manage the users in Expertiza
       
   @instructor
   @manage_users
+    @wip
   Scenario: Delete a user
     Given I View User "charlie_chevy"
       And I delete the user

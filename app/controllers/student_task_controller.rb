@@ -1,5 +1,10 @@
-class StudentTaskController < ApplicationController
+ class StudentTaskController < ApplicationController
   helper :submitted_content
+
+  def action_allowed?
+    current_role_name.eql?("Student")
+  end
+
 
   def list
     redirect_to(:controller => 'eula', :action => 'display') if current_user.is_new_user

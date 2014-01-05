@@ -62,3 +62,5 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'simplecov', :require => false, :group => :test
 end
+
+gem 'rails', '~>3.0.0'

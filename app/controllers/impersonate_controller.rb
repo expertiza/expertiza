@@ -3,6 +3,8 @@ class ImpersonateController < ApplicationController
     case params[:action]
     when 'impersonate'
       true
+    when 'start'
+      true
     end
   end
 

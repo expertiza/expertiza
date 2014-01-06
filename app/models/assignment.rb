@@ -2,10 +2,7 @@ class Assignment < ActiveRecord::Base
   require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   include DynamicReviewMapping
-
-  #alias_attribute :team_count, :max_team_size
-
-  # Does not necessarily belong to a course!
+  has_paper_trail
   belongs_to :course
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to
@@ -15,21 +12,19 @@ class Assignment < ActiveRecord::Base
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
   has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
-  has_many :due_dates
+  has_many :due_dates, :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
-  has_many :assignment_questionnaires
+  has_many :assignment_questionnaires,:dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
-  # has_many :responses, :through => :response_maps, :source => 'response'
+  has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
 
   validates_presence_of :name
-  validates_uniqueness_of :name
-  #validates_presence_of :directory_path, :on => :update
-  #validates_uniqueness_of :scope => [:directory_path, :instructor_id]
+  validates_uniqueness_of :name, :scope => :course_id
 
   COMPLETE = 'Finished'
   WAITLIST = 'Waitlist open'
@@ -295,9 +290,10 @@ class Assignment < ActiveRecord::Base
     response_map_set.first
   end
 
-  def is_using_dynamic_reviewer_assignment?
+  def dynamic_reviewer_assignment?
     (self.review_assignment_strategy == RS_AUTO_SELECTED || self.review_assignment_strategy == RS_STUDENT_SELECTED) ? true : false
   end
+  alias_method :is_using_dynamic_reviewer_assignment?, :dynamic_reviewer_assignment?
 
   def review_mappings
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
@@ -359,8 +355,8 @@ class Assignment < ActiveRecord::Base
     scores
   end
 
-  def get_contributor(contributor_id)
-    team_assignment? ? AssignmentTeam.find(contributor_id) : AssignmentParticipant.find(contributor_id)
+  def get_contributor(contrib_id)
+    AssignmentTeam.find(contrib_id)
   end
 
   # parameterized by questionnaire
@@ -495,18 +491,18 @@ class Assignment < ActiveRecord::Base
       # that includes the assignment, and which item has been updated.
       if mapping.reviewer.user.email_on_submission
         user = mapping.reviewer.user
-        Mailer.deliver_message(
-            {recipients: user.email,
-             subject: "A new submission is available for #{self.name}",
-             body: {
-                 obj_name: self.name,
-                 type: 'submission',
-                 location: get_review_number(mapping).to_s,
-                 first_name: ApplicationHelper::get_user_first_name(user),
-                 partial_name: 'update'
+        Mailer.sync_message(
+            {:to => user.email,
+             :subject => "A new submission is available for #{self.name}",
+             :body => {
+                 :obj_name => self.name,
+                 :type => 'submission',
+                 :location => get_review_number(mapping).to_s,
+                 :first_name => ApplicationHelper::get_user_first_name(user),
+                 :partial_name => 'update'
              }
             }
-        )
+        ).deliver
       end
     end
   end
@@ -605,9 +601,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id = nil)
-    self.staggered_deadline? ?
-        due_dates = TopicDeadline.find(:all, conditions: ['topic_id = ?', topic_id], order: 'due_at DESC') :
-        due_dates = DueDate.find(:all, :conditions => ['assignment_id = ?', self.id], order: 'due_at DESC')
+    due_dates = self.staggered_deadline? ?  TopicDeadline.find(:all, :conditions => ['topic_id = ?', topic_id], :order => 'due_at DESC') : DueDate.find(:all, :conditions => ['assignment_id = ?', self.id], :order => 'due_at DESC')
     if due_dates != nil && due_dates.size > 0
       if Time.now > due_dates[0].due_at
         return 'Finished'
@@ -643,7 +637,7 @@ class Assignment < ActiveRecord::Base
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
   def compute_reviews_hash
     review_questionnaire_id = get_review_questionnaire_id()
-    @questions = Question.find(:all, conditions: ['questionnaire_id = ?', review_questionnaire_id])
+    @questions = Question.find(:all, :conditions => ['questionnaire_id = ?', review_questionnaire_id])
     @review_scores = Hash.new
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
@@ -764,9 +758,7 @@ class Assignment < ActiveRecord::Base
     return 0 if get_total_reviews_assigned == 0
     sum_of_scores = 0
     self.response_maps.each do |response_map|
-      if !response_map.response.nil? then
-        sum_of_scores = sum_of_scores + response_map.response.average_score
-      end
+      sum_of_scores = sum_of_scores + response_map.response.get_average_score if !response_map.response.nil?
     end
     (sum_of_scores / get_total_reviews_completed).to_i
   end
@@ -775,9 +767,9 @@ class Assignment < ActiveRecord::Base
     distribution = Array.new(101, 0)
 
     self.response_maps.each do |response_map|
-      if !response_map.response.nil? then
-        score = response_map.response.average_score.to_i
-        distribution[score] += 1 if score >= 0 and score <= 100
+      if !response_map.response.nil?
+        score = response_map.response.get_average_score.to_i
+        distribution[score] += 1 if score >= 0 && score <= 100
       end
     end
     distribution
@@ -836,10 +828,7 @@ class Assignment < ActiveRecord::Base
     @assignment = Assignment.find(parent_id)
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
-    questionnaires.each {
-        |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    }
+    questionnaires.each { |questionnaire| @questions[questionnaire.symbol] = questionnaire.questions }
     @scores = @assignment.get_scores(@questions)
 
     return csv if @scores[:teams].nil?

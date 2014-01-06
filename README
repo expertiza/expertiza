@@ -1,256 +1,195 @@
-== Welcome to Rails
-
-Rails is a web-application framework that includes everything needed to create
-database-backed web applications according to the Model-View-Control pattern.
-
-This pattern splits the view (also called the presentation) into "dumb"
-templates that are primarily responsible for inserting pre-built data in between
-HTML tags. The model contains the "smart" domain objects (such as Account,
-Product, Person, Post) that holds all the business logic and knows how to
-persist themselves to a database. The controller handles the incoming requests
-(such as Save New Account, Update Product, Show Post) by manipulating the model
-and directing data to the view.
-
-In Rails, the model is handled by what's called an object-relational mapping
-layer entitled Active Record. This layer allows you to present the data from
-database rows as objects and embellish these data objects with business logic
-methods. You can read more about Active Record in
-link:files/vendor/rails/activerecord/README.html.
-
-The controller and view are handled by the Action Pack, which handles both
-layers by its two parts: Action View and Action Controller. These two layers
-are bundled in a single package due to their heavy interdependence. This is
-unlike the relationship between the Active Record and Action Pack that is much
-more separate. Each of these packages can be used independently outside of
-Rails. You can read more about Action Pack in
-link:files/vendor/rails/actionpack/README.html.
+E908. Integration and Testing: A 
+Social Bookmarking
 
 
-== Getting Started
 
-1. At the command prompt, create a new Rails application:
-       <tt>rails new myapp</tt> (where <tt>myapp</tt> is the application name)
-
-2. Change directory to <tt>myapp</tt> and start the web server:
-       <tt>cd myapp; rails server</tt> (run with --help for options)
-
-3. Go to http://localhost:3000/ and you'll see:
-       "Welcome aboard: You're riding Ruby on Rails!"
-
-4. Follow the guidelines to start developing your application. You can find
-the following resources handy:
-
-* The Getting Started Guide: http://guides.rubyonrails.org/getting_started.html
-* Ruby on Rails Tutorial Book: http://www.railstutorial.org/
+Design Document
 
 
-== Debugging Rails
-
-Sometimes your application goes wrong. Fortunately there are a lot of tools that
-will help you debug it and get it back on the rails.
-
-First area to check is the application log files. Have "tail -f" commands
-running on the server.log and development.log. Rails will automatically display
-debugging and runtime information to these files. Debugging info will also be
-shown in the browser on requests from 127.0.0.1.
-
-You can also log your own messages directly into the log file from your code
-using the Ruby logger class from inside your controllers. Example:
-
-  class WeblogController < ActionController::Base
-    def destroy
-      @weblog = Weblog.find(params[:id])
-      @weblog.destroy
-      logger.info("#{Time.now} Destroyed Weblog ID ##{@weblog.id}!")
-    end
-  end
-
-The result will be a message in your log file along the lines of:
-
-  Mon Oct 08 14:22:29 +1000 2007 Destroyed Weblog ID #1!
-
-More information on how to use the logger is at http://www.ruby-doc.org/core/
-
-Also, Ruby documentation can be found at http://www.ruby-lang.org/. There are
-several books available online as well:
-
-* Programming Ruby: http://www.ruby-doc.org/docs/ProgrammingRuby/ (Pickaxe)
-* Learn to Program: http://pine.fm/LearnToProgram/ (a beginners guide)
-
-These two books will bring you up to speed on the Ruby language and also on
-programming in general.
 
 
-== Debugger
-
-Debugger support is available through the debugger command when you start your
-Mongrel or WEBrick server with --debugger. This means that you can break out of
-execution at any point in the code, investigate and change the model, and then,
-resume execution! You need to install ruby-debug to run the server in debugging
-mode. With gems, use <tt>sudo gem install ruby-debug</tt>. Example:
-
-  class WeblogController < ActionController::Base
-    def index
-      @posts = Post.find(:all)
-      debugger
-    end
-  end
-
-So the controller will accept the action, run the first line, then present you
-with a IRB prompt in the server window. Here you can do things like:
-
-  >> @posts.inspect
-  => "[#<Post:0x14a6be8
-          @attributes={"title"=>nil, "body"=>nil, "id"=>"1"}>,
-       #<Post:0x14a6620
-          @attributes={"title"=>"Rails", "body"=>"Only ten..", "id"=>"2"}>]"
-  >> @posts.first.title = "hello from a debugger"
-  => "hello from a debugger"
-
-...and even better, you can examine how your runtime objects actually work:
-
-  >> f = @posts.first
-  => #<Post:0x13630c4 @attributes={"title"=>nil, "body"=>nil, "id"=>"1"}>
-  >> f.
-  Display all 152 possibilities? (y or n)
-
-Finally, when you're ready to resume execution, you can enter "cont".
 
 
-== Console
-
-The console is a Ruby shell, which allows you to interact with your
-application's domain model. Here you'll have all parts of the application
-configured, just like it is when the application is running. You can inspect
-domain models, change values, and save to the database. Starting the script
-without arguments will launch it in the development environment.
-
-To start the console, run <tt>rails console</tt> from the application
-directory.
-
-Options:
-
-* Passing the <tt>-s, --sandbox</tt> argument will rollback any modifications
-  made to the database.
-* Passing an environment name as an argument will load the corresponding
-  environment. Example: <tt>rails console production</tt>.
-
-To reload your controllers and models after launching the console run
-<tt>reload!</tt>
-
-More information about irb can be found at:
-link:http://www.rubycentral.com/pickaxe/irb.html
+Amrut Apte (acapte)
+Aniket Sonmale (amsonmal)
+Ankit Nair (apnair)
+Omkar Dalvi (okdalvi)
 
 
-== dbconsole
 
-You can go to the command line of your database directly through <tt>rails
-dbconsole</tt>. You would be connected to the database with the credentials
-defined in database.yml. Starting the script without arguments will connect you
-to the development database. Passing an argument will connect you to a different
-database, like <tt>rails dbconsole production</tt>. Currently works for MySQL,
-PostgreSQL and SQLite 3.
 
-== Description of Contents
+CONTENTS
 
-The default directory structure of a generated Ruby on Rails application:
+1. Problem Statement			 						
+	1.1 Limitations of the current system
+	1.2 Proposed System
+2. System Overview
+3. Use Cases for the System
+	3.1 View Topic Bookmark
+	3.2 Add Topic Bookmark
+	3.3 Add Tags for a Bookmark
+	3.4 Edit Tags for a Bookmark
+	3.5 View all Bookmarks
+	3.6 Managing/Adding the Rating Rubric
 
-  |-- app
-  |   |-- controllers
-  |   |-- helpers
-  |   |-- models
-  |   `-- views
-  |       `-- layouts
-  |-- config
-  |   |-- environments
-  |   |-- initializers
-  |   `-- locales
-  |-- db
-  |-- doc
-  |-- lib
-  |   `-- tasks
-  |-- log
-  |-- public
-  |   |-- images
-  |   |-- javascripts
-  |   `-- stylesheets
-  |-- script
-  |   `-- performance
-  |-- test
-  |   |-- fixtures
-  |   |-- functional
-  |   |-- integration
-  |   |-- performance
-  |   `-- unit
-  |-- tmp
-  |   |-- cache
-  |   |-- pids
-  |   |-- sessions
-  |   `-- sockets
-  `-- vendor
-      `-- plugins
 
-app
-  Holds all the code that's specific to this particular application.
+1. Problem Statement:
+Students should be allowed to suggest links for topics on the signup sheet in Expertiza.  Ultimately, they will be able to get credit if they provide good suggestions.  Each student/team working on a project will be able to access the suggested links for their topic, and rate the links based on how helpful they were. After each completed rating the average of all the ratings till then will be calculated and displayed along with each bookmark. 
 
-app/controllers
-  Holds controllers that should be named like weblogs_controller.rb for
-  automated URL mapping. All controllers should descend from
-  ApplicationController which itself descends from ActionController::Base.
+1.1 Limitations of current system
 
-app/models
-  Holds models that should be named like post.rb. Models descend from
-  ActiveRecord::Base by default.
+1. A header says "Rate Bookmark using the Questionnaire". Need to change the name as it is too detailed.
+2. Weight adding feature needs to be added related to each response.
+3. Bookmarks are enabled for all assignments. Add checkbox to allow one to enable bookmarks for an assignments; they are disabled by default.
+4. Average of ratings needs to be calculated and populated at the right place.
+5. Users are presently not able to vote for a bookmark as a part of the extra credit functionality to be implemented by the system. That Voting mechanism needs to be added along with displaying the number of votes for each bookmark.
+6. The UI needs to be improved by directing to the proper screens instead of too many intermediate screens.
+7. Tests need to be written.
 
-app/views
-  Holds the template files for the view that should be named like
-  weblogs/index.html.erb for the WeblogsController#index action. All views use
-  eRuby syntax by default.
+1.2 Proposed System
 
-app/views/layouts
-  Holds the template files for layouts to be used with views. This models the
-  common header/footer method of wrapping views. In your views, define a layout
-  using the <tt>layout :default</tt> and create a file named default.html.erb.
-  Inside default.html.erb, call <% yield %> to render the view using this
-  layout.
+The Proposed system attempts to resolve the aforementioned limitations in the light of problem statement. In an attempt to handle the limitations we shall add new UI’s and also add more responsibilities to existing actors.
 
-app/helpers
-  Holds view helpers that should be named like weblogs_helper.rb. These are
-  generated for you automatically when using generators for controllers.
-  Helpers can be used to wrap functionality for your views into methods.
 
-config
-  Configuration files for the Rails environment, the routing map, the database,
-  and other dependencies.
+2. System Overview
 
-db
-  Contains the database schema in schema.rb. db/migrate contains all the
-  sequence of Migrations for your schema.
+Social bookmarking is the concept that realizes learning by collaboration. It attempts to provide support for knowledge sharing where in Expertiza users can suggest bookmarks that may help the topic owners/authors.
 
-doc
-  This directory is where your application documentation will be stored when
-  generated using <tt>rake doc:app</tt>
+The current system consists of following actors:
+a) Administrators: Users who have administrative privileges
+b) Authors: Author of the topic for which the bookmarks are being suggested
+c) Contributors: Users who are suggesting the bookmarks for a topic
+d) Users: Any other logged in user apart from the above roles.
 
-lib
-  Application specific libraries. Basically, any kind of custom code that
-  doesn't belong under controllers, models, or helpers. This directory is in
-  the load path.
+The current system allows users to add bookmarks to topics. These bookmarks are external links to the web that are helpful for the topic owners/authors. They can also edit the bookmarks and view current bookmarks for the topic as well as on a whole.
+In the current system hyperlinks to add and view bookmarks exist in the bookmark column under the signup sheet view. This design clutters the view of Signup Sheet. We, therefore, propose a design change wherein instead of a new column ‘Bookmark’, a bookmark icon will be displayed in the ‘action’ column which redirects to the bookmark view page.
+The current system allows users to rate the bookmarks which in turn gives extra credit to the bookmark owner (i.e. contributor) .The extra credit system is handled on the basis of ratings received by the author of the topic for which bookmarks have been contributed. It also allows the contributor (as well as other users) to tag the bookmark to facilitate “search by tag” for bookmarks.
+In accordance with the requirement we introduce a change in the responsibilities of the user by allowing them to tag bookmarks not owned by them and restrict the ability of rating a bookmark to only the topic owner (i.e. author).
+The current system allows the user to view all the bookmarks and the bookmarks suggested by the user. The link for the same exist on the Signup Sheet under the name “view all bookmarks“ and “manage bookmarks”. We propose to change the same by moving the “Manage Bookmarks” functionality to the “Your Work” view under the name “My bookmarks”.
+In the current system the contributor can select the rating rubric for his/her owned bookmarks. The rubric is added by the administrator. But the rating rubric appears below the bookmark and makes the “TODO” view too verbose. To overcome the same we propose a change wherein under each bookmark a button to rate the bookmark will be available that redirects the topic owner to the rating rubric on a new page.
 
-public
-  The directory available for the web server. Contains subdirectories for
-  images, stylesheets, and javascripts. Also contains the dispatchers and the
-  default HTML files. This should be set as the DOCUMENT_ROOT of your web
-  server.
 
-script
-  Helper scripts for automation and generation.
+3.1: View  Bookmarks for a Topic
 
-test
-  Unit and functional tests along with fixtures. When using the rails generate
-  command, template test files will be generated for you and placed in this
-  directory.
+Use Case Id:	 	1
+Use Case Name: 	View Bookmarks for a Topic
+Actors:		             Author,Users,Contributors,Administrator
+Pre-conditions:       Topic should be present at the “Your topic” link, where Bookmarks         link is shown 
+Post-conditions: 	User can navigate to the “view bookmarks” screen.
 
-vendor
-  External libraries that the application depends on. Also includes the plugins
-  subdirectory. If the app has frozen rails, those gems also go here, under
-  vendor/rails/. This directory is in the load path.
+Normal Flow: 
+1. User logs in to Expertiza using his/her particular User id and password. 
+2. Navigate to the “Signup sheet” link,which can belong to any of the assignments. 
+3. The topics selected by the user as well as all other topics for this particular assignment will be displayed. 
+4. At the top of the sheet,the topic selected by that user is displayed. 
+5. The “action” column for each and every topic will have a bookmark ”hotspot” 
+6. User clicks on this “bookmark” icon. 
+7. He/She is presented with a new page, where all the bookmarks suggested for the selected topic are displayed. 
+8. 
+a) Role is User: If the actor is any regular user, then he/she will be able to see the “title”, “bookmark discoverer”, “description”, “copied by”, “owner” and “tags” for each of the bookmarks. 
+b) Role is Contributor: The “edit” link will be shown for this actor to make any changes, in addition to whatever is shown to the random user. 
+c) Role is Author: The actor will be able to see the “title”, “bookmark discoverer”,“description”, “copied by ” , “owner” and “tags” for each of the bookmarks and a rating button for each bookmark
+ 
+Special Cases: 1.If No topic exists then no bookmark present for the Topic. Assume that atleast one topic is present on the sign-up sheet. 
+Business Rules: N/A
+
+3.2: Add Bookmark for a Topic
+Use Case Id:	 	2
+Use Case Name:        Add Bookmark for a Topic
+Actors:		           Author,Users,Contributors,Administrator
+Pre-conditions:          Topic be present at “Your topic” where Bookmarks link is shown 
+Post-conditions:        System displays a form to add Bookmarks
+Normal Flow: 
+1. User logs in to Expertiza using his/her particular UserID and password. 
+2. Navigate to “Signup sheet” link, under any of the assignments. 
+3.The user selected topic along with all other topics for this assignment will be displayed. 
+4. At the top of the sheet the topic selected by that user is displayed. 
+5. User clicks the icon. 
+6. He/She is presented with a new page, where all the bookmarks suggested for the selected topic are displayed along with a button “New bookmark”. 
+7. User clicks “New bookmark” to add a bookmark. 
+8. System displays the form to add new bookmark with form fields as: bookmark URL, bookmark title, bookmark tags, bookmark description, bookmark rubric 
+9. User clicks on “Add” button to save the bookmark. 
+             10. System first validates the data entered and saves the bookmark if it is valid. 
+
+Special Cases: N/A 
+Assumptions: At least one topic is present on the Sign-up sheet. 
+Business Rules: N/A
+
+3.3: Add tags to a Topic’s Bookmark
+Use Case Id: 6 
+Use Case Name: Add Tag for Bookmarks 
+Actors: Authors, Contributors, Administrators, Users 
+Descriptions: Users can add new tags to the bookmark. 
+Pre-conditions: Topic should be present at the “Your work” link where Bookmarks link will be shown. 
+Post-conditions: Once tags are added, they will be displayed at the bottom of each of the bookmarks in 
+Normal Flow: 
+1. User logins to Expertiza Application using their User id and password. 
+2. The user selected topic along with all other topics for this assignment will be displayed. 
+3. The “action” column for each topic will have a bookmark ”hotspot” 
+4. User clicks the icon for the owned topic. 
+5. In the view page there's an add tag option for the user for each bookmark 
+6. Here user can add any new tags “tags” field provided at the bottom.
+7. User clicks on add button to save the changes. 
+
+Special Cases: No topic exists 
+Assumptions: At least one topic is present on the Signup sheet the “view” screen.
+3.4: Edit tags for a Topic’s Bookmark
+Use Case Id: 7 
+Use Case Name: Edit Tag for Bookmarks 
+Actors: Contributors, Administrators 
+Descriptions: Users can Edit tags to the bookmark. 
+Pre-conditions: Topic should be present at the “Your work” link where Bookmarks link will be shown. 
+Post-conditions: Once tags are edited, they will be displayed at the bottom of each of the bookmarks in the “view” screen.
+Normal Flow: 
+1. User logins to Expertiza Application using their User id and password. 
+2. Go to “Signup sheet” link, under any of the assignments
+3. The user selected topic along with all other topics for this assignment will be displayed. 
+4. The “action” column for each topic will have a bookmark ”hotspot” 
+5. User clicks the icon for the owned topic. 
+6. In the view page there's an edit tag option for the user for each bookmark tagged by them. 
+7. Here user can add any new tags “tags” field provided at the bottom or existing tags added by them. 
+8. User clicks on edit button to save the changes. 
+
+Special Cases: No topic exists 
+Assumptions: At least one topic is present on the Signup sheet the “view” screen.
+
+3.5: View all Bookmarks
+Use Case Id: 8 
+Use Case Name: View All Bookmarks 
+Actors: Users, Authors, Contributors, Administrators 
+Description: Users can see currently available bookmarks.
+Pre-conditions: The topic should be present at the “Sign up sheet” where View All Bookmarks link will be shown.
+Post-conditions: User will be able to navigate to the view bookmarks screen. 
+
+Normal Flow: 
+1. User will log in to Expertiza Application using their User id and password. 
+2. Navigate to “Signup sheet” link, under any of the assignments.
+3. The selected topic would be displayed and also all the other topics for this assignment. There would also be a link to view all the bookmarks. 
+4. Here we can browse by View most Recent (by timestamp) and View most popular (by rating). 
+
+Special Cases: No topic exists, no bookmark present for the Topic. 
+Assumptions: At least one topic is present on the sign-up sheet. 
+Business Rules: Bookmarks' rating is calculated by using Bayesian’s algorithm. 
+shown.
+
+
+3.6: Managing/Editing the rating Rubric
+Use Case Id: 11 
+Use Case Name: Managing the Rating Rubric Bookmarks 
+Actors: Administrators
+Description: The admin user has the ability to manage the rubrics for rating which are used by the contributors in the system to rate bookmarks.
+Normal Flow: 
+1. Administrators can go to the “Edit signup sheet” under the specific assignment. 
+2. He finds lists of topics under that assignment. Each topic has an edit action field. Click on that. 
+3. There we can see that we get “Select a bookmark rating rubric” option which has a drop Down to make choices from. Also on the page where we see the list of topics we have a link to “Manage bookmark rating rubrics”. 
+4. When we go to that link we get the option for setting up the “Minimum Rating” and “Maximum Rating” for that rubric. It also displays the text for that rubric. 
+5. There is also an option of adding a new rubric. 
+Assumptions: Topic should be present at “Your topic” where Bookmarks link will be shown. 
+contributors in the system to rate bookmarks.
+
+
+
+
+
+
+

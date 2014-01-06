@@ -16,6 +16,7 @@ Feature: Manage the courses in Expertiza
       And I fill in "Course1Directory" for "Course Directory"
       And I fill in "A very informational course about information" for "Course Information"
       And I press "Create"
+    And I follow "Manage Courses"
     Then I should see "Course1"
     
   @instructor
@@ -26,11 +27,14 @@ Feature: Manage the courses in Expertiza
       And I fill in "Course1Directory" for "Course Directory"
       And I fill in "A very informational course about information" for "Course Information"
       And I press "Create"
+      And I follow "Manage Courses"
     Then I should see "Course1"
       And I should see "private"
+
     
   @instructor
   @manage_courses
+  @wip
   Scenario: Expertiza will allow an instructor to copy a course
     Given I have a public course named "Course1"
       And I follow "Copy course"
@@ -39,6 +43,7 @@ Feature: Manage the courses in Expertiza
     
   @instructor
   @manage_courses
+  @wip
   Scenario: Expertiza will allow an instructor to delete a course
     Given I have a public course named "Course1"
     And I follow "Delete course"
@@ -46,6 +51,7 @@ Feature: Manage the courses in Expertiza
     
   @instructor
   @manage_courses
+  @wip
   Scenario: Expertiza will allow an instructor to edit a course
     Given I have a public course named "Course1"
       And I follow "Edit course"
@@ -55,6 +61,7 @@ Feature: Manage the courses in Expertiza
     
   @instructor
   @manage_courses
+  @wip
   Scenario: Expertiza will allow an instructor to make a course private
     Given I have a public course named "Course1"
       And I follow "Make private"

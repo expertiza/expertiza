@@ -182,15 +182,17 @@
 
         jQuery('#datetimepicker_' + element_id).datetimepicker({
             dateFormat: 'yy/mm/dd',
-            timeFormat: 'HH:mm:ss z',
+            timeFormat: 'HH:mm z',
             controlType: 'select',
-            timezoneList: [
+            timezoneList: [{value:'<%=Time.zone_offset(@user.timezonepref || '')%>', label: '<%=@user.timezonepref.try(:split, "\s").try(:[], 0)%>'}]
+
+            /*timezoneList: [
                 { value: -000, label: 'GMT'},
                 { value: -300, label: 'Eastern'},
                 { value: -360, label: 'Central' },
                 { value: -420, label: 'Mountain' },
                 { value: -480, label: 'Pacific' }
-            ]
+            ]*/
         });
     }
     function removeDueDateTableElement(deadline_type, round_no) {

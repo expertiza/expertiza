@@ -15,6 +15,7 @@ Feature: Manage the questionnaires in Expertiza
       And I press "Select"
       And I fill in "Name" with "Metareview1"
       And I press "Create metareview"
+      And I follow "Metareview rubrics"
     Then I should see "Metareview1"
     
   @instructor
@@ -24,6 +25,7 @@ Feature: Manage the questionnaires in Expertiza
       And I press "Select"
       And I fill in "Name" with "AuthorFeedback1"
       And I press "Create author feedback"
+      And I follow "Author feedbacks"
     Then I should see "AuthorFeedback1"
 
   @instructor
@@ -33,6 +35,7 @@ Feature: Manage the questionnaires in Expertiza
       And I press "Select"
       And I fill in "Name" with "PublicMetareview"
       And I press "Create review"
+      And I follow "Review rubrics"
     Then I should see "PublicMetareview"
 
   @instructor
@@ -42,6 +45,7 @@ Feature: Manage the questionnaires in Expertiza
       And I press "Select"
       And I fill in "Name" with "TeammateReview1"
       And I press "Create teammate review"
+      And I follow "Teammate review rubrics"
     Then I should see "TeammateReview1"
       
   @instructor
@@ -51,4 +55,5 @@ Feature: Manage the questionnaires in Expertiza
       And I press "Select"
       And I fill in "Name" with "CourseEval"
       And I press "Create course evaluation"
+      And I follow "Course evaluations"
     Then I should see "CourseEval"

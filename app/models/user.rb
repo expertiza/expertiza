@@ -35,8 +35,25 @@ class User < ActiveRecord::Base
   scope :tas, -> { where role_id: Role.ta }
   scope :students, -> { where role_id: Role.student }
 
+  has_paper_trail
+
   def salt_first?
     true
+  end
+
+  def bookmark_rated?(bmapping_id)
+    BmappingRatings.find(:first, :conditions => ["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"])
+  end
+
+  def bookmark_added?(bmapping_id)
+    puts "in bookmark_added?***********" + bmapping_id
+    Bmapping.find(:first, :conditions => ["id = #{bmapping_id} AND user_id = #{self.id}"])
+  end
+
+
+
+  def list_mine(object_type, user_id)
+    object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
   end
 
   def get_available_users(name)
@@ -63,7 +80,11 @@ class User < ActiveRecord::Base
   end
 
   def admin?
-    role.name == 'Administrator' || super_admin?
+    role.admin?
+  end
+
+  def student?
+    role.student?
   end
 
   def is_creator_of?(user)
@@ -197,6 +218,7 @@ class User < ActiveRecord::Base
     @email_on_review = true
     @email_on_submission = true
     @email_on_review_of_review = true
+    @copy_of_emails = false
   end
 
   def self.export(csv, parent_id, options)
@@ -213,7 +235,7 @@ class User < ActiveRecord::Base
         tcsv.push(user.parent.name)
       end
       if (options["email_options"] == "true")
-        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review)
+        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails)
       end
       if (options["handle"] == "true")
         tcsv.push(user.handle)

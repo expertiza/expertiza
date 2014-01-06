@@ -19,8 +19,8 @@ function checkWeights()
     var metareviewWeight = document.getElementById('weights_metareview').value
     var feedbackWeight = document.getElementById('weights_feedback').value
     var teammateWeight = document.getElementById('weights_teammate').value
-
-    var total = parseFloat(reviewWeight) + parseFloat(metareviewWeight) + parseFloat(feedbackWeight) + parseFloat(teammateWeight)
+    var bookmarkratingWeight = document.getElementById('weights_bookmarkrating').value
+    var total = parseFloat(reviewWeight) + parseFloat(metareviewWeight) + parseFloat(feedbackWeight) + parseFloat(teammateWeight) + parseFloat(bookmarkratingWeight)
     if (total == 100) return true
     else {
       alert ("The total of the weights given to an assignment must equal 100%. Your total weight percentage is "+total+"%.")

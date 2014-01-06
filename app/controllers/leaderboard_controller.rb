@@ -2,6 +2,11 @@ class LeaderboardController < ApplicationController
 
   before_filter :authorize
 
+  def action_allowed?
+    true
+  end
+
+
   # Our logic for the overall leaderboard. This method provides the data for
   # the Top 3 leaderboards and the Personal Achievement leaderboards.
   def index

@@ -21,7 +21,7 @@ before_install:
     - bundle config build.raspell --with-opt-dir=
 before_script:
     - mysql -u root < db/grant_expertiza.sql
-    - cp config/database.yml config/database.yml
+    - cp config/database.yml.example config/database.yml
     - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
     - bundle install
     - bundle exec rake db:migrate

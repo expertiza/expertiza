@@ -9,6 +9,7 @@ Given /^I have a (public|private) course named "([^"]*)"$/ do |public_or_private
       step "I fill in \"#{course_name}-directory\" for \"Course Directory\""
       step "I fill in \"A very informational course about information\" for \"Course Information\""
       step "I press \"Create\""
+      step "I follow \"Manage Courses\""
     step "I should see \"Course1\""
 end
 

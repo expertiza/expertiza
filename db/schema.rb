@@ -41,7 +41,6 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.integer  "review_of_review_questionnaire_id"
     t.integer  "teammate_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
-    t.boolean  "team_assignment"
     t.integer  "wiki_type_id",                      :default => 0,     :null => false
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false
@@ -58,6 +57,7 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.boolean  "copy_flag",                         :default => false
     t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "microtask",                         :default => false
+    t.boolean  "is_intelligent"
     t.boolean  "require_quiz"
     t.integer  "num_quiz_questions",                :default => 0,     :null => false
   end
@@ -85,6 +85,69 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
   end
 
   add_index "automated_metareviews", ["response_id"], :name => "fk_automated_metareviews_responses_id"
+
+  create_table "bids", :force => true do |t|
+    t.integer  "topic_id"
+    t.integer  "team_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bmapping_ratings", :force => true do |t|
+    t.integer  "bmapping_id", :null => false
+    t.integer  "user_id",     :null => false
+    t.integer  "rating",      :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bmappings", :force => true do |t|
+    t.integer  "bookmark_id",   :null => false
+    t.string   "title"
+    t.integer  "user_id",       :null => false
+    t.string   "description"
+    t.datetime "date_created",  :null => false
+    t.datetime "date_modified", :null => false
+  end
+
+  create_table "bmappings_sign_up_topics", :id => false, :force => true do |t|
+    t.integer "sign_up_topic_id", :null => false
+    t.integer "bmapping_id",      :null => false
+  end
+
+  create_table "bmappings_tags", :force => true do |t|
+    t.integer  "tag_id",      :null => false
+    t.integer  "bmapping_id", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bookmark_rating_rubrics", :force => true do |t|
+    t.string   "display_text",   :null => false
+    t.integer  "minimum_rating", :null => false
+    t.integer  "maximum_rating", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bookmark_tags", :force => true do |t|
+    t.string   "tag_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bookmarks", :force => true do |t|
+    t.string   "url",                :null => false
+    t.integer  "discoverer_user_id", :null => false
+    t.integer  "user_count",         :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "books", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -244,6 +307,17 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.string  "type"
   end
 
+  create_table "participant_score_views", :id => false, :force => true do |t|
+    t.integer "response_id",                      :default => 0, :null => false
+    t.integer "score"
+    t.integer "weight"
+    t.string  "questionaire_type",  :limit => 64
+    t.integer "max_question_score"
+    t.integer "team_id",                          :default => 0, :null => false
+    t.integer "participant_id"
+    t.integer "assignment_id"
+  end
+
   create_table "participants", :force => true do |t|
     t.boolean  "submit_allowed",       :default => true
     t.boolean  "review_allowed",       :default => true
@@ -282,9 +356,9 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",                     :null => false
+    t.string  "q_type",      :default => "", :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1, :null => false
+    t.integer "question_id", :default => 1,  :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -300,8 +374,8 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.string   "section"
     t.text     "instruction_loc"
+    t.string   "section"
   end
 
   create_table "questions", :force => true do |t|
@@ -312,11 +386,6 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
   end
 
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
-
-  create_table "quiz_grades", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "quiz_question_choices", :force => true do |t|
     t.integer "question_id"
@@ -396,6 +465,34 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.string  "object_type", :default => "",  :null => false
   end
 
+  create_table "score_views", :id => false, :force => true do |t|
+    t.integer  "question_weight"
+    t.integer  "q_id",                                 :default => 0
+    t.string   "q_type",                               :default => ""
+    t.string   "q_parameters"
+    t.integer  "q_question_id",                        :default => 1
+    t.integer  "q1_id",                                :default => 0
+    t.string   "q1_name",                :limit => 64
+    t.integer  "q1_instructor_id",                     :default => 0
+    t.boolean  "q1_private",                           :default => false
+    t.integer  "q1_min_question_score",                :default => 0
+    t.integer  "q1_max_question_score"
+    t.datetime "q1_created_at"
+    t.datetime "q1_updated_at"
+    t.integer  "q1_default_num_choices"
+    t.string   "q1_type"
+    t.string   "q1_display_type"
+    t.string   "q1_section"
+    t.text     "q1_instruction_loc"
+    t.integer  "ques_id",                              :default => 0,     :null => false
+    t.integer  "ques_questionnaire_id"
+    t.integer  "s_id",                                 :default => 0
+    t.integer  "s_question_id",                        :default => 0
+    t.integer  "s_score"
+    t.text     "s_comments"
+    t.integer  "s_response_id"
+  end
+
   create_table "scores", :force => true do |t|
     t.integer "question_id", :default => 0, :null => false
     t.integer "score"
@@ -417,12 +514,13 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "sign_up_topics", :force => true do |t|
-    t.text    "topic_name",                                    :null => false
-    t.integer "assignment_id",                  :default => 0, :null => false
-    t.integer "max_choosers",                   :default => 0, :null => false
+    t.text    "topic_name",                                             :null => false
+    t.integer "assignment_id",                           :default => 0, :null => false
+    t.integer "max_choosers",                            :default => 0, :null => false
     t.text    "category"
-    t.string  "topic_identifier", :limit => 10
-    t.integer "micropayment",                   :default => 0
+    t.string  "topic_identifier",          :limit => 10
+    t.integer "micropayment",                            :default => 0
+    t.integer "bookmark_rating_rubric_id"
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"
@@ -513,6 +611,10 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
   add_index "ta_mappings", ["course_id"], :name => "fk_ta_mappings_course_id"
   add_index "ta_mappings", ["ta_id"], :name => "fk_ta_mappings_ta_id"
 
+  create_table "tags", :force => true do |t|
+    t.string "tagname", :null => false
+  end
+
   create_table "teams", :force => true do |t|
     t.string  "name"
     t.integer "parent_id"
@@ -583,9 +685,21 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.string  "persistence_token"
     t.string  "timezonepref"
     t.text    "public_key"
+    t.boolean "copy_of_emails",                           :default => false
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"
+
+  create_table "versions", :force => true do |t|
+    t.string   "item_type",  :null => false
+    t.integer  "item_id",    :null => false
+    t.string   "event",      :null => false
+    t.string   "whodunnit"
+    t.text     "object"
+    t.datetime "created_at"
+  end
+
+  add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
 
   create_table "wiki_types", :force => true do |t|
     t.string "name", :default => "", :null => false

@@ -3,7 +3,7 @@ Given /^I am participating in (team|individual) assignment "(\S+)"$/ do |assignm
   a.team_assignment = 1
   a.max_team_size=1
 
-  if assignment_type= /^team$/
+  if assignment_type== "team"
     a.max_team_size=3
   end
 

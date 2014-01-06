@@ -7,6 +7,10 @@ class Response < ActiveRecord::Base
   delegate :questionnaire, :reviewee, :reviewer,
     :to => :map
 
+  def response_id
+    id
+  end
+
   def team_has_user?(user)
     reviewer.team.has_user user
   end
@@ -75,8 +79,8 @@ class Response < ActiveRecord::Base
   def notify_on_difference(new_pct, avg_pct, limit)
     mapping = self.map
     instructor = mapping.assignment.instructor
-    Mailer.deliver_message(
-        {:recipients => instructor.email,
+    Mailer.generic_message(
+        {:to => instructor.email,
          :subject => "Expertiza Notification: A review score is outside the acceptable range",
          :body => {
              :first_name => ApplicationHelper::get_user_first_name(instructor),
@@ -92,7 +96,7 @@ class Response < ActiveRecord::Base
              :partial_name => 'limit_notify'
          }
         }
-    )
+    ).deliver
   end
 
   def delete

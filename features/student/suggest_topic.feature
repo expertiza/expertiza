@@ -12,6 +12,7 @@ Scenario: Suggest a topic for assignment
     And I click the "Submit" button
   Then I should see "Thank you for your suggestion!"
 
+@wip
 Scenario: Student logs in, opens the assignment & suggests a topic for an individual Media Wiki assignment
   Given I am participating on a "Fringe_Event"
   And I am logged in as a "student2"

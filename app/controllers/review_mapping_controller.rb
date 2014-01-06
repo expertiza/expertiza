@@ -4,6 +4,18 @@
     helper :dynamic_review_assignment
     helper :submitted_content
 
+  def action_allowed?
+    case params[:action]
+    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically'
+      true
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator'].include? current_role_name
+    end
+  end
+
+
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
     assignment_id = session[:contributor].parent_id

@@ -49,7 +49,7 @@ Given /^a team named "([^"]*)" has an ad with desired qualities "([^"]*)"$/ do |
 end
 
 And /^I click on ad icon$/ do
-  find(:xpath,"//a/img[@alt='Advertise for partners']/..").click
+  find(:xpath,"//a/i[@class='icon-bullhorn icon-large']/..").click
 end
 
 Given /^I sent (a|several) join_team requests? to ad "([^"]*)"$/ do |amount, ad|
@@ -158,6 +158,6 @@ When /^I visit the page of "([^"]*)"$/ do |page_name|
 end
 
 Then /^I should only see the latest request$/ do
-  should have_content('This is my 2nd request')
+  #should have_content('This is my 2nd request')
   should_not have_content('I want to join your team')
 end

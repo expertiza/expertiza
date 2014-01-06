@@ -4,8 +4,11 @@ class SignUpTopic < ActiveRecord::Base
   has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy
   alias_method :deadlines, :topic_deadlines
   has_many :assignment_participants, :foreign_key => 'topic_id'
-
+  has_and_belongs_to_many :bmappings
+  has_many :bids, :foreign_key => 'topic_id', :dependent => :destroy
   belongs_to :assignment
+
+  has_paper_trail
 
   #the below relations have been added to make it consistent with the database schema
   validates_presence_of :topic_name, :assignment_id, :max_choosers
@@ -73,7 +76,7 @@ class SignUpTopic < ActiveRecord::Base
     #making sure that the drop date deadline hasn't passed
     dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})
     if (!dropDate.nil? && dropDate.due_at < Time.now)
-      flash[:error] = "You cannot drop this topic because the drop deadline has passed."
+      #flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
       #if team assignment find the creator id from teamusers table and teams
       #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
@@ -81,8 +84,9 @@ class SignUpTopic < ActiveRecord::Base
       #users_team will contain the team id of the team to which the user belongs
       users_team = SignedUpUser.find_team_users(assignment_id, session_user_id)
       signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
-
+      assignment = Assignment.find(assignment_id)
       #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
+      if(!assignment.is_intelligent?)
       if signup_record.is_waitlisted == false
         #find the first wait listed user if exists
         first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
@@ -105,7 +109,7 @@ class SignUpTopic < ActiveRecord::Base
           Waitlist.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
         end
       end
-
+      end
       if !signup_record.nil?
         participant = Participant.find_by_user_id_and_parent_id(session_user_id, assignment_id)
         #update participant's topic id to nil
@@ -126,13 +130,8 @@ class SignUpTopic < ActiveRecord::Base
 
         #update participants
         assignment = Assignment.find(self.assignment_id)
-        
-        if assignment.team_assignment?
           user_id = TeamsUser.find(:first, :conditions => {:team_id => next_wait_listed_user.creator_id}).user_id
           participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
-        else
-          participant = Participant.find_by_user_id_and_parent_id(next_wait_listed_user.creator_id,assignment.id)
-        end
         
         participant.update_topic_id(self.id)
       end

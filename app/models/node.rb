@@ -5,6 +5,7 @@
 #Author: AJBUDLON
 #Date: 7/18/2008
 class Node < ActiveRecord::Base
+  has_paper_trail
   acts_as_nested_set
 
   belongs_to :parent, :class_name => 'Node', :foreign_key => 'parent_id'
@@ -44,6 +45,10 @@ class Node < ActiveRecord::Base
   
   # Retrieves the node's object create_at
   def get_creation_date
+  end
+
+  # Retrieves the node's object create_at
+  def get_modified_date
   end
   
   # Retrieves the type of children this node has

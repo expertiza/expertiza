@@ -1,5 +1,12 @@
 class BookmarksController < ApplicationController
 
+  def action_allowed?
+    case params[:action]
+    when 'add_bookmark_form', 'add_bookmark', 'view_topic_bookmarks'
+      current_role_name.eql? 'Student'
+    end
+  end
+
   def add_bookmark_form
     # Fields: b_url b_type, b_title b_tags_text, b_type b_description
     @b_url = ""

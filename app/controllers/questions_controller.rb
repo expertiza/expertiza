@@ -35,7 +35,7 @@ class QuestionsController < ApplicationController
 
   # ?? Unknown as of 2/1/2009
   # Need further investigation
-  def SignupSheet
+  def SignUpSheet
     @questions = Question.paginate(:page => params[:page],:per_page => 10)
   end
  

@@ -4,7 +4,7 @@ module AssignmentsHelper
   WAITLIST = "Waitlist open"
   
   def self.find_current_stage(signup_id)
-    due_dates = SignupSheet.find(:all, 
+    due_dates = SignUpSheet.find(:all, 
                  :conditions => ["id = ?", signup_id])
                  
     if due_dates != nil and due_dates.size > 0

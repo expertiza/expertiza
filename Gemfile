@@ -8,6 +8,7 @@ gem 'rails', '~>3.0.0'
 gem 'automated_metareview'
 gem 'bind-it'
 gem 'capistrano'
+gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
@@ -44,7 +45,6 @@ group :development do
 end
 
 group :test do
-  gem 'coveralls', require: false
   gem 'cucumber-rails', require: false
   gem 'database_cleaner'
   gem 'gherkin'

@@ -1,6 +1,6 @@
 class CreateQuizDisplayType < ActiveRecord::Migration
   def self.up
-    TreeFolder.create :name => "Quiz", :child_type => "QuestionnaireNode", :parent_id => 1
+    TreeFolder.create :name => "Quiz", :child_type => "QuestionnaireNode"
   end
 
   def self.down

@@ -566,7 +566,7 @@ class SignUpSheetController < ApplicationController
   #used by save_topic_dependencies. The dependency graph is a partial ordering of topics ... some topics need to be done
   # before others can be attempted.
   def build_dependency_graph(topics,node)
-    SignupSheet.create_dependency_graph(topics,node)
+    SignUpSheet.create_dependency_graph(topics,node)
   end
   #used by save_topic_dependencies. Do not know how this works
   def create_common_start_time_topics(dg)

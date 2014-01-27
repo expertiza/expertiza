@@ -72,6 +72,7 @@ class AssignmentTeam < Team
   def get_submitted_files
     self.get_participants.first.submitted_files
   end
+  alias_method :submitted_files, :get_submitted_files
 
   def get_review_map_type
     'TeamReviewResponseMap'
@@ -177,6 +178,7 @@ class AssignmentTeam < Team
     scores[:total_score] = assignment.compute_total_score(scores)
     scores
   end
+  alias_method :scores, :get_scores
 
   def self.get_team(participant)
     team = nil

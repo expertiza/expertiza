@@ -26,6 +26,7 @@
             </th>
         </tr>
 		
+    <tr>
         <%@l = -1 %>
         <% @reviewers.each do |r| %>
 		<% @this_reviewer = r.reviewer_id %>
@@ -45,12 +46,12 @@
 		        <% username = User.find(parid).fullname%>
 
                 <% if (@l%2) == 0 %>
-                    <tr bgcolor="#ffffff">
+
                         <td bgcolor="#ffffff" rowspan= <%= @rspan%>>
                             <%= link_to_remote_redbox  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
                         </td>
                  <%else %>
-                    <tr bgcolor="#DDDDBB">
+
                         <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
                             <%= link_to_remote_redbox  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
                         </td>
@@ -62,7 +63,7 @@
                         <%= @count %>/<%= @rspan %>
                     </td>
                 <%else %>
-                    <td align = "center" rowspan= <%= @rspan%> style = "color:#DD3300">
+                  <td align = "center" rowspan= <%= @rspan%>>
                         <%= @count %>/<%= @rspan %>
                     </td>
                 <%end %>
@@ -94,7 +95,30 @@
                             <%end %>
                             <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                                </td>
-                        </tr>
+
+
+                      <% elsif !@assignment.team_assignment? %>
+                          <% @participantid = (Participant.find(ri.reviewee_id)).user_id %>
+                          <% @myuser = 0%>
+                          <% @myuser = ri.reviewee_id%>
+                          <% participant = User.find(@participantid) %>
+                          <% if (@l%2) == 0 %>
+                              <td id = "green" bgcolor="#ffffff" align = 'center' colspan=1>
+                          <%else %>
+                              <td id = "green" bgcolor="#DDDDBB" align = 'center' colspan=1>
+                          <%end %>
+                          <%= link_to_remote_redbox participant.fullname, :url => {:controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
+                          </td>
+                          <%= render :partial => 'participantscore' %>
+                          <!-- write ur partial here to print score -->
+                          <% if (@l%2) == 0 %>
+                              <td bgcolor="#ffffff" align = 'center'>
+                          <%else %>
+                              <td bgcolor="#DDDDBB" align = 'center'>
+                          <%end %>
+                          <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+
+                          </td>
 
                         <%end %>
 
@@ -117,6 +141,29 @@
                             <%end %>
                             No
                             </td>
+
+                      <% elsif !@assignment.team_assignment? %>
+                          <% @participantid = Participant.find(ri.reviewee_id).user_id %>
+                          <% @myuser = 0%>
+                          <% @myuser = ri.reviewee_id%>
+
+                          <% participant = User.find(@participantid) %>
+
+                          <% if (@l%2) == 0 %>
+                              <td id = "red" style ="color:#DD3300" align = 'center' colspan=1 bgcolor="#ffffff" >
+                          <%else%>
+                              <td  id = "red" style ="color:#DD3300" align = 'center' colspan=1 bgcolor="#DDDDBB"  >
+                          <%end%>
+                          <%= link_to_remote_redbox participant.fullname, :url => {:controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => nil} %>
+                          </td><!-- write ur partial here to print score -->
+                          <%= render :partial => 'participantscore' %>
+                          <% if (@l%2) == 0 %>
+                              <td bgcolor="#ffffff" align = 'center'>
+                          <%else %>
+                              <td bgcolor="#DDDDBB" align = 'center'>
+                          <%end %>
+                          No
+                          </td>
                             </tr>
                       <%end %>
                   <%end %>

@@ -1,7 +1,10 @@
 class ExportFileController < ApplicationController
-  # OSS808 Change 28/10/2013
-  # FasterCSV replaced now by CSV which is present by default in Ruby
-  #require 'fastercsv'
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator',
+     'Super-Administrator'].include? current_role_name
+  end
 
   def start
     @model = params[:model]

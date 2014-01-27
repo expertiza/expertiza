@@ -4,6 +4,9 @@ class ControllerActionsController < ApplicationController
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :index }
 
+  def action_allowed?
+    current_role_name.eql?("Super-Administrator")
+  end
 
   def index
     @controller_actions = ControllerAction.order(:name).paginate(per_page: 50, page: 1)

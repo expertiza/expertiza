@@ -1,6 +1,11 @@
 class JoinTeamRequestsController < ApplicationController
   # GET /join_team_requests
   # GET /join_team_requests.xml
+
+  def action_allowed?
+    current_role_name.eql?("Student")
+  end
+
   def index
     @join_team_requests = JoinTeamRequest.all
 
@@ -45,23 +50,23 @@ class JoinTeamRequestsController < ApplicationController
       flash[:note] = "You are already a member of team."
     else
 
-      @join_team_request = JoinTeamRequest.new
-      @join_team_request.comments = params[:comments]
-      @join_team_request.status = 'P'
-      @join_team_request.team_id = params[:team_id]
+    @join_team_request = JoinTeamRequest.new
+    @join_team_request.comments = params[:comments]
+    @join_team_request.status = 'P'
+    @join_team_request.team_id = params[:team_id]
 
-      participant = Participant.find_by_user_id_and_parent_id(session[:user][:id],params[:assignment_id])
-      @join_team_request.participant_id= participant.id
-      respond_to do |format|
-        if @join_team_request.save
-          format.html { redirect_to(@join_team_request, :notice => 'JoinTeamRequest was successfully created.') }
-          format.xml  { render :xml => @join_team_request, :status => :created, :location => @join_team_request }
-        else
-          format.html { render :action => "new" }
-          format.xml  { render :xml => @join_team_request.errors, :status => :unprocessable_entity }
-        end
+    participant = Participant.find_by_user_id_and_parent_id(session[:user][:id],params[:assignment_id])
+    @join_team_request.participant_id= participant.id
+    respond_to do |format|
+      if @join_team_request.save
+        format.html { redirect_to(@join_team_request, :notice => 'JoinTeamRequest was successfully created.') }
+        format.xml  { render :xml => @join_team_request, :status => :created, :location => @join_team_request }
+      else
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @join_team_request.errors, :status => :unprocessable_entity }
       end
     end
+  end
   end
 
   # PUT /join_team_requests/1

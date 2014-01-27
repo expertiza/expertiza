@@ -1,0 +1,16 @@
+<h1>Editing bookmark_tag</h1>
+
+<% form_for(@bookmark_tag) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :tag_name %><br />
+    <%= f.text_field :tag_name %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @bookmark_tag %> |
+<%= link_to 'Back', bookmark_tags_path %>

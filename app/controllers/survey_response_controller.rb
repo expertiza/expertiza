@@ -1,5 +1,9 @@
 class SurveyResponseController < ApplicationController
 
+  def action_allowed?
+    true
+  end
+
   def begin_survey
     unless session[:user] #redirect to homepage if user not logged in
       redirect_to '/'

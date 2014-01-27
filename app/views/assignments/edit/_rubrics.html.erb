@@ -93,14 +93,13 @@
           <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>.assignment_questionnaire,
           <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>
           );
-          if(<%= !@assignment.has_teams? %> && <%= @assignment.max_team_size > 0 %> ){
         addQuestionnaireTableRow(
           'TeammateReviewQuestionnaire',
           <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>.teammate_review_questionnaire,
           <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>.assignment_questionnaire,
           <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>
           );
-          }}());
+      }());
   </script>
 </table>
 

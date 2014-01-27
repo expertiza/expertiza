@@ -13,6 +13,7 @@ Given /^I try to create a (public|private) teammate review/ do |public_or_privat
       And "I fill in \"TeammateReview1\" for \"Name\""
       And "I fill in \"Question1\" for \"Question\""
       And "I press \"Create teammate review\""
+      And "I follow \"Teammate review rubrics\""
     Then "I should see \"TeammateReview1\""
 end
 
@@ -23,6 +24,7 @@ Given /^I try to create a (public|private) review/ do |public_or_private|
       And "I fill in \"Review1\" for \"Name\""
       And "I fill in \"Question1\" for \"Question\""
       And "I press \"Create review\""
+      And "I follow \"Review rubrics\""
     Then "I should see \"Review1\""
 end
 
@@ -33,6 +35,7 @@ Given /^I try to create a (public|private) metareview/ do |public_or_private|
       And "I fill in \"Metareview1\" for \"Name\""
       And "I fill in \"Question1\" for \"Question\""
       And "I press \"Create Metareview\""
+      And "I follow \"Metareview rubrics\""
     Then "I should see \"Metareview1\""
 end
 
@@ -43,6 +46,7 @@ Given /^I try to create a (public|private) author feedback review/ do |public_or
       And "I fill in \"AuthorFeedback1\" for \"Name\""
       And "I fill in \"Question1\" for \"Question\""
       And "I press \"Create author feedback\""
+      And "I follow \"Author feedbacks\""
     Then "I should see \"AuthorFeedback1\""
 end
 

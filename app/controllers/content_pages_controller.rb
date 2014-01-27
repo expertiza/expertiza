@@ -4,6 +4,15 @@ class ContentPagesController < ApplicationController
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :list }
 
+  def action_allowed?
+    case params[:action]
+    when 'view', 'view_default'
+      true
+    else
+      current_role_name.eql?('Super-Administrator')
+    end
+  end
+
   def index
     list
     render :action => 'list'

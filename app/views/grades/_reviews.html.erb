@@ -1,13 +1,31 @@
 <% if rscore and rscore[:assessments].length > 0 %>
+
     <BR/>
     <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
-    <BR/>
+
     <HR/>
+
+    <%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
+    <%= stylesheet_link_tag 'jquery-ui-1.10.3.custom.min' %>
+    <script src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="/javascripts/jquery-ui-timepicker-addon.js"></script>
+
+    <%= form_for @assignment, html: {id: 'review_form'} do %>
+
+        <div id="reviewtabs">
+          <ul>
+            <% for i in 1..rscore[:assessments].length %>
+                <li><a href="#reviewtabs-<%= i %>">Review <%= i %></a></li>
+            <% end %>
+          </ul>
+
     <% count = 0 %>
     <% for review in rscore[:assessments] %>
       <% review_feedback = nil %>
 
       <% count = count + 1 %>
+
+
 
     <% file_url = nil
     review_questionnaire = @assignment.questionnaires.select {|x| x.display_type == 'Review'}
@@ -45,6 +63,10 @@
         <% end %>
     <% else %>
         <% if @questionnaire.section.eql? "Custom" %>
+
+          <div id="reviewtabs-<%= count %>">
+
+
             <h2>Review <%= count %></h2>
             <!-- Display the latest review first -->
             <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a>
@@ -54,7 +76,7 @@
             <% @sorted_array=Array.new %>
             <% @prev=Response.all %>
             <%for element in @prev     %>
-                <%if(element.map_id==review.map.id)%>
+              <%if(element.map_id==review.map.map_id)%>
                     <%array_not_empty=1 %>
                     <% @sorted_array << element %>
                 <% end %>
@@ -84,21 +106,31 @@
             <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
             review_feedback = map.try :response %>
             <% if review_feedback %>
-                <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
-                <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>
+            <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %>
+            or
+            <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %>
+            feedback for Review <%= count %>
             <% else %>
-                <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+          <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %>
+          for Review <%= count %>
             <% end %>
-            <BR/><HR/><BR/>
+
+
+    </div>
+
         <% else %>
+
+    <div id="reviewtabs-<%= count %>">
+
             <h2>Review <%= count %></h2>
             <!-- Display the latest review first -->
-            <%= review.display_as_html(nil,review.version_num, file_url) %><BR/><BR/>
+      <%= review.display_as_html(nil, review.version_num, file_url) %>
+      <BR/><BR/>
             <!-- get all previous versions -->
             <% @sorted_array=Array.new %>
             <% @prev=Response.all %>
             <%for element in @prev     %>
-                <%if(element.map_id==review.map.id)%>
+        <%if(element.map_id==review.map.map_id)%>
                     <%array_not_empty=1 %>
                     <% @sorted_array << element %>
                 <% end %>
@@ -125,15 +157,40 @@
             <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
                 review_feedback = map.try :response %>
             <% if review_feedback %>
-                <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
-                <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>
+      <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %>
+      or
+      <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %>
+      feedback for Review <%= count %>
             <% else %>
-                <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+    <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %>
+    for Review <%= count %>
             <% end %>
-            <BR/><HR/><BR/>
+
+                       </div>
+
         <% end %>
     <% end %>
+
+          <% end %>
+
+
+
+        </div>
+
+
+        <script>
+            jQuery(document).ready(function () {
+                jQuery("#reviewtabs").tabs();
+            });
+        </script>
+
     <% end %>
+
+
+
 <% else %>
     <i>No reviews have been completed for this user's submissions.</i>
 <% end %>
+
+
+

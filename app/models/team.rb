@@ -1,7 +1,10 @@
 class Team < ActiveRecord::Base
-  has_many :teams_users
+  has_many :teams_users, :dependent => :destroy
   has_many :users, :through => :teams_users
   has_many :join_team_requests
+  has_one :team_node,:foreign_key => :node_object_id,:dependent => :destroy
+  has_many :bids, :dependent => :destroy
+  has_paper_trail
 
   def get_participants
     Participant.find_all_by_id users.map(&:id)

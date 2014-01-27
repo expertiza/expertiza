@@ -1,6 +1,12 @@
 <% @assignment = Assignment.find(params[:id]) %>
 <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
 
+
+<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <br/>
+<%= link_to 'Manage all Bookmarks', :controller => 'bookmarks', :action => 'manage_bookmarks' %>
+
+
+
 <% if flash[:notice] %>
     <div class="flash_note"><%= flash[:notice] %></div>
 <% end %>

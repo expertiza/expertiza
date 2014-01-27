@@ -1,10 +1,18 @@
 class AuthController < ApplicationController
   helper :auth
-  before_filter :authorize, :except => :login
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :login, :logout ],
     :redirect_to => { :action => :list }
+
+  def action_allowed?
+    case params[:action]
+    when 'login', 'logout', 'login_failed'
+      true
+    else
+      current_role_name.eql?("Super-Administrator")
+    end
+  end
 
   def login
     if request.get?

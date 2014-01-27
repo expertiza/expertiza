@@ -35,9 +35,28 @@ assignment<%= i %>:
   num_reviewers: <%= i%5+1 %>
   spec_location:
   wiki_type_id: 1
-#  team_count: <%= 2*i %>
-  
+  max_team_size: <%= 2*i %>
 <% end %>
+Intelligent_assignment:
+  name: Intelligent_assignment
+  directory_path: assignment331_dir
+  submitter_count: 1
+  course: course110
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
+  private: 0
+  num_reviews: 1
+  num_review_of_reviews: 1
+  num_review_of_reviewers: 1
+  review_questionnaire_id: <%= q_list[0] %>
+  review_of_review_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
+  author_feedback_questionnaire_id:  <%= Fixtures.identify(:peer_review_questionnaire) %>
+  teammate_review_questionnaire_id: <%= Fixtures.identify(:teammate_review_questionnaire) %>
+  reviews_visible_to_all: <%= 1 %>
+  require_signup: <%= 1 %>
+  num_reviewers: <%= 2 %>
+  spec_location:
+  wiki_type_id: <%= Fixtures.identify(:MediaWiki) %>
+  is_intelligent: 1
 
 assignment_team_count:
   name: Assignment Team Count
@@ -58,8 +77,8 @@ assignment_team_count:
   num_reviewers: <%= 2 %>
   spec_location:
   wiki_type_id: <%= Fixtures.identify(:MediaWiki) %>
-#  team_count: 2
- 
+  max_team_size: 2
+
 assignment_review0:
   name: Assignment Review 0
   directory_path: assignment331_dir
@@ -78,9 +97,9 @@ assignment_review0:
   require_signup: <%= 1 %>
   num_reviewers: <%= 3 %>
   spec_location:
-#  team_count: 2
+  max_team_size: 2
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %> 
- 
+
 #Assignments for course_object_oriented for instructor 1
 assignment_project1:
   name: Assignment_Project1
@@ -100,9 +119,8 @@ assignment_project1:
   require_signup: <%= 0 %>
   num_reviewers: <%= 3 %>
   spec_location:
-#  team_count: 2
+  max_team_size: 2
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>
-
 
 assignment_project2:
   name: Assignment_Project2
@@ -122,7 +140,7 @@ assignment_project2:
   require_signup: <%= 0 %>
   num_reviewers: <%= 3 %>
   spec_location:
-#  team_count: 2
+  max_team_size: 2
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>
 
 assignment_project3:
@@ -143,7 +161,7 @@ assignment_project3:
   require_signup: <%= 0 %>
   num_reviewers: <%= 3 %>
   spec_location:
-#  team_count: 1
+  max_team_size: 1
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>
 
 ################################################################
@@ -168,7 +186,7 @@ assignment_microtask1:
   reviews_visible_to_all: <%= 0 %>
   require_signup: <%= 0 %>
   num_reviewers: <%= 3 %>
-#  team_count: 1
+  max_team_size: 1
   microtask: true
 
 assignment_microtask2:
@@ -185,7 +203,7 @@ assignment_microtask2:
   reviews_visible_to_all: <%= 0 %>
   require_signup: <%= 0 %>
   num_reviewers: <%= 3 %>
-#  team_count: 1
+  max_team_size: 1
   microtask: true
   staggered_deadline: true
 
@@ -203,5 +221,26 @@ suggest_topic_assignment:
     reviews_visible_to_all: <%= 0 %>
     require_signup: <%= 0 %>
     num_reviewers: <%= 3 %>
-#    team_count: 1
+    max_team_size: 1
     staggered_deadline: true
+
+lottery_assignment:
+  name: LotteryAssignment
+  submitter_count: 0
+  course_id:  <%= Fixtures.identify(:course_object_oriented) %>
+  instructor_id: <%= Fixtures.identify(:instructor1) %>
+  private: 0
+  num_reviews: 1
+  num_review_of_reviews: 1
+  num_review_of_reviewers: 3
+  review_questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+  review_of_review_questionnaire_id: <%= Fixtures.identify(:questionnaire2) %>
+  teammate_review_questionnaire_id: <%= Fixtures.identify(:teammate_review_questionnaire) %>
+  reviews_visible_to_all: <%= 0 %>
+  team_assignment: <%= 1 %>
+  wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>
+  require_signup: <%= 1 %>
+  num_reviewers: <%= 3 %>
+  spec_location:
+  author_feedback_questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
+  max_team_size: 3

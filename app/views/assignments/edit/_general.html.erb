@@ -136,6 +136,13 @@
       <%= check_box_tag('assignment[require_signup]', 'true', @assignment.require_signup?, {:onChange => 'hasTopicsChanged()'}) %>
       <%= label_tag('assignment[require_signup]', 'Has topics?') %>
     </td>
+    <td style='padding:5px' id='assignment_is_intelligent_field'>
+      <%= label_tag('assignment[is_intelligent]', 'Intelligent Topic Selection:') %>
+      <select id="assignment_is_intelligent_field" name="assignment[is_intelligent]">
+        <option value=false style="width:75px">No</option>
+        <option value=true style="width:75px" <% if @assignment.is_intelligent %>SELECTED<%end%>>Yes</option>
+      </select>
+    </td>
   </tr>
 
   <% if @assignment.require_signup? %>
@@ -171,7 +178,7 @@
       <%= select('assignment', 'wiki_type_id', wiki_type_options, :selected => @assignment.wiki_type_id) %>
     </td>
   </tr>
-
+ <!--staggered_deadlin-->
   <tr>
     <td style='padding:5px' id='assignment_staggered_deadline_field'>
       <input name="assignment[staggered_deadline]" type="hidden" value="false"/>
@@ -217,6 +224,7 @@
       <%= label_tag('assignment[availability_flag]', 'Available to students?') %>
     </td>
   </tr>
+ <!--Quiz fields-->
 
   <tr>
     <td style='padding:5px' id='assignment_is_coding_assignment_field'>
@@ -224,9 +232,14 @@
       <%= check_box_tag('assignment[is_coding_assignment]', 'true', @assignment.is_coding_assignment, {:onchange => 'is_coding_assignmentChanged()'}) %>
       <%= label_tag('assignment[is_coding_assignment]', 'Is code submission required?') %>
     </td>
+    <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment.require_quiz %>>
+      <%= label_tag('assignment[num_quiz_questions]', 'Number of Quiz questions:') %>
+      <%= text_field_tag('assignment[num_quiz_questions]', @assignment.num_quiz_questions, { :style => 'width:20px'}) %>
+    </td>
   </tr>
 
 </table>
+
 
 <script>
     function hasTopicsChanged() {
@@ -299,6 +312,15 @@
             jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
         } else {
             jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
+        }
+    }
+
+
+    function hasQuizChanged() {
+        if (jQuery('#assignment_require_quiz').is(':checked')) {
+            jQuery('#assignment_numbers_of_quiz_field').removeAttr('hidden');
+        } else {
+            jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);
         }
     }
 </script>

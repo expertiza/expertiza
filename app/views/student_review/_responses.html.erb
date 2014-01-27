@@ -80,23 +80,57 @@
                     <%= link_to "Review Code", { :controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
                   <% end %>
                 </td>
+                <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
+                    <%- # show the link as edit when latest review is done in current phase  -%>
+                    <%- # show link as update when latest review is done in different phase than current phase  -%>
+                    <% if (deadline_version.due_at == deadline_time.due_at) %>
+                        <td><%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @sorted[0].id} %></td>
               <% else %>
-                <td>Begin</td><td> (Work has not yet been submitted)</td>
+                        <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
               <% end %>
             <% end %>
+            <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
+                <% if @assignment.staggered_deadline? %>
+                    <% if map.type.to_s == "MetareviewResponseMap" %>
+                        <% if @assignment.get_current_stage(participant.topic_id) == 'metareview' %>
+                            <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
           <% else %>
-            <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                            <td>Begin</td>
+                            <td> (Work has not yet been submitted)</td>
+                        <% end %>
+                    <% else %>
+                        <% if @assignment.get_current_stage(participant.topic_id) != 'submission' %>
+                            <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
             <td>&nbsp;&nbsp;</td>
-            <%#- Display link for code review if 'any' code review files -%>
-            <%#- have been uploaded i.e. files present in code review dir-%>
+                            <%- # Display link for code review if 'any' code review files  -%>
+                            <%- # have been uploaded i.e. files present in code review dir  -%>
             <td>&nbsp;&nbsp;&nbsp;&nbsp;
               <% if participant.get_files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
+                                  <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id} %>
+                              <% end %>
+                            </td>
+                        <% else %>
+                            <td>Begin</td>
+                            <td> (Work has not yet been submitted)</td>
+                        <% end %>
+                    <% end %>
+                <% else %>
+                    <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                    <td>&nbsp;&nbsp;</td>
+                    <%- # Display link for code review if 'any' code review files  -%>
+                    <%- # have been uploaded i.e. files present in code review dir -%>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;
+                      <% if participant.get_files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
                 <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
               <% end %>
             </td>
           <% end %>
-        <% else %><%#- Deadline has passed, and the work was not submitted -%>
-          <td>Begin</td><td> (Work has not yet been submitted)</td>for
+              <% end %>
+            <% end %>
+          <% end %>
+        <% else %>
+          <td>Begin</td>
+            <td> Work has not yet been submitted</td>for
         <% end %>
         <% review_no += 1 %>
       </tr>
@@ -107,13 +141,15 @@
         <TABLE class="grades" style=" font-style: italic; margin-left: 90px;">
           <% if (@sorted.size > 1) %>
             <% for i in 1..@sorted.size-1 %>
-              <tr><td colspan="10"><%= link_to "Review done at --#{@sorted[i].created_at}" ,{:controller => 'response', :action => 'view', :id => @sorted[i].id} %></td></tr>
+                        <tr>
+                <td colspan="10"><%= link_to "Review done at --#{@sorted[i].created_at}" ,{:controller => 'response', :action => 'view', :id => @sorted[i].id} %></td>
+              </tr>
             <% end %>
           <% else %>
             <tr><td><br> <font color="gray" style="font-style: italic;">No Previous Versions available</font></td></tr>
             <% end %>
-          <% end %>
         </TABLE>
     <% end %>
+  <% end %>
   <% end %>
 </table>

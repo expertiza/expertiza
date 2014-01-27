@@ -1,5 +1,9 @@
 class SiteControllersController < ApplicationController
 
+  def action_allowed?
+    current_role_name.eql?("Super-Administrator")
+  end
+
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :index }

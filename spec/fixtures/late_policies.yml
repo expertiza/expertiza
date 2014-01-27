@@ -1,0 +1,31 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+late_policy0:
+  penalty_period_in_minutes: 0
+  penalty_per_unit: 0
+  expressed_as_percentage: 0
+  max_penalty: 0
+late_policy1:
+  penalty_period_in_minutes: 30
+  penalty_per_unit: 5
+  expressed_as_percentage: 0
+  max_penalty: 20
+late_policy2:
+  penalty_period_in_minutes: 30
+  penalty_per_unit: 4
+  expressed_as_percentage: 1
+  max_penalty: 20
+late_policy3:
+  penalty_period_in_minutes: 60
+  penalty_per_unit: 2
+  expressed_as_percentage: 1
+  max_penalty: 40
+late_policy4:
+  penalty_period_in_minutes: 60
+  penalty_per_unit: 2
+  expressed_as_percentage: 0
+  max_penalty: 40
+late_policy5:
+  penalty_period_in_minutes: 120
+  penalty_per_unit: 2
+  expressed_as_percentage: 0
+  max_penalty: 50

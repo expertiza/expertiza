@@ -1,7 +1,7 @@
 class DataMigrations
   def self.run!
     files = Dir['./db/data_migrations/*.rb'].reject do |s|
-      s[/data_migrations.rb/]
+      s[/data_migrations.rb|scrub_database.rb/]
     end
 
     files.each do |file|

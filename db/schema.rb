@@ -41,7 +41,6 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.integer  "review_of_review_questionnaire_id"
     t.integer  "teammate_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
-    t.boolean  "team_assignment"
     t.integer  "wiki_type_id",                      :default => 0,     :null => false
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false
@@ -701,8 +700,8 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.text    "digital_certificate"
     t.string  "persistence_token"
     t.string  "timezonepref"
-    t.boolean "copy_of_emails",                           :default => false
     t.text    "public_key"
+    t.boolean "copy_of_emails",                           :default => false
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"

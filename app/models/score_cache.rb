@@ -195,7 +195,7 @@ class ScoreCache < ActiveRecord::Base
       #end
     end
 
-    average_score /= participant_count
+    average_score /= participant_count if participant_count != 0
     @result_hash = Array.new
     @result_hash[0] = average_score
     min_value = minmax_hash.min

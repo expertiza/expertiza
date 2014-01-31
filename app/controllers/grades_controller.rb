@@ -118,17 +118,19 @@ class GradesController < ApplicationController
       reviewee = participant.team
       review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
 
-    if review_mapping.nil?
-      review_exists = false
-      if participant.assignment.team_assignment?
-        review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-    end
-    review = Response.find_by_map_id(review_mapping.map_id)
+      if review_mapping.nil?
+        review_exists = false
+        if participant.assignment.team_assignment?
+          review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+        end
+        review = Response.find_by_map_id(review_mapping.map_id)
 
-    unless review_exists
-      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.map_id, :return => "instructor"
-    else
-      redirect_to :controller => 'response', :action => 'edit', :id => review.id, :return => "instructor"
+        unless review_exists
+          redirect_to :controller => 'response', :action => 'new', :id => review_mapping.map_id, :return => "instructor"
+        else
+          redirect_to :controller => 'response', :action => 'edit', :id => review.id, :return => "instructor"
+        end
+      end
     end
   end
 
@@ -274,6 +276,7 @@ You submitted a score of ##[recipients_grade] for assignment ##[assignment_name]
     
 The Expertiza system has brought this to my attention."
   end
+
   def calculate_all_penalties(assignment_id)
     @all_penalties = Hash.new
     @assignment = Assignment.find_by_id(assignment_id)

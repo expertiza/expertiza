@@ -1,6 +1,20 @@
 class GradesController < ApplicationController
+  use_google_charts
   helper :file
   helper :submitted_content
+  helper :penalty
+  include PenaltyHelper
+
+  def action_allowed?
+    case params[:action]
+    when 'view_my_scores'
+      current_role_name.eql? 'Student'
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator'].include? current_role_name
+    end
+  end
 
   #the view grading report provides the instructor with an overall view of all the grades for
   #an assignment. It lists all participants of an assignment and all the reviews they received.
@@ -15,10 +29,33 @@ class GradesController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     }
     @scores = @assignment.get_scores(@questions)
+    calculate_all_penalties(@assignment.id)
   end
 
   def view_my_scores
+
     @participant = AssignmentParticipant.find(params[:id])
+
+    @average_score_results = Array.new
+    @average_score_results = ScoreCache.get_class_scores(@participant.id)
+
+    @statistics = Array.new
+    @average_score_results.each { |x|
+      @statistics << x
+    }
+
+    puts "Participant id"
+    puts @participant.id
+    @average_reviews = ScoreCache.get_reviews_average(@participant.id)
+    @average_metareviews = ScoreCache.get_metareviews_average(@participant.id)
+
+    @my_reviews = ScoreCache.my_reviews(@participant.id)
+
+    puts "My Reviews are"
+    puts @my_reviews
+
+    @my_metareviews = ScoreCache.my_metareviews(@participant.id)
+
     return if redirect_when_disallowed
     @assignment = @participant.assignment
     @questions = Hash.new
@@ -27,10 +64,9 @@ class GradesController < ApplicationController
         |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-
     ## When user clicks on the notification, it should go away
     #deleting all review notifications
-    rmaps = @participant.response_maps
+    rmaps = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(@participant.id, @participant.assignment.id)
     for rmap in rmaps
       rmap.notification_accepted = true
       rmap.save
@@ -51,6 +87,7 @@ class GradesController < ApplicationController
 
     @pscore = @participant.get_scores(@questions)
     @stage = @participant.assignment.get_current_stage(@participant.topic_id)
+    calculate_all_penalties(@assignment.id)
   end
 
   def edit
@@ -63,7 +100,7 @@ class GradesController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 
-    @scores = @participant.get_scores(@questions)
+    @scores = @participant.scores(@questions)
   end
 
   def instructor_review
@@ -80,18 +117,11 @@ class GradesController < ApplicationController
     if participant.assignment.team_assignment?
       reviewee = participant.team
       review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
-    else
-      reviewee = participant
-      review_mapping = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
-    end
 
     if review_mapping.nil?
       review_exists = false
       if participant.assignment.team_assignment?
         review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-      else
-        review_mapping = ParticipantReviewResponseMap.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-      end
     end
     review = Response.find_by_map_id(review_mapping.map_id)
 
@@ -160,16 +190,16 @@ class GradesController < ApplicationController
     if @submission == "review"
       @caction = "view_review"
       @symbol = "review"
-      process_response("Review", "Reviewer", @participant.get_reviews, "ReviewQuestionnaire")
+      process_response("Review", "Reviewer", @participant.reviews, "ReviewQuestionnaire")
     elsif @submission == "review_of_review"
       @symbol = "metareview"
-      process_response("Metareview", "Metareviewer", @participant.get_metareviews, "MetareviewQuestionnaire")
+      process_response("Metareview", "Metareviewer", @participant.metareviews, "MetareviewQuestionnaire")
     elsif @submission == "review_feedback"
       @symbol = "feedback"
-      process_response("Feedback", "Author", @participant.get_feedback, "AuthorFeedbackQuestionnaire")
+      process_response("Feedback", "Author", @participant.feedback, "AuthorFeedbackQuestionnaire")
     elsif @submission == "teammate_review"
       @symbol = "teammate"
-      process_response("Teammate Review", "Reviewer", @participant.get_teammate_reviews, "TeammateReviewQuestionnaire")
+      process_response("Teammate Review", "Reviewer", @participant.teammate_reviews, "TeammateReviewQuestionnaire")
     end
 
     @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."
@@ -243,5 +273,52 @@ class GradesController < ApplicationController
 You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+". 
     
 The Expertiza system has brought this to my attention."
+  end
+  def calculate_all_penalties(assignment_id)
+    @all_penalties = Hash.new
+    @assignment = Assignment.find_by_id(assignment_id)
+    participant_count = 0
+    calculate_for_participant = false
+    if @assignment.is_penalty_calculated == false
+      calculate_for_participants = true
+    end
+    Participant.find_all_by_parent_id(assignment_id).each do |participant|
+      penalties = calculate_penalty(participant.id)
+      @total_penalty =0
+      if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
+        if(penalties[:submission].nil?)
+          penalties[:submission]=0
+        end
+        if(penalties[:review].nil?)
+          penalties[:review]=0
+        end
+        if(penalties[:meta_review].nil?)
+          penalties[:meta_review]=0
+        end
+        @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
+        l_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+        if(@total_penalty > l_policy.max_penalty)
+          @total_penalty = l_policy.max_penalty
+        end
+        if calculate_for_participants == true
+          penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
+          CalculatedPenalty.create(penalty_attr1)
+
+          penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
+          CalculatedPenalty.create(penalty_attr2)
+
+          penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
+          CalculatedPenalty.create(penalty_attr3)
+        end
+      end
+      @all_penalties[participant.id] = Hash.new
+      @all_penalties[participant.id][:submission] = penalties[:submission]
+      @all_penalties[participant.id][:review] = penalties[:review]
+      @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
+      @all_penalties[participant.id][:total_penalty] = @total_penalty
+    end
+    if @assignment.is_penalty_calculated == false
+      @assignment.update_attribute(:is_penalty_calculated, true)
+    end
   end
 end

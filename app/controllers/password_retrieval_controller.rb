@@ -1,4 +1,9 @@
 class PasswordRetrievalController < ApplicationController
+
+  def action_allowed?
+    true
+  end
+
   def forgotten
   end
 

@@ -1,5 +1,10 @@
 class ExportFileController < ApplicationController
-  require 'fastercsv'
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator',
+     'Super-Administrator'].include? current_role_name
+  end
 
   def start
     @model = params[:model]
@@ -33,7 +38,7 @@ class ExportFileController < ApplicationController
       filename = "out.txt"
       delimiter = other_char
     end
-    csv_data = FasterCSV.generate(:col_sep => delimiter) do |csv|
+    csv_data = CSV.generate(:col_sep => delimiter) do |csv|
       csv << Object.const_get(params[:model]).get_export_fields(params[:options])
 
       Object.const_get(params[:model]).export(csv, params[:id],params[:options])

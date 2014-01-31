@@ -1,5 +1,11 @@
 Expertiza::Application.routes.draw do |map|
+  map.resources :bookmark_tags
 
+  map.resources :books
+
+  map.resources :bookmarks
+
+  map.resources :join_team_requests
   resources :admin do
     collection do
       get :list_super_administrators
@@ -57,6 +63,10 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+
+
+
+
   resources :controller_actions do
     collection do
       get 'list'
@@ -94,6 +104,8 @@ Expertiza::Application.routes.draw do |map|
   resources :export_file do
     collection do
       get :start
+      get :export
+      post :export
     end
   end
 
@@ -103,7 +115,7 @@ Expertiza::Application.routes.draw do |map|
       get :view_my_scores
       get :view_my_scores_new
       get :instructor_review
-      get :remove_hyperlink
+      post :remove_hyperlink
       get :conflict_notification
     end
   end
@@ -122,17 +134,32 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  match '/import_file/import', controller: :import_file, action: :import
+
   resources :institutions
 
-  resources :invitation
+  resources :invitation do
+    collection do
+      get :cancel
+      get :accept
+      get :decline
+    end
+  end
 
-  resources :join_team_requests
+  resources :join_team_requests do
+    collection do
+      get :decline
+    end
+  end
+
+  match 'late_policies', controller: :late_policies, action: :index
 
   resources :leaderboard, constraints: {id: /\d+/} do
     collection do
       get :index
     end
   end
+
   match 'leaderboard/index', controller: :leaderboard, action: :index
 
   resources :markup_styles
@@ -152,13 +179,18 @@ Expertiza::Application.routes.draw do |map|
       get :add
       post :add
       get :auto_complete_for_user_name
+      get :delete_assignment_participant
       get :list
       get :change_handle
+      get :inherit
+      get :bequeath_all
       post :delete
       get :inherit
       get :bequeath_all
     end
   end
+
+  match '/participants/change_handle', controller: :participants, action: :change_handle
 
   resources :password_retrieval do
     collection do
@@ -196,36 +228,72 @@ Expertiza::Application.routes.draw do |map|
 
   resources :questionnaires do
     collection do
-      post :toggle_access
       get :copy
+      get :edit
+      get :list
+      post :list_questionnaires
+      get :new_quiz
       post :select_questionnaire_type
+      post :toggle_access
+      get :view
     end
   end
+
   resources :review_questionnaires, controller: :questionnaires
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires
   resources :survey_questionnaires, controller: :questionnaires
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_evaluation_questionnaires, controller: :questionnaires
+  resources :bookmarkrating_questionnaires, controller: :questionnaires
+
+
 
   resources :response do
     collection do
       get :new_feedback
       get :view
       post :delete
+      get :remove_hyperlink
+      get :saving
+      get :redirection
     end
   end
 
   resources :review_mapping do
     collection do
+      post :add_metareviewer
+      get :add_reviewer
+      post :add_reviewer
+      post :add_self_reviewer
+      get :add_self_reviewer
+      get :add_user_to_assignment
+      get :assign_metareviewer_dynamically
+      get :assign_reviewer_dynamically
+      post :assign_reviewer_dynamically
+      get :auto_complete_for_user_name
+      get :delete_all_metareviewers
+      get :delete_all_reviewers
+      get :delete_all_reviewers_and_metareviewers
+      get :delete_metareviewer
+      get :delete_reviewer
+      get :distribution
       get :list_mappings
       get :review_report
+      get :select_metareviewer
+      get :select_reviewer
+      get :select_mapping
+      get :show_available_submissions
     end
   end
 
   resources :review_files do
     collection do
       get :show_all_submitted_files
+      get :show_code_file
+      get :show_code_file_diff
+      get :get_comments
+      get :submit_comment
     end
   end
 
@@ -244,9 +312,17 @@ Expertiza::Application.routes.draw do |map|
 
   resources :sign_up_sheet do
     collection do
+      get :signup
+      get :delete_signup
       get :add_signup_topics
       get :add_signup_topics_staggered
+      get :delete_signup
+      get :edit
+      get :list
       get :signup_topics
+      get :signup
+      get :sign_up
+      get :team_details
       get :view_publishing_rights
     end
   end
@@ -285,13 +361,21 @@ Expertiza::Application.routes.draw do |map|
       get :edit
       get :leave
       get :auto_complete_for_user_name
+      get :update
     end
   end
 
   resources :submitted_content do
     collection do
-      get :view
+      get :download
       get :edit
+      get :folder_action
+      get :remove_hyperlink
+      get :submit_file
+      post :submit_hyperlink
+      get :submit_hyperlink
+      get :remove_hyperlink
+      get :view
     end
   end
 
@@ -350,14 +434,38 @@ Expertiza::Application.routes.draw do |map|
     end
   end
 
+  match '/users/show_selection', controller: :users, action: :show_selection
+  match '/users/list', controller: :users, action: :list
   match '/menu/*name', controller: :menu_items, action: :link
   match ':page_name', controller: :content_pages, action: :view, method: :get
+  match '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
 
   root to: 'content_pages#view', page_name: 'home'
 
+  match 'users/list', :to => 'users#list'
+
+  match '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
+  match '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'
+  match '/submitted_content/submit_file', :to => 'submitted_content#submit_file'
+  match '/review_mapping/show_available_submissions', :to => 'review_mapping#show_available_submissions'
+  match '/review_mapping/assign_reviewer_dynamically', :to => 'review_mapping#assign_reviewer_dynamically'
+  match "/review_mapping/assign_metareviewer_dynamically", :to => 'review_mapping#assign_metareviewer_dynamically'
+  match 'response/', :to => 'response#saving'
+
   map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
+
+  map.connect 'bookmark/manage', :controller => "bookmarks", :action => 'manage_bookmarks'
+  map.connect 'bookmark/view', :controller => "bookmarks", :action => 'view_bookmark'
+  map.connect 'bookmark/rating', :controller => "bookmarks", :action => 'view_rating_rubrics'
+  map.connect 'bookmark/rating2', :controller => "bookmarks", :action => 'add_rating_rubric_form'
+  map.connect 'bookmark/add_tag_bookmark', :controller => "bookmarks", :action => "add_tag_bookmark"
+  map.connect 'bookmark/create_tag_bookmark', :controller => "bookmarks", :action => "create_tag_bookmark"
+  map.connect 'bookmark/search_bookmarks', :controller => "bookmarks", :action => 'search_bookmarks'
+  map.connect 'bookmark/view_bookmarks', :controller => "bookmarks", :action => 'view_bookmarks'
+  map.connect 'bookmark/bookmark_rate', :controller => "bookmarks", :action => 'bookmarks_rate'
+  map.connect 'bookmark/view_rating_rubric', :controller => "bookmarks", :action => 'view_rating_rubric'
+
   map.connect ':controller/service.wsdl', :action => 'wsdl'
 
   match ':controller(/:action(/:id))(.:format)'
-
 end

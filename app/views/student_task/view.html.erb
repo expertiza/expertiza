@@ -7,17 +7,15 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
 <% end %>
 <ul>
 	<%if SignUpTopic.find_by_assignment_id(@assignment.id)%>
-		<li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'signup_topics', :id => @participant.parent_id%>
+		<li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'add_signup_topics', :id => @participant.parent_id%>
 		(Sign up for a topic)
 		</li>
 	<%end%>
   <!--ACS Here we need to know the size of the team to decide whether or not
       to display the label "Your team" in the student assignment tasks-->
-	<%if @assignment.team_assignment? %>
 		<li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %> 
 		(View and manage your team)
 		</li>
-	<%end%>	
 	<li>
 	    <% if @assignment.submission_allowed(@participant.topic_id) %>
 	    	<%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>
@@ -26,6 +24,14 @@ Next: Click the activity you wish to perform on the assignment titled: <%= @assi
         <% end %>	    		
 		(Submit and view your work)
 	</li>
+  <!--Quiz-->
+    <li>
+          <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Complete") %>
+              <%= link_to "Quiz",{:controller => 'student_quiz', :action => 'list', :id => @participant.id} %>
+          <% else %>
+              <font color="gray">Quiz</font>
+          <% end %> (Understand other's work and take the quiz)
+    </li>
 	<li>
 		<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
 			<%= link_to "Others' work",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>

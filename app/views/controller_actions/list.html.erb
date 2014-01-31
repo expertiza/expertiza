@@ -1,0 +1,25 @@
+<h1>Listing Actions</h1>
+
+<table>
+  <tr>
+    <th>Controller</th>
+    <th>Action</th>
+    <th>Permission</th>
+  </tr>
+  
+<% for controller_action in @controller_actions -%>
+  <tr>
+    <td><%= link_to controller_action.controller.name, 
+	    :controller => 'site_controllers',
+	    :action => 'show',
+	    :id => controller_action.controller.id %></td>
+    <td><%= link_to controller_action.name,
+	    :action => 'show',
+	    :id	    => controller_action.id %></td>
+    <td><%= controller_action.permission.name %></td>
+  </tr>
+<% end %>
+</table>
+
+<hr />
+<p><%= link_to 'New controller_action', :action => 'new' %></p>

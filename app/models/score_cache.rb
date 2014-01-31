@@ -39,7 +39,7 @@ class ScoreCache < ActiveRecord::Base
       @questions[questionnaire.symbol] = questionnaire.questions
     }
     team = Team.find(@contributor_id)
-    @allscores = team.get_scores(@questions)
+    @allscores = team.scores(@questions)
   end
       
   def self.get_participant_score()
@@ -53,7 +53,7 @@ class ScoreCache < ActiveRecord::Base
       |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     } 
-    @allscores = @participant1.get_scores( @questions) # Return scores that this participant has given
+    @allscores = @participant1.scores( @questions) # Return scores that this participant has given
     end
     
   def self.update_score_cache()
@@ -140,4 +140,141 @@ class ScoreCache < ActiveRecord::Base
     end
     return score_stat
   end
+
+
+  def self.get_class_scores(pid)
+=begin
+    take average score of every student for that assignment
+    find min and max from these
+    calculate average class score for that assignment from this
+
+    get number of reviews by each student for that assignment
+    calculate the average from the above data
+
+    get number of metareviews by each student for that assignment
+    calculate the average from the above data
+
+1. participant_id  from the view
+2. participant ka parent_id (which is assignment_id) from participant table for that participant
+3. get all participants from participant table for that parent_id
+4. get scores for all tuples in score_caches where rewiewee_id == participants_ids from step 3 --- mapped to score_caches ka reviewee_id
+=end
+
+    @participant = AssignmentParticipant.find(pid)
+    @participant_assignment_id = @participant.parent_id
+    @all_participants = Hash.new
+    @all_participants = AssignmentParticipant.find_all_by_parent_id(@participant_assignment_id)
+
+
+
+
+    individual_score = 0
+    average_score = 0
+    participant_count = 0
+    min_score = 101
+    max_score = -1
+    minmax_hash = Array.new
+
+
+    for participant in @all_participants
+      individual_score = ScoreCache.find_by_reviewee_id(participant.id)
+      if(individual_score)
+
+        average_score = average_score+individual_score.score
+
+
+        i = individual_score.score
+        minmax_hash << i
+        participant_count = participant_count + 1
+      end
+      #if individual_score < min_score
+      #  min_score = individual_score
+      #end
+      #if individual_score > max_score
+      #  max_score = individual_score
+      #end
+    end
+
+    average_score /= participant_count
+    @result_hash = Array.new
+    @result_hash[0] = average_score
+    min_value = minmax_hash.min
+    max_value = minmax_hash.max
+    @result_hash[1]=min_value
+    @result_hash[2]=max_value
+
+    return @result_hash
+
+  end
+
+
+  def self.get_reviews_average(pid)
+
+    @participant = AssignmentParticipant.find(pid)
+    @assignment_id = @participant.parent_id
+
+    assignment_num_reviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND type=?", @assignment_id, 'TeamReviewResponseMap'])
+    @assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
+
+    count = 0
+    @assignment_participants.each{count = count + 1}
+
+    num_review_count=0.0
+    assignment_num_reviews.each{num_review_count = num_review_count + 1.0}
+    @avg_review_count=num_review_count/count
+
+  end
+
+  def self.get_metareviews_average(pid)
+    @participant = AssignmentParticipant.find(pid)
+    @assignment_id = @participant.parent_id
+    assignment_num_metareviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND type=?", @assignment_id, 'MetareviewResponseMap'])
+    @assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
+
+    count = 0
+    @assignment_participants.each{count = count + 1}
+
+    num_metareview_count=0.0
+    assignment_num_metareviews.each{num_metareview_count = num_metareview_count + 1.0}
+    puts num_metareview_count
+    @average_metareviews = num_metareview_count/count
+  end
+
+  def self.my_reviews(pid)
+    @participant = AssignmentParticipant.find(pid)
+    @assignment_id = @participant.parent_id
+
+    #@num_of_reviews = ResponseMap.where("reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'TeamReviewResponseMap')
+    @num_of_reviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'TeamReviewResponseMap'])
+
+    reviews_remaining = Array.new
+    threshold = 2
+    count = 0
+    @num_of_reviews.each{count = count + 1}
+    reviews_remaining[0] = count
+    remaining = threshold-count
+    reviews_remaining[1] = remaining
+    return reviews_remaining
+  end
+
+  def self.my_metareviews(pid)
+    @participant = AssignmentParticipant.find(pid)
+    @assignment_id = @participant.parent_id
+
+    @num_of_metareviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'MetareviewResponseMap'])
+
+    metaReviews_remaining = Array.new
+    threshold=1
+    count = 0
+    @num_of_metareviews.each{count = count + 1}
+    metaReviews_remaining[0] = count
+
+    remaining=threshold-count
+    metaReviews_remaining[1] = remaining
+    return metaReviews_remaining
+  end
+
+
+
+
 end

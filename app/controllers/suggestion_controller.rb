@@ -1,5 +1,17 @@
 class SuggestionController < ApplicationController
- 
+
+  def action_allowed?
+    case params[:action]
+    when 'create', 'new'
+      current_role_name.eql? 'Student'
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
+    end
+  end
+
   def add_comment
        @suggestioncomment = SuggestionComment.new(params[:suggestion_comment])
        @suggestioncomment.suggestion_id=params[:id]

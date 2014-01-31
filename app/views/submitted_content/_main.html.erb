@@ -12,12 +12,50 @@
 <% if participant.assignment.wiki_type_id == 1 %>
     <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>
     <br/><br/><br/><b>
+  <% if participant.assignment.is_coding_assignment%>
   <%= link_to "Code Review Dashboard", :controller => 'review_files',
               :action => 'show_all_submitted_files',
               :participant_id => participant.id,
               :stage => stage %>
 </b><br/>
+  <% end %>
 <% else %>
     <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
 <% end %>
 <br/>
+
+
+<% if @assignment.require_quiz? %>
+    <!-- Setting the uid to team id for a team assignment and participant id for an individual assignment -->
+    <%# if @assignment.team_assignment?%>
+    <%    teams = TeamsUser.find(:all, :conditions => ["user_id = ?", session[:user].id])%>
+   <%     for t in teams do
+           if team = Team.find(:first, :conditions => ["id = ? and parent_id = ?", t.team_id, @assignment.id])
+             break
+           end
+         end
+         uid = team.id%>
+<%#   else
+         uid = participant.id
+       end
+    %>
+
+    <!-- If quiz is required for the assignment, find out if the quiz has already been created -->
+
+    <% if (controller.action_name != "view_my_scores" and !(@map and @map.reviewer_id != session[:user].id)) %>
+        <br/><b>Quiz:</b><br/><br/>
+        <% if questionnaire = Questionnaire.find(:first, :conditions => ["instructor_id = ?", uid]) %>
+            <%= link_to 'View Quiz', :controller => :questionnaires, :action => :view_quiz, :id => questionnaire.id, :pid => participant.id %>
+            <br/><br/>
+            <% if @assignment.submission_allowed(participant.topic_id) %>
+                <%= link_to 'Edit Quiz', :controller => :questionnaires, :action => :edit_quiz, :id => questionnaire.id, :pid => participant.id %>
+                <br/><br/>
+            <% end %>
+        <% else %>
+            <br/>
+            <%= link_to 'Create A Quiz', :controller => :questionnaires, :action => :new_quiz, :model => "QuizQuestionnaire", :private => 0, :aid => @assignment.id, :pid => participant.id %>
+            <br/><br/>
+        <% end %>
+    <% end %>
+    <br/>
+<% end %>

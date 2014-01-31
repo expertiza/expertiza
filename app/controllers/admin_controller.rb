@@ -1,4 +1,13 @@
 class AdminController < ApplicationController
+  def action_allowed?
+    case params[:action]
+    when 'list_instructors'
+      current_user.role.name['Administrator']
+    else
+      current_user.role.name['Super-Administrator']
+    end
+  end
+
   def new_instructor
     @user = User.find_or_create_by_name(params[:name])
 

@@ -3,13 +3,16 @@
 # newer version of cucumber-rails. Consider adding your own code to a new file
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
-
+require 'simplecov'
+SimpleCov.start 'rails'
+SimpleCov.coverage_dir 'coverage/cucumber'
 require 'cucumber/rails'
 
 # Capybara defaults to CSS3 selectors rather than XPath.
 # If you'd prefer to use XPath, just uncomment this line and adjust any
 # selectors in your step definitions to use the XPath syntax.
-# Capybara.default_selector = :xpath
+#Capybara.default_selector = :xpath
+Capybara.asset_host = 'http://localhost:3000'
 
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how 

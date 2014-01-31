@@ -4,6 +4,7 @@ Given /^I have a (public|private) (review|metareview|author feedback|teammate re
     step "I press \"Select\""
     step "I fill in \"#{review_name}\" for \"questionnaire[name]\""
     step "I press \"Create #{review_type}\""
+  step "I follow \"Manage Questionnaires Review Rubrics\""
   step "I should see \"#{review_name}\""
 end
 

@@ -35,7 +35,7 @@ class QuestionsController < ApplicationController
 
   # ?? Unknown as of 2/1/2009
   # Need further investigation
-  def SignupSheet
+  def SignUpSheet
     @questions = Question.paginate(:page => params[:page],:per_page => 10)
   end
  
@@ -84,5 +84,18 @@ class QuestionsController < ApplicationController
   def destroy
     Question.find(params[:id]).destroy
     redirect_to :action => 'list'
+  end
+
+  def review_questions
+    @assignment_id = params[:id]
+    @questions = Array.new
+    Team.find_all_by_parent_id(params[:id]).each do |quiz_creator|
+      Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
+        questions = Question.find_all_by_questionnaire_id(questionnaire.id)
+        questions.each do |question|
+          @questions.push question
+        end
+      end
+    end
   end
 end

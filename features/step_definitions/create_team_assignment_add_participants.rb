@@ -53,6 +53,7 @@ Given /^a team assignment named "(\S+)" exists$/ do |assignment|
   newAssignment.directory_path = 'test'
   newAssignment.spec_location= 'http://'
   newAssignment.availability_flag=true
+  newAssignment.instructor_id = Instructor.first.id
   newAssignment.save
 
   submitDate = DueDate.new
@@ -110,5 +111,6 @@ end
 =end
 
 Then /^I should find "(\S+)" under list of assignments$/  do |assignment|
+  step "I follow \"Assignments\""
   should have_content assignment
 end

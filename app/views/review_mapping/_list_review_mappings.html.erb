@@ -103,15 +103,15 @@
            <tr style="background-color:<%=bgcolor2%>">            
              <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
                <div style="text-align:right">
-                 <%= link_to 'delete', :action => 'delete_reviewer', :id => map.map_id %><br/>
-                 <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.map_id %><br/>
-                 <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.map_id %>
+                 <%= link_to 'delete', :action => 'delete_reviewer', :id => map.id %><br/>
+                 <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.id %><br/>               
+                 <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.id %>
                </div>
              </td>
 
              <td width="50%">
                <table width="100%">
-               <% rmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(map.map_id)
+               <% rmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(map.id) 
                   rmappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname } %>
                <% rmappings.each{
                   | rmap |
@@ -126,7 +126,7 @@
                    <tr style="background-color:<%=bgcolor3%>">
                      <td><%= rmap.reviewer.name %> (<%= rmap.reviewer.fullname %>)
                        <div style="text-align:right">
-                         <%= link_to 'delete', :action => 'delete_metareviewer', :id => rmap.map_id %><br/>
+                         <%= link_to 'delete', :action => 'delete_metareviewer', :id => rmap.id %><br/>
                        </div>
                      </td>
                    </tr>
@@ -148,7 +148,7 @@
   session[:return_to] = request.request_uri    
 %>
 
-<% if !assignment.is_using_dynamic_reviewer_assignment? %>
+<% if !assignment.dynamic_reviewer_assignment? %>
 
 <%= link_to 'Assign reviewers automatically', :action => 'select_mapping', :id => assignment.id %>
 | <%= link_to 'Import reviewer mappings', 
@@ -172,11 +172,18 @@
             :controller=>'export_file',
             :action=>'start',
             :model=> 'ReviewResponseMap',
-            :id=>assignment.id %>
-| <%= link_to 'Export metareview mappings',
+  :id=>assignment.id
+%>
+|
+<%= link_to 'Export metareview mappings',
             :controller=>'export_file',
             :action=>'start',
             :model=> 'MetareviewResponseMap',
-            :id=>assignment.id %>            
-| <%= link_to 'Delete all reviewers and metareviewers', :action => 'delete_all_reviewers_and_metareviewers',
-                                                        :id => assignment.id %> | 
+  :id=>assignment.id
+%>
+|
+<%= link_to 'Assign reviewers',
+  :action => 'add_self_reviewer',
+  :id => assignment.id
+%>
+|

@@ -36,4 +36,9 @@ class SignedUpUserTest < ActiveSupport::TestCase
   def test_pref_priority_number
     assert_blank new_signedup_user(:preference_priority_number => '').errors[:preference_priority_number]
   end
+  #for intelligent assignment of teams
+  def test_assign_preference_priority_number
+    s=signed_up_users(:SignedUpUser1)
+    s.valid?
+  end
 end

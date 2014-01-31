@@ -1,5 +1,9 @@
 class EulaController < ApplicationController
-  def display    
+  def action_allowed?
+    current_role_name.eql?("Student")
+  end
+
+  def display
   end
   
   def accept

@@ -27,7 +27,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
 
   def test_delete_reviewer
     mapping = ResponseMap.find(Fixtures.identify(:response_maps0))
-    post :delete_reviewer, {:id => mapping.map_id} , session_for(users(:admin))
+    post :delete_reviewer, {:id => mapping.id} , session_for(users(:admin))
 
     assert_redirected_to :action => 'list_mappings', :id => mapping.assignment.id
     assert_raise(ActiveRecord::RecordNotFound){ ResponseMap.find(:id) }
@@ -50,7 +50,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
     number_of_responses = ResponseMap.count
 
     mapping = ResponseMap.find(Fixtures.identify(:response_maps3))
-    mapping_id = mapping.map_id
+    mapping_id = mapping.id
     user_id = Participant.first(:conditions => ["id != ? and parent_id = ?", mapping.reviewee_id, mapping.assignment.id]).user_id
 
     post :add_metareviewer, {:id => mapping_id, :user_id => user_id }, session_for(users(:admin))
@@ -76,7 +76,7 @@ class ReviewMappingControllerTest < ActionController::TestCase
 
   def test_delete_all_metareviewers
     mapping = ResponseMap.find(Fixtures.identify(:response_maps3))
-    mapping_id = mapping.map_id
+    mapping_id = mapping.id
 
     number_of_responses = ResponseMap.count
     deleted_count = MetareviewResponseMap.find(:all, :conditions => {:reviewed_object_id => mapping_id}).count

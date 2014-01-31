@@ -11,8 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131108132457) do
-ActiveRecord::Schema.define(:version => 20131103014327) do
+ActiveRecord::Schema.define(:version => 20131201172700) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -41,7 +40,8 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.integer  "review_questionnaire_id"
     t.integer  "review_of_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
-    t.integer  "wiki_type_id",                      :default => 0,     :null => false
+    t.boolean  "team_assignment"
+    t.integer  "wiki_type_id"
     t.boolean  "require_signup"
     t.integer  "num_reviewers",                     :default => 0,     :null => false
     t.text     "spec_location"
@@ -58,10 +58,14 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "microtask",                         :default => false
     t.boolean  "availability_flag"
+    t.boolean  "calculate_penalty",                 :default => false, :null => false
+    t.integer  "late_policy_id"
+    t.boolean  "is_penalty_calculated",             :default => false, :null => false
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
   add_index "assignments", ["instructor_id"], :name => "fk_assignments_instructors"
+  add_index "assignments", ["late_policy_id"], :name => "fk_late_policy_id"
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
@@ -83,6 +87,15 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
   end
 
   add_index "automated_metareviews", ["response_id"], :name => "fk_automated_metareviews_responses_id"
+
+  create_table "calculated_penalties", :force => true do |t|
+    t.integer "participant_id"
+    t.integer "deadline_type_id"
+    t.integer "penalty_points"
+  end
+
+  add_index "calculated_penalties", ["deadline_type_id"], :name => "fk_deadline_type_id"
+  add_index "calculated_penalties", ["participant_id"], :name => "fk_participant_id"
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :null => false
@@ -154,7 +167,6 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.datetime "due_at"
     t.integer  "deadline_type_id"
     t.integer  "assignment_id"
-    t.integer  "late_policy_id"
     t.integer  "submission_allowed_id"
     t.integer  "review_allowed_id"
     t.integer  "resubmission_allowed_id"
@@ -168,7 +180,6 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
 
   add_index "due_dates", ["assignment_id"], :name => "fk_due_dates_assignments"
   add_index "due_dates", ["deadline_type_id"], :name => "fk_deadline_type_due_date"
-  add_index "due_dates", ["late_policy_id"], :name => "fk_due_date_late_policies"
   add_index "due_dates", ["rereview_allowed_id"], :name => "idx_rereview_allowed"
   add_index "due_dates", ["resubmission_allowed_id"], :name => "idx_resubmission_allowed"
   add_index "due_dates", ["review_allowed_id"], :name => "idx_review_allowed"
@@ -204,13 +215,15 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
   end
 
   create_table "late_policies", :force => true do |t|
-    t.integer "penalty_period_in_minutes"
-    t.integer "penalty_per_unit"
-    t.boolean "expressed_as_percentage"
-    t.integer "max_penalty",               :default => 0, :null => false
+    t.float   "penalty_per_unit"
+    t.integer "max_penalty",      :default => 0, :null => false
+    t.string  "penalty_unit",                    :null => false
+    t.integer "times_used",       :default => 0, :null => false
+    t.integer "instructor_id",                   :null => false
+    t.string  "policy_name",                     :null => false
   end
 
-  add_index "late_policies", ["penalty_period_in_minutes"], :name => "penalty_period_length_unit"
+  add_index "late_policies", ["instructor_id"], :name => "fk_instructor_id"
 
   create_table "leaderboards", :force => true do |t|
     t.integer "questionnaire_type_id"
@@ -290,9 +303,9 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",      :default => "", :null => false
+    t.string  "q_type",                     :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1,  :null => false
+    t.integer "question_id", :default => 1, :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -308,8 +321,8 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.text     "instruction_loc"
     t.string   "section"
+    t.text     "instruction_loc"
   end
 
   create_table "questions", :force => true do |t|
@@ -408,34 +421,6 @@ ActiveRecord::Schema.define(:version => 20131103014327) do
     t.integer  "ques_questionnaire_id"
     t.integer  "s_id",                                 :default => 0
     t.integer  "s_question_id"
-    t.integer  "s_score"
-    t.text     "s_comments"
-    t.integer  "s_response_id"
-  end
-
-  create_table "score_views", :id => false, :force => true do |t|
-    t.integer  "question_weight"
-    t.integer  "q_id",                                 :default => 0
-    t.string   "q_type",                               :default => ""
-    t.string   "q_parameters"
-    t.integer  "q_question_id",                        :default => 1
-    t.integer  "q1_id",                                :default => 0
-    t.string   "q1_name",                :limit => 64
-    t.integer  "q1_instructor_id",                     :default => 0
-    t.boolean  "q1_private",                           :default => false
-    t.integer  "q1_min_question_score",                :default => 0
-    t.integer  "q1_max_question_score"
-    t.datetime "q1_created_at"
-    t.datetime "q1_updated_at"
-    t.integer  "q1_default_num_choices"
-    t.string   "q1_type"
-    t.string   "q1_display_type"
-    t.string   "q1_section"
-    t.text     "q1_instruction_loc"
-    t.integer  "ques_id",                              :default => 0,     :null => false
-    t.integer  "ques_questionnaire_id"
-    t.integer  "s_id",                                 :default => 0
-    t.integer  "s_question_id",                        :default => 0
     t.integer  "s_score"
     t.text     "s_comments"
     t.integer  "s_response_id"

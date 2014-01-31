@@ -5,6 +5,10 @@ class ScrubDatabase
       user.name = "user#{user.id}"
       user.fullname = "#{user.id}, #{user.role.name}"
       user.email = "expertiza@mailinator.com"
+
+      user.password = "password"
+      user.password_confirmation = "password"
+
       user.save(false)
       print "." if user.id % 100 == 0
     end

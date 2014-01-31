@@ -2,7 +2,11 @@ require 'zip/zip'
 
 class SubmittedContentController < ApplicationController
   helper :wiki
-  
+
+  def action_allowed?
+    current_role_name.eql?("Student")
+  end
+
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -41,7 +45,7 @@ class SubmittedContentController < ApplicationController
       @participant.update_resubmit_times
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
-    end
+    end    
     undo_link("Link has been submitted successfully. ")
     redirect_to :action => 'edit', :id => @participant.id
   end    
@@ -55,7 +59,7 @@ class SubmittedContentController < ApplicationController
       @participant.remove_hyperlink(params['chk_links'].to_i)
     rescue 
       flash[:error] = $!
-    end
+    end    
     undo_link("Link has been removed successfully. ")
     redirect_to :action => 'edit', :id => @participant.id
   end

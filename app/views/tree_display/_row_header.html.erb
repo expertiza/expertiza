@@ -1,4 +1,7 @@
-<TR <% if rowtype != nil %>CLASS="<%= rowtype %>"<% elsif prefix != nil %>ID="<%= prefix %>" style="display: none;"<% end %>>
+<TR
+<% if rowtype != nil %>CLASS="<%= rowtype %>"
+<% elsif prefix != nil %>ID="<%= prefix %>" style="display: none;"
+<% end %>>
 <% if depth != nil
      index = 0
      while index < depth %>
@@ -13,7 +16,7 @@
 	<% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
 	<%else%>
      <% if child_nodes %>
-       <TD WIDTH="2%" ALIGN="RIGHT"><a id="<%= prefix %>Link" name="<%= prefix %>Link" href="#" <% if child_nodes.length > 0  %>onclick="toggleList('<%= prefix %>',<%= child_nodes.length %>);alternate('theTable');return false;"><img src="/images/expand.png"><% else %>onclick="return false;"><img src="/images/noaction.png"><% end %></a></div></TD>
+       <TD WIDTH="2%" ALIGN="RIGHT"><a id="<%= prefix %>Link" name="<%= prefix %>Link" href="#" <% if child_nodes.length > 0  %>onclick="toggleList('<%= prefix %>',<%= child_nodes.length %>);alternate('theTable');return false;"><img src="/images/expand.png"><% else %>onclick="return false;"><img src="/images/noaction.png"><% end %></a></TD>
        <TD WIDTH="2%" ALIGN="RIGHT"><%= link_to image_tag('/images/drill.png'), :controller => 'tree_display', :action => 'drill', :root => parent_node.id %></TD>
      <% end %>
 	<%end%>	     
@@ -29,5 +32,9 @@
 	  <% if parent_node.get_creation_date != nil %>
 	    <BR/><I>Creation Date:</I> <%= parent_node.get_creation_date %>
 	  <% end %>
+        <% if parent_node.get_modified_date != nil %>
+            <BR/><I>Updated Date:</I> <%= parent_node.get_modified_date %>
+        <% end %>
+
   <%end%>		  
 </TD>

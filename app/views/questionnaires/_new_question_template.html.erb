@@ -1,0 +1,40 @@
+<% (1..Assignment.find_by_id(@assignment_id).num_quiz_questions).each do |i| %>
+  <div id="question<%= i %>">
+    <label for="text_area">Question <%= i %>: <br></label>
+    <textarea name="new_question[#{i}]" id="text_area" placeholder='Enter question...' cols = "60" rows = "8"></textarea>
+
+
+    <span style="margin-left:20px;">
+    <label for="text_area"></label>
+    <!--hint:--><textarea name="new_question[#{i}]" placeholder='Enter hint...' size= "100"></textarea>
+   <br><br>
+    </span>
+  </div>
+
+  <div id="radio_buttons<%= i %>" style="display: none;">
+    <%= radio_button("new_choices[#{i}][MCR][1]",:iscorrect, '1') %> <%= text_field "new_choices[#{i}][MCR][1]", :txt, size: 50 %> <br>
+    <%= radio_button("new_choices[#{i}][MCR][1]",:iscorrect, '2') %> <%= text_field "new_choices[#{i}][MCR][2]", :txt, size: 50 %> <br>
+    <%= radio_button("new_choices[#{i}][MCR][1]",:iscorrect, '3') %> <%= text_field "new_choices[#{i}][MCR][3]", :txt, size: 50 %> <br>
+    <%= radio_button("new_choices[#{i}][MCR][1]",:iscorrect, '4') %> <%= text_field "new_choices[#{i}][MCR][4]", :txt, size: 50 %> <br><br>
+  </div>
+  <div id="true_false<%= i %>" style="display: none;">
+    <%= radio_button("new_choices[#{i}][TF][1]",:iscorrect, '1') %> True <br>
+    <%= radio_button("new_choices[#{i}][TF][1]",:iscorrect, '0') %> False <br><br>
+  </div>
+  <div id="essay<%= i %>" style="display: none;">
+    <%#= text_area "question_type[#{i}]", :txt, rows: 5, cols: 120 %>
+  </div>
+  <div id="check_boxes<%= i %>" style="display: none;">
+    <%= check_box("new_choices[#{i}][MCC][1]",:iscorrect) %> <%= text_field "new_choices[#{i}][MCC][1]", :txt, size: 50 %> <br>
+    <%= check_box("new_choices[#{i}][MCC][2]",:iscorrect) %> <%= text_field "new_choices[#{i}][MCC][2]", :txt, size: 50 %> <br>
+    <%= check_box("new_choices[#{i}][MCC][3]",:iscorrect) %> <%= text_field "new_choices[#{i}][MCC][3]", :txt, size: 50 %> <br>
+    <%= check_box("new_choices[#{i}][MCC][4]",:iscorrect) %> <%= text_field "new_choices[#{i}][MCC][4]", :txt, size: 50 %> <br><br>
+  </div>
+  <div id="qtype<%= i %>">
+    <%= radio_button("question_type[#{i}]","type", "MCR") %> Multiple Choice - Radio <br>
+    <%= radio_button("question_type[#{i}]","type", "MCC") %> Multiple Choice - Checked <br>
+    <%= radio_button("question_type[#{i}]","type", "TF") %> True/False <br>
+    <%= radio_button("question_type[#{i}]","type", "Essay") %> Essay <br><br>
+  </div>
+
+<% end %>

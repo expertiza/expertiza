@@ -18,6 +18,12 @@
 <p><label for="max_choosers">Number of slots</label><br/>
   <%= text_field 'topic', 'max_choosers', :size => 1 %></p>
 
+<p>
+  <label for="bookmark_rating_rubric_id">Select a bookmark rating rubric</label>
+  <br/>
+  <%= select("topic", "bookmark_rating_rubric_id", BookmarkRatingRubric.all.collect {|br| [ br.display_text, br.id ] }, { :include_blank => "Please select" }) %>
+</p>
+
 <% if @topic.assignment.is_microtask? %>  
   <p><label for="micropayment">Micropayment</label><br/>
     <%= text_field 'topic', 'micropayment' %></p>

@@ -1,5 +1,10 @@
 class PublishingController < ApplicationController
-  
+
+  def action_allowed?
+    current_role_name.eql?("Student")
+  end
+
+
   def view   
     @user = User.find_by_id(session[:user].id) # Find again, because the user's certificate may have changed since login
     @participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)

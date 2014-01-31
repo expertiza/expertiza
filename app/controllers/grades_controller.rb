@@ -1,8 +1,20 @@
 class GradesController < ApplicationController
+  use_google_charts
   helper :file
   helper :submitted_content
   helper :penalty
   include PenaltyHelper
+
+  def action_allowed?
+    case params[:action]
+    when 'view_my_scores'
+      current_role_name.eql? 'Student'
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator'].include? current_role_name
+    end
+  end
 
   #the view grading report provides the instructor with an overall view of all the grades for
   #an assignment. It lists all participants of an assignment and all the reviews they received.
@@ -21,7 +33,29 @@ class GradesController < ApplicationController
   end
 
   def view_my_scores
+
     @participant = AssignmentParticipant.find(params[:id])
+
+    @average_score_results = Array.new
+    @average_score_results = ScoreCache.get_class_scores(@participant.id)
+
+    @statistics = Array.new
+    @average_score_results.each { |x|
+      @statistics << x
+    }
+
+    puts "Participant id"
+    puts @participant.id
+    @average_reviews = ScoreCache.get_reviews_average(@participant.id)
+    @average_metareviews = ScoreCache.get_metareviews_average(@participant.id)
+
+    @my_reviews = ScoreCache.my_reviews(@participant.id)
+
+    puts "My Reviews are"
+    puts @my_reviews
+
+    @my_metareviews = ScoreCache.my_metareviews(@participant.id)
+
     return if redirect_when_disallowed
     @assignment = @participant.assignment
     @questions = Hash.new
@@ -30,10 +64,9 @@ class GradesController < ApplicationController
         |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
-
     ## When user clicks on the notification, it should go away
     #deleting all review notifications
-    rmaps = @participant.response_maps
+    rmaps = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(@participant.id, @participant.assignment.id)
     for rmap in rmaps
       rmap.notification_accepted = true
       rmap.save
@@ -43,7 +76,7 @@ class GradesController < ApplicationController
     #deleting all metareview notifications
     rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
     for rmap in rmaps
-      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.map_id)
+      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.id)
       if !mmaps.nil?
         for mmap in mmaps
           mmap.notification_accepted = true
@@ -75,20 +108,16 @@ class GradesController < ApplicationController
       reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
       reviewer.set_handle()
     end
-
-    review_exists = true
-
     reviewee = participant.team
     review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
 
     if review_mapping.nil?
-      review_exists = false
       review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
     end
-    review = Response.find_by_map_id(review_mapping.map_id)
+    review = Response.find_by_map_id(review_mapping.id)
 
-    unless review_exists
-      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.map_id, :return => "instructor"
+    if review.nil?
+      redirect_to :controller => 'response', :action => 'new', :id => review_mapping.id, :return => "instructor"
     else
       redirect_to :controller => 'response', :action => 'edit', :id => review.id, :return => "instructor"
     end

@@ -1,3 +1,4 @@
+#Testing (Happy case) for view_my_scores
 Feature: View scores for an assignment
   In order to view resulting scores
   As a student

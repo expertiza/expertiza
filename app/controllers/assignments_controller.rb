@@ -2,6 +2,13 @@ class AssignmentsController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
 
+ def action_allowed?
+   ['Super-Administrator',
+    'Administrator',
+    'Instructor',
+    'Teaching Assistant'].include? current_role_name
+ end
+
   # change access permission from public to private or vice versa
   def toggle_access
     assignment = Assignment.find(params[:id])
@@ -23,11 +30,24 @@ class AssignmentsController < ApplicationController
 
   def create
     @assignment = Assignment.new(params[:assignment])
+    #This one is working
+    #       emails = Array.new
+    #      #emails<<"vikas.023@gmail.com"
+    #Mailer.generic_message(
+    #    {:bcc => emails,
+    #     :subject => "one",
+    #     #:body => "two",
+    #    :partial_name => 'update'
+    #    }).deliver
 
     if @assignment.save
       @assignment.create_node
-      flash[:success] = 'Assignment was successfully created.'
-      redirect_to controller: :assignments, action: :edit, id: @assignment.id
+      # flash[:success] = 'Assignment was successfully created.'
+      # redirect_to controller: :assignments, action: :edit, id: @assignment.id
+      #AAD#
+      redirect_to :controller => 'tree_display', :action => 'list'
+      undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
+      #AAD#
     else
       render 'new'
     end
@@ -120,7 +140,6 @@ class AssignmentsController < ApplicationController
     end
   end
 
-
   def update
     @assignment = Assignment.find(params[:id])
     params[:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
@@ -129,10 +148,6 @@ class AssignmentsController < ApplicationController
     #TODO: insert warning if directory_path is duplicated
 
     @hash1 = Hash.new(params[:assignment])
-
-
-    #puts "----------------------------------"
-    #puts @hash1[:assignment][:late_policy_id]
     if  @hash1[:assignment][:late_policy_id].to_i > 0
       if @assignment.update_attributes(params[:assignment])
         flash[:note] = 'Assignment was successfully saved.'
@@ -143,6 +158,17 @@ class AssignmentsController < ApplicationController
         #  - rename an assgt. -- implemented by renaming a directory
         #  - assigning an assignment to a course -- implemented by moving a directory.
 
+        undo_link("Assignment \"#{@assignment.name}\" has been edited successfully. ")
+
+        if params[:due_date]
+          # delete the previous jobs from the delayed_jobs table
+          djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', @assignment.id])
+          for dj in djobs
+            delete_from_delayed_queue(dj.id)
+          end
+
+          add_to_delayed_queue
+        end
         redirect_to :action => 'edit', :id => @assignment.id
       else
         flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
@@ -158,9 +184,6 @@ class AssignmentsController < ApplicationController
         redirect_to :action => 'edit', :id => @assignment.id
       end
     end
-    #respond_to do |format|
-    #  format.json { render :json => params }
-    #end
   end
 
   def show
@@ -200,25 +223,46 @@ class AssignmentsController < ApplicationController
     if @assignment.microtask.nil?
       @assignment.microtask = false
     end
+    if @assignment.is_coding_assignment .nil?
+      @assignment.is_coding_assignment  = false
+    end
     if @assignment.reviews_visible_to_all.nil?
       @assignment.reviews_visible_to_all = false
     end
     if @assignment.review_assignment_strategy.nil?
       @assignment.review_assignment_strategy = ''
     end
+    if @assignment.require_quiz.nil?
+      @assignment.require_quiz =  false
+      @assignment.num_quiz_questions =  0
+    end
   end
 
-
-  # this function finds all the due_dates for a given assignment and calculates the time when the reminder for these deadlines needs to be sent. Enqueues them in the delayed_jobs table
   def add_to_delayed_queue
-    due_dates = @assignment.due_dates
-    due_dates.each do |due_date|
-      deadline_type_name = due_date.deadline_type.name
-      seconds_until_due = due_at - Time.now
-      minutes_until_due = seconds_until_due / 60
-      dj = Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type_name, due_at), 1, minutes_until_due)
-      due_date.update_attribute(:delayed_job_id, dj.id)
+    duedates = DueDate::find_all_by_assignment_id(@assignment.id)
+    for i in (0 .. duedates.length-1)
+      deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
+      due_at = duedates[i].due_at.to_s(:db)
+      Time.parse(due_at)
+      due_at= Time.parse(due_at)
+      mi=find_min_from_now(due_at)
+      diff = mi-(duedates[i].threshold)*60
+      if diff>0
+      dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)),
+                              1, diff.minutes.from_now)
+      duedates[i].update_attribute(:delayed_job_id, dj.id)
     end
+  end
+    end
+
+  # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
+  # from the current time and returns this difference in minutes
+  def find_min_from_now(due_at)
+
+    curr_time=DateTime.now.to_s(:db)
+    curr_time=Time.parse(curr_time)
+    time_in_min=((due_at - curr_time).to_i/60)
+    return time_in_min
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
@@ -378,6 +422,8 @@ class AssignmentsController < ApplicationController
     FileHelper.update_file_location(oldpath, newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
   end
+
+
 
 end
 

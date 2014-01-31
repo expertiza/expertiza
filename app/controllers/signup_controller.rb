@@ -35,6 +35,12 @@
         #TODO: fix this; cant use 0
         @selected_topics = other_confirmed_topic_for_user(params[:id], users_team[0].t_id)
       end
+
+
+
+
+
+
   end
 
 #This function lets the user choose a particular topic. This function is invoked when the user clicks the green check mark in
@@ -42,22 +48,25 @@
   def signup
     puts "++++++++++++++++++++++++++++"
     puts "you called me in signup_controller!"
+
+
     #find the assignment to which user is signing up
-    assignment = Assignment.find(params[:assignment_id])
-
+    @assignment = Assignment.find(params[:assignment_id])
+    if @assignment.team_assignment == true
       #check whether the user already has a team for this assignment
-      users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
+      @users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
 
-      if users_team.size == 0
+      if @users_team.size == 0
         #if team is not yet created, create new team.
-        team = AssignmentTeam.create_team_and_node(params[:assignment_id])
-        user = User.find(session[:user].id)
-        teamuser = create_team_users(user, team.id)
-        confirmationStatus = confirm_topic(team.id, params[:id], params[:assignment_id])
+        @team = AssignmentTeam.create_team_and_node(params[:assignment_id])
+        @user = User.find(session[:user].id)
+        @teamuser = create_team_users(user, team.id)
+        @confirmationStatus = confirm_topic(team.id, params[:id], params[:assignment_id])
       else
-        confirmationStatus = confirm_topic(users_team[0].t_id, params[:id], params[:assignment_id])
+        @confirmationStatus = confirm_topic(users_team[0].t_id, params[:id], params[:assignment_id])
       end
       redirect_to :action => 'list', :id => params[:assignment_id]
+      end
   end
 
   # When using this method when creating fields, update race conditions by using db transactions
@@ -69,6 +78,13 @@
     user_signup = SignedUpUser.find_user_signup_topics(assignment_id,creator_id)
     user_signup
   end
+
+
+
+
+
+
+
 
   def confirm_topic(creator_id, topic_id, assignment_id)
     #check whether user has signed up already

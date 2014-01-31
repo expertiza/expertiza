@@ -50,6 +50,32 @@ class Score < ActiveRecord::Base
     return scores
   end
 
+  def self.compute_quiz_scores(responses)
+    scores = Hash.new
+    if responses.length > 0
+      scores[:max] = -999999999
+      scores[:min] = 999999999
+      total_score = 0
+      responses.each {
+          | response |
+        questions = QuizQuestionnaire.find(response.map.reviewed_object_id).questions
+        curr_score = get_total_score(response, questions)
+        if curr_score > scores[:max]
+          scores[:max] = curr_score
+        end
+        if curr_score < scores[:min]
+          scores[:min] = curr_score
+        end
+        total_score += curr_score
+      }
+      scores[:avg] = total_score.to_f / responses.length.to_f
+    else
+      scores[:max] = nil
+      scores[:min] = nil
+      scores[:avg] = nil
+    end
+    return scores
+  end
   # Computes the total score for an assessment
   # params
   #  assessment - specifies the assessment for which the total score is being calculated
@@ -69,7 +95,7 @@ class Score < ActiveRecord::Base
     if @questionnaire.section == "Custom"
       @questions.each {
           |question|
-        item = Score.find_by_response_id_and_question_id(@response.response_id, question.id)
+        item = Score.find_by_response_id_and_question_id(@response.id, question.id)
         if @q_types.length <= x
           @q_types[x] = QuestionType.find_by_question_id(question.id)
         end
@@ -99,8 +125,8 @@ class Score < ActiveRecord::Base
       return (weighted_score / (sum_of_weights * max_question_score)) * 100
     else
       return -1 #indicating no score
+        end
     end
-  end
   #Check for invalid reviews.
   #Check if the latest review done by the reviewer falls into the latest review stage
 

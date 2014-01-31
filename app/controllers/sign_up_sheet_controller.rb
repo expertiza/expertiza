@@ -14,6 +14,17 @@ class SignUpSheetController < ApplicationController
   require 'graph/graphviz_dot'
   require 'rgl/topsort'
 
+  def action_allowed?
+    case params[:action]
+    when 'signup_topics', 'signup', 'delete_signup', 'add_signup_topics'
+      current_role_name.eql? 'Student'
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator'].include? current_role_name
+    end
+  end
+
   #Includes functions for team management. Refer /app/helpers/ManageTeamHelper
   include ManageTeamHelper
   #Includes functions for Dead line management. Refer /app/helpers/DeadLineHelper
@@ -245,19 +256,30 @@ class SignUpSheetController < ApplicationController
     @slots_filled = SignUpTopic.find_slots_filled(params[:id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
+    @priority = 0
     assignment=Assignment.find(params[:id])
+    #end
 
     if assignment.due_dates.find_by_deadline_type_id(1)!= nil
-      unless assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
+      unless !(assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now )
         @show_actions = false
       end
+
+    #Find whether the user has signed up for any topics; if so the user won't be able to
+    #sign up again unless the former was a waitlisted topic
+    #if team assignment, then team id needs to be passed as parameter else the user's id
+    users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
+
+    if users_team.size == 0
+      @selected_topics = nil
+    else
+      #TODO: fix this; cant use 0
+      @selected_topics = SignUpSheetController.other_confirmed_topic_for_user(params[:id], users_team[0].t_id)
     end
 
-    #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
     SignUpTopic.remove_team(users_team, @assignment_id)
 
+  end
   end
 
 
@@ -279,14 +301,99 @@ class SignUpSheetController < ApplicationController
     @user_id = session[:user].id
     #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
     #Always use team_id ACS
-
+    #s = Signupsheet.new
     #check whether the user already has a team for this assignment
-    SignupSheet.signup_team(@assignment, @user_id, params[:id])
+    signup_team(@assignment.id, @user_id, params[:id])
     redirect_to :action => 'list', :id => params[:assignment_id]
   end
 
+  def signup_team(assignment_id, user_id, topic_id)
+    puts   assignment_id
+    puts   user_id
+    puts   topic_id
+    users_team = SignedUpUser.find_team_users(assignment_id, user_id)
+    if users_team.size == 0
+      #if team is not yet created, create new team.
+      team = AssignmentTeam.create_team_and_node(assignment_id)
+      user = User.find(user_id)
+      teamuser = create_team_users(user, team.id)
+      confirmationStatus = confirmTopic(team.id, topic_id, assignment_id)
+    else
+      confirmationStatus = confirmTopic(users_team[0].t_id, topic_id, assignment_id)
+    end
+  end
+
+  def confirmTopic(creator_id, topic_id, assignment_id)
+    #check whether user has signed up already
+    user_signup = otherConfirmedTopicforUser(assignment_id, creator_id)
+
+    sign_up = SignedUpUser.new
+    sign_up.topic_id = params[:id]
+    sign_up.creator_id = creator_id
+    result = false
+    if user_signup.size == 0
+
+      # Using a DB transaction to ensure atomic inserts
+      ActiveRecord::Base.transaction do
+        #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
+        if slotAvailable?(topic_id)
+          sign_up.is_waitlisted = false
+
+          #Update topic_id in participant table with the topic_id
+          participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+
+          participant.update_topic_id(topic_id)
+        else
+          sign_up.is_waitlisted = true
+        end
+        if sign_up.save
+          result = true
+        end
+      end
+    else
+      #If all the topics choosen by the user are waitlisted,
+      for user_signup_topic in user_signup
+        if user_signup_topic.is_waitlisted == false
+          flash[:error] = "You have already signed up for a topic."
+          return false
+        end
+      end
+
+      # Using a DB transaction to ensure atomic inserts
+      ActiveRecord::Base.transaction do
+        #check whether user is clicking on a topic which is not going to place him in the waitlist
+        if !slotAvailable?(topic_id)
+          sign_up.is_waitlisted = true
+          if sign_up.save
+            result = true
+          end
+        else
+          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
+          SignUpTopic.cancel_all_waitlists(creator_id, assignment_id)
+          sign_up.is_waitlisted = false
+          sign_up.save
+          participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+          participant.update_topic_id(topic_id)
+          result = true
+        end
+      end
+    end
+
+    result
+  end
+
+  def otherConfirmedTopicforUser(assignment_id, creator_id)
+    user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
+    user_signup
+  end
+
   # When using this method when creating fields, update race conditions by using db transactions
-  def self.slotAvailable?(topic_id)
+  def slotAvailable?(topic_id)
+    SignUpTopic.slotAvailable?(topic_id)
+  end
+
+  # When using this method when creating fields, update race conditions by using db transactions
+  def slotAvailable?(topic_id)
     SignUpTopic.slotAvailable?(topic_id)
   end
 
@@ -297,9 +404,93 @@ class SignUpSheetController < ApplicationController
   end
 
   def confirm_topic(creator_id, topic_id, assignment_id)
-    @param_id = params[:id]
+    #@param_id = params[:id]
     @user_id = session[:user].id
-    Waitlist.waitlist_teams(@param_id, @user_id, creator_id, topic_id, assignment_id)
+    #Waitlist.waitlist_teams(@param_id, @user_id, creator_id, topic_id, assignment_id)
+
+    #check whether user has signed up already
+    user_signup = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, creator_id)
+
+    sign_up = SignedUpUser.new
+    sign_up.topic_id = topic_id
+    sign_up.creator_id = creator_id
+    result = false
+    if user_signup.size == 0
+
+      # Using a DB transaction to ensure atomic inserts
+      ActiveRecord::Base.transaction do
+        if(@assignment.is_intelligent == 0)
+          puts 'in thisss'
+        #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
+        if slotAvailable?(topic_id)
+          sign_up.is_waitlisted = false
+
+          #Update topic_id in participant table with the topic_id
+          participant = Participant.find_by_user_id_and_parent_id( @user_id , assignment_id)
+
+          participant.update_topic_id(topic_id)
+        else
+          sign_up.is_waitlisted = true
+        end
+        else
+          sign_up.is_waitlisted = true
+          if params[:priority].to_s.to_f > 0
+          sign_up.preference_priority_number = params[:priority];
+  end
+        end
+        if sign_up.save
+          result = true
+        end
+      end
+    else
+      #If all the topics choosen by the user are waitlisted,
+      for user_signup_topic in user_signup
+        if user_signup_topic.is_waitlisted == false
+          SignUpSheetController.flash_signedup_topic()
+
+          return false
+        end
+      end
+
+=begin
+      # Using a DB transaction to ensure atomic inserts
+      ActiveRecord::Base.transaction do
+        #check whether user is clicking on a topic which is not going to place him in the waitlist
+        if !slotAvailable?(topic_id)
+          sign_up.is_waitlisted = true
+          if sign_up.save
+            result = true
+          end
+        else
+          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
+          cancel_all_waitlists(creator_id, assignment_id)
+          sign_up.is_waitlisted = false
+          sign_up.save
+          participant = Participant.find_by_user_id_and_parent_id( @user_id , assignment_id)
+          participant.update_topic_id(topic_id)
+          result = true
+        end
+      end
+=end
+    end
+
+    result
+  end
+
+  def set_priority
+    @user_id = session[:user].id
+    users_team = SignedUpUser.find_team_users(params[:assignment_id].to_s, @user_id)
+    check = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND su.preference_priority_number = ?",params[:assignment_id].to_s,users_team[0].t_id,params[:priority].to_s])
+    if check.size == 0
+    signUp = SignedUpUser.find_by_topic_id_and_creator_id(params[:id], users_team[0].t_id)
+    #signUp.preference_priority_number = params[:priority].to_s
+    if params[:priority].to_s.to_f > 0
+      signUp.update_attribute('preference_priority_number' , params[:priority].to_s)
+    else
+      flash[:error] = "Invalid priority"
+    end
+    end
+    redirect_to :action => 'list', :id => params[:assignment_id]
   end
 
   #this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
@@ -375,7 +566,7 @@ class SignUpSheetController < ApplicationController
   #used by save_topic_dependencies. The dependency graph is a partial ordering of topics ... some topics need to be done
   # before others can be attempted.
   def build_dependency_graph(topics,node)
-    SignupSheet.create_dependency_graph(topics,node)
+    SignUpSheet.create_dependency_graph(topics,node)
   end
   #used by save_topic_dependencies. Do not know how this works
   def create_common_start_time_topics(dg)
@@ -461,4 +652,3 @@ class SignUpSheetController < ApplicationController
     end
   end
 end
-

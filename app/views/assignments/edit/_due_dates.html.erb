@@ -135,16 +135,18 @@
 //                '<option value="3">Yes</option>' +
 //                '</select></td>';
 
-//        html += '<td align="center" class="due_date_rereview_allowed_id" width="10%">' +
-//                '<select id="due_date_rereview_allowed_id" name="due_date[rereview_allowed_id]">' +
-//                '<option value="">---</option>' +
-//                '<option value="1">No</option>' +
-//                '<option value="2">Late</option>' +
-//                '<option value="3">Yes</option>' +
-//                '</select></td>';
+
 
         html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">' +
                 '<select id="due_date_review_of_review_allowed_id" name="due_date[review_of_review_allowed_id]">' +
+                '<option value="">---</option>' +
+                '<option value="1">No</option>' +
+                '<option value="2">Late</option>' +
+                '<option value="3">Yes</option>' +
+                '</select></td>';
+
+        html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
+                '<select id="due_date_quiz_allowed_id" name="due_date[quiz_allowed_id]">' +
                 '<option value="">---</option>' +
                 '<option value="1">No</option>' +
                 '<option value="2">Late</option>' +
@@ -175,6 +177,7 @@
         jQuery('#due_date_review_allowed_id').val(due_date.review_allowed_id).attr('id', '');
         jQuery('#due_date_rereview_allowed_id').val(due_date.rereview_allowed_id).attr('id', '');
         jQuery('#due_date_review_of_review_allowed_id').val(due_date.review_of_review_allowed_id).attr('id', '');
+        jQuery('#due_date_quiz_allowed_id').val(due_date.quiz_allowed_id).attr('id', '');
         jQuery('#due_date_threshold').val(due_date.threshold).attr('id', '');
 
         jQuery('#datetimepicker_' + element_id).datetimepicker({
@@ -234,13 +237,14 @@
 <table class='exp' id='due_dates_table' style='padding:10px'>
   <tr id='due_date_heading'>
     <th width=15%>Deadline type</th>
-    <th width=25%>Date & time</th>
+    <th width=20%>Date & time</th>
     <th width=10%>Submission allowed</th>
-    <th width=10%>Review allowed</th>
+    <th width=8%>Review allowed</th>
     <!--<th width=10%>Resubmission Allowed</th>-->
     <!--<th width=10%>Re-Review Allowed</th>-->
     <th width=10%>Meta-review allowed</th>
-    <th width=10%>Reminder(hrs)</th>
+    <th width=9%>Quiz allowed</th>
+    <th width=8%>Reminder(hrs)</th>
   </tr>
   <script>
       jQuery(document).ready(function () {

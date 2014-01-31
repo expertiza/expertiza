@@ -1,8 +1,6 @@
-class ResponseMap < Response
-
-  def response_id
-    self['id']
-  end
+class ResponseMap < ActiveRecord::Base
+  has_one :response, foreign_key: 'map_id'
+  belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id'
 
   def map_id
     id
@@ -86,21 +84,5 @@ class ResponseMap < Response
       end
     }
     return failedCount
-  end
-
-  def self.find(*args)
-    if args.length == 1
-      Response.find_by_map_id(args.first)
-    else
-      super
-    end
-  end
-
-  def self.find_by_id(*args)
-    Response.find_by_map_id(args.first)
-  end
-
-  def response
-    self
   end
 end

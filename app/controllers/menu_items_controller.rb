@@ -1,6 +1,15 @@
 require 'menu'
 
 class MenuItemsController < ApplicationController
+
+
+  def action_allowed?
+    case params[:action]
+    when 'link'
+      true
+    end
+  end
+
   def index
     list
     render :action => 'list'
@@ -8,6 +17,7 @@ class MenuItemsController < ApplicationController
 
   def list
     # @menu_item_pages, @menu_items = paginate :menu_items, :per_page => 10
+    @settings = SystemSettings.first
     @menu = Menu.new
     @items = @menu.get_menu(0)
   end

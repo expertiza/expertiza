@@ -1,0 +1,37 @@
+<h1 xmlns="http://www.w3.org/1999/html"> Listing of All Quiz Questions for <%= Assignment.find(@assignment_id).name %> </h1>
+<table>
+  <% @questions.each do |question| %>
+    <b> <%= question.txt %><br></b>
+    Question ID: <%= question.id %><br>
+    <% question_type = QuestionType.get_formatted_question_type question.id %>
+    Question Type: <%= question_type %><br>
+
+    <% if question_type == 'True/False' %>
+      Correct Answer: <%= (QuizQuestionChoice.find_by_question_id(question.id)).txt %><br><br>
+    <% elsif question_type == 'Multiple Choice - Radio' %>
+      <% correct_answer = '' %>
+      Answer Options:<br>
+      <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |choice| %>
+        <% if choice.iscorrect == true  %>
+          <% correct_answer = choice.txt %>
+        <% end %>
+        &nbsp;&nbsp;<%= choice.txt %><br>
+      <% end %>
+      Correct Answer:<br>
+      &nbsp;&nbsp;<%= correct_answer %><br><br>
+    <% elsif question_type == 'Multiple Choice - Checked' %>
+      <% correct_answers = Array.new %>
+      Answer Options:<br>
+      <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |choice| %>
+        <% if choice.iscorrect == true  %>
+          <% correct_answers.push choice.txt %>
+        <% end %>
+        &nbsp;&nbsp;<%= choice.txt %><br>
+      <% end %>
+      Correct Answer(s):<br>
+      <% correct_answers.each do |correct_answer| %>
+        &nbsp;&nbsp;<%= correct_answer %><br>
+      <% end %><br>
+    <% end %> <hr>
+  <% end %>
+</table>

@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class CourseTest < ActiveSupport::TestCase
-  fixtures :courses,:teams,:users,:participants,:assignments,:nodes,:tree_folders, :roles
+  fixtures :course,:teams,:users,:participants,:assignments,:nodes,:tree_folders, :roles
 
   def setup
     @course = courses(:course1)
@@ -39,9 +39,9 @@ class CourseTest < ActiveSupport::TestCase
     assert_equal 'team8', @teams.last.name
   end
 
-  # test method get_path
+  # test method dir_path
   def test_get_path
-    assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110/',@course0.get_path
+    assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110/',@course0.dir_path
   end
 
   # test method get_participants

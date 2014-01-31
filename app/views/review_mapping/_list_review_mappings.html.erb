@@ -148,7 +148,7 @@
   session[:return_to] = request.request_uri    
 %>
 
-<% if !assignment.is_using_dynamic_reviewer_assignment? %>
+<% if !assignment.dynamic_reviewer_assignment? %>
 
 <%= link_to 'Assign reviewers automatically', :action => 'select_mapping', :id => assignment.id %>
 | <%= link_to 'Import reviewer mappings', 
@@ -172,11 +172,18 @@
             :controller=>'export_file',
             :action=>'start',
             :model=> 'ReviewResponseMap',
-            :id=>assignment.id %>
-| <%= link_to 'Export metareview mappings',
+  :id=>assignment.id
+%>
+|
+<%= link_to 'Export metareview mappings',
             :controller=>'export_file',
             :action=>'start',
             :model=> 'MetareviewResponseMap',
-            :id=>assignment.id %>            
-| <%= link_to 'Delete all reviewers and metareviewers', :action => 'delete_all_reviewers_and_metareviewers',
-                                                        :id => assignment.id %> | 
+  :id=>assignment.id
+%>
+|
+<%= link_to 'Assign reviewers',
+  :action => 'add_self_reviewer',
+  :id => assignment.id
+%>
+|

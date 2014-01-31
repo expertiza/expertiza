@@ -1,4 +1,8 @@
 class InstitutionsController < ApplicationController
+  def action_allowed?
+    current_role_name.eql?("Super-Administrator")
+  end
+
   def index
     list
     render :action => 'list'

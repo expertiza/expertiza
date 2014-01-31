@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  response: MyText
+  assignment: 
+  questionnaire: 
+  question: 
+
+two:
+  response: MyText
+  assignment: 
+  questionnaire: 
+  question: 

@@ -4,6 +4,18 @@ class ReviewMappingController < ApplicationController
   helper :dynamic_review_assignment
   helper :submitted_content
   
+  def action_allowed?
+    case params[:action]
+    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically'
+      true
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator'].include? current_role_name
+    end
+  end
+
+
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
     assignment_id = session[:contributor].parent_id
@@ -63,6 +75,18 @@ class ReviewMappingController < ApplicationController
                                                                               requested_topic_id ,
                                                                               Assignment::RS_STUDENT_SELECTED)
   end 
+    def add_quiz_response_map
+      if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
+        flash[:error] = "You have already taken that quiz"
+      else
+      @map = QuizResponseMap.new
+      @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
+      @map.reviewer_id = params[:participant_id]
+      @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
+      @map.save
+      end
+      redirect_to :controller => 'student_quiz', :action => 'list', :id => params[:participant_id]
+    end
   
   # Assign self to a submission
   def add_self_reviewer
@@ -146,6 +170,38 @@ class ReviewMappingController < ApplicationController
     redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
   end
 
+  # assigns the quiz dynamically to the participant
+  def assign_quiz_dynamically
+    begin
+      assignment = Assignment.find(params[:assignment_id])
+      reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+      #topic_id = Participant.find_by_id(Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id).topic_id
+      unless params[:i_dont_care]
+        #topic = (topic_id.nil?) ? nil : SignUpTopic.find(topic_id)
+        if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
+          flash[:error] = "You have already taken that quiz"
+        else
+          @map = QuizResponseMap.new
+          puts "final=1==="+params[:questionnaire_id]
+          @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
+          @map.reviewer_id = params[:participant_id]
+          @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
+          @map.save
+        end
+      else
+        topic = assignment.candidate_topics_for_quiz.to_a.shuffle[0] rescue nil
+        assignment.assign_quiz_dynamically(reviewer, topic)
+      end
+
+
+
+    rescue Exception => e
+      flash[:alert] = (e.nil?) ? $! : e
+    end
+      redirect_to :controller => 'student_quiz', :action => 'list', :id => reviewer.id
+
+  end
+
   def add_metareviewer    
     mapping = ResponseMap.find(params[:id])
     msg = String.new
@@ -164,6 +220,34 @@ class ReviewMappingController < ApplicationController
       msg = $!
     end
     redirect_to :action => 'list_mappings', :id => mapping.assignment.id, :msg => msg                                  
+  end
+
+  def assign_metareviewer_dynamically
+    begin
+      assignment   = Assignment.find(params[:assignment_id])
+      metareviewer = AssignmentParticipant.find_by_user_id_and_parent_id(params[:metareviewer_id], assignment.id)
+
+      assignment.assign_metareviewer_dynamically(metareviewer)
+
+    rescue Exception => e
+      flash[:alert] = (e.nil?) ? $! : e
+    end
+
+    redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
+  end
+
+
+  def get_user(params)
+    if params[:user_id]
+      user = User.find(params[:user_id])
+    else
+      user = User.find_by_name(params[:user][:name])
+    end
+    if user.nil?
+      newuser = url_for :controller => 'users', :action => 'new'
+      raise "Please <a href='#{newuser}'>create an account</a> for this user to continue."
+    end
+    return user
   end
 
   def get_reviewer(user,assignment,reg_url)
@@ -243,6 +327,33 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => mapping.assignment.id
   end   
 
+  def delete_mappings(mappings, force=nil)
+    failedCount = 0
+    mappings.each{
+        |mapping|
+      assignment_id = mapping.assignment.id
+      begin
+        mapping.delete(force)
+      rescue
+        failedCount += 1
+      end
+    }
+    return failedCount
+  end
+
+  def delete_participant
+    contributor = AssignmentParticipant.find(params[:id])
+    name = contributor.name
+    assignment_id = contributor.assignment
+    begin
+      contributor.destroy
+      flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
+    rescue
+      flash[:error] = "\"#{name}\" was not removed. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
+    end
+    redirect_to :action => 'list_mappings', :id => assignment_id
+  end
+
   def delete_reviewer
     mapping = ResponseMap.find(params[:id]) 
     assignment_id = mapping.assignment.id
@@ -291,6 +402,15 @@ class ReviewMappingController < ApplicationController
     #metareview.delete
     mapping.delete
     redirect_to :action => 'list_mappings', :id => assignment_id
+  end
+
+  def delete_rofreviewer
+    mapping = ResponseMapping.find(params[:id])
+    revmapid = mapping.review_mapping.id
+    mapping.delete
+
+    flash[:note] = "The metareviewer has been deleted."
+    redirect_to :action => 'list_rofreviewers', :id => revmapid
   end
 
   def list

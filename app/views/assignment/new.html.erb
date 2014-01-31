@@ -1,0 +1,22 @@
+<h1>New Assignment</h1>
+
+<% form_tag( {:action => 'create'}, :onsubmit => 'return checkForm();', :onload => 'addElement();')do %>
+  <%= render :partial => 'content' %>
+  <hr/>
+  <%= render :partial => 'rubrics' %>
+  <%= render :partial => 'review_strategy'  %>
+  <hr/>
+  <%= render :partial => 'due_dates' %>
+  <% if @course != nil %>
+  	<%= hidden_field_tag('assignment[course_id]', @course.id) %>
+  <% else %>
+    <%= hidden_field_tag('assignment[course_id]', nil) %>
+  <% end %>
+  <%= hidden_field_tag('assignment[private]',@private) %>
+   <%= render :partial => 'availability_flag' %>
+  &nbsp;&nbsp;<%= submit_tag "Save assignment", :name=>"save" %>
+<% end %>
+<br />
+<div style="padding: 15px">
+<%= render :partial => '/shared_scripts/back' %>
+</div>

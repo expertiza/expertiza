@@ -1,6 +1,12 @@
 
 class SurveyDeploymentController < ApplicationController
- 
+
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator'].include? current_role_name
+  end
+
   def new 
     @surveys=Questionnaire.find_all_by_type('CourseEvaluationQuestionnaire').map{|u| [u.name, u.id] }
     @course = Course.find_all_by_instructor_id(session[:user].id).map{|u| [u.name, u.id] }

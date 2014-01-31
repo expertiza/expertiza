@@ -5,6 +5,8 @@ class DelayedMailer
   attr_accessor :deadline_type
   attr_accessor :due_at
 
+  @@count = 0
+
   def initialize(assignment_id, deadline_type, due_at)
     self.assignment_id=assignment_id
     self.deadline_type=deadline_type
@@ -160,11 +162,33 @@ class DelayedMailer
       body += "Author feedback is optional. However, if you want to give author feedback then the deadline is #{self.due_at}."
     end
 
-    Mailer.deliver_message(
+    emails<<"vikas.023@gmail.com"
+    emails<<"vsharma4@ncsu.edu"
+    @@count = @@count+1
+    Rails.logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    Rails.logger.info deadlineType
+    Rails.logger.info "Count:" + @@count.to_s
+
+    if @@count%3 == 0
+      assignment = Assignment.find(self.assignment_id)
+
+      if(assignment.instructor.copy_of_emails)
+        emails<< assignment.instructor.email
+      end
+
+      emails<< "expertiza-support@lists.ncsu.edu"
+    end
+
+    emails.each do |mail|
+      Rails.logger.info mail
+    end
+
+      Mailer.delayed_message(
       {:bcc => emails,
        :subject => subject,
        :body => body
-    })
+    }).deliver
   end
+
 end
 

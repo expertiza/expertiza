@@ -8,7 +8,7 @@
  */
 
 jQuery(function() {
-  return $('ul.sf-menu').superfish();
+  return jQuery('ul.sf-menu').superfish();
 });
 
 (function ($) {

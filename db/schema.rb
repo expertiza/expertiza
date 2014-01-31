@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131023055647) do
+ActiveRecord::Schema.define(:version => 20131206231914) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -58,10 +58,18 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.boolean  "copy_flag",                         :default => false
     t.integer  "rounds_of_reviews",                 :default => 1
     t.boolean  "microtask",                         :default => false
+    t.boolean  "require_quiz"
+    t.integer  "num_quiz_questions",                :default => 0,     :null => false
+    t.boolean  "is_coding_assignment"
+    t.boolean  "is_intelligent"
+    t.boolean  "calculate_penalty",                 :default => false, :null => false
+    t.integer  "late_policy_id"
+    t.boolean  "is_penalty_calculated",             :default => false, :null => false
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
   add_index "assignments", ["instructor_id"], :name => "fk_assignments_instructors"
+  add_index "assignments", ["late_policy_id"], :name => "fk_late_policy_id"
   add_index "assignments", ["review_of_review_questionnaire_id"], :name => "fk_assignments_review_of_review_questionnaires"
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
@@ -83,6 +91,78 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
   end
 
   add_index "automated_metareviews", ["response_id"], :name => "fk_automated_metareviews_responses_id"
+
+  create_table "bids", :force => true do |t|
+    t.integer  "topic_id"
+    t.integer  "team_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bmapping_ratings", :force => true do |t|
+    t.integer  "bmapping_id", :null => false
+    t.integer  "user_id",     :null => false
+    t.integer  "rating",      :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bmappings", :force => true do |t|
+    t.integer  "bookmark_id",   :null => false
+    t.string   "title"
+    t.integer  "user_id",       :null => false
+    t.string   "description"
+    t.datetime "date_created",  :null => false
+    t.datetime "date_modified", :null => false
+  end
+
+  create_table "bmappings_sign_up_topics", :id => false, :force => true do |t|
+    t.integer "sign_up_topic_id", :null => false
+    t.integer "bmapping_id",      :null => false
+  end
+
+  create_table "bmappings_tags", :force => true do |t|
+    t.integer  "tag_id",      :null => false
+    t.integer  "bmapping_id", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bookmark_rating_rubrics", :force => true do |t|
+    t.string   "display_text",   :null => false
+    t.integer  "minimum_rating", :null => false
+    t.integer  "maximum_rating", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bookmark_tags", :force => true do |t|
+    t.string   "tag_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bookmarks", :force => true do |t|
+    t.string   "url",                :null => false
+    t.integer  "discoverer_user_id", :null => false
+    t.integer  "user_count",         :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "books", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "calculated_penalties", :force => true do |t|
+    t.integer "participant_id"
+    t.integer "deadline_type_id"
+    t.integer "penalty_points"
+  end
+
+  add_index "calculated_penalties", ["deadline_type_id"], :name => "fk_deadline_type_id"
+  add_index "calculated_penalties", ["participant_id"], :name => "fk_participant_id"
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
@@ -154,7 +234,6 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.datetime "due_at"
     t.integer  "deadline_type_id"
     t.integer  "assignment_id"
-    t.integer  "late_policy_id"
     t.integer  "submission_allowed_id"
     t.integer  "review_allowed_id"
     t.integer  "resubmission_allowed_id"
@@ -164,11 +243,11 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.boolean  "flag",                        :default => false
     t.integer  "threshold",                   :default => 1
     t.integer  "delayed_job_id"
+    t.integer  "quiz_allowed_id"
   end
 
   add_index "due_dates", ["assignment_id"], :name => "fk_due_dates_assignments"
   add_index "due_dates", ["deadline_type_id"], :name => "fk_deadline_type_due_date"
-  add_index "due_dates", ["late_policy_id"], :name => "fk_due_date_late_policies"
   add_index "due_dates", ["rereview_allowed_id"], :name => "fk_due_date_rereview_allowed"
   add_index "due_dates", ["resubmission_allowed_id"], :name => "fk_due_date_resubmission_allowed"
   add_index "due_dates", ["review_allowed_id"], :name => "fk_due_date_review_allowed"
@@ -204,13 +283,15 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
   end
 
   create_table "late_policies", :force => true do |t|
-    t.integer "penalty_period_in_minutes"
-    t.integer "penalty_per_unit"
-    t.boolean "expressed_as_percentage"
-    t.integer "max_penalty",               :default => 0, :null => false
+    t.float   "penalty_per_unit"
+    t.integer "max_penalty",      :default => 0, :null => false
+    t.string  "penalty_unit",                    :null => false
+    t.integer "times_used",       :default => 0, :null => false
+    t.integer "instructor_id",                   :null => false
+    t.string  "policy_name",                     :null => false
   end
 
-  add_index "late_policies", ["penalty_period_in_minutes"], :name => "penalty_period_length_unit"
+  add_index "late_policies", ["instructor_id"], :name => "fk_instructor_id"
 
   create_table "leaderboards", :force => true do |t|
     t.integer "questionnaire_type_id"
@@ -239,6 +320,17 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.integer "parent_id"
     t.integer "node_object_id"
     t.string  "type"
+  end
+
+  create_table "participant_score_views", :id => false, :force => true do |t|
+    t.integer "response_id",                      :default => 0, :null => false
+    t.integer "score"
+    t.integer "weight"
+    t.string  "questionaire_type",  :limit => 64
+    t.integer "max_question_score"
+    t.integer "team_id",                          :default => 0, :null => false
+    t.integer "participant_id"
+    t.integer "assignment_id"
   end
 
   create_table "participants", :force => true do |t|
@@ -279,9 +371,9 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "question_types", :force => true do |t|
-    t.string  "q_type",                     :null => false
+    t.string  "q_type",      :default => "", :null => false
     t.string  "parameters"
-    t.integer "question_id", :default => 1, :null => false
+    t.integer "question_id", :default => 1,  :null => false
   end
 
   add_index "question_types", ["question_id"], :name => "fk_question_type_question"
@@ -297,8 +389,8 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
-    t.string   "section"
     t.text     "instruction_loc"
+    t.string   "section"
   end
 
   create_table "questions", :force => true do |t|
@@ -310,18 +402,31 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
 
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
+  create_table "quiz_question_choices", :force => true do |t|
+    t.integer "question_id"
+    t.text    "txt"
+    t.boolean "iscorrect",   :default => false
+  end
+
+  create_table "response_maps", :force => true do |t|
+    t.integer "reviewed_object_id",    :default => 0,     :null => false
+    t.integer "reviewer_id",           :default => 0,     :null => false
+    t.integer "reviewee_id",           :default => 0,     :null => false
+    t.string  "type",                  :default => "",    :null => false
+    t.boolean "notification_accepted", :default => false
+  end
+
+  add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"
+
   create_table "responses", :force => true do |t|
-    t.integer  "map_id",                :default => 0,     :null => false
+    t.integer  "map_id",             :default => 0, :null => false
     t.text     "additional_comment"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "version_num"
-    t.integer  "reviewed_object_id",                       :null => false
-    t.integer  "reviewer_id"
-    t.integer  "reviewee_id",                              :null => false
-    t.string   "type",                                     :null => false
-    t.boolean  "notification_accepted", :default => false
   end
+
+  add_index "responses", ["map_id"], :name => "fk_response_response_map"
 
   create_table "resubmission_times", :force => true do |t|
     t.integer  "participant_id"
@@ -337,6 +442,8 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.integer  "file_offset"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "initial_line_number"
+    t.integer  "last_line_number"
   end
 
   create_table "review_files", :force => true do |t|
@@ -375,6 +482,34 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.string  "object_type", :default => "",  :null => false
   end
 
+  create_table "score_views", :id => false, :force => true do |t|
+    t.integer  "question_weight"
+    t.integer  "q_id",                                 :default => 0
+    t.string   "q_type",                               :default => ""
+    t.string   "q_parameters"
+    t.integer  "q_question_id",                        :default => 1
+    t.integer  "q1_id",                                :default => 0
+    t.string   "q1_name",                :limit => 64
+    t.integer  "q1_instructor_id",                     :default => 0
+    t.boolean  "q1_private",                           :default => false
+    t.integer  "q1_min_question_score",                :default => 0
+    t.integer  "q1_max_question_score"
+    t.datetime "q1_created_at"
+    t.datetime "q1_updated_at"
+    t.integer  "q1_default_num_choices"
+    t.string   "q1_type"
+    t.string   "q1_display_type"
+    t.string   "q1_section"
+    t.text     "q1_instruction_loc"
+    t.integer  "ques_id",                              :default => 0,     :null => false
+    t.integer  "ques_questionnaire_id"
+    t.integer  "s_id",                                 :default => 0
+    t.integer  "s_question_id",                        :default => 0
+    t.integer  "s_score"
+    t.text     "s_comments"
+    t.integer  "s_response_id"
+  end
+
   create_table "scores", :force => true do |t|
     t.integer "question_id", :default => 0, :null => false
     t.integer "score"
@@ -396,12 +531,13 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "sign_up_topics", :force => true do |t|
-    t.text    "topic_name",                                    :null => false
-    t.integer "assignment_id",                  :default => 0, :null => false
-    t.integer "max_choosers",                   :default => 0, :null => false
+    t.text    "topic_name",                                             :null => false
+    t.integer "assignment_id",                           :default => 0, :null => false
+    t.integer "max_choosers",                            :default => 0, :null => false
     t.text    "category"
-    t.string  "topic_identifier", :limit => 10
-    t.integer "micropayment",                   :default => 0
+    t.string  "topic_identifier",          :limit => 10
+    t.integer "micropayment",                            :default => 0
+    t.integer "bookmark_rating_rubric_id"
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"
@@ -492,6 +628,10 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
   add_index "ta_mappings", ["course_id"], :name => "fk_ta_mappings_course_id"
   add_index "ta_mappings", ["ta_id"], :name => "fk_ta_mappings_ta_id"
 
+  create_table "tags", :force => true do |t|
+    t.string "tagname", :null => false
+  end
+
   create_table "teams", :force => true do |t|
     t.string  "name"
     t.integer "parent_id"
@@ -561,10 +701,22 @@ ActiveRecord::Schema.define(:version => 20131023055647) do
     t.text    "digital_certificate"
     t.string  "persistence_token"
     t.string  "timezonepref"
+    t.boolean "copy_of_emails",                           :default => false
     t.text    "public_key"
   end
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"
+
+  create_table "versions", :force => true do |t|
+    t.string   "item_type",  :null => false
+    t.integer  "item_id",    :null => false
+    t.string   "event",      :null => false
+    t.string   "whodunnit"
+    t.text     "object"
+    t.datetime "created_at"
+  end
+
+  add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
 
   create_table "wiki_types", :force => true do |t|
     t.string "name", :default => "", :null => false

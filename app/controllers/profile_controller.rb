@@ -1,5 +1,9 @@
 class ProfileController < ApplicationController
-  def edit 
+  def action_allowed?
+    current_user
+  end
+
+  def edit
     @user = session[:user]
     @assignment_questionnaire = AssignmentQuestionnaire.first :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]
   end

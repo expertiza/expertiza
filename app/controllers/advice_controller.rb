@@ -1,4 +1,9 @@
 class AdviceController < ApplicationController
+  def action_allowed?
+    ['Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_user.role.name
+  end
 
   # Modify the advice associated with a questionnaire
   def edit_advice

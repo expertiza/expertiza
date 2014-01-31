@@ -32,7 +32,7 @@ class SuperAdministrator < User
   end
    
   def list_admins(object_type, user_id)
-    if (object_type != SignupSheet)
+    if (object_type != SignUpSheet)
       object_type.find(:all,
                        :joins => "inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)
     else 
@@ -42,7 +42,7 @@ class SuperAdministrator < User
   end
 
   def list_instructors(object_type, user_id)
-    if (object_type != SignupSheet)
+    if (object_type != SignUpSheet)
       object_type.find(:all,
                        :joins => "inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)
     else

@@ -24,7 +24,7 @@ or<br/><br/>
 		<input type="reset" value="Reset"></div><br>
 	<% end %>
     <table>
-	  <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, false) %> </div></td></tr>
+	  <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, false).html_safe %> </div></td></tr>
     </table>
   <% end %>		
   <% end %>

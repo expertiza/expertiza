@@ -4,6 +4,10 @@ class ResponseMap < Response
     self['id']
   end
 
+  def map_id
+    id
+  end
+
   # return latest versions of the responses
   def self.get_assessments_for(participant)
     responses = Array.new

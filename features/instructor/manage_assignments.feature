@@ -15,17 +15,13 @@ Feature: Manage the assignments in Expertiza
 	  When I fill in "Assignment1" for "Name"
       And I press "Create"
       Then I should see "Assignment was successfully created."
-      And I check "Available to students"
-      And I fill in "2020/01/01 00:00:00 +0000" for "Submission"
-	  And I fill in "2020/01/02 00:00:00 +0000" for "Review"
-	When I press "Save"
-	Then I should see "Assignment was successfully saved."
+
 
   @instructor
   @manage_assignments
   Scenario: Instructor can create a valid assignment (using step)
 	When I create a public assignment named "Assignment2" using review named "test_review"
-	Then I should see "Assignment was successfully saved."
+	Then I should see "Assignment was successfully created."
 
 	
   @instructor
@@ -33,14 +29,19 @@ Feature: Manage the assignments in Expertiza
 
   Scenario: Instructor is notified when an assignment with a duplicate name is created
 	When I create a public assignment named "duplicate_test" using review named "test_review"
-	  And I create a public assignment named "duplicate_test" using review named "test_review"
-	Then I should see "There is already an assignment named"
-	
+    And I follow the "Manage..." link as an "instructor"
+    And I follow "Create Public Assignment"
+    And I fill in "duplicate_test" for "Name"
+    And I press "Create"
+    Then I should not see "Assignment was successfully created."
+
+
   @instructor
   @manage_assignments
+  @wip
   Scenario: Creating an assignment that is available to students with no due date should fail.
 	When I create a public assignment named "Assignment3" using no due date
-     And "Available to students" is checked
+     And I check "Available to students"
 	Then I should not see "Assignment was successfully created."
 
   Scenario: Creating an assignment with no due date if not available to student should not fail.

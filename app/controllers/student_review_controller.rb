@@ -1,5 +1,10 @@
 class StudentReviewController < ApplicationController
-  
+
+  def action_allowed?
+    current_role_name.eql?("Student")
+  end
+
+
   def list 
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)

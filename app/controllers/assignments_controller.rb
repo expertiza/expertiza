@@ -55,6 +55,7 @@ class AssignmentsController < ApplicationController
 
   def edit
     @assignment = Assignment.find(params[:id])
+    @user = current_user
     set_up_assignment_review
   end
 

@@ -496,3 +496,4 @@ def custom_create ###-### Is this used?  It is not present in the master branch.
     !current_user_id?(response.map.reviewer.user_id)
   end
 end
+end

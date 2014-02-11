@@ -50,6 +50,7 @@ group :test do
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
+  gem 'guard-cucumber'
   gem 'launchy'
   gem "minitest"
   gem "minitest-reporters", '>= 0.5.0'

@@ -1,0 +1,6 @@
+source "https://rubygems.org"
+
+gemspec :path => '..'
+
+gem 'activesupport', '~> 3.2.16'
+gem 'actionpack',    '~> 3.2.16'

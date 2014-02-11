@@ -1323,15 +1323,24 @@ admin?	app/models/user.rb	/^  def admin?$/;"	f	class:User
 administrator	app/models/role.rb	/^  def self.administrator$/;"	F	class:Role
 advance_pointer!	app/helpers/diff_helper.rb	/^    def advance_pointer!$/;"	f	class:DiffHelper.InputFile
 advertise_for_partners	app/controllers/student_team_controller.rb	/^  def advertise_for_partners$/;"	f	class:StudentTeamController
-after_initialize	app/models/author_feedback_questionnaire.rb	/^  def after_initialize    $/;"	f	class:AuthorFeedbackQuestionnaire
-after_initialize	app/models/bookmarkrating_questionnaire.rb	/^  def after_initialize$/;"	f	class:BookmarkratingQuestionnaire
-after_initialize	app/models/course_evaluation_questionnaire.rb	/^  def after_initialize    $/;"	f	class:CourseEvaluationQuestionnaire
-after_initialize	app/models/global_survey_questionnaire.rb	/^  def after_initialize   $/;"	f	class:GlobalSurveyQuestionnaire
-after_initialize	app/models/metareview_questionnaire.rb	/^  def after_initialize$/;"	f	class:MetareviewQuestionnaire
-after_initialize	app/models/quiz_questionnaire.rb	/^  def after_initialize$/;"	f	class:QuizQuestionnaire
-after_initialize	app/models/review_questionnaire.rb	/^  def after_initialize$/;"	f	class:ReviewQuestionnaire
-after_initialize	app/models/survey_questionnaire.rb	/^    def after_initialize$/;"	f	class:SurveyQuestionnaire
-after_initialize	app/models/teammate_review_questionnaire.rb	/^  def after_initialize$/;"	f	class:TeammateReviewQuestionnaire
+after_initialize	app/models/author_feedback_questionnaire.rb	/^  after_initialize :post_initialization
+def post_initialization    $/;"	f	class:AuthorFeedbackQuestionnaire
+after_initialize	app/models/bookmarkrating_questionnaire.rb	/^  after_initialize :post_initialization
+def post_initialization$/;"	f	class:BookmarkratingQuestionnaire
+after_initialize	app/models/course_evaluation_questionnaire.rb	/^  after_initialize :post_initialization
+def post_initialization    $/;"	f	class:CourseEvaluationQuestionnaire
+after_initialize	app/models/global_survey_questionnaire.rb	/^  after_initialize :post_initialization
+def post_initialization   $/;"	f	class:GlobalSurveyQuestionnaire
+after_initialize	app/models/metareview_questionnaire.rb	/^  after_initialize :post_initialization
+def post_initialization$/;"	f	class:MetareviewQuestionnaire
+after_initialize	app/models/quiz_questionnaire.rb	/^  after_initialize :post_initialization
+def post_initialization$/;"	f	class:QuizQuestionnaire
+after_initialize	app/models/review_questionnaire.rb	/^  after_initialize :post_initialization
+def post_initialization$/;"	f	class:ReviewQuestionnaire
+after_initialize	app/models/survey_questionnaire.rb	/^    after_initialize :post_initialization
+def post_initialization$/;"	f	class:SurveyQuestionnaire
+after_initialize	app/models/teammate_review_questionnaire.rb	/^  after_initialize :post_initialization
+def post_initialization$/;"	f	class:TeammateReviewQuestionnaire
 ajaxConvert	public/javascripts/jquery-1.9.1.js	/^function ajaxConvert( s, response ) {$/;"	f
 ajaxConvert	public/javascripts/jquery.js	/^function ajaxConvert( s, response, jqXHR, isSuccess ) {$/;"	f
 ajaxExtend	public/javascripts/jquery-1.9.1.js	/^function ajaxExtend( target, src ) {$/;"	f
@@ -1464,7 +1473,8 @@ base_path	vendor/plugins/rails_upgrade/lib/application_checker.rb	/^      def ba
 base_path	vendor/plugins/rails_upgrade/test/application_checker_test.rb	/^      def base_path$/;"	f	class:Rails.Upgrading.ApplicationChecker
 basic_alert	vendor/plugins/rails_upgrade/lib/application_checker.rb	/^      def basic_alert(title, text, more_info_url, culprits)$/;"	f
 before_destroy	vendor/plugins/acts_as_nested_set/lib/active_record/acts/nested_set.rb	/^        def before_destroy$/;"	f	class:ActiveRecord.Acts.NestedSet.ClassMethods.acts_as_nested_set.left_col_name.InstanceMethods
-before_save	app/models/content_page.rb	/^  def before_save$/;"	f	class:ContentPage
+before_save	app/models/content_page.rb	/^  before_save :setup_save
+def setup_save$/;"	f	class:ContentPage
 begin_survey	app/controllers/survey_response_controller.rb	/^  def begin_survey$/;"	f	class:SurveyResponseController
 below	app/models/menu_item.rb	/^  def below$/;"	f	class:MenuItem
 bequeath	app/controllers/team_controller.rb	/^ def bequeath$/;"	f	class:TeamController

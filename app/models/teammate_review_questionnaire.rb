@@ -1,5 +1,6 @@
 class TeammateReviewQuestionnaire < Questionnaire
-  def after_initialize
+  after_initialize :post_initialization
+def post_initialization
     self.display_type = 'Teammate Review' 
   end
   

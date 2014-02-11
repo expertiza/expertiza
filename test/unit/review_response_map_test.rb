@@ -86,18 +86,4 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
         p = ReviewResponseMap.add_reviewer(299716733,148111809,108022375)
         assert p.save
   end
-
-  #test "method_add_reviewer_already_existing_Fails" do
-  #      p = ReviewResponseMap.add_reviewer(217499789,311582000,20698453)
-  #      assert p.invalid?
-  #end
-  test "method_delete_review_response_map_exception" do
-    @assignment = assignments(:assignment0)
-    reviewrespmap = ReviewResponseMap.new
-    reviewrespmap.response = responses(:response0)
-    reviewrespmap.assignment = @assignment
-    assert_raise (LocalJumpError, reviewrespmap.delete(0))
-  end
-
-
 end

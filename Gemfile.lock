@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/expertiza/automated_metareview.git
+  revision: 4a96768c7cd11800a3ac5f1ef5d318c331b040ea
+  specs:
+    automated_metareview (0.0.3)
+
+GIT
   remote: https://github.com/expertiza/authlogic.git
   revision: 09163c7d2a9b21942c6716e885a14305e1aa0390
   specs:
@@ -41,7 +47,6 @@ GEM
     addressable (2.3.5)
     ansi (1.4.3)
     arel (2.0.10)
-    automated_metareview (0.0.2)
     bind-it (0.2.7)
       rjb (~> 1.4.3)
     builder (2.1.2)
@@ -284,7 +289,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth
-  automated_metareview
+  automated_metareview!
   bind-it
   capistrano
   capybara

@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/expertiza/automated_metareview.git
-  revision: 4a96768c7cd11800a3ac5f1ef5d318c331b040ea
+  revision: dbaa76388cb03eebf0daef53c133bec6504ea40e
   specs:
     automated_metareview (0.0.3)
 

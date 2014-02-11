@@ -10,17 +10,6 @@ describe 'should check login' do
   end
 end
 
-describe 'should check latepolicy page' do
-  it 'page should open successfully' do
-    visit '/'
-    fill_in('login_name', :with => 'admin')
-    fill_in('login_password', :with => 'admin')
-    click_button('Login')
-    visit '/late_policies'
-    page.should have_content('Listing late policies')
-  end
-end
-
 describe 'should create new policy' do
   it 'create policy' do
     visit '/'
@@ -108,16 +97,4 @@ describe 'login as student' do
     page.should have_content('Score for repo')
   end
 end
-
-describe 'login as instructor' do
-  it 'view scores as instructor' do
-    visit '/'
-    fill_in('login_name', :with => 'ins1')
-    fill_in('login_password', :with => 'abcd')
-    click_button('Login')
-    visit '/grades/view?id=14'
-    page.should have_content('Summary report')
-    page.should have_content('Average Penalty')
-    page.should have_content('Maximum Penalty')
-  end
 end

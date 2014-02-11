@@ -4,7 +4,8 @@ class QuizQuestionnaire < Questionnaire
 
   #validates_presence_of :quiz_question_type
 
-  def after_initialize
+  after_initialize :post_initialization
+def post_initialization
     self.display_type = 'Quiz'
   end
 

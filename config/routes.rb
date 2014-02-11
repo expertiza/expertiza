@@ -1,11 +1,9 @@
-Expertiza::Application.routes.draw do |map|
-  map.resources :bookmark_tags
+Expertiza::Application.routes.draw do
+  resources :bookmark_tags
+  resources :books
+  resources :bookmarks
+  resources :join_team_requests
 
-  map.resources :books
-
-  map.resources :bookmarks
-
-  map.resources :join_team_requests
   resources :admin do
     collection do
       get :list_super_administrators
@@ -55,6 +53,21 @@ Expertiza::Application.routes.draw do |map|
   end
 
   resources :author_feedback_questionnaires, controller: 'questionnaires'
+
+  resources :bookmark do
+    collection do
+      get :manage_bookmarks, as: :manage
+      get :view_bookmark, as: :view
+      get :view_rating_rubrics, as: :rating
+      get :add_rating_rubric_form, as: :rating2
+      get :add_tag_bookmark
+      get :create_tag_bookmark
+      get :search_bookmarks
+      get :view_bookmarks
+      get :bookmarks_rate, as: :bookmark_rate
+      get :view_rating_rubric
+    end
+  end
 
   resources :content_pages do
     collection do
@@ -452,20 +465,8 @@ Expertiza::Application.routes.draw do |map|
   match "/review_mapping/assign_metareviewer_dynamically", :to => 'review_mapping#assign_metareviewer_dynamically'
   match 'response/', :to => 'response#saving'
 
-  map.connect 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
-
-  map.connect 'bookmark/manage', :controller => "bookmarks", :action => 'manage_bookmarks'
-  map.connect 'bookmark/view', :controller => "bookmarks", :action => 'view_bookmark'
-  map.connect 'bookmark/rating', :controller => "bookmarks", :action => 'view_rating_rubrics'
-  map.connect 'bookmark/rating2', :controller => "bookmarks", :action => 'add_rating_rubric_form'
-  map.connect 'bookmark/add_tag_bookmark', :controller => "bookmarks", :action => "add_tag_bookmark"
-  map.connect 'bookmark/create_tag_bookmark', :controller => "bookmarks", :action => "create_tag_bookmark"
-  map.connect 'bookmark/search_bookmarks', :controller => "bookmarks", :action => 'search_bookmarks'
-  map.connect 'bookmark/view_bookmarks', :controller => "bookmarks", :action => 'view_bookmarks'
-  map.connect 'bookmark/bookmark_rate', :controller => "bookmarks", :action => 'bookmarks_rate'
-  map.connect 'bookmark/view_rating_rubric', :controller => "bookmarks", :action => 'view_rating_rubric'
-
-  map.connect ':controller/service.wsdl', :action => 'wsdl'
+  get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
+  get ':controller/service.wsdl', :action => 'wsdl'
 
   match ':controller(/:action(/:id))(.:format)'
 end

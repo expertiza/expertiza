@@ -6,12 +6,12 @@ class CourseParticipant < Participant
   def copy(assignment_id)
     part = AssignmentParticipant.find_by_user_id_and_parent_id(self.user_id,assignment_id)    
     if part.nil?
-       part = AssignmentParticipant.create(:user_id => self.user_id, :parent_id => assignment_id)
-       part.set_handle()
+      part = AssignmentParticipant.create(:user_id => self.user_id, :parent_id => assignment_id)
+      part.set_handle()
       return part
-    end
-  else
+    else
       return nil # return nil so we can tell a copy is not made
+    end
   end 
   
   # provide import functionality for Course Participants

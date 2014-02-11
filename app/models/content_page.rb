@@ -23,7 +23,8 @@ class ContentPage < ActiveRecord::Base
     end
   end
 
-  def before_save
+  before_save :setup_save
+def setup_save
     self.content_cache = markup_content
   end
 

@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-raise "Invalid ruby version: #{RUBY_VERSION}" unless RUBY_VERSION[/^1\.9\.3/]
+ruby '1.9.3'
 
 gem 'rails', '~>3.0.0'
 
@@ -64,5 +64,3 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'simplecov', :require => false, :group => :test
 end
-
-gem 'rails', '~>3.0.0'

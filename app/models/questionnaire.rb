@@ -1,4 +1,5 @@
 class Questionnaire < ActiveRecord::Base
+  validate :validate_questionnaire
 
   def get_weighted_score(assignment, scores)
     return compute_weighted_score(self.symbol, assignment, scores)
@@ -66,7 +67,7 @@ class Questionnaire < ActiveRecord::Base
   end
 
   # validate the entries for this questionnaire
-  def validate
+  def validate_questionnaire
     if max_question_score < 1
       errors.add(:max_question_score, "The maximum question score must be a positive integer.")
     end

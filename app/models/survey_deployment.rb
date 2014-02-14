@@ -3,8 +3,9 @@ class SurveyDeployment < ActiveRecord::Base
   validates_presence_of :num_of_students
   validates_presence_of :start_date
   validates_presence_of :end_date
+  validate :validate_survey_deployment
   
-  def validate
+  def validate_survey_deployment
     if((end_date != nil) && (start_date != nil) && (end_date-start_date)<0) 
       errors.add_to_base("End Date should be in the future of Start Date.")
     end

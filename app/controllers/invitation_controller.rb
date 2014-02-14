@@ -4,11 +4,11 @@ class InvitationController < ApplicationController
     current_role_name.eql?("Student")
   end
 
-  def new 
+  def new
     @invitation = Invitation.new
   end
-  
-  def create    
+
+  def create
     user = User.find_by_name(params[:user][:name].strip)
     team = AssignmentTeam.find_by_id(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
@@ -47,7 +47,7 @@ class InvitationController < ApplicationController
 
     redirect_to :controller => 'student_team', :action => 'view', :id=> student.id
   end
-  
+
   def update_join_team_request(user,student)
     #update the status in the join_team_request to A
     if user && student
@@ -60,19 +60,19 @@ class InvitationController < ApplicationController
       end
     end
   end
-  
+
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?    
+    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?
   end
- 
+
   def accept
     @inv = Invitation.find(params[:inv_id])
     @inv.reply_status = 'A'
     @inv.save
-    
+
     student = Participant.find(params[:student_id])
-    
+
     #Remove the users previous team since they are accepting an invite for possibly a new team.
     TeamsUser.remove_team(student.user_id, params[:team_id])
     #Accept the invite and return boolean on whether the add was successful
@@ -81,10 +81,10 @@ class InvitationController < ApplicationController
     unless add_successful
       flash[:error]= "The team already has the maximum number of members."
     end
-    
+
     redirect_to :controller => 'student_team', :action => 'view', :id => Participant.find(params[:student_id]).id
   end
-  
+
   def decline
     @inv = Invitation.find(params[:inv_id])
     @inv.reply_status = 'D'

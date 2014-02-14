@@ -1,6 +1,6 @@
 <% for column in Institution.content_columns %>
-<p>
-  <b><%= column.human_name %>:</b> <%=h @institution.send(column.name) %>
+  <p>
+    <b><%= column.human_name %>:</b> <%=h @institution.send(column.name) %>
 </p>
 <% end %>
 

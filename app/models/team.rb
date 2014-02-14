@@ -49,7 +49,7 @@ class Team < ActiveRecord::Base
     query = query + " where users.id = participants.user_id"
     query = query + " and participants.type = '"+self.get_participant_type+"'"
     query = query + " and participants.parent_id = #{self.parent_id}"
-    query = query + " and users.name like '#{name}%'"
+      query = query + " and users.name like '#{name}%'"
     query = query + " order by users.name"
     User.find_by_sql(query)
   end
@@ -84,7 +84,7 @@ class Team < ActiveRecord::Base
   def copy_members(new_team)
     members = TeamsUser.find_all_by_team_id(self.id)
     members.each{
-        | member |
+      | member |
       t_user = TeamsUser.create(:team_id => new_team.id, :user_id => member.user_id)
       parent = Object.const_get(self.get_parent_model).find(self.parent_id)
       TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
@@ -113,9 +113,9 @@ class Team < ActiveRecord::Base
     end
   end
 
-# @param parent [Object]
-# @param team_type [Object]
-# @param team_size [Object]
+  # @param parent [Object]
+  # @param team_type [Object]
+  # @param team_size [Object]
   def self.randomize_all_by_parent(parent, team_type, team_size)
     participants = Participant.find(:all, :conditions => ["parent_id = ? AND type = ?", parent.id, parent.class.to_s + "Participant"])
     participants = participants.sort{rand(3) - 1}

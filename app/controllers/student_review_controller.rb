@@ -5,7 +5,7 @@ class StudentReviewController < ApplicationController
   end
 
 
-  def list 
+  def list
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment  = @participant.assignment
@@ -14,7 +14,7 @@ class StudentReviewController < ApplicationController
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @review_mappings = TeamReviewResponseMap.find_all_by_reviewer_id(@participant.id)
-    @metareview_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)  
+    @metareview_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)
     # Calculate the number of reviews that the user has completed so far.
     @num_reviews_total       = @review_mappings.size
     @num_reviews_completed   = 0
@@ -53,7 +53,7 @@ class StudentReviewController < ApplicationController
           #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
           # to treat all assignments as team assignments
           participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
-        end
+          end
         if participant && participant.topic_id
           meta_review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(participant.topic_id,deadline_type_id,review_rounds)
           if meta_review_due_date.due_at < Time.now
@@ -61,7 +61,7 @@ class StudentReviewController < ApplicationController
           end
         end
       end
+        end
     end
-  end  
-  
+
 end

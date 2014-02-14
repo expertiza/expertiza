@@ -2,12 +2,12 @@ class AssignmentsController < ApplicationController
   auto_complete_for :user, :name
   before_filter :authorize
 
- def action_allowed?
-   ['Super-Administrator',
-    'Administrator',
-    'Instructor',
-    'Teaching Assistant'].include? current_role_name
- end
+  def action_allowed?
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_role_name
+  end
 
   # change access permission from public to private or vice versa
   def toggle_access
@@ -173,7 +173,7 @@ class AssignmentsController < ApplicationController
         redirect_to :action => 'edit', :id => @assignment.id
       else
         flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
-        redirect_to :action => 'edit', :id => @assignment.id
+          redirect_to :action => 'edit', :id => @assignment.id
       end
     else
 
@@ -182,7 +182,7 @@ class AssignmentsController < ApplicationController
         redirect_to :action => 'edit', :id => @assignment.id
       else
         flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
-        redirect_to :action => 'edit', :id => @assignment.id
+          redirect_to :action => 'edit', :id => @assignment.id
       end
     end
   end
@@ -192,8 +192,8 @@ class AssignmentsController < ApplicationController
   end
 
 
-#NOTE: many of these functions actually belongs to other models
-#====setup methods for new and edit method=====#
+  #NOTE: many of these functions actually belongs to other models
+  #====setup methods for new and edit method=====#
   def set_up_assignment_review
     set_up_defaults
 
@@ -249,12 +249,12 @@ class AssignmentsController < ApplicationController
       mi=find_min_from_now(due_at)
       diff = mi-(duedates[i].threshold)*60
       if diff>0
-      dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)),
-                              1, diff.minutes.from_now)
-      duedates[i].update_attribute(:delayed_job_id, dj.id)
+        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)),
+                                1, diff.minutes.from_now)
+        duedates[i].update_attribute(:delayed_job_id, dj.id)
+      end
     end
   end
-    end
 
   # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
   # from the current time and returns this difference in minutes
@@ -337,104 +337,104 @@ class AssignmentsController < ApplicationController
       flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
 
       redirect_to :action => 'edit', :id => new_assign.id
-    else
-      flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
-      redirect_to :action => 'list', :controller => 'tree_display'
-    end
-  end
-
-
-  #--------------------------------------------------------------------------------------------------------------------
-  # DELETE
-  # TODO: not been cleanup yep
-  #--------------------------------------------------------------------------------------------------------------------
-  def delete
-    assignment = Assignment.find(params[:id])
-
-    # If the assignment is already deleted, go back to the list of assignments
-    if assignment
-      begin
-        #delete from delayed_jobs queue
-        djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', assignment.id])
-        for dj in djobs
-          delete_from_delayed_queue(dj.id)
-        end
-
-        @user = session[:user]
-        id = @user.get_instructor
-        if (id != assignment.instructor_id)
-          raise "Not authorised to delete this assignment"
-        end
-        assignment.delete(params[:force])
-        @a = Node.find(:first, :conditions => ['node_object_id = ? and type = ?', params[:id], 'AssignmentNode'])
-
-        @a.destroy
-        flash[:notice] = "The assignment is deleted"
-      rescue
-        url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
-        url_no = url_for :action => 'delete', :id => params[:id]
-        error = $!
-        flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
+      else
+        flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
+        redirect_to :action => 'list', :controller => 'tree_display'
       end
     end
 
-    redirect_to :controller => 'tree_display', :action => 'list'
-  end
 
-  def list
-    set_up_display_options("ASSIGNMENT")
-    @assignments=super(Assignment)
-    #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
-  end
+    #--------------------------------------------------------------------------------------------------------------------
+    # DELETE
+    # TODO: not been cleanup yep
+    #--------------------------------------------------------------------------------------------------------------------
+    def delete
+      assignment = Assignment.find(params[:id])
 
+      # If the assignment is already deleted, go back to the list of assignments
+      if assignment
+        begin
+          #delete from delayed_jobs queue
+          djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', assignment.id])
+          for dj in djobs
+            delete_from_delayed_queue(dj.id)
+          end
 
-  #--------------------------------------------------------------------------------------------------------------------
-  # DEFINE_INSTRUCTOR_NOTIFICATION_LIMIT
-  # TODO: NO usages found need verification
-  #--------------------------------------------------------------------------------------------------------------------
-  def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
-    existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?', session[:user].id, assignment_id, questionnaire_id])
-    if existing.nil?
-      NotificationLimit.create(:user_id => session[:user].id,
-                               :assignment_id => assignment_id,
-                               :questionnaire_id => questionnaire_id,
-                               :limit => limit)
-    else
-      existing.limit = limit
-      existing.save
+          @user = session[:user]
+          id = @user.get_instructor
+          if (id != assignment.instructor_id)
+            raise "Not authorised to delete this assignment"
+          end
+          assignment.delete(params[:force])
+          @a = Node.find(:first, :conditions => ['node_object_id = ? and type = ?', params[:id], 'AssignmentNode'])
+
+          @a.destroy
+          flash[:notice] = "The assignment is deleted"
+        rescue
+          url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
+          url_no = url_for :action => 'delete', :id => params[:id]
+          error = $!
+          flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
+        end
+      end
+
+      redirect_to :controller => 'tree_display', :action => 'list'
     end
+
+    def list
+      set_up_display_options("ASSIGNMENT")
+      @assignments=super(Assignment)
+      #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
+    end
+
+
+    #--------------------------------------------------------------------------------------------------------------------
+    # DEFINE_INSTRUCTOR_NOTIFICATION_LIMIT
+    # TODO: NO usages found need verification
+    #--------------------------------------------------------------------------------------------------------------------
+    def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
+      existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?', session[:user].id, assignment_id, questionnaire_id])
+      if existing.nil?
+        NotificationLimit.create(:user_id => session[:user].id,
+                                 :assignment_id => assignment_id,
+                                 :questionnaire_id => questionnaire_id,
+                                 :limit => limit)
+      else
+        existing.limit = limit
+        existing.save
+      end
+    end
+
+    def associate_assignment_to_course
+      @assignment = Assignment.find(params[:id])
+      @assignment.inspect
+      @user = ApplicationHelper::get_user_role(session[:user])
+      @user = session[:user]
+      @courses = @user.set_courses_to_assignment
+    end
+
+    def remove_assignment_from_course
+      assignment = Assignment.find(params[:id])
+      oldpath = assignment.get_path rescue nil
+      assignment.course_id = nil
+      assignment.save
+      newpath = assignment.get_path rescue nil
+      FileHelper.update_file_location(oldpath, newpath)
+      redirect_to :controller => 'tree_display', :action => 'list'
+    end
+
+
+
   end
 
-  def associate_assignment_to_course
-    @assignment = Assignment.find(params[:id])
-    @assignment.inspect
-    @user = ApplicationHelper::get_user_role(session[:user])
-    @user = session[:user]
-    @courses = @user.set_courses_to_assignment
-  end
-
-  def remove_assignment_from_course
-    assignment = Assignment.find(params[:id])
-    oldpath = assignment.get_path rescue nil
-    assignment.course_id = nil
-    assignment.save
-    newpath = assignment.get_path rescue nil
-    FileHelper.update_file_location(oldpath, newpath)
-    redirect_to :controller => 'tree_display', :action => 'list'
-  end
-
-
-
-end
-
-def copy_assignment_questionnaire (old_assign, new_assign)
-  old_assign.assignment_questionnaires.each do |aq|
-    AssignmentQuestionnaire.create(
+  def copy_assignment_questionnaire (old_assign, new_assign)
+    old_assign.assignment_questionnaires.each do |aq|
+      AssignmentQuestionnaire.create(
         :assignment_id => new_assign.id,
         :questionnaire_id => aq.questionnaire_id,
         :user_id => session[:user].id,
         :notification_limit => aq.notification_limit,
         :questionnaire_weight => aq.questionnaire_weight
-    )
+      )
+    end
   end
-end

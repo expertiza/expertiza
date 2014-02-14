@@ -1,13 +1,13 @@
 <% form_for :tag, @tag, :url => { :action => "create_tag_bookmark", :bmapping_id => params[:id]} do |f| %>
 
-    <div><h1>Add Tags</h1></div>
-    <div class="field">
-      Tagname<br />
-      <%= f.text_field :tagname %>
-    </div>
-    <div class="actions">
-      <%= f.submit %>
-    </div>
-    <br/>
-    <%= link_to('Back',:controller => 'sign_up_sheet', :action => 'add_signup_topics') %>
+  <div><h1>Add Tags</h1></div>
+  <div class="field">
+    Tagname<br />
+    <%= f.text_field :tagname %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+  <br/>
+  <%= link_to('Back',:controller => 'sign_up_sheet', :action => 'add_signup_topics') %>
 <% end %>

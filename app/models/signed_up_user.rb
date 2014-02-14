@@ -77,8 +77,8 @@ class SignedUpUser < ActiveRecord::Base
           end
         end
         old_teams_signup.destroy
+        end
       end
     end
-  end
 
-end
+  end

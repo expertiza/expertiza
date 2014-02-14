@@ -10,7 +10,7 @@ class SurveyController < ApplicationController
     @assignment = Assignment.find(params[:id])
     @assigned_surveys = SurveyHelper::get_assigned_surveys(@assignment.id)
     @surveys = Array.new
-    
+
     if params['subset'] == "mine"
       @surveys = Questionnaire.find(:all, :conditions => ["type_id = 2 and instructor_id = ?", session[:user].id])
     elsif params['subset'] == "public"
@@ -18,11 +18,11 @@ class SurveyController < ApplicationController
     else
       @surveys = @assigned_surveys
     end
-    
+
     if params['update']
       if params[:surveys]
         @checked = params[:surveys]
-        
+
         if params['submit_subset'] == "mine"
           @submit_surveys = Questionnaire.find(:all, :conditions => ["type_id = 2 and instructor_id = ?", session[:user].id])
         elsif params['submit_subset'] == "public"
@@ -30,14 +30,14 @@ class SurveyController < ApplicationController
         else
           @submit_surveys = @assigned_surveys
         end
-        
+
         for survey in @submit_surveys
           unless @checked.include? survey.id
             AssignmentQuestionnaire.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
             @assigned_surveys.delete(survey)
           end
-        end 
-        
+        end
+
         for checked_survey in @checked
           @current = Questionnaire.find(checked_survey)
           unless @assigned_surveys.include? @current
@@ -51,12 +51,12 @@ class SurveyController < ApplicationController
           AssignmentQuestionnaire.delete_all(["questionnaire_id = ? and assignment_id = ?", survey.id, @assignment.id])
           @assigned_surveys.delete(survey)
           @surveys.delete(survey)
-        end 
+        end
       end
-    end    
+    end
     @surveys.sort!{|a,b| a.name <=> b.name}
   end
-  
-  
+
+
 
 end

@@ -4,22 +4,22 @@
 
 <table>
   <tr><th>Name</th><th>Full Name</th><th>Email Address</th><th>Parent</th></tr>
-<% for user in @users %>
-  <tr>
-    <td><%= link_to user.name, :action => 'show_instructor',
-	    :id => user.id %></td>
-    <td><%= user.fullname %></td>
-    <td><%= user.email %></td>
-    <td><%= (User.find_by_id(user.parent_id)).name  %></td>
+  <% for user in @users %>
+    <tr>
+      <td><%= link_to user.name, :action => 'show_instructor',
+        :id => user.id %></td>
+      <td><%= user.fullname %></td>
+      <td><%= user.email %></td>
+      <td><%= (User.find_by_id(user.parent_id)).name  %></td>
     </tr>
-<% end -%>
+  <% end -%>
 </table>
 
 <hr/>
 <%= form_tag('new_instructor', method: :get) do %>
 
-<br>
-<%= text_field_tag('name', '', {'size' => 30}) %>
-&nbsp;
-<input type='submit' value='New Instructor'/>
+  <br>
+  <%= text_field_tag('name', '', {'size' => 30}) %>
+  &nbsp;
+  <input type='submit' value='New Instructor'/>
 <% end %>

@@ -45,7 +45,7 @@ class ExportFileController < ApplicationController
     end
 
     send_data csv_data,
-              :type => 'text/csv; charset=iso-8859-1; header=present',
-              :disposition => "attachment; filename=#{filename}"
+      :type => 'text/csv; charset=iso-8859-1; header=present',
+      :disposition => "attachment; filename=#{filename}"
   end
 end

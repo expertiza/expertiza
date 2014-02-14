@@ -1,8 +1,8 @@
 require 'csv'
 
 module ImportFileHelper
- 
-  def self.define_attributes(row)   
+
+  def self.define_attributes(row)
     attributes = {}
     attributes["role_id"] = Role.student.id
     attributes["name"] = row[0].strip
@@ -20,8 +20,8 @@ module ImportFileHelper
     user = User.new(attributes)
     user.parent_id = (session[:user]).id
     user.save!
-   
-    user 
+
+    user
   end
 end
 

@@ -1,4 +1,4 @@
- class StudentTaskController < ApplicationController
+class StudentTaskController < ApplicationController
   helper :submitted_content
 
   def action_allowed?
@@ -10,7 +10,7 @@
     redirect_to(:controller => 'eula', :action => 'display') if current_user.is_new_user
     @student_tasks = StudentTask.from_user current_user
 
-     ########Tasks and Notifications##################
+    ########Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)
     @taskrevisions = @student_tasks.select(&:revision?)
     @notifications = @student_tasks.select(&:notify?)
@@ -44,7 +44,7 @@
   def others_work
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
-    
+
     @assignment = @participant.assignment
     # Finding the current phase that we are in
     due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id])

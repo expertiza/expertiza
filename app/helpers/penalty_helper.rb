@@ -50,7 +50,7 @@ module PenaltyHelper
       last_submission_time = resubmission_times.at(resubmission_times.size-1).resubmitted_at
       if(last_submission_time > submission_due_date)
         if(@penalty_unit == 'Minute')
-        penalty_minutes = ((last_submission_time - submission_due_date))/60
+          penalty_minutes = ((last_submission_time - submission_due_date))/60
         elsif(@penalty_unit == 'Hour')
           penalty_minutes = ((last_submission_time - submission_due_date))/3600
         elsif(@penalty_unit == 'Day')
@@ -155,7 +155,7 @@ module PenaltyHelper
     penalty = 0
 
     # Calculate the number of reviews that the user has completed so far.
-     review_mappings.each do |map|
+    review_mappings.each do |map|
       if map.response
         created_at = Response.find_by_map_id(map.id).created_at
         review_map_created_at_list <<  created_at
@@ -168,13 +168,13 @@ module PenaltyHelper
       if review_map_created_at_list.at(i)
         if (review_map_created_at_list.at(i) > review_due_date)
 
-            if(@penalty_unit == 'Minute')
-              penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/60
-            elsif(@penalty_unit == 'Hour')
-              penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/3600
-            elsif(@penalty_unit == 'Day')
-              penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/86400
-            end
+          if(@penalty_unit == 'Minute')
+            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/60
+          elsif(@penalty_unit == 'Hour')
+            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/3600
+          elsif(@penalty_unit == 'Day')
+            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/86400
+          end
           penalty_for_this_review = penalty_minutes * @penalty_per_unit
           if (penalty_for_this_review > @max_penalty_for_no_submission)
             penalty = @max_penalty_for_no_submission
@@ -183,7 +183,7 @@ module PenaltyHelper
           end
         end
       elsif
-          penalty = @max_penalty_for_no_submission
+        penalty = @max_penalty_for_no_submission
       end
     end
     penalty

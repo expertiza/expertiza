@@ -20,14 +20,14 @@ class ReviewFilesController < ApplicationController
     FileUtils.mkdir_p(version_dir) unless File.exists? version_dir
 
     filename_only = ReviewFilesHelper::get_safe_filename(
-        file.original_filename.to_s)
+      file.original_filename.to_s)
     full_filename = version_dir + filename_only
 
 
 
     # Copy file into version_dir
     File.open(full_filename, "wb") {
-        |f| f.write(file.read) }
+      |f| f.write(file.read) }
 
 
     #--------------New Code----------------#
@@ -49,16 +49,16 @@ class ReviewFilesController < ApplicationController
     respond_to do |format|
       if @success
         format.html { redirect_to :action => 'show_all_submitted_files',
-                                  :participant_id => participant.id and return}
+                      :participant_id => participant.id and return}
         format.xml  { render :xml => @review_file, :status => :created,
-                             :location => @review_file and return}
+                      :location => @review_file and return}
       else
         flash[:error] = "Code Review File was <b>not</b> successfully" +
-            "uploaded. Please Re-Submit."
+          "uploaded. Please Re-Submit."
         format.html { redirect_to :action => 'show_all_submitted_files',
-                                  :participant_id => participant.id and return}
+                      :participant_id => participant.id and return}
         format.xml  { render :xml => @review_file.errors,
-                             :status => :unprocessable_entity and return}
+                      :status => :unprocessable_entity and return}
       end
     end
 
@@ -90,12 +90,12 @@ class ReviewFilesController < ApplicationController
     @file_version_map = Hash.new
     all_review_files.each_with_index do |each_file,index|
       @file_version_map[File.basename(each_file.filepath)] = Array.new unless
-          @file_version_map[File.basename(each_file.filepath)]
+      @file_version_map[File.basename(each_file.filepath)]
       @file_version_map[File.basename(each_file.filepath)] << each_file.version_number
 
 
       auth[File.basename(each_file.filepath)] = Hash.new unless
-          auth[File.basename(each_file.filepath)]
+      auth[File.basename(each_file.filepath)]
       auth[File.basename(each_file.filepath)][each_file.version_number] = each_file.author_participant_id
     end
 
@@ -112,7 +112,7 @@ class ReviewFilesController < ApplicationController
       all_review_files.each {|file|
 
         #if file.filepath == file_path and file.version_number == versions.sort.last
-          @file_id_map[base_filename] = file.id
+        @file_id_map[base_filename] = file.id
         #end
       }
 
@@ -121,183 +121,183 @@ class ReviewFilesController < ApplicationController
       #    @file_id_map[base_filename] = review_file ? review_file.id : nil
       @file_version_map[base_filename] =  versions.sort
       @latest_version_number = (@file_version_map[base_filename][-1] >
-          @latest_version_number) ? @file_version_map[base_filename][-1] :
-          @latest_version_number
-    end
-
+                                @latest_version_number) ? @file_version_map[base_filename][-1] :
+      @latest_version_number
   end
+
+end
 
 =begin
-# This method is used to generate the view where the particular code file is
-  # viewed 'individually' (not diff).
-  # params[:review_file_id] - Id of the review_file whose source is to be shown
-  # params[:participant_id]
-  # params[:versions] an array (in asc order) of all versions of the review file
-  #                   contained in params[:review_file_id]
-  def show_code_file
-    @participant = AssignmentParticipant.find(params[:participant_id])
+   # This method is used to generate the view where the particular code file is
+   # viewed 'individually' (not diff).
+   # params[:review_file_id] - Id of the review_file whose source is to be shown
+   # params[:participant_id]
+   # params[:versions] an array (in asc order) of all versions of the review file
+   #                   contained in params[:review_file_id]
+   def show_code_file
+     @participant = AssignmentParticipant.find(params[:participant_id])
 
-    @current_review_file = ReviewFile.find(params[:review_file_id])
-    review_file=nil
+     @current_review_file = ReviewFile.find(params[:review_file_id])
+     review_file=nil
 
-    newer_version_comments = ReviewComment.find_all_by_review_file_id(@current_review_file.id)
+     newer_version_comments = ReviewComment.find_all_by_review_file_id(@current_review_file.id)
 
-    @version_fileId_map = Hash.new
-    params[:versions].each do |each_version|
+     @version_fileId_map = Hash.new
+     params[:versions].each do |each_version|
 
-      get_files_with_the_current_version = ReviewFile.find_all_by_version_number(each_version)
-      get_files_with_the_current_version.each {|file|
-        if File.basename(file.filepath) == File.basename(@current_review_file.filepath)
-          review_file = file.id
-        end
-      }
+       get_files_with_the_current_version = ReviewFile.find_all_by_version_number(each_version)
+       get_files_with_the_current_version.each {|file|
+         if File.basename(file.filepath) == File.basename(@current_review_file.filepath)
+           review_file = file.id
+         end
+       }
 
 
-      @version_fileId_map[each_version] = review_file ? review_file: nil
-    end
+       @version_fileId_map[each_version] = review_file ? review_file: nil
+     end
 
-    file_contents = File.open(@current_review_file.filepath).readlines
-    offset_array = [0]
+     file_contents = File.open(@current_review_file.filepath).readlines
+     offset_array = [0]
 
-    offset_array = ReviewFile.get_offset_array(file_contents)
+     offset_array = ReviewFile.get_offset_array(file_contents)
 
-    @shareObj = Hash.new()
-    @shareObj['linearray2'] = file_contents
-    @shareObj['offsetarray2'] = offset_array
-    @highlight_cell_right_file=ReviewFile.highlightRightOffset(newer_version_comments,offset_array,file_contents)
+     @shareObj = Hash.new()
+     @shareObj['linearray2'] = file_contents
+     @shareObj['offsetarray2'] = offset_array
+     @highlight_cell_right_file=ReviewFile.highlightRightOffset(newer_version_comments,offset_array,file_contents)
 
-  end
+   end
 =end
 
-  # This method is used to generate the view where the particular code file is
-  # viewed 'individually' (not diff).
-  # params[:review_file_id] - Id of the review_file whose source is to be shown
-  # params[:participant_id]
-  # params[:versions] an array (in asc order) of all versions of the review file
-  #                   contained in params[:review_file_id]
-  def show_code_file
-    @participant = AssignmentParticipant.find(params[:participant_id])
-    @current_review_file = ReviewFile.find(params[:review_file_id])
+# This method is used to generate the view where the particular code file is
+# viewed 'individually' (not diff).
+# params[:review_file_id] - Id of the review_file whose source is to be shown
+# params[:participant_id]
+# params[:versions] an array (in asc order) of all versions of the review file
+#                   contained in params[:review_file_id]
+def show_code_file
+  @participant = AssignmentParticipant.find(params[:participant_id])
+  @current_review_file = ReviewFile.find(params[:review_file_id])
 
-    review_file=nil
+  review_file=nil
 
-    newer_version_comments = ReviewComment.find_all_by_review_file_id(@current_review_file.id)
+  newer_version_comments = ReviewComment.find_all_by_review_file_id(@current_review_file.id)
 
-    @version_fileId_map = Hash.new
-    params[:versions].each do |each_version|
+  @version_fileId_map = Hash.new
+  params[:versions].each do |each_version|
 
-      get_files_with_the_current_version = ReviewFile.where(["version_number = :vid and author_participant_id = :pid", { vid: each_version, pid: @participant }])
-      get_files_with_the_current_version.each {|file|
-        if File.basename(file.filepath) == File.basename(@current_review_file.filepath)
-          review_file = file.id
-        end
-      }
+    get_files_with_the_current_version = ReviewFile.where(["version_number = :vid and author_participant_id = :pid", { vid: each_version, pid: @participant }])
+    get_files_with_the_current_version.each {|file|
+      if File.basename(file.filepath) == File.basename(@current_review_file.filepath)
+        review_file = file.id
+      end
+    }
 
-      @version_fileId_map[each_version] = review_file ? review_file: nil
-    end
-
-    file_contents = File.open(@current_review_file.filepath).readlines
-    offset_array = [0]
-
-    offset_array = ReviewFile.get_offset_array(file_contents)
-
-    @shareObj = Hash.new()
-    @shareObj['linearray2'] = file_contents
-    @shareObj['offsetarray2'] = offset_array
-    @highlight_cell_right_file=ReviewFile.highlightRightOffset(newer_version_comments,offset_array,file_contents)
-
-
+    @version_fileId_map[each_version] = review_file ? review_file: nil
   end
 
-  # params[:participant_id]
-  # params[:versions] an array (in asc order) of all versions of the review file
-  # params[:diff_with_file_id] - Id of current file to be diffed with
-  # params[:current_version_id] the if of current version of file
-  def show_code_file_diff
-    @participant = AssignmentParticipant.find(params[:participant_id])
-    review_file=nil
-    # Get the filepath of both the files.
-    older_file = ReviewFile.find(params[:current_version_id])
-    newer_file = ReviewFile.find(params[:diff_with_file_id])
+  file_contents = File.open(@current_review_file.filepath).readlines
+  offset_array = [0]
 
-    @current_review_file = older_file
+  offset_array = ReviewFile.get_offset_array(file_contents)
 
-    @version_fileId_map = Hash.new
-    params[:versions].each do |each_version|
-      get_files_with_the_current_version = ReviewFile.where(["version_number = :vid and author_participant_id = :pid", { vid: each_version, pid: @participant }])
-      get_files_with_the_current_version.each {|file|
-        if File.basename(file.filepath) == File.basename(@current_review_file.filepath)
-          review_file = file.id
-        end
-      }
-      @version_fileId_map[each_version] = review_file ? review_file : nil
-    end
-
-    # Swap them if older is more recent than newer
-    files = Hash.new
-    # Swap them if older is more recent than newer
-
-    files = ReviewFile.swap_files(older_file, newer_file)
-
-    processor = DiffHelper::Processor.new(files[:@older_file].filepath, files[:@newer_file].filepath)
-    processor.process!
-
-    @first_line_num = []
-    @second_line_num = []
-    @first_offset = []
-    @second_offset = []
-    first_count = 0
-    second_count = 0
-    @offsetswithcomments_file1 = []
-    @offsetswithcomments_file2 = []
-
-    @first_offset << 0
-    @second_offset << 0
-
-    for i in (0..processor.absolute_line_num)
-
-      @first_offset = ReviewFile.get_first_offset(processor, i, @first_offset)
-
-      @second_offset = ReviewFile.get_second_offset(processor, i, @second_offset)
-
-      first_line_num = Hash.new
-      first_line_num = ReviewFile.get_first_line_num(processor, i, first_count)
-
-      @first_line_num << first_line_num[:@first_line_num]
-      first_count = first_line_num[:first_count]
-
-      second_line_num = Hash.new
-      second_line_num = ReviewFile.get_second_line_num(processor, i,second_count)
-      @second_line_num << second_line_num[:@second_line_num]
-      second_count = second_line_num[:second_count]
-
-      # Remove newlines at the end of this line of code
-      processor = ReviewFile.get_first_file_array(processor, i)
-
-      processor = ReviewFile.get_second_file_array(processor, i)
+  @shareObj = Hash.new()
+  @shareObj['linearray2'] = file_contents
+  @shareObj['offsetarray2'] = offset_array
+  @highlight_cell_right_file=ReviewFile.highlightRightOffset(newer_version_comments,offset_array,file_contents)
 
 
-    end
+end
 
-    older_version_comments = ReviewComment.find_all_by_review_file_id(files[:@older_file].id)
-    newer_version_comments = ReviewComment.find_all_by_review_file_id(files[:@newer_file].id)
+# params[:participant_id]
+# params[:versions] an array (in asc order) of all versions of the review file
+# params[:diff_with_file_id] - Id of current file to be diffed with
+# params[:current_version_id] the if of current version of file
+def show_code_file_diff
+  @participant = AssignmentParticipant.find(params[:participant_id])
+  review_file=nil
+  # Get the filepath of both the files.
+  older_file = ReviewFile.find(params[:current_version_id])
+  newer_file = ReviewFile.find(params[:diff_with_file_id])
 
-    @shareObj = Hash.new()
-    @shareObj['linearray1'] = processor.first_file_array
-    @shareObj['linearray2'] = processor.second_file_array
-    @shareObj['comparator'] = processor.comparison_array
-    @shareObj['linenumarray1'] = @first_line_num
-    @shareObj['linenumarray2'] = @second_line_num
-    @shareObj['offsetarray1'] = @first_offset
-    @shareObj['offsetarray2'] = @second_offset
-    @file_on_left = files[:@older_file]
-    @file_on_right = files[:@newer_file]
+  @current_review_file = older_file
+
+  @version_fileId_map = Hash.new
+  params[:versions].each do |each_version|
+    get_files_with_the_current_version = ReviewFile.where(["version_number = :vid and author_participant_id = :pid", { vid: each_version, pid: @participant }])
+    get_files_with_the_current_version.each {|file|
+      if File.basename(file.filepath) == File.basename(@current_review_file.filepath)
+        review_file = file.id
+      end
+    }
+    @version_fileId_map[each_version] = review_file ? review_file : nil
+  end
+
+  # Swap them if older is more recent than newer
+  files = Hash.new
+  # Swap them if older is more recent than newer
+
+  files = ReviewFile.swap_files(older_file, newer_file)
+
+  processor = DiffHelper::Processor.new(files[:@older_file].filepath, files[:@newer_file].filepath)
+  processor.process!
+
+  @first_line_num = []
+  @second_line_num = []
+  @first_offset = []
+  @second_offset = []
+  first_count = 0
+  second_count = 0
+  @offsetswithcomments_file1 = []
+  @offsetswithcomments_file2 = []
+
+  @first_offset << 0
+  @second_offset << 0
+
+  for i in (0..processor.absolute_line_num)
+
+    @first_offset = ReviewFile.get_first_offset(processor, i, @first_offset)
+
+    @second_offset = ReviewFile.get_second_offset(processor, i, @second_offset)
+
+    first_line_num = Hash.new
+    first_line_num = ReviewFile.get_first_line_num(processor, i, first_count)
+
+    @first_line_num << first_line_num[:@first_line_num]
+    first_count = first_line_num[:first_count]
+
+    second_line_num = Hash.new
+    second_line_num = ReviewFile.get_second_line_num(processor, i,second_count)
+    @second_line_num << second_line_num[:@second_line_num]
+    second_count = second_line_num[:second_count]
+
+    # Remove newlines at the end of this line of code
+    processor = ReviewFile.get_first_file_array(processor, i)
+
+    processor = ReviewFile.get_second_file_array(processor, i)
 
 
-    # REFACTOR: Code Duplication removed
-    @highlight_cell_left_file=   ReviewFile.getHighlightCellLeft(older_version_comments,@first_offset,@first_line_num)
+end
 
-    @highlight_cell_right_file=ReviewFile.getHighlightCellRight(newer_version_comments,@second_offset,@second_line_num)
+older_version_comments = ReviewComment.find_all_by_review_file_id(files[:@older_file].id)
+newer_version_comments = ReviewComment.find_all_by_review_file_id(files[:@newer_file].id)
+
+@shareObj = Hash.new()
+@shareObj['linearray1'] = processor.first_file_array
+@shareObj['linearray2'] = processor.second_file_array
+@shareObj['comparator'] = processor.comparison_array
+@shareObj['linenumarray1'] = @first_line_num
+@shareObj['linenumarray2'] = @second_line_num
+@shareObj['offsetarray1'] = @first_offset
+@shareObj['offsetarray2'] = @second_offset
+@file_on_left = files[:@older_file]
+@file_on_right = files[:@newer_file]
+
+
+# REFACTOR: Code Duplication removed
+@highlight_cell_left_file=   ReviewFile.getHighlightCellLeft(older_version_comments,@first_offset,@first_line_num)
+
+@highlight_cell_right_file=ReviewFile.getHighlightCellRight(newer_version_comments,@second_offset,@second_line_num)
 
   end
 
@@ -333,8 +333,8 @@ class ReviewFilesController < ApplicationController
     newobj =  ReviewComment.find_all_by_review_file_id(params[:file_id]);
     ReviewComment.find_all_by_review_file_id(params[:file_id]).sort_by {|tempcomment| tempcomment[:initial_line_number]}.each {|comment|
       if (comment[:initial_line_number] <= ((params[:initial_line_number]).to_i ) and comment[:last_line_number] >= ((params[:final_line_number]).to_i)) or
-          (comment[:initial_line_number] >= ((params[:initial_line_number]).to_i ) and comment[:initial_line_number] <= ((params[:final_line_number]).to_i)) or
-          (comment[:initial_line_number] <= ((params[:initial_line_number]).to_i ) and comment[:last_line_number] <= ((params[:final_line_number]).to_i) and comment[:last_line_number] >= ((params[:initial_line_number]).to_i))
+        (comment[:initial_line_number] >= ((params[:initial_line_number]).to_i ) and comment[:initial_line_number] <= ((params[:final_line_number]).to_i)) or
+        (comment[:initial_line_number] <= ((params[:initial_line_number]).to_i ) and comment[:last_line_number] <= ((params[:final_line_number]).to_i) and comment[:last_line_number] >= ((params[:initial_line_number]).to_i))
 
         assignmentparticipant = AssignmentParticipant.find_by_id(params[:participant_id])
         current_participant = AssignmentParticipant.find_by_parent_id_and_user_id(assignmentparticipant[:parent_id],session[:user].id)
@@ -355,12 +355,12 @@ class ReviewFilesController < ApplicationController
           handle = "Me :"
           authorflag = 0
           # elsif  (comment[:reviewer_participant_id] == AssignmentParticipant.find_by_user_id(params[:participant_id]).id)
-        elsif member.include? comment[:reviewer_participant_id] or comment[:reviewer_participant_id] == assignmentparticipant.id
-          handle = "Author :"
-          authorflag = 0
-        else
-          handle = "Reviewer"+comment[:reviewer_participant_id].to_s
-        end
+          elsif member.include? comment[:reviewer_participant_id] or comment[:reviewer_participant_id] == assignmentparticipant.id
+            handle = "Author :"
+            authorflag = 0
+          else
+            handle = "Reviewer"+comment[:reviewer_participant_id].to_s
+          end
 
 
         #all_comment_contents << handle+": "+comment.comment_content.gsub("\n", " ")
@@ -381,7 +381,7 @@ class ReviewFilesController < ApplicationController
 
   def render_error_page(exception = nil)
     redirect_to :controller => 'content_pages', :action => 'show',
-                :id => SystemSettings.find(:first).not_found_page_id
+      :id => SystemSettings.find(:first).not_found_page_id
 
   end
 

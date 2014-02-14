@@ -34,43 +34,43 @@
              team = Team.find_by_id(signed_up_user.creator_id)
              users = []
              users = team.users if team
-            
+
              showed_team = false
              for user in users
-      %>
-          <tr>
-            <th>&nbsp;</th>
-            <th>&nbsp;</th>
-                <%   if !showed_team
-               %>
-             <td align="center" rowspan="<%= team.users.size %>"><b><%= team.name %></b></td>
-           <% end %>
-           <% showed_team = true %>
-            <td><%=user.name%></td>
-            <td><%=user.fullname%></td>
-            <%
-              permissionGranted = false
-              hasSignature = false
-              signatureValid = false
-              @assignment.participants.each do |participant|
-                if (user.id == participant.user.id)
-                  permissionGranted = participant.permission_granted?
-                end
-              end
-            %>
-            <td><%= (permissionGranted ? "granted" : "denied") %></td>
-            <td>
-              <% if (permissionGranted && hasSignature && signatureValid) %>
-                <img src="/images/Check-icon.png" title="verified with digitigal signature" alt="verified"/>
-              <% else %>
-                <img src="/images/delete_icon.png" title="no digitigal signature" alt="unverified"/>
-              <% end %>
-              &nbsp;
-            </td>
+           %>
+         <tr>
+           <th>&nbsp;</th>
+           <th>&nbsp;</th>
+           <%   if !showed_team
+         %>
+       <td align="center" rowspan="<%= team.users.size %>"><b><%= team.name %></b></td>
+     <% end %>
+     <% showed_team = true %>
+     <td><%=user.name%></td>
+     <td><%=user.fullname%></td>
+     <%
+         permissionGranted = false
+     hasSignature = false
+     signatureValid = false
+     @assignment.participants.each do |participant|
+       if (user.id == participant.user.id)
+         permissionGranted = participant.permission_granted?
+       end
+     end
+   %>
+ <td><%= (permissionGranted ? "granted" : "denied") %></td>
+ <td>
+   <% if (permissionGranted && hasSignature && signatureValid) %>
+     <img src="/images/Check-icon.png" title="verified with digitigal signature" alt="verified"/>
+   <% else %>
+     <img src="/images/delete_icon.png" title="no digitigal signature" alt="unverified"/>
+   <% end %>
+   &nbsp;
+ </td>
           </tr>
-          <% end %>
         <% end %>
       <% end %>
     <% end %>
-  </table>
+  <% end %>
+</table>
 <% end %>

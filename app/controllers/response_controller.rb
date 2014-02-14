@@ -16,18 +16,18 @@ class ResponseController < ApplicationController
     end
   end
 
-    def get_scores
-      @review_scores = Array.new
-      @question_type = Array.new
-      @questions.each{
-          | question |
-        @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
-        @question_type << QuestionType.find_by_question_id(question.id)
-      }
-    end
+  def get_scores
+    @review_scores = Array.new
+    @question_type = Array.new
+    @questions.each{
+      | question |
+      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+      @question_type << QuestionType.find_by_question_id(question.id)
+    }
+  end
   def delete
     @response = Response.find(params[:id])
-      return if redirect_when_disallowed(@response)             #user cannot delete other people's responses. Needs to be authenticated.
+    return if redirect_when_disallowed(@response)             #user cannot delete other people's responses. Needs to be authenticated.
       map_id = @response.map.id
     @response.delete
     redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
@@ -50,7 +50,7 @@ class ResponseController < ApplicationController
 
     latestResponseVersion
     #sort all the available versions in descending order.
-      if @prev.present?
+    if @prev.present?
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
       @latest_phase=@largest_version_num.created_at
@@ -88,91 +88,91 @@ class ResponseController < ApplicationController
       get_content
       @review_scores = Array.new
       @questions.each {
-          |question|
+        |question|
         @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
       }
       #**********************
       # Check whether this is Jen's assgt. & if so, use her rubric
       if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
         if @assignment.id < 469
-            @next_action = "update"
+          @next_action = "update"
           render :action => 'custom_response'
         else
-            @next_action = "update"
+          @next_action = "update"
           render :action => 'custom_response_2011'
         end
       else
         # end of special code (except for the end below, to match the if above)
         #**********************
         render :action => 'response'
-      end
-    else
-      #else create a new version and update it.
-      @header = "New"
+    end
+else
+  #else create a new version and update it.
+  @header = "New"
+  @next_action = "create"
+  @feedback = params[:feedback]
+  @map = ResponseMap.find(params[:id])
+  @return = params[:return]
+  @modified_object = @map.map_id
+  get_content
+  #**********************
+  # Check whether this is Jen's assgt. & if so, use her rubric
+  if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
+    if @assignment.id < 469
       @next_action = "create"
-      @feedback = params[:feedback]
-      @map = ResponseMap.find(params[:id])
-      @return = params[:return]
-      @modified_object = @map.map_id
-      get_content
-      #**********************
-      # Check whether this is Jen's assgt. & if so, use her rubric
-      if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
-        if @assignment.id < 469
-            @next_action = "create"
-          render :action => 'custom_response'
-        else
-            @next_action = "create"
-          render :action => 'custom_response_2011'
-        end
-      else
-        # end of special code (except for the end below, to match the if above)
-        #**********************
-        render :action => 'response'
-      end
-  end
-
-  def edit
-    @header = "Edit"
-    @next_action = "update"
-    @return = params[:return]
-    @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
-
-    @map = @response.map
-    array_not_empty=0
-    @review_scores=Array.new
-    @prev=Response.all
-    for element in @prev
-      if (element.map_id==@map.map_id)
-        array_not_empty=1
-        @review_scores << element
-      end
-    end
-    if @prev.present?
-      @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
-      @largest_version_num=@sorted[0]
-    end
-    @response = Response.find_by_map_id_and_version_num(@map.map_id, @largest_version_num.version_num)
-    @modified_object = @response.response_id
-    get_content
-    @review_scores = Array.new
-    @question_type = Array.new
-    @questions.each {
-        |question|
-      @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
-      @question_type << QuestionType.find_by_question_id(question.id)
-    }
-    # Check whether this is a custom rubric
-    if @map.questionnaire.section.eql? "Custom"
-      @next_action = "custom_update"
       render :action => 'custom_response'
     else
-      # end of special code (except for the end below, to match the if above)
-      #**********************
-      render :action => 'response'
+      @next_action = "create"
+      render :action => 'custom_response_2011'
     end
-  end
+  else
+    # end of special code (except for the end below, to match the if above)
+    #**********************
+    render :action => 'response'
+      end
+    end
+
+    def edit
+      @header = "Edit"
+      @next_action = "update"
+      @return = params[:return]
+      @response = Response.find(params[:id])
+      return if redirect_when_disallowed(@response)
+
+      @map = @response.map
+      array_not_empty=0
+      @review_scores=Array.new
+      @prev=Response.all
+      for element in @prev
+        if (element.map_id==@map.map_id)
+          array_not_empty=1
+          @review_scores << element
+        end
+      end
+      if @prev.present?
+        @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+        @largest_version_num=@sorted[0]
+      end
+      @response = Response.find_by_map_id_and_version_num(@map.map_id, @largest_version_num.version_num)
+      @modified_object = @response.response_id
+      get_content
+      @review_scores = Array.new
+      @question_type = Array.new
+      @questions.each {
+        |question|
+        @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
+        @question_type << QuestionType.find_by_question_id(question.id)
+      }
+      # Check whether this is a custom rubric
+      if @map.questionnaire.section.eql? "Custom"
+        @next_action = "custom_update"
+        render :action => 'custom_response'
+      else
+        # end of special code (except for the end below, to match the if above)
+        #**********************
+        render :action => 'response'
+      end
+    end
 
     def edit
       @header = "Edit"
@@ -199,93 +199,93 @@ class ResponseController < ApplicationController
       end
     end
 
-  def update  ###-### Seems like this method may no longer be used -- not in E806 version of the file
-    @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
-    @myid = @response.response_id
-    msg = ""
-    begin
+    def update  ###-### Seems like this method may no longer be used -- not in E806 version of the file
+      @response = Response.find(params[:id])
+      return if redirect_when_disallowed(@response)
       @myid = @response.response_id
-      @map = @response.map
-      @response.update_attribute('additional_comment', params[:review][:comments])
+      msg = ""
+      begin
+        @myid = @response.response_id
+        @map = @response.map
+        @response.update_attribute('additional_comment', params[:review][:comments])
 
-      @questionnaire = @map.questionnaire
-      questions = @questionnaire.questions
+        @questionnaire = @map.questionnaire
+        questions = @questionnaire.questions
 
-      params[:responses].each_pair do |k, v|
+        params[:responses].each_pair do |k, v|
 
-            score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
-        unless score
-          score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+          score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
+          unless score
+            score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+          end
+          score.update_attribute('score', v[:score])
+          score.update_attribute('comments', v[:comment])
         end
-        score.update_attribute('score', v[:score])
-        score.update_attribute('comments', v[:comment])
+      rescue
+        msg = "Your response was not saved. Cause:189 #{$!}"
       end
-    rescue
-      msg = "Your response was not saved. Cause:189 #{$!}"
-    end
 
-    begin
-      ResponseHelper.compare_scores(@response, @questionnaire)
-      ScoreCache.update_cache(@response.response_id)
+      begin
+        ResponseHelper.compare_scores(@response, @questionnaire)
+        ScoreCache.update_cache(@response.response_id)
 
-      msg = "Your response was successfully saved."
-    rescue
-      msg = "An error occurred while saving the response:198 #{$!}"
-    end
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
-  end
-
-  def new_feedback
-    review = Response.find(params[:id])
-    if review
-      reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, review.map.assignment.id)
-      map = FeedbackResponseMap.find_by_reviewed_object_id_and_reviewer_id(review.id, reviewer.id)
-      if map.nil?
-        map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)
+        msg = "Your response was successfully saved."
+      rescue
+        msg = "An error occurred while saving the response:198 #{$!}"
       end
-      redirect_to :action => 'new', :id => map.map_id, :return => "feedback"
-    else
-      redirect_to :back
+      redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
     end
-  end
 
-  def view
-    @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
-    @map = @response.map
-    get_content
-    @review_scores = Array.new
-    @question_type = Array.new
-    @questions.each {
-        |question|
-      @review_scores << Score.find_by_response_id_and_question_id(@map.response_id, question.id)
-      @question_type << QuestionType.find_by_question_id(question.id)
-    }
-  end
+    def new_feedback
+      review = Response.find(params[:id])
+      if review
+        reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, review.map.assignment.id)
+        map = FeedbackResponseMap.find_by_reviewed_object_id_and_reviewer_id(review.id, reviewer.id)
+        if map.nil?
+          map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)
+        end
+        redirect_to :action => 'new', :id => map.map_id, :return => "feedback"
+      else
+        redirect_to :back
+      end
+    end
 
-  def new
-
-    @header = "New"
-    @next_action = "create"
-    @feedback = params[:feedback]
-    @map = ResponseMap.find(params[:id])
-    @return = params[:return]
-    @modified_object = @map.map_id
-    get_content
-
-    # Check whether this is a custom rubric
-    if @map.questionnaire.section.eql? "Custom"
+    def view
+      @response = Response.find(params[:id])
+      return if redirect_when_disallowed(@response)
+      @map = @response.map
+      get_content
+      @review_scores = Array.new
       @question_type = Array.new
       @questions.each {
-          |question|
+        |question|
+        @review_scores << Score.find_by_response_id_and_question_id(@map.response_id, question.id)
         @question_type << QuestionType.find_by_question_id(question.id)
       }
-      if !@map.contributor.nil?
+    end
+
+    def new
+
+      @header = "New"
+      @next_action = "create"
+      @feedback = params[:feedback]
+      @map = ResponseMap.find(params[:id])
+      @return = params[:return]
+      @modified_object = @map.map_id
+      get_content
+
+      # Check whether this is a custom rubric
+      if @map.questionnaire.section.eql? "Custom"
+        @question_type = Array.new
+        @questions.each {
+          |question|
+          @question_type << QuestionType.find_by_question_id(question.id)
+        }
+        if !@map.contributor.nil?
           team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
           @topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id, team_member).topic_id
+        end
       end
-    end
     end
     def new_feedback
       review = Response.find(params[:id])
@@ -297,17 +297,17 @@ class ResponseController < ApplicationController
           map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)
         end
         redirect_to :action => 'new', :id => map.id, :return => "feedback"
-        else
+      else
         redirect_to :back
-        end
       end
+    end
     def view
       @response = Response.find(params[:id])
       return if redirect_when_disallowed(@response)
       @map = @response.map
       get_content
       get_scores
-      end
+    end
     def new
       @header = "New"
       @next_action = "create"
@@ -320,24 +320,24 @@ class ResponseController < ApplicationController
       if @map.questionnaire.section.eql? "Custom"
         @question_type = Array.new
         @questions.each{
-            | question |
+          | question |
           @question_type << QuestionType.find_by_question_id(question.id)
         }
         @next_action = "create"
 
-                                                                  #changed part of code changed from custom create to create
-      render :action => 'custom_response'
+        #changed part of code changed from custom create to create
+        render :action => 'custom_response'
 
-    else
+      else
 
-      render :action => 'response'
+        render :action => 'response'
+      end
     end
-  end
-  def create
+    def create
       @map = ResponseMap.find(params[:id])                 #assignment/review/metareview id is in params id
-    @res = 0
-    msg = ""
-    error_msg = ""
+      @res = 0
+      msg = ""
+      error_msg = ""
       latestResponseVersion
       @review_scores=Array.new
       @prev=Response.where(map_id: @map.id)
@@ -348,13 +348,13 @@ class ResponseController < ApplicationController
       if @prev.present?
         @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
         @largest_version_num=@sorted[0]
-          @version=@largest_version_num.version_num+1
+        @version=@largest_version_num.version_num+1
         #if no previous version is available then initial version number is 1
       else
         @version=1
       end
       @response = Response.find_by_map_id(@map.id)
-        @response.additional_comment = params[:review][:comments]
+      @response.additional_comment = params[:review][:comments]
       @response.version_num = @version
       @response.map = @map
       if @response.save
@@ -373,34 +373,34 @@ class ResponseController < ApplicationController
       #@map.save
       msg = "Your response was successfully saved."
 
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
-  end
-
-def custom_create ###-### Is this used?  It is not present in the master branch.
-    @map = ResponseMap.find(params[:id])
-    @map.additional_comment = ""
-    @map.save
-    #@response = Response.create(:map_id => @map.id, :additional_comment => "")
-    @res = @response.response_id
-    @questionnaire = @map.questionnaire
-    questions = @questionnaire.questions
-    for i in 0..questions.size-1
-      # Local variable score is unused; can it be removed?
-      score = Score.create(:response_id => @response.response_id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
+      redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
     end
-    msg = "#{@map.get_title} was successfully saved."
 
-    saving
-  end
+    def custom_create ###-### Is this used?  It is not present in the master branch.
+      @map = ResponseMap.find(params[:id])
+      @map.additional_comment = ""
+      @map.save
+      #@response = Response.create(:map_id => @map.id, :additional_comment => "")
+      @res = @response.response_id
+      @questionnaire = @map.questionnaire
+      questions = @questionnaire.questions
+      for i in 0..questions.size-1
+        # Local variable score is unused; can it be removed?
+        score = Score.create(:response_id => @response.response_id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
+      end
+      msg = "#{@map.get_title} was successfully saved."
 
-  def saving
-    @map = ResponseMap.find(params[:id])
-    @return = params[:return]
-    @map.notification_accepted = false
-    @map.save
-    if (@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
-      if (params["save_options"].nil? or params["save_options"].empty?) #default it to with metareviews
-        params["save_options"] = "WithMeta"
+      saving
+    end
+
+    def saving
+      @map = ResponseMap.find(params[:id])
+      @return = params[:return]
+      @map.notification_accepted = false
+      @map.save
+      if (@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
+        if (params["save_options"].nil? or params["save_options"].empty?) #default it to with metareviews
+          params["save_options"] = "WithMeta"
       end
       #calling the automated metareviewer controller, which calls its corresponding model/view
       if (params[:save_options] == "WithMeta")
@@ -417,53 +417,53 @@ def custom_create ###-### Is this used?  It is not present in the master branch.
       elsif (params[:save_options] == "WithoutMeta")
         redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
-    else
-      redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
-    end
-  end
-
-  def redirection
-    flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
-    flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
-
-    @map = Response.find(params[:id])
-    if params[:return] == "feedback"
-      redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
-    elsif params[:return] == "teammate"
-      redirect_to :controller => 'student_team', :action => 'view', :id => @map.reviewer.id
-    elsif params[:return] == "instructor"
-      redirect_to :controller => 'grades', :action => 'view', :id => @map.assignment.id
-    else
-      redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
-
-    end
-  end
-
-  private
-
-  def get_content
-    @title = @map.get_title
-    @assignment = @map.assignment
-    @participant = @map.reviewer
-    @contributor = @map.contributor
-    @questionnaire = @map.questionnaire
-    @questions = @questionnaire.questions
-    @min = @questionnaire.min_question_score
-    @max = @questionnaire.max_question_score
-  end
-
-  def redirect_when_disallowed(response)
-    # For author feedback, participants need to be able to read feedback submitted by other teammates.
-    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-    if response.map.read_attribute(:type) == 'FeedbackResponseMap'
-      team = response.map.reviewer.team
-      unless team.has_user session[:user]
-        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
       else
-        redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
+        redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
     end
-  end
+
+    def redirection
+      flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
+      flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
+
+      @map = Response.find(params[:id])
+      if params[:return] == "feedback"
+        redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
+      elsif params[:return] == "teammate"
+        redirect_to :controller => 'student_team', :action => 'view', :id => @map.reviewer.id
+      elsif params[:return] == "instructor"
+        redirect_to :controller => 'grades', :action => 'view', :id => @map.assignment.id
+      else
+        redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
+
+      end
+    end
+
+    private
+
+    def get_content
+      @title = @map.get_title
+      @assignment = @map.assignment
+      @participant = @map.reviewer
+      @contributor = @map.contributor
+      @questionnaire = @map.questionnaire
+      @questions = @questionnaire.questions
+      @min = @questionnaire.min_question_score
+      @max = @questionnaire.max_question_score
+    end
+
+    def redirect_when_disallowed(response)
+      # For author feedback, participants need to be able to read feedback submitted by other teammates.
+      # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+      if response.map.read_attribute(:type) == 'FeedbackResponseMap'
+        team = response.map.reviewer.team
+        unless team.has_user session[:user]
+          redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+        else
+          redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
+        end
+      end
+    end
 
     private
     def get_content
@@ -479,16 +479,16 @@ def custom_create ###-### Is this used?  It is not present in the master branch.
     def redirect_when_disallowed(response)
       # For author feedback, participants need to be able to read feedback submitted by other teammates.
       # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
-      team = response.map.reviewer.team
-      unless team.has_user session[:user]
-        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
-      else
-        return false
+      if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
+        team = response.map.reviewer.team
+        unless team.has_user session[:user]
+          redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+        else
+          return false
+        end
+        response.map.read_attribute(:type)
       end
-      response.map.read_attribute(:type)
+      !current_user_id?(response.map.reviewer.user_id)
     end
-    !current_user_id?(response.map.reviewer.user_id)
   end
-end
 end

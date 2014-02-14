@@ -91,7 +91,7 @@ class CourseController < ApplicationController
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = $! #"The following error occurred while saving the course: #"+
-      redirect_to :action => 'new'
+        redirect_to :action => 'new'
     end
   end
 
@@ -161,7 +161,7 @@ class CourseController < ApplicationController
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end
 
-# generate the undo link
+  # generate the undo link
   #def undo_link
   #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
   #end

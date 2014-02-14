@@ -14,168 +14,168 @@
 </table>
 
 <% if @questionnaire.type == 'QuizQuestionnaire' %>        <!--handle a questionnaire differently if it is a quiz-->
-    <table id="questions_table">
+  <table id="questions_table">
 
-      <% if $disp_flag != 1 %>
-          <tr>
-            <td ><strong>Questions</strong> </td>
-          </tr> <tr>
-            <td align=center width=300>Question</td>
-            <%  if @questionnaire.type != 'QuizQuestionnaire' %><td align=left>weight</td><%end%>
-            <td align=center width=200>Hint</td>
-          </tr>
-      <% end %>
-      <% questionnum=1 %>
-      <% for @new_question in @questionnaire.questions %>
-          <tr>
-            <% if $disp_flag != 1 %>
-              <td > <%= text_area "new_question[]", 'txt', :size=>80 %></td>
+    <% if $disp_flag != 1 %>
+      <tr>
+        <td ><strong>Questions</strong> </td>
+        </tr> <tr>
+        <td align=center width=300>Question</td>
+        <%  if @questionnaire.type != 'QuizQuestionnaire' %><td align=left>weight</td><%end%>
+        <td align=center width=200>Hint</td>
+      </tr>
+    <% end %>
+    <% questionnum=1 %>
+    <% for @new_question in @questionnaire.questions %>
+      <tr>
+        <% if $disp_flag != 1 %>
+          <td > <%= text_area "new_question[]", 'txt', :size=>80 %></td>
+        <% end %>
+        <%#  if @questionnaire.type == 'QuizQuestionnaire' %>
+        <%  @quiz_question_choices = QuizQuestionChoice.find_all_by_question_id(@new_question.id) %>
+        <%# else
+          i=1
+        @question_advices = QuestionAdvice.find_all_by_question_id(@new_question.id)
+        for @question_advice in @question_advices
+          if @question_advice.score == 1
+            @new_question.weight = i
+            break
+          else
+            i+=1
+          end
+        end
+        end %>
+      <%#  if @questionnaire.type != 'QuizQuestionnaire' %>
+      <!--<td><%#= select("new_question[]", :weight, Question::ANSWERS)%></td>-->
+      <%# end %>
+      <td><% @question_type= QuestionType.find_by_question_id(@new_question.id)%><%=  text_area "question_type[]", 'parameters', :size=>50 %><br></td>
+    </tr>
+    <% i=1 %>
+    <%#  if @questionnaire.type == 'QuizQuestionnaire' %>
+    <% for @quiz_question_choices in @quiz_question_choices %>
+      <tr>
+        <td>
+          &nbsp;&nbsp;&nbsp;
+          <% if   @question_type.q_type!="Essay"%>
+            <% if @question_type.q_type=="MCC" %>
+              <% if @quiz_question_choices.iscorrect%>
+                <%= check_box_tag("quiz_question_choices[#{questionnum}][MCC][#{i}][iscorrect]",'1', true) %>
+                &nbsp;<%= text_field "quiz_question_choices[]", 'txt', :size=>40 %>
+            <% else %>
+              <%= check_box_tag("quiz_question_choices[#{questionnum}][MCC][#{i}][iscorrect]", '1', false) %>
+              &nbsp;<%= text_field "quiz_question_choices[]", 'txt', :size=>40 %>
+          <% end%>
+          <% else if @question_type.q_type=="MCR" %>
+            <% if @quiz_question_choices.iscorrect %>
+              <%= radio_button_tag("quiz_question_choices[#{questionnum}][MCR][1][iscorrect]", "#{i}", true)%>
+            <% else %>
+              <%= radio_button_tag("quiz_question_choices[#{questionnum}][MCR][1][iscorrect]", "#{i}", false)%>
             <% end %>
-            <%#  if @questionnaire.type == 'QuizQuestionnaire' %>
-            <%  @quiz_question_choices = QuizQuestionChoice.find_all_by_question_id(@new_question.id) %>
-            <%# else
-               i=1
-                   @question_advices = QuestionAdvice.find_all_by_question_id(@new_question.id)
-                   for @question_advice in @question_advices
-                     if @question_advice.score == 1
-                       @new_question.weight = i
-                       break
-                     else
-                       i+=1
-                     end
-                   end
-                 end %>
-            <%#  if @questionnaire.type != 'QuizQuestionnaire' %>
-            <!--<td><%#= select("new_question[]", :weight, Question::ANSWERS)%></td>-->
-             <%# end %>
-            <td><% @question_type= QuestionType.find_by_question_id(@new_question.id)%><%=  text_area "question_type[]", 'parameters', :size=>50 %><br></td>
-          </tr>
-          <% i=1 %>
-          <%#  if @questionnaire.type == 'QuizQuestionnaire' %>
-              <% for @quiz_question_choices in @quiz_question_choices %>
-                  <tr>
-                    <td>
-                      &nbsp;&nbsp;&nbsp;
-                      <% if   @question_type.q_type!="Essay"%>
-                      <% if @question_type.q_type=="MCC" %>
-                             <% if @quiz_question_choices.iscorrect%>
-                                  <%= check_box_tag("quiz_question_choices[#{questionnum}][MCC][#{i}][iscorrect]",'1', true) %>
-                                  &nbsp;<%= text_field "quiz_question_choices[]", 'txt', :size=>40 %>
-                              <% else %>
-                                 <%= check_box_tag("quiz_question_choices[#{questionnum}][MCC][#{i}][iscorrect]", '1', false) %>
-                                 &nbsp;<%= text_field "quiz_question_choices[]", 'txt', :size=>40 %>
-                             <% end%>
-                      <% else if @question_type.q_type=="MCR" %>
-                              <% if @quiz_question_choices.iscorrect %>
-                                  <%= radio_button_tag("quiz_question_choices[#{questionnum}][MCR][1][iscorrect]", "#{i}", true)%>
-                              <% else %>
-                                  <%= radio_button_tag("quiz_question_choices[#{questionnum}][MCR][1][iscorrect]", "#{i}", false)%>
-                               <% end %>
-                              &nbsp;<%= text_field "quiz_question_choices[]", 'txt', :size=>40 %>
-                      <% else if @question_type.q_type=="TF" %>
-                               <% if @quiz_question_choices.txt=="True" %>
-                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'True', true) %>   True
-                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'False', false) %>  False
-                               <% else %>
-                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'True', false) %>  True
-                                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'False', true) %>   False
-                              <%end%>
-                       <% end %><% end %><% end %>
+            &nbsp;<%= text_field "quiz_question_choices[]", 'txt', :size=>40 %>
+          <% else if @question_type.q_type=="TF" %>
+            <% if @quiz_question_choices.txt=="True" %>
+              <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'True', true) %>   True
+              <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'False', false) %>  False
+            <% else %>
+              <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'True', false) %>  True
+              <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'False', true) %>   False
+            <%end%>
+          <% end %><% end %><% end %>
 
-                    </td>
-                  </tr>
-                  <% i+=1 %> <br><% end %>
-              <% end %>
-              <%# end %>
+      </td>
+    </tr>
+    <% i+=1 %> <br><% end %>
+<% end %>
+<%# end %>
           </table>
           <% questionnum=questionnum+1 %> <br>
-      <% end %>
-<% else %>
-
-
-    <table>
-      <tr>
-        <td>Questionnaire Type</td>
-        <td><input id="section" type="text" value='<%="#{@questionnaire.section}"%>' size=3 disabled="true"></td>
-      </tr>
-      <tr>
-        <td>Min question score:</td>
-        <td><%= text_area 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
-        <td>Max question score:</td>
-        <td><%= text_area 'questionnaire', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
-        <td>Is this <%= @questionnaire.display_type %> private:</td>
-        <td><%= select(:questionnaire, :private, [ ['no', false],
-                                                   ['yes',  true]])%>
-        </td>
-      </tr>
-    </table>
-    <br/>
-    <table id="questions_table">
-      <tr>
-        <% if @questionnaire.type != "QuizQuestionnaire" %>
-            <td colspan=2 style="padding-bottom: 5pt"><strong>Questions</strong>
-              <input style="margin-left: 50pt" type="button" value="Add" onclick="addQuestions()">
-              <input id="numQuestionsToAdd" type="text" value="1" size=1> more question(s)
-            <td colspan=2><input type="button" value="Delete selected questions" onclick= "deleteQuestions()"></td>
-
         <% end %>
-        <% if @questionnaire.questions.length > 0 %>
-            <td colspan=2><input type="button" id="deleteQuestion" value="Delete selected questions" onclick="deleteQuestions()"></td>
-        <% else %>
-            <td colspan=2><input type="button" id="deleteQuestion" value="Delete selected questions" onclick="deleteQuestions()" disabled="true"></td>
-        <% end %>
-      </tr>
-      <%# if @questionnaire.questions.length > 0 %>
-      <tr>
-        <td align=left width=30>Delete</td>
-        <td align=center width=300>Question</td>
-        <td align=center width=100>Scoring</td>
-        <% if (@questionnaire.section == "Custom") %>
-            <td align=center width=100>Parameters</td>
-        <%end%>
-        <td align=left>Weight</td>
-      </tr>
-      <% #end %>
-      <% 	i = 1   %>
-      <% for @question in @questionnaire.questions %>
-          <% @q = QuestionType.find_by_question_id(@question.id) if !params['import'] %>
-          <% @q ||= QuestionType.new %>
-          <% if params['import']  %>
-              <% @q = QuestionType.new %>
-          <% end %>
+      <% else %>
+
+
+        <table>
           <tr>
-            <td align=center><input type=checkbox id="question_chk<%= i %>"></td>
-            <td><%= text_area "question[]", 'txt', :size=>70 %></td>
-            <% if (@questionnaire.section == "Custom") %>
-                <% if params['import'] %>
-                    <% selected_value = 0 %>
-                <% elsif @q.q_type == "Checkbox"  %>
-                    <% selected_value = 0 %>
-                <% elsif @q.q_type == "TextField"%>
-                    <% selected_value = 1 %>
-                <% elsif @q.q_type == "TextArea"%>
-                    <% selected_value = 2 %>
-                <% elsif @q.q_type == "DropDown"%>
-                    <% selected_value = 3 %>
-                <% elsif @q.q_type == "UploadFile"%>
-                    <% selected_value = 4 %>
-                <% else selected_value = 5 %>
-                <% end %>
-
-                <td><%= select("q[]", :q_type, Question::GRADING_TYPES_CUSTOM, :selected => selected_value)%></td>
-                <td><%= text_field "q[]",  'parameters', :size=>30 %></td>
-
-            <%else%>
-                <td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
-            <% end%>
-
-            <td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
+            <td>Questionnaire Type</td>
+            <td><input id="section" type="text" value='<%="#{@questionnaire.section}"%>' size=3 disabled="true"></td>
           </tr>
-          <% 	i += 1 %>
-      <% end %>
-<%end %>
-</table>
+          <tr>
+            <td>Min question score:</td>
+            <td><%= text_area 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
+            <td>Max question score:</td>
+            <td><%= text_area 'questionnaire', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
+            <td>Is this <%= @questionnaire.display_type %> private:</td>
+            <td><%= select(:questionnaire, :private, [ ['no', false],
+                                                       ['yes',  true]])%>
+                                                   </td>
+                                                 </tr>
+                                               </table>
+                                               <br/>
+                                               <table id="questions_table">
+                                                 <tr>
+                                                   <% if @questionnaire.type != "QuizQuestionnaire" %>
+                                                     <td colspan=2 style="padding-bottom: 5pt"><strong>Questions</strong>
+                                                       <input style="margin-left: 50pt" type="button" value="Add" onclick="addQuestions()">
+                                                       <input id="numQuestionsToAdd" type="text" value="1" size=1> more question(s)
+                                                       <td colspan=2><input type="button" value="Delete selected questions" onclick= "deleteQuestions()"></td>
 
-<BR/>
-<!--[eoform:course]-->
+                                                     <% end %>
+                                                     <% if @questionnaire.questions.length > 0 %>
+                                                       <td colspan=2><input type="button" id="deleteQuestion" value="Delete selected questions" onclick="deleteQuestions()"></td>
+                                                     <% else %>
+                                                       <td colspan=2><input type="button" id="deleteQuestion" value="Delete selected questions" onclick="deleteQuestions()" disabled="true"></td>
+                                                     <% end %>
+                                                   </tr>
+                                                   <%# if @questionnaire.questions.length > 0 %>
+                                                   <tr>
+                                                     <td align=left width=30>Delete</td>
+                                                     <td align=center width=300>Question</td>
+                                                     <td align=center width=100>Scoring</td>
+                                                     <% if (@questionnaire.section == "Custom") %>
+                                                       <td align=center width=100>Parameters</td>
+                                                     <%end%>
+                                                     <td align=left>Weight</td>
+                                                   </tr>
+                                                   <% #end %>
+                                                   <% 	i = 1   %>
+                                                   <% for @question in @questionnaire.questions %>
+                                                     <% @q = QuestionType.find_by_question_id(@question.id) if !params['import'] %>
+                                                     <% @q ||= QuestionType.new %>
+                                                     <% if params['import']  %>
+                                                       <% @q = QuestionType.new %>
+                                                     <% end %>
+                                                     <tr>
+                                                       <td align=center><input type=checkbox id="question_chk<%= i %>"></td>
+                                                       <td><%= text_area "question[]", 'txt', :size=>70 %></td>
+                                                       <% if (@questionnaire.section == "Custom") %>
+                                                         <% if params['import'] %>
+                                                           <% selected_value = 0 %>
+                                                         <% elsif @q.q_type == "Checkbox"  %>
+                                                           <% selected_value = 0 %>
+                                                         <% elsif @q.q_type == "TextField"%>
+                                                           <% selected_value = 1 %>
+                                                         <% elsif @q.q_type == "TextArea"%>
+                                                           <% selected_value = 2 %>
+                                                         <% elsif @q.q_type == "DropDown"%>
+                                                           <% selected_value = 3 %>
+                                                         <% elsif @q.q_type == "UploadFile"%>
+                                                           <% selected_value = 4 %>
+                                                           <% else selected_value = 5 %>
+                                                           <% end %>
+
+                                                           <td><%= select("q[]", :q_type, Question::GRADING_TYPES_CUSTOM, :selected => selected_value)%></td>
+                                                           <td><%= text_field "q[]",  'parameters', :size=>30 %></td>
+
+                                                         <%else%>
+                                                           <td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
+                                                         <% end%>
+
+                                                         <td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
+                                                       </tr>
+                                                       <% 	i += 1 %>
+                                                     <% end %>
+                                                   <%end %>
+                                                 </table>
+
+                                                 <BR/>
+                                                 <!--[eoform:course]-->
 

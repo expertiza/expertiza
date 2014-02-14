@@ -3,7 +3,7 @@ class ReviewMappingController < ApplicationController
   use_google_charts
   helper :dynamic_review_assignment
   helper :submitted_content
-  
+
   def action_allowed?
     case params[:action]
     when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically'
@@ -19,34 +19,34 @@ class ReviewMappingController < ApplicationController
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
     assignment_id = session[:contributor].parent_id
-    @users = User.find(:all, :include => :participants, 
-      :conditions => ['participants.type = "AssignmentParticipant" and users.name like ? and participants.parent_id = ?',name,assignment_id], 
-      :order => 'name') 
+    @users = User.find(:all, :include => :participants,
+                       :conditions => ['participants.type = "AssignmentParticipant" and users.name like ? and participants.parent_id = ?',name,assignment_id],
+                       :order => 'name')
 
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
-  
+
   def select_reviewer
-    assignment = Assignment.find(params[:id])     
+    assignment = Assignment.find(params[:id])
     @contributor = assignment.get_contributor(params[:contributor_id])
     session[:contributor] = @contributor
   end
-  
+
   def select_metareviewer
-    @mapping = ResponseMap.find(params[:id])    
-  end  
-  
-  def add_reviewer 
-    assignment = Assignment.find(params[:id])  
+    @mapping = ResponseMap.find(params[:id])
+  end
+
+  def add_reviewer
+    assignment = Assignment.find(params[:id])
     msg = String.new
     begin
 
       user = User.from_params(params)
 
       regurl = url_for :action => 'add_user_to_assignment',
-          :id => assignment.id, 
-          :user_id => user.id, 
-          :contributor_id => params[:contributor_id]
+        :id => assignment.id,
+        :user_id => user.id,
+        :contributor_id => params[:contributor_id]
 
       # Get the assignment's participant corresponding to the user
       reviewer = get_reviewer(user,assignment,regurl)
@@ -58,10 +58,10 @@ class ReviewMappingController < ApplicationController
         raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
       end
 
-    rescue
-       msg = $!
-    end    
-    redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg    
+      rescue
+        msg = $!
+      end
+    redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg
   end
 
   # Get all the available submissions
@@ -74,20 +74,20 @@ class ReviewMappingController < ApplicationController
                                                                               reviewer.id,
                                                                               requested_topic_id ,
                                                                               Assignment::RS_STUDENT_SELECTED)
-  end 
-    def add_quiz_response_map
-      if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
-        flash[:error] = "You have already taken that quiz"
-      else
+  end
+  def add_quiz_response_map
+    if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
+      flash[:error] = "You have already taken that quiz"
+    else
       @map = QuizResponseMap.new
       @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
       @map.reviewer_id = params[:participant_id]
       @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
       @map.save
-      end
-      redirect_to :controller => 'student_quiz', :action => 'list', :id => params[:participant_id]
     end
-  
+    redirect_to :controller => 'student_quiz', :action => 'list', :id => params[:participant_id]
+  end
+
   # Assign self to a submission
   def add_self_reviewer
     assignment = Assignment.find(params[:assignment_id])
@@ -98,7 +98,7 @@ class ReviewMappingController < ApplicationController
       flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
       redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
     else
-  
+
       begin
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
@@ -111,12 +111,12 @@ class ReviewMappingController < ApplicationController
           raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
         end
         redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
-      rescue
-        redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :msg => $!
-      end
-  
+        rescue
+          redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :msg => $!
+        end
+
     end
-  end 
+  end
 
   #  Looks up the team from the submission.
   def get_team_from_submission(submission)
@@ -140,7 +140,7 @@ class ReviewMappingController < ApplicationController
     begin
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
-      
+
       unless params[:i_dont_care]
         topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
       else
@@ -197,11 +197,11 @@ class ReviewMappingController < ApplicationController
     rescue Exception => e
       flash[:alert] = (e.nil?) ? $! : e
     end
-      redirect_to :controller => 'student_quiz', :action => 'list', :id => reviewer.id
+    redirect_to :controller => 'student_quiz', :action => 'list', :id => reviewer.id
 
   end
 
-  def add_metareviewer    
+  def add_metareviewer
     mapping = ResponseMap.find(params[:id])
     msg = String.new
     begin
@@ -214,11 +214,11 @@ class ReviewMappingController < ApplicationController
       end
       MetareviewResponseMap.create(:reviewed_object_id => mapping.map_id,
                                    :reviewer_id => reviewer.id,
-                                   :reviewee_id => mapping.reviewer.id)                         
-    rescue  
+                                   :reviewee_id => mapping.reviewer.id)
+    rescue
       msg = $!
     end
-    redirect_to :action => 'list_mappings', :id => mapping.assignment.id, :msg => msg                                  
+    redirect_to :action => 'list_mappings', :id => mapping.assignment.id, :msg => msg
   end
 
   def assign_metareviewer_dynamically
@@ -250,22 +250,22 @@ class ReviewMappingController < ApplicationController
   end
 
   def get_reviewer(user,assignment,reg_url)
-      reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,assignment.id)
-      if reviewer.nil?
-         raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
-     end
-     return reviewer
-  end  
-  
-  
+    reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,assignment.id)
+    if reviewer.nil?
+      raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
+    end
+    return reviewer
+  end
+
+
   def add_user_to_assignment
     if params[:contributor_id]
-      assignment = Assignment.find(params[:id]) 
+      assignment = Assignment.find(params[:id])
     else
       mapping = ResponseMap.find(params[:id])
       assignment = mapping.assignment
     end
-         
+
     user = User.find(params[:user_id])
     begin
       assignment.add_participant(user.name)
@@ -279,8 +279,8 @@ class ReviewMappingController < ApplicationController
       redirect_to :action => 'add_metareviewer', :id => params[:id], :user_id => user.id
     end
   end
-  
- 
+
+
   def delete_all_reviewers_and_metareviewers
     assignment = Assignment.find(params[:id])
 
@@ -288,14 +288,14 @@ class ReviewMappingController < ApplicationController
     if failedCount > 0
       url_yes = url_for :action => 'delete_all_reviewers_and_metareviewers', :id => params[:id], :force => 1
       url_no  = url_for :action => 'delete_all_reviewers_and_metareviewers', :id => params[:id]
-      flash[:error] = "A delete action failed:<br/>#{failedCount} reviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"            
+      flash[:error] = "A delete action failed:<br/>#{failedCount} reviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
     else
-      flash[:note] = "All review mappings for this assignment have been deleted."             
-    end     
-    redirect_to :action => 'list_mappings', :id => params[:id]   
-  end  
-  
-  def delete_all_reviewers      
+      flash[:note] = "All review mappings for this assignment have been deleted."
+    end
+    redirect_to :action => 'list_mappings', :id => params[:id]
+  end
+
+  def delete_all_reviewers
     assignment = Assignment.find(params[:id])
     contributor = assignment.get_contributor(params[:contributor_id])
     mappings = contributor.review_mappings
@@ -304,32 +304,32 @@ class ReviewMappingController < ApplicationController
     if failedCount > 0
       url_yes = url_for :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id, :force => 1
       url_no  = url_for :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id
-      flash[:error] = "A delete action failed:<br/>#{failedCount} reviews and/or metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"            
+      flash[:error] = "A delete action failed:<br/>#{failedCount} reviews and/or metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
     else
-      flash[:note] = "All review mappings for \""+contributor.name+"\" have been deleted."             
-    end      
+      flash[:note] = "All review mappings for \""+contributor.name+"\" have been deleted."
+    end
     redirect_to :action => 'list_mappings', :id => assignment.id
   end
-  
-  def delete_all_metareviewers    
-    mapping = ResponseMap.find(params[:id])    
+
+  def delete_all_metareviewers
+    mapping = ResponseMap.find(params[:id])
     mmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(mapping.map_id)
 
     failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
     if failedCount > 0
       url_yes = url_for :action => 'delete_all_metareviewers', :id => mapping.map_id, :force => 1
       url_no  = url_for :action => 'delete_all_metareviewers', :id => mapping.map_id
-      flash[:error] = "A delete action failed:<br/>#{failedCount} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"                  
+      flash[:error] = "A delete action failed:<br/>#{failedCount} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
     else
-      flash[:note] = "All metareview mappings for contributor \""+mapping.reviewee.name+"\" and reviewer \""+mapping.reviewer.name+"\" have been deleted."      
+      flash[:note] = "All metareview mappings for contributor \""+mapping.reviewee.name+"\" and reviewer \""+mapping.reviewer.name+"\" have been deleted."
     end
     redirect_to :action => 'list_mappings', :id => mapping.assignment.id
-  end   
+  end
 
   def delete_mappings(mappings, force=nil)
     failedCount = 0
     mappings.each{
-        |mapping|
+      |mapping|
       assignment_id = mapping.assignment.id
       begin
         mapping.delete(force)
@@ -349,33 +349,33 @@ class ReviewMappingController < ApplicationController
       flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
     rescue
       flash[:error] = "\"#{name}\" was not removed. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
-    end
+      end
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
   def delete_reviewer
-    mapping = ResponseMap.find(params[:id]) 
+    mapping = ResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
     begin
       mapping.delete
-      flash[:note] = "The review mapping for \""+mapping.reviewee.name+"\" and \""+mapping.reviewer.name+"\" have been deleted."        
+      flash[:note] = "The review mapping for \""+mapping.reviewee.name+"\" and \""+mapping.reviewer.name+"\" have been deleted."
     rescue
       flash[:error] = "A delete action failed:<br/>" + $! + "Delete this mapping anyway?&nbsp;<a href='/review_mapping/delete_review/"+mapping.map_id.to_s+"'>Yes</a>&nbsp;|&nbsp;<a href='/review_mapping/list_mappings/#{assignment_id}'>No</a>"
     end
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
-  
+
   def delete_metareviewer
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
     flash[:note] = "The metareview mapping for "+mapping.reviewee.name+" and "+mapping.reviewer.name+" have been deleted."
-    
-    begin 
+
+    begin
       mapping.delete
     rescue
       flash[:error] = "A delete action failed:<br/>" + $! + "<a href='/review_mapping/delete_metareview/"+mapping.map_id.to_s+"'>Delete this mapping anyway>?"
     end
-    
+
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
@@ -385,7 +385,7 @@ class ReviewMappingController < ApplicationController
     mapping.delete
     redirect_to :controller => 'student_review', :action => 'list', :id => student_id
   end
-  
+
   def delete_review
     mapping = ResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
@@ -393,7 +393,7 @@ class ReviewMappingController < ApplicationController
     #redirect_to :action => 'delete_reviewer', :id => mapping.id
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
-  
+
   def delete_metareview
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
@@ -414,24 +414,24 @@ class ReviewMappingController < ApplicationController
 
   def list
     all_assignments = Assignment.find(:all, :order => 'name', :conditions => ["instructor_id = ?",session[:user].id])
-    
+
     letter = params[:letter]
     if letter == nil
       letter = all_assignments.first.name[0,1].downcase
-    end 
-    
+    end
+
     @letters = Array.new
-    @assignments = Assignment.paginate(:page => params[:page], :order => 'name',:per_page => 10, :conditions => ["instructor_id = ? and substring(name,1,1) = ?",session[:user].id, letter])    
-  
+    @assignments = Assignment.paginate(:page => params[:page], :order => 'name',:per_page => 10, :conditions => ["instructor_id = ? and substring(name,1,1) = ?",session[:user].id, letter])
+
     all_assignments.each {
-       | assignObj |
-       first = assignObj.name[0,1].downcase
-       if not @letters.include?(first)
-          @letters << first  
-       end
-    }       
-  end    
-  
+      | assignObj |
+      first = assignObj.name[0,1].downcase
+      if not @letters.include?(first)
+        @letters << first
+      end
+    }
+  end
+
   def list_mappings
     if params[:msg]
       flash[:error] = params[:msg]
@@ -441,20 +441,20 @@ class ReviewMappingController < ApplicationController
     # to treat all assignments as team assignments
     @items = AssignmentTeam.find_all_by_parent_id(@assignment.id)
     @items.sort!{|a,b| a.name <=> b.name}
-  end
-  
+    end
+
   def list_sortable
     @assignment = Assignment.find(params[:id])
-    @entries = Array.new 
+    @entries = Array.new
     index = 0
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     contributors = AssignmentTeam.find_all_by_parent_id(@assignment.id)
-    contributors.sort!{|a,b| a.name <=> b.name}    
+    contributors.sort!{|a,b| a.name <=> b.name}
     contributors.each{
       |contrib|
       review_mappings = ResponseMap.find_all_by_reviewed_object_id_and_reviewee_id(@assignment.id,contrib.id)
-      
+
       if review_mappings.length == 0
         single = Array.new
         single[0] = contrib.name
@@ -463,21 +463,21 @@ class ReviewMappingController < ApplicationController
         @entries[index] = single
         index += 1
       else
-      review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
-      review_mappings.each{
-        |review_map|
-        metareview_mappings = MetareviewResponseMap.find_all_by_reviewed_object_id(review_map.map_id)
-        if metareview_mappings.length == 0
-          single = Array.new
-          single[0] = contrib.name
-          single[1] = review_map.reviewer.name
-          single[2] = "&nbsp;"
-          @entries[index] = single
-          index += 1
-        else
-          metareview_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
-          metareview_mappings.each{
-            |metareview_map|
+        review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
+        review_mappings.each{
+          |review_map|
+          metareview_mappings = MetareviewResponseMap.find_all_by_reviewed_object_id(review_map.map_id)
+          if metareview_mappings.length == 0
+            single = Array.new
+            single[0] = contrib.name
+            single[1] = review_map.reviewer.name
+            single[2] = "&nbsp;"
+            @entries[index] = single
+            index += 1
+          else
+            metareview_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
+            metareview_mappings.each{
+              |metareview_map|
               single = Array.new
               single[0] = contrib.name
               single[1] = review_map.reviewer.name
@@ -488,16 +488,16 @@ class ReviewMappingController < ApplicationController
               end
               @entries[index] = single
               index += 1
-          }
-        end
-      }
+            }
+          end
+        }
       end
     }
-  end  
-  
+    end
+
   def generate_reviewer_mapping
     assignment = Assignment.find(params[:id])
-       
+
     if params[:selection]
       mapping_strategy = {}
       params[:selection].each do |a|
@@ -507,11 +507,11 @@ class ReviewMappingController < ApplicationController
       end
     else
       mapping_strategy = 1
-    end      
-      
+    end
+
     if assignment.update_attributes(params[:assignment])
       begin
-        assignment.assign_reviewers(mapping_strategy)        
+        assignment.assign_reviewers(mapping_strategy)
       rescue
         flash[:error] = "Reviewer assignment failed. Cause: " + $!
       ensure
@@ -520,8 +520,8 @@ class ReviewMappingController < ApplicationController
     else
       @wiki_types = WikiType.find(:all)
       redirect_to :action => 'list_mappings', :id => assignment.id
-    end    
-  end  
+    end
+  end
 
   # This is for staggered deadline assignment
   def automatic_reviewer_mapping
@@ -530,8 +530,8 @@ class ReviewMappingController < ApplicationController
     flash[:note] = message
     redirect_to :action => 'list_mappings', :id => assignment.id
   end
-  
-  
+
+
   def select_mapping
     @assignment = Assignment.find(params[:id])
     @review_strategies = ReviewStrategy.find(:all, :order => 'name')
@@ -558,10 +558,10 @@ class ReviewMappingController < ApplicationController
 
     # Arranged as the hash @review_scores[reveiwer_id][reviewee_id] = score for this particular assignment
     @review_scores = @assignment.compute_reviews_hash
-  end
+    end
 
   def distribution
-  
+
     @assignment = Assignment.find(params[:id])
 
     @scores = [0,0,0,0,0,0,0,0,0,0]
@@ -569,7 +569,7 @@ class ReviewMappingController < ApplicationController
     # to treat all assignments as team assignments
     teams = Team.find_all_by_parent_id(params[:id])
     objtype = "TeamReviewResponseMap"
-    
+
     teams.each do |team|
       score_cache = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",team.id,  objtype])
       t_score = 0
@@ -580,8 +580,8 @@ class ReviewMappingController < ApplicationController
         @scores[(t_score/10).to_i] =  @scores[(t_score/10).to_i] + 1
       end
     end
-    
-    
+
+
     dataset = GoogleChartDataset.new :data => @scores, :color => '9A0000'
     data = GoogleChartData.new :datasets => [dataset]
     axis = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
@@ -591,7 +591,7 @@ class ReviewMappingController < ApplicationController
 
 
     ###################### Second Graph ####################
-    
+
     max_score = 0
     @review_distribution =[0,0,0,0,0,0,0,0,0,0]
     ### For every responsemapping for this assgt, find the reviewer_id and reviewee_id #####
@@ -609,15 +609,15 @@ class ReviewMappingController < ApplicationController
         @reviews_not_done +=1
       end
     end
-    
+
     dataset2 = GoogleChartDataset.new :data => @review_distribution, :color => '9A0000'
     data2 = GoogleChartData.new :datasets => [dataset2]
     axis2 = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
-    
+
     @chart2 = GoogleBarChart.new :width => 500, :height => 200
     @chart2.data = data2
     @chart2.axis = axis2
-    
-  end
+
+    end
 
 end

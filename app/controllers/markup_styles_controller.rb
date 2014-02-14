@@ -8,7 +8,7 @@ class MarkupStylesController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-         :redirect_to => { :action => :list }
+    :redirect_to => { :action => :list }
 
   def index
     list
@@ -30,7 +30,7 @@ class MarkupStylesController < ApplicationController
   def create
     @markup_style = MarkupStyle.new(params[:markup_style])
     begin
-    @markup_style.save!
+      @markup_style.save!
       flash[:notice] = 'MarkupStyle was successfully created.'
       redirect_to :action => 'list'
     rescue

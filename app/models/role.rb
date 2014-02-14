@@ -62,63 +62,63 @@ class Role < ActiveRecord::Base
       role.rebuild_credentials
       role.rebuild_menu
       role.save
-    end
-  end
-
-  def other_roles
-    Role.where('id != ?', id).order(:name)
-  end
-
-  def rebuild_credentials
-    self.cache[:credentials] = Credentials.new(self.id)
-  end
-
-
-  def rebuild_menu
-    menu = Menu.new(self)
-    self.cache[:menu] = menu
-  end
-
-  # return ids of roles that are below this role
-  def get_available_roles  
-    ids = Array.new
-
-    current = self.parent_id
-    while current
-      role = Role.find(current)
-      if role
-        if not ids.index(role.id)
-          ids << role.id
-          current = role.parent_id
-        end   
-      end     
-    end
-    return ids
-  end
-
-  # "parents" are lesser roles. This returns a list including this role and all lesser roels.
-  def get_parents
-    parents = Array.new
-    seen = Hash.new
-
-    current = self.id
-
-    while current
-      role = Role.find(current)
-      if role 
-        if not seen.has_key?(role.id)
-          parents << role
-          seen[role.id] = true
-          current = role.parent_id
-        else
-          current = nil
-        end
-      else
-        current = nil
       end
     end
 
-    return parents
-  end
+    def other_roles
+      Role.where('id != ?', id).order(:name)
+    end
 
-end
+    def rebuild_credentials
+      self.cache[:credentials] = Credentials.new(self.id)
+    end
+
+
+    def rebuild_menu
+      menu = Menu.new(self)
+      self.cache[:menu] = menu
+    end
+
+    # return ids of roles that are below this role
+    def get_available_roles
+      ids = Array.new
+
+      current = self.parent_id
+      while current
+        role = Role.find(current)
+        if role
+          if not ids.index(role.id)
+            ids << role.id
+            current = role.parent_id
+          end
+        end
+      end
+      return ids
+    end
+
+    # "parents" are lesser roles. This returns a list including this role and all lesser roels.
+    def get_parents
+      parents = Array.new
+      seen = Hash.new
+
+      current = self.id
+
+      while current
+        role = Role.find(current)
+        if role
+          if not seen.has_key?(role.id)
+            parents << role
+            seen[role.id] = true
+            current = role.parent_id
+          else
+            current = nil
+          end
+        else
+          current = nil
+        end
+      end
+
+      return parents
+    end
+
+  end

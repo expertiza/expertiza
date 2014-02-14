@@ -1,11 +1,11 @@
 <!-- PARTICIPANT -->
 <%
-   participant = pscore[:participant]
-   if pscore[:metareview]
-     r_max = pscore[:metareview][:scores][:max]
-     r_min = pscore[:metareview][:scores][:min]
-     r_avg = pscore[:metareview][:scores][:avg]
-   end
+    participant = pscore[:participant]
+if pscore[:metareview]
+  r_max = pscore[:metareview][:scores][:max]
+  r_min = pscore[:metareview][:scores][:min]
+  r_avg = pscore[:metareview][:scores][:avg]
+end
 
 %>
 
@@ -15,30 +15,30 @@
 
 <TABLE class="grades">
 
-<TR>
-  <TH WIDTH="<%=colwidth %>%">Contributor</TH>
-  <TH WIDTH="<%= colwidth %>%">Average</TH>
-  <TH WIDTH="<%= colwidth %>%">Range</TH>
-</TR>
+  <TR>
+    <TH WIDTH="<%=colwidth %>%">Contributor</TH>
+    <TH WIDTH="<%= colwidth %>%">Average</TH>
+    <TH WIDTH="<%= colwidth %>%">Range</TH>
+  </TR>
 
   <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= participant.fullname %>
-      <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
-    </FONT>
-    </TD>
-    <% if r_avg %>
-        <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",r_avg) %>%
-        </TD>
-        <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
+    <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
+  </FONT>
+</TD>
+<% if r_avg %>
+  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",r_avg) %>%
+  </TD>
+  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
 
-        </TD>
-    <% else %>
-        <TD ALIGN="CENTER">---</TD>
-        <TD ALIGN="CENTER">---</TD>
-    <% end %>
+  </TD>
+<% else %>
+  <TD ALIGN="CENTER">---</TD>
+  <TD ALIGN="CENTER">---</TD>
+<% end %>
 
 </TABLE>
-     </br> </br>
+</br> </br>
 <%= render :partial=>'grades/metareviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:metareview]} %>
 
 </br>

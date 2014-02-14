@@ -40,7 +40,7 @@ class StudentTask
 
   def content_submitted_in_current_stage?
     (current_stage == "submission" || current_stage == "resubmission") &&
-    (participant.resubmission_times.size > 0 || hyperlinks.present?)
+      (participant.resubmission_times.size > 0 || hyperlinks.present?)
   end
 
   def course
@@ -73,7 +73,7 @@ class StudentTask
 
   def notify?
     reviews_given_in_current_stage? && !review_notification_accepted? ||
-    metareviews_given_in_current_stage? && !metareview_notification_accepted?
+      metareviews_given_in_current_stage? && !metareview_notification_accepted?
   end
 
   include ActionView::Helpers::DateHelper

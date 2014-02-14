@@ -2,7 +2,7 @@ class ControllerActionsController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-         :redirect_to => { :action => :index }
+    :redirect_to => { :action => :index }
 
   def action_allowed?
     current_role_name.eql?("Super-Administrator")
@@ -43,9 +43,9 @@ class ControllerActionsController < ApplicationController
 
 
   def create
-    if params[:controller_action][:specific_name] and 
-        params[:controller_action][:specific_name].length > 0
-      params[:controller_action][:name] = 
+    if params[:controller_action][:specific_name] and
+      params[:controller_action][:specific_name].length > 0
+      params[:controller_action][:name] =
         params[:controller_action][:specific_name]
     end
     @controller_action = ControllerAction.new(params[:controller_action])
@@ -53,7 +53,7 @@ class ControllerActionsController < ApplicationController
       flash[:notice] = 'ControllerAction was successfully created.'
       Role.rebuild_cache
       redirect_to :controller => 'site_controllers', :action => 'show',
-      :id => @controller_action.site_controller_id
+        :id => @controller_action.site_controller_id
     else
       foreign
       render :action => 'new'
@@ -73,7 +73,7 @@ class ControllerActionsController < ApplicationController
       flash[:notice] = 'ControllerAction was successfully updated.'
       Role.rebuild_cache
       redirect_to :controller => 'site_controllers', :action => 'show',
-      :id => @controller_action.site_controller_id
+        :id => @controller_action.site_controller_id
     else
       foreign
       render :action => 'edit'
@@ -102,7 +102,7 @@ class ControllerActionsController < ApplicationController
   def class_actions(classname)
     classes = SiteController.classes
     actions = Hash.new()
-    
+
     if classes.has_key? classname
       controller = classes[classname]
 
@@ -122,5 +122,5 @@ class ControllerActionsController < ApplicationController
 
     return action_collection
   end
-    
+
 end

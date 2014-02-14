@@ -19,13 +19,13 @@ class GradesController < ApplicationController
   #the view grading report provides the instructor with an overall view of all the grades for
   #an assignment. It lists all participants of an assignment and all the reviews they received.
   #It also gives a final score, which is an average of all the reviews and greatest difference
-  #in the scores of all the reviews.  
+  #in the scores of all the reviews.
   def view
     @assignment = Assignment.find(params[:id])
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
-        |questionnaire|
+      |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
     @scores = @assignment.get_scores(@questions)
@@ -56,7 +56,7 @@ class GradesController < ApplicationController
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
-        |questionnaire|
+      |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
     ## When user clicks on the notification, it should go away
@@ -91,7 +91,7 @@ class GradesController < ApplicationController
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
     questionnaires.each {
-        |questionnaire|
+      |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
 
@@ -145,178 +145,178 @@ class GradesController < ApplicationController
     body_text["##[assignment_name]"] = assignment.name
 
     Mailer.deliver_message(
-        {:recipients => email_form[:recipients],
-         :subject => email_form[:subject],
-         :from => email_form[:from],
-         :body => {
-             :body_text => body_text,
-             :partial_name => "grading_conflict"
-         }
-        }
+      {:recipients => email_form[:recipients],
+       :subject => email_form[:subject],
+       :from => email_form[:from],
+       :body => {
+         :body_text => body_text,
+         :partial_name => "grading_conflict"
+       }
+    }
     )
 
     flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
     redirect_to :action => 'conflict_email_form',
-                :assignment => email_form[:assignment],
-                :author => email_form[:author]
-  end
-
-  # the grading conflict email form provides the instructor a way of emailing
-  # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.  
-  def conflict_notification
-    if session[:user].role_id !=6
-      @instructor = session[:user]
-    else
-      @instructor = Ta.get_my_instructor(session[:user].id)
-    end
-    @participant = AssignmentParticipant.find(params[:id])
-    @assignment = Assignment.find(@participant.parent_id)
-
-
-    @questions = Hash.new
-    questionnaires = @assignment.questionnaires
-    questionnaires.each {
-        |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    }
-
-    @reviewers_email_hash = Hash.new
-
-    @caction = "view"
-    @submission = params[:submission]
-    if @submission == "review"
-      @caction = "view_review"
-      @symbol = "review"
-      process_response("Review", "Reviewer", @participant.reviews, "ReviewQuestionnaire")
-    elsif @submission == "review_of_review"
-      @symbol = "metareview"
-      process_response("Metareview", "Metareviewer", @participant.metareviews, "MetareviewQuestionnaire")
-    elsif @submission == "review_feedback"
-      @symbol = "feedback"
-      process_response("Feedback", "Author", @participant.feedback, "AuthorFeedbackQuestionnaire")
-    elsif @submission == "teammate_review"
-      @symbol = "teammate"
-      process_response("Teammate Review", "Reviewer", @participant.teammate_reviews, "TeammateReviewQuestionnaire")
+      :assignment => email_form[:assignment],
+      :author => email_form[:author]
     end
 
-    @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."
-    @body = get_body_text(params[:submission])
-
-  end
-
-
-  def update
-    participant = AssignmentParticipant.find(params[:id])
-    total_score = params[:total_score]
-    if sprintf("%.2f", total_score) != params[:participant][:grade]
-      participant.update_attribute('grade', params[:participant][:grade])
-      if participant.grade.nil?
-        message = "The computed score will be used for "+participant.user.name
+    # the grading conflict email form provides the instructor a way of emailing
+    # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.
+    def conflict_notification
+      if session[:user].role_id !=6
+        @instructor = session[:user]
       else
-        message = "A score of "+params[:participant][:grade]+"% has been saved for "+participant.user.name
+        @instructor = Ta.get_my_instructor(session[:user].id)
       end
+      @participant = AssignmentParticipant.find(params[:id])
+      @assignment = Assignment.find(@participant.parent_id)
+
+
+      @questions = Hash.new
+      questionnaires = @assignment.questionnaires
+      questionnaires.each {
+        |questionnaire|
+        @questions[questionnaire.symbol] = questionnaire.questions
+      }
+
+      @reviewers_email_hash = Hash.new
+
+      @caction = "view"
+      @submission = params[:submission]
+      if @submission == "review"
+        @caction = "view_review"
+        @symbol = "review"
+        process_response("Review", "Reviewer", @participant.reviews, "ReviewQuestionnaire")
+      elsif @submission == "review_of_review"
+        @symbol = "metareview"
+        process_response("Metareview", "Metareviewer", @participant.metareviews, "MetareviewQuestionnaire")
+      elsif @submission == "review_feedback"
+        @symbol = "feedback"
+        process_response("Feedback", "Author", @participant.feedback, "AuthorFeedbackQuestionnaire")
+      elsif @submission == "teammate_review"
+        @symbol = "teammate"
+        process_response("Teammate Review", "Reviewer", @participant.teammate_reviews, "TeammateReviewQuestionnaire")
+      end
+
+      @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."
+      @body = get_body_text(params[:submission])
+
     end
-    flash[:note] = message
-    redirect_to :action => 'edit', :id => params[:id]
-  end
 
-  private
 
-  def process_response(collabel, rowlabel, responses, questionnaire_type)
-    @collabel = collabel
-    @rowlabel = rowlabel
-    @reviews = responses
-    @reviews.each {
+    def update
+      participant = AssignmentParticipant.find(params[:id])
+      total_score = params[:total_score]
+      if sprintf("%.2f", total_score) != params[:participant][:grade]
+        participant.update_attribute('grade', params[:participant][:grade])
+        if participant.grade.nil?
+          message = "The computed score will be used for "+participant.user.name
+        else
+          message = "A score of "+params[:participant][:grade]+"% has been saved for "+participant.user.name
+        end
+      end
+      flash[:note] = message
+      redirect_to :action => 'edit', :id => params[:id]
+    end
+
+    private
+
+    def process_response(collabel, rowlabel, responses, questionnaire_type)
+      @collabel = collabel
+      @rowlabel = rowlabel
+      @reviews = responses
+      @reviews.each {
         |response|
-      user = response.map.reviewer.user
-      @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
-    }
-    @reviews.sort! { |a, b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname }
-    @questionnaire = @assignment.questionnaires.find_by_type(questionnaire_type)
-    @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
-  end
+        user = response.map.reviewer.user
+        @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
+      }
+      @reviews.sort! { |a, b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname }
+      @questionnaire = @assignment.questionnaires.find_by_type(questionnaire_type)
+      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
+    end
 
-  def redirect_when_disallowed
-    # For author feedback, participants need to be able to read feedback submitted by other teammates.
-    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-    ## This following code was cloned from response_controller.
+    def redirect_when_disallowed
+      # For author feedback, participants need to be able to read feedback submitted by other teammates.
+      # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+      ## This following code was cloned from response_controller.
 
-    #ACS Check if team count is more than 1 instead of checking if it is a team assignment
-    if @participant.assignment.max_team_size > 1
-      team = @participant.team
-      if (!team.nil?)
-        unless team.has_user session[:user]
-          redirect_to '/denied?reason=You are not on the team that wrote this feedback'
-          return true
+      #ACS Check if team count is more than 1 instead of checking if it is a team assignment
+      if @participant.assignment.max_team_size > 1
+        team = @participant.team
+        if (!team.nil?)
+          unless team.has_user session[:user]
+            redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+            return true
+          end
         end
+      else
+        reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @participant.assignment.id)
+        return true unless current_user_id?(reviewer.user_id)
       end
-    else
-      reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @participant.assignment.id)
-      return true unless current_user_id?(reviewer.user_id)
+      return false
     end
-    return false
-  end
 
-  def get_body_text(submission)
-    if submission
-      role = "reviewer"
-      item = "submission"
-    else
-      role = "metareviewer"
-      item = "review"
-    end
-    "Hi ##[recipient_name], 
-    
-You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+". 
-    
-The Expertiza system has brought this to my attention."
-  end
-
-  def calculate_all_penalties(assignment_id)
-    @all_penalties = Hash.new
-    @assignment = Assignment.find_by_id(assignment_id)
-    participant_count = 0
-    calculate_for_participant = false
-    if @assignment.is_penalty_calculated == false
-      calculate_for_participants = true
-    end
-    Participant.find_all_by_parent_id(assignment_id).each do |participant|
-      penalties = calculate_penalty(participant.id)
-      @total_penalty =0
-      if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
-        if(penalties[:submission].nil?)
-          penalties[:submission]=0
-        end
-        if(penalties[:review].nil?)
-          penalties[:review]=0
-        end
-        if(penalties[:meta_review].nil?)
-          penalties[:meta_review]=0
-        end
-        @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
-        l_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
-        if(@total_penalty > l_policy.max_penalty)
-          @total_penalty = l_policy.max_penalty
-        end
-        if calculate_for_participants == true
-          penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
-          CalculatedPenalty.create(penalty_attr1)
-
-          penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
-          CalculatedPenalty.create(penalty_attr2)
-
-          penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
-          CalculatedPenalty.create(penalty_attr3)
-        end
+    def get_body_text(submission)
+      if submission
+        role = "reviewer"
+        item = "submission"
+      else
+        role = "metareviewer"
+        item = "review"
       end
-      @all_penalties[participant.id] = Hash.new
-      @all_penalties[participant.id][:submission] = penalties[:submission]
-      @all_penalties[participant.id][:review] = penalties[:review]
-      @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
-      @all_penalties[participant.id][:total_penalty] = @total_penalty
+      "Hi ##[recipient_name],
+
+        You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+".
+
+        The Expertiza system has brought this to my attention."
     end
-    if @assignment.is_penalty_calculated == false
-      @assignment.update_attribute(:is_penalty_calculated, true)
+
+    def calculate_all_penalties(assignment_id)
+      @all_penalties = Hash.new
+      @assignment = Assignment.find_by_id(assignment_id)
+      participant_count = 0
+      calculate_for_participant = false
+      if @assignment.is_penalty_calculated == false
+        calculate_for_participants = true
+      end
+      Participant.find_all_by_parent_id(assignment_id).each do |participant|
+        penalties = calculate_penalty(participant.id)
+        @total_penalty =0
+        if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
+          if(penalties[:submission].nil?)
+            penalties[:submission]=0
+          end
+          if(penalties[:review].nil?)
+            penalties[:review]=0
+          end
+          if(penalties[:meta_review].nil?)
+            penalties[:meta_review]=0
+          end
+          @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
+          l_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+          if(@total_penalty > l_policy.max_penalty)
+            @total_penalty = l_policy.max_penalty
+          end
+          if calculate_for_participants == true
+            penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
+            CalculatedPenalty.create(penalty_attr1)
+
+            penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
+            CalculatedPenalty.create(penalty_attr2)
+
+            penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
+            CalculatedPenalty.create(penalty_attr3)
+          end
+        end
+        @all_penalties[participant.id] = Hash.new
+        @all_penalties[participant.id][:submission] = penalties[:submission]
+        @all_penalties[participant.id][:review] = penalties[:review]
+        @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
+        @all_penalties[participant.id][:total_penalty] = @total_penalty
+      end
+      if @assignment.is_penalty_calculated == false
+        @assignment.update_attribute(:is_penalty_calculated, true)
+      end
     end
   end
-end

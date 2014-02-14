@@ -1,8 +1,8 @@
 <h1>Edit an existing questionnaire's advice</h1>
 
 <script>
-<% for question in @questionnaire.questions %>
-  <%= "var display_vertical_" + question.id.to_s + " = false;" %>
+  <% for question in @questionnaire.questions %>
+ <%= "var display_vertical_" + question.id.to_s + " = false;" %>
 <% end %>
 
 function show_vertical_questions(question_id){
@@ -14,12 +14,12 @@ function show_vertical_questions(question_id){
 
   var i = 0;
   while(horz_questions.length > 0)
-  {
-    // Copy the value before deleting the horizontal question
-    vert_questions[i].value = horz_questions[0].value;
-    horz_questions[0].parentNode.removeChild(horz_questions[0]);
-    i++;
-  }
+    {
+      // Copy the value before deleting the horizontal question
+      vert_questions[i].value = horz_questions[0].value;
+      horz_questions[0].parentNode.removeChild(horz_questions[0]);
+      i++;
+    }
 }
 
 function show_horizontal_questions(question_id){

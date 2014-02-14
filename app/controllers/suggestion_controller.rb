@@ -13,10 +13,10 @@ class SuggestionController < ApplicationController
   end
 
   def add_comment
-       @suggestioncomment = SuggestionComment.new(params[:suggestion_comment])
-       @suggestioncomment.suggestion_id=params[:id]
-       @suggestioncomment.commenter= session[:user].name
-		if  @suggestioncomment.save
+    @suggestioncomment = SuggestionComment.new(params[:suggestion_comment])
+    @suggestioncomment.suggestion_id=params[:id]
+    @suggestioncomment.commenter= session[:user].name
+    if  @suggestioncomment.save
       flash[:notice] = "Successfully added your comment"
     else
       flash[:error] = "Error while adding comment"
@@ -25,7 +25,7 @@ class SuggestionController < ApplicationController
   end
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-         :redirect_to => { :action => :list }
+    :redirect_to => { :action => :list }
 
   def list
     @suggestions = Suggestion.find_all_by_assignment_id(params[:id])
@@ -38,30 +38,30 @@ class SuggestionController < ApplicationController
 
   def new
     @suggestion = Suggestion.new
-    session[:assignment_id] = params[:id]   
+    session[:assignment_id] = params[:id]
   end
 
-  def create    
+  def create
     @suggestion = Suggestion.new(params[:suggestion])
     @suggestion.assignment_id = session[:assignment_id]
-	  @suggestion.status = 'Initiated'
+    @suggestion.status = 'Initiated'
     if params[:suggestion_anonymous].nil?
-      @suggestion.unityID = session[:user].name      
+      @suggestion.unityID = session[:user].name
     else
       @suggestion.unityID = "";
     end
-    
+
     if @suggestion.save
       render :action => 'confirm_save'
     else
       render :action => 'new'
     end
   end
-  
+
   def confirm_save
     # Action to display successful creation of suggestion
   end
-  
+
   def submit
     if !params[:add_comment].nil?
       add_comment
@@ -71,7 +71,7 @@ class SuggestionController < ApplicationController
       reject_suggestion
     end
   end
-  
+
   def approve_suggestion
     @suggestion = Suggestion.find(params[:id])
     @signuptopic = SignUpTopic.new
@@ -79,23 +79,23 @@ class SuggestionController < ApplicationController
     @signuptopic.topic_name = @suggestion.title
     @signuptopic.assignment_id = @suggestion.assignment_id
     @signuptopic.max_choosers = 3;
-    
+
     if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
       flash[:notice] = 'Successfully approved the suggestion.'
     else
       flash[:error] = 'Error when approving the suggestion.'
-    end
+      end
     redirect_to :action => 'show', :id => @suggestion
   end
-  
+
   def reject_suggestion
     @suggestion = Suggestion.find(params[:id])
-    
+
     if @suggestion.update_attribute('status', 'Rejected')
       flash[:notice] = 'Successfully rejected the suggestion'
     else
       flash[:error] = 'Error when rejecting the suggestion'
-    end
+      end
     redirect_to :action => 'show', :id => @suggestion
   end
 end

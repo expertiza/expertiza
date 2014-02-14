@@ -21,18 +21,18 @@ class Mailer < ActionMailer::Base
 
     @body = defn[:body]
     @partial_name = defn[:body][:partial_name]
-     mail(subject: defn[:subject],
-          content_type: "text/html",
-          to: defn[:to])
+    mail(subject: defn[:subject],
+         content_type: "text/html",
+         to: defn[:to])
 
   end
 
   def delayed_message(defn)
     ret = mail(subject: defn[:subject],
-         body: defn[:body],
-         content_type: "text/html",
-         bcc: defn[:bcc])
-      CUSTOM_LOGGER.info("#{ret.encoded}")
+               body: defn[:body],
+               content_type: "text/html",
+               bcc: defn[:bcc])
+    CUSTOM_LOGGER.info("#{ret.encoded}")
   end
 
 end

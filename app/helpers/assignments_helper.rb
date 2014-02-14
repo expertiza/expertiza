@@ -2,11 +2,11 @@ module AssignmentsHelper
   require 'date'
   COMPLETE = "Finished"
   WAITLIST = "Waitlist open"
-  
+
   def self.find_current_stage(signup_id)
-    due_dates = SignUpSheet.find(:all, 
-                 :conditions => ["id = ?", signup_id])
-                 
+    due_dates = SignUpSheet.find(:all,
+                                 :conditions => ["id = ?", signup_id])
+
     if due_dates != nil and due_dates.size > 0
       if Time.now > due_dates[0].end_date
         return COMPLETE
@@ -17,7 +17,7 @@ module AssignmentsHelper
       end
     end
   end
-  
+
   def self.get_stage_deadline(assignment_id)
     due_date = find_current_stage(assignment_id)
     if due_date != nil and due_date != COMPLETE

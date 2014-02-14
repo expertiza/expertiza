@@ -1,20 +1,20 @@
 <SCRIPT LANGUAGE="JavaScript">
-function toggleVis(id) {
-                var elem = document.getElementById(id+"_myDiv");
+  function toggleVis(id) {
+    var elem = document.getElementById(id+"_myDiv");
                 if(elem.style.display == 'none'){
-                        elem.style.display = '';
+                  elem.style.display = '';
                         document.getElementById(id+"_show").style.display = 'none';
                         document.getElementById(id+"_hide").style.display = '';
                 } else {
-                        elem.style.display = 'none';
+                  elem.style.display = 'none';
                         document.getElementById(id+"_show").style.display = '';
                         document.getElementById(id+"_hide").style.display = 'none';
                 }
-        }
+  }
 </SCRIPT>
 <h1>Distributions for  <%=@assignment.name%></h1>
 
-<a href="#1" onClick="toggleVis('aggregateDistribution');">	
+<a href="#1" onClick="toggleVis('aggregateDistribution');">
   <span id="aggregateDistribution_show">View aggregate score distribution</span>
   <span id="aggregateDistribution_hide" style="display: none">Hide aggregate score distribution</span>
 </a>
@@ -24,7 +24,7 @@ function toggleVis(id) {
 </div>
 
 
-<a href="#1" onClick="toggleVis('reviewDistribution');">	
+<a href="#1" onClick="toggleVis('reviewDistribution');">
   <span id="reviewDistribution_show">View  individual reviews distribution</span>
   <span id="reviewDistribution_hide" style="display: none">Hide  individual reviews distribution</span>
 </a>
@@ -38,4 +38,4 @@ function toggleVis(id) {
 <br/>
 <br />
 
-<%= link_to "Back", :action=>'review_report', :id=>@assignment.id  %> 
+<%= link_to "Back", :action=>'review_report', :id=>@assignment.id  %>

@@ -18,7 +18,7 @@ class SiteController < ActiveRecord::Base
 
     ObjectSpace.each_object(Class) do |klass|
       if klass.respond_to?(:controller_name) && klass.superclass.to_s == ApplicationController.to_s
-          classes[klass.controller_name] = klass
+        classes[klass.controller_name] = klass
       end
     end
 

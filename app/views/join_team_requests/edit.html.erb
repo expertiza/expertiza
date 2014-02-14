@@ -3,9 +3,9 @@
 <%= form_for(@join_team_request) do |f| %>
   <%= f.error_messages %>
 
-    <%= f.hidden_field :participant_id %>
-    <%= f.hidden_field :team_id %>
-    <%= f.hidden_field :status %>
+  <%= f.hidden_field :participant_id %>
+  <%= f.hidden_field :team_id %>
+  <%= f.hidden_field :status %>
   <p>
     <%= f.label :comments %><br />
     <%= f.text_area :comments %>

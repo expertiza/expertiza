@@ -1,14 +1,14 @@
 <%= form_tag :controller => 'review_mapping',
-            :action => 'add_self_reviewer',
-            :assignment_id => params[:assignment_id],
-            :topic_id => params[:topic_id],
-            :reviewer_id => session[:user].id do %>
-    
+  :action => 'add_self_reviewer',
+  :assignment_id => params[:assignment_id],
+  :topic_id => params[:topic_id],
+  :reviewer_id => session[:user].id do %>
+
   <h2>Select a submission below to begin a new review</h2>
 
   <!-- Based on the topic and assignment , get the submissions , list all the submissions with [hyperlinks/files]
-       submitted by the participant. Allow the reviewer to choose one. The listed submissions should be based
-       on  ROUND ROBIN-->
+  submitted by the participant. Allow the reviewer to choose one. The listed submissions should be based
+  on  ROUND ROBIN-->
 
   <!-- TODO : Pagination / showing files if any -->
 
@@ -24,7 +24,7 @@
           <% participant =  Participant.find_by_id_and_parent_id(map[0],params[:assignment_id]) %>
           <% is_disabled = false %>
           <% if participant!= nil && participant.submit_allowed%>
-	        <% if (map[1] == 0) %>
+            <% if (map[1] == 0) %>
               <% is_disabled = false %>
             <% elsif (map[1] == 1) %>
               <% is_disabled = true %>
@@ -34,20 +34,20 @@
           </td>
           <td>
             <%= radio_button_tag 'submission_id', participant.id ,false,:disabled => is_disabled %><%=h "Submission " + @i.to_s %>
-	      </td>
-	      <td>
-		    <%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage =>  @stage} %>
-	      </td>
-	    </tr>
+          </td>
+          <td>
+            <%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage =>  @stage} %>
+          </td>
+        </tr>
 
       <% end %>
     <% end %>
-  <br>
-        
-  <input type='submit' value='Review Selected Submission'/>
-<% else %>
-  <%= "No submissions currently available for review." %>
-<% end %>
+    <br>
+
+    <input type='submit' value='Review Selected Submission'/>
+  <% else %>
+    <%= "No submissions currently available for review." %>
+  <% end %>
 <% end %>
 <br>
 <br>

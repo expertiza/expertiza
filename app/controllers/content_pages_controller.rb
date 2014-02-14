@@ -2,7 +2,7 @@ class ContentPagesController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-         :redirect_to => { :action => :list }
+    :redirect_to => { :action => :list }
 
   def action_allowed?
     case params[:action]
@@ -34,7 +34,7 @@ class ContentPagesController < ApplicationController
       if @settings
         @content_page = ContentPage.find(@settings.not_found_page_id)
       else
-        @content_page = ContentPage.new(:id => nil, 
+        @content_page = ContentPage.new(:id => nil,
                                         :content => '(no such page)')
       end
     end
@@ -44,8 +44,8 @@ class ContentPagesController < ApplicationController
     if @settings
       @content_page = ContentPage.find(@settings.site_default_page_id)
     else
-      @content_page = ContentPage.new(:id => nil, 
-                                        :content => '(Site not configured)')
+      @content_page = ContentPage.new(:id => nil,
+                                      :content => '(Site not configured)')
     end
   end
 
@@ -63,7 +63,7 @@ class ContentPagesController < ApplicationController
       redirect_to :action => 'list'
     rescue
       foreign
-      
+
       render :action => 'new'
     end
   end
@@ -88,7 +88,7 @@ class ContentPagesController < ApplicationController
   def destroy
     @content_page = ContentPage.find(params[:id])
     foreign
-    
+
     if @menu_items.length == 0 and not @system_pages
       @content_page.destroy
       Role.rebuild_cache
@@ -108,7 +108,7 @@ class ContentPagesController < ApplicationController
     if @content_page.id
       @menu_items = MenuItem.find(:all,
                                   :order => 'label',
-                                  :conditions => ['content_page_id=?', 
+                                  :conditions => ['content_page_id=?',
                                                   @content_page.id])
       @system_pages = @settings.system_pages @content_page.id
     end

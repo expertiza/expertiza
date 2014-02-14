@@ -21,21 +21,21 @@ class SignUpTopic < ActiveRecord::Base
 
   def self.import(row,session,id = nil)
 
-      if row.length != 4
-          raise ArgumentError, "CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category"
-      end      
+    if row.length != 4
+      raise ArgumentError, "CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category"
+    end
 
-      topic = SignUpTopic.find_by_topic_name_and_assignment_id(row[1],session[:assignment_id])
-      
-      if topic == nil        
-        attributes = ImportTopicsHelper::define_attributes(row)
-        ImportTopicsHelper::create_new_sign_up_topic(attributes,session)
-      else
-        topic.max_choosers = row[2]
-        topic.topic_identifier = row[0]
-        #topic.assignment_id = session[:assignment_id]  
-        topic.save
-      end
+    topic = SignUpTopic.find_by_topic_name_and_assignment_id(row[1],session[:assignment_id])
+
+    if topic == nil
+      attributes = ImportTopicsHelper::define_attributes(row)
+      ImportTopicsHelper::create_new_sign_up_topic(attributes,session)
+    else
+      topic.max_choosers = row[2]
+      topic.topic_identifier = row[0]
+      #topic.assignment_id = session[:assignment_id]
+      topic.save
+    end
   end
 
   def self.find_slots_filled(assignment_id)
@@ -87,28 +87,28 @@ class SignUpTopic < ActiveRecord::Base
       assignment = Assignment.find(assignment_id)
       #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
       if(!assignment.is_intelligent?)
-      if signup_record.is_waitlisted == false
-        #find the first wait listed user if exists
-        first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
+        if signup_record.is_waitlisted == false
+          #find the first wait listed user if exists
+          first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
 
-        if !first_waitlisted_user.nil?
-          # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-          ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
-          first_waitlisted_user.is_waitlisted = false
-          first_waitlisted_user.save
+          if !first_waitlisted_user.nil?
+            # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+            ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
+            first_waitlisted_user.is_waitlisted = false
+            first_waitlisted_user.save
 
-          #update the participants details
-          #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-          # to treat all assignments as team assignments
+            #update the participants details
+            #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
+            # to treat all assignments as team assignments
 
-          user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
-          participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
+            user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+            participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
 
-          participant.update_topic_id(topic_id)
+            participant.update_topic_id(topic_id)
 
-          Waitlist.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
+            Waitlist.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
+            end
         end
-      end
       end
       if !signup_record.nil?
         participant = Participant.find_by_user_id_and_parent_id(session_user_id, assignment_id)
@@ -116,7 +116,7 @@ class SignUpTopic < ActiveRecord::Base
         participant.update_topic_id(nil)
         signup_record.destroy
       end
-    end #end condition for 'drop deadline' check
+      end #end condition for 'drop deadline' check
   end
 
   def update_waitlisted_users(max_choosers)
@@ -130,9 +130,9 @@ class SignUpTopic < ActiveRecord::Base
 
         #update participants
         assignment = Assignment.find(self.assignment_id)
-          user_id = TeamsUser.find(:first, :conditions => {:team_id => next_wait_listed_user.creator_id}).user_id
-          participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
-        
+        user_id = TeamsUser.find(:first, :conditions => {:team_id => next_wait_listed_user.creator_id}).user_id
+        participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
+
         participant.update_topic_id(self.id)
       end
     }

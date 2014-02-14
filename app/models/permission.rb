@@ -11,7 +11,7 @@ class Permission < ActiveRecord::Base
   def Permission.find_for_role(role_ids)
     return find_by_sql( ["select permissions.* from permissions inner join roles_permissions on permissions.id = roles_permissions.permission_id where role_id in (?) order by permissions.name", role_ids] )
   end
-  
+
 
   # Find all Permissions for a Role.  This method gets the hierarchy
   # for the given Role and uses that to get all the Permissions for

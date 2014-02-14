@@ -53,7 +53,7 @@ class Response < ActiveRecord::Base
     count = 0
     #self.scores.each {
     Score.find_all_by_response_id(self.response_id).each {
-        |reviewScore|
+      |reviewScore|
       count += 1
       code += '<big><b>Question '+count.to_s+":</b> <I>"+Question.find_by_id(reviewScore.question_id).txt+"</I></big><BR/><BR/>"
       code += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find_by_id(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B></TD></TR>"
@@ -83,22 +83,22 @@ class Response < ActiveRecord::Base
     mapping = self.map
     instructor = mapping.assignment.instructor
     Mailer.generic_message(
-        {:to => instructor.email,
-           :subject => "Expertiza Notification: A review score is outside the acceptable range",
-           :body => {
-               :first_name => ApplicationHelper::get_user_first_name(instructor),
-               :reviewer_name => mapping.reviewer.fullname,
-               :type => "review",
-               :reviewee_name => mapping.reviewee.fullname,
-               :limit => limit,
-               :new_pct => new_pct,
-               :avg_pct => avg_pct,
-               :types => "reviews",
-               :performer => "reviewer",
-               :assignment => mapping.assignment,
-               :partial_name => 'limit_notify'
-           }
-          }
+      {:to => instructor.email,
+       :subject => "Expertiza Notification: A review score is outside the acceptable range",
+       :body => {
+         :first_name => ApplicationHelper::get_user_first_name(instructor),
+         :reviewer_name => mapping.reviewer.fullname,
+         :type => "review",
+         :reviewee_name => mapping.reviewee.fullname,
+         :limit => limit,
+         :new_pct => new_pct,
+         :avg_pct => avg_pct,
+         :types => "reviews",
+         :performer => "reviewer",
+         :assignment => mapping.assignment,
+         :partial_name => 'limit_notify'
+       }
+    }
     ).deliver
   end
 
@@ -177,4 +177,4 @@ class Response < ActiveRecord::Base
 
   require 'analytic/response_analytic'
   include ResponseAnalytic
-end
+  end

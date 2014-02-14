@@ -31,8 +31,8 @@ class Menu
 
       @url = String.new
       if item.controller_action
-        if item.controller_action.url_to_use and 
-            item.controller_action.url_to_use.length > 0
+        if item.controller_action.url_to_use and
+          item.controller_action.url_to_use.length > 0
           @url = item.controller_action.url_to_use
         else
           @url = "/#{item.controller_action.controller.name}/#{item.controller_action.name}"
@@ -40,7 +40,7 @@ class Menu
       else
         @url = "/#{item.content_page.name}"
       end
-      
+
     end
 
     def site_controller
@@ -101,13 +101,13 @@ class Menu
         # Build hashes of items by name and id
         for item in items do
           # Convert keys to integers (for braindead DB backends)
-#           item.menu_item_id         &&= item.menu_item_id.to_i
-#           item.menu_item_seq        &&= item.menu_item_seq.to_i
-#           item.menu_item_parent_id  &&= item.menu_item_parent_id.to_i
-#           item.site_controller_id   &&= item.site_controller_id.to_i
-#           item.controller_action_id &&= item.controller_action_id.to_i
-#           item.content_page_id      &&= item.content_page_id.to_i
-#           item.permission_id        &&= item.permission_id.to_i
+          #           item.menu_item_id         &&= item.menu_item_id.to_i
+          #           item.menu_item_seq        &&= item.menu_item_seq.to_i
+          #           item.menu_item_parent_id  &&= item.menu_item_parent_id.to_i
+          #           item.site_controller_id   &&= item.site_controller_id.to_i
+          #           item.controller_action_id &&= item.controller_action_id.to_i
+          #           item.content_page_id      &&= item.content_page_id.to_i
+          #           item.permission_id        &&= item.permission_id.to_i
 
           node = Node.new
           node.setup(item)
@@ -128,13 +128,13 @@ class Menu
           end
         end
       end  # if items.size > 0
-      
-      
+
+
       if @root.children and @root.children.length > 0
-        select(@by_id[@root.children[0]].name) 
+        select(@by_id[@root.children[0]].name)
       end
     end  # if items
-    
+
   end
 
 
@@ -178,8 +178,8 @@ class Menu
       @vector[@vector.length - 1].name
     end
   end
-  
-  
+
+
   # Returns true if the specified item is selected; false if otherwise.
   def selected?(menu_id)
     @selected.has_key?(menu_id) ? true : false
@@ -195,4 +195,4 @@ class Menu
     return crumbs
   end
 
-end
+  end

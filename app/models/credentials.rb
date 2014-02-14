@@ -1,5 +1,5 @@
 class Credentials
-  
+
   attr_accessor :role_id, :updated_at, :role_ids
   attr_accessor :permission_ids
   attr_accessor :controllers, :actions, :pages
@@ -20,8 +20,8 @@ class Credentials
       @permission_ids << 0
     end
 
-#    actions = ControllerAction.find_by_sql ["select *, (case when permission_id in (?) then 1 else 0 end) as allowed from view_controller_actions", 
-#                                           @permission_ids]
+    #    actions = ControllerAction.find_by_sql ["select *, (case when permission_id in (?) then 1 else 0 end) as allowed from view_controller_actions",
+    #                                           @permission_ids]
     actions = ControllerAction.actions_allowed(@permission_ids)
     @actions = Hash.new
     for a in actions do
@@ -33,7 +33,7 @@ class Credentials
       end
     end
 
-    controllers = SiteController.find_by_sql ["select *, (case when permission_id in (?) then 1 else 0 end) as allowed from site_controllers", 
+    controllers = SiteController.find_by_sql ["select *, (case when permission_id in (?) then 1 else 0 end) as allowed from site_controllers",
                                               @permission_ids]
     @controllers = Hash.new
     for c in controllers do
@@ -54,7 +54,7 @@ class Credentials
         @pages[p.name] = false
       end
     end
-    
+
   end
 
 end

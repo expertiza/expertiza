@@ -282,7 +282,7 @@ class BookmarksController < ApplicationController
       print("Chutya4")
     end
     print("Chutya5")
-  end
+    end
 
 
   def add_rating_rubric_form

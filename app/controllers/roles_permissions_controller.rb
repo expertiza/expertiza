@@ -2,7 +2,7 @@ class RolesPermissionsController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-         :redirect_to => { :action => :list }
+    :redirect_to => { :action => :list }
 
   def index
     list
@@ -32,7 +32,7 @@ class RolesPermissionsController < ApplicationController
     @roles_permission = RolesPermission.new(params[:roles_permission])
     if @roles_permission.save
       flash[:notice] = 'RolesPermission was successfully created.'
-      redirect_to :controller => 'roles', :action => 'show', 
+      redirect_to :controller => 'roles', :action => 'show',
         :id => @roles_permission.role_id
     else
       render :action => 'new'

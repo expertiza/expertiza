@@ -1,11 +1,11 @@
-#This helper contains methods to manipulate due dates of topics in an assignment. This helper if used by 
+#This helper contains methods to manipulate due dates of topics in an assignment. This helper if used by
 #sign_up_controller
 module DeadlineHelper
 
-#Creates a new topic deadline for topic specified by topic_id.
-# The deadline itself is specified by due_date object which contains several values which specify
-# type { submission deadline, metareview deadline, etc.} a set of other parameters that
-#specify whether submission, review, metareview, etc. are allowed for the particular deadline
+  #Creates a new topic deadline for topic specified by topic_id.
+  # The deadline itself is specified by due_date object which contains several values which specify
+  # type { submission deadline, metareview deadline, etc.} a set of other parameters that
+  #specify whether submission, review, metareview, etc. are allowed for the particular deadline
   def create_topic_deadline(due_date, offset, topic_id)
     topic_deadline = TopicDeadline.new
     topic_deadline.topic_id = topic_id
@@ -19,8 +19,8 @@ module DeadlineHelper
     topic_deadline.save
   end
 
-# This function is used to set the starting due date for a group of topics belonging to an assignment.
-# This function is used in building the dependency graph for preventing injection attacks as specified in the sign_up_controller.
+  # This function is used to set the starting due date for a group of topics belonging to an assignment.
+  # This function is used in building the dependency graph for preventing injection attacks as specified in the sign_up_controller.
   def set_start_due_date(assignment_id,set_of_topics)
 
     #Remember, in create_common_start_time_topics function we reversed the graph so reverse it back

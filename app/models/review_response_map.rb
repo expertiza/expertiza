@@ -26,10 +26,10 @@ class ReviewResponseMap < ResponseMap
     mappings = find_all_by_reviewed_object_id(parent_id)
     mappings.sort! { |a, b| a.reviewee.name <=> b.reviewee.name }
     mappings.each {
-        |map|
+      |map|
       csv << [
-          map.reviewee.name,
-          map.reviewer.name
+        map.reviewee.name,
+        map.reviewer.name
       ]
     }
   end
@@ -54,14 +54,14 @@ class ReviewResponseMap < ResponseMap
         raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
       end
       if assignment.team_assignment
-      reviewee = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, assignment.id)
-      if reviewee == nil
-        raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
-      end
-      existing = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
-      if existing.nil?
-        TeamReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
-      end
+        reviewee = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, assignment.id)
+        if reviewee == nil
+          raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
+        end
+        existing = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+        if existing.nil?
+          TeamReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
+        end
       else
         puser = User.find_by_name(row[0].to_s.strip)
         if user == nil

@@ -10,7 +10,7 @@
       end %>title='<%= long_name %>'><%= item.label.html_safe %></a>
     <% if item.children -%>
       <ul>
-        <%= render :partial => 'menu_items/suckerfish', 
+        <%= render :partial => 'menu_items/suckerfish',
           :locals => {:items => item.children} %>
       </ul>
     <% end -%>

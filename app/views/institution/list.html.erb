@@ -2,21 +2,21 @@
 
 <table>
   <tr>
-  <% for column in Institution.content_columns %>
-    <th><%= column.human_name %></th>
-  <% end %>
+    <% for column in Institution.content_columns %>
+      <th><%= column.human_name %></th>
+    <% end %>
   </tr>
-  
-<% for institution in @institutions %>
-  <tr>
-  <% for column in Institution.content_columns %>
-    <td><%=h institution.send(column.name) %></td>
+
+  <% for institution in @institutions %>
+    <tr>
+      <% for column in Institution.content_columns %>
+        <td><%=h institution.send(column.name) %></td>
+      <% end %>
+      <td><%= link_to 'Show', :action => 'show', :id => institution %></td>
+      <td><%= link_to 'Edit', :action => 'edit', :id => institution %></td>
+      <td><%= link_to 'Delete', { :action => 'destroy', :id => institution }, :confirm => 'Are you sure?', :method => :post %></td>
+    </tr>
   <% end %>
-    <td><%= link_to 'Show', :action => 'show', :id => institution %></td>
-    <td><%= link_to 'Edit', :action => 'edit', :id => institution %></td>
-    <td><%= link_to 'Delete', { :action => 'destroy', :id => institution }, :confirm => 'Are you sure?', :method => :post %></td>
-  </tr>
-<% end %>
 </table>
 
 <br />

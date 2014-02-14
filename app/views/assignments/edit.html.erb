@@ -6,23 +6,23 @@
 <h1>Editing Assignment</h1>
 
 <script>
-    function validate() {
-        return true;
-    }
+  function validate() {
+    return true;
+  }
 
     function submit_form() {
-        //validating the form
+      //validating the form
         if (validate()) {
-            //submit the due dates and questionnaires before submitting the rest of the form
+          //submit the due dates and questionnaires before submitting the rest of the form
             jQuery.ajaxSetup({async: false});
             submit_due_dates();
             submit_questionnaires();
             jQuery('#assignment_form').submit();
         }
     }
-</script>
+  </script>
 
-<%= form_for @assignment, html: { id: 'assignment_form' } do %>
+  <%= form_for @assignment, html: { id: 'assignment_form' } do %>
     <div id="tabs">
       <ul>
         <li><a href="#tabs-1">General</a></li>
@@ -48,11 +48,11 @@
       </div>
     </div>
     <script>
-        jQuery(document).ready(function () {
-            jQuery("#tabs").tabs();
-        });
+      jQuery(document).ready(function () {
+        jQuery("#tabs").tabs();
+      });
     </script>
     <%= button_to_function 'Save', 'submit_form()' %>| <%= render :partial => '/shared_scripts/back' %>
-<% end %>
+  <% end %>
 
-<br/>
+  <br/>

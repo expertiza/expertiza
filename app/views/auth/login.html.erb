@@ -1,7 +1,7 @@
 <h1>Login</h1>
 
 <% if flash[:notice] -%>
-   <div id="ErrorExplanation"><%= flash[:notice] %></div>
+  <div id="ErrorExplanation"><%= flash[:notice] %></div>
 <% end -%>
 
 <%= form_tag :action => 'login' do %>

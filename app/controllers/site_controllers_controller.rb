@@ -6,7 +6,7 @@ class SiteControllersController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-         :redirect_to => { :action => :index }
+    :redirect_to => { :action => :index }
 
   def index
     @builtin_site_controllers = SiteController.builtin
@@ -116,15 +116,15 @@ class SiteControllersController < ApplicationController
     @has_builtin = (@builtin.length > 0) ? true : false
   end
 
-  
+
   # Given a controller name, returns an array of available actions to
   # which that controller will respond.
 
   def controller_actions(controller_name)
-    
+
     controllers = controller_classes()
     actions = Hash.new()
-    
+
     if @controller_classes.has_key? controller_name
       controller = @controller_classes[controller_name]
 
@@ -136,8 +136,8 @@ class SiteControllersController < ApplicationController
         actions.delete hidden
       end
     end
-    
+
     return actions.keys
   end  # def controller_actions
 
-end  # class
+  end  # class

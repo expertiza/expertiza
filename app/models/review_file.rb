@@ -1,11 +1,11 @@
 class ReviewFile < ActiveRecord::Base
   # Associate the author (participant) with the file
   belongs_to :participant, :class_name => 'Participant',
-             :foreign_key => 'author_participant_id'
+    :foreign_key => 'author_participant_id'
 
   # Associate the review_comments with the review_file
   has_many :review_comments, :class_name => 'ReviewComment',
-           :foreign_key => 'review_file_id'
+    :foreign_key => 'review_file_id'
 
 
   #attr_accessor :filepath, :author_participant_id, :version_number
@@ -15,8 +15,8 @@ class ReviewFile < ActiveRecord::Base
   def self.get_max_version_num(participant)
     # Find the max version number of code submitted by 'participant'
     file = ReviewFile.find(
-        :first, :conditions => ['author_participant_id = ?', participant.id],
-        :order => 'version_number desc')
+      :first, :conditions => ['author_participant_id = ?', participant.id],
+      :order => 'version_number desc')
     #if file
     #  max_version_num = file.version_number
     #else
@@ -27,21 +27,21 @@ class ReviewFile < ActiveRecord::Base
 
     # For all other members of the team, find the most recent version of code
     #   review files submitted by any of them.
-      participant.team.get_participants.each { |member|
-        file = ReviewFile.find(
-            :first, :conditions => ['author_participant_id = ?', member.id],
-            :order => 'version_number desc')
+    participant.team.get_participants.each { |member|
+      file = ReviewFile.find(
+        :first, :conditions => ['author_participant_id = ?', member.id],
+        :order => 'version_number desc')
 
-        #if file
-        #  max_member_version = file.version_number
-        #else
-        #  max_member_version = 0
-        #end
+      #if file
+      #  max_member_version = file.version_number
+      #else
+      #  max_member_version = 0
+      #end
 
-        max_member_version  = file.nil? ? 0 : file.version_number
+      max_member_version  = file.nil? ? 0 : file.version_number
 
-        max_version_num = max_member_version if max_member_version > max_version_num
-      }
+      max_version_num = max_member_version if max_member_version > max_version_num
+    }
     return max_version_num
   end
 
@@ -98,8 +98,8 @@ class ReviewFile < ActiveRecord::Base
 
         # Increment table_row_num until a non "" string is encountered in @first_line_num
         while ( (@second_line_num[table_row_num].nil? or
-            @second_line_num[table_row_num].blank?) and
-            table_row_num < @second_line_num.length)
+                 @second_line_num[table_row_num].blank?) and
+          table_row_num < @second_line_num.length)
           table_row_num += 1
         end
 
@@ -122,7 +122,7 @@ class ReviewFile < ActiveRecord::Base
       #first_count += 1
       hash = {:@first_line_num => first_count + 1, :first_count => first_count += 1}
     else # empty
-         #  @first_line_num << nil
+      #  @first_line_num << nil
       hash = {:@first_line_num => nil, :first_count => first_count}
     end
   end
@@ -137,7 +137,7 @@ class ReviewFile < ActiveRecord::Base
       #  second_count += 1
       hash2 = {:@second_line_num => second_count + 1, :second_count => second_count += 1}
     else # empty
-         #  @second_line_num << nil
+      #  @second_line_num << nil
       hash2 = {:@second_line_num => nil, :second_count => second_count}
     end
     return hash2
@@ -161,7 +161,7 @@ class ReviewFile < ActiveRecord::Base
   #   computed by the concatenation of this method's arguments.
   def self.get_file(code_review_dir, version_number, base_file_name)
     filepath = code_review_dir + ReviewFilesHelper::VERSION_DIR_SUFFIX +
-        version_number.to_s + '//' + base_file_name
+      version_number.to_s + '//' + base_file_name
     abc = ReviewFile.find_by_filepath(filepath)
   end
 
@@ -179,8 +179,8 @@ class ReviewFile < ActiveRecord::Base
 
         # Increment table_row_num until a non "" string is encountered in @first_line_num
         while ( (first_line_num[table_row_num].nil? or
-            first_line_num[table_row_num].blank?) and
-            table_row_num < first_line_num.length)
+                 first_line_num[table_row_num].blank?) and
+          table_row_num < first_line_num.length)
           table_row_num += 1
         end
 
@@ -197,7 +197,7 @@ class ReviewFile < ActiveRecord::Base
     newer_version_comments.each do |each_comment|
       line_counter = each_comment.initial_line_number
       while line_counter <= each_comment.last_line_number do
-#--------------------------CHANGE----------------------------@NIMITT
+        #--------------------------CHANGE----------------------------@NIMITT
 
 
         table_row_num =  line_counter
@@ -205,8 +205,8 @@ class ReviewFile < ActiveRecord::Base
 
         # Increment table_row_num until a non "" string is encountered in @first_line_num
         while ( (file_contents[table_row_num].nil? or
-            file_contents[table_row_num].blank?) and
-            table_row_num < file_contents.length)
+                 file_contents[table_row_num].blank?) and
+          table_row_num < file_contents.length)
           table_row_num += 1
         end
 

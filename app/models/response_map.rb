@@ -67,7 +67,7 @@ class ResponseMap < ActiveRecord::Base
   end
 
   # Assigns a metareviewer to this review (response)
-  # @param[in] metareviewer AssignmentParticipant object 
+  # @param[in] metareviewer AssignmentParticipant object
   def assign_metareviewer(metareviewer)
     MetareviewResponseMap.create(:reviewed_object_id => self.id,
                                  :reviewer_id => metareviewer.id, :reviewee_id => reviewer.id)
@@ -76,7 +76,7 @@ class ResponseMap < ActiveRecord::Base
   def self.delete_mappings(mappings, force=nil)
     failedCount = 0
     mappings.each {
-        |mapping|
+      |mapping|
       begin
         mapping.delete(force)
       rescue

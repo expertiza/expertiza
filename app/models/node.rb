@@ -13,36 +13,36 @@ class Node < ActiveRecord::Base
   # Retrieves the nodes of this type
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil,search=nil)
   end
-  
+
   # Retrieves the children of this node
   def get_children(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil,search = nil)
   end
-  
+
   # Retrieves the action partial for this node
   def get_partial_name
-     self.class.table+"_actions"      
+    self.class.table+"_actions"
   end
-  
+
   # Most objects are not leaves
-  # Currently only assignment and questionnaire are a leaf 
+  # Currently only assignment and questionnaire are a leaf
   # type node
   def is_leaf
     false
   end
-  
+
   # Retrieves the corresponding model for the
   # node's object type
-  def self.table 
+  def self.table
   end
-  
+
   # Retreives the node's object name
   def get_name
   end
-  
+
   # Retrieves the node's object directory
   def get_directory
-  end  
-  
+  end
+
   # Retrieves the node's object create_at
   def get_creation_date
   end
@@ -50,8 +50,8 @@ class Node < ActiveRecord::Base
   # Retrieves the node's object create_at
   def get_modified_date
   end
-  
+
   # Retrieves the type of children this node has
-  def get_child_type   
+  def get_child_type
   end
 end

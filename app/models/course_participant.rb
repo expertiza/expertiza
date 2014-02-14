@@ -1,10 +1,10 @@
 class CourseParticipant < Participant
 
   belongs_to :course, :class_name => 'Course', :foreign_key => 'parent_id'
-  
+
   # Copy this participant to an assignment
   def copy(assignment_id)
-    part = AssignmentParticipant.find_by_user_id_and_parent_id(self.user_id,assignment_id)    
+    part = AssignmentParticipant.find_by_user_id_and_parent_id(self.user_id,assignment_id)
     if part.nil?
       part = AssignmentParticipant.create(:user_id => self.user_id, :parent_id => assignment_id)
       part.set_handle()
@@ -12,26 +12,26 @@ class CourseParticipant < Participant
     else
       return nil # return nil so we can tell a copy is not made
     end
-  end 
-  
+  end
+
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row,session,id)
     if row.length != 4
-       raise ArgumentError, "The record containing #{row[0]} should have 4 items, it has #{row.length}."
+      raise ArgumentError, "The record containing #{row[0]} should have 4 items, it has #{row.length}."
     end
-    user = User.find_by_name(row[0])        
+    user = User.find_by_name(row[0])
     if user == nil
       attributes = ImportFileHelper::define_attributes(row)
       user = ImportFileHelper::create_new_user(attributes,session)
-    end              
+    end
     course = Course.find(id)
     if course == nil
-       raise ImportError, "The course with id \""+id.to_s+"\" was not found."
+      raise ImportError, "The course with id \""+id.to_s+"\" was not found."
     end
     if find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, course.id]}).size == 0
-       create(:user_id => user.id, :parent_id => course.id)
-    end   
+      create(:user_id => user.id, :parent_id => course.id)
+    end
   end
 
   def course_string
@@ -49,8 +49,8 @@ class CourseParticipant < Participant
   # provide export functionality for Assignment Participants
   def self.export(csv, parent_id, options)
     find_all_by_parent_id(parent_id).each {
-        |part|
-    tcsv = Array.new
+      |part|
+      tcsv = Array.new
       user = part.user
       if options["personal_details"] == "true"
         tcsv.push(user.name, user.fullname, user.email)

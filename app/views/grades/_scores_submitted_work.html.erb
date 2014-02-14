@@ -1,53 +1,53 @@
 <script>
-    var submitted_work = {};
+  var submitted_work = {};
     submitted_work.questions = [];
     var question;
     <%
         review = rscore[:assessments][0]
-        Score.find_all_by_response_id(review.response_id).each {
-               |reviewScore|
-               question = Question.find_by_id(reviewScore.question_id)
+    Score.find_all_by_response_id(review.response_id).each {
+      |reviewScore|
+      question = Question.find_by_id(reviewScore.question_id)
     %>
     question = {};
-    question.txt = '<%= question.txt %>'.trim();
-    question.max_score = '<%= question.questionnaire.max_question_score.to_s %>'.trim();
-    submitted_work.questions.push(question);
-    <%
-        }
+      question.txt = '<%= question.txt %>'.trim();
+      question.max_score = '<%= question.questionnaire.max_question_score.to_s %>'.trim();
+      submitted_work.questions.push(question);
+      <%
+      }
     %>
     submitted_work.reviews = [];
     var review;
     <%
         for review in rscore[:assessments]
-    %>
+        %>
     review = {};
     review.id = '<%= review.id %>';
     review.updated_at = '<%= review.updated_at.strftime('%x') %><br/><%= review.updated_at.strftime('%X') %>';
     <% if review.additional_comment %>
-    review.additional_comment = '<%= review.additional_comment.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim();
+ review.additional_comment = '<%= review.additional_comment.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim();
     <% else %>
-    review.additional_comment = '';
+ review.additional_comment = '';
     <% end %>
     review.scores = [];
     review.comments = [];
 
     <%
-            Score.find_all_by_response_id(review.response_id).each{ |reviewScore|
+        Score.find_all_by_response_id(review.response_id).each{ |reviewScore|
     %>
     review.scores.push('<%= reviewScore.score.to_s %>'.trim());
-    review.comments.push('<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
-    <%
-            }
-            feedback = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
-            if feedback
-    %>
+          review.comments.push('<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
+          <%
+      }
+        feedback = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
+        if feedback
+        %>
     review.feedback = '<%= link_to "view", :controller => "response", :action => "view", :id => feedback.id %> <%= link_to "edit", :controller => "response", :action => "edit", :id => feedback.id, :return => "feedback" %>'
     <% else %>
-    review.feedback = '<%= link_to "new", :controller => "response", :action => "new_feedback", :id => review.id %>'
+ review.feedback = '<%= link_to "new", :controller => "response", :action => "new_feedback", :id => review.id %>'
     <% end %>
     submitted_work.reviews.push(review);
     <%
-        end
+    end
     %>
 </script>
 
@@ -55,38 +55,38 @@
 
 <table class="table round-border-table text-center table-striped" id="submitted-work-table">
   <thead>
-  <tr style="background-color:#dddddd">
-  <th style="text-align:left">Question</th>
-  </thead>
-  <tbody>
+    <tr style="background-color:#dddddd">
+      <th style="text-align:left">Question</th>
+    </thead>
+    <tbody>
 
-  </tbody>
-</table>
+    </tbody>
+  </table>
 
-<!-- Modal -->
-<div class="modal fade" id="submitted-work-modal" tabindex="-1" role="dialog" aria-labelledby="submitted-work-modal-label" aria-hidden="true">
-  <div class="modal-dialog" style="width: 1000px">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="submitted-work-modal-label">Submitted Work</h4>
+  <!-- Modal -->
+  <div class="modal fade" id="submitted-work-modal" tabindex="-1" role="dialog" aria-labelledby="submitted-work-modal-label" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="submitted-work-modal-label">Submitted Work</h4>
+        </div>
+        <div class="modal-body">
+          <div id="divSubmittedWorkChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <div id="divSubmittedWorkChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
+      <!-- /.modal-content -->
     </div>
-    <!-- /.modal-content -->
-  </div>
-  <!-- /.modal-dialog -->
-</div><!-- /.modal -->
+    <!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 
-<script>
+  <script>
     // Add questions to the table
     $('#submitted-work-table > tbody:last').append('<tr><td style="text-align:left"><b>Review date<b></td></tr>');
     for (var index = 0; index < submitted_work.questions.length; index++) {
-        var q = submitted_work.questions[index];
+      var q = submitted_work.questions[index];
         $('#submitted-work-table > tbody:last').append('<tr><td style="text-align:left">' + q.txt + '</td></tr>');
     }
     $('#submitted-work-table > tbody:last').append('<tr><td style="text-align:left"><b>Total Score</b></td></tr>');
@@ -94,14 +94,14 @@
 
     // Add reviews to the table
     for (var index = 0; index < submitted_work.reviews.length; index++) {
-        var r = submitted_work.reviews[index];
+      var r = submitted_work.reviews[index];
         $('#submitted-work-table > thead').find('tr').each(function () {
-            var trow = $(this);
+          var trow = $(this);
             if (r.additional_comment.length > 0) {
-                trow.append('<th title="' + r.additional_comment + '" class="td-top-arrow">Review ' + (index + 1) + '<span class="top-arrow"></span></th>');
+              trow.append('<th title="' + r.additional_comment + '" class="td-top-arrow">Review ' + (index + 1) + '<span class="top-arrow"></span></th>');
             }
             else {
-                trow.append('<th>Review ' + (index + 1) + '</th>');
+              trow.append('<th>Review ' + (index + 1) + '</th>');
             }
         });
 
@@ -110,16 +110,16 @@
         var obtained_total = 0;
         var max_total = 0;
         $('#submitted-work-table > tbody').find('tr').each(function () {
-            var trow = $(this);
+          var trow = $(this);
             if (trow.index() >= 1 && trow.index() < submitted_work.questions.length + 1) {
-                var qid = trow.index() - 1;
+              var qid = trow.index() - 1;
                 obtained_total += parseFloat(r.scores[qid]);
                 max_total += parseFloat(submitted_work.questions[qid].max_score);
                 if (r.comments[qid].length > 0) {
-                    trow.append('<td class="td-top-arrow" title="' + r.comments[qid] + '"><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b><span class="top-arrow"></span></td>');
+                  trow.append('<td class="td-top-arrow" title="' + r.comments[qid] + '"><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b><span class="top-arrow"></span></td>');
                 }
                 else {
-                    trow.append('<td><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b></td>');
+                  trow.append('<td><b>' + r.scores[qid] + '</b> / <b>' + submitted_work.questions[qid].max_score + '</b></td>');
                 }
             }
         });
@@ -132,71 +132,71 @@
 
     $(function () {
 
-        $('#submitted-work-modal').on('shown.bs.modal', function () {
+      $('#submitted-work-modal').on('shown.bs.modal', function () {
 
-            var questions = [], questionScores = [], firstArrayFlag = true, scoreCounter;
+        var questions = [], questionScores = [], firstArrayFlag = true, scoreCounter;
             questions.counter = 0;
 
             $(submitted_work.reviews).each(function () {
-                scoreCounter = 0;
+              scoreCounter = 0;
                 $(this.scores).each(function () {
-                    if (firstArrayFlag)
-                        questionScores.push(parseInt(this));
-                    else {
-                        questionScores[scoreCounter++] += parseInt(this);
-                    }
+                  if (firstArrayFlag)
+                    questionScores.push(parseInt(this));
+                  else {
+                    questionScores[scoreCounter++] += parseInt(this);
+                  }
                 });
                 firstArrayFlag = false;
             });
 
             for (var counter = 0; counter < questionScores.length; counter++) {
-                questionScores[counter] /= submitted_work.reviews.length;
+              questionScores[counter] /= submitted_work.reviews.length;
                 questionScores[counter] = Math.round(questionScores[counter] * 100) / 100;
             }
 
 
             $(submitted_work.questions).each(function () {
-                questions.push(this.txt);
+              questions.push(this.txt);
             });
 
             var masterChart = new Highcharts.Chart({
-                chart: {
-                    type: 'bar',
+              chart: {
+                type: 'bar',
                     renderTo: 'divSubmittedWorkChart'
-                },
+              },
                 title: {
-                    text: 'Average Scores for all Questions'
+                  text: 'Average Scores for all Questions'
                 },
                 xAxis: {
-                    categories: questions,
+                  categories: questions,
                     labels: {
-                        align: 'right',
+                      align: 'right',
                         formatter: function () {
-                            questions.counter = questions.counter + 1;
+                          questions.counter = questions.counter + 1;
                             return "Question " + (questions.counter - submitted_work.questions.length);
 
                         }
                     }
                 },
                 yAxis: {
-                    min: 0,
+                  min: 0,
                     title: {
-                        text: 'Average Score'
+                      text: 'Average Score'
                     },
                     max: submitted_work.questions[0].max_score
                 },
                 legend: {
-                    enabled: false
+                  enabled: false
                 },
                 series: [
-                    {
-                        name: 'Average Score',
+                  {
+                    name: 'Average Score',
                         color: '#4572A7',
                         data: questionScores
-                    }
+                  }
                 ]
             });
         });
     });
 
-</script>
+  </script>

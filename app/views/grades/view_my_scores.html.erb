@@ -4,43 +4,43 @@
 <script src="/javascripts/jquery-ui-1.10.3.custom.scores.js"></script>
 
 <style type="text/css">
-    .round-border-table {
-        border-collapse: separate !important;
-        border-spacing: 0 !important;
-        border: 1px solid #dddddd !important;
-        border-radius: 5px !important;
-        -moz-border-radius: 5px !important;
-        padding: 0px !important;
-    }
+  .round-border-table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border: 1px solid #dddddd !important;
+    border-radius: 5px !important;
+    -moz-border-radius: 5px !important;
+    padding: 0px !important;
+  }
 
-    .round-border-table td {
-        border: 1px solid #dddddd;
-    }
+  .round-border-table td {
+    border: 1px solid #dddddd;
+  }
 
-    table.text-center th, table.text-center td {
-        text-align: center;
-        vertical-align: middle !important;
-    }
+  table.text-center th, table.text-center td {
+    text-align: center;
+    vertical-align: middle !important;
+  }
 
-    table td {
-        min-width: 108px !important;
-    }
+  table td {
+    min-width: 108px !important;
+  }
 
-    .graph-btn {
-        cursor: pointer;
-    }
+  .graph-btn {
+    cursor: pointer;
+  }
 
-    .td-top-arrow {
-        position: relative; padding: 5px;
-    }
+  .td-top-arrow {
+    position: relative; padding: 5px;
+  }
 
-    .top-arrow {
-        position: absolute;
-        top: 0;
-        right: 0;
-        border-top: 10px solid #428bca;
-        border-left: 10px solid transparent;
-    }
+  .top-arrow {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-top: 10px solid #428bca;
+    border-left: 10px solid transparent;
+  }
 </style>
 
 
@@ -59,40 +59,40 @@
       <div class="col-md-12">
         <ul class="nav nav-tabs" id="tabs">
           <li><a href="#SubmittedWork" data-toggle="tab">
-            Submitted
-            Work&nbsp;<img class="graph-btn" id="submitted-work-graph-btn" src="/images/graph.png" data-toggle="modal" data-target="#submitted-work-modal"/>
+              Submitted
+              Work&nbsp;<img class="graph-btn" id="submitted-work-graph-btn" src="/images/graph.png" data-toggle="modal" data-target="#submitted-work-modal"/>
           </a></li>
           <li><a href="#Reviewing" data-toggle="tab">
-            Reviewing&nbsp;<img class="graph-btn" id="reviewing-graph-btn" src="/images/graph.png" data-toggle="modal" data-target="#reviewing-modal"/>
+              Reviewing&nbsp;<img class="graph-btn" id="reviewing-graph-btn" src="/images/graph.png" data-toggle="modal" data-target="#reviewing-modal"/>
           </a></li>
           <li><a href="#AuthorFeedback" data-toggle="tab">
-            Author
-            Feedback&nbsp;<img class="graph-btn" id="author-feedback-graph-btn" src="/images/graph.png" data-toggle="modal" data-target="#author-feedback-modal"/>
+              Author
+              Feedback&nbsp;<img class="graph-btn" id="author-feedback-graph-btn" src="/images/graph.png" data-toggle="modal" data-target="#author-feedback-modal"/>
           </a></li>
         </ul>
         <div class="tab-content">
           <div id="SubmittedWork" class="tab-pane active col-md-12">
             <% if @pscore[:review] and @pscore[:review][:assessments].length > 0 %>
-                <%= render :partial => 'grades/scores_submitted_work', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:review]} %>
+              <%= render :partial => 'grades/scores_submitted_work', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:review]} %>
             <% else %>
-                <br/>
-                No reviews have been completed for this submission.
+              <br/>
+              No reviews have been completed for this submission.
             <% end %>
           </div>
           <div id="Reviewing" class="tab-pane col-md-12">
             <% if @pscore[:metareview] and @pscore[:metareview][:assessments].length > 0 %>
-                <%= render :partial => 'grades/scores_metareview', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:metareview]} %>
+              <%= render :partial => 'grades/scores_metareview', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:metareview]} %>
             <% else %>
-                <br/>
-                No meta-reviews have been completed for this submission.
+              <br/>
+              No meta-reviews have been completed for this submission.
             <% end %>
           </div>
           <div id="AuthorFeedback" class="tab-pane col-md-12">
             <% if @pscore[:feedback] and @pscore[:feedback][:assessments].length > 0 %>
-                <%= render :partial => 'grades/scores_author_feedback', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:feedback]} %>
+              <%= render :partial => 'grades/scores_author_feedback', :locals => {:prefix => 'user', :participant => @pscore[:participant], :rscore => @pscore[:feedback]} %>
             <% else %>
-                <br/>
-                No author feedback has been completed for this submission.
+              <br/>
+              No author feedback has been completed for this submission.
             <% end %>
           </div>
         </div>
@@ -104,14 +104,14 @@
   </div>
 </div>
 <script>
-    jQuery(function () {
-        jQuery('#tabs li:first a:first').tab('show');
+  jQuery(function () {
+    jQuery('#tabs li:first a:first').tab('show');
         jQuery(document).tooltip({
-            track: true
+          track: true
         });
         jQuery('#user_filesLink').click(function () {
-            jQuery('#submission-panel').toggle();
+          jQuery('#submission-panel').toggle();
         });
-    });
+  });
 </script>
 

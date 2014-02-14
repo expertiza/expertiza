@@ -14,7 +14,7 @@ class PgUsersController < UsersController
       render :controller => controller, :action => failure_action
     end
   end
-  
+
   # user_id - the id (in the users table) of the user to be removed.
   # user_type - a string representing the type of user that is being removed
   def self.remove_user(user_id, user_type)

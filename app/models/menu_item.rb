@@ -13,10 +13,10 @@ class MenuItem < ActiveRecord::Base
 
   def above
     if self.parent_id
-      conditions = 
+      conditions =
         ["parent_id = ? and seq = ?", self.parent_id, self.seq - 1]
     else
-      conditions = 
+      conditions =
         ["parent_id is null and seq = ?", self.seq - 1]
     end
 
@@ -27,10 +27,10 @@ class MenuItem < ActiveRecord::Base
 
   def below
     if self.parent_id
-      conditions = 
+      conditions =
         ["parent_id = ? and seq = ?", self.parent_id, self.seq + 1]
     else
-      conditions = 
+      conditions =
         ["parent_id is null and seq = ?", self.seq + 1]
     end
 
@@ -90,7 +90,7 @@ class MenuItem < ActiveRecord::Base
                            :order => 'parent_id, seq, id')
     for item in menu_items do
       if item.controller_action_id.to_i > 0
-        item.controller_action = 
+        item.controller_action =
           ControllerAction.find(item.controller_action_id)
         if perms
           if perms.has_key?(item.controller_action.effective_permission_id)
@@ -100,7 +100,7 @@ class MenuItem < ActiveRecord::Base
           items << item
         end
       elsif item.content_page_id.to_i > 0
-        item.content_page = 
+        item.content_page =
           ContentPage.find(item.content_page_id)
         if perms
           if perms.has_key?(item.content_page.permission_id)

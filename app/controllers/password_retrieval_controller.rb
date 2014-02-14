@@ -21,5 +21,5 @@ class PasswordRetrievalController < ApplicationController
       end
     end
     redirect_to :action => 'forgotten'
-   end
+  end
 end

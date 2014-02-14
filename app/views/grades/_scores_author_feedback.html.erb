@@ -1,42 +1,42 @@
 <script>
-    var author_feedback = {};
+  var author_feedback = {};
     author_feedback.questions = [];
     var question;
     <%
-    review = rscore[:assessments][0]
+        review = rscore[:assessments][0]
     Score.find_all_by_response_id(review.response_id).each {
-    |reviewScore|
-                question = Question.find_by_id(reviewScore.question_id)
-                %>
+      |reviewScore|
+      question = Question.find_by_id(reviewScore.question_id)
+              %>
     question = {};
-    question.txt = '<%= question.txt %>'.trim();
-    question.max_score = '<%= question.questionnaire.max_question_score.to_s %>'.trim();
-    author_feedback.questions.push(question);
-    <%
-    }
+      question.txt = '<%= question.txt %>'.trim();
+      question.max_score = '<%= question.questionnaire.max_question_score.to_s %>'.trim();
+      author_feedback.questions.push(question);
+      <%
+      }
     %>
     author_feedback.reviews = [];
     var feedback;
     <%
-    for review in rscore[:assessments]
-    %>
+        for review in rscore[:assessments]
+        %>
     feedback = {};
     feedback.updated_at = '<%= review.updated_at.strftime('%x') %><br/><%= review.updated_at.strftime('%X') %>';
     <% if review.additional_comment %>
-    feedback.additional_comment = '<%= review.additional_comment.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim();
+ feedback.additional_comment = '<%= review.additional_comment.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim();
     <% else %>
-    feedback.additional_comment = '';
+ feedback.additional_comment = '';
     <% end %>
     feedback.scores = [];
     feedback.comments = [];
 
     <%
-    Score.find_all_by_response_id(review.response_id).each{ |reviewScore|
+        Score.find_all_by_response_id(review.response_id).each{ |reviewScore|
     %>
     feedback.scores.push('<%= reviewScore.score.to_s %>'.trim());
-    feedback.comments.push('<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
-    <%
-    }
+          feedback.comments.push('<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
+          <%
+      }
     %>
     author_feedback.reviews.push(feedback);
     <%
@@ -48,52 +48,52 @@
 
 <table class="table round-border-table text-center table-striped" id="author-feedback-table">
   <thead>
-  <tr style="background-color:#dddddd">
-  <th style="text-align:left">Question</th>
-  </thead>
-  <tbody>
+    <tr style="background-color:#dddddd">
+      <th style="text-align:left">Question</th>
+    </thead>
+    <tbody>
 
-  </tbody>
-</table>
+    </tbody>
+  </table>
 
-<!-- Modal -->
-<div class="modal fade" id="author-feedback-modal" tabindex="-1" role="dialog" aria-labelledby="author-feedback-modal-label" aria-hidden="true">
-  <div class="modal-dialog" style="width: 1000px">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="author-feedback-modal-label">Author Feedback</h4>
+  <!-- Modal -->
+  <div class="modal fade" id="author-feedback-modal" tabindex="-1" role="dialog" aria-labelledby="author-feedback-modal-label" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="author-feedback-modal-label">Author Feedback</h4>
+        </div>
+        <div class="modal-body">
+          <div id="divAuthorFeedbackChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <div id="divAuthorFeedbackChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
+      <!-- /.modal-content -->
     </div>
-    <!-- /.modal-content -->
-  </div>
-  <!-- /.modal-dialog -->
-</div><!-- /.modal -->
+    <!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 
-<script>
+  <script>
     // Add questions to the table
     $('#author-feedback-table > tbody:last').append('<tr><td style="text-align:left"><b>Review date<b></td></tr>');
     for (var index = 0; index < author_feedback.questions.length; index++) {
-        var q = author_feedback.questions[index];
+      var q = author_feedback.questions[index];
         $('#author-feedback-table > tbody:last').append('<tr><td style="text-align:left">' + q.txt + '</td></tr>');
     }
     $('#author-feedback-table > tbody:last').append('<tr><td style="text-align:left"><b>Total Score</b></td></tr>');
 
     // Add reviews to the table
     for (var index = 0; index < author_feedback.reviews.length; index++) {
-        var r = author_feedback.reviews[index];
+      var r = author_feedback.reviews[index];
         $('#author-feedback-table > thead').find('tr').each(function () {
-            var trow = $(this);
+          var trow = $(this);
             if (r.additional_comment.length > 0) {
-                trow.append('<th title="' + r.additional_comment + '" class="td-top-arrow">Feedback ' + (index + 1) + '<span class="top-arrow"></span></th>');
+              trow.append('<th title="' + r.additional_comment + '" class="td-top-arrow">Feedback ' + (index + 1) + '<span class="top-arrow"></span></th>');
             }
             else {
-                trow.append('<th>Feedback ' + (index + 1) + '</th>');
+              trow.append('<th>Feedback ' + (index + 1) + '</th>');
             }
         });
 
@@ -102,16 +102,16 @@
         var obtained_total = 0;
         var max_total = 0;
         $('#author-feedback-table > tbody').find('tr').each(function () {
-            var trow = $(this);
+          var trow = $(this);
             if (trow.index() >= 1 && trow.index() < author_feedback.questions.length + 1) {
-                var qid = trow.index() - 1;
+              var qid = trow.index() - 1;
                 obtained_total += parseFloat(r.scores[qid]);
                 max_total += parseFloat(author_feedback.questions[qid].max_score);
                 if (r.comments[qid].length > 0) {
-                    trow.append('<td class="td-top-arrow" title="' + r.comments[qid] + '"><b>' + r.scores[qid] + '</b> / <b>' + author_feedback.questions[qid].max_score + '</b><span class="top-arrow"></span></td>');
+                  trow.append('<td class="td-top-arrow" title="' + r.comments[qid] + '"><b>' + r.scores[qid] + '</b> / <b>' + author_feedback.questions[qid].max_score + '</b><span class="top-arrow"></span></td>');
                 }
                 else {
-                    trow.append('<td><b>' + r.scores[qid] + '</b> / <b>' + author_feedback.questions[qid].max_score + '</b></td>');
+                  trow.append('<td><b>' + r.scores[qid] + '</b> / <b>' + author_feedback.questions[qid].max_score + '</b></td>');
                 }
             }
         });
@@ -122,69 +122,69 @@
 
 
     $(function () {
-        $('#author-feedback-modal').on('shown.bs.modal', function () {
+      $('#author-feedback-modal').on('shown.bs.modal', function () {
 
-            var questions = [], questionScores = [], firstArrayFlag = true, scoreCounter;
+        var questions = [], questionScores = [], firstArrayFlag = true, scoreCounter;
             questions.counter = 0;
 
             $(author_feedback.reviews).each(function () {
-                scoreCounter = 0;
+              scoreCounter = 0;
                 $(this.scores).each(function () {
-                    if (firstArrayFlag)
-                        questionScores.push(parseInt(this));
-                    else {
-                        questionScores[scoreCounter++] += parseInt(this);
-                    }
+                  if (firstArrayFlag)
+                    questionScores.push(parseInt(this));
+                  else {
+                    questionScores[scoreCounter++] += parseInt(this);
+                  }
                 });
                 firstArrayFlag = false;
             });
 
             for (var counter = 0; counter < questionScores.length; counter++) {
-                questionScores[counter] /= author_feedback.reviews.length;
+              questionScores[counter] /= author_feedback.reviews.length;
                 questionScores[counter] = Math.round(questionScores[counter] * 100) / 100;
             }
 
             $(author_feedback.questions).each(function () {
-                questions.push(this.txt);
+              questions.push(this.txt);
             });
 
             var masterChart = new Highcharts.Chart({
-                chart: {
-                    type: 'bar',
+              chart: {
+                type: 'bar',
                     renderTo: 'divAuthorFeedbackChart'
-                },
+              },
                 title: {
-                    text: 'Average Scores for all Questions'
+                  text: 'Average Scores for all Questions'
                 },
                 xAxis: {
-                    categories: questions,
+                  categories: questions,
                     labels: {
-                        align: 'right',
+                      align: 'right',
                         formatter: function () {
-                            questions.counter = questions.counter + 1;
+                          questions.counter = questions.counter + 1;
                             return "Question " + (questions.counter - author_feedback.questions.length);
 
                         }
                     }
                 },
                 yAxis: {
-                    min: 0,
+                  min: 0,
                     title: {
-                        text: 'Average Score'
+                      text: 'Average Score'
                     },
                     max: author_feedback.questions[0].max_score
                 },
                 legend: {
-                    enabled: false
+                  enabled: false
                 },
                 series: [
-                    {
-                        name: 'Average Score',
+                  {
+                    name: 'Average Score',
                         color: '#4572A7',
                         data: questionScores
-                    }
+                  }
                 ]
             });
         });
     });
-</script>
+  </script>

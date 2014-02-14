@@ -5,7 +5,7 @@ class QuizQuestionnaire < Questionnaire
   #validates_presence_of :quiz_question_type
 
   after_initialize :post_initialization
-def post_initialization
+  def post_initialization
     self.display_type = 'Quiz'
   end
 
@@ -25,9 +25,9 @@ def post_initialization
     if scores[:quiz][:scores][:avg]
       #dont bracket and to_f the whole thing - you get a 0 in the result.. what you do is just to_f the 100 part .. to get the fractions
       return scores[:quiz][:scores][:avg] * 100  / 100.to_f
-    else
-      return 0
+      else
+        return 0
+      end
     end
-  end
 
-end
+  end

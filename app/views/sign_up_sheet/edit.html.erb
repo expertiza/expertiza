@@ -3,10 +3,10 @@
 <% form_tag :action => 'update'do %>
 
 
-    <%= render :partial => 'topic' %>
-    <%= hidden_field_tag('id', params[:id]) %>
-    <%= hidden_field_tag('assignment_id', params[:assignment_id]) %>
-    <%= submit_tag "Update"%>
+  <%= render :partial => 'topic' %>
+  <%= hidden_field_tag('id', params[:id]) %>
+  <%= hidden_field_tag('assignment_id', params[:assignment_id]) %>
+  <%= submit_tag "Update"%>
 <% end %>
 
 <%= link_to 'Back', :action => 'add_signup_topics', :id => params[:assignment_id]%>

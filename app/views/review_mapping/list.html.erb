@@ -5,9 +5,9 @@
 <table>
   <TR><TH>Assignment Name</TH><TH>Assignment Directory</TH></TR>
   <% for assignment in @assignments %>
-  <TR>
-     <TD><%= link_to assignment.name, :action => 'list_mappings', :id => assignment.id %></TD><TD><%= assignment.directory_path %>
-  </TR>
+    <TR>
+      <TD><%= link_to assignment.name, :action => 'list_mappings', :id => assignment.id %></TD><TD><%= assignment.directory_path %>
+    </TR>
   <% end %>
 </table>
 

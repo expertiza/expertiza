@@ -94,7 +94,7 @@ class TreeDisplayController < ApplicationController
         search_string = params[:search_string]
       else
         search_string = nil
-    end
+      end
     else
       search_string = nil
     end
@@ -140,7 +140,7 @@ class TreeDisplayController < ApplicationController
         assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(assignment.id)
         if assignment_questionnaires
           assignment_questionnaires.each { |q|  qid << "#{q.questionnaire_id.to_s}+" }
-        session[:root] = 1
+          session[:root] = 1
         end
       end
     elsif filter_node == 'ACN'
@@ -150,4 +150,4 @@ class TreeDisplayController < ApplicationController
     return qid
   end
 
-end
+  end

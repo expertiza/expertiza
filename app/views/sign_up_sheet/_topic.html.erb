@@ -24,7 +24,7 @@
   <%= select("topic", "bookmark_rating_rubric_id", BookmarkRatingRubric.all.collect {|br| [ br.display_text, br.id ] }, { :include_blank => "Please select" }) %>
 </p>
 
-<% if @topic.assignment.is_microtask? %>  
+<% if @topic.assignment.is_microtask? %>
   <p><label for="micropayment">Micropayment</label><br/>
     <%= text_field 'topic', 'micropayment' %></p>
 <% end %>

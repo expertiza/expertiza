@@ -20,49 +20,49 @@ class AnalyticController < ApplicationController
     @available_data_types[:team] = AssignmentTeamAnalytic.instance_methods
     #data type by chart type
     @available_data_types[:bar] = [
-        #general
-        "num_participants",
-        "num_assignments",
-        "num_teams",
-        "num_participants",
-        "num_reviews",
-        #assignment_teams
-        "total_num_assignment_teams",
-        "average_num_assignment_teams",
-        "max_num_assignment_teams",
-        "min_num_assignment_teams",
-        #assignment_scores
-        "average_assignment_score",
-        "max_assignment_score",
-        "min_assignment_score",
-        #assignment_reviews
-        "total_num_assignment_reviews",
-        "average_num_assignment_reviews",
-        "max_num_assignment_reviews",
-        "min_num_assignment_reviews",
-        #team_reviews
-        "total_num_team_reviews",
-        "average_num_team_reviews",
-        "max_num_team_reviews",
-        "min_num_team_reviews",
-        #team_scores
-        "average_team_score",
-        "max_team_score",
-        "min_team_score",
-        #review_score
-        "average_review_score",
-        "max_review_score",
-        "min_review_score",
-        #review_word_count
-        "total_review_word_count",
-        "average_review_word_count",
-        "max_review_word_count",
-        "min_review_word_count",
-        #character_count
-        "total_review_character_count",
-        "average_review_character_count",
-        "max_review_character_count",
-        "min_review_character_count"
+      #general
+      "num_participants",
+      "num_assignments",
+      "num_teams",
+      "num_participants",
+      "num_reviews",
+      #assignment_teams
+      "total_num_assignment_teams",
+      "average_num_assignment_teams",
+      "max_num_assignment_teams",
+      "min_num_assignment_teams",
+      #assignment_scores
+      "average_assignment_score",
+      "max_assignment_score",
+      "min_assignment_score",
+      #assignment_reviews
+      "total_num_assignment_reviews",
+      "average_num_assignment_reviews",
+      "max_num_assignment_reviews",
+      "min_num_assignment_reviews",
+      #team_reviews
+      "total_num_team_reviews",
+      "average_num_team_reviews",
+      "max_num_team_reviews",
+      "min_num_team_reviews",
+      #team_scores
+      "average_team_score",
+      "max_team_score",
+      "min_team_score",
+      #review_score
+      "average_review_score",
+      "max_review_score",
+      "min_review_score",
+      #review_word_count
+      "total_review_word_count",
+      "average_review_word_count",
+      "max_review_word_count",
+      "min_review_word_count",
+      #character_count
+      "total_review_character_count",
+      "average_review_character_count",
+      "max_review_character_count",
+      "min_review_character_count"
     ]
 
     @available_data_types[:scatter] = [
@@ -101,14 +101,14 @@ class AnalyticController < ApplicationController
     end
 
     case params[:type]
-      when "line"
-        chart_data = line_graph_data(params[:scope], params[:id], params[:data_type])
-      when "bar"
-        chart_data = bar_chart_data(params[:scope], params[:id], params[:data_type])
-      when "scatter"
-        chart_data = scatter_plot_data(params[:scope], params[:id], params[:data_type])
-      when "pie"
-        chart_data = pie_chart_data(params[:scope], params[:id], params[:data_type])
+    when "line"
+      chart_data = line_graph_data(params[:scope], params[:id], params[:data_type])
+    when "bar"
+      chart_data = bar_chart_data(params[:scope], params[:id], params[:data_type])
+    when "scatter"
+      chart_data = scatter_plot_data(params[:scope], params[:id], params[:data_type])
+    when "pie"
+      chart_data = pie_chart_data(params[:scope], params[:id], params[:data_type])
     end
 
     respond_to do |format|

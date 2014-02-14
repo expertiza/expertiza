@@ -4,13 +4,13 @@
   <tr>
   </tr>
 
-<% @question_types.each do |question_type| %>
-  <tr>
-    <td><%= link_to 'Show', question_type %></td>
-    <td><%= link_to 'Edit', edit_question_type_path(question_type) %></td>
-    <td><%= link_to 'Destroy', question_type, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
+  <% @question_types.each do |question_type| %>
+    <tr>
+      <td><%= link_to 'Show', question_type %></td>
+      <td><%= link_to 'Edit', edit_question_type_path(question_type) %></td>
+      <td><%= link_to 'Destroy', question_type, :confirm => 'Are you sure?', :method => :delete %></td>
+    </tr>
+  <% end %>
 </table>
 
 <br />

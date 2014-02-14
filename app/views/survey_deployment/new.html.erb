@@ -31,45 +31,45 @@
       </td>
       <td>
         <%= text_field 'survey_deployment','num_of_students', "size" => 3, "maxlength" => 2 %> <p>
+        </td>
+      </tr>
+
+      <tr>
+        <td><label>Use Random Subset:</label></td>
+      </td>
+      <td>
+        <%= check_box 'random_subset','value' %>
       </td>
     </tr>
 
     <tr>
-      <td><label>Use Random Subset:</label></td>
+      <td><label>Total number of students:</label></td>
     </td>
     <td>
-      <%= check_box 'random_subset','value' %>
+      <%= @total_students %>
     </td>
   </tr>
 
   <tr>
-    <td><label>Total number of students:</label></td>
+    <td><label>Survey Assigned:</label></td>
   </td>
   <td>
-    <%= @total_students %>
+    <%= select(:survey_deployment, :course_evaluation_id, @surveys) %>
   </td>
 </tr>
-
-<tr>
-  <td><label>Survey Assigned:</label></td>
-</td>
-<td>
-  <%= select(:survey_deployment, :course_evaluation_id, @surveys) %>
-</td>
-      </tr>
-    </table>	
+    </table>
   </td>
 </tr>
    </table>
    <p>
-   <%= submit_tag "Add" %>
+     <%= submit_tag "Add" %>
 
 
 
 
- <% end %>
- <br />
- <%= link_to 'Back', :action => 'list' %>
+   <% end %>
+   <br />
+   <%= link_to 'Back', :action => 'list' %>
 
 
 

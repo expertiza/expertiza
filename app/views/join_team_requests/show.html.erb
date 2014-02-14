@@ -1,4 +1,4 @@
- <p>
+<p>
   <b>Team:</b> <br>
   <%=h Team.find(@join_team_request.team_id).name %>
 </p>
@@ -11,16 +11,16 @@
 <p>
   <b>Status:</b>  <br>
   <% if @join_team_request.status=="P" %>
-      Pending: A request has been made to join this team.
+    Pending: A request has been made to join this team.
     <% else if @join_team_request.status=="D"%>
       Denied: The team has denied your request.
       <% else if @join_team_request.status=="A"%>
-      Accepted: The team has accepted your request. <br>
-      You should receive an invitation in "Your Team".
-       <% else %>
-       <%=  @join_team_request.status %>
-       <% end %>
+        Accepted: The team has accepted your request. <br>
+        You should receive an invitation in "Your Team".
+      <% else %>
+        <%=  @join_team_request.status %>
       <% end %>
+    <% end %>
   <% end %>
 
 </p>

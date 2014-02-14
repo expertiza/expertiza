@@ -4,7 +4,7 @@
   <% if @user.public_key.nil?  %>
          <tr><td>
          <div class="flash_note">
-         In order for your work to be published on our website, you need to grant us 
+         In order for your work to be published on our website, you need to grant us
          publishing rights for your work.  Before doing so you must generate a set of public and private keys so
          you can digitally sign your granting action.
 
@@ -18,7 +18,7 @@
 
          <td colspan=5>
          <div class="flash_note">
-         In order for your work to be published on our website, you need to need to grant us 
+         In order for your work to be published on our website, you need to need to grant us
          publishing rights for your work. You may do this on a per assignment basis, or if
          you wish you can grant or deny rights to all your past work.
            </div>
@@ -58,7 +58,7 @@
                  <% unless participant.user.public_key.nil? %>
                         <%= participant.verify_digital_signature(participant.user.public_key) ? "verified" : "invalid" %>
                       <% end %>
-                      &nbsp;	
+                      &nbsp;
                       </td>
                       <td><%= link_to 'Deny', :action =>'set_publish_permission', :id => participant.id, :allow => 0 %></td>
                     <% else %>
@@ -70,5 +70,5 @@
                     <td width=30%>&nbsp;</td>
                   </tr>
                 <% end %>
-                                      <% end %>
-                                    </table>
+              <% end %>
+            </table>

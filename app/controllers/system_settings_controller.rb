@@ -11,13 +11,13 @@ class SystemSettingsController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-         :redirect_to => { :action => :list }
+    :redirect_to => { :action => :list }
 
   def list
     @system_settings = SystemSettings.find(:first)
     redirect_to :action => :show, :id => @system_settings
 
-    # @system_settings_pages, @system_settings = paginate :system_settings, 
+    # @system_settings_pages, @system_settings = paginate :system_settings,
     # :class_name => 'SystemSettings', :per_page => 10
   end
 

@@ -119,9 +119,9 @@ class User < ActiveRecord::Base
 
   def self.import(row,session,id = nil)
     if row.length != 4
-      raise ArgumentError, "Not enough items" 
-    end    
-    user = User.find_by_name(row[0])    
+      raise ArgumentError, "Not enough items"
+    end
+    user = User.find_by_name(row[0])
 
     if user == nil
       attributes = ImportFileHelper::define_attributes(row)
@@ -133,7 +133,7 @@ class User < ActiveRecord::Base
       user.parent_id = (session[:user]).id
       user.save
     end
-  end  
+  end
 
   def get_author_name
     return self.fullname
@@ -147,7 +147,7 @@ class User < ActiveRecord::Base
     else
       ""
     end
-  end    
+  end
 
   # locate User based on provided login.
   # If user supplies e-mail or name, the
@@ -159,14 +159,14 @@ class User < ActiveRecord::Base
       shortName = items[0]
       userList = User.find(:all, {:conditions=> ["name =?",shortName]})
       if userList != nil && userList.length == 1
-        user = userList.first            
+        user = userList.first
       end
     end
-    return user     
-  end 
+    return user
+  end
 
-  def set_instructor (new_assign)  
-    new_assign.instructor_id = self.id  
+  def set_instructor (new_assign)
+    new_assign.instructor_id = self.id
   end
 
   def get_instructor
@@ -181,11 +181,11 @@ class User < ActiveRecord::Base
     end
   end
 
-  def set_courses_to_assignment 
-    @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')    
+  def set_courses_to_assignment
+    @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')
   end
 
-  # generate a new RSA public/private key pair and create our own X509 digital certificate which we 
+  # generate a new RSA public/private key pair and create our own X509 digital certificate which we
   # save in the database. The private key is returned by the method but not saved.
   def generate_keys
     # check if we are replacing a digital certificate already generated
@@ -202,14 +202,14 @@ class User < ActiveRecord::Base
       participants = AssignmentParticipant.find_all_by_user_id(self.id)
       for participant in participants
         if (participant.permission_granted)
-          AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [ participant ]) 
+          AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [ participant ])
         end
       end
     end
 
     # return the new private key
     new_key.to_pem
-  end
+    end
 
   def initialize(attributes = nil)
     super(attributes)
@@ -285,7 +285,7 @@ class User < ActiveRecord::Base
     return false if student.role.name != 'Student'
     return true if Course.all.any? do |c|
       c.participants.all(:conditions => "user_id=#{student.id}").size > 0 &&
-      c.participants.all(:conditions => "user_id=#{id}").size > 0
+        c.participants.all(:conditions => "user_id=#{id}").size > 0
     end
     return false
   end

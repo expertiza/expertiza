@@ -51,4 +51,4 @@ class AdvertiseForPartnerController < ApplicationController
   def edit
     @team = Team.find(params[:team_id])
   end
-end
+  end

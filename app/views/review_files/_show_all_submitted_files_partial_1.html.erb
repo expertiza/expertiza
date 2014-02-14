@@ -5,29 +5,29 @@
   </tr>
   <tr>
     <% for i in 1..@latest_version_number %>
-        <th align="center"><%= i %></th>
+      <th align="center"><%= i %></th>
     <% end %>
   </tr>
   <% @file_version_map.sort.each do |filename, versions| %>
-      <tr>
-        <td><b>
+    <tr>
+      <td><b>
           <%= link_to filename,
-                      :controller  => 'review_files',
-                      :action      => 'show_code_file',
-                      :review_file_id => @file_id_map[filename],
-                      :participant_id => @participant.id,
-                      :versions => versions %>
-        </b></td>
-        <% for i in 1..@latest_version_number %>
-            <td align="center">
-              <% if versions.include?(i) %>
-                  <img src="/images/signup.png" alt="Icon">
-              <% else %>
-                  <img src="/images/delete.png" alt="Icon">
-              <% end %>
-            </td>
-        <% end %>
-      </tr>
+            :controller  => 'review_files',
+            :action      => 'show_code_file',
+            :review_file_id => @file_id_map[filename],
+            :participant_id => @participant.id,
+            :versions => versions %>
+      </b></td>
+      <% for i in 1..@latest_version_number %>
+        <td align="center">
+          <% if versions.include?(i) %>
+            <img src="/images/signup.png" alt="Icon">
+          <% else %>
+            <img src="/images/delete.png" alt="Icon">
+          <% end %>
+        </td>
+      <% end %>
+    </tr>
   <% end %>
 </table>
 <br/>

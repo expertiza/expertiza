@@ -1,17 +1,17 @@
 <% if @found %>
-   <h1>Edit Instructor</h1>
- <% else %>
-   <h1>New Instructor</h1>
- <% end %>
+  <h1>Edit Instructor</h1>
+<% else %>
+  <h1>New Instructor</h1>
+<% end %>
 
 <%= flash[:notice] %>
 <%= form_tag 'create_instructor' do %>
   <%= render :partial => 'users/user' %>
   <% if @found %>
-   <%= submit_tag "Save", :name=>"save" %>
- <% else %>
-   <%= submit_tag "Create" %>
- <% end %>
+    <%= submit_tag "Save", :name=>"save" %>
+  <% else %>
+    <%= submit_tag "Create" %>
+  <% end %>
 <% end %>
 
 <br />

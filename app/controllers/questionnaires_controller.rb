@@ -2,7 +2,7 @@ class QuestionnairesController < ApplicationController
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
-  # Generally a questionnaire is associated with an assignment (Assignment)  
+  # Generally a questionnaire is associated with an assignment (Assignment)
 
   before_filter :authorize
 
@@ -19,7 +19,7 @@ class QuestionnairesController < ApplicationController
     questions = Question.find_all_by_questionnaire_id(params[:id])
     @questionnaire = orig_questionnaire.clone
     @questionnaire.instructor_id = session[:user].instructor_id  ## Why was TA-specific code removed here?  See Project E713.
-    @questionnaire.name = 'Copy of ' + orig_questionnaire.name
+      @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
     clone_questionnaire_details(questions)
     if (session[:user]).role.name != "Teaching Assistant"
@@ -38,8 +38,8 @@ class QuestionnairesController < ApplicationController
 
         newquestion = question.clone
         newquestion.questionnaire_id = @questionnaire.id
-        newquestion.save        
-        
+        newquestion.save
+
         advice = QuestionAdvice.find_by_question_id(question.id)
         if !(advice.nil?)
           newadvice = advice.clone
@@ -64,9 +64,9 @@ class QuestionnairesController < ApplicationController
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :back
     rescue
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!      
+      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
       redirect_to :action => 'list', :controller => 'tree_display'
-    end            
+    end
   end
 
   # Remove a given questionnaire
@@ -83,12 +83,12 @@ class QuestionnairesController < ApplicationController
             current_q_type.delete
           end
         end
-          @questionnaire.assignments.each{
-              | assignment |
-            raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
-          }
-          @questionnaire.destroy
-          undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")
+        @questionnaire.assignments.each{
+          | assignment |
+          raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+        }
+        @questionnaire.destroy
+        undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")
       rescue
         flash[:error] = $!
       end
@@ -168,29 +168,29 @@ class QuestionnairesController < ApplicationController
                 quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
               end
             else if (@question_type.q_type=="MCR")
-                   if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== i.to_s
-                     quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-                   else
-                     quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-                   end
-                 else if (@question_type.q_type=="TF")
-                        if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== 1.to_s
-                          quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"True")
-                        else
-                          quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"False")
-                        end
-                      end
-                 end
+              if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== i.to_s
+                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+              else
+                quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+              end
+            else if (@question_type.q_type=="TF")
+              if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== 1.to_s
+                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"True")
+              else
+                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"False")
+              end
             end
-            i+=1
           end
         end
-        questionnum+=1
+        i+=1
       end
-      # save
-      #save_choices @questionnaire.id
     end
-    redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid]
+    questionnum+=1
+  end
+  # save
+  #save_choices @questionnaire.id
+end
+redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid]
   end
 
   # Define a new questionnaire
@@ -228,15 +228,15 @@ class QuestionnairesController < ApplicationController
       @questionnaire.section = "Quiz"
       print "=====create_questionnaire========="
       @assignment = Assignment.find_by_id(params[:aid])
-        teams = TeamsUser.find_all_by_user_id(session[:user].id)
+      teams = TeamsUser.find_all_by_user_id(session[:user].id)
       for t in teams do
-          if Team.find_by_id_and_parent_id(t.team_id, @assignment.id)
-              if team = Team.find_by_id_and_parent_id(t.team_id, @assignment.id)
-                break
-              end
+        if Team.find_by_id_and_parent_id(t.team_id, @assignment.id)
+          if team = Team.find_by_id_and_parent_id(t.team_id, @assignment.id)
+            break
           end
         end
-        @questionnaire.instructor_id = team.id    #for a team assignment, set the instructor id to the team_id
+      end
+      @questionnaire.instructor_id = team.id    #for a team assignment, set the instructor id to the team_id
 
       @successful_create = true
       print "=====save in create_questionnaire begin========="
@@ -556,27 +556,27 @@ class QuestionnairesController < ApplicationController
                 q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
               end
             else  if(q_type=="TF")
-                    if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
-                      q = QuizQuestionChoice.new(:txt => "True", :iscorrect => "true",:question_id => question.id)
-                    else
-                      q = QuizQuestionChoice.new(:txt => "False", :iscorrect => "false",:question_id => question.id)
-                    end
-                  else
-                    if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
-                      q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
-                    else
-                      q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
-                    end
-                  end
+              if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
+                q = QuizQuestionChoice.new(:txt => "True", :iscorrect => "true",:question_id => question.id)
+              else
+                q = QuizQuestionChoice.new(:txt => "False", :iscorrect => "false",:question_id => question.id)
+              end
+            else
+              if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
+                q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
+              else
+                q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
+              end
             end
-            q.save
           end
+          q.save
         end
-        questionnum += 1
-        question.weight = 1
-        question.true_false = false
       end
+      questionnum += 1
+      question.weight = 1
+      question.true_false = false
     end
+  end
   end
 
   private
@@ -589,8 +589,8 @@ class QuestionnairesController < ApplicationController
     csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
 
     send_data csv_data,
-              :type => 'text/csv; charset=iso-8859-1; header=present',
-              :disposition => "attachment; filename=questionnaires.csv"
+      :type => 'text/csv; charset=iso-8859-1; header=present',
+      :disposition => "attachment; filename=questionnaires.csv"
   end
 
   def import

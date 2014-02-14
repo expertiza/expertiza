@@ -1,11 +1,11 @@
 <!-- PARTICIPANT -->
 <%
-   participant = pscore[:participant]
-   if pscore[:review]
-     s_max = pscore[:review][:scores][:max]
-     s_min = pscore[:review][:scores][:min]
-     s_avg = pscore[:review][:scores][:avg]
-   end
+    participant = pscore[:participant]
+if pscore[:review]
+  s_max = pscore[:review][:scores][:max]
+  s_min = pscore[:review][:scores][:min]
+  s_avg = pscore[:review][:scores][:avg]
+end
 
 %>
 
@@ -15,29 +15,29 @@
 
 <TABLE class="grades">
 
-<TR>
-  <TH WIDTH="<%=colwidth %>%">Contributor</TH>
-  <TH WIDTH="<%= colwidth %>%">Average</TH>
-  <TH WIDTH="<%= colwidth %>%">Range</TH>
-</TR>
+  <TR>
+    <TH WIDTH="<%=colwidth %>%">Contributor</TH>
+    <TH WIDTH="<%= colwidth %>%">Average</TH>
+    <TH WIDTH="<%= colwidth %>%">Range</TH>
+  </TR>
 
   <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= participant.fullname %>
-      <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
-    </FONT>
-    </TD>
+    <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
+  </FONT>
+</TD>
 <% if s_avg %>
-      <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%
+  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%
 
-      </TD>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>%
-      <% if controller.action_name != "view_my_scores" %>
-          <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
-      <% end %>
-    </TD>
+  </TD>
+  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>%
+    <% if controller.action_name != "view_my_scores" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
+    <% end %>
+  </TD>
 <% else %>
-    <TD ALIGN="CENTER">---</TD>
-    <TD ALIGN="CENTER">---</TD>
+  <TD ALIGN="CENTER">---</TD>
+  <TD ALIGN="CENTER">---</TD>
 
 <% end %>
 

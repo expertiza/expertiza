@@ -18,8 +18,8 @@ class AdviceController < ApplicationController
 
       sorted_advice = question.question_advices.sort_by { |x| -x.score }
       if question.question_advices.length != num_questions or
-          sorted_advice[0].score != @questionnaire.min_question_score or
-          sorted_advice[sorted_advice.length-1] != @questionnaire.max_question_score
+        sorted_advice[0].score != @questionnaire.min_question_score or
+        sorted_advice[sorted_advice.length-1] != @questionnaire.max_question_score
         #  The number of advices for this question has changed.
         QuestionnaireHelper::adjust_advice_size(@questionnaire, question)
       end

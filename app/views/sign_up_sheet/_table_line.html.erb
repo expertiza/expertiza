@@ -2,7 +2,7 @@
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 
 <% if @assignment.is_microtask? %>
-    <td align="center"><%= topic.micropayment %></td>
+  <td align="center"><%= topic.micropayment %></td>
 <% end %>
 
 <td align="center"><%= topic.max_choosers %></td>
@@ -12,16 +12,16 @@
 <td align="center"><%= render :partial => '/sign_up_sheet/actions', :locals => {:topic=>topic} %></td>
 
 <% if @assignment.has_partner_ads?(params[:id]) %>
- <td align="center">
-   <% signed_up_team =SignedUpUser.find_by_topic_id(topic.id)%>
-   <% if signed_up_team!=nil %>
-     <% team_id=signed_up_team.creator_id %>
+  <td align="center">
+    <% signed_up_team =SignedUpUser.find_by_topic_id(topic.id)%>
+    <% if signed_up_team!=nil %>
+      <% team_id=signed_up_team.creator_id %>
       <% if Team.find(team_id).advertise_for_partner?   %>
         <% link_to :controller => 'sign_up_sheet', :action => 'show_team', :assignment_id=>params[:id], :id=>topic.id do %>
           <i class="icon-bullhorn icon-large" style='text-decoration: none; color: black;'></i>
-               <p>advertise</p>
+          <p>advertise</p>
         <% end %>
-     <% end %>
-   <% end %>
- </td>
+      <% end %>
+    <% end %>
+  </td>
 <% end %>

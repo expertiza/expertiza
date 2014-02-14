@@ -8,7 +8,7 @@ class TopicDependency < ActiveRecord::Base
       if topic_dependency == nil
         topic_dependency = TopicDependency.new
         topic_dependency.topic_id = topic[0]
-      end      
+      end
       dependency_list = topic[1].collect{|i| i.to_i}
       topic_dependency.dependent_on = dependency_list
       topic_dependency.save

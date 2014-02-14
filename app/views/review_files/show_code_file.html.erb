@@ -1,14 +1,14 @@
 <head>
 
-<script type="text/javascript"
-        src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js">
-</script>
+  <script type="text/javascript"
+    src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js">
+  </script>
 
-<script type="text/javascript"
-        src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js">
-</script>
+  <script type="text/javascript"
+    src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js">
+  </script>
 
-<script type="text/javascript">
+  <script type="text/javascript">
 
     // Global Variables for sharing data between Javascript functions.
     isMinSelected = false;
@@ -33,19 +33,19 @@
      * inserts the comment in the database.
      */
     function ajaxSubmitComment() {
-        var commentText = document.getElementById('forminput_2');
+      var commentText = document.getElementById('forminput_2');
 
         if(!commentText.value) {
-            alert('Cannot save an empty Comment');
+          alert('Cannot save an empty Comment');
             return;
         }
 
 
         $.ajax({
-            url:'/review_files/submit_comment',
+          url:'/review_files/submit_comment',
             type:'get',
             data:{
-                file_id :file_id,
+              file_id :file_id,
                 file_offset :comment_offset,
                 comment_content :commentText.value,
                 participant_id: participant_id,
@@ -60,30 +60,30 @@
         lineNumCellDom.bgColor = "cyan";
         //-------------------------------------change in code @nimitt to color range of lines----------------------------
         for (var i = mintd;i<=maxtd;i++){
-            var tdElement = document.getElementById(i);
+          var tdElement = document.getElementById(i);
             if(tdElement != null || tdElement != undefined )
-            {
+              {
                 tdElement.style.fontWeight="900";//setAttribute('bgcolor','purple');
                 tdElement.bgColor = "cyan";
-            }
+              }
         }
         createComments(highlight_cell_id, line_number, comment_offset, file_id);
     }
     //---------------------------------------------@nimitt-----------------------------------------------------
     function ajaxSubmitComment1() {
-        var commentText = document.getElementById('forminput_3');
+      var commentText = document.getElementById('forminput_3');
 
         if(!commentText.value) {
-            alert('Cannot save an empty Comment');
+          alert('Cannot save an empty Comment');
             return;
         }
 
 
         $.ajax({
-            url:'/review_files/submit_comment',
+          url:'/review_files/submit_comment',
             type:'get',
             data:{
-                file_id :file_id,
+              file_id :file_id,
                 file_offset :comment_offset,
                 comment_content :commentText.value,
                 participant_id: participant_id,
@@ -109,19 +109,19 @@
      * Hides the comment Window and restores the colors of table cells if the reviewer did not submit the comment.
      */
     function hideCommentWindow() {
-        for (var i = mintd;i<=maxtd;i++){
-            var tdElement = document.getElementById(i);
+      for (var i = mintd;i<=maxtd;i++){
+        var tdElement = document.getElementById(i);
             if((tdElement != null || tdElement != undefined) && (tdElement.bgColor == "purple") )
-            {
+              {
                 tdElement.bgColor=oldcolorhash[i];
-            }
-        }
+              }
+      }
 
         $("#comment_window_outline").fadeOut();
         restore();
     }
     function hideAuthorCommentWindow(){
-        $("#authorComment").fadeOut();
+      $("#authorComment").fadeOut();
     }
 
     /** HELPER METHOD
@@ -130,12 +130,12 @@
      */
 
     function constructCloseWindowLink() {
-        return "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' " +
+      return "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' " +
                 "onclick='hideCommentWindow()'><img float='right' class='close_button'" +
                 "src='/images/tree_view/delete-icon-16.png' alt='Icon'></a><br>";
     }
     function constructAuthorCloseWindowLink() {
-        return "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' " +
+      return "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' " +
                 "onclick='hideAuthorCommentWindow()'><img float='right' class='close_button'" +
                 "src='/images/tree_view/delete-icon-16.png' alt='Icon'></a><br>";
     }
@@ -143,7 +143,7 @@
     // New code to handle reply by authors ----------------------------------Nimitt---------------------------------
     function createButton(i,initial,final){
 
-        $("#authorComment").fadeIn()
+      $("#authorComment").fadeIn()
 
         var commentForm1 = document.getElementById('comment_window1').innerHTML;
         var commentWindowDom1 = document.getElementById('authorComment');
@@ -161,10 +161,10 @@
     //added . Vandit.---------------------------------------------------------------------------------------------------------------
     function checkMouseDown(event,id,offset) {
 
-        // var tdElement = document.getElementById(id);
+      // var tdElement = document.getElementById(id);
         // tdElement.setAttribute('bgcolor','purple');
         if(!isMinSelected)
-        {
+          {
             isMinSelected = true;
 
             var tdElement = document.getElementById(id);
@@ -177,9 +177,9 @@
 
             //select this cell--initial
             return false;
-        }
+          }
         else
-        {
+          {
 
             maxtd = id;
             maxtd = parseInt(maxtd);
@@ -189,44 +189,44 @@
             //select this cell--initial
             isMinSelected = false;
             if (mintd != maxtd)
-            {
+              {
                 var tdElement = document.getElementById(maxtd);
                 oldcolorhash[maxtd]= tdElement.bgColor;
                 tdElement.setAttribute('bgcolor','purple');
                 if(parseInt(maxtd)<parseInt(mintd))
-                {
+                  {
                     temp = maxtd;
                     maxtd = mintd;
                     mintd = temp;
 
-                }
+                  }
 
                 for (var i = mintd+1;i<maxtd;i++){
-                    var tdElement = document.getElementById(i);
+                  var tdElement = document.getElementById(i);
                     if((tdElement != null || tdElement != undefined))
-                    {
+                      {
                         if(oldcolorhash[i]!="")
-                            oldcolorhash[i]=tdElement.bgColor;
+                          oldcolorhash[i]=tdElement.bgColor;
                         tdElement.setAttribute('bgcolor','purple');
 
-                    }
+                      }
                 }
-            }
+              }
             expandWindow();
             return true;
-        }
+          }
 
 
     }
 
     function restore() {
 
-        $('#overlay').fadeOut();
+      $('#overlay').fadeOut();
     }
 
     function expandWindow() {
 
-        $('#overlay').fadeIn();
+      $('#overlay').fadeIn();
     }
 
 
@@ -238,7 +238,7 @@
      */
 
     function constructWindowHeader(line_number) {
-        return "<b style='font-size: larger;'><u>" + "Comments for Line# " +
+      return "<b style='font-size: larger;'><u>" + "Comments for Line# " +
                 (mintd+1) + "-" + (maxtd+1) + "</u></b>" + constructCloseWindowLink();
     }
 
@@ -251,16 +251,16 @@
      *               be fetched.
      */
     function viewComments(line_number, offset, fileId) {
-        var commentWindowDom = document.getElementById('comment_window_outline');
+      var commentWindowDom = document.getElementById('comment_window_outline');
         file_id = fileId;
 
 
 
         $.ajax({
-            url:'/review_files/get_comments',
+          url:'/review_files/get_comments',
             type:'get',
             data:{
-                file_id: fileId,
+              file_id: fileId,
                 file_offset: offset,
                 line_number: line_number,
                 participant_id: participant_id,
@@ -268,7 +268,7 @@
                 final_line_number: maxtd,
                 part: participant_id_actual},
             success:function(return_value) {
-                var all_comments = return_value ?
+              var all_comments = return_value ?
                         return_value : noCommentsHtml;//"No Comments yet<br/>";
                 commentWindowDom.innerHTML = constructWindowHeader(line_number) +
                         "<br>" + all_comments;
@@ -310,17 +310,17 @@
 
 
         $.ajax({
-            url:'/review_files/get_comments',
+          url:'/review_files/get_comments',
             type:'get',
             data:{
-                file_id: fileId,
+              file_id: fileId,
                 file_offset: offset,
                 participant_id: participant_id,
                 initial_line_number: mintd,
                 final_line_number: maxtd,
                 part: participant_id_actual},
             success:function(return_value) {
-                var all_comments = return_value ?
+              var all_comments = return_value ?
                         return_value : noCommentsHtml+"<br/>";//"No Comments yet<br/>";
 
                 var commentWindowHtml = constructWindowHeader(line_num) + "<br>" +
@@ -336,50 +336,50 @@
     }
 
 
-</script>
+  </script>
 
 
-<style >
+  <style >
     .parentDisable {
-        position:absolute;
-        width:250px;
-        /*height:200px;*/
-        top:350px;    left:250px;
-        display:none;
-        padding: 6px;
-        z-index:3;
-        color: black;
-        background-color: rgba(228, 235, 233, 0.91);
-        border:1px solid black;
-        border-radius:5px;
-        -moz-border-radius:5px;
-        -webkit-border-radius:5px;
+      position:absolute;
+      width:250px;
+      /*height:200px;*/
+      top:350px;    left:250px;
+      display:none;
+      padding: 6px;
+      z-index:3;
+      color: black;
+      background-color: rgba(228, 235, 233, 0.91);
+      border:1px solid black;
+      border-radius:5px;
+      -moz-border-radius:5px;
+      -webkit-border-radius:5px;
     }
 
     a.line_number:link {
-        COLOR: black;
-        text-decoration: underline;
+      COLOR: black;
+      text-decoration: underline;
     }
     a.line_number:visited {
-        COLOR: black;
-        text-decoration: underline;
+      COLOR: black;
+      text-decoration: underline;
     }
     a.line_number:active {
-        COLOR: black;
-        text-decoration: underline;
+      COLOR: black;
+      text-decoration: underline;
     }
 
     a.line_number_hover :hover {
-        background-color: black;
-        COLOR: white;
-        text-decoration: underline;
-        font-weight: bold;
+      background-color: black;
+      COLOR: white;
+      text-decoration: underline;
+      font-weight: bold;
     }
 
     .curved {
-        -moz-border-radius:10px;
-        -webkit-border-radius:10px;
-        behavior:url(border-radius.htc);
+      -moz-border-radius:10px;
+      -webkit-border-radius:10px;
+      behavior:url(border-radius.htc);
     }
 
     td{ font-color: black; }
@@ -389,90 +389,90 @@
     .margin{ margin: 0; }
 
     #code_review_frame_div{
-        border:1;
-        width:100%;
-        height:440px;
+      border:1;
+      width:100%;
+      height:440px;
     }
 
     #version_header{
-        border:1;
-        width:100%;
-        height:28px;
-        vertical-align: middle;
+      border:1;
+      width:100%;
+      height:28px;
+      vertical-align: middle;
     }
 
     tr.highlight :hover { font-weight: bold;  }
 
     td.version_number {
-        background-color: white;
-        color: black;
-        border-left: thin solid gray;
-        border-right: thin solid gray;
-        border-top: thin solid gray;
-        border-bottom: thin solid gray;
+      background-color: white;
+      color: black;
+      border-left: thin solid gray;
+      border-right: thin solid gray;
+      border-top: thin solid gray;
+      border-bottom: thin solid gray;
     }
 
 
     td.version_number :hover {
-        font-weight: bold;
-        color: blue;
+      font-weight: bold;
+      color: blue;
     }
 
     td.current_version {
-        background-color: rgb(255, 0, 28);
-        color: black;
-        font-weight: bold;
-        border-left: thin solid black;
-        border-right: thin solid black;
-        border-top: thin solid black;
-        border-bottom: thin solid black;
+      background-color: rgb(255, 0, 28);
+      color: black;
+      font-weight: bold;
+      border-left: thin solid black;
+      border-right: thin solid black;
+      border-top: thin solid black;
+      border-bottom: thin solid black;
     }
 
     td.top_header {
-        border-bottom: thin brown;
+      border-bottom: thin brown;
     }
 
     .dashboard_header_css {
-        border-bottom: none;
-        border-left: thin solid black;
-        border-right: thin solid black;
-        border-top: thin solid black;
-        border-width: 1px;
-        color: white;
-        background-color: rgb(150, 0, 4);
+      border-bottom: none;
+      border-left: thin solid black;
+      border-right: thin solid black;
+      border-top: thin solid black;
+      border-width: 1px;
+      color: white;
+      background-color: rgb(150, 0, 4);
     }
 
     .overlay
     {
-        background-color: #000;
-        opacity: .92;
-        position: absolute; top: 0; left: 0;
-        width: 100%; height: 200%;
-        z-index: 10;
+      background-color: #000;
+      opacity: .92;
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 200%;
+      z-index: 10;
     }
 
     .dashboard_content_css{
-        border: thin solid;
-        border-width: 1px;
-        background-color: rgba(250, 3, 0, 0.12);
+      border: thin solid;
+      border-width: 1px;
+      background-color: rgba(250, 3, 0, 0.12);
     }
 
     .version_diff_header {
-        border-bottom: none;
-        border-left: thin solid black;
-        border-right:thin solid black;
-        border-top: thin solid black;
-        border-width: 1px;
-        background-color: rgb(150, 0, 4);
-        color: white;
+      border-bottom: none;
+      border-left: thin solid black;
+      border-right:thin solid black;
+      border-top: thin solid black;
+      border-width: 1px;
+      background-color: rgb(150, 0, 4);
+      color: white;
     }
 
     a.version_link {
-        color: black;
+      color: black;
     }
 
 
-</style>
+  </style>
 
 
 </head>
@@ -481,17 +481,17 @@
 <font face="courier" size="2">
 
   <script>
-      $(document).ready (
-              function() {
-                  $("#comment_window_outline").draggable();
+    $(document).ready (
+      function() {
+        $("#comment_window_outline").draggable();
                   $("#comment_window").fadeOut(0);
 
                   $("#authorComment").draggable();
                   $("#comment_window1").fadeOut(0);
 
                   $("#overlay").fadeOut(0);
-              }
-      );
+      }
+    );
   </script>
 
   </br>
@@ -516,53 +516,53 @@
 
       <% file_versions = [] %>
       <% @version_fileId_map.sort.each do |version, review_file_id| %>
-          <% file_versions << version.to_i %>
+        <% file_versions << version.to_i %>
       <% end %>
 
 
       <% for i in 0..@shareObj['linearray2'].size %>
 
-          <% @color = "lightgray" %>
-          <% line2color = "lightgreen"%>
-          <% line2_font_weight = "normal" %>
+        <% @color = "lightgray" %>
+        <% line2color = "lightgreen"%>
+        <% line2_font_weight = "normal" %>
 
-          <tr bgcolor="<%=@color%>" class="highlight" >
-
-
-            <!-- If map contains an entry for this line number then there exists -->
-            <!-- a comment of this row in the html table. -->
-            <% if @highlight_cell_right_file[i] %>
-                <% line2color = 'cyan' %>
-                <% line2_font_weight = "bold" %>
-            <%end%>
+        <tr bgcolor="<%=@color%>" class="highlight" >
 
 
-            <!-- Allow commenting on code file only if this is the most recent version -->
-            <!-- AND if current user is reviewer (i.e. != author/author's team) -->
-            <% if @shareObj['linearray2'][i].blank? %>
-                <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-right: thin solid black; vertical-align: top;">
+          <!-- If map contains an entry for this line number then there exists -->
+          <!-- a comment of this row in the html table. -->
+          <% if @highlight_cell_right_file[i] %>
+            <% line2color = 'cyan' %>
+            <% line2_font_weight = "bold" %>
+          <%end%>
+
+
+          <!-- Allow commenting on code file only if this is the most recent version -->
+          <!-- AND if current user is reviewer (i.e. != author/author's team) -->
+          <% if @shareObj['linearray2'][i].blank? %>
+            <td width="4%" id="td_new_<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ; border-right: thin solid black; vertical-align: top;">
                   <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" ><u> <pre><%=(i+1)%></pre></u></a></td>
-            <% elsif @current_review_file.version_number.to_i == file_versions.sort[-1] and session[:user].id != @participant.user_id %>
-                <td width="4%" id="<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ;  border-right: thin solid black; vertical-align: top;"  onclick="if(checkMouseDown(event,id,'<%=@shareObj['offsetarray2'][i]%>')){ createComments('<%= (i) %>','<%= (i+1) %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@current_review_file.id %>')}">
+          <% elsif @current_review_file.version_number.to_i == file_versions.sort[-1] and session[:user].id != @participant.user_id %>
+            <td width="4%" id="<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ;  border-right: thin solid black; vertical-align: top;"  onclick="if(checkMouseDown(event,id,'<%=@shareObj['offsetarray2'][i]%>')){ createComments('<%= (i) %>','<%= (i+1) %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@current_review_file.id %>')}">
                   <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)"> <u> <pre><%= (i+1) %></pre></u></a>
-                </td>
-            <% else %>
+          </td>
+        <% else %>
 
-                <td width="4%" id="<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ;  border-right: thin solid black; vertical-align: top;"  onclick="if(checkMouseDown(event,id,'<%=@shareObj['offsetarray2'][i]%>')){ viewComments('<%= (i+1) %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@current_review_file.id %>')}"  >
+          <td width="4%" id="<%=i%>" bgcolor="<%=line2color%>" style=" font-weight: <%= line2_font_weight %> ;  border-right: thin solid black; vertical-align: top;"  onclick="if(checkMouseDown(event,id,'<%=@shareObj['offsetarray2'][i]%>')){ viewComments('<%= (i+1) %>', '<%=@shareObj['offsetarray2'][i]%>', '<%=@current_review_file.id %>')}"  >
 
                   <a class="line_number line_number_hover" style="display:block;" href="javascript:void(0)" ><u> <pre><%= (i+1) %></pre></u></a>
-                </td>
-            <% end %>
+        </td>
+      <% end %>
 
-            <td width="1%"></td>
+      <td width="1%"></td>
 
-            <!-- THE ACTUAL DATA LINE -->
+      <!-- THE ACTUAL DATA LINE -->
             <td width="95%" style="vertical-align: middle;"><pre><%=@shareObj['linearray2'][i]%></pre></td>
 
-          </tr>
+    </tr>
 
-      <%end%>
-    </table>
+  <%end%>
+</table>
   </div>
 
 

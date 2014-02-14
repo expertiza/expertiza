@@ -5,14 +5,14 @@
     <th>Tag name</th>
   </tr>
 
-<% @bookmark_tags.each do |bookmark_tag| %>
-  <tr>
-    <td><%=h bookmark_tag.tag_name %></td>
-    <td><%= link_to 'Show', bookmark_tag %></td>
-    <td><%= link_to 'Edit', edit_bookmark_tag_path(bookmark_tag) %></td>
-    <td><%= link_to 'Destroy', bookmark_tag, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
+  <% @bookmark_tags.each do |bookmark_tag| %>
+    <tr>
+      <td><%=h bookmark_tag.tag_name %></td>
+      <td><%= link_to 'Show', bookmark_tag %></td>
+      <td><%= link_to 'Edit', edit_bookmark_tag_path(bookmark_tag) %></td>
+      <td><%= link_to 'Destroy', bookmark_tag, :confirm => 'Are you sure?', :method => :delete %></td>
+    </tr>
+  <% end %>
 </table>
 
 <br />

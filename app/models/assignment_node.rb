@@ -36,13 +36,13 @@ class AssignmentNode < Node
     end
 
     conditions += " and course_id = #{parent_id}"  if parent_id
-    sortvar ||= 'created_at'
+      sortvar ||= 'created_at'
     sortorder ||= 'desc'
 
     if search
       conditions += " and assignments.name LIKE ?"
       search = "%#{search}%"
-      find_conditions = [conditions, values, search]
+        find_conditions = [conditions, values, search]
     else
       find_conditions = [conditions, values]
     end
@@ -60,22 +60,22 @@ class AssignmentNode < Node
     Assignment.find(self.node_object_id).name
   end
 
-  # Gets the directory_path from the associated object  
+  # Gets the directory_path from the associated object
   def get_directory
     Assignment.find(self.node_object_id).directory_path
   end
 
-  # Gets the created_at from the associated object   
+  # Gets the created_at from the associated object
   def get_creation_date
     Assignment.find(self.node_object_id).created_at
   end
 
-  # Gets the updated_at from the associated object   
+  # Gets the updated_at from the associated object
   def get_modified_date
     Assignment.find(self.node_object_id).updated_at
   end
 
-  # Gets any TeamNodes associated with this object   
+  # Gets any TeamNodes associated with this object
   def get_teams
     TeamNode.get(self.node_object_id)
   end

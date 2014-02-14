@@ -10,7 +10,7 @@ class ContentPage < ActiveRecord::Base
 
   def self.find_for_permission(p_ids)
     where('permission_id in (?)', p_ids)
-    .order(:name)
+      .order(:name)
   end
 
   def url
@@ -24,7 +24,7 @@ class ContentPage < ActiveRecord::Base
   end
 
   before_save :setup_save
-def setup_save
+  def setup_save
     self.content_cache = markup_content
   end
 

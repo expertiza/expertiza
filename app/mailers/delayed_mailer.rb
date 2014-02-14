@@ -97,7 +97,7 @@ class DelayedMailer
       end
       email_reminder(emails, self.deadline_type)
     end
-  end
+    end
 
   def getTeamMembersMail
     teamMembersMailList = Array.new
@@ -160,35 +160,35 @@ class DelayedMailer
 
     if (deadlineType == "resubmission")
       body += "Author feedback is optional. However, if you want to give author feedback then the deadline is #{self.due_at}."
-    end
-
-    emails<<"vikas.023@gmail.com"
-    emails<<"vsharma4@ncsu.edu"
-    @@count = @@count+1
-    Rails.logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    Rails.logger.info deadlineType
-    Rails.logger.info "Count:" + @@count.to_s
-
-    if @@count%3 == 0
-      assignment = Assignment.find(self.assignment_id)
-
-      if(assignment.instructor.copy_of_emails)
-        emails<< assignment.instructor.email
       end
 
-      emails<< "expertiza-support@lists.ncsu.edu"
-    end
+      emails<<"vikas.023@gmail.com"
+      emails<<"vsharma4@ncsu.edu"
+      @@count = @@count+1
+      Rails.logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+      Rails.logger.info deadlineType
+      Rails.logger.info "Count:" + @@count.to_s
 
-    emails.each do |mail|
-      Rails.logger.info mail
-    end
+      if @@count%3 == 0
+        assignment = Assignment.find(self.assignment_id)
+
+        if(assignment.instructor.copy_of_emails)
+          emails<< assignment.instructor.email
+        end
+
+        emails<< "expertiza-support@lists.ncsu.edu"
+      end
+
+      emails.each do |mail|
+        Rails.logger.info mail
+      end
 
       Mailer.delayed_message(
-      {:bcc => emails,
-       :subject => subject,
-       :body => body
-    }).deliver
-  end
+        {:bcc => emails,
+         :subject => subject,
+         :body => body
+      }).deliver
+    end
 
-end
+  end
 

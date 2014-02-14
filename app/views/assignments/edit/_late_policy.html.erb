@@ -1,8 +1,8 @@
 <% if session[:user].role.name == "Teaching Assistant"
      user_id = Ta.get_my_instructor(session[:user].id)
-   else
-     user_id = session[:user].id
-   end %>
+else
+  user_id = session[:user].id
+end %>
 
 <table>
   <tr>
@@ -13,9 +13,9 @@
       <select name="assignment[late_policy_id]">
         <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
         <% LatePolicy.find(:all, :conditions => ['instructor_id = ?', user_id], :order => "times_used DESC").each{| late_policy | %>
-            <option value="<%=late_policy.id%>" <% if selected != nil && selected == late_policy.id %>selected="yes"<%end%>>
-                    <%=late_policy.policy_name %>
-            </option>
+          <option value="<%=late_policy.id%>" <% if selected != nil && selected == late_policy.id %>selected="yes"<%end%>>
+          <%=late_policy.policy_name %>
+          </option>
         <% } %>
       </select>
     </td>

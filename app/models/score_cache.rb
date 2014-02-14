@@ -1,5 +1,5 @@
 class ScoreCache < ActiveRecord::Base
-  
+
   ## makes an entry into score_cache table whenever a response is given/edited.
   ## handles team and individual assignments differently - for individual assignments the reviewee_id = participant.id, for team assignments, reviewee_id = team_id
   def self.update_cache(rid)
@@ -25,47 +25,47 @@ class ScoreCache < ActiveRecord::Base
     update_score_cache()
     #########################
   end
-    
+
   def self.get_team_score()
-      @ass_id = @rm.reviewed_object_id
-      @assignment1 = Assignment.find(@ass_id)
+    @ass_id = @rm.reviewed_object_id
+    @assignment1 = Assignment.find(@ass_id)
     @teammember =  TeamsUser.find(:first, :conditions => ["team_id = ?",@rm.reviewee_id])  #team which is being reviewed
-      @participant1 = AssignmentParticipant.find(:first, :conditions =>["user_id = ? and parent_id = ?", @teammember.user_id, @ass_id])
-      @contributor_id = @teammember.team_id
+    @participant1 = AssignmentParticipant.find(:first, :conditions =>["user_id = ? and parent_id = ?", @teammember.user_id, @ass_id])
+    @contributor_id = @teammember.team_id
     @questions = Hash.new
     questionnaires = @assignment1.questionnaires
     questionnaires.each{
-        |questionnaire|
+      |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     }
     team = Team.find(@contributor_id)
     @allscores = team.scores(@questions)
   end
-      
+
   def self.get_participant_score()
     @participant1 = AssignmentParticipant.find(@rm.reviewee_id) # entire tuple with info of asgnment n participant
-      @contributor_id = @participant1.id
-      @assignment1 = Assignment.find(@participant1.parent_id)
-      @ass_id = @assignment1.id
-    @questions = Hash.new    
+    @contributor_id = @participant1.id
+    @assignment1 = Assignment.find(@participant1.parent_id)
+    @ass_id = @assignment1.id
+    @questions = Hash.new
     questionnaires = @assignment1.questionnaires
     questionnaires.each{
       |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
-    } 
+    }
     @allscores = @participant1.scores( @questions) # Return scores that this participant has given
-    end
-    
+  end
+
   def self.update_score_cache()
     @p_score = 0
     @p_min = 0
     @p_max = 0
     @scorehash = get_score_set_for_review_type(@allscores, @map_type) ##isolates the scores for the particular item needed
-    
-    @p_score = @scorehash[:avg]               
+
+    @p_score = @scorehash[:avg]
     @p_min = @scorehash[:min]
     @p_max = @scorehash[:max]
-    
+
     sc = ScoreCache.find(:first,:conditions =>["reviewee_id = ? and object_type = ?",  @contributor_id, @map_type ])
     if sc == nil
       @msgs = "first entry"
@@ -74,7 +74,7 @@ class ScoreCache < ActiveRecord::Base
       range_string = ((@p_min*100).round/100.0).to_s + "-" + ((@p_max*100).round/100.0).to_s
       sc.range =    range_string
       sc.score = (@p_score*100).round/100.0
-      sc.object_type = @map_type                        
+      sc.object_type = @map_type
       sc.save
       # make another new tuple for new score
     else
@@ -84,7 +84,7 @@ class ScoreCache < ActiveRecord::Base
       #presenceflag = 2
       sc.save
       #look for a consolidated score and change
-    end               
+    end
   end
 
   def self.get_score_set_for_review_type(allscores, map_type)
@@ -94,7 +94,7 @@ class ScoreCache < ActiveRecord::Base
     #  MetareviewResponseMap - Metareview mappings
     #  TeammateReviewResponseMap - Review mapping between teammates
     #  FeedbackResponseMap - Feedback from author to reviewer
-    
+
     score_set = Hash.new
     if map_type == "ParticipantReviewResponseMap"
       if allscores[:review]
@@ -104,12 +104,12 @@ class ScoreCache < ActiveRecord::Base
       if allscores[:review]
         score_set = compute_scoreset(allscores , "review")
       end
-    
+
     elsif map_type == "TeammateReviewResponseMap"
       if allscores[:review]
         score_set = compute_scoreset(allscores , "teammate")
       end
-      
+
     elsif map_type == "MetareviewResponseMap"
       if allscores[:metareview]
         score_set = compute_scoreset(allscores , "metareview")
@@ -118,14 +118,14 @@ class ScoreCache < ActiveRecord::Base
       if allscores[:feedback]
         score_set = compute_scoreset(allscores , "feedback")
       end
-    end 
+    end
     @scoreset = Hash.new
     @scoreset[:avg] = score_set[:avg]
     @scoreset[:min] = score_set[:min]
     @scoreset[:max] = score_set[:max]
     return @scoreset
   end
- 
+
   def self.compute_scoreset(allscores , score_param)
     score_stat = Hash.new
     if score_param != nil && allscores[score_param.to_sym] != nil
@@ -144,20 +144,20 @@ class ScoreCache < ActiveRecord::Base
 
   def self.get_class_scores(pid)
 =begin
-    take average score of every student for that assignment
-    find min and max from these
-    calculate average class score for that assignment from this
+   take average score of every student for that assignment
+   find min and max from these
+   calculate average class score for that assignment from this
 
-    get number of reviews by each student for that assignment
-    calculate the average from the above data
+   get number of reviews by each student for that assignment
+   calculate the average from the above data
 
-    get number of metareviews by each student for that assignment
-    calculate the average from the above data
+   get number of metareviews by each student for that assignment
+   calculate the average from the above data
 
-1. participant_id  from the view
-2. participant ka parent_id (which is assignment_id) from participant table for that participant
-3. get all participants from participant table for that parent_id
-4. get scores for all tuples in score_caches where rewiewee_id == participants_ids from step 3 --- mapped to score_caches ka reviewee_id
+   1. participant_id  from the view
+   2. participant ka parent_id (which is assignment_id) from participant table for that participant
+   3. get all participants from participant table for that parent_id
+   4. get scores for all tuples in score_caches where rewiewee_id == participants_ids from step 3 --- mapped to score_caches ka reviewee_id
 =end
 
     @participant = AssignmentParticipant.find(pid)
@@ -193,17 +193,17 @@ class ScoreCache < ActiveRecord::Base
       #if individual_score > max_score
       #  max_score = individual_score
       #end
-    end
+  end
 
-    average_score /= participant_count if participant_count != 0
-    @result_hash = Array.new
-    @result_hash[0] = average_score
-    min_value = minmax_hash.min
-    max_value = minmax_hash.max
-    @result_hash[1]=min_value
-    @result_hash[2]=max_value
+  average_score /= participant_count if participant_count != 0
+  @result_hash = Array.new
+  @result_hash[0] = average_score
+  min_value = minmax_hash.min
+  max_value = minmax_hash.max
+  @result_hash[1]=min_value
+  @result_hash[2]=max_value
 
-    return @result_hash
+  return @result_hash
 
   end
 

@@ -1,10 +1,10 @@
 <script type="text/javascript">
   jQuery(function(){
-      // For each radio button whose name is 'content[id]':
+    // For each radio button whose name is 'content[id]':
       jQuery("input[type='radio'][value='MCR']").each(function(index, button){
-          // Give the button a certain click behaviour:
+        // Give the button a certain click behaviour:
           jQuery(button).change(function(){
-              var question_num = index + 1;
+            var question_num = index + 1;
               $('#check_boxes' + question_num).hide();
               $('#essay' + question_num).hide();
               $('#true_false' + question_num).hide();
@@ -13,9 +13,9 @@
       });
 
       jQuery("input[type='radio'][value='TF']").each(function(index, button){
-          // Give the button a certain click behaviour:
+        // Give the button a certain click behaviour:
           jQuery(button).change(function(){
-              var question_num = index + 1;
+            var question_num = index + 1;
               $('#check_boxes' + question_num).hide();
               $('#radio_buttons' + question_num).hide();
               $('#essay' + question_num).hide();
@@ -24,9 +24,9 @@
       });
 
       jQuery("input[type='radio'][value='Essay']").each(function(index, button){
-          // Give the button a certain click behaviour:
+        // Give the button a certain click behaviour:
           jQuery(button).change(function(){
-              var question_num = index + 1;
+            var question_num = index + 1;
               $('#check_boxes' + question_num).hide();
               $('#true_false' + question_num).hide();
               $('#radio_buttons' + question_num).hide();
@@ -35,9 +35,9 @@
       });
 
       jQuery("input[type='radio'][value='MCC']").each(function(index, button){
-          // Give the button a certain click behaviour:
+        // Give the button a certain click behaviour:
           jQuery(button).change(function(){
-              var question_num = index + 1;
+            var question_num = index + 1;
               $('#radio_buttons' + question_num).hide();
               $('#true_false' + question_num).hide();
               $('#essay' + question_num).hide();

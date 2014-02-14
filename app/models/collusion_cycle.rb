@@ -11,15 +11,15 @@ class CollusionCycle
     assignment_participant.get_reviewers.each do |ap|
       if ap.get_reviewers.include?(assignment_participant)
         if assignment_participant.reviews_by_reviewer(ap).nil?
-         next
+          next
         else
-         s01 = assignment_participant.reviews_by_reviewer(ap).get_total_score
+          s01 = assignment_participant.reviews_by_reviewer(ap).get_total_score
         end
 
         if ap.reviews_by_reviewer(assignment_participant).nil?
-         next
+          next
         else
-         s10 = ap.reviews_by_reviewer(assignment_participant).get_total_score
+          s10 = ap.reviews_by_reviewer(assignment_participant).get_total_score
         end
 
         collusion_cycles.push([[assignment_participant, s01], [ap, s10]])

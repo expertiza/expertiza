@@ -46,7 +46,7 @@ class Course < ActiveRecord::Base
     errors = Array.new
     error_msg = String.new
     participants.each {
-        |participant|
+      |participant|
       user = User.find(participant.user_id)
 
       begin
@@ -57,7 +57,7 @@ class Course < ActiveRecord::Base
     }
     if errors.length > 0
       errors.each {
-          |error|
+        |error|
         if error
           error_msg = error_msg+"<BR/>"+error
         end

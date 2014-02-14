@@ -49,7 +49,6 @@ class ParticipantsController < ApplicationController
       participant.delete(params[:force])
       undo_link("User \"#{name}\" has been removed as a participant successfully. ")
     rescue => error
-      # puts error.message
       url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
       url_show = url_for :action => 'delete_display', :id => params[:id], :model => participant.class.to_s.gsub("Participant","")
       url_no  = url_for :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")

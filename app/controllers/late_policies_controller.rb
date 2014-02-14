@@ -66,7 +66,6 @@ class LatePoliciesController < ApplicationController
     if (params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i)
       flash[:error] = "Max penalty cannot be less than penalty per unit."
       is_number = false
-      puts " in max"
     end
 
     @policy = LatePolicy.find_all_by_policy_name(params[:late_policy][:policy_name])
@@ -75,12 +74,10 @@ class LatePoliciesController < ApplicationController
         if p.instructor_id == user_id
           flash[:error] = "A policy with same name already exists"
           is_number = false
-          puts "same name"
           break
         end
       end
     end
-       puts is_number
     if (is_number)
       @late_policy = LatePolicy.new(params[:late_policy])
       @late_policy.instructor_id = user_id

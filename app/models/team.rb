@@ -154,10 +154,8 @@ class Team < ActiveRecord::Base
   end
 
   def import_team_members(starting_index, row)
-    puts ">>>in import_team_members, row.length = " + row.length.to_s
     index = starting_index
     while(index < row.length)
-      puts ">>> user_id:" + row[index].to_s.strip
       user = User.find_by_name(row[index].to_s.strip)
       if user.nil?
         raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"

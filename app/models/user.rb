@@ -46,7 +46,6 @@ class User < ActiveRecord::Base
   end
 
   def bookmark_added?(bmapping_id)
-    puts "in bookmark_added?***********" + bmapping_id
     Bmapping.find(:first, :conditions => ["id = #{bmapping_id} AND user_id = #{self.id}"])
   end
 

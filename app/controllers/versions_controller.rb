@@ -11,7 +11,6 @@ class VersionsController < ApplicationController
   end
 
   def deleteAll
-    puts "in delete all"
     versions = Version.all
     versions.each do |v|
       v.destroy

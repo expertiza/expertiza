@@ -5,7 +5,6 @@ class AdvertiseForPartnerController < ApplicationController
 
   #adds a new advertise for partners entry in team table...
   def new
-    puts "team #{params[:team_id]}"
   end
 
   #removes an entry from team table for corresponding team who requested to remove their advertisement for partner request

@@ -262,8 +262,6 @@ class ResponseController < ApplicationController
       @review_scores << Score.find_by_response_id_and_question_id(@map.response_id, question.id)
       @question_type << QuestionType.find_by_question_id(question.id)
     }
-    puts @question_type
-    puts @review_scores
   end
 
   def new
@@ -401,13 +399,11 @@ def custom_create ###-### Is this used?  It is not present in the master branch.
     @map.notification_accepted = false
     @map.save
     if (@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
-                                   #puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
       if (params["save_options"].nil? or params["save_options"].empty?) #default it to with metareviews
         params["save_options"] = "WithMeta"
       end
       #calling the automated metareviewer controller, which calls its corresponding model/view
       if (params[:save_options] == "WithMeta")
-        # puts "WithMeta"
         redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.map_id
       elsif (params[:save_options] == "EmailMeta")
         redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
@@ -419,7 +415,6 @@ def custom_create ###-### Is this used?  It is not present in the master branch.
         #send email to the reviewer with the metareview details
         @automated_metareview.send_metareview_metrics_email(@response, params[:id])
       elsif (params[:save_options] == "WithoutMeta")
-        # puts "WithoutMeta"
         redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
     else

@@ -103,9 +103,7 @@ class CollusionCycle
     count = 0.0
     for pivot in 0 ... cycle.size-1 do
       pivot_score = cycle[pivot][1]
-      # puts "Pivot:" + cycle[pivot][1].to_s
       for other in pivot+1 ... cycle.size do
-        # puts "Other:" + cycle[other][1].to_s
         similarity_score = similarity_score + (pivot_score - cycle[other][1]).abs
         count = count + 1.0
       end

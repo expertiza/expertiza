@@ -73,22 +73,17 @@ class LotteryController < ApplicationController
   end
 
   def choose_winner_for_topic(topic, max_team_size)
-    puts "In random selection method"
     weighted_bids = make_weighted_bid_array(topic)
     winning_bid = weighted_bids.sample
     remaining_bids = topic.bids.to_a - winning_bid.to_a
     fill_team(winning_bid.team, remaining_bids, max_team_size) if winning_bid.team.teams_users.size < max_team_size
 
     # Since we have a winner, assign this topic to that team
-    puts "Selected a winning bid: " + winning_bid.inspect + "(#{winning_bid.team.name})"
     assign_team_topic (winning_bid)
 
     # Find and delete all the bids for this team or this topic
     Bid.delete_all("team_id=#{winning_bid.team.id} OR topic_id=#{winning_bid.topic.id}")
 
-    puts "Daniel's debug section for figuring out how all this is connected"
-    #puts Participant.find_by_topic_id(topic.id).inspect
-    #puts TeamsUser.find_by_user_id(Participant.find_by_topic_id(topic.id).user_id).team.id
   end
 
   def fill_team (winning_team, team_bids, max_team_size)
@@ -250,7 +245,6 @@ class LotteryController < ApplicationController
                 bids = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,1, :order => "preference_priority_number")
 
                 if bids.size == 0
-                #puts 'no bids' do nothing
                 else if bids.size == 1
                     #if there's only one team who has chosen the topic and
                     # the team does not have any other high priority topics,

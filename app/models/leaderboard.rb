@@ -31,7 +31,6 @@ class Leaderboard < ActiveRecord::Base
   end
   
   # This method gets all tuples in the Participants table associated
-  # with a course in the courseArray and puts them into a hash structure
   # hierarchy (qtype => course => user => score)
   
   
@@ -46,7 +45,6 @@ class Leaderboard < ActiveRecord::Base
   end
   
   # This method gets all tuples in the Participants table associated
-  # with a specific assignment and puts them into a hash structure
   # hierarchy (qtype => course => user => score).
   
   
@@ -57,7 +55,6 @@ class Leaderboard < ActiveRecord::Base
   end
   
   # This method gets all tuples in the Participants table associated
-  # with an assignment in the assignmentList and puts them into a hash 
   # structure hierarchy (qtype => course => user => score).
   def self.getParticipantEntriesInAssignmentList(assignmentList)
 
@@ -184,9 +181,7 @@ class Leaderboard < ActiveRecord::Base
                    end
    	    end
     end
-    #puts "************looking at all the csEntries elements***********"
     #for csEntry in csEntries
-    #puts "csEntry -> #{csEntry.participant_id} , #{csEntry.questionnaire_id}, #{csEntry.total_score}"
     #end
     ####################### end of Code Abhishek #############
     #qtype => course => user => score
@@ -294,7 +289,6 @@ class Leaderboard < ActiveRecord::Base
                 if courseAccHash[courseID] == nil
                    courseAccHash[courseID] = Array.new
                 end
-                #puts csHash[qtypeid][courseID][userID].join(",")
                 # Add an array with accomplishment and score
                 courseAccHash[courseID] << [qtypeid, csHash[qtypeid][courseID][userID]]
            	
@@ -314,11 +308,9 @@ class Leaderboard < ActiveRecord::Base
     
     courseAccomp = Hash.new
     courseAccHash.each { |courseID, accompScoreArray|
-      # puts "Processing course #{courseID}"
        accompScoreArray.each { |accompScoreArrayEntry|
         #  pp accompScoreArrayEntry
           
-         # puts accompScoreArrayEntry[courseID][idx]
             score = accompScoreArrayEntry[1][0]
             #let me know if you can't understand this part.
             accomp = accompScoreArrayEntry[0]

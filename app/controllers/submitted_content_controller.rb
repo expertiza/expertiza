@@ -21,10 +21,7 @@ class SubmittedContentController < ApplicationController
       else if @participant.team.nil?
              #create a new team for current user before submission
              team = AssignmentTeam.create_team_and_node(@assignment.id)
-             puts "+++++@participant.user_id = "+ @participant.user_id.to_s
-             puts "+++++@assignment.id = "+ @assignment.id.to_s
              team.add_member(User.find(@participant.user_id),@assignment.id)
-             puts "+++++++++ I just create a new team!"
            end
     end
   end

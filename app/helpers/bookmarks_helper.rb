@@ -7,7 +7,6 @@ module BookmarksHelper
       unless this_tag_tuple.nil?
         @tags << this_tag_tuple
       else
-        puts " We dint find any matching for #{each_of_my_tag}"
       end
     end
     return @tags

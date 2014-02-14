@@ -308,9 +308,6 @@ class SignUpSheetController < ApplicationController
   end
 
   def signup_team(assignment_id, user_id, topic_id)
-    puts   assignment_id
-    puts   user_id
-    puts   topic_id
     users_team = SignedUpUser.find_team_users(assignment_id, user_id)
     if users_team.size == 0
       #if team is not yet created, create new team.
@@ -420,7 +417,6 @@ class SignUpSheetController < ApplicationController
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         if(@assignment.is_intelligent == 0)
-          puts 'in thisss'
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
         if slotAvailable?(topic_id)
           sign_up.is_waitlisted = false

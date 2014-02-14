@@ -16,17 +16,14 @@ class AutomatedMetareviewsController < ApplicationController
     @automated_metareview.calculate_metareview_metrics(@response, params[:id])
     if @automated_metareview.save!
       flash[:notice] = 'Automated Metareview Saved!'
-      puts "SAVED SUCESSFULLY - #{@automated_metareview.response_id}"
     else
       flash[:error] = 'Automated Metareview Not Saved'
-      puts "NOT SAVED!"
     end
     
     #fetching average metrics values
     avg_existing_metareviews = AutomatedMetareview.find_by_sql(["select avg(relevance) as relevance, avg(content_summative) as summative, 
       avg(content_problem) as problem, avg(content_advisory) as advisory, avg(tone_positive) as positive, avg(tone_negative) as negative, 
       avg(tone_neutral) as neutral, avg(quantity) as quantity from automated_metareviews where response_id <> ?", @automated_metareview.response_id])[0]
-    puts "avg_existing_metareviews #{avg_existing_metareviews}"
     if(!avg_existing_metareviews.nil?)
       #if any of the values are -ve, set them as 0 (for graph display)
       if(avg_existing_metareviews.relevance.nil? or avg_existing_metareviews.relevance < 0)
@@ -97,7 +94,6 @@ class AutomatedMetareviewsController < ApplicationController
       bc.stacked = false
       bc.data_encoding = :extended
       bc.shape_marker :circle, :color => '00ff00', :data_set_index => 0, :data_point_index => -1, :pixel_size => 10
-      #puts bc.to_url
       @graph = bc.to_url
     end
   end

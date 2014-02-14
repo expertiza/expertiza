@@ -53,7 +53,6 @@ class Assignment < ActiveRecord::Base
     contributor_set = Array.new(contributors)
     # Reject contributors that have not selected a topic, or have no submissions
     contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? }
-    puts "begin in assignment3===" + contributors.inspect
     #####contributor_set.reject! { |contributor| !contributor.has_quiz? }
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
@@ -66,12 +65,9 @@ class Assignment < ActiveRecord::Base
     ### min_quizzes = contributor.quiz_mappings.count rescue 0
     ###contributor_set.reject! { |contributor| contributor.quiz_mappings.count > min_quizzes + review_topic_threshold }
 
-    puts "in assignment.rb"+contributor_set.inspect
 
     candidate_topics = Set.new
     contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
-    puts "in assignment.rb!2"
-    #puts candidate_topics.inspect
     candidate_topics
   end
 
@@ -79,7 +75,6 @@ class Assignment < ActiveRecord::Base
   # Returns a set of topics that can be reviewed.
   # We choose the topics if one of its submissions has received the fewest reviews so far
   def candidate_topics_to_review
-    puts "I,m in assignment.rb candidata"
     return nil if sign_up_topics.empty? # This is not a topic assignment
     contributor_set = Array.new(contributors)
     # Reject contributors that have not selected a topic, or have no submissions
@@ -174,9 +169,7 @@ class Assignment < ActiveRecord::Base
     # is much simpler, and probably almost as good, given that even if the contributors are
     # picked in round-robin fashion, the reviews will not be submitted in the same order that
     # they were picked.
-     puts "in ass.rb!!yes"
     contributor_set.sample
-    #puts "in ass.rb!!yes2"
   end
 
   def quiz_taken_by?(contributor, reviewer)
@@ -401,8 +394,6 @@ class Assignment < ActiveRecord::Base
     right_id = next_due_date.send column
 
     right = DeadlineRight.find(right_id)
-    #puts "DEBUG RIGHT_ID = " + right_id.to_s
-    #puts "DEBUG RIGHT = " + right.name
     (right && (right.name == 'OK' || right.name == 'Late'))
   end
 

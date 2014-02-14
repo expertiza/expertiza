@@ -46,8 +46,6 @@
 #This function lets the user choose a particular topic. This function is invoked when the user clicks the green check mark in
 #the signup sheet
   def signup
-    puts "++++++++++++++++++++++++++++"
-    puts "you called me in signup_controller!"
 
 
     #find the assignment to which user is signing up
@@ -161,7 +159,6 @@
     #find whether assignment is team assignment
     assignment = Assignment.find(assignment_id)
     if SignedUpUser.find_by_creator_id(session[:user].id).nil?
-      puts "we have a problem"
     end
     #making sure that the drop date deadline hasn't passed
     dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})

@@ -47,7 +47,6 @@ class ReportsController < ApplicationController
   def create
     @next_action = "view"
     @map = Response.find_by_id(params[:id])     #assignment/review/metareview id is in params id
-    #puts "Values in map"+ @map.id.to_s
     @res = 0
     msg = ""
     error_msg = ""
@@ -80,7 +79,6 @@ class ReportsController < ApplicationController
     params[:responses].each_pair do |k, v|
       score = Score.create(:response_id => @response.response_id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
     end
-      puts ("helloooooo")
   rescue
     error_msg = "Your response was not saved. Cause: "
 
@@ -123,13 +121,11 @@ class ReportsController < ApplicationController
     @map.save
     #@map.assignment.id == 561 or @map.assignment.id == 559 or
     if (@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
-                                   #puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
       if (params["save_options"].nil? or params["save_options"].empty?) #default it to with metareviews
         params["save_options"] = "WithMeta"
       end
       #calling the automated metareviewer controller, which calls its corresponding model/view
       if (params[:save_options] == "WithMeta")
-        # puts "WithMeta"
         redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.map_id
       elsif (params[:save_options] == "EmailMeta")
         redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
@@ -141,7 +137,6 @@ class ReportsController < ApplicationController
         #send email to the reviewer with the metareview details
         @automated_metareview.send_metareview_metrics_email(@response, params[:id])
       elsif (params[:save_options] == "WithoutMeta")
-        # puts "WithoutMeta"
         redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
     else

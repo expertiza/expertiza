@@ -273,7 +273,6 @@ class BookmarksController < ApplicationController
       print("Chutya2")
     end
     if(@my_user == "all_users")
-      puts "rendering view"
       render :action => "view_bookmarks"
       print("Chutya3")
     else
@@ -346,14 +345,12 @@ class BookmarksController < ApplicationController
   end
 
   def create_tag_bookmark
-    puts "********************************************************"
     @tag = Tag.new(params[:tag])
     @tag.save
     @bmapping_tag = BmappingsTags.new
     @bmapping_tag.bmapping_id = params[:bmapping_id]
     @bmapping_tag.tag_id = @tag.id
     @bmapping_tag.save
-    puts "########################################################"
     redirect_to(:action =>"view", :id =>params[:bmapping_id])
   end
 
@@ -363,6 +360,5 @@ class BookmarksController < ApplicationController
     @topic = SignUpTopic.find(params[:id])
     @topic_bookmark_rating_rubric = BookmarkRatingRubric.find(@topic.bookmark_rating_rubric_id) unless @topic.bookmark_rating_rubric_id.nil?
     @search_results = params[:bookmark_id]
-        puts "*********************************"+@search_results
   end
 end

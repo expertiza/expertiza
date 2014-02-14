@@ -58,8 +58,6 @@ class CourseTeam < Team
   end
 
   def self.handle_duplicate(team, name, course_id, handle_dups)
-    puts ">>>at beginning of handle_duplicate, name = "+ name
-    puts ">>>at beginning of handle_duplicate, handle_dups = "+ handle_dups
     if team.nil? #no duplicate
       return name
     end

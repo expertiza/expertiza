@@ -44,15 +44,10 @@ class GradesController < ApplicationController
       @statistics << x
     }
 
-    puts "Participant id"
-    puts @participant.id
     @average_reviews = ScoreCache.get_reviews_average(@participant.id)
     @average_metareviews = ScoreCache.get_metareviews_average(@participant.id)
 
     @my_reviews = ScoreCache.my_reviews(@participant.id)
-
-    puts "My Reviews are"
-    puts @my_reviews
 
     @my_metareviews = ScoreCache.my_metareviews(@participant.id)
 

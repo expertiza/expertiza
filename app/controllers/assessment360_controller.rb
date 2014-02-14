@@ -7,7 +7,6 @@ class Assessment360Controller < ApplicationController
   end
 
   def one_course_all_assignments
-    puts "inside one course all assignment"
     #@REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap"]
     @REVIEW_TYPES = ["TeammateReviewResponseMap"]
     @course = Course.find_by_id(params[:course_id])
@@ -175,7 +174,6 @@ class Assessment360Controller < ApplicationController
        end
        i = i +1
      end
-     puts "\nBar Chart"
      @bc= bc.to_url
      end
     end
@@ -204,7 +202,6 @@ class Assessment360Controller < ApplicationController
        end
        i = i +1
      end
-     puts "\nBar Chart"
      @mt= bc.to_url
      end
     end

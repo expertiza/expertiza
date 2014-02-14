@@ -64,7 +64,6 @@ class StudentTeamController < ApplicationController
   end
 
   def advertise_for_partners
-      puts "team #{params[:team_id]}"
       Team.update_all("advertise_for_partner=true",:id=>params[:team_id])
       #respond_to do |format|
       #  format.html #  index.html.erb

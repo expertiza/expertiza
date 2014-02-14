@@ -70,7 +70,6 @@ class TreeDisplayController < ApplicationController
 
   def goto_bookmarkrating_rubrics
     node_object = TreeFolder.find_by_name('Bookmarkrating')
-    puts node_object.id
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to :controller => 'tree_display', :action => 'list'
   end
@@ -123,8 +122,6 @@ class TreeDisplayController < ApplicationController
     else
       @child_nodes = FolderNode.get()
     end
-
-    puts "list end #{@sortorder}"
   end
 
   def drill

@@ -88,12 +88,8 @@ class AssignmentController < ApplicationController
   def find_min_from_now(due_at)
 
 		curr_time=DateTime.now.to_s(:db)
-		#puts curr_time
 		curr_time=Time.parse(curr_time)
-		#puts curr_time
 		time_in_min=((due_at - curr_time).to_i/60)
-		#puts "inside find minutes"
-		#puts time_in_min
 		return time_in_min
   end
 	
@@ -106,37 +102,21 @@ class AssignmentController < ApplicationController
 
   ############korak##############
   def add_to_delayed_queue
-		#puts "entered add delayed queue"		
 		#get all the duedates for this assignment
 #		assignment = Assignment.find(params[:id])
 		duedates = DueDate::find_all_by_assignment_id(@assignment.id)
 		for i in (0 .. duedates.length-1)
 			deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
-			#puts deadline_type
 			due_at = duedates[i].due_at.to_datetime.to_s(:db)
-			#puts due_at
 			Time.parse(due_at)
-			#puts "due at is"			
 			due_at= Time.parse(due_at)
-			#puts due_at
 			mi=find_min_from_now(due_at).abs
 ##KORAK TEST##
-puts "&############################&"
-			puts "for deadline_type".deadline_type
-			puts "time in min for due_at"
-			puts mi
-			puts "threshold"
-			puts duedates[i].threshold
-			puts "time in min for reminder"			
-			puts mi-(duedates[i].threshold)*60
-puts "&############################&"
 ##KORAK TEST##
 
-			#puts @assignment.id
 			dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type) , 1, mi.minutes.from_now)
 			##the above enqueue method returns a delayed job object .. we store the dj.id in the DueDate db			
 			## if we want to delete it later..
-			#DEBUG puts "Delayed Job id returned"
 			#DEBUG print dj.id
 			duedates[i].update_attribute(:delayed_job_id, dj.id)
 		end
@@ -412,7 +392,6 @@ puts "&############################&"
             due_date_temp = DueDate.find(due_date_key)
 	    #korak#delete entry from delayed job table.. delete_from_delayed_queue
             delete_from_delayed_queue (due_date_temp.delayed_job_id)
-	    #puts due_date_temp.id
             due_date_temp.update_attributes(params[:due_date][due_date_key])              
             raise "Please enter a valid date & time" if due_date_temp.errors.length > 0						
           end

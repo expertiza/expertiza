@@ -75,4 +75,3 @@
 <!--<img src="<%= @graph %>"/>-->
 <a href="javascript:window.history.back()">Edit Review Again</a> <br>
 <%= link_to 'Back to Reviews List', :controller => 'student_review', :action =>'list', :id => ResponseMap.find(@automated_metareview.responses.map_id).reviewer_id %>
-<% puts "@participant.id #{ResponseMap.find(@automated_metareview.responses.map_id).reviewer_id}"%> 

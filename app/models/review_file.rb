@@ -42,7 +42,6 @@ class ReviewFile < ActiveRecord::Base
 
         max_version_num = max_member_version if max_member_version > max_version_num
       }
-    puts max_version_num
     return max_version_num
   end
 
@@ -163,9 +162,7 @@ class ReviewFile < ActiveRecord::Base
   def self.get_file(code_review_dir, version_number, base_file_name)
     filepath = code_review_dir + ReviewFilesHelper::VERSION_DIR_SUFFIX +
         version_number.to_s + '//' + base_file_name
-    puts "File path in getfile : #{filepath}"
     abc = ReviewFile.find_by_filepath(filepath)
-    puts "Abc object : #{abc}"
   end
 
   #Returns the non empty lines in the code file to be displayed on the left #

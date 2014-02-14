@@ -86,10 +86,8 @@ class AssignmentParticipant < Participant
 
   def assign_quiz(contributor,reviewer,topic)
     participant_id=AssignmentParticipant.find_by_topic_id_and_parent_id(topic, contributor.parent_id).id
-    puts "====assignquiz2==="+contributor.inspect+"==="
 
     quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
-    puts "====assignquiz3==="+quiz.inspect+"==="
     QuizResponseMap.create(:reviewed_object_id => quiz.id,:reviewee_id => contributor.id, :reviewer_id => reviewer.id,
                            :type=>"QuizResponseMap", :notification_accepted => 0)
   end

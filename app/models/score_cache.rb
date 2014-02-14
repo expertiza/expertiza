@@ -236,7 +236,6 @@ class ScoreCache < ActiveRecord::Base
 
     num_metareview_count=0.0
     assignment_num_metareviews.each{num_metareview_count = num_metareview_count + 1.0}
-    puts num_metareview_count
     @average_metareviews = num_metareview_count/count
   end
 

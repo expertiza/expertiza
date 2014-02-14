@@ -143,14 +143,11 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid] if @questionnaire == nil
     if params['save']
-      puts "save Q"
       @questionnaire.update_attributes(params[:questionnaire])
-      puts "save Q done"
       for qtypeid in params[:question_type].keys
         @question_type = QuestionType.find_by_id(qtypeid)
         @question_type.update_attributes(params[:question_type][qtypeid])
       end
-      puts "save q_type done"
       questionnum=1
       for qid in params[:new_question].keys
         @question = Question.find_by_id(qid)
@@ -163,13 +160,11 @@ class QuestionnairesController < ApplicationController
             if (@question_type.q_type=="MCC")
               if(params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][i.to_s])
                 if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][i.to_s][:iscorrect]==1.to_s
-                  puts quiz_question_choice.id.to_s+"save q_type done1"
                   quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
                 else
                   quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
                 end
               else
-                puts quiz_question_choice.id.to_s+"save q_type done2"
                 quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
               end
             else if (@question_type.q_type=="MCR")
@@ -292,7 +287,6 @@ class QuestionnairesController < ApplicationController
         if type == 'MCC' or type == 'MCR'
           correct_selected = false
           (1..4).each do |x|
-            puts params[:new_choices][i.to_s][type.to_s][x.to_s][:iscorrect]
             if params[:new_choices][i.to_s][type][x.to_s][:txt] == ''
               #Text isnt provided for an option
               valid = "Please make sure every question has text for all options"

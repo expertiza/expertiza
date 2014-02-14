@@ -206,8 +206,6 @@ class ReviewFilesController < ApplicationController
     @shareObj['offsetarray2'] = offset_array
     @highlight_cell_right_file=ReviewFile.highlightRightOffset(newer_version_comments,offset_array,file_contents)
 
-    puts "Version field map------------------------------------------------------------------------------"
-    puts @version_fileId_map
 
   end
 
@@ -333,7 +331,6 @@ class ReviewFilesController < ApplicationController
     authorflag = 0 # used to identify whether the reply to the comment button should be displayed
 
     newobj =  ReviewComment.find_all_by_review_file_id(params[:file_id]);
-    puts newobj
     ReviewComment.find_all_by_review_file_id(params[:file_id]).sort_by {|tempcomment| tempcomment[:initial_line_number]}.each {|comment|
       if (comment[:initial_line_number] <= ((params[:initial_line_number]).to_i ) and comment[:last_line_number] >= ((params[:final_line_number]).to_i)) or
           (comment[:initial_line_number] >= ((params[:initial_line_number]).to_i ) and comment[:initial_line_number] <= ((params[:final_line_number]).to_i)) or
@@ -373,7 +370,6 @@ class ReviewFilesController < ApplicationController
         i=i+1
       end}
 
-    puts comments_in_table;
     comments_in_table += "</table>"
     respond_to do |format|
       format.js { render :json => comments_in_table }

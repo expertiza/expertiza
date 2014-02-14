@@ -128,19 +128,16 @@ class Bookmark < ActiveRecord::Base
                              ## for every word, search for every bookmark that was tagged with that word. Then take the intersection of all the bmapping_ids
     first_time = "true"
     for each_tag in @tags
-      puts "for tag name -> #{each_tag.tagname}"
 
       q_tuples = BmappingsTags.find(:all, :conditions =>["tag_id = ?", each_tag])
 
       if first_time == "true"
-        puts "first time = #{first_time}"
         for q_t in q_tuples
           @q_tuples_with_all_tags << q_t.bmapping_id
         end
 
         first_time = "false"
       else
-        puts "first time = #{first_time}"
         temp_array = Array.new
         for q_t in q_tuples
           temp_array << q_t.bmapping_id
@@ -193,23 +190,18 @@ class Bookmark < ActiveRecord::Base
     @q_tuples_with_all_tags = Array.new
     first_time = "true"
     for each_tag in @tags
-      puts "for tag name -> #{each_tag.tagname}"
       ##search for all qualifier tuples with b
       q_tuples = BmappingsTags.find(:all, :conditions =>["tag_id = ?", each_tag])
-      puts "printing out q_tuples"
       for q_t in q_tuples
-        puts q_t.bmapping_id
       end
 
       if first_time == "true"
-        puts "first time = #{first_time}"
         for q_t in q_tuples
           @q_tuples_with_all_tags << q_t.bmapping_id
         end
 
         first_time = "false"
       else
-        puts "first time = #{first_time}"
         temp_array = Array.new
         for q_t in q_tuples
           temp_array << q_t.bmapping_id
@@ -218,7 +210,6 @@ class Bookmark < ActiveRecord::Base
       end
     end
 
-    puts @q_tuples_with_all_tags
 
     ## now you have qualifer tuples with all the required bmapping ids - search for the req ones
     temp_result_records =  Bmapping.find(:all, :conditions =>["id in (?) and user_id = ?", @q_tuples_with_all_tags,this_user_id ])

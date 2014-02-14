@@ -79,8 +79,6 @@ class AssignmentTeam < Team
   end
 
   def self.handle_duplicate(team, name, assignment_id, handle_duplicates)
-    puts ">>>at beginning of handle_duplicate, name = "+ name
-    puts ">>>at beginning of handle_duplicate, handle_duplicates = "+ handle_duplicates
     return name if team.nil? #no duplicate
 
     if handle_duplicates == "ignore" #ignore: do not create the new team

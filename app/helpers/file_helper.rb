@@ -31,7 +31,6 @@ module FileHelper
         create_directory_from_path(newpath)    
       end
     rescue
-      puts $!
     end
   end
   
@@ -69,9 +68,7 @@ module FileHelper
         FileUtils.mkdir_p(in_object.get_path)
       end
     rescue PathError
-      puts $!
     rescue
-      puts $!
       raise "An error was encountered while creating this directory: "+$!
     end   
   end  
@@ -82,9 +79,7 @@ module FileHelper
         FileUtils.mkdir_p(path)
       end
     rescue PathError
-      puts $!
     rescue
-      puts $!
       raise "An error was encountered while creating this directory: "+$!
     end   
   end   

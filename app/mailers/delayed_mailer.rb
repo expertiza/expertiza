@@ -33,14 +33,14 @@ class DelayedMailer
       end
 
       if(self.deadline_type == "drop_topic")
-        sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', self.assignment_id])
+        sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
         if(sign_up_topics != nil && sign_up_topics.count != 0)
           mail_signed_up_users #reminder to signed_up users of the assignment
         end
       end
 
       if(self.deadline_type == "signup")
-        sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', self.assignment_id])
+        sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
         if(sign_up_topics != nil && sign_up_topics.count != 0)
           mail_assignment_participants #reminder to all participants
         end
@@ -62,7 +62,7 @@ class DelayedMailer
   def mail_signed_up_users
     emails = Array.new
     assignment = Assignment.find(self.assignment_id)
-    sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', self.assignment_id])
+    sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
 
     # If there are sign_up topics for an assignement then send a mail toonly signed_up_users else send a mail to all participants
     if(sign_up_topics == nil || sign_up_topics.count == 0)
@@ -77,7 +77,7 @@ class DelayedMailer
       end
     else
       for topic in sign_up_topics
-        signedUpUsers = SignedUpUser.find(:all, :conditions => ['topic_id = ?', topic.id])
+        signedUpUsers = SignedUpUser.where( ['topic_id = ?', topic.id])
         unless assignment.team_assignment?
           for signedUser in signedUpUsers
             uid  = signedUser.creator_id
@@ -102,9 +102,9 @@ class DelayedMailer
   def getTeamMembersMail
     teamMembersMailList = Array.new
     assignment = Assignment.find(self.assignment_id)
-    teams = Team.find(:all, :conditions => ['parent_id = ?', self.assignment_id])
+    teams = Team.where( ['parent_id = ?', self.assignment_id])
     for team in teams
-      team_participants = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
+      team_participants = TeamsUser.where( ['team_id = ?', team.id])
       for team_participant in team_participants
         user = User.find(team_participant.user_id)
         teamMembersMailList << user.email
@@ -116,12 +116,12 @@ class DelayedMailer
   def mail_metareviewers
     emails = Array.new
     #find reviewers for the assignment
-    reviewer_tuples = ResponseMap.find(:all, :conditions => ['reviewed_object_id = ? AND (type = "ParticipantReviewResponseMap" OR type = "TeamReviewResponseMap")', self.assignment_id])
+    reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND (type = "ParticipantReviewResponseMap" OR type = "TeamReviewResponseMap")', self.assignment_id])
     for reviewer in reviewer_tuples
       #find metareviewers - people who will review the reviewers
-      meta_reviewer_tuples = ResponseMap.find(:all, :conditions => ['reviewed_object_id = ? AND type = "MetareviewResponseMap"', reviewer.id])
+      meta_reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND type = "MetareviewResponseMap"', reviewer.id])
       for metareviewer in meta_reviewer_tuples
-        participant = Participant.find(:first, :conditions => ['parent_id = ? AND id = ?', self.assignment_id, metareviewer.reviewer_id])
+        participant = Participant.where( ['parent_id = ? AND id = ?', self.assignment_id, metareviewer.reviewer_id])
         uid  = participant.user_id
         user = User.find(uid)
         emails << user.email
@@ -132,9 +132,9 @@ class DelayedMailer
 
   def mail_reviewers
     emails = Array.new
-    reviewer_tuples = ResponseMap.find(:all, :conditions => ['reviewed_object_id = ? AND (type = "ParticipantReviewResponseMap" OR type = "TeamReviewResponseMap")', self.assignment_id])
+    reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND (type = "ParticipantReviewResponseMap" OR type = "TeamReviewResponseMap")', self.assignment_id])
     for reviewer in reviewer_tuples
-      participant = Participant.find(:first, :conditions => ['parent_id = ? AND id = ?', self.assignment_id, reviewer.reviewer_id])
+      participant = Participant.where( ['parent_id = ? AND id = ?', self.assignment_id, reviewer.reviewer_id])
       uid  = participant.user_id
       user = User.find(uid)
       emails << user.email

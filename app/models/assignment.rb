@@ -382,9 +382,15 @@ class Assignment < ActiveRecord::Base
     drop_topic_deadline_id = DeadlineType.find_by_name('drop_topic').id
     self.staggered_deadline? ?
       topic_id ?
-      next_due_date = TopicDeadline.find(:first, :conditions => ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id], :order => 'due_at') :
-      next_due_date = TopicDeadline.find(:first, :conditions => ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id], :joins => {:topic => :assignment}, :order => 'due_at') :
-      next_due_date = DueDate.find(:first, :conditions => ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id], :order => 'due_at')
+      next_due_date = TopicDeadline
+      .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id])
+      .order('due_at') :
+    next_due_date = TopicDeadline
+      .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
+      .joins( {:topic => :assignment}, :order => 'due_at') :
+    next_due_date = DueDate
+      .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
+      .order('due_at')
 
     return false if next_due_date.nil?
 
@@ -418,7 +424,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_quiz_deadline
-    return (DueDate.find(:first, :conditions => ['assignment_id = ? and deadline_type_id >= ?', self.id, 7]).due_at)
+    return (DueDate.where( ['assignment_id = ? and deadline_type_id >= ?', self.id, 7]).due_at)
   end
 
   def delete(force = nil)
@@ -597,7 +603,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id=nil)
-    due_dates = self.staggered_deadline? ?  TopicDeadline.find(:all, :conditions => ['topic_id = ?', topic_id], :order => 'due_at DESC') : DueDate.find(:all, :conditions => ['assignment_id = ?', self.id], :order => 'due_at DESC')
+    due_dates = self.staggered_deadline? ?  TopicDeadline.where( ['topic_id = ?', topic_id], :order => 'due_at DESC') : DueDate.where( ['assignment_id = ?', self.id]).order('due_at DESC')
     if due_dates != nil && due_dates.size > 0
       if Time.now > due_dates[0].due_at
         return 'Finished'
@@ -633,19 +639,19 @@ class Assignment < ActiveRecord::Base
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
   def compute_reviews_hash
     review_questionnaire_id = get_review_questionnaire_id()
-    @questions = Question.find(:all, :conditions => ['questionnaire_id = ?', review_questionnaire_id])
+    @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
     @review_scores = Hash.new
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @response_type = 'TeamReviewResponseMap'
 
-    @myreviewers = ResponseMap.find(:all, select: 'DISTINCT reviewer_id', conditions: ['reviewed_object_id = ? && type = ? ', self.id, @type])
+    @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @type])
 
-    @response_maps = ResponseMap.find(:all, conditions: ['reviewed_object_id = ? && type = ?', self.id, @response_type])
+    @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
 
     @response_maps.each do |response_map|
       # Check if response is there
-      @corresponding_response = Response.find(:first, conditions: ['map_id = ?', response_map.id])
+      @corresponding_response = Response.where(['map_id = ?', response_map.id])
       @respective_scores = Hash.new
       @respective_scores = @review_scores[response_map.reviewer_id] if @review_scores[response_map.reviewer_id] != nil
 
@@ -663,7 +669,7 @@ class Assignment < ActiveRecord::Base
 
   def get_review_questionnaire_id
     @revqids = []
-    @revqids = AssignmentQuestionnaire.find(:all, :conditions => ['assignment_id = ?', self.id])
+    @revqids = AssignmentQuestionnaire.where(['assignment_id = ?', self.id])
     @revqids.each do |rqid|
       rtype = Questionnaire.find(rqid.questionnaire_id).type
       @review_questionnaire_id = rqid.questionnaire_id if rtype == 'ReviewQuestionnaire'
@@ -677,9 +683,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_next_stage()
-    due_dates = DueDate.find(:all,
-                             :conditions => ['assignment_id = ?', self.id],
-                             :order => 'due_at DESC')
+    due_dates = DueDate.where( ['assignment_id = ?', self.id]).order('due_at DESC')
 
     if due_dates != nil and due_dates.size > 0
       if Time.now > due_dates[0].due_at

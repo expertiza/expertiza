@@ -2,31 +2,7 @@ Soon-to-be-deprecated ActiveRecord calls
 Methods such as find(:all), find(:first), finds with conditions, and the :joins option will soon be deprecated.
 More information: http://m.onkey.org/2010/1/22/active-record-query-interface
 
-The culprits: 
-	- app//controllers/assignment_signups_controller.rb
-	- app//controllers/assignments_controller.rb
-	- app//controllers/bookmarks_controller.rb
-	- app//controllers/content_pages_controller.rb
-	- app//controllers/popup_controller.rb
-	- app//controllers/questionnaires_controller.rb
-	- app//controllers/questions_controller.rb
-	- app//controllers/response_controller.rb
-	- app//controllers/review_mapping_controller.rb
-	- app//controllers/sign_up_sheet_controller.rb
-	- app//controllers/signup_controller.rb
-	- app//controllers/site_controllers_controller.rb
-	- app//controllers/statistics_controller.rb
-	- app//controllers/student_task_controller.rb
-	- app//controllers/student_task_controller.rb~
-	- app//controllers/student_team_controller.rb
-	- app//controllers/survey_controller.rb
-	- app//controllers/survey_deployment_controller.rb
-	- app//controllers/survey_response_controller.rb
-	- app//controllers/system_settings_controller.rb
-	- app//controllers/users_controller.rb
-	- app//controllers/versions_controller.rb
-	- app//helpers/assignment_helper.rb
-	- app//helpers/assignments_helper.rb
+The culprits:
 	- app//helpers/dynamic_review_mapping.rb
 	- app//helpers/leaderboard_helper.rb
 	- app//helpers/participants_helper.rb

@@ -84,6 +84,7 @@ class Assignment < ActiveRecord::Base
         contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' ||
         contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'submission'
     end
+
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }

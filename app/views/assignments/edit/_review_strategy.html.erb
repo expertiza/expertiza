@@ -29,4 +29,31 @@
       <%= text_field_tag('assignment[max_reviews_per_submission]', @assignment.max_reviews_per_submission, {:style => 'width:75px'}) %>
     </td>
   </tr>
+
+  <tr>
+    <td>Offset: </td>
+    <td><%= text_field :assigned, :thresh, :size=>10, :value=>20 %></td>
+  </tr>
+  <tr>
+    <td>Redistribution Factor: </td>
+    <td><%= text_field :assigned, :rfactor, :size=>10, :value=>0.5 %></td>
+  </tr>
+  <tr>
+    <td>Maximum Deductable Points:  </td>
+    <td> <%= text_field :assigned, :mpd, :size=>10, :value=>10 %></td>
+  </tr>
+  <tr>
+    <td>use class average score as hardline?</td>
+    <td><%= check_box :assigned, :ifclass, {}, true, false %></td>
+  </tr>
+  <tr>
+    <td>Hardline: </td>
+    <td><%= text_field :assigned, :hardline, :size=>10, :value=>85 %></td>
+  </tr>
+
+
+
+
+
+
 </table>

@@ -47,7 +47,7 @@
 
 <p>
   <%
-      session[:return_to] = request.request_uri
+      session[:return_to] = "#{request.protocol}#{request.host_with_port}#{request.fullpath}"
     %>
 
   <%= link_to 'New User', :action => 'new' %> |

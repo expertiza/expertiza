@@ -62,6 +62,9 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.integer  "num_quiz_questions",                :default => 0,     :null => false
     t.boolean  "is_coding_assignment"
     t.boolean  "is_intelligent"
+    t.integer  "selfreview_questionnaire_id"
+    t.integer  "managerreview_questionnaire_id"
+    t.integer  "readerreview_questionnaire_id"
     t.boolean  "calculate_penalty",                 :default => false, :null => false
     t.integer  "late_policy_id"
     t.boolean  "is_penalty_calculated",             :default => false, :null => false
@@ -160,9 +163,6 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.integer "deadline_type_id"
     t.integer "penalty_points"
   end
-
-  add_index "calculated_penalties", ["deadline_type_id"], :name => "fk_deadline_type_id"
-  add_index "calculated_penalties", ["participant_id"], :name => "fk_participant_id"
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :null => false
@@ -333,6 +333,16 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.integer "assignment_id",                    :default => 0, :null => false
   end
 
+  create_table "participant_team_roles", :force => true do |t|
+    t.integer  "role_assignment_id"
+    t.integer  "participant_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "participant_team_roles", ["participant_id"], :name => "fk_participant_id"
+  add_index "participant_team_roles", ["role_assignment_id"], :name => "fk_role_assignment_id"
+
   create_table "participants", :force => true do |t|
     t.boolean  "submit_allowed",                      :default => true
     t.boolean  "review_allowed",                      :default => true
@@ -349,6 +359,7 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
     t.integer  "topic_id"
     t.datetime "time_stamp"
     t.text     "digital_signature"
+    t.string   "special_role"
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
@@ -633,6 +644,45 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
   create_table "tags", :force => true do |t|
     t.string "tagname", :null => false
   end
+
+  create_table "team_role_questionnaire", :force => true do |t|
+    t.integer  "team_roles_id"
+    t.integer  "questionnaire_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "team_role_questionnaire", ["questionnaire_id"], :name => "fk_questionnaire_id"
+  add_index "team_role_questionnaire", ["team_roles_id"], :name => "fk_team_roles_id"
+
+  create_table "team_roles", :force => true do |t|
+    t.string  "role_names"
+    t.integer "questionnaire_id"
+  end
+
+  add_index "team_roles", ["questionnaire_id"], :name => "fk_team_roles_questionnaire"
+
+  create_table "team_rolesets", :force => true do |t|
+    t.string "roleset_name"
+  end
+
+  create_table "team_rolesets_maps", :force => true do |t|
+    t.integer  "team_rolesets_id"
+    t.integer  "team_role_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "team_rolesets_maps", ["team_role_id"], :name => "fk_team_role_id"
+  add_index "team_rolesets_maps", ["team_rolesets_id"], :name => "fk_team_rolesets_id"
+
+  create_table "teamrole_assignment", :force => true do |t|
+    t.integer "team_roleset_id"
+    t.integer "assignment_id"
+  end
+
+  add_index "teamrole_assignment", ["assignment_id"], :name => "fk_teamrole_assignment_assignments"
+  add_index "teamrole_assignment", ["team_roleset_id"], :name => "fk_teamrole_assignment_team_rolesets"
 
   create_table "teams", :force => true do |t|
     t.string  "name"

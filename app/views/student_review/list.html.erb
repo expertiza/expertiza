@@ -9,7 +9,7 @@
     <% elsif @assignment.review_assignment_strategy == Assignment::RS_STUDENT_SELECTED %>
       <%= render :partial => 'set_self_review', :locals => {:assignment => @assignment} %>
     <% end %>
-    <% #end %>
+	  <% end %>
   <% end %>
 <% else %>
   <p><em>Reviews cannot be performed at this time</em></p>

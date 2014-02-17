@@ -5,10 +5,6 @@ class CreateCalculatedPenalties < ActiveRecord::Migration
       t.column "deadline_type_id", :integer
       t.column "penalty_points", :integer
     end
-
-    execute "ALTER TABLE calculated_penalties ADD CONSTRAINT `fk_participant_id` FOREIGN KEY (participant_id) REFERENCES participants(id);"
-    execute "ALTER TABLE calculated_penalties ADD CONSTRAINT `fk_deadline_type_id` FOREIGN KEY (deadline_type_id) REFERENCES deadline_types(id);"
-
   end
 
   def self.down

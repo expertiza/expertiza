@@ -9,10 +9,21 @@
 </script>
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 <% if !@map.contributor.nil?   %>
+
+    <%if @map.assignment.team_assignment?
+               team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
+                topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id,team_member).topic_id
+          else%>
+                <% topic_id = Participant.find(@map.contributor).topic_id%>
+          <%end%>
+
+
   <% if !@topic_id.nil? %>
     <h2>You are reviewing <%= @signedUpTopic %></h2>
   <% end %>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage =>  @assignment.get_current_stage()} %>
+
+</hr>
 <% end %>
 
 <%= @map.show_review() %>

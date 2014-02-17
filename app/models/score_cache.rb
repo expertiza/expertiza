@@ -19,11 +19,137 @@ class ScoreCache < ActiveRecord::Base
     @t_max = 0
     if @map_type == "TeamReviewResponseMap"
       get_team_score()
+      tm_id=@contributor_id
     else
       get_participant_score()
+      part = Participant.find(:first, :conditions => ["id = ?", @rm.reviewee_id])
+      tm_user=TeamsUser.find(:first, :conditions => ["user_id = ?", part.user_id])
+      tm_id=tm_user.team_id
     end
     update_score_cache()
     #########################
+                                            # From here on to the end of this method is the algorithm of
+                                            # score redistribution, for detailed algorithm, please check
+                                            # the project documentation
+    tm_user_ct = TeamsUser.count(:all, :conditions => ["team_id = ?", tm_id])
+    tm_rv_ct = ScoreCache.count(:all, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "TeammateReviewResponseMap"])
+    sc_proj = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "TeamReviewResponseMap"])
+
+    if tm_user_ct == tm_rv_ct and sc_proj != nil
+
+      sc_cls = ScoreCache.find(:all, :conditions => ["object_type = ?", "TeammateReviewResponseMap"])
+      ct_cls = ScoreCache.count(:all, :conditions => ["object_type = ?", "TeammateReviewResponseMap"])
+
+      tm_rv_all = ScoreCache.find(:all, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "TeammateReviewResponseMap"])
+
+
+      avg_cls = 0
+      sc_cls.each{|item| (avg_cls += item.score) if item}
+      avg_cls /= ct_cls if ct_cls
+
+      avg_tm = 0
+      tm_max = 0
+      tm_rv_all.each do |item|
+
+        endavg_tm += item.score if item
+        if item.score >tm_max
+          tm_max = item.score
+        end
+      end
+      avg_tm /= tm_user_ct  #avg_tm the average teammate review score of this team
+
+
+      threshold = avg_tm  # the line of score to determine if a student needs to be punished or rewarded
+      hardline = 85 # when the average of the whole team's teammate review is lower than the hardline but some of the students' teammate reviews are higher than hardline, hardline is used as threshold
+      offset = 20 # determines how much points below the line begins the punishment
+      rate = 0.5 # each point below threshold - offset will deduct the team review score of the student by 'rate'
+      max_deduct = 10 # maximum deducted score a student could have
+      use_cls = 0  # if the class average of teammate review score is used as the hardline
+      if sc_th = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"HardLine"])
+        hardline = sc_th.score
+      end
+      if sc_off = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"Threshold"])
+        offset = sc_off.score
+      end
+      if sc_rate = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"RedisFactor"])
+        rate = sc_rate.score
+      end
+      if sc_max = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"MaxDeduct"])
+        max_deduct = sc_max.score
+      end
+      if sc_ifcls = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"IfClass"])
+        use_cls = sc_ifcls.score
+      end
+
+      if use_cls
+        hardline = avg_cls
+      end
+
+      if avg_tm < hardline and tm_max > hardline
+        threshold = hardline
+      end
+
+      score_pool = 0
+      total_plus = 0
+
+      tm_rv_all.each do |item|
+        teamrvsc = item.score
+        if teamrvsc < (threshold - offset)
+          sc_mod = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and reviewee_id = ? and object_type = ?", tm_id, item.reviewee_id, "ModifiedAssignmentScore"])
+          if sc_mod == nil
+            sc_mod = ScoreCache.new
+          end
+          if (threshold - offset - teamrvsc)*rate <= max_deduct
+            sc_mod.score = sc_proj.score - (threshold - offset - teamrvsc)*rate
+            score_pool += (threshold - offset - teamrvsc)*rate
+          else
+            sc_mod.score = sc_proj.score - max_deduct
+            score_pool += max_deduct
+          end
+          sc_mod.range = sc_mod.score
+          sc_mod.object_type = "ModifiedAssignmentScore"
+          sc_mod.reviewee_id = item.reviewee_id
+          #sc_mod.team_id = tm_id
+          sc_mod.save
+
+
+        elsif teamrvsc > threshold
+          total_plus += (teamrvsc - threshold)
+        else
+          sc_mod = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and reviewee_id = ? and object_type = ?", tm_id, item.reviewee_id, "ModifiedAssignmentScore"])
+          if sc_mod == nil
+            sc_mod = ScoreCache.new
+          end
+          sc_mod.score = sc_proj.score
+          sc_mod.range = sc_mod.score
+          sc_mod.object_type = "ModifiedAssignmentScore"
+          sc_mod.reviewee_id = item.reviewee_id
+          #sc_mod.team_id = tm_id
+          sc_mod.save
+        end
+      end
+
+      tm_rv_all.each do |item|
+        teamrvsc = item.score
+        if teamrvsc > threshold
+          sc_mod = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and reviewee_id = ? and object_type = ?", tm_id, item.reviewee_id, "ModifiedAssignmentScore"])
+          if sc_mod == nil
+            sc_mod = ScoreCache.new
+          end
+
+          sc_mod.score = sc_proj.score + score_pool*(teamrvsc - threshold)/total_plus
+          sc_mod.range = sc_mod.score
+          sc_mod.object_type = "ModifiedAssignmentScore"
+          sc_mod.reviewee_id = item.reviewee_id
+          #sc_mod.team_id = tm_id
+          sc_mod.save
+        end
+      end
+
+    end
+
+    score_all = ScoreCache.find(:all, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "ModifiedAssignmentScore"])
+    ##################end###########################
   end
 
   def self.get_team_score()

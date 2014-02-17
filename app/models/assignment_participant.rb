@@ -256,7 +256,7 @@ class AssignmentParticipant < Participant
       scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
       scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
-    scores[:total_score] = assignment.compute_total_score(scores)
+    scores[:total_score] = self.assignment.compute_total_score(scores)
 
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
@@ -334,7 +334,7 @@ class AssignmentParticipant < Participant
 
 
   def get_hyperlinks
-    team.try :get_hyperlinks
+    team.try(:get_hyperlinks) || []
   end
   alias_method :hyperlinks, :get_hyperlinks
 

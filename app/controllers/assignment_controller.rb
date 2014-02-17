@@ -235,7 +235,6 @@ class AssignmentController < ApplicationController
           @wiki_types = WikiType.all
           render :action => 'new'
         end
-
       else
         @wiki_types = WikiType.all
         render :action => 'new'

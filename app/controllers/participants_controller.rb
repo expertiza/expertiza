@@ -17,6 +17,9 @@ class ParticipantsController < ApplicationController
     @parent = Object.const_get(params[:model]).find(params[:id])
     @participants = @parent.participants
     @model = params[:model]
+    # E726 Fall2012 Changes Begin
+        @special_role = params[:special_role]
+        # E726 Fall2012 Changes End
   end
 
   #OSS_808 change 28th oct

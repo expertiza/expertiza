@@ -16,7 +16,7 @@ module LeaderboardHelper
   # This method converts the questionnaire_type to a
   # sensible string for the Leaderboard table.
   def self.getAchieveName(qtype)
-    achieveName = Leaderboard.find(:first , :conditions =>[ "qtype like ?",qtype]).name
+    achieveName = Leaderboard.where([ "qtype like ?",qtype]).name
 
   end
 
@@ -68,7 +68,7 @@ module LeaderboardHelper
   # Returns list of course ids in which the student has an assignment
   def self.studentInWhichCourses(userid)
     # Get all entries in Participant table for user
-    assignPartList = AssignmentParticipant.find(:all, :conditions =>["user_id =?",userid])
+    assignPartList = AssignmentParticipant.where(["user_id =?",userid])
     @courseList = Array.new
 
     for participantEntry in assignPartList
@@ -91,8 +91,7 @@ module LeaderboardHelper
   # This method assumes the instructor_id in the Courses table indicates
   # the courses an instructor is managing.
   def self.instructorCourses(userid)
-    courseTuples = Course.find(:all,
-                               :conditions => ['instructor_id = ?', userid])
+    courseTuples = Course.where( ['instructor_id = ?', userid])
 
     @courseList = Array.new
     courseTuples.each { |course| @courseList << course.id }
@@ -126,7 +125,7 @@ module LeaderboardHelper
   # a concern about accuracy of leaderboard results.
   def self.dumpCSTable
     @expList = Array.new
-    @csEntries = ComputedScore.find(:all)
+    @csEntries = ComputedScore.all
     @csEntries.each { |csEntry|
       participant = AssignmentParticipant.find(csEntry.participant_id)
       questionnaire = Questionnaire.find(csEntry.questionnaire_id)

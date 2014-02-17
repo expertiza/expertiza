@@ -221,7 +221,7 @@ class SignUpSheetController < ApplicationController
       #participants(people who are doing this assignment) and signed up users (people who have chosen a topic (confirmed or waitlisted)
       def load_add_signup_topics(assignment_id)
         @id = assignment_id
-        @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', assignment_id])
+        @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', assignment_id])
         @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
         @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 
@@ -252,7 +252,7 @@ class SignUpSheetController < ApplicationController
 
       def list
         @assignment_id = params[:id]
-        @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', params[:id]])
+        @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]])
         @slots_filled = SignUpTopic.find_slots_filled(params[:id])
         @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
         @show_actions = true

@@ -23,7 +23,7 @@ module AssignmentHelper
   end
 
   def questionnaire_options(assignment, type)
-    questionnaires = Questionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?', assignment.instructor_id], :order => 'name')
+    questionnaires = Questionnaire.where( ['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
     options = Array.new
     questionnaires.select { |x| x.type == type }.each do |questionnaire|
       options << [questionnaire.name, questionnaire.id]

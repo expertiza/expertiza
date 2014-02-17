@@ -14,7 +14,7 @@ class SystemSettingsController < ApplicationController
     :redirect_to => { :action => :list }
 
   def list
-    @system_settings = SystemSettings.find(:first)
+    @system_settings = SystemSettings.first
     redirect_to :action => :show, :id => @system_settings
 
     # @system_settings_pages, @system_settings = paginate :system_settings,
@@ -23,11 +23,11 @@ class SystemSettingsController < ApplicationController
 
   def show
     foreign()
-    @system_settings = SystemSettings.find(:first)
+    @system_settings = SystemSettings.first
   end
 
   def new
-    @system_settings = SystemSettings.find(:first)
+    @system_settings = SystemSettings.first
     if @system_settings != nil
       redirect_to :action => :edit, :id => @system_settings.id
     else
@@ -69,9 +69,9 @@ class SystemSettingsController < ApplicationController
   protected
 
   def foreign
-    @roles = Role.find(:all, :order => 'name')
-    @pages = ContentPage.find(:all, :order => 'name')
-    @markup_styles = MarkupStyle.find(:all, :order => 'name')
+    @roles = Role.order('name')
+    @pages = ContentPage.order('name')
+    @markup_styles = MarkupStyle.order('name')
     @markup_styles.unshift MarkupStyle.new(:id => nil, :name => '(none)')
   end
 

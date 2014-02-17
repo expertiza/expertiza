@@ -33,7 +33,7 @@ class StatisticsController < ApplicationController
       total_question_response=SurveyResponse.find_all_by_survey_deployment_id_and_question_id(sd_id1,q.id).length
       for i in @survey.min_question_score..@survey.max_question_score
         if(total_question_response>0)
-          @num_responses1[q.id][i]=(SurveyResponse.find(:all,:conditions=>["survey_deployment_id=? and question_id=? and score=?",sd_id1,q.id,i]).length.to_f/total_question_response)
+          @num_responses1[q.id][i]=(SurveyResponse.where(["survey_deployment_id=? and question_id=? and score=?",sd_id1,q.id,i]).length.to_f/total_question_response)
         else
           @num_responses1[q.id][i]=0.0
         end
@@ -43,7 +43,7 @@ class StatisticsController < ApplicationController
       total_question_response=SurveyResponse.find_all_by_survey_deployment_id_and_question_id(sd_id2,q.id).length
       for i in @survey.min_question_score..@survey.max_question_score
         if(total_question_response>0)
-          @num_responses2[q.id][i]=(SurveyResponse.find(:all,:conditions=>["survey_deployment_id=? and question_id=? and score=?",sd_id2,q.id,i]).length.to_f/total_question_response)
+          @num_responses2[q.id][i]=(SurveyResponse.where(["survey_deployment_id=? and question_id=? and score=?",sd_id2,q.id,i]).length.to_f/total_question_response)
         else
           @num_responses2[q.id][i]=0.0
         end

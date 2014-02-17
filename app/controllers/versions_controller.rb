@@ -23,7 +23,7 @@ class VersionsController < ApplicationController
 
   def conflict?
     @version = Version.find(params[:id])
-    @versions = Version.find(:all,:conditions => ["whodunnit = ? AND created_at = ?", @version.whodunnit,@version.created_at])
+    @versions = Version.where( ["whodunnit = ? AND created_at = ?", @version.whodunnit,@version.created_at])
     @versions.each do |v|
       if v.item
         if v.item.versions.last.whodunnit.to_i != session[:user].id
@@ -37,7 +37,7 @@ class VersionsController < ApplicationController
   def revert
     @version = Version.find_by_id(params[:id])
     # find all new versions created by current user at one single action
-    @versions = Version.find(:all,:conditions => ["whodunnit = ? AND created_at BETWEEN ? AND ?", @version.whodunnit,@version.created_at-1.0,@version.created_at + 1.0])
+    @versions = Version.where( ["whodunnit = ? AND created_at BETWEEN ? AND ?", @version.whodunnit,@version.created_at-1.0,@version.created_at + 1.0])
     @iteration = 0
     # due to association constraints, the
     while @versions.length != 0 and @iteration <= 5

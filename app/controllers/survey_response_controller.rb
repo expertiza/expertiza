@@ -10,7 +10,7 @@ class SurveyResponseController < ApplicationController
       return
     end
 
-    @participants = AssignmentParticipant.find(:all, :conditions => ["user_id = ? and parent_id = ?", session[:user].id, params[:id]])
+    @participants = AssignmentParticipant.where( ["user_id = ? and parent_id = ?", session[:user].id, params[:id]])
     if @participants.length == 0   #make sure the user is a participant of the assignment
       redirect_to '/'
       return
@@ -44,7 +44,7 @@ class SurveyResponseController < ApplicationController
         @comments = params[:comments]
         for question in @submit_questions
           list = []
-          list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and email = ?", params[:id], params[:survey_id], question.id, params[:email]]) if params[:email]
+          list = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ? and email = ?", params[:id], params[:survey_id], question.id, params[:email]]) if params[:email]
           if list.length > 0
             @new = list[0]
           else
@@ -102,7 +102,7 @@ def view_responses
 
   if params[:course_eval] # Check if this is a course evaluation
     survey_id=SurveyDeployment.find(params[:id]).course_evaluation_id
-    @surveys = Questionnaire.find(:all, :conditions=>["id=?", survey_id])
+    @surveys = Questionnaire.where(["id=?", survey_id])
     #Temprorary Assignment object
     @assignment=Assignment.new
     @assignment.name="Course Evaluation"
@@ -126,9 +126,9 @@ def view_responses
     this_response_survey[:avg_values] = Array.new
     this_response_survey[:max] = max
     if !params[:course_eval]
-      surveylist = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ?", params[:id], survey.id])
+      surveylist = SurveyResponse.where( ["assignment_id = ? and survey_id = ?", params[:id], survey.id])
     else
-      surveylist = SurveyResponse.find(:all, :conditions => ["survey_deployment_id = ? and survey_id = ?", params[:id], survey.id])
+      surveylist = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ?", params[:id], survey.id])
     end
     if surveylist.length > 0
       @empty = false
@@ -145,9 +145,9 @@ def view_responses
       for i in min..max
         if !question.true_false? || i == min || i == max
           if !params[:course_eval]
-            list = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
+            list = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
           elsif params[:course_eval]
-            list = SurveyResponse.find(:all, :conditions => ["survey_deployment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i]);
+            list = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i]);
           end
           if question.true_false?
             if i == min
@@ -163,9 +163,9 @@ def view_responses
         end
       end
       if !params[:course_eval]
-        no_of_question = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
+        no_of_question = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
       else
-        no_of_question = SurveyResponse.find(:all, :conditions => ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
+        no_of_question = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
       end
       this_response_question[:count] = no_of_question.length
 
@@ -184,9 +184,9 @@ end
 
 def comments
   unless params[:course_eval] # Check if survey is a course evaluation
-    @responses = SurveyResponse.find(:all, :conditions => ["assignment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]], :order => "score");
+    @responses = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]]).order("score")
   else
-    @responses = SurveyResponse.find(:all, :conditions => ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]], :order => "score");
+    @responses = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]]).order("score")
     @course_eval="1"
   end
 

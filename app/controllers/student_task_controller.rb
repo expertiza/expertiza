@@ -47,8 +47,8 @@ class StudentTaskController < ApplicationController
 
     @assignment = @participant.assignment
     # Finding the current phase that we are in
-    due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id])
-    @very_last_due_date = DueDate.find(:all, :order => "due_at DESC", :limit =>1, :conditions => ["assignment_id = ?", @assignment.id])
+    due_dates = DueDate.where( ["assignment_id = ?", @assignment.id])
+    @very_last_due_date = DueDate.order("due_at DESC").limit(1).where( ["assignment_id = ?", @assignment.id])
     next_due_date = @very_last_due_date[0]
     for due_date in due_dates
       if due_date.due_at > Time.now

@@ -33,7 +33,7 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def list
-    @survey_deployments=SurveyDeployment.find(:all)
+    @survey_deployments=SurveyDeployment.all
     @surveys={}
     @survey_deployments.each do |sd|
       @surveys[sd.id]=Questionnaire.find(sd.course_evaluation_id).name

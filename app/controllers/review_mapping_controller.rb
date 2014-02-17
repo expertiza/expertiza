@@ -19,9 +19,9 @@ class ReviewMappingController < ApplicationController
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
     assignment_id = session[:contributor].parent_id
-    @users = User.find(:all, :include => :participants,
-                       :conditions => ['participants.type = "AssignmentParticipant" and users.name like ? and participants.parent_id = ?',name,assignment_id],
-                       :order => 'name')
+    @users = User.join(:participants)
+      .where( ['participants.type = "AssignmentParticipant" and users.name like ? and participants.parent_id = ?',name,assignment_id])
+      .order ('name')
 
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
@@ -52,7 +52,7 @@ class ReviewMappingController < ApplicationController
       reviewer = get_reviewer(user,assignment,regurl)
       #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).nil?
+      if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).nil?
         TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
       else
         raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
@@ -103,7 +103,7 @@ class ReviewMappingController < ApplicationController
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         contributor = get_team_from_submission(submission)
-        if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
+        if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
           TeamReviewResponseMap.create(:reviewee_id => contributor.id,
                                        :reviewer_id => reviewer.id,
                                        :reviewed_object_id => assignment.id)
@@ -209,7 +209,7 @@ class ReviewMappingController < ApplicationController
 
       regurl = url_for :action => 'add_user_to_assignment', :id => mapping.map_id, :user_id => user.id
       reviewer = get_reviewer(user,mapping.assignment,regurl)
-      if MetareviewResponseMap.find(:first, :conditions => ['reviewed_object_id = ? and reviewer_id = ?',mapping.map_id,reviewer.id]) != nil
+      if MetareviewResponseMap.where( ['reviewed_object_id = ? and reviewer_id = ?',mapping.map_id,reviewer.id]) != nil
         raise "The metareviewer \""+reviewer.user.name+"\" is already assigned to this reviewer."
       end
       MetareviewResponseMap.create(:reviewed_object_id => mapping.map_id,
@@ -413,7 +413,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def list
-    all_assignments = Assignment.find(:all, :order => 'name', :conditions => ["instructor_id = ?",session[:user].id])
+    all_assignments = Assignment.order('name').where( ["instructor_id = ?",session[:user].id])
 
     letter = params[:letter]
     if letter == nil
@@ -518,7 +518,7 @@ class ReviewMappingController < ApplicationController
         redirect_to :action => 'list_mappings', :id => assignment.id
       end
     else
-      @wiki_types = WikiType.find(:all)
+      @wiki_types = WikiType.all
       redirect_to :action => 'list_mappings', :id => assignment.id
     end
   end
@@ -534,8 +534,8 @@ class ReviewMappingController < ApplicationController
 
   def select_mapping
     @assignment = Assignment.find(params[:id])
-    @review_strategies = ReviewStrategy.find(:all, :order => 'name')
-    @mapping_strategies = MappingStrategy.find(:all, :order => 'name')
+    @review_strategies = ReviewStrategy.order('name')
+    @mapping_strategies = MappingStrategy.order('name')
   end
 
   def review_report
@@ -548,12 +548,14 @@ class ReviewMappingController < ApplicationController
 
     if params[:user].nil?
       # This is not a search, so find all reviewers for this assignment
-      @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? ", @id, @type] )
+      @reviewers = ResponseMap.select( "DISTINCT reviewer_id").where( ["reviewed_object_id = ? and type = ? ", @id, @type] )
     else
       # This is a search, so find reviewers by user's full name
-      us = User.find(:all, :select => "DISTINCT id", :conditions => ["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
-      participants = Participant.find(:all, :select => "DISTINCT id", :conditions => ["user_id IN (?) and parent_id = ?", us, @assignment.id] )
-      @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, participants] )
+      us = User.select( "DISTINCT id").where( ["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
+      participants = Participant.select( "DISTINCT id").where( ["user_id IN (?) and parent_id = ?", us, @assignment.id] )
+      @reviewers = ResponseMap
+        .select( "DISTINCT reviewer_id")
+        .where( ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, participants] )
     end
 
     # Arranged as the hash @review_scores[reveiwer_id][reviewee_id] = score for this particular assignment
@@ -571,7 +573,7 @@ class ReviewMappingController < ApplicationController
     objtype = "TeamReviewResponseMap"
 
     teams.each do |team|
-      score_cache = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",team.id,  objtype])
+      score_cache = ScoreCache.where( ["reviewee_id = ? and object_type = ?",team.id,  objtype])
       t_score = 0
       if score_cache!= nil
         t_score = score_cache.score
@@ -596,7 +598,7 @@ class ReviewMappingController < ApplicationController
     @review_distribution =[0,0,0,0,0,0,0,0,0,0]
     ### For every responsemapping for this assgt, find the reviewer_id and reviewee_id #####
     @reviews_not_done = 0
-    response_maps =  ResponseMap.find(:all, :conditions =>["reviewed_object_id = ? and type = ?", @assignment.id, objtype])
+    response_maps =  ResponseMap.where(["reviewed_object_id = ? and type = ?", @assignment.id, objtype])
     review_report = @assignment.compute_reviews_hash
     for response_map in response_maps
       score_for_this_review = review_report[response_map.reviewer_id][response_map.reviewee_id]

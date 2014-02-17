@@ -10,7 +10,7 @@ class SignupController < ApplicationController
   #people who have already chosen the topic, etc
   def list
     @assignment_id = params[:id]
-    @sign_up_topics = SignUpTopic.find(:all, :conditions => ['assignment_id = ?', params[:id]])
+    @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]])
     @slots_filled =  SignUpTopic.find_slots_filled(params[:id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
@@ -161,7 +161,7 @@ class SignupController < ApplicationController
       if SignedUpUser.find_by_creator_id(session[:user].id).nil?
       end
       #making sure that the drop date deadline hasn't passed
-      dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})
+      dropDate = DueDate.where( {:assignment_id => assignment.id, :deadline_type_id => '6'})
       if(!dropDate.nil? && dropDate.due_at < Time.now)
         flash[:error] = "You cannot drop this topic because the drop deadline has passed."
       else
@@ -182,7 +182,7 @@ class SignupController < ApplicationController
             first_waitlisted_user.save
 
             #update the participants details
-            user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+            user_id = TeamsUser.where( {:team_id => first_waitlisted_user.creator_id}).user_id
             participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
             participant.update_topic_id(topic_id)
 

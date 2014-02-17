@@ -471,9 +471,9 @@ module DynamicReviewMapping
 
                                              topic_team_id = Hash.new
                                              temp_contributors.each {|contributor|
-                                               participant = Participant.find(:all,
-                                                                              :joins => "INNER JOIN teams_users ON participants.user_id = teams_users.user_id",
-                                                                              :conditions => "teams_users.team_id = #{contributor} AND participants.parent_id = #{@assignment.id}")
+                                               participant = Participant
+                                                 .joins( "INNER JOIN teams_users ON participants.user_id = teams_users.user_id")
+                                                 .where( "teams_users.team_id = #{contributor} AND participants.parent_id = #{@assignment.id}")
                                                topic_team_id[contributor] = participant[0].topic_id
                                              }
 
@@ -607,7 +607,7 @@ module DynamicReviewMapping
               #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
               if !participant.nil?
                 reviewer_id = participant.id
-                if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', team_id, reviewer_id]).nil?
+                if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', team_id, reviewer_id]).nil?
                   TeamReviewResponseMap.create(:reviewee_id => team_id, :reviewer_id => reviewer_id, :reviewed_object_id => @assignment.id)
                 else
                   #if there is such a review mapping just skip it. Or it can be handled by informing
@@ -839,7 +839,7 @@ module DynamicReviewMapping
                   #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
                   if !participant.nil?
                     reviewer_id = participant.id
-                    if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', reviewee_participant.id, reviewer_id]).nil?
+                    if ParticipantReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', reviewee_participant.id, reviewer_id]).nil?
                       ParticipantReviewResponseMap.create(:reviewee_id => reviewee_participant.id, :reviewer_id => reviewer_id, :reviewed_object_id => @assignment.id)
                     else
                       #if there is such a review mapping just skip it. Or it can be handled by informing
@@ -1123,7 +1123,7 @@ module DynamicReviewMapping
             #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
             if !participant.nil?
               reviewer_id = participant.id
-              if MetareviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ? and reviewed_object_id = ?', map.reviewer_id, reviewer_id,mapping[0]]).nil?
+              if MetareviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? and reviewed_object_id = ?', map.reviewer_id, reviewer_id,mapping[0]]).nil?
                 MetareviewResponseMap.create(:reviewee_id => map.reviewer_id, :reviewer_id => reviewer_id, :reviewed_object_id => mapping[0])
               else
                 #if there is such a review mapping just skip it. Or it can be handled by informing

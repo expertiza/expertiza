@@ -40,7 +40,7 @@ class UsersController < ApplicationController
   def auto_complete_for_user_name
     user = session[:user]
     role = Role.find(user.role_id)
-    @users = User.find(:all, :conditions => ['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%",role.get_available_roles, user.id])
+    @users = User.where( ['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%",role.get_available_roles, user.id])
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
 
@@ -48,7 +48,7 @@ class UsersController < ApplicationController
   def list
     user = session[:user]
     role = Role.find(user.role_id)
-    all_users = User.find(:all, :order => 'name', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+    all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
 
     letter = params[:letter]
     session[:letter] = letter
@@ -195,7 +195,7 @@ class UsersController < ApplicationController
 
         def foreign
           role = Role.find((session[:user]).role_id)
-          @all_roles = Role.find(:all, :conditions => ['id in (?) or id = ?',role.get_available_roles,role.id])
+          @all_roles = Role.where( ['id in (?) or id = ?',role.get_available_roles,role.id])
         end
 
         private
@@ -234,7 +234,7 @@ class UsersController < ApplicationController
           end
 
           if (paginate_options["#{@per_page}"].nil?) #displaying all - no pagination
-            users = User.paginate(:page => params[:page], :order => 'name', :per_page => User.count(:all), :conditions => [condition, role.get_available_roles, user_id, search_filter])
+            users = User.order('name').where( [condition, role.get_available_roles, user_id, search_filter]).paginate(:page => params[:page], :per_page => User.count)
           else #some pagination is active - use the per_page
             users = User.paginate(:page => params[:page], :order => 'name', :per_page => paginate_options["#{@per_page}"], :conditions => [condition, role.get_available_roles, user_id, search_filter])
           end

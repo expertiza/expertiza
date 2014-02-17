@@ -27,9 +27,9 @@ class QuestionsController < ApplicationController
   def listuser
     @question = Array.new
     @i = 0
-    @sign_qts = SignupQuestion.find(:all,
-                                    :conditions => 'signup_id = '+@params[:id].to_s,
-                                    :order => 'id')
+    @sign_qts = SignupQuestion
+      .where( 'signup_id = '+@params[:id].to_s)
+      .order('id')
 
   end
 

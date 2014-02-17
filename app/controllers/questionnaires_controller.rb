@@ -442,7 +442,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   # @param [Object] questionnaire_id
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    questions = Question.find(:all, :conditions => "questionnaire_id = " + questionnaire_id.to_s)
+    questions = Question.where( "questionnaire_id = " + questionnaire_id.to_s)
     @deleted_questions = []
     for question in questions
       should_delete = true

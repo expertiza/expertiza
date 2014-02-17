@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
   end
 
   def undo_link(message)
-    @version = Version.find(:all,:conditions => ['whodunnit = ?',session[:user].id]).last
+    @version = Version.where(['whodunnit = ?',session[:user].id]).last
     if @version.try(:created_at) && Time.now - @version.created_at < 5.0
       @link_name = params[:redo] == "true" ? "redo" : "undo"
       flash[:notice] = message + "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @version.id,:redo => !params[:redo])}>#{@link_name}</a>"

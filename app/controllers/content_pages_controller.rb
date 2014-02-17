@@ -19,8 +19,7 @@ class ContentPagesController < ApplicationController
   end
 
   def list
-    @content_pages = ContentPage.find(:all,
-                                      :order => 'name')
+    @content_pages = ContentPage.order('name')
   end
 
   def show
@@ -103,13 +102,12 @@ class ContentPagesController < ApplicationController
   protected
 
   def foreign
-    @markup_styles = MarkupStyle.find(:all, :order => 'name')
-    @permissions = Permission.find(:all, :order => 'name')
+    @markup_styles = MarkupStyle.order('name')
+    @permissions = Permission.order('name')
     if @content_page.id
-      @menu_items = MenuItem.find(:all,
-                                  :order => 'label',
-                                  :conditions => ['content_page_id=?',
-                                                  @content_page.id])
+      @menu_items = MenuItem
+        .order('label')
+        .where(['content_page_id=?', @content_page.id])
       @system_pages = @settings.system_pages @content_page.id
     end
   end

@@ -73,7 +73,7 @@ class AdminController < ApplicationController
   end
 
   def list_users(conditions)
-    @users = User.paginate(:page => params[:page], :order => 'name',:conditions => conditions, :per_page => 50)
+    @users = User.order(:name).where(conditions).paginate(:page => params[:page], :per_page => 50)
   end
 
   def new_super_administrator
@@ -81,7 +81,7 @@ class AdminController < ApplicationController
   end
 
   def list_super_administrators
-    @users = User.find(:all, :conditions => ["role_id = ?", Role.superadministrator.id])
+    @users = User.where(["role_id = ?", Role.superadministrator.id])
   end
 
   def show_instructor

@@ -163,7 +163,7 @@ class AssignmentsController < ApplicationController
 
         if params[:due_date]
           # delete the previous jobs from the delayed_jobs table
-          djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', @assignment.id])
+          djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
           for dj in djobs
             delete_from_delayed_queue(dj.id)
           end
@@ -355,7 +355,7 @@ class AssignmentsController < ApplicationController
       if assignment
         begin
           #delete from delayed_jobs queue
-          djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', assignment.id])
+          djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', assignment.id])
           for dj in djobs
             delete_from_delayed_queue(dj.id)
           end
@@ -366,7 +366,7 @@ class AssignmentsController < ApplicationController
             raise "Not authorised to delete this assignment"
           end
           assignment.delete(params[:force])
-          @a = Node.find(:first, :conditions => ['node_object_id = ? and type = ?', params[:id], 'AssignmentNode'])
+          @a = Node.where(['node_object_id = ? and type = ?', params[:id], 'AssignmentNode'])
 
           @a.destroy
           flash[:notice] = "The assignment is deleted"
@@ -393,7 +393,7 @@ class AssignmentsController < ApplicationController
     # TODO: NO usages found need verification
     #--------------------------------------------------------------------------------------------------------------------
     def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
-      existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?', session[:user].id, assignment_id, questionnaire_id])
+      existing = NotificationLimit.where(['user_id = ? and assignment_id = ? and questionnaire_id = ?', session[:user].id, assignment_id, questionnaire_id])
       if existing.nil?
         NotificationLimit.create(:user_id => session[:user].id,
                                  :assignment_id => assignment_id,

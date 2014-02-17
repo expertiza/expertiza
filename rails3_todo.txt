@@ -1,0 +1,206 @@
+Soon-to-be-deprecated ActiveRecord calls
+Methods such as find(:all), find(:first), finds with conditions, and the :joins option will soon be deprecated.
+More information: http://m.onkey.org/2010/1/22/active-record-query-interface
+
+The culprits: 
+	- app//controllers/assignment_signups_controller.rb
+	- app//controllers/assignments_controller.rb
+	- app//controllers/bookmarks_controller.rb
+	- app//controllers/content_pages_controller.rb
+	- app//controllers/popup_controller.rb
+	- app//controllers/questionnaires_controller.rb
+	- app//controllers/questions_controller.rb
+	- app//controllers/response_controller.rb
+	- app//controllers/review_mapping_controller.rb
+	- app//controllers/sign_up_sheet_controller.rb
+	- app//controllers/signup_controller.rb
+	- app//controllers/site_controllers_controller.rb
+	- app//controllers/statistics_controller.rb
+	- app//controllers/student_task_controller.rb
+	- app//controllers/student_task_controller.rb~
+	- app//controllers/student_team_controller.rb
+	- app//controllers/survey_controller.rb
+	- app//controllers/survey_deployment_controller.rb
+	- app//controllers/survey_response_controller.rb
+	- app//controllers/system_settings_controller.rb
+	- app//controllers/users_controller.rb
+	- app//controllers/versions_controller.rb
+	- app//helpers/assignment_helper.rb
+	- app//helpers/assignments_helper.rb
+	- app//helpers/dynamic_review_mapping.rb
+	- app//helpers/leaderboard_helper.rb
+	- app//helpers/participants_helper.rb
+	- app//helpers/survey_helper.rb
+	- app//helpers/team_helper.rb
+	- app//mailers/delayed_mailer.rb
+	- app//models/administrator.rb
+	- app//models/assignment.rb
+	- app//models/assignment_node.rb
+	- app//models/assignment_participant.rb
+	- app//models/assignment_team.rb
+	- app//models/bookmark.rb
+	- app//models/controller_action.rb
+	- app//models/course_node.rb
+	- app//models/course_participant.rb
+	- app//models/course_team.rb
+	- app//models/courses_users.rb
+	- app//models/due_date.rb
+	- app//models/folder_node.rb
+	- app//models/instructor.rb
+	- app//models/invitation.rb
+	- app//models/leaderboard.rb
+	- app//controllers/assignment_controller.rb
+	- app//controllers/assignments_controller.rb
+	- app//controllers/grades_controller.rb
+	- app//controllers/popup_controller.rb
+	- app//controllers/profile_controller.rb
+	- app//controllers/review_files_controller.rb
+	- app//controllers/review_mapping_controller.rb
+	- app//controllers/signup_controller.rb
+	- app//controllers/student_team_controller.rb
+	- app//controllers/system_settings_controller.rb
+	- app//helpers/bookmarks_helper.rb
+	- app//helpers/dynamic_review_mapping.rb
+	- app//helpers/leaderboard_helper.rb
+	- app//helpers/questionnaire_helper.rb
+	- app//mailers/delayed_mailer.rb
+	- app//models/administrator.rb
+	- app//models/assignment.rb
+	- app//models/assignment_participant.rb
+	- app//models/assignment_team.rb
+	- app//models/bookmark.rb
+	- app//models/course_team.rb
+	- app//models/instructor.rb
+	- app//models/leaderboard.rb
+	- app//models/menu_item.rb
+	- app//models/score_cache.rb
+	- app//models/sign_up_topic.rb
+	- app//models/super_administrator.rb
+	- app//models/ta.rb
+	- app//models/team.rb
+	- app//models/teams_user.rb
+	- app//models/user.rb
+	- app//support/goldberg_filters.rb
+	- app//views/advertise_for_partner/show.html.erb
+	- app//views/bookmarks/view.rhtml
+	- app//views/popup/participants_popup.html.erb
+	- app//views/popup/team_users_popup.html.erb
+	- app//views/review_mapping/_list_review_mappings.html.erb
+	- app//views/review_mapping/_participantscore.html.erb
+	- app//views/review_mapping/_report.html.erb
+	- app//views/review_mapping/_teamscore.html.erb
+	- app//views/review_mapping/select_mapping.html.erb
+	- app//views/student_team/view.html.erb
+	- app//views/submitted_content/_main.html.erb
+	- app//views/tree_display/actions/_assignments_actions.html.erb
+	- app//controllers/assignment_controller.rb
+	- app//controllers/assignments_controller.rb
+	- app//controllers/bookmarks_controller.rb
+	- app//controllers/grades_controller.rb
+	- app//controllers/popup_controller.rb
+	- app//controllers/profile_controller.rb
+	- app//controllers/questionnaires_controller.rb
+	- app//controllers/response_controller.rb
+	- app//controllers/review_mapping_controller.rb
+	- app//controllers/sign_up_sheet_controller.rb
+	- app//controllers/signup_controller.rb
+	- app//controllers/student_task_controller.rb
+	- app//controllers/student_task_controller.rb~
+	- app//controllers/student_team_controller.rb
+	- app//controllers/survey_controller.rb
+	- app//controllers/survey_response_controller.rb
+	- app//controllers/users_controller.rb
+	- app//controllers/versions_controller.rb
+	- app//helpers/assignment_helper.rb
+	- app//helpers/dynamic_review_mapping.rb
+	- app//helpers/leaderboard_helper.rb
+	- app//helpers/participants_helper.rb
+	- app//helpers/survey_helper.rb
+	- app//helpers/team_helper.rb
+	- app//mailers/delayed_mailer.rb
+	- app//models/assignment.rb
+	- app//models/assignment_node.rb
+	- app//models/assignment_participant.rb
+	- app//models/bookmark.rb
+	- app//models/course_node.rb
+	- app//models/course_participant.rb
+	- app//models/course_team.rb
+	- app//models/courses_users.rb
+	- app//models/due_date.rb
+	- app//models/folder_node.rb
+	- app//models/instructor.rb
+	- app//models/invitation.rb
+	- app//models/leaderboard.rb
+	- app//models/menu_item.rb
+	- app//models/questionnaire_node.rb
+	- app//helpers/dynamic_review_mapping.rb
+	- app//models/administrator.rb
+	- app//models/assignment.rb
+	- app//models/super_administrator.rb
+
+Deprecated constant(s)
+Constants like RAILS_ENV, RAILS_ROOT, and RAILS_DEFAULT_LOGGER are now deprecated.
+More information: http://litanyagainstfear.com/blog/2010/02/03/the-rails-module/
+
+The culprits: 
+	- app//helpers/participants_helper.rb
+	- app//models/assignment.rb
+	- app//models/course.rb
+	- lib//tasks/goldberg.rake
+	- lib//tasks/hoptoad_notifier_tasks.rake
+
+Old gem bundling (config.gems)
+The old way of bundling is gone now.  You need a Gemfile for bundler.
+More information: http://omgbloglol.com/post/353978923/the-path-to-rails-3-approaching-the-upgrade
+
+The culprits: 
+	- config/environments/cucumber.rb
+
+Deprecated ActionMailer API
+You're using the old ActionMailer API to send e-mails in a controller, model, or observer.
+More information: http://lindsaar.net/2010/1/26/new-actionmailer-api-in-rails-3
+
+The culprits: 
+	- app/models//courses_users.rb
+	- app/models//participant.rb
+	- app/controllers//grades_controller.rb
+	- app/controllers//participants_controller.rb
+
+Deprecated ERb helper calls
+Block helpers that use concat (e.g., form_for) should use <%= instead of <%.  The current form will continue to work for now, but you will get deprecation warnings since this form will go away in the future.
+More information: http://weblog.rubyonrails.org/
+
+The culprits: 
+	- app/views/bookmark_tags/edit.html.erb
+	- app/views/bookmark_tags/new.html.erb
+	- app/views/bookmarks/add_tag_bookmark.erb
+	- app/views/books/edit.html.erb
+	- app/views/books/new.html.erb
+	- app/views/late_policies/new.html.erb
+	- app/views/assignment/associate_assignment_to_course.html.erb
+	- app/views/assignment/edit.html.erb
+	- app/views/assignment/list.html.erb
+	- app/views/bookmarks/_searchform.rhtml
+	- app/views/bookmarks/_searchmine.rhtml
+	- app/views/bookmarks/add_bookmark_form.rhtml
+	- app/views/bookmarks/add_rating_rubric_form.rhtml
+	- app/views/bookmarks/bookmark_rate.erb
+	- app/views/bookmarks/edit_bookmark_form.rhtml
+	- app/views/bookmarks/edit_rating_rubric_form.rhtml
+	- app/views/late_policies/edit.html.erb
+	- app/views/questionnaires/edit.html.erb
+	- app/views/questionnaires/edit_advice.html.erb
+	- app/views/questionnaires/edit_questionnaire.html.erb
+	- app/views/questionnaires/list.html.erb
+	- app/views/questionnaires/list_questionnaires.html.erb
+	- app/views/questionnaires/new_quiz.erb
+	- app/views/team/create_teams_view.html.erb
+	- app/views/team/edit.html.erb
+
+Deprecated AJAX helper calls
+AJAX javascript helpers have been switched to be unobtrusive and use :remote => true instead of having a seperate function to handle remote requests.
+More information: http://blog.jordanwest.me/modest-rubyist-archive/rails-3-ujs-and-csrf-meta-tags
+
+The culprits: 
+	- app/views/review_mapping/_report.html.erb
+

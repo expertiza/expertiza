@@ -53,7 +53,7 @@ class AssignmentController < ApplicationController
 
       @assignment = Assignment.new
 
-      @wiki_types = WikiType.find(:all)
+      @wiki_types = WikiType.all
       @private = params[:private] == true
       #calling the defalut values mathods
       get_limits_and_weights
@@ -163,7 +163,7 @@ class AssignmentController < ApplicationController
           render :action => 'create'
         elsif(!late_policy_set)
           flash[:error] = "Please select a valid late policy!!"
-          @wiki_types = WikiType.find(:all)
+          @wiki_types = WikiType.all
           get_limits_and_weights
           @private = params[:private] == true
           render :action => 'new'
@@ -232,12 +232,12 @@ class AssignmentController < ApplicationController
         rescue
           flash[:error] = $!
           prepare_to_edit
-          @wiki_types = WikiType.find(:all)
+          @wiki_types = WikiType.all
           render :action => 'new'
         end
 
       else
-        @wiki_types = WikiType.find(:all)
+        @wiki_types = WikiType.all
         render :action => 'new'
       end
 
@@ -400,7 +400,7 @@ class AssignmentController < ApplicationController
       end
 
       get_limits_and_weights
-      @wiki_types = WikiType.find(:all)
+      @wiki_types = WikiType.all
     end
 
     def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
@@ -710,7 +710,7 @@ class AssignmentController < ApplicationController
               for due_date_key in params[:due_date].keys
                 due_date_temp = DueDate.find(due_date_key)
                 # delete the previous jobs from the delayed_jobs table
-                djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', @assignment.id])
+                djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
                 for dj in djobs
                   delete_from_delayed_queue(dj.id)
                 end
@@ -730,7 +730,7 @@ class AssignmentController < ApplicationController
             render :action => 'edit', :id => @assignment
           end
         else # Simply refresh the page
-          @wiki_types = WikiType.find(:all)
+          @wiki_types = WikiType.all
           render :action => 'edit'
         end
       end
@@ -754,7 +754,7 @@ class AssignmentController < ApplicationController
         if @assignment
           begin
             #delete from delayed_jobs queue
-            djobs = Delayed::Job.find(:all, :conditions => ['handler LIKE "%assignment_id: ?%"', @assignment.id])
+            djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
             for dj in djobs
               delete_from_delayed_queue(dj.id)
             end

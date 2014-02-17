@@ -10,7 +10,7 @@ class AssignmentSignupsController < ApplicationController
     :redirect_to => { :action => :list }
 
   def list
-    @assignment_signups = SignUpSheet.find(:all)
+    @assignment_signups = SignUpSheet.all
   end
 
   def listuser
@@ -28,7 +28,7 @@ class AssignmentSignupsController < ApplicationController
 
   def new
     @assignment_signup = AssignmentSignup.new
-    @signup_sheets = SignUpSheet.find(:all)
+    @signup_sheets = SignUpSheet.all
     @assignments = Assignment.find_by_sql("select * from assignments where id not in (select assignment_id from assignment_signups where signup_id = "+@params[:id].to_s+")")
   end
 
@@ -42,14 +42,14 @@ class AssignmentSignupsController < ApplicationController
       flash[:notice] = 'Assignment Signup was successfully created for assignment '+@assignments.name
       redirect_to :controller => 'signup_sheets', :action => 'list'
     else
-      @signup_sheets = SignUpSheet.find(:all)
-      @assignments = Assignment.find(:all)
+      @signup_sheets = SignUpSheet.all
+      @assignments = Assignment.all
       render :action => 'new'
     end
   end
 
   def edit
-    @assignments = Assignment.find(:all)
+    @assignments = Assignment.all
     @assignment_signup = AssignmentSignup.find(params[:id])
   end
 
@@ -61,7 +61,7 @@ class AssignmentSignupsController < ApplicationController
       flash[:notice] = 'AssignmentSignup was successfully updated.'
       redirect_to :action => 'show', :id => @assignment_signup
     else
-      @assignments = Assignment.find(:all)
+      @assignments = Assignment.all
       render :action => 'edit'
     end
   end

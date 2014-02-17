@@ -22,7 +22,7 @@ class PopupController < ApplicationController
       @scores = Score.find_all_by_response_id(@reviewid)
 
       ##3
-      @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
+      @revqids = AssignmentQuestionnaire.where(["assignment_id = ?",@assignment.id])
       @revqids.each do |rqid|
         rtype = Questionnaire.find(rqid.questionnaire_id).type
         if( rtype == 'ReviewQuestionnaire')
@@ -82,10 +82,10 @@ class PopupController < ApplicationController
       #@reviewer_id = ReviewMapping.find(params[:id2]).reviewer_id
       @assignment_id = ResponseMap.find(params[:id2]).reviewed_object_id
       @assignment = Assignment.find(@assignment_id)
-      @participant = Participant.find(:first, :conditions => ["id = ? and parent_id = ? ", params[:id],@assignment_id])
+      @participant = Participant.where(["id = ? and parent_id = ? ", params[:id],@assignment_id])
 
       ##3
-      @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",@assignment.id])
+      @revqids = AssignmentQuestionnaire.where(["assignment_id = ?",@assignment.id])
       @revqids.each do |rqid|
         rtype = Questionnaire.find(rqid.questionnaire_id).type
         if( rtype == 'ReviewQuestionnaire')

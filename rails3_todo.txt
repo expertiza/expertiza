@@ -3,9 +3,6 @@
 [1mMore information:[0m [36mhttp://m.onkey.org/2010/1/22/active-record-query-interface
 
 [37mThe culprits: 
-[33m	- app//mailers/delayed_mailer.rb
-[33m	- app//models/administrator.rb
-[33m	- app//models/assignment.rb
 [33m	- app//models/assignment_node.rb
 [33m	- app//models/assignment_participant.rb
 [33m	- app//models/assignment_team.rb
@@ -26,9 +23,6 @@
 [33m	- app//controllers/review_files_controller.rb
 [33m	- app//helpers/bookmarks_helper.rb
 [33m	- app//helpers/questionnaire_helper.rb
-[33m	- app//mailers/delayed_mailer.rb
-[33m	- app//models/administrator.rb
-[33m	- app//models/assignment.rb
 [33m	- app//models/assignment_participant.rb
 [33m	- app//models/assignment_team.rb
 [33m	- app//models/bookmark.rb
@@ -59,8 +53,6 @@
 [33m	- app//controllers/assignment_controller.rb
 [33m	- app//controllers/grades_controller.rb
 [33m	- app//controllers/profile_controller.rb
-[33m	- app//mailers/delayed_mailer.rb
-[33m	- app//models/assignment.rb
 [33m	- app//models/assignment_node.rb
 [33m	- app//models/assignment_participant.rb
 [33m	- app//models/bookmark.rb
@@ -75,8 +67,6 @@
 [33m	- app//models/leaderboard.rb
 [33m	- app//models/menu_item.rb
 [33m	- app//models/questionnaire_node.rb
-[33m	- app//models/administrator.rb
-[33m	- app//models/assignment.rb
 [33m	- app//models/super_administrator.rb
 [0m
 [31m[1mDeprecated constant(s)[0m
@@ -88,7 +78,6 @@
 [33m	- app//models/assignment.rb
 [33m	- app//models/course.rb
 [33m	- lib//tasks/goldberg.rake
-[33m	- lib//tasks/hoptoad_notifier_tasks.rake
 [0m
 [31m[1mOld gem bundling (config.gems)[0m
 [37mThe old way of bundling is gone now.  You need a Gemfile for bundler.

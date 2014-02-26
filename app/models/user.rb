@@ -101,7 +101,7 @@ class User < ActiveRecord::Base
     MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)
   end
 
-  def check_password(password)
+  def valid_password?(password)
     Authlogic::CryptoProviders::Sha1.stretches = 1
     Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + password])
   end

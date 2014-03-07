@@ -31,6 +31,8 @@ class AssignmentFormObject
     due_dates_list = Array.new
   end
 
+  #I'm not sure I like this, honestly, I don't like just hoping that someone will send us the right params
+  #but that's how it's supposed to go I guess
   def add_topic(topic_params)
     #TODO: check if this is right
     topics_list.push(SignUpTopic.new(topic_params))
@@ -45,21 +47,29 @@ class AssignmentFormObject
 
   def persist!
     #TODO: make sure this is correct
-    @assignment = Assignment.create!(:name => assignment_name, :scope => assignment_scope, :course => assignment_course, :instructor => assignment_instructor, :max_team_size => assignment_max_team_size)
-    #might need to set the assignment_id in each of these topics and due dates, not sure
-    #the interconnections are difficult to figure out from the models
-    topics_list.each do |a|
-      if a.save
-        topics.push(a)
-      else
-        #TODO: we should probably have something here to flag what topics were not created and maybe not persist everything?
+    #Start a transaction, we only want to create the assignment if we can create EVERYTHING in the assignment
+    Assignment.transaction do
+      @assignment = Assignment.create!(:name => assignment_name, :scope => assignment_scope, :course => assignment_course, :instructor => assignment_instructor, :max_team_size => assignment_max_team_size)
+      if !@assignment
+        raise ActiveRecord::Rollback
       end
-    end
-    due_dates_list.each do |a|
-      if a.save
-        due_dates.push(a)
-      else
-        #TODO: we should probably have something here to flag what due dates were not created and maybe not persist anything?
+      #might need to set the assignment_id in each of these topics and due dates, not sure
+      #the interconnections are difficult to figure out from the models
+      topics_list.each do |a|
+        a.assignment = @assignment
+        if a.save
+          topics.push(a)
+        else
+          raise ActiveRecord::Rollback
+        end
+      end
+      due_dates_list.each do |a|
+        a.assignment = @assignment
+        if a.save
+          due_dates.push(a)
+        else
+          raise ActiveRecord::Rollback
+        end
       end
     end
   end

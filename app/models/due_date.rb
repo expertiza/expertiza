@@ -90,4 +90,8 @@ class DueDate < ActiveRecord::Base
     topic_deadline.save
   end
 
+  def <=>(other)
+    self.due_at <=>(other.due_at)
+  end
+
 end

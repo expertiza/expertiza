@@ -10,8 +10,12 @@ class AssignmentFormObject
   attribute :assignment_name, :assignment_scope, :assignment_course, :assignment_instructor, :assignment_wiki_type, :assignment_max_team_size, :topics_list, :due_dates_list
 
   #TODO: I have a feeling these validations are not correct
-  validates_presence_of :assignment_name
-  validates_uniqueness_of :assignment_name, :assignment_scope => :course_id
+
+  # the following validation and the one underneath it may do the same thing
+  validates :assignment_name, presence: true, uniqueness: {scope: :course_id}
+  #validates_uniqueness_of :assignment_name, :assignment_scope => :course_id
+
+
   # Forms are never themselves persisted
   def persisted?
     false
@@ -31,8 +35,7 @@ class AssignmentFormObject
     due_dates_list = Array.new
   end
 
-  #I'm not sure I like this, honestly, I don't like just hoping that someone will send us the right params
-  #but that's how it's supposed to go I guess
+  # topic_params would be filtered by the controller to verify they are correct
   def add_topic(topic_params)
     #TODO: check if this is right
     topics_list.push(SignUpTopic.new(topic_params))

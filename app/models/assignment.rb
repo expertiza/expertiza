@@ -393,12 +393,12 @@ class Assignment < ActiveRecord::Base
       .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
       .order('due_at')
 
-    return false if next_due_date.nil?
+    return false if next_due_date.first.nil?
 
     # command pattern - get the attribute with the name in column
     # Here, column is usually something like 'review_allowed_id'
 
-    right_id = next_due_date.send column
+    right_id = next_due_date.first.send column
 
     right = DeadlineRight.find(right_id)
     (right && (right.name == 'OK' || right.name == 'Late'))

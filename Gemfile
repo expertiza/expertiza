@@ -38,6 +38,8 @@ gem 'superfish-rails'
 
 gem 'will_paginate'
 
+gem 'virtus'
+
 group :development do
   gem 'daemons'
   gem 'sqlite3-ruby', :require => 'sqlite3'

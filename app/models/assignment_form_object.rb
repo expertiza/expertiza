@@ -1,20 +1,24 @@
 #TODO: Not working yet
 
 class AssignmentFormObject
+  include Virtus.model
+
   extend ActiveModel::Naming
   include ActiveModel::Conversion
   include ActiveModel::Validations
 
   attr_reader :assignment, :topics, :due_dates
 
-  attribute :assignment_name, :assignment_scope, :assignment_course, :assignment_instructor, :assignment_wiki_type, :assignment_max_team_size, :topics_list, :due_dates_list
+  attribute :assignment_name, String
+  attribute :assignment_course_id, Integer
+  attribute :assignment_wiki_type_id, Integer
+  attribute :assignment_max_team_size, Integer
+  #:assignment_instructor, :topics_list, :due_dates_list
 
   #TODO: I have a feeling these validations are not correct
 
-  # the following validation and the one underneath it may do the same thing
-  validates :assignment_name, presence: true, uniqueness: {scope: :course_id}
-  #validates_uniqueness_of :assignment_name, :assignment_scope => :course_id
-
+  validates :assignment_name, presence: true
+  validates_uniqueness_of :assignment_name, :scope => :assignment_course_id
 
   # Forms are never themselves persisted
   def persisted?
@@ -28,11 +32,6 @@ class AssignmentFormObject
     else
       false
     end
-  end
-
-  def initialize
-    topics_list = Array.new
-    due_dates_list = Array.new
   end
 
   # topic_params would be filtered by the controller to verify they are correct

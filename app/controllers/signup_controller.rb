@@ -161,7 +161,7 @@ class SignupController < ApplicationController
       if SignedUpUser.find_by_creator_id(session[:user].id).nil?
       end
       #making sure that the drop date deadline hasn't passed
-      dropDate = DueDate.where( {:assignment_id => assignment.id, :deadline_type_id => '6'})
+      dropDate = DueDate.where( {:assignment_id => assignment.id, :deadline_type_id => '6'}).first
       if(!dropDate.nil? && dropDate.due_at < Time.now)
         flash[:error] = "You cannot drop this topic because the drop deadline has passed."
       else
@@ -182,7 +182,7 @@ class SignupController < ApplicationController
             first_waitlisted_user.save
 
             #update the participants details
-            user_id = TeamsUser.where( {:team_id => first_waitlisted_user.creator_id}).user_id
+            user_id = TeamsUser.where( {:team_id => first_waitlisted_user.creator_id}).first.user_id
             participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
             participant.update_topic_id(topic_id)
 

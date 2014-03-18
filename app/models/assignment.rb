@@ -383,22 +383,23 @@ class Assignment < ActiveRecord::Base
     drop_topic_deadline_id = DeadlineType.find_by_name('drop_topic').id
     self.staggered_deadline? ?
       topic_id ?
-      next_due_date = TopicDeadline
+      next_due_dates = TopicDeadline
       .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id])
       .order('due_at') :
-    next_due_date = TopicDeadline
+    next_due_dates = TopicDeadline
       .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
       .joins( {:topic => :assignment}, :order => 'due_at') :
-    next_due_date = DueDate
+    next_due_dates = DueDate
       .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
       .order('due_at')
+    next_due_date = next_due_dates.first
 
-    return false if next_due_date.first.nil?
+    return false if next_due_date.nil?
 
     # command pattern - get the attribute with the name in column
     # Here, column is usually something like 'review_allowed_id'
 
-    right_id = next_due_date.first.send column
+    right_id = next_due_date.send column
 
     right = DeadlineRight.find(right_id)
     (right && (right.name == 'OK' || right.name == 'Late'))

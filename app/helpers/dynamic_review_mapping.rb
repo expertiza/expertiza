@@ -607,7 +607,7 @@ module DynamicReviewMapping
               #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
               if !participant.nil?
                 reviewer_id = participant.id
-                if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', team_id, reviewer_id]).nil?
+                if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', team_id, reviewer_id]).first.nil?
                   TeamReviewResponseMap.create(:reviewee_id => team_id, :reviewer_id => reviewer_id, :reviewed_object_id => @assignment.id)
                 else
                   #if there is such a review mapping just skip it. Or it can be handled by informing
@@ -839,7 +839,7 @@ module DynamicReviewMapping
                   #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
                   if !participant.nil?
                     reviewer_id = participant.id
-                    if ParticipantReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', reviewee_participant.id, reviewer_id]).nil?
+                    if ParticipantReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', reviewee_participant.id, reviewer_id]).first.nil?
                       ParticipantReviewResponseMap.create(:reviewee_id => reviewee_participant.id, :reviewer_id => reviewer_id, :reviewed_object_id => @assignment.id)
                     else
                       #if there is such a review mapping just skip it. Or it can be handled by informing
@@ -1123,7 +1123,7 @@ module DynamicReviewMapping
             #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
             if !participant.nil?
               reviewer_id = participant.id
-              if MetareviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? and reviewed_object_id = ?', map.reviewer_id, reviewer_id,mapping[0]]).nil?
+              if MetareviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? and reviewed_object_id = ?', map.reviewer_id, reviewer_id,mapping[0]]).first.nil?
                 MetareviewResponseMap.create(:reviewee_id => map.reviewer_id, :reviewer_id => reviewer_id, :reviewed_object_id => mapping[0])
               else
                 #if there is such a review mapping just skip it. Or it can be handled by informing

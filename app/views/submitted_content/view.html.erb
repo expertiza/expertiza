@@ -2,7 +2,7 @@
 
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
 <!-- E726 Changes Begin -->
-<%= render :partial => 'submitted_content/selfreview'%>
+<!--<%#= render :partial => 'submitted_content/selfreview'%> Comment: we can't find this partial, though it probably is in the commit for Project E726 -->
 <!-- TODO Need to add changes for Manager and Reader -->
 <!-- E726 Changes End -->
 <a href="javascript:window.history.back()">Back</a>

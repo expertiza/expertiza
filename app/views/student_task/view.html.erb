@@ -7,7 +7,7 @@
 <% end %>
 <ul>
   <%if SignUpTopic.find_by_assignment_id(@assignment.id)%>
-    <li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'sign_up', :id => @participant.parent_id%>
+    <li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.parent_id%>
     (Sign up for a topic)
   </li>
 <%end%>

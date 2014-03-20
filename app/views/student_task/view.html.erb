@@ -13,9 +13,11 @@
 <%end%>
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
-<li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %>
-(View and manage your team)
+  <%if @assignment.team_assignment? %>
+    <li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %> 
+	 (View and manage your team)
     </li>
+  <%end%>
     <li>
       <% if @assignment.submission_allowed(@participant.topic_id) %>
         <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>

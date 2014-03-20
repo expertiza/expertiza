@@ -3,6 +3,9 @@
 class AssignmentFormObject
   include Virtus.model
 
+  @sign_up_topics
+  @due_dates
+
   extend ActiveModel::Naming
   include ActiveModel::Conversion
   include ActiveModel::Validations
@@ -18,9 +21,10 @@ class AssignmentFormObject
   attribute :due_dates_list, Array
 
   #TODO: I have a feeling these validations are not correct
-
-  validates :assignment_name, presence: true
-  validates_uniqueness_of :assignment_name, :scope => :assignment_course_id
+  validates :assignment, presence: true
+  #validates :assignment_name, presence: true
+  #validates :assignment_name, uniqueness: {scope: :assignment_course_id }
+  #validates_uniqueness_of :assignment_name, :scope => :assignment_course_id
 
   # Forms are never themselves persisted
   def persisted?
@@ -36,16 +40,22 @@ class AssignmentFormObject
     end
   end
 
+  def initialize(attributes = {})
+    @assignment = Assignment.new(attributes)
+    @due_dates = Array.new
+    @sign_up_topics = Array.new
+  end
+
   # topic_params would be filtered by the controller to verify they are correct
   def add_topic(topic_params)
     #TODO: check if this is right
-    topics_list.push(SignUpTopic.new(topic_params))
+    @sign_up_topics.push(SignUpTopic.new(topic_params))
   end
 
   # same for due_date_params
   def add_due_date(due_date_params)
     #TODO: check if this is right
-    due_dates_list.push(DueDate.new(due_date_params))
+    @due_dates.push(DueDate.new(due_date_params))
   end
 
   private

@@ -58,16 +58,14 @@ describe AssignmentFormObject do
 
   describe "assignment form object" do
     before do
-      #attributes = {}
-      #attributes[:assignment] = valid_assignment
       @form = AssignmentFormObject.new()
     end
 
     subject{@form}
 
     it {should respond_to(:assignment)}
-    it {should respond_to(:due_dates)}
-    it {should respond_to(:topics)}
+    it {should respond_to(:due_dates_list)}
+    it {should respond_to(:topics_list)}
 
     describe "when assignment is missing" do
       before {@form.assignment = nil}
@@ -75,16 +73,59 @@ describe AssignmentFormObject do
     end
 
     describe "when assignment is present" do
-      before {@form.assignment = valid_assignment}
+      before do
+        @form = AssignmentFormObject.new(assignment: valid_assignment)
+      end
+
       it {should be_valid}
+      specify{ expect(@form.assignment.valid?).to eq true}
+      specify{ expect(@form.assignment.name).to eq valid_assignment.name }
+      specify{ expect(@form.assignment.course_id).to eq valid_assignment.course_id}
     end
 
-    #it {should respond_to(:assignment_name)}
+    describe "when adding signup topics" do
 
-    #describe "when assignment_name is not present" do
-    # before{@form.assignment_name = " "}
-    # it {should_not be_valid}
-    #end
+      describe "and signup topics are all valid" do
+        before do
+          topic = valid_sign_up_topic
+          @form = AssignmentFormObject.new(assignment: valid_assignment)
+          @form.add_topic(topic)
+        end
+
+        it{should be_valid}
+      end
+
+      describe "and signup topics are not valid" do
+        before do
+          invalid_topic = valid_sign_up_topic
+          invalid_topic.topic_name = nil
+          @form = AssignmentFormObject.new(assignment: valid_assignment)
+          @form.add_topic(invalid_topic)
+        end
+
+        it {should_not be_valid}
+      end
+
+    end
+
+    describe "when adding due dates" do
+
+      describe "and due dates are all valid" do
+        before do
+          due_date = valid_due_date
+          @form = AssignmentFormObject.new(assignment: valid_assignment)
+          @form.add_due_date(due_date)
+        end
+
+        it {should be_valid}
+      end
+
+      describe "and due dates are not valid" do
+        # Not sure how to create an invalid due_date. It only validates 'due_at', but I couldn't get that
+        # to be invalid
+      end
+    end
+
   end
 
 

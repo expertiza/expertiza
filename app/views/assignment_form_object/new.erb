@@ -15,18 +15,14 @@
         if (validate()) {
             //submit the due dates and questionnaires before submitting the rest of the form
             jQuery.ajaxSetup({async: false});
-            //add_due_dates_to_assignment_form_object();
-            //submit_questionnaires();
-            jQuery('#new_assignment').submit();
+            add_due_dates_to_assignment_form_object();
+            submit_questionnaires();
+            jQuery('#assignment_form').submit();
         }
     }
 </script>
 
 <%= form_for @assignment do %>
-    <%= hidden_field_tag('assignment[instructor_id]', @assignment.instructor_id) %>
-    <%= hidden_field_tag('assignment[course_id]', @assignment.course_id) %>
-    <%= hidden_field_tag('assignment[wiki_type_id]', @assignment.wiki_type_id) %>
-    <%= hidden_field_tag('assignment[max_team_size]', @assignment.max_team_size) %>
     <div id="tabs">
       <ul>
         <li><a href="#tabs-1">General</a></li>
@@ -39,7 +35,7 @@
         <%= render 'assignments/new/general' %>
       </div>
       <div id="tabs-2">
-        <%#<%= render 'assignments/new/rubrics' %>
+        <%= render 'assignments/new/rubrics' %>
       </div>
       <div id="tabs-3">
         <%= render 'assignments/new/review_strategy' %>
@@ -60,26 +56,3 @@
 <% end %>
 
 <br/>
-
-
-
-
-
-
-<%#<h1>New Assignment</h1>%>
-
-<%# <%= form_tag @assignment do %>
-<%#<%= hidden_field_tag('assignment[instructor_id]', @assignment.instructor_id) %>
-<%#<%= hidden_field_tag('assignment[course_id]', @assignment.course_id) %>
-<%#<%= hidden_field_tag('assignment[wiki_type_id]', @assignment.wiki_type_id) %>
-<%#<%= hidden_field_tag('assignment[max_team_size]', @assignment.max_team_size) %>
-
-<%#<%= label_tag('assignment[name]', 'Name:') %>
-<%#<%= text_field_tag('assignment[name]') %>
-<%#<br/><br/>
-
-  <%#<%= submit_tag 'Create' %> |
-<%#<%= render :partial => '/shared_scripts/back' %>
-<%#<br/>
-<%#<% end %>
-

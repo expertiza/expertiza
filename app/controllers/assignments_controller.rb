@@ -18,7 +18,9 @@ class AssignmentsController < ApplicationController
   end
 
   def new
+    @user = current_user
     @assignment = Assignment.new
+
     @assignment.course = Course.find(params[:parent_id]) if params[:parent_id]
 
     @assignment.instructor = @assignment.course.instructor if @assignment.course
@@ -26,6 +28,8 @@ class AssignmentsController < ApplicationController
 
     @assignment.wiki_type_id = 1 #default no wiki type
     @assignment.max_team_size = 1
+
+    @assignment_form_object = AssignmentFormObject.new(assignment: @assignment)
   end
 
   def create
@@ -40,17 +44,25 @@ class AssignmentsController < ApplicationController
     #    :partial_name => 'update'
     #    }).deliver
 
-    if @assignment.save
-      @assignment.create_node
+    @assignment_form_object = AssignmentFormObject.new(assignment: @assignment)
+
+    if @assignment_form_object.save
+      alert("Form saved")
+    else
+      alert("Error saving form")
+    end
+
+    #if @assignment.save
+      #@assignment.create_node
       # flash[:success] = 'Assignment was successfully created.'
       # redirect_to controller: :assignments, action: :edit, id: @assignment.id
       #AAD#
-      redirect_to :controller => 'tree_display', :action => 'list'
-      undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
+      #redirect_to :controller => 'tree_display', :action => 'list'
+      #undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
       #AAD#
-    else
-      render 'new'
-    end
+    #else
+      #render 'new'
+    #end
   end
 
   def edit

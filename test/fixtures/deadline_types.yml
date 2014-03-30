@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+deadline_type_submission:
+  name: submission
+deadline_type_review:
+  name: review
+deadline_type_resubmission:
+  name: resubmission
+deadline_type_rereview:
+  name: rereview
+deadline_type_metareview:
+  name: metareview
+deadline_type_drop_topic:
+  name: drop_topic

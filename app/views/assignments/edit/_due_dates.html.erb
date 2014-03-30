@@ -241,7 +241,13 @@
     function submit_due_dates() {
         var data, para, fields, i, j;
         //delete old due_dates
-        jQuery.get("/assignments/delete_all_due_dates?assignment_id=" + <%= @assignment.id %>);
+        if (<%= !@assignment.id.nil? %>){
+            jQuery.get("/assignments/delete_all_due_dates?assignment_id=" + <%= if (@assignment.id.nil?)
+                                                                                0;
+                                                                                else
+                                                                                @assignment.id ;
+                                                                                end %>);
+        }
         //create the new due_dates
         data = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
         for (i = 0; i < data.length; i++) {
@@ -279,15 +285,21 @@
   </tr>
   <script>
       jQuery(document).ready(function () {
+
           <%due_dates = @assignment.due_dates.sort%>
           <%for i in 0..due_dates.count-1 %>
           addDueDateTableElement(<%= due_dates[i].type.to_json.html_safe %>, <%= due_dates[i].round.to_json.html_safe %>, <%= due_dates[i].to_json.html_safe %>.due_date);
           <% end %>
 
+          alert("hi");
           addBlankRounds();
 
       }());
   </script>
 </table>
 
+
 <%= render :partial => 'assignments/edit/late_policy' %>
+
+<%= debug @assignment.rounds_of_reviews %>
+<%= debug @assignment.due_dates.count %>

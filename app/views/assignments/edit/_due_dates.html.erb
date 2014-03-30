@@ -256,7 +256,7 @@
             for (j = 0; j < fields.length; j++) {
                 para += "&" + (fields[j].name + "=" + fields[j].value);
             }
-            jQuery.get("/assignment_form_object/set_due_date" + para);
+            jQuery.get("/assignments/set_due_date" + para);
         }
     }
 </script>

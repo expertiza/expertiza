@@ -32,6 +32,7 @@ class AssignmentsController < ApplicationController
   end
 
   def create
+    @user = current_user
     @assignment = Assignment.new(params[:assignment])
     #This one is working
     #       emails = Array.new
@@ -44,6 +45,31 @@ class AssignmentsController < ApplicationController
     #    }).deliver
 
     @assignment_form_object = AssignmentFormObject.new(assignment: @assignment)
+
+    due_dates = params[:due_date]
+    upper_index = due_dates[:assignment_id].count - 1
+    for i in 0..upper_index
+
+      due_date = DueDate.new
+      # Don't need to set assignment_id because it doesn't exist until assignment is saved.
+      #due_date.assignment_id = due_dates[:assignment_id][i]
+      due_date.deadline_type_id = due_dates[:deadline_type_id][i]
+      begin
+        due_at = DateTime.parse(due_dates[:due_at][i])
+      rescue
+        flash.now[:error] = "Error parsing due date date time"
+        render 'new'
+        return
+      end
+
+
+      due_date.due_at = due_at
+      due_date.submission_allowed_id = due_dates[:submission_allowed_id][i]
+      due_date.review_allowed_id = due_dates[:review_allowed_id][i]
+      due_date.review_of_review_allowed_id = due_dates[:review_of_review_allowed_id][i]
+      due_date.quiz_allowed_id = due_dates[:quiz_allowed_id][i]
+      @assignment_form_object.add_due_date(due_date)
+    end
 
     if @assignment_form_object.save
       flash.now[:note] = "Form saved"

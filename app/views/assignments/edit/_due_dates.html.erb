@@ -242,6 +242,7 @@
         var data, para, fields, i, j;
         //delete old due_dates
         if (<%= !@assignment.id.nil? %>){
+            alert("???");
             jQuery.get("/assignments/delete_all_due_dates?assignment_id=" + <%= if (@assignment.id.nil?)
                                                                                 0;
                                                                                 else
@@ -291,7 +292,6 @@
           addDueDateTableElement(<%= due_dates[i].type.to_json.html_safe %>, <%= due_dates[i].round.to_json.html_safe %>, <%= due_dates[i].to_json.html_safe %>.due_date);
           <% end %>
 
-          alert("hi");
           addBlankRounds();
 
       }());
@@ -300,6 +300,3 @@
 
 
 <%= render :partial => 'assignments/edit/late_policy' %>
-
-<%= debug @assignment.rounds_of_reviews %>
-<%= debug @assignment.due_dates.count %>

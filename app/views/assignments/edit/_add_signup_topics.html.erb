@@ -1,5 +1,4 @@
 <% @assignment = Assignment.find(params[:id]) %>
-<h1>Signup sheet for <%= @assignment.name %> assignment</h1>
 
 <% if flash[:notice] %>
   <div class="flash_note"><%= flash[:notice] %></div>

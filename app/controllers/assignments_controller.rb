@@ -25,7 +25,6 @@ class AssignmentsController < ApplicationController
 
     @assignment.instructor = @assignment.course.instructor if @assignment.course
     @assignment.instructor ||= current_user
-
     @assignment.wiki_type_id = 1 #default no wiki type
     @assignment.max_team_size = 1
 
@@ -47,9 +46,12 @@ class AssignmentsController < ApplicationController
     @assignment_form_object = AssignmentFormObject.new(assignment: @assignment)
 
     if @assignment_form_object.save
-      alert("Form saved")
+      flash.now[:note] = "Form saved"
+      redirect_to action: 'edit', id: @assignment_form_object.assignment.id
+      undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
     else
-      alert("Error saving form")
+      flash.now[:error] = "Error saving form"
+      render 'new'
     end
 
     #if @assignment.save

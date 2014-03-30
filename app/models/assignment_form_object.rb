@@ -127,24 +127,24 @@ class AssignmentFormObject
 
         topics_list.each do |a|
           a.assignment = @assignment
-          if a.save
-            topics.push(a)
-          else
+          if !a.save
             raise ActiveRecord::Rollback
           end
         end
 
         due_dates_list.each do |a|
           a.assignment = @assignment
-          if a.save
-            due_dates.push(a)
-          else
+          if !a.save
             raise ActiveRecord::Rollback
           end
         end
 
         set_up_assignment_review
-        @assignment.save
+        # Update the assignment again to have the due_dates and sign_up_topics
+        # This might need to be update?
+        if !@assignment.save
+          raise ActiveRecord::Rollback
+        end
       else
         raise ActiveRecord::Rollback
       end

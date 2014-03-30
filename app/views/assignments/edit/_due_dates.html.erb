@@ -242,7 +242,6 @@
         var data, para, fields, i, j;
         //delete old due_dates
         if (<%= !@assignment.id.nil? %>){
-            alert("???");
             jQuery.get("/assignments/delete_all_due_dates?assignment_id=" + <%= if (@assignment.id.nil?)
                                                                                 0;
                                                                                 else
@@ -257,7 +256,7 @@
             for (j = 0; j < fields.length; j++) {
                 para += "&" + (fields[j].name + "=" + fields[j].value);
             }
-            jQuery.get("/assignments/set_due_date" + para);
+            jQuery.get("/assignment_form_object/set_due_date" + para);
         }
     }
 </script>

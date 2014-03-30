@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131206231914) do
+ActiveRecord::Schema.define(:version => 20140321025833) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -420,11 +420,13 @@ ActiveRecord::Schema.define(:version => 20131206231914) do
   end
 
   create_table "response_maps", :force => true do |t|
-    t.integer "reviewed_object_id",                       :null => false
-    t.integer "reviewer_id",                              :null => false
-    t.integer "reviewee_id",                              :null => false
-    t.string  "type",                                     :null => false
-    t.boolean "notification_accepted", :default => false
+    t.integer  "reviewed_object_id",                       :null => false
+    t.integer  "reviewer_id",                              :null => false
+    t.integer  "reviewee_id",                              :null => false
+    t.string   "type",                                     :null => false
+    t.boolean  "notification_accepted", :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"

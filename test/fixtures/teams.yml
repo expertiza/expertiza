@@ -29,3 +29,28 @@ lottery_team3:
   name: LotteryTeam3
   parent_id: <%= Fixtures.identify(:lottery_assignment) %>
   type: AssignmentTeam
+
+project1_team1:
+  name: Project1Team1
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  type: AssignmentTeam
+
+project1_team2:
+  name: Project1Team2
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  type: AssignmentTeam
+
+project1_team3:
+  name: Project1Team3
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  type: AssignmentTeam
+
+exist_team1:
+  name: ExistTeam1
+  parent_id: <%= Fixtures.identify(:assignment1) %>
+  type: AssignmentTeam
+
+exist_team2:
+  name: ExistTeam2
+  parent_id: <%= Fixtures.identify(:course0) %>
+  type: CourseTeam

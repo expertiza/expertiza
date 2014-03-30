@@ -1,7 +1,5 @@
 require 'spec_helper'
 
-
-
 def valid_sign_up_topic
   SignUpTopic.new(topic_name: 'foo',
                   assignment_id: 1,
@@ -28,7 +26,29 @@ def valid_assignment
                  :wiki_type_id => 1)
 end
 
+def valid_questionnaire
+  Questionnaire.new(name: 'questionnaire',
+                    max_question_score: 2,
+                    min_question_score: 1,
+                    section: 1
+  )
+end
+
+def valid_instructor_user
+  users(:instructor1)
+end
+
 describe AssignmentFormObject do
+  fixtures :users, :roles
+  # Make sure that we can get valid questionnaire. (Fixtures are non-existant...)
+  describe "when there is a valid questionnaire" do
+    before do
+      @questionnaire = valid_questionnaire
+    end
+    subject{@questionnaire}
+    it {should be_valid}
+  end
+
   # Make sure that we can get a valid sign_up_topic
   describe "when there is a valid sign_up_topic" do
     before do
@@ -126,9 +146,28 @@ describe AssignmentFormObject do
       end
     end
 
+    describe "when creating a new form object" do
+      before do
+        assignment = valid_assignment
+        questionnaire = valid_questionnaire
+        questionnaire.save
+        assignment.review_questionnaire_id = questionnaire.id
+        assignment.review_of_review_questionnaire_id = questionnaire.id
+        assignment.instructor_id = valid_instructor_user.id
+        @form = AssignmentFormObject.new(assignment: assignment)
+      end
+
+      describe "saving the form object should save the assignment" do
+        before do
+          @form.save
+        end
+        subject {@form.assignment.id}
+        it {should_not be nil}
+
+      end
+
+    end
+
   end
-
-
-
 
 end

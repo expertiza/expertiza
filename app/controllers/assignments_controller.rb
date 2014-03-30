@@ -47,7 +47,7 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form_object.save
       flash.now[:note] = "Form saved"
-      redirect_to controller: 'tree_display', action: 'list'
+      redirect_to action: 'edit', id: @assignment_form_object.assignment.id
       undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
     else
       flash.now[:error] = "Error saving form"

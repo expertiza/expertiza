@@ -144,6 +144,7 @@ class AssignmentFormObject
         # This might need to be update?
         if !@assignment.save
           raise ActiveRecord::Rollback
+          false
         end
       else
         raise ActiveRecord::Rollback
@@ -164,6 +165,7 @@ class AssignmentFormObject
 
       #same as the topics list
       due_dates_list = []
+      true
     end
   end
 

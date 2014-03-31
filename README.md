@@ -21,6 +21,11 @@ assignment due dates in order of next due.
 * Create a form object to encapsulate the creation and editing of Assignments, Due Dates, and Topics
 * Add the ability to sort Due Dates
 
+### Group Information
+* William Morrow (wemorrow)
+* Rachel Lloyd (rjlloyd)
+* Mitchell Neville (mdnevill)
+
 Setup
 -----
 

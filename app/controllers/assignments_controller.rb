@@ -35,17 +35,6 @@ class AssignmentsController < ApplicationController
   def create
     @user = current_user
     @assignment = Assignment.new(params[:assignment])
-
-    #This one is working
-    #       emails = Array.new
-    #      #emails<<"vikas.023@gmail.com"
-    #Mailer.generic_message(
-    #    {:bcc => emails,
-    #     :subject => "one",
-    #     #:body => "two",
-    #    :partial_name => 'update'
-    #    }).deliver
-
     @assignment_form_object = AssignmentFormObject.new(assignment: @assignment)
 
     due_dates = params[:due_date]
@@ -56,20 +45,25 @@ class AssignmentsController < ApplicationController
       #due_date.assignment_id = due_dates[:assignment_id][i]
       due_date.deadline_type_id = due_dates[:deadline_type_id][i]
 
-      # Metareviews can have a nil value for due_at. If it is a metareview, don't parse due_at.
+      # If it is not a metareview, parse the due_at date time. If it is a metareview, do not parse the due_at
+      # date time if it was left blank. (Metareviews don't require a due_at date time)
       if(due_date.deadline_type_id != DeadlineType.find_by_name('metareview').id)
-        # If due_at is not blank, try to parse it. If it is blank or nil, skip this due date
-        if(due_dates[:due_at][i] == "" || due_dates[:due_at][i] == nil)
-          next
-        else
-          begin
-            due_at = DateTime.parse(due_dates[:due_at][i])
-            due_date.due_at = due_at
-          rescue
-            flash.now[:error] = "Error parsing due date date time"
-            render 'new'
-            return
-          end
+        begin
+          due_at = DateTime.parse(due_dates[:due_at][i])
+          due_date.due_at = due_at
+        rescue
+          flash.now[:error] = "Error parsing due date date time"
+          render 'new'
+          return
+        end
+      elsif((due_dates[:due_at][i] != nil) && (due_dates[:due_at][i] != ""))
+        begin
+          due_at = DateTime.parse(due_dates[:due_at][i])
+          due_date.due_at = due_at
+        rescue
+          flash.now[:error] = "Error parsing due date date time"
+          render 'new'
+          return
         end
       end
 
@@ -103,17 +97,6 @@ class AssignmentsController < ApplicationController
       render 'new'
     end
 
-    #if @assignment.save
-      #@assignment.create_node
-      # flash[:success] = 'Assignment was successfully created.'
-      # redirect_to controller: :assignments, action: :edit, id: @assignment.id
-      #AAD#
-      #redirect_to :controller => 'tree_display', :action => 'list'
-      #undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
-      #AAD#
-    #else
-      #render 'new'
-    #end
   end
 
   def edit

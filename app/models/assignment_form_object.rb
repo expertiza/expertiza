@@ -17,15 +17,10 @@ class AssignmentFormObject
   attribute :topics_list, Array
   attribute :due_dates_list, Array
 
-  #TODO: I have a feeling these validations are not correct
   validates :assignment, presence: true
   validate :assignment_must_be_valid
   validate :due_dates_list_must_contain_valid_due_dates
   validate :topics_list_must_contain_valid_topics
-
-  #validates :assignment_name, presence: true
-  #validates :assignment_name, uniqueness: {scope: :assignment_course_id }
-  #validates_uniqueness_of :assignment_name, :scope => :assignment_course_id
 
   # Forms are never themselves persisted
   def persisted?
@@ -41,12 +36,10 @@ class AssignmentFormObject
   end
 
   def add_topic(topic)
-    #TODO: check if this is right
     topics_list.push(topic)
   end
 
   def add_due_date(due_date)
-    #TODO: check if this is right
     due_dates_list.push(due_date)
   end
 
@@ -120,7 +113,6 @@ class AssignmentFormObject
   end
 
   def persist!
-    #TODO: make sure this is correct
     #Start a transaction, we only want to create the assignment if we can create EVERYTHING in the assignment
     Assignment.transaction do
       if @assignment.save
@@ -149,15 +141,6 @@ class AssignmentFormObject
       else
         raise ActiveRecord::Rollback
       end
-      #if we've already made the assignment, don't bother trying to persist that
-      #if !@assignment
-        #@assignment = Assignment.create!(:name => assignment_name, :scope => assignment_scope, :course => assignment_course, :instructor => assignment_instructor, :max_team_size => assignment_max_team_size)
-        #if !@assignment
-          #raise ActiveRecord::Rollback
-        #end
-      #end
-      #might need to set the assignment_id in each of these topics and due dates, not sure
-      #the interconnections are difficult to figure out from the models
 
       #don't need to re-persist these topics, remove them from the "Queue"
       topics_list = []

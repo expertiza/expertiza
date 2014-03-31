@@ -6,9 +6,9 @@ class Participant < ActiveRecord::Base
 
   has_many   :comments, :dependent => :destroy
   has_many   :resubmission_times, :dependent => :destroy
-  has_many   :reviews, :class_name => 'ResponseMap', :foreign_key => 'reviewer_id'
-  has_many   :team_reviews, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewer_id'
-  has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id'
+  has_many   :reviews, :class_name => 'ResponseMap', :foreign_key => 'reviewer_id', dependent: :destroy
+  has_many   :team_reviews, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewer_id', dependent: :destroy
+  has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id', dependent: :destroy
 
   validates_numericality_of :grade, :allow_nil => true
 

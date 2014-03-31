@@ -51,23 +51,28 @@ class AssignmentsController < ApplicationController
     due_dates = params[:due_date]
     upper_index = due_dates[:deadline_type_id].count - 1
     for i in 0..upper_index
-      if due_dates[:due_at][i] == nil || due_dates[:due_at][i] == ""
-        next
-      end
       due_date = DueDate.new
       # Don't need to set assignment_id because it doesn't exist until assignment is saved.
       #due_date.assignment_id = due_dates[:assignment_id][i]
       due_date.deadline_type_id = due_dates[:deadline_type_id][i]
-      begin
-        due_at = DateTime.parse(due_dates[:due_at][i])
-      rescue
-        flash.now[:error] = "Error parsing due date date time"
-        render 'new'
-        return
+
+      # Metareviews can have a nil value for due_at. If it is a metareview, don't parse due_at.
+      if(due_date.deadline_type_id != DeadlineType.find_by_name('metareview').id)
+        # If due_at is not blank, try to parse it. If it is blank or nil, skip this due date
+        if(due_dates[:due_at][i] == "" || due_dates[:due_at][i] == nil)
+          next
+        else
+          begin
+            due_at = DateTime.parse(due_dates[:due_at][i])
+            due_date.due_at = due_at
+          rescue
+            flash.now[:error] = "Error parsing due date date time"
+            render 'new'
+            return
+          end
+        end
       end
 
-
-      due_date.due_at = due_at
       due_date.submission_allowed_id = due_dates[:submission_allowed_id][i]
       due_date.review_allowed_id = due_dates[:review_allowed_id][i]
       due_date.review_of_review_allowed_id = due_dates[:review_of_review_allowed_id][i]

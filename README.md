@@ -11,12 +11,18 @@ Expertiza is a web application where students can submit and peer-review learnin
 About this Fork
 -----
 Background
-------
+----
 Assignments in Expertiza have many components--due dates and topics, for example. Due dates and topics are objects in
 their own right (DueDate, SignupTopic); we need a way to have sets of due dates and topics associated with an
 assignment. There are also separate forms to create and edit an Assignment and its components (Topics, Due Dates),
 these forms should be unified into one form for every component of an Assignment. Also, it'd be nice if we could sort
 assignment due dates in order of next due.
+
+Goals
+----
+* Remove the separate New and Edit forms for assignment
+* Create a form object to encapsulate the creation and editing of Assignments, Due Dates, and Topics
+* Add the ability to sort Due Dates
 
 Setup
 -----

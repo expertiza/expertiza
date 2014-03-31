@@ -14,24 +14,13 @@ class StudentTeamControllerTest < ActionController::TestCase
     @controller = StudentTeamController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
-    #@request.session[:user] = User.find(users(:superadmin).id )
-    #roleid = User.find(users(:superadmin).id).role_id
     Role.rebuild_cache
-    #Role.find(roleid).cache[:credentials]
-    #@request.session[:credentials] = Role.find(roleid).cache[:credentials]
-    #@settings = SystemSettings.find(:first)
-    #AuthController.set_current_role(roleid,@request.session)
-    #@request.session[:user] = User.find_by_name("suadmin")
-    @testUser = users(:ta1).id
-    @testAssignment = assignments(:assignment_project1).id
-    @testCourse = courses(:course1).id
-    @testTeams = teams(:project1_team1).id
   end
 
   test "view student team" do
     sessionVars = session_for(users(:student1))
     get(:view, {'id' =>  participants(:par1).id}, sessionVars, nil)
-    assert_not_nil assigns(:student)
+    assert_equal assigns(:student).user_id, users(:student1).id
     assert_not_nil assigns(:send_invs)
     assert_not_nil assigns(:received_invs)
   end
@@ -55,10 +44,9 @@ class StudentTeamControllerTest < ActionController::TestCase
     #something like <"Team \"test_team\" has been created successfully. <a href = http://test.host/versions/revert/12?redo=true>undo</a>
     #assert_equal 'Team "test_team" has been created successfully. ', flash[:notice]
     assert_redirected_to :controller => 'student_team', :action => 'view', :id => participants(:par1).id
-    #assert_response :redirect
   end
 
-  test "create_student team with invalid name " do
+  test "create_student team with name in use" do
     sessionVars = session_for(users(:student8))
     post(:create,
          {'team' => { 'name' => 'IntelligentTeam2'}, 'id' => participants(:par21).id, "commit" => "Create Team"},
@@ -81,7 +69,7 @@ class StudentTeamControllerTest < ActionController::TestCase
     #assert_equal 'new_name', teams(:IntelligentTeam1).name
   end
 
-  test "update invalid team name" do
+  test "update team name in use" do
     sessionVars = session_for(users(:student8))
     get(:update,
         { 'team' => { 'name' => 'IntelligentTeam2'}, 'student_id' => participants(:par21).id, 'team_id' => teams(:IntelligentTeam1).id},
@@ -102,18 +90,8 @@ class StudentTeamControllerTest < ActionController::TestCase
     assert_equal 'IntelligentTeam1', Team.find(teams(:IntelligentTeam1).id).name
   end
 
-=begin
-  test "advertise for partners" do
-    sessionVars = session_for(users(:student8))
-    get(:advertise_for_partners,
-        {'team_id' => teams(:IntelligentTeam1).id},
-        sessionVars,
-        nil)
-    team = Team.find_by_name 'IntelligentTeam1'
-    assert_true team.advertise_for_partner
-
-  end
-=end
+  # this is not used because the work is done by
+  # AdvertiseForPartnersController, but it is functional
   test "remove advertise for partners" do
     sessionVars = session_for(users(:student8))
     get(:remove,
@@ -125,8 +103,24 @@ class StudentTeamControllerTest < ActionController::TestCase
 
   end
 
+  #It turns out that this is not used. The work is done
+  #by AdvertiseForPartnersController instead.
+  #so it has missing template error.
 =begin
-  #this should fail
+  test "advertise for partners" do
+    sessionVars = session_for(users(:student8))
+    get(:advertise_for_partners,
+        {'team_id' => teams(:IntelligentTeam1).id, :format => :html},
+        sessionVars,
+        nil)
+    assert_redirected_to :controller => "advertise_for_partner"
+    team = Team.find_by_name 'IntelligentTeam1'
+    assert_true team.advertise_for_partner
+
+  end
+=end
+=begin
+  #this will raise error due to
   test "leave student team" do
     sessionVars = session_for(users(:student8))
     get(:leave,

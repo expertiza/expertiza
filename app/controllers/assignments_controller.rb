@@ -51,7 +51,9 @@ class AssignmentsController < ApplicationController
     due_dates = params[:due_date]
     upper_index = due_dates[:deadline_type_id].count - 1
     for i in 0..upper_index
-
+      if due_dates[:due_at][i] == nil || due_dates[:due_at][i] == ""
+        next
+      end
       due_date = DueDate.new
       # Don't need to set assignment_id because it doesn't exist until assignment is saved.
       #due_date.assignment_id = due_dates[:assignment_id][i]

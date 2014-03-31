@@ -14,7 +14,7 @@ class StudentTeamController < ApplicationController
   end
 
   def create
-    @student = AssignmentParticipant.find(params[:id])
+    @student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(@student.user_id)
 
     check = AssignmentTeam.where( ["name =? and parent_id =?", params[:team][:name], @student.parent_id])

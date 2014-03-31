@@ -97,7 +97,7 @@ class StudentTeamController < ApplicationController
     if other_members.count == 0
       old_team = AssignmentTeam.where( ['id = ?', params[:team_id]])
       if old_team
-        old_team.delete
+        old_team.destroy_all
         #if assignment has signup sheet then the topic selected by the team has to go back to the pool
         #or to the first team in the waitlist
         signups = SignedUpUser.where( {:creator_id => params[:team_id]})

@@ -81,12 +81,21 @@ class AssignmentsController < ApplicationController
       @assignment_form_object.add_due_date(due_date)
     end
 
+    topics_list = params[:assignment_form_object][:topics_list]
+    topics_list.each do |t|
+      sign_up_topic = SignUpTopic.new(topic_name: t[:topic_name],
+                                      max_choosers: t[:max_choosers],
+                                      topic_identifier: t[:topic_identifier],
+                                      category: t[:category])
+      @assignment_form_object.add_topic(sign_up_topic)
+    end
+
     if @assignment_form_object.save
       flash.now[:note] = "Form saved"
       redirect_to action: 'edit', id: @assignment_form_object.assignment.id
       undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
     else
-      flash.now[:error] = "Error saving form"
+      flash.now[:error] = "Error saving form: #{@assignment_form_object.errors.full_messages}"
       render 'new'
     end
 

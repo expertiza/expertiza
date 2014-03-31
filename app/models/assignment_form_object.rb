@@ -54,7 +54,7 @@ class AssignmentFormObject
 
   def assignment_must_be_valid
     if !@assignment.valid?
-      errors.add(:assignment, "Assignment is not valid")
+      errors.add(:assignment, "Assignment is not valid #{@assignment.errors.full_messages}")
     end
   end
 

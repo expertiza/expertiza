@@ -63,7 +63,7 @@ class StudentTeamController < ApplicationController
     end
   end
 
-  def advertise_for_partners
+  def advertise
     Team.update_all("advertise_for_partner=true",:id=>params[:team_id])
     #respond_to do |format|
     #  format.html #  index.html.erb
@@ -71,7 +71,7 @@ class StudentTeamController < ApplicationController
     #end
     #redirect_to :controller => 'student_team', :action => 'advertise_for_partners' , :id => params[:team_id]
   end
-  def remove
+  def remove_advertisement
     Team.update_all("advertise_for_partner=false",:id=>params[:team_id])
 
     redirect_to :controller => 'student_team', :action => 'view' , :id => params[:team_id]

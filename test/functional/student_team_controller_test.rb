@@ -92,9 +92,9 @@ class StudentTeamControllerTest < ActionController::TestCase
 
   # this is not used because the work is done by
   # AdvertiseForPartnersController, but it is functional
-  test "remove advertise for partners" do
+  test "remove advertisement" do
     sessionVars = session_for(users(:student8))
-    get(:remove,
+    get(:remove_advertisement,
         {'team_id' => teams(:IntelligentTeam1).id},
         sessionVars,
         nil)
@@ -103,11 +103,11 @@ class StudentTeamControllerTest < ActionController::TestCase
 
   end
 
-  #It turns out that this is not used. The work is done
-  #by AdvertiseForPartnersController instead.
-  #so it has missing template error.
+  # It turns out that this is not used. The work is done
+  # by AdvertiseForPartnersController instead.
+  # so it has missing template error.
 =begin
-  test "advertise for partners" do
+  test "advertise" do
     sessionVars = session_for(users(:student8))
     get(:advertise_for_partners,
         {'team_id' => teams(:IntelligentTeam1).id, :format => :html},
@@ -120,7 +120,8 @@ class StudentTeamControllerTest < ActionController::TestCase
   end
 =end
 =begin
-  #this will raise error due to
+  # this will raise error due to the calling length of other_members,
+  # which is a single object but not an array.
   test "leave student team" do
     sessionVars = session_for(users(:student8))
     get(:leave,

@@ -155,8 +155,4 @@ class StudentTeamController < ApplicationController
     redirect_to :controller => 'student_team', :action => 'view' , :id => @student.id
     end
 
-  def review
-    @assignment = Assignment.find_by_id(params[:assignment_id])
-    redirect_to :controller =>'questionnaire', :action => 'view_questionnaire', :id => @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
-  end
 end

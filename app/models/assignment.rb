@@ -15,7 +15,7 @@ class Assignment < ActiveRecord::Base
   has_many :due_dates, :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
-  has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
+  has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :assignment_questionnaires,:dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'

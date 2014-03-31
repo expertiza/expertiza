@@ -27,13 +27,15 @@ class AssignmentsController < ApplicationController
     @assignment.instructor ||= current_user
     @assignment.wiki_type_id = 1 #default no wiki type
     @assignment.max_team_size = 1
-
+    # Assume initially that there is 1 round of reviews for an assignment
+    @assignment.rounds_of_reviews = 1
     @assignment_form_object = AssignmentFormObject.new(assignment: @assignment)
   end
 
   def create
     @user = current_user
     @assignment = Assignment.new(params[:assignment])
+
     #This one is working
     #       emails = Array.new
     #      #emails<<"vikas.023@gmail.com"
@@ -47,7 +49,7 @@ class AssignmentsController < ApplicationController
     @assignment_form_object = AssignmentFormObject.new(assignment: @assignment)
 
     due_dates = params[:due_date]
-    upper_index = due_dates[:assignment_id].count - 1
+    upper_index = due_dates[:deadline_type_id].count - 1
     for i in 0..upper_index
 
       due_date = DueDate.new
@@ -68,6 +70,7 @@ class AssignmentsController < ApplicationController
       due_date.review_allowed_id = due_dates[:review_allowed_id][i]
       due_date.review_of_review_allowed_id = due_dates[:review_of_review_allowed_id][i]
       due_date.quiz_allowed_id = due_dates[:quiz_allowed_id][i]
+      due_date.round = due_dates[:round][i]
       @assignment_form_object.add_due_date(due_date)
     end
 

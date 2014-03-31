@@ -89,10 +89,12 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
     return
   }
     var html = '<tr id=' + element_id + '>';
+    console.log("Adding review for round " + round_no);
+    // Assignment id does not exist for assignments that have not been saved!
+    //html += '<input class="due_date_assignment_id" name="due_date[assignment_id][]" type="hidden" value="' + <%= @assignment.id %> + '">';
+    html += '<input class="due_date_deadline_type_id" name="due_date[deadline_type_id][]" type="hidden" value="' + due_date.deadline_type_id + '">';
 
-    html += '<input class="due_date_assignment_id" name="due_date[assignment_id][]" type="hidden" value="' + <%= @assignment.id %> + '">' +
-      '<input class="due_date_round" name="due_date[round][]" type="hidden" value="' + round_no + '">' +
-      '<input class="due_date_deadline_type_id" name="due_date[deadline_type_id][]" type="hidden" value="' + due_date.deadline_type_id + '">';
+    html += '<input class="due_date_round" name="due_date[round][]" type="hidden" value="' + round_no + '">';
 
     html += '<td class="due_date_name" width="15%">';
     if (round_no != 0) {
@@ -265,11 +267,13 @@ function add_due_dates_to_assignment_form_object(){
   </tr>
   <script>
     jQuery(document).ready(function () {
+        console.log("Found " + <%=@assignment.rounds_of_reviews%> + " rounds of reviews.");
       <% for i in 1..@assignment.rounds_of_reviews %>
- addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json.html_safe %>.due_date);
-          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json.html_safe %>.due_date);
-    <% end %>
-          addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json.html_safe %>.due_date);
+        console.log("Inserting review round " + <%=i%>);
+        addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json.html_safe %>.due_date);
+        addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json.html_safe %>.due_date);
+      <% end %>
+        addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json.html_safe %>.due_date);
     }());
   </script>
 </table>

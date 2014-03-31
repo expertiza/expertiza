@@ -31,8 +31,8 @@ class StudentTeamControllerTest < ActionController::TestCase
         {'student_id' => participants(:par21).id, 'team_id' => teams(:IntelligentTeam1).id},
         sessionVars,
         nil)
-    assert_not_nil assigns(:student)
-    assert_not_nil assigns(:team)
+    assert_equal assigns(:student).user_id, users(:student8).id
+    assert_equal assigns(:team).id, teams(:IntelligentTeam1).id
   end
 
   test "create_student team with valid name " do
@@ -43,6 +43,12 @@ class StudentTeamControllerTest < ActionController::TestCase
          nil)
     #something like <"Team \"test_team\" has been created successfully. <a href = http://test.host/versions/revert/12?redo=true>undo</a>
     #assert_equal 'Team "test_team" has been created successfully. ', flash[:notice]
+    assert_equal assigns(:team).parent_id, participants(:par1).parent_id
+    team = Team.find_by_name('test_team')
+    teamUser = TeamsUser.find_by_team_id(assigns(:team).id)
+    assert_equal team.name, 'test_team'
+    assert_equal team.id, teamUser.team_id
+    assert_equal teamUser.user_id, users(:student1).id
     assert_redirected_to :controller => 'student_team', :action => 'view', :id => participants(:par1).id
   end
 
@@ -54,19 +60,18 @@ class StudentTeamControllerTest < ActionController::TestCase
          nil)
 
     assert_equal 'Team name is already in use.', flash[:notice]
-
+    assert_redirected_to :controller => 'student_team', :action => 'view', :id => participants(:par21).id
   end
 
-  #this is NOT working... should enable assert_equal
   test "update valid team name" do
     sessionVars = session_for(users(:student8))
     get(:update,
         { 'team' => { 'name' => 'new_name'}, 'student_id' => participants(:par21).id, 'team_id' => teams(:IntelligentTeam1).id},
         sessionVars,
         nil)
-    #assert_not_nil assigns(:student)
-    #assert_not_nil assigns(:team)
-    #assert_equal 'new_name', teams(:IntelligentTeam1).name
+    assert_equal assigns(:team).name, 'new_name'
+    assert_redirected_to :controller => 'student_team', :action => 'view', :id => participants(:par21).id
+
   end
 
   test "update team name in use" do
@@ -76,6 +81,7 @@ class StudentTeamControllerTest < ActionController::TestCase
         sessionVars,
         nil)
     assert_equal 'Team name is already in use.', flash[:notice]
+    assert_redirected_to :controller => 'student_team', :action => 'edit', :team_id => teams(:IntelligentTeam1).id, :student_id => participants(:par21).id
     assert_equal 'IntelligentTeam1', Team.find(teams(:IntelligentTeam1).id).name
   end
 
@@ -85,9 +91,8 @@ class StudentTeamControllerTest < ActionController::TestCase
         { 'team' => { 'name' => 'IntelligentTeam1'}, 'student_id' => participants(:par21).id, 'team_id' => teams(:IntelligentTeam1).id},
         sessionVars,
         nil)
-    #nothing really happens
     assert_redirected_to :controller => 'student_team', :action => 'view', :id => participants(:par21).id
-    assert_equal 'IntelligentTeam1', Team.find(teams(:IntelligentTeam1).id).name
+    assert_equal teams(:IntelligentTeam1).name, assigns(:team).name
   end
 
   # this is not used because the work is done by
@@ -128,6 +133,7 @@ class StudentTeamControllerTest < ActionController::TestCase
         {'student_id' => participants(:par21).id, 'team_id' => teams(:IntelligentTeam1).id},
         sessionVars,
         nil)
+    assert_nil TeamsUser.where(["team_id =? and user_id =?", teams(:IntelligentTeam1).id, users(:student8).id]).first
     assert_redirected_to :controller => 'student_team', :action => 'view', :id => participants(:par21).id
   end
 =end

@@ -87,9 +87,13 @@ class AssignmentsController < ApplicationController
                                       max_choosers: t[:max_choosers],
                                       topic_identifier: t[:topic_identifier],
                                       category: t[:category])
-      @assignment_form_object.add_topic(sign_up_topic)
+      if sign_up_topic.valid?
+        @assignment_form_object.add_topic(sign_up_topic)
+      end
     end
-
+    if @assignment.late_policy_id=0
+      @assignment.late_policy_id=nil
+    end
     if @assignment_form_object.save
       flash.now[:note] = "Form saved"
       redirect_to action: 'edit', id: @assignment_form_object.assignment.id

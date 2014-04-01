@@ -1,7 +1,7 @@
 development:
   adapter: mysql
   database: pg_development
-  username: root
+  username: expertiza
   password:
   host: localhost
 

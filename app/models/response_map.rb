@@ -1,5 +1,5 @@
 class ResponseMap < ActiveRecord::Base
-  has_one :response, foreign_key: 'map_id'
+  has_one :response, :class_name => 'Response', foreign_key: 'map_id'
   belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id'
 
   def map_id

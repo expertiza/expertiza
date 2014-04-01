@@ -2,7 +2,7 @@ class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
   has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id'
-  before_create :add_dummy_map_id
+  #before_create :add_dummy_map_id
 
   attr_accessor :difficulty_rating
 

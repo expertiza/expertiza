@@ -11,7 +11,11 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(:version => 20140321025833) do
+=======
+ActiveRecord::Schema.define(:version => 20140331120322) do
+>>>>>>> 1c29dd5dc3958d3c8013a822830b511b76d9563c
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"

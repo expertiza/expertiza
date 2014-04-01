@@ -1,4 +1,6 @@
 Expertiza::Application.routes.draw do
+  resources :assignment_score_views
+
   resources :bookmark_tags
   resources :books
   resources :bookmarks
@@ -130,6 +132,10 @@ Expertiza::Application.routes.draw do
       get :instructor_review
       post :remove_hyperlink
       get :conflict_notification
+      get :all_scores
+      post :all_scores
+      get :view_course_scores
+      post :view_course_scores
     end
   end
 

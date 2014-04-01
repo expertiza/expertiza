@@ -9,11 +9,121 @@ class GradesController < ApplicationController
     case params[:action]
     when 'view_my_scores'
       current_role_name.eql? 'Student'
+    when 'all_scores'
+        current_role_name.eql? 'Student'
     else
       ['Instructor',
        'Teaching Assistant',
        'Administrator'].include? current_role_name
+
     end
+   true
+  end
+
+  # method to return scores of user for all assignments
+  def all_scores
+    @scores = Hash.new
+
+    # Single query to return all scores for user
+    st = ActiveRecord::Base.connection.raw_connection.prepare("select assignments.name, questionnaire_type, avg(score), min(score), max(score) from
+          (select r.id as response_id, team_id, tu.user_id as user_id, (SUM(weight*score)*100)/(sum(weight)*max_question_score) as score, parent_id as assignment_id, qs.type as questionnaire_type from scores s ,responses r, response_maps rm, questions q, questionnaires qs , teams_users tu , teams t
+           WHERE  rm.id = r.map_id AND r.id=s.response_id AND q.id = s.question_id AND qs.id = q.questionnaire_id    AND tu.team_id = rm.reviewee_id   AND tu.team_id = t.id group by r.id
+          ) as participant_score_aggregate, assignments where assignments.id = participant_score_aggregate.assignment_id
+          and user_id = ? group by assignment_id, questionnaire_type")
+
+    # Execute query and pass current user id
+    results = st.execute(current_user.id)
+
+    # Loop through results to populate scores hash
+    # row[0] is assignment name
+    # row[1] is questionnaire type
+    # row[2] is avg
+    # row[3] is min
+    # row[4] is max
+
+    results.each do |row|
+      @scores[row[0].to_s.to_sym] = Hash.new
+      @scores[row[0].to_s.to_sym][row[1].to_s.to_sym] = Hash.new
+      @scores[row[0].to_s.to_sym][row[1].to_s.to_sym][:avg] = row[2].to_f.round(2)
+      @scores[row[0].to_s.to_sym][row[1].to_s.to_sym][:min] = row[3].to_f.round(2)
+      @scores[row[0].to_s.to_sym][row[1].to_s.to_sym][:max] = row[4].to_f.round(2)
+    end
+  end
+  def view_course_scores
+
+    # Create empty scores hash
+    @scores = Hash.new
+
+    @scores[params[:course_id]]= Hash.new
+
+    course_assignments = Array.new
+    # Get all the assignments for this course
+    course_assignments = Assignment.find_all_by_course_id(params[:course_id])
+
+    # Hash creation begins. A hash is created to have the same structure as required by the view
+    # This hash is not created after the query according to the resultset because
+    # the query only returns results for participants who got responses and scores.
+    # We want an empty placeholder for participants that have no scores.
+    # Loop through the course assignments array
+    course_assignments.each do |assignment|
+      @scores[params[:course_id]][assignment.name.to_sym] = Hash.new
+
+      # Loop through all the participants of this assignment
+      assignment.participants.each do |participant|
+
+        # Get the user name of the participant from the user id
+        participant_name = User.find(participant.user_id).name
+
+        @scores[params[:course_id]][assignment.name.to_sym][participant_name.to_s.to_sym]=Hash.new
+
+        # Loop through the assignment questionnaires
+        assignment.questionnaires.each do |questionnaire|
+          @scores[params[:course_id]][assignment.name.to_sym][participant_name.to_s.to_sym][questionnaire.symbol] = Hash.new
+          @scores[params[:course_id]][assignment.name.to_sym][participant_name.to_s.to_sym][questionnaire.symbol][:scores] = Hash.new
+          @scores[params[:course_id]][assignment.name.to_sym][participant_name.to_s.to_sym][questionnaire.symbol][:scores][:avg] = nil
+          @scores[params[:course_id]][assignment.name.to_sym][participant_name.to_s.to_sym][questionnaire.symbol][:scores][:min] = nil
+          @scores[params[:course_id]][assignment.name.to_sym][participant_name.to_s.to_sym][questionnaire.symbol][:scores][:max] = nil
+        end
+      end
+    end
+    # Hash creation completed
+
+    # Single sql query
+    st = ActiveRecord::Base.connection.raw_connection.prepare("select assignments.name, user_id, questionnaire_type, avg(score), min(score), max(score) from
+  (select r.id as response_id, team_id, u.name as user_id, (SUM(weight*score)*100)/(sum(weight)*max_question_score) as score, t.parent_id as assignment_id, qs.type as questionnaire_type from scores s ,responses r, response_maps rm, questions q, questionnaires qs , users u, teams_users tu , teams t
+   WHERE  rm.id = r.map_id AND r.id=s.response_id AND q.id = s.question_id AND qs.id = q.questionnaire_id    AND tu.team_id = rm.reviewee_id   AND tu.team_id = t.id AND tu.user_id=u.id group by r.id
+  ) as participant_score_aggregate, assignments where assignments.id = participant_score_aggregate.assignment_id
+  and assignments.course_id = ? group by assignment_id, questionnaire_type")
+    # Run the sql query with the course id as parameter
+    results = st.execute(params[:course_id])
+
+    # Loop through the results
+    # row[0] is assignment name
+    # row[1] is user id
+    # row[2] is questionnaire typ
+    # row[3] is avg
+    # row[4] is min
+    # row[5] is max
+    results.each do |row|
+      # Set the type of questionnaire
+      case row[2].to_sym
+        when :ReviewQuestionnaire
+          quetionnaire_type= :review
+        when :AuthorFeedbackQuestionnaire
+          quetionnaire_type= :feedback
+        when :MetareviewQuestionnaire
+          quetionnaire_type= :metareview
+        when :TeammateReviewQuestionnaire
+          quetionnaire_type= :teammate
+      end
+
+      # Set the avg, min and max scores
+      @scores[params[:course_id]][row[0].to_s.to_sym][row[1].to_s.to_sym][quetionnaire_type][:scores][:avg]=row[3].to_f.round(2)
+      @scores[params[:course_id]][row[0].to_s.to_sym][row[1].to_s.to_sym][quetionnaire_type][:scores][:min]=row[4].to_f.round(2)
+      @scores[params[:course_id]][row[0].to_s.to_sym][row[1].to_s.to_sym][quetionnaire_type][:scores][:max]=row[5].to_f.round(2)
+    end
+
+    @scores
   end
 
   #the view grading report provides the instructor with an overall view of all the grades for
@@ -281,6 +391,7 @@ class GradesController < ApplicationController
         calculate_for_participants = true
       end
       Participant.find_all_by_parent_id(assignment_id).each do |participant|
+        if participant.type=='AssignmentParticipant'
         penalties = calculate_penalty(participant.id)
         @total_penalty =0
         if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
@@ -314,9 +425,14 @@ class GradesController < ApplicationController
         @all_penalties[participant.id][:review] = penalties[:review]
         @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
         @all_penalties[participant.id][:total_penalty] = @total_penalty
+       end
       end
       if @assignment.is_penalty_calculated == false
         @assignment.update_attribute(:is_penalty_calculated, true)
       end
     end
+
+
+
+
   end

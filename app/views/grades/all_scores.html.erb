@@ -1,0 +1,109 @@
+<link href="/stylesheets/bootstrap.css" rel="stylesheet">
+<link href="/stylesheets/smoothness/jquery-ui-1.10.3.custom.css" rel="stylesheet">
+<script src="/javascripts/bootstrap.min.js"></script>
+<script src="/javascripts/jquery-ui-1.10.3.custom.scores.js"></script>
+
+<style type="text/css">
+    .round-border-table {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+        border: 1px solid #dddddd !important;
+        border-radius: 5px !important;
+        -moz-border-radius: 5px !important;
+        padding: 0px !important;
+    }
+
+    .round-border-table td {
+        border: 1px solid #dddddd;
+    }
+
+    table.text-center th, table.text-center td {
+        text-align: center;
+        vertical-align: middle !important;
+    }
+
+    table td {
+        min-width: 108px !important;
+    }
+
+    .graph-btn {
+        cursor: pointer;
+    }
+
+    .td-top-arrow {
+        position: relative; padding: 5px;
+    }
+
+    .top-arrow {
+        position: absolute;
+        top: 0;
+        right: 0;
+        border-top: 10px solid #428bca;
+        border-left: 10px solid transparent;
+    }
+</style>
+<br><br><br><br>
+<div class="twbs">
+  <div class="container" style="...">
+    <table>
+
+      <tr>
+        <th>Assignments</th>
+        <th colspan="2">Submitted</th>
+        <th colspan="2">Reviewing</th>
+        <th colspan="2">Author Feedback</th>
+        <th colspan="2">Teammate Review</th>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Avg</td>
+        <td>Range</td>
+        <td>Avg</td>
+        <td>Range</td>
+        <td>Avg</td>
+        <td>Range</td>
+        <td>Avg</td>
+        <td>Range</td>
+      </tr>
+      <% @scores.each do |assignment, questionnaire_type|%>
+      <tr>
+        <td><%= assignment %></td>
+        <% questionnaire_type.each do |type, value| %>
+            <%if type==:ReviewQuestionnaire%>
+                <td><%= value[:avg]%>%</td>
+                <td><%= value[:min]%>%-<%=value[:max]%>%</td>
+            <%else %>
+                <td> --- </td>
+                <td> --- </td>
+            <% end %>
+            <%if type==:MetareviewQuestionnaire%>
+                <td><%= value[:avg]%>%</td>
+                <td><%= value[:min]%>%-<%=value[:max]%>%</td>
+            <%else %>
+                <td> --- </td>
+                <td> --- </td>
+            <% end %>
+            <%if type==:AuthorFeedbackQuestionnaire%>
+                <td><%= value[:avg]%>%</td>
+                <td><%= value[:min]%>%-<%=value[:max]%>%</td>
+            <%else %>
+                <td> --- </td>
+                <td> --- </td>
+            <% end %>
+            <%if type==:TeammateReviewQuestionnaire%>
+                <td><%= value[:avg]%>%</td>
+                <td><%= value[:min]%>%-<%=value[:max]%>%</td>
+            <%else %>
+                <td> --- </td>
+                <td> --- </td>
+            <% end %>
+
+      </tr>
+      <%end %>
+      <%end %>
+
+    </table>
+
+    <br><br><br><br><br>
+  </div>
+</div>

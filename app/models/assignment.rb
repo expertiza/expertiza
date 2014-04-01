@@ -308,9 +308,85 @@ class Assignment < ActiveRecord::Base
     scores = Hash.new
 
     scores[:participants] = Hash.new
-    self.participants.each do |participant|
-      scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
 
+    # Create empty hash
+    # This is a placeholder for scores that will be returned from database.
+    # Reason to do this before running the query is because the query returns results
+    # only for submissions that did get responses. We want the rest to be present
+    # in the hash, even if nil.
+    # Loop through all the participants of this assignment
+    self.participants.each do |participant|
+      scores[:participants][participant.id.to_s.to_sym] = Hash.new
+      scores[:participants][participant.id.to_s.to_sym][:participant] = participant
+
+      # Loop through all the questionnaires
+      self.questionnaires.each do |questionnaire|
+      scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
+      scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Hash.new
+      scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
+      scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores][:avg] = nil
+      scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores][:min] = nil
+      scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores][:max] = nil
+      end
+
+      scores[:participants][participant.id.to_s.to_sym][:total_score] = 0
+      quiz_responses = Array.new
+
+      quiz_response_mappings = QuizResponseMap.find_all_by_reviewer_id(participant.id)
+      quiz_response_mappings.each do |qmapping|
+        if (qmapping.response)
+          quiz_responses << qmapping.response
+        end
+      end
+
+      scores[:participants][participant.id.to_s.to_sym][:quiz] = Hash.new
+      scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments] = quiz_responses
+      scores[:participants][participant.id.to_s.to_sym][:quiz][:scores] = Score.compute_quiz_scores(scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments])
+      scores[:teams] = Hash.new
+    end
+    # End of creation of empty hash
+
+    # Single query
+    st = ActiveRecord::Base.connection.raw_connection.prepare("select pid as participant_id, avg(score), min(score), max(score), questionnaire_type from (select r.id as response_id, p.id as pid, p.user_id as user_id, (SUM(weight*score)*100)/(sum(weight)*max_question_score) as score, parent_id , qs.type as questionnaire_type from scores s ,responses r, response_maps rm, questions q, questionnaires qs , participants p WHERE  rm.id = r.map_id AND r.id=s.response_id AND q.id = s.question_id AND qs.id = q.questionnaire_id AND p.id = rm.reviewee_id AND parent_id= ? group by r.id) as assignment_score_aggregate group by questionnaire_type, pid")
+    # Execute the SQL query with the assignment id
+    results = st.execute(self.id)
+
+    # Loop through the result returned to populate the hash
+    # row[0] is participant id
+    # row[1] is avg
+    # row[1] is min
+    # row[1] is max
+    # row[1] is questionnaire_type
+    results.each do |row|
+      participant=self.participants.find(row[0].to_int)
+
+      scores[:participants][participant.id.to_s.to_sym][:participant] = participant
+
+      questionnaire_type_score = Hash.new
+      questionnaire_type = row[4]
+      questionnaire_type_score[questionnaire_type.to_sym] = Hash.new
+      questionnaire_type_score[questionnaire_type.to_sym][:avg] = row[1].to_f.round(2)
+      questionnaire_type_score[questionnaire_type.to_sym][:min] = row[2].to_f.round(2)
+      questionnaire_type_score[questionnaire_type.to_sym][:max] = row[3].to_f.round(2)
+
+      # Loop through questionnaires
+      self.questionnaires.each do |questionnaire|
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Hash.new
+
+        # Check the type of questionnaire
+        if questionnaire.symbol==:review && !questionnaire_type_score[:ReviewQuestionnaire].nil?
+          scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = questionnaire_type_score[:ReviewQuestionnaire]
+        elsif questionnaire.symbol==:feedback && !questionnaire_type_score[:AuthorFeedbackQuestionnaire].nil?
+          scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = questionnaire_type_score[:AuthorFeedbackQuestionnaire]
+        elsif questionnaire.symbol==:metareview && !questionnaire_type_score[:MetareviewQuestionnaire].nil?
+          scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = questionnaire_type_score[:MetareviewQuestionnaire]
+        elsif questionnaire.symbol==:teammate && !questionnaire_type_score[:TeammateReviewQuestionnaire].nil?
+          scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = questionnaire_type_score[:TeammateReviewQuestionnaire]
+        end
+
+      end
 
       # for all quiz questionnaires (quizzes) taken by the participant
       quiz_responses = Array.new
@@ -327,27 +403,23 @@ class Assignment < ActiveRecord::Base
 
       scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
       scores[:participants][participant.id.to_s.to_sym][:total_score] += participant.compute_quiz_scores(scores[:participants][participant.id.to_s.to_sym])
+      index = 0
 
-
-
+      # get scores for teams. This is retained from previous code
+      #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # to treat all assignments as team assignments
+      self.teams.each do |team|
+        scores[:teams][index.to_s.to_sym] = Hash.new
+        scores[:teams][index.to_s.to_sym][:team] = team
+        assessments = TeamReviewResponseMap.get_assessments_for(team)
+        scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
+        #... = ScoreCache.get_participant_score(team, id, questionnaire.display_type)
+        index = index + 1
+      end
     end
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
 
-
-
-    scores[:teams] = Hash.new
-    index = 0
-    self.teams.each do |team|
-      scores[:teams][index.to_s.to_sym] = Hash.new
-      scores[:teams][index.to_s.to_sym][:team] = team
-      assessments = TeamReviewResponseMap.get_assessments_for(team)
-      scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
-      #... = ScoreCache.get_participant_score(team, id, questionnaire.display_type)
-      index = index + 1
-    end
     scores
-    end
+  end
 
   def get_contributor(contrib_id)
     AssignmentTeam.find(contrib_id)
@@ -393,12 +465,12 @@ class Assignment < ActiveRecord::Base
       .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
       .order('due_at')
 
-    return false if next_due_date.nil?
+    return false if next_due_date.first.nil?
 
     # command pattern - get the attribute with the name in column
     # Here, column is usually something like 'review_allowed_id'
 
-    right_id = next_due_date.send column
+    right_id = next_due_date.first.send column
 
     right = DeadlineRight.find(right_id)
     (right && (right.name == 'OK' || right.name == 'Late'))
@@ -913,5 +985,9 @@ class Assignment < ActiveRecord::Base
     # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
     def has_partner_ads?(id)
       Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
+    end
+    def scores(id)
+      scores=Array.new
+      scores = AssignmentScoreView.find_by_sql ["SELECT team_id, score, assignment_id FROM assignment_score_views WHERE assignment_id = ?", id]
     end
   end

@@ -18,44 +18,23 @@ class TeamsControllerTest < ActionController::TestCase
     @request.session[:credentials] = Role.find(roleid).cache[:credentials]
     @settings = SystemSettings.find(:first)
     AuthController.set_current_role(roleid,@request.session)
-    #@request.session[:user] = User.find_by_name("suadmin")
     @testUser = users(:ta1).id
     @testAssignment = assignments(:assignment_project1).id
     @testCourse = courses(:course1).id
-    @testTeams = teams(:project1_team1).id
+    @testTeam = teams(:project1_team1).id
+    @testTeam1 = teams(:exist_team2).id
   end
 
   #no use !!! this method is from teams_controller
-  #test "create_teams_view should assign parent" do
-
-    #user = User.find_by_name('student1')
-    #session[:user] = user
-    #Role.rebuild_cache
-    #AuthController.set_current_role(user.role.id, session)
+  test "create_teams_view should assign parent" do
+    #assignment = Assignment.find_by_name("Assignment_Project1")
     #sessionVars = session
     #sessionVars[:team_type] = "Assignment"# class
-    #sessionVars.save
-
-    #get :create_teams_view, {'id' => nodes(:node23).node_object_id}, sessionVars
+ 
+    #post(:create_teams_view, {'id' => assignment.id}, sessionVars,nil)
     #assert_response :success
     #assert_not_nil assigns(:parent)
-  #end
-
-    test "create_teams assignment should be valid" do
-	sessionVars = session_for(users(:superadmin))
-    	sessionVars[:team_type] = "Assignment"
-    
-    	post(:create_teams, {'team' => 'my_team', 'size' => '2','id'=> @testAssignment}, sessionVars,nil)
-	assert_response :redirect
-    end
-
-    test "create_teams course should be valid" do
-	sessionVars = session_for(users(:superadmin))
-    	sessionVars[:team_type] = "Course"
-    
-    	post(:create_teams, {'team' => 'my_team', 'size' => '2','id'=> @testCourse}, sessionVars,nil)
-	assert_response :redirect
-    end
+  end
 
     test "delete_all should delete all team" do
 	sessionVars = session_for(users(:instructor1))
@@ -181,5 +160,109 @@ class TeamsControllerTest < ActionController::TestCase
 	assert_response :redirect
 
     end
+
+  test "test_update_should_redirect_to_list_for_Course_type" do
+    sessionVars = session_for(users(:instructor3))
+    sessionVars[:team_type] = "Course"
+    post(:update, { :id => @testTeam1, :team => {:name => "newName"}}, sessionVars,nil)
+    assert_response :redirect
+  end
+
+  test "update should redirect to list for Assignemt type" do
+    sessionVars = session_for(users(:instructor1))
+    sessionVars[:team_type] = "Assignment"
+    post(:update, { :id => @testTeam, :team => {:name => "newName"}}, sessionVars,nil)
+    assert_response :redirect
+  end
+
+  test "update should have valid name for Course type" do
+    sessionVars = session_for(users(:instructor3))
+    sessionVars[:team_type] = "Course"
+    post(:update, { :id => @testTeam1, :team => {:name => "ExistTeam2"}}, sessionVars,nil)
+    assert_not_equal $!,flash[:error]
+    assert_response :redirect
+  end
+
+  test "update should have valid name for Assignemt type" do
+    sessionVars = session_for(users(:instructor1))
+    sessionVars[:team_type] = "Assignment"
+    post(:update, { :id => @testTeam, :team => {:name => "Project1Team1"}}, sessionVars,nil)
+    assert_not_equal $!,flash[:error]
+    assert_response :redirect
+  end
+
+  test "edit test for Assignment type" do
+    sessionVars = session_for(users(:instructor1))
+    sessionVars[:team_type] = "Assignment"
+    post(:edit, { :id => @testTeam}, sessionVars,nil)
+    assert true
+  end
+
+  test "edit test for Course type" do
+    sessionVars = session_for(users(:instructor3))
+    sessionVars[:team_type] = "Course"
+    post(:edit, { :id => @testTeam1}, sessionVars,nil)
+    assert true
+  end
+
+  test "test_delete_should_redirect_to_list_for_Course_type" do
+    sessionVars = session_for(users(:instructor3))
+    sessionVars[:team_type] = "Course"
+    post(:delete, {'id' => @testTeam1}, sessionVars,nil)
+    assert_response :redirect
+  end
+
+  test "delete should redirect to list for Assignemt type" do
+    sessionVars = session_for(users(:instructor1))
+    sessionVars[:team_type] = "Assignment"
+    post(:delete, {'id' => @testTeam}, sessionVars,nil)
+    assert_response :redirect
+  end
+
+  test "delete should decrease number of teams for Course type" do
+    sessionVars = session_for(users(:instructor3))
+    sessionVars[:team_type] = "Course"
+    assert_difference 'Team.count', -1, 'a team is deleted' do
+      post(:delete, {:id => @testTeam1}, sessionVars,nil)
+    end
+  end
+
+  test "delete should decrease number of teams for Assignemt type" do
+    sessionVars = session_for(users(:instructor1))
+    sessionVars[:team_type] = "Assignment"
+    assert_difference('Team.count', -1) do
+      get(:delete, {:id => @testTeam}, sessionVars,nil)
+    end
+  end
+
+  test "delete should decrease number of team nodes for Course type" do
+    sessionVars = session_for(users(:instructor3))
+    sessionVars[:team_type] = "Course"
+    assert_difference('TeamNode.count', -1) do
+      get(:delete, {'id' => @testTeam1}, sessionVars,nil)
+    end
+  end
+
+  test "delete should decrease number of team nodes for Assignemt type" do
+    sessionVars = session_for(users(:instructor1))
+    sessionVars[:team_type] = "Assignment"
+    assert_difference('TeamNode.count', -1) do
+      get(:delete, {'id' => @testTeam}, sessionVars,nil)# this is wrong
+    end
+  end
+
+  test "inherit should redirect to list" do
+    sessionVars = session_for(users(:superadmin))
+    sessionVars[:team_type] = "Assignment"
+    post(:inherit, {'id' => @testTeam}, sessionVars,nil)
+    assert_response :redirect
+  end
+
+  test "bequeath should redirect to list" do
+    sessionVars = session_for(users(:superadmin))
+    sessionVars[:team_type] = "Assignment"
+    post(:bequeath, {'id' => @testTeam}, sessionVars,nil)
+    assert_response :redirect
+  end
 
 end

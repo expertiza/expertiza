@@ -5,7 +5,7 @@ ruby '1.9.3'
 gem 'rails', '~>3.0.0'
 
 ## Gems in Alphabetical Order
-gem 'automated_metareview', github: 'expertiza/automated_metareview'
+#gem 'automated_metareview', github: 'expertiza/automated_metareview'
 gem 'bind-it'
 gem 'capistrano'
 gem 'coveralls', require: false
@@ -25,7 +25,7 @@ gem 'nokogiri'
 gem 'open-uri-cached'
 gem 'paper_trail'
 gem 'rake'
-gem 'raspell'
+#gem 'raspell'
 gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rjb'

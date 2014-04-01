@@ -1,4 +1,4 @@
-require 'automated_metareview'
+# require 'automated_metareview'
 class AutomatedMetareviewsController < ApplicationController
   attr_accessor :automated_metareviews
   def index

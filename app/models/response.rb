@@ -1,8 +1,13 @@
 class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id', dependent: :destroy
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
+<<<<<<< HEAD
+  has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id'
+  #before_create :add_dummy_map_id
+=======
   has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id', dependent: :destroy
   before_create :add_dummy_map_id
+>>>>>>> 1c29dd5dc3958d3c8013a822830b511b76d9563c
 
   attr_accessor :difficulty_rating
 

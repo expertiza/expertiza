@@ -1,6 +1,11 @@
 class ResponseMap < ActiveRecord::Base
+<<<<<<< HEAD
+  has_one :response, :class_name => 'Response', foreign_key: 'map_id'
+  belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id'
+=======
   has_one :response, foreign_key: 'map_id', dependent: :destroy
   belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id',:dependent => :destroy
+>>>>>>> 1c29dd5dc3958d3c8013a822830b511b76d9563c
 
   def map_id
     id

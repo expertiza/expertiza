@@ -35,6 +35,7 @@ gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
+#gem 'simplecov', '~>0.7.1', :require => false, :group => :test
 
 gem 'will_paginate'
 

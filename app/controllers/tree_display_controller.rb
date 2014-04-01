@@ -118,7 +118,7 @@ class TreeDisplayController < ApplicationController
 
     if session[:root]
       @root_node = Node.find(session[:root])
-      @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show,nil,@search)
+      @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show,@search)
     else
       @child_nodes = FolderNode.get()
     end

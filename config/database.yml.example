@@ -27,4 +27,4 @@ production:
   database: pg_development
   username: expertiza
   password:
-  host: localhost
+  host: localhost 

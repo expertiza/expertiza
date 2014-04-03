@@ -1,7 +1,7 @@
 development:
   adapter: mysql
   database: pg_development
-  username: expertiza
+  username: root
   password:
   host: localhost
 
@@ -11,14 +11,14 @@ development:
 test:
   adapter: mysql
   database: pg_test
-  username: expertiza
+  username: root
   password:
   host: localhost
 
 cucumber:
   adapter: mysql
   database: pg_test
-  username: expertiza
+  username: root
   password:
   host: localhost
 
@@ -27,4 +27,4 @@ production:
   database: pg_development
   username: expertiza
   password:
-  host: localhost 
+  host: localhost

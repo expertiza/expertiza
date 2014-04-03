@@ -1,195 +1,195 @@
--E908. Integration and Testing: A 
- -Social Bookmarking
- -
- -
- -
- -Design Document
- -
- -
- -
- -
- -
- -
- -Amrut Apte (acapte)
- -Aniket Sonmale (amsonmal)
- -Ankit Nair (apnair)
- -Omkar Dalvi (okdalvi)
- -
- -
- -
- -
- -CONTENTS
- -
- -1. Problem Statement			 						
- -	1.1 Limitations of the current system
- -	1.2 Proposed System
- -2. System Overview
- -3. Use Cases for the System
- -	3.1 View Topic Bookmark
- -	3.2 Add Topic Bookmark
- -	3.3 Add Tags for a Bookmark
- -	3.4 Edit Tags for a Bookmark
- -	3.5 View all Bookmarks
- -	3.6 Managing/Adding the Rating Rubric
- -
- -
- -1. Problem Statement:
- -Students should be allowed to suggest links for topics on the signup sheet in Expertiza.  Ultimately, they will be able to get credit if they provide good suggestions.  Each student/team working on a project will be able to access the suggested links for their topic, and rate the links based on how helpful they were. After each completed rating the average of all the ratings till then will be calculated and displayed along with each bookmark. 
- -
- -1.1 Limitations of current system
- -
- -1. A header says "Rate Bookmark using the Questionnaire". Need to change the name as it is too detailed.
- -2. Weight adding feature needs to be added related to each response.
- -3. Bookmarks are enabled for all assignments. Add checkbox to allow one to enable bookmarks for an assignments; they are disabled by default.
- -4. Average of ratings needs to be calculated and populated at the right place.
- -5. Users are presently not able to vote for a bookmark as a part of the extra credit functionality to be implemented by the system. That Voting mechanism needs to be added along with displaying the number of votes for each bookmark.
- -6. The UI needs to be improved by directing to the proper screens instead of too many intermediate screens.
- -7. Tests need to be written.
- -
- -1.2 Proposed System
- -
- -The Proposed system attempts to resolve the aforementioned limitations in the light of problem statement. In an attempt to handle the limitations we shall add new UI’s and also add more responsibilities to existing actors.
- -
- -
- -2. System Overview
- -
- -Social bookmarking is the concept that realizes learning by collaboration. It attempts to provide support for knowledge sharing where in Expertiza users can suggest bookmarks that may help the topic owners/authors.
- -
- -The current system consists of following actors:
- -a) Administrators: Users who have administrative privileges
- -b) Authors: Author of the topic for which the bookmarks are being suggested
- -c) Contributors: Users who are suggesting the bookmarks for a topic
- -d) Users: Any other logged in user apart from the above roles.
- -
- -The current system allows users to add bookmarks to topics. These bookmarks are external links to the web that are helpful for the topic owners/authors. They can also edit the bookmarks and view current bookmarks for the topic as well as on a whole.
- -In the current system hyperlinks to add and view bookmarks exist in the bookmark column under the signup sheet view. This design clutters the view of Signup Sheet. We, therefore, propose a design change wherein instead of a new column ‘Bookmark’, a bookmark icon will be displayed in the ‘action’ column which redirects to the bookmark view page.
- -The current system allows users to rate the bookmarks which in turn gives extra credit to the bookmark owner (i.e. contributor) .The extra credit system is handled on the basis of ratings received by the author of the topic for which bookmarks have been contributed. It also allows the contributor (as well as other users) to tag the bookmark to facilitate “search by tag” for bookmarks.
- -In accordance with the requirement we introduce a change in the responsibilities of the user by allowing them to tag bookmarks not owned by them and restrict the ability of rating a bookmark to only the topic owner (i.e. author).
- -The current system allows the user to view all the bookmarks and the bookmarks suggested by the user. The link for the same exist on the Signup Sheet under the name “view all bookmarks“ and “manage bookmarks”. We propose to change the same by moving the “Manage Bookmarks” functionality to the “Your Work” view under the name “My bookmarks”.
- -In the current system the contributor can select the rating rubric for his/her owned bookmarks. The rubric is added by the administrator. But the rating rubric appears below the bookmark and makes the “TODO” view too verbose. To overcome the same we propose a change wherein under each bookmark a button to rate the bookmark will be available that redirects the topic owner to the rating rubric on a new page.
- -
- -
- -3.1: View  Bookmarks for a Topic
- -
- -Use Case Id:	 	1
- -Use Case Name: 	View Bookmarks for a Topic
- -Actors:		             Author,Users,Contributors,Administrator
- -Pre-conditions:       Topic should be present at the “Your topic” link, where Bookmarks         link is shown 
- -Post-conditions: 	User can navigate to the “view bookmarks” screen.
- -
- -Normal Flow: 
- -1. User logs in to Expertiza using his/her particular User id and password. 
- -2. Navigate to the “Signup sheet” link,which can belong to any of the assignments. 
- -3. The topics selected by the user as well as all other topics for this particular assignment will be displayed. 
- -4. At the top of the sheet,the topic selected by that user is displayed. 
- -5. The “action” column for each and every topic will have a bookmark ”hotspot” 
- -6. User clicks on this “bookmark” icon. 
- -7. He/She is presented with a new page, where all the bookmarks suggested for the selected topic are displayed. 
- -8. 
- -a) Role is User: If the actor is any regular user, then he/she will be able to see the “title”, “bookmark discoverer”, “description”, “copied by”, “owner” and “tags” for each of the bookmarks. 
- -b) Role is Contributor: The “edit” link will be shown for this actor to make any changes, in addition to whatever is shown to the random user. 
- -c) Role is Author: The actor will be able to see the “title”, “bookmark discoverer”,“description”, “copied by ” , “owner” and “tags” for each of the bookmarks and a rating button for each bookmark
- - 
- -Special Cases: 1.If No topic exists then no bookmark present for the Topic. Assume that atleast one topic is present on the sign-up sheet. 
- -Business Rules: N/A
- -
- -3.2: Add Bookmark for a Topic
- -Use Case Id:	 	2
- -Use Case Name:        Add Bookmark for a Topic
- -Actors:		           Author,Users,Contributors,Administrator
- -Pre-conditions:          Topic be present at “Your topic” where Bookmarks link is shown 
- -Post-conditions:        System displays a form to add Bookmarks
- -Normal Flow: 
- -1. User logs in to Expertiza using his/her particular UserID and password. 
- -2. Navigate to “Signup sheet” link, under any of the assignments. 
- -3.The user selected topic along with all other topics for this assignment will be displayed. 
- -4. At the top of the sheet the topic selected by that user is displayed. 
- -5. User clicks the icon. 
- -6. He/She is presented with a new page, where all the bookmarks suggested for the selected topic are displayed along with a button “New bookmark”. 
- -7. User clicks “New bookmark” to add a bookmark. 
- -8. System displays the form to add new bookmark with form fields as: bookmark URL, bookmark title, bookmark tags, bookmark description, bookmark rubric 
- -9. User clicks on “Add” button to save the bookmark. 
- -             10. System first validates the data entered and saves the bookmark if it is valid. 
- -
- -Special Cases: N/A 
- -Assumptions: At least one topic is present on the Sign-up sheet. 
- -Business Rules: N/A
- -
- -3.3: Add tags to a Topic’s Bookmark
- -Use Case Id: 6 
- -Use Case Name: Add Tag for Bookmarks 
- -Actors: Authors, Contributors, Administrators, Users 
- -Descriptions: Users can add new tags to the bookmark. 
- -Pre-conditions: Topic should be present at the “Your work” link where Bookmarks link will be shown. 
- -Post-conditions: Once tags are added, they will be displayed at the bottom of each of the bookmarks in 
- -Normal Flow: 
- -1. User logins to Expertiza Application using their User id and password. 
- -2. The user selected topic along with all other topics for this assignment will be displayed. 
- -3. The “action” column for each topic will have a bookmark ”hotspot” 
- -4. User clicks the icon for the owned topic. 
- -5. In the view page there's an add tag option for the user for each bookmark 
- -6. Here user can add any new tags “tags” field provided at the bottom.
- -7. User clicks on add button to save the changes. 
- -
- -Special Cases: No topic exists 
- -Assumptions: At least one topic is present on the Signup sheet the “view” screen.
- -3.4: Edit tags for a Topic’s Bookmark
- -Use Case Id: 7 
- -Use Case Name: Edit Tag for Bookmarks 
- -Actors: Contributors, Administrators 
- -Descriptions: Users can Edit tags to the bookmark. 
- -Pre-conditions: Topic should be present at the “Your work” link where Bookmarks link will be shown. 
- -Post-conditions: Once tags are edited, they will be displayed at the bottom of each of the bookmarks in the “view” screen.
- -Normal Flow: 
- -1. User logins to Expertiza Application using their User id and password. 
- -2. Go to “Signup sheet” link, under any of the assignments
- -3. The user selected topic along with all other topics for this assignment will be displayed. 
- -4. The “action” column for each topic will have a bookmark ”hotspot” 
- -5. User clicks the icon for the owned topic. 
- -6. In the view page there's an edit tag option for the user for each bookmark tagged by them. 
- -7. Here user can add any new tags “tags” field provided at the bottom or existing tags added by them. 
- -8. User clicks on edit button to save the changes. 
- -
- -Special Cases: No topic exists 
- -Assumptions: At least one topic is present on the Signup sheet the “view” screen.
- -
- -3.5: View all Bookmarks
- -Use Case Id: 8 
- -Use Case Name: View All Bookmarks 
- -Actors: Users, Authors, Contributors, Administrators 
- -Description: Users can see currently available bookmarks.
- -Pre-conditions: The topic should be present at the “Sign up sheet” where View All Bookmarks link will be shown.
- -Post-conditions: User will be able to navigate to the view bookmarks screen. 
- -
- -Normal Flow: 
- -1. User will log in to Expertiza Application using their User id and password. 
- -2. Navigate to “Signup sheet” link, under any of the assignments.
- -3. The selected topic would be displayed and also all the other topics for this assignment. There would also be a link to view all the bookmarks. 
- -4. Here we can browse by View most Recent (by timestamp) and View most popular (by rating). 
- -
- -Special Cases: No topic exists, no bookmark present for the Topic. 
- -Assumptions: At least one topic is present on the sign-up sheet. 
- -Business Rules: Bookmarks' rating is calculated by using Bayesian’s algorithm. 
- -shown.
- -
- -
- -3.6: Managing/Editing the rating Rubric
- -Use Case Id: 11 
- -Use Case Name: Managing the Rating Rubric Bookmarks 
- -Actors: Administrators
- -Description: The admin user has the ability to manage the rubrics for rating which are used by the contributors in the system to rate bookmarks.
- -Normal Flow: 
- -1. Administrators can go to the “Edit signup sheet” under the specific assignment. 
- -2. He finds lists of topics under that assignment. Each topic has an edit action field. Click on that. 
- -3. There we can see that we get “Select a bookmark rating rubric” option which has a drop Down to make choices from. Also on the page where we see the list of topics we have a link to “Manage bookmark rating rubrics”. 
- -4. When we go to that link we get the option for setting up the “Minimum Rating” and “Maximum Rating” for that rubric. It also displays the text for that rubric. 
- -5. There is also an option of adding a new rubric. 
- -Assumptions: Topic should be present at “Your topic” where Bookmarks link will be shown. 
- -contributors in the system to rate bookmarks.
- -
- -
- -
- -
- -
- -
- -
+E908. Integration and Testing: A 
+Social Bookmarking
+
+
+
+Design Document
+
+
+
+
+
+
+Amrut Apte (acapte)
+Aniket Sonmale (amsonmal)
+Ankit Nair (apnair)
+Omkar Dalvi (okdalvi)
+
+
+
+
+CONTENTS
+
+1. Problem Statement			 						
+	1.1 Limitations of the current system
+	1.2 Proposed System
+2. System Overview
+3. Use Cases for the System
+	3.1 View Topic Bookmark
+	3.2 Add Topic Bookmark
+	3.3 Add Tags for a Bookmark
+	3.4 Edit Tags for a Bookmark
+	3.5 View all Bookmarks
+	3.6 Managing/Adding the Rating Rubric
+
+
+1. Problem Statement:
+Students should be allowed to suggest links for topics on the signup sheet in Expertiza.  Ultimately, they will be able to get credit if they provide good suggestions.  Each student/team working on a project will be able to access the suggested links for their topic, and rate the links based on how helpful they were. After each completed rating the average of all the ratings till then will be calculated and displayed along with each bookmark. 
+
+1.1 Limitations of current system
+
+1. A header says "Rate Bookmark using the Questionnaire". Need to change the name as it is too detailed.
+2. Weight adding feature needs to be added related to each response.
+3. Bookmarks are enabled for all assignments. Add checkbox to allow one to enable bookmarks for an assignments; they are disabled by default.
+4. Average of ratings needs to be calculated and populated at the right place.
+5. Users are presently not able to vote for a bookmark as a part of the extra credit functionality to be implemented by the system. That Voting mechanism needs to be added along with displaying the number of votes for each bookmark.
+6. The UI needs to be improved by directing to the proper screens instead of too many intermediate screens.
+7. Tests need to be written.
+
+1.2 Proposed System
+
+The Proposed system attempts to resolve the aforementioned limitations in the light of problem statement. In an attempt to handle the limitations we shall add new UI’s and also add more responsibilities to existing actors.
+
+
+2. System Overview
+
+Social bookmarking is the concept that realizes learning by collaboration. It attempts to provide support for knowledge sharing where in Expertiza users can suggest bookmarks that may help the topic owners/authors.
+
+The current system consists of following actors:
+a) Administrators: Users who have administrative privileges
+b) Authors: Author of the topic for which the bookmarks are being suggested
+c) Contributors: Users who are suggesting the bookmarks for a topic
+d) Users: Any other logged in user apart from the above roles.
+
+The current system allows users to add bookmarks to topics. These bookmarks are external links to the web that are helpful for the topic owners/authors. They can also edit the bookmarks and view current bookmarks for the topic as well as on a whole.
+In the current system hyperlinks to add and view bookmarks exist in the bookmark column under the signup sheet view. This design clutters the view of Signup Sheet. We, therefore, propose a design change wherein instead of a new column ‘Bookmark’, a bookmark icon will be displayed in the ‘action’ column which redirects to the bookmark view page.
+The current system allows users to rate the bookmarks which in turn gives extra credit to the bookmark owner (i.e. contributor) .The extra credit system is handled on the basis of ratings received by the author of the topic for which bookmarks have been contributed. It also allows the contributor (as well as other users) to tag the bookmark to facilitate “search by tag” for bookmarks.
+In accordance with the requirement we introduce a change in the responsibilities of the user by allowing them to tag bookmarks not owned by them and restrict the ability of rating a bookmark to only the topic owner (i.e. author).
+The current system allows the user to view all the bookmarks and the bookmarks suggested by the user. The link for the same exist on the Signup Sheet under the name “view all bookmarks“ and “manage bookmarks”. We propose to change the same by moving the “Manage Bookmarks” functionality to the “Your Work” view under the name “My bookmarks”.
+In the current system the contributor can select the rating rubric for his/her owned bookmarks. The rubric is added by the administrator. But the rating rubric appears below the bookmark and makes the “TODO” view too verbose. To overcome the same we propose a change wherein under each bookmark a button to rate the bookmark will be available that redirects the topic owner to the rating rubric on a new page.
+
+
+3.1: View  Bookmarks for a Topic
+
+Use Case Id:	 	1
+Use Case Name: 	View Bookmarks for a Topic
+Actors:		             Author,Users,Contributors,Administrator
+Pre-conditions:       Topic should be present at the “Your topic” link, where Bookmarks         link is shown 
+Post-conditions: 	User can navigate to the “view bookmarks” screen.
+
+Normal Flow: 
+1. User logs in to Expertiza using his/her particular User id and password. 
+2. Navigate to the “Signup sheet” link,which can belong to any of the assignments. 
+3. The topics selected by the user as well as all other topics for this particular assignment will be displayed. 
+4. At the top of the sheet,the topic selected by that user is displayed. 
+5. The “action” column for each and every topic will have a bookmark ”hotspot” 
+6. User clicks on this “bookmark” icon. 
+7. He/She is presented with a new page, where all the bookmarks suggested for the selected topic are displayed. 
+8. 
+a) Role is User: If the actor is any regular user, then he/she will be able to see the “title”, “bookmark discoverer”, “description”, “copied by”, “owner” and “tags” for each of the bookmarks. 
+b) Role is Contributor: The “edit” link will be shown for this actor to make any changes, in addition to whatever is shown to the random user. 
+c) Role is Author: The actor will be able to see the “title”, “bookmark discoverer”,“description”, “copied by ” , “owner” and “tags” for each of the bookmarks and a rating button for each bookmark
+ 
+Special Cases: 1.If No topic exists then no bookmark present for the Topic. Assume that atleast one topic is present on the sign-up sheet. 
+Business Rules: N/A
+
+3.2: Add Bookmark for a Topic
+Use Case Id:	 	2
+Use Case Name:        Add Bookmark for a Topic
+Actors:		           Author,Users,Contributors,Administrator
+Pre-conditions:          Topic be present at “Your topic” where Bookmarks link is shown 
+Post-conditions:        System displays a form to add Bookmarks
+Normal Flow: 
+1. User logs in to Expertiza using his/her particular UserID and password. 
+2. Navigate to “Signup sheet” link, under any of the assignments. 
+3.The user selected topic along with all other topics for this assignment will be displayed. 
+4. At the top of the sheet the topic selected by that user is displayed. 
+5. User clicks the icon. 
+6. He/She is presented with a new page, where all the bookmarks suggested for the selected topic are displayed along with a button “New bookmark”. 
+7. User clicks “New bookmark” to add a bookmark. 
+8. System displays the form to add new bookmark with form fields as: bookmark URL, bookmark title, bookmark tags, bookmark description, bookmark rubric 
+9. User clicks on “Add” button to save the bookmark. 
+             10. System first validates the data entered and saves the bookmark if it is valid. 
+
+Special Cases: N/A 
+Assumptions: At least one topic is present on the Sign-up sheet. 
+Business Rules: N/A
+
+3.3: Add tags to a Topic’s Bookmark
+Use Case Id: 6 
+Use Case Name: Add Tag for Bookmarks 
+Actors: Authors, Contributors, Administrators, Users 
+Descriptions: Users can add new tags to the bookmark. 
+Pre-conditions: Topic should be present at the “Your work” link where Bookmarks link will be shown. 
+Post-conditions: Once tags are added, they will be displayed at the bottom of each of the bookmarks in 
+Normal Flow: 
+1. User logins to Expertiza Application using their User id and password. 
+2. The user selected topic along with all other topics for this assignment will be displayed. 
+3. The “action” column for each topic will have a bookmark ”hotspot” 
+4. User clicks the icon for the owned topic. 
+5. In the view page there's an add tag option for the user for each bookmark 
+6. Here user can add any new tags “tags” field provided at the bottom.
+7. User clicks on add button to save the changes. 
+
+Special Cases: No topic exists 
+Assumptions: At least one topic is present on the Signup sheet the “view” screen.
+3.4: Edit tags for a Topic’s Bookmark
+Use Case Id: 7 
+Use Case Name: Edit Tag for Bookmarks 
+Actors: Contributors, Administrators 
+Descriptions: Users can Edit tags to the bookmark. 
+Pre-conditions: Topic should be present at the “Your work” link where Bookmarks link will be shown. 
+Post-conditions: Once tags are edited, they will be displayed at the bottom of each of the bookmarks in the “view” screen.
+Normal Flow: 
+1. User logins to Expertiza Application using their User id and password. 
+2. Go to “Signup sheet” link, under any of the assignments
+3. The user selected topic along with all other topics for this assignment will be displayed. 
+4. The “action” column for each topic will have a bookmark ”hotspot” 
+5. User clicks the icon for the owned topic. 
+6. In the view page there's an edit tag option for the user for each bookmark tagged by them. 
+7. Here user can add any new tags “tags” field provided at the bottom or existing tags added by them. 
+8. User clicks on edit button to save the changes. 
+
+Special Cases: No topic exists 
+Assumptions: At least one topic is present on the Signup sheet the “view” screen.
+
+3.5: View all Bookmarks
+Use Case Id: 8 
+Use Case Name: View All Bookmarks 
+Actors: Users, Authors, Contributors, Administrators 
+Description: Users can see currently available bookmarks.
+Pre-conditions: The topic should be present at the “Sign up sheet” where View All Bookmarks link will be shown.
+Post-conditions: User will be able to navigate to the view bookmarks screen. 
+
+Normal Flow: 
+1. User will log in to Expertiza Application using their User id and password. 
+2. Navigate to “Signup sheet” link, under any of the assignments.
+3. The selected topic would be displayed and also all the other topics for this assignment. There would also be a link to view all the bookmarks. 
+4. Here we can browse by View most Recent (by timestamp) and View most popular (by rating). 
+
+Special Cases: No topic exists, no bookmark present for the Topic. 
+Assumptions: At least one topic is present on the sign-up sheet. 
+Business Rules: Bookmarks' rating is calculated by using Bayesian’s algorithm. 
+shown.
+
+
+3.6: Managing/Editing the rating Rubric
+Use Case Id: 11 
+Use Case Name: Managing the Rating Rubric Bookmarks 
+Actors: Administrators
+Description: The admin user has the ability to manage the rubrics for rating which are used by the contributors in the system to rate bookmarks.
+Normal Flow: 
+1. Administrators can go to the “Edit signup sheet” under the specific assignment. 
+2. He finds lists of topics under that assignment. Each topic has an edit action field. Click on that. 
+3. There we can see that we get “Select a bookmark rating rubric” option which has a drop Down to make choices from. Also on the page where we see the list of topics we have a link to “Manage bookmark rating rubrics”. 
+4. When we go to that link we get the option for setting up the “Minimum Rating” and “Maximum Rating” for that rubric. It also displays the text for that rubric. 
+5. There is also an option of adding a new rubric. 
+Assumptions: Topic should be present at “Your topic” where Bookmarks link will be shown. 
+contributors in the system to rate bookmarks.
+
+
+
+
+
+
+

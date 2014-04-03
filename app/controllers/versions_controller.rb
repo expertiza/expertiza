@@ -64,4 +64,9 @@ class VersionsController < ApplicationController
     redirect_to :back
   end
 
+  private
+
+  def action_allowed?
+    true
   end
+end

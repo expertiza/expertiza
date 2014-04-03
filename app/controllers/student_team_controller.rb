@@ -93,11 +93,11 @@ class StudentTeamController < ApplicationController
     end
 
     #if your old team does not have any members, delete the entry for the team
-    other_members = TeamsUser.where( ['team_id = ?', params[:team_id]]).first
-    if other_members.length == 0
+    other_members = TeamsUser.where( ['team_id = ?', params[:team_id]])
+    if other_members.count == 0
       old_team = AssignmentTeam.where( ['id = ?', params[:team_id]])
-      if old_team != nil
-        old_team.destroy
+      if old_team
+        old_team.destroy_all
         #if assignment has signup sheet then the topic selected by the team has to go back to the pool
         #or to the first team in the waitlist
         signups = SignedUpUser.where( {:creator_id => params[:team_id]})

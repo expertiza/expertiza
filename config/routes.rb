@@ -374,7 +374,6 @@ Expertiza::Application.routes.draw do
       get :edit
       get :leave
       get :auto_complete_for_user_name
-      post ':id', action: :update
     end
   end
 

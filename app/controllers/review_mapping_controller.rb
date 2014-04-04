@@ -144,7 +144,7 @@ class ReviewMappingController < ApplicationController
       unless params[:i_dont_care]
         topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
       else
-        topic = assignment.candidate_topics_to_review.to_a.shuffle[0] rescue nil
+        topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
       end
 
       assignment.assign_reviewer_dynamically(reviewer, topic)

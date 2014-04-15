@@ -15,15 +15,6 @@ function requireSignUpChanged() {
   }
 }
 
-function wikiAssignmentChanged() {
-  if (jQuery('#assignment_wiki_assignment').is(':checked')) {
-    jQuery('#assignment_wiki_type_field').removeAttr('hidden');
-  } else {
-    jQuery('#assignment_wiki_type_field').attr('hidden', true);
-    jQuery('#assignment_wiki_type').val('1');
-  }
-}
-
 function teamAssignmentChanged() {
   var msg = 'Warning! Unchecking this box will remove teams that already exist.'
 
@@ -36,20 +27,6 @@ function teamAssignmentChanged() {
       removeDueDateTableElement('team_formation', 0);
     } else {
       jQuery('#assignment_team_assignment').prop('checked', true);
-    }
-  }
-}
-
-function staggeredDeadlineChanged() {
-  var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
-
-  if (jQuery('#assignment_staggered_deadline').is(':checked')) {
-    jQuery('#assignment_days_between_submissions_field').removeAttr('hidden');
-  } else {
-    if (confirm(msg)) {
-      jQuery('#assignment_days_between_submissions_field').attr('hidden', true);
-    } else {
-      jQuery('#assignment_staggered_deadline').prop('checked', true);
     }
   }
 }
@@ -70,16 +47,6 @@ function is_coding_assignmentChanged(){
   }
 }
 
-function reviewStrategyChanged() {
-  var val = jQuery('#assignment_review_assignment_strategy').val();
-  if (val == 'Auto-Selected') {
-    jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
-  } else if (val == '') {
-    jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
-  } else {
-    jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
-  }
-}
 </script>
 
 <table id='assignment_general_info_table'>
@@ -297,21 +264,24 @@ function reviewStrategyChanged() {
     }
 
     function staggeredDeadlineChanged() {
+      var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
       if (jQuery('#assignment_staggered_deadline').is(':checked')) {
         jQuery('#assignment_days_between_submissions_field').removeAttr('hidden');
       } else {
-        jQuery('#assignment_days_between_submissions_field').attr('hidden', true);
+        if (confirm(msg)) {
+          jQuery('#assignment_days_between_submissions_field').attr('hidden', true);
+        } else {
+          jQuery('#assignment_staggered_deadline').prop('checked', true);
+        }
       }
     }
 
    function reviewStrategyChanged() {
      var val = jQuery('#assignment_review_assignment_strategy').val();
-        if (val == 'Auto-Selected') {
-          jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
-        } else if (val == '') {
-          jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
-        } else {
+        if (val == 'Student-Selected' || val == 'Auto-Selected') {
           jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
+        } else {
+          jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
         }
    }
 

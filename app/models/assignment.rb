@@ -112,7 +112,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def reject_previously_reviewed_submissions(contributor_set, reviewer)
-    contributor_set.reject! { |contributor| contributor.reviewed_by?(Participant.where(user_id: reviewer.id, parent_id: contributor.assignment.id).first) }
+    contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
     return contributor_set
   end
 
@@ -151,7 +151,6 @@ class Assignment < ActiveRecord::Base
     # The following method raises an exception if not successful which
     # has to be captured by the caller (in review_mapping_controller)
     contributor = contributor_to_review(reviewer, topic)
-
     contributor.assign_reviewer(reviewer)
   end
 
@@ -218,17 +217,11 @@ class Assignment < ActiveRecord::Base
   def contributor_to_review(reviewer, topic)
     raise 'Please select a topic' if has_topics? && topic.nil?
     raise 'This assignment does not have topics' if !has_topics? && topic
-
     # This condition might happen if the reviewer waited too much time in the
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.
     raise 'This topic has too many reviews; please select another one.' unless candidate_topics_to_review(reviewer).include?(topic) if topic
 
-    p "contributors.nil?"
-    p contributors.nil?
-    p "Contributors:"
-    p contributors.class
-    p contributors.size
     contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
@@ -262,9 +255,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def contributors
-    p "in contributors method:"
-    p "teams.size"
-    p teams.size
     #ACS Contributors are just teams, so removed check to see if it is a team assignment
     @contributors ||= teams #ACS
   end

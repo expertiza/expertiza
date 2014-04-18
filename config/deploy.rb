@@ -63,6 +63,5 @@ task :load_data, :roles => :db, :only => { :primary => true } do
   system "gunzip -c #{filename} | mysql -u #{database['development']['username']} --password=#{database['development']['password']} #{database['development']['database']} && rm -f #{filename}"
 end
 
-set :default_environment, 'JAVA_HOME' => "C:\Program Files\Java\jdk1.7.0_25"
-# set :default_environment, 'JAVA_HOME' => "/etc/alternatives//"
+set :default_environment, 'JAVA_HOME' => "/etc/alternatives/java_sdk/"
 # set :default_environment, 'JAVA_HOME' => "/usr/lib/jvm/java-6-openjdk/"

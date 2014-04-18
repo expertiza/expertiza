@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/expertiza/automated_metareview.git
+  revision: dbaa76388cb03eebf0daef53c133bec6504ea40e
+  specs:
+    automated_metareview (0.0.3)
+
+GIT
   remote: https://github.com/expertiza/authlogic.git
   revision: 09163c7d2a9b21942c6716e885a14305e1aa0390
   specs:
@@ -200,6 +206,7 @@ GEM
       rdoc (~> 3.4)
       thor (~> 0.14.4)
     rake (10.1.0)
+    raspell (1.3)
     rb-fsevent (0.9.3)
     rb-inotify (0.9.0)
       ffi (>= 0.5.0)
@@ -272,7 +279,6 @@ GEM
     tzinfo (0.3.37)
     websocket (1.0.7)
     will_paginate (3.0.4)
-    win32console (1.3.2)
     win32console (1.3.2-x86-mingw32)
     xpath (2.0.0)
       nokogiri (~> 1.3)
@@ -283,6 +289,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth
+  automated_metareview!
   bind-it
   capistrano
   capybara
@@ -314,6 +321,7 @@ DEPENDENCIES
   paper_trail
   rails (~> 3.0.0)
   rake
+  raspell
   rgl
   rjb
   rspec-rails

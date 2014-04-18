@@ -6,7 +6,6 @@ class StudentReviewController < ApplicationController
 
 
   def list
-    print "==== "
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment  = @participant.assignment
@@ -23,9 +22,6 @@ class StudentReviewController < ApplicationController
       @num_reviews_completed += 1 if map.response
     end
     @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
-    print "------------------------"
-    print @num_reviews_in_progress
-    print "------------------------"
     # Calculate the number of metareviews that the user has completed so far.
     @num_metareviews_total       = @metareview_mappings.size
     @num_metareviews_completed   = 0

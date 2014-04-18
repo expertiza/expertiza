@@ -28,14 +28,14 @@ class TeamsParticipantsController < ApplicationController
 
     #  flash[:error] = $!
     #end
-    redirect_to :controller => 'team', :action => 'list', :id => team.parent_id
+    redirect_to :controller => 'teams', :action => 'list', :id => team.parent_id
 end
 
 def delete
   teamuser = TeamsParticipant.find(params[:id])
   parent_id = Team.find(teamuser.team_id).parent_id
   teamuser.destroy
-  redirect_to :controller => 'team', :action => 'list', :id => parent_id
+  redirect_to :controller => 'teams', :action => 'list', :id => parent_id
 end
 
 def delete_selected

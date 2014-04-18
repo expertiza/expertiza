@@ -39,7 +39,7 @@ class TeamsUsersController < ApplicationController
     @teams_user = TeamsUser.last
     undo_link("Team user \"#{user.name}\" has been added to \"#{team.name}\" successfully. ")
 
-    redirect_to :controller => 'team', :action => 'list', :id => team.parent_id
+    redirect_to :controller => 'teams', :action => 'list', :id => team.parent_id
   end
 
   def delete
@@ -48,7 +48,7 @@ class TeamsUsersController < ApplicationController
     @user = User.find(@teams_user.user_id)
     @teams_user.destroy
     undo_link("Team user \"#{@user.name}\" has been removed successfully. ")
-    redirect_to :controller => 'team', :action => 'list', :id => parent_id
+    redirect_to :controller => 'teams', :action => 'list', :id => parent_id
   end
 
   def delete_selected

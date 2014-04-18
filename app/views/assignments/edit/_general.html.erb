@@ -264,10 +264,15 @@ function is_coding_assignmentChanged(){
     }
 
     function staggeredDeadlineChanged() {
+      var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
       if (jQuery('#assignment_staggered_deadline').is(':checked')) {
         jQuery('#assignment_days_between_submissions_field').removeAttr('hidden');
       } else {
-        jQuery('#assignment_days_between_submissions_field').attr('hidden', true);
+        if (confirm(msg)) {
+          jQuery('#assignment_days_between_submissions_field').attr('hidden', true);
+        } else {
+          jQuery('#assignment_staggered_deadline').prop('checked', true);
+        }
       }
     }
 

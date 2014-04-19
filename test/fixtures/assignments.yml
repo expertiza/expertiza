@@ -237,7 +237,6 @@ lottery_assignment:
   review_of_review_questionnaire_id: <%= Fixtures.identify(:questionnaire2) %>
   teammate_review_questionnaire_id: <%= Fixtures.identify(:teammate_review_questionnaire) %>
   reviews_visible_to_all: <%= 0 %>
-  team_assignment: <%= 1 %>
   wiki_type_id: <=% Fixtures.identify(:MediaWiki) %>
   require_signup: <%= 1 %>
   num_reviewers: <%= 3 %>

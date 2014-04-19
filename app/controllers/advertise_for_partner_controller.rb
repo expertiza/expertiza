@@ -4,8 +4,9 @@ class AdvertiseForPartnerController < ApplicationController
   end
 
   #adds a new advertise for partners entry in team table...
-  def new
-  end
+  #This is empty, so removed.
+  #def new
+  #end
 
   #removes an entry from team table for corresponding team who requested to remove their advertisement for partner request
   def remove

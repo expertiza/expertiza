@@ -5,6 +5,50 @@
 <!--2. switch to a new date time picker-->
 <!--3. actually pretty much rewrote the whole thing...-->
 
+<div>
+  <%= label_tag('assignment[rounds_of_reviews]', 'Number of Review Rounds:') %>
+  <%= text_field_tag('assignment[rounds_of_reviews]', @assignment.rounds_of_reviews, :style => 'width:50px') %>
+  <%= button_to_function('Set', 'changeReviewRounds()') %>
+</div>
+
+<table>
+  <tr>
+    <th width=15%>Deadline type</th>
+    <th width=20%>Date & time</th>
+    <th width=10%>Submission allowed</th>
+    <th width=8%>Review allowed</th>
+    <th width=10%>Resubmission Allowed</th>
+    <th width=10%>Re-Review Allowed</th>
+
+    <th width=10%>Meta-review allowed</th>
+    <th width=9%>Quiz allowed</th>
+    <th width=8%>Reminder(hrs)</th>
+  </tr>
+  <% @assignment.due_dates.each do |due_date| %>
+    <tr>
+      <%= hidden_field_tag 'due_dates[][assignment_id]', @assignment.id %>
+      <%= hidden_field_tag 'due_dates[][round]', due_date.round %>
+      <%= hidden_field_tag 'due_dates[][deadline_type_id]', due_date.deadline_type_id %>
+      <td>
+        <%if due_date.type == 'metareview' %>
+            <%=due_date.type.titleize%>
+        <%else%>
+            Round <%=due_date.round%>: <%=due_date.type.titleize%>
+        <%end%>
+      </td>
+      <td>
+        <%= text_field_tag 'due_dates[][due_at]', due_date.due_at, class: 'due_date_datetime hasDatepicker' %>
+      </td>
+    </tr>
+    <tr>
+
+    </tr>
+    <tr>
+
+    </tr>
+  <% end %>
+</table>
+
 <script type="text/javascript">
 
     function addBlankRounds() {
@@ -292,6 +336,27 @@
           <% end %>
 
           addBlankRounds();
+
+          jQuery(".due_date_datetime").each(function(){
+              var x = this;
+              console.log("x: " + x);
+              console.log("jQuery(x): " + jQuery(x));
+              jQuery(this).datetimepicker({
+                  dateFormat: 'yy/mm/dd',
+                  timeFormat: 'HH:mm z',
+                  controlType: 'select',
+                  timezoneList: [{value:'<%=Time.zone_offset(@user.timezonepref || '')%>', label: '<%=@user.timezonepref.try(:split, "\s").try(:[], 0)%>'}]
+
+                  /*timezoneList: [
+                   { value: -000, label: 'GMT'},
+                   { value: -300, label: 'Eastern'},
+                   { value: -360, label: 'Central' },
+                   { value: -420, label: 'Mountain' },
+                   { value: -480, label: 'Pacific' }
+                   ]*/
+              });
+          });
+
 
       }());
   </script>

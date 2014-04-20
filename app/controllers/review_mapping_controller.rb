@@ -52,7 +52,7 @@ class ReviewMappingController < ApplicationController
       reviewer = get_reviewer(user,assignment,regurl)
       #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).nil?
+      if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).first.nil?
         TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
       else
         raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
@@ -103,7 +103,7 @@ class ReviewMappingController < ApplicationController
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         contributor = get_team_from_submission(submission)
-        if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
+        if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).first.nil?
           TeamReviewResponseMap.create(:reviewee_id => contributor.id,
                                        :reviewer_id => reviewer.id,
                                        :reviewed_object_id => assignment.id)
@@ -144,7 +144,7 @@ class ReviewMappingController < ApplicationController
       unless params[:i_dont_care]
         topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
       else
-        topic = assignment.candidate_topics_to_review.to_a.shuffle[0] rescue nil
+        topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
       end
 
       assignment.assign_reviewer_dynamically(reviewer, topic)
@@ -209,7 +209,7 @@ class ReviewMappingController < ApplicationController
 
       regurl = url_for :action => 'add_user_to_assignment', :id => mapping.map_id, :user_id => user.id
       reviewer = get_reviewer(user,mapping.assignment,regurl)
-      if MetareviewResponseMap.where( ['reviewed_object_id = ? and reviewer_id = ?',mapping.map_id,reviewer.id]) != nil
+      if MetareviewResponseMap.where( ['reviewed_object_id = ? and reviewer_id = ?',mapping.map_id,reviewer.id]).first != nil
         raise "The metareviewer \""+reviewer.user.name+"\" is already assigned to this reviewer."
       end
       MetareviewResponseMap.create(:reviewed_object_id => mapping.map_id,
@@ -573,7 +573,7 @@ class ReviewMappingController < ApplicationController
     objtype = "TeamReviewResponseMap"
 
     teams.each do |team|
-      score_cache = ScoreCache.where( ["reviewee_id = ? and object_type = ?",team.id,  objtype])
+      score_cache = ScoreCache.where( ["reviewee_id = ? and object_type = ?",team.id,  objtype]).first
       t_score = 0
       if score_cache!= nil
         t_score = score_cache.score

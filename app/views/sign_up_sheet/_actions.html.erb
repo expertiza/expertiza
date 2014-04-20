@@ -1,4 +1,3 @@
-<%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id => topic.id, :assignment_id => params[:id] %>
 <%= link_to :controller=>'bookmarks', :action=> 'view_topic_bookmarks', :id => topic.id , :assignment_id => params[:id] do %>
   <span class="fa-stack fa-md" title='View topic bookmarks'>
     <i class="fa fa-bookmark fa-stack-1x fa-2x"></i>
@@ -10,4 +9,6 @@
     <i class="fa fa-plus fa-stack-1x fa-inverse" style='font-size: .5em'></i>
   </span>
 <% end %>
+
+<%= render :partial => 'reserve_topic', :locals => {:i=>i, :topic=>topic} %>
 

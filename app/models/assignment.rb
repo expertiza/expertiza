@@ -15,7 +15,7 @@ class Assignment < ActiveRecord::Base
   has_many :due_dates, :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
-  has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id'
+  has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :assignment_questionnaires,:dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
@@ -74,27 +74,62 @@ class Assignment < ActiveRecord::Base
 
   # Returns a set of topics that can be reviewed.
   # We choose the topics if one of its submissions has received the fewest reviews so far
-  def candidate_topics_to_review
+  def candidate_topics_to_review(reviewer)
     return nil if sign_up_topics.empty? # This is not a topic assignment
+
+    # Initialize contributor set with all teams participating in this assignment
     contributor_set = Array.new(contributors)
+
     # Reject contributors that have not selected a topic, or have no submissions
-    # Also reject contributions of topics whose deadline has passed
-    contributor_set.reject! do |contributor|
-      signed_up_topic(contributor).nil? || !contributor.has_submissions? ||
-        contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' ||
-        contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'submission'
-    end
+    contributor_set=reject_by_no_topic_selection_or_no_submission(contributor_set)
+
+    # Reject contributions of topics whose deadline has passed, or which are not reviewable in the current stage
+    contributor_set=reject_by_deadline(contributor_set)
+
+    # Filter submission by reviewer him/her self
+    contributor_set=reject_own_submission(contributor_set, reviewer)
+
+    # Filter submissions already reviewed by reviewer
+    contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
-    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
+    contributor_set=reject_by_least_reviewed(contributor_set)
 
+    # Add topics for all remaining submissions to a list of available topics for review
+    candidate_topics = Set.new
+    contributor_set.each { |contributor|
+      candidate_topics.add(signed_up_topic(contributor))
+    }
+    candidate_topics
+  end
+
+  def reject_by_least_reviewed(contributor_set)
+    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
     min_reviews = contributor.review_mappings.count rescue 0
     contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
+    return contributor_set
+  end
 
-    candidate_topics = Set.new
-    contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
-    candidate_topics
+  def reject_previously_reviewed_submissions(contributor_set, reviewer)
+    contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
+    return contributor_set
+  end
+
+  def reject_own_submission(contributor_set, reviewer)
+    contributor_set.reject! { |contributor| contributor.teams_users.find_by_user_id(reviewer.id) }
+    return contributor_set
+  end
+
+  def reject_by_deadline(contributor_set)
+    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
+        !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
+    return contributor_set
+  end
+
+  def reject_by_no_topic_selection_or_no_submission(contributor_set)
+    contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
+    return contributor_set
   end
 
   def has_topics?
@@ -116,7 +151,6 @@ class Assignment < ActiveRecord::Base
     # The following method raises an exception if not successful which
     # has to be captured by the caller (in review_mapping_controller)
     contributor = contributor_to_review(reviewer, topic)
-
     contributor.assign_reviewer(reviewer)
   end
 
@@ -183,17 +217,11 @@ class Assignment < ActiveRecord::Base
   def contributor_to_review(reviewer, topic)
     raise 'Please select a topic' if has_topics? && topic.nil?
     raise 'This assignment does not have topics' if !has_topics? && topic
-
     # This condition might happen if the reviewer waited too much time in the
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.
-    raise 'This topic has too many reviews; please select another one.' unless candidate_topics_to_review.include?(topic) if topic
+    raise 'This topic has too many reviews; please select another one.' unless candidate_topics_to_review(reviewer).include?(topic) if topic
 
-    p "contributors.nil?"
-    p contributors.nil?
-    p "Contributors:"
-    p contributors.class
-    p contributors.size
     contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
@@ -227,9 +255,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def contributors
-    p "in contributors method:"
-    p "teams.size"
-    p teams.size
     #ACS Contributors are just teams, so removed check to see if it is a team assignment
     @contributors ||= teams #ACS
   end
@@ -383,22 +408,23 @@ class Assignment < ActiveRecord::Base
     drop_topic_deadline_id = DeadlineType.find_by_name('drop_topic').id
     self.staggered_deadline? ?
       topic_id ?
-      next_due_date = TopicDeadline
+      next_due_dates = TopicDeadline
       .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id])
       .order('due_at') :
-    next_due_date = TopicDeadline
+    next_due_dates = TopicDeadline
       .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
       .joins( {:topic => :assignment}, :order => 'due_at') :
-    next_due_date = DueDate
+    next_due_dates = DueDate
       .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
       .order('due_at')
+    next_due_date = next_due_dates.first
 
-    return false if next_due_date.first.nil?
+    return false if next_due_date.nil?
 
     # command pattern - get the attribute with the name in column
     # Here, column is usually something like 'review_allowed_id'
 
-    right_id = next_due_date.first.send column
+    right_id = next_due_date.send column
 
     right = DeadlineRight.find(right_id)
     (right && (right.name == 'OK' || right.name == 'Late'))

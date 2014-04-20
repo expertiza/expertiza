@@ -16,7 +16,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'signup_topics', 'signup', 'delete_signup', 'add_signup_topics'
+    when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team'
       current_role_name.eql? 'Student'
     else
       ['Instructor',
@@ -252,7 +252,7 @@ class SignUpSheetController < ApplicationController
 
       def list
         @assignment_id = params[:id]
-        @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]])
+        @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]]).all
         @slots_filled = SignUpTopic.find_slots_filled(params[:id])
         @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
         @show_actions = true
@@ -366,7 +366,7 @@ class SignUpSheetController < ApplicationController
                   end
                 else
                   #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-                  SignUpTopic.cancel_all_waitlists(creator_id, assignment_id)
+                  Waitlist.cancel_all_waitlists(creator_id, assignment_id)
                   sign_up.is_waitlisted = false
                   sign_up.save
                   participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)

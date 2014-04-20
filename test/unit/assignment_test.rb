@@ -100,4 +100,63 @@ class AssignmentTest < ActiveSupport::TestCase
     assert a.compute_scores
   end
 
+  def test_sign_up_topics
+    a = Assignment.new
+    if a.has_topics?
+      assert !a.sign_up_topics.empty?
+    else
+      assert a.sign_up_topics.empty?
+    end
+  end
+
+  def test_reject_by_no_topic_selection_or_no_submission
+    assign = Assignment.new
+    user=User.new
+    AssignmentParticipant.new(user_id:user.id,parent_id:assign.id)
+    contributors = Array.new(Team.find_all_by_parent_id(assign.id))
+    contributors=assign.reject_by_no_topic_selection_or_no_submission(contributors)
+    assert contributors.empty?
+  end
+
+  def test_reject_previously_reviewed_submissions
+    assign = Assignment.new
+    reviewer=User.new
+    reviewee=User.new
+    reviewerPart=Participant.new(user_id:reviewer.id,parent_id:assign.id)
+    revieweePart=Participant.new(user_id:reviewee.id,parent_id:assign.id)
+    ResponseMap.new(reviewed_object_id:assign.id,reviewer_id:reviewerPart.id,reviewee_id:revieweePart.id)
+    contributors = Array.new(Team.find_all_by_parent_id(assign.id))
+    contributors=assign.reject_previously_reviewed_submissions(contributors,reviewer)
+    assert contributors.empty?
+  end
+
+  def test_reject_own_submission
+    assign = Assignment.find(assignments(:assignment7))
+    reviewer=Participant.find(participants(:par14))
+    contributors = Array.new(Team.find_all_by_parent_id(assign.id))
+    contributors.each {|contributor| assert contributor.teams_users.find_by_user_id(reviewer.id)}
+
+    contributors=assign.reject_own_submission(contributors,reviewer)
+    contributors.each {|contributor| assert !contributor.teams_users.find_by_user_id(reviewer.id)}
+  end
+
+  def test_reject_by_deadline
+    assign = Assignment.find(assignments(:assignment7))
+    topic =SignUpTopic.find(sign_up_topics(:topic_deadline331))
+    user=User.new
+    participant=AssignmentParticipant.new(user_id:user.id,parent_id:assign.id)
+    participant.topic_id=topic.id
+
+    contributors = Array.new(Team.find_all_by_parent_id(assign.id))
+    assert !contributors.include?(reviewer)
+    contributors=assign.reject_own_submission(contributors,reviewer)
+    assert !contributors.include?(reviewer)
+  end
+
+  def test_candidate_topics_to_review_returns_nil
+    assign = Assignment.find(assignments(:assignment_project1))
+    participant = Participant.find_by_parent_id(assign.id)
+    topics = assign.candidate_topics_to_review(participant)
+    assert_equal(nil,topics)
+  end
 end

@@ -1,4 +1,4 @@
-class TeamController < ApplicationController
+class TeamsController < ApplicationController
   auto_complete_for :user, :name
 
 
@@ -63,7 +63,7 @@ class TeamController < ApplicationController
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team.name = params[:team][:name]
       @team.save
-      undo_link("Team \"@team.name\" has been updated successfully. ")
+      undo_link("Team \"#{@team.name}\" has been updated successfully. ")
       redirect_to :action => 'list', :id => parent.id
     rescue TeamExistsError
       flash[:error] = $!
@@ -101,7 +101,7 @@ class TeamController < ApplicationController
     else
       flash[:error] = "No course was found for this assignment."
     end
-    redirect_to :controller => 'team', :action => 'list', :id => assignment.id
+    redirect_to :controller => 'teams', :action => 'list', :id => assignment.id
   end
 
   # Copies existing teams from an assignment up to a course
@@ -116,6 +116,6 @@ class TeamController < ApplicationController
     else
       flash[:error] = "This assignment is not #{url_for(:controller => 'assignment', :action => 'assign', :id => assignment.id)} with a course."
     end
-    redirect_to :controller => 'team', :action => 'list', :id => assignment.id
+    redirect_to :controller => 'teams', :action => 'list', :id => assignment.id
   end
 end

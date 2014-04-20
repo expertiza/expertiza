@@ -16,7 +16,7 @@ module LeaderboardHelper
   # This method converts the questionnaire_type to a
   # sensible string for the Leaderboard table.
   def self.getAchieveName(qtype)
-    achieveName = Leaderboard.where([ "qtype like ?",qtype]).name
+    achieveName = Leaderboard.where([ "qtype like ?",qtype]).first.name
 
   end
 

@@ -7,15 +7,17 @@
 <% end %>
 <ul>
   <%if SignUpTopic.find_by_assignment_id(@assignment.id)%>
-    <li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'add_signup_topics', :id => @participant.parent_id%>
+    <li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.parent_id%>
     (Sign up for a topic)
   </li>
 <%end%>
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
-<li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %>
-(View and manage your team)
+  <%if @assignment.team_assignment? %>
+    <li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %> 
+	 (View and manage your team)
     </li>
+  <%end%>
     <li>
       <% if @assignment.submission_allowed(@participant.topic_id) %>
         <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>

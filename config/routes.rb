@@ -375,7 +375,6 @@ Expertiza::Application.routes.draw do
       get :edit
       get :leave
       get :auto_complete_for_user_name
-      get :update
     end
   end
 
@@ -428,6 +427,7 @@ Expertiza::Application.routes.draw do
   resources :teams do
     collection do
       get :list
+      post ':id', action: :update
     end
   end
 

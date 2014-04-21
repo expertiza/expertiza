@@ -195,3 +195,9 @@ node_intelligent_team:
  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
  node_object_id: <%= Fixtures.identify(:IntelligentTeam1) %>
  type: TeamNode
+
+#assignment_project3
+node_course_team1:
+ parent_id: <%= Fixtures.identify(:course_object_oriented) %>
+ node_object_id: <%= Fixtures.identify(:course_team1) %>
+ type: TeamNode

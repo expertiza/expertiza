@@ -55,7 +55,7 @@ exist_team2:
   parent_id: <%= Fixtures.identify(:course0) %>
   type: CourseTeam
 
-#CourseTeam1:
-  #name: CourseTeam1
-  #parent_id: <%= Fixtures.identify(:Object_Oriented_Programming) %>
-  #type: CourseTeam
+course_team1:
+  name: CourseTeam1
+  parent_id: <%= Fixtures.identify(:course_object_oriented) %>
+  type: CourseTeam

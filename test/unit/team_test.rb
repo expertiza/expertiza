@@ -77,35 +77,30 @@ class TeamTest < ActiveSupport::TestCase
     assert_equal( '"student9" is already a member of the team, "IntelligentTeam1"', exception.message )
   end
 
-  #test "add member for course" do
-  #  team = teams(:IntelligentTeam1)
-  #  assert team.add_member(users(:student9), nil)
-  #  assert_equal( '"student9" is already a member of the team, "IntelligentTeam1"', exception.message )
-  #end
+  # id cannot be nil
+  # because runtime error
+  # Called id for nil, which would mistakenly be 4 -- if you really wanted the id of nil, use object_id
+  # Note: add_participant for course team is deprecated
+  test "add member for course" do
+    team = teams(:course_team1)
+    assert team.add_member(users(:student9), assignments(:assignment_project3).id)
+    teams_user = TeamsUser.where('user_id = ? and team_id = ?', users(:student9).id, teams(:course_team1).id)
+    assert_equal teams_user.count, 1
+    parent = TeamNode.find_by_node_object_id(team.id)
+    team_user_node = TeamUserNode.where('parent_id = ? AND node_object_id = ?', parent.id, teams_user.first.id)
+    assert_equal team_user_node.count, 1
+  end
+
+  
+
   # add member for assignment successfully
   # add member to full team should fail
+  #assignment_project3 max = 1
 
   #test "copy_members" do
   #  new_team = Team.new
   #  teams(:IntelligentTeam1).copy_members(new_team)
   #end
 
-=begin
-  def test_add_team_member
-    course = courses(:course0)
-    parent = CourseNode.create(:parent_id => nil, :node_object_id => course.id)
-    
-    currTeam = CourseTeam.new
-   	currTeam.name = name
-   	currTeam.parent_id = course.id
-   	assert currTeam.save
-
-   	TeamNode.create(:parent_id => parent.id, :node_object_id => currTeam.id)
-   	#TODO assertion missing?
-
-    currTeam.add_member(users(:student1))
-    assert_true currTeam.has_user(users(:student1))
-  end
-=end
 end
 

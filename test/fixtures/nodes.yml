@@ -158,7 +158,6 @@ node22:
  parent_id: <%= Fixtures.identify(:team2) %>
  node_object_id: <%= Fixtures.identify(:student6) %>
  type: TeamUserNode
- type: TeamUser
 
 node23:
   parent_id: <%= Fixtures.identify(:instructor3) %>
@@ -169,3 +168,30 @@ node24:
   parent_id: <%= Fixtures.identify(:instructor1) %>
   node_object_id: <%= Fixtures.identify(:course_object_oriented) %>
   type: CourseNode
+
+# I think all TeamUserNode fixtures are wrong...
+# node_object_id should be team_user_id
+node_intelligent_teams_users1:
+ parent_id: <%= Fixtures.identify(:IntelligentTeam1) %>
+ node_object_id: <%= Fixtures.identify(:intelligent_teams_users1) %>
+ type: TeamUserNode
+
+node_intelligent_teams_users2:
+ parent_id: <%= Fixtures.identify(:IntelligentTeam1) %>
+ node_object_id: <%= Fixtures.identify(:intelligent_teams_users2) %>
+ type: TeamUserNode
+
+node_intelligent_teams_users3:
+ parent_id: <%= Fixtures.identify(:IntelligentTeam1) %>
+ node_object_id: <%= Fixtures.identify(:intelligent_teams_users3) %>
+ type: TeamUserNode
+
+node_intelligent_teams_users4:
+ parent_id: <%= Fixtures.identify(:IntelligentTeam1) %>
+ node_object_id: <%= Fixtures.identify(:intelligent_teams_users4) %>
+ type: TeamUserNode
+
+node_intelligent_team:
+ parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+ node_object_id: <%= Fixtures.identify(:IntelligentTeam1) %>
+ type: TeamNode

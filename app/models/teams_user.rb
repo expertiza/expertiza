@@ -12,9 +12,9 @@ class TeamsUser < ActiveRecord::Base
     TeamUserNode.find_by_node_object_id(self.id).destroy
     team = self.team
     self.destroy
-    if team.teams_users.length == 0
-      team.delete
-    end
+    #if team.teams_users.length == 0
+    #  team.delete
+    #end
   end
 
   def hello

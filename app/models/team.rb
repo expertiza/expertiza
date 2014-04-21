@@ -6,9 +6,11 @@ class Team < ActiveRecord::Base
   has_many :bids, :dependent => :destroy
   has_paper_trail
 
-  def get_participants
-    Participant.find_all_by_id users.map(&:id)
-  end
+
+  #This is overwrote by the second get_participants
+  # def get_participants
+  #  Participant.find_all_by_id users.map(&:id)
+  #end
 
   def delete
     for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", self.id])
@@ -33,6 +35,8 @@ class Team < ActiveRecord::Base
     return self.name
   end
 
+  # define twice - overloaded below
+=begin
   def self.generate_team_name()
     counter = 0
     while (true)
@@ -42,8 +46,8 @@ class Team < ActiveRecord::Base
       end
       counter=counter+1
     end
-  end
-
+    end
+=end
   def get_possible_team_members(name)
     query = "select users.* from users, participants"
     query = query + " where users.id = participants.user_id"
@@ -54,6 +58,7 @@ class Team < ActiveRecord::Base
     User.find_by_sql(query)
   end
 
+  # should be has_user?
   def has_user(user)
     users.include? user
   end

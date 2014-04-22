@@ -5,11 +5,16 @@
 <!--2. switch to a new date time picker-->
 <!--3. actually pretty much rewrote the whole thing...-->
 
+<%= stylesheet_link_tag 'jquery-ui-1.10.3.custom', 'jquery-ui-timepicker-addon' %>
+
 <div>
   <%= label_tag('assignment[rounds_of_reviews]', 'Number of Review Rounds:') %>
   <%= text_field_tag('assignment[rounds_of_reviews]', @assignment.rounds_of_reviews, :style => 'width:50px') %>
   <%= button_to_function('Set', 'changeReviewRounds()') %>
 </div>
+
+
+<input id="test" type="text" value="<%=@assignment.due_dates[0].due_at%>"/>
 
 <table>
   <tr>
@@ -37,7 +42,7 @@
         <%end%>
       </td>
       <td>
-        <%= text_field_tag 'due_dates[][due_at]', due_date.due_at, class: 'due_date_datetime hasDatepicker' %>
+        <input class="due_date_datetime" name="due_dates[][due_at]" type="text" value="<%=due_date.due_at %>" />
       </td>
     </tr>
     <tr>
@@ -337,13 +342,17 @@
 
           addBlankRounds();
 
+          var i = 1;
           jQuery(".due_date_datetime").each(function(){
+
               var x = this;
-              console.log("x: " + x);
-              console.log("jQuery(x): " + jQuery(x));
+              console.log("x: ");
+              console.log(x);
+              console.log("jQuery(x): ");
+              console.log(jQuery(x));
               jQuery(this).datetimepicker({
-                  dateFormat: 'yy/mm/dd',
-                  timeFormat: 'HH:mm z',
+                  dateFormat: 'yy-mm-dd',
+                  timeFormat: 'HH:mm:ss z',
                   controlType: 'select',
                   timezoneList: [{value:'<%=Time.zone_offset(@user.timezonepref || '')%>', label: '<%=@user.timezonepref.try(:split, "\s").try(:[], 0)%>'}]
 
@@ -355,6 +364,7 @@
                    { value: -480, label: 'Pacific' }
                    ]*/
               });
+              i++;
           });
 
 

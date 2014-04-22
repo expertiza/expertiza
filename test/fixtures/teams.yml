@@ -59,3 +59,13 @@ course_team1:
   name: CourseTeam1
   parent_id: <%= Fixtures.identify(:course_object_oriented) %>
   type: CourseTeam
+
+single_person_team:
+  name: SinglePersonTeam
+  parent_id: <%= Fixtures.identify(:assignment_project3) %>
+  type: AssignmentTeam
+
+course0_team1:
+  name: Course0Team1
+  parent_id: <%= Fixtures.identify(:course0) %>
+  type: CourseTeam

@@ -13,23 +13,38 @@ class TeamTest < ActiveSupport::TestCase
     assert team.save
   end
 
-  test "test delete" do
+  test "delete should destroy the team" do
     team = teams(:IntelligentTeam1)
     assert team.delete
     assert team.destroyed?
+  end
+
+  test "delete should remove all teams user" do
+    team = teams(:IntelligentTeam1)
+    assert team.delete
     for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", teams(:IntelligentTeam1).id])
       assert_nil teamsuser
     end
+  end
+
+  test "delete should remove all team node" do
+    team = teams(:IntelligentTeam1)
+    assert team.delete
     assert_nil Node.find_by_node_object_id(teams(:IntelligentTeam1).id)
   end
 
-  #need to test course team
-  test "get_participants" do
-    #team = Team.find_by_id teams(:IntelligentTeam1).id
+  # need to test course team
+  # this called the one in AssignmentTeam
+  test "get_participants from assignment team" do
     participants = teams(:IntelligentTeam1).get_participants
     assert (participants &
             [participants(:par20), participants(:par21),
              participants(:par22), participants(:par23)]).present?
+  end
+
+  test "get_participants from course team" do
+    participants = teams(:course0_team1).get_participants
+    assert_include participants, participants(:par5)
   end
 
   test "get_node_type" do
@@ -81,25 +96,75 @@ class TeamTest < ActiveSupport::TestCase
   # because runtime error
   # Called id for nil, which would mistakenly be 4 -- if you really wanted the id of nil, use object_id
   # Note: add_participant for course team is deprecated
-  test "add member for course" do
+  test "add member for course should create teams user" do
     team = teams(:course_team1)
     assert team.add_member(users(:student9), assignments(:assignment_project3).id)
     teams_user = TeamsUser.where('user_id = ? and team_id = ?', users(:student9).id, teams(:course_team1).id)
     assert_equal teams_user.count, 1
+  end
+
+  test "add member for course should create teams user node" do
+    team = teams(:course_team1)
+    assert team.add_member(users(:student9), assignments(:assignment_project3).id)
+    teams_user = TeamsUser.where('user_id = ? and team_id = ?', users(:student9).id, teams(:course_team1).id)
     parent = TeamNode.find_by_node_object_id(team.id)
     team_user_node = TeamUserNode.where('parent_id = ? AND node_object_id = ?', parent.id, teams_user.first.id)
     assert_equal team_user_node.count, 1
   end
 
-  
+  test "add member to assignment team successfully" do
+    team = teams(:single_person_team)
+    assert_difference ['TeamUserNode.count', 'TeamsUser.count'], 1 do
+      assert team.add_member(users(:student8), assignments(:assignment_project3).id)
+    end
+  end
 
-  # add member for assignment successfully
-  # add member to full team should fail
-  #assignment_project3 max = 1
+  test "add member to full assignment team should fail" do
+    team = teams(:single_person_team)
+    assert team.add_member(users(:student9), assignments(:assignment_project3).id)
+    assert_no_difference ['TeamsUser.count', 'TeamUserNode.count'] do
+      assert_false team.add_member(users(:student8), assignments(:assignment_project3).id)
+    end
+  end
 
-  #test "copy_members" do
-  #  new_team = Team.new
-  #  teams(:IntelligentTeam1).copy_members(new_team)
+  # I guess this is always one-way for assignment -> course?
+  # no assignment size check
+  test "copy_members from assignmentTeam" do
+    new_team = Team.new
+    assert_difference ['TeamUserNode.count', 'TeamsUser.count'], 2 do
+      assert teams(:IntelligentTeam1).copy_members(new_team)
+    end
+  end
+
+  # This will only return nil
+  test "check_for_existing for AssignmentTeam" do
+    Team.check_for_existing(assignments(:assignment_project3), "abc", "Assignment")
+  end
+
+  test "check_for_existing for existed AssignmentTeam should raise error" do
+    assert_raises TeamExistsError do
+       Team.check_for_existing(assignments(:assignment_project3), "SinglePersonTeam", "Assignment")
+    end
+  end
+
+  # what if teams = nil?
+  test "delete all by parent should delete teams" do
+    assert_difference 'Team.count', -3 do
+      Team.delete_all_by_parent(assignments(:Intelligent_assignment))
+    end
+  end
+
+  test "delete all by parent will not fail when no teams found" do
+    assert_no_difference 'Team.count' do
+      Team.delete_all_by_parent(assignments(:assignment_review0))
+    end
+  end
+
+
+  #test "randomize_all_by_parent" do
+  #  assert_difference 'Team.count', -3 do
+  #    Team.randomize_all_by_parent(assignments(:Intelligent_assignment))
+  #  end
   #end
 
 end

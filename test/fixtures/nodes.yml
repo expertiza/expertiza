@@ -201,3 +201,8 @@ node_course_team1:
  parent_id: <%= Fixtures.identify(:course_object_oriented) %>
  node_object_id: <%= Fixtures.identify(:course_team1) %>
  type: TeamNode
+
+node_single_person_team:
+ parent_id: <%= Fixtures.identify(:assignment_project3) %>
+ node_object_id: <%= Fixtures.identify(:single_person_team) %>
+ type: TeamNode

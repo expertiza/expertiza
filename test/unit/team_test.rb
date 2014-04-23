@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class TeamTest < ActiveSupport::TestCase
   fixtures :users, :roles, :teams, :assignments, :nodes, :courses, :teams_users,
@@ -59,6 +59,7 @@ class TeamTest < ActiveSupport::TestCase
   end
 
   # first one is overloaded...
+  # so I commented out the first one (Line 38)
   test "generate_team_name" do
     assert_equal Team.generate_team_name("Test"), "Test_Team1"
   end
@@ -92,8 +93,7 @@ class TeamTest < ActiveSupport::TestCase
     assert_equal( '"student9" is already a member of the team, "IntelligentTeam1"', exception.message )
   end
 
-  # id cannot be nil
-  # because runtime error
+  # id cannot be nil because runtime error
   # Called id for nil, which would mistakenly be 4 -- if you really wanted the id of nil, use object_id
   # Note: add_participant for course team is deprecated
   test "add member for course should create teams user" do
@@ -129,14 +129,22 @@ class TeamTest < ActiveSupport::TestCase
 
   # I guess this is always one-way for assignment -> course?
   # no assignment size check
-  test "copy_members from assignmentTeam" do
+  # cannot copy to non-empty team
+  test "copy_members from assignment team" do
     new_team = Team.new
     assert_difference ['TeamUserNode.count', 'TeamsUser.count'], 2 do
       assert teams(:IntelligentTeam1).copy_members(new_team)
     end
   end
 
-  # This will only return nil
+  test "copy_members from course team" do
+    new_team = Team.new
+    assert_difference ['TeamUserNode.count', 'TeamsUser.count'], 1 do
+      assert teams(:course0_team1).copy_members(new_team)
+    end
+  end
+
+  # This will only return nil or raise error
   test "check_for_existing for AssignmentTeam" do
     Team.check_for_existing(assignments(:assignment_project3), "abc", "Assignment")
   end
@@ -147,7 +155,6 @@ class TeamTest < ActiveSupport::TestCase
     end
   end
 
-  # what if teams = nil?
   test "delete all by parent should delete teams" do
     assert_difference 'Team.count', -3 do
       Team.delete_all_by_parent(assignments(:Intelligent_assignment))
@@ -161,7 +168,7 @@ class TeamTest < ActiveSupport::TestCase
   end
 
   # 4 participants, 3 existed teams => 2 teams
-  # will raise error because assignment id not passed.
+  # will raise error because assignment id not passed. (wrong argument)
   #test "randomize_all_by_parent" do
   #  assert_difference 'Team.count', 1 do
   #    Team.randomize_all_by_parent(assignments(:Intelligent_assignment), "Assignment", 2)
@@ -179,7 +186,7 @@ class TeamTest < ActiveSupport::TestCase
         exception.message )
   end
 =begin
-  # problem: add_member are not adding correct assignment id at line 169
+  # problem: add_member are not passing correct assignment id at line 169
   test "import team members successfully" do
     row = ["hi", "student1","student2", "student3"]
     team = Team.new

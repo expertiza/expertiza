@@ -207,7 +207,7 @@ class AssignmentsController < ApplicationController
 
         undo_link("Assignment \"#{@assignment.name}\" has been edited successfully. ")
 
-        if params[:due_date]
+        if params[:due_dates]
           # delete the previous jobs from the delayed_jobs table
           djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
           for dj in djobs
@@ -216,6 +216,8 @@ class AssignmentsController < ApplicationController
 
           add_to_delayed_queue
         end
+
+        set_due_dates
         redirect_to :action => 'edit', :id => @assignment.id
       else
         flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
@@ -225,6 +227,9 @@ class AssignmentsController < ApplicationController
 
       @hash1[:assignment][:late_policy_id] = nil
       if @assignment.update_attributes(@hash1[:assignment])
+        flash[:note] = 'Assignment was successfully saved.'
+        set_due_dates
+        undo_link("Assignment \"#{@assignment.name}\" has been edited successfully. ")
         redirect_to :action => 'edit', :id => @assignment.id
       else
         flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
@@ -482,5 +487,22 @@ class AssignmentsController < ApplicationController
         :notification_limit => aq.notification_limit,
         :questionnaire_weight => aq.questionnaire_weight
       )
+    end
+  end
+
+  private
+
+  def set_due_dates
+    #delete all old due dates for an assignment
+    @assignment.due_dates.each do |due_date|
+      due_date.delete
+    end
+
+    new_due_dates = params[:due_dates]
+    #set the assignment's due dates to the new due dates
+    new_due_dates.each do |new_due_date|
+      due_date = DueDate.new(new_due_date)
+
+      due_date.save
     end
   end

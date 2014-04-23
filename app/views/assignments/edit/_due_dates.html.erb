@@ -7,25 +7,19 @@
 
 <%= stylesheet_link_tag 'jquery-ui-1.10.3.custom', 'jquery-ui-timepicker-addon' %>
 
-<div>
+<div id='review_round'>
   <%= label_tag('assignment[rounds_of_reviews]', 'Number of Review Rounds:') %>
   <%= text_field_tag('assignment[rounds_of_reviews]', @assignment.rounds_of_reviews, :style => 'width:50px') %>
   <%= button_to_function('Set', 'changeReviewRounds()') %>
 </div>
 
-
-<input id="test" type="text" value="<%=@assignment.due_dates[0].due_at%>"/>
-
-<table>
+<table id="due_dates_table">
   <tr>
     <th width=15%>Deadline type</th>
     <th width=20%>Date & time</th>
     <th width=10%>Submission allowed</th>
     <th width=8%>Review allowed</th>
-    <th width=10%>Resubmission Allowed</th>
-    <th width=10%>Re-Review Allowed</th>
-
-    <th width=10%>Meta-review allowed</th>
+    <th width=10%>Metareview Allowed</th>
     <th width=9%>Quiz allowed</th>
     <th width=8%>Reminder(hrs)</th>
   </tr>
@@ -41,18 +35,63 @@
             Round <%=due_date.round%>: <%=due_date.type.titleize%>
         <%end%>
       </td>
-      <td>
+      <td align="center">
         <input class="due_date_datetime" name="due_dates[][due_at]" type="text" value="<%=due_date.due_at %>" />
       </td>
-    </tr>
-    <tr>
-
-    </tr>
-    <tr>
-
+      <td align="center">
+        <select id="due_date_submission_allowed_id" name="due_dates[][submission_allowed_id]">
+          <option value="">---</option>
+          <option value="1">No</option>
+          <option value="2">Late</option>
+          <option value="3">Yes</option>
+        </select>
+      </td>
+      <td align="center">
+        <select id="due_date_review_allowed_id" name="due_dates[][review_allowed_id]">
+          <option value="">---</option>
+          <option value="1">No</option>
+          <option value="2">Late</option>
+          <option value="3">Yes</option>
+        </select>
+      </td>
+      <td align="center">
+        <select id="due_date_review_of_review_allowed_id" name="due_dates[][review_of_review_allowed_id]">
+          <option value="">---</option>
+          <option value="1">No</option>
+          <option value="2">Late</option>
+          <option value="3">Yes</option>
+        </select>
+      </td>
+      <td align="center">
+        <select id="due_date_quiz_allowed_id" name="due_dates[][quiz_allowed_id]">
+           <option value="">---</option>
+           <option value="1">No</option>
+           <option value="2">Late</option>
+           <option value="3">Yes</option>
+         </select></td>
+      </td>
+      <td align="center">
+        <select id="due_date_threshold" name="due_dates[][threshold]">
+          <option value="">---</option>
+          <option value="8">8</option>
+          <option value="16">16</option>
+          <option value="24">24</option>
+          <option value="32">32</option>
+          <option value="40">40</option>
+          <option value="48">48</option>
+          <option value="56">56</option>
+          <option value="64">64</option>
+          <option value="72">72</option>
+          <option value="80">80</option>
+          <option value="88">88</option>
+          <option value="96">96</option>
+        </select>
+      </td>
     </tr>
   <% end %>
 </table>
+
+<%= render :partial => 'assignments/edit/late_policy' %>
 
 <script type="text/javascript">
 
@@ -314,63 +353,56 @@
   <b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b>
 </div>
 
-<div style='padding: 5px' id='review_round'>
-  <%= label_tag('assignment[rounds_of_reviews]', 'Number of Review Rounds:') %>
-  <%= text_field_tag('assignment[rounds_of_reviews]', @assignment.rounds_of_reviews, :style => 'width:50px') %>
-  <%= button_to_function('Set', 'changeReviewRounds()') %>
-</div>
 
-<table class='exp' id='due_dates_table' style='padding:10px'>
+
+<!--<table class='exp' id='due_dates_table' style='padding:10px'>
   <tr id='due_date_heading'>
     <th width=15%>Deadline type</th>
     <th width=20%>Date & time</th>
     <th width=10%>Submission allowed</th>
-    <th width=8%>Review allowed</th>
+    <th width=8%>Review allowed</th>-->
     <!--<th width=10%>Resubmission Allowed</th>-->
     <!--<th width=10%>Re-Review Allowed</th>-->
-    <th width=10%>Meta-review allowed</th>
+    <!--<th width=10%>Meta-review allowed</th>
     <th width=9%>Quiz allowed</th>
     <th width=8%>Reminder(hrs)</th>
-  </tr>
-  <script>
-      jQuery(document).ready(function () {
+  </tr>-->
+<script>
+  jQuery(document).ready(function () {
 
-          <%due_dates = @assignment.due_dates.sort%>
-          <%for i in 0..due_dates.count-1 %>
-          addDueDateTableElement(<%= due_dates[i].type.to_json.html_safe %>, <%= due_dates[i].round.to_json.html_safe %>, <%= due_dates[i].to_json.html_safe %>.due_date);
-          <% end %>
+      <%#due_dates = @assignment.due_dates.sort%>
+      <%#for i in 0..due_dates.count-1 %>
+      //addDueDateTableElement(<%#= due_dates[i].type.to_json.html_safe %>, <%#= due_dates[i].round.to_json.html_safe %>, <%#= due_dates[i].to_json.html_safe %>.due_date);
+      <%# end %>
 
-          addBlankRounds();
+      //addBlankRounds();
 
-          var i = 1;
-          jQuery(".due_date_datetime").each(function(){
+      jQuery(".due_date_datetime").each(function(){
+          jQuery(this).datetimepicker({
+              dateFormat: 'yy-mm-dd',
+              timeFormat: 'HH:mm:ss z',
+              controlType: 'select',
+              timezoneList: [{value:'<%=Time.zone_offset(@user.timezonepref || '')%>', label: '<%=@user.timezonepref.try(:split, "\s").try(:[], 0)%>'}]
 
-              var x = this;
-              console.log("x: ");
-              console.log(x);
-              console.log("jQuery(x): ");
-              console.log(jQuery(x));
-              jQuery(this).datetimepicker({
-                  dateFormat: 'yy-mm-dd',
-                  timeFormat: 'HH:mm:ss z',
-                  controlType: 'select',
-                  timezoneList: [{value:'<%=Time.zone_offset(@user.timezonepref || '')%>', label: '<%=@user.timezonepref.try(:split, "\s").try(:[], 0)%>'}]
-
-                  /*timezoneList: [
-                   { value: -000, label: 'GMT'},
-                   { value: -300, label: 'Eastern'},
-                   { value: -360, label: 'Central' },
-                   { value: -420, label: 'Mountain' },
-                   { value: -480, label: 'Pacific' }
-                   ]*/
-              });
-              i++;
+              /*timezoneList: [
+               { value: -000, label: 'GMT'},
+               { value: -300, label: 'Eastern'},
+               { value: -360, label: 'Central' },
+               { value: -420, label: 'Mountain' },
+               { value: -480, label: 'Pacific' }
+               ]*/
           });
+      });
 
 
-      }());
-  </script>
-</table>
+  }());
+
+  function addDueDates()
+  {
+      var html = "<tr></tr>"
+  }
+</script>
 
 
-<%= render :partial => 'assignments/edit/late_policy' %>
+
+

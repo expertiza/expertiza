@@ -1,0 +1,14 @@
+questionnaire1:
+  instructor: instructor1
+  name: "Questionnaire 1"
+  min_question_score: 0
+  max_question_score: 5
+  section: "Regular"
+  instruction_loc: "http://www.courses.ncsu.edu/csc517"
+questionnaire2:
+  instructor: instructor2
+  name: "Questionnaire 2"
+  min_question_score: 0
+  max_question_score: 2
+  section: "Regular"
+  instruction_loc: "http://www.courses.ncsu.edu/csc517"

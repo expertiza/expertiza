@@ -434,32 +434,6 @@ class ResponseController < ApplicationController
   end
 
   private
-
-  def get_content
-    @title = @map.get_title
-    @assignment = @map.assignment
-    @participant = @map.reviewer
-    @contributor = @map.contributor
-    @questionnaire = @map.questionnaire
-    @questions = @questionnaire.questions
-    @min = @questionnaire.min_question_score
-    @max = @questionnaire.max_question_score
-  end
-
-  def redirect_when_disallowed(response)
-    # For author feedback, participants need to be able to read feedback submitted by other teammates.
-    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-    if response.map.read_attribute(:type) == 'FeedbackResponseMap'
-      team = response.map.reviewer.team
-      unless team.has_user session[:user]
-        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
-      else
-        redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
-      end
-    end
-  end
-
-  private
   def get_content
     @title = @map.get_title
     @assignment = @map.assignment

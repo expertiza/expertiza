@@ -1,4 +1,5 @@
 Expertiza::Application.routes.draw do
+  resources :assignment_form_object
   resources :bookmark_tags
   resources :books
   resources :bookmarks

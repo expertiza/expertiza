@@ -90,4 +90,16 @@ class DueDate < ActiveRecord::Base
     topic_deadline.save
   end
 
+  def <=>(other)
+    if(self.due_at == nil && other.due_at == nil)
+      0
+    elsif self.due_at == nil
+      -1
+    elsif other.due_at == nil
+      1
+    else
+      self.due_at <=>(other.due_at)
+    end
+  end
+
 end

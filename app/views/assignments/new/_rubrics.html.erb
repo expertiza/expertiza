@@ -34,11 +34,7 @@
     function submit_questionnaires() {
       var data, para, fields, i, j;
         //delete old assignment_questionnaires
-        jQuery.get("/assignments/delete_all_questionnaires?assignment_id=" + <%= if (@assignment.id.nil?)
-                                                                                0;
-                                                                                else
-                                                                                @assignment.id ;
-                                                                                end %>);
+        jQuery.get("/assignments/delete_all_questionnaires?assignment_id=" + <%= @assignment.id %>);
         //create the new assignment_questionnaires
         data = jQuery('#assignment_questionnaire_table>tbody>tr:not(.heading)');
         for (i = 0; i < data.length; i++) {
@@ -67,21 +63,17 @@
     }
   </script>
 
-  <script>
-   if (!<%= @assignment.id.nil? %>){
-       document.getElementById("tabs-2").innerHTML+=
-        "<table class='exp' id='assignment_questionnaire_table' style='padding:10px'>" +
-    "<tr class='heading'>"+
-      "<th width='10%'></th>"+
-      "<th align='center' width='30%'>Questionnaire</th>"+
-      "<th align='center' width='15%'>Weight</th>"+
-      "<th align='center' width='15%'>Notification Limit"+
-        "<img src='/images/info.png' title='If two reviews differ by more than this amount, the instructor will be notified by e-mail.'>"+
-      "</th>"+
-      "<th width='30%'></th>"+
-    "</tr>"+
-    "</table>";
-
+  <table class='exp' id='assignment_questionnaire_table' style='padding:10px'>
+    <tr class='heading'>
+      <th width="10%"></th>
+      <th align='center' width="30%">Questionnaire</th>
+      <th align='center' width="15%">Weight</th>
+      <th align='center' width="15%">Notification Limit
+        <img src="/images/info.png" title="If two reviews differ by more than this amount, the instructor will be notified by e-mail.">
+      </th>
+      <th width='30%'></th>
+    </tr>
+    <script>
       jQuery(document).ready(function () {
         addQuestionnaireTableRow(
           'ReviewQuestionnaire',
@@ -108,13 +100,8 @@
           <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>
         );
       }());
-   }
-    else{
-       document.getElementById("tabs-2").innerHTML+="<h2>Name and Save the assignment in order to edit the rubrics</h2>";
-
-   }
-
-</script>
+    </script>
+  </table>
 
 
 

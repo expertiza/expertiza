@@ -18,39 +18,61 @@ class AssignmentsController < ApplicationController
   end
 
   def new
+    @user = current_user
     @assignment = Assignment.new
+
     @assignment.course = Course.find(params[:parent_id]) if params[:parent_id]
 
     @assignment.instructor = @assignment.course.instructor if @assignment.course
     @assignment.instructor ||= current_user
-
     @assignment.wiki_type_id = 1 #default no wiki type
     @assignment.max_team_size = 1
+    # Assume initially that there is 1 round of reviews for an assignment
+    @assignment.rounds_of_reviews = 1
+    @assignment_form_object = AssignmentFormObject.new(assignment: @assignment)
   end
 
   def create
+    @user = current_user
     @assignment = Assignment.new(params[:assignment])
-    #This one is working
-    #       emails = Array.new
-    #      #emails<<"vikas.023@gmail.com"
-    #Mailer.generic_message(
-    #    {:bcc => emails,
-    #     :subject => "one",
-    #     #:body => "two",
-    #    :partial_name => 'update'
-    #    }).deliver
+    @assignment_form_object = AssignmentFormObject.new(assignment: @assignment)
 
-    if @assignment.save
-      @assignment.create_node
-      # flash[:success] = 'Assignment was successfully created.'
-      # redirect_to controller: :assignments, action: :edit, id: @assignment.id
-      #AAD#
-      redirect_to :controller => 'tree_display', :action => 'list'
+    due_dates = params[:due_dates]
+    due_dates.each do |new_due_date|
+      begin
+        due_at = DateTime.parse(new_due_date[:due_at])
+      rescue
+        flash.now[:error] = "Error parsing due date date time"
+        render 'new'
+        return
+      end
+
+      due_date = DueDate.new(new_due_date)
+      @assignment_form_object.add_due_date(due_date)
+    end
+
+    topics_list = params[:assignment_form_object][:topics_list]
+    topics_list.each do |t|
+      sign_up_topic = SignUpTopic.new(topic_name: t[:topic_name],
+                                      max_choosers: t[:max_choosers],
+                                      topic_identifier: t[:topic_identifier],
+                                      category: t[:category])
+      if sign_up_topic.valid?
+        @assignment_form_object.add_topic(sign_up_topic)
+      end
+    end
+    if @assignment.late_policy_id=0
+      @assignment.late_policy_id=nil
+    end
+    if @assignment_form_object.save
+      flash.now[:note] = "Form saved"
+      redirect_to action: 'edit', id: @assignment_form_object.assignment.id
       undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
-      #AAD#
     else
+      flash.now[:error] = "Error saving form: #{@assignment_form_object.errors.full_messages}"
       render 'new'
     end
+
   end
 
   def edit
@@ -161,7 +183,7 @@ class AssignmentsController < ApplicationController
 
         undo_link("Assignment \"#{@assignment.name}\" has been edited successfully. ")
 
-        if params[:due_date]
+        if params[:due_dates]
           # delete the previous jobs from the delayed_jobs table
           djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
           for dj in djobs
@@ -170,6 +192,8 @@ class AssignmentsController < ApplicationController
 
           add_to_delayed_queue
         end
+
+        set_due_dates
         redirect_to :action => 'edit', :id => @assignment.id
       else
         flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
@@ -179,6 +203,9 @@ class AssignmentsController < ApplicationController
 
       @hash1[:assignment][:late_policy_id] = nil
       if @assignment.update_attributes(@hash1[:assignment])
+        flash[:note] = 'Assignment was successfully saved.'
+        set_due_dates
+        undo_link("Assignment \"#{@assignment.name}\" has been edited successfully. ")
         redirect_to :action => 'edit', :id => @assignment.id
       else
         flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
@@ -277,7 +304,7 @@ class AssignmentsController < ApplicationController
   #--------------------------------------------------------------------------------------------------------------------
   # GET_PATH (Helper function for CREATE and UPDATE)
   #  return the file location if there is any for the assignment
-  # TODO: to be depreicated
+  # TODO: to be deprecated
   #--------------------------------------------------------------------------------------------------------------------
   def get_path
     begin
@@ -436,5 +463,22 @@ class AssignmentsController < ApplicationController
         :notification_limit => aq.notification_limit,
         :questionnaire_weight => aq.questionnaire_weight
       )
+    end
+  end
+
+  private
+
+  def set_due_dates
+    #delete all old due dates for an assignment
+    @assignment.due_dates.each do |due_date|
+      due_date.delete
+    end
+
+    new_due_dates = params[:due_dates]
+    #set the assignment's due dates to the new due dates
+    new_due_dates.each do |new_due_date|
+      due_date = DueDate.new(new_due_date)
+
+      due_date.save
     end
   end

@@ -1,0 +1,35 @@
+
+<% @assignment %>
+<h1>Signup sheet</h1>
+
+<% if flash[:notice] %>
+  <div class="flash_note"><%= flash[:notice] %></div>
+<% end %>
+<p>You can add a sign up topic here. More may be added after saving the assignment.</p>
+<fieldset id="sign_up_topics_list">
+  <legend>New Topic</legend>
+  <div class="topic_row">
+  <%=text_field_tag "assignment_form_object[topics_list][][topic_name]", nil, placeholder: "Name"%>
+  <%=text_field_tag "assignment_form_object[topics_list][][max_choosers]", nil, placeholder: "Max Choosers"%>
+  <%=text_field_tag "assignment_form_object[topics_list][][topic_identifier]", nil, placeholder: "Topic Identifier"%>
+  <%=text_field_tag "assignment_form_object[topics_list][][category]", nil, placeholder: "Category"%>
+  </div>
+</fieldset>
+
+<button type='button' id='moreTopics'>Add another topic field</button>
+
+<% session[:return_to] = request.fullpath %>
+<br/><br/>
+
+<script>
+
+    jQuery('#moreTopics').click(function() {
+        jQuery('.topic_row:last').clone(true).find("input:text").val("").end().insertAfter(".topic_row:last");
+    });
+
+
+</script>
+
+
+<%#<%= render :partial => '/sign_up_sheet/add_topics' %>
+<!--<a href="javascript:history.back()">Back</a>-->

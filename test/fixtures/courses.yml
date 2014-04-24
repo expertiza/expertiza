@@ -1,0 +1,12 @@
+course1:
+  name: "Course 1"
+  instructor_id: instructor1
+  directory_path: "asdf"
+  info: "info"
+  private: false
+course2:
+  name: "Course 2"
+  instructor_id: instructor2
+  directory_path: "asdf2"
+  info: "info2"
+  private: false

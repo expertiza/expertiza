@@ -74,7 +74,6 @@ describe AssignmentsController do
       @request.session[:user] = valid_instructor_user
       get :associate_assignment_with_course, {:id => instructor_1_assignment.id.to_s}
       expect(assigns(:assignment)).to eq(instructor_1_assignment)
-      expect(assigns(:user)).to eq(valid_instructor_user)
       expect(assigns(:courses)).to eq(valid_course)
     end
 
@@ -86,26 +85,24 @@ describe AssignmentsController do
   end
 
   describe "GET copy" do
-    #this subtest does not work, I suspect problems with how I try to find out if Assignment got a save call
     it "saves the copied assignment" do
       @request.session[:user] = valid_instructor_user
+      Assignment.any_instance.should_receive(:save).at_least(:once)
       get :copy, {:id=> valid_assignment.id.to_s}
-      Assignment.any_instance.should_receive(:save)
     end
 
     it "redirects to edit" do
       @request.session[:user] = valid_instructor_user
       get :copy, {:id=> valid_assignment.id.to_s}
-      expect(response).should be_redirect
+      expect(response).to be_redirect
     end
   end
 
   describe "GET toggle_access" do
-    #this subtest does not work, I suspect problems with how I try to find out if Assignment got a save call
     it "toggles the private attribute of the assignment" do
       @request.session[:user] = valid_instructor_user
-      get :toggle_access, {:id => valid_assignment.id.to_s}
       Assignment.any_instance.should_receive(:save)
+      get :toggle_access, {:id => valid_assignment.id.to_s}
     end
 
     it "redirects to tree_display#list" do
@@ -114,4 +111,22 @@ describe AssignmentsController do
       expect(response).to redirect_to("/tree_display/list")
     end
   end
+
+  describe "GET set_questionnaire" do
+    it "assigns new questionnaire to assignment" do
+      @request.session[:user] = valid_instructor_user
+      AssignmentQuestionnaire.any_instance.should_receive(:save)
+      get :set_questionnaire, {:assignment_questionnaire =>{:assignment_id => valid_assignment.id.to_s, :questionnaire_id => valid_questionnaire.id.to_s}}
+    end
+  end
+
+  describe "GET set_due_date" do
+    it "assigns new due_date to assignment" do
+      @request.session[:user] = valid_instructor_user
+      DueDate.any_instance.should_receive(:save)
+      get :set_due_date, {:due_date=>{:assignment_id => valid_assignment.id.to_s, :due_at => "2100/10/10 10:10:10"}}
+    end
+  end
+
+
 end

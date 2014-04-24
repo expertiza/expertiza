@@ -1,8 +1,13 @@
-<% @qid = "TeamReviewResponseMap" %>
-<%@teamid%>
+
+<% @qid = @type %>
+<%if @teamid%>
+    <% id = @teamid %>
+<%elsif @participantid%>
+    <% id = @participantid%>
+<%end%>
 <%@id%>
 <% @this_reviewer %>
-<%@sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",@teamid, @qid  ])  %>
+<%@sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",id, @qid  ])  %>
 <% if @sc %>
   <% t_score, t_range = @sc.score, @sc.range  %>
 <%else%>
@@ -16,8 +21,8 @@
   <%else%>
     <td  bgcolor="#DDDDBB" align = 'center' >
     <%end%>
-    <% if @review_scores[@this_reviewer][@teamid] != 0 %>
-      <%= @review_scores[@this_reviewer][@teamid] %>
+    <% if @review_scores[@this_reviewer][id] != 0 %>
+      <%= @review_scores[@this_reviewer][id] %>
     <% else %>
       --
     <% end %>

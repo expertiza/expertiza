@@ -3,7 +3,7 @@
 <div class = "reviewreport">
   <table width="100%" cellspacing="0" cellpadding="2" border="0">
     <tr bgcolor="#CCCCCC">
-      <th width = "16%">
+      <th width = "14%">
         Reviewer
       </th>
       <th width = "14%">
@@ -26,9 +26,10 @@
       </th>
     </tr>
 
-    <tr>
+
       <%@l = -1 %>
       <% @reviewers.each do |r| %>
+        <tr>
         <% @this_reviewer = r.reviewer_id %>
         <% @count = 0 %>
         <% @rspan = 0 %>
@@ -39,6 +40,8 @@
           <% end %>
           <% if (Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0) %>
             <% @rspan = @rspan + 1 %>
+          <% elsif (Participant.find(:all, :conditions => {:id => ri.reviewee_id}).length > 0)%>
+                  <% @rspan = @rspan + 1 %>
           <% end %>
         <%end %>
         <%if r.reviewer_id != -1 %>
@@ -47,13 +50,13 @@
 
           <% if (@l%2) == 0 %>
 
-            <td bgcolor="#ffffff" rowspan= <%= @rspan%>>
-              <%= link_to_remote_redbox  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
+            <td bgcolor="#ffffff" rowspan=<%= @rspan%>>
+              <%= link_to username, :controller => 'popup', :action => 'view_review_scores', :id => r.reviewer_id, :type => @type %>
             </td>
           <%else %>
 
             <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
-              <%= link_to_remote_redbox  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
+              <%= link_to username, :controller => 'popup', :action => 'view_review_scores', :id => r.reviewer_id, :type => @type %>
             </td>
 
           <%end %>
@@ -73,19 +76,69 @@
               <%if Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>
                 <% @teamid = @team.id%>
+                        <% if (@l%2) == 0 %>
+                            <td id = "green" bgcolor="#ffffff" align = 'center' colspan=1>
+                        <%else %>
+                            <td id = "green" bgcolor="#DDDDBB" align = 'center' colspan=1>
+                        <%end %>
+                        <% if Team.find(ri.reviewee_id).users.size==1 %>
+                            <%=  Team.find(ri.reviewee_id).users.first.name %>
+                        <% else %>
+                            <%=  Team.find(ri.reviewee_id).name %>
+                        <% end %>
+
+                        <%#= link_to_remote_redbox Team.find(ri.reviewee_id).name,:url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
+                        </td>
+                        <%= render :partial => 'teamscore' %>
+
+                        <% if (@l%2) == 0 %>
+                            <td bgcolor="#ffffff" align = 'center'>
+                        <%else %>
+                            <td bgcolor="#DDDDBB" align = 'center'>
+                        <%end %>
+                        <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+                        </td>
+
+
+                    <% elsif !@assignment.team_assignment? %>
+                        <% @participantid = (Participant.find(ri.reviewee_id)).user_id %>
+                        <% @myuser = 0%>
+                        <% @myuser = ri.reviewee_id%>
+                        <% participant = User.find(@participantid) %>
+                        <% if (@l%2) == 0 %>
+                            <td id = "green" bgcolor="#ffffff" align = 'center' colspan=1>
+                        <%else %>
+                            <td id = "green" bgcolor="#DDDDBB" align = 'center' colspan=1>
+                        <%end %>
+                        <%= link_to participant.fullname, :controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => ri.id, :type => @type %>
+                        </td>
+                        <%= render :partial => 'participantscore' %>
+                        <!-- write ur partial here to print score -->
+                        <% if (@l%2) == 0 %>
+                            <td bgcolor="#ffffff" align = 'center'>
+                        <%else %>
+                            <td bgcolor="#DDDDBB" align = 'center'>
+                        <%end %>
+                        <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+
+                        </td>
+
+                 <%elsif (Participant.find(:all, :conditions => {:id => ri.reviewee_id}).length > 0)%>
+                <%@participant = Participant.find(ri.reviewee_id) %>
+                <%@participantid = @participant.id%>
+
                 <% if (@l%2) == 0 %>
                   <td id = "green" bgcolor="#ffffff" align = 'center' colspan=1>
                   <%else %>
                     <td id = "green" bgcolor="#DDDDBB" align = 'center' colspan=1>
                     <%end %>
-                    <% if Team.find(ri.reviewee_id).users.size==1 %>
-                      <%=  Team.find(ri.reviewee_id).users.first.name %>
-                    <% else %>
-                      <%=  Team.find(ri.reviewee_id).name %>
-                    <% end %>
+
+                      <%=  User.find(Participant.find(ri.reviewee_id).user_id).name %>
+
 
                     <%#= link_to_remote_redbox Team.find(ri.reviewee_id).name,:url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
                   </td>
+
                   <%= render :partial => 'teamscore' %>
 
                   <% if (@l%2) == 0 %>
@@ -107,7 +160,7 @@
                       <%else %>
                         <td id = "green" bgcolor="#DDDDBB" align = 'center' colspan=1>
                         <%end %>
-                        <%= link_to_remote_redbox participant.fullname, :url => {:controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
+                        <%= link_to participant.fullname, :controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => ri.id, :type => @type %>
                       </td>
                       <%= render :partial => 'participantscore' %>
                       <!-- write ur partial here to print score -->
@@ -124,16 +177,23 @@
 
                     <% else %>
                       <%if Team.find(:all, :conditions => { :id => ri.reviewee_id}).length > 0 %>
+
+
+
                         <% if (@l%2) == 0 %>
+
+
                           <td id = "red" bgcolor="#ffffff" style ="color:#DD3300" align = 'center' colspan=1>
                           <%else %>
+
                             <td id = "red" bgcolor="#DDDDBB" style ="color:#DD3300" align = 'center' colspan=1>
                             <%end %>
+
                             <%@team = Team.find(ri.reviewee_id) %>
                             <% @teamid = @team.id%>
-                            <%= link_to_remote_redbox Team.find(ri.reviewee_id).name, :url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil} %>
+                            <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil, :type => @type %>
                           </td>
-                          <%= render :partial => 'teamscore' %>
+                         <%= render :partial => 'teamscore' %>
                           <% if (@l%2) == 0 %>
                             <td bgcolor="#ffffff" style ="color:#DD3300" align = 'center'>
                             <%else %>
@@ -141,6 +201,7 @@
                               <%end %>
                               No
                             </td>
+
 
                           <% elsif !@assignment.team_assignment? %>
                             <% @participantid = Participant.find(ri.reviewee_id).user_id %>
@@ -150,11 +211,12 @@
                             <% participant = User.find(@participantid) %>
 
                             <% if (@l%2) == 0 %>
+
                               <td id = "red" style ="color:#DD3300" align = 'center' colspan=1 bgcolor="#ffffff" >
                               <%else%>
                                 <td  id = "red" style ="color:#DD3300" align = 'center' colspan=1 bgcolor="#DDDDBB"  >
                                 <%end%>
-                                <%= link_to_remote_redbox participant.fullname, :url => {:controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => nil} %>
+                                <%= link_to participant.fullname, :controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => nil, :type => @type %>
                               </td><!-- write ur partial here to print score -->
                               <%= render :partial => 'participantscore' %>
                               <% if (@l%2) == 0 %>
@@ -164,9 +226,12 @@
                                   <%end %>
                                   No
                                 </td>
-                              </tr>
+                      <% else %>
+                          <tr></tr>
                             <%end %>
+
                           <%end %>
+                   </tr>
                         <%end %>
                       <%end %>
                     <%end %>

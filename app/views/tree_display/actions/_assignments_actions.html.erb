@@ -53,7 +53,13 @@
           </div>
           <div>
             <%= link_to image_tag('/images/tree_view/view-scores-24.png', :title => 'View scores'), {:controller => 'grades', :action => 'view', :id => node.node_object_id}, {:title => 'View scores'} %>
-            <%= link_to image_tag('/images/tree_view/view-review-report-24.png', :title => 'View review report'), {:controller => 'review_mapping', :action => 'review_report', :id => node.node_object_id}, {:title => 'View review report'} %>
+            <%= link_to image_tag('/images/tree_view/view-review-report-24.png', :title => 'View review report'), {:controller => 'review_mapping', :action => 'review_report', :type => 'TeamReviewResponseMap', :id => node.node_object_id}, {:title => 'View review report'} %>
+
+            <%= link_to image_tag('/images/tree_view/view-review-report-24.png', :title => 'View Meta review report'), {:controller => 'review_mapping', :action => 'review_report', :type => 'MetareviewResponseMap', :id => node.node_object_id}, {:title => 'View Meta review report'}%>
+            <%= link_to image_tag('/images/tree_view/view-review-report-24.png', :title => 'View Author Feedback report'), {:controller => 'review_mapping', :action => 'review_report', :type => 'FeedbackResponseMap', :id => node.node_object_id}, {:title => 'View Author Feedback report'} %>
+            <%= link_to image_tag('/images/tree_view/view-review-report-24.png', :title => 'View Teammate report'), {:controller => 'review_mapping', :action => 'review_report', :type => 'TeammateReviewResponseMap', :id => node.node_object_id}, {:title => 'View Teammate report'} %>
+
+
             <%= link_to image_tag('/images/tree_view/view-survey-24.png', :title => 'View survey responses'), {:controller => 'survey_response', :action => 'view_responses', :id => node.node_object_id}, {:title => 'View survey responses'} %>
             <%= link_to image_tag('/images/tree_view/view-suggestion-24.png', :title => 'View suggestions'), {:controller => 'suggestion', :action => 'list', :id => node.node_object_id}, {:title => 'View suggestions'} %>
             <% if signup_topic %>

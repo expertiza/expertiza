@@ -1,5 +1,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<h1> Review report for <%= @assignment.name%> </h1>
+
+<% if @type == 'MetareviewResponseMap' %>
+    <h1> Metareview report for <%= @assignment.name%> </h1>
+<% elsif @type == 'FeedbackResponseMap' %>
+    <h1> Feedback report for <%= @assignment.name%> </h1>
+<% elsif @type == 'TeammateReviewResponseMap' %>
+    <h1> Teammate review report for <%= @assignment.name%> </h1>
+<% elsif @type == 'ParticipantReviewResponseMap' %>
+    <h1> Participant review report for <%= @assignment.name%> </h1>
+<% elsif @type == 'TeamReviewResponseMap' %>
+    <h1> Team review report for <%= @assignment.name%> </h1>
+<%end%>
 
 <div id="searchbox">
 

@@ -12,6 +12,7 @@ class ReviewMappingController < ApplicationController
       ['Instructor',
        'Teaching Assistant',
        'Administrator'].include? current_role_name
+        true
     end
   end
 
@@ -544,7 +545,8 @@ class ReviewMappingController < ApplicationController
     @assignment = Assignment.find(params[:id])
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @type = "TeamReviewResponseMap"
+    #@type = "TeamReviewResponseMap"
+    @type = params[:type]
 
     if params[:user].nil?
       # This is not a search, so find all reviewers for this assignment
@@ -559,8 +561,9 @@ class ReviewMappingController < ApplicationController
     end
 
     # Arranged as the hash @review_scores[reveiwer_id][reviewee_id] = score for this particular assignment
-    @review_scores = @assignment.compute_reviews_hash
+    @review_scores = @assignment.compute_reviews_hash(@type)
     end
+
 
   def distribution
 
@@ -599,7 +602,7 @@ class ReviewMappingController < ApplicationController
     ### For every responsemapping for this assgt, find the reviewer_id and reviewee_id #####
     @reviews_not_done = 0
     response_maps =  ResponseMap.where(["reviewed_object_id = ? and type = ?", @assignment.id, objtype])
-    review_report = @assignment.compute_reviews_hash
+    review_report = @assignment.compute_reviews_hash(objtype)
     for response_map in response_maps
       score_for_this_review = review_report[response_map.reviewer_id][response_map.reviewee_id]
       if(score_for_this_review != 0)

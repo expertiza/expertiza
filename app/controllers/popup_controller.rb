@@ -1,5 +1,10 @@
 class PopupController < ApplicationController
-  layout 'standard'
+  #layout 'standard'
+
+  def action_allowed?
+    true
+  end
+
   def team_users_popup
     @maxscore = 0
     @sum = 0
@@ -123,10 +128,18 @@ class PopupController < ApplicationController
 
   end
 
-  def view_review_scores_popup
+  def view_review_scores
     @reviewid = params[:id]
-    @scores = Score.find_all_by_instance_id(@reviewid)
-
+    @scores = Array.new
+    @type = params[:type]
+    response_map = ResponseMap.find(:all, :conditions => ["type = ? AND reviewer_id = ?", @type, @reviewid])
+    response_map.each do |rm|
+      @response = Response.find_by_map_id(rm.id)
+      if (@response != nil)
+      @scores << Score.find_all_by_response_id(@response.id)
+        end
+    end
+    @scores.flatten!
 
   end
 

@@ -1,4 +1,5 @@
 class Assignment < ActiveRecord::Base
+  @@print_count = 0
   require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   include DynamicReviewMapping
@@ -664,21 +665,23 @@ class Assignment < ActiveRecord::Base
   end
 
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
-  def compute_reviews_hash
+  def compute_reviews_hash(type)
+    @@print_count = @@print_count + 1
+
     review_questionnaire_id = get_review_questionnaire_id()
     @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
     @review_scores = Hash.new
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @response_type = 'TeamReviewResponseMap'
+    @response_type = type
 
-    @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @type])
+    @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @response_type])
 
     @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
 
     @response_maps.each do |response_map|
       # Check if response is there
-      @corresponding_response = Response.where(['map_id = ?', response_map.id])
+      @corresponding_response = Response.find_by_map_id(response_map.id)
       @respective_scores = Hash.new
       @respective_scores = @review_scores[response_map.reviewer_id] if @review_scores[response_map.reviewer_id] != nil
 

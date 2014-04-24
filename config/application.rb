@@ -18,5 +18,7 @@ module Expertiza
     config.filter_parameters += [:password, :password_confirmation, :password, :password_confirmation]
 
     config.autoload_paths += Dir[Rails.root.join('lib', '{**}')]
+
+
   end
 end

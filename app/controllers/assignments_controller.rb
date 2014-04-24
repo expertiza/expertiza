@@ -37,41 +37,17 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.new(params[:assignment])
     @assignment_form_object = AssignmentFormObject.new(assignment: @assignment)
 
-    due_dates = params[:due_date]
-    upper_index = due_dates[:deadline_type_id].count - 1
-    for i in 0..upper_index
-      due_date = DueDate.new
-      # Don't need to set assignment_id because it doesn't exist until assignment is saved.
-      #due_date.assignment_id = due_dates[:assignment_id][i]
-      due_date.deadline_type_id = due_dates[:deadline_type_id][i]
-
-      # If it is not a metareview, parse the due_at date time. If it is a metareview, do not parse the due_at
-      # date time if it was left blank. (Metareviews don't require a due_at date time)
-      if(due_date.deadline_type_id != DeadlineType.find_by_name('metareview').id)
-        begin
-          due_at = DateTime.parse(due_dates[:due_at][i])
-          due_date.due_at = due_at
-        rescue
-          flash.now[:error] = "Error parsing due date date time"
-          render 'new'
-          return
-        end
-      elsif((due_dates[:due_at][i] != nil) && (due_dates[:due_at][i] != ""))
-        begin
-          due_at = DateTime.parse(due_dates[:due_at][i])
-          due_date.due_at = due_at
-        rescue
-          flash.now[:error] = "Error parsing due date date time"
-          render 'new'
-          return
-        end
+    due_dates = params[:due_dates]
+    due_dates.each do |new_due_date|
+      begin
+        due_at = DateTime.parse(new_due_date[:due_at])
+      rescue
+        flash.now[:error] = "Error parsing due date date time"
+        render 'new'
+        return
       end
 
-      due_date.submission_allowed_id = due_dates[:submission_allowed_id][i]
-      due_date.review_allowed_id = due_dates[:review_allowed_id][i]
-      due_date.review_of_review_allowed_id = due_dates[:review_of_review_allowed_id][i]
-      due_date.quiz_allowed_id = due_dates[:quiz_allowed_id][i]
-      due_date.round = due_dates[:round][i]
+      due_date = DueDate.new(new_due_date)
       @assignment_form_object.add_due_date(due_date)
     end
 

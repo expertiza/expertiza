@@ -52,7 +52,7 @@ class AdvertiseForPartnerControllerTest < ActionController::TestCase
     assert_equal team.comments_for_advertisement, 'join us'
   end
 
-  test "test create advertisement should redirect to viewt" do
+  test "test create advertisement should redirect to view" do
     sessionVars = session_for(users(:student8))
     post(:create, {'id' =>  teams(:IntelligentTeam1).id, 'comments_for_advertisement' => 'join us' }, sessionVars, nil)
     team = Team.find_by_id(teams(:IntelligentTeam1).id)

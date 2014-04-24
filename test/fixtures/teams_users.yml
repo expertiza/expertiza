@@ -32,7 +32,22 @@ lottery_teams_users4:
   team_id: <%= Fixtures.identify(:lottery_team3) %>
   user_id: <%= Fixtures.identify(:student4) %>
 
-# team member of course0_team1
-course0_team1_users1:
+lottery_teams_users5:
+  team_id: <%= Fixtures.identify(:lottery_team1) %>
+  user_id: <%= Fixtures.identify(:student5) %>
+
+assignments7_users1:
+  team_id: <%= Fixtures.identify(:assignment7_team1) %>
+  user_id: <%= Fixtures.identify(:student2) %>
+
+course0_users1:
   team_id: <%= Fixtures.identify(:course0_team1) %>
   user_id: <%= Fixtures.identify(:student6) %>
+
+course_teams_user1:
+  team_id: <%= Fixtures.identify(:exist_team2) %>
+  user_id: <%= Fixtures.identify(:student1) %>
+
+assignment_teams_user1:
+  team_id: <%= Fixtures.identify(:exist_team1) %>
+  user_id: <%= Fixtures.identify(:student1) %>

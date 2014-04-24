@@ -274,23 +274,57 @@ module ResponseHelper
 
   def rearrangeQuestions(questions)
     questions_response_count=Hash.new
+    questionsTemp=Array.new
+    prev_topic=nil
+    current_topic=nil
+    #tempCount=10
+
     questions.each{
     |question|
-      questions_response_count[question.id]= find_number_of_responses(question)
+      question_type=question.question_type
+      current_topic = question_type.parameters.split("::")[0]
+      if (!current_topic.nil? && (current_topic==prev_topic || prev_topic.nil?) ) #current question is in same accordion panel
+        questions_response_count[question.id]= find_number_of_responses(question)
+        #tempCount=tempCount-1
+      else
+        questionsTemp = sort_and_copy_questions_hash(questions, questions_response_count, questionsTemp)
+        questions_response_count=Hash.new
+        questions_response_count[question.id]= find_number_of_responses(question)
+        #tempCount=tempCount-1
+      end
+      prev_topic=current_topic
     }
-    questions_response_count=Hash[questions_response_count.sort_by{|k,v| v}]
-    questionsTemp=Array.new
-    questions_response_count.each{
-        |key,value|
-      qTemp = questions.select{|q| q.id.eql?(key) }
-      questionsTemp<<qTemp[0]
-    }
+    unless (questions_response_count.empty?)
+      questionsTemp = sort_and_copy_questions_hash(questions, questions_response_count, questionsTemp)
+    end
     return questionsTemp
   end
 
+  def sort_and_copy_questions_hash(questions, questions_response_count, questionsTemp)
+    questions_response_count=Hash[questions_response_count.sort_by { |k, v| v }]
+    questions_response_count.each {
+        |key, value|
+      qTemp = questions.select { |q| q.id.eql?(key) }
+      questionsTemp<<qTemp[0]
+    }
+    questionsTemp
+  end
+
   def find_number_of_responses(question)
-    response_count=Score.find_by_sql(["SELECT * FROM pg_development.scores s, responses r, response_maps rm WHERE s.response_id=r.id AND r.map_id= rm.id AND rm.reviewed_object_id=? AND rm.reviewee_id=? AND s.comments != '' AND s.question_id=?",@map.reviewed_object_id,@map.reviewee_id, question.id]).count
-    return response_count
+    empty_response_character=''
+    case question.question_type.q_type
+      when "TextBox", "TextArea"
+        empty_response_character=''
+      when "DropDown", "Rating"
+        empty_response_character= @questionnaire.min_question_score
+        #if (@questionnaire.min_question_score) ? @questionnaire.min_question_score : '0'
+      when "CheckBox"
+        empty_response_character='0'
+      when "UploadFile"
+
+    end
+    response_count=Score.find_by_sql(["SELECT * FROM pg_development.scores s, responses r, response_maps rm WHERE s.response_id=r.id AND r.map_id= rm.id AND rm.reviewed_object_id=? AND rm.reviewee_id=? AND s.comments != ? AND s.question_id=?",@map.reviewed_object_id,@map.reviewee_id, empty_response_character, question.id]).count
+    response_count
   end
 
 end

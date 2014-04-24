@@ -328,7 +328,7 @@ class AssignmentsController < ApplicationController
   #--------------------------------------------------------------------------------------------------------------------
   # GET_PATH (Helper function for CREATE and UPDATE)
   #  return the file location if there is any for the assignment
-  # TODO: to be depreicated
+  # TODO: to be deprecated
   #--------------------------------------------------------------------------------------------------------------------
   def get_path
     begin

@@ -1,0 +1,6 @@
+duedate1:
+  due_at: '2100-10-10 10:10:10'
+  assignment: assignment1
+duedate2:
+  due_at: '2100-10-10 11:10:10'
+  assignment: assignment2

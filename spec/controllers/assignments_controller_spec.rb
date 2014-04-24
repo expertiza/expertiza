@@ -25,7 +25,7 @@ end
 
 
 describe AssignmentsController do
-  fixtures :users, :roles, :assignments, :questionnaires, :courses
+  fixtures :users, :roles, :assignments, :questionnaires, :courses, :assignment_questionnaires, :due_dates
   describe "GET show :id" do
     it "assigns @assignment" do
       @request.session[:user] = valid_instructor_user
@@ -128,5 +128,19 @@ describe AssignmentsController do
     end
   end
 
+  describe "GET delete_all_questionnaires" do
+    it "deletes questionnaires" do
+      @request.session[:user] = valid_instructor_user
+      AssignmentQuestionnaire.any_instance.should_receive(:delete).at_least(:once)
+      get :delete_all_questionnaires, {:assignment_id=> valid_assignment.id.to_s}
+    end
+  end
 
+  describe "GET delete_all_due_dates" do
+    it "deletes due dates" do
+      @request.session[:user] = valid_instructor_user
+      DueDate.any_instance.should_receive(:delete).at_least(:once)
+      get :delete_all_due_dates, {:assignment_id=> valid_assignment.id.to_s}
+    end
+  end
 end

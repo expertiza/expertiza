@@ -5,6 +5,8 @@
 <!--2. switch to a new date time picker-->
 <!--3. actually pretty much rewrote the whole thing...-->
 
+<%= stylesheet_link_tag 'jquery-ui-1.10.3.custom', 'jquery-ui-timepicker-addon' %>
+
 <script type="text/javascript">
 function changeReviewRounds() {
   var new_round_count = parseInt(jQuery('#assignment_rounds_of_reviews').val());
@@ -92,9 +94,9 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
     console.log("Adding review for round " + round_no);
     // Assignment id does not exist for assignments that have not been saved!
     //html += '<input class="due_date_assignment_id" name="due_date[assignment_id][]" type="hidden" value="' + <%= @assignment.id %> + '">';
-    html += '<input class="due_date_deadline_type_id" name="due_date[deadline_type_id][]" type="hidden" value="' + due_date.deadline_type_id + '">';
+    html += '<input class="due_date_deadline_type_id" name="due_dates[][deadline_type_id]" type="hidden" value="' + due_date.deadline_type_id + '">';
 
-    html += '<input class="due_date_round" name="due_date[round][]" type="hidden" value="' + round_no + '">';
+    html += '<input class="due_date_round" name="due_dates[][round]" type="hidden" value="' + round_no + '">';
 
     html += '<td class="due_date_name" width="15%">';
     if (round_no != 0) {
@@ -110,11 +112,11 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
     }
       html += '<td align="center" class="due_date_due_at" width="25%">' +
         '<input id="datetimepicker_' + element_id +
-        '" name="due_date[due_at][]" style="width: 200px" type="text" value="' +
+        '" name="due_dates[][due_at]" style="width: 200px" type="text" value="' +
         due_at + '">' + '</td>';
 
       html += '<td align="center" class="due_date_submission_allowed_id" width="10%">' +
-        '<select id="due_date_submission_allowed_id" name="due_date[submission_allowed_id][]">' +
+        '<select id="due_date_submission_allowed_id" name="due_dates[][submission_allowed_id]">' +
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
@@ -122,7 +124,7 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
         '</select></td>';
 
       html += '<td align="center" class="due_date_review_allowed_id" width="10%">' +
-        '<select id="due_date_review_allowed_id" name="due_date[review_allowed_id][]">' +
+        '<select id="due_date_review_allowed_id" name="due_dates[][review_allowed_id]">' +
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
@@ -140,7 +142,7 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
 
 
       html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">' +
-        '<select id="due_date_review_of_review_allowed_id" name="due_date[review_of_review_allowed_id][]">' +
+        '<select id="due_date_review_of_review_allowed_id" name="due_dates[][review_of_review_allowed_id]">' +
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
@@ -148,7 +150,7 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
         '</select></td>';
 
       html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
-        '<select id="due_date_quiz_allowed_id" name="due_date[quiz_allowed_id][]">' +
+        '<select id="due_date_quiz_allowed_id" name="due_dates[][quiz_allowed_id]">' +
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
@@ -156,7 +158,7 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
         '</select></td>';
 
       html += '<td align="center" class="due_date_threshold" width="10%">' +
-        '<select id="due_date_threshold" name="due_date[threshold][]">' +
+        '<select id="due_date_threshold" name="due_dates[][threshold]">' +
         '<option value="">---</option>' +
         '<option value="8">8</option>' +
         '<option value="16">16</option>' +

@@ -15,8 +15,6 @@
         if (validate()) {
             //submit the due dates and questionnaires before submitting the rest of the form
             jQuery.ajaxSetup({async: false});
-            //add_due_dates_to_assignment_form_object();
-            //submit_questionnaires();
             jQuery('#new_assignment').submit();
         }
     }

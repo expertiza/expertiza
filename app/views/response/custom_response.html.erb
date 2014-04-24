@@ -37,7 +37,7 @@
    rearrangedQuestions=rearrangeQuestions(questions)
    rearrangedQuestions.each {
            |question| %>
-    <%= question_type=question.question_type %>
+    <% question_type=question.question_type %>
     <%= get_accordion_title(current_topic, question_type.parameters.split("::")[0]) %>
     <%= find_question_type(question, question_type, i, false, nil, nil, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
     <% current_topic = question_type.parameters.split("::")[0]

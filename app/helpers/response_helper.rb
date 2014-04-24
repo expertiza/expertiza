@@ -273,41 +273,65 @@ module ResponseHelper
   end
 
   def rearrangeQuestions(questions)
+    panel_questions=Hash.new
+    panel_scores=Hash.new
     questions_response_count=Hash.new
-    questionsTemp=Array.new
+    sorted_panel_questions=Array.new
     prev_topic=nil
     current_topic=nil
-    #tempCount=10
+    current_checkbox_response_count=0
+    sorted_questions=Array.new
 
     questions.each{
     |question|
       question_type=question.question_type
       current_topic = question_type.parameters.split("::")[0]
-      if (!current_topic.nil? && (current_topic==prev_topic || prev_topic.nil?) ) #current question is in same accordion panel
-        questions_response_count[question.id]= find_number_of_responses(question)
-        #tempCount=tempCount-1
-      else
-        questionsTemp = sort_and_copy_questions_hash(questions, questions_response_count, questionsTemp)
+      unless (!current_topic.nil? && (current_topic==prev_topic || prev_topic.nil?) )
+        questions_response_count=Hash[questions_response_count.sort_by { |k, v| v }]
+        panel_score=0
+        questions_response_count.each {
+            |key, value|
+          sorted_panel_questions << questions.select { |q| q.id.eql?(key) }[0]
+          panel_score+=value
+        }
+        panel_questions[prev_topic]=sorted_panel_questions
+        panel_scores[prev_topic]=panel_score/sorted_panel_questions.length
+
+        sorted_panel_questions=Array.new
         questions_response_count=Hash.new
+      end
+      if question_type.q_type.eql?'Checkbox'
+        if(current_topic.eql?prev_topic)
+          questions_response_count[question.id]= current_checkbox_response_count
+        else
+          checkbox_questions=questions.select{|checkbox_question| checkbox_question.question_type.parameters.split("::")[0].eql?(current_topic)}
+          current_checkbox_response_count= find_number_of_responses_for_checkbox(checkbox_questions)
+          questions_response_count[question.id]=current_checkbox_response_count
+        end
+      else
         questions_response_count[question.id]= find_number_of_responses(question)
-        #tempCount=tempCount-1
       end
       prev_topic=current_topic
     }
     unless (questions_response_count.empty?)
-      questionsTemp = sort_and_copy_questions_hash(questions, questions_response_count, questionsTemp)
+      questions_response_count=Hash[questions_response_count.sort_by { |k, v| v }]
+      panel_score=0
+      questions_response_count.each {
+          |key, value|
+        sorted_panel_questions << questions.select { |q| q.id.eql?(key) }[0]
+        panel_score+=value
+      }
+      panel_questions[prev_topic]=sorted_panel_questions
+      panel_scores[prev_topic]=panel_score/questions_response_count.length
     end
-    return questionsTemp
-  end
 
-  def sort_and_copy_questions_hash(questions, questions_response_count, questionsTemp)
-    questions_response_count=Hash[questions_response_count.sort_by { |k, v| v }]
-    questions_response_count.each {
+    panel_scores=Hash[panel_scores.sort_by { |k, v| v }]
+    panel_scores.each {
         |key, value|
-      qTemp = questions.select { |q| q.id.eql?(key) }
-      questionsTemp<<qTemp[0]
+      panel_questions.fetch(key).each{|question| sorted_questions << question }
     }
-    questionsTemp
+    sorted_questions.each{|question| puts question.txt}
+    sorted_questions
   end
 
   def find_number_of_responses(question)
@@ -324,6 +348,15 @@ module ResponseHelper
 
     end
     response_count=Score.find_by_sql(["SELECT * FROM pg_development.scores s, responses r, response_maps rm WHERE s.response_id=r.id AND r.map_id= rm.id AND rm.reviewed_object_id=? AND rm.reviewee_id=? AND s.comments != ? AND s.question_id=?",@map.reviewed_object_id,@map.reviewee_id, empty_response_character, question.id]).count
+    response_count
+  end
+
+  def find_number_of_responses_for_checkbox(checkbox_questions)
+    question_ids=Array.new
+    checkbox_questions.each{|checkbox_question|
+      question_ids<<checkbox_question.id
+    }
+    response_count=Score.find_by_sql(["SELECT * FROM pg_development.scores s, responses r, response_maps rm WHERE s.response_id=r.id AND r.map_id= rm.id AND rm.reviewed_object_id=? AND rm.reviewee_id=? AND s.comments != '0' AND s.question_id IN (?) GROUP BY r.map_id",@map.reviewed_object_id,@map.reviewee_id, question_ids]).count
     response_count
   end
 

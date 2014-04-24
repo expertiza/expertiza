@@ -14,7 +14,7 @@ class TeamsUsersController < ApplicationController
 
   def list
     @team = Team.find_by_id(params[:id])
-    @assignment = Assignment.find(@team.assignment_id)
+    @assignment = Assignment.find_by_id(@team.assignment.id)
     @teams_users = TeamsUser.paginate(:page => params[:page], :per_page => 10, :conditions => ["team_id = ?", params[:id]])
   end
 

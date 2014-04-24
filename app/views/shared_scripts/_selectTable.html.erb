@@ -63,7 +63,7 @@ function submitAction(container_id, action_url){
                 <% if definition[:type] == "display" %>
                   <%= element[definition[:field].to_sym] %>
                 <% elsif definition[:type] == "fetch" %>
-                  <%= get_field(element,definition[:field],definition[:model]) %>
+                  <%= get_field(element,definition[:field]) %>
                 <% else %>
                   <%
                       disabled = false
@@ -89,7 +89,6 @@ function submitAction(container_id, action_url){
 <% if delete_options[:enabled] %>
   <a href="" onClick="return markAllRows('tableForm');">Check All</a> | <a href="" onClick="return unMarkAllRows('tableForm');">Uncheck All</a>
   <br/>With selected: <a href="" onClick="submitAction('tableForm','<%= url_for(:controller => delete_options[:controller], :action => 'delete_selected', :edit => nil, :list => nil) %>')">Delete</a>
-<% end %>
-<% end %>
-<% end %>
 <br/>
+<% end %>
+<% end %>

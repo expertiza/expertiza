@@ -34,7 +34,7 @@
    i = 0
    current_topic = nil
    questions = @questionnaire.questions
-   rearrangedQuestions=rearrangeQuestions(questions)
+   rearrangedQuestions=rearrange_questions(questions)
    rearrangedQuestions.each {
            |question| %>
     <% question_type=question.question_type %>

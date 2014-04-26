@@ -353,11 +353,6 @@ module ResponseHelper
         empty_response_character=''
       when "DropDown", "Rating"
         empty_response_character= @questionnaire.min_question_score
-      #if (@questionnaire.min_question_score) ? @questionnaire.min_question_score : '0'
-      when "CheckBox"
-        empty_response_character='0'
-      when "UploadFile"
-
     end
     response_count=Score.find_by_sql(["SELECT * FROM pg_development.scores s, responses r, response_maps rm WHERE s.response_id=r.id AND r.map_id= rm.id AND rm.reviewed_object_id=? AND rm.reviewee_id=? AND s.comments != ? AND s.question_id=?", @map.reviewed_object_id, @map.reviewee_id, empty_response_character, question.id]).count
     response_count
@@ -376,11 +371,7 @@ module ResponseHelper
     max_threshold = @assignment.review_topic_threshold
     #Assignment.find_by_sql(["SELECT review_topic_threshold FROM pg_development.assignments WHERE assignments.id =?",assign.id])
     num_reviews = ResponseMap.find_by_sql(["SELECT * FROM pg_development.response_maps rm where rm.reviewed_object_id =? AND rm.reviewee_id=?", @assignment.id, @map.reviewee_id]).count
-    print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-    print max_threshold
-    print num_reviews
-    print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-    if max_threshold == 0 or NULL
+    if max_threshold == 0 || max_threshold.nil?
       max_threshold = 5
     end
 

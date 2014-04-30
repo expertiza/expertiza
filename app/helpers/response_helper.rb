@@ -114,7 +114,6 @@ module ResponseHelper
     table_hash
   end
 
-  #find_question_type(question, question_type, i, false, nil, nil, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a)
   def find_question_type(question, ques_type, q_number, is_view, file_url, score, score_range)
     default_textfield_size = "3"
     default_textarea_size = "40x5"
@@ -272,10 +271,16 @@ module ResponseHelper
     end
   end
 
+  # Rearrange questions shown to a reviewer based on response count
+  # for each question and accordion panel of previous reviews for that submission
   def rearrange_questions(questions)
+    # Start rearranging only after number of reviews for a submission exceeds
+    # half of max_review_threshold for the assignment
     if (check_threshold)
       return questions
     end
+
+    # Initialize local variables
     panel_questions=Hash.new
     panel_scores=Hash.new
     questions_response_count=Hash.new
@@ -286,13 +291,16 @@ module ResponseHelper
     primary_response_count=0
     sorted_questions=Array.new
 
+    # Loop through questions array and store in a hash with its response counts
     questions.each {
         |question|
       question_type=question.question_type
       current_topic = question_type.parameters.split("::")[0]
       grouping_position= question_type.parameters.split("::").length==1 ? nil : question_type.parameters.split("::").last.split("|").first
       puts grouping_position.to_i
+      # grouping_position > 1 implies secondary questions among questions grouped by 1|2 logic
       if grouping_position.to_i<=1
+        # create new hash set for new accordion panel
         unless (!current_topic.nil? && (current_topic==prev_topic || prev_topic.nil?))
           questions_response_count=Hash[questions_response_count.sort_by { |k, v| [v, k] }]
           panel_score=0
@@ -307,6 +315,8 @@ module ResponseHelper
           sorted_panel_questions=Array.new
           questions_response_count=Hash.new
         end
+        # calculate response count when first checkbox type question comes
+        # for the rest of the checkbox questios; assign the same calculated response count
         if question_type.q_type.eql? 'Checkbox'
           if (current_topic.eql? prev_topic)
             questions_response_count[question.id]= current_checkbox_response_count
@@ -322,10 +332,10 @@ module ResponseHelper
       else
         questions_response_count[question.id]= primary_response_count
       end
-      puts primary_response_count
-      print "="
       prev_topic=current_topic
     }
+
+    # Ensure last hash of questions is also included in the final rearranged question array
     unless (questions_response_count.empty?)
       questions_response_count=Hash[questions_response_count.sort_by { |k, v| [v, k] }]
       panel_score=0
@@ -338,6 +348,7 @@ module ResponseHelper
       panel_scores[prev_topic]=panel_score/questions_response_count.length
     end
 
+    # Create final array of rearanged questions by sorting hash of each panel
     panel_scores=Hash[panel_scores.sort_by { |k, v| v }]
     panel_scores.each {
         |key, value|
@@ -346,6 +357,7 @@ module ResponseHelper
     return sorted_questions
   end
 
+  # Calculate response count for a question based on empty_response_character
   def find_number_of_responses(question)
     empty_response_character=''
     case question.question_type.q_type
@@ -358,6 +370,7 @@ module ResponseHelper
     response_count
   end
 
+  # Calculate response count for checkbox type questions if any one of the checkboxes is checked
   def find_number_of_responses_for_checkbox(checkbox_questions)
     question_ids=Array.new
     checkbox_questions.each { |checkbox_question|
@@ -367,6 +380,7 @@ module ResponseHelper
     response_count
   end
 
+  # calculates number of reviews received for current submission
   def check_threshold
     max_threshold = @assignment.review_topic_threshold
     #Assignment.find_by_sql(["SELECT review_topic_threshold FROM pg_development.assignments WHERE assignments.id =?",assign.id])

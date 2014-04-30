@@ -50,7 +50,7 @@ class AssignmentTeam < Team
   def delete
     if read_attribute(:type) == 'AssignmentTeam'
       sign_up = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
-      sign_up.each &:destroy
+      sign_up.each &:destroy # has bug, should check if sign_up is nil before destroy
     end
     super
   end
@@ -82,7 +82,7 @@ class AssignmentTeam < Team
     return name if team.nil? #no duplicate
 
     if handle_duplicates == "ignore" #ignore: do not create the new team
-      p '>>>setting name to nil ...'
+      p '>>>setting name to nil ...' # this line should be deleted
       return nil
     end
     return self.generate_team_name(Assignment.find(assignment_id).name) if handle_duplicates == "rename" #rename: rename new team
@@ -123,7 +123,7 @@ class AssignmentTeam < Team
       end
 
       def email
-        self.get_team_users.first.email
+        self.get_team_users.first.email#has bug, the current version has no get_team_users method
       end
 
       def get_participant_type

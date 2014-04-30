@@ -14,7 +14,7 @@ class TeamsUsersController < ApplicationController
 
   def list
     @team = Team.find_by_id(params[:id])
-    @assignment = Assignment.find(@team.assignment_id)
+    @assignment = Assignment.find_by_id(@team.assignment.id)
     @teams_users = TeamsUser.paginate(:page => params[:page], :per_page => 10, :conditions => ["team_id = ?", params[:id]])
   end
 
@@ -50,7 +50,8 @@ class TeamsUsersController < ApplicationController
     undo_link("Team user \"#{@user.name}\" has been removed successfully. ")
     redirect_to :controller => 'teams', :action => 'list', :id => parent_id
   end
-
+  
+  #Qi: the find method will return an exact object, which cannot use firt then
   def delete_selected
     params[:item].each {
       |item_id|

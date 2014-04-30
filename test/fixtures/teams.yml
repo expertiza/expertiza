@@ -29,3 +29,60 @@ lottery_team3:
   name: LotteryTeam3
   parent_id: <%= Fixtures.identify(:lottery_assignment) %>
   type: AssignmentTeam
+
+project1_team1:
+  name: Project1Team1
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  type: AssignmentTeam
+
+project1_team2:
+  name: Project1Team2
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  type: AssignmentTeam
+
+project1_team3:
+  name: Project1Team3
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  type: AssignmentTeam
+
+exist_team1:
+  name: ExistTeam1
+  parent_id: <%= Fixtures.identify(:assignment1) %>
+  type: AssignmentTeam
+
+exist_team2:
+  name: ExistTeam2
+  parent_id: <%= Fixtures.identify(:course0) %>
+  type: CourseTeam
+
+course_team1:
+  name: CourseTeam1
+  parent_id: <%= Fixtures.identify(:course_object_oriented) %>
+  type: CourseTeam
+
+single_person_team:
+  name: SinglePersonTeam
+  parent_id: <%= Fixtures.identify(:assignment_project3) %>
+  type: AssignmentTeam
+
+course0_team1:
+  name: Course0Team1
+  parent_id: <%= Fixtures.identify(:course0) %>
+  type: CourseTeam
+
+exist_team3:
+  name: ExistTeam3
+  parent_id: <%= Fixtures.identify(:course0) %>
+  type: CourseTeam
+
+assignment_team1:
+  name: AssignmentTeam1
+  parent_id: <%= Fixtures.identify(:assignment1) %>
+  type: AssignmentTeam
+
+assignment7_team1:
+  name: Assignment7Team1
+  parent_id: <%= Fixtures.identify(:assignment7) %>
+  type: AssignmentTeam
+
+

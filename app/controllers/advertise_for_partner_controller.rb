@@ -3,10 +3,6 @@ class AdvertiseForPartnerController < ApplicationController
     current_user.role.name.eql?("Student")
   end
 
-  #adds a new advertise for partners entry in team table...
-  def new
-  end
-
   #removes an entry from team table for corresponding team who requested to remove their advertisement for partner request
   def remove
     team = Team.find(params[:team_id])

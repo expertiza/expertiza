@@ -62,7 +62,7 @@ class CourseTeam < Team
       return name
     end
     if handle_dups == "ignore" #ignore: do not create the new team
-      p '>>>setting name to nil ...'
+      p '>>>setting name to nil ...'#this line should be deleted
       return nil
     end
     if handle_dups == "rename" #rename: rename new team

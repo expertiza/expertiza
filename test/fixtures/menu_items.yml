@@ -1,0 +1,238 @@
+menu_item_home:
+  parent_id: 
+  name: 'home'
+  label: 'Home'
+  seq: 1
+  content_page_id: <%= Fixtures.identify(:content_home) %>
+  controller_action_id: 
+menu_item_admin:
+  parent_id: 
+  name: 'admin'
+  label: 'Administration'
+  seq: 2
+  content_page_id: <%= Fixtures.identify(:content_site_admin) %> 
+  controller_action_id:
+menu_item_manage_instructor_content:
+  parent_id: 
+  name: 'manage instructor content'
+  label: 'Manage...'
+  seq: 3
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_tree_display_drill) %>
+menu_item_survey_deployments:
+  parent_id: 
+  name: 'Survey Deployments'
+  label: 'Survey Deployments'
+  seq: 4
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_survey_deployment_list) %>
+menu_item_sutdent_task:
+  parent_id: 
+  name: 'student_task'
+  label: 'Assignments'
+  seq: 8
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_student_task_list) %>
+menu_item_profile:
+  parent_id: 
+  name: 'profile'
+  label: 'Profile'
+  seq: 9
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_profile_edit) %>
+menu_item_contact_us:
+  parent_id: 
+  name: 'contact_us'
+  label: 'Contact Us'
+  seq: 10
+  content_page_id: <%= Fixtures.identify(:content_contact_us) %>
+  controller_action_id: 
+menu_item_leaderboard:
+  parent_id: <%= Fixtures.identify(:menu_item_home) %>
+  name: 'leaderboard'
+  label: 'Leaderboard'
+  seq: 1
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_leaderboard_index) %>
+menu_item_credits:
+  parent_id: <%= Fixtures.identify(:menu_item_contact_us) %>
+  name: 'credits'
+  label: 'Credits &amp; Licence'
+  seq: 1
+  content_page_id: <%= Fixtures.identify(:content_credits) %>
+  controller_action_id: 
+menu_item_setup:
+  parent_id: <%= Fixtures.identify(:menu_item_admin) %>
+  name: 'setup'
+  label: 'Setup'
+  seq: 1
+  content_page_id: <%= Fixtures.identify(:content_site_admin) %> 
+  controller_action_id: 
+menu_item_show:
+  parent_id: <%= Fixtures.identify(:menu_item_admin) %>
+  name: 'show'
+  label: 'Show...'
+  seq: 2
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_users_list) %>
+menu_item_setup_roles:
+  parent_id: <%= Fixtures.identify(:menu_item_setup) %>
+  name: 'setup/roles'
+  label: 'Roles'
+  seq: 2
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_roles_list) %>
+menu_item_setup_permissions:
+  parent_id: <%= Fixtures.identify(:menu_item_setup) %>
+  name: 'setup/permissions'
+  label: 'Permissions'
+  seq: 3
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_permissions_list) %>
+menu_item_setup_controllers:
+  parent_id: <%= Fixtures.identify(:menu_item_setup) %>
+  name: 'setup/controllers'
+  label: 'Controllers / Actions'
+  seq: 4
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_site_controllers_list) %>
+menu_item_setup_pages:
+  parent_id: <%= Fixtures.identify(:menu_item_setup) %>
+  name: 'setup/pages'
+  label: 'Content Pages'
+  seq: 5
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_content_pages_list) %>
+menu_item_setup_menus:
+  parent_id: <%= Fixtures.identify(:menu_item_setup) %>
+  name: 'setup/menus'
+  label: 'Menu Editor'
+  seq: 6
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_menu_items_list) %>
+menu_item_setup_system_settings:
+  parent_id: <%= Fixtures.identify(:menu_item_setup) %>
+  name: 'setup/system_settings'
+  label: 'System Settings'
+  seq: 7
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_system_settings_list) %>
+menu_item_statistical_test:
+  parent_id: <%= Fixtures.identify(:menu_item_survey_deployments) %>
+  name: 'Statistical Test'
+  label: 'Statistical Test'
+  seq: 3
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_list_surveys) %>
+menu_item_manage_users:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_instructor_content) %>
+  name: 'manage/users'
+  label: 'Users'
+  seq: 1
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_users_list) %>
+menu_item_maange_questionnaires:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_instructor_content) %>
+  name: 'manage/questionnaires'
+  label: 'Questionnaires'
+  seq: 2
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_goto_questionnaires) %>
+menu_item_manage_courses:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_instructor_content) %>
+  name: 'manage/courses'
+  label: 'Courses'
+  seq: 3
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_goto_courses) %>
+menu_item_manage_assignments:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_instructor_content) %>
+  name: 'manage/assignments'
+  label: 'Assignments'
+  seq: 4
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_goto_assignments) %>
+menu_item_impersonate:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_instructor_content) %>
+  name: 'impersonate'
+  label: 'Impersonate User'
+  seq: 5
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_impersonate_start) %>
+menu_item_manage_questionnaires_review_rubrics:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_questionnaires) %>
+  name: 'manage/questionnaires/review rubrics'
+  label: 'Review rubrics'
+  seq: 1
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_goto_review_rubrics) %>
+menu_item_manage_questionnaires_metareview_rubrics:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_questionnaires) %>
+  name: 'manage/questionnaires/metareview rubrics'
+  label: 'Metareview rubrics'
+  seq: 2
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_goto_metareview_rubrics) %>
+menu_item_manage_questionnaires_teammatereview_rubrics:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_questionnaires) %>
+  name: 'manage/questionnaires/teammate review rubrics'
+  label: 'Teammate review rubrics'
+  seq: 3
+  content_page_id: 
+  controller_action_id: <%= Fixtures.identify(:controller_action_goto_teammatereview_rubrics) %>
+menu_item_manage_questionnaires_author_feedbacks:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_questionnaires) %>
+  name: 'manage/questionnaires/author feedbacks'
+  label: 'Author feedbacks'
+  seq: 4
+  content_page_id: 
+  controller_action_id: <%= Fixtures.identify(:controller_action_goto_author_feedbacks) %>
+menu_item_manage_questionnaires_global_survey:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_questionnaires) %>
+  name: 'manage/questionnaires/global survey'
+  label: 'Global survey'
+  seq: 5
+  content_page_id: 
+  controller_action_id: <%= Fixtures.identify(:controller_action_goto_global_survey) %>
+menu_item_manage_questionnaires_surveys:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_questionnaires) %>
+  name: 'manage/questionnaires/surveys'
+  label: 'Surveys'
+  seq: 6
+  content_page_id: 
+  controller_action_id: <%= Fixtures.identify(:controller_action_goto_surveys) %>
+menu_item_manage_questionnaires_course_evaluations:
+  parent_id: <%= Fixtures.identify(:menu_item_manage_questionnaires) %>
+  name: 'manage/questionnaires/course evaluations'
+  label: 'Course evaluations'
+  seq: 7
+  content_page_id: 
+  controller_action_id: <%= Fixtures.identify(:controller_action_goto_surveys) %>
+menu_item_show_institutions:
+  parent_id: <%= Fixtures.identify(:menu_item_show) %>
+  name: 'show/institutions'
+  label: 'Institutions'
+  seq: 1
+  content_page_id:  
+  controller_action_id: <%= Fixtures.identify(:controller_action_institution_list) %>
+menu_item_show_super_administrators:
+  parent_id: <%= Fixtures.identify(:menu_item_show) %>
+  name: 'show/super-administrators'
+  label: 'Super-Administrators'
+  seq: 2
+  content_page_id: 
+  controller_action_id: <%= Fixtures.identify(:controller_action_list_super_administrators) %>
+menu_item_show_administrators:
+  parent_id: <%= Fixtures.identify(:menu_item_show) %>
+  name: 'show/administrators'
+  label: 'Administrators'
+  seq: 3
+  content_page_id: 
+  controller_action_id: <%= Fixtures.identify(:controller_action_list_administrators) %>
+menu_item_show_instructors:
+  parent_id: <%= Fixtures.identify(:menu_item_show) %>
+  name: 'show/instructors'
+  label: 'Instructors'
+  seq: 4
+  content_page_id: 
+  controller_action_id: <%= Fixtures.identify(:controller_action_list_instructors) %>

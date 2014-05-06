@@ -4,9 +4,6 @@ class ResponseTest < ActiveSupport::TestCase
   fixtures :responses
 
   # Replace this with your real tests.
-  def test_truth
-    assert true
-  end
 
   # The response is after the latest submission time - so it should be VALID
   def test_response_latest

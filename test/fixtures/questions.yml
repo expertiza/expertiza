@@ -1,0 +1,54 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+question1:
+ txt: Was assignment guidelines followed?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:questionnaire1) %>
+ weight: 5
+  
+question2:
+ txt: Was the assignment graded fairly?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:questionnaire2) %>
+ weight: 5
+    
+question3:
+ txt: Were enough comments provided for points taken off?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:peer_review_questionnaire) %>
+ weight: 5
+  
+question4:
+ txt: How helpful is the live questions app during the class?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:questionnaire4) %>
+ weight: 2
+
+question5:
+ txt: How helpful expertiza was for the class?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:questionnaire3) %>
+ weight: 5
+
+question6:
+ txt: Did the teammember completed his part on time?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:teammate_review_questionnaire) %>
+ weight: 5
+
+question7:
+ txt: What future changes should be implemented on expertiza?
+ true_false: false
+ questionnaire_id: <%= Fixtures.identify(:global_survey_questionnaire) %>
+ weight: 5
+
+#question8:
+# txt: This is test question 1?
+# true_false: true
+# questionnaire_id: <%= Fixtures.identify(:questionnaire3) %>
+# weight: 5
+#
+#question9:
+# txt: This is test question 1?
+# true_false: true
+# questionnaire_id: <%= Fixtures.identify(:questionnaire3) %>
+# weight: 5

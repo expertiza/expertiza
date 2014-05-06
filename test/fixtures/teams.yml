@@ -1,31 +1,57 @@
-# Teams for the intelligent assignment
-IntelligentTeam1:
-  name: IntelligentTeam1
-  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+team0:
+  name: team1
+  parent_id: <%= Fixtures.identify(:assignment0) %>
+  type: AssignmentTeam
+team1:
+  name: team2
+  parent_id: <%= Fixtures.identify(:assignment0) %>
+  type: AssignmentTeam
+  
+team2:
+  name: team3
+  parent_id: <%= Fixtures.identify(:course0) %>
+  type: CourseTeam
+
+team3:
+  name: team4
+  parent_id: <%= Fixtures.identify(:assignment2) %>
   type: AssignmentTeam
 
-IntelligentTeam2:
-  name: IntelligentTeam2
-  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+team4:
+  name: team5
+  parent_id: <%= Fixtures.identify(:assignment2) %>
   type: AssignmentTeam
 
-IntelligentTeam3:
-  name: IntelligentTeam3
-  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+team5:
+  name: team6
+  parent_id: <%= Fixtures.identify(:assignment2) %>
   type: AssignmentTeam
 
-# Teams for the lottery assignment
-lottery_team1:
-  name: LotteryTeam1
-  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+
+team7:
+  name: team8
+  parent_id: <%= Fixtures.identify(:course0) %>
+  type: CourseTeam
+
+#Teams for course_object_oriented and instructor 1
+Assignment_Project1_Team1:
+  name: Assignment1Team1
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
   type: AssignmentTeam
 
-lottery_team2:
-  name: LotteryTeam2
-  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+Assignment_Project1_Team2:
+  name: Assignment1Team2
+  parent_id: <%= Fixtures.identify(:assignment_project1) %>
   type: AssignmentTeam
 
-lottery_team3:
-  name: LotteryTeam3
-  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+Assignment_Project2_Team1:
+  name: Assignment2Team1
+  parent_id: <%= Fixtures.identify(:assignment_project2) %>
   type: AssignmentTeam
+
+Assignment_Project2_Team2:
+  name: Assignment2Team2
+  parent_id: <%= Fixtures.identify(:assignment_project2) %>
+  type: AssignmentTeam
+  

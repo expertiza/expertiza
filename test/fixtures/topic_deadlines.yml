@@ -1,0 +1,66 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+ ############################################################
+#Topic deadlines for course_object_oriented and instructor1
+############################################################
+
+<% topic_list = [] %>
+<% topic_list << Fixtures.identify("Topic1") %>
+<% topic_list << Fixtures.identify("Topic2") %>
+<% topic_list << Fixtures.identify("Topic3") %>
+
+#Create Due dates for all deadlines
+<% for j in 0..2 %>
+topic_deadline_submission<%= j %>:
+  due_at: <%= (Time.now + 100000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: <%= Fixtures.identify("deadline_type_submission") %>
+  topic_id: <%= topic_list[j] %>
+  late_policy_id: <%= Fixtures.identify("late_policy5") %>
+  submission_allowed_id: 3
+  review_allowed_id: 1
+  resubmission_allowed_id: 1
+  rereview_allowed_id: 1
+  review_of_review_allowed_id: 1
+  round: 2
+topic_deadline_review<%= j %>:
+  due_at: <%= (Time.now + 500000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: <%= Fixtures.identify("deadline_type_review") %>
+  topic_id: <%= topic_list[j] %>
+  late_policy_id: <%= Fixtures.identify("late_policy1") %>
+  submission_allowed_id: 2
+  review_allowed_id: 3
+  resubmission_allowed_id: 1
+  rereview_allowed_id: 1
+  review_of_review_allowed_id: 1
+topic_deadline_resubmission<%= j %>:
+  due_at: <%= (Time.now + 700000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: <%= Fixtures.identify("deadline_type_resubmission") %>
+  topic_id: <%= topic_list[j] %>
+  late_policy_id: <%= Fixtures.identify("late_policy5") %>
+  submission_allowed_id: 2
+  review_allowed_id: 2
+  resubmission_allowed_id: 3
+  rereview_allowed_id: 1
+  review_of_review_allowed_id: 1
+topic_deadline_rereview<%= j %>:
+  due_at: <%= (Time.now + 800000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: <%= Fixtures.identify("deadline_type_rereview") %>
+  topic_id: <%= topic_list[j] %>
+  late_policy_id: <%= Fixtures.identify("late_policy5") %>
+  submission_allowed_id: 2
+  review_allowed_id: 2
+  resubmission_allowed_id: 2
+  rereview_allowed_id: 3
+  review_of_review_allowed_id: 1
+topic_deadline_metareview<%= j %>:
+  due_at: <%= (Time.now + 1000000).strftime("%Y-%m-%d %H:%M:%S") %>
+  deadline_type_id: <%= Fixtures.identify("deadline_type_metareview") %>
+  topic_id: <%= topic_list[j] %>
+  late_policy_id: <%= Fixtures.identify("late_policy5") %>
+  submission_allowed_id: 2
+  review_allowed_id: 2
+  resubmission_allowed_id: 2
+  rereview_allowed_id: 2
+  review_of_review_allowed_id: 3
+  round: 2
+<%end%>

@@ -1,0 +1,5 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+markup_textile:
+  name: 'Textile'
+markup_markdown:
+  name: 'Markdown'

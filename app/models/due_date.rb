@@ -49,7 +49,12 @@ class DueDate < ActiveRecord::Base
 
   def due_at_is_valid_datetime
     unless due_at.blank?
-      errors.add(:due_at, 'must be a valid datetime') if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
+      errors.add(:due_at, 'must be a valid datetime')
+      if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
+        return true
+      else
+        return false
+      end
     end
   end
 

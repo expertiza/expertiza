@@ -99,7 +99,14 @@
                                                                                        <td>
                                                                                          <% participant.get_course_string %></td>
                                                                                        <td><%= participant.get_topic_string %></td>
-                                                                                       <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
+<td>
+<% if participant.assignment.get_link_for_current_stage(participant.topic_id)!= nil && participant.assignment.get_link_for_current_stage(participant.topic_id).length!=0%>
+<%= link_to participant.assignment.get_current_stage(participant.topic_id), participant.assignment.get_link_for_current_stage(participant.topic_id) %>
+<% else %>
+<%= participant.assignment.get_current_stage(participant.topic_id) %>
+<% end %>
+
+</td>
                                                                                        <td><%= student_task.stage_deadline %></td>
                                                                                        <td align=center>
                                                                                          <% if participant.permission_granted %>granted

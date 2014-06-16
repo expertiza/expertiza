@@ -518,10 +518,29 @@ class Assignment < ActiveRecord::Base
     if due_date == nil or due_date == COMPLETE
       return COMPLETE
     else
-      return DeadlineType.find(due_date.deadline_type_id).name
+      if(due_date.deadline_name==nil)
+        return DeadlineType.find(due_date.deadline_type_id).name
+      else
+        return due_date.deadline_name
+      end
+
     end
   end
 
+  def get_link_for_current_stage(topic_id=nil)
+    if self.staggered_deadline?
+      if topic_id.nil?
+        return nil
+      end
+    end
+    due_date = find_current_stage(topic_id)
+    if due_date == nil or due_date == COMPLETE
+      return nil
+    else
+        return due_date.description_url
+    end
+
+  end
 
   def get_stage_deadline(topic_id=nil)
     if self.staggered_deadline?

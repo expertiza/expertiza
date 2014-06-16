@@ -1,4 +1,10 @@
-<h1>Submit or Review work for <%= @assignment.name %></h1>
+<h1>
+<% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
+Submit or Review work for <%= @assignment.name %>
+<% else %>
+Submit or Review work for <%= link_to @assignment.name, @assignment.spec_location %>
+<% end %>
+</h1>
 <div class="flash_note">
 Next: Click the activity you wish to perform on the assignment titled: <%= @assignment.name %>
 </div>

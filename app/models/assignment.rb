@@ -577,6 +577,35 @@ class Assignment < ActiveRecord::Base
     rounds
   end
 
+  #if current  stage is submission or review, find the round number
+  #otherwise, return 0
+  def get_current_round(topic_id)
+    if self.staggered_deadline?
+      due_dates = TopicDeadline.find(:all,
+                                     :conditions => ['topic_id = ?', topic_id],
+                                     :order => 'due_at DESC')
+    else
+      due_dates = DueDate.find(:all,
+                               :conditions => ['assignment_id = ?', self.id],
+                               :order => 'due_at DESC')
+    end
+    puts due_dates.size
+    if due_dates != nil and due_dates.size > 0
+      if Time.now > due_dates[0].due_at
+        return 0
+      else
+        i = 0
+        for due_date in due_dates
+          if Time.now < due_date.due_at and
+              (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
+            return due_date.round
+          end
+          i = i + 1
+        end
+      end
+    end
+  end
+
 
   def find_current_stage(topic_id=nil)
     if self.staggered_deadline?

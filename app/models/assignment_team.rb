@@ -12,8 +12,17 @@ class AssignmentTeam < Team
   end
 
   def assign_reviewer(reviewer)
+    topic_id = self.topic.id
+    if topic_id==nil
+      raise "this team has not taken any topic"
+    end
+    assignment = Assignment.find(self.parent_id)
+    if assignment==nil
+      raise "this cannot find this assignment"
+    end
+    round = assignment.get_current_round(topic_id)
     TeamReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
-                                 :reviewed_object_id => assignment.id)
+                                 :reviewed_object_id => assignment.id, :round =>round)
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer

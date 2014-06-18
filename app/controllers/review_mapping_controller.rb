@@ -24,8 +24,10 @@ class ReviewMappingController < ApplicationController
     @mapping = ResponseMap.find(params[:id])    
   end  
   
-  def add_reviewer 
-    assignment = Assignment.find(params[:id])  
+  def add_reviewer
+    assignment = Assignment.find(params[:id])
+    topic_id = params[:topic_id]
+    round = assignment.get_current_round(topic_id)
     msg = String.new
     begin
 
@@ -40,8 +42,8 @@ class ReviewMappingController < ApplicationController
       reviewer = get_reviewer(user,assignment,regurl)
       #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).nil?
-        TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
+      if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ? and round = ?',params[:id], reviewer.id, round]).nil?
+        TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id, :round => round)
       else
         raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
       end
@@ -67,6 +69,8 @@ class ReviewMappingController < ApplicationController
   # Assign self to a submission
   def add_self_reviewer
     assignment = Assignment.find(params[:assignment_id])
+    topic_id = params[:topic_id]
+    round = assignment.get_current_round(topic_id)
     reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
     submission = AssignmentParticipant.find_by_id_and_parent_id(params[:submission_id],assignment.id)
 
@@ -79,10 +83,11 @@ class ReviewMappingController < ApplicationController
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         contributor = get_team_from_submission(submission)
-        if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
+        if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ? and round = ?', contributor.id, reviewer.id, round]).nil?
           TeamReviewResponseMap.create(:reviewee_id => contributor.id,
                                        :reviewer_id => reviewer.id,
-                                       :reviewed_object_id => assignment.id)
+                                       :reviewed_object_id => assignment.id,
+                                       :round => round)
         else
           raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
         end

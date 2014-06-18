@@ -153,9 +153,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def contributors
-    p "in contributors method:"
-    p "teams.size"
-    p teams.size
     #ACS Contributors are just teams, so removed check to see if it is a team assignment
     @contributors ||= teams #ACS
   end
@@ -518,12 +515,23 @@ class Assignment < ActiveRecord::Base
     if due_date == nil or due_date == COMPLETE
       return COMPLETE
     else
-      if(due_date.deadline_name==nil)
-        return DeadlineType.find(due_date.deadline_type_id).name
-      else
-        return due_date.deadline_name
-      end
+       return DeadlineType.find(due_date.deadline_type_id).name
+    end
+  end
 
+  #For varying rubric feature
+  def get_current_stage_name(topic_id=nil)
+    if self.staggered_deadline?
+      if topic_id.nil?
+        return 'Unknown'
+      end
+    end
+    due_date = find_current_stage(topic_id)
+
+    if( due_date!=COMPLETE && due_date!='Finished'&& due_date.deadline_name!=nil)
+      return due_date.deadline_name
+    else
+      return get_current_stage(topic_id)
     end
   end
 

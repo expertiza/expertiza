@@ -1,6 +1,8 @@
 class ReviewResponseMap < ResponseMap
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'reviewed_object_id'
-  
+
+  #Since all the assignments are team assignments now, my guess is this class (ReviewResponseMap) is no longer
+  # being used. So when I create the "varying rubrics" feature, I did not touch this code. -Yang
   def questionnaire
     self.assignment.questionnaires.find_by_type('ReviewQuestionnaire')
   end 

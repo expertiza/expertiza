@@ -166,7 +166,6 @@ class Response < ActiveRecord::Base
     is_valid
   end
 
-
   require 'models/analytic/response_analytic'
   include ResponseAnalytic
 end

@@ -100,7 +100,7 @@
     <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
     	<TD ALIGN="CENTER">
-    	<% if stage == "Finished" %>
+    	<% if stage == "Complete" %>      
         <% if participant.grade
           total_score = participant.grade
           title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."

@@ -21,7 +21,7 @@ gem 'bind-it', "0.2.0"
 gem 'rwordnet'
 gem 'open-uri-cached'
 gem 'edavis10-ruby-web-search'
-gem 'stemmer'
+#gem 'stemmer'
 gem 'ffi-aspell'
 gem 'nokogiri'
 gem 'seer'

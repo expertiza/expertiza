@@ -119,11 +119,8 @@
                  total_score = total_score - (hardline -tr_avg)*0.5
 
             %>
-             <%end%>
-              <% if total_score>100
-              total_score = 100
-              %>
-              <%end%>
+
+                  <%end%>
         <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %><%= score_postfix %></div>
         <% if controller.action_name != "view_my_scores" %> 
           <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>

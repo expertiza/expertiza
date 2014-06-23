@@ -1,7 +1,7 @@
 class GradesController < ApplicationController
   helper :file
   helper :submitted_content
-  helper :penalty
+  #helper :penalty #There is no penalty_helper in production. This helper is created in Master in Dec 2013 -Yang
   #the view grading report provides the instructor with an overall view of all the grades for
   #an assignment. It lists all participants of an assignment and all the reviews they received.
   #It also gives a final score, which is an average of all the reviews and greatest difference
@@ -25,7 +25,16 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     questionnaires.each {
       |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
+      #create symbol for "varying rubrics" feature -Yang
+      round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+      if(round!=nil)
+        questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+      else
+        questionnaire_symbol = questionnaire.symbol
+      end
+      @questions[questionnaire_symbol] = questionnaire.questions
+      puts questionnaire_symbol.to_s
+      puts questionnaire.questions.first.txt
     }
 
     ## When user clicks on the notification, it should go away

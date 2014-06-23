@@ -239,7 +239,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_scores(questions)
-    scores = Hash.new
+    scores= Hash.new
 
     scores[:participants] = Hash.new
     self.participants.each do |participant|
@@ -535,6 +535,17 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  #check if this assignment has multilple review phases with different review rubrics
+  def varying_rubrics_by_round?
+    assignment_questionnaires = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id=? and used_in_round=?",self.id,2])
+
+    if assignment_questionnaires.size>=1
+      true
+    else
+      false
+    end
+  end
+
   def get_link_for_current_stage(topic_id=nil)
     if self.staggered_deadline?
       if topic_id.nil?
@@ -568,12 +579,13 @@ class Assignment < ActiveRecord::Base
   def get_review_rounds
     due_dates = DueDate.find_all_by_assignment_id(self.id)
     rounds = 0
-    for i in (0 .. due_dates.length-1)
-      deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
-      if deadline_type.name == 'review'
-        rounds = rounds + 1
-      end
-    end
+    due_dates.each{
+      |due_date|
+       if due_date.round>rounds
+         rounds = due_date.round
+       end
+    }
+
     rounds
   end
 

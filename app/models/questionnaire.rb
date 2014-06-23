@@ -1,7 +1,14 @@
 class Questionnaire < ActiveRecord::Base
 
   def get_weighted_score(assignment, scores)
-    return compute_weighted_score(self.symbol, assignment, scores)
+    #create symbol for "varying rubrics" feature -Yang
+    round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(assignment.id, self.id).used_in_round
+    if(round!=nil)
+      questionnaire_symbol = (self.symbol.to_s+round.to_s).to_sym
+    else
+      questionnaire_symbol = self.symbol
+    end
+    return compute_weighted_score(questionnaire_symbol, assignment, scores)
   end
 
   # for doc on why we do it this way,
@@ -26,7 +33,7 @@ class Questionnaire < ActiveRecord::Base
     aq = self.assignment_questionnaires.find_by_assignment_id(assignment.id)
     if scores[symbol][:scores][:avg]
       #dont bracket and to_f the whole thing - you get a 0 in the result.. what you do is just to_f the 100 part .. to get the fractions
-     
+
       return scores[symbol][:scores][:avg] * aq.questionnaire_weight  / 100.to_f
     else 
       return 0
@@ -84,4 +91,5 @@ class Questionnaire < ActiveRecord::Base
                           id, name, instructor_id])
     errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
   end
+
 end

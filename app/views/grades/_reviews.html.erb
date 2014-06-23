@@ -1,6 +1,31 @@
 <% if rscore and rscore[:assessments].length > 0 %>
     <BR/>
-    <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
+    <%flag_varying_rubrics=false%>
+    <%puts "@questions.has_key?(review1)  "+@questions.has_key?("review1".to_sym).to_s%>
+
+    <%if @questions.has_key?("review1".to_sym)%>
+    <b> Round1:</b>
+    <%flag_varying_rubrics=true%>
+    <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review1".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
+    <%end%>
+
+    <%if @questions.has_key?("review2".to_sym)%>
+    <b> Round2:</b>
+    <%flag_varying_rubrics=true%>
+    <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review2".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
+    <%end%>
+			
+    <%if @questions.has_key?("review3".to_sym)%>
+    <b> Round3:</b>
+    <%flag_varying_rubrics=true%>
+    <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review3".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
+    <%end%>
+	
+    <%puts flag_varying_rubrics%>
+    <%if flag_varying_rubrics==false%>
+    <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%> 
+    <%end%>
+
     <BR/>
     <HR/>
     <% count = 0 %>

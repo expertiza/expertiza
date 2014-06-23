@@ -330,16 +330,12 @@ class ResponseController < ApplicationController
     rescue
       error_msg = "Your response was not saved. Cause: " + $!
     end
-    
-    begin
+
       ResponseHelper.compare_scores(@response, @questionnaire)
-      ScoreCache.update_cache(@res)
+      #ScoreCache.update_cache(@res) #score cache is the feature that we want to revert
       @map.save
       msg = "Your response was successfully saved."
-    rescue
-      @response.delete
-      error_msg = "Your response was not saved. Cause: " + $!
-    end
+
     
     redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end      
@@ -418,7 +414,7 @@ class ResponseController < ApplicationController
     @questionnaire = @map.questionnaire
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score
-    @max = @questionnaire.max_question_score     
+    @max = @questionnaire.max_question_score
   end
   
   def redirect_when_disallowed(response)

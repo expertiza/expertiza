@@ -2,9 +2,6 @@
 
 <%@stage = @assignment.get_current_stage(@participant.topic_id)%>
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => @stage} %>
-<!-- E726 Changes Begin -->
-<%= render :partial => 'submitted_content/selfreview'%>
-<!-- E726 Changes End -->
 
 <BR/>
 <BR/>

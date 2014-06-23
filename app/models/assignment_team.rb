@@ -20,7 +20,11 @@ class AssignmentTeam < Team
     if assignment==nil
       raise "this cannot find this assignment"
     end
-    round = assignment.get_current_round(topic_id)
+    if assignment.varying_rubrics_by_round?
+      round = assignment.get_current_round(topic_id) #record round number only for varying rubrics feature
+    else
+      round=nil
+    end
     TeamReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
                                  :reviewed_object_id => assignment.id, :round =>round)
   end

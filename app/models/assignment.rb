@@ -108,11 +108,6 @@ class Assignment < ActiveRecord::Base
       raise 'This topic has too many reviews; please select another one.' unless candidate_topics_to_review.include?(topic)
     end
 
-    p "contributors.nil?"
-    p contributors.nil?
-    p "Contributors:"
-    p contributors.class
-    p contributors.size
     contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
@@ -125,9 +120,15 @@ class Assignment < ActiveRecord::Base
     end
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
-    # Reviewer can review each contributor only once 
-    contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
-    raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
+    # Reviewer can review each contributor only once
+    if self.varying_rubrics_by_round?# However, in varying rubric feature, reviewer can review a artifact twice in different rounds
+      round = self.get_current_round(topic.id)
+      contributor_set.reject! { |contributor| contributor.reviewed_by_in_round?(reviewer,round) }
+      raise "You have already reviewed all submissions for 555555this #{work}." if contributor_set.empty?
+    else
+      contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
+      raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
+    end
 
     # Reduce to the contributors with the least number of reviews ("responses") received
     min_contributor = contributor_set.min_by { |a| a.responses.count }

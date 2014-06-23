@@ -32,6 +32,12 @@ class AssignmentTeam < Team
                                                        self.id, reviewer.id, assignment.id]) > 0
   end
 
+  #for varying rubric feature -Yang
+  def reviewed_by_in_round?(reviewer,round)
+    return TeamReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ? AND round=?',
+                                                       self.id, reviewer.id, assignment.id, round]) > 0
+  end
+
   # Topic picked by the team
   def topic
     team_topic = nil

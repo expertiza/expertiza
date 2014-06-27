@@ -80,6 +80,24 @@ class Assignment < ActiveRecord::Base
     candidate_topics
   end
 
+  #This method is only for the assignments without topics
+  def candidate_assignment_teams_to_review
+
+    contributor_set = Array.new(contributors)
+
+    # Reject contributors that have no submissions
+    contributor_set.reject! { |contributor| !contributor.has_submissions? }
+
+    # Filter the contributors with the least number of reviews
+    # (using the fact that each contributor is associated with a topic)
+    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
+
+    min_reviews = contributor.review_mappings.count rescue 0
+    contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
+
+    contributor_set
+  end
+
   def has_topics?
     @has_topics ||= !sign_up_topics.empty?
   end
@@ -95,6 +113,30 @@ class Assignment < ActiveRecord::Base
 
     contributor.assign_reviewer(reviewer)
   end
+
+  #assign the reviewer to review the assignment_team's submission. Only used in the assignments that do not have any topic
+  def assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
+    if assignment_team==nil
+      raise "There is no submission right now. Come back later."
+    end
+    participants = assignment_team.get_participants
+
+    if participants.include?(reviewer)
+      raise "We randomly picked your own artifact. You may try click the button again or come back later."
+    end
+    if self.varying_rubrics_by_round?  #review rubrics vary by rounds
+      round = get_current_round(nil)
+      if assignment_team.reviewed_by_in_round?(reviewer,round)
+        raise "We randomly picked an artifact which has already been reviewed by you. You may try click the button again or come back later."
+      end
+    else
+      if assignment_team.reviewed_by?(reviewer)
+        raise "We randomly picked an artifact which has already been reviewed by you. You may try click the button again or come back later."
+      end
+    end
+    assignment_team.assign_reviewer(reviewer)
+  end
+
 
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
@@ -124,7 +166,7 @@ class Assignment < ActiveRecord::Base
     if self.varying_rubrics_by_round?# However, in varying rubric feature, reviewer can review a artifact twice in different rounds
       round = self.get_current_round(topic.id)
       contributor_set.reject! { |contributor| contributor.reviewed_by_in_round?(reviewer,round) }
-      raise "You have already reviewed all submissions for 555555this #{work}." if contributor_set.empty?
+      raise "You have already reviewed all submissions for this #{work} in current round." if contributor_set.empty?
     else
       contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
       raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
@@ -602,7 +644,7 @@ class Assignment < ActiveRecord::Base
                                :conditions => ['assignment_id = ?', self.id],
                                :order => 'due_at DESC')
     end
-    puts due_dates.size
+
     if due_dates != nil and due_dates.size > 0
       if Time.now > due_dates[0].due_at
         return 0

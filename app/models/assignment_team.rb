@@ -11,14 +11,17 @@ class AssignmentTeam < Team
     return participants.include?(participant)
   end
 
+# Assign a reviewer to this team, the assignment_team.id is reviewee_id. -Yang
   def assign_reviewer(reviewer)
-    topic_id = self.topic.id
-    if topic_id==nil
-      raise "this team has not taken any topic"
+    if assignment.has_topics?
+      topic_id = self.topic.id
+      if topic_id==nil
+        raise "this team has not taken any topic"
+      end
     end
     assignment = Assignment.find(self.parent_id)
     if assignment==nil
-      raise "this cannot find this assignment"
+      raise "cannot find this assignment"
     end
     if assignment.varying_rubrics_by_round?
       round = assignment.get_current_round(topic_id) #record round number only for varying rubrics feature

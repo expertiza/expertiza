@@ -288,16 +288,58 @@ class Assignment < ActiveRecord::Base
     self.participants.each do |participant|
       scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
     end
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     scores[:teams] = Hash.new
     index = 0
     self.teams.each do |team|
       scores[:teams][index.to_s.to_sym] = Hash.new
       scores[:teams][index.to_s.to_sym][:team] = team
-      assessments = TeamReviewResponseMap.get_assessments_for(team)
-      scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
-      #... = ScoreCache.get_participant_score(team, id, questionnaire.display_type)
+
+      if self.varying_rubrics_by_round?
+        grades_by_rounds = Hash.new
+
+        total_score = 0
+        total_num_of_assessments = 0    #calculate grades for each rounds
+        for i in 1..self.get_review_rounds
+          assessments = TeamReviewResponseMap.get_assessments_round_for(team,i)
+          round_sym = ("review"+i.to_s).to_sym
+          grades_by_rounds[round_sym]= Score.compute_scores(assessments, questions[round_sym])
+          total_num_of_assessments += assessments.size
+          if grades_by_rounds[round_sym][:avg]!=nil
+            total_score += grades_by_rounds[round_sym][:avg]*assessments.size.to_f
+          end
+        end
+
+        #merge the grades from multiple rounds
+        scores[:teams][index.to_s.to_sym][:scores] = Hash.new
+        scores[:teams][index.to_s.to_sym][:scores][:max] = -999999999
+        scores[:teams][index.to_s.to_sym][:scores][:min] = 999999999
+        scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
+        for i in 1..self.get_review_rounds
+          round_sym = ("review"+i.to_s).to_sym
+          if(grades_by_rounds[round_sym][:max]!=nil && scores[:teams][index.to_s.to_sym][:scores][:max]<grades_by_rounds[round_sym][:max])
+            scores[:teams][index.to_s.to_sym][:scores][:max]= grades_by_rounds[round_sym][:max]
+          end
+          if(grades_by_rounds[round_sym][:min]!= nil && scores[:teams][index.to_s.to_sym][:scores][:min]>grades_by_rounds[round_sym][:min])
+            scores[:teams][index.to_s.to_sym][:scores][:min]= grades_by_rounds[round_sym][:min]
+          end
+        end
+
+        if total_num_of_assessments!=0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score/total_num_of_assessments
+        else
+          scores[:teams][index.to_s.to_sym][:scores][:avg]=0
+          scores[:teams][index.to_s.to_sym][:scores][:max]=0
+          scores[:teams][index.to_s.to_sym][:scores][:min]=0
+        end
+
+      else
+        assessments = TeamReviewResponseMap.get_assessments_for(team)
+        scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
+      end
+
+
       index += 1
     end
     scores

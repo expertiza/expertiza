@@ -185,7 +185,7 @@ class AssignmentParticipant < Participant
     end
 
     scores[:total_score] = self.assignment.compute_total_score(scores)
-    #merge review# to review  not finished
+    #merge scores[review#] (for each round) to score[review]  -Yang
     if self.assignment.varying_rubrics_by_round?
       review_sym = "review".to_sym
       scores[review_sym] = Hash.new
@@ -196,7 +196,6 @@ class AssignmentParticipant < Participant
       scores[review_sym][:scores][:avg] = 0
       total_score = 0
       for i in 1..self.assignment.get_review_rounds
-        puts i.to_s
         round_sym = ("review"+i.to_s).to_sym
         length_of_assessments=scores[round_sym][:assessments].length.to_f
 
@@ -211,6 +210,11 @@ class AssignmentParticipant < Participant
         if(scores[round_sym][:scores][:avg]!=nil)
           total_score += scores[round_sym][:scores][:avg]*length_of_assessments
         end
+      end
+
+      if scores[review_sym][:scores][:max] == -999999999 && scores[review_sym][:scores][:min] == 999999999
+        scores[review_sym][:scores][:max] = 0
+        scores[review_sym][:scores][:min] = 0
       end
       scores[review_sym][:scores][:avg] = total_score/scores[review_sym][:assessments].length.to_f
     end

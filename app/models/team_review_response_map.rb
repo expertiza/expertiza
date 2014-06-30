@@ -16,4 +16,20 @@ class TeamReviewResponseMap < ReviewResponseMap
       return self.assignment.questionnaires.find_by_id(questionnaire_id)
     end
   end
+
+  # return  the responses for specified round, for varying rubric feature -Yang
+  def self.get_assessments_round_for(team,round)
+    team_id =team.id
+    responses = Array.new
+    if team_id
+      maps = ResponseMap.find(:all, :conditions => ['reviewee_id = ? and type = ? and round=?',team_id,"TeamReviewResponseMap", round])
+      maps.each{ |map|
+        if map.response
+          responses << map.response
+        end
+      }
+      responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
+    end
+    return responses
+  end
 end

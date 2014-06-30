@@ -10,10 +10,23 @@ class GradesController < ApplicationController
     @assignment = Assignment.find(params[:id])
     @questions = Hash.new
     questionnaires = @assignment.questionnaires
-    questionnaires.each {
-            |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    }
+    if @assignment.varying_rubrics_by_round?
+      questionnaires.each {
+          |questionnaire|
+        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+        if(round!=nil)
+          questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+        else
+          questionnaire_symbol = questionnaire.symbol
+        end
+        @questions[questionnaire_symbol] = questionnaire.questions
+      }
+    else      #if this assignment does not have "varying rubric by rounds" feature
+      questionnaires.each {
+              |questionnaire|
+        @questions[questionnaire.symbol] = questionnaire.questions
+      }
+    end
     @scores = @assignment.get_scores(@questions)
   end
 
@@ -33,8 +46,6 @@ class GradesController < ApplicationController
         questionnaire_symbol = questionnaire.symbol
       end
       @questions[questionnaire_symbol] = questionnaire.questions
-      puts questionnaire_symbol.to_s
-      puts questionnaire.questions.first.txt
     }
 
     ## When user clicks on the notification, it should go away

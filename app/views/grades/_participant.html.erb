@@ -108,22 +108,6 @@
           total_score = pscore[:total_score] 
           title = nil
         end %>
-
-            <% hardline = 85
-               if tr_avg > hardline
-                 total_score = total_score + 0.05*total_score
-
-               elsif tr_avg < hardline and (hardline -tr_avg) > 40
-                  total_score = total_score - 10
-               elsif tr_avg < hardline and (hardline -tr_avg) > 20
-                 total_score = total_score - (hardline -tr_avg)*0.5
-
-            %>
-             <%end%>
-              <% if total_score>100
-              total_score = 100
-              %>
-              <%end%>
         <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %><%= score_postfix %></div>
         <% if controller.action_name != "view_my_scores" %> 
           <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>

@@ -8,6 +8,9 @@ class ApplicationController < ActionController::Base
   before_filter :set_time_zone
   before_filter :authorize
 
+  def self.verify(args)
+  end
+
   def current_user_role?
     current_user.role.name
   end

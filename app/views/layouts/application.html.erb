@@ -4,30 +4,9 @@
     <%= params[:controller] %> | <%= params[:action] %>
   </title>
 
-  <%= csrf_meta_tag %>
-  <%= stylesheet_link_tag 'goldberg',
-    'layout',
-    'application',
-    'flash_messages',
-    'balloontip',
-    'redbox' %>
-
-  <%= javascript_include_tag :all,
-    'jquery',
-    'redbox',
-    'suckerfish',
-    'superfish',
-    'actionmenu',
-    'tableactions',
-    'application',
-    'datetimepicker',
-    'CalendarPopup',
-    'ajaxtabs',
-    'sorttable',
-    'shared',
-    'textareasizer'
-  %>
-<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+  <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+  <%= csrf_meta_tags %>
 </head>
 
 <body>

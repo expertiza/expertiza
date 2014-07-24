@@ -22,7 +22,7 @@ class Invitation < ActiveRecord::Base
 
   #Remove all invites sent by a user for an assignment.
   def self.remove_users_sent_invites_for_assignment(user_id, assignment_id)
-    invites = Invitation.find(:all, :conditions => ['from_id = ? and assignment_id = ?', user_id, assignment_id])
+    invites = Invitation.all(:conditions => ['from_id = ? and assignment_id = ?', user_id, assignment_id])
     for invite in invites
       invite.destroy
     end

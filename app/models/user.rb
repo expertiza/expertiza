@@ -24,7 +24,7 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :name
 
   validates_presence_of :email, :message => "can't be blank"
-  validates_format_of :email, :with => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, :allow_blank => true
+  validates_format_of :email, :with => /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, :allow_blank => true
 
   before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.password.blank? } # AuthLogic
   after_create :email_welcome
@@ -54,12 +54,12 @@ class User < ActiveRecord::Base
 
 
   def list_mine(object_type, user_id)
-    object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
+    object_type.all(:conditions => ["instructor_id = ?", user_id])
   end
 
   def get_available_users(name)
     lesser_roles = role.get_parents
-    all_users = User.find(:all, :conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
+    all_users = User.all(:conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
     visible_users = all_users.select{|user| lesser_roles.include? user.role}
     return visible_users[0,10] # the first 10
   end
@@ -159,7 +159,7 @@ class User < ActiveRecord::Base
     if user == nil
       items = login.split("@")
       shortName = items[0]
-      userList = User.find(:all, {:conditions=> ["name =?",shortName]})
+      userList = User.all({:conditions=> ["name =?",shortName]})
       if userList != nil && userList.length == 1
         user = userList.first
       end

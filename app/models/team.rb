@@ -11,7 +11,7 @@ class Team < ActiveRecord::Base
   end
 
   def delete
-    for teamsuser in TeamsUser.find(:all, :conditions => ["team_id =?", self.id])
+    for teamsuser in TeamsUser.all(:conditions => ["team_id =?", self.id])
       teamsuser.delete
     end
     node = TeamNode.find_by_node_object_id(self.id)
@@ -99,14 +99,14 @@ class Team < ActiveRecord::Base
   end
 
   def self.check_for_existing(parent, name, team_type)
-    list = Object.const_get(team_type + 'Team').find(:all, :conditions => ['parent_id = ? and name = ?', parent.id, name])
+    list = Object.const_get(team_type + 'Team').all(:conditions => ['parent_id = ? and name = ?', parent.id, name])
     if list.length > 0
       raise TeamExistsError, 'Team name, "' + name + '", is already in use.'
     end
   end
 
   def self.delete_all_by_parent(parent)
-    teams = Team.find(:all, :conditions => ["parent_id=?", parent.id])
+    teams = Team.all(:conditions => ["parent_id=?", parent.id])
 
     for team in teams
       team.delete
@@ -117,7 +117,7 @@ class Team < ActiveRecord::Base
   # @param team_type [Object]
   # @param team_size [Object]
   def self.randomize_all_by_parent(parent, team_type, team_size)
-    participants = Participant.find(:all, :conditions => ["parent_id = ? AND type = ?", parent.id, parent.class.to_s + "Participant"])
+    participants = Participant.all(:conditions => ["parent_id = ? AND type = ?", parent.id, parent.class.to_s + "Participant"])
     participants = participants.sort{rand(3) - 1}
     users = participants.map{|p| User.find_by_id(p.user_id)}
     #users = users.uniq

@@ -6,7 +6,7 @@ class MenuItem < ActiveRecord::Base
   validates_uniqueness_of :name
 
   def delete
-    children = MenuItem.find(:all, :conditions => ['parent_id = ?',self.id])
+    children = MenuItem.all(:conditions => ['parent_id = ?',self.id])
     children.each {|child| child.delete }
     self.destroy
   end

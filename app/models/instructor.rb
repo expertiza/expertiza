@@ -16,7 +16,7 @@ class Instructor < User
   end
 
   def list_mine(object_type, user_id)
-    object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
+    object_type.all(:conditions => ["instructor_id = ?", user_id])
   end
 
   def get(object_type, id, user_id)

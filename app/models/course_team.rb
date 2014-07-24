@@ -38,7 +38,7 @@ class CourseTeam < Team
 
   def export_participants
     userNames = Array.new
-    participants = TeamsUser.find(:all, :conditions => ['team_id = ?', self.id])
+    participants = TeamsUser.all(:conditions => ['team_id = ?', self.id])
     participants.each do |participant|
       userNames.push(participant.name)
       userNames.push(" ")
@@ -145,7 +145,7 @@ class CourseTeam < Team
           teamUsers = Array.new
           tcsv.push(team.name)
           if (options["team_name"] == "true")
-            teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
+            teamMembers = TeamsUser.all(:conditions => ['team_id = ?', team.id])
             teamMembers.each do |user|
               teamUsers.push(user.name)
               teamUsers.push(" ")

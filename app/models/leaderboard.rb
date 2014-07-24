@@ -13,7 +13,7 @@ class Leaderboard < ActiveRecord::Base
 
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
   def self.getIndependantAssignments(user_id)
-    userAssignments = AssignmentParticipant.find(:all, :conditions =>["user_id = ? ", user_id])
+    userAssignments = AssignmentParticipant.all(:conditions =>["user_id = ? ", user_id])
     noCourseAssignments = Array.new
     for ua in userAssignments
       noCA = Assignment.find(:first, :conditions =>["id = ? and course_id is NULL", ua.parent_id])
@@ -72,7 +72,7 @@ class Leaderboard < ActiveRecord::Base
       end
       @revqids = []
       differentQuestionnaires = Hash.new
-      @revqids = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id = ?",assgt.id])
+      @revqids = AssignmentQuestionnaire.all(:conditions => ["assignment_id = ?",assgt.id])
       @revqids.each do |rqid|
         rtype = Questionnaire.find(rqid.questionnaire_id).type
         if( rtype == 'ReviewQuestionnaire')

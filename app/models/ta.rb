@@ -12,7 +12,7 @@ class Ta < User
   end
 
   def list_all(object_type, user_id)
-    object_type.find(:all, 
+    object_type.all(
                      :conditions => ["instructor_id = ? OR private = 0", user_id])
   end
   
@@ -33,7 +33,7 @@ class Ta < User
       Assignment.find_by_sql(["select assignments.id, assignments.name, assignments.directory_path " +
       "from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?",user_id])    
     else
-      object_type.find(:all, :conditions => ["instructor_id = ?", user_id])      
+      object_type.all(:conditions => ["instructor_id = ?", user_id])      
     end
   end
   

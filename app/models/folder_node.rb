@@ -4,7 +4,7 @@ class FolderNode < Node
 
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil,search=nil)
 
-    find(:all, :include => :folder, :conditions => ['type = ? and tree_folders.parent_id is NULL',self.to_s])
+    all(:include => :folder, :conditions => ['type = ? and tree_folders.parent_id is NULL',self.to_s])
 
   end
 

@@ -121,10 +121,10 @@ class AssignmentParticipant < Participant
   def reviewees
     reviewees = []
     if self.assignment.team_assignment?
-      rmaps = ResponseMap.find(:all, conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
+      rmaps = ResponseMap.all(conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
         rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
     else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
+      rmaps = ResponseMap.all(:conditions => ["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
         rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
     end
 
@@ -135,9 +135,9 @@ class AssignmentParticipant < Participant
   def get_reviewers
     reviewers = []
     if self.assignment.team_assignment? && self.team
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
+      rmaps = ResponseMap.all(:conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
     else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      rmaps = ResponseMap.all(:conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
     end
     rmaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
@@ -471,7 +471,7 @@ class AssignmentParticipant < Participant
       user = ImportFileHelper::create_new_user(attributes,session)
     end
     raise ImportError, "The assignment with id \""+id.to_s+"\" was not found." if Assignment.find(id) == nil
-    if find(:all, {conditions: ['user_id=? && parent_id=?', user.id, id]}).size == 0
+    if all({conditions: ['user_id=? && parent_id=?', user.id, id]}).size == 0
       new_part = AssignmentParticipant.create(:user_id => user.id, :parent_id => id)
       new_part.set_handle()
     end

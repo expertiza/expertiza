@@ -46,7 +46,7 @@ class AssignmentNode < Node
     else
       find_conditions = [conditions, values]
     end
-    find(:all, :include => :assignment, :conditions => find_conditions, :order => "assignments.#{sortvar} #{sortorder}")
+    all( :include => :assignment, :conditions => find_conditions, :order => "assignments.#{sortvar} #{sortorder}")
 
   end
 

@@ -24,11 +24,11 @@ class SuperAdministrator < User
   end
 
   def list_all(object_type, user_id)
-    object_type.find(:all, :conditions => "private = 0")
+    object_type.all(:conditions => "private = 0")
   end
 
   def list_all_private(object_type, user_id)
-    object_type.find(:all, :conditions => "private = 1")
+    object_type.all(:conditions => "private = 1")
   end
 
   def list_admins(object_type, user_id)

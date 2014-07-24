@@ -37,10 +37,10 @@ class ScoreCache < ActiveRecord::Base
 
     if tm_user_ct == tm_rv_ct and sc_proj != nil
 
-      sc_cls = ScoreCache.find(:all, :conditions => ["object_type = ?", "TeammateReviewResponseMap"])
+      sc_cls = ScoreCache.all(:conditions => ["object_type = ?", "TeammateReviewResponseMap"])
       ct_cls = ScoreCache.count(:all, :conditions => ["object_type = ?", "TeammateReviewResponseMap"])
 
-      tm_rv_all = ScoreCache.find(:all, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "TeammateReviewResponseMap"])
+      tm_rv_all = ScoreCache.all(:conditions => ["reviewee_id = ? and object_type = ?", tm_id, "TeammateReviewResponseMap"])
 
 
       avg_cls = 0
@@ -148,7 +148,7 @@ class ScoreCache < ActiveRecord::Base
 
     end
 
-    score_all = ScoreCache.find(:all, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "ModifiedAssignmentScore"])
+    score_all = ScoreCache.all(:conditions => ["reviewee_id = ? and object_type = ?", tm_id, "ModifiedAssignmentScore"])
     ##################end###########################
   end
 

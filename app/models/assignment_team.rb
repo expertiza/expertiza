@@ -38,13 +38,13 @@ class AssignmentTeam < Team
   end
 
   def reviewed_contributor?(contributor)
-    TeamReviewResponseMap.find(:all, conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
+    TeamReviewResponseMap.all(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
   end
 
   # END of contributor methods
 
   def participants
-    @participants ||= AssignmentParticipant.find(:all, conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
+    @participants ||= AssignmentParticipant.all(conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
   end
 
   def delete
@@ -195,7 +195,7 @@ class AssignmentTeam < Team
           team_users = Array.new
           tcsv.push(team.name)
           if options["team_name"] == "false"
-            team_members = TeamsUser.find(:all, conditions: ['team_id = ?', team.id])
+            team_members = TeamsUser.all(conditions: ['team_id = ?', team.id])
             team_members.each do |user|
               team_users.push(user.name)
               team_users.push(" ")

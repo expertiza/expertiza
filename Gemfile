@@ -5,7 +5,8 @@ ruby '1.9.3'
 gem 'rails', '~>3.0.0'
 
 ## Gems in Alphabetical Order
-# gem 'automated_metareview', github: 'expertiza/automated_metareview'
+
+gem 'RedCloth'
 gem 'bind-it'
 gem 'capistrano'
 gem 'coveralls', require: false
@@ -25,8 +26,6 @@ gem 'nokogiri'
 gem 'open-uri-cached'
 gem 'paper_trail'
 gem 'rake'
-#gem 'raspell'
-gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip', '< 1.0.0'
@@ -35,7 +34,6 @@ gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
-
 gem 'will_paginate'
 
 group :development do
@@ -48,15 +46,15 @@ group :test do
   gem 'cucumber-rails', require: false
   gem 'database_cleaner'
   gem 'gherkin'
+  gem 'guard-cucumber'
   gem 'guard-rails'
   gem 'guard-rspec'
-  gem 'guard-cucumber'
   gem 'launchy'
-  gem "minitest"
-  gem "minitest-reporters", '>= 0.5.0'
-  gem "rspec-rails"
+  gem 'minitest'
+  gem 'minitest-reporters', '>= 0.5.0'
+  gem 'rspec-rails'
   gem 'shoulda'
-  gem "test-unit"
+  gem 'test-unit'
 end
 
 group :development, :test do

@@ -147,7 +147,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  match '/import_file/import', controller: :import_file, action: :import
+  get '/import_file/import', controller: :import_file, action: :import
 
   resources :institutions
 
@@ -165,7 +165,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  match 'late_policies', controller: :late_policies, action: :index
+  get 'late_policies', controller: :late_policies, action: :index
 
   resources :leaderboard, constraints: {id: /\d+/} do
     collection do
@@ -173,7 +173,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  match 'leaderboard/index', controller: :leaderboard, action: :index
+  get 'leaderboard/index', controller: :leaderboard, action: :index
 
   resources :markup_styles
 
@@ -203,7 +203,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  match '/participants/change_handle', controller: :participants, action: :change_handle
+  get '/participants/change_handle', controller: :participants, action: :change_handle
 
   resources :password_retrieval do
     collection do
@@ -447,26 +447,26 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  match '/users/show_selection', controller: :users, action: :show_selection
-  match '/users/list', controller: :users, action: :list
-  match '/menu/*name', controller: :menu_items, action: :link
-  match ':page_name', controller: :content_pages, action: :view, method: :get
-  match '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
+  get '/users/show_selection', controller: :users, action: :show_selection
+  get '/users/list', controller: :users, action: :list
+  get '/menu/*name', controller: :menu_items, action: :link
+  get ':page_name', controller: :content_pages, action: :view, method: :get
+  get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
 
   root to: 'content_pages#view', page_name: 'home'
 
-  match 'users/list', :to => 'users#list'
+  get 'users/list', :to => 'users#list'
 
-  match '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
-  match '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'
-  match '/submitted_content/submit_file', :to => 'submitted_content#submit_file'
-  match '/review_mapping/show_available_submissions', :to => 'review_mapping#show_available_submissions'
-  match '/review_mapping/assign_reviewer_dynamically', :to => 'review_mapping#assign_reviewer_dynamically'
-  match "/review_mapping/assign_metareviewer_dynamically", :to => 'review_mapping#assign_metareviewer_dynamically'
-  match 'response/', :to => 'response#saving'
+  get '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
+  get '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'
+  get '/submitted_content/submit_file', :to => 'submitted_content#submit_file'
+  get '/review_mapping/show_available_submissions', :to => 'review_mapping#show_available_submissions'
+  get '/review_mapping/assign_reviewer_dynamically', :to => 'review_mapping#assign_reviewer_dynamically'
+  get "/review_mapping/assign_metareviewer_dynamically", :to => 'review_mapping#assign_metareviewer_dynamically'
+  get 'response/', :to => 'response#saving'
 
   get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   get ':controller/service.wsdl', :action => 'wsdl'
 
-  match ':controller(/:action(/:id))(.:format)'
+  get ':controller(/:action(/:id))(.:format)'
 end

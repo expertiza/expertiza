@@ -137,7 +137,7 @@ class GradesController < ApplicationController
   def send_grading_conflict_email
     email_form = params[:mailer]
     assignment = Assignment.find(email_form[:assignment])
-    recipient = User.find(:first, :conditions => ["email = ?", email_form[:recipients]])
+    recipient = User.where(["email = ?", email_form[:recipients]]).first
 
     body_text = email_form[:body_text]
     body_text["##[recipient_name]"] = recipient.fullname

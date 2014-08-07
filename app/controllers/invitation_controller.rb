@@ -18,12 +18,12 @@ class InvitationController < ApplicationController
     if !user
       flash[:note] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
     else
-      participant= AssignmentParticipant.first( :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
+      participant= AssignmentParticipant.first.where(['user_id =? and parent_id =?', user.id, student.parent_id])
       #check if the user is a participant of the assignment
       if !participant
         flash[:note] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
       else
-        team_member = TeamsUser.all(:conditions => ['team_id =? and user_id =?', team.id, user.id])
+        team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
         if (team_member.size > 0)
           flash[:note] = "\"#{user.name}\" is already a member of team."
@@ -51,9 +51,9 @@ class InvitationController < ApplicationController
   def update_join_team_request(user,student)
     #update the status in the join_team_request to A
     if user && student
-      participant= AssignmentParticipant.first( :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
+      participant= AssignmentParticipant.where(['user_id =? and parent_id =?', user.id, student.parent_id]).first
       if participant
-        old_entry = JoinTeamRequest.first(:conditions => ['participant_id =? and team_id =?', participant.id,params[:team_id]])
+        old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id,params[:team_id]]).first
         if old_entry
           old_entry.update_attribute("status",'A')
         end

@@ -85,7 +85,6 @@ class StudentTeamController < ApplicationController
 
     #remove the entry from teams_users
     user = TeamsUser.where(["team_id =? and user_id =?", params[:team_id], @student.user_id]).first
-#   user = TeamsUser.find(:first, :conditions =>["team_id =? and user_id =?", params[:team_id], @student.user_id])
     if user
       user.destroy
 

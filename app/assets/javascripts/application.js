@@ -20,6 +20,10 @@
 //= require_tree .
 //= require_self
 
+$(document).on('ready page:load', function() {
+  $(this).trigger('turbo:ready');
+});
+
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase();
 }

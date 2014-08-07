@@ -76,9 +76,7 @@ class ControllerAction < ActiveRecord::Base
 
   def self.find_for_permission(p_ids)
     if p_ids and p_ids.length > 0
-      return find(:all,
-                  :conditions => ['permission_id in (?)', p_ids],
-                  :order => 'name')
+      return where(['permission_id in (?)', p_ids].order('name')
     else
       return Array.new
     end

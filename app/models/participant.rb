@@ -36,7 +36,7 @@ class Participant < ActiveRecord::Base
   def delete(force = nil)
 
     # TODO How do we test this code?  #need a controller test_oss808
-    maps = ResponseMap.all(:conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
+    maps = ResponseMap.where(['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
 
     if force or ((maps.nil? or maps.length == 0) and
                  self.team.nil?)

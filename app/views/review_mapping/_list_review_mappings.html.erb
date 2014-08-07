@@ -1,6 +1,6 @@
 <table width="100%" cellpadding="10">
   <tr CLASS="head" >
-    <% has_signup_sheet = !(SignUpTopic.find(:first, :conditions => ['assignment_id = ?', assignment.id])).nil? %>
+    <% has_signup_sheet = !(SignUpTopic.where(['assignment_id = ?', assignment.id])).first.nil? %>
     <% if has_signup_sheet %>
       <th width="20%">Topic selected</th>
     <%end%>

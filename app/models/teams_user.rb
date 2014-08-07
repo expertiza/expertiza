@@ -27,7 +27,7 @@ class TeamsUser < ActiveRecord::Base
 
   #Removes entry in the TeamUsers table for the given user and given team id
   def self.remove_team(user_id, team_id)
-    team_user = TeamsUser.find(:first, :conditions => ['user_id = ? and team_id = ?', user_id, team_id])
+    team_user = TeamsUser.where(['user_id = ? and team_id = ?', user_id, team_id]).first
     if team_user != nil
       team_user.destroy
     end
@@ -46,9 +46,9 @@ class TeamsUser < ActiveRecord::Base
 
   #Add member to the team they were invited to and accepted the invite for
   def self.add_member_to_invited_team(invitee_user_id, invited_user_id, assignment_id)
-    users_teams = TeamsUser.all(:conditions => ['user_id = ?', invitee_user_id])
+    users_teams = TeamsUser.where(['user_id = ?', invitee_user_id])
     for team in users_teams
-      new_team = AssignmentTeam.find(:first, :conditions => ['id = ? and parent_id = ?', team.team_id, assignment_id])
+      new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
       if new_team != nil
         can_add_member = new_team.add_member(User.find(invited_user_id), assignment_id)
       end

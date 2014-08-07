@@ -12,7 +12,7 @@ end %>
       <% selected = @assignment.questionnaires.find_by_type('ReviewQuestionnaire') %>
       <select style="width:250px" name="questionnaires[review]">
         <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
-        <% ReviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
+        <% ReviewQuestionnaire.where(['private = 0 or instructor_id = ?',user_id]).order("name").each{
           | questionnaire | %>
         <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id %>selected="yes"<%end%>><%=questionnaire.name %></option>
         <% @assignment.review_questionnaire_id = questionnaire.id %>
@@ -34,7 +34,7 @@ end %>
     <% selected = @assignment.questionnaires.find_by_type('MetareviewQuestionnaire') %>
     <select style="width:250px" name="questionnaires[metareview]">
       <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
-      <% MetareviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
+      <% MetareviewQuestionnaire.where(['private = 0 or instructor_id = ?',user_id].order("name").each{
         | questionnaire | %>
       <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
     <% } %>
@@ -52,7 +52,7 @@ end %>
        <% selected = @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire') %>
        <select style="width:250px" name="questionnaires[feedback]">
          <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
-         <% AuthorFeedbackQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
+         <% AuthorFeedbackQuestionnaire.where(['private = 0 or instructor_id = ?',user_id].order("name").each{
            | questionnaire | %>
          <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
        <% } %>
@@ -71,7 +71,7 @@ end %>
      <% selected = @assignment.questionnaires.find_by_type('BookmarkratingQuestionnaire') %>
      <select style="width:250px" name="questionnaires[bookmarkrating]">
        <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
-       <% BookmarkratingQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
+       <% BookmarkratingQuestionnaire.where(['private = 0 or instructor_id = ?',user_id].order("name").each{
          | questionnaire | %>
        <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
      <% } %>
@@ -91,7 +91,7 @@ end %>
       <% selected = @assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') %>
       <select style="width:250px" name="questionnaires[teammate]">
         <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
-        <% TeammateReviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id], :order => "name").each{
+        <% TeammateReviewQuestionnaire.where(['private = 0 or instructor_id = ?',user_id]).order("name").each{
           | questionnaire | %>
         <option value="<%=questionnaire.id%>" <% if selected != nil and questionnaire.id == selected.id%>selected="yes"<%end%>><%=questionnaire.name %></option>
       <% } %>

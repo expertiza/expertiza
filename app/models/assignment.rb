@@ -209,8 +209,8 @@ class Assignment < ActiveRecord::Base
 
   def quiz_taken_by?(contributor, reviewer)
     quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id).id
-    return QuizResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
-                                                 contributor.id, reviewer.id, quiz_id]) > 0
+    return QuizResponseMap.where(['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
+                                  contributor.id, reviewer.id, quiz_id]).count > 0
   end
 
   # Returns a contributor to review if available, otherwise will raise an error

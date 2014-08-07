@@ -17,7 +17,7 @@ class CoursesUsers < ActiveRecord::Base
     if course == nil
       raise ImportError, "The course with id \""+id.to_s+"\" was not found."
     end
-    if (CoursesUsers.all({:conditions => ['user_id=? AND course_id=?', user.id, course.id]}).size == 0)
+    if (CoursesUsers.where(['user_id=? AND course_id=?', user.id, course.id]).count.zero?)
       CoursesUsers.create :user_id => user.id, :course_id => course.id
     end
   end
